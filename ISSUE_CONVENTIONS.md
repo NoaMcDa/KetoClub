@@ -54,6 +54,60 @@ When creating an issue, include:
    - Link to any dependent or related issues
    - Example: `Blocks #123`, `Related to #456`
 
+## Tests Required
+
+**All feature issues MUST include unit and flow tests.** Specify in the acceptance criteria:
+
+- **Unit Tests**: What functionality needs isolated testing?
+  - Example: "Test WoltApiClient.fetchMenu() with valid/invalid JSON"
+  - See `UNIT_TEST_CONVENTIONS.md` for guidelines
+  
+- **Flow Tests**: What user journeys validate this feature?
+  - Example: "User searches venue → views menu → sees classifications"
+  - See `FLOW_TEST_CONVENTIONS.md` for guidelines
+
+- **Coverage Target**: Specify expected code coverage
+  - Services: 80%+
+  - Models: 90%+
+  - Utilities: 75%+
+
+### Example
+
+```
+## Acceptance Criteria
+- [x] WoltApiClient fetches menu from API
+- [x] Response is parsed into Dart models
+- [x] Network errors are handled gracefully
+- [ ] Unit tests pass with 80%+ coverage
+- [ ] Flow test: User views Wolt menu successfully
+- [ ] Documentation updated in CLAUDE.md
+```
+
+## Technology Research
+
+**If an issue requires new libraries, APIs, or integrations, include research:**
+
+- **Library Evaluation**: Compare options (e.g., geolocator vs. location package)
+- **API Documentation**: Research external service requirements
+- **Integration Challenges**: Note any known compatibility issues
+- **Decision Record**: Document which technology was chosen and why
+
+### Example
+
+```
+## Technology Research
+- [ ] Research geolocator package for iOS/Android/Web support
+- [ ] Verify Wolt API rate limits and CORS requirements
+- [ ] Confirm http package version compatibility with Flutter 3.x
+- [ ] Check if location permissions differ between platforms
+
+## Decision
+Use `geolocator` because:
+- Supports web, iOS, Android from single codebase
+- Well-maintained with good documentation
+- Permission handling built-in for all platforms
+```
+
 ## Phase Assignment
 
 Assign issues to one of the four project phases:
@@ -83,14 +137,27 @@ Description:
 Fetch restaurant menus directly from Wolt's API and parse the JSON response into Dart models.
 
 Context:
-This is the first API integration and should be completed in Phase 1. Wolt has no auth requirements, making it the ideal starting point.
+This is the first API integration and should be completed in Phase 1. Wolt has no auth 
+requirements, making it the ideal starting point.
 
 Acceptance Criteria:
 - WoltApiClient class fetches menu data from https://restaurant-api.wolt.com/v4/venues/slug/{venue_slug}/menu/data
 - JSON response is parsed into Menu, Dish, and DishModifier models
 - Handles network errors gracefully (timeout, 404, 500)
-- Unit tests cover successful fetch and error cases
+- Unit tests cover successful fetch and error cases (80%+ coverage)
+- Flow test: User can load Wolt menu and see dish classifications
 - Documented in code with example usage
+
+Technology Research:
+- [x] Reviewed Wolt API documentation and endpoint structure
+- [x] Confirmed http package compatibility with Flutter 3.x
+- [x] Verified no CORS issues for web platform
+- Decision: Use http package (lightweight, no additional dependencies)
+
+Tests Required:
+- Unit: WoltApiClient.fetchMenu() with valid JSON, malformed JSON, timeout, 404
+- Unit: Menu.fromJson() serialization/deserialization
+- Flow: User navigates to venue with Wolt menu, verifies dishes display
 
 Related Issues:
 Blocks #2 (Menu classifier), Related to #1 (Restaurant API research)
