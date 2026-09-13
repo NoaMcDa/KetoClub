@@ -16,8 +16,7 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 
-import '../../test/fakes/fake_app_dependencies.dart';
-import '../support/flow_harness.dart';
+import 'flow_support.dart';
 
 /// The OpenRouter key typed into Settings in the happy-path journey. Not a
 /// real key; the fakes never validate its shape.
