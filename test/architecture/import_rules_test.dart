@@ -40,6 +40,21 @@ const serviceRank = <String, int>{
   'classifier': 1,
 };
 
+/// Paths under lib/ that hold generated code, as lib-relative prefixes.
+///
+/// These rules police the layering of code a person wrote. `flutter gen-l10n`
+/// emits a base class and one subclass per locale that import each other, so
+/// its output contains a cycle no author can remove. The same directory is
+/// already excluded from the analyzer (analysis_options.yaml), from the
+/// coverage gate (tool/coverage_gate.sh) and from the all-imports helper
+/// (tool/gen_coverage_helper.sh); excluding it here keeps the four gates
+/// consistent. Regenerate it with `flutter gen-l10n`, never by hand.
+const generatedPrefixes = <String>['l10n/generated/'];
+
+/// Whether [relativePath] is generated output rather than authored code.
+bool isGenerated(String relativePath) =>
+    generatedPrefixes.any(relativePath.startsWith);
+
 /// Layers that must not import Flutter beyond foundation.dart.
 const pureDartLayers = <String>{'models', 'utils', 'services'};
 
@@ -95,6 +110,7 @@ Map<String, _LibFile> _readLib() {
   final files = <String, _LibFile>{};
   for (final file in dartFiles) {
     final relative = _toLibRelative(file.path);
+    if (isGenerated(relative)) continue;
     final source = file.readAsStringSync();
     final resolved = <String>[];
     for (final m in _directive.allMatches(source)) {

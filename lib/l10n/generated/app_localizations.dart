@@ -1,0 +1,464 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart' as intl;
+
+import 'app_localizations_en.dart';
+import 'app_localizations_he.dart';
+
+// ignore_for_file: type=lint
+
+/// Callers can lookup localized strings with an instance of AppLocalizations
+/// returned by `AppLocalizations.of(context)`.
+///
+/// Applications need to include `AppLocalizations.delegate()` in their app's
+/// `localizationDelegates` list, and the locales they support in the app's
+/// `supportedLocales` list. For example:
+///
+/// ```dart
+/// import 'generated/app_localizations.dart';
+///
+/// return MaterialApp(
+///   localizationsDelegates: AppLocalizations.localizationsDelegates,
+///   supportedLocales: AppLocalizations.supportedLocales,
+///   home: MyApplicationHome(),
+/// );
+/// ```
+///
+/// ## Update pubspec.yaml
+///
+/// Please make sure to update your pubspec.yaml to include the following
+/// packages:
+///
+/// ```yaml
+/// dependencies:
+///   # Internationalization support.
+///   flutter_localizations:
+///     sdk: flutter
+///   intl: any # Use the pinned version from flutter_localizations
+///
+///   # Rest of dependencies
+/// ```
+///
+/// ## iOS Applications
+///
+/// iOS applications define key application metadata, including supported
+/// locales, in an Info.plist file that is built into the application bundle.
+/// To configure the locales supported by your app, you’ll need to edit this
+/// file.
+///
+/// First, open your project’s ios/Runner.xcworkspace Xcode workspace file.
+/// Then, in the Project Navigator, open the Info.plist file under the Runner
+/// project’s Runner folder.
+///
+/// Next, select the Information Property List item, select Add Item from the
+/// Editor menu, then select Localizations from the pop-up menu.
+///
+/// Select and expand the newly-created Localizations item then, for each
+/// locale your application supports, add a new item and select the locale
+/// you wish to add from the pop-up menu in the Value field. This list should
+/// be consistent with the languages listed in the AppLocalizations.supportedLocales
+/// property.
+abstract class AppLocalizations {
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+
+  final String localeName;
+
+  static AppLocalizations? of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+  }
+
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
+
+  /// A list of this localizations delegate along with the default localizations
+  /// delegates.
+  ///
+  /// Returns a list of localizations delegates containing this delegate along with
+  /// GlobalMaterialLocalizations.delegate, GlobalCupertinoLocalizations.delegate,
+  /// and GlobalWidgetsLocalizations.delegate.
+  ///
+  /// Additional delegates can be added by appending to this list in
+  /// MaterialApp. This list does not have to be used at all if a custom list
+  /// of delegates is preferred or required.
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
+
+  /// A list of this localizations delegate's supported locales.
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('en'),
+    Locale('he'),
+  ];
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTitle;
+
+  /// No description provided for @actionRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get actionRetry;
+
+  /// No description provided for @actionReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Report this'**
+  String get actionReport;
+
+  /// No description provided for @actionOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get actionOpenSettings;
+
+  /// No description provided for @actionCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get actionCopy;
+
+  /// No description provided for @actionCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get actionCopied;
+
+  /// No description provided for @venueSearchLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Restaurant link'**
+  String get venueSearchLabel;
+
+  /// No description provided for @venueSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste a Wolt link, or a venue slug'**
+  String get venueSearchHint;
+
+  /// No description provided for @venueSearchInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub cannot read a menu from that yet. Paste a Wolt restaurant link or its slug.'**
+  String get venueSearchInvalid;
+
+  /// No description provided for @venueSearchOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the keto menu'**
+  String get venueSearchOpen;
+
+  /// No description provided for @menuLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading the menu…'**
+  String get menuLoading;
+
+  /// No description provided for @menuEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'This menu has no dishes.'**
+  String get menuEmpty;
+
+  /// No description provided for @filterGreenOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Order as-is only'**
+  String get filterGreenOnly;
+
+  /// No description provided for @filterGreenAndYellow.
+  ///
+  /// In en, this message translates to:
+  /// **'As-is and with changes'**
+  String get filterGreenAndYellow;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything'**
+  String get filterAll;
+
+  /// No description provided for @redGroupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not keto ({count})'**
+  String redGroupTitle(int count);
+
+  /// No description provided for @unclassifiedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not read ({count})'**
+  String unclassifiedTitle(int count);
+
+  /// No description provided for @unclassifiedExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub saw these dishes but could not place them. Read them yourself before ordering.'**
+  String get unclassifiedExplain;
+
+  /// No description provided for @engineChipAi.
+  ///
+  /// In en, this message translates to:
+  /// **'AI'**
+  String get engineChipAi;
+
+  /// No description provided for @engineChipRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Rules'**
+  String get engineChipRules;
+
+  /// No description provided for @rulesNotVerifiedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Rule-based result, not AI-verified.'**
+  String get rulesNotVerifiedHint;
+
+  /// No description provided for @cachedFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing the menu saved on {date}.'**
+  String cachedFrom(String date);
+
+  /// No description provided for @verdictOrderAsIs.
+  ///
+  /// In en, this message translates to:
+  /// **'Order as-is'**
+  String get verdictOrderAsIs;
+
+  /// No description provided for @verdictModifiable.
+  ///
+  /// In en, this message translates to:
+  /// **'Order with a change'**
+  String get verdictModifiable;
+
+  /// No description provided for @verdictNonKeto.
+  ///
+  /// In en, this message translates to:
+  /// **'Not keto'**
+  String get verdictNonKeto;
+
+  /// No description provided for @waiterCardOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the waiter card'**
+  String get waiterCardOpen;
+
+  /// No description provided for @waiterCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Say this to the waiter'**
+  String get waiterCardTitle;
+
+  /// No description provided for @settingsKeySection.
+  ///
+  /// In en, this message translates to:
+  /// **'OpenRouter key'**
+  String get settingsKeySection;
+
+  /// No description provided for @settingsKeyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste your OpenRouter key'**
+  String get settingsKeyHint;
+
+  /// No description provided for @settingsKeySave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save key'**
+  String get settingsKeySave;
+
+  /// No description provided for @settingsKeyPresent.
+  ///
+  /// In en, this message translates to:
+  /// **'A key is stored on this device.'**
+  String get settingsKeyPresent;
+
+  /// No description provided for @settingsKeyAbsent.
+  ///
+  /// In en, this message translates to:
+  /// **'No key stored. KetoClub will use on-device rules.'**
+  String get settingsKeyAbsent;
+
+  /// No description provided for @settingsKeyDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove key'**
+  String get settingsKeyDelete;
+
+  /// No description provided for @settingsWebStorageNote.
+  ///
+  /// In en, this message translates to:
+  /// **'On the web the key is kept in browser storage, which protects it less well than a phone\'s keychain.'**
+  String get settingsWebStorageNote;
+
+  /// No description provided for @settingsConsentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What leaves this device'**
+  String get settingsConsentTitle;
+
+  /// No description provided for @settingsConsentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'With a key, dish names, descriptions and option labels from the menu you open are sent to OpenRouter for analysis. Nothing about you, your location or your history is sent. Menus are read straight from the restaurant platform, which receives only the venue identifier. There is no other server and no analytics.'**
+  String get settingsConsentBody;
+
+  /// No description provided for @settingsConsentAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand'**
+  String get settingsConsentAccept;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get settingsLanguage;
+
+  /// No description provided for @settingsLanguageSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Match my device'**
+  String get settingsLanguageSystem;
+
+  /// No description provided for @settingsLanguageEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get settingsLanguageEnglish;
+
+  /// No description provided for @settingsLanguageHebrew.
+  ///
+  /// In en, this message translates to:
+  /// **'Hebrew'**
+  String get settingsLanguageHebrew;
+
+  /// No description provided for @settingsFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Default filter'**
+  String get settingsFilter;
+
+  /// No description provided for @settingsClearCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear saved menus'**
+  String get settingsClearCache;
+
+  /// No description provided for @settingsCacheCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved menus cleared.'**
+  String get settingsCacheCleared;
+
+  /// No description provided for @fetchFailedOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection, so the menu could not be read.'**
+  String get fetchFailedOffline;
+
+  /// No description provided for @fetchFailedNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No venue found on {platform}. Check the link.'**
+  String fetchFailedNotFound(String platform);
+
+  /// No description provided for @fetchFailedPlatformChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'{platform} changed its menu format (HTTP {statusCode}), so KetoClub could not read it. Please report this.'**
+  String fetchFailedPlatformChanged(String platform, String statusCode);
+
+  /// No description provided for @fetchFailedUnsupportedSource.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub cannot read menus from that site yet.'**
+  String get fetchFailedUnsupportedSource;
+
+  /// No description provided for @analysisNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an OpenRouter key in Settings for AI analysis.'**
+  String get analysisNotConfigured;
+
+  /// No description provided for @analysisOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline. Showing rule-based results.'**
+  String get analysisOffline;
+
+  /// No description provided for @analysisTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI model was too slow. Showing rule-based results.'**
+  String get analysisTimeout;
+
+  /// No description provided for @analysisRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'The daily AI limit for this key is used up. Showing rule-based results.'**
+  String get analysisRateLimited;
+
+  /// No description provided for @analysisUnauthorised.
+  ///
+  /// In en, this message translates to:
+  /// **'OpenRouter rejected your key, so nothing was analysed.'**
+  String get analysisUnauthorised;
+
+  /// No description provided for @analysisBadResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'AI analysis failed ({detail}). Showing rule-based results.'**
+  String analysisBadResponse(String detail);
+
+  /// No description provided for @analysisNoDishesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI could not identify any dishes on this menu.'**
+  String get analysisNoDishesFound;
+}
+
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
+  const _AppLocalizationsDelegate();
+
+  @override
+  Future<AppLocalizations> load(Locale locale) {
+    return SynchronousFuture<AppLocalizations>(lookupAppLocalizations(locale));
+  }
+
+  @override
+  bool isSupported(Locale locale) =>
+      <String>['en', 'he'].contains(locale.languageCode);
+
+  @override
+  bool shouldReload(_AppLocalizationsDelegate old) => false;
+}
+
+AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when only language code is specified.
+  switch (locale.languageCode) {
+    case 'en':
+      return AppLocalizationsEn();
+    case 'he':
+      return AppLocalizationsHe();
+  }
+
+  throw FlutterError(
+    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.',
+  );
+}

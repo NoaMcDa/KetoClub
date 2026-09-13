@@ -1,0 +1,87 @@
+{
+  "@@locale": "he",
+
+  "settingsTitle": "הגדרות",
+  "actionRetry": "נסה שוב",
+  "actionReport": "דווח על זה",
+  "actionOpenSettings": "פתח הגדרות",
+  "actionCopy": "העתק",
+  "actionCopied": "הועתק",
+
+  "venueSearchLabel": "קישור למסעדה",
+  "venueSearchHint": "הדביקו קישור מוולט, או מזהה מסעדה",
+  "venueSearchInvalid": "קטוקלאב לא יודע לקרוא תפריט משם עדיין. הדביקו קישור למסעדה בוולט או את המזהה שלה.",
+  "venueSearchOpen": "הצג תפריט קטוגני",
+
+  "menuLoading": "קורא את התפריט…",
+  "menuEmpty": "בתפריט הזה אין מנות.",
+  "filterGreenOnly": "רק מנות להזמנה כמו שהן",
+  "filterGreenAndYellow": "כמו שהן ועם שינוי",
+  "filterAll": "הכול",
+  "redGroupTitle": "לא קטוגני ({count})",
+  "@redGroupTitle": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "unclassifiedTitle": "לא נקראו ({count})",
+  "@unclassifiedTitle": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "unclassifiedExplain": "קטוקלאב ראה את המנות האלה אבל לא הצליח לסווג אותן. קראו אותן בעצמכם לפני שאתם מזמינים.",
+  "engineChipAi": "בינה מלאכותית",
+  "engineChipRules": "כללים",
+  "rulesNotVerifiedHint": "תוצאה על בסיס כללים, ללא אימות בינה מלאכותית.",
+  "cachedFrom": "מוצג התפריט שנשמר בתאריך {date}.",
+  "@cachedFrom": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+
+  "verdictOrderAsIs": "להזמין כמו שזה",
+  "verdictModifiable": "להזמין עם שינוי",
+  "verdictNonKeto": "לא קטוגני",
+
+  "waiterCardOpen": "הצג כרטיס למלצר",
+  "waiterCardTitle": "זה מה שאומרים למלצר",
+
+  "settingsKeySection": "מפתח OpenRouter",
+  "settingsKeyHint": "הדביקו את מפתח ה‑OpenRouter שלכם",
+  "settingsKeySave": "שמור מפתח",
+  "settingsKeyPresent": "מפתח שמור במכשיר הזה.",
+  "settingsKeyAbsent": "אין מפתח שמור. קטוקלאב ישתמש בכללים שעל המכשיר.",
+  "settingsKeyDelete": "הסר מפתח",
+  "settingsWebStorageNote": "בדפדפן המפתח נשמר באחסון הדפדפן, שמגן עליו פחות טוב מהכספת של הטלפון.",
+  "settingsConsentTitle": "מה יוצא מהמכשיר הזה",
+  "settingsConsentBody": "כשיש מפתח, שמות המנות, התיאורים ושמות התוספות מהתפריט שאתם פותחים נשלחים ל‑OpenRouter לניתוח. שום דבר עליכם, על מקומכם או על ההיסטוריה שלכם לא נשלח. התפריטים נקראים ישירות מפלטפורמת המסעדה, שמקבלת רק את מזהה המסעדה. אין שרת אחר ואין איסוף נתונים.",
+  "settingsConsentAccept": "הבנתי",
+  "settingsLanguage": "שפה",
+  "settingsLanguageSystem": "לפי המכשיר",
+  "settingsLanguageEnglish": "אנגלית",
+  "settingsLanguageHebrew": "עברית",
+  "settingsFilter": "סינון ברירת מחדל",
+  "settingsClearCache": "נקה תפריטים שמורים",
+  "settingsCacheCleared": "התפריטים השמורים נוקו.",
+
+  "fetchFailedOffline": "אין חיבור, ולכן לא היה אפשר לקרוא את התפריט.",
+  "fetchFailedNotFound": "לא נמצאה מסעדה ב{platform}. בדקו את הקישור.",
+  "@fetchFailedNotFound": {
+    "placeholders": { "platform": { "type": "String" } }
+  },
+  "fetchFailedPlatformChanged": "{platform} שינתה את מבנה התפריט (HTTP {statusCode}), ולכן קטוקלאב לא הצליח לקרוא אותו. אנא דווחו על זה.",
+  "@fetchFailedPlatformChanged": {
+    "placeholders": {
+      "platform": { "type": "String" },
+      "statusCode": { "type": "String" }
+    }
+  },
+  "fetchFailedUnsupportedSource": "קטוקלאב לא יודע לקרוא תפריטים מהאתר הזה עדיין.",
+
+  "analysisNotConfigured": "הוסיפו מפתח OpenRouter בהגדרות כדי לקבל ניתוח בינה מלאכותית.",
+  "analysisOffline": "לא מחוברים. מוצגות תוצאות על בסיס כללים.",
+  "analysisTimeout": "מודל הבינה המלאכותית היה אטי מדי. מוצגות תוצאות על בסיס כללים.",
+  "analysisRateLimited": "המגבלה היומית של הבינה המלאכותית למפתח הזה נגמרה. מוצגות תוצאות על בסיס כללים.",
+  "analysisUnauthorised": "OpenRouter דחתה את המפתח שלכם, ולכן שום דבר לא נותח.",
+  "analysisBadResponse": "ניתוח הבינה המלאכותית נכשל ({detail}). מוצגות תוצאות על בסיס כללים.",
+  "@analysisBadResponse": {
+    "placeholders": { "detail": { "type": "String" } }
+  },
+  "analysisNoDishesFound": "הבינה המלאכותית לא הצליחה לזהות מנות בתפריט הזה."
+}
