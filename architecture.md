@@ -1,8 +1,9 @@
 # KetoClub — Architecture
 
-**Status:** design document. No application code exists yet; this file is the
-blueprint the first implementation follows. When code and this document disagree,
-fix one of them in the same pull request.
+**Status:** living design document. The Flutter skeleton, the composition root
+and the CI pipeline exist (build-order step 1, §16); every feature below is still to
+be built. When code and this document disagree, fix one of them in the same pull
+request.
 
 **Audience:** anyone about to write the first line of Dart for KetoClub, and anyone
 reviewing it.
@@ -38,6 +39,14 @@ notes). The resolutions are recorded in §14 so nobody has to re-derive them.
 15. [Testing strategy](#15-testing-strategy)
 16. [Build order and extension points](#16-build-order-and-extension-points)
 17. [Open questions](#17-open-questions)
+18. [Engineering standards](#18-engineering-standards)
+    - 18.1 SOLID, as concrete rules for this codebase
+    - 18.2 The import graph is a DAG
+    - 18.3 Clean-code rules
+    - 18.4 Tests from day one
+    - 18.5 Continuous integration
+    - 18.6 Definition of Done for a pull request
+    - 18.7 What these standards changed in the architecture
 
 ---
 
@@ -71,7 +80,7 @@ database: everything runs on the device.
 │  │  MenuRepository ── PlatformMenuAdapter ── WoltAdapter / TenBisAdapter / …   │ │
 │  │        │                                                                    │ │
 │  │        ▼                                                                    │ │
-│  │  MenuClassifier ── ClassifierRouter ──┬── LlmMenuClassifier ── LlmChatClient│ │
+│  │  MenuClassifier ── RoutingMenuClassifier ┬── LlmMenuClassifier ── LlmChatClient│ │
 │  │                                       └── HeuristicMenuClassifier           │ │
 │  │                                                                             │ │
 │  │  LocationService      VenueSearchService      MenuCache      KeyStore       │ │
@@ -133,6 +142,11 @@ issues and reviews can cite them.
     history is sent to the model.
 12. **No test makes a network call.** Every adapter and the LLM client sit behind
     an interface with a fake; fixtures are checked-in JSON.
+13. **Engineering standards apply from the first commit.** SOLID, an acyclic
+    import graph, clean-code rules, unit and flow tests, and a CI pipeline that
+    gates every pull request are defined in §18 and are not deferred to "after the
+    MVP". The workflow, lint configuration and architecture test landed with the
+    first skeleton, before any feature code.
 
 ---
 
@@ -152,7 +166,7 @@ issues and reviews can cite them.
  adapter.normalise(json) ──► Menu { categories[ Dish{name, description, price, options} ] }
           │
           ▼
- MenuClassifier.classify(menu)           ClassifierRouter picks the engine (§6.2)
+ MenuClassifier.classify(menu)           RoutingMenuClassifier picks the engine (§6.2)
           │
           ├─ key present + online ──► LlmMenuClassifier
           │                              → MenuAnalysisPrompt (system + user + schema)
@@ -194,8 +208,9 @@ feature-per-directory split would be ceremony.
 ```
 ketoclub/
 ├── lib/
-│   ├── main.dart                         # MaterialApp, provider wiring, localisation setup
-│   ├── app.dart                          # routes, theme, RTL/LTR handling
+│   ├── main.dart                         # runApp(buildApp(buildDependencies()))
+│   ├── di.dart                           # composition root: the ONLY file that constructs concrete services
+│   ├── app.dart                          # MaterialApp, routes, theme, RTL/LTR, provider tree
 │   │
 │   ├── screens/
 │   │   ├── venue_search_screen.dart      # location + name search, paste-a-URL field
@@ -209,36 +224,46 @@ ketoclub/
 │   │   ├── waiter_script_widget.dart     # copyable instruction text
 │   │   └── engine_chip.dart              # "AI" / "rules (offline)" indicator
 │   │
-│   ├── state/                            # ChangeNotifiers consumed by screens via provider
+│   ├── state/                            # ChangeNotifiers; constructor-injected with interfaces
+│   │   ├── app_dependencies.dart         # immutable holder of service interfaces; filled by di.dart
 │   │   ├── venue_search_controller.dart
 │   │   ├── menu_controller.dart
 │   │   └── settings_controller.dart
 │   │
-│   ├── services/
-│   │   ├── menu/
-│   │   │   ├── menu_repository.dart      # cache-first load; owns the adapter registry
-│   │   │   ├── platform_menu_adapter.dart# interface: fetch + normalise
-│   │   │   ├── wolt_adapter.dart
-│   │   │   ├── tenbis_adapter.dart
-│   │   │   ├── tabit_adapter.dart        # Phase 2+
-│   │   │   └── ontopo_adapter.dart       # Phase 4 (PDF links only)
-│   │   ├── classifier/
-│   │   │   ├── menu_classifier.dart      # interface + ClassifierRouter
-│   │   │   ├── llm_menu_classifier.dart
-│   │   │   ├── menu_analysis_prompt.dart # system prompt, user prompt builder, JSON schema
-│   │   │   ├── menu_response_parser.dart # §9.4 — pure, static, never throws
-│   │   │   └── heuristic_menu_classifier.dart
-│   │   ├── llm/
+│   ├── services/                         # every folder: interface(s) + implementations + fakes-friendly seams
+│   │   ├── platform/                     # rank 0 — abstractions over the device/runtime
+│   │   │   ├── clock.dart                # abstract Clock { DateTime now(); }  (cache freshness, tests)
+│   │   │   └── connectivity.dart         # abstract Connectivity { Future<bool> isOnline(); }
+│   │   ├── storage/                      # rank 0
+│   │   │   ├── key_store.dart            # interface + SecureKeyStore (flutter_secure_storage)
+│   │   │   ├── menu_cache.dart           # interface + HiveMenuCache
+│   │   │   └── settings_store.dart       # interface + PrefsSettingsStore
+│   │   ├── llm/                          # rank 0
 │   │   │   ├── llm_chat_client.dart      # interface, ChatResult, ChatFailureReason
 │   │   │   └── open_router_client.dart   # the ONLY file that knows the OpenRouter URL
-│   │   ├── location_service.dart         # geolocator wrapper with manual fallback
-│   │   ├── venue_search_service.dart     # Wolt venue search + paste-a-URL resolver
-│   │   └── storage/
-│   │       ├── key_store.dart            # flutter_secure_storage wrapper
-│   │       ├── menu_cache.dart           # Hive box: venueRef → (menu, analysis, fetchedAt)
-│   │       └── settings_store.dart       # shared_preferences wrapper
+│   │   ├── location/                     # rank 0
+│   │   │   └── location_service.dart     # interface + GeolocatorLocationService
+│   │   ├── venue/                        # rank 0
+│   │   │   ├── venue_ref_resolver.dart   # pure: pasted URL / slug / ID → VenueRef
+│   │   │   └── venue_search_service.dart # interface + WoltVenueSearchService
+│   │   ├── menu/                         # rank 1 — may import storage/ and platform/
+│   │   │   ├── menu_repository.dart      # interface + CachedMenuRepository (cache-first, adapter registry)
+│   │   │   ├── platform_menu_adapter.dart# interface: fetch(VenueRef) → MenuFetchResult
+│   │   │   ├── wolt/
+│   │   │   │   ├── wolt_adapter.dart     # HTTP only; delegates to the mapper
+│   │   │   │   └── wolt_menu_mapper.dart # pure: Wolt JSON → Menu (fixture-tested, no I/O)
+│   │   │   ├── tenbis/                   # same split
+│   │   │   ├── tabit/                    # Phase 2+
+│   │   │   └── ontopo/                   # Phase 4 (PDF links only)
+│   │   └── classifier/                   # rank 1 — may import llm/ and platform/
+│   │       ├── menu_classifier.dart      # interface only
+│   │       ├── classifier_router.dart    # RoutingMenuClassifier: picks LLM or rules per call
+│   │       ├── llm_menu_classifier.dart
+│   │       ├── menu_analysis_prompt.dart # system prompt, user prompt builder, JSON schema
+│   │       ├── menu_response_parser.dart # §9.4 — pure, static, never throws
+│   │       └── heuristic_menu_classifier.dart
 │   │
-│   ├── models/
+│   ├── models/                           # plain Dart, immutable, no Flutter beyond foundation
 │   │   ├── venue.dart
 │   │   ├── menu.dart                     # Menu, MenuCategory, Dish, DishOption
 │   │   ├── analysis.dart                 # DishVerdict, AnalysedDish, MenuAnalysis (sealed)
@@ -255,23 +280,42 @@ ketoclub/
 │       └── app_he.arb
 │
 ├── test/
+│   ├── architecture/
+│   │   └── import_rules_test.dart        # §18.2: layer order + cycle detection over lib/
 │   ├── fixtures/                         # checked-in platform JSON + menu transcripts
-│   ├── services/                         # adapter, parser, heuristic, router tests
+│   ├── fakes/                            # one fake per interface, shared by unit and flow tests
+│   ├── services/                         # mirrors lib/services/ one-to-one
+│   ├── state/
+│   ├── utils/
+│   ├── screens/                          # one widget test per screen, dependencies faked
 │   └── widgets/
-├── integration_test/                     # end-to-end flows with the classifier faked
+├── integration_test/
+│   └── flows/                            # §18.4: user journeys on a real browser/device (FLOW_TEST_CONVENTIONS.md)
+├── test_driver/integration_test.dart     # driver for `flutter drive` on web
+├── tool/
+│   ├── check.sh                          # runs exactly what CI runs
+│   ├── coverage_gate.sh                  # fails below the coverage threshold
+│   └── gen_coverage_helper.sh            # imports every lib/ file so untested files count
+├── .github/workflows/ci.yml              # §18.5
 ├── ios/  android/  web/
 ├── pubspec.yaml
-└── analysis_options.yaml
+└── analysis_options.yaml                 # very_good_analysis + strict modes
 ```
 
-**Dependency rules, enforced by review:**
+**Dependency rules, enforced by `test/architecture/import_rules_test.dart` (§18.2):**
 
-- `models/` and `utils/` import nothing from `services/`, `state/`, `screens/`, or
-  `widgets/`, and nothing from Flutter beyond `foundation.dart`.
-- `services/` never imports `package:flutter/widgets.dart`.
+- Layer order, lowest first: `models`, `l10n` → `utils` → `services` → `state` →
+  `widgets` → `screens` → `app.dart` → `di.dart`, `main.dart`. A file may import
+  only files in its own layer or a lower one.
+- Inside `services/`, sub-packages have a rank (shown in the tree). A sub-package
+  may import only sub-packages of equal or lower rank. Within one sub-package the
+  cycle check still applies.
+- `models/`, `utils/` and `services/` import nothing from Flutter beyond
+  `package:flutter/foundation.dart`.
 - `screens/` and `widgets/` reach services only through a controller in `state/`.
-- The string `openrouter.ai` appears in exactly one file under `lib/`. The concrete
-  classifier classes are named in exactly one file: `menu_classifier.dart`'s router.
+- The full import graph of `lib/` has no cycles.
+- The string `openrouter.ai` appears in exactly one file under `lib/`. Concrete
+  service classes are constructed in exactly one file: `di.dart`.
 
 **Dependencies (initial `pubspec.yaml`):**
 
@@ -285,6 +329,9 @@ ketoclub/
 | `shared_preferences` | Non-secret settings (filters, language, last venue). |
 | `flutter_localizations` + `intl` | Hebrew and English UI, RTL, number formatting. |
 | `url_launcher` | Open the venue on the source platform. |
+
+Dev dependencies: `flutter_test` and `integration_test` (SDK), `very_good_analysis`
+(lints, §18.3). Add `fake_async` when the first timeout is under test (§18.4).
 
 Nothing else until a concrete need appears. In particular no code generation, no
 `freezed`, no `riverpod`: the app is small, and each of those adds a build step.
@@ -357,7 +404,7 @@ result is labelled as "rules" in the UI (`engine_chip.dart`) and its greens carr
 "not AI-verified" hint. Hebrew triggers live next to the English ones in
 `constants.dart` (פירה, צ'יפס, אורז, תפוח אדמה, פסטה, פיצה, לחמנייה, …).
 
-**`ClassifierRouter`** — decides, per call, in this order:
+**`RoutingMenuClassifier`** — decides, per call, in this order:
 
 1. No key stored, or estimation consent not given → heuristic, with
    `engine = rules(reason: notConfigured)`.
@@ -368,7 +415,9 @@ result is labelled as "rules" in the UI (`engine_chip.dart`) and its greens carr
    A `badResponse` or `unauthorised` failure is **not** silently papered over with
    rules: the user must see that their key or the model is the problem.
 
-The router is the one file that names concrete classifiers (constraint 4).
+`RoutingMenuClassifier` receives both engines, the `Connectivity` abstraction and
+the `KeyStore` through its constructor; `di.dart` is where the concrete engines are
+built and handed to it (constraint 4, §18.1).
 
 Dish-level output is the same from either engine:
 
@@ -808,10 +857,14 @@ live fetching**, until a CORS proxy exists (§13).
 
 ## 15. Testing strategy
 
+The pyramid, the coverage gate, and the CI wiring are defined in §18.4 and §18.5.
+This section lists what each part of the system must be tested for.
+
 - **Adapters:** one checked-in real JSON fixture per platform in `test/fixtures/`,
-  and a normalisation test that pins category count, dish count, price conversion,
-  and option flattening. Re-record the fixture when the platform changes; the test
-  failing is the alarm.
+  and a mapper test that pins category count, dish count, price conversion, and
+  option flattening. The mapper is pure, so it is tested with no HTTP at all; the
+  adapter is tested with a fake `http.Client` for status handling only. Re-record
+  the fixture when the platform changes; the test failing is the alarm.
 - **Heuristic classifier:** table-driven tests over the README examples plus Hebrew
   equivalents. Every entry in `CARB_MODIFIERS` and `NON_KETO_BASES` has at least one
   positive case and one word-boundary negative case (`rice` must not match `price`).
@@ -823,12 +876,18 @@ live fetching**, until a CORS proxy exists (§13).
   fallback, and that 401/429/5xx are not retried.
 - **Router:** no key → rules; offline → rules; LLM `timeout` → rules with reason;
   LLM `unauthorised` → failure, no rules.
+- **Contract tests:** every `MenuClassifier` and every `PlatformMenuAdapter`
+  implementation runs the same shared contract suite (never throws, returns a sealed
+  result, honours the interface's documented invariants). See §18.1 (Liskov).
 - **Widgets:** a red group collapses with a count; an unclassified section renders;
   a yellow card always has script text; the engine chip reflects the result.
-- **Integration:** two flows with `MenuClassifier` faked at the interface — paste a
-  Wolt URL and see a classified menu; open Settings, enter a key, confirm consent.
-- **Rule:** no test opens a socket. CI runs `flutter analyze`, `dart format --set-exit-if-changed`,
-  and `flutter test`.
+- **Flows** (`integration_test/flows/`): paste a Wolt URL and see a classified menu; go offline
+  and see rule-based results with the reason; enter a key in Settings, confirm
+  consent, and see the engine chip switch to AI; a rejected key shows the
+  unauthorised message and no rules fallback.
+- **Screens** (`test/screens/`): each screen with its controller and faked
+  dependencies, asserting what the flow tests assert but in milliseconds.
+- **Rule:** no test opens a socket or uses a real clock.
 
 ---
 
@@ -836,8 +895,17 @@ live fetching**, until a CORS proxy exists (§13).
 
 Build in this order; each step is demonstrable on its own.
 
-1. **Skeleton** — `flutter create`, dependencies, `analysis_options.yaml`, ARB files,
-   the `models/` package, the sealed result types. No screens yet.
+0. **Day zero (already committed)** — `.github/workflows/ci.yml`,
+   `analysis_options.yaml`, `test/architecture/import_rules_test.dart`,
+   `test_driver/integration_test.dart`, `tool/check.sh`, `tool/coverage_gate.sh`,
+   `tool/gen_coverage_helper.sh`.
+   CI is red until step 1 makes it green; that is intended.
+1. **Skeleton** — `flutter create` (done on `main`), `di.dart` with an empty
+   dependency set, `app.dart`, a placeholder first screen, one widget test and
+   one flow test so every CI job runs and passes (done in the pull request that
+   added §18). Still open in this step: ARB files, the `models/` package and the
+   sealed result types. **Branch protection is switched on when this step
+   merges.**
 2. **Heuristic classifier** — `constants.dart`, `classification_rules.dart`,
    `HeuristicMenuClassifier`, and its tests. Validates the model shapes before any
    network code exists.
@@ -889,3 +957,226 @@ default the implementation follows until answered.
    the MVP.
 5. **Cache freshness window.** 24 hours is a guess. Default: 24 hours, configurable
    in `constants.dart`.
+
+---
+
+## 18. Engineering standards
+
+These standards are part of the architecture, not a style preference. They are
+enforced by tooling wherever tooling can enforce them (§18.2, §18.5) and by review
+where it cannot. They apply from the first commit of application code.
+
+They sit on top of the repository's convention documents on `main`:
+`ISSUE_CONVENTIONS.md`, `PR_CONVENTIONS.md`, `MILESTONE_CONVENTIONS.md`,
+`UNIT_TEST_CONVENTIONS.md` and `FLOW_TEST_CONVENTIONS.md`. Where this section is
+stricter (the coverage gate, fakes for project interfaces, the layer test), this
+section wins; everything else in those documents applies as written.
+
+### 18.1 SOLID, as concrete rules for this codebase
+
+**Single responsibility.** Each class has one reason to change, and the split points
+are fixed:
+
+- A platform adapter does HTTP and nothing else; its mapper turns JSON into `Menu`
+  and does no I/O. A change to Wolt's URL touches `wolt_adapter.dart`; a change to
+  Wolt's JSON touches `wolt_menu_mapper.dart`.
+- `MenuResponseParser` validates; `MenuAnalysisPrompt` builds text;
+  `LlmMenuClassifier` sequences the two through the client. None of them knows the
+  key, the URL, or a widget.
+- A controller holds screen state and delegates. It never parses JSON, formats a
+  price, or builds a regex. A widget renders; it never calls a service.
+- `constants.dart` is the only home for thresholds, caps and vocabularies.
+
+**Open/closed.** Adding a platform is a new `PlatformMenuAdapter` registered in
+`di.dart`. Adding an engine is a new `MenuClassifier` handed to the router in
+`di.dart`. No `switch` on `MenuSource` or on engine type exists outside the adapter
+registry and the router. If a feature requires editing three existing classes to add
+a fourth case, the abstraction is wrong and the pull request says so.
+
+**Liskov substitution.** Every implementation of an interface obeys the interface's
+documented contract, and the contract is executable: `test/services/` holds one
+shared contract suite per interface (`menu_classifier_contract.dart`,
+`platform_menu_adapter_contract.dart`, `menu_cache_contract.dart`) that every
+implementation, including the fakes in `test/fakes/`, is run through. "Never
+throws", "returns a sealed result", "a yellow carries an instruction" are contract
+assertions, not comments.
+
+**Interface segregation.** Interfaces are small and consumer-shaped: `LlmChatClient`
+has `complete`; `KeyStore` has `read`, `write`, `delete`; `Clock` has `now`;
+`Connectivity` has `isOnline`. A controller depends on the two or three interfaces
+it uses, never on a "services" bag. A widget depends on its controller, never on a
+service.
+
+**Dependency inversion.** Every service is depended on as an abstraction and
+supplied by constructor injection. `di.dart` is the composition root and the only
+file under `lib/` that constructs a concrete service, an `http.Client`, a Hive box,
+or a plugin wrapper. No service locators, no global singletons, no static state
+except compile-time constants. `http.Client`, `Clock` and `Connectivity` are injected
+so that tests control I/O and time. Flow tests call `buildDependencies` with fakes
+and get the real app on top.
+
+### 18.2 The import graph is a DAG
+
+The `lib/` import graph must be a directed acyclic graph with a fixed layer order.
+The rules are in §5; the enforcement is `test/architecture/import_rules_test.dart`,
+which runs in the ordinary unit-test job and:
+
+1. resolves every `import`, `export` and `part` in `lib/` that points inside the
+   package;
+2. fails if any import points to a higher layer, or to a higher-ranked sub-package
+   inside `services/`;
+3. fails if `models/`, `utils/` or `services/` import Flutter beyond
+   `foundation.dart`;
+4. runs a cycle detection over the whole graph and prints the cycle if one exists.
+
+The test landed with the first skeleton, so the first file that breaks the
+layering fails CI rather than starting a habit. Adding a layer or a sub-package
+means editing the rank tables in that test in the same pull request, and saying why.
+
+### 18.3 Clean-code rules
+
+- **Lints.** `very_good_analysis` with `strict-casts`, `strict-inference` and
+  `strict-raw-types`. `flutter analyze --fatal-infos --fatal-warnings` in CI, so an
+  info-level lint fails the build. Suppressions (`// ignore:`) need a reason on the
+  same line and are counted in review.
+- **Formatting.** `dart format` with the default page width. CI fails on a diff.
+- **Immutability by default.** `final` fields, `const` constructors, unmodifiable
+  collections at service boundaries. Models are value objects with `==` and
+  `hashCode`.
+- **Errors as values at boundaries.** A service returns a sealed result. Exceptions
+  are allowed inside a service and must be caught before its boundary. `catch (e)`
+  without a type is not allowed; `on SocketException`, `on FormatException`, and so
+  on, each mapped to a named reason.
+- **No `dynamic` past the parser.** JSON is `Map<String, Object?>` until the
+  mapper or parser has produced a typed model. Nothing typed `dynamic` leaves
+  `services/`.
+- **No magic values.** Every number and string with meaning lives in
+  `constants.dart` or an enum, with a name and a doc comment saying where it came
+  from.
+- **Small units.** Functions fit on a screen (about 40 lines); a class with more
+  than five constructor dependencies is doing two jobs. Prefer a pure function to a
+  class when there is no state.
+- **Naming.** Interfaces are nouns (`MenuCache`), implementations say how
+  (`HiveMenuCache`), fakes say so (`FakeMenuCache`). Booleans read as predicates
+  (`isOnline`, `hasKey`). No abbreviations that are not in this document.
+- **Doc comments** on every public class and method in `services/` and `models/`,
+  stating the contract: what it returns on failure, what it never does.
+- **Logging.** `dart:developer` `log` through one `AppLogger` interface in
+  `services/platform/`; no `print`. Nothing logged ever includes the key, a
+  bearer header, or an upstream error body.
+- **No dead ends.** No `TODO` without an issue number. No commented-out code. No
+  feature flags without a removal issue.
+- **Pull requests are small.** One concern per pull request; a refactor and a
+  behaviour change are two pull requests.
+
+### 18.4 Tests from day one
+
+Three kinds of test, all present from step 1 of the build order (§16), all run on
+every pull request:
+
+| Kind | Where | What it exercises | Runs in |
+|---|---|---|---|
+| **Unit** | `test/` mirroring `lib/` | one class or pure function, dependencies faked at their interface | `flutter test`, seconds |
+| **Widget** | `test/screens/`, `test/widgets/` | one screen or widget with its controller, dependencies faked | `flutter test`, seconds |
+| **Flow** | `integration_test/flows/*_flow_test.dart` (`FLOW_TEST_CONVENTIONS.md`) | a whole user journey through the real build: routing, localisation, plugins, platform channels; I/O faked through the composition root | `flutter drive` on headless Chrome in CI; on devices before a release |
+
+Rules:
+
+- **A change to `lib/` ships with its tests in the same pull request.** A new public
+  method without a unit test, or a new screen without a flow test, is not
+  reviewable.
+- **Fakes for the project's own interfaces.** `test/fakes/` holds one hand-written
+  fake per interface, passing the interface's contract suite; a fake that records
+  calls is a few lines of Dart and is readable. `mockito`, as shown in
+  `UNIT_TEST_CONVENTIONS.md`, is acceptable for third-party types such as
+  `http.Client`, never for an interface this project defines.
+- **Deterministic.** No network, no real timers, no real clock, no wall-clock
+  `Duration` sleeps. `Clock` and `Connectivity` are injected; `fake_async` is used
+  where a timeout is under test.
+- **Fixtures are real.** Platform JSON in `test/fixtures/` is a recorded real
+  response, redacted only where a field is personal. Synthetic fixtures are labelled
+  as such in a comment at the top of the file.
+- **Coverage gate: 80% of lines across all of `lib/`**, measured by
+  `flutter test --coverage`, enforced by `tool/coverage_gate.sh`. The per-component
+  targets in `UNIT_TEST_CONVENTIONS.md` are guidance underneath this gate, not a
+  lower bar. Generated files
+  (`*.g.dart`, `l10n/` output) are excluded. Because `lcov` only counts files that
+  some test imported, `tool/check.sh` first generates a test file that imports every
+  file under `lib/`, so an untested file counts as zero rather than disappearing.
+- **The architecture test is a test.** `test/architecture/import_rules_test.dart`
+  runs with the unit tests and is a required check.
+
+### 18.5 Continuous integration
+
+`.github/workflows/ci.yml` landed with the first skeleton. It runs on every pull request
+and on every push to `main`, and every job is a required status check under branch
+protection: nothing merges red, and nothing merges without a review.
+
+| Job | Steps | Purpose |
+|---|---|---|
+| `quality` | `flutter pub get` · `dart format --output=none --set-exit-if-changed` · `flutter analyze --fatal-infos --fatal-warnings` | style and static correctness |
+| `test` | generate the all-imports helper · `flutter test --coverage` (unit + flow + architecture) · `tool/coverage_gate.sh` · upload `lcov.info` | behaviour and the 80% gate |
+| `integration` | headless Chrome + chromedriver · `flutter drive` for every file in `integration_test/` | the real build on a real browser |
+| `build` | `flutter build web --release` · `flutter build apk --debug` | the app still compiles for the shipping targets |
+| `ios` | `flutter build ios --no-codesign` on macOS, on pushes to `main` only | catches iOS-only breakage without spending macOS minutes on every push |
+
+Conventions:
+
+- The Flutter version is pinned in two places that must agree: `flutter-version`
+  in the workflow and `environment: flutter:` in `pubspec.yaml` (3.47.4 today).
+  Bump both in one commit.
+- `tool/check.sh` runs `quality` and `test` locally with the same commands; run it
+  before pushing. It is the pre-commit hook for anyone who wants one
+  (`ln -s ../../tool/check.sh .git/hooks/pre-push`).
+- A red `main` is the top priority for whoever broke it; no new work merges on top
+  of a red `main`.
+- Flaky tests are fixed or deleted the day they flake; there is no retry button.
+- Dependencies are updated by a scheduled bot pull request, which goes through the
+  same checks as any other.
+
+### 18.6 Definition of Done for a pull request
+
+- [ ] Title, commits and body follow `PR_CONVENTIONS.md` (`[type] description`,
+      the five-section template); the pull request does one thing.
+- [ ] `tool/check.sh` passes locally; all CI jobs green.
+- [ ] New or changed behaviour has unit tests; a new or changed screen has a flow
+      test; a new interface has a contract suite and a fake.
+- [ ] No new `// ignore:` without a reason; no new `dynamic`, `print`, or bare
+      `catch`.
+- [ ] Concrete services constructed only in `di.dart`; no new import edge that the
+      architecture test had to be edited to allow, unless the description explains
+      the new layer.
+- [ ] Strings in ARB files for both languages; no user-facing literal in Dart.
+- [ ] Failure paths have a named reason and copy; nothing maps to "no internet"
+      that is not a network failure.
+- [ ] Nothing logs, stores, or sends the key or an upstream error body.
+- [ ] `architecture.md` updated if a boundary, a layer, a dependency, or a decision
+      changed.
+- [ ] Reviewed by someone who did not write it.
+
+### 18.7 What these standards changed in the architecture
+
+The first version of this document already had interfaces for the adapters, the
+classifier and the LLM client. Applying §18.1 and §18.2 uniformly changed the
+following, and the rest of the document has been updated to match:
+
+- **A composition root.** `lib/di.dart` is new and is the only place concrete
+  services are constructed; `main.dart` calls it. Previously wiring was implied to
+  live in `main.dart` with services free to construct their own dependencies.
+- **Every service is an interface**, not only the three that had obvious
+  alternatives. `MenuRepository`, `KeyStore`, `MenuCache`, `SettingsStore`,
+  `LocationService`, `VenueSearchService` each have an interface, one production
+  implementation, and one fake. This is what makes flow tests possible without a
+  mocking library.
+- **`Clock` and `Connectivity` abstractions** in `services/platform/`. Cache
+  freshness and the offline decision were reading the real clock and the real
+  network, which made them untestable deterministically.
+- **Adapters split into adapter and mapper.** The mapper is a pure function over
+  JSON, tested against fixtures with no HTTP; the adapter only does the request.
+- **`services/` is organised into ranked sub-packages** so the DAG rule can be
+  stated and checked mechanically rather than by reading.
+- **`test/` grew `architecture/` and `fakes/`, `integration_test/` grew `flows/`**, and the repository grew
+  `tool/`, `test_driver/` and `.github/workflows/`, all landed with the first skeleton, before any feature
+  code.
+- **Build order gained step 0**, and step 1 now ends with a green pipeline and
+  branch protection rather than with "no screens yet".

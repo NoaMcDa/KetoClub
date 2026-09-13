@@ -1,0 +1,151 @@
+# KetoClub continuous integration.
+#
+# Every job here is a required status check on pull requests (see
+# architecture.md §18.5). Green since the first skeleton (build-order step 1);
+# a red main is the top priority for whoever broke it.
+#
+# The Flutter version is pinned below and must equal environment.flutter in
+# pubspec.yaml; bump both in one commit.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Format and analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.4  # keep equal to environment.flutter in pubspec.yaml
+          cache: true
+      - run: flutter pub get
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test integration_test test_driver
+      - name: Analyze (infos and warnings are fatal)
+        run: flutter analyze --fatal-infos --fatal-warnings
+
+  test:
+    name: Unit, flow and architecture tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.4  # keep equal to environment.flutter in pubspec.yaml
+          cache: true
+      - run: flutter pub get
+      - name: Generate the all-imports helper so untested files count as zero coverage
+        run: tool/gen_coverage_helper.sh
+      - name: Run tests with coverage
+        run: flutter test --coverage --reporter expanded
+      - name: Enforce the coverage gate
+        run: tool/coverage_gate.sh coverage/lcov.info
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lcov
+          path: coverage/lcov.info
+          if-no-files-found: ignore
+
+  integration:
+    name: Integration tests (headless Chrome)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.4  # keep equal to environment.flutter in pubspec.yaml
+          cache: true
+      - uses: browser-actions/setup-chrome@v1
+        id: chrome
+        with:
+          chrome-version: stable
+          install-chromedriver: true   # a driver that matches the browser it installs
+          install-dependencies: true
+      - name: Expose Chrome under the name chromedriver looks for
+        run: |
+          sudo ln -sf "${{ steps.chrome.outputs.chrome-path }}" /usr/local/bin/google-chrome
+          google-chrome --version
+          "${{ steps.chrome.outputs.chromedriver-path }}" --version
+      - run: flutter pub get
+      - name: Start chromedriver
+        run: |
+          "${{ steps.chrome.outputs.chromedriver-path }}" --port=4444 &
+          sleep 2
+      - name: Drive every integration test on web-server
+        env:
+          CHROME_EXECUTABLE: ${{ steps.chrome.outputs.chrome-path }}
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(find integration_test -name '*_test.dart' | sort)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No integration tests found under integration_test/." >&2
+            exit 1
+          fi
+          for f in "${files[@]}"; do
+            echo "=== $f"
+            flutter drive \
+              --driver=test_driver/integration_test.dart \
+              --target="$f" \
+              -d web-server \
+              --browser-name=chrome \
+              --headless
+          done
+
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [web, apk]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        if: matrix.target == 'apk'
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.4  # keep equal to environment.flutter in pubspec.yaml
+          cache: true
+      - run: flutter pub get
+      - name: Build web
+        if: matrix.target == 'web'
+        run: flutter build web --release
+      - name: Build Android (debug)
+        if: matrix.target == 'apk'
+        run: flutter build apk --debug
+
+  ios:
+    name: Build iOS (no codesign)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.4  # keep equal to environment.flutter in pubspec.yaml
+          cache: true
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign
