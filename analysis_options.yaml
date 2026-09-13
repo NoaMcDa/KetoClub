@@ -1,0 +1,39 @@
+# Static analysis for KetoClub (architecture.md §18.3).
+#
+# very_good_analysis is the strictest widely used lint set. The three strict
+# language modes below make the analyzer refuse implicit downcasts, implicit
+# dynamic, and raw generic types. CI runs `flutter analyze --fatal-infos
+# --fatal-warnings`, so every diagnostic here fails the build.
+#
+# Requires `very_good_analysis` in dev_dependencies (added in build-order step 1).
+
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  errors:
+    # Promote the lints we care most about to errors so they cannot be
+    # accidentally left as infos in an editor that hides them.
+    avoid_print: error
+    avoid_catches_without_on_clauses: error
+    avoid_dynamic_calls: error
+    unawaited_futures: error
+    always_declare_return_types: error
+    prefer_final_locals: error
+    public_member_api_docs: warning
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "lib/l10n/generated/**"
+    - "build/**"
+
+linter:
+  rules:
+    # Disagreements with the base set, each with a reason.
+    #
+    # Trailing commas are already enforced by `dart format` on recent SDKs;
+    # keeping the lint on double-reports the same diff.
+    require_trailing_commas: false

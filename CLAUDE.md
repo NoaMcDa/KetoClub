@@ -201,6 +201,7 @@ flutter build appbundle                 # Build Android App Bundle for Play Stor
 **Core Documentation:**
 - `architecture.md`: The authoritative architecture (client-only Flutter app, LLM-primary classifier with heuristic fallback, adapters, storage, failure handling, decisions log). Read this before the README where they disagree
 - `README.md`: Full project narrative, API endpoints, database schema, keto classification rules, Phase roadmap
+- Engineering standards (SOLID, acyclic imports, clean code, tests, CI) are `architecture.md` §18. Run `tool/check.sh` before pushing; it runs exactly what CI runs.
 
 **Research & Analysis:**
 - `m16_menu_scanner_research.md`: Computer vision and OCR strategy for physical menu scanning (Phase 4)
