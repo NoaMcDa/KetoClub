@@ -1,12 +1,14 @@
 # KetoClub backend — plan, API contract and prioritisation
 
-> **Status: planned, not built.** Decided 2026-09-13. The issues are #94–#109 in
-> three milestones: *Phase 3: Backend Foundations* (#94–#99), *Phase 3: Hosted
-> Classification* (#100–#104) and *Phase 3: Community API* (#105–#109). This
-> document is the design the issues cite; `architecture.md` stays authoritative
-> and gains D11 when #97 lands. Until then, where this document and
-> `architecture.md` disagree, this document describes the intended future and
-> `architecture.md` the code as it is.
+> **Status: milestone A is built; B and C are not.** Decided 2026-09-13. The issues
+> are #94–#109 in three milestones: *Phase 3: Backend Foundations* (#94–#99, built),
+> *Phase 3: Hosted Classification* (#100–#104) and *Phase 3: Community API*
+> (#105–#109).
+>
+> **`architecture.md` is authoritative**, as always: D11 records the decision and §13
+> describes what shipped. This document is the fuller design the issues cite. Where
+> the two disagree about what exists, believe `architecture.md`; where this one
+> describes something unbuilt, it is a plan, not a claim.
 
 ## 1. Why a backend, and why now
 
@@ -38,7 +40,7 @@ the full Phase 3 backend so the work is planned once.
 backend URL the app behaves exactly as it does today, including the web build's
 paste path. The backend is deliberately dumb: it forwards, holds a key, caches
 and stores community data. It does **not** normalise Wolt JSON, build prompts
-or parse model replies. Those stay in Dart, where 1418 tests already cover them,
+or parse model replies. Those stay in Dart, where they are already tested,
 so nothing is duplicated in Python. D10 extends to the backend: the call is the
 probe, and the client never pre-checks whether the server is up.
 
@@ -245,9 +247,9 @@ because milestone A is what makes Wolt work on web.
 
 | # | Issue | Priority |
 |---|---|---|
-| #94 | Scaffold the Python backend and the CI job | critical |
-| #95 | Wolt menu proxy route | critical |
-| #96 | `WoltMenuAdapter` proxy base; web build routes through the backend | critical |
+| #94 | ✅ Scaffold the Python backend and the CI job | critical |
+| #95 | ✅ Wolt menu proxy route | critical |
+| #96 | ✅ `WoltMenuAdapter` proxy base; web build routes through the backend | critical |
 | #97 | Record the decision: D11 and the document reconciliation | high |
 | #98 | Enforce the `openrouter.ai` single-file boundary | medium |
 | #99 | Backend URL override in Settings | low |

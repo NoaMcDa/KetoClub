@@ -16,7 +16,9 @@ comment.
 
 `restaurant-api.wolt.com` is blocked from this build environment — the
 egress proxy returns a 403 on the CONNECT to that host — so a real
-response could not be recorded from here. `wolt_vitrina_lilinblum_menu.json`
+response could not be recorded from here. That is a limit of the
+environment, not of the project: see "Re-recording" below for the route
+that now exists. `wolt_vitrina_lilinblum_menu.json`
 is instead hand-built from the payload documented in `menu_api_research`
 (lines 24-36) and `README.md` (lines 85-120), extended with every shape
 variation `WoltMenuMapper` needs to survive: a `radio` and a `checkbox`
@@ -44,8 +46,22 @@ curl -s \
   'https://restaurant-api.wolt.com/v4/venues/slug/vitrina-lilinblum/menu/data'
 ```
 
-(the `User-Agent` value is `browserUserAgent` in `lib/utils/constants.dart`
-— keep the two in sync if it ever changes). Redact only fields that are
+Or, more simply, through the backend, which sets that header itself:
+
+```bash
+cd backend && uv run uvicorn app.main:app --reload --port 8000
+curl -s 'http://localhost:8000/v1/proxy/wolt/v4/venues/slug/vitrina-lilinblum/menu/data' \
+  | python3 -m json.tool
+```
+
+The backend relays Wolt's body unchanged, so the two produce the same
+recording; the second needs no hand-copied header.
+
+(The `User-Agent` value lives in **three** places that must agree:
+`browserUserAgent` in `lib/utils/constants.dart`, the literal above, and
+`WOLT_USER_AGENT` in `backend/app/services/wolt.py`. The backend needs its
+own copy because a browser forbids a page from setting that header, which
+is part of why the proxy exists at all.) Redact only fields that are
 personal (there should be none in a public menu). Keep the `_fixture_note`
 key, updated to describe the real recording instead, or remove the note
 and the assertion in `wolt_menu_mapper_test.dart` that checks it is

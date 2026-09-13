@@ -1,6 +1,6 @@
 Tier A — Must-Have (MVP Core)
-Without these, the client-only application cannot function.
-Direct Client-to-API Menu Fetcher: Fetches raw menu JSON directly from Wolt's internal menu endpoint using a restaurant slug, handling network requests natively on-device.
+Without these, the application cannot function. (Written when the design was client-only; a small backend now exists for the web build, but no Tier A feature depends on one — see architecture.md D11.)
+Direct Client-to-API Menu Fetcher: Fetches raw menu JSON directly from Wolt's internal menu endpoint using a restaurant slug, handling network requests natively on-device. (Built. "Directly" holds on iOS and Android; a browser refuses the call, so the web build routes it through the KetoClub backend, which relays the response unchanged.)
 Client-Side OpenRouter LLM Analysis Engine: Directly sends batches of dish titles, descriptions, and modifier options from the client to the OpenRouter API (e.g., running cost-effective, high-reasoning models like Claude 3.5 Haiku, DeepSeek, or Gemini 1.5 Flash). The prompt instructs the model to return structured JSON with keto safety evaluations and specific waiter modification scripts.
 Client API Key Configuration: A secure local storage input (e.g., Flutter Secure Storage) allowing the user to provide or store an OpenRouter API key on-device.
 Traffic-Light Tagging (🟢 / 🟡 / 🔴): Renders the structured LLM response into clear visual categories:
@@ -24,6 +24,6 @@ Personal Notes: Local notes attached to analyzed dishes (e.g., "Waitstaff happil
 Tier D — Nice to Have (Future Expansions)
 Long-term enhancements for future iterations.
 On-Device OCR to OpenRouter: Capturing physical paper menus via camera, running text extraction via ML Kit, and piping the raw text to OpenRouter for live analysis.
-Shared Community Proxy & Global Cache: An optional lightweight backend that pools common OpenRouter analyses across users, reducing individual API billing.
+Shared Community Proxy & Global Cache: An optional lightweight backend that pools common OpenRouter analyses across users, reducing individual API billing. (This turned out to be two things. The proxy half was not optional and not Tier D: a browser cannot fetch a menu at all, so it became critical-path for Tier A on web and is built. The shared analysis cache is still Tier D and still unbuilt; it needs the backend to make the model call first.)
 Crowdsourced Modification Feedback: Community tagging indicating how accommodating the venue was with requested changes.
 Shareable Menu Cards: Exporting an image or text summary of safe dishes to share via messaging apps.

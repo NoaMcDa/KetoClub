@@ -26,11 +26,13 @@ read to a server.
 |---|---|
 | Tests | 1418 unit, widget and architecture, plus 3 flow tests on real headless Chrome |
 | Coverage | 98.9% of 1673 instrumented lines (gate is 80%) |
-| CI | six checks: format/analyze, tests, integration, build web, build apk, build iOS (main only) |
+| CI | seven checks: format/analyze, tests, integration, build web, build apk, build iOS (main only), backend (ruff/mypy/pytest) |
 
 What is **not** built: 10bis, Tabit and Ontopo adapters; nearby venue search; any
-geolocation (the `geolocator` dependency is present but unused); OCR; and anything
-in Phases 3–4. None of it is stubbed — the files simply do not exist, which keeps
+geolocation (the `geolocator` dependency is present but unused); OCR; Phase 4; and
+the community half of Phase 3. Phase 3's backend foundations **are** built — see
+`backend/` and `backend_plan.md` — but the backend serves only the menu proxy: it
+holds no model key and stores nothing about anyone. None of it is stubbed — the files simply do not exist, which keeps
 them out of the coverage denominator.
 
 ---
@@ -53,7 +55,9 @@ stated reason.
    `test/fixtures/wolt_vitrina_lilinblum_menu.json` says so in its first key, and
    `test/fixtures/README.md` carries the `curl` to re-record it. It was built to
    contain the shapes the mapper must survive, but it cannot tell you what Wolt
-   actually sends. Re-record from a real venue.
+   actually sends. Re-record from a real venue. **This is now easy**: run the
+   backend from a machine with ordinary network access and curl its proxy route,
+   which sets the browser `User-Agent` for you — see `backend/README.md`.
 3. **iOS and every physical device are unexercised.** CI builds web and an Android
    APK, and builds iOS without codesigning on pushes to `main`. Nothing has run on a
    real phone.
@@ -73,10 +77,12 @@ stated reason.
   cauliflower"` produces a needless yellow ("omit the rice" on a dish with no rice).
   That fails in the safe direction — a pointless modification request, not the wrong
   green architecture.md constraint 5 names as the failure that matters.
-- **The web build cannot fetch menus at all.** The restaurant APIs send no CORS
-  headers, so live fetching is a mobile feature until a CORS-forwarding proxy exists
-  (§13, D9). The web build's classifier works, because OpenRouter permits
-  browser-origin calls.
+- **The web build cannot fetch menus without the backend running.** The restaurant
+  APIs send no CORS headers. For Wolt this is solved: start `backend/` and pass
+  `--dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000` (§13, D11). Without
+  that define, or for 10bis, Tabit and Ontopo — which have no proxy route yet —
+  fetching on web still fails as `blockedByBrowser`. The web build's classifier has
+  always worked, because OpenRouter permits browser-origin calls.
 - **`net_carbs_estimate` is modelled but never rendered** (§17.4). The model can
   produce a number; it cannot be trusted as fact.
 
@@ -84,11 +90,12 @@ stated reason.
 
 ## Where to start next
 
-Build-order §16 continues at step 6, **but the backend comes first**: the web
-build cannot fetch Wolt menus (CORS), so a local Python backend is planned in
-`backend_plan.md` — issues #94–#109 across three "Phase 3" milestones. Start at
-#94, #95, #96; after those three, `flutter run -d chrome` with
-`--dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000` shows a live menu.
+**The backend is built and the web build fetches Wolt menus through it** (#94 to
+#96). Start `backend/`, pass `--dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000`,
+and a pasted Wolt link loads in Chrome. What remains of that work is planned in
+`backend_plan.md`: milestone B gives the backend the model key so web users stop
+pasting one (#100 to #104), and milestone C adds community data (#105 to #109).
+Build-order §16 otherwise continues at step 6.
 
 - **Step 6 — the 10bis adapter.** Blocked on a live capture: the shape of
   `dishOptionsList` is undocumented anywhere in this repo, there is no stable
@@ -118,7 +125,14 @@ build cannot fetch Wolt menus (CORS), so a local Python backend is planned in
   `integration_test/` too.
 - **The egress proxy blocks `restaurant-api.wolt.com`, `www.10bis.co.il` and
   `openrouter.ai`.** Nothing can be verified against a live service from CI or from
-  a Claude Code session. `pub.dev` and `storage.googleapis.com` are reachable.
+  a Claude Code session, which is why the backend's tests fake upstreams with
+  `respx`. `pub.dev` and `storage.googleapis.com` are reachable. This limits the
+  environment, not the project: from a machine with ordinary network access the
+  backend is now the documented way to record a real Wolt response — see
+  `backend/README.md` and outstanding item 2 above.
+- **Two toolchains, two gates.** Flutter 3.47.4 for the app, Python ≥ 3.11 with `uv`
+  for `backend/`. `tool/check.sh` does not look at `backend/`; `backend/check.sh`
+  does not look at the app. A change touching both needs both.
 - **Running several agents in one worktree:** serialise test runs with
   `flock /tmp/ketoclub.lock -c 'flutter test …'`. Concurrent `flutter test` races on
   `.dart_tool` and `coverage/lcov.info` and produces failures that are not real.
@@ -173,9 +187,11 @@ this is the short list.
 
 ## Where the reasoning lives
 
-- `architecture.md` §14 — the decisions log, D1 to D10, each recording what was
+- `architecture.md` §14 — the decisions log, D1 to D11, each recording what was
   decided, why, and what it supersedes. D10 (no connectivity pre-check) and the
-  `(Phase 1)` markers throughout were added by this work.
+  `(Phase 1)` markers throughout were added by the Phase 1 work; D11 (a backend
+  exists, as an accelerator) records why `backend/` appeared and what keeps it from
+  becoming a dependency.
 - `architecture.md` §17 — open questions, each with the default the code follows.
 - The commit messages on #90 and #91 carry the reasoning for individual decisions,
   including the corrections made to agents' first attempts and why.

@@ -9,8 +9,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > **Status: Phase 1 is built and merged.** Build-order steps 1–5 of
 > `architecture.md` §16 ship: models and service contracts, the bilingual heuristic
 > engine, Wolt ingestion with a Hive cache, the classified menu screen and Waiter
-> Card, and the OpenRouter client with its router and Settings. 1418 tests, 98.9% of
-> 1673 instrumented lines.
+> Card, and the OpenRouter client with its router and Settings. Phase 1 shipped with
+> 1418 tests at 98.9% of 1673 instrumented lines; the Dart suite and the backend's own
+> 25 Python tests have both grown since, so run the gates for current figures.
+>
+> **The backend foundations of Phase 3 also ship** (issues #94 to #96): `backend/` is a
+> FastAPI service that lets the **web** build fetch Wolt menus, which a browser
+> otherwise forbids. See `backend_plan.md` and `architecture.md` D11.
 >
 > **Read `architecture.md` first — it is authoritative.** This file and `README.md`
 > predate the code in places; where any of them disagrees with `architecture.md`,
@@ -19,7 +24,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture & Core Components
 
-### Client-Only Architecture (No Backend)
+### Client-First Architecture (one small backend)
 
 Single Flutter codebase for web, iOS, and Android with:
 - **Classification Engine**: **a hosted language model is the primary classifier, with
@@ -27,13 +32,18 @@ Single Flutter codebase for web, iOS, and Android with:
   their own OpenRouter key; when there is no key, no consent, or no network, the rule
   engine answers and the UI labels the result "rules". Both sit behind one
   `MenuClassifier` interface and a router picks per call.
-- **API Integration**: Direct calls to restaurant platform APIs from the client.
-  **Only Wolt is implemented**; 10bis, Tabit and Ontopo are not built.
+- **API Integration**: Direct calls to restaurant platform APIs from the client on
+  iOS and Android. On **web** a browser refuses those calls (no CORS headers), so the
+  Wolt fetch goes through the backend when one is configured (`architecture.md` §13,
+  D11). **Only Wolt is implemented**; 10bis, Tabit and Ontopo are not built.
 - **Local Storage**: Hive caches the normalised menu and its analysis for 24 hours;
   `flutter_secure_storage` holds the OpenRouter key; `shared_preferences` holds
   non-secret settings.
-- **No server, no database**: All menu analysis and data processing happens on the
-  user's device.
+- **Analysis is entirely on-device**: classification, caching and the waiter script
+  never leave the phone or browser. The backend does not parse menus, build prompts
+  or read model replies; it forwards a request the browser is not allowed to make,
+  and caches the reply. Nothing depends on it: with no backend configured the app
+  behaves exactly as it did before one existed.
 
 ### Menu Ingestion & API Integration
 
@@ -123,6 +133,8 @@ lib/
 test/                          # mirrors lib/, plus architecture/, fakes/, fixtures/, l10n/
 integration_test/flows/        # three flow tests + flow_support.dart (same-directory helper)
 tool/                          # check.sh (the gate), coverage_gate.sh, gen_coverage_helper.sh
+backend/                       # FastAPI: the web build's Wolt proxy. Own gate (check.sh),
+                               # own CI job, own 80% coverage floor. See backend/README.md
 ```
 
 `architecture.md` §5 carries the same tree with the layer-rank rules the
@@ -133,13 +145,19 @@ architecture test enforces.
 ```bash
 flutter pub get
 tool/check.sh          # format, analyze --fatal-infos --fatal-warnings, tests, 80% coverage gate
-flutter run -d chrome  # web; live menu fetching is blocked by CORS, see architecture.md §13
-flutter run -d <device>
+flutter run -d <device>            # iOS/Android: fetches Wolt directly, no backend needed
+
+# Web needs the backend, or menus cannot be fetched at all (architecture.md §13):
+cd backend && uv run uvicorn app.main:app --reload --port 8000   # in one terminal
+flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
+backend/check.sh       # the backend's gate; tool/check.sh does NOT cover backend/
 ```
 
 **Flutter 3.47.4 / Dart 3.13.3**, pinned in `.github/workflows/ci.yml` and
-`pubspec.yaml`; bump both in one commit. `tool/check.sh` runs exactly what the
-`quality` and `test` CI jobs run — run it before pushing.
+`pubspec.yaml`; bump both in one commit. **Python ≥ 3.11** for the backend, pinned in
+`backend/pyproject.toml` with a committed `uv.lock`. `tool/check.sh` runs exactly
+what the `quality` and `test` CI jobs run; `backend/check.sh` runs what the `backend`
+job runs. A change touching both needs both.
 
 An **info-level lint fails the build** (`--fatal-infos`), including the 80-column
 limit and `public_member_api_docs`, in `test/` and `integration_test/` too.
@@ -195,8 +213,8 @@ The section this replaces described a heuristic-first design that predates the c
    lives in "choice of side", not the description.
 6. **Everything at a service boundary returns a sealed result**, never throws, and
    every failure reason is distinct. Collapsing two reasons into one message is the
-   bug §10 names; `failure_copy.dart` has a test asserting no two of the eleven
-   reasons share copy in either language.
+   bug §10 names; `failure_copy.dart` has a test asserting that no two reasons share
+   copy in either language. It iterates the enums, so it covers new ones for free.
 7. **`di.dart` is the only file that constructs a concrete service**, and nothing it
    calls performs plugin I/O — see the traps above.
 8. **The key** lives in `flutter_secure_storage`, is read only by `OpenRouterClient`,
@@ -211,9 +229,12 @@ The section this replaces described a heuristic-first design that predates the c
 - `README.md`: Full project narrative, API endpoints, database schema, keto classification rules, Phase roadmap
 - Engineering standards (SOLID, acyclic imports, clean code, tests, CI) are `architecture.md` §18. Run `tool/check.sh` before pushing; it runs exactly what CI runs.
 
-- `backend_plan.md`: The planned Python (FastAPI) backend — why (CORS on web), the
-  API contract, the client seams, and issues #94–#109 in priority order. Planned,
-  not built; `architecture.md` gains D11 when #97 lands
+- `backend_plan.md`: The Python (FastAPI) backend — why (CORS on web), the API
+  contract, the client seams, and issues #94–#109 in priority order. Milestone A
+  (#94 to #99) is built; milestones B and C are not. `architecture.md` D11 is the
+  authoritative record
+- `backend/README.md`: How to run the backend, its endpoints, and how to record a
+  real Wolt fixture through it
 
 **Research & Analysis:**
 - `m16_menu_scanner_research.md`: Computer vision and OCR strategy for physical menu scanning (Phase 4)
@@ -230,7 +251,8 @@ When reading research docs (m15/m16), note that prefixes indicate iteration/mile
 - **Phase 1**: menu ingestion, classification and waiter scripts → **Built and merged**
 - **Phase 2**: geolocation and nearby search → **Next.** Blocked on discovery: no Wolt
   venue-search endpoint is known (`architecture.md` §17.2)
-- **Phase 3**: Community database, user reviews, restaurant submissions → **Planned**
+- **Phase 3**: Backend, community database, user reviews, submissions → **Backend
+  foundations built** (the web menu proxy); the community half is planned
 - **Phase 4**: OCR/vision, configurable dietary rules → **Planned**
 
 Phase 1 is built. Phase 2 is next; `feature_prioratization` has the tier breakdown.
@@ -242,8 +264,10 @@ Phase 1 is built. Phase 2 is next; `feature_prioratization` has the tier breakdo
   adapter plus a registration in `di.dart`.
 - Nearby venue search and any geolocation. `geolocator` is in `pubspec.yaml` but no
   code uses it. Paste-a-link (Tier A) is what ships.
-- OCR and the photographed-menu path (Phase 4), community features and any backend
-  (Phase 3).
+- OCR and the photographed-menu path (Phase 4).
+- Community features, and the backend routes they need (Phase 3, issues #105 to
+  #108). The backend itself exists but serves only the menu proxy; it holds no model
+  key yet (#100) and stores nothing about anyone.
 - `net_carbs_estimate` is in the model but deliberately never rendered
   (`architecture.md` §17.4).
 
@@ -254,8 +278,9 @@ the coverage denominator.
 
 1. **`HANDOFF.md`** — what exists, what is unfinished and why, the traps.
 2. **`architecture.md`** — the authoritative design. §16 is the build order (continue
-   at step 6, the 10bis adapter), §14 the decisions log D1–D10, §17 the open
-   questions with the default the code follows.
+   at step 6, the 10bis adapter, after the out-of-order step 5.5 that built the
+   backend), §14 the decisions log D1–D11, §17 the open questions with the default
+   the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing

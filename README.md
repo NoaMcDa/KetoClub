@@ -169,7 +169,14 @@ To capture new or modified endpoints directly in a web browser:
 4. Filter by terms such as menu, catalog, venue, items, or ordering.
 5. Locate the request returning HTTP status 200 with application/json Content-Type.
 6. Right-click the record → select Copy as cURL to export the request, headers, and parameters directly into code or Postman.
-Ingestion & Normalization Engine (Python Implementation)
+Ingestion & Normalization Engine (Python Implementation — superseded, and NOT `backend/`)
+
+> **Superseded by `architecture.md` D1 and D2.** Ingestion and normalisation are
+> implemented in Dart, on the device (`lib/services/menu/`). The Python below is the
+> original prototype and runs nowhere. In particular it is **not** what lives in
+> `backend/`: that service deliberately does not parse menus, precisely so there is
+> only one normaliser to keep correct. Read this section as history.
+
 The following production-ready module demonstrates how to fetch a menu from Wolt, run it through the keto heuristic parser, assign 🟢 Green / 🟡 Yellow status, and generate custom waiter scripts:
 Python
 
@@ -313,7 +320,12 @@ if __name__ == "__main__":
                     print(f"  👉 Waiter Script: {note}")
     except Exception as error:
         print(f"Failed to fetch venue data: {error}")
-Persistent Database & Data Architecture
+Persistent Database & Data Architecture (planned — NOT the backend's schema)
+
+> **Superseded by `architecture.md` D1 and §7.** The PostgreSQL model below is the
+> original design for Phase 3 community data. The backend that exists today stores
+> exactly one table, a cache of raw upstream menu bodies, in SQLite.
+
 To ensure speed and offline capabilities, KetoClub maintains a persistent database of reviewed, rated, and verified keto-accessible restaurants.
 ┌─────────────────────────────────┐       ┌───────────────────────────────────┐
 │             Venues              │       │               Menus               │
@@ -355,7 +367,8 @@ Roadmap & Milestone Tracking
     * [ ] Cross-platform mobile client (Flutter).
     * [ ] Geolocation integration and address-based venue search.
     * [ ] Search filtering by dish type (e.g., "Show only steakhouses with Green ratings").
-* [ ] Phase 3: Persistent Community Database
+* [ ] Phase 3: Backend & Persistent Community Database
+    * [x] Backend foundations: a service that lets the web build fetch menus a browser would otherwise refuse.
     * [ ] Verified directory of keto-dedicated and keto-accessible restaurants.
     * [ ] User review feedback loop ("Did the restaurant accommodate your substitution?").
     * [ ] User submissions for unlisted restaurants and manual review tagging.
@@ -363,28 +376,57 @@ Roadmap & Milestone Tracking
     * [ ] Computer Vision & OCR: Snap a photo of a physical printed paper menu to receive the same color-coded breakdown.
     * [ ] Configurable dietary rules: Support for carnivore, pesco-keto, and strict seed-oil avoidance modes.
 Development Setup & Installation
-Prerequisites
-* Python: Version 3.11 or later
-* Flutter SDK: Version 3.19 or later (for mobile client)
-* PostgreSQL: Version 15+ (for local venue persistence)
-1. Repository Clone
-Bash
+**Prerequisites**
+* Flutter SDK 3.47.4 — builds all three targets, web included. Pinned in `pubspec.yaml`
+  and `.github/workflows/ci.yml`
+* Python 3.11 or later, and [uv](https://docs.astral.sh/uv/) — only if you want the
+  backend, which only the web build needs
 
-git clone [https://github.com/your-org/ketoclub.git](https://github.com/your-org/ketoclub.git)
-cd ketoclub
-2. Backend Service Setup
-Bash
+No database to install: the backend uses SQLite and creates its file on first run.
 
-cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-3. Mobile Client Setup
-Bash
+**1. Clone**
 
-cd ../frontend
+```bash
+git clone https://github.com/NoaMcDa/KetoClub.git
+cd KetoClub
+```
+
+**2. Run the app**
+
+The Flutter project is at the repository root, not in a `frontend/` directory.
+
+```bash
 flutter pub get
-flutter run
+flutter run -d <device>      # iOS or Android: fetches menus directly, no backend
+```
+
+**3. The backend — web only**
+
+A browser refuses a request to Wolt, because Wolt sends no CORS headers, so the web
+build cannot fetch a menu on its own. The backend makes that call from a server and
+relays the answer unchanged. Nothing else needs it, and nothing depends on it: with
+no backend configured the app behaves exactly as it does without one.
+
+```bash
+cd backend
+uv sync
+uv run uvicorn app.main:app --reload --port 8000
+```
+
+Then, in another terminal:
+
+```bash
+flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
+```
+
+Routes live under `/v1` (`/v1/health`, `/v1/proxy/wolt/…`). See `backend/README.md`
+for the endpoints and `architecture.md` D11 for why it exists.
+
+**Checks**
+
+```bash
+tool/check.sh        # the app: format, analyze, tests, coverage
+backend/check.sh     # the backend: ruff, mypy, pytest, coverage
+```
 License
 Distributed under the MIT License. See LICENSE for details.

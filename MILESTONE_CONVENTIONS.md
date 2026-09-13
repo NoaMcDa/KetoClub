@@ -25,7 +25,7 @@ Phase N: [Feature Group Name]
 
 ### Phase 1: Core Parsing & Classification
 
-**Goal**: Build the restaurant menu ingestion and keto classification engine (no backend).
+**Goal**: Build the restaurant menu ingestion and keto classification engine, entirely on the device.
 
 **Milestones:**
 1. `Phase 1: API Client Infrastructure` — HTTP clients for Wolt, 10bis, Tabit, Ontopo
@@ -58,10 +58,21 @@ Phase N: [Feature Group Name]
 
 ### Phase 3: Community Database & Reviews
 
-**Goal**: Add persistent user feedback and venue ratings.
+**Goal**: The backend, and the community data it makes possible: persistent user
+feedback and venue ratings.
 
 **Milestones:**
-1. `Phase 3: Backend Infrastructure` — Basic server + database (if needed)
+1. `Phase 3: Backend Foundations` — the service, the Wolt menu proxy that makes the
+   web build work, and its CI job. **Built** (#94 to #99)
+2. `Phase 3: Hosted Classification` — the backend holds the model key so web users
+   stop pasting one (#100 to #104)
+3. `Phase 3: Community API` — venue ratings, per-dish feedback, submissions (#105 to
+   #109)
+
+The three above replace a single `Phase 3: Backend Infrastructure` milestone, which
+was closed. Note that Phase 3 now **starts before** the remaining Phase 2 milestones:
+the phase label is a feature group, not a running order, and the menu proxy was what
+made the web build usable at all (`architecture.md` D11).
 2. `Phase 3: User Ratings & Reviews` — Post-visit feedback mechanism
 3. `Phase 3: Venue Submission` — Crowdsourced venue directory
 4. `Phase 3: Verified Badges` — Keto-friendly venue verification

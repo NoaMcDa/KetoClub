@@ -61,8 +61,11 @@ then 10bis, later Tabit and Ontopo), classifies every dish as 🟢 order-as-is,
 🟡 order-with-a-change, or 🔴 not keto, and for every yellow dish produces an exact
 sentence to say to the waiter. Classification is done by a hosted language model the
 user reaches with their own OpenRouter key; when there is no key or no network, an
-on-device rule engine gives a coarser answer. There is no backend and no server-side
-database: everything runs on the device.
+on-device rule engine gives a coarser answer. Classification, caching and the waiter
+script all run on the device. A small backend exists *(Phase 3)* and does one thing
+the device cannot do for itself: it fetches a menu on behalf of the **web** build,
+which a browser forbids (§13, D11). Nothing depends on it — with no backend
+configured the app behaves exactly as it did without one.
 
 ---
 
@@ -95,6 +98,11 @@ database: everything runs on the device.
                                │ restaurant-api.wolt.com   www.10bis.co.il       │
                                │ tgp-api.tabit.cloud       ontopo.com            │
                                │ openrouter.ai  (user's own key)                 │
+                               │                                                 │
+                               │ KetoClub backend — web build only, and only     │
+                               │ when configured. The Wolt call above is then    │
+                               │ made from there instead of from the browser     │
+                               │ (§13, D11). Mobile never uses it.               │
                                └─────────────────────────────────────────────────┘
 ```
 
@@ -109,10 +117,12 @@ three layers.
 These are the rules every component in this document obeys. They are numbered so
 issues and reviews can cite them.
 
-1. **Client-only.** No server, no server-side database, no shared secret. Every
-   network call originates from the user's device and every result lives on it.
-   A backend is an explicit Phase 3+ addition (§16), not something the MVP quietly
-   depends on.
+1. **The app never depends on a server.** *(Amended Phase 3 — see D11.)* Every
+   feature must work with no backend configured, and every result lives on the
+   device. A backend now exists, because a browser will not let the app read a
+   menu at all (§13); it is an accelerator for the web build and nothing more.
+   The rule that survives is the one that mattered: no feature may require it,
+   no analysis happens on it, and the app ships no shared secret.
 2. **One codebase, three targets.** Web, iOS and Android share all business logic.
    Platform differences are confined to permissions, HTTP transport and layout.
 3. **Bring your own key.** The language model is reached with an OpenRouter key the
@@ -143,7 +153,9 @@ issues and reviews can cite them.
     and option labels are sent. Nothing about the user, their location, or their
     history is sent to the model.
 12. **No test makes a network call.** Every adapter and the LLM client sit behind
-    an interface with a fake; fixtures are checked-in JSON.
+    an interface with a fake; fixtures are checked-in JSON. The backend's own
+    suite obeys the same rule: upstreams are faked with `respx` and its database
+    is in-memory.
 13. **Engineering standards apply from the first commit.** SOLID, an acyclic
     import graph, clean-code rules, unit and flow tests, and a CI pipeline that
     gates every pull request are defined in §18 and are not deferred to "after the
@@ -302,6 +314,17 @@ ketoclub/
 │   ├── check.sh                          # runs exactly what CI runs
 │   ├── coverage_gate.sh                  # fails below the coverage threshold
 │   └── gen_coverage_helper.sh            # imports every lib/ file so untested files count
+├── backend/                              # §13, D11 — the web build's menu proxy
+│   ├── app/
+│   │   ├── main.py                       # factory, lifespan (db + one httpx client), CORS
+│   │   ├── config.py                     # pydantic-settings; every value has a local default
+│   │   ├── db.py  models.py  schemas.py  # SQLAlchemy over SQLite; menu_cache
+│   │   ├── routers/                      # health, proxy (chat and community are unbuilt)
+│   │   └── services/                     # wolt, cache, clock
+│   ├── tests/                            # pytest + respx; no test makes a network call
+│   ├── pyproject.toml  uv.lock           # uv; Python ≥ 3.11
+│   ├── check.sh                          # the backend gate, mirroring tool/check.sh
+│   └── README.md  .env.example
 ├── .github/workflows/ci.yml              # §18.5
 ├── ios/  android/  web/
 ├── pubspec.yaml
@@ -320,8 +343,12 @@ ketoclub/
   `package:flutter/foundation.dart`.
 - `screens/` and `widgets/` reach services only through a controller in `state/`.
 - The full import graph of `lib/` has no cycles.
-- The string `openrouter.ai` appears in exactly one file under `lib/`. Concrete
-  service classes are constructed in exactly one file: `di.dart`.
+- The string `openrouter.ai` appears in exactly one file under `lib/`, and so does
+  `restaurant-api.wolt.com`. Both are asserted by the architecture test. The rules
+  in this list govern `lib/`; `backend/` has its own gate (§18.5), and the Wolt host
+  necessarily appears there too, as that service's own upstream.
+- Concrete service classes are constructed in exactly one file: `di.dart`, which is
+  also the only file that reads `KETOCLUB_BACKEND_URL`.
 
 **Dependencies (initial `pubspec.yaml`):**
 
@@ -393,9 +420,15 @@ checks the cache first (§6.4), and is the only thing the controllers call.
 
 **Web caveat (important):** the restaurant platform APIs do not send CORS headers
 for arbitrary origins. Native iOS and Android HTTP stacks do not enforce CORS, so the
-adapters work there as written. In a browser they will be blocked. See §13 for the
-options; the MVP treats mobile as the primary target for live menu fetching and the
-web build as primary for the paste-a-menu path.
+adapters work there as written. In a browser they are blocked before the request
+leaves, and what happens next now depends on the platform *(Phase 3)*:
+
+- **Wolt** is fetched through the backend when one is configured, which makes the
+  same call from a server and relays the answer unchanged (§13, D11). The adapter
+  takes a base URL; nothing else about it changes.
+- **10bis, Tabit and Ontopo** have no proxy route yet, so in a browser they still
+  fail as `MenuFetch.blockedByBrowser` and remain mobile-first. Adding one is a
+  route in `backend/` plus a base URL, not a change to the adapter's logic.
 
 ### 6.2 Classification engine
 
@@ -653,7 +686,9 @@ could place none" is a result to show rather than a failure to retry.
 
 Relationship to the README's ER diagram: the three README entities (Venues, Menus,
 Dishes) are the three classes above. They are **cache records on the device**, not
-tables on a server. `keto_rating_score` and `is_verified_keto_friendly` are Phase 3
+tables on a server. (The backend caches a raw upstream body per venue so it can
+answer a repeat request without troubling Wolt, but it never holds a `Menu`: it
+does not parse the payload, and normalisation stays in Dart.) `keto_rating_score` and `is_verified_keto_friendly` are Phase 3
 fields and are not modelled until then.
 
 ---
@@ -667,11 +702,16 @@ fields and are not modelled until then.
 | **Tabit** | `GET https://tgp-api.tabit.cloud/menu/v2/{siteId}` (alt: `online.tabit.cloud/api/v1/ordering/menu?siteId=`) | session / anonymous token from the QR landing | Phase 2+ | Dine-in venues absent from delivery apps |
 | **Ontopo** | `POST https://ontopo.com/api/loginAnonymously` → `GET https://ontopo.com/api/venue/{venueId}` | anonymous bearer | Phase 4 | Returns PDF/image links, needs the OCR path |
 | **OpenRouter** | `POST https://openrouter.ai/api/v1/chat/completions` | `Authorization: Bearer <user key>` | Phase 1 | See §9 |
+| **KetoClub backend** | `GET {base}/v1/proxy/wolt/v4/venues/slug/{slug}/menu/data`, `GET {base}/v1/health` | none | Phase 3 | Web build only, and only when configured. Relays Wolt's status, body and content type unchanged; see §13 and D11 |
 
 All restaurant endpoints are undocumented internal APIs discovered by network
 inspection (`menu_api_research`). Each adapter therefore:
 
-- sends a browser-like `User-Agent` and `Accept: application/json`;
+- sends a browser-like `User-Agent` and `Accept: application/json`. A browser
+  forbids a page from setting `User-Agent`, so when the request goes through the
+  backend the header is set there instead. The value is therefore duplicated in
+  `lib/utils/constants.dart` and in `backend/app/services/wolt.py`, deliberately
+  and with a comment on both sides; change them together;
 - treats any non-2xx or non-JSON body as `MenuFetchFailureReason.platformChanged`,
   with the status code, so a schema change is diagnosable from the failure copy;
 - is covered by a fixture test against a checked-in real response, so a schema
@@ -815,11 +855,12 @@ languages. Collapsing reasons is a bug.
 
 | Reason | Where it arises | What the user sees | Way out |
 |---|---|---|---|
-| `MenuFetch.offline` | adapter, socket/DNS error | "No connection. Showing the cached menu from {date}." (if any) | retry |
-| `MenuFetch.blockedByBrowser` | adapter, request refused by the browser (CORS, §13) | "A web browser cannot read {platform} menus. Open this link in the KetoClub phone app." | phone app |
+| `MenuFetch.offline` | adapter, socket/DNS error; also a configured backend's own 502 or 504, which mean it could not reach the platform | "No connection. Showing the cached menu from {date}." (if any) | retry |
+| `MenuFetch.blockedByBrowser` | adapter, request refused by the browser (CORS, §13), when **no** backend is configured | "A web browser cannot read {platform} menus. Open this link in the KetoClub phone app." | phone app |
 | `MenuFetch.notFound` | adapter, 404 | "Venue not found on {platform}. Check the link." | edit input |
 | `MenuFetch.platformChanged` | adapter, non-JSON / unexpected shape | "{platform} changed its menu format. Please report this." | report |
 | `MenuFetch.unsupportedSource` | repository | "KetoClub cannot read menus from this site yet." | paste text (Phase 4) |
+| `MenuFetch.backendUnreachable` | adapter, request to a configured backend failed before any answer *(Phase 3)* | "The KetoClub server could not be reached. Try again." | retry |
 | `Analysis.notConfigured` | router, no key or no consent | rules result + "Add an OpenRouter key in Settings for AI analysis." | settings |
 | `Analysis.offline` | router / client, no route | rules result + "Offline. Showing rule-based results." | retry |
 | `Analysis.timeout` | client, > 120 s | rules result + "The AI model was too slow. Showing rule-based results." | retry |
@@ -843,6 +884,11 @@ an upstream error body can echo request headers, including the bearer token.
   - To the restaurant platform: the venue identifier. Nothing else.
   - To OpenRouter: dish names, descriptions, option labels, and the optional dietary
     constraints from Settings. No location, no venue name, no user identity.
+  - To the KetoClub backend, on the web build and only when one is configured: the
+    venue identifier, which it forwards to the platform on the app's behalf
+    *(Phase 3, D11)*. It logs one line per request — route, status, duration — and
+    caches the platform's reply. Nothing about the user is sent or stored, and the
+    disclosure in Settings says so.
   - Nowhere else. There is no telemetry.
 - **Consent.** The first time a key is entered, Settings shows one disclosure stating
   the above in plain language, and the user confirms once. The router treats
@@ -853,8 +899,12 @@ an upstream error body can echo request headers, including the bearer token.
 - **Menu content is untrusted too.** A dish named "ignore previous instructions" is
   a dish with an odd name; it is sent in the user turn, never the system turn, and
   it fails or passes the parser like any other.
-- **No secrets in the repo.** `.gitignore` already excludes `.env*`; there is nothing
-  to put in one.
+- **No secrets in the repo.** `.gitignore` excludes `.env*` while keeping
+  `.env.example`. The app itself still ships no secret. The backend has a `.env`
+  *(Phase 3)*: `backend/.env.example` documents every variable with a safe local
+  default, and the two that will one day hold secrets — the server's model key and
+  the admin token — are empty until milestone B and C build the routes that read
+  them.
 
 ---
 
@@ -883,21 +933,37 @@ an upstream error body can echo request headers, including the bearer token.
 
 - **CORS blocks the restaurant adapters in a browser.** The platform APIs answer
   browser requests from foreign origins without `Access-Control-Allow-Origin`. This
-  is a property of those services, not of the app. Consequences for the MVP:
-  - Live menu fetching is a **mobile** feature first. In a browser the block
-    surfaces as a client-side request failure indistinguishable from a dead
-    network, so the adapters report it as `MenuFetch.blockedByBrowser` (§10)
-    when built for web rather than as `offline`: the copy then points at the
-    phone app instead of inviting a retry that cannot succeed.
-  - The web build ships with the classifier fully working (OpenRouter permits
-    browser-origin calls) and takes menus by paste or, once Phase 4 lands, by file.
-  - For local development, run Chrome with web security disabled
-    (`flutter run -d chrome --web-browser-flag=--disable-web-security`); never ship
-    with that.
-  - The clean fix is a tiny CORS-forwarding proxy (a single edge function) that
-    passes the request through unchanged and adds the header. That is the first
-    thing the Phase 3 backend does, and it is the only reason to add one before
-    community features.
+  is a property of those services, not of the app. The fix this section used to
+  call for has been built *(Phase 3, D11)*:
+  - **Wolt menus work on web through the backend.** `backend/` makes the same
+    request from a server, where CORS does not apply, and relays Wolt's status,
+    body and content type unchanged. Point the app at it with a compile-time
+    define:
+
+    ```sh
+    cd backend && uv run uvicorn app.main:app --reload --port 8000
+    flutter run -d chrome \
+      --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
+    ```
+
+    The backend is not hosted anywhere yet, so this works for whoever runs it
+    (§17.6). A failed request to it is `MenuFetch.backendUnreachable`, whose copy
+    says retry, not "use the phone app".
+  - **Without a define, nothing changes.** The adapter goes straight to Wolt, the
+    browser refuses it, and the failure surfaces as a client-side error
+    indistinguishable from a dead network — so the adapter reports it as
+    `MenuFetch.blockedByBrowser` (§10) rather than `offline`, and the copy points
+    at the phone app instead of inviting a retry that cannot succeed. The same is
+    true of 10bis, Tabit and Ontopo on any build, since no proxy route exists for
+    them yet.
+  - The web build's classifier has always worked, because OpenRouter permits
+    browser-origin calls, and the web build also takes menus by paste, or by file
+    once Phase 4 lands.
+  - Disabling the browser's web security
+    (`flutter run -d chrome --web-browser-flag=--disable-web-security`) is no
+    longer the answer for Wolt and should not be reached for: run the backend
+    instead. It remains the only local workaround for the platforms that have no
+    proxy route, and must never be shipped.
 - Geolocation requires HTTPS.
 - Secure storage on web is `localStorage`-backed; say so in Settings.
 
@@ -925,6 +991,9 @@ documents. Each names what was decided, why, and what it supersedes.
 Supersedes README §9 ("Backend Service Setup", PostgreSQL). The MVP has nothing a
 server would do better, and a server would need a hosted key and a data policy. A
 backend enters at Phase 3 for community data and, optionally, a CORS proxy for web.
+**Amended by D11** *(Phase 3)*: the optional proxy turned out to be necessary, and
+was built first. The part of D1 that still holds is that no feature depends on a
+server; the part that does not is "no backend, no server database".
 
 **D2 — The LLM is the primary classifier; rules are the fallback.**
 Supersedes README §3/§6 and `CLAUDE.md`'s "heuristic-based classification". Follows
@@ -935,8 +1004,12 @@ stays because it answers offline and without a key, behind the same interface.
 
 **D3 — Bring your own OpenRouter key.**
 Follows `feature_prioratization` Tier A. Shipping a key in a client is not an option,
-and a proxy is D1's backend. Free-tier quota is 50 requests a day, which one request
-per menu plus a cache makes workable.
+and at the time a proxy meant the backend D1 ruled out. **The decision stands, the
+reason has moved** *(Phase 3)*: a backend exists now, but it does not hold a model
+key and `POST /v1/chat` is not built, so bringing your own key is still the only
+path to the model. Milestone B revisits this, and when it lands the key becomes a
+fallback rather than the only option. Free-tier quota is 50 requests a day, which one
+request per menu plus a cache makes workable.
 
 **D4 — Standalone app with a flat layout and `provider`.**
 The m15/m16 documents describe a separate, existing Flutter application (Keto Lens,
@@ -966,7 +1039,10 @@ No diary, no macro tracking, no profile. The meal-logging design in
 here.
 
 **D9 — Web is a first-class target for classification and a second-class target for
-live fetching**, until a CORS proxy exists (§13).
+live fetching**, until a CORS proxy exists (§13). **The condition has been met for
+Wolt** *(Phase 3, D11)*: with a backend configured, the web build fetches Wolt menus
+like any other target. It remains second-class for 10bis, Tabit and Ontopo, which
+have no proxy route, and for anyone who has no backend to point at.
 
 **D10 — No connectivity pre-check. The LLM call is the probe.** *(Phase 1.)*
 §6.2's original rule 2 asked the router to consult a `Connectivity` abstraction
@@ -979,6 +1055,27 @@ every other degrading failure uses. The cost is one wasted request when the devi
 is offline *and* the menu is uncached; the saving is one fewer outbound host, two
 fewer files, and one fewer abstraction whose fake could disagree with reality.
 `Clock` stays injected — cache freshness genuinely cannot be tested without it.
+
+**D11 — A backend exists, as an accelerator, never a dependency.** *(Phase 3.)*
+Amends D1 and resolves D9; §13 had named this as the first thing a Phase 3 backend
+would do, and it is. A browser will not let the app read a Wolt menu at all, and no
+amount of client-side work changes that, so `backend/` (Python, FastAPI, SQLite,
+run locally for now) makes the request from a server and relays it. Four choices
+make it an accelerator rather than a dependency. It is reached only through a
+compile-time define, so a build without one behaves exactly as the app did before.
+It relays Wolt's status, body and content type **unchanged**, so the adapter's
+existing failure mapping survives and the proxy adds no vocabulary of its own
+beyond 502 and 504, which mean "I could not reach Wolt" and map to `offline`.
+A failed call to it is `MenuFetch.backendUnreachable` rather than a reuse of
+`blockedByBrowser`, because the way out differs: a browser block is permanent and
+sends you to the phone app, while an unreachable server usually means it is not
+running and a retry will work. And it stays dumb: it does not normalise the
+payload, build a prompt or parse a reply, all of which stay in Dart where they are
+already tested, so nothing is implemented twice. D10 extends to it unchanged — the
+call is the probe, and nothing pre-checks whether the server is up. What the
+backend will grow next (a hosted model key, a shared analysis cache, community
+data) is `backend_plan.md`; what it must never grow is a feature the app cannot
+work without.
 
 ---
 
@@ -1021,7 +1118,11 @@ This section lists what each part of the system must be tested for.
 ## 16. Build order and extension points
 
 Build in this order; each step is demonstrable on its own. **Steps 0 to 5 are
-done** *(Phase 1)*; step 6 onwards is next.
+done** *(Phase 1)*.
+
+**The backend was built out of order** *(Phase 3, D11)*, between steps 5 and 6,
+because the web build could not fetch a menu at all and no later step fixed that.
+It is step 5.5 below. Step 6 is next after it.
 
 0. **Day zero (already committed)** — `.github/workflows/ci.yml`,
    `analysis_options.yaml`, `test/architecture/import_rules_test.dart`,
@@ -1045,6 +1146,10 @@ done** *(Phase 1)*; step 6 onwards is next.
 5. ✅ **OpenRouter client + LLM classifier + router + Settings** — key store, consent,
    prompt, schema, parser, fallback logic, failure copy. Verify the pinned model
    against the real prompt before merging.
+5.5. ✅ **Backend and the web menu proxy** *(Phase 3, out of order — see above)* —
+   `backend/` with its own gate and CI job, the Wolt proxy route, and the adapter's
+   configurable base URL. The remaining backend work is planned in
+   `backend_plan.md`.
 6. **10bis adapter.**
 7. **Location and nearby search.**
 8. **Platform setup** — permissions, icons, store metadata; test on a physical iOS
@@ -1058,9 +1163,9 @@ Extension points already designed in:
 | Photographed or PDF menus (Phase 4) | a new source that yields `Menu` from OCR text; the M16 research is the reference | the prompt and parser |
 | Vision-model classification | a second `MenuClassifier`; router chooses | the UI |
 | Custom dietary rules (Tier C) | `ClassificationOptions` → appended to the system prompt and to the rules table | schema |
-| Community ratings, venue directory (Phase 3) | a backend with its own client under `services/community/`; `Venue` gains the README's rating fields | everything above stays client-only |
-| CORS proxy for web | one edge function; adapters get a configurable base URL | adapter logic |
-| Shared analysis cache (Tier D) | the same backend; `MenuCache` gains a remote tier | parser, models |
+| Community ratings, venue directory (Phase 3) | the backend gains routes and the app a client under `services/community/`; `Venue` gains the README's rating fields | every feature keeps working with no backend configured (D11) |
+| ~~CORS proxy for web~~ **built** *(Phase 3, D11)* | a FastAPI route in `backend/`, not an edge function as first sketched; `WoltMenuAdapter` gained a base URL | adapter logic, which did not change |
+| Shared analysis cache (Tier D) | the same backend, but server-side and keyed by a hash of the prompt, **not** a remote tier of `MenuCache` as first sketched — it only works once the backend makes the model call at all (`backend_plan.md`) | parser, models |
 
 ---
 
@@ -1090,6 +1195,13 @@ default the implementation follows until answered.
 5. **Cache freshness window.** 24 hours is a guess. *(Phase 1: settled at 24 hours
    in `menuCacheTtl`, with an exclusive boundary — see §6.4. Still a guess, but now
    a guess in one named place.)*
+6. **Where the backend runs.** *(Phase 3.)* It runs on whoever's machine started it,
+   which is enough to develop against and enough for the web build to work for that
+   person, and nothing else. Hosting it changes the privacy story (a server someone
+   else operates sees venue identifiers), the abuse story (the install id is
+   spoofable and the rate limit is in memory) and the cost story. Default: stay
+   local until someone other than a developer needs the web build, and decide with
+   the options compared in `backend_plan.md`.
 
 ---
 
@@ -1246,7 +1358,9 @@ Rules:
   response, redacted only where a field is personal. Synthetic fixtures are labelled
   as such in a comment at the top of the file.
 - **Coverage gate: 80% of lines across all of `lib/`**, measured by
-  `flutter test --coverage`, enforced by `tool/coverage_gate.sh`. The per-component
+  `flutter test --coverage`, enforced by `tool/coverage_gate.sh`. The backend has
+  the same floor on its own denominator, enforced by `pytest --cov-fail-under=80`
+  inside `backend/check.sh` *(Phase 3)*. Two gates, one standard. The per-component
   targets in `UNIT_TEST_CONVENTIONS.md` are guidance underneath this gate, not a
   lower bar. Generated files
   (`*.g.dart`, `l10n/` output) are excluded. Because `lcov` only counts files that
@@ -1268,15 +1382,24 @@ protection: nothing merges red, and nothing merges without a review.
 | `integration` | headless Chrome + chromedriver · `flutter drive` for every file in `integration_test/` | the real build on a real browser |
 | `build` | `flutter build web --release` · `flutter build apk --debug` | the app still compiles for the shipping targets |
 | `ios` | `flutter build ios --no-codesign` on macOS, on pushes to `main` only | catches iOS-only breakage without spending macOS minutes on every push |
+| `backend` *(Phase 3)* | `uv sync --frozen` · `ruff check` · `ruff format --check` · `mypy app` (strict) · `pytest --cov-fail-under=80` | the backend's equivalent of `quality` and `test` |
 
 Conventions:
 
 - The Flutter version is pinned in two places that must agree: `flutter-version`
   in the workflow and `environment: flutter:` in `pubspec.yaml` (3.47.4 today).
-  Bump both in one commit.
-- `tool/check.sh` runs `quality` and `test` locally with the same commands; run it
-  before pushing. It is the pre-commit hook for anyone who wants one
-  (`ln -s ../../tool/check.sh .git/hooks/pre-push`).
+  Bump both in one commit. The backend pins Python the same way, through
+  `requires-python` in `backend/pyproject.toml` and a committed `uv.lock`.
+- **Two gates, one per toolchain** *(Phase 3)*. `tool/check.sh` runs `quality` and
+  `test` locally with the same commands; run it before pushing. It is the
+  pre-commit hook for anyone who wants one
+  (`ln -s ../../tool/check.sh .git/hooks/pre-push`). It does **not** look at
+  `backend/`: `backend/check.sh` is that half, and a change touching both needs
+  both.
+- The `backend` job is not filtered by path, though it could be. A required check
+  that does not run on a pull request stays pending forever and blocks the merge,
+  so it is cheaper to run it always than to explain that to every contributor who
+  touches only Dart.
 - A red `main` is the top priority for whoever broke it; no new work merges on top
   of a red `main`.
 - Flaky tests are fixed or deleted the day they flake; there is no retry button.

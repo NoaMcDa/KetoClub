@@ -114,7 +114,7 @@ Assign issues to one of the four project phases:
 
 - **Phase 1**: Core parsing, heuristic engine, waiter script generation
 - **Phase 2**: Mobile interface, geolocation, search filtering
-- **Phase 3**: Community database, user reviews, restaurant submissions
+- **Phase 3**: Backend, community database, user reviews, restaurant submissions
 - **Phase 4**: OCR/vision, configurable dietary rules
 
 See `feature_prioratization` and `CLAUDE.md` for phase details.
@@ -151,7 +151,7 @@ Acceptance Criteria:
 Technology Research:
 - [x] Reviewed Wolt API documentation and endpoint structure
 - [x] Confirmed http package compatibility with Flutter 3.x
-- [x] Verified no CORS issues for web platform
+- [x] Checked CORS behaviour for the web platform (there is none; see architecture.md §13)
 - Decision: Use http package (lightweight, no additional dependencies)
 
 Tests Required:
