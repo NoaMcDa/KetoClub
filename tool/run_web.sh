@@ -21,5 +21,5 @@ proxy_pid=$!
 trap 'kill "$proxy_pid" 2>/dev/null || true' EXIT
 
 flutter run -d chrome \
-  --dart-define="KETOCLUB_MENU_PROXY_URL=http://localhost:$port/" \
+  --dart-define="KETOCLUB_MENU_PROXY_URL=http://127.0.0.1:$port/" \
   "$@"

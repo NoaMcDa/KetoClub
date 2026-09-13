@@ -25,7 +25,7 @@ final class CorsProxyClient extends http.BaseClient {
   /// The client that actually talks to the proxy.
   final http.Client inner;
 
-  /// The proxy's own URL, e.g. `http://localhost:8787/`. Any query
+  /// The proxy's own URL, e.g. `http://127.0.0.1:8787/`. Any query
   /// parameters it already carries are kept beside [urlParameter].
   final Uri proxy;
 

@@ -99,7 +99,7 @@ http.Client menuHttpClient(http.Client client, {required String proxyUrl}) {
       proxyUrl,
       'proxyUrl',
       'KETOCLUB_MENU_PROXY_URL must be an absolute URL such as '
-          'http://localhost:8787/',
+          'http://127.0.0.1:8787/',
     );
   }
   return CorsProxyClient(inner: client, proxy: proxy);

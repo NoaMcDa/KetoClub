@@ -41,7 +41,7 @@ Future<void> main(List<String> args) async {
   final port = _portFrom(args);
   final server = await HttpServer.bind(InternetAddress.loopbackIPv4, port);
   stdout
-    ..writeln('KetoClub CORS proxy listening on http://localhost:$port/')
+    ..writeln('KetoClub CORS proxy listening on http://127.0.0.1:$port/')
     ..writeln('Forwarding to: ${allowedHosts.join(', ')}');
 
   final client = HttpClient();
