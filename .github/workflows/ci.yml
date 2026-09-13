@@ -73,25 +73,35 @@ jobs:
           channel: stable
           flutter-version: 3.47.4  # keep equal to environment.flutter in pubspec.yaml
           cache: true
-      - uses: browser-actions/setup-chrome@v1
-        id: chrome
-        with:
-          chrome-version: stable
-          install-chromedriver: true   # a driver that matches the browser it installs
-          install-dependencies: true
-      - name: Expose Chrome under the name chromedriver looks for
+      # Use the runner image's own Chrome and the ChromeDriver built for it.
+      # Installing a second browser is what used to break this job: ChromeDriver
+      # launches whatever Chrome sits on the default path, not the binary an
+      # action downloaded into the tool cache, so a driver from one release tried
+      # to drive the image's Chrome from another and refused the session. The
+      # image keeps its pair in step, which removes the drift at its source.
+      - name: Resolve ChromeDriver and check it matches the browser
         run: |
-          sudo ln -sf "${{ steps.chrome.outputs.chrome-path }}" /usr/local/bin/google-chrome
+          set -euo pipefail
+          driver="${CHROMEWEBDRIVER:-}/chromedriver"
+          if [ ! -x "$driver" ]; then
+            driver="$(command -v chromedriver)"
+          fi
           google-chrome --version
-          "${{ steps.chrome.outputs.chromedriver-path }}" --version
+          "$driver" --version
+          chrome_major="$(google-chrome --version | grep -oE '[0-9]+' | head -1)"
+          driver_major="$("$driver" --version | grep -oE '[0-9]+' | head -1)"
+          if [ "$chrome_major" != "$driver_major" ]; then
+            echo "Chrome $chrome_major and ChromeDriver $driver_major disagree;" \
+                 "the runner image shipped an unmatched pair." >&2
+            exit 1
+          fi
+          echo "CHROMEDRIVER=$driver" >> "$GITHUB_ENV"
       - run: flutter pub get
       - name: Start chromedriver
         run: |
-          "${{ steps.chrome.outputs.chromedriver-path }}" --port=4444 &
+          "$CHROMEDRIVER" --port=4444 &
           sleep 2
       - name: Drive every integration test on web-server
-        env:
-          CHROME_EXECUTABLE: ${{ steps.chrome.outputs.chrome-path }}
         run: |
           set -euo pipefail
           mapfile -t files < <(find integration_test -name '*_test.dart' | sort)
