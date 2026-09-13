@@ -1,11 +1,14 @@
 {
   "artboards": [
-    { "file": "Main.dc.html", "title": "A · Fresh Market", "x": 0, "y": 0, "w": 880, "h": 1080, "is_interactive": true },
-    { "file": "DarkKitchen.dc.html", "title": "B · Dark Kitchen", "x": 960, "y": 0, "w": 880, "h": 1080, "is_interactive": true },
-    { "file": "CleanUtility.dc.html", "title": "C · Clean Utility", "x": 1920, "y": 0, "w": 880, "h": 1080, "is_interactive": true }
+    { "file": "Discovery.dc.html", "title": "Discovery", "x": 0, "y": 0, "w": 390, "h": 844, "is_interactive": true },
+    { "file": "Main.dc.html", "title": "Restaurant menu", "x": 510, "y": 0, "w": 390, "h": 844, "is_interactive": true },
+    { "file": "MenuDark.dc.html", "title": "Restaurant menu — dark", "x": 1020, "y": 0, "w": 390, "h": 844, "is_interactive": true },
+    { "file": "WaiterCard.dc.html", "title": "Waiter card", "x": 1530, "y": 0, "w": 390, "h": 844, "is_interactive": true },
+    { "file": "Settings.dc.html", "title": "Settings", "x": 2040, "y": 0, "w": 390, "h": 844, "is_interactive": true }
   ],
   "annotations": [
-    { "id": "brief", "x": 0, "y": -230, "w": 900, "text": "KetoClub — three visual directions, same two screens each.\n\nPick one and I'll build the full app into it: discovery/search, restaurant page, menu with traffic-light marks, waiter card, and settings with the API key.\n\nThe filter chips and the \"Ask your waiter\" panels are live in all three — click them.\nPhoto tiles are placeholders; real images come from the Wolt/10bis feeds." }
+    { "id": "brief", "x": 0, "y": -250, "w": 880, "text": "KetoClub — Fresh Market, built out.\n\nEvery screen carries a Light/Dark tweak above the artboard, so any of them flips. \"Restaurant menu — dark\" is the same screen set to Dark, and Settings' own Appearance control drives its screen live.\n\nThe traffic lights are no longer a dot: each dish gets a coloured left rail, a labelled status pill, a tinted card and a matching net-carb chip. The three counters under the venue name are the filter — tap one." },
+    { "id": "photos", "x": 0, "y": 920, "w": 420, "text": "Photo tiles are placeholders — real imagery comes from the Wolt/10bis feeds at runtime." }
   ],
   "launch": { "view": "canvas" }
 }

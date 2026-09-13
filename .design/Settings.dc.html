@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Public+Sans:wght@400;500;600;700;800&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Public Sans', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); }
+    .app { --bg: #faf7f0; --surface: #ffffff; --surface2: #f4efe4; --ink: #1f1c17; --ink2: #6f675b; --ink3: #a09484;
+      --line: rgba(31,28,23,0.11); --line2: rgba(31,28,23,0.07);
+      --accent: oklch(0.52 0.10 148); --accent-hover: oklch(0.42 0.10 148); --accent-ink: #faf7f0;
+      --green: oklch(0.56 0.13 148); --green-tint: oklch(0.965 0.022 152); --green-ink: oklch(0.40 0.10 150); --green-on: #faf7f0;
+      --amber: oklch(0.75 0.14 74); --amber-tint: oklch(0.965 0.032 85); --amber-ink: oklch(0.44 0.10 66); --amber-on: #2a1e08;
+      --red: oklch(0.56 0.17 27); --red-tint: oklch(0.965 0.020 25); --red-ink: oklch(0.47 0.14 27); --red-on: #faf7f0;
+      --shadow: 0 20px 44px -20px rgba(31,28,23,0.40);
+      --photo: linear-gradient(135deg, #e9e1cf 0%, #d8cbb0 100%); --photo-ink: #8b7d63; }
+    .app.dark { --bg: #14120e; --surface: #1e1b15; --surface2: #272218; --ink: #f5f0e4; --ink2: #a99e8c; --ink3: #7d7364;
+      --line: rgba(245,240,228,0.12); --line2: rgba(245,240,228,0.07);
+      --accent: oklch(0.74 0.13 148); --accent-hover: oklch(0.82 0.12 148); --accent-ink: #14120e;
+      --green: oklch(0.76 0.14 148); --green-tint: oklch(0.30 0.055 150); --green-ink: oklch(0.85 0.13 150); --green-on: #0f1710;
+      --amber: oklch(0.81 0.13 78); --amber-tint: oklch(0.31 0.05 72); --amber-ink: oklch(0.89 0.11 82); --amber-on: #1c1406;
+      --red: oklch(0.66 0.17 27); --red-tint: oklch(0.29 0.065 25); --red-ink: oklch(0.78 0.14 27); --red-on: #170c0a;
+      --shadow: 0 20px 44px -20px rgba(0,0,0,0.85);
+      --photo: linear-gradient(135deg, #322c22 0%, #1c180f 100%); --photo-ink: #6b6152; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; user-select: none; }
+    .pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px 4px 7px; border-radius: 8px; font-size: 10px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .ph { position: relative; display: flex; align-items: center; justify-content: center; background: var(--photo); }
+    .serif { font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-weight: 400; }
+    .nav { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .nav span { font-size: 10px; font-weight: 700; }
+  </style>
+</helmet>
+
+<div class="app {{themeClass}}" style="position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); color: var(--ink); display: flex; flex-direction: column;">
+
+  <div style="padding: 22px 20px 14px 20px; flex-shrink: 0;">
+    <div class="serif" style="font-size: 32px; line-height: 1.1; color: var(--ink);">Settings</div>
+  </div>
+
+  <div style="flex-grow: 1; overflow: hidden; padding: 0 20px;">
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-size: 10px; font-weight: 800; letter-spacing: 0.11em; text-transform: uppercase; color: var(--ink3);">Analysis</div>
+        <div style="border-radius: 15px; background: var(--surface); border: 1px solid var(--line); overflow: hidden;">
+          <div style="padding: 14px 15px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--line2);">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+              <span style="font-size: 14px; font-weight: 700; color: var(--ink);">OpenRouter API key</span>
+              <span style="font-size: 12.5px; font-weight: 700; color: var(--accent); cursor: pointer;">Replace</span>
+            </div>
+            <div style="padding: 9px 12px; border-radius: 10px; background: var(--surface2); font-size: 13px; letter-spacing: 0.06em; color: var(--ink2);">sk-or-v1-••••••••••••••••4f2a</div>
+            <div style="display: flex; gap: 7px; align-items: flex-start;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green-ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1.5px;"><rect x="4" y="10" width="16" height="10" rx="2.5"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/></svg>
+              <span style="font-size: 11.5px; line-height: 1.45; color: var(--ink3); text-wrap: pretty;">Kept on this device only. Sent to OpenRouter and nowhere else.</span>
+            </div>
+          </div>
+          <div style="padding: 14px 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer;">
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <span style="font-size: 14px; font-weight: 700; color: var(--ink);">Model</span>
+              <span style="font-size: 11.5px; color: var(--ink3);">About ₪0.04 per menu</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 13px; color: var(--ink2);">Claude Haiku 4.5</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-size: 10px; font-weight: 800; letter-spacing: 0.11em; text-transform: uppercase; color: var(--ink3);">Your keto rules</div>
+        <div style="border-radius: 15px; background: var(--surface); border: 1px solid var(--line); overflow: hidden;">
+          <div style="padding: 13px 15px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line2);">
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <span style="font-size: 14px; font-weight: 700; color: var(--ink);">Net carb limit</span>
+              <span style="font-size: 11.5px; color: var(--ink3);">Dishes above this are never green</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; padding: 4px; border-radius: 10px; background: var(--surface2);">
+              <div style="width: 28px; height: 28px; border-radius: 7px; background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; font-size: 16px; font-weight: 700; color: var(--ink2);" onClick="{{carbsDown}}">−</div>
+              <div style="min-width: 38px; text-align: center; font-size: 14px; font-weight: 800; color: var(--ink);">{{carbLimit}}</div>
+              <div style="width: 28px; height: 28px; border-radius: 7px; background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; font-size: 16px; font-weight: 700; color: var(--ink2);" onClick="{{carbsUp}}">+</div>
+            </div>
+          </div>
+          <sc-for list="{{rules}}" as="rule" hint-placeholder-count="3">
+            <div style="padding: 13px 15px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line2); cursor: pointer; user-select: none;" onClick="{{rule.toggle}}">
+              <div style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1;">
+                <span style="font-size: 14px; font-weight: 700; color: var(--ink);">{{rule.name}}</span>
+                <span style="font-size: 11.5px; line-height: 1.4; color: var(--ink3); text-wrap: pretty;">{{rule.hint}}</span>
+              </div>
+              <div style="width: 46px; height: 27px; border-radius: 999px; flex-shrink: 0; padding: 3px; box-sizing: border-box; display: flex; justify-content: {{rule.justify}}; background: {{rule.track}}; border: 1px solid {{rule.trackEdge}}">
+                <div style="width: 21px; height: 21px; border-radius: 999px; background: {{rule.knob}}"></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-size: 10px; font-weight: 800; letter-spacing: 0.11em; text-transform: uppercase; color: var(--ink3);">Appearance</div>
+        <div style="padding: 5px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); display: flex; gap: 5px;">
+          <sc-for list="{{themes}}" as="t" hint-placeholder-count="3">
+            <div style="flex-grow: 1; flex-basis: 0; padding: 10px; border-radius: 10px; text-align: center; cursor: pointer; user-select: none; font-size: 13px; font-weight: 700; background: {{t.bg}}; color: {{t.fg}}" onClick="{{t.pick}}">{{t.label}}</div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="font-size: 10px; font-weight: 800; letter-spacing: 0.11em; text-transform: uppercase; color: var(--ink3);">Saved menus</div>
+        <div style="padding: 14px 15px; border-radius: 15px; background: var(--surface); border: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-size: 14px; font-weight: 700; color: var(--ink);">14 menus cached</span>
+            <span style="font-size: 11.5px; color: var(--ink3);">2.3 MB · works offline</span>
+          </div>
+          <span style="font-size: 12.5px; font-weight: 700; color: var(--red-ink); cursor: pointer;">Clear</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"theme":{"editor":"enum","options":["Light","Dark"],"default":"Dark","section":"Appearance"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { appearance: null, carbs: 6, rules: { seedoil: true, dairy: false, carnivore: false } };
+  }
+
+  renderVals() {
+    const fallback = (this.props.theme ?? 'Dark');
+    const appearance = this.state.appearance ?? fallback;
+    const dark = (appearance === 'System' ? fallback : appearance) === 'Dark';
+
+    const ruleDefs = [
+      { id: 'seedoil', name: 'Strict seed-oil free', hint: 'Flags canola, sunflower and soybean oil in fried dishes.' },
+      { id: 'dairy', name: 'Dairy-free keto', hint: 'Treats cream, butter and cheese as a modification.' },
+      { id: 'carnivore', name: 'Carnivore only', hint: 'Greens only meat, fish, eggs — vegetables become yellow.' }
+    ];
+
+    return {
+      themeClass: dark ? 'dark' : 'light',
+      carbLimit: this.state.carbs + 'g',
+      carbsDown: () => this.setState({ carbs: Math.max(2, this.state.carbs - 1) }),
+      carbsUp: () => this.setState({ carbs: Math.min(25, this.state.carbs + 1) }),
+      rules: ruleDefs.map((r) => {
+        const on = !!this.state.rules[r.id];
+        return {
+          name: r.name,
+          hint: r.hint,
+          justify: on ? 'flex-end' : 'flex-start',
+          track: on ? 'var(--accent)' : 'var(--surface2)',
+          trackEdge: on ? 'var(--accent)' : 'var(--line)',
+          knob: on ? 'var(--accent-ink)' : 'var(--ink3)',
+          toggle: () => this.setState({ rules: Object.assign({}, this.state.rules, { [r.id]: !on }) })
+        };
+      }),
+      themes: ['Light', 'Dark', 'System'].map((label) => {
+        const active = (label === 'System' ? appearance === 'System' : appearance === label);
+        return {
+          label: label,
+          bg: active ? 'var(--ink)' : 'transparent',
+          fg: active ? 'var(--bg)' : 'var(--ink2)',
+          pick: () => this.setState({ appearance: label })
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

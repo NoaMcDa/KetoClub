@@ -1,0 +1,166 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Public+Sans:wght@400;500;600;700;800&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Public Sans', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); }
+    .app { --bg: #faf7f0; --surface: #ffffff; --surface2: #f4efe4; --ink: #1f1c17; --ink2: #6f675b; --ink3: #a09484;
+      --line: rgba(31,28,23,0.11); --line2: rgba(31,28,23,0.07);
+      --accent: oklch(0.52 0.10 148); --accent-hover: oklch(0.42 0.10 148); --accent-ink: #faf7f0;
+      --green: oklch(0.56 0.13 148); --green-tint: oklch(0.965 0.022 152); --green-ink: oklch(0.40 0.10 150); --green-on: #faf7f0;
+      --amber: oklch(0.75 0.14 74); --amber-tint: oklch(0.965 0.032 85); --amber-ink: oklch(0.44 0.10 66); --amber-on: #2a1e08;
+      --red: oklch(0.56 0.17 27); --red-tint: oklch(0.965 0.020 25); --red-ink: oklch(0.47 0.14 27); --red-on: #faf7f0;
+      --shadow: 0 20px 44px -20px rgba(31,28,23,0.40);
+      --photo: linear-gradient(135deg, #e9e1cf 0%, #d8cbb0 100%); --photo-ink: #8b7d63; }
+    .app.dark { --bg: #14120e; --surface: #1e1b15; --surface2: #272218; --ink: #f5f0e4; --ink2: #a99e8c; --ink3: #7d7364;
+      --line: rgba(245,240,228,0.12); --line2: rgba(245,240,228,0.07);
+      --accent: oklch(0.74 0.13 148); --accent-hover: oklch(0.82 0.12 148); --accent-ink: #14120e;
+      --green: oklch(0.76 0.14 148); --green-tint: oklch(0.30 0.055 150); --green-ink: oklch(0.85 0.13 150); --green-on: #0f1710;
+      --amber: oklch(0.81 0.13 78); --amber-tint: oklch(0.31 0.05 72); --amber-ink: oklch(0.89 0.11 82); --amber-on: #1c1406;
+      --red: oklch(0.66 0.17 27); --red-tint: oklch(0.29 0.065 25); --red-ink: oklch(0.78 0.14 27); --red-on: #170c0a;
+      --shadow: 0 20px 44px -20px rgba(0,0,0,0.85);
+      --photo: linear-gradient(135deg, #322c22 0%, #1c180f 100%); --photo-ink: #6b6152; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; user-select: none; }
+    .pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px 4px 7px; border-radius: 8px; font-size: 10px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .ph { position: relative; display: flex; align-items: center; justify-content: center; background: var(--photo); }
+    .serif { font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-weight: 400; }
+    .nav { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .nav span { font-size: 10px; font-weight: 700; }
+  </style>
+</helmet>
+
+<div class="app {{themeClass}}" style="position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); color: var(--ink); display: flex; flex-direction: column;">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 22px 20px 10px 20px; flex-shrink: 0;">
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+      <div style="font-size: 9.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink3);">Looking around</div>
+      <div style="display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 700; color: var(--ink);">Rothschild 22
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink2)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+    </div>
+    <div style="width: 34px; height: 34px; border-radius: 999px; background: var(--accent); display: flex; align-items: center; justify-content: center; color: var(--accent-ink); font-size: 13px; font-weight: 800;">N</div>
+  </div>
+
+  <div style="padding: 4px 20px 13px 20px; flex-shrink: 0;">
+    <div class="serif" style="font-size: 34px; line-height: 1.08; color: var(--ink);">Where to eat</div>
+  </div>
+
+  <div style="padding: 0 20px 13px 20px; flex-shrink: 0;">
+    <div style="display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 15px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line);">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <div style="font-size: 13.5px; color: var(--ink3);">Search a restaurant, or paste a link</div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 8px; padding: 0 20px 14px 20px; overflow: hidden; flex-shrink: 0;">
+    <sc-for list="{{chips}}" as="chip" hint-placeholder-count="4">
+      <div class="chip" style="background: {{chip.bg}}; color: {{chip.fg}}; border: 1px solid {{chip.border}}" onClick="{{chip.pick}}">{{chip.label}}</div>
+    </sc-for>
+  </div>
+
+  <div style="flex-grow: 1; overflow: hidden; padding: 0 20px;">
+    <div style="display: flex; flex-direction: column; gap: 19px;">
+      <sc-for list="{{venues}}" as="v" hint-placeholder-count="3">
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div class="ph" style="width: 100%; height: 118px; border-radius: 16px; overflow: hidden;">
+            <svg width="29" height="29" viewBox="0 0 24 24" fill="none" stroke="var(--photo-ink)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m4 17 5-5 4.5 4.5L17 13l3 3"/></svg>
+            <div style="position: absolute; top: 11px; left: 11px; display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px 5px 8px; border-radius: 9px; background: var(--green); color: var(--green-on);">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg>
+              <span style="font-size: 11.5px; font-weight: 800; letter-spacing: 0.02em;">{{v.green}} dishes as-is</span>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px;">
+              <div class="serif" style="font-size: 21px; line-height: 1.15; color: var(--ink);">{{v.name}}</div>
+              <div style="display: flex; align-items: baseline; gap: 4px;">
+                <span class="serif" style="font-size: 17px; color: var(--green-ink);">{{v.score}}</span>
+                <span style="font-size: 9px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink3);">keto</span>
+              </div>
+            </div>
+            <div style="font-size: 13px; line-height: 1.45; color: var(--ink2); text-wrap: pretty;">{{v.blurb}}</div>
+            <div style="display: flex; align-items: center; gap: 10px; padding-top: 3px;">
+              <span style="font-size: 12px; color: var(--ink3);">{{v.meta}}</span>
+              <span style="display: inline-flex; align-items: center; gap: 5px;">
+                <span style="width: 8px; height: 8px; border-radius: 999px; background: var(--amber);"></span>
+                <span style="font-size: 12px; font-weight: 700; color: var(--ink2);">{{v.yellow}} with changes</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 78px; background: linear-gradient(to top, var(--bg) 62%, transparent); display: flex; align-items: center; justify-content: space-around; padding: 0 14px 12px 14px;">
+    <div class="nav" style="color: var(--accent);">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>
+      <span>Explore</span>
+    </div>
+    <div class="nav" style="color: var(--ink3);">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V7a3 3 0 0 1 3-3h2M15 4h2a3 3 0 0 1 3 3v2M20 15v2a3 3 0 0 1-3 3h-2M9 20H7a3 3 0 0 1-3-3v-2"/><path d="M7 12h10"/></svg>
+      <span style="font-weight: 600;">Scan</span>
+    </div>
+    <div class="nav" style="color: var(--ink3);">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1z"/></svg>
+      <span style="font-weight: 600;">Saved</span>
+    </div>
+    <div class="nav" style="color: var(--ink3);">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M5 12h14M5 17h14"/><circle cx="9" cy="7" r="2.2" fill="var(--bg)"/><circle cx="15" cy="12" r="2.2" fill="var(--bg)"/><circle cx="8" cy="17" r="2.2" fill="var(--bg)"/></svg>
+      <span style="font-weight: 600;">Settings</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"theme":{"editor":"enum","options":["Light","Dark"],"default":"Light","section":"Appearance"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { chip: 'nearby' };
+  }
+
+  renderVals() {
+    const dark = (this.props.theme ?? 'Light') === 'Dark';
+
+    const all = [
+      { id: 'ember', name: 'Ember & Vine', blurb: 'Charcoal grill, aged cuts, and a genuinely serious salad list.', meta: 'Steakhouse · 12 min', score: '9.1', green: 9, yellow: 5, open: true },
+      { id: 'salt', name: 'Salt & Stone', blurb: 'Whole fish on coals, mezze, and nothing breaded on the menu.', meta: 'Seafood · 22 min', score: '8.9', green: 11, yellow: 4, open: true },
+      { id: 'harvest', name: 'Harvest Room', blurb: 'Farm salads, roasted vegetable mains, cauliflower done properly.', meta: 'Seasonal · 9 min', score: '8.4', green: 7, yellow: 6, open: false },
+      { id: 'copper', name: 'The Copper Pan', blurb: 'Mediterranean small plates, most of them grilled rather than fried.', meta: 'Mediterranean · 18 min', score: '7.8', green: 5, yellow: 8, open: true }
+    ];
+
+    const chipDefs = [
+      { id: 'nearby', label: 'Nearby' },
+      { id: 'high', label: 'Keto 8+' },
+      { id: 'open', label: 'Open now' },
+      { id: 'grill', label: 'Grill' }
+    ];
+
+    const c = this.state.chip;
+    const venues = all.filter((v) => c === 'high' ? parseFloat(v.score) >= 8 : c === 'open' ? v.open : c === 'grill' ? /grill|coals/i.test(v.blurb) : true);
+
+    return {
+      themeClass: dark ? 'dark' : 'light',
+      chips: chipDefs.map((d) => ({
+        label: d.label,
+        bg: c === d.id ? 'var(--accent)' : 'var(--surface)',
+        fg: c === d.id ? 'var(--accent-ink)' : 'var(--ink2)',
+        border: c === d.id ? 'var(--accent)' : 'var(--line)',
+        pick: () => this.setState({ chip: c === d.id ? 'nearby' : d.id })
+      })),
+      venues: venues
+    };
+  }
+}
+</script>
+</body>
+</html>
