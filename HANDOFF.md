@@ -84,7 +84,11 @@ stated reason.
 
 ## Where to start next
 
-Build-order §16 continues at step 6.
+Build-order §16 continues at step 6, **but the backend comes first**: the web
+build cannot fetch Wolt menus (CORS), so a local Python backend is planned in
+`backend_plan.md` — issues #94–#109 across three "Phase 3" milestones. Start at
+#94, #95, #96; after those three, `flutter run -d chrome` with
+`--dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000` shows a live menu.
 
 - **Step 6 — the 10bis adapter.** Blocked on a live capture: the shape of
   `dishOptionsList` is undocumented anywhere in this repo, there is no stable
