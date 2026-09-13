@@ -1,9 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/di.dart';
-import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
+import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
+import 'package:ketoclub/services/storage/key_store.dart';
+import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 
 void main() {
@@ -22,9 +24,11 @@ void main() {
 
       // Assert
       expect(dependencies.menuRepository, isA<CachedMenuRepository>());
-      expect(dependencies.menuClassifier, isA<HeuristicMenuClassifier>());
+      expect(dependencies.menuClassifier, isA<RoutingMenuClassifier>());
       expect(dependencies.clock, isA<SystemClock>());
       expect(dependencies.logger, isA<DeveloperLogAppLogger>());
+      expect(dependencies.keyStore, isA<SecureKeyStore>());
+      expect(dependencies.settingsStore, isA<PrefsSettingsStore>());
     });
 
     test('performs no plugin I/O while building the graph', () {
