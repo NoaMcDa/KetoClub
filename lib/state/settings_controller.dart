@@ -56,6 +56,10 @@ final class SettingsController extends ChangeNotifier {
   /// Which verdicts the menu view keeps by default.
   MenuFilter get filter => _appSettings.filter;
 
+  /// The KetoClub backend the user pointed the app at, or null to use the
+  /// one this build was compiled with (architecture.md §13, D11).
+  String? get backendUrl => _appSettings.backendUrl;
+
   /// Reads [KeyStore.hasKey] and the [SettingsStore], populating every
   /// other getter.
   Future<void> load() async {
@@ -134,6 +138,30 @@ final class SettingsController extends ChangeNotifier {
     notifyListeners();
 
     _appSettings = _appSettings.copyWith(languageTag: tag);
+    await _settings.write(_appSettings);
+
+    _isBusy = false;
+    notifyListeners();
+  }
+
+  /// Points menu fetches at the backend at [url], or clears the override
+  /// — meaning "use the compile-time value" — when [url] is null or blank.
+  ///
+  /// The value is trimmed, and a blank one is stored as null rather than
+  /// as an empty string, so "cleared" has one representation. Nothing
+  /// validates the URL here: `menuProxyBase` in `di.dart` rejects anything
+  /// that is not an absolute http or https URL, and falls back to the
+  /// compile-time value, so a half-typed host degrades instead of
+  /// breaking. Like [setLanguage], [url] is always passed through
+  /// explicitly so the `copyWith` sentinel is never mistaken for a value.
+  Future<void> setBackendUrl(String? url) async {
+    _isBusy = true;
+    notifyListeners();
+
+    final trimmed = url?.trim();
+    _appSettings = _appSettings.copyWith(
+      backendUrl: trimmed == null || trimmed.isEmpty ? null : trimmed,
+    );
     await _settings.write(_appSettings);
 
     _isBusy = false;

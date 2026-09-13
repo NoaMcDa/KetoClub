@@ -21,33 +21,36 @@ import 'package:ketoclub/utils/constants.dart';
 /// so a request made from a browser is blocked before this class ever
 /// sees a response. There are two ways that ends:
 ///
-/// * With no [proxyBase], the browser surfaces the block as the same
+/// * With no backend resolved, the browser surfaces the block as the same
 ///   [http.ClientException] a dead network would raise, so [fetch]
 ///   reports it as [MenuFetchFailureReason.blockedByBrowser] rather than
 ///   `offline` whenever it [runsInBrowser]: the user's way out is the
 ///   phone app, not a retry (architecture.md §10, §13).
-/// * With a [proxyBase], the request goes to the KetoClub backend
-///   instead, which makes the same call from a server where CORS does
-///   not apply and returns Wolt's answer unchanged. The browser is then
-///   no longer the thing that fails, so `blockedByBrowser` cannot arise
-///   and [MenuFetchFailureReason.backendUnreachable] takes its place
-///   (`backend_plan.md` §4).
+/// * With a [resolveProxyBase] that yields a base, the request goes to
+///   the KetoClub backend instead, which makes the same call from a
+///   server where CORS does not apply and returns Wolt's answer
+///   unchanged. The browser is then no longer the thing that fails, so
+///   `blockedByBrowser` cannot arise and
+///   [MenuFetchFailureReason.backendUnreachable] takes its place
+///   (architecture.md §13, D11).
 final class WoltMenuAdapter implements PlatformMenuAdapter {
   /// Creates an adapter that sends its requests through [client].
   ///
   /// The parameter is named `client`, not `_client`, so it cannot be an
   /// initializing formal (`this._client`) and is assigned explicitly.
   ///
-  /// [proxyBase] is the root of a KetoClub backend, or null to call Wolt
-  /// directly. Only `di.dart` decides which, and it chooses a proxy only
-  /// for the web build (`backend_plan.md` §4).
+  /// [resolveProxyBase] answers "which backend, if any" once per fetch.
+  /// It is a closure rather than a value because the answer can come from
+  /// Settings, which is asynchronous, while `di.dart` must stay
+  /// synchronous and free of plugin I/O. Null, or a closure yielding
+  /// null, means call Wolt directly. Only `di.dart` decides.
   ///
   /// [runsInBrowser] defaults to [kIsWeb] and exists so a test can
   /// exercise both the browser and the native mapping of a failed
   /// request on one platform.
   new({
     required http.Client client,
-    this.proxyBase,
+    this.resolveProxyBase,
     this.runsInBrowser = kIsWeb,
   })
     // The field is private and the parameter is not, so `this._client` is
@@ -61,10 +64,10 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
   /// from here (architecture.md §10, `MenuFetch.offline`).
   static const Duration _timeout = Duration(seconds: 15);
 
-  /// Wolt's own host, used when there is no [proxyBase].
+  /// Wolt's own host, used when no backend is in force.
   static const String _woltHost = 'restaurant-api.wolt.com';
 
-  /// The menu path, appended to Wolt's host or to [proxyBase] unchanged.
+  /// The menu path, appended to Wolt's host or to the backend unchanged.
   /// The backend route deliberately mirrors Wolt's own path so that
   /// switching between them is a change of origin and nothing else.
   static String _menuPath(String slug) => '/v4/venues/slug/$slug/menu/data';
@@ -82,10 +85,16 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
 
   final http.Client _client;
 
-  /// The root of the KetoClub backend to route through, or null to call
-  /// Wolt directly. A base with a path is respected, so a backend hosted
+  /// Resolves the root of the KetoClub backend to route through, or null
+  /// to call Wolt directly. Invoked once per [fetch], so a backend URL
+  /// changed in Settings takes effect on the next fetch rather than at
+  /// the next launch.
+  ///
+  /// Assumed not to throw: the only implementation reads `SettingsStore`,
+  /// which promises the same, and passes the result through a pure
+  /// function. A base carrying a path is respected, so a backend hosted
   /// under a sub-path works without further configuration.
-  final Uri? proxyBase;
+  final Future<Uri?> Function()? resolveProxyBase;
 
   /// Whether requests go out through a browser. A browser forbids a page
   /// from setting `User-Agent`, so the header is omitted there, and it
@@ -99,9 +108,9 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
   @override
   bool canHandle(VenueRef ref) => ref.source == MenuSource.wolt;
 
-  /// The URL one fetch of [slug] is sent to.
-  Uri _uriFor(String slug) {
-    final proxy = proxyBase;
+  /// The URL one fetch of [slug] is sent to, given the [proxy] in force
+  /// for this fetch.
+  Uri _uriFor(String slug, Uri? proxy) {
     if (proxy == null) {
       return Uri.https(_woltHost, _menuPath(slug));
     }
@@ -113,13 +122,14 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
 
   @override
   Future<MenuFetchResult> fetch(VenueRef ref) async {
-    final usesProxy = proxyBase != null;
+    final proxy = await resolveProxyBase?.call();
+    final usesProxy = proxy != null;
 
     http.Response response;
     try {
       response = await _client
           .get(
-            _uriFor(ref.platformId),
+            _uriFor(ref.platformId, proxy),
             headers: <String, String>{
               if (!runsInBrowser) 'User-Agent': browserUserAgent,
               'Accept': 'application/json',

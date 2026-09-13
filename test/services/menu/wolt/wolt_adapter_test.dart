@@ -56,7 +56,7 @@ WoltMenuAdapter _proxiedAdapter(
   bool runsInBrowser = false,
 }) => WoltMenuAdapter(
   client: MockClient(respond),
-  proxyBase: _proxyBase,
+  resolveProxyBase: () async => _proxyBase,
   runsInBrowser: runsInBrowser,
 );
 
@@ -353,7 +353,7 @@ void main() {
           requested = request.url;
           return http.Response(_emptyMenuBody, 200);
         }),
-        proxyBase: Uri.parse('http://localhost:8000/'),
+        resolveProxyBase: () async => Uri.parse('http://localhost:8000/'),
       );
 
       // Act
@@ -372,7 +372,8 @@ void main() {
           requested = request.url;
           return http.Response(_emptyMenuBody, 200);
         }),
-        proxyBase: Uri.parse('https://api.example.com/keto'),
+        resolveProxyBase: () async =>
+            Uri.parse('https://api.example.com/keto'),
       );
 
       // Act
@@ -558,6 +559,75 @@ void main() {
           ),
         ),
       );
+    });
+
+    test('a resolver that answers null goes straight to Wolt', () async {
+      // Arrange: this is what a build with no backend configured does, and
+      // it must be indistinguishable from having no resolver at all — the
+      // browser block included.
+      Uri? requested;
+      final adapter = WoltMenuAdapter(
+        client: MockClient((request) async {
+          requested = request.url;
+          return http.Response(_emptyMenuBody, 200);
+        }),
+        resolveProxyBase: () async => null,
+      );
+
+      // Act
+      await adapter.fetch(_refItHandles);
+
+      // Assert
+      expect(requested, equals(_expectedUri));
+    });
+
+    test(
+      'a resolver answering null still reports a browser block, not an '
+      'unreachable backend',
+      () async {
+        // Arrange
+        final adapter = WoltMenuAdapter(
+          client: MockClient((request) async {
+            throw http.ClientException('Failed to fetch', request.url);
+          }),
+          resolveProxyBase: () async => null,
+          runsInBrowser: true,
+        );
+
+        // Act
+        final result = await adapter.fetch(_refItHandles);
+
+        // Assert
+        expect(
+          result,
+          equals(
+            const MenuFetchFailed(
+              reason: MenuFetchFailureReason.blockedByBrowser,
+            ),
+          ),
+        );
+      },
+    );
+
+    test('the resolver is consulted on every fetch, not cached', () async {
+      // Arrange: a backend URL changed in Settings must take effect on the
+      // next fetch, which is the whole reason this is a closure.
+      final bases = <Uri?>[null, _proxyBase];
+      final requested = <Uri>[];
+      final adapter = WoltMenuAdapter(
+        client: MockClient((request) async {
+          requested.add(request.url);
+          return http.Response(_emptyMenuBody, 200);
+        }),
+        resolveProxyBase: () async => bases.removeAt(0),
+      );
+
+      // Act
+      await adapter.fetch(_refItHandles);
+      await adapter.fetch(_refItHandles);
+
+      // Assert
+      expect(requested, equals([_expectedUri, _expectedProxiedUri]));
     });
 
     test('fetch maps a TimeoutException to offline, proxy or not', () async {

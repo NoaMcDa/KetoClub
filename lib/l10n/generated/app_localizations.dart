@@ -311,7 +311,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsConsentBody.
   ///
   /// In en, this message translates to:
-  /// **'With a key, dish names, descriptions and option labels from the menu you open are sent to OpenRouter for analysis. Nothing about you, your location or your history is sent. Menus are read straight from the restaurant platform, which receives only the venue identifier. There is no other server and no analytics.'**
+  /// **'With a key, dish names, descriptions and option labels from the menu you open are sent to OpenRouter for analysis. Nothing about you, your location or your history is sent. Menus are read from the restaurant platform, and on the web through the KetoClub server, which forwards the request and sees only the venue identifier. There is no analytics.'**
   String get settingsConsentBody;
 
   /// No description provided for @settingsConsentAccept.
@@ -361,6 +361,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Saved menus cleared.'**
   String get settingsCacheCleared;
+
+  /// No description provided for @settingsBackendSection.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub server'**
+  String get settingsBackendSection;
+
+  /// No description provided for @settingsBackendBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The web build reads menus through this server, because a browser cannot read them directly. Leave it empty to use the address this app was built with.'**
+  String get settingsBackendBody;
+
+  /// No description provided for @settingsBackendHint.
+  ///
+  /// In en, this message translates to:
+  /// **'http://localhost:8000'**
+  String get settingsBackendHint;
+
+  /// No description provided for @settingsBackendSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save server address'**
+  String get settingsBackendSave;
+
+  /// No description provided for @settingsBackendClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear server address'**
+  String get settingsBackendClear;
 
   /// No description provided for @fetchFailedOffline.
   ///

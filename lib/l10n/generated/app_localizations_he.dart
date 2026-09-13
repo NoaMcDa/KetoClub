@@ -127,7 +127,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settingsConsentBody =>
-      'כשיש מפתח, שמות המנות, התיאורים ושמות התוספות מהתפריט שאתם פותחים נשלחים ל‑OpenRouter לניתוח. שום דבר עליכם, על מקומכם או על ההיסטוריה שלכם לא נשלח. התפריטים נקראים ישירות מפלטפורמת המסעדה, שמקבלת רק את מזהה המסעדה. אין שרת אחר ואין איסוף נתונים.';
+      'כשיש מפתח, שמות המנות, התיאורים ושמות התוספות מהתפריט שאתם פותחים נשלחים ל‑OpenRouter לניתוח. שום דבר עליכם, על מקומכם או על ההיסטוריה שלכם לא נשלח. התפריטים נקראים מפלטפורמת המסעדה, ובדפדפן דרך שרת קטוקלאב, שמעביר את הבקשה ורואה רק את מזהה המסעדה. אין איסוף נתונים.';
 
   @override
   String get settingsConsentAccept => 'הבנתי';
@@ -152,6 +152,22 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settingsCacheCleared => 'התפריטים השמורים נוקו.';
+
+  @override
+  String get settingsBackendSection => 'שרת קטוקלאב';
+
+  @override
+  String get settingsBackendBody =>
+      'בדפדפן התפריטים נקראים דרך השרת הזה, כי דפדפן לא יכול לקרוא אותם ישירות. השאירו ריק כדי להשתמש בכתובת שאיתה נבנתה האפליקציה.';
+
+  @override
+  String get settingsBackendHint => 'http://localhost:8000';
+
+  @override
+  String get settingsBackendSave => 'שמור כתובת שרת';
+
+  @override
+  String get settingsBackendClear => 'נקה כתובת שרת';
 
   @override
   String get fetchFailedOffline =>

@@ -248,5 +248,94 @@ void main() {
       // Assert
       expect(count, 2);
     });
+
+    test('backendUrl is null before anything is stored', () {
+      // Assert
+      expect(controller.backendUrl, isNull);
+    });
+
+    test('load populates backendUrl', () async {
+      // Arrange
+      await settings.write(
+        const AppSettings(backendUrl: 'http://192.168.1.20:8000'),
+      );
+
+      // Act
+      await controller.load();
+
+      // Assert
+      expect(controller.backendUrl, equals('http://192.168.1.20:8000'));
+    });
+
+    test('setBackendUrl stores the value and exposes it', () async {
+      // Act
+      await controller.setBackendUrl('http://localhost:8000');
+
+      // Assert
+      expect(controller.backendUrl, equals('http://localhost:8000'));
+      expect(
+        (await settings.read()).backendUrl,
+        equals('http://localhost:8000'),
+      );
+    });
+
+    test('setBackendUrl trims the value', () async {
+      // Act
+      await controller.setBackendUrl('  http://localhost:8000  ');
+
+      // Assert
+      expect(controller.backendUrl, equals('http://localhost:8000'));
+    });
+
+    test('setBackendUrl(null) clears the override', () async {
+      // Arrange
+      await controller.setBackendUrl('http://localhost:8000');
+
+      // Act
+      await controller.setBackendUrl(null);
+
+      // Assert
+      expect(controller.backendUrl, isNull);
+      expect((await settings.read()).backendUrl, isNull);
+    });
+
+    test('setBackendUrl stores a blank value as null, not as empty', () async {
+      // Arrange: "cleared" must have one representation, so the code
+      // reading it never has to test for both null and ''.
+      await controller.setBackendUrl('http://localhost:8000');
+
+      // Act
+      await controller.setBackendUrl('   ');
+
+      // Assert
+      expect(controller.backendUrl, isNull);
+    });
+
+    test('setBackendUrl leaves the other settings alone', () async {
+      // Arrange
+      await settings.write(
+        const AppSettings(languageTag: 'he', estimationConsentGiven: true),
+      );
+      await controller.load();
+
+      // Act
+      await controller.setBackendUrl('http://localhost:8000');
+
+      // Assert
+      expect(controller.languageTag, equals('he'));
+      expect(controller.consentGiven, isTrue);
+    });
+
+    test('setBackendUrl notifies twice, busy then done', () async {
+      // Arrange
+      var count = 0;
+      controller.addListener(() => count++);
+
+      // Act
+      await controller.setBackendUrl('http://localhost:8000');
+
+      // Assert
+      expect(count, 2);
+    });
   });
 }

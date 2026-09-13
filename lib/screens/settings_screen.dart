@@ -34,6 +34,11 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _keyField = TextEditingController();
 
+  /// The backend address field. Unlike [_keyField] this one **is**
+  /// prefilled from the controller, because the value is not a secret and
+  /// editing an address you cannot see would be needless work.
+  final TextEditingController _backendField = TextEditingController();
+
   /// Whether [SettingsController.clearCache] has completed since this
   /// screen was built, so [AppLocalizations.settingsCacheCleared] can be
   /// shown once. Local UI state, not part of [SettingsController]: the
@@ -49,13 +54,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // StatefulWidget rather than provider's create.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      unawaited(context.read<SettingsController>().load());
+      unawaited(_loadAndPrefill());
     });
+  }
+
+  /// Loads the stored settings, then seeds the one field that shows a
+  /// stored value. Prefilling happens here rather than in `build` so no
+  /// build ever mutates state, and so typing is never overwritten by a
+  /// later rebuild.
+  Future<void> _loadAndPrefill() async {
+    final controller = context.read<SettingsController>();
+    await controller.load();
+    if (!mounted) return;
+    _backendField.text = controller.backendUrl ?? '';
   }
 
   @override
   void dispose() {
     _keyField.dispose();
+    _backendField.dispose();
     super.dispose();
   }
 
@@ -84,6 +101,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _filterSection(context, l10n, controller),
             const SizedBox(height: 24),
             _cacheSection(l10n, controller),
+            const SizedBox(height: 24),
+            _backendSection(context, l10n, controller),
           ],
         ),
       ),
@@ -158,6 +177,68 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await controller.saveKey(text);
     if (!mounted) return;
     _keyField.clear();
+  }
+
+  /// The KetoClub server address, which overrides the one this build was
+  /// compiled with (architecture.md §13, D11).
+  ///
+  /// Last on the screen because almost nobody needs it: the web build
+  /// already has an address if it was built with one, and mobile needs no
+  /// server at all. It exists for pointing a phone at a backend running
+  /// on a machine nearby, which no compile-time value can do.
+  Widget _backendSection(
+    BuildContext context,
+    AppLocalizations l10n,
+    SettingsController controller,
+  ) {
+    final busy = controller.isBusy;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.settingsBackendSection,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        Text(l10n.settingsBackendBody),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _backendField,
+          enabled: !busy,
+          keyboardType: TextInputType.url,
+          decoration: InputDecoration(hintText: l10n.settingsBackendHint),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          children: [
+            FilledButton(
+              onPressed: busy
+                  ? null
+                  : () => unawaited(
+                      controller.setBackendUrl(_backendField.text),
+                    ),
+              child: Text(l10n.settingsBackendSave),
+            ),
+            if (controller.backendUrl != null)
+              OutlinedButton(
+                onPressed: busy
+                    ? null
+                    : () => unawaited(_clearBackendUrl(controller)),
+                child: Text(l10n.settingsBackendClear),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// Clears the stored address and empties the field, so "cleared" looks
+  /// cleared rather than leaving the old text sitting there unsaved.
+  Future<void> _clearBackendUrl(SettingsController controller) async {
+    await controller.setBackendUrl(null);
+    if (!mounted) return;
+    _backendField.clear();
   }
 
   /// The consent disclosure: what leaves the device, and the

@@ -31,24 +31,36 @@ const String _menuCacheBoxName = 'menu_cache';
 const String _backendUrl = String.fromEnvironment('KETOCLUB_BACKEND_URL');
 
 /// The backend to route Wolt menu requests through, or null to call Wolt
-/// directly.
+/// directly (architecture.md §13, D11).
 ///
-/// A browser will not let the app read a menu from Wolt at all, because
-/// Wolt sends no CORS headers (architecture.md §13, D9); a native HTTP
-/// stack does not enforce CORS and has never needed help. So the proxy is
-/// used when the app [runsInBrowser] *and* a backend was [configured],
-/// and not otherwise.
+/// Two sources, and the rule between them is what makes Settings useful:
 ///
-/// A [configured] value that is not an absolute `http`/`https` URL yields
-/// null rather than a malformed request: a mistyped define degrades to
-/// the behaviour the app has without one, which is a working app on
-/// mobile and an honest "open the phone app" on web.
+/// * [overridden] is what the user typed in Settings. It wins on **every**
+///   platform, because the reason to type one is to point a phone at a
+///   backend running on a machine across the room — a rule that only
+///   applied in a browser would make that impossible.
+/// * [configured] is the compile-time `KETOCLUB_BACKEND_URL`. It applies
+///   only when the app [runsInBrowser], since a native HTTP stack does not
+///   enforce CORS and has never needed the help.
+///
+/// A value that is not an absolute `http`/`https` URL yields null rather
+/// than a malformed request, so a mistyped define or a half-typed setting
+/// degrades to the behaviour the app has without one: a working app on
+/// mobile, and an honest "open the phone app" on web.
 ///
 /// Pure and top-level so `di_test` can cover every branch without a
 /// `--dart-define`, which a unit test cannot set.
-Uri? menuProxyBase({required bool runsInBrowser, required String configured}) {
-  if (!runsInBrowser || configured.isEmpty) return null;
-  final parsed = Uri.tryParse(configured);
+Uri? menuProxyBase({
+  required bool runsInBrowser,
+  required String configured,
+  String? overridden,
+}) {
+  final chosen = switch (overridden?.trim()) {
+    final String typed when typed.isNotEmpty => typed,
+    _ => runsInBrowser ? configured : '',
+  };
+  if (chosen.isEmpty) return null;
+  final parsed = Uri.tryParse(chosen);
   if (parsed == null || !parsed.isAbsolute) return null;
   if (parsed.scheme != 'http' && parsed.scheme != 'https') return null;
   return parsed;
@@ -73,6 +85,9 @@ AppDependencies buildDependencies() {
   final client = http.Client();
   const clock = SystemClock();
   const keyStore = SecureKeyStore(FlutterSecureStorage());
+  // Built once and shared: the adapter reads the backend URL from it on
+  // every fetch, and it memoises the preferences instance itself.
+  final settingsStore = PrefsSettingsStore(load: SharedPreferences.getInstance);
 
   const heuristic = HeuristicMenuClassifier(clock: clock);
   final llm = LlmMenuClassifier(
@@ -85,9 +100,13 @@ AppDependencies buildDependencies() {
       adapters: [
         WoltMenuAdapter(
           client: client,
-          proxyBase: menuProxyBase(
+          // Read per fetch, not once here: buildDependencies() must stay
+          // synchronous and free of plugin I/O, and a backend URL typed
+          // into Settings should take effect without a restart.
+          resolveProxyBase: () async => menuProxyBase(
             runsInBrowser: kIsWeb,
             configured: _backendUrl,
+            overridden: (await settingsStore.read()).backendUrl,
           ),
         ),
       ],
@@ -101,7 +120,7 @@ AppDependencies buildDependencies() {
     ),
     menuClassifier: RoutingMenuClassifier(llm, heuristic, keyStore),
     keyStore: keyStore,
-    settingsStore: PrefsSettingsStore(load: SharedPreferences.getInstance),
+    settingsStore: settingsStore,
     clock: clock,
     logger: const DeveloperLogAppLogger(),
   );

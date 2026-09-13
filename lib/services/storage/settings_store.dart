@@ -31,6 +31,7 @@ final class AppSettings {
     this.filter = MenuFilter.greenAndYellow,
     this.estimationConsentGiven = false,
     this.lastVenue,
+    this.backendUrl,
   });
 
   /// Reads settings written by [toJson].
@@ -53,11 +54,14 @@ final class AppSettings {
       lastVenue = VenueRef.tryFrom(rawLastVenue);
       if (lastVenue == null) return null;
     }
+    final rawBackendUrl = json['backendUrl'];
+    if (rawBackendUrl != null && rawBackendUrl is! String) return null;
     return AppSettings(
       languageTag: rawLanguageTag is String ? rawLanguageTag : null,
       filter: filter,
       estimationConsentGiven: rawConsent,
       lastVenue: lastVenue,
+      backendUrl: rawBackendUrl is String ? rawBackendUrl : null,
     );
   }
 
@@ -74,6 +78,17 @@ final class AppSettings {
   /// The last venue opened, or null before any venue has been.
   final VenueRef? lastVenue;
 
+  /// The KetoClub backend to route menu fetches through, overriding the
+  /// compile-time `KETOCLUB_BACKEND_URL`, or null to use that value
+  /// (architecture.md §13, D11).
+  ///
+  /// Its reason to exist is testing a phone build against a backend on
+  /// the machine next to it, so unlike the compile-time value it applies
+  /// on every platform, not only the web. Not a secret: it is a host the
+  /// user typed, and it is stored beside the other preferences rather
+  /// than in the key store.
+  final String? backendUrl;
+
   /// Returns a copy with the given fields replaced.
   ///
   /// Omitting [languageTag] or [lastVenue] leaves the current value in
@@ -85,6 +100,7 @@ final class AppSettings {
     MenuFilter? filter,
     bool? estimationConsentGiven,
     Object? lastVenue = _unset,
+    Object? backendUrl = _unset,
   }) => AppSettings(
     languageTag: identical(languageTag, _unset)
         ? this.languageTag
@@ -95,6 +111,9 @@ final class AppSettings {
     lastVenue: identical(lastVenue, _unset)
         ? this.lastVenue
         : lastVenue as VenueRef?,
+    backendUrl: identical(backendUrl, _unset)
+        ? this.backendUrl
+        : backendUrl as String?,
   );
 
   /// Writes a form [tryFrom] can read back.
@@ -103,6 +122,7 @@ final class AppSettings {
     'filter': filter.name,
     'estimationConsentGiven': estimationConsentGiven,
     'lastVenue': lastVenue?.toJson(),
+    'backendUrl': backendUrl,
   };
 
   @override
@@ -111,11 +131,17 @@ final class AppSettings {
       other.languageTag == languageTag &&
       other.filter == filter &&
       other.estimationConsentGiven == estimationConsentGiven &&
-      other.lastVenue == lastVenue;
+      other.lastVenue == lastVenue &&
+      other.backendUrl == backendUrl;
 
   @override
-  int get hashCode =>
-      Object.hash(languageTag, filter, estimationConsentGiven, lastVenue);
+  int get hashCode => Object.hash(
+    languageTag,
+    filter,
+    estimationConsentGiven,
+    lastVenue,
+    backendUrl,
+  );
 
   @override
   String toString() =>

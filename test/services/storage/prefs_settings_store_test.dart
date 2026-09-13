@@ -254,4 +254,85 @@ void main() {
       expect(result, isNotNull);
     });
   });
+
+  group('AppSettings.backendUrl', () {
+    test('round-trips through the store', () async {
+      // Arrange
+      final store = _buildStore();
+      const settings = AppSettings(backendUrl: 'http://192.168.1.20:8000');
+
+      // Act
+      await store.write(settings);
+      final result = await store.read();
+
+      // Assert
+      expect(result.backendUrl, equals('http://192.168.1.20:8000'));
+      expect(result, equals(settings));
+    });
+
+    test('is null on a virgin store', () async {
+      // Arrange
+      final store = _buildStore();
+
+      // Act
+      final result = await store.read();
+
+      // Assert
+      expect(result.backendUrl, isNull);
+    });
+
+    test('a write without it clears a previously stored value', () async {
+      // Arrange
+      final store = _buildStore();
+      await store.write(const AppSettings(backendUrl: 'http://localhost:8000'));
+
+      // Act
+      await store.write(const AppSettings());
+      final result = await store.read();
+
+      // Assert
+      expect(result.backendUrl, isNull);
+    });
+
+    test('a stored value of the wrong type reads as defaults', () async {
+      // Arrange: a hand-edited or older payload must not crash the app.
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        'flutter.ketoclub_settings':
+            '{"filter":"greenAndYellow","estimationConsentGiven":false,'
+            '"backendUrl":42}',
+      });
+      final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
+
+      // Act
+      final result = await store.read();
+
+      // Assert
+      expect(result, equals(const AppSettings()));
+    });
+
+    test('copyWith leaves it alone unless it is passed', () {
+      // Arrange
+      const settings = AppSettings(backendUrl: 'http://localhost:8000');
+
+      // Act
+      final unchanged = settings.copyWith(languageTag: 'he');
+      final cleared = settings.copyWith(backendUrl: null);
+      final replaced = settings.copyWith(backendUrl: 'http://other:9000');
+
+      // Assert
+      expect(unchanged.backendUrl, equals('http://localhost:8000'));
+      expect(cleared.backendUrl, isNull);
+      expect(replaced.backendUrl, equals('http://other:9000'));
+    });
+
+    test('two settings differing only in it are not equal', () {
+      // Arrange
+      const a = AppSettings(backendUrl: 'http://localhost:8000');
+      const b = AppSettings(backendUrl: 'http://localhost:9000');
+
+      // Assert
+      expect(a, isNot(equals(b)));
+      expect(a.hashCode, isNot(equals(b.hashCode)));
+    });
+  });
 }

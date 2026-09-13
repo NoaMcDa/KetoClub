@@ -50,7 +50,7 @@
   "settingsKeyDelete": "Remove key",
   "settingsWebStorageNote": "On the web the key is kept in browser storage, which protects it less well than a phone's keychain.",
   "settingsConsentTitle": "What leaves this device",
-  "settingsConsentBody": "With a key, dish names, descriptions and option labels from the menu you open are sent to OpenRouter for analysis. Nothing about you, your location or your history is sent. Menus are read straight from the restaurant platform, which receives only the venue identifier. There is no other server and no analytics.",
+  "settingsConsentBody": "With a key, dish names, descriptions and option labels from the menu you open are sent to OpenRouter for analysis. Nothing about you, your location or your history is sent. Menus are read from the restaurant platform, and on the web through the KetoClub server, which forwards the request and sees only the venue identifier. There is no analytics.",
   "settingsConsentAccept": "I understand",
   "settingsLanguage": "Language",
   "settingsLanguageSystem": "Match my device",
@@ -59,6 +59,12 @@
   "settingsFilter": "Default filter",
   "settingsClearCache": "Clear saved menus",
   "settingsCacheCleared": "Saved menus cleared.",
+
+  "settingsBackendSection": "KetoClub server",
+  "settingsBackendBody": "The web build reads menus through this server, because a browser cannot read them directly. Leave it empty to use the address this app was built with.",
+  "settingsBackendHint": "http://localhost:8000",
+  "settingsBackendSave": "Save server address",
+  "settingsBackendClear": "Clear server address",
 
   "fetchFailedOffline": "No connection, so the menu could not be read.",
   "fetchFailedBlockedByBrowser": "A web browser cannot read {platform} menus: {platform} blocks requests from other websites. Open this link in the KetoClub phone app instead.",

@@ -99,6 +99,74 @@ void main() {
       expect(base, isNull);
     });
 
+    test('a Settings override wins over the compile-time value', () {
+      // Act
+      final base = menuProxyBase(
+        runsInBrowser: true,
+        configured: configured,
+        overridden: 'http://192.168.1.20:8000',
+      );
+
+      // Assert
+      expect(base, equals(Uri.parse('http://192.168.1.20:8000')));
+    });
+
+    test('a Settings override applies off the web too', () {
+      // Arrange: this is the whole point of the override — pointing a
+      // phone at a backend running on a machine nearby. A rule that only
+      // applied in a browser would make that impossible.
+
+      // Act
+      final base = menuProxyBase(
+        runsInBrowser: false,
+        configured: '',
+        overridden: 'http://192.168.1.20:8000',
+      );
+
+      // Assert
+      expect(base, equals(Uri.parse('http://192.168.1.20:8000')));
+    });
+
+    test('a blank override falls back to the compile-time value', () {
+      // Act
+      final base = menuProxyBase(
+        runsInBrowser: true,
+        configured: configured,
+        overridden: '   ',
+      );
+
+      // Assert
+      expect(base, equals(Uri.parse(configured)));
+    });
+
+    test('an override is trimmed', () {
+      // Act
+      final base = menuProxyBase(
+        runsInBrowser: false,
+        configured: '',
+        overridden: '  http://localhost:9000  ',
+      );
+
+      // Assert
+      expect(base, equals(Uri.parse('http://localhost:9000')));
+    });
+
+    test('a malformed override does not fall back, it disables the proxy', () {
+      // Arrange: falling back to the compile-time value would send menus
+      // somewhere the user did not ask for, right after they told us where
+      // they wanted them. Off is the honest answer.
+
+      // Act
+      final base = menuProxyBase(
+        runsInBrowser: true,
+        configured: configured,
+        overridden: 'not a url',
+      );
+
+      // Assert
+      expect(base, isNull);
+    });
+
     test('is null for a scheme that is not http or https', () {
       // Act
       final base = menuProxyBase(

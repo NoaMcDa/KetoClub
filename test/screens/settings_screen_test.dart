@@ -328,5 +328,108 @@ void main() {
       expect(find.text(_he.settingsTitle), findsOneWidget);
       expect(find.text(_he.settingsKeySection), findsOneWidget);
     });
+
+    testWidgets('build shows the backend section', (tester) async {
+      // Arrange
+      final controller = _controllerFor();
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.settingsBackendSection), findsOneWidget);
+      expect(find.text(_en.settingsBackendBody), findsOneWidget);
+      expect(
+        find.widgetWithText(FilledButton, _en.settingsBackendSave),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('build with no stored address hides the clear action', (
+      tester,
+    ) async {
+      // Arrange
+      final controller = _controllerFor();
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(
+        find.widgetWithText(OutlinedButton, _en.settingsBackendClear),
+        findsNothing,
+      );
+    });
+
+    testWidgets('a stored address is prefilled and clearable', (tester) async {
+      // Arrange: unlike the key, this value is not a secret, so the field
+      // shows it — editing an address you cannot see would be needless
+      // work.
+      final settingsStore = FakeSettingsStore();
+      await settingsStore.write(
+        const AppSettings(backendUrl: 'http://192.168.1.20:8000'),
+      );
+      final controller = _controllerFor(settingsStore: settingsStore);
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('http://192.168.1.20:8000'), findsOneWidget);
+      expect(
+        find.widgetWithText(OutlinedButton, _en.settingsBackendClear),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('typing an address and saving stores it', (tester) async {
+      // Arrange
+      final settingsStore = FakeSettingsStore();
+      final controller = _controllerFor(settingsStore: settingsStore);
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Act
+      // The backend field is the last on the screen; the key field is the
+      // other one, and it is obscured.
+      await tester.enterText(
+        find.byType(TextField).last,
+        'http://localhost:8000',
+      );
+      await tester.tap(
+        find.widgetWithText(FilledButton, _en.settingsBackendSave),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(
+        (await settingsStore.read()).backendUrl,
+        equals('http://localhost:8000'),
+      );
+    });
+
+    testWidgets('clearing the address empties the field too', (tester) async {
+      // Arrange
+      final settingsStore = FakeSettingsStore();
+      await settingsStore.write(
+        const AppSettings(backendUrl: 'http://192.168.1.20:8000'),
+      );
+      final controller = _controllerFor(settingsStore: settingsStore);
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(
+        find.widgetWithText(OutlinedButton, _en.settingsBackendClear),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect((await settingsStore.read()).backendUrl, isNull);
+      expect(find.text('http://192.168.1.20:8000'), findsNothing);
+    });
   });
 }

@@ -126,7 +126,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsConsentBody =>
-      'With a key, dish names, descriptions and option labels from the menu you open are sent to OpenRouter for analysis. Nothing about you, your location or your history is sent. Menus are read straight from the restaurant platform, which receives only the venue identifier. There is no other server and no analytics.';
+      'With a key, dish names, descriptions and option labels from the menu you open are sent to OpenRouter for analysis. Nothing about you, your location or your history is sent. Menus are read from the restaurant platform, and on the web through the KetoClub server, which forwards the request and sees only the venue identifier. There is no analytics.';
 
   @override
   String get settingsConsentAccept => 'I understand';
@@ -151,6 +151,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsCacheCleared => 'Saved menus cleared.';
+
+  @override
+  String get settingsBackendSection => 'KetoClub server';
+
+  @override
+  String get settingsBackendBody =>
+      'The web build reads menus through this server, because a browser cannot read them directly. Leave it empty to use the address this app was built with.';
+
+  @override
+  String get settingsBackendHint => 'http://localhost:8000';
+
+  @override
+  String get settingsBackendSave => 'Save server address';
+
+  @override
+  String get settingsBackendClear => 'Clear server address';
 
   @override
   String get fetchFailedOffline =>
