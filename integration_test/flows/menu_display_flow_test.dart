@@ -16,8 +16,7 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 
-import '../../test/fakes/fake_app_dependencies.dart';
-import '../support/flow_harness.dart';
+import 'flow_support.dart';
 
 /// The Wolt venue page the user pastes, in the documented
 /// `wolt.com/{lang}/{country}/{city}/restaurant/{slug}` form

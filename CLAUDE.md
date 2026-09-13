@@ -6,15 +6,34 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **KetoClub** is a restaurant menu analysis platform designed to help keto dieters find safe dining options. The app ingests live menus from restaurant delivery platforms, classifies dishes by keto-compatibility, and generates automatic waiter instructions for modifications.
 
+> **Status: Phase 1 is built and merged.** Build-order steps 1–5 of
+> `architecture.md` §16 ship: models and service contracts, the bilingual heuristic
+> engine, Wolt ingestion with a Hive cache, the classified menu screen and Waiter
+> Card, and the OpenRouter client with its router and Settings. 1418 tests, 98.9% of
+> 1673 instrumented lines.
+>
+> **Read `architecture.md` first — it is authoritative.** This file and `README.md`
+> predate the code in places; where any of them disagrees with `architecture.md`,
+> architecture.md wins. **`HANDOFF.md` is the fastest way in**: what exists, what is
+> deliberately unfinished, and the traps that already cost time.
+
 ## Architecture & Core Components
 
 ### Client-Only Architecture (No Backend)
 
 Single Flutter codebase for web, iOS, and Android with:
-- **Classification Engine**: Heuristic-based keto dish classifier running client-side in Dart
-- **API Integration**: Direct calls to restaurant platform APIs (Wolt, 10bis, Tabit, Ontopo) from the client
-- **Local Storage**: Device-level caching using Hive or SharedPreferences (optional, for offline access)
-- **No server, no database**: All menu analysis and data processing happens on the user's device
+- **Classification Engine**: **a hosted language model is the primary classifier, with
+  an on-device rule engine as the fallback** (`architecture.md` D2). The user supplies
+  their own OpenRouter key; when there is no key, no consent, or no network, the rule
+  engine answers and the UI labels the result "rules". Both sit behind one
+  `MenuClassifier` interface and a router picks per call.
+- **API Integration**: Direct calls to restaurant platform APIs from the client.
+  **Only Wolt is implemented**; 10bis, Tabit and Ontopo are not built.
+- **Local Storage**: Hive caches the normalised menu and its analysis for 24 hours;
+  `flutter_secure_storage` holds the OpenRouter key; `shared_preferences` holds
+  non-secret settings.
+- **No server, no database**: All menu analysis and data processing happens on the
+  user's device.
 
 ### Menu Ingestion & API Integration
 
@@ -74,127 +93,116 @@ Future additions: user ratings, review feedback loop, OCR/vision processing for 
 
 ## Development Workflow
 
-### Current Status: Research & Planning Phase
+### Current status
 
-⚠️ **No code has been implemented yet.** The repository contains:
-- Detailed architectural documentation (README.md)
-- API endpoint specifications and reverse-engineering notes
-- Keto classification heuristics and waiter script templates
-- Database entity definitions and ER diagrams
-- Research documents on AI/LLM integration (OpenRouter, structured output)
-- Feature prioritization and phase roadmap
+Phase 1 is built and merged (see the banner at the top). The repository holds a
+working Flutter app plus the planning documents it was built from.
 
-### Expected Project Structure (to build)
-
-When implementation begins, follow this layout:
+### Actual project structure
 
 ```
-ketoclub/
-├── lib/
-│   ├── main.dart                     # Flutter app entry point
-│   ├── screens/
-│   │   ├── venue_search_screen.dart  # Location/restaurant search
-│   │   ├── menu_detail_screen.dart   # Display classified menu
-│   │   └── settings_screen.dart      # User preferences
-│   ├── widgets/
-│   │   ├── dish_card.dart            # Reusable dish card with status badge
-│   │   ├── status_badge.dart         # GREEN/YELLOW/RED badge
-│   │   └── waiter_script_widget.dart # Expandable waiter instructions
-│   ├── services/
-│   │   ├── restaurant_api_client.dart    # Direct calls to Wolt, 10bis, Tabit, Ontopo
-│   │   ├── location_service.dart        # Device geolocation
-│   │   └── menu_classifier.dart         # Client-side keto classification logic
-│   ├── models/
-│   │   ├── dish.dart                 # Dish data class
-│   │   ├── menu.dart                 # Menu data class
-│   │   └── venue.dart                # Venue data class
-│   └── utils/
-│       ├── constants.dart            # Carb modifiers, non-keto bases, waiter templates
-│       ├── classification_rules.dart # Regex patterns, heuristic matchers
-│       └── local_storage.dart        # Hive/SharedPreferences wrapper (optional)
-├── ios/                              # iOS-specific configuration
-│   ├── Podfile
-│   └── Runner.xcodeproj/
-├── android/                          # Android-specific configuration
-│   ├── app/
-│   └── AndroidManifest.xml
-├── web/                              # Web-specific files
-│   └── index.html
-├── pubspec.yaml                      # Flutter dependencies
-├── pubspec.lock
-└── analysis_options.yaml             # Dart analysis settings
+lib/
+├── main.dart                  # runApp(KetoClubApp(dependencies: buildDependencies()))
+├── di.dart                    # composition root: the ONLY file constructing concrete services
+├── app.dart                   # MaterialApp, localisation delegates, generateRoute
+├── l10n/                      # app_en.arb, app_he.arb + committed generated/ output
+├── models/                    # venue, menu, analysis, failures — plain immutable Dart
+├── utils/                     # constants (the keto vocabulary), text_normaliser,
+│                              # classification_rules, price_format
+├── services/
+│   ├── platform/              # clock, app_logger
+│   ├── storage/               # key_store, menu_cache, settings_store (interface + impl each)
+│   ├── llm/                   # llm_chat_client, open_router_client
+│   ├── venue/                 # venue_ref_resolver (paste-a-URL, pure)
+│   ├── menu/                  # platform_menu_adapter, menu_repository, wolt/
+│   └── classifier/            # menu_classifier, heuristic, llm, router, prompt, parser
+├── state/                     # app_dependencies + one ChangeNotifier per screen
+├── widgets/                   # dish_card, status_badge, engine_chip, waiter_script, failure_copy
+└── screens/                   # venue_search, menu, waiter_card_sheet, settings
+
+test/                          # mirrors lib/, plus architecture/, fakes/, fixtures/, l10n/
+integration_test/flows/        # three flow tests + flow_support.dart (same-directory helper)
+tool/                          # check.sh (the gate), coverage_gate.sh, gen_coverage_helper.sh
 ```
 
-### Setup (when code exists)
+`architecture.md` §5 carries the same tree with the layer-rank rules the
+architecture test enforces.
 
-**Flutter Application (web, iOS, Android):**
+### Setup and the gate
+
 ```bash
-flutter pub get                          # Install dependencies
-
-# Run on web (localhost:8080)
-flutter run -d chrome                    # Or 'web' for headless web build
-
-# Run on iOS (macOS only)
-flutter run -d "iPhone 15"              # Or use simulator ID from 'flutter devices'
-
-# Run on Android
-flutter run -d emulator                  # Or use connected device ID
-
-# Build for production
-flutter build web                        # Build web (output in build/web/)
-flutter build ios                        # Build iOS app
-flutter build apk                        # Build Android APK
-flutter build appbundle                 # Build Android App Bundle for Play Store
+flutter pub get
+tool/check.sh          # format, analyze --fatal-infos --fatal-warnings, tests, 80% coverage gate
+flutter run -d chrome  # web; live menu fetching is blocked by CORS, see architecture.md §13
+flutter run -d <device>
 ```
 
-**No backend or database setup required** — all data processing and API calls happen on the client device.
+**Flutter 3.47.4 / Dart 3.13.3**, pinned in `.github/workflows/ci.yml` and
+`pubspec.yaml`; bump both in one commit. `tool/check.sh` runs exactly what the
+`quality` and `test` CI jobs run — run it before pushing.
 
-## Implementation Notes & Design Decisions
+An **info-level lint fails the build** (`--fatal-infos`), including the 80-column
+limit and `public_member_api_docs`, in `test/` and `integration_test/` too.
 
-### Client-Only Architecture (from README & research docs)
+### Traps that already cost time
 
-1. **Heuristic-based classification (client-side)**: 
-   - Implement regex patterns on dish name + description in Dart (see `CARB_MODIFIERS` and `NON_KETO_BASES` in README)
-   - Build `MenuClassifier` service that evaluates dishes and returns status (GREEN/YELLOW/RED) + waiter script
-   - No backend needed; logic lives in `lib/services/menu_classifier.dart`
+The long form is in `HANDOFF.md`; these are the ones that bite while writing code.
 
-2. **Restaurant API clients (direct from device)**:
-   - Wolt: Slug-based, no auth required (easiest starting point)
-   - 10bis: Restaurant ID lookup, no auth needed
-   - Tabit: Session token via QR endpoint (more complex, can defer to later)
-   - Ontopo: Bearer token + PDF links (lowest priority)
-   - All calls made directly from Flutter app using `http` package or `dio`
+- **Dart's `\b` is ASCII-only.** `RegExp(r'\bפסטה\b')` matches nothing, so a Hebrew
+  vocabulary built that way is silently dead while English tests pass. Hebrew triggers
+  use unicode lookarounds: permissive left (grammatical particles), strict right.
+- **`material.dart` exports its own `MenuController`** in this SDK. Import it with
+  `hide MenuController` when you also need ours from `state/`.
+- **`services/` may import neither `dart:io`** (breaks `flutter build web`) **nor
+  `package:flutter/services.dart`** (breaks the architecture test). So no
+  `SocketException` — use `ClientException` — and no `PlatformException` by name.
+- **No constructor reached from `di.dart` may perform plugin I/O.** Pass a closure
+  invoked on first use, as the Hive and preferences wiring does; `di_test` asserts it.
+- **A `ListView` builds lazily**, so widgets below the fold are absent from the element
+  tree and `find.text` finds nothing. Scroll first, or use a `Column` for short screens.
+- **A web flow test's imports must be same-directory or `package:`** — `flutter drive`
+  roots the compile at the test file's own directory. Only `flutter drive` catches a
+  violation; `flutter test` and `flutter build web --target=…` both pass regardless.
+- **Serialise test runs when several agents share a worktree:**
+  `flock /tmp/ketoclub.lock -c 'flutter test …'`.
 
-3. **Waiter script generation (client-side)**:
-   - Pre-composed template strings in `lib/utils/constants.dart` (see README examples)
-   - `MenuClassifier` returns both status and matching waiter instructions
-   - No NLG or backend processing needed
+## Implementation notes — how it actually works
 
-4. **Single codebase for all platforms** (Flutter):
-   - One directory targeting web, iOS, and Android
-   - Responsive UI using Flutter's adaptive widgets (`ResponsiveBuilder`, `LayoutBuilder`)
-   - Share all business logic: API clients, classifier, constants across platforms
+The section this replaces described a heuristic-first design that predates the code.
+`architecture.md` §6 and §9 are the real reference; this is the short version.
 
-5. **Geolocation strategy**:
-   - Use `geolocator` package for cross-platform device location
-   - Web: Browser Geolocation API with permission handling
-   - iOS/Android: Native OS permissions with graceful fallback to manual input
-   - Once user provides location, search for nearby venues (no radius endpoint needed; filter results client-side)
-
-6. **Local caching (optional)**:
-   - Use `hive` or `shared_preferences` to cache fetched menus locally on device
-   - Enables offline viewing of previously loaded menus
-   - Optional for MVP; can skip if not needed initially
-
-7. **Platform-specific considerations**:
-   - **iOS**: Configure `Info.plist` for location permission prompts
-   - **Android**: Configure `AndroidManifest.xml` for location + internet permissions
-   - **Web**: Responsive layout for desktop/tablet/mobile browsers
-   - Use `kIsWeb`, `Platform`, and conditional rendering to handle platform differences
-
-8. **Future backend (Phase 3+)**: 
-   - If user ratings and venue reviews are added later, a backend can be introduced
-   - For now, all MVP features work client-side with no server infrastructure
+1. **Two classifiers behind one interface.** `MenuClassifier.classify(menu)` is one
+   call per menu, never one per dish — the OpenRouter free tier is 50 requests a day
+   (D6). `RoutingMenuClassifier` chooses: no key or no consent means the heuristic
+   stamped `notConfigured`; otherwise the LLM, falling back to the heuristic on
+   `offline`, `timeout`, `rateLimited` and `badResponse` with that reason carried
+   through so the UI can say why. **`unauthorised` does not fall back** — a rejected
+   key must be visible, not quietly answered with a weaker result.
+2. **The model's reply is untrusted input.** `MenuResponseParser` is static, pure and
+   never throws, and implements §9.4's eight rules: a dish the menu does not contain
+   is an invention and is never given a verdict; a yellow whose instruction is
+   missing or blank is demoted rather than promoted; dishes the model skipped are
+   listed by name, so "could not place it" never looks like "did not see it".
+3. **The waiter script *is* `AnalysedDish.modification`** — there is no separate
+   generator. It is written in the **menu's** language, detected from the dish text,
+   not the UI locale (§12): it gets read aloud to a waiter in that restaurant. That
+   is why the heuristic's templates live bilingually in `constants.dart` rather than
+   in ARB, a documented exception to "no user-facing literal in Dart".
+4. **Adapters are split in two.** `wolt_adapter.dart` does HTTP; `wolt_menu_mapper.dart`
+   is a pure JSON→`Menu` function tested against a fixture with no HTTP at all. A URL
+   change touches one file, a schema change the other.
+5. **Option text is part of what the classifier reads.** A dish's yellow-ness often
+   lives in "choice of side", not the description.
+6. **Everything at a service boundary returns a sealed result**, never throws, and
+   every failure reason is distinct. Collapsing two reasons into one message is the
+   bug §10 names; `failure_copy.dart` has a test asserting no two of the eleven
+   reasons share copy in either language.
+7. **`di.dart` is the only file that constructs a concrete service**, and nothing it
+   calls performs plugin I/O — see the traps above.
+8. **The key** lives in `flutter_secure_storage`, is read only by `OpenRouterClient`,
+   and never reaches a log, a failure value, the cache or the widget tree. Settings
+   exposes `hasKey`, never the key; there are tests asserting the string appears
+   nowhere it should not.
 
 ## Planning & Research Documents
 
@@ -215,135 +223,40 @@ When reading research docs (m15/m16), note that prefixes indicate iteration/mile
 
 ## Project Phases
 
-- **Phase 1**: Core parsing, heuristic engine, waiter script generation → **Designed (README documented), not implemented**
-- **Phase 2**: Mobile interface, geolocation, search filtering → **Planned**
+- **Phase 1**: menu ingestion, classification and waiter scripts → **Built and merged**
+- **Phase 2**: geolocation and nearby search → **Next.** Blocked on discovery: no Wolt
+  venue-search endpoint is known (`architecture.md` §17.2)
 - **Phase 3**: Community database, user reviews, restaurant submissions → **Planned**
 - **Phase 4**: OCR/vision, configurable dietary rules → **Planned**
 
-Currently, only Phase 1 is specified and planned. Phase 2 is next priority (see `feature_prioratization`).
+Phase 1 is built. Phase 2 is next; `feature_prioratization` has the tier breakdown.
 
-## What's NOT in This Repository
+## What is NOT built yet
 
-- ❌ No backend (Python, Node, etc.) — not needed for MVP
-- ❌ No database (PostgreSQL, etc.) — not needed for MVP
-- ❌ No Flutter app code (web, iOS, Android)
-- ❌ No API client implementations for restaurant platforms
-- ❌ No tests or CI/CD configuration
-- ❌ No Flutter dependencies installed (no `.packages`, no build artifacts)
+- 10bis, Tabit and Ontopo adapters. Only Wolt ships. The `PlatformMenuAdapter`
+  interface and its shared contract suite already exist, so a new platform is a new
+  adapter plus a registration in `di.dart`.
+- Nearby venue search and any geolocation. `geolocator` is in `pubspec.yaml` but no
+  code uses it. Paste-a-link (Tier A) is what ships.
+- OCR and the photographed-menu path (Phase 4), community features and any backend
+  (Phase 3).
+- `net_carbs_estimate` is in the model but deliberately never rendered
+  (`architecture.md` §17.4).
 
-**Build order (client-only MVP):**
-1. Flutter project structure with dependencies
-2. Restaurant API clients (Wolt, 10bis, Tabit, Ontopo)
-3. Menu classifier and waiter script generator
-4. UI screens and widgets
-5. Geolocation and venue search
+Nothing above is stubbed — the files simply do not exist, which keeps them out of
+the coverage denominator.
 
-A backend can be added later (Phase 3+) when user ratings/community features are needed.
+## Getting started
 
-## Getting Started (New Developer)
-
-### Before Writing Code
-
-1. **Read the full narrative**: `README.md` (sections 1–8) covers core value, UX flow, classification engine, API details, and database schema
-2. **Understand the classification rules**: Memorize the `CARB_MODIFIERS` and `NON_KETO_BASES` lists (README lines 183–204); these drive dish evaluation
-3. **Map the APIs**: Review the Platform Architectural Comparison table (README lines 79–82) and endpoint specs for each platform
-4. **Review the ER schema**: Diagram in README (around line 318)—three entities, one menu per venue per platform
-5. **Check feature priorities**: Read `feature_prioratization` to understand Phase 1 scope vs. Phase 2–4 deferred work
-
-### Starting Implementation (Client-Only MVP)
-
-**Phase 1: Flutter Project Setup**
-
-1. **Initialize Flutter project**
-   ```bash
-   flutter create --org com.ketoclub ketoclub
-   cd ketoclub
-   flutter config --enable-web
-   ```
-
-2. **Add dependencies** to `pubspec.yaml`:
-   - `http` or `dio` → HTTP client for restaurant APIs
-   - `geolocator` → Cross-platform geolocation (device location)
-   - `provider` → State management for menu caching
-   - `intl` → Date/number formatting (optional)
-
-**Phase 2: Core Business Logic**
-
-1. **API Clients** (`lib/services/restaurant_api_client.dart`)
-   - Implement Wolt client first (simplest, no auth):
-     - `fetchWoltMenu(venueSlug)` → HTTP GET to Wolt API
-     - Parse JSON response into Dart models
-   - Add 10bis client next
-   - Defer Tabit, Ontopo to later phase
-
-2. **Menu Classifier** (`lib/services/menu_classifier.dart`)
-   - Implement the logic from README's `KetoMenuIngestionService` class (lines 181–296) in Dart
-   - Take dish name + description, return `DishClassification`:
-     ```dart
-     class DishClassification {
-       String status;  // GREEN, YELLOW, RED
-       String badge;   // 🟢, 🟡, 🔴
-       List<String> waiterInstructions;
-     }
-     ```
-   - Use regex matching against `CARB_MODIFIERS` and `NON_KETO_BASES` from README
-
-3. **Models** (`lib/models/`)
-   - `dish.dart` → Name, description, price, status, waiter script
-   - `menu.dart` → List of dishes, venue info
-   - `venue.dart` → Name, address, latitude, longitude
-
-**Phase 3: UI & Screens**
-
-1. **Main entry point** (`lib/main.dart`)
-   - Set up MaterialApp with home screen
-
-2. **Venue Search Screen** (`lib/screens/venue_search_screen.dart`)
-   - Get user's device location via `geolocator`
-   - Display list of nearby restaurants (from hardcoded list or Wolt venue search)
-   - Allow manual search by restaurant name
-
-3. **Menu Detail Screen** (`lib/screens/menu_detail_screen.dart`)
-   - Fetch menu from restaurant API (Wolt, 10bis, etc.)
-   - Run classifier on each dish
-   - Display in scrollable list with color-coded cards
-
-4. **Widgets** (`lib/widgets/`)
-   - `dish_card.dart` → Show dish name, price, status badge (🟢/🟡/🔴)
-   - `status_badge.dart` → Colored badge widget
-   - `waiter_script_widget.dart` → Expandable box with waiter instructions (copyable text)
-
-5. **Utils** (`lib/utils/`)
-   - `constants.dart` → CARB_MODIFIERS, NON_KETO_BASES, waiter script templates (from README)
-   - `classification_rules.dart` → Regex patterns and matching logic
-
-**Phase 4: Platform-Specific Setup**
-
-1. **iOS** (`ios/Runner/Info.plist`)
-   - Add location permission prompt:
-     ```xml
-     <key>NSLocationWhenInUseUsageDescription</key>
-     <string>KetoClub needs your location to find nearby restaurants</string>
-     ```
-
-2. **Android** (`android/app/src/main/AndroidManifest.xml`)
-   - Add location and internet permissions:
-     ```xml
-     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-     <uses-permission android:name="android.permission.INTERNET" />
-     ```
-
-3. **Web** (no special setup needed)
-   - Uses browser Geolocation API automatically via `geolocator`
-
-**Development Workflow**
-
-1. Start with web for fast iteration: `flutter run -d chrome`
-2. Build classifier first (no UI needed to test), validate against README examples
-3. Add Wolt API client and test with real restaurant data
-4. Build UI screens incrementally
-5. Test on iOS simulator: `flutter run -d "iPhone 15"`
-6. Test on Android emulator: `flutter run -d emulator`
-7. Verify across all platforms: geolocation works, menus load, classification is correct
-
-**All three platforms share:** API clients, classifier logic, models, and utilities. Only UI/platform-specific code differs (geolocation permissions, screen layouts).
+1. **`HANDOFF.md`** — what exists, what is unfinished and why, the traps.
+2. **`architecture.md`** — the authoritative design. §16 is the build order (continue
+   at step 6, the 10bis adapter), §14 the decisions log D1–D10, §17 the open
+   questions with the default the code follows.
+3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
+   `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
+   **Caveat:** the test-convention documents contain illustrative examples referencing
+   screens and workflow files that do not exist (`HomeScreen`, `VenueListScreen`, a
+   `test.yml` workflow). Their rules apply; their sample code does not compile.
+4. `README.md` for the product narrative and the original keto vocabulary. Its
+   classification pseudo-code is superseded — see `architecture.md` §6.2 and
+   `lib/utils/constants.dart`, which fixed several defects in it.
