@@ -1,0 +1,5 @@
+{
+  "_fixture_note": "SYNTHETIC. A 2xx body Wolt has never been observed to send, used to exercise the platformChanged path when the response is valid JSON but not the menu/data shape this mapper knows (architecture.md §8).",
+  "resultCode": 0,
+  "message": "temporarily unavailable, please retry"
+}
