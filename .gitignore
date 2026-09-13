@@ -141,3 +141,19 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+pubspec.lock
+.packages
+.pub-cache/
+build/
+*.iml
+.idea/
+.DS_Store
+ios/Flutter/Flutter.podspec
+ios/Pods/
+.symlinks/
+flutter/ephemeral/
