@@ -1,9 +1,11 @@
 # KetoClub — Architecture
 
-**Status:** living design document. The Flutter skeleton, the composition root
-and the CI pipeline exist (build-order step 1, §16); every feature below is still to
-be built. When code and this document disagree, fix one of them in the same pull
-request.
+**Status:** living design document. **Phase 1 is built** — build-order steps 1 to 5
+(§16): the models and service contracts, the bilingual heuristic engine, Wolt
+ingestion with a Hive cache, the classified menu screen and Waiter Card, and the
+OpenRouter client with its router and Settings. Phase 2 onwards is still to come.
+When code and this document disagree, fix one of them in the same pull request;
+the entries marked *(Phase 1)* below record where that already happened.
 
 **Audience:** anyone about to write the first line of Dart for KetoClub, and anyone
 reviewing it.
@@ -222,7 +224,8 @@ ketoclub/
 │   │   ├── dish_card.dart                # name, price, badge, expandable script
 │   │   ├── status_badge.dart             # icon + colour, never colour alone
 │   │   ├── waiter_script_widget.dart     # copyable instruction text
-│   │   └── engine_chip.dart              # "AI" / "rules (offline)" indicator
+│   │   ├── engine_chip.dart              # "AI" / "rules (offline)" indicator
+│   │   └── failure_copy.dart             # pure: failure reason → message; exhaustive, no default
 │   │
 │   ├── state/                            # ChangeNotifiers; constructor-injected with interfaces
 │   │   ├── app_dependencies.dart         # immutable holder of service interfaces; filled by di.dart
@@ -233,7 +236,7 @@ ketoclub/
 │   ├── services/                         # every folder: interface(s) + implementations + fakes-friendly seams
 │   │   ├── platform/                     # rank 0 — abstractions over the device/runtime
 │   │   │   ├── clock.dart                # abstract Clock { DateTime now(); }  (cache freshness, tests)
-│   │   │   └── connectivity.dart         # abstract Connectivity { Future<bool> isOnline(); }
+│   │   │   └── app_logger.dart           # abstract AppLogger; never sees the key or an upstream body
 │   │   ├── storage/                      # rank 0
 │   │   │   ├── key_store.dart            # interface + SecureKeyStore (flutter_secure_storage)
 │   │   │   ├── menu_cache.dart           # interface + HiveMenuCache
@@ -277,7 +280,10 @@ ketoclub/
 │   │
 │   └── l10n/
 │       ├── app_en.arb
-│       └── app_he.arb
+│       ├── app_he.arb
+│       └── generated/                    # `flutter gen-l10n` output, committed; excluded from
+│                                         # the analyzer, the coverage gate, the all-imports
+│                                         # helper and the architecture test (§18.2)
 │
 ├── test/
 │   ├── architecture/
@@ -371,6 +377,17 @@ Option labels ("Choice of side: potato purée / green salad") are part of the te
 classifier sees, because a dish's yellow-ness often lives in the options, not the
 description.
 
+*(Phase 1)* Two normalisation rules the Wolt payload forced, both in
+`wolt_menu_mapper.dart`: an `item_id` a category lists but `items[]` does not
+contain is **skipped**, not an error; and a dish id appearing in two categories is
+**deduplicated, first category winning**, because Wolt does list one item twice and
+a duplicate id would break the parser's provenance and skipped-dish rules (§9.4
+rules 3 and 7). An individually malformed `items[]` entry currently fails the whole
+fetch as `platformChanged`, on the grounds that a loud schema-drift signal beats a
+silently missing dish; if real payloads ship the occasional odd entry — a null price
+on a "call for price" item — that trade should be revisited against a real
+recording.
+
 `MenuRepository` owns the adapter registry, resolves a pasted URL to a `VenueRef`,
 checks the cache first (§6.4), and is the only thing the controllers call.
 
@@ -399,25 +416,68 @@ both belong to the client.
 **`HeuristicMenuClassifier`** — the fallback. A Dart port of the README's
 `analyze_dish`: word-boundary regex over `NON_KETO_BASES` → red; over
 `CARB_MODIFIERS` → yellow with the mapped template sentences; else green. It runs
-on-device, offline, in milliseconds, and its vocabulary is deliberately small, so its
-result is labelled as "rules" in the UI (`engine_chip.dart`) and its greens carry a
-"not AI-verified" hint. Hebrew triggers live next to the English ones in
-`constants.dart` (פירה, צ'יפס, אורז, תפוח אדמה, פסטה, פיצה, לחמנייה, …).
+on-device, offline, in milliseconds, and its result is labelled as "rules" in the UI
+(`engine_chip.dart`) with its greens carrying a "not AI-verified" hint. Hebrew
+triggers live next to the English ones in `constants.dart` (פירה, צ'יפס, אורז,
+תפוח אדמה, פסטה, פיצה, לחמנייה, …).
+
+*(Phase 1)* The vocabulary is no longer "deliberately small", and it needed three
+relations this section did not anticipate, all in `constants.dart`:
+
+- **`ketoQualifierGuards{En,He}`** cancel a trigger when a rescuing word sits
+  beside it. Without them `cauliflower rice`, `spaghetti squash`, `zucchini
+  noodles`, `kale chips` and `לחם ענן` all turned red and were hidden — the very
+  dishes the app exists to surface, and the ones §7's `is_verified_keto_friendly`
+  names. The Hebrew guards look both ways, because a Hebrew adjective follows its
+  noun: `פיצה כרובית` is "cauliflower pizza".
+- **`triggerSuppresses`** lets the more specific phrase win, so `sweet potato` does
+  not also emit the generic potato sentence.
+- **`nonKetoBaseLabels{En,He}`** render `{base}` in the red `why`. Required, not
+  decoration: the matched substring is the *normalised* form, so without them the
+  text read aloud to a waiter would be `ציפס`, `תפוא`, `ראמנ`.
+
+Four scope decisions, recorded as D-V1 to D-V4 in the constants' doc comments:
+guards exist (above); **breading is red** (`fish and chips` previously returned
+yellow with "replace the chips" and left the batter, an instruction that cannot make
+the dish keto); **bread that merely carries a dish is yellow and removable**, which
+makes README's own "serve the burger without the bun" template reachable for the
+first time; and the Israeli trap list is adopted in full, so שווארמה בפיתה no longer
+classifies green.
+
+**Dart's `\b` is ASCII-only.** `RegExp(r'\bפסטה\b')` matches nothing at all, so a
+literal port of README's `rf"\b{base}\b"` leaves the entire Hebrew vocabulary dead
+while every English test passes. Hebrew triggers compile to a lookaround that is
+permissive on the left — ב/ה/ו/כ/ל/מ/ש are grammatical particles, so `הפסטה` must
+match — and strict on the right, because a suffix is a different word and folded
+`לחמ` must not match inside `לחמנייה`. Latin triggers keep a plain word boundary and
+must never be loosened: `toasted almonds` and `Sacramento tomato salad` would turn
+red. `text_normaliser.dart` also folds diacritics, without which README's own worked
+example, "butter-infused potato purée", failed its own `puree` trigger.
 
 **`RoutingMenuClassifier`** — decides, per call, in this order:
 
 1. No key stored, or estimation consent not given → heuristic, with
-   `engine = rules(reason: notConfigured)`.
-2. Device reports offline → heuristic, `engine = rules(reason: offline)`.
-3. Otherwise → LLM. If the LLM call fails with `offline`, `rateLimited`, or
-   `timeout`, fall back to heuristic and surface the reason in the result so the
-   UI can say "showing rule-based results; AI analysis failed because …".
-   A `badResponse` or `unauthorised` failure is **not** silently papered over with
-   rules: the user must see that their key or the model is the problem.
+   `engine = rules(reason: notConfigured)`. §11 treats withheld consent exactly
+   like a missing key.
+2. Otherwise → LLM. If the LLM call fails with `offline`, `timeout`,
+   `rateLimited` or `badResponse`, fall back to the heuristic and surface that
+   reason in the result, so the UI can say "showing rule-based results; AI
+   analysis failed because …". A `badResponse` is shown with its reason named,
+   never silently — which is what §6.2 and §10's table together require.
+3. An `unauthorised` failure is returned as a failure, with **no** rules
+   fallback: the user must see that their key was rejected rather than be quietly
+   handed a weaker answer. `noDishesFound` is likewise returned rather than
+   swapped for rules — §10 gives that row "try rules" as a way out the user
+   takes, not as an automatic degradation.
 
-`RoutingMenuClassifier` receives both engines, the `Connectivity` abstraction and
-the `KeyStore` through its constructor; `di.dart` is where the concrete engines are
-built and handed to it (constraint 4, §18.1).
+*(Phase 1)* There is **no device-offline pre-check**; see D10. The old rule 2 is
+gone because nothing needs it: the LLM call itself reports `offline`, and rule 2
+above already handles that.
+
+`RoutingMenuClassifier` receives both engines and the `KeyStore` through its
+constructor; `di.dart` is where the concrete engines are built and handed to it
+(constraint 4, §18.1). Consent arrives per call in `ClassificationOptions`, not as a
+fourth dependency, which keeps the class inside §18.3's five-dependency limit.
 
 Dish-level output is the same from either engine:
 
@@ -443,7 +503,15 @@ step:
   style rules (§9.1): polite, one or two sentences, names the exact component to
   remove and the exact substitute to ask for.
 - The heuristic engine composes it from `CARB_MODIFIERS` templates in
-  `constants.dart`, deduplicated, in the UI language.
+  `constants.dart`, deduplicated, **in the menu's language** — detected per §12 from
+  the dish's own text, not from the UI locale. *(Phase 1: this sentence used to say
+  "in the UI language", which contradicted §12. §12 wins: the script is read aloud
+  to a waiter in that restaurant, and the LLM engine already writes in the menu's
+  language, so both engines now agree. The consequence is that the template
+  sentences and the green/yellow/red `why` text live bilingually in
+  `constants.dart` rather than in ARB — a deliberate, documented exception to
+  §18.6's "no user-facing literal in Dart", because they are selected by menu
+  language while `AppLocalizations` only ever yields the UI locale.)*
 
 The Waiter Card (`waiter_card_sheet.dart`) renders the script full-screen in large
 high-contrast type with a copy button, so the phone can be shown to the server.
@@ -466,6 +534,12 @@ Cache rules:
   answer.
 - The cache never stores the raw platform JSON, only the normalised `Menu`.
 - The user can clear the cache from Settings.
+
+*(Phase 1)* Two things this list left open, both now decided and tested. The
+freshness boundary is **exclusive**: a menu exactly 24 hours old refetches, because
+"fresh for 24 hours" means younger than 24 hours. And `forceRefresh` skips only the
+early return, not the cache *read*, so a forced refetch that fails still falls back
+to whatever is cached and is never worse than the ordinary path.
 
 No health data, no diary, no user profile is stored. KetoClub's storage is a cache
 and one secret.
@@ -557,7 +631,7 @@ class DishOption { final String name; final List<String> values; }
 
 sealed class MenuAnalysis {}
 final class MenuAnalysed extends MenuAnalysis {
-  final List<AnalysedDish> dishes;     // never empty
+  final List<AnalysedDish> dishes;     // may be empty; see §9.4 rule 8
   final List<String> unclassified;     // names seen but not placeable — shown, never silent
   final AnalysisEngine engine;         // llm(model) | rules(reason)
   final DateTime analysedAt;
@@ -566,6 +640,16 @@ final class MenuAnalysisFailed extends MenuAnalysis {
   final MenuAnalysisFailureReason reason;
 }
 ```
+
+*(Phase 1)* Two notes on making these work as cache records. "No code generation"
+means every cached model carries a hand-written `toJson()` and a
+`static X? tryFrom(Map<String, Object?>)` that **returns null rather than throwing**
+on any shape mismatch — that is what lets the Hive cache treat a corrupt or stale
+entry as a miss without the bare `catch` §18.3 forbids. Enums are matched by string
+name, never by ordinal, so reordering a variant cannot silently re-point data already
+on disk. And `MenuAnalysed.dishes` **may be empty**: the sketch above said "never
+empty", but §9.4 rule 8 is the more specific rule, and "the model saw the dishes and
+could place none" is a result to show rather than a failure to retry.
 
 Relationship to the README's ER diagram: the three README entities (Venues, Menus,
 Dishes) are the three classes above. They are **cache records on the device**, not
@@ -651,6 +735,17 @@ which is what OpenAI-style strict mode demands; nullable fields are typed
 `["string","null"]` rather than omitted. (`m16_structured_output_fix.md` records
 the outage caused by getting this wrong.)
 
+*(Phase 1)* **A `description` property is deliberately absent, and should stay
+absent.** `m16_structured_output_fix.md` lists `description` among its nullable
+required fields, which reads like a defect here — it is not. That was a different
+project whose analyser echoed the dish description back to be re-displayed.
+KetoClub's parser (§9.4) never reads a description from the reply; it already has
+one, from the menu it fetched. Because strict mode forces every property into
+`required`, adding it would oblige the model to emit a field we discard, spending
+output tokens against the exact `max_tokens` budget m16 flags as its remaining
+suspect for that outage. The `verdict` enum in the shipped schema is derived from
+`DishVerdict.values` rather than retyped, so the schema cannot drift from the model.
+
 ### 9.3 Request strategy
 
 - `response_format: {type: "json_schema", json_schema: {name, strict: true, schema}}`
@@ -672,8 +767,12 @@ the outage caused by getting this wrong.)
 
 ### 9.4 The parser rules
 
-`MenuResponseParser.parse(String body, {required Menu source})` is static, pure,
-and never throws. In order:
+`MenuResponseParser.parse` is static, pure, and never throws. *(Phase 1: the
+signature is `parse(String body, {required Menu source, required DateTime
+analysedAt, required AnalysisEngine engine})`. The two extra arguments are not
+optional extras — `MenuAnalysed` cannot be constructed without them, and taking the
+clock and the engine stamp as arguments is what keeps this function pure and its
+tests free of a real clock.)* In order:
 
 1. Strip a markdown fence if present. `jsonDecode` inside `try`; any throw →
    `badResponse`.
@@ -687,8 +786,16 @@ and never throws. In order:
 5. `verdict == modifiable` with a null, blank, or over-length `modification` →
    `unclassified` (constraint 7). A green or red carrying a `modification` keeps the
    verdict and drops the field.
-6. Caps: more than 150 dishes → `badResponse`; `why` and `modification` truncated at
-   300 characters, never rejected for length alone.
+6. Caps: more than 150 dishes → `badResponse`; `why` truncated at 300 characters,
+   never rejected for length alone.
+
+   *(Phase 1)* Rules 5 and 6 read as contradicting each other on an over-length
+   `modification`: rule 5 demotes the dish, rule 6 says to truncate rather than
+   reject. **The rules apply in order, so rule 5 disposes of every `modification`
+   case and rule 6's truncation is live only for `why`.** Truncating a waiter script
+   mid-sentence would leave it reading as a complete, correct instruction while
+   being neither — the same wrong-green failure constraint 5 names, just wearing
+   yellow.
 7. Source dishes the model did not mention at all go to `unclassified` by name, so
    the user sees the model skipped them.
 8. `dishes` empty and `unclassified` empty → `MenuAnalysisFailed(noDishesFound)`;
@@ -853,6 +960,18 @@ here.
 **D9 — Web is a first-class target for classification and a second-class target for
 live fetching**, until a CORS proxy exists (§13).
 
+**D10 — No connectivity pre-check. The LLM call is the probe.** *(Phase 1.)*
+§6.2's original rule 2 asked the router to consult a `Connectivity` abstraction
+before choosing an engine. Implementing it meant either a new plugin the §5
+dependency table does not list, or an HTTP probe to some neutral host — a second
+outbound destination, for a question the request we are about to make answers by
+itself. So `services/platform/connectivity.dart` does not exist: the router tries
+the LLM, and `ChatFailed(offline)` sends it to the heuristic through the same path
+every other degrading failure uses. The cost is one wasted request when the device
+is offline *and* the menu is uncached; the saving is one fewer outbound host, two
+fewer files, and one fewer abstraction whose fake could disagree with reality.
+`Clock` stays injected — cache freshness genuinely cannot be tested without it.
+
 ---
 
 ## 15. Testing strategy
@@ -893,7 +1012,8 @@ This section lists what each part of the system must be tested for.
 
 ## 16. Build order and extension points
 
-Build in this order; each step is demonstrable on its own.
+Build in this order; each step is demonstrable on its own. **Steps 0 to 5 are
+done** *(Phase 1)*; step 6 onwards is next.
 
 0. **Day zero (already committed)** — `.github/workflows/ci.yml`,
    `analysis_options.yaml`, `test/architecture/import_rules_test.dart`,
@@ -906,15 +1026,15 @@ Build in this order; each step is demonstrable on its own.
    added §18). Still open in this step: ARB files, the `models/` package and the
    sealed result types. **Branch protection is switched on when this step
    merges.**
-2. **Heuristic classifier** — `constants.dart`, `classification_rules.dart`,
+2. ✅ **Heuristic classifier** — `constants.dart`, `classification_rules.dart`,
    `HeuristicMenuClassifier`, and its tests. Validates the model shapes before any
    network code exists.
-3. **Wolt adapter + repository + cache** — fixture-tested normalisation, Hive cache,
+3. ✅ **Wolt adapter + repository + cache** — fixture-tested normalisation, Hive cache,
    paste-a-URL resolution.
-4. **Menu screen** — `MenuController`, `DishCard`, `StatusBadge`, filters, red group,
+4. ✅ **Menu screen** — `MenuController`, `DishCard`, `StatusBadge`, filters, red group,
    unclassified section, engine chip, Waiter Card. At this point the app is usable
    offline with the rules engine.
-5. **OpenRouter client + LLM classifier + router + Settings** — key store, consent,
+5. ✅ **OpenRouter client + LLM classifier + router + Settings** — key store, consent,
    prompt, schema, parser, fallback logic, failure copy. Verify the pinned model
    against the real prompt before merging.
 6. **10bis adapter.**
@@ -941,10 +1061,14 @@ Extension points already designed in:
 Things this document could not settle from the available material. Each has a
 default the implementation follows until answered.
 
-1. **Which OpenRouter model to pin.** Free-tier ids rotate. Default: choose at
-   implementation time by running the real system prompt against candidates and
-   pinning the fastest one that returns valid JSON in under 20 seconds; record the
-   measurement in the client's doc comment.
+1. **Which OpenRouter model to pin.** Free-tier ids rotate. *(Phase 1: pinned to
+   `nex-agi/nex-n2.5-pro:free`, with `dots-studio/dots-3-note-preview:free` and
+   `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` as documented fallbacks.
+   **The pre-release check is still outstanding.** The 8–12 s figure is carried over
+   from `m15_openrouter_models_fix.md`, not measured here: `openrouter.ai` is
+   unreachable from the build environment, so the real system prompt has never been
+   run against the pinned id. Do that before release; the id is a constructor
+   parameter, so swapping it is one line in `di.dart`.)*
 2. **Exact Wolt venue-search endpoint** for nearby search. `menu_api_research` covers
    menus only. Default: ship paste-a-URL first (Tier A) and discover the search
    endpoint with the reverse-engineering protocol in `README.md` when building
@@ -955,8 +1079,9 @@ default the implementation follows until answered.
 4. **Whether to show `net_carbs_estimate` at all.** The model can produce a number;
    it cannot be trusted as fact. Default: keep it in the model, do not render it in
    the MVP.
-5. **Cache freshness window.** 24 hours is a guess. Default: 24 hours, configurable
-   in `constants.dart`.
+5. **Cache freshness window.** 24 hours is a guess. *(Phase 1: settled at 24 hours
+   in `menuCacheTtl`, with an exclusive boundary — see §6.4. Still a guess, but now
+   a guess in one named place.)*
 
 ---
 
@@ -1003,7 +1128,7 @@ assertions, not comments.
 
 **Interface segregation.** Interfaces are small and consumer-shaped: `LlmChatClient`
 has `complete`; `KeyStore` has `read`, `write`, `delete`; `Clock` has `now`;
-`Connectivity` has `isOnline`. A controller depends on the two or three interfaces
+`AppLogger` has `info` and `warn`. A controller depends on the two or three interfaces
 it uses, never on a "services" bag. A widget depends on its controller, never on a
 service.
 
@@ -1011,8 +1136,8 @@ service.
 supplied by constructor injection. `di.dart` is the composition root and the only
 file under `lib/` that constructs a concrete service, an `http.Client`, a Hive box,
 or a plugin wrapper. No service locators, no global singletons, no static state
-except compile-time constants. `http.Client`, `Clock` and `Connectivity` are injected
-so that tests control I/O and time. Flow tests call `buildDependencies` with fakes
+except compile-time constants. `http.Client` and `Clock` are injected so that tests
+control I/O and time. Flow tests call `buildDependencies` with fakes
 and get the real app on top.
 
 ### 18.2 The import graph is a DAG
@@ -1033,6 +1158,14 @@ The test landed with the first skeleton, so the first file that breaks the
 layering fails CI rather than starting a habit. Adding a layer or a sub-package
 means editing the rank tables in that test in the same pull request, and saying why.
 
+*(Phase 1)* The test skips generated paths — currently `l10n/generated/`. These
+rules police the layering of code a person wrote, and `flutter gen-l10n` emits a
+base class and one subclass per locale that import each other, a cycle no author
+can remove. It is the fourth gate to exclude that directory: the analyzer, the
+coverage gate and the all-imports helper already did, and the exclusion is named
+and explained in one place in the test. That was the only edit this phase made to
+the rank tables, and it added no layer.
+
 ### 18.3 Clean-code rules
 
 - **Lints.** `very_good_analysis` with `strict-casts`, `strict-inference` and
@@ -1045,8 +1178,16 @@ means editing the rank tables in that test in the same pull request, and saying 
   `hashCode`.
 - **Errors as values at boundaries.** A service returns a sealed result. Exceptions
   are allowed inside a service and must be caught before its boundary. `catch (e)`
-  without a type is not allowed; `on SocketException`, `on FormatException`, and so
-  on, each mapped to a named reason.
+  without a type is not allowed; `on ClientException`, `on TimeoutException`,
+  `on FormatException`, and so on, each mapped to a named reason.
+- **No `dart:io` under `lib/`.** *(Phase 1: this replaces the `on SocketException`
+  example above, which cannot be written here — `SocketException` is `dart:io`, and
+  importing `dart:io` anywhere in `lib/` fails `flutter build web`. `package:http`'s
+  `IOClient` already wraps socket errors as `ClientException`, so nothing is lost.
+  A test file may import `dart:io` freely; the restriction is on `lib/`.)* One
+  consequence worth knowing: `PlatformException` and `MissingPluginException` live
+  in `package:flutter/services.dart`, which `services/` may not import either, so
+  the two plugin-backed stores catch `Exception` and say why at the top of the file.
 - **No `dynamic` past the parser.** JSON is `Map<String, Object?>` until the
   mapper or parser has produced a typed model. Nothing typed `dynamic` leaves
   `services/`.
@@ -1091,8 +1232,8 @@ Rules:
   `UNIT_TEST_CONVENTIONS.md`, is acceptable for third-party types such as
   `http.Client`, never for an interface this project defines.
 - **Deterministic.** No network, no real timers, no real clock, no wall-clock
-  `Duration` sleeps. `Clock` and `Connectivity` are injected; `fake_async` is used
-  where a timeout is under test.
+  `Duration` sleeps. `Clock` is injected; `fake_async` is used where a timeout is
+  under test (the LLM client's 120-second one is tested that way).
 - **Fixtures are real.** Platform JSON in `test/fixtures/` is a recorded real
   response, redacted only where a field is personal. Synthetic fixtures are labelled
   as such in a comment at the top of the file.
@@ -1168,9 +1309,10 @@ following, and the rest of the document has been updated to match:
   `LocationService`, `VenueSearchService` each have an interface, one production
   implementation, and one fake. This is what makes flow tests possible without a
   mocking library.
-- **`Clock` and `Connectivity` abstractions** in `services/platform/`. Cache
-  freshness and the offline decision were reading the real clock and the real
-  network, which made them untestable deterministically.
+- **A `Clock` abstraction** in `services/platform/`, because cache freshness was
+  reading the real clock, which made it untestable deterministically. *(Phase 1: a
+  `Connectivity` abstraction was listed here too and has been dropped — see D10.
+  `AppLogger` took its place in that folder.)*
 - **Adapters split into adapter and mapper.** The mapper is a pure function over
   JSON, tested against fixtures with no HTTP; the adapter only does the request.
 - **`services/` is organised into ranked sub-packages** so the DAG rule can be
