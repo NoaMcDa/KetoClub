@@ -1,0 +1,4 @@
+{
+  "_fixture_note": "synthetic fixture: the reply places zero dishes (architecture.md §9.4 rule 8). Paired with an empty source menu this is noDishesFound; paired with a non-empty source menu, rule 7 fills unclassified and this is a placed, empty-dish-list MenuAnalysed.",
+  "dishes": []
+}

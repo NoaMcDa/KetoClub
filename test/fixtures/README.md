@@ -54,3 +54,15 @@ the fixture still exercises every shape variation listed above; a real
 venue may not happen to have a checkbox option group or a duplicated
 item id, in which case keep a couple of hand-added dishes alongside the
 real ones rather than losing that coverage.
+
+## LLM response fixtures (`llm_*.json`)
+
+These are **synthetic by design**, not recordings. Each one is a hand-built
+OpenRouter reply shaped to exercise exactly one of the eight parser rules in
+architecture.md §9.4 — an invented dish, a yellow with no instruction, an
+over-cap list, a reply that is not JSON at all, and so on. A recorded response
+could not be relied on to contain those cases, so recording them would make the
+suite weaker rather than stronger.
+
+`llm_unknown_keys.json` doubles as the parser's unknown-key tolerance test: it
+carries a `_fixture_note` key that the parser must ignore.

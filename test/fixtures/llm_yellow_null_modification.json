@@ -1,0 +1,13 @@
+{
+  "_fixture_note": "synthetic fixture: a modifiable dish with modification: null (architecture.md §9.4 rule 5, negative case — constraint 7, 'a yellow without an instruction does not exist').",
+  "dishes": [
+    {
+      "id": "dish-steak",
+      "name": "Grilled Steak",
+      "verdict": "modifiable",
+      "why": "Great protein, but it comes with a starchy side.",
+      "modification": null,
+      "net_carbs_estimate": 8
+    }
+  ]
+}

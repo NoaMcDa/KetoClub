@@ -1,0 +1,15 @@
+```json
+{
+  "_fixture_note": "synthetic fixture: a valid reply wrapped in a markdown code fence (architecture.md §9.4 rule 1, positive case).",
+  "dishes": [
+    {
+      "id": "dish-steak",
+      "name": "Grilled Steak",
+      "verdict": "orderAsIs",
+      "why": "Plain grilled protein, nothing starchy or sweet.",
+      "modification": null,
+      "net_carbs_estimate": 1
+    }
+  ]
+}
+```

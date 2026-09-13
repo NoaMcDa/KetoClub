@@ -1,0 +1,13 @@
+{
+  "_fixture_note": "synthetic fixture: a nonKeto dish that also carries a modification (architecture.md §9.4 rule 5, second sentence — a red keeps its verdict and drops the field too, since no modification can fix a non-keto base).",
+  "dishes": [
+    {
+      "id": "dish-pizza",
+      "name": "Margherita Pizza",
+      "verdict": "nonKeto",
+      "why": "Built on a wheat-flour crust, which cannot be made keto.",
+      "modification": "Ask for the crust to be replaced with cauliflower base.",
+      "net_carbs_estimate": null
+    }
+  ]
+}

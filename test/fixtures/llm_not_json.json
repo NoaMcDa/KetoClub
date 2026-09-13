@@ -1,0 +1,3 @@
+Sorry, I can't complete this request right now. Please try again later.
+
+(synthetic fixture: not JSON at all, and not fenced either — architecture.md §9.4 rule 1, negative case. No `_fixture_note` key: this file's whole point is that its content is not a JSON object, so it cannot carry one.)

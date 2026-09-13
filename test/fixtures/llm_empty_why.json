@@ -1,0 +1,13 @@
+{
+  "_fixture_note": "synthetic fixture: why is an empty string (architecture.md §9.4 rule 4, negative case).",
+  "dishes": [
+    {
+      "id": "dish-steak",
+      "name": "Grilled Steak",
+      "verdict": "orderAsIs",
+      "why": "",
+      "modification": null,
+      "net_carbs_estimate": 1
+    }
+  ]
+}

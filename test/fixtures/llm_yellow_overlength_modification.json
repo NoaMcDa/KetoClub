@@ -1,0 +1,13 @@
+{
+  "_fixture_note": "synthetic fixture: a modifiable dish with a modification over 300 characters (architecture.md §9.4 rule 5, negative case: an over-length instruction is demoted, not truncated).",
+  "dishes": [
+    {
+      "id": "dish-steak",
+      "name": "Grilled Steak",
+      "verdict": "modifiable",
+      "why": "Great protein, but it comes with a starchy side.",
+      "modification": "Please replace the fries with a green salad and steamed vegetables instead. Please replace the fries with a green salad and steamed vegetables instead. Please replace the fries with a green salad and steamed vegetables instead. Please replace the fries with a green salad and steamed vegetables instead. Please replace the fries with a green salad and steamed vegetables instead. ",
+      "net_carbs_estimate": 8
+    }
+  ]
+}

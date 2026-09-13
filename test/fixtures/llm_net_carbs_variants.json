@@ -1,0 +1,21 @@
+{
+  "_fixture_note": "synthetic fixture: net_carbs_estimate as null and as a number, on two dishes (architecture.md §9.2).",
+  "dishes": [
+    {
+      "id": "dish-steak",
+      "name": "Grilled Steak",
+      "verdict": "orderAsIs",
+      "why": "Plain grilled protein.",
+      "modification": null,
+      "net_carbs_estimate": null
+    },
+    {
+      "id": "dish-salmon",
+      "name": "Grilled Salmon",
+      "verdict": "orderAsIs",
+      "why": "Lemon and dill, nothing starchy.",
+      "modification": null,
+      "net_carbs_estimate": 2.5
+    }
+  ]
+}

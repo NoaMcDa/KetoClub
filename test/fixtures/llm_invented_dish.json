@@ -1,0 +1,13 @@
+{
+  "_fixture_note": "synthetic fixture: a dish the model invented, matching no dish id or name in the source menu (architecture.md §9.4 rule 3, negative case — constraint 6, 'never invent a dish').",
+  "dishes": [
+    {
+      "id": "not-a-real-source-id",
+      "name": "Unicorn Tartare",
+      "verdict": "orderAsIs",
+      "why": "Lean and lightly seasoned.",
+      "modification": null,
+      "net_carbs_estimate": 0
+    }
+  ]
+}

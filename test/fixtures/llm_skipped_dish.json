@@ -1,0 +1,13 @@
+{
+  "_fixture_note": "synthetic fixture: the reply classifies one source dish and says nothing at all about a second one (architecture.md §9.4 rule 7 — the skipped dish goes to unclassified by name).",
+  "dishes": [
+    {
+      "id": "dish-steak",
+      "name": "Grilled Steak",
+      "verdict": "orderAsIs",
+      "why": "Plain grilled protein.",
+      "modification": null,
+      "net_carbs_estimate": 1
+    }
+  ]
+}

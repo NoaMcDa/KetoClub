@@ -1,0 +1,13 @@
+{
+  "_fixture_note": "synthetic fixture: verdict is not one of the three known names (architecture.md §9.4 rule 4, negative case). Also guards against ordinal matching: 'GREEN' is not a valid DishVerdict.name even though it looks like an obvious green.",
+  "dishes": [
+    {
+      "id": "dish-steak",
+      "name": "Grilled Steak",
+      "verdict": "GREEN",
+      "why": "Plain grilled protein.",
+      "modification": null,
+      "net_carbs_estimate": 1
+    }
+  ]
+}

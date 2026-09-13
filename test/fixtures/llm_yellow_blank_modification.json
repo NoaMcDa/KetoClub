@@ -1,0 +1,13 @@
+{
+  "_fixture_note": "synthetic fixture: a modifiable dish with modification set to whitespace only (architecture.md §9.4 rule 5, negative case).",
+  "dishes": [
+    {
+      "id": "dish-steak",
+      "name": "Grilled Steak",
+      "verdict": "modifiable",
+      "why": "Great protein, but it comes with a starchy side.",
+      "modification": "   ",
+      "net_carbs_estimate": 8
+    }
+  ]
+}

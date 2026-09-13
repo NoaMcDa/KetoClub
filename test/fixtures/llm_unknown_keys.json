@@ -1,0 +1,14 @@
+{
+  "_fixture_note": "synthetic fixture: unrecognised keys at both the top level (this key) and inside a dish entry ('confidence' below), which the parser must silently tolerate.",
+  "dishes": [
+    {
+      "id": "dish-steak",
+      "name": "Grilled Steak",
+      "verdict": "orderAsIs",
+      "why": "Plain grilled protein.",
+      "modification": null,
+      "net_carbs_estimate": 1,
+      "confidence": "very high"
+    }
+  ]
+}

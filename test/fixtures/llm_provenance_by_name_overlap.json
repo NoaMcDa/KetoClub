@@ -1,0 +1,13 @@
+{
+  "_fixture_note": "synthetic fixture: the model's id does not match the source dish, but its name shares a normalised word of 3+ letters with the source dish's name (architecture.md §9.4 rule 3, positive case for the name-overlap path).",
+  "dishes": [
+    {
+      "id": "llm-generated-id-42",
+      "name": "Steak au poivre",
+      "verdict": "orderAsIs",
+      "why": "A peppercorn crust on a plain steak.",
+      "modification": null,
+      "net_carbs_estimate": 2
+    }
+  ]
+}
