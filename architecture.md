@@ -891,13 +891,21 @@ an upstream error body can echo request headers, including the bearer token.
     phone app instead of inviting a retry that cannot succeed.
   - The web build ships with the classifier fully working (OpenRouter permits
     browser-origin calls) and takes menus by paste or, once Phase 4 lands, by file.
-  - For local development, run Chrome with web security disabled
-    (`flutter run -d chrome --web-browser-flag=--disable-web-security`, wrapped
-    as `tool/run_web.sh`); never ship with that.
-  - The clean fix is a tiny CORS-forwarding proxy (a single edge function) that
-    passes the request through unchanged and adds the header. That is the first
-    thing the Phase 3 backend does, and it is the only reason to add one before
-    community features.
+  - The clean fix is a tiny CORS-forwarding proxy that passes the request
+    through unchanged and adds the header. The app's half exists:
+    `--dart-define=KETOCLUB_MENU_PROXY_URL=<proxy>` makes `di.dart` wrap the
+    platform adapters' client in `CorsProxyClient`, which moves each request's
+    URL into the proxy's `url` query parameter. The OpenRouter client is never
+    proxied.
+  - For local development, `tool/run_web.sh` starts `tool/cors_proxy.dart` (a
+    loopback-only Dart proxy that forwards to the platform hosts alone) and runs
+    the app against it, so a pasted Wolt link works in Chrome as it does on a
+    phone. A deployed web build needs the same proxy hosted somewhere (a single
+    edge function); that is the first thing the Phase 3 backend does, and the
+    only reason to add one before community features.
+  - Chrome with web security disabled
+    (`flutter run -d chrome --web-browser-flag=--disable-web-security`) also
+    works for a quick look; never ship with that.
 - Geolocation requires HTTPS.
 - Secure storage on web is `localStorage`-backed; say so in Settings.
 
@@ -1059,7 +1067,7 @@ Extension points already designed in:
 | Vision-model classification | a second `MenuClassifier`; router chooses | the UI |
 | Custom dietary rules (Tier C) | `ClassificationOptions` → appended to the system prompt and to the rules table | schema |
 | Community ratings, venue directory (Phase 3) | a backend with its own client under `services/community/`; `Venue` gains the README's rating fields | everything above stays client-only |
-| CORS proxy for web | one edge function; adapters get a configurable base URL | adapter logic |
+| CORS proxy for web | one hosted edge function; the client side (`CorsProxyClient`, `KETOCLUB_MENU_PROXY_URL`) and a local dev proxy already exist | adapter logic |
 | Shared analysis cache (Tier D) | the same backend; `MenuCache` gains a remote tier | parser, models |
 
 ---

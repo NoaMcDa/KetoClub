@@ -95,7 +95,7 @@ void main() {
           capturedHeaders = request.headers;
           return http.Response(_emptyMenuBody, 200);
         }),
-        runsInBrowser: false,
+        directFromBrowser: false,
       );
 
       // Act
@@ -226,7 +226,7 @@ void main() {
         client: MockClient((request) async {
           throw http.ClientException('Connection failed', request.url);
         }),
-        runsInBrowser: false,
+        directFromBrowser: false,
       );
 
       // Act
@@ -249,7 +249,7 @@ void main() {
           client: MockClient((request) async {
             throw http.ClientException('Failed to fetch', request.url);
           }),
-          runsInBrowser: true,
+          directFromBrowser: true,
         );
 
         // Act
@@ -276,7 +276,7 @@ void main() {
           capturedHeaders = request.headers;
           return http.Response(_emptyMenuBody, 200);
         }),
-        runsInBrowser: true,
+        directFromBrowser: true,
       );
 
       // Act

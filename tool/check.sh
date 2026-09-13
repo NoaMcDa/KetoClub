@@ -9,7 +9,7 @@ echo "== flutter pub get"
 flutter pub get
 
 echo "== dart format"
-dart format --output=none --set-exit-if-changed lib test integration_test test_driver
+dart format --output=none --set-exit-if-changed lib test integration_test test_driver tool
 
 echo "== flutter analyze"
 flutter analyze --fatal-infos --fatal-warnings

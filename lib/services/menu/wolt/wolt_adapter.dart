@@ -22,18 +22,20 @@ import 'package:ketoclub/utils/constants.dart';
 /// sees a response. The browser surfaces that block as the same
 /// [http.ClientException] a dead network would raise, so [fetch] reports
 /// it as [MenuFetchFailureReason.blockedByBrowser] rather than `offline`
-/// whenever it [runsInBrowser]: the user's way out is the phone app, not
-/// a retry (architecture.md §10, §13). This adapter is a mobile-first
-/// path; the web build takes menus by paste instead.
+/// whenever it is [directFromBrowser]: the user's way out is the phone
+/// app, not a retry (architecture.md §10, §13). A web build that sends its
+/// requests through a CORS-forwarding proxy (`CorsProxyClient`) is not
+/// direct, and behaves here exactly like a native one.
 final class WoltMenuAdapter implements PlatformMenuAdapter {
   /// Creates an adapter that sends its requests through [client]. The
   /// parameter is named `client`, not `_client`, so it cannot be an
   /// initializing formal (`this._client`) and is assigned explicitly.
   ///
-  /// [runsInBrowser] defaults to [kIsWeb] and exists so a test can
-  /// exercise both the browser and the native mapping of a failed
-  /// request on one platform.
-  new({required http.Client client, this.runsInBrowser = kIsWeb})
+  /// [directFromBrowser] defaults to [kIsWeb] — a bare web build — and is
+  /// a parameter so the composition root can clear it when a CORS proxy
+  /// sits in front of [client], and so a test can exercise both mappings
+  /// of a failed request on one platform.
+  new({required http.Client client, this.directFromBrowser = kIsWeb})
     // The field is private and the parameter is not, so `this._client` is
     // not available; see the constructor doc above.
     // ignore: prefer_initializing_formals
@@ -47,11 +49,12 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
 
   final http.Client _client;
 
-  /// Whether requests go out through a browser. A browser forbids a page
-  /// from setting `User-Agent`, so the header is omitted there, and it
-  /// turns Wolt's missing CORS headers into a request failure that
-  /// [fetch] must not confuse with being offline (architecture.md §13).
-  final bool runsInBrowser;
+  /// Whether requests leave a browser page straight for Wolt, with no
+  /// CORS proxy between. A browser forbids a page from setting
+  /// `User-Agent`, so the header is omitted then, and it turns Wolt's
+  /// missing CORS headers into a request failure that [fetch] must not
+  /// confuse with being offline (architecture.md §13).
+  final bool directFromBrowser;
 
   @override
   MenuSource get source => MenuSource.wolt;
@@ -72,18 +75,18 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
           .get(
             uri,
             headers: <String, String>{
-              if (!runsInBrowser) 'User-Agent': browserUserAgent,
+              if (!directFromBrowser) 'User-Agent': browserUserAgent,
               'Accept': 'application/json',
             },
           )
           .timeout(_timeout);
     } on http.ClientException {
       // A browser reports a CORS refusal exactly as it reports a dead
-      // network, and Wolt refuses every foreign origin, so in a browser a
-      // client-side failure is the block, not the network
+      // network, and Wolt refuses every foreign origin, so straight from a
+      // browser a client-side failure is the block, not the network
       // (architecture.md §13).
       return MenuFetchFailed(
-        reason: runsInBrowser
+        reason: directFromBrowser
             ? MenuFetchFailureReason.blockedByBrowser
             : MenuFetchFailureReason.offline,
       );
