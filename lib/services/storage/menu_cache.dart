@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
@@ -128,4 +131,98 @@ abstract interface class MenuCache {
   ///
   /// Never throws.
   Future<void> clear();
+}
+
+/// A [MenuCache] in a Hive box of JSON strings.
+///
+/// The box is supplied as a lazily-invoked opener rather than a `Box`,
+/// because `di.dart` must not perform plugin I/O while constructing the
+/// dependency graph: `buildDependencies()` is called from `main()` and
+/// from tests that run without a plugin binding. The opener is invoked at
+/// most once; its result is cached and reused by every later call.
+final class HiveMenuCache implements MenuCache {
+  /// Creates a cache over the box [openBox] returns.
+  new({required this.openBox});
+
+  /// Opens (or creates) the backing box. Invoked at most once; see
+  /// [_box].
+  final Future<Box<String>> Function() openBox;
+
+  /// The box, once opened. Holds the in-flight (or completed) future
+  /// rather than a `Box` directly, so nothing here touches the box before
+  /// [openBox] has actually run.
+  Future<Box<String>>? _box;
+
+  /// Returns the box, opening it via [openBox] on the first call and
+  /// reusing that result on every later call.
+  Future<Box<String>> _openedBox() => _box ??= openBox();
+
+  @override
+  Future<CachedMenu?> read(VenueRef ref) async {
+    final Box<String> box;
+    try {
+      box = await _openedBox();
+      // A broken box is a miss, never a throw (architecture.md §6.4).
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      return null;
+    }
+    String? raw;
+    try {
+      raw = box.get(ref.cacheKey);
+      // A broken box is a miss, never a throw (architecture.md §6.4).
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      return null;
+    }
+    if (raw == null) return null;
+    final Object? decoded;
+    try {
+      decoded = jsonDecode(raw);
+    } on FormatException {
+      return null;
+    }
+    if (decoded is! Map<String, Object?>) return null;
+    return CachedMenu.tryFrom(decoded);
+  }
+
+  @override
+  Future<void> write(CachedMenu entry) async {
+    final Box<String> box;
+    try {
+      box = await _openedBox();
+      // A broken box drops the write, never throws (architecture.md §6.4).
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      return;
+    }
+    final key = entry.menu.venueRef.cacheKey;
+    final value = jsonEncode(entry.toJson());
+    try {
+      await box.put(key, value);
+      // Drop the write; a broken box degrades instead of throwing.
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      // Nothing to do: the write above never landed.
+    }
+  }
+
+  @override
+  Future<void> clear() async {
+    final Box<String> box;
+    try {
+      box = await _openedBox();
+      // Nothing to clear if the box itself never opened.
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      return;
+    }
+    try {
+      await box.clear();
+      // An unclearable box just keeps its stale entries.
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      // Nothing to do: the clear above never landed.
+    }
+  }
 }
