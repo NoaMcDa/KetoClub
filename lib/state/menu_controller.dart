@@ -99,9 +99,18 @@ final class MenuController extends ChangeNotifier {
   /// [MenuFilter.all] adds dishes [analysis] never placed on top of that.
   /// A dish verdict [DishVerdict.nonKeto] never appears here, under any
   /// filter — see [redRows].
+  ///
+  /// **When there is no successful analysis, every dish is returned with a
+  /// null verdict, whatever the filter says.** A filter selects verdicts, and
+  /// with no analysis there are none to select, so applying it would return an
+  /// empty list and a failed analysis would cost the user the menu — which
+  /// architecture.md §6.6 forbids. Keeping that rule here rather than in a
+  /// screen means no screen has to reach around this controller to rebuild
+  /// rows for itself.
   List<DishRow> get visibleRows {
     final currentMenu = _menu;
     if (currentMenu == null) return const <DishRow>[];
+    if (analysis is! MenuAnalysed) return _allRows(currentMenu);
     final analysedById = _analysedById();
     final rows = <DishRow>[];
     for (final category in currentMenu.categories) {
@@ -116,6 +125,13 @@ final class MenuController extends ChangeNotifier {
     }
     return rows;
   }
+
+  /// Every dish in [menu] as an unjudged row, in category order.
+  List<DishRow> _allRows(Menu menu) => <DishRow>[
+    for (final category in menu.categories)
+      for (final dish in category.dishes)
+        DishRow(dish: dish, category: category.name),
+  ];
 
   /// The collapsed red group: every [DishVerdict.nonKeto] dish, regardless
   /// of [filter] (architecture.md §6.6, constraint 8 — red is grouped,

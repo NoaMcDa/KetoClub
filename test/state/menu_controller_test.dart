@@ -414,6 +414,31 @@ void main() {
       expect(notifyCount, 2);
     });
 
+    test(
+      'visibleRows returns every dish unjudged when the analysis failed',
+      () async {
+        // Arrange: a menu that fetched fine but could not be classified.
+        final menu = _menuOf([_dish('Entrecote'), _dish('Pizza', id: 'd2')]);
+        repository.stub(_ref, MenuFetched(menu: menu));
+        classifier.respondWith(
+          const MenuAnalysisFailed(
+            reason: MenuAnalysisFailureReason.badResponse,
+          ),
+        );
+
+        // Act
+        await controller.open(_ref);
+
+        // Assert: a filter selects verdicts, and there are none to select, so
+        // applying it would hand the user an empty menu. §6.6 forbids letting
+        // a failed analysis cost the menu itself.
+        expect(controller.filter, MenuFilter.greenAndYellow);
+        expect(controller.visibleRows, hasLength(2));
+        expect(controller.visibleRows.every((r) => r.analysis == null), isTrue);
+        expect(controller.menu, isNotNull);
+      },
+    );
+
     test('visibleRows and redRows before any open are empty, not a crash', () {
       // Arrange: nothing opened yet.
 

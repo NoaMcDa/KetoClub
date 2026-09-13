@@ -45,9 +45,7 @@ void main() {
       pushedNames = <String>[];
     });
 
-    testWidgets('build renders the title and the search field', (
-      tester,
-    ) async {
+    testWidgets('build renders the title and the search field', (tester) async {
       // Act
       await _pump(tester, controller: controller, pushedNames: pushedNames);
 
@@ -108,22 +106,21 @@ void main() {
       );
     });
 
-    testWidgets(
-      'tapping the submit affordance pushes the venue route path',
-      (tester) async {
-        // Arrange
-        await _pump(tester, controller: controller, pushedNames: pushedNames);
-        await tester.enterText(find.byType(TextField), '123456');
-        await tester.pump();
+    testWidgets('tapping the submit affordance pushes the venue route path', (
+      tester,
+    ) async {
+      // Arrange
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      await tester.enterText(find.byType(TextField), '123456');
+      await tester.pump();
 
-        // Act
-        await tester.tap(find.byType(FilledButton));
-        await tester.pumpAndSettle();
+      // Act
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
 
-        // Assert
-        expect(pushedNames, contains('/venue/tenbis/123456'));
-      },
-    );
+      // Assert
+      expect(pushedNames, contains('/venue/tenbis/123456'));
+    });
 
     testWidgets('tapping the settings action pushes the settings route', (
       tester,
