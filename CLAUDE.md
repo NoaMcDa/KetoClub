@@ -211,6 +211,10 @@ The section this replaces described a heuristic-first design that predates the c
 - `README.md`: Full project narrative, API endpoints, database schema, keto classification rules, Phase roadmap
 - Engineering standards (SOLID, acyclic imports, clean code, tests, CI) are `architecture.md` §18. Run `tool/check.sh` before pushing; it runs exactly what CI runs.
 
+- `backend_plan.md`: The planned Python (FastAPI) backend — why (CORS on web), the
+  API contract, the client seams, and issues #94–#109 in priority order. Planned,
+  not built; `architecture.md` gains D11 when #97 lands
+
 **Research & Analysis:**
 - `m16_menu_scanner_research.md`: Computer vision and OCR strategy for physical menu scanning (Phase 4)
 - `m15_meal_entry_research.md`: User flow design for meal logging and macro tracking
