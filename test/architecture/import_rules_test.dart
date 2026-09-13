@@ -61,6 +61,22 @@ const pureDartLayers = <String>{'models', 'utils', 'services'};
 /// The only Flutter import allowed in the pure-Dart layers.
 const allowedFlutterImport = 'package:flutter/foundation.dart';
 
+/// External hosts that may be named in exactly one file under lib/, mapped
+/// to the lib-relative path of the file that owns each (architecture.md §5).
+///
+/// architecture.md states this rule and `open_router_client.dart` says "a
+/// boundary check enforces this"; this is that check. A second mention of a
+/// host is a second place to edit when a URL moves, and for the gateway it
+/// is a second place a request could be sent from — which is exactly what
+/// the backend chat client added in milestone B must not become.
+///
+/// The rule governs lib/ only. `backend/` names the Wolt host too, as its
+/// own upstream, which is the point of it.
+const singleFileHosts = <String, String>{
+  'openrouter.ai': 'services/llm/open_router_client.dart',
+  'restaurant-api.wolt.com': 'services/menu/wolt/wolt_adapter.dart',
+};
+
 final _directive = RegExp(
   r'''^\s*(?:import|export|part)\s+['"]([^'"]+)['"]''',
   multiLine: true,
@@ -151,6 +167,12 @@ String? _resolve(String uri, String importerRelative) {
   }
   return base.join('/');
 }
+
+/// Whether the file at [relativePath] under lib/ names [host] anywhere,
+/// including inside a comment. A host named in a comment is still a second
+/// place someone has to find and change.
+bool namesHost(String relativePath, String host) =>
+    File('lib/$relativePath').readAsStringSync().contains(host);
 
 /// Raw (unresolved) Flutter imports of a file, for the pure-Dart check.
 List<String> _flutterImportsOf(String relativePath) {
@@ -290,6 +312,28 @@ void main() {
           'Only $allowedFlutterImport is allowed below state/:\n'
           '${violations.join('\n')}',
     );
+  });
+
+  test('each external host is named in exactly one file under lib/', () {
+    final violations = <String>[];
+    for (final MapEntry(key: host, value: owner) in singleFileHosts.entries) {
+      final naming = files.keys.where((p) => namesHost(p, host)).toList();
+      naming.sort();
+
+      if (!naming.contains(owner)) {
+        violations.add(
+          "'$host' is named nowhere, but $owner is meant to own it. "
+          'Move the rule if the file moved.',
+        );
+      }
+      for (final path in naming.where((p) => p != owner)) {
+        violations.add(
+          "'$host' is named in $path; it belongs only in $owner. "
+          'Pass it in from there, or from di.dart, instead.',
+        );
+      }
+    }
+    expect(violations, isEmpty, reason: violations.join('\n'));
   });
 
   test('the import graph of lib/ has no cycles', () {
