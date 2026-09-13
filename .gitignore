@@ -165,3 +165,16 @@ test/all_lib_imports_test.dart
 # Generated design canvas bundles (rebuilt from .design/*.dc.html)
 .design/*.html
 !.design/*.dc.html
+
+# Python backend (backend/). uv.lock is committed; the venv and caches are not.
+backend/.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+backend/*.db
+backend/*.db-wal
+backend/*.db-shm

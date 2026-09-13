@@ -159,3 +159,32 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: flutter build ios --release --no-codesign
+
+  backend:
+    name: Backend (lint, types, tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    # Not filtered by path. A required status check that never runs stays
+    # "Expected" forever and blocks merging a Flutter-only pull request, so
+    # this job runs on every one; it takes about a minute.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - name: Install dependencies from the lockfile
+        run: uv sync --frozen
+      - name: Lint
+        run: uv run ruff check .
+      - name: Check formatting
+        run: uv run ruff format --check .
+      - name: Type-check (strict)
+        run: uv run mypy app
+      - name: Run tests with coverage
+        run: uv run pytest --cov=app --cov-report=term-missing --cov-fail-under=80
