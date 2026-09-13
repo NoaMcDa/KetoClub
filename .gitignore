@@ -157,3 +157,7 @@ ios/Flutter/Flutter.podspec
 ios/Pods/
 .symlinks/
 flutter/ephemeral/
+
+# Generated design canvas bundles (rebuilt from .design/*.dc.html)
+.design/*.html
+!.design/*.dc.html

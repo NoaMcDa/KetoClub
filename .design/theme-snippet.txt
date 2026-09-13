@@ -1,0 +1,27 @@
+  <style>
+    body { margin: 0; font-family: 'Public Sans', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); }
+    .app { --bg: #faf7f0; --surface: #ffffff; --surface2: #f4efe4; --ink: #1f1c17; --ink2: #6f675b; --ink3: #a09484;
+      --line: rgba(31,28,23,0.11); --line2: rgba(31,28,23,0.07);
+      --accent: oklch(0.52 0.10 148); --accent-hover: oklch(0.42 0.10 148); --accent-ink: #faf7f0;
+      --green: oklch(0.56 0.13 148); --green-tint: oklch(0.965 0.022 152); --green-ink: oklch(0.40 0.10 150); --green-on: #faf7f0;
+      --amber: oklch(0.75 0.14 74); --amber-tint: oklch(0.965 0.032 85); --amber-ink: oklch(0.44 0.10 66); --amber-on: #2a1e08;
+      --red: oklch(0.56 0.17 27); --red-tint: oklch(0.965 0.020 25); --red-ink: oklch(0.47 0.14 27); --red-on: #faf7f0;
+      --shadow: 0 20px 44px -20px rgba(31,28,23,0.40);
+      --photo: linear-gradient(135deg, #e9e1cf 0%, #d8cbb0 100%); --photo-ink: #8b7d63; }
+    .app.dark { --bg: #14120e; --surface: #1e1b15; --surface2: #272218; --ink: #f5f0e4; --ink2: #a99e8c; --ink3: #7d7364;
+      --line: rgba(245,240,228,0.12); --line2: rgba(245,240,228,0.07);
+      --accent: oklch(0.74 0.13 148); --accent-hover: oklch(0.82 0.12 148); --accent-ink: #14120e;
+      --green: oklch(0.76 0.14 148); --green-tint: oklch(0.30 0.055 150); --green-ink: oklch(0.85 0.13 150); --green-on: #0f1710;
+      --amber: oklch(0.81 0.13 78); --amber-tint: oklch(0.31 0.05 72); --amber-ink: oklch(0.89 0.11 82); --amber-on: #1c1406;
+      --red: oklch(0.66 0.17 27); --red-tint: oklch(0.29 0.065 25); --red-ink: oklch(0.78 0.14 27); --red-on: #170c0a;
+      --shadow: 0 20px 44px -20px rgba(0,0,0,0.85);
+      --photo: linear-gradient(135deg, #322c22 0%, #1c180f 100%); --photo-ink: #6b6152; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; user-select: none; }
+    .pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px 4px 7px; border-radius: 8px; font-size: 10px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .ph { position: relative; display: flex; align-items: center; justify-content: center; background: var(--photo); }
+    .serif { font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-weight: 400; }
+    .nav { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .nav span { font-size: 10px; font-weight: 700; }
+  </style>
