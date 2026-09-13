@@ -1,0 +1,11 @@
+# Localisation generation (architecture.md §12).
+#
+# The generated output is committed under lib/l10n/generated/, which is already
+# excluded from analysis (analysis_options.yaml), from the coverage gate
+# (tool/coverage_gate.sh) and from the all-imports helper
+# (tool/gen_coverage_helper.sh). Regenerate with `flutter gen-l10n`.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+output-dir: lib/l10n/generated

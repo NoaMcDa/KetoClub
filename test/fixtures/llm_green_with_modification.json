@@ -1,0 +1,13 @@
+{
+  "_fixture_note": "synthetic fixture: an orderAsIs dish that also carries a modification (architecture.md §9.4 rule 5, second sentence — a green keeps its verdict and drops the field).",
+  "dishes": [
+    {
+      "id": "dish-salmon",
+      "name": "Grilled Salmon",
+      "verdict": "orderAsIs",
+      "why": "Lemon and dill, nothing starchy.",
+      "modification": "You could ask for extra lemon, but it is not needed.",
+      "net_carbs_estimate": 1
+    }
+  ]
+}

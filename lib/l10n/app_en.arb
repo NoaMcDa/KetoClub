@@ -1,0 +1,87 @@
+{
+  "@@locale": "en",
+
+  "settingsTitle": "Settings",
+  "actionRetry": "Try again",
+  "actionReport": "Report this",
+  "actionOpenSettings": "Open Settings",
+  "actionCopy": "Copy",
+  "actionCopied": "Copied",
+
+  "venueSearchLabel": "Restaurant link",
+  "venueSearchHint": "Paste a Wolt link, or a venue slug",
+  "venueSearchInvalid": "KetoClub cannot read a menu from that yet. Paste a Wolt restaurant link or its slug.",
+  "venueSearchOpen": "Show the keto menu",
+
+  "menuLoading": "Reading the menu…",
+  "menuEmpty": "This menu has no dishes.",
+  "filterGreenOnly": "Order as-is only",
+  "filterGreenAndYellow": "As-is and with changes",
+  "filterAll": "Everything",
+  "redGroupTitle": "Not keto ({count})",
+  "@redGroupTitle": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "unclassifiedTitle": "Not read ({count})",
+  "@unclassifiedTitle": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "unclassifiedExplain": "KetoClub saw these dishes but could not place them. Read them yourself before ordering.",
+  "engineChipAi": "AI",
+  "engineChipRules": "Rules",
+  "rulesNotVerifiedHint": "Rule-based result, not AI-verified.",
+  "cachedFrom": "Showing the menu saved on {date}.",
+  "@cachedFrom": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+
+  "verdictOrderAsIs": "Order as-is",
+  "verdictModifiable": "Order with a change",
+  "verdictNonKeto": "Not keto",
+
+  "waiterCardOpen": "Show the waiter card",
+  "waiterCardTitle": "Say this to the waiter",
+
+  "settingsKeySection": "OpenRouter key",
+  "settingsKeyHint": "Paste your OpenRouter key",
+  "settingsKeySave": "Save key",
+  "settingsKeyPresent": "A key is stored on this device.",
+  "settingsKeyAbsent": "No key stored. KetoClub will use on-device rules.",
+  "settingsKeyDelete": "Remove key",
+  "settingsWebStorageNote": "On the web the key is kept in browser storage, which protects it less well than a phone's keychain.",
+  "settingsConsentTitle": "What leaves this device",
+  "settingsConsentBody": "With a key, dish names, descriptions and option labels from the menu you open are sent to OpenRouter for analysis. Nothing about you, your location or your history is sent. Menus are read straight from the restaurant platform, which receives only the venue identifier. There is no other server and no analytics.",
+  "settingsConsentAccept": "I understand",
+  "settingsLanguage": "Language",
+  "settingsLanguageSystem": "Match my device",
+  "settingsLanguageEnglish": "English",
+  "settingsLanguageHebrew": "Hebrew",
+  "settingsFilter": "Default filter",
+  "settingsClearCache": "Clear saved menus",
+  "settingsCacheCleared": "Saved menus cleared.",
+
+  "fetchFailedOffline": "No connection, so the menu could not be read.",
+  "fetchFailedNotFound": "No venue found on {platform}. Check the link.",
+  "@fetchFailedNotFound": {
+    "placeholders": { "platform": { "type": "String" } }
+  },
+  "fetchFailedPlatformChanged": "{platform} changed its menu format (HTTP {statusCode}), so KetoClub could not read it. Please report this.",
+  "@fetchFailedPlatformChanged": {
+    "placeholders": {
+      "platform": { "type": "String" },
+      "statusCode": { "type": "String" }
+    }
+  },
+  "fetchFailedUnsupportedSource": "KetoClub cannot read menus from that site yet.",
+
+  "analysisNotConfigured": "Add an OpenRouter key in Settings for AI analysis.",
+  "analysisOffline": "Offline. Showing rule-based results.",
+  "analysisTimeout": "The AI model was too slow. Showing rule-based results.",
+  "analysisRateLimited": "The daily AI limit for this key is used up. Showing rule-based results.",
+  "analysisUnauthorised": "OpenRouter rejected your key, so nothing was analysed.",
+  "analysisBadResponse": "AI analysis failed ({detail}). Showing rule-based results.",
+  "@analysisBadResponse": {
+    "placeholders": { "detail": { "type": "String" } }
+  },
+  "analysisNoDishesFound": "The AI could not identify any dishes on this menu."
+}

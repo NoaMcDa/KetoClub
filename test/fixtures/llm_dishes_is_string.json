@@ -1,0 +1,4 @@
+{
+  "_fixture_note": "synthetic fixture: dishes is a string, not a list (architecture.md §9.4 rule 2, negative case).",
+  "dishes": "orderAsIs for everything"
+}

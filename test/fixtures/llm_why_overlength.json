@@ -1,0 +1,13 @@
+{
+  "_fixture_note": "synthetic fixture: why is over 300 characters (architecture.md §9.4 rule 6, positive case: truncated, never rejected for length alone).",
+  "dishes": [
+    {
+      "id": "dish-steak",
+      "name": "Grilled Steak",
+      "verdict": "orderAsIs",
+      "why": "This dish is plain grilled protein with nothing starchy sweet or breaded on it. This dish is plain grilled protein with nothing starchy sweet or breaded on it. This dish is plain grilled protein with nothing starchy sweet or breaded on it. This dish is plain grilled protein with nothing starchy sweet or breaded on it. This dish is plain grilled protein with nothing starchy sweet or breaded on it. ",
+      "modification": null,
+      "net_carbs_estimate": 1
+    }
+  ]
+}
