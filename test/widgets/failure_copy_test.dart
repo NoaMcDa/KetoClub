@@ -1,0 +1,146 @@
+import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/models/failures.dart';
+import 'package:ketoclub/widgets/failure_copy.dart';
+
+const _locales = [Locale('en'), Locale('he')];
+
+void main() {
+  group('fetchFailureMessage', () {
+    for (final locale in _locales) {
+      test('returns a non-empty message for every reason in $locale', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+
+        // Act & Assert
+        for (final reason in MenuFetchFailureReason.values) {
+          final message = fetchFailureMessage(
+            reason,
+            l10n,
+            platform: 'Wolt',
+            statusCode: 502,
+          );
+          expect(
+            message,
+            isNotEmpty,
+            reason: '$reason should have copy in ${locale.languageCode}',
+          );
+        }
+      });
+
+      test('gives every reason its own copy in ${locale.languageCode}', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+
+        // Act
+        final messages = [
+          for (final reason in MenuFetchFailureReason.values)
+            fetchFailureMessage(
+              reason,
+              l10n,
+              platform: 'Wolt',
+              statusCode: 502,
+            ),
+        ];
+
+        // Assert: collapsing reasons is a bug (architecture.md §10).
+        expect(messages.toSet(), hasLength(messages.length));
+      });
+    }
+  });
+
+  group('analysisFailureMessage', () {
+    for (final locale in _locales) {
+      test('returns a non-empty message for every reason in $locale', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+
+        // Act & Assert
+        for (final reason in MenuAnalysisFailureReason.values) {
+          final message = analysisFailureMessage(
+            reason,
+            l10n,
+            detail: 'unexpected shape',
+          );
+          expect(
+            message,
+            isNotEmpty,
+            reason: '$reason should have copy in ${locale.languageCode}',
+          );
+        }
+      });
+
+      test('gives every reason its own copy in ${locale.languageCode}', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+
+        // Act
+        final messages = [
+          for (final reason in MenuAnalysisFailureReason.values)
+            analysisFailureMessage(reason, l10n, detail: 'unexpected shape'),
+        ];
+
+        // Assert: collapsing reasons is a bug (architecture.md §10).
+        expect(messages.toSet(), hasLength(messages.length));
+      });
+    }
+  });
+
+  group('fetchFailureMessage and analysisFailureMessage together', () {
+    for (final locale in _locales) {
+      test('never share copy across the two failure enums in $locale', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+
+        // Act
+        final fetchMessages = [
+          for (final reason in MenuFetchFailureReason.values)
+            fetchFailureMessage(
+              reason,
+              l10n,
+              platform: 'Wolt',
+              statusCode: 502,
+            ),
+        ];
+        final analysisMessages = [
+          for (final reason in MenuAnalysisFailureReason.values)
+            analysisFailureMessage(reason, l10n, detail: 'unexpected shape'),
+        ];
+
+        // Assert
+        final all = [...fetchMessages, ...analysisMessages];
+        expect(all.toSet(), hasLength(all.length));
+      });
+    }
+  });
+
+  group('allowsRulesFallback', () {
+    test('unauthorised is false', () {
+      // Arrange
+      const reason = MenuAnalysisFailureReason.unauthorised;
+
+      // Act
+      final allowed = allowsRulesFallback(reason);
+
+      // Assert: a rejected key must be shown as-is, never papered over.
+      expect(allowed, isFalse);
+    });
+
+    test('every other reason is true', () {
+      for (final reason in MenuAnalysisFailureReason.values) {
+        if (reason == MenuAnalysisFailureReason.unauthorised) continue;
+
+        // Act
+        final allowed = allowsRulesFallback(reason);
+
+        // Assert
+        expect(
+          allowed,
+          isTrue,
+          reason: '$reason should allow a rules fallback',
+        );
+      }
+    });
+  });
+}
