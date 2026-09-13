@@ -25,11 +25,7 @@ const layerRank = <String, int>{
 };
 
 /// Files that live directly under lib/ (not in a layer directory).
-const rootFileRank = <String, int>{
-  'app.dart': 6,
-  'di.dart': 7,
-  'main.dart': 7,
-};
+const rootFileRank = <String, int>{'app.dart': 6, 'di.dart': 7, 'main.dart': 7};
 
 /// Sub-packages under lib/services/. A sub-package may import only
 /// sub-packages of equal or lower rank. Cycles within one sub-package are
@@ -57,7 +53,7 @@ final _directive = RegExp(
 
 /// A file under lib/, identified by its path relative to lib/ using `/`.
 class _LibFile {
-  _LibFile(this.relativePath, this.imports);
+  new(this.relativePath, this.imports);
 
   final String relativePath;
   final List<String> imports;
@@ -88,12 +84,13 @@ Map<String, _LibFile> _readLib() {
   final lib = Directory('lib');
   if (!lib.existsSync()) return <String, _LibFile>{};
 
-  final dartFiles = lib
-      .listSync(recursive: true)
-      .whereType<File>()
-      .where((f) => f.path.endsWith('.dart'))
-      .toList()
-    ..sort((a, b) => a.path.compareTo(b.path));
+  final dartFiles =
+      lib
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.dart'))
+          .toList()
+        ..sort((a, b) => a.path.compareTo(b.path));
 
   final files = <String, _LibFile>{};
   for (final file in dartFiles) {
@@ -198,7 +195,8 @@ void main() {
     expect(
       unknown,
       isEmpty,
-      reason: 'Files outside the layer tables in import_rules_test.dart: '
+      reason:
+          'Files outside the layer tables in import_rules_test.dart: '
           '$unknown. Add the layer to architecture.md §5 and to this test.',
     );
   });
@@ -212,7 +210,8 @@ void main() {
     expect(
       unknown,
       isEmpty,
-      reason: 'Files under lib/services/ must live in a ranked sub-package: '
+      reason:
+          'Files under lib/services/ must live in a ranked sub-package: '
           '$unknown. See architecture.md §5.',
     );
   });
@@ -271,7 +270,8 @@ void main() {
     expect(
       violations,
       isEmpty,
-      reason: 'Only $allowedFlutterImport is allowed below state/:\n'
+      reason:
+          'Only $allowedFlutterImport is allowed below state/:\n'
           '${violations.join('\n')}',
     );
   });

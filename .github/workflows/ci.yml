@@ -1,12 +1,11 @@
 # KetoClub continuous integration.
 #
 # Every job here is a required status check on pull requests (see
-# architecture.md §18.5). The workflow is committed before any application
-# code exists, so it is red until the Flutter skeleton lands; making it green
-# is step 1 of the build order.
+# architecture.md §18.5). Green since the first skeleton (build-order step 1);
+# a red main is the top priority for whoever broke it.
 #
-# The Flutter version is read from pubspec.yaml (environment.flutter) so local
-# and CI builds use the same SDK.
+# The Flutter version is pinned below and must equal environment.flutter in
+# pubspec.yaml; bump both in one commit.
 
 name: CI
 
@@ -31,7 +30,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version-file: pubspec.yaml
+          flutter-version: 3.47.4  # keep equal to environment.flutter in pubspec.yaml
           cache: true
       - run: flutter pub get
       - name: Check formatting
@@ -47,7 +46,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version-file: pubspec.yaml
+          flutter-version: 3.47.4  # keep equal to environment.flutter in pubspec.yaml
           cache: true
       - run: flutter pub get
       - name: Generate the all-imports helper so untested files count as zero coverage
@@ -72,7 +71,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version-file: pubspec.yaml
+          flutter-version: 3.47.4  # keep equal to environment.flutter in pubspec.yaml
           cache: true
       - uses: browser-actions/setup-chrome@v1
         id: chrome
@@ -87,8 +86,7 @@ jobs:
           CHROME_EXECUTABLE: ${{ steps.chrome.outputs.chrome-path }}
         run: |
           set -euo pipefail
-          shopt -s nullglob
-          files=(integration_test/*_test.dart)
+          mapfile -t files < <(find integration_test -name '*_test.dart' | sort)
           if [ ${#files[@]} -eq 0 ]; then
             echo "No integration tests found under integration_test/." >&2
             exit 1
@@ -120,7 +118,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version-file: pubspec.yaml
+          flutter-version: 3.47.4  # keep equal to environment.flutter in pubspec.yaml
           cache: true
       - run: flutter pub get
       - name: Build web
@@ -139,7 +137,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version-file: pubspec.yaml
+          flutter-version: 3.47.4  # keep equal to environment.flutter in pubspec.yaml
           cache: true
       - run: flutter pub get
       - run: flutter build ios --release --no-codesign

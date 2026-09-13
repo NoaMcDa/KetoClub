@@ -1,8 +1,9 @@
 # KetoClub — Architecture
 
-**Status:** design document. No application code exists yet; this file is the
-blueprint the first implementation follows. When code and this document disagree,
-fix one of them in the same pull request.
+**Status:** living design document. The Flutter skeleton, the composition root
+and the CI pipeline exist (build-order step 1, §16); every feature below is still to
+be built. When code and this document disagree, fix one of them in the same pull
+request.
 
 **Audience:** anyone about to write the first line of Dart for KetoClub, and anyone
 reviewing it.
@@ -144,8 +145,8 @@ issues and reviews can cite them.
 13. **Engineering standards apply from the first commit.** SOLID, an acyclic
     import graph, clean-code rules, unit and flow tests, and a CI pipeline that
     gates every pull request are defined in §18 and are not deferred to "after the
-    MVP". The workflow, lint configuration and architecture test are committed
-    before any application code.
+    MVP". The workflow, lint configuration and architecture test landed with the
+    first skeleton, before any feature code.
 
 ---
 
@@ -224,6 +225,7 @@ ketoclub/
 │   │   └── engine_chip.dart              # "AI" / "rules (offline)" indicator
 │   │
 │   ├── state/                            # ChangeNotifiers; constructor-injected with interfaces
+│   │   ├── app_dependencies.dart         # immutable holder of service interfaces; filled by di.dart
 │   │   ├── venue_search_controller.dart
 │   │   ├── menu_controller.dart
 │   │   └── settings_controller.dart
@@ -285,9 +287,10 @@ ketoclub/
 │   ├── services/                         # mirrors lib/services/ one-to-one
 │   ├── state/
 │   ├── utils/
-│   ├── widgets/
-│   └── flows/                            # §18.4: whole-app journeys with fakes injected via di.dart
-├── integration_test/                     # real widgets on a real browser/device, classifier faked
+│   ├── screens/                          # one widget test per screen, dependencies faked
+│   └── widgets/
+├── integration_test/
+│   └── flows/                            # §18.4: user journeys on a real browser/device (FLOW_TEST_CONVENTIONS.md)
 ├── test_driver/integration_test.dart     # driver for `flutter drive` on web
 ├── tool/
 │   ├── check.sh                          # runs exactly what CI runs
@@ -328,7 +331,7 @@ ketoclub/
 | `url_launcher` | Open the venue on the source platform. |
 
 Dev dependencies: `flutter_test` and `integration_test` (SDK), `very_good_analysis`
-(lints, §18.3), `fake_async` (timeouts under test, §18.4).
+(lints, §18.3). Add `fake_async` when the first timeout is under test (§18.4).
 
 Nothing else until a concrete need appears. In particular no code generation, no
 `freezed`, no `riverpod`: the app is small, and each of those adds a build step.
@@ -878,13 +881,12 @@ This section lists what each part of the system must be tested for.
   result, honours the interface's documented invariants). See §18.1 (Liskov).
 - **Widgets:** a red group collapses with a count; an unclassified section renders;
   a yellow card always has script text; the engine chip reflects the result.
-- **Flows** (`test/flows/`): paste a Wolt URL and see a classified menu; go offline
+- **Flows** (`integration_test/flows/`): paste a Wolt URL and see a classified menu; go offline
   and see rule-based results with the reason; enter a key in Settings, confirm
   consent, and see the engine chip switch to AI; a rejected key shows the
   unauthorised message and no rules fallback.
-- **Integration** (`integration_test/`): the paste-a-URL flow on a real browser with
-  the classifier and adapters faked; the build, routing, localisation and platform
-  plugins are real.
+- **Screens** (`test/screens/`): each screen with its controller and faked
+  dependencies, asserting what the flow tests assert but in milliseconds.
 - **Rule:** no test opens a socket or uses a real clock.
 
 ---
@@ -898,11 +900,12 @@ Build in this order; each step is demonstrable on its own.
    `test_driver/integration_test.dart`, `tool/check.sh`, `tool/coverage_gate.sh`,
    `tool/gen_coverage_helper.sh`.
    CI is red until step 1 makes it green; that is intended.
-1. **Skeleton** — `flutter create`, dependencies, ARB files, the `models/` package,
-   the sealed result types, `di.dart` with an empty dependency set, one trivial
-   unit test and one trivial flow test so every CI job runs and passes. **Merging
-   this step requires a green pipeline**; branch protection is switched on at the
-   same time.
+1. **Skeleton** — `flutter create` (done on `main`), `di.dart` with an empty
+   dependency set, `app.dart`, a placeholder first screen, one widget test and
+   one flow test so every CI job runs and passes (done in the pull request that
+   added §18). Still open in this step: ARB files, the `models/` package and the
+   sealed result types. **Branch protection is switched on when this step
+   merges.**
 2. **Heuristic classifier** — `constants.dart`, `classification_rules.dart`,
    `HeuristicMenuClassifier`, and its tests. Validates the model shapes before any
    network code exists.
@@ -963,6 +966,12 @@ These standards are part of the architecture, not a style preference. They are
 enforced by tooling wherever tooling can enforce them (§18.2, §18.5) and by review
 where it cannot. They apply from the first commit of application code.
 
+They sit on top of the repository's convention documents on `main`:
+`ISSUE_CONVENTIONS.md`, `PR_CONVENTIONS.md`, `MILESTONE_CONVENTIONS.md`,
+`UNIT_TEST_CONVENTIONS.md` and `FLOW_TEST_CONVENTIONS.md`. Where this section is
+stricter (the coverage gate, fakes for project interfaces, the layer test), this
+section wins; everything else in those documents applies as written.
+
 ### 18.1 SOLID, as concrete rules for this codebase
 
 **Single responsibility.** Each class has one reason to change, and the split points
@@ -1020,7 +1029,7 @@ which runs in the ordinary unit-test job and:
    `foundation.dart`;
 4. runs a cycle detection over the whole graph and prints the cycle if one exists.
 
-The test is checked in before any code exists, so the first file that breaks the
+The test landed with the first skeleton, so the first file that breaks the
 layering fails CI rather than starting a habit. Adding a layer or a sub-package
 means editing the rank tables in that test in the same pull request, and saying why.
 
@@ -1068,17 +1077,19 @@ every pull request:
 | Kind | Where | What it exercises | Runs in |
 |---|---|---|---|
 | **Unit** | `test/` mirroring `lib/` | one class or pure function, dependencies faked at their interface | `flutter test`, seconds |
-| **Flow** | `test/flows/*_flow_test.dart` | a whole user journey through the real widget tree, real controllers, real services where they are pure, fakes for I/O, injected through `di.dart` | `flutter test`, seconds |
-| **Integration** | `integration_test/` | the real build on a real browser or device: routing, localisation, plugins, platform channels; classifier and adapters faked | `flutter drive` on headless Chrome in CI, on devices before a release |
+| **Widget** | `test/screens/`, `test/widgets/` | one screen or widget with its controller, dependencies faked | `flutter test`, seconds |
+| **Flow** | `integration_test/flows/*_flow_test.dart` (`FLOW_TEST_CONVENTIONS.md`) | a whole user journey through the real build: routing, localisation, plugins, platform channels; I/O faked through the composition root | `flutter drive` on headless Chrome in CI; on devices before a release |
 
 Rules:
 
 - **A change to `lib/` ships with its tests in the same pull request.** A new public
   method without a unit test, or a new screen without a flow test, is not
   reviewable.
-- **Fakes, not mocks.** `test/fakes/` holds one hand-written fake per interface,
-  passing the interface's contract suite. No mocking library; a fake that records
-  calls is a few lines of Dart and is readable.
+- **Fakes for the project's own interfaces.** `test/fakes/` holds one hand-written
+  fake per interface, passing the interface's contract suite; a fake that records
+  calls is a few lines of Dart and is readable. `mockito`, as shown in
+  `UNIT_TEST_CONVENTIONS.md`, is acceptable for third-party types such as
+  `http.Client`, never for an interface this project defines.
 - **Deterministic.** No network, no real timers, no real clock, no wall-clock
   `Duration` sleeps. `Clock` and `Connectivity` are injected; `fake_async` is used
   where a timeout is under test.
@@ -1086,7 +1097,9 @@ Rules:
   response, redacted only where a field is personal. Synthetic fixtures are labelled
   as such in a comment at the top of the file.
 - **Coverage gate: 80% of lines across all of `lib/`**, measured by
-  `flutter test --coverage`, enforced by `tool/coverage_gate.sh`. Generated files
+  `flutter test --coverage`, enforced by `tool/coverage_gate.sh`. The per-component
+  targets in `UNIT_TEST_CONVENTIONS.md` are guidance underneath this gate, not a
+  lower bar. Generated files
   (`*.g.dart`, `l10n/` output) are excluded. Because `lcov` only counts files that
   some test imported, `tool/check.sh` first generates a test file that imports every
   file under `lib/`, so an untested file counts as zero rather than disappearing.
@@ -1095,7 +1108,7 @@ Rules:
 
 ### 18.5 Continuous integration
 
-`.github/workflows/ci.yml` is committed on day zero. It runs on every pull request
+`.github/workflows/ci.yml` landed with the first skeleton. It runs on every pull request
 and on every push to `main`, and every job is a required status check under branch
 protection: nothing merges red, and nothing merges without a review.
 
@@ -1109,8 +1122,9 @@ protection: nothing merges red, and nothing merges without a review.
 
 Conventions:
 
-- The Flutter version is pinned in `pubspec.yaml` (`environment: flutter:`) and the
-  workflow reads it from there, so local and CI builds cannot drift.
+- The Flutter version is pinned in two places that must agree: `flutter-version`
+  in the workflow and `environment: flutter:` in `pubspec.yaml` (3.47.4 today).
+  Bump both in one commit.
 - `tool/check.sh` runs `quality` and `test` locally with the same commands; run it
   before pushing. It is the pre-commit hook for anyone who wants one
   (`ln -s ../../tool/check.sh .git/hooks/pre-push`).
@@ -1122,7 +1136,8 @@ Conventions:
 
 ### 18.6 Definition of Done for a pull request
 
-- [ ] Does one thing, stated in the title; description says what and why.
+- [ ] Title, commits and body follow `PR_CONVENTIONS.md` (`[type] description`,
+      the five-section template); the pull request does one thing.
 - [ ] `tool/check.sh` passes locally; all CI jobs green.
 - [ ] New or changed behaviour has unit tests; a new or changed screen has a flow
       test; a new interface has a contract suite and a fake.
@@ -1160,8 +1175,8 @@ following, and the rest of the document has been updated to match:
   JSON, tested against fixtures with no HTTP; the adapter only does the request.
 - **`services/` is organised into ranked sub-packages** so the DAG rule can be
   stated and checked mechanically rather than by reading.
-- **`test/` grew `architecture/`, `fakes/` and `flows/`**, and the repository grew
-  `tool/`, `test_driver/` and `.github/workflows/`, all committed before application
+- **`test/` grew `architecture/` and `fakes/`, `integration_test/` grew `flows/`**, and the repository grew
+  `tool/`, `test_driver/` and `.github/workflows/`, all landed with the first skeleton, before any feature
   code.
 - **Build order gained step 0**, and step 1 now ends with a green pipeline and
   branch protection rather than with "no screens yet".
