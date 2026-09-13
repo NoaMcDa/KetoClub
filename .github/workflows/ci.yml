@@ -79,10 +79,9 @@ jobs:
           chrome-version: stable
           install-chromedriver: true   # a driver that matches the browser it installs
           install-dependencies: true
-      - name: Expose Chrome under the name chromedriver looks for
+      - name: Show the browser and driver versions (they must match)
         run: |
-          sudo ln -sf "${{ steps.chrome.outputs.chrome-path }}" /usr/local/bin/google-chrome
-          google-chrome --version
+          "${{ steps.chrome.outputs.chrome-path }}" --version
           "${{ steps.chrome.outputs.chromedriver-path }}" --version
       - run: flutter pub get
       - name: Start chromedriver
@@ -106,6 +105,7 @@ jobs:
               --target="$f" \
               -d web-server \
               --browser-name=chrome \
+              --chrome-binary="${{ steps.chrome.outputs.chrome-path }}" \
               --headless
           done
 
