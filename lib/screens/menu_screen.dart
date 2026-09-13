@@ -41,6 +41,11 @@ String _platformName(MenuSource source) => switch (source) {
 /// failed analysis never does — the raw menu is still shown, per
 /// architecture.md §6.6's "a failed analysis must not cost the user the
 /// menu".
+///
+/// The app bar carries the Settings action, as every screen does: the
+/// analysis banners on this screen ("Add an OpenRouter key in Settings…",
+/// "OpenRouter rejected your key") name Settings as the way out, so it
+/// must be reachable from here without first going back.
 class MenuScreen extends StatefulWidget {
   /// Creates a screen that loads and classifies the menu for [ref].
   const new({required this.ref, super.key});
@@ -76,7 +81,18 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final controller = context.watch<MenuController>();
-    return Scaffold(appBar: AppBar(), body: _body(context, l10n, controller));
+    return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: l10n.actionOpenSettings,
+            onPressed: () => Navigator.pushNamed(context, '/settings'),
+          ),
+        ],
+      ),
+      body: _body(context, l10n, controller),
+    );
   }
 
   /// The screen body for the controller's current state: loading, a

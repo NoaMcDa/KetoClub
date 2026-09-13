@@ -61,6 +61,10 @@
   "settingsCacheCleared": "Saved menus cleared.",
 
   "fetchFailedOffline": "No connection, so the menu could not be read.",
+  "fetchFailedBlockedByBrowser": "A web browser cannot read {platform} menus: {platform} blocks requests from other websites. Open this link in the KetoClub phone app instead.",
+  "@fetchFailedBlockedByBrowser": {
+    "placeholders": { "platform": { "type": "String" } }
+  },
   "fetchFailedNotFound": "No venue found on {platform}. Check the link.",
   "@fetchFailedNotFound": {
     "placeholders": { "platform": { "type": "String" } }

@@ -4,7 +4,8 @@ import 'package:ketoclub/models/failures.dart';
 /// The message for a menu-fetch failure (architecture.md §10).
 ///
 /// [platform] names the source platform (e.g. "Wolt") and is required by
-/// [MenuFetchFailureReason.notFound] and
+/// [MenuFetchFailureReason.notFound],
+/// [MenuFetchFailureReason.blockedByBrowser] and
 /// [MenuFetchFailureReason.platformChanged]; [statusCode] is required by
 /// [MenuFetchFailureReason.platformChanged].
 /// A caller that omits one where it is expected gets an empty
@@ -21,6 +22,9 @@ String fetchFailureMessage(
   int? statusCode,
 }) => switch (reason) {
   MenuFetchFailureReason.offline => l10n.fetchFailedOffline,
+  MenuFetchFailureReason.blockedByBrowser => l10n.fetchFailedBlockedByBrowser(
+    platform ?? '',
+  ),
   MenuFetchFailureReason.notFound => l10n.fetchFailedNotFound(platform ?? ''),
   MenuFetchFailureReason.platformChanged => l10n.fetchFailedPlatformChanged(
     platform ?? '',

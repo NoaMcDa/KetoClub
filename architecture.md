@@ -816,6 +816,7 @@ languages. Collapsing reasons is a bug.
 | Reason | Where it arises | What the user sees | Way out |
 |---|---|---|---|
 | `MenuFetch.offline` | adapter, socket/DNS error | "No connection. Showing the cached menu from {date}." (if any) | retry |
+| `MenuFetch.blockedByBrowser` | adapter, request refused by the browser (CORS, §13) | "A web browser cannot read {platform} menus. Open this link in the KetoClub phone app." | phone app |
 | `MenuFetch.notFound` | adapter, 404 | "Venue not found on {platform}. Check the link." | edit input |
 | `MenuFetch.platformChanged` | adapter, non-JSON / unexpected shape | "{platform} changed its menu format. Please report this." | report |
 | `MenuFetch.unsupportedSource` | repository | "KetoClub cannot read menus from this site yet." | paste text (Phase 4) |
@@ -883,7 +884,11 @@ an upstream error body can echo request headers, including the bearer token.
 - **CORS blocks the restaurant adapters in a browser.** The platform APIs answer
   browser requests from foreign origins without `Access-Control-Allow-Origin`. This
   is a property of those services, not of the app. Consequences for the MVP:
-  - Live menu fetching is a **mobile** feature first.
+  - Live menu fetching is a **mobile** feature first. In a browser the block
+    surfaces as a client-side request failure indistinguishable from a dead
+    network, so the adapters report it as `MenuFetch.blockedByBrowser` (§10)
+    when built for web rather than as `offline`: the copy then points at the
+    phone app instead of inviting a retry that cannot succeed.
   - The web build ships with the classifier fully working (OpenRouter permits
     browser-origin calls) and takes menus by paste or, once Phase 4 lands, by file.
   - For local development, run Chrome with web security disabled
@@ -903,7 +908,10 @@ an upstream error body can echo request headers, including the bearer token.
 
 ### Android
 
-- `ACCESS_FINE_LOCATION` and `INTERNET` in `AndroidManifest.xml`.
+- `ACCESS_FINE_LOCATION` and `INTERNET` in `AndroidManifest.xml`. `INTERNET` must
+  sit in the **main** manifest: the debug and profile manifests Flutter generates
+  grant it only to those build types, and a release build without it fails every
+  fetch as `MenuFetch.offline`.
 - `minSdk` 21 or higher for `flutter_secure_storage`.
 
 ---

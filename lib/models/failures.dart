@@ -5,6 +5,14 @@ enum MenuFetchFailureReason {
   /// Showing the cached menu from {date}." when a cached menu exists.
   offline,
 
+  /// The adapter ran in a browser, where the platform's missing CORS
+  /// headers make the browser refuse the request before any response is
+  /// seen (architecture.md §13). Kept apart from [offline] because the
+  /// way out differs: no retry will help, the phone app will. Shown as
+  /// "A browser cannot read {platform} menus. Use the KetoClub phone
+  /// app."
+  blockedByBrowser,
+
   /// The adapter got a 404. Shown as "Venue not found on {platform}.
   /// Check the link."
   notFound,
