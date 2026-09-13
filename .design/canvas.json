@@ -7,8 +7,8 @@
     { "file": "Settings.dc.html", "title": "Settings", "x": 2040, "y": 0, "w": 390, "h": 844, "is_interactive": true }
   ],
   "annotations": [
-    { "id": "brief", "x": 0, "y": -250, "w": 880, "text": "KetoClub — Fresh Market, built out.\n\nEvery screen carries a Light/Dark tweak above the artboard, so any of them flips. \"Restaurant menu — dark\" is the same screen set to Dark, and Settings' own Appearance control drives its screen live.\n\nThe traffic lights are no longer a dot: each dish gets a coloured left rail, a labelled status pill, a tinted card and a matching net-carb chip. The three counters under the venue name are the filter — tap one." },
-    { "id": "photos", "x": 0, "y": 920, "w": 420, "text": "Photo tiles are placeholders — real imagery comes from the Wolt/10bis feeds at runtime." }
+    { "id": "brief", "x": 0, "y": -250, "w": 880, "text": "KetoClub — the app, built out in direction A.\n\nThe row deliberately mixes both themes: Discovery and Restaurant menu open light, the other three open dark. Every screen carries its own Light/Dark tweak above the artboard, so any of them flips — and Settings' own Appearance control drives its screen live.\n\nThe traffic lights are no longer a dot: each dish gets a coloured left rail, a labelled status pill, a tinted card and a matching net-carb chip. The three counters under the venue name are the filter — tap one." },
+    { "id": "photos", "x": 0, "y": 920, "w": 430, "text": "Photo tiles are placeholders — real imagery comes from the Wolt/10bis feeds at runtime. Restaurant and dish data is invented; the waiter scripts follow the README's templates." }
   ],
   "launch": { "view": "canvas" }
 }

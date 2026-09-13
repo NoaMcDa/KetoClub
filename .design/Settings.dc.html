@@ -43,7 +43,7 @@
     <div class="serif" style="font-size: 32px; line-height: 1.1; color: var(--ink);">Settings</div>
   </div>
 
-  <div style="flex-grow: 1; overflow: hidden; padding: 0 20px;">
+  <div style="flex-grow: 1; overflow-y: auto; padding: 0 20px 96px 20px;">
     <div style="display: flex; flex-direction: column; gap: 20px;">
 
       <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -121,6 +121,25 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 78px; background: linear-gradient(to top, var(--bg) 62%, transparent); display: flex; align-items: center; justify-content: space-around; padding: 0 14px 12px 14px;">
+    <div class="nav" style="color: var(--ink3);">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>
+      <span style="font-weight: 600;">Explore</span>
+    </div>
+    <div class="nav" style="color: var(--ink3);">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V7a3 3 0 0 1 3-3h2M15 4h2a3 3 0 0 1 3 3v2M20 15v2a3 3 0 0 1-3 3h-2M9 20H7a3 3 0 0 1-3-3v-2"/><path d="M7 12h10"/></svg>
+      <span style="font-weight: 600;">Scan</span>
+    </div>
+    <div class="nav" style="color: var(--ink3);">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1z"/></svg>
+      <span style="font-weight: 600;">Saved</span>
+    </div>
+    <div class="nav" style="color: var(--accent);">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M5 12h14M5 17h14"/><circle cx="9" cy="7" r="2.2" fill="var(--bg)"/><circle cx="15" cy="12" r="2.2" fill="var(--bg)"/><circle cx="8" cy="17" r="2.2" fill="var(--bg)"/></svg>
+      <span>Settings</span>
     </div>
   </div>
 
