@@ -199,6 +199,7 @@ flutter build appbundle                 # Build Android App Bundle for Play Stor
 ## Planning & Research Documents
 
 **Core Documentation:**
+- `architecture.md`: The authoritative architecture (client-only Flutter app, LLM-primary classifier with heuristic fallback, adapters, storage, failure handling, decisions log). Read this before the README where they disagree
 - `README.md`: Full project narrative, API endpoints, database schema, keto classification rules, Phase roadmap
 
 **Research & Analysis:**
