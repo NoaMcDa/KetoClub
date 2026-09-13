@@ -25,6 +25,9 @@ analyzer:
     prefer_final_locals: error
     public_member_api_docs: warning
   exclude:
+    - "android/**"
+    - "ios/**"
+    - "web/**"
     - "**/*.g.dart"
     - "**/*.freezed.dart"
     - "lib/l10n/generated/**"
