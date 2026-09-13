@@ -77,6 +77,7 @@
     }
   },
   "fetchFailedUnsupportedSource": "קטוקלאב לא יודע לקרוא תפריטים מהאתר הזה עדיין.",
+  "fetchFailedBackendUnreachable": "לא הצלחנו להגיע לשרת של קטוקלאב. נסו שוב.",
 
   "analysisNotConfigured": "הוסיפו מפתח OpenRouter בהגדרות כדי לקבל ניתוח בינה מלאכותית.",
   "analysisOffline": "לא מחוברים. מוצגות תוצאות על בסיס כללים.",

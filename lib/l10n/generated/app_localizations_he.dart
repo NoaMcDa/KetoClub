@@ -177,6 +177,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'קטוקלאב לא יודע לקרוא תפריטים מהאתר הזה עדיין.';
 
   @override
+  String get fetchFailedBackendUnreachable =>
+      'לא הצלחנו להגיע לשרת של קטוקלאב. נסו שוב.';
+
+  @override
   String get analysisNotConfigured =>
       'הוסיפו מפתח OpenRouter בהגדרות כדי לקבל ניתוח בינה מלאכותית.';
 

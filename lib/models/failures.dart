@@ -24,6 +24,16 @@ enum MenuFetchFailureReason {
   /// The repository was asked to read a site with no adapter for it.
   /// Shown as "KetoClub cannot read menus from this site yet."
   unsupportedSource,
+
+  /// The adapter was pointed at a KetoClub backend and the request to it
+  /// failed before any response was seen (`backend_plan.md` §4).
+  ///
+  /// Distinct from [offline], which is about the device's own connection,
+  /// and from [blockedByBrowser], which no retry can fix. This one
+  /// usually means the backend is simply not running, so a retry helps
+  /// once it is. Shown as "The KetoClub server could not be reached.
+  /// Try again."
+  backendUnreachable,
 }
 
 /// Why menu analysis could not be produced, or fell back to the rules

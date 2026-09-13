@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -17,6 +18,41 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// The name of the Hive box holding cached menus and their analyses.
 const String _menuCacheBoxName = 'menu_cache';
+
+/// The KetoClub backend, supplied at build time:
+///
+/// ```sh
+/// flutter run -d chrome \
+///   --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
+/// ```
+///
+/// Empty by default, which is what mobile builds use: they reach Wolt
+/// directly and need no server (`backend_plan.md` §2).
+const String _backendUrl = String.fromEnvironment('KETOCLUB_BACKEND_URL');
+
+/// The backend to route Wolt menu requests through, or null to call Wolt
+/// directly.
+///
+/// A browser will not let the app read a menu from Wolt at all, because
+/// Wolt sends no CORS headers (architecture.md §13, D9); a native HTTP
+/// stack does not enforce CORS and has never needed help. So the proxy is
+/// used when the app [runsInBrowser] *and* a backend was [configured],
+/// and not otherwise.
+///
+/// A [configured] value that is not an absolute `http`/`https` URL yields
+/// null rather than a malformed request: a mistyped define degrades to
+/// the behaviour the app has without one, which is a working app on
+/// mobile and an honest "open the phone app" on web.
+///
+/// Pure and top-level so `di_test` can cover every branch without a
+/// `--dart-define`, which a unit test cannot set.
+Uri? menuProxyBase({required bool runsInBrowser, required String configured}) {
+  if (!runsInBrowser || configured.isEmpty) return null;
+  final parsed = Uri.tryParse(configured);
+  if (parsed == null || !parsed.isAbsolute) return null;
+  if (parsed.scheme != 'http' && parsed.scheme != 'https') return null;
+  return parsed;
+}
 
 /// Composition root (architecture.md §18.1).
 ///
@@ -46,7 +82,15 @@ AppDependencies buildDependencies() {
 
   return AppDependencies(
     menuRepository: CachedMenuRepository(
-      adapters: [WoltMenuAdapter(client: client)],
+      adapters: [
+        WoltMenuAdapter(
+          client: client,
+          proxyBase: menuProxyBase(
+            runsInBrowser: kIsWeb,
+            configured: _backendUrl,
+          ),
+        ),
+      ],
       cache: HiveMenuCache(
         openBox: () async {
           await Hive.initFlutter();

@@ -40,4 +40,74 @@ void main() {
       expect(buildDependencies, returnsNormally);
     });
   });
+
+  group('menuProxyBase', () {
+    const configured = 'http://localhost:8000';
+
+    test('is null off the web, however the app was configured', () {
+      // Arrange: a native HTTP stack does not enforce CORS, so mobile has
+      // never needed the backend and must not start depending on one.
+
+      // Act
+      final base = menuProxyBase(
+        runsInBrowser: false,
+        configured: configured,
+      );
+
+      // Assert
+      expect(base, isNull);
+    });
+
+    test('is null in a browser with no backend configured', () {
+      // Act
+      final base = menuProxyBase(runsInBrowser: true, configured: '');
+
+      // Assert
+      expect(base, isNull);
+    });
+
+    test('is the configured backend in a browser', () {
+      // Act
+      final base = menuProxyBase(runsInBrowser: true, configured: configured);
+
+      // Assert
+      expect(base, equals(Uri.parse(configured)));
+    });
+
+    test('keeps a base that carries a path', () {
+      // Act
+      final base = menuProxyBase(
+        runsInBrowser: true,
+        configured: 'https://api.example.com/keto',
+      );
+
+      // Assert
+      expect(base, equals(Uri.parse('https://api.example.com/keto')));
+    });
+
+    test('is null for a value that is not an absolute URL', () {
+      // Arrange: a mistyped define degrades to the behaviour the app has
+      // without one, rather than sending a malformed request.
+
+      // Act
+      final base = menuProxyBase(
+        runsInBrowser: true,
+        configured: 'localhost:8000',
+      );
+
+      // Assert
+      expect(base, isNull);
+    });
+
+    test('is null for a scheme that is not http or https', () {
+      // Act
+      final base = menuProxyBase(
+        runsInBrowser: true,
+        configured: 'ftp://localhost:8000',
+      );
+
+      // Assert
+      expect(base, isNull);
+    });
+  });
 }

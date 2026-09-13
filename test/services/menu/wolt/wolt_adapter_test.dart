@@ -38,6 +38,28 @@ final Uri _expectedUri = Uri.https(
   '/v4/venues/slug/vitrina-lilinblum/menu/data',
 );
 
+/// A KetoClub backend running where the developer runs it.
+final Uri _proxyBase = Uri.parse('http://localhost:8000');
+
+/// The URL [_refItHandles] is fetched from through [_proxyBase]. The
+/// backend's route mirrors Wolt's own path, so only the origin and the
+/// prefix differ from [_expectedUri].
+final Uri _expectedProxiedUri = Uri.parse(
+  'http://localhost:8000/v1/proxy/wolt'
+  '/v4/venues/slug/vitrina-lilinblum/menu/data',
+);
+
+/// Builds an adapter that routes through [_proxyBase] and answers every
+/// request with [respond].
+WoltMenuAdapter _proxiedAdapter(
+  Future<http.Response> Function(http.Request request) respond, {
+  bool runsInBrowser = false,
+}) => WoltMenuAdapter(
+  client: MockClient(respond),
+  proxyBase: _proxyBase,
+  runsInBrowser: runsInBrowser,
+);
+
 /// Builds an adapter whose client always answers with a valid, empty
 /// menu, regardless of the request — enough for the shared contract
 /// suite, which asserts shape and provenance only.
@@ -295,6 +317,254 @@ void main() {
           throw TimeoutException('Timed out');
         }),
       );
+
+      // Act
+      final result = await adapter.fetch(_refItHandles);
+
+      // Assert
+      expect(
+        result,
+        equals(const MenuFetchFailed(reason: MenuFetchFailureReason.offline)),
+      );
+    });
+  });
+
+  group('WoltMenuAdapter through a KetoClub backend', () {
+    test('fetch sends the request to the backend, not to Wolt', () async {
+      // Arrange
+      Uri? requested;
+      final adapter = _proxiedAdapter((request) async {
+        requested = request.url;
+        return http.Response(_emptyMenuBody, 200);
+      });
+
+      // Act
+      await adapter.fetch(_refItHandles);
+
+      // Assert
+      expect(requested, equals(_expectedProxiedUri));
+    });
+
+    test('fetch tolerates a trailing slash on the base', () async {
+      // Arrange
+      Uri? requested;
+      final adapter = WoltMenuAdapter(
+        client: MockClient((request) async {
+          requested = request.url;
+          return http.Response(_emptyMenuBody, 200);
+        }),
+        proxyBase: Uri.parse('http://localhost:8000/'),
+      );
+
+      // Act
+      await adapter.fetch(_refItHandles);
+
+      // Assert
+      expect(requested, equals(_expectedProxiedUri));
+    });
+
+    test('fetch keeps a base that already carries a path', () async {
+      // Arrange: a backend hosted under a sub-path is still one origin
+      // change away, with no further configuration.
+      Uri? requested;
+      final adapter = WoltMenuAdapter(
+        client: MockClient((request) async {
+          requested = request.url;
+          return http.Response(_emptyMenuBody, 200);
+        }),
+        proxyBase: Uri.parse('https://api.example.com/keto'),
+      );
+
+      // Act
+      await adapter.fetch(_refItHandles);
+
+      // Assert
+      expect(
+        requested,
+        equals(
+          Uri.parse(
+            'https://api.example.com/keto/v1/proxy/wolt'
+            '/v4/venues/slug/vitrina-lilinblum/menu/data',
+          ),
+        ),
+      );
+    });
+
+    test('fetch returns the menu the backend relayed', () async {
+      // Arrange
+      final adapter = _proxiedAdapter(
+        (_) async => http.Response(_emptyMenuBody, 200),
+      );
+
+      // Act
+      final result = await adapter.fetch(_refItHandles);
+
+      // Assert
+      expect(result, isA<MenuFetched>());
+    });
+
+    test(
+      'fetch maps a ClientException to backendUnreachable, not '
+      'blockedByBrowser',
+      () async {
+        // Arrange: with a proxy in the path the browser is no longer the
+        // thing refusing the request — the backend is simply not
+        // answering, and a retry helps once it is.
+        final adapter = _proxiedAdapter((request) async {
+          throw http.ClientException('Failed to fetch', request.url);
+        }, runsInBrowser: true);
+
+        // Act
+        final result = await adapter.fetch(_refItHandles);
+
+        // Assert
+        expect(
+          result,
+          equals(
+            const MenuFetchFailed(
+              reason: MenuFetchFailureReason.backendUnreachable,
+            ),
+          ),
+        );
+      },
+    );
+
+    test(
+      'fetch maps a ClientException to backendUnreachable off the web too',
+      () async {
+        // Arrange
+        final adapter = _proxiedAdapter((request) async {
+          throw http.ClientException('Connection refused', request.url);
+        });
+
+        // Act
+        final result = await adapter.fetch(_refItHandles);
+
+        // Assert
+        expect(
+          result,
+          equals(
+            const MenuFetchFailed(
+              reason: MenuFetchFailureReason.backendUnreachable,
+            ),
+          ),
+        );
+      },
+    );
+
+    test('fetch maps a 502 from the backend itself to offline', () async {
+      // Arrange: 502 is the backend saying it could not reach Wolt. That
+      // is a retry, not a claim about Wolt's payload, so it must not
+      // become platformChanged.
+      final adapter = _proxiedAdapter(
+        (_) async => http.Response('{"reason":"offline"}', 502),
+      );
+
+      // Act
+      final result = await adapter.fetch(_refItHandles);
+
+      // Assert
+      expect(
+        result,
+        equals(
+          const MenuFetchFailed(
+            reason: MenuFetchFailureReason.offline,
+            statusCode: 502,
+          ),
+        ),
+      );
+    });
+
+    test('fetch maps a 504 from the backend itself to offline', () async {
+      // Arrange
+      final adapter = _proxiedAdapter(
+        (_) async => http.Response('{"reason":"timeout"}', 504),
+      );
+
+      // Act
+      final result = await adapter.fetch(_refItHandles);
+
+      // Assert
+      expect(
+        result,
+        equals(
+          const MenuFetchFailed(
+            reason: MenuFetchFailureReason.offline,
+            statusCode: 504,
+          ),
+        ),
+      );
+    });
+
+    test('fetch relays a 404 from the backend as notFound', () async {
+      // Arrange: the backend passes Wolt's status through unchanged, so
+      // the existing mapping keeps working with a proxy in the path.
+      final adapter = _proxiedAdapter(
+        (_) async => http.Response('not found', 404),
+      );
+
+      // Act
+      final result = await adapter.fetch(_refItHandles);
+
+      // Assert
+      expect(
+        result,
+        equals(
+          const MenuFetchFailed(
+            reason: MenuFetchFailureReason.notFound,
+            statusCode: 404,
+          ),
+        ),
+      );
+    });
+
+    test('fetch relays another upstream status as platformChanged', () async {
+      // Arrange
+      final adapter = _proxiedAdapter((_) async => http.Response('oops', 500));
+
+      // Act
+      final result = await adapter.fetch(_refItHandles);
+
+      // Assert
+      expect(
+        result,
+        equals(
+          const MenuFetchFailed(
+            reason: MenuFetchFailureReason.platformChanged,
+            statusCode: 500,
+          ),
+        ),
+      );
+    });
+
+    test('a 502 without a proxy is still platformChanged', () async {
+      // Arrange: 502 only means "the backend could not reach Wolt" when
+      // there is a backend. Straight from Wolt it is an ordinary bad
+      // status, and the direct path must not change.
+      final adapter = WoltMenuAdapter(
+        client: MockClient((_) async => http.Response('bad gateway', 502)),
+      );
+
+      // Act
+      final result = await adapter.fetch(_refItHandles);
+
+      // Assert
+      expect(
+        result,
+        equals(
+          const MenuFetchFailed(
+            reason: MenuFetchFailureReason.platformChanged,
+            statusCode: 502,
+          ),
+        ),
+      );
+    });
+
+    test('fetch maps a TimeoutException to offline, proxy or not', () async {
+      // Arrange
+      final adapter = _proxiedAdapter((_) async {
+        throw TimeoutException('Timed out');
+      });
 
       // Act
       final result = await adapter.fetch(_refItHandles);
