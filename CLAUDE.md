@@ -134,6 +134,7 @@ architecture test enforces.
 flutter pub get
 tool/check.sh          # format, analyze --fatal-infos --fatal-warnings, tests, 80% coverage gate
 flutter run -d chrome  # web; live menu fetching is blocked by CORS, see architecture.md §13
+tool/run_web.sh        # web with a local CORS proxy, so pasted Wolt links load in the browser
 flutter run -d <device>
 ```
 

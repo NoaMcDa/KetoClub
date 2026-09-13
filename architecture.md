@@ -892,8 +892,8 @@ an upstream error body can echo request headers, including the bearer token.
   - The web build ships with the classifier fully working (OpenRouter permits
     browser-origin calls) and takes menus by paste or, once Phase 4 lands, by file.
   - For local development, run Chrome with web security disabled
-    (`flutter run -d chrome --web-browser-flag=--disable-web-security`); never ship
-    with that.
+    (`flutter run -d chrome --web-browser-flag=--disable-web-security`, wrapped
+    as `tool/run_web.sh`); never ship with that.
   - The clean fix is a tiny CORS-forwarding proxy (a single edge function) that
     passes the request through unchanged and adds the header. That is the first
     thing the Phase 3 backend does, and it is the only reason to add one before
