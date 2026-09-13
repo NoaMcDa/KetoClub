@@ -61,6 +61,10 @@
   "settingsCacheCleared": "התפריטים השמורים נוקו.",
 
   "fetchFailedOffline": "אין חיבור, ולכן לא היה אפשר לקרוא את התפריט.",
+  "fetchFailedBlockedByBrowser": "דפדפן לא יכול לקרוא תפריטים מ{platform}: {platform} חוסמת בקשות מאתרים אחרים. פתחו את הקישור באפליקציית קטוקלאב בטלפון במקום.",
+  "@fetchFailedBlockedByBrowser": {
+    "placeholders": { "platform": { "type": "String" } }
+  },
   "fetchFailedNotFound": "לא נמצאה מסעדה ב{platform}. בדקו את הקישור.",
   "@fetchFailedNotFound": {
     "placeholders": { "platform": { "type": "String" } }

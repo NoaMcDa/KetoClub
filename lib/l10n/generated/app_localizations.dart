@@ -368,6 +368,12 @@ abstract class AppLocalizations {
   /// **'No connection, so the menu could not be read.'**
   String get fetchFailedOffline;
 
+  /// No description provided for @fetchFailedBlockedByBrowser.
+  ///
+  /// In en, this message translates to:
+  /// **'A web browser cannot read {platform} menus: {platform} blocks requests from other websites. Open this link in the KetoClub phone app instead.'**
+  String fetchFailedBlockedByBrowser(String platform);
+
   /// No description provided for @fetchFailedNotFound.
   ///
   /// In en, this message translates to:

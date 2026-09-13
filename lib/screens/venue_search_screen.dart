@@ -26,6 +26,7 @@ class VenueSearchScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
+            tooltip: l10n.actionOpenSettings,
             onPressed: () => Navigator.pushNamed(context, '/settings'),
           ),
         ],

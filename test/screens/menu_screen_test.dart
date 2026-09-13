@@ -103,8 +103,62 @@ Future<void> _pump(
   );
 }
 
+/// Pumps a [MenuScreen] like [_pump], but with a route table that records
+/// every pushed route name into [pushedNames] instead of building it — for
+/// the one test that taps an app bar action rather than reading the body.
+Future<void> _pumpWithRoutes(
+  WidgetTester tester,
+  MenuController controller,
+  List<String> pushedNames,
+) {
+  return tester.pumpWidget(
+    MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: ChangeNotifierProvider<MenuController>.value(
+        value: controller,
+        child: const MenuScreen(ref: _ref),
+      ),
+      onGenerateRoute: (settings) {
+        pushedNames.add(settings.name ?? '');
+        return MaterialPageRoute<void>(
+          builder: (_) => const SizedBox.shrink(),
+          settings: settings,
+        );
+      },
+    ),
+  );
+}
+
 void main() {
   group('MenuScreen', () {
+    testWidgets(
+      'tapping the settings action pushes the settings route even after a '
+      'failed fetch',
+      (tester) async {
+        // Arrange: the failure whose copy names Settings as the way out
+        // must leave Settings reachable from this very screen.
+        final repository = FakeMenuRepository()
+          ..stub(
+            _ref,
+            const MenuFetchFailed(
+              reason: MenuFetchFailureReason.blockedByBrowser,
+            ),
+          );
+        final controller = _controllerFor(repository: repository);
+        final pushedNames = <String>[];
+        await _pumpWithRoutes(tester, controller, pushedNames);
+        await tester.pumpAndSettle();
+
+        // Act
+        await tester.tap(find.byIcon(Icons.settings));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(pushedNames, contains('/settings'));
+      },
+    );
+
     testWidgets('build shows menuLoading before the fetch resolves', (
       tester,
     ) async {

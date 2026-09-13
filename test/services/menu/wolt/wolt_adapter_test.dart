@@ -86,7 +86,8 @@ void main() {
       expect(capturedUri, equals(_expectedUri));
     });
 
-    test('fetch sends the browser User-Agent and Accept headers', () async {
+    test('fetch sends the browser User-Agent and Accept headers outside a '
+        'browser', () async {
       // Arrange
       Map<String, String>? capturedHeaders;
       final adapter = WoltMenuAdapter(
@@ -94,6 +95,7 @@ void main() {
           capturedHeaders = request.headers;
           return http.Response(_emptyMenuBody, 200);
         }),
+        runsInBrowser: false,
       );
 
       // Act
@@ -218,12 +220,13 @@ void main() {
       },
     );
 
-    test('fetch maps a ClientException to offline', () async {
+    test('fetch maps a ClientException to offline outside a browser', () async {
       // Arrange
       final adapter = WoltMenuAdapter(
         client: MockClient((request) async {
           throw http.ClientException('Connection failed', request.url);
         }),
+        runsInBrowser: false,
       );
 
       // Act
@@ -234,6 +237,55 @@ void main() {
         result,
         equals(const MenuFetchFailed(reason: MenuFetchFailureReason.offline)),
       );
+    });
+
+    test(
+      'fetch maps a ClientException to blockedByBrowser in a browser',
+      () async {
+        // Arrange: a browser reports a CORS block the same way it reports a
+        // dead network (architecture.md §13), so the adapter must tell them
+        // apart by where it runs, never by the exception.
+        final adapter = WoltMenuAdapter(
+          client: MockClient((request) async {
+            throw http.ClientException('Failed to fetch', request.url);
+          }),
+          runsInBrowser: true,
+        );
+
+        // Act
+        final result = await adapter.fetch(_refItHandles);
+
+        // Assert
+        expect(
+          result,
+          equals(
+            const MenuFetchFailed(
+              reason: MenuFetchFailureReason.blockedByBrowser,
+            ),
+          ),
+        );
+      },
+    );
+
+    test('fetch omits the User-Agent header in a browser', () async {
+      // Arrange: a page may not set User-Agent; a browser drops it with a
+      // console warning, so the adapter does not send it there.
+      Map<String, String>? capturedHeaders;
+      final adapter = WoltMenuAdapter(
+        client: MockClient((request) async {
+          capturedHeaders = request.headers;
+          return http.Response(_emptyMenuBody, 200);
+        }),
+        runsInBrowser: true,
+      );
+
+      // Act
+      await adapter.fetch(_refItHandles);
+
+      // Assert
+      expect(capturedHeaders, isNotNull);
+      expect(capturedHeaders!.containsKey('User-Agent'), isFalse);
+      expect(capturedHeaders!['Accept'], equals('application/json'));
     });
 
     test('fetch maps a TimeoutException to offline', () async {

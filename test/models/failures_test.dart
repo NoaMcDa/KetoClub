@@ -7,6 +7,7 @@ void main() {
       // Arrange
       const expectedNames = [
         'offline',
+        'blockedByBrowser',
         'notFound',
         'platformChanged',
         'unsupportedSource',

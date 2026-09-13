@@ -158,6 +158,11 @@ class AppLocalizationsHe extends AppLocalizations {
       'אין חיבור, ולכן לא היה אפשר לקרוא את התפריט.';
 
   @override
+  String fetchFailedBlockedByBrowser(String platform) {
+    return 'דפדפן לא יכול לקרוא תפריטים מ$platform: $platform חוסמת בקשות מאתרים אחרים. פתחו את הקישור באפליקציית קטוקלאב בטלפון במקום.';
+  }
+
+  @override
   String fetchFailedNotFound(String platform) {
     return 'לא נמצאה מסעדה ב$platform. בדקו את הקישור.';
   }

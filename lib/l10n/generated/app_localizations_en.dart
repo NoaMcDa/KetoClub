@@ -157,6 +157,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'No connection, so the menu could not be read.';
 
   @override
+  String fetchFailedBlockedByBrowser(String platform) {
+    return 'A web browser cannot read $platform menus: $platform blocks requests from other websites. Open this link in the KetoClub phone app instead.';
+  }
+
+  @override
   String fetchFailedNotFound(String platform) {
     return 'No venue found on $platform. Check the link.';
   }
