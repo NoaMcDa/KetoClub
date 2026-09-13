@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Manrope', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: oklch(0.52 0.11 168); text-decoration: none; }
+    a:hover { color: oklch(0.42 0.11 168); }
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; user-select: none; }
+    .ph { position: relative; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #eef0f2 0%, #dfe4e8 100%); }
+  </style>
+</helmet>
+
+<div style="width: 880px; height: 1080px; box-sizing: border-box; padding: 28px 30px; background: #e9ecef; display: flex; flex-direction: column; gap: 18px;">
+
+  <div style="display: flex; flex-direction: column; gap: 6px;">
+    <div style="font-size: 11.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.52 0.11 168);">KetoClub · Direction C</div>
+    <div style="font-size: 44px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; color: #16181c;">Clean Utility</div>
+    <div style="font-size: 13.5px; line-height: 1.5; color: #666c75; max-width: 640px; text-wrap: pretty;">Bright, dense, one typeface, minimal chrome. Restaurants list as compact rows and the menu stays grouped by its real categories, so you can scan a 38-dish menu without much scrolling. The most familiar of the three.</div>
+    <div style="font-size: 12.5px; line-height: 1.5; color: #8a919b;"><strong style="color: #666c75;">Tradeoff:</strong> familiar means forgettable — it will look like every other ordering app unless the traffic lights carry the personality.</div>
+  </div>
+
+  <div style="display: flex; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #8a919b;">Discovery</div>
+      <div style="position: relative; width: 390px; height: 844px; border-radius: 34px; overflow: hidden; background: #ffffff; border: 1px solid rgba(22,24,28,0.10); box-shadow: 0 20px 44px -20px rgba(22,24,28,0.32);">
+        <div style="display: flex; flex-direction: column; height: 100%;">
+
+          <div style="padding: 22px 18px 12px 18px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 19px; font-weight: 800; letter-spacing: -0.02em; color: #16181c;">Nearby</span>
+              <span style="font-size: 13px; font-weight: 600; color: #8a919b;">· Rothschild 22</span>
+            </div>
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: #f4f5f6; display: flex; align-items: center; justify-content: center;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3d434b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M5 12h14M5 17h14"/><circle cx="9" cy="7" r="2" fill="#f4f5f6"/><circle cx="15" cy="12" r="2" fill="#f4f5f6"/><circle cx="8" cy="17" r="2" fill="#f4f5f6"/></svg>
+            </div>
+          </div>
+
+          <div style="padding: 0 18px 12px 18px;">
+            <div style="display: flex; align-items: center; gap: 9px; height: 42px; padding: 0 13px; border-radius: 10px; background: #f4f5f6; border: 1px solid rgba(22,24,28,0.07);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a919b" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <div style="font-size: 13px; color: #8a919b;">Search a restaurant, or paste a link</div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 7px; padding: 0 18px 14px 18px; overflow: hidden;">
+            <div class="chip" style="background: oklch(0.52 0.11 168); color: #ffffff;">Keto 8+</div>
+            <div class="chip" style="background: #f4f5f6; color: #3d434b; border: 1px solid rgba(22,24,28,0.08);">Open now</div>
+            <div class="chip" style="background: #f4f5f6; color: #3d434b; border: 1px solid rgba(22,24,28,0.08);">Grill</div>
+            <div class="chip" style="background: #f4f5f6; color: #3d434b; border: 1px solid rgba(22,24,28,0.08);">≤ 15 min</div>
+          </div>
+
+          <div style="border-top: 1px solid rgba(22,24,28,0.07);">
+            <sc-for list="{{venues}}" as="v" hint-placeholder-count="4">
+              <div style="display: flex; gap: 13px; padding: 14px 18px; border-bottom: 1px solid rgba(22,24,28,0.07); align-items: center;">
+                <div class="ph" style="width: 78px; height: 78px; border-radius: 10px; flex-shrink: 0;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a4acb5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m4 17 5-5 4.5 4.5L17 13l3 3"/></svg>
+                </div>
+                <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 3px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <div style="font-size: 15px; font-weight: 700; letter-spacing: -0.01em; color: #16181c;">{{v.name}}</div>
+                    <div style="display: flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 6px; background: oklch(0.95 0.03 160);">
+                      <span style="width: 6px; height: 6px; border-radius: 999px; background: oklch(0.58 0.13 148);"></span>
+                      <span style="font-size: 11.5px; font-weight: 800; color: oklch(0.42 0.10 155);">{{v.score}}</span>
+                    </div>
+                  </div>
+                  <div style="font-size: 12.5px; line-height: 1.4; color: #666c75; text-wrap: pretty;">{{v.blurb}}</div>
+                  <div style="font-size: 11.5px; font-weight: 600; color: #8a919b;">{{v.meta}}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #8a919b;">Restaurant menu · chips and scripts work</div>
+      <div style="position: relative; width: 390px; height: 844px; border-radius: 34px; overflow: hidden; background: #ffffff; border: 1px solid rgba(22,24,28,0.10); box-shadow: 0 20px 44px -20px rgba(22,24,28,0.32);">
+        <div style="display: flex; flex-direction: column; height: 100%;">
+
+          <div class="ph" style="width: 100%; height: 132px; flex-shrink: 0;">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#a4acb5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m4 17 5-5 4.5 4.5L17 13l3 3"/></svg>
+            <div style="position: absolute; top: 18px; left: 16px; width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.94); display: flex; align-items: center; justify-content: center;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#16181c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+            </div>
+            <div style="position: absolute; top: 18px; right: 16px; width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.94); display: flex; align-items: center; justify-content: center;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#16181c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1z"/></svg>
+            </div>
+          </div>
+
+          <div style="padding: 14px 18px 12px 18px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <div style="font-size: 21px; font-weight: 800; letter-spacing: -0.025em; color: #16181c;">Ember &amp; Vine</div>
+              <div style="font-size: 12px; font-weight: 600; color: #8a919b;">Charcoal grill · Rothschild 22 · ₪₪₪</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; padding-top: 2px;">
+              <div style="font-size: 17px; font-weight: 800; color: oklch(0.45 0.11 155);">9.1</div>
+              <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #8a919b;">Keto score</div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 7px; padding: 0 18px 12px 18px;">
+            <sc-for list="{{chips}}" as="chip" hint-placeholder-count="3">
+              <div class="chip" style="background: {{chip.bg}}; color: {{chip.fg}}; border: 1px solid {{chip.border}}" onClick="{{chip.pick}}">{{chip.label}}</div>
+            </sc-for>
+          </div>
+
+          <div style="padding: 9px 18px; background: #f4f5f6; border-top: 1px solid rgba(22,24,28,0.07); border-bottom: 1px solid rgba(22,24,28,0.07); display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #666c75;">Meat &amp; Steaks</span>
+            <span style="font-size: 11px; font-weight: 700; color: #8a919b;">{{countLabel}}</span>
+          </div>
+
+          <div>
+            <sc-for list="{{dishes}}" as="dish" hint-placeholder-count="4">
+              <div style="border-bottom: 1px solid rgba(22,24,28,0.07); border-left: 3px solid {{dish.rail}}; opacity: {{dish.dim}}">
+                <div style="display: flex; gap: 12px; padding: 13px 18px 13px 15px; align-items: flex-start;">
+                  <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px;">
+                    <div style="display: flex; align-items: center; gap: 7px;">
+                      <span style="font-size: 14.5px; font-weight: 700; letter-spacing: -0.01em; color: #16181c; line-height: 1.25;">{{dish.name}}</span>
+                      <span style="font-size: 10px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; padding: 2px 6px; border-radius: 5px; background: {{dish.tagBg}}; color: {{dish.tagFg}}">{{dish.tag}}</span>
+                    </div>
+                    <div style="font-size: 12.5px; line-height: 1.4; color: #666c75; text-wrap: pretty;">{{dish.desc}}</div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding-top: 1px;">
+                      <span style="font-size: 13.5px; font-weight: 700; color: #16181c;">{{dish.price}}</span>
+                      <span style="font-size: 11.5px; font-weight: 600; color: {{dish.carbColor}}">{{dish.carbs}}</span>
+                    </div>
+                  </div>
+                  <div class="ph" style="width: 68px; height: 68px; border-radius: 9px; flex-shrink: 0;">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#a4acb5" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.4"/></svg>
+                  </div>
+                </div>
+                <sc-if value="{{dish.hasScript}}" hint-placeholder-val="{{ true }}">
+                  <div style="padding: 0 18px 13px 15px; display: flex; flex-direction: column; gap: 0;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 12px; border-radius: 9px; background: oklch(0.97 0.03 88); border: 1px solid oklch(0.88 0.07 82); cursor: pointer;" onClick="{{dish.toggle}}">
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="oklch(0.52 0.12 70)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4"/><path d="M5 4h14v5a7 7 0 0 1-14 0z"/></svg>
+                        <span style="font-size: 12px; font-weight: 700; color: oklch(0.44 0.10 70);">Ask your waiter</span>
+                      </div>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="oklch(0.52 0.12 70)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </div>
+                    <sc-if value="{{dish.showScript}}" hint-placeholder-val="{{ true }}">
+                      <div style="margin-top: 7px; padding: 12px 13px; border-radius: 9px; background: #f4f5f6; border: 1px solid rgba(22,24,28,0.08); display: flex; flex-direction: column; gap: 10px;">
+                        <div style="font-size: 12.5px; line-height: 1.55; color: #2b3038; white-space: pre-line; text-wrap: pretty;">{{dish.script}}</div>
+                        <div style="display: flex; gap: 7px;">
+                          <div class="chip" style="background: oklch(0.52 0.11 168); color: #ffffff;">Show to waiter</div>
+                          <div class="chip" style="background: #ffffff; color: #3d434b; border: 1px solid rgba(22,24,28,0.12);">Copy</div>
+                        </div>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"$preview":{"width":880,"height":1080}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { filter: 'all', open: 'seabass' };
+  }
+
+  renderVals() {
+    const chipDefs = [
+      { id: 'all', label: 'All dishes' },
+      { id: 'green', label: 'Green only' },
+      { id: 'gy', label: 'Green + Yellow' }
+    ];
+
+    const menu = [
+      { id: 'entrecote', status: 'green', name: 'Prime Entrecôte 300g', desc: 'Aged 300g cut over charcoal, herb butter, grilled onion.', price: '₪142', carbs: '~2g net carbs' },
+      { id: 'seabass', status: 'yellow', name: 'Sea Bass Fillet', desc: 'Whole fillet, lemon and thyme, served with potato purée and baby carrots.', price: '₪128', carbs: '~11g net carbs',
+        script: 'Please replace the potato purée with a green salad or extra steamed greens, and leave out the baby carrots.\nOlive oil and lemon on the side instead of the house dressing.' },
+      { id: 'carpaccio', status: 'green', name: 'Beef Carpaccio', desc: 'Thin sliced sirloin, olive oil, aged parmesan, rocket.', price: '₪64', carbs: '~3g net carbs' },
+      { id: 'gnocchi', status: 'red', name: 'Truffle Gnocchi', desc: 'Potato gnocchi, cream, black truffle.', price: '₪88', carbs: 'Not keto' }
+    ];
+
+    const tone = {
+      green: { rail: 'oklch(0.58 0.13 148)', tagBg: 'oklch(0.95 0.04 158)', tagFg: 'oklch(0.42 0.10 155)', carb: 'oklch(0.45 0.10 155)', tag: 'As-is' },
+      yellow: { rail: 'oklch(0.72 0.14 75)', tagBg: 'oklch(0.96 0.05 85)', tagFg: 'oklch(0.46 0.10 70)', carb: 'oklch(0.50 0.11 70)', tag: 'Modify' },
+      red: { rail: 'oklch(0.55 0.17 27)', tagBg: 'oklch(0.95 0.04 25)', tagFg: 'oklch(0.48 0.14 27)', carb: '#8a919b', tag: 'Not keto' }
+    };
+
+    const f = this.state.filter;
+    const visible = menu.filter((d) => f === 'green' ? d.status === 'green' : f === 'gy' ? d.status !== 'red' : true);
+
+    return {
+      countLabel: visible.length + ' of 4 shown',
+      chips: chipDefs.map((c) => ({
+        label: c.label,
+        bg: f === c.id ? 'oklch(0.52 0.11 168)' : '#f4f5f6',
+        fg: f === c.id ? '#ffffff' : '#3d434b',
+        border: f === c.id ? 'oklch(0.52 0.11 168)' : 'rgba(22,24,28,0.08)',
+        pick: () => this.setState({ filter: c.id })
+      })),
+      dishes: visible.map((d) => ({
+        name: d.name,
+        desc: d.desc,
+        price: d.price,
+        carbs: d.carbs,
+        script: d.script || '',
+        hasScript: !!d.script,
+        showScript: this.state.open === d.id,
+        rail: tone[d.status].rail,
+        tag: tone[d.status].tag,
+        tagBg: tone[d.status].tagBg,
+        tagFg: tone[d.status].tagFg,
+        carbColor: tone[d.status].carb,
+        dim: d.status === 'red' ? '0.55' : '1',
+        toggle: () => this.setState({ open: this.state.open === d.id ? null : d.id })
+      })),
+      venues: [
+        { name: 'Ember & Vine', blurb: 'Charcoal grill, aged cuts, and a serious salad list.', meta: 'Steakhouse · 12 min · ₪₪₪', score: '9.1' },
+        { name: 'The Copper Pan', blurb: 'Mediterranean small plates, mostly grilled.', meta: 'Mediterranean · 18 min · ₪₪', score: '7.8' },
+        { name: 'Harvest Room', blurb: 'Farm salads and roasted vegetable mains.', meta: 'Seasonal · 9 min · ₪₪', score: '8.4' },
+        { name: 'Salt & Stone', blurb: 'Whole fish on coals, mezze, nothing breaded.', meta: 'Seafood · 22 min · ₪₪₪', score: '8.9' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

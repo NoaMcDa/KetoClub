@@ -1,0 +1,11 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "title": "A · Fresh Market", "x": 0, "y": 0, "w": 880, "h": 1080, "is_interactive": true },
+    { "file": "DarkKitchen.dc.html", "title": "B · Dark Kitchen", "x": 960, "y": 0, "w": 880, "h": 1080, "is_interactive": true },
+    { "file": "CleanUtility.dc.html", "title": "C · Clean Utility", "x": 1920, "y": 0, "w": 880, "h": 1080, "is_interactive": true }
+  ],
+  "annotations": [
+    { "id": "brief", "x": 0, "y": -230, "w": 900, "text": "KetoClub — three visual directions, same two screens each.\n\nPick one and I'll build the full app into it: discovery/search, restaurant page, menu with traffic-light marks, waiter card, and settings with the API key.\n\nThe filter chips and the \"Ask your waiter\" panels are live in all three — click them.\nPhoto tiles are placeholders; real images come from the Wolt/10bis feeds." }
+  ],
+  "launch": { "view": "canvas" }
+}
