@@ -1,0 +1,238 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Public+Sans:wght@400;500;600;700;800&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Public Sans', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); }
+    .app { --bg: #faf7f0; --surface: #ffffff; --surface2: #f4efe4; --ink: #1f1c17; --ink2: #6f675b; --ink3: #a09484;
+      --line: rgba(31,28,23,0.11); --line2: rgba(31,28,23,0.07);
+      --accent: oklch(0.52 0.10 148); --accent-hover: oklch(0.42 0.10 148); --accent-ink: #faf7f0;
+      --green: oklch(0.56 0.13 148); --green-tint: oklch(0.965 0.022 152); --green-ink: oklch(0.40 0.10 150); --green-on: #faf7f0;
+      --amber: oklch(0.75 0.14 74); --amber-tint: oklch(0.965 0.032 85); --amber-ink: oklch(0.44 0.10 66); --amber-on: #2a1e08;
+      --red: oklch(0.56 0.17 27); --red-tint: oklch(0.965 0.020 25); --red-ink: oklch(0.47 0.14 27); --red-on: #faf7f0;
+      --shadow: 0 20px 44px -20px rgba(31,28,23,0.40);
+      --photo: linear-gradient(135deg, #e9e1cf 0%, #d8cbb0 100%); --photo-ink: #8b7d63; }
+    .app.dark { --bg: #14120e; --surface: #1e1b15; --surface2: #272218; --ink: #f5f0e4; --ink2: #a99e8c; --ink3: #7d7364;
+      --line: rgba(245,240,228,0.12); --line2: rgba(245,240,228,0.07);
+      --accent: oklch(0.74 0.13 148); --accent-hover: oklch(0.82 0.12 148); --accent-ink: #14120e;
+      --green: oklch(0.76 0.14 148); --green-tint: oklch(0.30 0.055 150); --green-ink: oklch(0.85 0.13 150); --green-on: #0f1710;
+      --amber: oklch(0.81 0.13 78); --amber-tint: oklch(0.31 0.05 72); --amber-ink: oklch(0.89 0.11 82); --amber-on: #1c1406;
+      --red: oklch(0.66 0.17 27); --red-tint: oklch(0.29 0.065 25); --red-ink: oklch(0.78 0.14 27); --red-on: #170c0a;
+      --shadow: 0 20px 44px -20px rgba(0,0,0,0.85);
+      --photo: linear-gradient(135deg, #322c22 0%, #1c180f 100%); --photo-ink: #6b6152; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; user-select: none; }
+    .pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px 4px 7px; border-radius: 8px; font-size: 10px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .ph { position: relative; display: flex; align-items: center; justify-content: center; background: var(--photo); }
+    .serif { font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif; font-weight: 400; }
+    .nav { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .nav span { font-size: 10px; font-weight: 700; }
+  </style>
+</helmet>
+
+<div class="app {{themeClass}}" style="position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bg); color: var(--ink); display: flex; flex-direction: column;">
+
+  <div class="ph" style="width: 100%; height: 158px; flex-shrink: 0;">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--photo-ink)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m4 17 5-5 4.5 4.5L17 13l3 3"/></svg>
+    <div style="position: absolute; top: 18px; left: 18px; width: 34px; height: 34px; border-radius: 999px; background: var(--surface); display: flex; align-items: center; justify-content: center;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+    </div>
+    <div style="position: absolute; top: 18px; right: 18px; width: 34px; height: 34px; border-radius: 999px; background: var(--surface); display: flex; align-items: center; justify-content: center;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12a1 1 0 0 1 1 1v15l-7-4-7 4V5a1 1 0 0 1 1-1z"/></svg>
+    </div>
+  </div>
+
+  <div style="padding: 15px 20px 12px 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-shrink: 0;">
+    <div style="display: flex; flex-direction: column; gap: 3px;">
+      <div class="serif" style="font-size: 28px; line-height: 1.1; color: var(--ink);">Ember &amp; Vine</div>
+      <div style="font-size: 12.5px; color: var(--ink3);">Charcoal grill · Herzl 8 · ₪₪₪</div>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 1px; padding-top: 3px;">
+      <div class="serif" style="font-size: 24px; line-height: 1; color: var(--green-ink);">9.1</div>
+      <div style="font-size: 9px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink3);">Keto score</div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 8px; padding: 0 20px 11px 20px; flex-shrink: 0;">
+    <sc-for list="{{tiles}}" as="t" hint-placeholder-count="3">
+      <div style="flex-grow: 1; flex-basis: 0; padding: 9px 10px 10px 10px; border-radius: 13px; cursor: pointer; user-select: none; background: {{t.bg}}; border: 1.5px solid {{t.border}}; display: flex; flex-direction: column; gap: 3px;" onClick="{{t.pick}}">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="width: 11px; height: 11px; border-radius: 999px; flex-shrink: 0; background: {{t.dot}}"></span>
+          <span style="font-size: 18px; font-weight: 800; line-height: 1; color: {{t.numColor}}">{{t.count}}</span>
+        </div>
+        <div style="font-size: 9.5px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: {{t.labelColor}}">{{t.label}}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 20px 10px 20px; flex-shrink: 0;">
+    <div style="font-size: 11.5px; font-weight: 700; color: var(--ink2);">{{showingLabel}}</div>
+    <div style="font-size: 11.5px; color: var(--ink3);">Wolt · 4 min ago</div>
+  </div>
+
+  <div style="flex-grow: 1; overflow: hidden; padding: 0 20px;">
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <sc-for list="{{dishes}}" as="dish" hint-placeholder-count="4">
+        <div style="border-radius: 15px; overflow: hidden; background: {{dish.cardBg}}; border: 1px solid {{dish.cardEdge}}; border-left: 5px solid {{dish.rail}}">
+          <div style="padding: 12px 13px; display: flex; gap: 12px; align-items: flex-start;">
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px;">
+              <div class="pill" style="align-self: flex-start; background: {{dish.pillBg}}; color: {{dish.pillFg}}">
+                <sc-if value="{{dish.isGreen}}" hint-placeholder-val="{{ true }}">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg>
+                </sc-if>
+                <sc-if value="{{dish.isYellow}}" hint-placeholder-val="{{ false }}">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>
+                </sc-if>
+                <sc-if value="{{dish.isRed}}" hint-placeholder-val="{{ false }}">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+                </sc-if>
+                {{dish.pillLabel}}
+              </div>
+              <div style="font-size: 15px; font-weight: 700; line-height: 1.25; color: var(--ink);">{{dish.name}}</div>
+              <div style="font-size: 12.5px; line-height: 1.45; color: var(--ink2); text-wrap: pretty;">{{dish.desc}}</div>
+              <div style="display: flex; align-items: center; gap: 9px; padding-top: 1px;">
+                <span style="font-size: 13.5px; font-weight: 700; color: var(--ink);">{{dish.price}}</span>
+                <span style="font-size: 11.5px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: {{dish.carbBg}}; color: {{dish.carbFg}}">{{dish.carbs}}</span>
+              </div>
+            </div>
+            <div class="ph" style="width: 72px; height: 72px; border-radius: 12px; flex-shrink: 0;">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--photo-ink)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.4"/></svg>
+            </div>
+          </div>
+          <sc-if value="{{dish.hasScript}}" hint-placeholder-val="{{ true }}">
+            <div style="padding: 0 13px 12px 13px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 11px; cursor: pointer; user-select: none; background: var(--amber-tint); border: 1px solid var(--amber);" onClick="{{dish.toggle}}">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amber-ink)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4"/><path d="M5 4h14v5a7 7 0 0 1-14 0z"/></svg>
+                  <span style="font-size: 12.5px; font-weight: 700; color: var(--amber-ink);">{{dish.scriptCta}}</span>
+                </div>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--amber-ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform: {{dish.caret}}"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+              <sc-if value="{{dish.showScript}}" hint-placeholder-val="{{ true }}">
+                <div style="margin-top: 8px; padding: 13px 14px; border-radius: 11px; background: var(--surface); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 11px;">
+                  <div style="font-size: 13px; line-height: 1.55; color: var(--ink); white-space: pre-line; text-wrap: pretty;">{{dish.script}}</div>
+                  <div style="display: flex; gap: 8px;">
+                    <div class="chip" style="background: var(--accent); color: var(--accent-ink);">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2.5"/><path d="M10.5 18h3"/></svg>
+                      Show to waiter
+                    </div>
+                    <div class="chip" style="background: var(--surface2); color: var(--ink2); border: 1px solid var(--line);">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/></svg>
+                      Copy
+                    </div>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 20px 18px 20px; background: linear-gradient(to top, var(--bg) 55%, transparent); display: flex; justify-content: center;">
+    <div style="display: inline-flex; align-items: center; gap: 9px; padding: 12px 20px; border-radius: 999px; background: var(--ink); color: var(--bg); box-shadow: var(--shadow); cursor: pointer; user-select: none;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2.5"/><path d="M10.5 18h3"/></svg>
+      <span style="font-size: 13.5px; font-weight: 700;">Waiter card · 2 dishes</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"theme":{"editor":"enum","options":["Light","Dark"],"default":"Dark","section":"Appearance"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { filter: 'all', open: 'seabass' };
+  }
+
+  renderVals() {
+    const dark = (this.props.theme ?? 'Light') === 'Dark';
+
+    const menu = [
+      { id: 'entrecote', status: 'green', name: 'Prime Entrecôte 300g',
+        desc: 'Aged 300g cut over charcoal, herb butter, grilled onion.', price: '₪142', carbs: '~2g net carbs' },
+      { id: 'seabass', status: 'yellow', name: 'Sea Bass Fillet',
+        desc: 'Whole fillet, lemon and thyme, served with potato purée and baby carrots.', price: '₪128', carbs: '~11g net carbs',
+        changes: 2,
+        script: 'Please replace the potato purée with a green salad or extra steamed greens, and leave out the baby carrots.\nOlive oil and lemon on the side instead of the house dressing.' },
+      { id: 'carpaccio', status: 'green', name: 'Beef Carpaccio',
+        desc: 'Thin sliced sirloin, olive oil, aged parmesan, rocket.', price: '₪64', carbs: '~3g net carbs' },
+      { id: 'chicken', status: 'yellow', name: 'Charcoal Chicken Thigh',
+        desc: 'Boneless thigh in a honey-teriyaki glaze, served over rice.', price: '₪96', carbs: '~34g net carbs',
+        changes: 2,
+        script: 'Please grill the chicken without the honey-teriyaki glaze — any sauce in a ramekin on the side.\nSwap the rice for a green salad or grilled vegetables.' },
+      { id: 'gnocchi', status: 'red', name: 'Truffle Gnocchi',
+        desc: 'Potato gnocchi, cream, black truffle.', price: '₪88', carbs: 'Not keto' }
+    ];
+
+    const tone = {
+      green:  { rail: 'var(--green)',  pillBg: 'var(--green)',  pillFg: 'var(--green-on)',  cardBg: 'var(--green-tint)',  cardEdge: 'var(--green-tint)', carbBg: 'var(--surface)', carbFg: 'var(--green-ink)', label: 'Order as-is' },
+      yellow: { rail: 'var(--amber)',  pillBg: 'var(--amber)',  pillFg: 'var(--amber-on)',  cardBg: 'var(--surface)',     cardEdge: 'var(--line)',       carbBg: 'var(--amber-tint)', carbFg: 'var(--amber-ink)', label: 'Modify' },
+      red:    { rail: 'var(--red)',    pillBg: 'var(--red-tint)', pillFg: 'var(--red-ink)', cardBg: 'var(--surface2)',    cardEdge: 'var(--line2)',      carbBg: 'var(--red-tint)',   carbFg: 'var(--red-ink)',   label: 'Not keto' }
+    };
+
+    const tileDefs = [
+      { id: 'green',  count: 9,  label: 'Order as-is',  dot: 'var(--green)', ink: 'var(--green-ink)', tint: 'var(--green-tint)', edge: 'var(--green)' },
+      { id: 'yellow', count: 5,  label: 'With changes', dot: 'var(--amber)', ink: 'var(--amber-ink)', tint: 'var(--amber-tint)', edge: 'var(--amber)' },
+      { id: 'red',    count: 24, label: 'Skip',         dot: 'var(--red)',   ink: 'var(--red-ink)',   tint: 'var(--red-tint)',   edge: 'var(--red)' }
+    ];
+
+    const f = this.state.filter;
+    const visible = menu.filter((d) => f === 'all' ? true : d.status === f);
+    const showing = { all: 'Showing all 38 dishes', green: 'Showing dishes you can order as-is', yellow: 'Showing dishes that need a change', red: 'Showing what to skip' };
+
+    return {
+      themeClass: dark ? 'dark' : 'light',
+      showingLabel: showing[f],
+      tiles: tileDefs.map((t) => ({
+        count: t.count,
+        label: t.label,
+        dot: t.dot,
+        bg: f === t.id ? t.tint : 'var(--surface)',
+        border: f === t.id ? t.edge : 'var(--line)',
+        numColor: f === t.id ? t.ink : 'var(--ink)',
+        labelColor: f === t.id ? t.ink : 'var(--ink3)',
+        pick: () => this.setState({ filter: f === t.id ? 'all' : t.id })
+      })),
+      dishes: visible.map((d) => {
+        const t = tone[d.status];
+        const open = this.state.open === d.id;
+        return {
+          name: d.name,
+          desc: d.desc,
+          price: d.price,
+          carbs: d.carbs,
+          script: d.script || '',
+          scriptCta: open ? 'Hide the waiter script' : 'Ask your waiter · ' + (d.changes || 0) + ' changes',
+          hasScript: !!d.script,
+          showScript: open,
+          caret: open ? 'rotate(180deg)' : 'rotate(0deg)',
+          isGreen: d.status === 'green',
+          isYellow: d.status === 'yellow',
+          isRed: d.status === 'red',
+          pillLabel: t.label,
+          pillBg: t.pillBg,
+          pillFg: t.pillFg,
+          rail: t.rail,
+          cardBg: t.cardBg,
+          cardEdge: t.cardEdge,
+          carbBg: t.carbBg,
+          carbFg: t.carbFg,
+          toggle: () => this.setState({ open: open ? null : d.id })
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>
