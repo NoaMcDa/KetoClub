@@ -16,6 +16,7 @@ from typing import Any
 
 from sqlalchemy import Engine, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session
+from sqlalchemy.pool import StaticPool
 
 from app.config import Settings
 
@@ -28,10 +29,17 @@ def build_engine(settings: Settings) -> Engine:
     with ``StaticPool`` to avoid touching the filesystem.
     """
     connect_args: dict[str, Any] = {}
+    engine_kwargs: dict[str, Any] = {}
     if settings.DATABASE_URL.startswith("sqlite"):
         connect_args["check_same_thread"] = False
+        if ":memory:" in settings.DATABASE_URL:
+            # A plain sqlite in-memory database is per-connection: without a
+            # shared pool, each checkout would see an empty database.
+            engine_kwargs["poolclass"] = StaticPool
 
-    engine = create_engine(settings.DATABASE_URL, connect_args=connect_args)
+    engine = create_engine(
+        settings.DATABASE_URL, connect_args=connect_args, **engine_kwargs
+    )
 
     # Enable WAL journal mode for SQLite.  WAL lets reads proceed while a
     # write is in progress, which matters even with a single worker because the

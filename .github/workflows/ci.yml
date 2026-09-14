@@ -22,6 +22,18 @@ permissions:
   contents: read
 
 jobs:
+  backend:
+    name: Backend (FastAPI)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - name: Run the backend gate
+        run: backend/check.sh
+
   quality:
     name: Format and analyze
     runs-on: ubuntu-latest
