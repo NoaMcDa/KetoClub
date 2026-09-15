@@ -529,6 +529,18 @@ void main() {
       expect(result, equals(menu));
     });
 
+    test('tryFrom accepts an empty categories list', () {
+      // Arrange
+      final json = <String, Object?>{...validJson, 'categories': <Object?>[]};
+
+      // Act
+      final result = Menu.tryFrom(json);
+
+      // Assert
+      expect(result?.categories, isEmpty);
+      expect(result?.allDishes, isEmpty);
+    });
+
     test('tryFrom returns null when venueRef is not a Map', () {
       // Arrange
       final json = <String, Object?>{...validJson, 'venueRef': 'nope'};

@@ -122,4 +122,7 @@ final class Venue {
   @override
   int get hashCode =>
       Object.hash(ref, name, address, latitude, longitude, sourceUrl);
+
+  @override
+  String toString() => 'Venue(${ref.cacheKey}: $name)';
 }

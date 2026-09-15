@@ -197,6 +197,19 @@ void main() {
       expect(a.hashCode, equals(b.hashCode));
     });
 
+    test('== returns true for two non-const venues built separately with '
+        'equal fields', () {
+      // Arrange
+      const ref = VenueRef(source: MenuSource.wolt, platformId: 'v1');
+      final names = <String>['Diner', 'Diner'];
+      final a = Venue(ref: ref, name: names[0]);
+      final b = Venue(ref: ref, name: names[1]);
+
+      // Act & Assert
+      expect(a, equals(b));
+      expect(a.hashCode, equals(b.hashCode));
+    });
+
     test('== returns false for venues differing in name', () {
       // Arrange
       const ref = VenueRef(source: MenuSource.wolt, platformId: 'v1');
@@ -216,6 +229,19 @@ void main() {
       // Act & Assert
       expect(a, equals(b));
       expect(a.hashCode, equals(b.hashCode));
+    });
+
+    test('toString mentions the cache key and the name', () {
+      // Arrange
+      const ref = VenueRef(source: MenuSource.wolt, platformId: 'v1');
+      const venue = Venue(ref: ref, name: 'Diner');
+
+      // Act
+      final result = venue.toString();
+
+      // Assert
+      expect(result, contains('wolt/v1'));
+      expect(result, contains('Diner'));
     });
   });
 }

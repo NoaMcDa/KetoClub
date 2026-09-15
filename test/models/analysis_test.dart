@@ -678,4 +678,48 @@ void main() {
       expect(result, contains('noDishesFound'));
     });
   });
+
+  group('MenuAnalysis (sealed)', () {
+    test('a switch over MenuAnalysis needs no fallback branch', () {
+      // Arrange
+      const MenuAnalysis analysis = MenuAnalysisFailed(
+        reason: MenuAnalysisFailureReason.offline,
+      );
+
+      // Act
+      //
+      // Exhaustive: MenuAnalysis is sealed over exactly MenuAnalysed and
+      // MenuAnalysisFailed, so the analyzer proves this switch covers every
+      // case at compile time. Deleting either case below, or adding a new
+      // MenuAnalysis subclass without a case for it, fails the build with
+      // "non_exhaustive_switch_statement" rather than failing at runtime.
+      final kind = switch (analysis) {
+        MenuAnalysed() => 'analysed',
+        MenuAnalysisFailed() => 'failed',
+      };
+
+      // Assert
+      expect(kind, equals('failed'));
+    });
+  });
+
+  group('AnalysisEngine (sealed)', () {
+    test('a switch over AnalysisEngine needs no fallback branch', () {
+      // Arrange
+      const AnalysisEngine engine = LlmEngine(model: 'nex-agi/nex-n2.5-pro');
+
+      // Act
+      //
+      // Exhaustive: AnalysisEngine is sealed over exactly LlmEngine and
+      // RulesEngine, so the analyzer proves this switch covers every case
+      // at compile time; a missing case fails the build, not a test run.
+      final kind = switch (engine) {
+        LlmEngine() => 'llm',
+        RulesEngine() => 'rules',
+      };
+
+      // Assert
+      expect(kind, equals('llm'));
+    });
+  });
 }
