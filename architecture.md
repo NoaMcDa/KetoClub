@@ -186,7 +186,7 @@ issues and reviews can cite them.
           │
           ▼
  MenuController ──► MenuScreen
-     🟢 green  ·  🟡 yellow (expandable waiter script)  ·  🔴 red (collapsed group, with count)
+     🟢 green  ·  🟡 yellow (expandable waiter script)  ·  🔴 red (inline; counter tile filters)
      ⚪ unclassified (listed, no colour)  ·  chip showing which engine produced the result
 ```
 
@@ -629,9 +629,17 @@ Screens:
 | `SettingsScreen` | `/settings` | Key entry, disclosure text, cache clear, language |
 
 Visual rules: a verdict is always icon **and** colour, never colour alone
-(accessibility). Red dishes are a collapsed group with a count at the bottom of the
-list. Unclassified dishes are listed under their own neutral heading. The engine
-chip is always visible on a classified menu.
+(accessibility). Unclassified dishes are listed under their own neutral heading.
+The engine chip is always visible on a classified menu.
+
+**Red dishes are no longer a collapsed group** *(issue #29, Phase 1)*. The original
+rule put them in a count-labelled group at the bottom of the list. The artboard the
+screen was built to (`.design/Main.dc.html`) instead makes the three verdict counters
+the filter — tap "Skip" and non-keto dishes are the list, shown inline with the same
+rail, tint and pill every other verdict gets. A dish hidden inside a collapsed group
+cannot also be the result of a filter that selects it, so the group went and
+`MenuController.redRows` went with it. The count survives where it now belongs: on
+the Skip counter tile.
 
 ---
 
@@ -1078,7 +1086,8 @@ This section lists what each part of the system must be tested for.
 - **Contract tests:** every `MenuClassifier` and every `PlatformMenuAdapter`
   implementation runs the same shared contract suite (never throws, returns a sealed
   result, honours the interface's documented invariants). See §18.1 (Liskov).
-- **Widgets:** a red group collapses with a count; an unclassified section renders;
+- **Widgets:** the counter tiles filter and carry each verdict's count; an
+  unclassified section renders;
   a yellow card always has script text; the engine chip reflects the result.
 - **Flows** (`integration_test/flows/`): paste a Wolt URL and see a classified menu; go offline
   and see rule-based results with the reason; enter a key in Settings, confirm
