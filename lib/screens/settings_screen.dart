@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 import 'package:provider/provider.dart';
 
@@ -195,6 +196,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// The three-way UI language choice: system, English, or Hebrew
   /// (architecture.md §12). "Match my device" is `null` in
   /// [SettingsController.setLanguage], never a sentinel tag.
+  ///
+  /// [SettingsController] stays the only writer of the persisted tag; once
+  /// its write lands, [LocaleController.applyTag] is told directly, so
+  /// `MaterialApp.locale` (owned by the app-level [LocaleController], not by
+  /// this screen's own controller) updates without a second write path —
+  /// see the class doc on `LocaleController`.
   Widget _languageSection(
     BuildContext context,
     AppLocalizations l10n,
@@ -210,7 +217,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         RadioGroup<String?>(
           groupValue: controller.languageTag,
-          onChanged: (tag) => unawaited(controller.setLanguage(tag)),
+          onChanged: (tag) => unawaited(_setLanguage(context, controller, tag)),
           child: Column(
             children: [
               RadioListTile<String?>(
@@ -236,6 +243,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ],
     );
+  }
+
+  /// Persists [tag] through [controller] — the sole writer of the stored
+  /// language tag — then applies it to the app-level [LocaleController], so
+  /// `MaterialApp.locale` picks it up. Never the other way around: this
+  /// screen never writes a locale directly, only relays a write that has
+  /// already completed.
+  Future<void> _setLanguage(
+    BuildContext context,
+    SettingsController controller,
+    String? tag,
+  ) async {
+    await controller.setLanguage(tag);
+    if (!context.mounted) return;
+    context.read<LocaleController>().applyTag(tag);
   }
 
   /// The three-way [MenuFilter] default, mirroring `MenuScreen`'s own

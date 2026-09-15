@@ -202,4 +202,30 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get analysisNoDishesFound =>
       'The AI could not identify any dishes on this menu.';
+
+  @override
+  String get navExplore => 'Explore';
+
+  @override
+  String get navScan => 'Scan';
+
+  @override
+  String get navSaved => 'Saved';
+
+  @override
+  String get navSettings => 'Settings';
+
+  @override
+  String get scanPlaceholderTitle => 'Scan a menu';
+
+  @override
+  String get scanPlaceholderBody =>
+      'Photographing a physical menu is coming in a later update. For now, paste a delivery link on Explore.';
+
+  @override
+  String get savedPlaceholderTitle => 'Saved venues';
+
+  @override
+  String get savedPlaceholderBody =>
+      'Save a venue to find it here later. This is coming in a later update.';
 }

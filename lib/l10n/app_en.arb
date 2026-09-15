@@ -87,5 +87,13 @@
   "@analysisBadResponse": {
     "placeholders": { "detail": { "type": "String" } }
   },
-  "analysisNoDishesFound": "The AI could not identify any dishes on this menu."
+  "analysisNoDishesFound": "The AI could not identify any dishes on this menu.",
+  "navExplore": "Explore",
+  "navScan": "Scan",
+  "navSaved": "Saved",
+  "navSettings": "Settings",
+  "scanPlaceholderTitle": "Scan a menu",
+  "scanPlaceholderBody": "Photographing a physical menu is coming in a later update. For now, paste a delivery link on Explore.",
+  "savedPlaceholderTitle": "Saved venues",
+  "savedPlaceholderBody": "Save a venue to find it here later. This is coming in a later update."
 }

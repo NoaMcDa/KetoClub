@@ -203,4 +203,30 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get analysisNoDishesFound =>
       'הבינה המלאכותית לא הצליחה לזהות מנות בתפריט הזה.';
+
+  @override
+  String get navExplore => 'גילוי';
+
+  @override
+  String get navScan => 'סריקה';
+
+  @override
+  String get navSaved => 'שמורים';
+
+  @override
+  String get navSettings => 'הגדרות';
+
+  @override
+  String get scanPlaceholderTitle => 'סריקת תפריט';
+
+  @override
+  String get scanPlaceholderBody =>
+      'צילום תפריט פיזי יתאפשר בעדכון עתידי. בינתיים, הדביקו קישור למשלוח במסך גילוי.';
+
+  @override
+  String get savedPlaceholderTitle => 'מסעדות שמורות';
+
+  @override
+  String get savedPlaceholderBody =>
+      'שמרו מסעדה כדי למצוא אותה כאן בהמשך. האפשרות הזו תגיע בעדכון עתידי.';
 }
