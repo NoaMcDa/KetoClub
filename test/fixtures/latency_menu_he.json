@@ -1,0 +1,351 @@
+{
+  "_fixture_note": "Synthetic 40-dish Hebrew menu for tool/measure_model_latency.dart (issue #16). Not a recorded response -- built to be a realistic, varied real-world menu of the size the pre-release latency/cost check should exercise.",
+  "dishes": [
+    {
+      "id": "dish-he-1",
+      "category": "מנות ראשונות",
+      "name": "סלט יווני",
+      "description": "פטה, זיתים, מלפפון ועגבנייה בשמן זית",
+      "options": []
+    },
+    {
+      "id": "dish-he-2",
+      "category": "מנות ראשונות",
+      "name": "סלט קיסר",
+      "description": "חסה רומית, פרמזן, קרוטונים ורוטב קיסר",
+      "options": [
+        {
+          "name": "תוספת",
+          "values": [
+            "חזה עוף בגריל",
+            "שרימפס בגריל"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dish-he-3",
+      "category": "מנות ראשונות",
+      "name": "סלט קפרזה",
+      "description": "עגבנייה, מוצרלה ובזיליקום עם זיגוג בלסמי",
+      "options": []
+    },
+    {
+      "id": "dish-he-4",
+      "category": "מנות ראשונות",
+      "name": "כנפי עוף",
+      "description": "כנפיים פריכות ברוטב חריף",
+      "options": [
+        {
+          "name": "רוטב",
+          "values": [
+            "חריף",
+            "ברביקיו",
+            "דבש חרדל"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dish-he-5",
+      "category": "מנות ראשונות",
+      "name": "קלמארי",
+      "description": "קלמארי מטוגן עם איולי לימון",
+      "options": []
+    },
+    {
+      "id": "dish-he-6",
+      "category": "מנות ראשונות",
+      "name": "ברוסקטה",
+      "description": "לחם קלוי עם עגבנייה, שום ובזיליקום",
+      "options": []
+    },
+    {
+      "id": "dish-he-7",
+      "category": "מנות ראשונות",
+      "name": "מרק בצל צרפתי",
+      "description": "מרק בצל מקורמל עם טוסט גבינת גרויאר",
+      "options": []
+    },
+    {
+      "id": "dish-he-8",
+      "category": "מנות ראשונות",
+      "name": "צלחת חומוס",
+      "description": "חומוס עם פיתה ושמן זית",
+      "options": []
+    },
+    {
+      "id": "dish-he-9",
+      "category": "מנות ראשונות",
+      "name": "סיגרים ממולאים",
+      "description": "סיגרים במילוי ירקות עם רוטב צ'ילי מתוק",
+      "options": []
+    },
+    {
+      "id": "dish-he-10",
+      "category": "מנות ראשונות",
+      "name": "נאצ'וס",
+      "description": "צ'יפס תירס עם גבינה, חלפיניו וסלסה",
+      "options": []
+    },
+    {
+      "id": "dish-he-11",
+      "category": "עיקריות",
+      "name": "סלמון בגריל",
+      "description": "מוגש עם חמאת לימון ותוספת לבחירה",
+      "options": [
+        {
+          "name": "תוספת",
+          "values": [
+            "צ'יפס",
+            "סלט ירוק",
+            "ירקות מאודים"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dish-he-12",
+      "category": "עיקריות",
+      "name": "אנטריקוט",
+      "description": "אנטריקוט מיושן 300 גרם עם חמאת שום",
+      "options": [
+        {
+          "name": "תוספת",
+          "values": [
+            "פירה תפוחי אדמה",
+            "סלט ירוק"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dish-he-13",
+      "category": "עיקריות",
+      "name": "פיצה מרגריטה",
+      "description": "עגבנייה, מוצרלה ובזיליקום טרי",
+      "options": []
+    },
+    {
+      "id": "dish-he-14",
+      "category": "עיקריות",
+      "name": "פיצה פפרוני",
+      "description": "עגבנייה, מוצרלה ופפרוני",
+      "options": []
+    },
+    {
+      "id": "dish-he-15",
+      "category": "עיקריות",
+      "name": "ספגטי בולונז",
+      "description": "ספגטי עם רוטב בשר מבושל לאט",
+      "options": []
+    },
+    {
+      "id": "dish-he-16",
+      "category": "עיקריות",
+      "name": "עוף פרמזן",
+      "description": "חזה עוף בציפוי פריך עם רוטב עגבניות ומוצרלה",
+      "options": []
+    },
+    {
+      "id": "dish-he-17",
+      "category": "עיקריות",
+      "name": "המבורגר בקר",
+      "description": "מוגש בלחמנייה עם צ'יפס",
+      "options": [
+        {
+          "name": "לחמנייה",
+          "values": [
+            "לחמנייה",
+            "עטיפת חסה"
+          ]
+        },
+        {
+          "name": "תוספת",
+          "values": [
+            "צ'יפס",
+            "סלט"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dish-he-18",
+      "category": "עיקריות",
+      "name": "דג וצ'יפס",
+      "description": "דג מצופה בבלילה עם צ'יפס ורוטב טרטר",
+      "options": []
+    },
+    {
+      "id": "dish-he-19",
+      "category": "עיקריות",
+      "name": "חזה עוף בגריל",
+      "description": "עם ירקות צלויים ורוטב עשבי תיבול",
+      "options": []
+    },
+    {
+      "id": "dish-he-20",
+      "category": "עיקריות",
+      "name": "ראפ פלאפל",
+      "description": "פלאפל, חומוס וסלט בראפ",
+      "options": []
+    },
+    {
+      "id": "dish-he-21",
+      "category": "עיקריות",
+      "name": "שקשוקה",
+      "description": "ביצים מבושלות ברוטב עגבניות מתובל",
+      "options": []
+    },
+    {
+      "id": "dish-he-22",
+      "category": "עיקריות",
+      "name": "שניצל עוף",
+      "description": "שניצל עוף פריך עם צ'יפס",
+      "options": [
+        {
+          "name": "תוספת",
+          "values": [
+            "צ'יפס",
+            "אורז",
+            "סלט"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dish-he-23",
+      "category": "עיקריות",
+      "name": "פאד תאי",
+      "description": "אטריות אורז עם בוטנים, ביצה ורוטב טמרינד",
+      "options": []
+    },
+    {
+      "id": "dish-he-24",
+      "category": "עיקריות",
+      "name": "ראמן בקר",
+      "description": "ראמן במרק בקר עם ביצה רכה",
+      "options": []
+    },
+    {
+      "id": "dish-he-25",
+      "category": "עיקריות",
+      "name": "צלעות טלה בגריל",
+      "description": "עם פירה בטטה ורוטב נענע",
+      "options": []
+    },
+    {
+      "id": "dish-he-26",
+      "category": "עיקריות",
+      "name": "פוקה טונה",
+      "description": "טונה, אבוקדו, מלפפון ואורז",
+      "options": [
+        {
+          "name": "בסיס",
+          "values": [
+            "אורז",
+            "אורז כרובית"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dish-he-27",
+      "category": "עיקריות",
+      "name": "ריזוטו ירקות",
+      "description": "ריזוטו קרמי עם ירקות עונתיים",
+      "options": []
+    },
+    {
+      "id": "dish-he-28",
+      "category": "עיקריות",
+      "name": "ראפ עוף קיסר",
+      "description": "עוף, חסה רומית ורוטב קיסר בטורטייה",
+      "options": []
+    },
+    {
+      "id": "dish-he-29",
+      "category": "עיקריות",
+      "name": "טאקוס בקר",
+      "description": "שלושה טאקוס רכים עם בקר, סלסה וגבינה",
+      "options": []
+    },
+    {
+      "id": "dish-he-30",
+      "category": "עיקריות",
+      "name": "קלצונה מרגריטה",
+      "description": "פיצה מקופלת עם עגבנייה ומוצרלה",
+      "options": []
+    },
+    {
+      "id": "dish-he-31",
+      "category": "תוספות",
+      "name": "צ'יפס",
+      "description": "צ'יפס פריך עם קטשופ",
+      "options": []
+    },
+    {
+      "id": "dish-he-32",
+      "category": "תוספות",
+      "name": "פירה תפוחי אדמה",
+      "description": "פירה תפוחי אדמה עם חמאה",
+      "options": []
+    },
+    {
+      "id": "dish-he-33",
+      "category": "תוספות",
+      "name": "תרד מוקפץ",
+      "description": "תרד מוקפץ עם שום",
+      "options": []
+    },
+    {
+      "id": "dish-he-34",
+      "category": "תוספות",
+      "name": "ברוקולי מאודה",
+      "description": "עם רוטב שמן זית",
+      "options": []
+    },
+    {
+      "id": "dish-he-35",
+      "category": "תוספות",
+      "name": "טבעות בצל",
+      "description": "טבעות בצל פריכות בבלילה",
+      "options": []
+    },
+    {
+      "id": "dish-he-36",
+      "category": "קינוחים",
+      "name": "עוגת שוקולד",
+      "description": "עוגת שוקולד עשירה בשכבות",
+      "options": []
+    },
+    {
+      "id": "dish-he-37",
+      "category": "קינוחים",
+      "name": "עוגת גבינה",
+      "description": "עוגת גבינה ניו יורקית עם רוטב פירות יער",
+      "options": []
+    },
+    {
+      "id": "dish-he-38",
+      "category": "קינוחים",
+      "name": "גלידה בקערה",
+      "description": "גלידת וניל עם רוטב שוקולד ואגוזים",
+      "options": []
+    },
+    {
+      "id": "dish-he-39",
+      "category": "קינוחים",
+      "name": "בקלאווה",
+      "description": "בצק עלים במילוי אגוזים וסירופ דבש",
+      "options": []
+    },
+    {
+      "id": "dish-he-40",
+      "category": "שתייה",
+      "name": "לימונדה טרייה",
+      "description": "לימונדה טרייה עם נענע",
+      "options": []
+    }
+  ]
+}
