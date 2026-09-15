@@ -10,6 +10,10 @@ environment:
   flutter: ">=3.47.4"
 
 dependencies:
+  # Reachability hint consulted by the classifier router before it spends an
+  # LLM request (architecture.md §8, D10). A hint, never a verdict: a request
+  # that fails anyway still maps to `offline`.
+  connectivity_plus: ^7.3.1
   cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
@@ -26,6 +30,9 @@ dependencies:
   http: ^1.1.0
   intl: ^0.20.3
   provider: ^6.0.0
+  # Raises screen brightness while the Waiter Card is open so a waiter can read
+  # it across a table; restored on close, and a no-op on web.
+  screen_brightness: ^2.1.11
   # Non-secret settings: filters, language, consent, last venue.
   shared_preferences: ^2.5.5
   # Opens the venue on its source platform.
@@ -49,3 +56,33 @@ flutter:
   # is committed under lib/l10n/generated/ per l10n.yaml.
   generate: true
   uses-material-design: true
+
+  # The licence text for the bundled families, registered with
+  # LicenseRegistry at startup so `showLicensePage` credits them.
+  assets:
+    - assets/fonts/OFL-PublicSans.txt
+    - assets/fonts/OFL-InstrumentSerif.txt
+
+  # The two families the .design artboards call for. Both are SIL OFL 1.1;
+  # the licence text sits beside the files in assets/fonts/.
+  #
+  # Neither family carries Hebrew glyphs, and this app is bilingual (D7), so
+  # the theme must set a fontFamilyFallback that reaches a Hebrew-capable
+  # system face. Do not set either family as a bare default.
+  fonts:
+    - family: Public Sans
+      fonts:
+        - asset: assets/fonts/PublicSans-400.ttf
+          weight: 400
+        - asset: assets/fonts/PublicSans-500.ttf
+          weight: 500
+        - asset: assets/fonts/PublicSans-600.ttf
+          weight: 600
+        - asset: assets/fonts/PublicSans-700.ttf
+          weight: 700
+        - asset: assets/fonts/PublicSans-800.ttf
+          weight: 800
+    - family: Instrument Serif
+      fonts:
+        - asset: assets/fonts/InstrumentSerif-400.ttf
+          weight: 400
