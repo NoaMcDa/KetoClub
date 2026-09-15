@@ -87,5 +87,39 @@
   "@analysisBadResponse": {
     "placeholders": { "detail": { "type": "String" } }
   },
-  "analysisNoDishesFound": "הבינה המלאכותית לא הצליחה לזהות מנות בתפריט הזה."
+  "analysisNoDishesFound": "הבינה המלאכותית לא הצליחה לזהות מנות בתפריט הזה.",
+
+  "pillSemanticLabel": "פסיקה: {verdict}",
+  "@pillSemanticLabel": {
+    "placeholders": { "verdict": { "type": "String" } }
+  },
+
+  "dishCardAskWaiter": "שאלו את המלצר",
+  "dishCardHideScript": "הסתירו את הטקסט למלצר",
+  "dishCardScriptFallback": "שאלו את המלצר לגבי תחליף קטוגני למנה הזו.",
+
+  "netCarbsChipLabel": "~{grams} גרם פחמימות נטו (הערכה)",
+  "@netCarbsChipLabel": {
+    "placeholders": { "grams": { "type": "String" } }
+  },
+  "netCarbsChipSemanticLabel": "הערכת פחמימות נטו, לא מאומתת: {grams} גרם",
+  "@netCarbsChipSemanticLabel": {
+    "placeholders": { "grams": { "type": "String" } }
+  },
+
+  "engineChipAiSemanticLabel": "מנוע בינה מלאכותית, מודל {model}",
+  "@engineChipAiSemanticLabel": {
+    "placeholders": { "model": { "type": "String" } }
+  },
+  "engineChipRulesSemanticLabel": "מנוע כללים, ללא אימות בינה מלאכותית: {reason}",
+  "@engineChipRulesSemanticLabel": {
+    "placeholders": { "reason": { "type": "String" } }
+  },
+  "engineChipReasonNotConfigured": "אין מפתח",
+  "engineChipReasonOffline": "לא מקוון",
+  "engineChipReasonTimeout": "פסק זמן",
+  "engineChipReasonRateLimited": "המכסה היומית נוצלה",
+  "engineChipReasonUnauthorised": "המפתח נדחה",
+  "engineChipReasonBadResponse": "שגיאת בינה מלאכותית",
+  "engineChipReasonNoDishesFound": "לא נמצאו מנות"
 }

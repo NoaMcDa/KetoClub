@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 
 /// Pumps [child] inside a localised [MaterialApp] and a [Scaffold], the
@@ -41,33 +42,40 @@ void main() {
       }
     });
 
-    testWidgets('build shows verdictOrderAsIs label for orderAsIs', (
-      tester,
-    ) async {
-      // Arrange
-      await _pump(tester, const StatusBadge(verdict: DishVerdict.orderAsIs));
+    testWidgets(
+      'build shows the verdictOrderAsIs label, uppercased, for orderAsIs',
+      (tester) async {
+        // Arrange
+        await _pump(tester, const StatusBadge(verdict: DishVerdict.orderAsIs));
 
-      // Act & Assert
-      expect(find.text('Order as-is'), findsOneWidget);
-    });
+        // Act & Assert: the pill is uppercase per the artboard's `.pill`
+        // class, but the label text itself stays sentence-case in the
+        // ARB file — only the display transforms it.
+        expect(find.text('ORDER AS-IS'), findsOneWidget);
+      },
+    );
 
-    testWidgets('build shows verdictModifiable label for modifiable', (
-      tester,
-    ) async {
-      // Arrange
-      await _pump(tester, const StatusBadge(verdict: DishVerdict.modifiable));
+    testWidgets(
+      'build shows the verdictModifiable label, uppercased, for modifiable',
+      (tester) async {
+        // Arrange
+        await _pump(tester, const StatusBadge(verdict: DishVerdict.modifiable));
 
-      // Act & Assert
-      expect(find.text('Order with a change'), findsOneWidget);
-    });
+        // Act & Assert
+        expect(find.text('ORDER WITH A CHANGE'), findsOneWidget);
+      },
+    );
 
-    testWidgets('build shows verdictNonKeto label for nonKeto', (tester) async {
-      // Arrange
-      await _pump(tester, const StatusBadge(verdict: DishVerdict.nonKeto));
+    testWidgets(
+      'build shows the verdictNonKeto label, uppercased, for nonKeto',
+      (tester) async {
+        // Arrange
+        await _pump(tester, const StatusBadge(verdict: DishVerdict.nonKeto));
 
-      // Act & Assert
-      expect(find.text('Not keto'), findsOneWidget);
-    });
+        // Act & Assert
+        expect(find.text('NOT KETO'), findsOneWidget);
+      },
+    );
 
     testWidgets('build shows the Hebrew label in the he locale', (
       tester,
@@ -79,8 +87,40 @@ void main() {
         locale: const Locale('he'),
       );
 
-      // Act & Assert
+      // Act & Assert: Hebrew has no letter case, so the ARB text is shown
+      // verbatim.
       expect(find.text('לא קטוגני'), findsOneWidget);
+    });
+
+    testWidgets('build carries a Semantics label naming the verdict for screen '
+        'readers', (tester) async {
+      // Arrange
+      await _pump(tester, const StatusBadge(verdict: DishVerdict.modifiable));
+
+      // Act & Assert
+      expect(
+        find.bySemanticsLabel('Verdict: Order with a change'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('build paints the pill background from VerdictColors.pill, not '
+        'VerdictColors.rail', (tester) async {
+      // Arrange: green and amber render their pill on the loud base
+      // colour; red renders its pill on its own tint instead — a
+      // deliberate difference the artboard makes (VerdictTone's own doc
+      // comment explains why).
+      await _pump(tester, const StatusBadge(verdict: DishVerdict.nonKeto));
+
+      // Act
+      final decoration =
+          tester.widget<DecoratedBox>(find.byType(DecoratedBox)).decoration
+              as BoxDecoration;
+      final tone = VerdictColors.light().red;
+
+      // Assert
+      expect(decoration.color, tone.pill);
+      expect(decoration.color, isNot(tone.rail));
     });
   });
 }

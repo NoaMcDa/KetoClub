@@ -87,5 +87,39 @@
   "@analysisBadResponse": {
     "placeholders": { "detail": { "type": "String" } }
   },
-  "analysisNoDishesFound": "The AI could not identify any dishes on this menu."
+  "analysisNoDishesFound": "The AI could not identify any dishes on this menu.",
+
+  "pillSemanticLabel": "Verdict: {verdict}",
+  "@pillSemanticLabel": {
+    "placeholders": { "verdict": { "type": "String" } }
+  },
+
+  "dishCardAskWaiter": "Ask your waiter",
+  "dishCardHideScript": "Hide the waiter script",
+  "dishCardScriptFallback": "Ask your waiter about a keto-friendly substitution.",
+
+  "netCarbsChipLabel": "~{grams}g net carbs (estimate)",
+  "@netCarbsChipLabel": {
+    "placeholders": { "grams": { "type": "String" } }
+  },
+  "netCarbsChipSemanticLabel": "Estimated net carbs, not confirmed: {grams} grams",
+  "@netCarbsChipSemanticLabel": {
+    "placeholders": { "grams": { "type": "String" } }
+  },
+
+  "engineChipAiSemanticLabel": "AI engine, model {model}",
+  "@engineChipAiSemanticLabel": {
+    "placeholders": { "model": { "type": "String" } }
+  },
+  "engineChipRulesSemanticLabel": "Rules engine, not AI-verified: {reason}",
+  "@engineChipRulesSemanticLabel": {
+    "placeholders": { "reason": { "type": "String" } }
+  },
+  "engineChipReasonNotConfigured": "no key",
+  "engineChipReasonOffline": "offline",
+  "engineChipReasonTimeout": "timeout",
+  "engineChipReasonRateLimited": "rate limited",
+  "engineChipReasonUnauthorised": "key rejected",
+  "engineChipReasonBadResponse": "AI error",
+  "engineChipReasonNoDishesFound": "no dishes found"
 }

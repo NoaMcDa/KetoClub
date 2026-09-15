@@ -33,10 +33,18 @@ void main() {
         const EngineChip(engine: LlmEngine(model: 'test/model')),
       );
 
-      // Act & Assert
+      // Act & Assert: "AI" is still its own Text widget (so it stays
+      // findable by itself, as `settings_key_flow_test.dart` relies on),
+      // but a sibling Text carries the model, so the chip reads "AI ·
+      // test/model" — issue #30.
       expect(find.text('AI'), findsOneWidget);
+      expect(find.text(' · test/model'), findsOneWidget);
       expect(find.byType(Icon), findsOneWidget);
       expect(find.byType(Tooltip), findsNothing);
+      expect(
+        find.bySemanticsLabel('AI engine, model test/model'),
+        findsOneWidget,
+      );
     });
 
     testWidgets(
@@ -55,10 +63,32 @@ void main() {
         // Act
         final tooltip = tester.widget<Tooltip>(find.byType(Tooltip));
 
-        // Assert
+        // Assert: the reason ("no key" for notConfigured) is shown right
+        // on the chip, not only in the tooltip — issue #30.
         expect(find.text('Rules'), findsOneWidget);
+        expect(find.text(' (no key)'), findsOneWidget);
         expect(find.byType(Icon), findsOneWidget);
         expect(tooltip.message, 'Rule-based result, not AI-verified.');
+        expect(
+          find.bySemanticsLabel('Rules engine, not AI-verified: no key'),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'build shows the offline reason on the chip for the offline reason',
+      (tester) async {
+        // Arrange
+        await _pump(
+          tester,
+          const EngineChip(
+            engine: RulesEngine(reason: MenuAnalysisFailureReason.offline),
+          ),
+        );
+
+        // Act & Assert
+        expect(find.text(' (offline)'), findsOneWidget);
       },
     );
 
@@ -76,6 +106,7 @@ void main() {
 
       // Act & Assert
       expect(find.text('כללים'), findsOneWidget);
+      expect(find.text(' (לא מקוון)'), findsOneWidget);
     });
   });
 }

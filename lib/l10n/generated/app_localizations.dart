@@ -433,6 +433,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The AI could not identify any dishes on this menu.'**
   String get analysisNoDishesFound;
+
+  /// No description provided for @pillSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Verdict: {verdict}'**
+  String pillSemanticLabel(String verdict);
+
+  /// No description provided for @dishCardAskWaiter.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask your waiter'**
+  String get dishCardAskWaiter;
+
+  /// No description provided for @dishCardHideScript.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide the waiter script'**
+  String get dishCardHideScript;
+
+  /// No description provided for @dishCardScriptFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask your waiter about a keto-friendly substitution.'**
+  String get dishCardScriptFallback;
+
+  /// No description provided for @netCarbsChipLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'~{grams}g net carbs (estimate)'**
+  String netCarbsChipLabel(String grams);
+
+  /// No description provided for @netCarbsChipSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated net carbs, not confirmed: {grams} grams'**
+  String netCarbsChipSemanticLabel(String grams);
+
+  /// No description provided for @engineChipAiSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'AI engine, model {model}'**
+  String engineChipAiSemanticLabel(String model);
+
+  /// No description provided for @engineChipRulesSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Rules engine, not AI-verified: {reason}'**
+  String engineChipRulesSemanticLabel(String reason);
+
+  /// No description provided for @engineChipReasonNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'no key'**
+  String get engineChipReasonNotConfigured;
+
+  /// No description provided for @engineChipReasonOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'offline'**
+  String get engineChipReasonOffline;
+
+  /// No description provided for @engineChipReasonTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'timeout'**
+  String get engineChipReasonTimeout;
+
+  /// No description provided for @engineChipReasonRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'rate limited'**
+  String get engineChipReasonRateLimited;
+
+  /// No description provided for @engineChipReasonUnauthorised.
+  ///
+  /// In en, this message translates to:
+  /// **'key rejected'**
+  String get engineChipReasonUnauthorised;
+
+  /// No description provided for @engineChipReasonBadResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'AI error'**
+  String get engineChipReasonBadResponse;
+
+  /// No description provided for @engineChipReasonNoDishesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'no dishes found'**
+  String get engineChipReasonNoDishesFound;
 }
 
 class _AppLocalizationsDelegate

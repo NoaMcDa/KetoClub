@@ -1157,8 +1157,14 @@ default the implementation follows until answered.
    QR landing page". Default: defer the adapter until a real payload has been
    captured.
 4. **Whether to show `net_carbs_estimate` at all.** The model can produce a number;
-   it cannot be trusted as fact. Default: keep it in the model, do not render it in
-   the MVP.
+   it cannot be trusted as fact. *(Issue #30: reversed. `DishCard`'s net-carb chip
+   now renders it — "~{n}g net carbs (estimate)", never a bare number — and is
+   **hidden entirely** when `AnalysedDish.netCarbsEstimate` is null, which is
+   always true for a rules-engine result: `HeuristicMenuClassifier` never sets the
+   field, so a rules verdict shows no chip at all. The chip's own copy and its
+   `Semantics` label both say "estimate", not a fact, which is the constraint this
+   answer is conditioned on — see `lib/widgets/dish_card.dart` and the
+   `netCarbsChip*` keys in `lib/l10n/app_en.arb` / `app_he.arb`.)*
 5. **Cache freshness window.** 24 hours is a guess. *(Phase 1: settled at 24 hours
    in `menuCacheTtl`, with an exclusive boundary — see §6.4. Still a guess, but now
    a guess in one named place.)*

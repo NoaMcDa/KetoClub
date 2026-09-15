@@ -4,11 +4,16 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 
 /// One dish verdict, shown as an icon **and** a colour together
-/// (architecture.md §6.6).
+/// (architecture.md §6.6), styled as the artboard's `.pill` — uppercase,
+/// letter-spaced, 10px, 800-weight, rounded corners rather than a fully
+/// round badge (`.design/Main.dc.html` around line 178, the
+/// `verdictStyles` table).
 ///
 /// Colour alone would be unreadable to a colour-blind user, so every
 /// verdict pairs a distinct [Icon] with a localised label; neither is
-/// ever shown without the other.
+/// ever shown without the other. The pair is wrapped in one [Semantics]
+/// node so a screen reader announces a single clean label instead of the
+/// icon and text as two disjoint nodes.
 class StatusBadge extends StatelessWidget {
   /// Creates a badge for [verdict].
   const new({required this.verdict, super.key});
@@ -21,24 +26,37 @@ class StatusBadge extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final tone = VerdictColors.of(context).forVerdict(verdict);
     final spec = _specFor(verdict, l10n);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: tone.tint,
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: tone.rail),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(spec.icon, size: 16, color: tone.rail),
-            const SizedBox(width: 6),
-            Text(
-              spec.label,
-              style: TextStyle(color: tone.rail, fontWeight: FontWeight.w600),
-            ),
-          ],
+    // The artboard's pill foreground is the loud "-on" colour for green and
+    // amber, whose pill background is the saturated base colour, but the
+    // "-ink" colour for red, whose pill background is itself a tint — see
+    // VerdictTone's class doc comment for why the two verdicts differ.
+    final foreground = verdict == DishVerdict.nonKeto ? tone.ink : tone.on;
+    return Semantics(
+      label: l10n.pillSemanticLabel(spec.label),
+      excludeSemantics: true,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: tone.pill,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(7, 4, 9, 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(spec.icon, size: 12, color: foreground),
+              const SizedBox(width: 5),
+              Text(
+                spec.label.toUpperCase(),
+                style: TextStyle(
+                  color: foreground,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 10,
+                  letterSpacing: 0.7,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

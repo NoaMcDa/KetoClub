@@ -202,4 +202,60 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get analysisNoDishesFound =>
       'The AI could not identify any dishes on this menu.';
+
+  @override
+  String pillSemanticLabel(String verdict) {
+    return 'Verdict: $verdict';
+  }
+
+  @override
+  String get dishCardAskWaiter => 'Ask your waiter';
+
+  @override
+  String get dishCardHideScript => 'Hide the waiter script';
+
+  @override
+  String get dishCardScriptFallback =>
+      'Ask your waiter about a keto-friendly substitution.';
+
+  @override
+  String netCarbsChipLabel(String grams) {
+    return '~${grams}g net carbs (estimate)';
+  }
+
+  @override
+  String netCarbsChipSemanticLabel(String grams) {
+    return 'Estimated net carbs, not confirmed: $grams grams';
+  }
+
+  @override
+  String engineChipAiSemanticLabel(String model) {
+    return 'AI engine, model $model';
+  }
+
+  @override
+  String engineChipRulesSemanticLabel(String reason) {
+    return 'Rules engine, not AI-verified: $reason';
+  }
+
+  @override
+  String get engineChipReasonNotConfigured => 'no key';
+
+  @override
+  String get engineChipReasonOffline => 'offline';
+
+  @override
+  String get engineChipReasonTimeout => 'timeout';
+
+  @override
+  String get engineChipReasonRateLimited => 'rate limited';
+
+  @override
+  String get engineChipReasonUnauthorised => 'key rejected';
+
+  @override
+  String get engineChipReasonBadResponse => 'AI error';
+
+  @override
+  String get engineChipReasonNoDishesFound => 'no dishes found';
 }
