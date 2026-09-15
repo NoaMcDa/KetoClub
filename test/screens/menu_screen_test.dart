@@ -403,6 +403,75 @@ void main() {
     });
 
     testWidgets(
+      'tapping the legend toggle shows the same three verdict definitions '
+      'the system prompt sends (issue #17), and hides them again',
+      (tester) async {
+        // Arrange
+        final green = _dish('Steak', id: 'green');
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([green])));
+        final classifier = FakeMenuClassifier()
+          ..respondWith(
+            MenuAnalysed(
+              dishes: [_verdictFor(green, DishVerdict.orderAsIs)],
+              unclassified: const <String>[],
+              engine: const RulesEngine(
+                reason: MenuAnalysisFailureReason.notConfigured,
+              ),
+              analysedAt: DateTime.utc(2026),
+            ),
+          );
+        final controller = _controllerFor(
+          repository: repository,
+          classifier: classifier,
+        );
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Assert: collapsed by default.
+        expect(find.text(_en.legendToggle), findsOneWidget);
+        expect(
+          find.textContaining(_en.verdictOrderAsIs, findRichText: true),
+          findsNothing,
+        );
+
+        // Act
+        await tester.tap(find.text(_en.legendToggle));
+        await tester.pumpAndSettle();
+
+        // Assert: the definitions come from promptVerdictDefinitions
+        // itself, not a re-typed copy.
+        expect(find.text(_en.legendHide), findsOneWidget);
+        expect(
+          find.textContaining(_en.verdictOrderAsIs, findRichText: true),
+          findsOneWidget,
+        );
+        expect(
+          find.textContaining(
+            'net carbohydrates 6g or less',
+            findRichText: true,
+          ),
+          findsOneWidget,
+        );
+        expect(find.text(_en.legendNote), findsOneWidget);
+
+        // Act: collapse again.
+        await tester.tap(find.text(_en.legendHide));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_en.legendToggle), findsOneWidget);
+        expect(
+          find.textContaining(
+            'net carbohydrates 6g or less',
+            findRichText: true,
+          ),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
       'build still shows the raw menu with analysisFailureMessage above it '
       'when analysis fails',
       (tester) async {
