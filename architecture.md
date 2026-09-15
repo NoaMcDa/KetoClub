@@ -236,7 +236,8 @@ ketoclub/
 │   ├── services/                         # every folder: interface(s) + implementations + fakes-friendly seams
 │   │   ├── platform/                     # rank 0 — abstractions over the device/runtime
 │   │   │   ├── clock.dart                # abstract Clock { DateTime now(); }  (cache freshness, tests)
-│   │   │   └── app_logger.dart           # abstract AppLogger; never sees the key or an upstream body
+│   │   │   ├── app_logger.dart           # abstract AppLogger; never sees the key or an upstream body
+│   │   │   └── connectivity.dart         # abstract Connectivity { Future<bool> isOnline(); } — a hint, never a verdict (§14 D10)
 │   │   ├── storage/                      # rank 0
 │   │   │   ├── key_store.dart            # interface + SecureKeyStore (flutter_secure_storage)
 │   │   │   ├── menu_cache.dart           # interface + HiveMenuCache
@@ -335,6 +336,7 @@ ketoclub/
 | `shared_preferences` | Non-secret settings (filters, language, last venue). |
 | `flutter_localizations` + `intl` | Hebrew and English UI, RTL, number formatting. |
 | `url_launcher` | Open the venue on the source platform. |
+| `connectivity_plus` | Backs `Connectivity`, the pre-flight hint `RoutingMenuClassifier` consults before spending an OpenRouter request (§6.2, §8, §14 D10 — reinstated in Phase 1). |
 
 Dev dependencies: `flutter_test` and `integration_test` (SDK), `very_good_analysis`
 (lints, §18.3). Add `fake_async` when the first timeout is under test (§18.4).
@@ -459,25 +461,33 @@ example, "butter-infused potato purée", failed its own `puree` trigger.
 1. No key stored, or estimation consent not given → heuristic, with
    `engine = rules(reason: notConfigured)`. §11 treats withheld consent exactly
    like a missing key.
-2. Otherwise → LLM. If the LLM call fails with `offline`, `timeout`,
-   `rateLimited` or `badResponse`, fall back to the heuristic and surface that
-   reason in the result, so the UI can say "showing rule-based results; AI
-   analysis failed because …". A `badResponse` is shown with its reason named,
-   never silently — which is what §6.2 and §10's table together require.
-3. An `unauthorised` failure is returned as a failure, with **no** rules
+2. `Connectivity.isOnline()` answers false → heuristic, with
+   `engine = rules(reason: offline)`, and the LLM is never called. This is the
+   original rule 2, restored (§14 D10, reversed): the pre-check exists solely to
+   avoid spending the OpenRouter request — and the user's free-tier quota (D3,
+   D6) — on a call that cannot succeed. `isOnline()` is a hint, not a verdict
+   (documented on the interface itself), so this rule only ever produces a false
+   *negative*: it can skip a call that would have worked, but never claims a
+   call will fail when it would not have. A false positive (`isOnline()` says
+   true, the call fails anyway) is simply rule 4 below, which stamps the exact
+   same `offline` reason — the UI's copy cannot tell the two paths apart.
+3. Otherwise → LLM.
+4. If the LLM call fails with `offline`, `timeout`, `rateLimited` or
+   `badResponse`, fall back to the heuristic and surface that reason in the
+   result, so the UI can say "showing rule-based results; AI analysis failed
+   because …". A `badResponse` is shown with its reason named, never silently
+   — which is what §6.2 and §10's table together require.
+5. An `unauthorised` failure is returned as a failure, with **no** rules
    fallback: the user must see that their key was rejected rather than be quietly
    handed a weaker answer. `noDishesFound` is likewise returned rather than
    swapped for rules — §10 gives that row "try rules" as a way out the user
    takes, not as an automatic degradation.
 
-*(Phase 1)* There is **no device-offline pre-check**; see D10. The old rule 2 is
-gone because nothing needs it: the LLM call itself reports `offline`, and rule 2
-above already handles that.
-
-`RoutingMenuClassifier` receives both engines and the `KeyStore` through its
-constructor; `di.dart` is where the concrete engines are built and handed to it
-(constraint 4, §18.1). Consent arrives per call in `ClassificationOptions`, not as a
-fourth dependency, which keeps the class inside §18.3's five-dependency limit.
+`RoutingMenuClassifier` receives both engines, the `KeyStore` and `Connectivity`
+through its constructor; `di.dart` is where the concrete engines and the
+connectivity check are built and handed to it (constraint 4, §18.1). Consent
+arrives per call in `ClassificationOptions`, not as a fifth dependency, which
+keeps the class inside §18.3's five-dependency limit.
 
 Dish-level output is the same from either engine:
 
@@ -676,6 +686,13 @@ inspection (`menu_api_research`). Each adapter therefore:
   with the status code, so a schema change is diagnosable from the failure copy;
 - is covered by a fixture test against a checked-in real response, so a schema
   drift is caught by re-recording the fixture, not by a user.
+
+**One local dependency, not an external endpoint.** `Connectivity`
+(`services/platform/connectivity.dart`, backed by `connectivity_plus` — §5) checks
+the device's own network status before `RoutingMenuClassifier` calls OpenRouter
+(§6.2, §14 D10 — reinstated). It contacts no host, needs no auth, and is not a
+sixth row in the table above: nothing about it ever leaves the device. It is
+listed here because it exists only to gate the one row above that does.
 
 ---
 
@@ -968,17 +985,37 @@ here.
 **D9 — Web is a first-class target for classification and a second-class target for
 live fetching**, until a CORS proxy exists (§13).
 
-**D10 — No connectivity pre-check. The LLM call is the probe.** *(Phase 1.)*
-§6.2's original rule 2 asked the router to consult a `Connectivity` abstraction
-before choosing an engine. Implementing it meant either a new plugin the §5
-dependency table does not list, or an HTTP probe to some neutral host — a second
-outbound destination, for a question the request we are about to make answers by
-itself. So `services/platform/connectivity.dart` does not exist: the router tries
-the LLM, and `ChatFailed(offline)` sends it to the heuristic through the same path
-every other degrading failure uses. The cost is one wasted request when the device
-is offline *and* the menu is uncached; the saving is one fewer outbound host, two
-fewer files, and one fewer abstraction whose fake could disagree with reality.
-`Clock` stays injected — cache freshness genuinely cannot be tested without it.
+**D10 — Connectivity pre-check, reinstated.** *(Reverses this decision's own
+Phase 1 text below; §18.6 forbids the code and this document disagreeing, so
+the old paragraph is replaced rather than left standing beside the new one.)*
+`services/platform/connectivity.dart` now exists: `Connectivity` is a
+one-method interface (`isOnline()`), backed in production by `DeviceConnectivity`
+over the `connectivity_plus` plugin (added to the §5 dependency table and named
+in §8 as the one dependency that is local rather than an external endpoint), with
+a settable `FakeConnectivity` in `test/fakes/`. `RoutingMenuClassifier`'s rule 2
+(§6.2, restored to its original position) asks it before ever building an
+OpenRouter request, falling back to the heuristic — stamped `offline`, the same
+reason a failed call already produced — when it answers false.
+
+**The cost:** one more plugin (§5), one more service threaded through
+`di.dart` and the router's constructor (now four instead of three), and one more
+abstraction whose fake can disagree with the device it stands in for.
+`isOnline()` is documented on the interface itself as a hint, never a verdict,
+precisely because of that last point: a `true` reading can still be followed by
+a request that fails. That failure still reports `offline` through the ordinary
+post-call path (§6.2 rule 4), exactly as it did before this decision existed —
+the pre-check narrows *when* the LLM is tried, it never changes what a failure
+means.
+
+**What it buys:** the device being plainly offline — a lift, a restaurant with
+a dead signal, the app opened before the phone reconnects — used to cost one
+OpenRouter request every time, which is also one unit of the user's 50-a-day
+free-tier quota (D3, D6) spent on a call that could not have succeeded. That
+case is common enough that the recurring cost of the wasted requests it
+prevents was judged larger than the cost of the extra abstraction. `Clock`
+stayed injected throughout both versions of this decision — cache freshness
+genuinely cannot be tested without it — and this reversal changes nothing
+about that.
 
 ---
 
@@ -1319,8 +1356,8 @@ following, and the rest of the document has been updated to match:
   mocking library.
 - **A `Clock` abstraction** in `services/platform/`, because cache freshness was
   reading the real clock, which made it untestable deterministically. *(Phase 1: a
-  `Connectivity` abstraction was listed here too and has been dropped — see D10.
-  `AppLogger` took its place in that folder.)*
+  `Connectivity` abstraction was also listed here, dropped, and later reinstated
+  — see D10's full history. `AppLogger` shares the folder with both.)*
 - **Adapters split into adapter and mapper.** The mapper is a pure function over
   JSON, tested against fixtures with no HTTP; the adapter only does the request.
 - **`services/` is organised into ranked sub-packages** so the DAG rule can be
