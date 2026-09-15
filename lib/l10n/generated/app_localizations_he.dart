@@ -285,4 +285,14 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get savedPlaceholderBody =>
       'שמרו מסעדה כדי למצוא אותה כאן בהמשך. האפשרות הזו תגיע בעדכון עתידי.';
+
+  @override
+  String get discoveryTitle => 'איפה לאכול';
+
+  @override
+  String get discoveryEmptyTitle => 'הדביקו קישור כדי להתחיל';
+
+  @override
+  String get discoveryEmptyBody =>
+      'חיפוש עדיין לא זמין — הדביקו למעלה קישור למסעדה בוולט, או את המזהה שלה, כדי לראות תפריט מסווג לפי קטו.';
 }

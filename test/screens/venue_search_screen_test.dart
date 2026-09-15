@@ -45,14 +45,44 @@ void main() {
       pushedNames = <String>[];
     });
 
-    testWidgets('build renders the title and the search field', (tester) async {
+    testWidgets('build renders the brand, the title and the search field', (
+      tester,
+    ) async {
+      // Act
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      final context = tester.element(find.byType(VenueSearchScreen));
+      final l10n = AppLocalizations.of(context)!;
+
+      // Assert
+      expect(find.text(appName), findsOneWidget);
+      expect(find.text(l10n.discoveryTitle), findsOneWidget);
+      expect(find.byType(TextField), findsOneWidget);
+    });
+
+    testWidgets('build has no app bar: Settings is reached from the bottom nav '
+        'shell, not a duplicate icon here', (tester) async {
       // Act
       await _pump(tester, controller: controller, pushedNames: pushedNames);
 
       // Assert
-      expect(find.text(appName), findsOneWidget);
-      expect(find.byType(TextField), findsOneWidget);
+      expect(find.byType(AppBar), findsNothing);
+      expect(find.byIcon(Icons.settings), findsNothing);
     });
+
+    testWidgets(
+      'the empty state explains that only a link works today, standing '
+      "in for the artboard's search results and filter chips",
+      (tester) async {
+        // Act
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        final context = tester.element(find.byType(VenueSearchScreen));
+        final l10n = AppLocalizations.of(context)!;
+
+        // Assert
+        expect(find.text(l10n.discoveryEmptyTitle), findsOneWidget);
+        expect(find.text(l10n.discoveryEmptyBody), findsOneWidget);
+      },
+    );
 
     testWidgets('typing nonsense shows the venueSearchInvalid message', (
       tester,
@@ -106,37 +136,44 @@ void main() {
       );
     });
 
-    testWidgets('tapping the submit affordance pushes the venue route path', (
-      tester,
-    ) async {
-      // Arrange
-      await _pump(tester, controller: controller, pushedNames: pushedNames);
-      await tester.enterText(find.byType(TextField), '123456');
-      await tester.pump();
+    testWidgets(
+      'tapping the submit affordance pushes the venue route path for a '
+      'Wolt slug',
+      (tester) async {
+        // Arrange
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await tester.enterText(find.byType(TextField), 'vitrina-lilinblum');
+        await tester.pump();
 
-      // Act
-      await tester.tap(find.byType(FilledButton));
-      await tester.pumpAndSettle();
+        // Act
+        await tester.tap(find.byType(FilledButton));
+        await tester.pumpAndSettle();
 
-      // Assert
-      expect(pushedNames, contains('/venue/tenbis/123456'));
-    });
+        // Assert
+        expect(pushedNames, contains('/venue/wolt/vitrina-lilinblum'));
+      },
+    );
 
-    testWidgets('tapping the settings action pushes the settings route', (
-      tester,
-    ) async {
-      // Arrange
-      await _pump(tester, controller: controller, pushedNames: pushedNames);
+    testWidgets(
+      'a pasted 10bis id resolves and pushes a tenbis venue route — the '
+      "unsupportedSource message it hits from there is MenuScreen's job, "
+      'not this one',
+      (tester) async {
+        // Arrange
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await tester.enterText(find.byType(TextField), '123456');
+        await tester.pump();
 
-      // Act
-      await tester.tap(find.byIcon(Icons.settings));
-      await tester.pumpAndSettle();
+        // Act
+        await tester.tap(find.byType(FilledButton));
+        await tester.pumpAndSettle();
 
-      // Assert
-      expect(pushedNames, contains('/settings'));
-    });
+        // Assert
+        expect(pushedNames, contains('/venue/tenbis/123456'));
+      },
+    );
 
-    testWidgets('build under Locale(he) renders the Hebrew label', (
+    testWidgets('build under Locale(he) renders the Hebrew title', (
       tester,
     ) async {
       // Act
@@ -151,7 +188,8 @@ void main() {
 
       // Assert
       expect(find.text(l10n.venueSearchLabel), findsOneWidget);
-      expect(find.text(appName), findsOneWidget);
+      expect(find.text(l10n.discoveryTitle), findsOneWidget);
+      expect(find.text(l10n.discoveryEmptyBody), findsOneWidget);
     });
   });
 }

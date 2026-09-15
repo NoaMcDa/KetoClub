@@ -3,7 +3,6 @@
 // (architecture.md §6.2, §10) that must never degrade silently into a
 // quiet rules fallback.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
@@ -79,8 +78,10 @@ void main() {
         );
         await pumpApp(tester, fakes);
 
-        // Act: open Settings from the venue search screen's app bar.
-        await tapAndSettle(tester, find.byIcon(Icons.settings));
+        // Act: open Settings from the bottom navigation shell — the
+        // Explore screen's own app bar no longer duplicates this shortcut
+        // (issue #11 added the Settings tab; issue #33 removed the icon).
+        await tapAndSettle(tester, find.text(_en.navSettings));
 
         // Act: type a key and save it.
         await enterText(tester, _typedKey);
@@ -101,9 +102,10 @@ void main() {
           isTrue,
         );
 
-        // Act: go back to venue search and open the venue.
-        await tester.pageBack();
-        await tester.pumpAndSettle();
+        // Act: back to Explore via the tab (the Settings tab replaces the
+        // route rather than pushing it, so there is nothing to pop) and
+        // open the venue.
+        await tapAndSettle(tester, find.text(_en.navExplore));
         await enterText(tester, ref.platformId);
         await tapAndSettle(tester, find.text(_en.venueSearchOpen));
 

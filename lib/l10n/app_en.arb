@@ -129,5 +129,9 @@
   "scanPlaceholderTitle": "Scan a menu",
   "scanPlaceholderBody": "Photographing a physical menu is coming in a later update. For now, paste a delivery link on Explore.",
   "savedPlaceholderTitle": "Saved venues",
-  "savedPlaceholderBody": "Save a venue to find it here later. This is coming in a later update."
+  "savedPlaceholderBody": "Save a venue to find it here later. This is coming in a later update.",
+
+  "discoveryTitle": "Where to eat",
+  "discoveryEmptyTitle": "Paste a link to get started",
+  "discoveryEmptyBody": "Search isn't available yet — paste a Wolt restaurant link, or its slug, above to see its keto-classified menu."
 }

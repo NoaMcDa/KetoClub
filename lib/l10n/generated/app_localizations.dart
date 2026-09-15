@@ -571,6 +571,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save a venue to find it here later. This is coming in a later update.'**
   String get savedPlaceholderBody;
+
+  /// No description provided for @discoveryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Where to eat'**
+  String get discoveryTitle;
+
+  /// No description provided for @discoveryEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste a link to get started'**
+  String get discoveryEmptyTitle;
+
+  /// No description provided for @discoveryEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Search isn\'t available yet — paste a Wolt restaurant link, or its slug, above to see its keto-classified menu.'**
+  String get discoveryEmptyBody;
 }
 
 class _AppLocalizationsDelegate
