@@ -1,4 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart' as plus;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -11,10 +12,12 @@ import 'package:ketoclub/services/menu/wolt/wolt_adapter.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
+import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/key_store.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
+import 'package:screen_brightness/screen_brightness.dart' as plugin;
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// The name of the Hive box holding cached menus and their analyses.
@@ -46,6 +49,12 @@ AppDependencies buildDependencies() {
     OpenRouterClient(client: client, keyStore: keyStore),
     clock,
   );
+  // `screen_brightness` has no web implementation; the no-op is a
+  // deliberate composition choice for that platform, not a fallback from a
+  // caught failure (screen_brightness.dart's own doc comment).
+  final screenBrightness = kIsWeb
+      ? const NoOpScreenBrightness()
+      : DeviceScreenBrightness(plugin.ScreenBrightness());
 
   return AppDependencies(
     menuRepository: CachedMenuRepository(
@@ -68,5 +77,6 @@ AppDependencies buildDependencies() {
     settingsStore: PrefsSettingsStore(load: SharedPreferences.getInstance),
     clock: clock,
     logger: const DeveloperLogAppLogger(),
+    screenBrightness: screenBrightness,
   );
 }

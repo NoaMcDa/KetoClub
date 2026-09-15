@@ -285,4 +285,12 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get savedPlaceholderBody =>
       'שמרו מסעדה כדי למצוא אותה כאן בהמשך. האפשרות הזו תגיע בעדכון עתידי.';
+
+  @override
+  String get waiterCardCopyButton => 'העתק טקסט';
+
+  @override
+  String waiterCardAfterText(String grams) {
+    return 'עם השינויים האלו, בערך $grams גרם פחמימות נטו (הערכה) — בטוח להזמין.';
+  }
 }

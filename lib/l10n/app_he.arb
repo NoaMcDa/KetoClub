@@ -129,5 +129,11 @@
   "scanPlaceholderTitle": "סריקת תפריט",
   "scanPlaceholderBody": "צילום תפריט פיזי יתאפשר בעדכון עתידי. בינתיים, הדביקו קישור למשלוח במסך גילוי.",
   "savedPlaceholderTitle": "מסעדות שמורות",
-  "savedPlaceholderBody": "שמרו מסעדה כדי למצוא אותה כאן בהמשך. האפשרות הזו תגיע בעדכון עתידי."
+  "savedPlaceholderBody": "שמרו מסעדה כדי למצוא אותה כאן בהמשך. האפשרות הזו תגיע בעדכון עתידי.",
+
+  "waiterCardCopyButton": "העתק טקסט",
+  "waiterCardAfterText": "עם השינויים האלו, בערך {grams} גרם פחמימות נטו (הערכה) — בטוח להזמין.",
+  "@waiterCardAfterText": {
+    "placeholders": { "grams": { "type": "String" } }
+  }
 }

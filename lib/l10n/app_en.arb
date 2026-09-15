@@ -129,5 +129,11 @@
   "scanPlaceholderTitle": "Scan a menu",
   "scanPlaceholderBody": "Photographing a physical menu is coming in a later update. For now, paste a delivery link on Explore.",
   "savedPlaceholderTitle": "Saved venues",
-  "savedPlaceholderBody": "Save a venue to find it here later. This is coming in a later update."
+  "savedPlaceholderBody": "Save a venue to find it here later. This is coming in a later update.",
+
+  "waiterCardCopyButton": "Copy text",
+  "waiterCardAfterText": "With these changes, about {grams}g net carbs (estimate) — safe to order.",
+  "@waiterCardAfterText": {
+    "placeholders": { "grams": { "type": "String" } }
+  }
 }

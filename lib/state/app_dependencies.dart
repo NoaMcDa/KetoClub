@@ -3,6 +3,7 @@ import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
+import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/key_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 
@@ -14,6 +15,12 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 @immutable
 class AppDependencies {
   /// Creates the dependency set the screens and controllers are built on.
+  ///
+  /// [screenBrightness] defaults to [NoOpScreenBrightness] rather than
+  /// being required: it was added after every existing call site — every
+  /// flow test's fake dependency set among them — was already written, and
+  /// a caller with nothing to say about brightness should not have to say
+  /// so.
   const new({
     required this.menuRepository,
     required this.menuClassifier,
@@ -21,6 +28,7 @@ class AppDependencies {
     required this.settingsStore,
     required this.clock,
     required this.logger,
+    this.screenBrightness = const NoOpScreenBrightness(),
   });
 
   /// Loads a venue's menu, cache first (architecture.md §6.1).
@@ -42,4 +50,9 @@ class AppDependencies {
 
   /// Structured logging; never receives the key or an upstream error body.
   final AppLogger logger;
+
+  /// Raises and restores the screen brightness while the Waiter Card is
+  /// open (architecture.md §6.3). A no-op on platforms with no brightness
+  /// API of their own, such as web.
+  final ScreenBrightness screenBrightness;
 }

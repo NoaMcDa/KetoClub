@@ -284,4 +284,12 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get savedPlaceholderBody =>
       'Save a venue to find it here later. This is coming in a later update.';
+
+  @override
+  String get waiterCardCopyButton => 'Copy text';
+
+  @override
+  String waiterCardAfterText(String grams) {
+    return 'With these changes, about ${grams}g net carbs (estimate) — safe to order.';
+  }
 }

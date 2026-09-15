@@ -571,6 +571,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save a venue to find it here later. This is coming in a later update.'**
   String get savedPlaceholderBody;
+
+  /// No description provided for @waiterCardCopyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy text'**
+  String get waiterCardCopyButton;
+
+  /// No description provided for @waiterCardAfterText.
+  ///
+  /// In en, this message translates to:
+  /// **'With these changes, about {grams}g net carbs (estimate) — safe to order.'**
+  String waiterCardAfterText(String grams);
 }
 
 class _AppLocalizationsDelegate
