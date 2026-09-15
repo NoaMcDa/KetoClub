@@ -11,6 +11,7 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
+import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/utils/constants.dart';
@@ -82,10 +83,15 @@ String _definitionTextFrom(String line) {
 /// must be reachable from here without first going back.
 class MenuScreen extends StatefulWidget {
   /// Creates a screen that loads and classifies the menu for [ref].
-  const new({required this.ref, super.key});
+  const new({required this.ref, required this.screenBrightness, super.key});
 
   /// Which venue, on which platform, to load a menu for.
   final VenueRef ref;
+
+  /// Raises the screen brightness while the Waiter Card is open, so the
+  /// card stays readable across a restaurant table, and restores it on
+  /// close. A no-op on web, chosen in `di.dart` (architecture.md §6.6).
+  final ScreenBrightness screenBrightness;
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -496,7 +502,8 @@ class _MenuScreenState extends State<MenuScreen> {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => WaiterCardSheet(row: row),
+      builder: (_) =>
+          WaiterCardSheet(row: row, screenBrightness: widget.screenBrightness),
     );
   }
 }

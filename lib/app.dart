@@ -192,7 +192,10 @@ Route<void>? generateRoute(
           dependencies.menuClassifier,
           dependencies.settingsStore,
         ),
-        child: MenuScreen(ref: ref),
+        child: MenuScreen(
+          ref: ref,
+          screenBrightness: dependencies.screenBrightness,
+        ),
       ),
     );
   }

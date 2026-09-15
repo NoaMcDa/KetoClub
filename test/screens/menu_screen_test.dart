@@ -11,6 +11,7 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/menu_screen.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
+import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
@@ -20,6 +21,7 @@ import 'package:provider/provider.dart';
 
 import '../fakes/fake_menu_classifier.dart';
 import '../fakes/fake_menu_repository.dart';
+import '../fakes/fake_screen_brightness.dart';
 import '../fakes/fake_settings_store.dart';
 
 /// The venue every test opens, unless a test builds its own.
@@ -86,6 +88,7 @@ Future<void> _pump(
   MenuController controller, {
   VenueRef ref = _ref,
   Locale locale = const Locale('en'),
+  ScreenBrightness? screenBrightness,
 }) {
   return tester.pumpWidget(
     MaterialApp(
@@ -98,7 +101,11 @@ Future<void> _pump(
         // tree slot (the platform-name loop test) mounts a fresh
         // MenuScreen — and so runs initState's open() again — rather than
         // Flutter updating the previous element in place.
-        child: MenuScreen(key: ValueKey(ref.cacheKey), ref: ref),
+        child: MenuScreen(
+          key: ValueKey(ref.cacheKey),
+          ref: ref,
+          screenBrightness: screenBrightness ?? FakeScreenBrightness(),
+        ),
       ),
     ),
   );
@@ -118,7 +125,7 @@ Future<void> _pumpWithRoutes(
       supportedLocales: AppLocalizations.supportedLocales,
       home: ChangeNotifierProvider<MenuController>.value(
         value: controller,
-        child: const MenuScreen(ref: _ref),
+        child: MenuScreen(ref: _ref, screenBrightness: FakeScreenBrightness()),
       ),
       onGenerateRoute: (settings) {
         pushedNames.add(settings.name ?? '');
@@ -716,6 +723,59 @@ void main() {
         expect(find.byType(WaiterCardSheet), findsOneWidget);
         expect(find.text(_en.waiterCardTitle), findsOneWidget);
         expect(find.text(script), findsWidgets);
+      },
+    );
+
+    testWidgets(
+      'opening the waiter card raises the screen brightness and restores '
+      'it on close: MenuScreen passes its ScreenBrightness down, so the '
+      'sheet is not left with the no-op default (issue #31)',
+      (tester) async {
+        // Arrange
+        const script = 'Ask for a salad instead of fries.';
+        final yellow = _dish('Fries', id: 'yellow');
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([yellow])));
+        final classifier = FakeMenuClassifier()
+          ..respondWith(
+            MenuAnalysed(
+              dishes: [
+                _verdictFor(
+                  yellow,
+                  DishVerdict.modifiable,
+                  modification: script,
+                ),
+              ],
+              unclassified: const <String>[],
+              engine: const RulesEngine(
+                reason: MenuAnalysisFailureReason.notConfigured,
+              ),
+              analysedAt: DateTime.utc(2026),
+            ),
+          );
+        final controller = _controllerFor(
+          repository: repository,
+          classifier: classifier,
+        );
+        final brightness = FakeScreenBrightness();
+        await _pump(tester, controller, screenBrightness: brightness);
+        await tester.pumpAndSettle();
+        expect(brightness.raiseCount, 0);
+
+        // Act
+        await tester.tap(find.text(_en.waiterCardOpen));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(brightness.raiseCount, 1);
+        expect(brightness.restoreCount, 0);
+
+        // Act again: dismissing the sheet must restore it.
+        Navigator.of(tester.element(find.byType(WaiterCardSheet))).pop();
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(brightness.restoreCount, 1);
       },
     );
 
