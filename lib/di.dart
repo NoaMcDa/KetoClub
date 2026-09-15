@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart' as plus;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -9,6 +10,7 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/wolt/wolt_adapter.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
+import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/storage/key_store.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -37,6 +39,7 @@ AppDependencies buildDependencies() {
   final client = http.Client();
   const clock = SystemClock();
   const keyStore = SecureKeyStore(FlutterSecureStorage());
+  final connectivity = DeviceConnectivity(plus.Connectivity());
 
   const heuristic = HeuristicMenuClassifier(clock: clock);
   final llm = LlmMenuClassifier(
@@ -55,7 +58,12 @@ AppDependencies buildDependencies() {
       ),
       clock: clock,
     ),
-    menuClassifier: RoutingMenuClassifier(llm, heuristic, keyStore),
+    menuClassifier: RoutingMenuClassifier(
+      llm,
+      heuristic,
+      keyStore,
+      connectivity,
+    ),
     keyStore: keyStore,
     settingsStore: PrefsSettingsStore(load: SharedPreferences.getInstance),
     clock: clock,

@@ -7,6 +7,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/storage/key_store.dart';
 
 /// Re-stamps [heuristicResult] with a [RulesEngine] tag naming [reason],
@@ -33,28 +34,34 @@ MenuAnalysis _toRulesResult(
 /// Picks the LLM or heuristic engine per call, and degrades between them
 /// on failure (architecture.md §6.2).
 ///
-/// **No `Connectivity` dependency.** architecture.md §6.2's rule 2
-/// ("device reports offline → heuristic") is deliberately not
-/// implemented here: there is no `Connectivity` abstraction in the
-/// dependency table (§8), and a pre-flight connectivity check would add
-/// its own outbound host to probe. Letting the LLM call itself fail
-/// with [MenuAnalysisFailureReason.offline] and falling back from that
-/// covers the same case without the extra dependency.
+/// **The `Connectivity` pre-check (architecture.md §14 D10, reinstated).**
+/// Before ever building an OpenRouter request, [classify] asks
+/// [_connectivity] whether the device appears to have a route at all; a
+/// `false` reading skips the LLM call entirely — and the free-tier request
+/// it would have spent — falling straight to the heuristic stamped
+/// [MenuAnalysisFailureReason.offline]. [Connectivity.isOnline] is a hint,
+/// never a verdict, so a `true` reading that turns out wrong is not a bug in
+/// this router: the LLM call is still attempted, still fails, and still maps
+/// to the same [MenuAnalysisFailureReason.offline] through
+/// [_handleLlmFailure] below — the UI's copy cannot tell the two paths
+/// apart, and it is not supposed to be able to.
 @immutable
 final class RoutingMenuClassifier implements MenuClassifier {
   /// Creates a router that sends the primary engine's requests through
-  /// [_llm], falls back to [_heuristic], and checks [_keyStore] for a
-  /// stored OpenRouter key before every call.
+  /// [_llm], falls back to [_heuristic], checks [_keyStore] for a stored
+  /// OpenRouter key before every call, and consults [_connectivity] before
+  /// ever calling [_llm].
   ///
   /// Positional and private, matching every other service constructor
   /// in this layer (see `HeuristicMenuClassifier`, `MenuController`):
   /// Dart has no way to make a named initializing formal private at the
   /// call site, so the choice is positional or a suppressed lint.
-  const new(this._llm, this._heuristic, this._keyStore);
+  const new(this._llm, this._heuristic, this._keyStore, this._connectivity);
 
   final MenuClassifier _llm;
   final MenuClassifier _heuristic;
   final KeyStore _keyStore;
+  final Connectivity _connectivity;
 
   @override
   Future<MenuAnalysis> classify(
@@ -70,6 +77,20 @@ final class RoutingMenuClassifier implements MenuClassifier {
       return _toRulesResult(
         heuristicResult,
         MenuAnalysisFailureReason.notConfigured,
+      );
+    }
+
+    final online = await _connectivity.isOnline();
+    if (!online) {
+      // Rule 2 (architecture.md §6.2, §14 D10 — reinstated): the device
+      // plainly has no route, so the LLM call — and the free-tier
+      // request it would spend — is skipped entirely, straight to the
+      // heuristic. Stamped with the exact reason `_handleLlmFailure`
+      // uses for a call that failed after being attempted, so the UI's
+      // copy never reveals which path produced it.
+      return _toRulesResult(
+        await _heuristic.classify(menu, options: options),
+        MenuAnalysisFailureReason.offline,
       );
     }
 

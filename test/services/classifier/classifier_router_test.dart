@@ -6,6 +6,7 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 
+import '../../fakes/fake_connectivity.dart';
 import '../../fakes/fake_key_store.dart';
 import '../../fakes/fake_menu_classifier.dart';
 import 'menu_classifier_contract.dart';
@@ -86,6 +87,7 @@ void main() {
       FakeMenuClassifier(),
       FakeMenuClassifier(),
       FakeKeyStore(seed: 'contract-key'),
+      FakeConnectivity(),
     ),
   );
 
@@ -96,7 +98,12 @@ void main() {
       final llm = FakeMenuClassifier();
       final heuristic = FakeMenuClassifier();
       final keyStore = FakeKeyStore();
-      final router = RoutingMenuClassifier(llm, heuristic, keyStore);
+      final router = RoutingMenuClassifier(
+        llm,
+        heuristic,
+        keyStore,
+        FakeConnectivity(),
+      );
       final menu = _menuOf([_dishNamed('dish-1', 'Salmon')]);
       const options = ClassificationOptions(estimationConsentGiven: true);
 
@@ -121,7 +128,12 @@ void main() {
       final llm = FakeMenuClassifier();
       final heuristic = FakeMenuClassifier();
       final keyStore = FakeKeyStore(seed: 'stored-key');
-      final router = RoutingMenuClassifier(llm, heuristic, keyStore);
+      final router = RoutingMenuClassifier(
+        llm,
+        heuristic,
+        keyStore,
+        FakeConnectivity(),
+      );
       final menu = _menuOf([_dishNamed('dish-1', 'Salmon')]);
 
       // Act
@@ -147,7 +159,12 @@ void main() {
       final llm = FakeMenuClassifier()..respondWith(llmResult);
       final heuristic = FakeMenuClassifier();
       final keyStore = FakeKeyStore(seed: 'stored-key');
-      final router = RoutingMenuClassifier(llm, heuristic, keyStore);
+      final router = RoutingMenuClassifier(
+        llm,
+        heuristic,
+        keyStore,
+        FakeConnectivity(),
+      );
       final menu = _menuOf(dishes);
       const options = ClassificationOptions(estimationConsentGiven: true);
 
@@ -173,7 +190,12 @@ void main() {
           final heuristicResult = _heuristicAnalysis(dishes);
           final heuristic = FakeMenuClassifier()..respondWith(heuristicResult);
           final keyStore = FakeKeyStore(seed: 'stored-key');
-          final router = RoutingMenuClassifier(llm, heuristic, keyStore);
+          final router = RoutingMenuClassifier(
+            llm,
+            heuristic,
+            keyStore,
+            FakeConnectivity(),
+          );
           final menu = _menuOf(dishes);
           const options = ClassificationOptions(estimationConsentGiven: true);
 
@@ -201,7 +223,12 @@ void main() {
         );
       final heuristic = FakeMenuClassifier();
       final keyStore = FakeKeyStore(seed: 'stored-key');
-      final router = RoutingMenuClassifier(llm, heuristic, keyStore);
+      final router = RoutingMenuClassifier(
+        llm,
+        heuristic,
+        keyStore,
+        FakeConnectivity(),
+      );
       final menu = _menuOf([_dishNamed('dish-1', 'Salmon')]);
       const options = ClassificationOptions(estimationConsentGiven: true);
 
@@ -231,7 +258,12 @@ void main() {
         );
       final heuristic = FakeMenuClassifier();
       final keyStore = FakeKeyStore(seed: 'stored-key');
-      final router = RoutingMenuClassifier(llm, heuristic, keyStore);
+      final router = RoutingMenuClassifier(
+        llm,
+        heuristic,
+        keyStore,
+        FakeConnectivity(),
+      );
       final menu = _menuOf([_dishNamed('dish-1', 'Salmon')]);
       const options = ClassificationOptions(estimationConsentGiven: true);
 
@@ -266,7 +298,12 @@ void main() {
         final heuristicResult = _heuristicAnalysis(dishes);
         final heuristic = FakeMenuClassifier()..respondWith(heuristicResult);
         final keyStore = FakeKeyStore(seed: 'stored-key');
-        final router = RoutingMenuClassifier(llm, heuristic, keyStore);
+        final router = RoutingMenuClassifier(
+          llm,
+          heuristic,
+          keyStore,
+          FakeConnectivity(),
+        );
         final menu = _menuOf(dishes);
         const options = ClassificationOptions(estimationConsentGiven: true);
 
@@ -304,7 +341,12 @@ void main() {
       );
       final heuristic = FakeMenuClassifier()..respondWith(heuristicResult);
       final keyStore = FakeKeyStore(seed: 'stored-key');
-      final router = RoutingMenuClassifier(llm, heuristic, keyStore);
+      final router = RoutingMenuClassifier(
+        llm,
+        heuristic,
+        keyStore,
+        FakeConnectivity(),
+      );
       final menu = _menuOf(dishes);
       const options = ClassificationOptions(estimationConsentGiven: true);
 
@@ -334,7 +376,12 @@ void main() {
         );
         final heuristic = FakeMenuClassifier()..respondWith(heuristicFailure);
         final keyStore = FakeKeyStore();
-        final router = RoutingMenuClassifier(llm, heuristic, keyStore);
+        final router = RoutingMenuClassifier(
+          llm,
+          heuristic,
+          keyStore,
+          FakeConnectivity(),
+        );
         final menu = _menuOf([_dishNamed('dish-1', 'Salmon')]);
 
         // Act
@@ -344,5 +391,107 @@ void main() {
         expect(result, equals(heuristicFailure));
       },
     );
+
+    test('classify given the device reports offline returns the heuristic '
+        'result stamped offline, and the LLM was never called', () async {
+      // Arrange
+      final dishes = [_dishNamed('dish-1', 'Salmon')];
+      final llm = FakeMenuClassifier();
+      final heuristicResult = _heuristicAnalysis(dishes);
+      final heuristic = FakeMenuClassifier()..respondWith(heuristicResult);
+      final keyStore = FakeKeyStore(seed: 'stored-key');
+      final connectivity = FakeConnectivity(online: false);
+      final router = RoutingMenuClassifier(
+        llm,
+        heuristic,
+        keyStore,
+        connectivity,
+      );
+      final menu = _menuOf(dishes);
+      const options = ClassificationOptions(estimationConsentGiven: true);
+
+      // Act
+      final result = await router.classify(menu, options: options);
+
+      // Assert
+      expect(llm.calls, isEmpty);
+      expect(heuristic.calls, hasLength(1));
+      final analysed = result as MenuAnalysed;
+      expect(analysed.dishes, equals(heuristicResult.dishes));
+      expect(
+        analysed.engine,
+        equals(const RulesEngine(reason: MenuAnalysisFailureReason.offline)),
+      );
+    });
+
+    test(
+      'classify given no key stamps notConfigured even when the device '
+      'is also offline: rule 1 is decided before rule 2 is ever reached',
+      () async {
+        // Arrange: connectivity reports offline too, so a stamp of
+        // `offline` rather than `notConfigured` would mean rule 2 ran
+        // first — that is the only way to tell the two rules apart from
+        // the outside.
+        final llm = FakeMenuClassifier();
+        final heuristic = FakeMenuClassifier();
+        final keyStore = FakeKeyStore();
+        final connectivity = FakeConnectivity(online: false);
+        final router = RoutingMenuClassifier(
+          llm,
+          heuristic,
+          keyStore,
+          connectivity,
+        );
+        final menu = _menuOf([_dishNamed('dish-1', 'Salmon')]);
+
+        // Act
+        final result = await router.classify(menu);
+
+        // Assert
+        final analysed = result as MenuAnalysed;
+        expect(
+          analysed.engine,
+          equals(
+            const RulesEngine(reason: MenuAnalysisFailureReason.notConfigured),
+          ),
+        );
+      },
+    );
+
+    test('classify given the device reports online but the LLM call then '
+        'fails offline anyway still returns the heuristic result stamped '
+        'offline: the pre-check is a hint, never a verdict', () async {
+      // Arrange
+      final dishes = [_dishNamed('dish-1', 'Salmon')];
+      final llm = FakeMenuClassifier()
+        ..respondWith(
+          const MenuAnalysisFailed(reason: MenuAnalysisFailureReason.offline),
+        );
+      final heuristicResult = _heuristicAnalysis(dishes);
+      final heuristic = FakeMenuClassifier()..respondWith(heuristicResult);
+      final keyStore = FakeKeyStore(seed: 'stored-key');
+      final connectivity = FakeConnectivity();
+      final router = RoutingMenuClassifier(
+        llm,
+        heuristic,
+        keyStore,
+        connectivity,
+      );
+      final menu = _menuOf(dishes);
+      const options = ClassificationOptions(estimationConsentGiven: true);
+
+      // Act
+      final result = await router.classify(menu, options: options);
+
+      // Assert: the LLM was tried (the pre-check said online), it failed,
+      // and the result is indistinguishable from the pre-check path above.
+      expect(llm.calls, hasLength(1));
+      expect(heuristic.calls, hasLength(1));
+      final analysed = result as MenuAnalysed;
+      expect(
+        analysed.engine,
+        equals(const RulesEngine(reason: MenuAnalysisFailureReason.offline)),
+      );
+    });
   });
 }
