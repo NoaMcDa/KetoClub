@@ -52,15 +52,37 @@ enum DishVerdict {
 }
 
 /// Which verdicts a filtered menu view keeps (architecture.md §6.2, §6.6).
+///
+/// Issue #29 turns the menu screen's three verdict counters into the
+/// filter itself: tapping one narrows to that single verdict, and tapping
+/// the active one returns to [all]. [yellowOnly] and [redOnly] exist for
+/// that — added rather than replacing anything, so a value already
+/// persisted through `AppSettings` before this change (most users'
+/// [greenAndYellow] default included) keeps decoding to the same filter
+/// it always did; see the class's own `tryParse` doc for why decoding by
+/// name rather than ordinal already made this safe. [greenAndYellow]
+/// itself is unreachable from either screen's control now — no artboard
+/// tile represents "green and yellow together" — but stays a real,
+/// correctly-handled value rather than one this file quietly abandons.
 enum MenuFilter {
   /// Only [DishVerdict.orderAsIs] dishes.
   greenOnly,
 
-  /// [DishVerdict.orderAsIs] and [DishVerdict.modifiable] dishes.
+  /// [DishVerdict.orderAsIs] and [DishVerdict.modifiable] dishes. See the
+  /// enum doc: no longer offered by either filter control, but still a
+  /// valid, correctly-handled value.
   greenAndYellow,
 
-  /// Every dish, including [DishVerdict.nonKeto].
-  all;
+  /// Every dish, including [DishVerdict.nonKeto]. The state every verdict
+  /// counter tile returns to when tapped a second time.
+  all,
+
+  /// Only [DishVerdict.modifiable] dishes — the menu screen's "With
+  /// changes" tile.
+  yellowOnly,
+
+  /// Only [DishVerdict.nonKeto] dishes — the menu screen's "Skip" tile.
+  redOnly;
 
   /// The filter whose [name] equals [wire], or null when none does.
   ///

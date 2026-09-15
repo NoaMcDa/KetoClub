@@ -285,4 +285,104 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get savedPlaceholderBody =>
       'שמרו מסעדה כדי למצוא אותה כאן בהמשך. האפשרות הזו תגיע בעדכון עתידי.';
+
+  @override
+  String get menuKetoScoreLabel => 'ציון קטוגני';
+
+  @override
+  String menuKetoScoreSemanticLabel(String score) {
+    return 'ציון קטוגני: $score מתוך 10';
+  }
+
+  @override
+  String menuSourceLine(String platform, String age) {
+    return '$platform · $age';
+  }
+
+  @override
+  String menuShowingAll(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'מוצגות $count מנות',
+      two: 'מוצגות שתי מנות',
+      one: 'מוצגת מנה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get menuShowingGreen => 'מוצגות מנות שאפשר להזמין כמו שהן';
+
+  @override
+  String get menuShowingYellow => 'מוצגות מנות שדורשות שינוי';
+
+  @override
+  String get menuShowingRed => 'מוצג מה כדאי לדלג עליו';
+
+  @override
+  String get menuShowingGreenAndYellow =>
+      'מוצגות מנות שאפשר להזמין כמו שהן או עם שינוי';
+
+  @override
+  String get tileGreenLabel => 'להזמין כמו שהן';
+
+  @override
+  String get tileYellowLabel => 'עם שינוי';
+
+  @override
+  String get tileRedLabel => 'לדלג';
+
+  @override
+  String tileSemanticLabel(String label, int count) {
+    return '$label: $count';
+  }
+
+  @override
+  String get ageJustNow => 'הרגע';
+
+  @override
+  String ageMinutes(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'לפני $count דקות',
+      two: 'לפני דקתיים',
+      one: 'לפני דקה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ageHours(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'לפני $count שעות',
+      two: 'לפני שעתיים',
+      one: 'לפני שעה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ageDays(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'לפני $count ימים',
+      two: 'לפני יומיים',
+      one: 'לפני יום',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get legendToggle => 'מה משמעות הצבעים?';
+
+  @override
+  String get legendHide => 'הסתר את המקרא';
+
+  @override
+  String get legendNote => 'אותם הכללים שקטוקלאב שולחת למודל הבינה המלאכותית.';
 }

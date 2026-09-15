@@ -129,5 +129,52 @@
   "scanPlaceholderTitle": "סריקת תפריט",
   "scanPlaceholderBody": "צילום תפריט פיזי יתאפשר בעדכון עתידי. בינתיים, הדביקו קישור למשלוח במסך גילוי.",
   "savedPlaceholderTitle": "מסעדות שמורות",
-  "savedPlaceholderBody": "שמרו מסעדה כדי למצוא אותה כאן בהמשך. האפשרות הזו תגיע בעדכון עתידי."
+  "savedPlaceholderBody": "שמרו מסעדה כדי למצוא אותה כאן בהמשך. האפשרות הזו תגיע בעדכון עתידי.",
+
+  "menuKetoScoreLabel": "ציון קטוגני",
+  "menuKetoScoreSemanticLabel": "ציון קטוגני: {score} מתוך 10",
+  "@menuKetoScoreSemanticLabel": {
+    "placeholders": { "score": { "type": "String" } }
+  },
+  "menuSourceLine": "{platform} · {age}",
+  "@menuSourceLine": {
+    "placeholders": {
+      "platform": { "type": "String" },
+      "age": { "type": "String" }
+    }
+  },
+  "menuShowingAll": "{count, plural, one{מוצגת מנה אחת} two{מוצגות שתי מנות} other{מוצגות {count} מנות}}",
+  "@menuShowingAll": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "menuShowingGreen": "מוצגות מנות שאפשר להזמין כמו שהן",
+  "menuShowingYellow": "מוצגות מנות שדורשות שינוי",
+  "menuShowingRed": "מוצג מה כדאי לדלג עליו",
+  "menuShowingGreenAndYellow": "מוצגות מנות שאפשר להזמין כמו שהן או עם שינוי",
+  "tileGreenLabel": "להזמין כמו שהן",
+  "tileYellowLabel": "עם שינוי",
+  "tileRedLabel": "לדלג",
+  "tileSemanticLabel": "{label}: {count}",
+  "@tileSemanticLabel": {
+    "placeholders": {
+      "label": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "ageJustNow": "הרגע",
+  "ageMinutes": "{count, plural, one{לפני דקה} two{לפני דקתיים} other{לפני {count} דקות}}",
+  "@ageMinutes": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "ageHours": "{count, plural, one{לפני שעה} two{לפני שעתיים} other{לפני {count} שעות}}",
+  "@ageHours": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "ageDays": "{count, plural, one{לפני יום} two{לפני יומיים} other{לפני {count} ימים}}",
+  "@ageDays": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "legendToggle": "מה משמעות הצבעים?",
+  "legendHide": "הסתר את המקרא",
+  "legendNote": "אותם הכללים שקטוקלאב שולחת למודל הבינה המלאכותית."
 }

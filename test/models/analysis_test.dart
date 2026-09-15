@@ -41,14 +41,22 @@ void main() {
     });
 
     test('tryParse returns null for an unknown string', () {
-      // Arrange
-      const wire = 'redOnly';
+      // Arrange: not one of MenuFilter.values' names.
+      const wire = 'purple';
 
       // Act
       final result = MenuFilter.tryParse(wire);
 
       // Assert
       expect(result, isNull);
+    });
+
+    test('tryParse returns yellowOnly and redOnly — added by issue #29 for '
+        "the menu screen's per-verdict counter tiles, additively so an "
+        'already-persisted greenAndYellow or all keeps decoding unchanged', () {
+      // Act & Assert
+      expect(MenuFilter.tryParse('yellowOnly'), MenuFilter.yellowOnly);
+      expect(MenuFilter.tryParse('redOnly'), MenuFilter.redOnly);
     });
   });
 

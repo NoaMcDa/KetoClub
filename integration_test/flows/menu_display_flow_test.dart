@@ -2,7 +2,6 @@
 // journey of pasting a Wolt link and seeing the resulting menu classified
 // into keto verdicts, filtered, and turned into a waiter script.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
@@ -15,6 +14,7 @@ import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 
 import 'flow_support.dart';
 
@@ -126,41 +126,47 @@ void main() {
       await enterText(tester, _woltUrl);
       await tapAndSettle(tester, find.text(_en.venueSearchOpen));
 
-      // Assert: the classified menu is shown — the filter control and the
-      // engine chip only appear once an analysis has succeeded, and the
-      // green and modifiable dishes are both visible under the default
-      // filter.
+      // Assert: the classified menu is shown — the verdict counter tiles
+      // and the engine chip only appear once an analysis has succeeded,
+      // the source line names the platform, and the green and modifiable
+      // dishes are both visible under the default filter (red is not).
       expect(find.byType(EngineChip), findsOneWidget);
-      expect(find.byType(SegmentedButton<MenuFilter>), findsOneWidget);
+      expect(find.byType(VerdictCounterTiles), findsOneWidget);
+      expect(find.textContaining('Wolt'), findsWidgets);
       expect(find.text(fixture.green.name), findsOneWidget);
       expect(find.text(fixture.yellow.name), findsOneWidget);
+      expect(find.text(fixture.red.name), findsNothing);
       expect(find.byType(DishCard), findsNWidgets(2));
 
-      // Act: narrow the filter to green-only dishes.
-      await tapAndSettle(tester, find.text(_en.filterGreenOnly));
+      // Act: tap the "With changes" tile to narrow to the modifiable dish
+      // alone — the acceptance criterion's "filter to yellow".
+      await tapAndSettle(tester, find.text(_en.tileYellowLabel.toUpperCase()));
 
-      // Assert: the modifiable dish drops out; the green one stays.
+      // Assert: only the modifiable dish shows.
       expect(find.byType(DishCard), findsOneWidget);
-      expect(find.text(fixture.green.name), findsOneWidget);
-      expect(find.text(fixture.yellow.name), findsNothing);
-
-      // Act: widen the filter back so the modifiable dish returns.
-      await tapAndSettle(tester, find.text(_en.filterGreenAndYellow));
-
-      // Assert
       expect(find.text(fixture.yellow.name), findsOneWidget);
+      expect(find.text(fixture.green.name), findsNothing);
+      expect(find.text(_en.menuShowingYellow), findsOneWidget);
 
-      // Assert: the red group starts collapsed, showing only its count.
-      expect(find.text(_en.redGroupTitle(1)), findsOneWidget);
-      expect(find.text(fixture.red.name), findsNothing);
+      // Act: tap the now-active tile again to return to showing everything.
+      await tapAndSettle(tester, find.text(_en.tileYellowLabel.toUpperCase()));
 
-      // Act: expand it.
-      await tapAndSettle(tester, find.text(_en.redGroupTitle(1)));
-
-      // Assert: the non-keto dish now appears, only after the tap.
+      // Assert: every verdict is back, including the non-keto dish — issue
+      // #29 shows red dishes inline under "all" rather than in a separate
+      // always-collapsed group. The red dish is third in a ListView that
+      // stays deliberately lazy (CLAUDE.md's traps), so it must be
+      // scrolled into view before a widget below the fold is findable.
+      expect(find.text(fixture.green.name), findsOneWidget);
+      expect(find.text(fixture.yellow.name), findsOneWidget);
+      await tester.scrollUntilVisible(find.text(fixture.red.name), 200);
+      await tester.pumpAndSettle();
       expect(find.text(fixture.red.name), findsOneWidget);
 
-      // Act: open the Waiter Card from the modifiable dish.
+      // Act: scroll back up to the modifiable dish and open its Waiter
+      // Card — the scroll above may have taken its button out of the
+      // lazy list's built range.
+      await tester.scrollUntilVisible(find.text(_en.waiterCardOpen), -200);
+      await tester.pumpAndSettle();
       await tapAndSettle(tester, find.text(_en.waiterCardOpen));
 
       // Assert: the Waiter Card is open and its script text is on screen.

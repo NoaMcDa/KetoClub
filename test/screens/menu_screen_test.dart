@@ -15,6 +15,7 @@ import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
+import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
 
 import '../fakes/fake_menu_classifier.dart';
@@ -177,6 +178,110 @@ void main() {
     });
 
     testWidgets(
+      'the header falls back to the pasted reference when venueName is '
+      'null — the normal case, not an edge case (Menu.venueName)',
+      (tester) async {
+        // Arrange: _menuOf never sets venueName, matching every real Wolt
+        // fetch today.
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        final controller = _controllerFor(repository: repository);
+
+        // Act
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Assert: falls back to the ref's own platform id, never a
+        // placeholder like "Restaurant".
+        expect(find.text(_ref.platformId), findsOneWidget);
+        expect(find.text('Restaurant'), findsNothing);
+      },
+    );
+
+    testWidgets('the header shows Menu.venueName when the platform named '
+        'the venue', (tester) async {
+      // Arrange
+      final menu = Menu(
+        venueRef: _ref,
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: [
+          MenuCategory(id: 'c1', name: 'Mains', dishes: [_dish('Steak')]),
+        ],
+        venueName: 'Sunny Diner',
+      );
+      final repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: menu));
+      final controller = _controllerFor(repository: repository);
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Sunny Diner'), findsOneWidget);
+      expect(find.text(_ref.platformId), findsNothing);
+    });
+
+    testWidgets(
+      'the source line names the platform and shows for a freshly fetched '
+      'menu, not only a cached one',
+      (tester) async {
+        // Arrange: fetched two minutes ago, not from cache.
+        final fetchedAt = DateTime.now().toUtc().subtract(
+          const Duration(minutes: 2),
+        );
+        final repository = FakeMenuRepository()
+          ..stub(
+            _ref,
+            MenuFetched(menu: _menuOf([_dish('Steak')], fetchedAt: fetchedAt)),
+          );
+        final controller = _controllerFor(repository: repository);
+
+        // Act
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(controller.isFromCache, isFalse);
+        expect(
+          find.text(_en.menuSourceLine('Wolt', _en.ageMinutes(2))),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'the keto score badge renders no digit when the analysis has not '
+      'produced one — never a fallback 0.0',
+      (tester) async {
+        // Arrange: the fetch succeeds but analysis fails, so
+        // ketoScoreOutOfTen is null.
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        final classifier = FakeMenuClassifier()
+          ..respondWith(
+            const MenuAnalysisFailed(
+              reason: MenuAnalysisFailureReason.badResponse,
+            ),
+          );
+        final controller = _controllerFor(
+          repository: repository,
+          classifier: classifier,
+        );
+
+        // Act
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Assert: no score label, and no stray "0.0".
+        expect(controller.ketoScoreOutOfTen, isNull);
+        expect(find.text(_en.menuKetoScoreLabel.toUpperCase()), findsNothing);
+        expect(find.text('0.0'), findsNothing);
+      },
+    );
+
+    testWidgets(
       'build shows fetchFailureMessage and a retry affordance on a failed '
       'fetch',
       (tester) async {
@@ -285,7 +390,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.byType(SegmentedButton<MenuFilter>), findsOneWidget);
+      expect(find.byType(VerdictCounterTiles), findsOneWidget);
       expect(find.byType(EngineChip), findsOneWidget);
       expect(find.byType(DishCard), findsNWidgets(2));
     });
@@ -323,7 +428,7 @@ void main() {
         expect(find.text(message), findsOneWidget);
         expect(find.text('Steak'), findsOneWidget);
         expect(find.byType(EngineChip), findsNothing);
-        expect(find.byType(SegmentedButton<MenuFilter>), findsNothing);
+        expect(find.byType(VerdictCounterTiles), findsNothing);
       },
     );
 
@@ -390,7 +495,9 @@ void main() {
     });
 
     testWidgets(
-      'the red group starts collapsed shows its count and expands on tap',
+      'tapping the Skip tile filters to red dishes only; tapping it again '
+      'returns to all — issue #29 replaces the old always-shown collapsed '
+      'red group with this tile',
       (tester) async {
         // Arrange
         final green = _dish('Steak', id: 'green');
@@ -418,16 +525,27 @@ void main() {
         await _pump(tester, controller);
         await tester.pumpAndSettle();
 
-        // Assert: collapsed
-        expect(find.text(_en.redGroupTitle(1)), findsOneWidget);
+        // Assert: the default filter (greenAndYellow) never shows red.
         expect(find.text('Spaghetti Carbonara'), findsNothing);
+        expect(find.text(_en.tileRedLabel.toUpperCase()), findsOneWidget);
 
-        // Act: expand
-        await tester.tap(find.text(_en.redGroupTitle(1)));
+        // Act: tap the Skip tile.
+        await tester.tap(find.text(_en.tileRedLabel.toUpperCase()));
         await tester.pumpAndSettle();
 
-        // Assert: expanded
+        // Assert: only the red dish shows, and the label says so.
         expect(find.text('Spaghetti Carbonara'), findsOneWidget);
+        expect(find.text('Steak'), findsNothing);
+        expect(find.text(_en.menuShowingRed), findsOneWidget);
+
+        // Act: tap the now-active Skip tile again.
+        await tester.tap(find.text(_en.tileRedLabel.toUpperCase()));
+        await tester.pumpAndSettle();
+
+        // Assert: back to showing everything.
+        expect(find.text('Steak'), findsOneWidget);
+        expect(find.text('Spaghetti Carbonara'), findsOneWidget);
+        expect(find.text(_en.menuShowingAll(2)), findsOneWidget);
       },
     );
 
@@ -494,14 +612,68 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(DishCard), findsNWidgets(2));
 
-      // Act
-      await tester.tap(find.text(_en.filterGreenOnly));
+      // Act: tap the Order-as-is tile. Scoped to VerdictCounterTiles: its
+      // label text is identical to the green DishCard's own StatusBadge
+      // pill ("Order as-is"), so an unscoped find.text would be ambiguous.
+      await tester.tap(
+        find.descendant(
+          of: find.byType(VerdictCounterTiles),
+          matching: find.text(_en.tileGreenLabel.toUpperCase()),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Assert
       expect(find.byType(DishCard), findsOneWidget);
       expect(find.text('Steak'), findsOneWidget);
+      expect(find.text(_en.menuShowingGreen), findsOneWidget);
     });
+
+    testWidgets(
+      'tapping the yellow tile filters to modifiable dishes only — the '
+      "acceptance criterion's paste-link-then-filter-to-yellow flow, at "
+      'widget level',
+      (tester) async {
+        // Arrange
+        final green = _dish('Steak', id: 'green');
+        final yellow = _dish('Fries', id: 'yellow');
+        final red = _dish('Pasta', id: 'red');
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([green, yellow, red])));
+        final classifier = FakeMenuClassifier()
+          ..respondWith(
+            MenuAnalysed(
+              dishes: [
+                _verdictFor(green, DishVerdict.orderAsIs),
+                _verdictFor(yellow, DishVerdict.modifiable, modification: 'x'),
+                _verdictFor(red, DishVerdict.nonKeto),
+              ],
+              unclassified: const <String>[],
+              engine: const RulesEngine(
+                reason: MenuAnalysisFailureReason.notConfigured,
+              ),
+              analysedAt: DateTime.utc(2026),
+            ),
+          );
+        final controller = _controllerFor(
+          repository: repository,
+          classifier: classifier,
+        );
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Act
+        await tester.tap(find.text(_en.tileYellowLabel.toUpperCase()));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(DishCard), findsOneWidget);
+        expect(find.text('Fries'), findsOneWidget);
+        expect(find.text('Steak'), findsNothing);
+        expect(find.text('Pasta'), findsNothing);
+        expect(find.text(_en.menuShowingYellow), findsOneWidget);
+      },
+    );
 
     testWidgets(
       'tapping a yellow card opens the Waiter Card and the script text is '
@@ -579,8 +751,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text(_he.filterGreenOnly), findsOneWidget);
-      expect(find.text(_he.redGroupTitle(1)), findsOneWidget);
+      expect(find.text(_he.tileGreenLabel.toUpperCase()), findsOneWidget);
+      expect(find.text(_he.tileRedLabel.toUpperCase()), findsOneWidget);
+      expect(find.text(_he.menuKetoScoreLabel.toUpperCase()), findsOneWidget);
     });
 
     testWidgets(

@@ -331,48 +331,107 @@ void main() {
 
       // Assert
       expect(controller.visibleRows.map((row) => row.dish.id), ['green']);
-      expect(controller.redRows.map((row) => row.dish.id), ['red']);
+    });
+
+    test('visibleRows under yellowOnly keeps only modifiable dishes', () async {
+      // Arrange: issue #29's "With changes" tile.
+      final green = _dish('Steak', id: 'green');
+      final yellow = _dish('Fries', id: 'yellow');
+      final red = _dish('Pasta', id: 'red');
+      final menu = _menuOf([green, yellow, red]);
+      repository.stub(_ref, MenuFetched(menu: menu));
+      classifier.respondWith(
+        MenuAnalysed(
+          dishes: [
+            _verdictFor(green, DishVerdict.orderAsIs),
+            _verdictFor(yellow, DishVerdict.modifiable, modification: 'x'),
+            _verdictFor(red, DishVerdict.nonKeto),
+          ],
+          unclassified: const <String>[],
+          engine: const RulesEngine(
+            reason: MenuAnalysisFailureReason.notConfigured,
+          ),
+          analysedAt: clock.now(),
+        ),
+      );
+      await controller.open(_ref);
+
+      // Act
+      controller.setFilter(MenuFilter.yellowOnly);
+
+      // Assert
+      expect(controller.visibleRows.map((row) => row.dish.id), ['yellow']);
+    });
+
+    test('visibleRows under redOnly keeps only nonKeto dishes — issue #29 '
+        "replaces the old always-shown collapsed group with this tile's own "
+        'filter state', () async {
+      // Arrange
+      final green = _dish('Steak', id: 'green');
+      final red = _dish('Pasta', id: 'red');
+      final menu = _menuOf([green, red]);
+      repository.stub(_ref, MenuFetched(menu: menu));
+      classifier.respondWith(
+        MenuAnalysed(
+          dishes: [
+            _verdictFor(green, DishVerdict.orderAsIs),
+            _verdictFor(red, DishVerdict.nonKeto),
+          ],
+          unclassified: const <String>[],
+          engine: const RulesEngine(
+            reason: MenuAnalysisFailureReason.notConfigured,
+          ),
+          analysedAt: clock.now(),
+        ),
+      );
+      await controller.open(_ref);
+
+      // Act
+      controller.setFilter(MenuFilter.redOnly);
+
+      // Assert
+      expect(controller.visibleRows.map((row) => row.dish.id), ['red']);
+    });
+
+    test('visibleRows under greenAndYellow keeps orderAsIs and modifiable — '
+        'unreachable from either filter control now, but still a valid, '
+        'correctly-handled value for a filter already persisted before '
+        'issue #29', () async {
+      // Arrange
+      final green = _dish('Steak', id: 'green');
+      final yellow = _dish('Fries', id: 'yellow');
+      final red = _dish('Pasta', id: 'red');
+      final menu = _menuOf([green, yellow, red]);
+      repository.stub(_ref, MenuFetched(menu: menu));
+      classifier.respondWith(
+        MenuAnalysed(
+          dishes: [
+            _verdictFor(green, DishVerdict.orderAsIs),
+            _verdictFor(yellow, DishVerdict.modifiable, modification: 'x'),
+            _verdictFor(red, DishVerdict.nonKeto),
+          ],
+          unclassified: const <String>[],
+          engine: const RulesEngine(
+            reason: MenuAnalysisFailureReason.notConfigured,
+          ),
+          analysedAt: clock.now(),
+        ),
+      );
+      await controller.open(_ref);
+
+      // Act
+      controller.setFilter(MenuFilter.greenAndYellow);
+
+      // Assert
+      expect(controller.visibleRows.map((row) => row.dish.id).toSet(), {
+        'green',
+        'yellow',
+      });
     });
 
     test(
-      'visibleRows under greenAndYellow keeps orderAsIs and modifiable',
-      () async {
-        // Arrange
-        final green = _dish('Steak', id: 'green');
-        final yellow = _dish('Fries', id: 'yellow');
-        final red = _dish('Pasta', id: 'red');
-        final menu = _menuOf([green, yellow, red]);
-        repository.stub(_ref, MenuFetched(menu: menu));
-        classifier.respondWith(
-          MenuAnalysed(
-            dishes: [
-              _verdictFor(green, DishVerdict.orderAsIs),
-              _verdictFor(yellow, DishVerdict.modifiable, modification: 'x'),
-              _verdictFor(red, DishVerdict.nonKeto),
-            ],
-            unclassified: const <String>[],
-            engine: const RulesEngine(
-              reason: MenuAnalysisFailureReason.notConfigured,
-            ),
-            analysedAt: clock.now(),
-          ),
-        );
-        await controller.open(_ref);
-
-        // Act
-        controller.setFilter(MenuFilter.greenAndYellow);
-
-        // Assert
-        expect(controller.visibleRows.map((row) => row.dish.id).toSet(), {
-          'green',
-          'yellow',
-        });
-        expect(controller.redRows, isNotEmpty);
-      },
-    );
-
-    test(
-      'visibleRows under all adds unclassified dishes but never red ones',
+      'visibleRows under all adds unclassified and red dishes alike — '
+      'issue #29 draws no distinction between verdicts under "all"',
       () async {
         // Arrange
         final green = _dish('Steak', id: 'green');
@@ -401,6 +460,7 @@ void main() {
         // Assert
         expect(controller.visibleRows.map((row) => row.dish.id).toSet(), {
           'green',
+          'red',
           'unclassified',
         });
         expect(
@@ -409,11 +469,6 @@ void main() {
               .analysis,
           isNull,
         );
-        expect(
-          controller.visibleRows.any((row) => row.dish.id == 'red'),
-          isFalse,
-        );
-        expect(controller.redRows.map((row) => row.dish.id), ['red']);
       },
     );
 
@@ -555,19 +610,55 @@ void main() {
       },
     );
 
-    test('visibleRows and redRows before any open are empty, not a crash', () {
+    test('visibleRows before any open is empty, not a crash', () {
       // Arrange: nothing opened yet.
 
       // Act
       final visible = controller.visibleRows;
-      final red = controller.redRows;
       final unclassified = controller.unclassifiedNames;
 
       // Assert
       expect(visible, isEmpty);
-      expect(red, isEmpty);
       expect(unclassified, isEmpty);
       expect(controller.engine, isNull);
+    });
+  });
+
+  // Issue #29 adds MenuFilter.yellowOnly and MenuFilter.redOnly. Placed
+  // here rather than in a `services/storage` test file (this file's own
+  // ownership boundary for this issue) because `MenuController.open`
+  // reads exactly this decoding path through its `SettingsStore` — a
+  // regression here is a regression in what this controller reads on
+  // every launch.
+  group('AppSettings filter decoding (issue #29)', () {
+    Map<String, Object?> settingsJson(String filter) => <String, Object?>{
+      'languageTag': null,
+      'filter': filter,
+      'estimationConsentGiven': false,
+      'lastVenue': null,
+    };
+
+    test('every current MenuFilter name, old and new, round-trips through '
+        'AppSettings.tryFrom', () {
+      for (final filter in MenuFilter.values) {
+        // Act
+        final decoded = AppSettings.tryFrom(settingsJson(filter.name));
+
+        // Assert
+        expect(decoded?.filter, filter, reason: 'for ${filter.name}');
+      }
+    });
+
+    test('a filter name AppSettings.tryFrom does not recognise degrades to '
+        'null rather than throwing — the case a stored value from a future '
+        'or corrupted format would hit', () {
+      // Act
+      final decoded = AppSettings.tryFrom(settingsJson('somethingUnknown'));
+
+      // Assert: PrefsSettingsStore.read() treats a null tryFrom result as
+      // "use defaults" (architecture.md §6.4), so this is what keeps a
+      // stored value it no longer recognises from crashing the app.
+      expect(decoded, isNull);
     });
   });
 }

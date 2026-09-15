@@ -571,6 +571,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save a venue to find it here later. This is coming in a later update.'**
   String get savedPlaceholderBody;
+
+  /// No description provided for @menuKetoScoreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Keto score'**
+  String get menuKetoScoreLabel;
+
+  /// No description provided for @menuKetoScoreSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Keto score: {score} out of 10'**
+  String menuKetoScoreSemanticLabel(String score);
+
+  /// No description provided for @menuSourceLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{platform} · {age}'**
+  String menuSourceLine(String platform, String age);
+
+  /// No description provided for @menuShowingAll.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Showing 1 dish} other{Showing {count} dishes}}'**
+  String menuShowingAll(num count);
+
+  /// No description provided for @menuShowingGreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing dishes you can order as-is'**
+  String get menuShowingGreen;
+
+  /// No description provided for @menuShowingYellow.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing dishes that need a change'**
+  String get menuShowingYellow;
+
+  /// No description provided for @menuShowingRed.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing what to skip'**
+  String get menuShowingRed;
+
+  /// No description provided for @menuShowingGreenAndYellow.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing dishes you can order as-is or with a change'**
+  String get menuShowingGreenAndYellow;
+
+  /// No description provided for @tileGreenLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Order as-is'**
+  String get tileGreenLabel;
+
+  /// No description provided for @tileYellowLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'With changes'**
+  String get tileYellowLabel;
+
+  /// No description provided for @tileRedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get tileRedLabel;
+
+  /// No description provided for @tileSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {count}'**
+  String tileSemanticLabel(String label, int count);
+
+  /// No description provided for @ageJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get ageJustNow;
+
+  /// No description provided for @ageMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 minute ago} other{{count} minutes ago}}'**
+  String ageMinutes(num count);
+
+  /// No description provided for @ageHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 hour ago} other{{count} hours ago}}'**
+  String ageHours(num count);
+
+  /// No description provided for @ageDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 day ago} other{{count} days ago}}'**
+  String ageDays(num count);
+
+  /// No description provided for @legendToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'What do the colours mean?'**
+  String get legendToggle;
+
+  /// No description provided for @legendHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide the legend'**
+  String get legendHide;
+
+  /// No description provided for @legendNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The same rules KetoClub sends to the AI model.'**
+  String get legendNote;
 }
 
 class _AppLocalizationsDelegate
