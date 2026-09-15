@@ -284,4 +284,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get savedPlaceholderBody =>
       'Save a venue to find it here later. This is coming in a later update.';
+
+  @override
+  String get discoveryTitle => 'Where to eat';
+
+  @override
+  String get discoveryEmptyTitle => 'Paste a link to get started';
+
+  @override
+  String get discoveryEmptyBody =>
+      'Search isn\'t available yet — paste a Wolt restaurant link, or its slug, above to see its keto-classified menu.';
 }
