@@ -6,6 +6,7 @@ import 'package:ketoclub/l10n/generated/app_localizations_he.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/screens/settings_screen.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 import 'package:provider/provider.dart';
 
@@ -36,24 +37,33 @@ SettingsController _controllerFor({
   repository ?? FakeMenuRepository(),
 );
 
-/// Pumps the real [SettingsScreen] over a real [SettingsController],
-/// inside a localised [MaterialApp] — the shape every test in this file
-/// uses. Does not itself wait for [SettingsController.load] to settle;
-/// callers that need loaded state call `tester.pumpAndSettle()`
-/// afterwards, exactly as the app's own post-frame load is expected to
-/// resolve.
+/// Pumps the real [SettingsScreen] over a real [SettingsController] and a
+/// real [LocaleController], inside a localised [MaterialApp] — the shape
+/// every test in this file uses. A [LocaleController] is provided here
+/// because the language section reaches one via `context.read` after a
+/// successful [SettingsController.setLanguage] call, exactly as
+/// `KetoClubApp` provides one above its `Navigator` in the real app. Does
+/// not itself wait for [SettingsController.load] to settle; callers that
+/// need loaded state call `tester.pumpAndSettle()` afterwards, exactly as
+/// the app's own post-frame load is expected to resolve.
 Future<void> _pump(
   WidgetTester tester,
   SettingsController controller, {
   Locale locale = const Locale('en'),
+  LocaleController? localeController,
 }) {
   return tester.pumpWidget(
     MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: locale,
-      home: ChangeNotifierProvider<SettingsController>.value(
-        value: controller,
+      home: MultiProvider(
+        providers: [
+          ChangeNotifierProvider<SettingsController>.value(value: controller),
+          ChangeNotifierProvider<LocaleController>.value(
+            value: localeController ?? LocaleController(FakeSettingsStore()),
+          ),
+        ],
         child: const SettingsScreen(),
       ),
     ),
@@ -216,7 +226,8 @@ void main() {
       // Arrange
       final settingsStore = FakeSettingsStore();
       final controller = _controllerFor(settingsStore: settingsStore);
-      await _pump(tester, controller);
+      final localeController = LocaleController(settingsStore);
+      await _pump(tester, controller, localeController: localeController);
       await tester.pumpAndSettle();
 
       // Act
@@ -228,13 +239,18 @@ void main() {
       // Assert
       expect(controller.languageTag, equals('en'));
       expect((await settingsStore.read()).languageTag, equals('en'));
+      // The app-level controller picks the change up without a second
+      // write to the store (issue #8 — see LocaleController's class doc).
+      expect(localeController.locale, equals(const Locale('en')));
+      expect(settingsStore.writeCallCount, equals(1));
     });
 
     testWidgets('choosing Hebrew sets the language tag to he', (tester) async {
       // Arrange
       final settingsStore = FakeSettingsStore();
       final controller = _controllerFor(settingsStore: settingsStore);
-      await _pump(tester, controller);
+      final localeController = LocaleController(settingsStore);
+      await _pump(tester, controller, localeController: localeController);
       await tester.pumpAndSettle();
 
       // Act
@@ -246,6 +262,8 @@ void main() {
       // Assert
       expect(controller.languageTag, equals('he'));
       expect((await settingsStore.read()).languageTag, equals('he'));
+      expect(localeController.locale, equals(const Locale('he')));
+      expect(settingsStore.writeCallCount, equals(1));
     });
 
     testWidgets(
@@ -256,7 +274,8 @@ void main() {
           initial: const AppSettings(languageTag: 'he'),
         );
         final controller = _controllerFor(settingsStore: settingsStore);
-        await _pump(tester, controller);
+        final localeController = LocaleController(settingsStore);
+        await _pump(tester, controller, localeController: localeController);
         await tester.pumpAndSettle();
 
         // Act
@@ -268,6 +287,7 @@ void main() {
         // Assert
         expect(controller.languageTag, isNull);
         expect((await settingsStore.read()).languageTag, isNull);
+        expect(localeController.locale, isNull);
       },
     );
 

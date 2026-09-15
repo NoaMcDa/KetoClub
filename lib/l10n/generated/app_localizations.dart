@@ -523,6 +523,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'no dishes found'**
   String get engineChipReasonNoDishesFound;
+
+  /// No description provided for @navExplore.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore'**
+  String get navExplore;
+
+  /// No description provided for @navScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get navScan;
+
+  /// No description provided for @navSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get navSaved;
+
+  /// No description provided for @navSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get navSettings;
+
+  /// No description provided for @scanPlaceholderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan a menu'**
+  String get scanPlaceholderTitle;
+
+  /// No description provided for @scanPlaceholderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Photographing a physical menu is coming in a later update. For now, paste a delivery link on Explore.'**
+  String get scanPlaceholderBody;
+
+  /// No description provided for @savedPlaceholderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved venues'**
+  String get savedPlaceholderTitle;
+
+  /// No description provided for @savedPlaceholderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a venue to find it here later. This is coming in a later update.'**
+  String get savedPlaceholderBody;
 }
 
 class _AppLocalizationsDelegate

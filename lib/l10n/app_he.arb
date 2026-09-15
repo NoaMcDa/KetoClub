@@ -121,5 +121,13 @@
   "engineChipReasonRateLimited": "המכסה היומית נוצלה",
   "engineChipReasonUnauthorised": "המפתח נדחה",
   "engineChipReasonBadResponse": "שגיאת בינה מלאכותית",
-  "engineChipReasonNoDishesFound": "לא נמצאו מנות"
+  "engineChipReasonNoDishesFound": "לא נמצאו מנות",
+  "navExplore": "גילוי",
+  "navScan": "סריקה",
+  "navSaved": "שמורים",
+  "navSettings": "הגדרות",
+  "scanPlaceholderTitle": "סריקת תפריט",
+  "scanPlaceholderBody": "צילום תפריט פיזי יתאפשר בעדכון עתידי. בינתיים, הדביקו קישור למשלוח במסך גילוי.",
+  "savedPlaceholderTitle": "מסעדות שמורות",
+  "savedPlaceholderBody": "שמרו מסעדה כדי למצוא אותה כאן בהמשך. האפשרות הזו תגיע בעדכון עתידי."
 }

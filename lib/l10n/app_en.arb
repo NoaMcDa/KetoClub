@@ -121,5 +121,13 @@
   "engineChipReasonRateLimited": "rate limited",
   "engineChipReasonUnauthorised": "key rejected",
   "engineChipReasonBadResponse": "AI error",
-  "engineChipReasonNoDishesFound": "no dishes found"
+  "engineChipReasonNoDishesFound": "no dishes found",
+  "navExplore": "Explore",
+  "navScan": "Scan",
+  "navSaved": "Saved",
+  "navSettings": "Settings",
+  "scanPlaceholderTitle": "Scan a menu",
+  "scanPlaceholderBody": "Photographing a physical menu is coming in a later update. For now, paste a delivery link on Explore.",
+  "savedPlaceholderTitle": "Saved venues",
+  "savedPlaceholderBody": "Save a venue to find it here later. This is coming in a later update."
 }
