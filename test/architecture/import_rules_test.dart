@@ -20,6 +20,7 @@ const layerRank = <String, int>{
   'utils': 1,
   'services': 2,
   'state': 3,
+  'theme': 4,
   'widgets': 4,
   'screens': 5,
 };
