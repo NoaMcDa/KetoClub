@@ -81,7 +81,7 @@ void main() {
         // Act: open Settings from the bottom navigation shell — the
         // Explore screen's own app bar no longer duplicates this shortcut
         // (issue #11 added the Settings tab; issue #33 removed the icon).
-        await tapAndSettle(tester, find.text(_en.navSettings));
+        await tapAndSettle(tester, navDestination(_en.navSettings));
 
         // Act: type a key and save it.
         await enterText(tester, _typedKey);
@@ -105,7 +105,7 @@ void main() {
         // Act: back to Explore via the tab (the Settings tab replaces the
         // route rather than pushing it, so there is nothing to pop) and
         // open the venue.
-        await tapAndSettle(tester, find.text(_en.navExplore));
+        await tapAndSettle(tester, navDestination(_en.navExplore));
         await enterText(tester, ref.platformId);
         await tapAndSettle(tester, find.text(_en.venueSearchOpen));
 

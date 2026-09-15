@@ -165,9 +165,15 @@ void main() {
       expect(find.text(fixture.red.name), findsOneWidget);
       expect(find.byType(DishCard), findsNWidgets(3));
 
-      // Act: scroll back up before filtering — the yellow tile and dish
-      // must be back in the lazy list's built range.
-      await tester.scrollUntilVisible(find.text(fixture.green.name), -200);
+      // Act: scroll back up until the yellow counter tile itself is on
+      // screen. Scrolling to some other widget and hoping the tile came
+      // with it depends on the viewport's height — it holds on web and
+      // fails on the smaller flutter-tester surface. Scroll to the thing
+      // about to be tapped.
+      await tester.scrollUntilVisible(
+        find.text(_en.tileYellowLabel.toUpperCase()),
+        -200,
+      );
       await tester.pumpAndSettle();
 
       // Act: tap the "With changes" tile to narrow to the modifiable dish

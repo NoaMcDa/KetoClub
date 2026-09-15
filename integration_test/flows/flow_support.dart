@@ -21,7 +21,7 @@
 // where a browser cannot start. `flutter build web --target=…` does NOT catch
 // it: that resolves imports from the package root instead.
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/app.dart';
 import 'package:ketoclub/models/analysis.dart';
@@ -52,6 +52,16 @@ Future<void> enterText(WidgetTester tester, String text) async {
   await tester.enterText(find.byType(EditableText).first, text);
   await tester.pumpAndSettle();
 }
+
+/// The bottom-navigation destination labelled [label].
+///
+/// Scoped to the [NavigationBar] on purpose. `navSettings` and
+/// `settingsTitle` are both the literal string "Settings", so a bare
+/// `find.text('Settings')` matches two widgets whenever the Settings tab
+/// is showing — the destination label and the app bar title — and a tap
+/// on an ambiguous finder fails. Every flow test taps tabs through this.
+Finder navDestination(String label) =>
+    find.descendant(of: find.byType(NavigationBar), matching: find.text(label));
 
 /// Taps the widget [finder] resolves to and settles.
 Future<void> tapAndSettle(WidgetTester tester, Finder finder) async {
