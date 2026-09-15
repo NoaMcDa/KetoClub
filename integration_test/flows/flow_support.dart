@@ -90,10 +90,21 @@ final class FakeAppDependencies {
   /// The faked logger.
   final FlowFakeAppLogger logger;
 
+  /// When set, [dependencies] wires this in place of [classifier].
+  ///
+  /// Every flow test that only needs to script "what the top-level
+  /// classifier answered" uses [classifier] directly, matching the rest of
+  /// this harness. A flow that must exercise real routing — the real
+  /// `RoutingMenuClassifier` degrading to a real `HeuristicMenuClassifier`
+  /// over a faked LLM engine and a faked `Connectivity`, rather than a
+  /// classifier scripted with the finished answer — sets this instead
+  /// (see `offline_analysis_flow_test.dart`).
+  MenuClassifier? classifierOverride;
+
   /// The dependency set to hand to the app widget.
   AppDependencies get dependencies => AppDependencies(
     menuRepository: repository,
-    menuClassifier: classifier,
+    menuClassifier: classifierOverride ?? classifier,
     keyStore: keyStore,
     settingsStore: settingsStore,
     clock: clock,

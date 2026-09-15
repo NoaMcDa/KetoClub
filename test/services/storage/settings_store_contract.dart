@@ -28,7 +28,7 @@ void runSettingsStoreContract(String name, SettingsStore Function() build) {
       final store = build();
       const settings = AppSettings(
         languageTag: 'he',
-        filter: MenuFilter.all,
+        filter: MenuFilter.greenOnly,
         estimationConsentGiven: true,
         lastVenue: VenueRef(source: MenuSource.wolt, platformId: 'v1'),
       );

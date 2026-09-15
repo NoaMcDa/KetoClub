@@ -28,7 +28,7 @@ final class AppSettings {
   /// value a virgin store should read back.
   const new({
     this.languageTag,
-    this.filter = MenuFilter.greenAndYellow,
+    this.filter = MenuFilter.all,
     this.estimationConsentGiven = false,
     this.lastVenue,
   });

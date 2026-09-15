@@ -112,6 +112,32 @@ void main() {
       },
     );
 
+    test('an install that persisted greenAndYellow before issue #35 changed '
+        'the default and the Settings control still loads it without a '
+        'crash', () async {
+      // Arrange: the exact JSON shape `PrefsSettingsStore` wrote before
+      // `AppSettings`'s default filter changed from greenAndYellow to
+      // all, and before the Settings screen's control dropped
+      // greenAndYellow as a choice — `MenuFilter.tryParse` still knows
+      // the name (models/analysis.dart), so this must decode cleanly
+      // rather than falling back to today's defaults.
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        'flutter.ketoclub_settings':
+            '{"languageTag":null,"filter":"greenAndYellow",'
+            '"estimationConsentGiven":false,"lastVenue":null}',
+      });
+      final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
+
+      // Act
+      final result = await store.read();
+
+      // Assert: the persisted value survives, not today's default.
+      expect(result.filter, equals(MenuFilter.greenAndYellow));
+      expect(result.languageTag, isNull);
+      expect(result.estimationConsentGiven, isFalse);
+      expect(result.lastVenue, isNull);
+    });
+
     test(
       'write then read round-trips every field, including nullable ones',
       () async {

@@ -292,10 +292,15 @@ void main() {
     );
 
     testWidgets('choosing each filter persists it', (tester) async {
+      // The four values on offer match exactly what the menu screen's own
+      // verdict counter tiles can produce (issue #35); greenAndYellow is
+      // no longer one of the choices here, though it still decodes safely
+      // for an install that persisted it before this change.
       for (final testCase in <({String label, MenuFilter filter})>[
-        (label: _en.filterGreenOnly, filter: MenuFilter.greenOnly),
+        (label: _en.tileGreenLabel, filter: MenuFilter.greenOnly),
+        (label: _en.tileYellowLabel, filter: MenuFilter.yellowOnly),
+        (label: _en.tileRedLabel, filter: MenuFilter.redOnly),
         (label: _en.filterAll, filter: MenuFilter.all),
-        (label: _en.filterGreenAndYellow, filter: MenuFilter.greenAndYellow),
       ]) {
         // Arrange
         final settingsStore = FakeSettingsStore();
@@ -314,6 +319,29 @@ void main() {
         expect((await settingsStore.read()).filter, equals(testCase.filter));
       }
     });
+
+    testWidgets(
+      'an install with a persisted greenAndYellow filter opens Settings '
+      'without crashing, even though no segment offers that choice any '
+      'more',
+      (tester) async {
+        // Arrange: a filter value no longer reachable from this control
+        // (issue #35), but still a legal, previously-persisted one.
+        final settingsStore = FakeSettingsStore(
+          initial: const AppSettings(filter: MenuFilter.greenAndYellow),
+        );
+        final controller = _controllerFor(settingsStore: settingsStore);
+
+        // Act
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Assert: the screen renders — no exception, and the stored value
+        // is unchanged since the user has not touched the control.
+        expect(find.byType(SettingsScreen), findsOneWidget);
+        expect(controller.filter, equals(MenuFilter.greenAndYellow));
+      },
+    );
 
     testWidgets(
       'clearing the cache calls the repository and shows settingsCacheCleared',

@@ -50,7 +50,7 @@ final class MenuController extends ChangeNotifier {
   int? _fetchStatusCode;
   bool _isFromCache = false;
   MenuFetchFailureReason? _staleReason;
-  MenuFilter _filter = MenuFilter.greenAndYellow;
+  MenuFilter _filter = MenuFilter.all;
 
   /// Whether [open] is currently loading or classifying a menu.
   bool get isLoading => _isLoading;

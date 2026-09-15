@@ -603,7 +603,7 @@ void main() {
         // Assert: a filter selects verdicts, and there are none to select, so
         // applying it would hand the user an empty menu. §6.6 forbids letting
         // a failed analysis cost the menu itself.
-        expect(controller.filter, MenuFilter.greenAndYellow);
+        expect(controller.filter, MenuFilter.all);
         expect(controller.visibleRows, hasLength(2));
         expect(controller.visibleRows.every((r) => r.analysis == null), isTrue);
         expect(controller.menu, isNotNull);

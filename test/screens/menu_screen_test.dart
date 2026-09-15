@@ -601,8 +601,9 @@ void main() {
         await _pump(tester, controller);
         await tester.pumpAndSettle();
 
-        // Assert: the default filter (greenAndYellow) never shows red.
-        expect(find.text('Spaghetti Carbonara'), findsNothing);
+        // Assert: the default filter (all) shows every dish, red included.
+        expect(find.text('Steak'), findsOneWidget);
+        expect(find.text('Spaghetti Carbonara'), findsOneWidget);
         expect(find.text(_en.tileRedLabel.toUpperCase()), findsOneWidget);
 
         // Act: tap the Skip tile.
@@ -686,7 +687,6 @@ void main() {
       );
       await _pump(tester, controller);
       await tester.pumpAndSettle();
-      expect(find.byType(DishCard), findsNWidgets(2));
 
       // Act: tap the Order-as-is tile. Scoped to VerdictCounterTiles: its
       // label text is identical to the green DishCard's own StatusBadge

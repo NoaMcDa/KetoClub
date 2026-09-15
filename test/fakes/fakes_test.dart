@@ -316,11 +316,11 @@ void main() {
   });
 
   group('AppSettings', () {
-    test('defaults are greenAndYellow, no consent, no venue, no language', () {
+    test('defaults are all, no consent, no venue, no language', () {
       const settings = AppSettings();
 
       expect(settings.languageTag, isNull);
-      expect(settings.filter, equals(MenuFilter.greenAndYellow));
+      expect(settings.filter, equals(MenuFilter.all));
       expect(settings.estimationConsentGiven, isFalse);
       expect(settings.lastVenue, isNull);
     });
@@ -328,7 +328,7 @@ void main() {
     test('tryFrom(x.toJson()) round-trips settings with every field set', () {
       const settings = AppSettings(
         languageTag: 'he',
-        filter: MenuFilter.all,
+        filter: MenuFilter.greenOnly,
         estimationConsentGiven: true,
         lastVenue: VenueRef(source: MenuSource.tenbis, platformId: '9'),
       );
@@ -445,14 +445,14 @@ void main() {
     });
 
     test('== returns false for settings differing in filter', () {
-      const a = AppSettings(filter: MenuFilter.all);
+      const a = AppSettings();
       const b = AppSettings(filter: MenuFilter.greenOnly);
 
       expect(a, isNot(equals(b)));
     });
 
     test('toString mentions the language and filter', () {
-      const settings = AppSettings(languageTag: 'he', filter: MenuFilter.all);
+      const settings = AppSettings(languageTag: 'he');
 
       expect(settings.toString(), contains('he'));
       expect(settings.toString(), contains('all'));

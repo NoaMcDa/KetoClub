@@ -260,8 +260,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     context.read<LocaleController>().applyTag(tag);
   }
 
-  /// The three-way [MenuFilter] default, mirroring `MenuScreen`'s own
-  /// filter control (architecture.md §6.6).
+  /// The [MenuFilter] default, offering exactly the four values the menu
+  /// screen's own verdict counter tiles can produce
+  /// ([MenuFilter.greenOnly], [MenuFilter.yellowOnly], [MenuFilter.redOnly]
+  /// and [MenuFilter.all]) — issue #35 dropped [MenuFilter.greenAndYellow]
+  /// from this control since no tile can reproduce it either, and reused
+  /// the tiles' own labels so the two controls read as the same vocabulary
+  /// (architecture.md §6.6). [MenuFilter.greenAndYellow] itself is
+  /// untouched: still a real, correctly-decoding value for a filter
+  /// persisted by an install that predates issue #35, just not one this
+  /// control (or any tile) offers any more.
   Widget _filterSection(
     BuildContext context,
     AppLocalizations l10n,
@@ -280,11 +288,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
           segments: [
             ButtonSegment(
               value: MenuFilter.greenOnly,
-              label: Text(l10n.filterGreenOnly),
+              label: Text(l10n.tileGreenLabel),
             ),
             ButtonSegment(
-              value: MenuFilter.greenAndYellow,
-              label: Text(l10n.filterGreenAndYellow),
+              value: MenuFilter.yellowOnly,
+              label: Text(l10n.tileYellowLabel),
+            ),
+            ButtonSegment(
+              value: MenuFilter.redOnly,
+              label: Text(l10n.tileRedLabel),
             ),
             ButtonSegment(value: MenuFilter.all, label: Text(l10n.filterAll)),
           ],

@@ -30,7 +30,7 @@ void main() {
       expect(freshController.hasKey, isFalse);
       expect(freshController.consentGiven, isFalse);
       expect(freshController.languageTag, isNull);
-      expect(freshController.filter, MenuFilter.greenAndYellow);
+      expect(freshController.filter, MenuFilter.all);
       expect(freshController.isBusy, isFalse);
     });
 
