@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/price_format.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
@@ -10,14 +11,17 @@ import 'package:ketoclub/widgets/status_badge.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
 
 /// Pumps [child] inside a localised [MaterialApp] and a [Scaffold], the
-/// shape every widget test in `test/widgets/` uses.
+/// shape every widget test in `test/widgets/` uses. [theme] defaults to
+/// null, the bare-[MaterialApp] shape most of this file's tests use.
 Future<void> _pump(
   WidgetTester tester,
   Widget child, {
   Locale locale = const Locale('en'),
+  ThemeData? theme,
 }) {
   return tester.pumpWidget(
     MaterialApp(
+      theme: theme,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: locale,
@@ -358,6 +362,48 @@ void main() {
       );
       expect(rail.color, tone.rail);
     });
+
+    for (final entry in {
+      'light': AppTheme.light(),
+      'dark': AppTheme.dark(),
+    }.entries) {
+      testWidgets("build paints a non-keto row on the ${entry.key} theme's "
+          'NeutralSurfaces surface2/line2, not a Material 3 substitute', (
+        tester,
+      ) async {
+        // Arrange
+        final row = DishRow(
+          dish: _dish(),
+          category: 'Mains',
+          analysis: const AnalysedDish(
+            dishId: 'dish_1',
+            name: 'Spaghetti Carbonara',
+            verdict: DishVerdict.nonKeto,
+            why: 'Pasta is a non-keto base.',
+          ),
+        );
+
+        // Act
+        await _pump(
+          tester,
+          DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+          theme: entry.value,
+        );
+        final decoration =
+            tester
+                    .widget<DecoratedBox>(find.byType(DecoratedBox).first)
+                    .decoration
+                as BoxDecoration;
+        final neutral = entry.value.extension<NeutralSurfaces>()!;
+
+        // Assert: the artboard's `--surface2` / `--line2`
+        // (`.design/theme-snippet.txt`), not
+        // `colorScheme.surfaceContainerHighest` /
+        // `colorScheme.outlineVariant`.
+        expect(decoration.color, neutral.surface2);
+        expect(decoration.border, Border.all(color: neutral.line2));
+      });
+    }
 
     testWidgets('build renders the Hebrew waiter-card label in the he locale', (
       tester,

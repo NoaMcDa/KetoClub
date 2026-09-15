@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/theme/app_theme.dart';
+import 'package:ketoclub/theme/app_tokens.dart';
 import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 
@@ -73,6 +74,125 @@ void main() {
     expect(light.green, isNot(dark.green));
     expect(light.amber, isNot(dark.amber));
     expect(light.red, isNot(dark.red));
+  });
+
+  group('NeutralSurfaces', () {
+    test('the light theme resolves the artboard --surface2 and --line2 '
+        'exactly', () {
+      // Act
+      final neutral = AppTheme.light().extension<NeutralSurfaces>()!;
+
+      // Assert: `.design/theme-snippet.txt`'s `.app` block —
+      // `--surface2: #f4efe4` and `--line2: rgba(31,28,23,0.07)`.
+      expect(neutral.surface2, AppTokens.lightSurface2);
+      expect(
+        neutral.line2,
+        AppTokens.lightInk.withValues(alpha: AppTokens.line2Alpha),
+      );
+    });
+
+    test(
+      'the dark theme resolves the artboard --surface2 and --line2 exactly',
+      () {
+        // Act
+        final neutral = AppTheme.dark().extension<NeutralSurfaces>()!;
+
+        // Assert: `.design/theme-snippet.txt`'s `.app.dark` block —
+        // `--surface2: #272218` and `--line2: rgba(245,240,228,0.07)`.
+        expect(neutral.surface2, AppTokens.darkSurface2);
+        expect(
+          neutral.line2,
+          AppTokens.darkInk.withValues(alpha: AppTokens.line2Alpha),
+        );
+      },
+    );
+
+    test('light and dark resolve to different values', () {
+      // Arrange
+      final light = AppTheme.light().extension<NeutralSurfaces>()!;
+      final dark = AppTheme.dark().extension<NeutralSurfaces>()!;
+
+      // Assert
+      expect(light.surface2, isNot(dark.surface2));
+      expect(light.line2, isNot(dark.line2));
+    });
+
+    test('copyWith replaces only the given fields', () {
+      // Arrange
+      final base = AppTheme.light().extension<NeutralSurfaces>()!;
+
+      // Act
+      final copy = base.copyWith(surface2: AppTokens.darkSurface2);
+
+      // Assert
+      expect(copy.surface2, AppTokens.darkSurface2);
+      expect(copy.line2, base.line2);
+    });
+
+    test('lerp at the endpoints returns the matching palette', () {
+      // Arrange
+      final light = AppTheme.light().extension<NeutralSurfaces>()!;
+      final dark = AppTheme.dark().extension<NeutralSurfaces>()!;
+
+      // Act & Assert
+      expect(light.lerp(dark, 0).surface2, light.surface2);
+      expect(light.lerp(dark, 1).surface2, dark.surface2);
+    });
+
+    test('lerp against a foreign extension type returns this unchanged', () {
+      // Arrange
+      final light = AppTheme.light().extension<NeutralSurfaces>()!;
+
+      // Act & Assert
+      expect(light.lerp(null, 0.5), same(light));
+    });
+
+    testWidgets('of falls back to the light values when unregistered', (
+      tester,
+    ) async {
+      // Arrange: a bare MaterialApp with no theme.
+      late final BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      // Act
+      final resolved = NeutralSurfaces.of(capturedContext);
+
+      // Assert
+      expect(resolved, AppTheme.light().extension<NeutralSurfaces>());
+    });
+
+    testWidgets('of resolves the registered extension when one exists', (
+      tester,
+    ) async {
+      // Arrange
+      late final BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.dark(),
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      // Act
+      final resolved = NeutralSurfaces.of(capturedContext);
+
+      // Assert
+      expect(resolved, AppTheme.dark().extension<NeutralSurfaces>());
+    });
   });
 
   group('bilingual fonts', () {

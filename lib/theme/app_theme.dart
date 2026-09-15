@@ -30,6 +30,10 @@ abstract final class AppTheme {
       ink: ink,
       ink2: AppTokens.lightInk2,
       verdictColors: VerdictColors.light(),
+      neutralSurfaces: NeutralSurfaces(
+        surface2: AppTokens.lightSurface2,
+        line2: ink.withValues(alpha: AppTokens.line2Alpha),
+      ),
       photoGradient: const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -62,6 +66,10 @@ abstract final class AppTheme {
       ink: ink,
       ink2: AppTokens.darkInk2,
       verdictColors: VerdictColors.dark(),
+      neutralSurfaces: NeutralSurfaces(
+        surface2: AppTokens.darkSurface2,
+        line2: ink.withValues(alpha: AppTokens.line2Alpha),
+      ),
       photoGradient: const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -79,6 +87,7 @@ abstract final class AppTheme {
     required Color ink,
     required Color ink2,
     required VerdictColors verdictColors,
+    required NeutralSurfaces neutralSurfaces,
     required LinearGradient photoGradient,
     required Color photoInk,
   }) {
@@ -99,8 +108,77 @@ abstract final class AppTheme {
       ),
       extensions: [
         verdictColors,
+        neutralSurfaces,
         PhotoPlaceholder(gradient: photoGradient, ink: photoInk),
       ],
+    );
+  }
+}
+
+/// The artboard's `--surface2` and `--line2`: a second, quieter surface
+/// and a fainter hairline shared across verdicts, rather than belonging to
+/// any one of them (`.design/theme-snippet.txt`).
+///
+/// A [ThemeExtension], the same shape as [PhotoPlaceholder] just below and
+/// for the same reason: [VerdictTone] carries only the roles a single
+/// verdict palette needs, and these two tokens are neutral, not
+/// per-verdict, so they do not belong there. [line2] is pre-composed as
+/// `ink` at [AppTokens.line2Alpha] — the same alpha-over-ink treatment
+/// [AppTheme] already gives [ThemeData.dividerColor] from
+/// [AppTokens.lineAlpha] — rather than exposing the bare alpha, so a caller
+/// never has to know which ink colour to layer it over.
+@immutable
+final class NeutralSurfaces extends ThemeExtension<NeutralSurfaces> {
+  /// Creates a neutral-surfaces style.
+  const new({required this.surface2, required this.line2});
+
+  /// The artboard's `--surface2`: a second, quieter surface than
+  /// [ThemeData.cardColor]/[ColorScheme.surface].
+  final Color surface2;
+
+  /// The artboard's `--line2`: a fainter hairline than
+  /// [ThemeData.dividerColor].
+  final Color line2;
+
+  @override
+  NeutralSurfaces copyWith({Color? surface2, Color? line2}) {
+    return NeutralSurfaces(
+      surface2: surface2 ?? this.surface2,
+      line2: line2 ?? this.line2,
+    );
+  }
+
+  @override
+  NeutralSurfaces lerp(ThemeExtension<NeutralSurfaces>? other, double t) {
+    if (other is! NeutralSurfaces) return this;
+    return NeutralSurfaces(
+      surface2: Color.lerp(surface2, other.surface2, t) ?? surface2,
+      line2: Color.lerp(line2, other.line2, t) ?? line2,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is NeutralSurfaces &&
+      other.surface2 == surface2 &&
+      other.line2 == line2;
+
+  @override
+  int get hashCode => Object.hash(surface2, line2);
+
+  /// Reads the [NeutralSurfaces] registered on the ambient [Theme].
+  ///
+  /// Falls back to the light-theme values when none is registered, the
+  /// same fallback [VerdictColors.of] uses and for the same reason: many
+  /// existing widget tests pump a bare [MaterialApp] with no `theme:`
+  /// argument.
+  // ignore: prefer_constructors_over_static_methods
+  static NeutralSurfaces of(BuildContext context) {
+    final extension = Theme.of(context).extension<NeutralSurfaces>();
+    if (extension != null) return extension;
+    return NeutralSurfaces(
+      surface2: AppTokens.lightSurface2,
+      line2: AppTokens.lightInk.withValues(alpha: AppTokens.line2Alpha),
     );
   }
 }

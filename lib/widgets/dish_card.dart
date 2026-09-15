@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/price_format.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
@@ -72,8 +73,9 @@ class _DishCardState extends State<DishCard> {
         ? (_nonBlank(analysis?.modification) ?? l10n.dishCardScriptFallback)
         : null;
     final netCarbs = analysis?.netCarbsEstimate;
+    final neutralSurfaces = NeutralSurfaces.of(context);
 
-    final cardEdge = _cardEdge(theme, verdict, tone);
+    final cardEdge = _cardEdge(theme, neutralSurfaces, verdict, tone);
     final content = Padding(
       padding: const EdgeInsets.all(12),
       child: Column(
@@ -143,7 +145,7 @@ class _DishCardState extends State<DishCard> {
       borderRadius: BorderRadius.circular(15),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: _cardBackground(theme, verdict, tone),
+          color: _cardBackground(theme, neutralSurfaces, verdict, tone),
           border: Border.all(color: cardEdge),
         ),
         child: tone == null
@@ -174,36 +176,37 @@ String? _nonBlank(String? value) =>
 /// table: green uses its own tint, amber the plain surface, red a second,
 /// quieter surface. [tone] is required exactly when [verdict] is not null.
 ///
-/// `VerdictTone` has no field for amber's and red's card backgrounds,
-/// which are neutral tokens shared by every verdict rather than
-/// per-verdict ones — amber's is the theme's own card colour
-/// ([ThemeData.cardColor]), already exposed; red's is
-/// [ColorScheme.surfaceContainerHighest], the Material 3 "second surface"
-/// role `AppTheme` already derives from the same seed. Neither is a colour
-/// literal in this file. See this issue's final report for why red does
-/// not read `--surface2` directly: that token is not yet exposed on
-/// [ThemeData] outside `VerdictColors`, which this file does not own.
+/// `VerdictTone` has no field for amber's and red's card backgrounds, which
+/// are neutral tokens shared by every verdict rather than per-verdict
+/// ones — amber's is the theme's own card colour ([ThemeData.cardColor]),
+/// already exposed; red's is [NeutralSurfaces.surface2], the artboard's
+/// `--surface2`. Neither is a colour literal in this file.
 Color _cardBackground(
   ThemeData theme,
+  NeutralSurfaces neutralSurfaces,
   DishVerdict? verdict,
   VerdictTone? tone,
 ) => switch (verdict) {
   null => theme.cardColor,
   DishVerdict.orderAsIs => tone!.tint,
   DishVerdict.modifiable => theme.cardColor,
-  DishVerdict.nonKeto => theme.colorScheme.surfaceContainerHighest,
+  DishVerdict.nonKeto => neutralSurfaces.surface2,
 };
 
 /// The card edge colour for [verdict], the border-colour counterpart of
 /// [_cardBackground] — see its doc comment for where each neutral token
-/// comes from.
-Color _cardEdge(ThemeData theme, DishVerdict? verdict, VerdictTone? tone) =>
-    switch (verdict) {
-      null => theme.dividerColor,
-      DishVerdict.orderAsIs => tone!.tint,
-      DishVerdict.modifiable => theme.dividerColor,
-      DishVerdict.nonKeto => theme.colorScheme.outlineVariant,
-    };
+/// comes from. Red's is [NeutralSurfaces.line2], the artboard's `--line2`.
+Color _cardEdge(
+  ThemeData theme,
+  NeutralSurfaces neutralSurfaces,
+  DishVerdict? verdict,
+  VerdictTone? tone,
+) => switch (verdict) {
+  null => theme.dividerColor,
+  DishVerdict.orderAsIs => tone!.tint,
+  DishVerdict.modifiable => theme.dividerColor,
+  DishVerdict.nonKeto => neutralSurfaces.line2,
+};
 
 /// The net-carb chip background for [verdict]: the plain surface for
 /// green (the artboard's `--surface`), and [tone]'s own tint for amber and
