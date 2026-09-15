@@ -147,6 +147,173 @@ void main() {
       });
     });
 
+    group('userPrompt — golden fixture menu (#17 audit)', () {
+      // A realistic multi-category, multi-dish menu, exercising a plain
+      // dish, a dish with one option group, and a dish with two option
+      // groups together, so the golden string below is a genuine
+      // end-to-end check of `userPrompt` rather than a single-dish
+      // structural assertion (the groups above already cover those).
+      test('userPrompt renders the exact expected text for an English '
+          'fixture menu', () {
+        // Arrange
+        final menu = _menuOf([
+          (
+            'Starters',
+            [
+              const Dish(
+                id: 'starter-1',
+                name: 'Greek Salad',
+                description: 'Feta, olives and cucumber',
+                price: 38,
+                options: [],
+              ),
+              const Dish(
+                id: 'starter-2',
+                name: 'Buffalo Wings',
+                description: 'Crispy wings with hot sauce',
+                price: 44,
+                options: [
+                  DishOption(name: 'Sauce', values: ['Buffalo', 'BBQ']),
+                ],
+              ),
+            ],
+          ),
+          (
+            'Mains',
+            [
+              const Dish(
+                id: 'main-1',
+                name: 'Grilled Salmon',
+                description: 'Served with lemon butter',
+                price: 96,
+                options: [
+                  DishOption(
+                    name: 'Side',
+                    values: ['French Fries', 'Green Salad'],
+                  ),
+                ],
+              ),
+              const Dish(
+                id: 'main-2',
+                name: 'Margherita Pizza',
+                description: 'Tomato, mozzarella, basil',
+                price: 58,
+                options: [],
+              ),
+              const Dish(
+                id: 'main-3',
+                name: 'Beef Burger',
+                description: 'Served on a brioche bun with fries',
+                price: 64,
+                options: [
+                  DishOption(
+                    name: 'Bun',
+                    values: ['Brioche bun', 'Lettuce wrap'],
+                  ),
+                  DishOption(name: 'Side', values: ['Fries', 'Salad']),
+                ],
+              ),
+            ],
+          ),
+          (
+            'Desserts',
+            [
+              const Dish(
+                id: 'dessert-1',
+                name: 'Chocolate Cake',
+                description: 'Rich dark chocolate',
+                price: 32,
+                options: [],
+              ),
+            ],
+          ),
+        ]);
+
+        // Act
+        final prompt = MenuAnalysisPrompt.userPrompt(menu);
+
+        // Assert
+        expect(
+          prompt,
+          'starter-1 | Starters | Greek Salad | Feta, olives and cucumber | '
+          '\n'
+          'starter-2 | Starters | Buffalo Wings | Crispy wings with hot '
+          'sauce | Sauce: Buffalo, BBQ\n'
+          'main-1 | Mains | Grilled Salmon | Served with lemon butter | '
+          'Side: French Fries, Green Salad\n'
+          'main-2 | Mains | Margherita Pizza | Tomato, mozzarella, '
+          'basil | \n'
+          'main-3 | Mains | Beef Burger | Served on a brioche bun with '
+          'fries | Bun: Brioche bun, Lettuce wrap; Side: Fries, Salad\n'
+          'dessert-1 | Desserts | Chocolate Cake | Rich dark chocolate '
+          '| ',
+        );
+      });
+
+      test('userPrompt renders the exact expected text for a Hebrew '
+          'fixture menu', () {
+        // Arrange
+        final menu = _menuOf([
+          (
+            'מנות ראשונות',
+            [
+              const Dish(
+                id: 'starter-1',
+                name: 'סלט יווני',
+                description: 'פטה, זיתים ומלפפון',
+                price: 38,
+                options: [],
+              ),
+              const Dish(
+                id: 'starter-2',
+                name: 'כנפי עוף',
+                description: "צ'יפס וכנפיים פריכות עם רוטב חריף",
+                price: 44,
+                options: [
+                  DishOption(name: 'רוטב', values: ['חריף', 'ברביקיו']),
+                ],
+              ),
+            ],
+          ),
+          (
+            'עיקריות',
+            [
+              const Dish(
+                id: 'main-1',
+                name: 'סלמון בגריל',
+                description: 'מוגש עם חמאת לימון ופירה תפוחי אדמה',
+                price: 96,
+                options: [
+                  DishOption(name: 'תוספת', values: ["צ'יפס", 'סלט ירוק']),
+                ],
+              ),
+              const Dish(
+                id: 'main-2',
+                name: 'המבורגר בקר',
+                description: 'מוגש בלחמנייה עם צ׳יפס',
+                price: 64,
+                options: [],
+              ),
+            ],
+          ),
+        ]);
+
+        // Act
+        final prompt = MenuAnalysisPrompt.userPrompt(menu);
+
+        // Assert
+        expect(
+          prompt,
+          'starter-1 | מנות ראשונות | סלט יווני | פטה, זיתים ומלפפון | \n'
+          "starter-2 | מנות ראשונות | כנפי עוף | צ'יפס וכנפיים פריכות "
+          'עם רוטב חריף | רוטב: חריף, ברביקיו\n'
+          'main-1 | עיקריות | סלמון בגריל | מוגש עם חמאת לימון ופירה '
+          "תפוחי אדמה | תוספת: צ'יפס, סלט ירוק\n"
+          'main-2 | עיקריות | המבורגר בקר | מוגש בלחמנייה עם צ׳יפס | ',
+        );
+      });
+    });
+
     group('userPrompt', () {
       test('userPrompt emits one line per dish, in menu order', () {
         // Arrange

@@ -253,7 +253,7 @@ const Map<String, String> carbModifiersEn = <String, String>{
 };
 
 // ---------------------------------------------------------------------------
-// carbModifiers — Hebrew (72 triggers → waiter sentence)
+// carbModifiers — Hebrew (75 triggers → waiter sentence)
 // ---------------------------------------------------------------------------
 
 const String _sPirePotato =
@@ -289,9 +289,12 @@ const String _sToastHe = 'אפשר בבקשה בלי הלחם, ועם סלט א�
 const String _sTortiyaHe = 'אפשר בבקשה לקבל את המנה בקערה, בלי הטורטייה?';
 
 /// Carb-modifier triggers (waiter-script templates) in Hebrew
-/// (`vocabulary_spec.md` "carbModifiers — Hebrew"). 72 entries: the
+/// (`vocabulary_spec.md` "carbModifiers — Hebrew"). 75 entries: the
 /// "/"-separated variants in the spec are flattened here into one map
-/// entry per variant, sharing the same sentence.
+/// entry per variant, sharing the same sentence. Includes three #12
+/// audit additions (agent 1D): `מייפל` and `זיגוג בלסמי`, which had no
+/// Hebrew counterpart at all, and `ראפ`, moved here from
+/// [nonKetoBasesHe] to match its English counterpart `wrap` (D-V3).
 const Map<String, String> carbModifiersHe = <String, String>{
   'פירה': _sPirePotato,
   'מחית תפוחי אדמה': _sMechitPotato,
@@ -370,14 +373,27 @@ const Map<String, String> carbModifiersHe = <String, String>{
   'בצל מטוגן': 'אפשר בבקשה בלי הבצל המטוגן? הוא מקומח.',
   'תמרינד': 'אפשר בבקשה בלי רוטב התמרינד? יש בו סוכר.',
   'הויסין': 'אפשר בבקשה בלי רוטב ההויסין? יש בו סוכר.',
+
+  // #12 audit additions (agent 1D): `maple` and `balsamic glaze` had no
+  // Hebrew counterpart at all, the exact silent-vocabulary-gap failure
+  // mode CLAUDE.md warns about.
+  'מייפל': 'אפשר בבקשה בלי סירופ המייפל?',
+  'זיגוג בלסמי': 'אפשר בבקשה בלי זיגוג הבלסמי? הוא מצומצם עם סוכר.',
+
+  // #12 audit fix (agent 1D): `ראפ` ("wrap") was in [nonKetoBasesHe]
+  // (red, unsalvageable) while its English counterpart `wrap` is a
+  // [carbModifiersEn] trigger (yellow, D-V3 — a wrap's tortilla merely
+  // carries the filling and is removable, same as `tortilla`/`טורטייה`
+  // above). Moved here to match D-V3 and the English vocabulary.
+  'ראפ': 'אפשר בבקשה לקבל את המילוי בקערה, בלי הראפ?',
 };
 
 // ---------------------------------------------------------------------------
-// nonKetoBases — English (91 triggers)
+// nonKetoBases — English (92 triggers)
 // ---------------------------------------------------------------------------
 
 /// Non-keto-base triggers in English: any match makes a dish red with no
-/// waiter script (`vocabulary_spec.md` "nonKetoBases — English"). 91
+/// waiter script (`vocabulary_spec.md` "nonKetoBases — English"). 92
 /// entries: README's 16, minus the three D-V3 moves (`sandwich`,
 /// `brioche bun`, `toast`, now [carbModifiersEn]), plus verified plural
 /// and spelling variants, D-V2 breading, and D-V4 families.
@@ -429,11 +445,17 @@ const List<String> nonKetoBasesEn = <String>[
 ];
 
 // ---------------------------------------------------------------------------
-// nonKetoBases — Hebrew (87 triggers)
+// nonKetoBases — Hebrew (107 triggers)
 // ---------------------------------------------------------------------------
 
 /// Non-keto-base triggers in Hebrew (`vocabulary_spec.md` "nonKetoBases —
-/// Hebrew"). 87 entries. `penne`'s transliteration (`פנה`) is
+/// Hebrew"). 107 entries, including 20 #12 audit additions (agent 1D)
+/// for English triggers that had no Hebrew counterpart at all —
+/// `fish and chips`/`fish chips`, `pancake(s)`, `waffle(s)`, `katsu`,
+/// `milanese`, `macaroni`, `mac and cheese`, `polenta`, `grits`,
+/// `empanada`, `gyoza`, `bao`, `arancini`, `croquette`, `pie`,
+/// `burrito`, `quesadilla`, `taco shell` — the exact silent-vocabulary
+/// gap CLAUDE.md warns about. `penne`'s transliteration (`פנה`) is
 /// deliberately absent: it is an ordinary Hebrew word ("turned"), so a
 /// bare trigger would redden unrelated dishes; Israeli menus print
 /// *Penne* in Latin and `פסטה` catches the rest.
@@ -457,7 +479,31 @@ const List<String> nonKetoBasesHe = <String>[
   'אודון', 'סובה', 'פאד תאי', 'לו מיין', 'ורמישלי',
   'קרפ', 'קראפ', "בלינצ'ס", 'מלבי', 'קנאפה', 'בקלאווה', 'סופלה', 'בראוניז',
   'עוגה', 'עוגיות', 'טארט', 'קרם ברולה', 'חלבה', 'גלידה', 'מילקשייק',
-  'חלה', 'בייגל', 'ראפ', 'קרואסון', 'דונאט', 'לביבות', 'ניוקי בטטה',
+  'חלה', 'בייגל', 'קרואסון', 'דונאט', 'לביבות', 'ניוקי בטטה',
+
+  // #12 audit additions (agent 1D): these English triggers had no Hebrew
+  // counterpart at all — the exact silent-vocabulary-gap failure mode
+  // CLAUDE.md warns about (English tests pass while the Hebrew
+  // vocabulary is silently dead). `ראפ` ("wrap") used to be here too;
+  // it moved to [carbModifiersHe] — see that map's doc comment.
+  "פיש אנד צ'יפס", "דג וצ'יפס", // fish and chips / fish chips
+  'פנקייק', 'פנקייקים', // pancake / pancakes
+  'וופל', 'וופלים', // waffle / waffles
+  'קטסו', // katsu
+  'מילנז', // milanese
+  'מקרוני', // macaroni
+  "מק אנד צ'יז", // mac and cheese
+  'פולנטה', // polenta
+  'גריטס', // grits
+  'אמפנדה', // empanada
+  'גיוזה', // gyoza
+  'באו', // bao
+  "ארנצ'יני", // arancini
+  'קרוקט', // croquette
+  'פאי', // pie
+  'בוריטו', // burrito
+  'קסדיה', // quesadilla
+  'קליפת טאקו', // taco shell
 ];
 
 // ---------------------------------------------------------------------------
@@ -490,6 +536,11 @@ const Map<String, String> nonKetoBaseLabelsHe = <String, String>{
   'רזוטו': 'ריזוטו',
   'רמן': 'ראמן',
   'פיצות': 'פיצה',
+  // #12 audit addition (agent 1D), mirroring [nonKetoBaseLabelsEn]'s
+  // `fish and chips`/`fish chips` → `battered fish`: names the batter,
+  // not the chips.
+  "פיש אנד צ'יפס": 'דג מצופה',
+  "דג וצ'יפס": 'דג מצופה',
 };
 
 // ---------------------------------------------------------------------------

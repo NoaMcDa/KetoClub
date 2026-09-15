@@ -126,9 +126,9 @@ void main() {
   });
 
   group('carbModifiersHe', () {
-    test('has 72 triggers', () {
+    test('has 75 triggers', () {
       // Assert
-      expect(carbModifiersHe, hasLength(72));
+      expect(carbModifiersHe, hasLength(75));
     });
 
     test('every trigger maps to a non-empty sentence', () {
@@ -140,6 +140,21 @@ void main() {
           reason: 'carbModifiersHe["${entry.key}"] must not be empty',
         );
       }
+    });
+
+    test('#12 audit: maple and balsamic glaze have a Hebrew counterpart', () {
+      // Assert: these two English carbModifiersEn triggers had no Hebrew
+      // equivalent at all before the #12 audit.
+      expect(carbModifiersHe, contains('מייפל'));
+      expect(carbModifiersHe, contains('זיגוג בלסמי'));
+    });
+
+    test('#12 audit: ראפ ("wrap") is a carb modifier (yellow), matching '
+        'its English counterpart wrap, not a non-keto base (red)', () {
+      // Assert: D-V3 treats bread that merely carries a dish (a bun, a
+      // pita, a tortilla, a wrap) as removable and yellow, never red.
+      expect(carbModifiersHe, contains('ראפ'));
+      expect(nonKetoBasesHe, isNot(contains('ראפ')));
     });
   });
 
@@ -183,9 +198,9 @@ void main() {
   });
 
   group('nonKetoBasesHe', () {
-    test('has 87 triggers', () {
+    test('has 107 triggers', () {
       // Assert
-      expect(nonKetoBasesHe, hasLength(87));
+      expect(nonKetoBasesHe, hasLength(107));
     });
 
     test('has no duplicate triggers', () {
@@ -199,6 +214,39 @@ void main() {
       // Assert: פנה is an ordinary Hebrew word ("turned"); see the doc
       // comment on nonKetoBasesHe for why it is deliberately absent.
       expect(nonKetoBasesHe, isNot(contains('פנה')));
+    });
+
+    test('#12 audit: every English trigger that had no Hebrew counterpart '
+        'now has one', () {
+      // Assert: found by enumerating nonKetoBasesEn against
+      // nonKetoBasesHe during the #12 audit — each of these had no
+      // Hebrew equivalent at all (`fish and chips`/`fish chips`,
+      // `pancake(s)`, `waffle(s)`, `katsu`, `milanese`, `macaroni`,
+      // `mac and cheese`, `polenta`, `grits`, `empanada`, `gyoza`,
+      // `bao`, `arancini`, `croquette`, `pie`, `burrito`, `quesadilla`,
+      // `taco shell`), the exact silent-vocabulary-gap failure mode
+      // CLAUDE.md warns about.
+      expect(nonKetoBasesHe, contains("פיש אנד צ'יפס"));
+      expect(nonKetoBasesHe, contains("דג וצ'יפס"));
+      expect(nonKetoBasesHe, contains('פנקייק'));
+      expect(nonKetoBasesHe, contains('פנקייקים'));
+      expect(nonKetoBasesHe, contains('וופל'));
+      expect(nonKetoBasesHe, contains('וופלים'));
+      expect(nonKetoBasesHe, contains('קטסו'));
+      expect(nonKetoBasesHe, contains('מילנז'));
+      expect(nonKetoBasesHe, contains('מקרוני'));
+      expect(nonKetoBasesHe, contains("מק אנד צ'יז"));
+      expect(nonKetoBasesHe, contains('פולנטה'));
+      expect(nonKetoBasesHe, contains('גריטס'));
+      expect(nonKetoBasesHe, contains('אמפנדה'));
+      expect(nonKetoBasesHe, contains('גיוזה'));
+      expect(nonKetoBasesHe, contains('באו'));
+      expect(nonKetoBasesHe, contains("ארנצ'יני"));
+      expect(nonKetoBasesHe, contains('קרוקט'));
+      expect(nonKetoBasesHe, contains('פאי'));
+      expect(nonKetoBasesHe, contains('בוריטו'));
+      expect(nonKetoBasesHe, contains('קסדיה'));
+      expect(nonKetoBasesHe, contains('קליפת טאקו'));
     });
   });
 

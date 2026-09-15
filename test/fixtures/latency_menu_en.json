@@ -1,0 +1,351 @@
+{
+  "_fixture_note": "Synthetic 40-dish English menu for tool/measure_model_latency.dart (issue #16). Not a recorded response -- built to be a realistic, varied real-world menu of the size the pre-release latency/cost check should exercise.",
+  "dishes": [
+    {
+      "id": "dish-en-1",
+      "category": "Starters",
+      "name": "Greek Salad",
+      "description": "Feta, olives, cucumber and tomato with olive oil",
+      "options": []
+    },
+    {
+      "id": "dish-en-2",
+      "category": "Starters",
+      "name": "Caesar Salad",
+      "description": "Romaine, parmesan, croutons and Caesar dressing",
+      "options": [
+        {
+          "name": "Add",
+          "values": [
+            "Grilled Chicken",
+            "Grilled Shrimp"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dish-en-3",
+      "category": "Starters",
+      "name": "Caprese Salad",
+      "description": "Tomato, mozzarella and basil with balsamic glaze",
+      "options": []
+    },
+    {
+      "id": "dish-en-4",
+      "category": "Starters",
+      "name": "Buffalo Wings",
+      "description": "Crispy wings tossed in hot sauce",
+      "options": [
+        {
+          "name": "Sauce",
+          "values": [
+            "Buffalo",
+            "BBQ",
+            "Honey Mustard"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dish-en-5",
+      "category": "Starters",
+      "name": "Calamari",
+      "description": "Fried calamari with lemon aioli",
+      "options": []
+    },
+    {
+      "id": "dish-en-6",
+      "category": "Starters",
+      "name": "Bruschetta",
+      "description": "Toasted bread with tomato, garlic and basil",
+      "options": []
+    },
+    {
+      "id": "dish-en-7",
+      "category": "Starters",
+      "name": "French Onion Soup",
+      "description": "Caramelized onion soup with gruyere toast",
+      "options": []
+    },
+    {
+      "id": "dish-en-8",
+      "category": "Starters",
+      "name": "Hummus Plate",
+      "description": "Hummus with pita and olive oil",
+      "options": []
+    },
+    {
+      "id": "dish-en-9",
+      "category": "Starters",
+      "name": "Spring Rolls",
+      "description": "Vegetable spring rolls with sweet chili sauce",
+      "options": []
+    },
+    {
+      "id": "dish-en-10",
+      "category": "Starters",
+      "name": "Nachos",
+      "description": "Tortilla chips with cheese, jalapenos and salsa",
+      "options": []
+    },
+    {
+      "id": "dish-en-11",
+      "category": "Mains",
+      "name": "Grilled Salmon",
+      "description": "Served with lemon butter and a choice of side",
+      "options": [
+        {
+          "name": "Side",
+          "values": [
+            "French Fries",
+            "Green Salad",
+            "Steamed Vegetables"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dish-en-12",
+      "category": "Mains",
+      "name": "Ribeye Steak",
+      "description": "300g dry-aged ribeye with garlic butter",
+      "options": [
+        {
+          "name": "Side",
+          "values": [
+            "Mashed Potatoes",
+            "Green Salad"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dish-en-13",
+      "category": "Mains",
+      "name": "Margherita Pizza",
+      "description": "Tomato, mozzarella and fresh basil",
+      "options": []
+    },
+    {
+      "id": "dish-en-14",
+      "category": "Mains",
+      "name": "Pepperoni Pizza",
+      "description": "Tomato, mozzarella and pepperoni",
+      "options": []
+    },
+    {
+      "id": "dish-en-15",
+      "category": "Mains",
+      "name": "Spaghetti Bolognese",
+      "description": "Spaghetti with slow-cooked beef ragu",
+      "options": []
+    },
+    {
+      "id": "dish-en-16",
+      "category": "Mains",
+      "name": "Chicken Parmesan",
+      "description": "Breaded chicken breast with tomato sauce and mozzarella",
+      "options": []
+    },
+    {
+      "id": "dish-en-17",
+      "category": "Mains",
+      "name": "Beef Burger",
+      "description": "Served on a brioche bun with fries",
+      "options": [
+        {
+          "name": "Bun",
+          "values": [
+            "Brioche Bun",
+            "Lettuce Wrap"
+          ]
+        },
+        {
+          "name": "Side",
+          "values": [
+            "Fries",
+            "Salad"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dish-en-18",
+      "category": "Mains",
+      "name": "Fish and Chips",
+      "description": "Battered cod with chips and tartar sauce",
+      "options": []
+    },
+    {
+      "id": "dish-en-19",
+      "category": "Mains",
+      "name": "Grilled Chicken Breast",
+      "description": "With roasted vegetables and herb sauce",
+      "options": []
+    },
+    {
+      "id": "dish-en-20",
+      "category": "Mains",
+      "name": "Falafel Wrap",
+      "description": "Falafel, hummus and salad in a tortilla wrap",
+      "options": []
+    },
+    {
+      "id": "dish-en-21",
+      "category": "Mains",
+      "name": "Shakshuka",
+      "description": "Eggs poached in spiced tomato sauce",
+      "options": []
+    },
+    {
+      "id": "dish-en-22",
+      "category": "Mains",
+      "name": "Chicken Schnitzel",
+      "description": "Breaded chicken schnitzel with fries",
+      "options": [
+        {
+          "name": "Side",
+          "values": [
+            "Fries",
+            "Rice",
+            "Salad"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dish-en-23",
+      "category": "Mains",
+      "name": "Pad Thai",
+      "description": "Rice noodles with peanuts, egg and tamarind sauce",
+      "options": []
+    },
+    {
+      "id": "dish-en-24",
+      "category": "Mains",
+      "name": "Beef Ramen",
+      "description": "Ramen noodles in beef broth with soft egg",
+      "options": []
+    },
+    {
+      "id": "dish-en-25",
+      "category": "Mains",
+      "name": "Grilled Lamb Chops",
+      "description": "With sweet potato mash and mint sauce",
+      "options": []
+    },
+    {
+      "id": "dish-en-26",
+      "category": "Mains",
+      "name": "Tuna Poke Bowl",
+      "description": "Tuna, avocado, cucumber and rice",
+      "options": [
+        {
+          "name": "Base",
+          "values": [
+            "Rice",
+            "Cauliflower Rice"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dish-en-27",
+      "category": "Mains",
+      "name": "Vegetable Risotto",
+      "description": "Creamy risotto with seasonal vegetables",
+      "options": []
+    },
+    {
+      "id": "dish-en-28",
+      "category": "Mains",
+      "name": "Chicken Caesar Wrap",
+      "description": "Chicken, romaine and Caesar dressing in a tortilla",
+      "options": []
+    },
+    {
+      "id": "dish-en-29",
+      "category": "Mains",
+      "name": "Beef Tacos",
+      "description": "Three soft tacos with beef, salsa and cheese",
+      "options": []
+    },
+    {
+      "id": "dish-en-30",
+      "category": "Mains",
+      "name": "Margherita Calzone",
+      "description": "Folded pizza with tomato and mozzarella",
+      "options": []
+    },
+    {
+      "id": "dish-en-31",
+      "category": "Sides",
+      "name": "French Fries",
+      "description": "Crispy fries with ketchup",
+      "options": []
+    },
+    {
+      "id": "dish-en-32",
+      "category": "Sides",
+      "name": "Mashed Potatoes",
+      "description": "Buttery mashed potatoes",
+      "options": []
+    },
+    {
+      "id": "dish-en-33",
+      "category": "Sides",
+      "name": "Sauteed Spinach",
+      "description": "Spinach sauteed with garlic",
+      "options": []
+    },
+    {
+      "id": "dish-en-34",
+      "category": "Sides",
+      "name": "Steamed Broccoli",
+      "description": "With a drizzle of olive oil",
+      "options": []
+    },
+    {
+      "id": "dish-en-35",
+      "category": "Sides",
+      "name": "Onion Rings",
+      "description": "Crispy battered onion rings",
+      "options": []
+    },
+    {
+      "id": "dish-en-36",
+      "category": "Desserts",
+      "name": "Chocolate Cake",
+      "description": "Rich dark chocolate layer cake",
+      "options": []
+    },
+    {
+      "id": "dish-en-37",
+      "category": "Desserts",
+      "name": "Cheesecake",
+      "description": "New York style cheesecake with berry compote",
+      "options": []
+    },
+    {
+      "id": "dish-en-38",
+      "category": "Desserts",
+      "name": "Ice Cream Sundae",
+      "description": "Vanilla ice cream with chocolate sauce and nuts",
+      "options": []
+    },
+    {
+      "id": "dish-en-39",
+      "category": "Desserts",
+      "name": "Baklava",
+      "description": "Layered pastry with nuts and honey syrup",
+      "options": []
+    },
+    {
+      "id": "dish-en-40",
+      "category": "Drinks",
+      "name": "Fresh Lemonade",
+      "description": "Fresh-squeezed lemonade with mint",
+      "options": []
+    }
+  ]
+}
