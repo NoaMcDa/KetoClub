@@ -9,8 +9,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > **Status: Phase 1 is built and merged.** Build-order steps 1–5 of
 > `architecture.md` §16 ship: models and service contracts, the bilingual heuristic
 > engine, Wolt ingestion with a Hive cache, the classified menu screen and Waiter
-> Card, and the OpenRouter client with its router and Settings. 1418 tests, 98.9% of
-> 1673 instrumented lines.
+> Card, and the OpenRouter client with its router and Settings. 1707 tests, 98.5% of
+> 2331 instrumented lines (six flow tests in `integration_test/flows/`). Three
+> recorded decisions were reversed in this close-out pass (`architecture.md`): D10
+> reinstates `Connectivity`, §17.4 now renders `net_carbs_estimate` as a labelled
+> chip, and §6.6's collapsed red-dish group is gone — the verdict counter tiles are
+> the filter now.
 >
 > **Read `architecture.md` first — it is authoritative.** This file and `README.md`
 > predate the code in places; where any of them disagrees with `architecture.md`,
@@ -26,7 +30,11 @@ Single Flutter codebase for web, iOS, and Android with:
   an on-device rule engine as the fallback** (`architecture.md` D2). The user supplies
   their own OpenRouter key; when there is no key, no consent, or no network, the rule
   engine answers and the UI labels the result "rules". Both sit behind one
-  `MenuClassifier` interface and a router picks per call.
+  `MenuClassifier` interface and a router picks per call. A `Connectivity` pre-check
+  (`architecture.md` D10, reinstated in this pass) asks the device whether it looks
+  online before ever spending an OpenRouter request; it is a hint, never a verdict,
+  so a failed call still reports `offline` exactly as it did before this check
+  existed.
 - **API Integration**: Direct calls to restaurant platform APIs from the client.
   **Only Wolt is implemented**; 10bis, Tabit and Ontopo are not built.
 - **Local Storage**: Hive caches the normalised menu and its analysis for 24 hours;
@@ -87,7 +95,9 @@ Three core entities:
 **Dishes** (menu items)
 - `id`, `menu_id`, `name`, `description`, `price`, `status` (GREEN/YELLOW/RED)
 - `waiter_script`: Auto-generated modification instructions
-- `net_carbs_estimate`: Heuristic-derived carb count
+- `net_carbs_estimate`: An LLM-only estimate (the rule engine never sets it) shown
+  in the UI as a labelled "estimate" chip, never a bare number — see
+  `architecture.md` §17.4, reversed in this pass from "never rendered"
 
 Future additions: user ratings, review feedback loop, OCR/vision processing for physical menus.
 
@@ -108,21 +118,25 @@ lib/
 ├── l10n/                      # app_en.arb, app_he.arb + committed generated/ output
 ├── models/                    # venue, menu, analysis, failures — plain immutable Dart
 ├── utils/                     # constants (the keto vocabulary), text_normaliser,
-│                              # classification_rules, price_format
+│                              # classification_rules, price_format, keto_score
 ├── services/
-│   ├── platform/              # clock, app_logger
+│   ├── platform/              # clock, app_logger, connectivity (D10), screen_brightness
 │   ├── storage/               # key_store, menu_cache, settings_store (interface + impl each)
 │   ├── llm/                   # llm_chat_client, open_router_client
 │   ├── venue/                 # venue_ref_resolver (paste-a-URL, pure)
 │   ├── menu/                  # platform_menu_adapter, menu_repository, wolt/
 │   └── classifier/            # menu_classifier, heuristic, llm, router, prompt, parser
-├── state/                     # app_dependencies + one ChangeNotifier per screen
-├── widgets/                   # dish_card, status_badge, engine_chip, waiter_script, failure_copy
-└── screens/                   # venue_search, menu, waiter_card_sheet, settings
+├── theme/                     # app_tokens, verdict_colors, app_typography, app_theme
+├── state/                     # app_dependencies, locale_controller + one ChangeNotifier per screen
+├── widgets/                   # dish_card, status_badge, engine_chip, waiter_script,
+│                              # verdict_counter_tiles, keto_score_badge, app_shell, failure_copy
+└── screens/                   # venue_search, menu, waiter_card_sheet, settings,
+                               # scan and saved (bottom-nav placeholders, issue #11)
 
-test/                          # mirrors lib/, plus architecture/, fakes/, fixtures/, l10n/
-integration_test/flows/        # three flow tests + flow_support.dart (same-directory helper)
-tool/                          # check.sh (the gate), coverage_gate.sh, gen_coverage_helper.sh
+test/                          # mirrors lib/, plus architecture/, fakes/, fixtures/, l10n/, tool/
+integration_test/flows/        # six flow tests + flow_support.dart (same-directory helper)
+tool/                          # check.sh (the gate), coverage_gate.sh, gen_coverage_helper.sh,
+                                # measure_model_latency.dart (issue #16), record_wolt_fixture.sh (issue #22)
 ```
 
 `architecture.md` §5 carries the same tree with the layer-rank rules the
@@ -212,8 +226,11 @@ The section this replaces described a heuristic-first design that predates the c
 - Engineering standards (SOLID, acyclic imports, clean code, tests, CI) are `architecture.md` §18. Run `tool/check.sh` before pushing; it runs exactly what CI runs.
 
 - `backend_plan.md`: The planned Python (FastAPI) backend — why (CORS on web), the
-  API contract, the client seams, and issues #94–#109 in priority order. Planned,
-  not built; `architecture.md` gains D11 when #97 lands
+  API contract, the client seams, and issues #94–#109 in priority order.
+  Scaffolding has started (`backend/`, issue #94: a health endpoint, its own
+  `check.sh` and a required CI job) but the menu proxy is not built and nothing
+  in `lib/` talks to it yet — the Flutter app is still client-only in practice.
+  `architecture.md` gains D11 when #97 lands
 
 **Research & Analysis:**
 - `m16_menu_scanner_research.md`: Computer vision and OCR strategy for physical menu scanning (Phase 4)
@@ -228,27 +245,59 @@ When reading research docs (m15/m16), note that prefixes indicate iteration/mile
 ## Project Phases
 
 - **Phase 1**: menu ingestion, classification and waiter scripts → **Built and merged**
-- **Phase 2**: geolocation and nearby search → **Next.** Blocked on discovery: no Wolt
-  venue-search endpoint is known (`architecture.md` §17.2)
-- **Phase 3**: Community database, user reviews, restaurant submissions → **Planned**
+- **Phase 2**: geolocation and nearby search, plus the 10bis adapter → **Next.**
+  Nearby search is blocked on discovery: no Wolt venue-search endpoint is known
+  (`architecture.md` §17.2). See `MILESTONE_CONVENTIONS.md` for the real GitHub
+  milestone names — they differ from earlier drafts of this document.
+- **Phase 3**: Community database, user reviews, restaurant submissions, and the
+  CORS-forwarding backend the web build needs (`backend_plan.md`) → **Planned**
 - **Phase 4**: OCR/vision, configurable dietary rules → **Planned**
 
 Phase 1 is built. Phase 2 is next; `feature_prioratization` has the tier breakdown.
 
 ## What is NOT built yet
 
-- 10bis, Tabit and Ontopo adapters. Only Wolt ships. The `PlatformMenuAdapter`
+- 10bis, Tabit and Ontopo adapters. Only Wolt ships. `VenueRefResolver` already
+  recognises a pasted 10bis URL or bare restaurant id, but `MenuRepository` has no
+  adapter registered for it, so it fails with `unsupportedSource` — paste
+  recognition and platform support are independent claims. The `PlatformMenuAdapter`
   interface and its shared contract suite already exist, so a new platform is a new
-  adapter plus a registration in `di.dart`.
+  adapter plus a registration in `di.dart`. (10bis is its own GitHub milestone,
+  `Phase 2: 10bis Integration` — not Phase 1.)
 - Nearby venue search and any geolocation. `geolocator` is in `pubspec.yaml` but no
   code uses it. Paste-a-link (Tier A) is what ships.
 - OCR and the photographed-menu path (Phase 4), community features and any backend
-  (Phase 3).
-- `net_carbs_estimate` is in the model but deliberately never rendered
-  (`architecture.md` §17.4).
+  (Phase 3). The Scan and Saved bottom-nav tabs exist only as localized placeholder
+  screens explaining that (issue #11) — they are not stubs left blank.
+- The pinned OpenRouter model has never been run against the real prompt from this
+  environment: `openrouter.ai` is unreachable through the egress proxy here. See
+  "What is NOT verified yet" below.
 
 Nothing above is stubbed — the files simply do not exist, which keeps them out of
 the coverage denominator.
+
+## What is NOT verified yet
+
+Built, but not confirmed end to end, and not to be reported as done:
+
+- **The pinned OpenRouter model** (`architecture.md` §17 open question 1).
+  `tool/measure_model_latency.dart` and `tool/README.md` now make this a one
+  command job (`OPENROUTER_API_KEY=... dart run tool/measure_model_latency.dart`)
+  for anyone with a network path to `openrouter.ai` — this container does not have
+  one. Until someone runs it, the pinned model's latency and structured-output
+  behaviour are still carried over from `m15_openrouter_models_fix.md`, not
+  measured against this app's real prompt.
+- **The Wolt fixture is synthetic**, not a recorded response (issue #22).
+  `tool/record_wolt_fixture.sh` exists to re-record it from a real venue, but has
+  never been run — `restaurant-api.wolt.com` is also unreachable here.
+- **No physical iOS or Android device has ever run this app.** Screen-brightness
+  raising for the Waiter Card in particular is evidenced only by a mocked method
+  channel and a fake.
+- **No screenshot or narrow-width run has confirmed the UI against the artboards.**
+  Token fidelity (colours, spacing) is enforced by a test; pixel fidelity is not.
+- **No human has reviewed this code.**
+- Two light-mode colour pairs in `lib/theme/app_tokens.dart` fail WCAG AA contrast
+  (green-on-green at 4.08:1, ink3-on-bg at 2.78:1) — tracked as issue #64, not fixed.
 
 ## Getting started
 

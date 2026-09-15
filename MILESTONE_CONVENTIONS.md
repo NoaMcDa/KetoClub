@@ -16,77 +16,116 @@ Phase N: [Feature Group Name]
 
 - `Phase 1: Wolt API Integration`
 - `Phase 1: Menu Classifier Engine`
-- `Phase 1: Waiter Script Generation`
 - `Phase 2: Geolocation & Venue Search`
-- `Phase 2: Menu Display UI`
+- `Phase 2: 10bis Integration`
 - `Phase 3: User Ratings & Reviews`
+
+> **These are the milestones actually created on GitHub** (verified against the
+> repository's milestone list while closing issue #36), not an illustrative plan.
+> An earlier draft of this document listed different names for several of
+> them — e.g. a Phase 1 "API Client Infrastructure" and "Waiter Script Generation"
+> and a Phase 4 "Meal Logging" — that were never created. `D8` in
+> `architecture.md` §14 rules meal logging out of scope entirely ("nothing about
+> the user is stored"), which is why no such milestone exists in any phase.
 
 ## Phase Breakdown
 
 ### Phase 1: Core Parsing & Classification
 
 **Goal**: Build the restaurant menu ingestion and keto classification engine (no backend).
+**Status**: built and merged — see `CLAUDE.md`'s status banner and `HANDOFF.md`.
 
-**Milestones:**
-1. `Phase 1: API Client Infrastructure` — HTTP clients for Wolt, 10bis, Tabit, Ontopo
-2. `Phase 1: Menu Classifier Engine` — Heuristic-based dish classification (🟢/🟡/🔴)
-3. `Phase 1: Waiter Script Generation` — Auto-generated modification instructions
-4. `Phase 1: Core UI Screens` — Home, venue search, menu display
+**Milestones (as created on GitHub):**
+1. `Phase 1: Domain Foundations` — models, service-boundary result types, the
+   project skeleton and day-zero CI
+2. `Phase 1: Menu Classifier Engine` — the bilingual heuristic engine and the
+   OpenRouter-backed LLM classifier behind one `MenuClassifier` interface
+3. `Phase 1: Wolt API Integration` — the Wolt adapter, mapper, cache and
+   paste-a-URL resolution
+4. `Phase 1: Core UI Screens` — venue search, the classified menu screen, the
+   Waiter Card and Settings
 
 **Success Criteria:**
-- ✅ Fetch menus from at least Wolt and 10bis APIs
-- ✅ Classify dishes with >90% accuracy on common cases
-- ✅ Generate accurate waiter scripts for Yellow dishes
-- ✅ App is usable on web, iOS, and Android
+- ✅ Fetch and classify menus from Wolt. **Not** 10bis — no 10bis adapter exists;
+  a pasted 10bis link is recognised but fails with `unsupportedSource`
+  (`architecture.md` §16 step 6, now tracked as its own `Phase 2: 10bis
+  Integration` milestone rather than a Phase 1 one)
+- ✅ Classify dishes 🟢/🟡/🔴 with an LLM primary engine and a rule-engine
+  fallback, table-driven-tested against README's examples plus Hebrew equivalents
+- ✅ Generate waiter scripts for modifiable (🟡) dishes, in the menu's language
+- ✅ App builds for web, iOS, and Android (a physical-device run is still
+  outstanding — see `HANDOFF.md`)
+- ⏳ Each of these four milestones still has open issues on GitHub even though
+  the code shipped — closing this documentation issue does not itself close them
 
 ### Phase 2: Mobile Interface & Discovery
 
-**Goal**: Complete the user-facing mobile app with geolocation and filtering.
+**Goal**: Complete the user-facing mobile app with geolocation, the 10bis adapter,
+and filtering. **Status**: next; not started.
 
-**Milestones:**
-1. `Phase 2: Geolocation & Venue Search` — Device location + venue discovery
-2. `Phase 2: Menu Display & Navigation` — Improved UI, search filtering, bookmarks
-3. `Phase 2: Settings & Preferences` — User settings, dietary rule customization
-4. `Phase 2: Polish & Performance` — Responsive design, loading states, error handling
+**Milestones (as created on GitHub):**
+1. `Phase 2: Geolocation & Venue Search` — device location + venue discovery.
+   Blocked on discovery: no Wolt venue-search endpoint is known
+   (`architecture.md` §17 open question 2)
+2. `Phase 2: 10bis Integration` — the 10bis adapter. Blocked on a live capture:
+   `dishOptionsList`'s shape, a stable category id, and a real restaurant id/URL
+   are all unverified (`HANDOFF.md`)
+3. `Phase 2: Menu Display & Navigation` — improved UI, search filtering, bookmarks
+4. `Phase 2: Settings & Preferences` — user settings, dietary rule customization
+5. `Phase 2: Polish & Performance` — responsive design, loading states, error handling
 
 **Success Criteria:**
-- ✅ Users can search nearby restaurants by location
-- ✅ App displays filtered results (Green/Yellow/Red)
-- ✅ Smooth navigation between screens
-- ✅ Works offline for cached menus
-- ✅ <3s load time on 4G network
+- Users can search nearby restaurants by location
+- 10bis menus fetch and classify the same way Wolt's do
+- App displays filtered results (Green/Yellow/Red)
+- Works offline for cached menus
+- <3s load time on 4G network
 
 ### Phase 3: Community Database & Reviews
 
-**Goal**: Add persistent user feedback and venue ratings.
+**Goal**: Add the CORS-forwarding backend (blocking the web build today), persistent
+user feedback, and venue ratings. **Status**: planned — see `backend_plan.md` for
+the backend's design and its own issue range (#94–#109).
 
-**Milestones:**
-1. `Phase 3: Backend Infrastructure` — Basic server + database (if needed)
-2. `Phase 3: User Ratings & Reviews` — Post-visit feedback mechanism
-3. `Phase 3: Venue Submission` — Crowdsourced venue directory
-4. `Phase 3: Verified Badges` — Keto-friendly venue verification
+**Milestones (as created on GitHub):**
+1. `Phase 3: Backend Foundations` — the menu-proxy backend that unblocks web
+   fetching (`backend_plan.md` §1; `architecture.md` gains D11 when this lands)
+2. `Phase 3: Hosted Classification` — a shared, backend-held model key as an
+   alternative to bring-your-own-key
+3. `Phase 3: Community API` — the server side of ratings, reviews and submissions
+4. `Phase 3: User Ratings & Reviews` — post-visit feedback mechanism
+5. `Phase 3: Venue Submission` — crowdsourced venue directory
+6. `Phase 3: Verified Badges` — keto-friendly venue verification
 
 **Success Criteria:**
-- ✅ Users can rate venues after dining
-- ✅ Community ratings influence venue ranking
-- ✅ Verified keto-friendly badges visible to users
-- ✅ Support for user submissions of new venues
+- Web build fetches live menus without a local proxy
+- Users can rate venues after dining
+- Community ratings influence venue ranking
+- Verified keto-friendly badges visible to users
+- Support for user submissions of new venues
 
 ### Phase 4: Advanced Features
 
 **Goal**: Add OCR vision processing and advanced dietary customization.
+**Status**: planned.
 
-**Milestones:**
-1. `Phase 4: OCR Menu Scanning` — Snap photo of physical menu, extract text
-2. `Phase 4: Dietary Customization` — Carnivore, pesco-keto, seed-oil avoidance modes
-3. `Phase 4: LLM Integration` — AI-powered edge case classification
-4. `Phase 4: Meal Logging` — Track consumed meals, macro tracking
+**Milestones (as created on GitHub):**
+1. `Phase 4: OCR Menu Scanning` — snap a photo of a physical menu, extract text
+   (`m16_menu_scanner_research.md`)
+2. `Phase 4: Dietary Customization` — carnivore, pesco-keto, seed-oil avoidance
+   modes (Tier C in `feature_prioratization`)
+3. `Phase 4: Vision Classifier` — a vision-model `MenuClassifier` for OCR'd text,
+   behind the same interface as the two Phase 1 engines (`architecture.md` §16's
+   extension-points table)
+
+**There is no Phase 4 "Meal Logging" milestone.** `architecture.md` D8 rules meal
+logging and macro tracking out of scope for KetoClub entirely — that design in
+`m15_meal_entry_research.md` belongs to a different application.
 
 **Success Criteria:**
-- ✅ OCR extracts 95%+ of readable text from menu photos
-- ✅ Users can switch between dietary rulesets
-- ✅ LLM fallback handles ambiguous dishes
-- ✅ Macro tracking integrated with meal log
+- OCR extracts 95%+ of readable text from menu photos
+- Users can switch between dietary rulesets
+- A vision-model classifier handles menus with no extractable text
 
 ## Milestone Properties
 

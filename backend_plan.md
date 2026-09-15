@@ -1,12 +1,20 @@
 # KetoClub backend — plan, API contract and prioritisation
 
-> **Status: planned, not built.** Decided 2026-09-13. The issues are #94–#109 in
-> three milestones: *Phase 3: Backend Foundations* (#94–#99), *Phase 3: Hosted
-> Classification* (#100–#104) and *Phase 3: Community API* (#105–#109). This
-> document is the design the issues cite; `architecture.md` stays authoritative
-> and gains D11 when #97 lands. Until then, where this document and
-> `architecture.md` disagree, this document describes the intended future and
-> `architecture.md` the code as it is.
+> **Status: scaffolding started, the menu proxy is not built.** Decided
+> 2026-09-13. The issues are #94–#109 in three milestones: *Phase 3: Backend
+> Foundations* (#94–#99), *Phase 3: Hosted Classification* (#100–#104) and
+> *Phase 3: Community API* (#105–#109). #94 has landed: `backend/` is a real
+> FastAPI project (`uv`, tests, its own `backend/check.sh`, and a required
+> `backend` job in `.github/workflows/ci.yml`) serving `GET /v1/health` only —
+> see `backend/README.md`. The menu-proxy route (#95–#96) that would actually
+> unblock the web build's CORS problem is not built, and **nothing in `lib/`
+> references the backend yet**: no `KETOCLUB_BACKEND_URL` dart-define is read
+> anywhere in the Flutter app, so the client remains exactly as client-only as
+> `architecture.md` D1 describes until that wiring lands. This document is the
+> design the issues cite; `architecture.md` stays authoritative and gains D11
+> when #97 lands. Until then, where this document and `architecture.md`
+> disagree, this document describes the intended future and `architecture.md`
+> the code as it is.
 
 ## 1. Why a backend, and why now
 

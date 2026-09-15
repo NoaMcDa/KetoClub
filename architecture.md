@@ -218,7 +218,9 @@ ketoclub/
 │   │   ├── venue_search_screen.dart      # location + name search, paste-a-URL field
 │   │   ├── menu_screen.dart              # classified menu, filters (green / green+yellow / all)
 │   │   ├── waiter_card_sheet.dart        # full-screen high-contrast script + copy button
-│   │   └── settings_screen.dart          # OpenRouter key, consent text, dietary toggles (later)
+│   │   ├── settings_screen.dart          # OpenRouter key, consent text, dietary toggles (later)
+│   │   ├── scan_screen.dart              # Scan tab placeholder (Phase 4, issue #11)
+│   │   └── saved_screen.dart             # Saved tab placeholder (Phase 3, issue #11)
 │   │
 │   ├── theme/                            # design tokens as the app theme (rank 4, see below)
 │   │   ├── app_tokens.dart               # raw sRGB constants converted from the artboard's oklch tokens
@@ -227,23 +229,28 @@ ketoclub/
 │   │   └── app_theme.dart                # AppTheme.light() / AppTheme.dark()
 │   │
 │   ├── widgets/
-│   │   ├── dish_card.dart                # name, price, badge, expandable script
+│   │   ├── dish_card.dart                # name, price, badge, expandable script, net-carb chip
 │   │   ├── status_badge.dart             # icon + colour, never colour alone
 │   │   ├── waiter_script_widget.dart     # copyable instruction text
 │   │   ├── engine_chip.dart              # "AI" / "rules (offline)" indicator
+│   │   ├── verdict_counter_tiles.dart    # the three counters double as the green/yellow/red filter (§6.6)
+│   │   ├── keto_score_badge.dart         # renders nothing when the score is null, never a fallback 0.0
+│   │   ├── app_shell.dart                # bottom-nav shell around the four tab-root routes (issue #11)
 │   │   └── failure_copy.dart             # pure: failure reason → message; exhaustive, no default
 │   │
 │   ├── state/                            # ChangeNotifiers; constructor-injected with interfaces
 │   │   ├── app_dependencies.dart         # immutable holder of service interfaces; filled by di.dart
 │   │   ├── venue_search_controller.dart
 │   │   ├── menu_controller.dart
-│   │   └── settings_controller.dart
+│   │   ├── settings_controller.dart
+│   │   └── locale_controller.dart        # the app-wide language switch (not tied to one screen)
 │   │
 │   ├── services/                         # every folder: interface(s) + implementations + fakes-friendly seams
 │   │   ├── platform/                     # rank 0 — abstractions over the device/runtime
 │   │   │   ├── clock.dart                # abstract Clock { DateTime now(); }  (cache freshness, tests)
 │   │   │   ├── app_logger.dart           # abstract AppLogger; never sees the key or an upstream body
-│   │   │   └── connectivity.dart         # abstract Connectivity { Future<bool> isOnline(); } — a hint, never a verdict (§14 D10)
+│   │   │   ├── connectivity.dart         # abstract Connectivity { Future<bool> isOnline(); } — a hint, never a verdict (§14 D10)
+│   │   │   └── screen_brightness.dart    # raises brightness for the Waiter Card, restores it on close
 │   │   ├── storage/                      # rank 0
 │   │   │   ├── key_store.dart            # interface + SecureKeyStore (flutter_secure_storage)
 │   │   │   ├── menu_cache.dart           # interface + HiveMenuCache
@@ -283,7 +290,8 @@ ketoclub/
 │   │   ├── constants.dart                # CARB_MODIFIERS, NON_KETO_BASES, templates, caps
 │   │   ├── classification_rules.dart     # compiled regexes for the heuristic engine
 │   │   ├── text_normaliser.dart          # lowercase, strip niqqud/punctuation, for provenance
-│   │   └── price_format.dart             # agorot → ILS, locale-aware formatting
+│   │   ├── price_format.dart             # agorot → ILS, locale-aware formatting
+│   │   └── keto_score.dart               # menu-level score from the dish verdicts, for KetoScoreBadge
 │   │
 │   └── l10n/
 │       ├── app_en.arb
@@ -546,6 +554,13 @@ step:
 
 The Waiter Card (`waiter_card_sheet.dart`) renders the script full-screen in large
 high-contrast type with a copy button, so the phone can be shown to the server.
+*(Phase 1)* It also raises the device's screen brightness to full while open,
+through `services/platform/screen_brightness.dart`, and restores it on close —
+a hint the sheet acts on, never a guarantee: `ScreenBrightness.raise`/`restore`
+never throw, so a platform that cannot change brightness (web among them) or a
+plugin call that fails simply leaves brightness unchanged rather than breaking
+the card. This is evidenced in tests only by a mocked method channel and a fake;
+no physical device has exercised it (`HANDOFF.md`).
 
 ### 6.4 Local storage
 
@@ -627,6 +642,19 @@ Screens:
 | `MenuScreen` | `/venue/:source/:id` | Classified menu with filters and engine chip |
 | `WaiterCardSheet` | modal | Large-type script with copy |
 | `SettingsScreen` | `/settings` | Key entry, disclosure text, cache clear, language |
+| `ScanScreen` | `/scan` | Placeholder — physical-menu scanning is Phase 4 |
+| `SavedScreen` | `/saved` | Placeholder — saving a venue is not built (Phase 3 territory) |
+
+**The bottom-navigation shell** *(issue #11, Phase 1)*, not in this document when
+the four screens above were written: `AppShell` wraps all four tab-root routes
+(Explore `/`, Scan `/scan`, Saved `/saved`, Settings `/settings`) with a
+`NavigationBar`. It is purely presentational — it takes an already-built `child`
+and the `currentIndex` `app.dart`'s `generateRoute` supplies, and switches tabs
+with `Navigator.pushReplacementNamed` rather than an `IndexedStack`, so the stack
+never grows and each visit to a tab rebuilds its controller from scratch. `Scan`
+and `SavedScreen` are stateless placeholders with localized copy explaining what
+is missing, not stubs left silently blank; `MenuScreen` (reached from a search
+result, not a tab) and `WaiterCardSheet` (a modal) sit outside the shell.
 
 Visual rules: a verdict is always icon **and** colour, never colour alone
 (accessibility). Unclassified dishes are listed under their own neutral heading.
@@ -640,6 +668,15 @@ rail, tint and pill every other verdict gets. A dish hidden inside a collapsed g
 cannot also be the result of a filter that selects it, so the group went and
 `MenuController.redRows` went with it. The count survives where it now belongs: on
 the Skip counter tile.
+
+**The menu header shows a keto score out of 10** *(issue #29, Phase 1)*, computed
+by `utils/keto_score.dart` from the analysis's verdict counts (green counts full,
+yellow at half weight, red at none) and rendered by `KetoScoreBadge`. It is a
+`MenuAnalysed`-only figure — a raw menu with no analysis, or an analysis that
+failed, has no verdicts to score — so `MenuController.ketoScoreOutOfTen` is
+nullable and the badge **renders nothing when it is null**, never a fallback
+`0.0`, which would misreport "this menu is zero keto-friendly" rather than "not
+computable".
 
 ---
 
@@ -1120,9 +1157,9 @@ done** *(Phase 1)*; step 6 onwards is next.
    network code exists.
 3. ✅ **Wolt adapter + repository + cache** — fixture-tested normalisation, Hive cache,
    paste-a-URL resolution.
-4. ✅ **Menu screen** — `MenuController`, `DishCard`, `StatusBadge`, filters, red group,
-   unclassified section, engine chip, Waiter Card. At this point the app is usable
-   offline with the rules engine.
+4. ✅ **Menu screen** — `MenuController`, `DishCard`, `StatusBadge`, filters (the
+   verdict counter tiles, §6.6), unclassified section, engine chip, Waiter Card. At
+   this point the app is usable offline with the rules engine.
 5. ✅ **OpenRouter client + LLM classifier + router + Settings** — key store, consent,
    prompt, schema, parser, fallback logic, failure copy. Verify the pinned model
    against the real prompt before merging.
