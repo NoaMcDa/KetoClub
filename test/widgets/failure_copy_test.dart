@@ -115,6 +115,67 @@ void main() {
     }
   });
 
+  group('the no-internet copy is exclusive to offline', () {
+    for (final locale in _locales) {
+      test('fetchFailureMessage: only offline returns the no-internet copy '
+          'in ${locale.languageCode}', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+        final offlineCopy = fetchFailureMessage(
+          MenuFetchFailureReason.offline,
+          l10n,
+        );
+
+        // Act & Assert
+        for (final reason in MenuFetchFailureReason.values) {
+          final message = fetchFailureMessage(
+            reason,
+            l10n,
+            platform: 'Wolt',
+            statusCode: 502,
+          );
+          if (reason == MenuFetchFailureReason.offline) {
+            expect(message, equals(offlineCopy));
+          } else {
+            expect(
+              message,
+              isNot(equals(offlineCopy)),
+              reason: '$reason must not share the no-internet copy',
+            );
+          }
+        }
+      });
+
+      test('analysisFailureMessage: only offline returns the no-internet '
+          'copy in ${locale.languageCode}', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+        final offlineCopy = analysisFailureMessage(
+          MenuAnalysisFailureReason.offline,
+          l10n,
+        );
+
+        // Act & Assert
+        for (final reason in MenuAnalysisFailureReason.values) {
+          final message = analysisFailureMessage(
+            reason,
+            l10n,
+            detail: 'unexpected shape',
+          );
+          if (reason == MenuAnalysisFailureReason.offline) {
+            expect(message, equals(offlineCopy));
+          } else {
+            expect(
+              message,
+              isNot(equals(offlineCopy)),
+              reason: '$reason must not share the no-internet copy',
+            );
+          }
+        }
+      });
+    }
+  });
+
   group('allowsRulesFallback', () {
     test('unauthorised is false', () {
       // Arrange

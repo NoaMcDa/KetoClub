@@ -171,10 +171,35 @@ void main() {
       expect(controller.isFromCache, isTrue);
       expect(controller.staleReason, MenuFetchFailureReason.offline);
       expect(controller.cachedAt, equals(fetchedAt));
+      expect(controller.fetchedAt, equals(fetchedAt));
     });
 
-    test('cachedAt for a freshly fetched menu is null', () async {
+    test('cachedAt for a freshly fetched menu is null, but fetchedAt is '
+        'still set from Menu.fetchedAt', () async {
       // Arrange
+      final fetchedAt = DateTime.utc(2026, 3, 1, 12);
+      final menu = _menuOf([_dish('Steak')], fetchedAt: fetchedAt);
+      repository.stub(_ref, MenuFetched(menu: menu));
+
+      // Act
+      await controller.open(_ref);
+
+      // Assert: cachedAt is only for a stale-served menu, but the source
+      // line ("Wolt · 4 min ago") needs a timestamp on a fresh fetch too.
+      expect(controller.isFromCache, isFalse);
+      expect(controller.cachedAt, isNull);
+      expect(controller.fetchedAt, equals(fetchedAt));
+    });
+
+    test('fetchedAt and venueName are null before anything is opened', () {
+      // Assert
+      expect(controller.fetchedAt, isNull);
+      expect(controller.venueName, isNull);
+    });
+
+    test('venueName reflects Menu.venueName, including when the platform '
+        'did not supply one', () async {
+      // Arrange: the fixture menu built by _menuOf never sets venueName.
       final menu = _menuOf([_dish('Steak')]);
       repository.stub(_ref, MenuFetched(menu: menu));
 
@@ -182,8 +207,99 @@ void main() {
       await controller.open(_ref);
 
       // Assert
-      expect(controller.isFromCache, isFalse);
-      expect(controller.cachedAt, isNull);
+      expect(controller.venueName, isNull);
+    });
+
+    test('venueName is exposed when the menu carries one', () async {
+      // Arrange
+      final menu = Menu(
+        venueRef: _ref,
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: const <MenuCategory>[],
+        venueName: 'Sunny Diner',
+      );
+      repository.stub(_ref, MenuFetched(menu: menu));
+
+      // Act
+      await controller.open(_ref);
+
+      // Assert
+      expect(controller.venueName, equals('Sunny Diner'));
+    });
+
+    test('verdict counts and ketoScoreOutOfTen are all zero-ish before '
+        'any open', () {
+      // Assert
+      expect(controller.greenCount, 0);
+      expect(controller.yellowCount, 0);
+      expect(controller.redCount, 0);
+      expect(controller.unclassifiedCount, 0);
+      expect(controller.totalDishCount, 0);
+      expect(controller.ketoScoreOutOfTen, isNull);
+    });
+
+    test('verdict counts and ketoScoreOutOfTen reflect a MenuAnalysed '
+        'result, not the active filter', () async {
+      // Arrange: two green, one yellow, one red, one unclassified — the
+      // filter is narrowed to greenOnly afterwards to prove the counts
+      // are unaffected by it.
+      final green1 = _dish('Steak', id: 'green1');
+      final green2 = _dish('Chicken', id: 'green2');
+      final yellow = _dish('Fries', id: 'yellow');
+      final red = _dish('Pasta', id: 'red');
+      final unclassified = _dish('Mystery', id: 'unclassified');
+      final menu = _menuOf([green1, green2, yellow, red, unclassified]);
+      repository.stub(_ref, MenuFetched(menu: menu));
+      classifier.respondWith(
+        MenuAnalysed(
+          dishes: [
+            _verdictFor(green1, DishVerdict.orderAsIs),
+            _verdictFor(green2, DishVerdict.orderAsIs),
+            _verdictFor(yellow, DishVerdict.modifiable, modification: 'x'),
+            _verdictFor(red, DishVerdict.nonKeto),
+          ],
+          unclassified: const <String>['Mystery'],
+          engine: const RulesEngine(
+            reason: MenuAnalysisFailureReason.notConfigured,
+          ),
+          analysedAt: clock.now(),
+        ),
+      );
+      await controller.open(_ref);
+
+      // Act
+      controller.setFilter(MenuFilter.greenOnly);
+
+      // Assert
+      expect(controller.greenCount, 2);
+      expect(controller.yellowCount, 1);
+      expect(controller.redCount, 1);
+      expect(controller.unclassifiedCount, 1);
+      expect(controller.totalDishCount, 5);
+      // score = 10 * (2 + 0.5 * 1) / (2 + 1 + 1) = 6.25 -> 6.3
+      expect(controller.ketoScoreOutOfTen, equals(6.3));
+    });
+
+    test('verdict counts are all zero when analysis failed, even though '
+        'the raw menu is still there', () async {
+      // Arrange
+      final menu = _menuOf([_dish('Steak'), _dish('Pizza', id: 'd2')]);
+      repository.stub(_ref, MenuFetched(menu: menu));
+      classifier.respondWith(
+        const MenuAnalysisFailed(reason: MenuAnalysisFailureReason.badResponse),
+      );
+
+      // Act
+      await controller.open(_ref);
+
+      // Assert
+      expect(controller.totalDishCount, 2);
+      expect(controller.greenCount, 0);
+      expect(controller.yellowCount, 0);
+      expect(controller.redCount, 0);
+      expect(controller.unclassifiedCount, 0);
+      expect(controller.ketoScoreOutOfTen, isNull);
     });
 
     test('visibleRows under greenOnly keeps only orderAsIs dishes', () async {

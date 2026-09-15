@@ -7,6 +7,7 @@ import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/utils/keto_score.dart';
 
 /// Screen state for the classified menu screen (architecture.md §6.6).
 ///
@@ -32,9 +33,10 @@ final class MenuController extends ChangeNotifier {
   /// distinct, so a misordered call does not compile.
   ///
   /// No `Clock` is injected. Every timestamp this controller exposes comes
-  /// from the result it was read from — [cachedAt] from `Menu.fetchedAt` and
-  /// `analysedAt` from the classifier — so a clock here would be a dependency
-  /// nothing reads.
+  /// from the result it was read from — [cachedAt] and [fetchedAt] from
+  /// `Menu.fetchedAt`, `analysedAt` from the classifier — so a clock here
+  /// would be a dependency nothing reads. Rendering "4 min ago" from
+  /// [fetchedAt] is left to whoever displays it, against its own clock.
   new(this._repository, this._classifier, this._settings);
 
   final MenuRepository _repository;
@@ -81,6 +83,86 @@ final class MenuController extends ChangeNotifier {
   /// null for a freshly fetched menu, since there is nothing stale to
   /// date.
   DateTime? get cachedAt => _isFromCache ? _menu?.fetchedAt : null;
+
+  /// When [menu] was fetched, whether that fetch was fresh or served from
+  /// cache; null before any menu is loaded.
+  ///
+  /// This is the source for the persistent "Wolt · 4 min ago" line: unlike
+  /// [cachedAt] — which is null on a fresh fetch, since there is nothing
+  /// stale to report — that line is shown for every loaded menu, so it
+  /// needs a timestamp regardless of [isFromCache]. There is deliberately
+  /// no injected `Clock` on this class (see the constructor doc); "4 min
+  /// ago" is computed by whoever renders this value, against its own
+  /// clock, from the [Menu.fetchedAt] every menu already carries.
+  DateTime? get fetchedAt => _menu?.fetchedAt;
+
+  /// The restaurant name from [menu], when the source platform named it;
+  /// null otherwise.
+  ///
+  /// **Null is the normal case here, not the exception.** No documented
+  /// Wolt payload names the venue today (see `WoltMenuMapper`); only the
+  /// checked-in fixture is synthetic. A header reading this value falls
+  /// back to something else — the pasted venue reference, per
+  /// [Menu.venueName]'s own doc comment — never to a placeholder guessed
+  /// in this class.
+  String? get venueName => _menu?.venueName;
+
+  /// A rough "how keto-friendly is this menu" score out of 10, or null
+  /// when [analysis] is not a [MenuAnalysed] — see [ketoScore] for the
+  /// formula and the judgement calls behind it. Never render a fallback
+  /// number in its place; a null here means "not computable", not zero.
+  double? get ketoScoreOutOfTen => ketoScore(
+    greenCount: greenCount,
+    yellowCount: yellowCount,
+    redCount: redCount,
+  );
+
+  /// How many dishes in [analysis] were classified [DishVerdict.orderAsIs]
+  /// (green); 0 when there is no [MenuAnalysed] result.
+  int get greenCount => _countOf(DishVerdict.orderAsIs);
+
+  /// How many dishes in [analysis] were classified [DishVerdict.modifiable]
+  /// (yellow); 0 when there is no [MenuAnalysed] result.
+  int get yellowCount => _countOf(DishVerdict.modifiable);
+
+  /// How many dishes in [analysis] were classified [DishVerdict.nonKeto]
+  /// (red); 0 when there is no [MenuAnalysed] result.
+  int get redCount => _countOf(DishVerdict.nonKeto);
+
+  /// How many dish names [analysis] saw on the menu but could not place;
+  /// 0 when there is no [MenuAnalysed] result. Same source as
+  /// [unclassifiedNames]'s length, exposed as a count for a summary line
+  /// that does not need the names themselves.
+  int get unclassifiedCount {
+    final currentAnalysis = _analysis;
+    return currentAnalysis is MenuAnalysed
+        ? currentAnalysis.unclassified.length
+        : 0;
+  }
+
+  /// The total number of dishes on [menu], across every category; 0
+  /// before a menu is loaded.
+  ///
+  /// This counts dishes on the raw menu, not verdicts, so it stays
+  /// meaningful even when [analysis] failed: [greenCount] + [yellowCount]
+  /// + [redCount] + [unclassifiedCount] equals this only once a
+  /// [MenuAnalysed] result exists, since a failed analysis places no
+  /// dish at all.
+  int get totalDishCount {
+    final currentMenu = _menu;
+    if (currentMenu == null) return 0;
+    return currentMenu.allDishes.length;
+  }
+
+  /// How many dishes in [analysis] carry [verdict]; 0 when there is no
+  /// [MenuAnalysed] result.
+  int _countOf(DishVerdict verdict) {
+    final currentAnalysis = _analysis;
+    if (currentAnalysis is! MenuAnalysed) return 0;
+    return currentAnalysis.dishes
+        .where((dish) => dish.verdict == verdict)
+        .length;
+  }
 
   /// Which engine produced [analysis], or null before a [MenuAnalysed]
   /// result exists.
