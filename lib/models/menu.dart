@@ -215,23 +215,31 @@ final class MenuCategory {
 /// A menu fetched from one platform for one venue (architecture.md §7).
 @immutable
 final class Menu {
-  /// Creates a menu for [venueRef], fetched at [fetchedAt].
+  /// Creates a menu for [venueRef], fetched at [fetchedAt]. [venueName]
+  /// is optional: not every platform payload names the venue it belongs
+  /// to (see `WoltMenuMapper`), and a menu with no name is still a valid
+  /// menu.
   const new({
     required this.venueRef,
     required this.currency,
     required this.fetchedAt,
     required this.categories,
+    this.venueName,
   });
 
   /// Reads a menu written by [toJson].
   ///
   /// Returns null for any shape mismatch, including a malformed
-  /// [VenueRef], category, or timestamp, and never throws.
+  /// [VenueRef], category, or timestamp, and never throws. `venueName`
+  /// is read tolerantly: absent (as in every entry cached before this
+  /// field existed) or null both decode to a null [venueName], and only
+  /// a present-but-non-string value fails the whole entry.
   static Menu? tryFrom(Map<String, Object?> json) {
     final rawVenueRef = json['venueRef'];
     final currency = json['currency'];
     final rawFetchedAt = json['fetchedAt'];
     final rawCategories = json['categories'];
+    final rawVenueName = json['venueName'];
     if (rawVenueRef is! Map<String, Object?>) return null;
     final venueRef = VenueRef.tryFrom(rawVenueRef);
     if (venueRef == null) return null;
@@ -240,6 +248,7 @@ final class Menu {
     final fetchedAt = DateTime.tryParse(rawFetchedAt);
     if (fetchedAt == null) return null;
     if (rawCategories is! List<Object?>) return null;
+    if (rawVenueName != null && rawVenueName is! String) return null;
     final categories = <MenuCategory>[];
     for (final rawCategory in rawCategories) {
       if (rawCategory is! Map<String, Object?>) return null;
@@ -252,6 +261,7 @@ final class Menu {
       currency: currency,
       fetchedAt: fetchedAt,
       categories: categories,
+      venueName: rawVenueName is String ? rawVenueName : null,
     );
   }
 
@@ -268,6 +278,12 @@ final class Menu {
   ///
   /// Callers must not mutate the list passed to the constructor.
   final List<MenuCategory> categories;
+
+  /// The restaurant's name, when the platform payload named it. Null
+  /// when the source did not carry a name — the menu screen's header
+  /// falls back to the pasted reference in that case, never to a
+  /// placeholder guessed here.
+  final String? venueName;
 
   /// Every dish in the menu, flattened, category order preserved.
   Iterable<Dish> get allDishes =>
@@ -290,6 +306,7 @@ final class Menu {
     'currency': currency,
     'fetchedAt': fetchedAt.toIso8601String(),
     'categories': categories.map((category) => category.toJson()).toList(),
+    'venueName': venueName,
   };
 
   @override
@@ -298,13 +315,20 @@ final class Menu {
       other.venueRef == venueRef &&
       other.currency == currency &&
       other.fetchedAt == fetchedAt &&
-      _listEquals(other.categories, categories);
+      _listEquals(other.categories, categories) &&
+      other.venueName == venueName;
 
   @override
-  int get hashCode =>
-      Object.hash(venueRef, currency, fetchedAt, Object.hashAll(categories));
+  int get hashCode => Object.hash(
+    venueRef,
+    currency,
+    fetchedAt,
+    Object.hashAll(categories),
+    venueName,
+  );
 
   @override
   String toString() =>
-      'Menu(${venueRef.cacheKey}, ${categories.length} categories)';
+      'Menu(${venueRef.cacheKey}, ${venueName ?? '?'}, '
+      '${categories.length} categories)';
 }

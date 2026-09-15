@@ -40,6 +40,12 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 /// - An empty `categories` list is a valid, empty menu.
 /// - Unknown keys anywhere, including a top-level `_fixture_note`, are
 ///   ignored: only the keys named above are ever read.
+/// - [Menu.venueName] is read tolerantly, trying `venue.name` first and
+///   then a top-level `name`, and is null when neither is a non-empty
+///   string. A missing or wrong-shaped name is never a mapping failure —
+///   `menu_api_research`'s documented `menu/data` shape does not carry
+///   the venue's name at all, so null is the ordinary case today, not a
+///   drift signal.
 ///
 /// Anything else — a missing or wrong-typed `currency`/`categories`/
 /// `items`, or a present-but-malformed entry inside `categories[]`,
@@ -113,7 +119,25 @@ abstract final class WoltMenuMapper {
       currency: currency,
       fetchedAt: fetchedAt,
       categories: categories,
+      venueName: _tryReadVenueName(json),
     );
+  }
+
+  /// The venue's display name, tried first at `venue.name` and then at a
+  /// top-level `name`, or null when neither is a non-empty string.
+  ///
+  /// Tolerant by design (see the class doc comment): a missing or
+  /// malformed name must never fail the mapping, only leave
+  /// [Menu.venueName] null.
+  static String? _tryReadVenueName(Map<String, Object?> json) {
+    final rawVenue = json['venue'];
+    if (rawVenue is Map<String, Object?>) {
+      final nested = rawVenue['name'];
+      if (nested is String && nested.isNotEmpty) return nested;
+    }
+    final topLevel = json['name'];
+    if (topLevel is String && topLevel.isNotEmpty) return topLevel;
+    return null;
   }
 
   /// Builds one entry of the top-level `options[]` id-lookup table from

@@ -209,6 +209,32 @@ void main() {
       expect(adapter.fetchCalls, isEmpty);
     });
 
+    test('registering a second adapter routes to it with no repository '
+        'change (architecture.md §18.1, Open/Closed)', () async {
+      // Arrange: a second CachedMenuRepository instance with two
+      // adapters registered, proving a new platform is purely a
+      // registration — no change to CachedMenuRepository itself.
+      final woltAdapter = FakePlatformMenuAdapter();
+      final tenbisAdapter = FakePlatformMenuAdapter(source: MenuSource.tenbis);
+      final multiRepository = CachedMenuRepository(
+        adapters: [woltAdapter, tenbisAdapter],
+        cache: cache,
+        clock: clock,
+        freshFor: _freshFor,
+      );
+      final tenbisMenu = _menuWith(_tenbisRef, clock.now());
+      tenbisAdapter.queueFetched(tenbisMenu);
+
+      // Act
+      final result = await multiRepository.load(_tenbisRef);
+
+      // Assert: the newly-registered adapter answered; the first
+      // adapter, which cannot handle a tenbis ref, was never asked.
+      expect(result, equals(MenuFetched(menu: tenbisMenu)));
+      expect(tenbisAdapter.fetchCalls, [_tenbisRef]);
+      expect(woltAdapter.fetchCalls, isEmpty);
+    });
+
     test(
       'load with forceRefresh skips a fresh cache hit and still writes',
       () async {
