@@ -133,5 +133,51 @@
 
   "discoveryTitle": "Where to eat",
   "discoveryEmptyTitle": "Paste a link to get started",
-  "discoveryEmptyBody": "Search isn't available yet — paste a Wolt restaurant link, or its slug, above to see its keto-classified menu."
+  "discoveryEmptyBody": "Search isn't available yet — paste a Wolt restaurant link, or its slug, above to see its keto-classified menu.",
+  "menuKetoScoreLabel": "Keto score",
+  "menuKetoScoreSemanticLabel": "Keto score: {score} out of 10",
+  "@menuKetoScoreSemanticLabel": {
+    "placeholders": { "score": { "type": "String" } }
+  },
+  "menuSourceLine": "{platform} · {age}",
+  "@menuSourceLine": {
+    "placeholders": {
+      "platform": { "type": "String" },
+      "age": { "type": "String" }
+    }
+  },
+  "menuShowingAll": "{count, plural, one{Showing 1 dish} other{Showing {count} dishes}}",
+  "@menuShowingAll": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "menuShowingGreen": "Showing dishes you can order as-is",
+  "menuShowingYellow": "Showing dishes that need a change",
+  "menuShowingRed": "Showing what to skip",
+  "menuShowingGreenAndYellow": "Showing dishes you can order as-is or with a change",
+  "tileGreenLabel": "Order as-is",
+  "tileYellowLabel": "With changes",
+  "tileRedLabel": "Skip",
+  "tileSemanticLabel": "{label}: {count}",
+  "@tileSemanticLabel": {
+    "placeholders": {
+      "label": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "ageJustNow": "Just now",
+  "ageMinutes": "{count, plural, one{1 minute ago} other{{count} minutes ago}}",
+  "@ageMinutes": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "ageHours": "{count, plural, one{1 hour ago} other{{count} hours ago}}",
+  "@ageHours": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "ageDays": "{count, plural, one{1 day ago} other{{count} days ago}}",
+  "@ageDays": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "legendToggle": "What do the colours mean?",
+  "legendHide": "Hide the legend",
+  "legendNote": "The same rules KetoClub sends to the AI model."
 }

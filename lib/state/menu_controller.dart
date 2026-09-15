@@ -174,13 +174,23 @@ final class MenuController extends ChangeNotifier {
   /// Which verdicts [visibleRows] keeps.
   MenuFilter get filter => _filter;
 
-  /// Non-red dishes to render, honouring [filter].
+  /// The dishes to render, honouring [filter].
   ///
   /// [MenuFilter.greenOnly] keeps [DishVerdict.orderAsIs] dishes;
-  /// [MenuFilter.greenAndYellow] adds [DishVerdict.modifiable] ones;
-  /// [MenuFilter.all] adds dishes [analysis] never placed on top of that.
-  /// A dish verdict [DishVerdict.nonKeto] never appears here, under any
-  /// filter — see [redRows].
+  /// [MenuFilter.yellowOnly] keeps [DishVerdict.modifiable] ones;
+  /// [MenuFilter.redOnly] keeps [DishVerdict.nonKeto] ones;
+  /// [MenuFilter.greenAndYellow] keeps the first two together (see its own
+  /// doc: no longer offered by a control, but still honoured); and
+  /// [MenuFilter.all] keeps every dish, judged or not.
+  ///
+  /// **Issue #29 replaced the menu screen's separate, always-shown
+  /// "collapsed red group" with [MenuFilter.redOnly] as a tile like any
+  /// other** — the artboard's three counters draw no distinction between
+  /// verdicts here, so this getter no longer carves non-keto dishes out on
+  /// its own the way an earlier version did (that version's counterpart
+  /// getter, `redRows`, no longer exists). A screen that still wants every
+  /// non-keto dish regardless of the active filter can total [redCount]
+  /// instead.
   ///
   /// **When there is no successful analysis, every dish is returned with a
   /// null verdict, whatever the filter says.** A filter selects verdicts, and
@@ -198,7 +208,6 @@ final class MenuController extends ChangeNotifier {
     for (final category in currentMenu.categories) {
       for (final dish in category.dishes) {
         final verdict = analysedById[dish.id];
-        if (verdict?.verdict == DishVerdict.nonKeto) continue;
         if (!_matchesFilter(verdict)) continue;
         rows.add(
           DishRow(dish: dish, category: category.name, analysis: verdict),
@@ -214,26 +223,6 @@ final class MenuController extends ChangeNotifier {
       for (final dish in category.dishes)
         DishRow(dish: dish, category: category.name),
   ];
-
-  /// The collapsed red group: every [DishVerdict.nonKeto] dish, regardless
-  /// of [filter] (architecture.md §6.6, constraint 8 — red is grouped,
-  /// never hidden).
-  List<DishRow> get redRows {
-    final currentMenu = _menu;
-    if (currentMenu == null) return const <DishRow>[];
-    final analysedById = _analysedById();
-    final rows = <DishRow>[];
-    for (final category in currentMenu.categories) {
-      for (final dish in category.dishes) {
-        final verdict = analysedById[dish.id];
-        if (verdict?.verdict != DishVerdict.nonKeto) continue;
-        rows.add(
-          DishRow(dish: dish, category: category.name, analysis: verdict),
-        );
-      }
-    }
-    return rows;
-  }
 
   /// Dish names [analysis] saw on the menu but could not place, shown
   /// under their own heading regardless of [filter] (architecture.md
@@ -316,12 +305,16 @@ final class MenuController extends ChangeNotifier {
   }
 
   /// Whether [verdict] belongs in [visibleRows] under the current
-  /// [filter].
+  /// [filter]. An exhaustive switch with no `default`: adding a
+  /// [MenuFilter] value without updating this function is a compile error
+  /// (architecture.md §10).
   bool _matchesFilter(AnalysedDish? verdict) => switch (_filter) {
     MenuFilter.greenOnly => verdict?.verdict == DishVerdict.orderAsIs,
     MenuFilter.greenAndYellow =>
       verdict?.verdict == DishVerdict.orderAsIs ||
           verdict?.verdict == DishVerdict.modifiable,
+    MenuFilter.yellowOnly => verdict?.verdict == DishVerdict.modifiable,
+    MenuFilter.redOnly => verdict?.verdict == DishVerdict.nonKeto,
     MenuFilter.all => true,
   };
 }

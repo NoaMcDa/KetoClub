@@ -12,9 +12,13 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/state/menu_controller.dart';
+import 'package:ketoclub/theme/app_typography.dart';
+import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
+import 'package:ketoclub/widgets/keto_score_badge.dart';
+import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
 
 /// The brand name shown for [source] inside failure copy (architecture.md
@@ -31,9 +35,39 @@ String _platformName(MenuSource source) => switch (source) {
   MenuSource.ontopo => 'Ontopo',
 };
 
-/// The classified menu screen: filters, the engine chip, dish cards, the
-/// collapsed red group and the unclassified section (architecture.md
-/// §6.6).
+/// The bucketed "time ago" phrase for [fetchedAt] relative to [now]
+/// (issue #29's persistent source line): "just now" under a minute, then
+/// the coarsest whole unit that fits — minutes, then hours, then days —
+/// the way a person reads a timestamp rather than as raw seconds. [now] is
+/// a parameter, not `DateTime.now()` read internally, purely so a caller
+/// (or a test) controls it explicitly; this file still injects no `Clock`
+/// dependency anywhere, matching `MenuController`'s own choice not to.
+///
+/// A [fetchedAt] slightly in the future — clock skew, not a real case —
+/// reads as "just now" rather than a negative duration, since
+/// [Duration.inMinutes] on a negative difference is itself negative and
+/// so already less than 1.
+String _ageLabel(DateTime fetchedAt, DateTime now, AppLocalizations l10n) {
+  final elapsed = now.difference(fetchedAt);
+  if (elapsed.inMinutes < 1) return l10n.ageJustNow;
+  if (elapsed.inHours < 1) return l10n.ageMinutes(elapsed.inMinutes);
+  if (elapsed.inDays < 1) return l10n.ageHours(elapsed.inHours);
+  return l10n.ageDays(elapsed.inDays);
+}
+
+/// The definition text of one [promptVerdictDefinitions] line, stripped of
+/// its leading `verdictName — ` prefix. Returns the whole line, trimmed,
+/// when no em dash is present, rather than failing — this is display
+/// text, not a value anything downstream depends on being exact.
+String _definitionTextFrom(String line) {
+  final dashIndex = line.indexOf('—');
+  return dashIndex == -1 ? line.trim() : line.substring(dashIndex + 1).trim();
+}
+
+/// The classified menu screen: a header naming the venue and its keto
+/// score, the persistent "{platform} · {age}" source line, the three
+/// verdict counter tiles that double as the filter, the engine chip, dish
+/// cards, and the unclassified section (architecture.md §6.6, issue #29).
 ///
 /// Reads its [MenuController] from `provider` and loads [ref] once, after
 /// the first frame, so the initial build never itself triggers I/O. A
@@ -58,12 +92,15 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  /// Whether the collapsed red group has been expanded by the user.
+  /// Whether the verdict legend (issue #17, §"WHAT TO BUILD" item 5) is
+  /// expanded.
   ///
   /// Local UI state, not persisted and not part of [MenuController]: it
   /// says nothing about the menu itself, only about this screen's
-  /// disclosure widget.
-  bool _redExpanded = false;
+  /// disclosure widget — the same reasoning that kept the collapsed red
+  /// group's expansion flag local before issue #29 replaced that group
+  /// with [MenuFilter.redOnly].
+  bool _legendExpanded = false;
 
   @override
   void initState() {
@@ -152,18 +189,30 @@ class _MenuScreenState extends State<MenuScreen> {
     Menu menu,
   ) {
     final banners = _banners(context, l10n, controller);
+    // The header and the source line name the venue and when its menu was
+    // read; neither depends on a successful analysis, so both render for
+    // an empty menu and for a failed analysis alike.
+    final header = _header(context, l10n, controller);
+    final sourceLine = controller.fetchedAt == null
+        ? null
+        : _sourceLine(context, l10n, controller.fetchedAt!);
+
     if (menu.allDishes.isEmpty) {
       return ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          header,
+          const SizedBox(height: 4),
+          ?sourceLine,
+          const SizedBox(height: 12),
           ...banners,
           Center(child: Text(l10n.menuEmpty)),
         ],
       );
     }
 
-    // The filter control, the engine chip and the red/unclassified groups
-    // all key off a verdict that exists only once the analysis succeeded, so
+    // The tiles, the "Showing" label, the legend and the engine chip all
+    // key off a verdict that exists only once the analysis succeeded, so
     // they are hidden without one. The dish list itself is not:
     // MenuController.visibleRows already returns every dish unjudged in that
     // case, so a failed analysis never costs the user the menu (§6.6).
@@ -174,11 +223,37 @@ class _MenuScreenState extends State<MenuScreen> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        ...banners,
+        header,
+        const SizedBox(height: 4),
         if (analysed) ...[
-          _filterControl(l10n, controller),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
+          VerdictCounterTiles(
+            greenCount: controller.greenCount,
+            yellowCount: controller.yellowCount,
+            redCount: controller.redCount,
+            filter: controller.filter,
+            onFilterChanged: controller.setFilter,
+          ),
+          const SizedBox(height: 10),
         ],
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (analysed)
+              Expanded(
+                child: Text(
+                  _showingLabel(l10n, controller),
+                  style: Theme.of(context).textTheme.labelMedium,
+                ),
+              )
+            else
+              const Spacer(),
+            ?sourceLine,
+          ],
+        ),
+        if (analysed) ...[const SizedBox(height: 4), _legend(context, l10n)],
+        const SizedBox(height: 8),
+        ...banners,
         if (controller.engine != null) ...[
           EngineChip(engine: controller.engine!),
           const SizedBox(height: 12),
@@ -192,11 +267,149 @@ class _MenuScreenState extends State<MenuScreen> {
               onShowScript: (shown) => unawaited(_openWaiterCard(shown)),
             ),
           ),
-        if (analysed && controller.redRows.isNotEmpty)
-          _redGroup(l10n, controller, localeTag),
         if (analysed && controller.unclassifiedNames.isNotEmpty)
           _unclassifiedSection(context, l10n, controller),
       ],
+    );
+  }
+
+  /// The venue name and keto score (issue #29's header row,
+  /// `.design/Main.dc.html`).
+  ///
+  /// **`venueName` is null on every real fetch today** — no documented
+  /// Wolt payload names the venue, so this is the normal case, not an
+  /// edge case: the header falls back to [VenueRef.platformId] — the
+  /// pasted slug or reference — rather than a placeholder like
+  /// "Restaurant", per `Menu.venueName`'s own doc comment.
+  Widget _header(
+    BuildContext context,
+    AppLocalizations l10n,
+    MenuController controller,
+  ) {
+    final name = controller.venueName ?? widget.ref.platformId;
+    final theme = Theme.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Text(
+            name,
+            style: AppTypography.displayStyle(
+              size: 28,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+        ),
+        KetoScoreBadge(score: controller.ketoScoreOutOfTen),
+      ],
+    );
+  }
+
+  /// The persistent source line, e.g. "Wolt · 4 min ago"
+  /// (`.design/Main.dc.html`): unlike the old cache-only notice, this
+  /// shows for every loaded menu, fresh or cached, from
+  /// [MenuController.fetchedAt] — see that getter's own doc comment for
+  /// why it, not [MenuController.cachedAt], is the right source.
+  Widget _sourceLine(
+    BuildContext context,
+    AppLocalizations l10n,
+    DateTime fetchedAt,
+  ) {
+    final age = _ageLabel(fetchedAt, DateTime.now(), l10n);
+    return Text(
+      l10n.menuSourceLine(_platformName(widget.ref.source), age),
+      style: Theme.of(context).textTheme.bodySmall,
+    );
+  }
+
+  /// A short label for `controller.filter`, matching
+  /// `.design/Main.dc.html`'s `showing` map. An exhaustive switch with no
+  /// `default`: adding a [MenuFilter] value without updating this
+  /// function is a compile error (architecture.md §10).
+  String _showingLabel(AppLocalizations l10n, MenuController controller) =>
+      switch (controller.filter) {
+        MenuFilter.greenOnly => l10n.menuShowingGreen,
+        MenuFilter.yellowOnly => l10n.menuShowingYellow,
+        MenuFilter.redOnly => l10n.menuShowingRed,
+        MenuFilter.greenAndYellow => l10n.menuShowingGreenAndYellow,
+        MenuFilter.all => l10n.menuShowingAll(controller.totalDishCount),
+      };
+
+  /// The verdict legend (issue #17): a toggle, and — once expanded — the
+  /// same three verdict definitions the system prompt sends
+  /// ([promptVerdictDefinitions]), so the legend the UI shows and the
+  /// definitions the prompt sends can never drift apart. See this
+  /// screen's final report for why this reads that constant directly
+  /// rather than a re-translated copy of it.
+  Widget _legend(BuildContext context, AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: () => setState(() => _legendExpanded = !_legendExpanded),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  size: 14,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  _legendExpanded ? l10n.legendHide : l10n.legendToggle,
+                  style: theme.textTheme.labelMedium,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (_legendExpanded) _legendBody(context, l10n),
+      ],
+    );
+  }
+
+  /// The expanded legend body: one line per verdict, parsed from
+  /// [promptVerdictDefinitions] — never re-typed — plus `l10n.legendNote`
+  /// naming that source. Renders nothing if that constant is ever
+  /// reshaped away from its documented one-line-per-verdict form, rather
+  /// than guessing at a malformed split.
+  Widget _legendBody(BuildContext context, AppLocalizations l10n) {
+    final lines = promptVerdictDefinitions.split('\n');
+    if (lines.length != 3) return const SizedBox.shrink();
+    final labels = [
+      l10n.verdictOrderAsIs,
+      l10n.verdictModifiable,
+      l10n.verdictNonKeto,
+    ];
+    final bodyStyle = Theme.of(context).textTheme.bodySmall;
+    return Padding(
+      padding: const EdgeInsets.only(top: 2, bottom: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (var i = 0; i < labels.length; i++)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: RichText(
+                text: TextSpan(
+                  style: bodyStyle,
+                  children: [
+                    TextSpan(
+                      text: '${labels[i]}: ',
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    TextSpan(text: _definitionTextFrom(lines[i])),
+                  ],
+                ),
+              ),
+            ),
+          Text(l10n.legendNote, style: bodyStyle),
+        ],
+      ),
     );
   }
 
@@ -249,72 +462,6 @@ class _MenuScreenState extends State<MenuScreen> {
         ),
       ),
     ];
-  }
-
-  /// The three-way [MenuFilter] control.
-  Widget _filterControl(AppLocalizations l10n, MenuController controller) {
-    return SegmentedButton<MenuFilter>(
-      segments: [
-        ButtonSegment(
-          value: MenuFilter.greenOnly,
-          label: Text(l10n.filterGreenOnly),
-        ),
-        ButtonSegment(
-          value: MenuFilter.greenAndYellow,
-          label: Text(l10n.filterGreenAndYellow),
-        ),
-        ButtonSegment(value: MenuFilter.all, label: Text(l10n.filterAll)),
-      ],
-      selected: <MenuFilter>{controller.filter},
-      onSelectionChanged: (selection) => controller.setFilter(selection.first),
-    );
-  }
-
-  /// The collapsed red group: a tap target naming [MenuFilter]-independent
-  /// [MenuController.redRows] and its count, expanding on tap to show a
-  /// [DishCard] per red dish (architecture.md §6.6, constraint 8).
-  ///
-  /// A hand-rolled disclosure rather than [ExpansionTile]: its children
-  /// only enter the widget tree once expanded, so the collapsed state is
-  /// verifiable with a plain `findsNothing`, not an `Offstage` that still
-  /// builds (and would still be found by) its hidden children.
-  Widget _redGroup(
-    AppLocalizations l10n,
-    MenuController controller,
-    String localeTag,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        InkWell(
-          onTap: () => setState(() => _redExpanded = !_redExpanded),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    l10n.redGroupTitle(controller.redRows.length),
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                ),
-                Icon(_redExpanded ? Icons.expand_less : Icons.expand_more),
-              ],
-            ),
-          ),
-        ),
-        if (_redExpanded)
-          for (final row in controller.redRows)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: DishCard(
-                row: row,
-                localeTag: localeTag,
-                onShowScript: (_) {},
-              ),
-            ),
-      ],
-    );
   }
 
   /// The unclassified section: a neutral heading naming

@@ -294,4 +294,100 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get discoveryEmptyBody =>
       'Search isn\'t available yet — paste a Wolt restaurant link, or its slug, above to see its keto-classified menu.';
+
+  @override
+  String get menuKetoScoreLabel => 'Keto score';
+
+  @override
+  String menuKetoScoreSemanticLabel(String score) {
+    return 'Keto score: $score out of 10';
+  }
+
+  @override
+  String menuSourceLine(String platform, String age) {
+    return '$platform · $age';
+  }
+
+  @override
+  String menuShowingAll(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Showing $count dishes',
+      one: 'Showing 1 dish',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get menuShowingGreen => 'Showing dishes you can order as-is';
+
+  @override
+  String get menuShowingYellow => 'Showing dishes that need a change';
+
+  @override
+  String get menuShowingRed => 'Showing what to skip';
+
+  @override
+  String get menuShowingGreenAndYellow =>
+      'Showing dishes you can order as-is or with a change';
+
+  @override
+  String get tileGreenLabel => 'Order as-is';
+
+  @override
+  String get tileYellowLabel => 'With changes';
+
+  @override
+  String get tileRedLabel => 'Skip';
+
+  @override
+  String tileSemanticLabel(String label, int count) {
+    return '$label: $count';
+  }
+
+  @override
+  String get ageJustNow => 'Just now';
+
+  @override
+  String ageMinutes(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minutes ago',
+      one: '1 minute ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ageHours(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hours ago',
+      one: '1 hour ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ageDays(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days ago',
+      one: '1 day ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get legendToggle => 'What do the colours mean?';
+
+  @override
+  String get legendHide => 'Hide the legend';
+
+  @override
+  String get legendNote => 'The same rules KetoClub sends to the AI model.';
 }
