@@ -614,6 +614,83 @@ void main() {
       expect(result, isNull);
     });
 
+    test('tryFrom decodes a Menu with venueName == null when the key is '
+        'absent, not a failure — the shape of every cache entry written '
+        'before venueName existed', () {
+      // Arrange: validJson deliberately carries no 'venueName' key.
+      expect(validJson.containsKey('venueName'), isFalse);
+
+      // Act
+      final result = Menu.tryFrom(validJson);
+
+      // Assert
+      expect(result, isNotNull);
+      expect(result?.venueName, isNull);
+    });
+
+    test('tryFrom reads a present venueName', () {
+      // Arrange
+      final json = <String, Object?>{
+        ...validJson,
+        'venueName': 'Vitrina Lilinblum',
+      };
+
+      // Act
+      final result = Menu.tryFrom(json);
+
+      // Assert
+      expect(result?.venueName, equals('Vitrina Lilinblum'));
+    });
+
+    test('tryFrom treats an explicit null venueName the same as absent', () {
+      // Arrange
+      final json = <String, Object?>{...validJson, 'venueName': null};
+
+      // Act
+      final result = Menu.tryFrom(json);
+
+      // Assert
+      expect(result?.venueName, isNull);
+    });
+
+    test('tryFrom returns null when venueName is present but not a String', () {
+      // Arrange
+      final json = <String, Object?>{...validJson, 'venueName': 42};
+
+      // Act
+      final result = Menu.tryFrom(json);
+
+      // Assert
+      expect(result, isNull);
+    });
+
+    test('tryFrom(x.toJson()) round-trips a Menu carrying a venueName', () {
+      // Arrange
+      final menu = Menu.tryFrom(<String, Object?>{
+        ...validJson,
+        'venueName': 'Vitrina Lilinblum',
+      })!;
+
+      // Act
+      final result = Menu.tryFrom(menu.toJson());
+
+      // Assert
+      expect(result, equals(menu));
+      expect(result?.venueName, equals('Vitrina Lilinblum'));
+    });
+
+    test('== returns false for menus differing only in venueName', () {
+      // Arrange
+      final a = Menu.tryFrom(validJson)!;
+      final b = Menu.tryFrom(<String, Object?>{
+        ...validJson,
+        'venueName': 'Named Venue',
+      })!;
+
+      // Act & Assert
+      expect(a, isNot(equals(b)));
+    });
+
     test('allDishes flattens categories, preserving order', () {
       // Arrange
       final menu = Menu.tryFrom(validJson)!;

@@ -32,28 +32,50 @@ error envelope with none of `currency`/`categories`/`items`), used to
 exercise the `platformChanged` path in `wolt_adapter_test.dart` and
 `wolt_menu_mapper_test.dart`.
 
-### Re-recording before release
+### Re-recording before release (issue #22)
 
-Before shipping, replace `wolt_vitrina_lilinblum_menu.json` with a real
-recording — from a network environment that can reach Wolt — of:
+**`wolt_vitrina_lilinblum_menu.json` is synthetic. It has never been a real
+Wolt response, and it proves only that `WoltMenuMapper` handles the shapes
+listed above — it proves nothing about what Wolt's real API actually
+returns today.** `restaurant-api.wolt.com` is unreachable from every
+environment this repository's automation runs in (the egress proxy 403s
+the CONNECT), so issue #22 — recording a real fixture — stays open until
+someone runs the recorder below from an unblocked machine.
 
 ```bash
-curl -s \
-  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' \
-  -H 'Accept: application/json' \
-  'https://restaurant-api.wolt.com/v4/venues/slug/vitrina-lilinblum/menu/data'
+tool/record_wolt_fixture.sh vitrina-lilinblum
 ```
 
-(the `User-Agent` value is `browserUserAgent` in `lib/utils/constants.dart`
-— keep the two in sync if it ever changes). Redact only fields that are
-personal (there should be none in a public menu). Keep the `_fixture_note`
-key, updated to describe the real recording instead, or remove the note
-and the assertion in `wolt_menu_mapper_test.dart` that checks it is
+This does everything the old hand-typed `curl` command needed doing by
+hand: it sends the same `User-Agent` `browserUserAgent` in
+`lib/utils/constants.dart` sends (keep the two in sync if it ever
+changes), fails loudly with the response body printed if the request
+does not come back `200` or the body is not JSON, redacts any field whose
+key looks like a token/secret/session/credential and any string value
+shaped like a bearer token or JWT, writes
+`test/fixtures/wolt_{slug}_menu.json` pretty-printed with a
+`_fixture_note` header naming the venue, the recording timestamp, the
+endpoint, and exactly what was redacted, and finally runs
+`wolt_fixture_shape_test.dart` against it so a schema drift shows up
+immediately rather than the next time someone happens to run the suite.
+Pass any venue slug as `$1`; `vitrina-lilinblum` is the one already used
+throughout this repo's docs and fixtures, so keeping the same slug means
+the new file replaces this one directly.
+
+Before committing the result: open the file and skim it for anything the
+redaction pass missed (it does not know your account's own data if you
+were logged into Wolt while fetching — request the endpoint from a
+private/incognito session to avoid that entirely). Keep the
+`_fixture_note` key, or remove it and the assertion in
+`wolt_menu_mapper_test.dart` that checks an unknown top-level key is
 ignored — either is fine as long as they change together. Re-check that
 the fixture still exercises every shape variation listed above; a real
 venue may not happen to have a checkbox option group or a duplicated
 item id, in which case keep a couple of hand-added dishes alongside the
-real ones rather than losing that coverage.
+real ones rather than losing that coverage. `wolt_fixture_shape_test.dart`
+runs against every `wolt_*_menu.json` fixture automatically (except
+`wolt_malformed_menu.json`), so a new file needs no test-file edit to be
+covered.
 
 ## LLM response fixtures (`llm_*.json`)
 

@@ -431,6 +431,144 @@ void main() {
       expect(dish.options, isEmpty);
     });
 
+    test(
+      'toMenu produces a null venueName from the checked-in fixture — it '
+      'carries no venue name, matching the documented Wolt payload shape',
+      () {
+        // Arrange
+        final json = _validFixture();
+
+        // Act
+        final result = WoltMenuMapper.toMenu(
+          json,
+          ref: _ref,
+          fetchedAt: _fetchedAt,
+        ) as MenuFetched;
+
+        // Assert
+        expect(result.menu.venueName, isNull);
+      },
+    );
+
+    test('toMenu reads venueName from a nested venue.name', () {
+      // Arrange
+      final json = <String, Object?>{
+        ..._validFixture(),
+        'venue': <String, Object?>{'name': 'Vitrina Lilinblum'},
+      };
+
+      // Act
+      final result = WoltMenuMapper.toMenu(
+        json,
+        ref: _ref,
+        fetchedAt: _fetchedAt,
+      ) as MenuFetched;
+
+      // Assert
+      expect(result.menu.venueName, equals('Vitrina Lilinblum'));
+    });
+
+    test('toMenu reads venueName from a top-level name when venue.name is '
+        'absent', () {
+      // Arrange
+      final json = <String, Object?>{
+        ..._validFixture(),
+        'name': 'Vitrina Lilinblum',
+      };
+
+      // Act
+      final result = WoltMenuMapper.toMenu(
+        json,
+        ref: _ref,
+        fetchedAt: _fetchedAt,
+      ) as MenuFetched;
+
+      // Assert
+      expect(result.menu.venueName, equals('Vitrina Lilinblum'));
+    });
+
+    test('toMenu prefers venue.name over a top-level name', () {
+      // Arrange
+      final json = <String, Object?>{
+        ..._validFixture(),
+        'venue': <String, Object?>{'name': 'From venue.name'},
+        'name': 'From top level',
+      };
+
+      // Act
+      final result = WoltMenuMapper.toMenu(
+        json,
+        ref: _ref,
+        fetchedAt: _fetchedAt,
+      ) as MenuFetched;
+
+      // Assert
+      expect(result.menu.venueName, equals('From venue.name'));
+    });
+
+    test('toMenu never fails when venue.name is malformed, and falls back to '
+        'a top-level name', () {
+      // Arrange
+      final json = <String, Object?>{
+        ..._validFixture(),
+        'venue': 'not a map',
+        'name': 'Vitrina Lilinblum',
+      };
+
+      // Act
+      final result = WoltMenuMapper.toMenu(
+        json,
+        ref: _ref,
+        fetchedAt: _fetchedAt,
+      );
+
+      // Assert
+      expect(result, isA<MenuFetched>());
+      expect(
+        (result as MenuFetched).menu.venueName,
+        equals('Vitrina Lilinblum'),
+      );
+    });
+
+    test('toMenu never fails when both venue.name and name are absent or '
+        'wrongly shaped', () {
+      // Arrange
+      final json = <String, Object?>{
+        ..._validFixture(),
+        'venue': <String, Object?>{'name': 42},
+        'name': <Object?>[],
+      };
+
+      // Act
+      final result = WoltMenuMapper.toMenu(
+        json,
+        ref: _ref,
+        fetchedAt: _fetchedAt,
+      );
+
+      // Assert
+      expect(result, isA<MenuFetched>());
+      expect((result as MenuFetched).menu.venueName, isNull);
+    });
+
+    test('toMenu treats an empty venue.name as absent', () {
+      // Arrange
+      final json = <String, Object?>{
+        ..._validFixture(),
+        'venue': <String, Object?>{'name': ''},
+      };
+
+      // Act
+      final result = WoltMenuMapper.toMenu(
+        json,
+        ref: _ref,
+        fetchedAt: _fetchedAt,
+      ) as MenuFetched;
+
+      // Assert
+      expect(result.menu.venueName, isNull);
+    });
+
     test('toMenu returns platformChanged when currency is missing', () {
       // Arrange
       final json = <String, Object?>{
