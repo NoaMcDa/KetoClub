@@ -12,6 +12,7 @@ import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
+import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:provider/provider.dart';
 
@@ -31,6 +32,13 @@ class KetoClubApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: appName,
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      // Explicit even though it matches MaterialApp's own default: it is
+      // the acceptance criterion for issue #9, and stating it here means a
+      // future default change upstream can never silently change it.
+      // ignore: avoid_redundant_argument_values
+      themeMode: ThemeMode.system,
       localizationsDelegates: const <LocalizationsDelegate<Object>>[
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

@@ -8,6 +8,12 @@ import 'package:ketoclub/models/analysis.dart';
 /// The rules variant always carries the "not AI-verified" meaning — its
 /// greens have not been checked by the LLM — surfaced here as a
 /// [Tooltip] so it is available without depending on colour.
+///
+/// Neither engine is a keto verdict, so this reads its colours from
+/// [ColorScheme] rather than `VerdictColors` (architecture.md §6.6): the AI
+/// engine uses the theme's primary/accent colour, and the rules fallback a
+/// neutral outline colour, so the chip stays legible in both themes without
+/// its own hard-coded palette.
 class EngineChip extends StatelessWidget {
   /// Creates a chip for [engine].
   const new({required this.engine, super.key});
@@ -18,18 +24,19 @@ class EngineChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
     return switch (engine) {
       LlmEngine() => _chip(
         icon: Icons.auto_awesome,
         label: l10n.engineChipAi,
-        color: Colors.blue.shade700,
+        color: colorScheme.primary,
       ),
       RulesEngine() => Tooltip(
         message: l10n.rulesNotVerifiedHint,
         child: _chip(
           icon: Icons.rule,
           label: l10n.engineChipRules,
-          color: Colors.grey.shade700,
+          color: colorScheme.onSurfaceVariant,
         ),
       ),
     };

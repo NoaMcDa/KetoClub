@@ -220,6 +220,12 @@ ketoclub/
 │   │   ├── waiter_card_sheet.dart        # full-screen high-contrast script + copy button
 │   │   └── settings_screen.dart          # OpenRouter key, consent text, dietary toggles (later)
 │   │
+│   ├── theme/                            # design tokens as the app theme (rank 4, see below)
+│   │   ├── app_tokens.dart               # raw sRGB constants converted from the artboard's oklch tokens
+│   │   ├── verdict_colors.dart           # ThemeExtension<VerdictColors>: green/amber/red tones
+│   │   ├── app_typography.dart           # TextTheme over the bundled fonts, with Hebrew fallbacks
+│   │   └── app_theme.dart                # AppTheme.light() / AppTheme.dark()
+│   │
 │   ├── widgets/
 │   │   ├── dish_card.dart                # name, price, badge, expandable script
 │   │   ├── status_badge.dart             # icon + colour, never colour alone
@@ -309,11 +315,26 @@ ketoclub/
 └── analysis_options.yaml                 # very_good_analysis + strict modes
 ```
 
+**The `theme/` layer (issue #9):** rank 4, the same rank as `widgets/`. It holds the
+design tokens (`app_tokens.dart`), the `ThemeExtension<VerdictColors>` the verdict
+palette lives on, the bundled-font `TextTheme` and `AppTheme.light()` /
+`AppTheme.dark()`. It sits at 4 rather than lower because a theme is themable UI
+configuration, not a service or a piece of app state: it depends on nothing in
+`state/` or `services/` (an `AppTheme` is built from constants alone, with no
+injected dependency), and nothing below `widgets/` should ever need to read it —
+`state/` controllers hold data, not colours. Rank 4 gives `widgets/` (4), `screens/`
+(5) and `app.dart` (6) the read access they need to theme their output, while
+keeping `state/` (3) and `services/` (2) from importing it, which would be a sign
+that colour had leaked into a layer that must stay presentation-agnostic. The
+`Colors.*`/`Color(0x...)` grep test (`test/architecture/theme_tokens_test.dart`)
+enforces the flip side: no file outside `theme/` may declare its own colour
+literal.
+
 **Dependency rules, enforced by `test/architecture/import_rules_test.dart` (§18.2):**
 
 - Layer order, lowest first: `models`, `l10n` → `utils` → `services` → `state` →
-  `widgets` → `screens` → `app.dart` → `di.dart`, `main.dart`. A file may import
-  only files in its own layer or a lower one.
+  `widgets`, `theme` → `screens` → `app.dart` → `di.dart`, `main.dart`. A file may
+  import only files in its own layer or a lower one.
 - Inside `services/`, sub-packages have a rank (shown in the tree). A sub-package
   may import only sub-packages of equal or lower rank. Within one sub-package the
   cycle check still applies.
