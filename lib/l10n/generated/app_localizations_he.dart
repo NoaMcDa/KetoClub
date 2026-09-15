@@ -395,4 +395,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get legendNote => 'אותם הכללים שקטוקלאב שולחת למודל הבינה המלאכותית.';
+
+  @override
+  String get waiterCardCopyButton => 'העתק טקסט';
+
+  @override
+  String waiterCardAfterText(String grams) {
+    return 'עם השינויים האלו, בערך $grams גרם פחמימות נטו (הערכה) — בטוח להזמין.';
+  }
 }

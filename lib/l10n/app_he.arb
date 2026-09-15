@@ -179,5 +179,10 @@
   },
   "legendToggle": "מה משמעות הצבעים?",
   "legendHide": "הסתר את המקרא",
-  "legendNote": "אותם הכללים שקטוקלאב שולחת למודל הבינה המלאכותית."
+  "legendNote": "אותם הכללים שקטוקלאב שולחת למודל הבינה המלאכותית.",
+  "waiterCardCopyButton": "העתק טקסט",
+  "waiterCardAfterText": "עם השינויים האלו, בערך {grams} גרם פחמימות נטו (הערכה) — בטוח להזמין.",
+  "@waiterCardAfterText": {
+    "placeholders": { "grams": { "type": "String" } }
+  }
 }

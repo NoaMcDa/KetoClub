@@ -179,5 +179,10 @@
   },
   "legendToggle": "What do the colours mean?",
   "legendHide": "Hide the legend",
-  "legendNote": "The same rules KetoClub sends to the AI model."
+  "legendNote": "The same rules KetoClub sends to the AI model.",
+  "waiterCardCopyButton": "Copy text",
+  "waiterCardAfterText": "With these changes, about {grams}g net carbs (estimate) — safe to order.",
+  "@waiterCardAfterText": {
+    "placeholders": { "grams": { "type": "String" } }
+  }
 }

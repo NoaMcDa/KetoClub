@@ -2,6 +2,8 @@
 // journey of pasting a Wolt link and seeing the resulting menu classified
 // into keto verdicts, filtered, and turned into a waiter script.
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
@@ -111,6 +113,26 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Menu display flow', () {
+    // The Waiter Card's copy button goes through `Clipboard.setData`, which
+    // needs a platform channel this binding does not provide on its own;
+    // a mock handler that records every call stands in for it (mirrors
+    // test/widgets/waiter_script_widget_test.dart).
+    late List<MethodCall> platformCalls;
+
+    setUp(() {
+      platformCalls = <MethodCall>[];
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+            platformCalls.add(call);
+            return null;
+          });
+    });
+
+    tearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null);
+    });
+
     testWidgets('user pastes a Wolt link and sees the classified menu', (
       tester,
     ) async {
@@ -172,6 +194,18 @@ void main() {
       // Assert: the Waiter Card is open and its script text is on screen.
       expect(find.byType(WaiterCardSheet), findsOneWidget);
       expect(find.text(_yellowScript), findsWidgets);
+
+      // Act: copy the script from the Waiter Card.
+      await tapAndSettle(tester, find.text(_en.waiterCardCopyButton));
+
+      // Assert: the confirmation shows, and the plain script — not any
+      // numbering the card draws around it — reached the clipboard.
+      expect(find.text(_en.actionCopied), findsOneWidget);
+      final setData = platformCalls.singleWhere(
+        (call) => call.method == 'Clipboard.setData',
+      );
+      final arguments = setData.arguments as Map<Object?, Object?>;
+      expect(arguments['text'], _yellowScript);
     });
   });
 }

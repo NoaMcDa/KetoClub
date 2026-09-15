@@ -390,4 +390,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get legendNote => 'The same rules KetoClub sends to the AI model.';
+
+  @override
+  String get waiterCardCopyButton => 'Copy text';
+
+  @override
+  String waiterCardAfterText(String grams) {
+    return 'With these changes, about ${grams}g net carbs (estimate) — safe to order.';
+  }
 }

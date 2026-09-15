@@ -703,6 +703,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The same rules KetoClub sends to the AI model.'**
   String get legendNote;
+
+  /// No description provided for @waiterCardCopyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy text'**
+  String get waiterCardCopyButton;
+
+  /// No description provided for @waiterCardAfterText.
+  ///
+  /// In en, this message translates to:
+  /// **'With these changes, about {grams}g net carbs (estimate) — safe to order.'**
+  String waiterCardAfterText(String grams);
 }
 
 class _AppLocalizationsDelegate
