@@ -135,5 +135,57 @@ void runMenuCacheContract(String name, MenuCache Function() build) {
         completes,
       );
     });
+
+    test('size is 0 for a freshly built cache', () async {
+      final cache = build();
+
+      expect(await cache.size(), equals(0));
+    });
+
+    test('size counts one entry after a single write', () async {
+      final cache = build();
+
+      await cache.write(CachedMenu(menu: _menuFor(woltRef)));
+
+      expect(await cache.size(), equals(1));
+    });
+
+    test('size counts distinct VenueRefs, not distinct platformIds', () async {
+      final cache = build();
+      await cache.write(CachedMenu(menu: _menuFor(woltRef)));
+      await cache.write(CachedMenu(menu: _menuFor(tenbisRef)));
+
+      expect(await cache.size(), equals(2));
+    });
+
+    test(
+      'size does not grow when a write overwrites an existing ref',
+      () async {
+        final cache = build();
+        await cache.write(CachedMenu(menu: _menuFor(woltRef)));
+
+        await cache.write(
+          CachedMenu(menu: _menuFor(woltRef, fetchedAt: DateTime.utc(2027))),
+        );
+
+        expect(await cache.size(), equals(1));
+      },
+    );
+
+    test('size is 0 after clear', () async {
+      final cache = build();
+      await cache.write(CachedMenu(menu: _menuFor(woltRef)));
+      await cache.write(CachedMenu(menu: _menuFor(tenbisRef)));
+
+      await cache.clear();
+
+      expect(await cache.size(), equals(0));
+    });
+
+    test('size never throws', () async {
+      final cache = build();
+
+      await expectLater(cache.size(), completes);
+    });
   });
 }

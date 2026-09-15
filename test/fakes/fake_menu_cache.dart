@@ -39,4 +39,7 @@ final class FakeMenuCache implements MenuCache {
     clearCallCount++;
     _entries.clear();
   }
+
+  @override
+  Future<int> size() async => _entries.length;
 }

@@ -207,6 +207,106 @@ void main() {
       expect(result?.description, equals(''));
     });
 
+    test('tryFrom decodes a map with no imageUrl key to a null imageUrl', () {
+      // Arrange: a Hive entry written before imageUrl existed.
+      final json = <String, Object?>{...validJson}..remove('imageUrl');
+
+      // Act
+      final result = Dish.tryFrom(json);
+
+      // Assert
+      expect(result, isNotNull);
+      expect(result?.imageUrl, isNull);
+    });
+
+    test('tryFrom decodes a null imageUrl to null', () {
+      // Arrange
+      final json = <String, Object?>{...validJson, 'imageUrl': null};
+
+      // Act
+      final result = Dish.tryFrom(json);
+
+      // Assert
+      expect(result?.imageUrl, isNull);
+    });
+
+    test('tryFrom decodes a non-String imageUrl to null, not a failure', () {
+      // Arrange
+      final json = <String, Object?>{...validJson, 'imageUrl': 7};
+
+      // Act
+      final result = Dish.tryFrom(json);
+
+      // Assert
+      expect(result, isNotNull);
+      expect(result?.imageUrl, isNull);
+    });
+
+    test('tryFrom decodes an empty imageUrl to null', () {
+      // Arrange
+      final json = <String, Object?>{...validJson, 'imageUrl': ''};
+
+      // Act
+      final result = Dish.tryFrom(json);
+
+      // Assert
+      expect(result?.imageUrl, isNull);
+    });
+
+    test('tryFrom reads a present imageUrl', () {
+      // Arrange
+      final json = <String, Object?>{
+        ...validJson,
+        'imageUrl': 'https://example.invalid/dish.jpg',
+      };
+
+      // Act
+      final result = Dish.tryFrom(json);
+
+      // Assert
+      expect(result?.imageUrl, equals('https://example.invalid/dish.jpg'));
+    });
+
+    test('tryFrom(x.toJson()) round-trips a dish with an imageUrl', () {
+      // Arrange
+      const dish = Dish(
+        id: 'dish_1',
+        name: 'Ribeye',
+        description: '300g',
+        price: 45.5,
+        options: [],
+        imageUrl: 'https://example.invalid/dish.jpg',
+      );
+
+      // Act
+      final result = Dish.tryFrom(dish.toJson());
+
+      // Assert
+      expect(result, equals(dish));
+    });
+
+    test('== returns false when imageUrl differs', () {
+      // Arrange
+      const a = Dish(
+        id: '1',
+        name: 'Steak',
+        description: '',
+        price: 1,
+        options: [],
+        imageUrl: 'https://example.invalid/a.jpg',
+      );
+      const b = Dish(
+        id: '1',
+        name: 'Steak',
+        description: '',
+        price: 1,
+        options: [],
+      );
+
+      // Act & Assert
+      expect(a, isNot(equals(b)));
+    });
+
     test('tryFrom returns null when id is empty', () {
       // Arrange
       final json = <String, Object?>{...validJson, 'id': ''};

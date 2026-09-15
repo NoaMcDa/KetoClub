@@ -211,6 +211,114 @@ void main() {
       expect(entrecote.price, equals(142.00));
     });
 
+    test('toMenu pins the entrecôte image URL from the fixture', () {
+      // Arrange
+      final json = _validFixture();
+
+      // Act
+      final result = WoltMenuMapper.toMenu(
+        json,
+        ref: _ref,
+        fetchedAt: _fetchedAt,
+      ) as MenuFetched;
+
+      // Assert
+      final entrecote = result.menu.allDishes.firstWhere(
+        (dish) => dish.id == 'dish_entrecote_300',
+      );
+      expect(
+        entrecote.imageUrl,
+        equals('https://example.invalid/entrecote.jpg'),
+      );
+    });
+
+    test('toMenu defaults an absent image to a null imageUrl', () {
+      // Arrange
+      final json = _validFixture();
+
+      // Act
+      final result = WoltMenuMapper.toMenu(
+        json,
+        ref: _ref,
+        fetchedAt: _fetchedAt,
+      ) as MenuFetched;
+
+      // Assert
+      final freeBread = result.menu.allDishes.firstWhere(
+        (dish) => dish.id == 'dish_zero_price',
+      );
+      expect(freeBread.imageUrl, isNull);
+    });
+
+    test('toMenu never fails when an item image is not a String, and reads '
+        'the rest of the dish normally', () {
+      // Arrange
+      final json = <String, Object?>{
+        'currency': 'ILS',
+        'categories': <Object?>[
+          <String, Object?>{
+            'id': 'cat_1',
+            'name': 'Mains',
+            'item_ids': <Object?>['dish_1'],
+          },
+        ],
+        'items': <Object?>[
+          <String, Object?>{
+            'id': 'dish_1',
+            'name': 'Plain Chicken',
+            'price': 3000,
+            'image': 42,
+          },
+        ],
+      };
+
+      // Act
+      final result = WoltMenuMapper.toMenu(
+        json,
+        ref: _ref,
+        fetchedAt: _fetchedAt,
+      );
+
+      // Assert
+      expect(result, isA<MenuFetched>());
+      final dish = (result as MenuFetched).menu.allDishes.single;
+      expect(dish.imageUrl, isNull);
+      expect(dish.name, equals('Plain Chicken'));
+    });
+
+    test('toMenu treats an empty item image as a null imageUrl', () {
+      // Arrange
+      final json = <String, Object?>{
+        'currency': 'ILS',
+        'categories': <Object?>[
+          <String, Object?>{
+            'id': 'cat_1',
+            'name': 'Mains',
+            'item_ids': <Object?>['dish_1'],
+          },
+        ],
+        'items': <Object?>[
+          <String, Object?>{
+            'id': 'dish_1',
+            'name': 'Plain Chicken',
+            'price': 3000,
+            'image': '',
+          },
+        ],
+      };
+
+      // Act
+      final result = WoltMenuMapper.toMenu(
+        json,
+        ref: _ref,
+        fetchedAt: _fetchedAt,
+      );
+
+      // Assert
+      expect(result, isA<MenuFetched>());
+      expect((result as MenuFetched).menu.allDishes.single.imageUrl, isNull);
+    });
+
     test('toMenu keeps a zero price as 0.0', () {
       // Arrange
       final json = _validFixture();

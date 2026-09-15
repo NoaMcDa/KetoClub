@@ -131,6 +131,23 @@ abstract interface class MenuCache {
   ///
   /// Never throws.
   Future<void> clear();
+
+  /// How many menus are currently cached — one per distinct [VenueRef]
+  /// that has been [write]n and not since removed by [clear].
+  ///
+  /// This is a count of entries, not a count of bytes. Hive's `Box`
+  /// reports how many keys it holds, not the on-disk size of the box
+  /// file, and on web — where the box lives in IndexedDB rather than a
+  /// file at all — there is no file to size in the first place, so a
+  /// byte figure would be fabricated on at least one platform this app
+  /// ships on (architecture.md §6.4). Issue #61's "Saved menus section
+  /// in Settings: count, size, clear" is read as wanting this entry
+  /// count for "size": how many menus the section can offer to clear,
+  /// not their storage footprint.
+  ///
+  /// Never throws; a storage failure reads as `0`, the same as an empty
+  /// cache.
+  Future<int> size();
 }
 
 /// A [MenuCache] in a Hive box of JSON strings.
@@ -223,6 +240,25 @@ final class HiveMenuCache implements MenuCache {
       // ignore: avoid_catching_errors
     } on HiveError {
       // Nothing to do: the clear above never landed.
+    }
+  }
+
+  @override
+  Future<int> size() async {
+    final Box<String> box;
+    try {
+      box = await _openedBox();
+      // A box that never opened holds nothing readable: 0, not a throw.
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      return 0;
+    }
+    try {
+      return box.length;
+      // A closed or otherwise broken box reads as empty, never throws.
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      return 0;
     }
   }
 }

@@ -65,6 +65,31 @@ const _accepted = <_Accepted>[
     '123456',
     VenueRef(source: MenuSource.tenbis, platformId: '123456'),
   ),
+  _Accepted(
+    'a 10bis restaurant URL with www and mixed-case segments',
+    'https://www.10bis.co.il/Restaurants/Menu/123456',
+    VenueRef(source: MenuSource.tenbis, platformId: '123456'),
+  ),
+  _Accepted(
+    'a 10bis restaurant URL with menu/delivery/slug segments after the id',
+    'https://10bis.co.il/next/restaurants/menu/delivery/123456/pizza-hut',
+    VenueRef(source: MenuSource.tenbis, platformId: '123456'),
+  ),
+  _Accepted(
+    'a scheme-less 10bis restaurant URL',
+    '10bis.co.il/Restaurants/123456',
+    VenueRef(source: MenuSource.tenbis, platformId: '123456'),
+  ),
+  _Accepted(
+    'a 10bis restaurant URL with a query string',
+    'https://www.10bis.co.il/Restaurants/Menu/123456?utm=x',
+    VenueRef(source: MenuSource.tenbis, platformId: '123456'),
+  ),
+  _Accepted(
+    'a 10bis restaurant URL with a trailing slash',
+    'https://www.10bis.co.il/Restaurants/Menu/123456/',
+    VenueRef(source: MenuSource.tenbis, platformId: '123456'),
+  ),
 ];
 
 const _rejected = <_Rejected>[
@@ -81,6 +106,22 @@ const _rejected = <_Rejected>[
   _Rejected(
     'a wolt.com URL whose restaurant segment has no slug after it',
     'https://wolt.com/en/isr/tel-aviv/restaurant/',
+  ),
+  _Rejected(
+    'a lookalike wolt host with wolt.com as a prefix, not the domain',
+    'https://wolt.com.evil.com/en/isr/tel-aviv/restaurant/vitrina-lilinblum',
+  ),
+  _Rejected(
+    'a 10bis URL with no numeric id anywhere in the path',
+    'https://www.10bis.co.il/Restaurants/Menu/',
+  ),
+  _Rejected(
+    'a 10bis URL whose id segment is non-numeric',
+    'https://www.10bis.co.il/Restaurants/Menu/abc123',
+  ),
+  _Rejected(
+    'a lookalike 10bis host with 10bis.co.il as a prefix, not the domain',
+    'https://10bis.co.il.evil.com/Restaurants/Menu/123456',
   ),
 ];
 

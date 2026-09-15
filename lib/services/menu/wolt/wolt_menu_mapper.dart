@@ -33,6 +33,9 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 ///   `options` list on an item (as opposed to a present-but-empty one) is
 ///   also tolerated and treated as no options, for the same "an absent
 ///   thing is not evidence of drift" reasoning as the two joins above.
+/// - An item's `image` becomes [Dish.imageUrl] when it is a non-empty
+///   String, and null for anything else — absent, null, the wrong type,
+///   or empty. A bad photo URL is never grounds to fail the whole fetch.
 /// - A dish `id` already used by an earlier category is dropped from
 ///   every later category: first category wins. Wolt can list one item
 ///   under two categories, and a duplicate id would break the LLM
@@ -175,6 +178,7 @@ abstract final class WoltMenuMapper {
     final rawDescription = raw['description'];
     final rawPrice = raw['price'];
     final rawOptionIds = raw['options'] ?? <Object?>[];
+    final rawImage = raw['image'];
     if (id is! String || id.isEmpty) return null;
     if (name is! String || name.isEmpty) return null;
     if (rawDescription != null && rawDescription is! String) return null;
@@ -194,6 +198,9 @@ abstract final class WoltMenuMapper {
       description: rawDescription is String ? rawDescription : '',
       price: rawPrice / 100,
       options: options,
+      // A missing or malformed image is never a mapping failure; see
+      // the class doc comment.
+      imageUrl: rawImage is String && rawImage.isNotEmpty ? rawImage : null,
     );
   }
 

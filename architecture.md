@@ -565,6 +565,13 @@ Cache rules:
   answer.
 - The cache never stores the raw platform JSON, only the normalised `Menu`.
 - The user can clear the cache from Settings.
+- `MenuCache.size()` reports how many menus are cached — a count of entries, one
+  per distinct `VenueRef`, never a byte figure. Hive's `Box` exposes how many keys
+  it holds, not the on-disk size of the box file, and on web the box lives in
+  IndexedDB with no file to size at all, so a byte count would be fabricated on at
+  least one platform this app ships on. Issue #61's Settings "Saved menus" section
+  ("count, size, clear") reads this as the count: how many menus there are to
+  clear, not their storage footprint.
 
 *(Phase 1)* Two things this list left open, both now decided and tested. The
 freshness boundary is **exclusive**: a menu exactly 24 hours old refetches, because
@@ -584,8 +591,15 @@ gracefully to "type an address or a venue name" on denial or on web without HTTP
 `feature_prioratization`:
 
 1. **Paste a URL or ID** (Tier A, ships first). Recognises Wolt venue URLs
-   (`wolt.com/…/restaurant/{slug}`), bare slugs, and 10bis restaurant IDs, and returns
-   a `VenueRef`. No network needed for the resolution itself.
+   (`wolt.com/…/restaurant/{slug}`), bare Wolt slugs, 10bis restaurant URLs
+   (`10bis.co.il/…/restaurants/…/{numeric id}/…`, the id landing wherever the
+   `restaurants` path segment is followed by a purely-numeric one — mirroring the
+   `Restaurants/{id}/Menu` API shape from `menu_api_research` §3.2, since
+   `10bis.co.il` was unreachable to record a page from directly), and bare 10bis
+   restaurant IDs, and returns a `VenueRef`. No network needed for the resolution
+   itself. A resolved 10bis `VenueRef` still fails with `unsupportedSource` once it
+   reaches `MenuRepository` — no 10bis adapter exists yet (§16 build-order step 6)
+   — so paste recognition and platform support are independent claims.
 2. **Search nearby** (Tier B). Queries Wolt's venue search with the device position
    or a typed string and lists results with a name, address, and distance. Results are
    filtered client-side; no radius endpoint is assumed.

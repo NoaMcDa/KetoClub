@@ -180,6 +180,29 @@ void main() {
       await expectLater(cache.clear(), completes);
     });
 
+    test('size returns 0 when opening the box throws', () async {
+      // Arrange
+      final cache = HiveMenuCache(
+        openBox: () => Future<Box<String>>.error(HiveError('boom')),
+      );
+
+      // Act
+      final result = await cache.size();
+
+      // Assert
+      expect(result, equals(0));
+    });
+
+    test('size returns 0 once the box is closed underneath it', () async {
+      // Arrange
+      final closedBox = await _openTestBox();
+      await closedBox.close();
+      final cache = HiveMenuCache(openBox: () async => closedBox);
+
+      // Act & Assert
+      await expectLater(cache.size(), completion(equals(0)));
+    });
+
     test('opens the box once across several operations', () async {
       // Arrange
       var openCount = 0;

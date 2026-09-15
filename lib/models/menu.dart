@@ -67,25 +67,32 @@ final class DishOption {
 @immutable
 final class Dish {
   /// Creates a dish. [description] should be `''`, never null, when the
-  /// platform did not supply one.
+  /// platform did not supply one. [imageUrl] is null when the platform
+  /// supplied no photo, or one that could not be read — a missing or
+  /// malformed image must never fail the whole fetch.
   const new({
     required this.id,
     required this.name,
     required this.description,
     required this.price,
     required this.options,
+    this.imageUrl,
   });
 
   /// Reads a dish written by [toJson].
   ///
   /// Returns null for any shape mismatch — including a negative
-  /// [price] or a malformed option — and never throws.
+  /// [price] or a malformed option — and never throws. `imageUrl` is
+  /// read tolerantly: absent (as in every entry cached before this
+  /// field existed), null, non-String or empty all decode to a null
+  /// [imageUrl], never to a failure of the whole entry.
   static Dish? tryFrom(Map<String, Object?> json) {
     final id = json['id'];
     final name = json['name'];
     final rawDescription = json['description'];
     final rawPrice = json['price'];
     final rawOptions = json['options'];
+    final rawImageUrl = json['imageUrl'];
     if (id is! String || id.isEmpty) return null;
     if (name is! String || name.isEmpty) return null;
     if (rawDescription != null && rawDescription is! String) return null;
@@ -105,6 +112,9 @@ final class Dish {
       description: description,
       price: rawPrice.toDouble(),
       options: options,
+      imageUrl: rawImageUrl is String && rawImageUrl.isNotEmpty
+          ? rawImageUrl
+          : null,
     );
   }
 
@@ -127,6 +137,12 @@ final class Dish {
   /// Callers must not mutate the list passed to the constructor.
   final List<DishOption> options;
 
+  /// The dish photo's URL, when the platform supplied one. Null when
+  /// the source had none, or supplied a value that was not a non-empty
+  /// String — this field is not rendered anywhere yet
+  /// (architecture.md §17).
+  final String? imageUrl;
+
   /// Writes a form [tryFrom] can read back.
   Map<String, Object?> toJson() => <String, Object?>{
     'id': id,
@@ -134,6 +150,7 @@ final class Dish {
     'description': description,
     'price': price,
     'options': options.map((option) => option.toJson()).toList(),
+    'imageUrl': imageUrl,
   };
 
   @override
@@ -143,11 +160,18 @@ final class Dish {
       other.name == name &&
       other.description == description &&
       other.price == price &&
-      _listEquals(other.options, options);
+      _listEquals(other.options, options) &&
+      other.imageUrl == imageUrl;
 
   @override
-  int get hashCode =>
-      Object.hash(id, name, description, price, Object.hashAll(options));
+  int get hashCode => Object.hash(
+    id,
+    name,
+    description,
+    price,
+    Object.hashAll(options),
+    imageUrl,
+  );
 
   @override
   String toString() => 'Dish($id: $name)';

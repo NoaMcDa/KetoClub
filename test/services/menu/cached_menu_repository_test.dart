@@ -6,6 +6,7 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
+import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 
 import '../../fakes/fake_clock.dart';
 import '../../fakes/fake_menu_cache.dart';
@@ -196,6 +197,29 @@ void main() {
         'a network attempt', () async {
       // Act
       final result = await repository.load(_tenbisRef);
+
+      // Assert
+      expect(
+        result,
+        equals(
+          const MenuFetchFailed(
+            reason: MenuFetchFailureReason.unsupportedSource,
+          ),
+        ),
+      );
+      expect(adapter.fetchCalls, isEmpty);
+    });
+
+    test('load with a ref resolved from a pasted 10bis.co.il URL still '
+        'returns unsupportedSource — recognising the URL is not the same '
+        'as having an adapter for it', () async {
+      // Arrange
+      final ref = VenueRefResolver.resolve(
+        'https://www.10bis.co.il/Restaurants/Menu/123456',
+      );
+
+      // Act
+      final result = await repository.load(ref!);
 
       // Assert
       expect(
