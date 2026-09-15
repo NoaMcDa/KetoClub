@@ -203,4 +203,60 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get analysisNoDishesFound =>
       'הבינה המלאכותית לא הצליחה לזהות מנות בתפריט הזה.';
+
+  @override
+  String pillSemanticLabel(String verdict) {
+    return 'פסיקה: $verdict';
+  }
+
+  @override
+  String get dishCardAskWaiter => 'שאלו את המלצר';
+
+  @override
+  String get dishCardHideScript => 'הסתירו את הטקסט למלצר';
+
+  @override
+  String get dishCardScriptFallback =>
+      'שאלו את המלצר לגבי תחליף קטוגני למנה הזו.';
+
+  @override
+  String netCarbsChipLabel(String grams) {
+    return '~$grams גרם פחמימות נטו (הערכה)';
+  }
+
+  @override
+  String netCarbsChipSemanticLabel(String grams) {
+    return 'הערכת פחמימות נטו, לא מאומתת: $grams גרם';
+  }
+
+  @override
+  String engineChipAiSemanticLabel(String model) {
+    return 'מנוע בינה מלאכותית, מודל $model';
+  }
+
+  @override
+  String engineChipRulesSemanticLabel(String reason) {
+    return 'מנוע כללים, ללא אימות בינה מלאכותית: $reason';
+  }
+
+  @override
+  String get engineChipReasonNotConfigured => 'אין מפתח';
+
+  @override
+  String get engineChipReasonOffline => 'לא מקוון';
+
+  @override
+  String get engineChipReasonTimeout => 'פסק זמן';
+
+  @override
+  String get engineChipReasonRateLimited => 'המכסה היומית נוצלה';
+
+  @override
+  String get engineChipReasonUnauthorised => 'המפתח נדחה';
+
+  @override
+  String get engineChipReasonBadResponse => 'שגיאת בינה מלאכותית';
+
+  @override
+  String get engineChipReasonNoDishesFound => 'לא נמצאו מנות';
 }
