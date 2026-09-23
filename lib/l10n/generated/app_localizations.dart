@@ -134,6 +134,12 @@ abstract class AppLocalizations {
   /// **'Copied'**
   String get actionCopied;
 
+  /// No description provided for @actionRefreshMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh menu'**
+  String get actionRefreshMenu;
+
   /// No description provided for @venueSearchLabel.
   ///
   /// In en, this message translates to:
