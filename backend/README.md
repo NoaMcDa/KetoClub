@@ -13,9 +13,10 @@ Routes shipped so far:
 | Route | Issue | What it does |
 |---|---|---|
 | `GET /v1/health` | #94 | `{status, version, llm_configured}` |
+| `GET /v1/proxy/wolt/v4/venues/slug/{slug}/menu/data` | #95 | The Wolt menu proxy for the web build, see below |
 | `POST /v1/chat` | #100 | Hosted classification: forwards one completion to Gemini `generateContent` with the server's key |
 
-The menu proxy and community routes are later issues (`backend_plan.md` §5).
+Community routes are later issues (`backend_plan.md` §5).
 
 ### `POST /v1/chat`
 
@@ -42,6 +43,36 @@ Every error the route originates is `{reason, status_code}`:
 A body that fails validation (empty prompt, prompt over its bound) is
 FastAPI's own 422. Logs carry the install id's first 8 characters and
 upstream status codes only: never the key, prompt text or an upstream body.
+
+## The Wolt menu proxy
+
+`GET /v1/proxy/wolt/v4/venues/slug/{slug}/menu/data` forwards to
+`{WOLT_BASE_URL}/v4/venues/slug/{slug}/menu/data` and returns Wolt's status,
+body and `Content-Type` unchanged, 404 included — the Dart adapter's status
+mapping needs no change whether it talks to Wolt directly or through this
+proxy. It is the **only** proxy route: the upstream host always comes from
+`WOLT_BASE_URL` in config, never from the request.
+
+- `slug` is validated against `^[a-z0-9][a-z0-9-]{0,99}$`; anything else is
+  422 before any upstream call is made.
+- Upstream request headers are built from scratch (`User-Agent`, `Accept`)
+  — nothing from the inbound request (`Origin`, `Cookie`, `Authorization`,
+  the install id) is forwarded.
+- A connect failure is 502 (`{"reason": "offline", ...}`); an upstream
+  timeout is 504 (`{"reason": "timeout", ...}`).
+- 2xx responses are cached per slug for `MENU_CACHE_TTL_SECONDS`; the
+  response carries `X-KetoClub-Cache: hit` or `miss`. Failures are never
+  cached.
+
+The synthetic Wolt fixture used in `lib/` tests has never been recorded from
+a real venue (issue #22); this proxy can do that from a machine that can
+reach `restaurant-api.wolt.com` (the sandbox this backend was built in
+cannot):
+
+```bash
+curl -sS localhost:8000/v1/proxy/wolt/v4/venues/slug/vitrina-lilinblum/menu/data \
+  -o test/fixtures/wolt_vitrina_lilinblum_menu.json
+```
 
 ## Running locally
 

@@ -19,7 +19,7 @@ from app.config import Settings, get_settings
 from app.db import build_engine
 from app.errors import BackendError, handle_backend_error
 from app.models import Base
-from app.routers import chat, health
+from app.routers import chat, health, proxy
 from app.services.rate_limit import RateLimiter
 from app.services.request_logging import RequestLoggingMiddleware
 
@@ -70,6 +70,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app.include_router(health.router, prefix="/v1")
     app.include_router(chat.router, prefix="/v1")
+    app.include_router(proxy.router, prefix="/v1")
 
     return app
 
