@@ -16,7 +16,7 @@ class Settings(BaseSettings):
 
     Defaults are chosen so the server starts without any .env file and serves
     the health endpoint immediately.  Production deployments set at least
-    OPENROUTER_API_KEY and ADMIN_TOKEN.
+    GEMINI_API_KEY and ADMIN_TOKEN.
     """
 
     model_config = SettingsConfigDict(
@@ -26,11 +26,21 @@ class Settings(BaseSettings):
     )
 
     # --- LLM ------------------------------------------------------------------
-    # The server's OpenRouter key.  Absent → /v1/chat returns notConfigured.
-    OPENROUTER_API_KEY: str = ""
-    # Model id forwarded to OpenRouter (#100).  Kept in sync with the Dart
-    # client's pinned model when that model is bumped.
-    OPENROUTER_MODEL: str = "nex-agi/nex-n2.5-pro:free"
+    # The server's Gemini API key.  Absent → /v1/chat returns notConfigured.
+    # Sent upstream only as the ``x-goog-api-key`` header, never in a URL.
+    GEMINI_API_KEY: str = ""
+    # Model id in the generateContent path (#100).
+    GEMINI_MODEL: str = "gemini-2.5-flash"
+    # Upstream Gemini host.  Never taken from a request, for the same reason
+    # as WOLT_BASE_URL; tests point respx at the default.
+    GEMINI_BASE_URL: str = "https://generativelanguage.googleapis.com"
+    # generationConfig.maxOutputTokens.  A full menu's verdicts fit well
+    # inside it; a reply that hits it ends MAX_TOKENS and is badResponse.
+    GEMINI_MAX_OUTPUT_TOKENS: int = 8192
+    # generationConfig.thinkingConfig.thinkingBudget.  Thinking tokens count
+    # against the output budget above, and this is a classification task
+    # with a strict schema, so the default spends none on thinking.
+    GEMINI_THINKING_BUDGET: int = 0
 
     # --- Proxy ----------------------------------------------------------------
     # Upstream Wolt host for the proxy route (#95).
@@ -63,8 +73,8 @@ class Settings(BaseSettings):
 
     @property
     def llm_configured(self) -> bool:
-        """True when the server holds an OpenRouter key."""
-        return bool(self.OPENROUTER_API_KEY)
+        """True when the server holds a Gemini key."""
+        return bool(self.GEMINI_API_KEY)
 
 
 @lru_cache
