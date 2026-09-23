@@ -516,4 +516,21 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get noteEditorClear => 'מחק הערה';
+
+  @override
+  String get menuSearchHint => 'חפשו מנות';
+
+  @override
+  String get menuSearchSemanticLabel => 'חיפוש מנות לפי שם או תיאור';
+
+  @override
+  String get menuSearchClear => 'נקה חיפוש';
+
+  @override
+  String get menuNoResults => 'אין מנות שמתאימות לחיפוש שלכם.';
+
+  @override
+  String categoryChipSemanticLabel(String category) {
+    return 'עברו אל $category';
+  }
 }

@@ -91,6 +91,20 @@ MenuController _controllerFor({
   notes ?? FakeNotesStore(),
 );
 
+/// Gives the test surface a phone-tall viewport for the rest of the test.
+///
+/// The default 800×600 surface fits the header, the verdict tiles, the
+/// legend, the search field, the chip row and a category heading with
+/// room for only one dish card underneath; a lazy [ListView] then never
+/// builds the second card, and every `find` for it comes back empty. The
+/// size is reset when the test ends.
+void _useTallSurface(WidgetTester tester) {
+  tester.view.physicalSize = const Size(800, 1600);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+}
+
 /// Pumps a [MenuScreen] for [ref] over [controller], inside a localised
 /// [MaterialApp] with [controller] provided through `provider` — the
 /// shape every test in this file uses.
@@ -102,6 +116,7 @@ Future<void> _pump(
   ScreenBrightness? screenBrightness,
   FakeExternalLinkOpener? externalLinkOpener,
 }) {
+  _useTallSurface(tester);
   return tester.pumpWidget(
     MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -132,6 +147,7 @@ Future<void> _pumpWithRoutes(
   MenuController controller,
   List<String> pushedNames,
 ) {
+  _useTallSurface(tester);
   return tester.pumpWidget(
     MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -1429,7 +1445,9 @@ void main() {
 
         // Act: drag the list down far and fast enough to cross
         // RefreshIndicator's trigger threshold.
-        await tester.fling(find.byType(ListView), const Offset(0, 300), 1000);
+        // RefreshIndicator arms once the overscroll passes a sixth of the
+        // viewport, which is ~260 px on the tall test surface _pump sets.
+        await tester.fling(find.byType(ListView), const Offset(0, 600), 1000);
         await tester.pump();
         await tester.pump(const Duration(seconds: 1));
         await tester.pumpAndSettle();
@@ -1475,7 +1493,9 @@ void main() {
         final loadCallsBefore = repository.loadCalls.length;
 
         // Act
-        await tester.fling(find.byType(ListView), const Offset(0, 300), 1000);
+        // RefreshIndicator arms once the overscroll passes a sixth of the
+        // viewport, which is ~260 px on the tall test surface _pump sets.
+        await tester.fling(find.byType(ListView), const Offset(0, 600), 1000);
         await tester.pump();
         await tester.pump(const Duration(seconds: 1));
         await tester.pumpAndSettle();
@@ -1572,8 +1592,13 @@ void main() {
           expect(find.byType(NoteEditorSheet), findsOneWidget);
 
           // Act: type a note and save.
+          // Scoped to the sheet: the menu's search field (issue #51) is a
+          // TextField too, and it is still in the tree under the sheet.
           await tester.enterText(
-            find.byType(TextField),
+            find.descendant(
+              of: find.byType(NoteEditorSheet),
+              matching: find.byType(TextField),
+            ),
             'Waitstaff happily substituted cauliflower.',
           );
           await tester.tap(find.text(_en.noteEditorSave));
@@ -1649,6 +1674,135 @@ void main() {
 
           // Assert
           expect(find.text('Skip it.'), findsOneWidget);
+        },
+      );
+    });
+
+    group('search and category jump (issue #51)', () {
+      testWidgets('typing in the search field narrows the dish cards', (
+        tester,
+      ) async {
+        // Arrange
+        final steak = _dish('Grilled Steak', id: 'steak');
+        final salad = _dish('Greek Salad', id: 'salad');
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([steak, salad])));
+        final controller = _controllerFor(repository: repository);
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+        expect(find.byType(DishCard), findsNWidgets(2));
+
+        // Act
+        await tester.enterText(find.byType(TextField), 'steak');
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(DishCard), findsOneWidget);
+        expect(find.text('Grilled Steak'), findsOneWidget);
+        expect(find.text('Greek Salad'), findsNothing);
+      });
+
+      testWidgets(
+        'a search with no matching dish shows menuNoResults instead of an '
+        'empty list',
+        (tester) async {
+          // Arrange
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+          final controller = _controllerFor(repository: repository);
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+
+          // Act
+          await tester.enterText(find.byType(TextField), 'sushi');
+          await tester.pumpAndSettle();
+
+          // Assert
+          expect(find.byType(DishCard), findsNothing);
+          expect(find.text(_en.menuNoResults), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'clearing the search field with its clear button restores every '
+        'dish card',
+        (tester) async {
+          // Arrange
+          final steak = _dish('Grilled Steak', id: 'steak');
+          final salad = _dish('Greek Salad', id: 'salad');
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([steak, salad])));
+          final controller = _controllerFor(repository: repository);
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+          await tester.enterText(find.byType(TextField), 'steak');
+          await tester.pumpAndSettle();
+          expect(find.byType(DishCard), findsOneWidget);
+
+          // Act
+          await tester.tap(find.byIcon(Icons.clear));
+          await tester.pumpAndSettle();
+
+          // Assert
+          expect(find.byType(DishCard), findsNWidgets(2));
+        },
+      );
+
+      testWidgets(
+        "tapping a category chip brings that category's header on screen "
+        '— it is not there before the tap, since a ListView is lazy and '
+        'this menu is long enough to keep it off the built range',
+        (tester) async {
+          // Arrange: eight categories of five dishes each — long enough
+          // that the last category's header is not yet in the element
+          // tree when the screen first settles.
+          final categories = <MenuCategory>[
+            for (var c = 0; c < 8; c++)
+              MenuCategory(
+                id: 'cat$c',
+                name: 'Category $c',
+                dishes: [
+                  for (var d = 0; d < 5; d++) _dish('Dish $c-$d', id: 'd$c-$d'),
+                ],
+              ),
+          ];
+          final menu = Menu(
+            venueRef: _ref,
+            currency: 'ILS',
+            fetchedAt: DateTime.utc(2026),
+            categories: categories,
+          );
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: menu));
+          final controller = _controllerFor(repository: repository);
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+
+          // Assert: only the chip carries this label so far — the header
+          // for the same category, far down the list, has not been built.
+          expect(find.text('Category 7'), findsOneWidget);
+
+          // Act: the eighth chip sits past the right edge of the chip
+          // row, so scroll it into view first — a tap on an off-screen
+          // widget lands on nothing.
+          await tester.ensureVisible(find.text('Category 7'));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Category 7'));
+          await tester.pumpAndSettle();
+
+          // Assert: the header (the styled Text; the chip's label has no
+          // style of its own) is now built and on screen.
+          final header = find.byWidgetPredicate(
+            (widget) =>
+                widget is Text &&
+                widget.data == 'Category 7' &&
+                widget.style != null,
+            description: "the 'Category 7' heading",
+          );
+          expect(header, findsOneWidget);
+          final headerRect = tester.getRect(header);
+          final screen = tester.getRect(find.byType(MenuScreen));
+          expect(screen.overlaps(headerRect), isTrue);
         },
       );
     });

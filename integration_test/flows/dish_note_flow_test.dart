@@ -3,6 +3,7 @@
 // revisit of the same venue — through the flow fake `NotesStore`, never
 // through a controller reached from the side.
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
@@ -98,7 +99,16 @@ void main() {
         // Act: open the note editor and write a note.
         await tapAndSettle(tester, find.text(_en.dishCardAddNote));
         expect(find.byType(NoteEditorSheet), findsOneWidget);
-        await enterText(tester, _note);
+        // Typed into the sheet's own field: the menu's search field
+        // (issue #51) is the first text field on screen, under the sheet.
+        await tester.enterText(
+          find.descendant(
+            of: find.byType(NoteEditorSheet),
+            matching: find.byType(TextField),
+          ),
+          _note,
+        );
+        await tester.pumpAndSettle();
         await tapAndSettle(tester, find.text(_en.noteEditorSave));
 
         // Assert: the sheet closed and the card now shows the note.
