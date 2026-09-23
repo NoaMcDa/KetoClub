@@ -53,6 +53,14 @@
   "settingsAppearanceSystem": "לפי ערכת הנושא של המכשיר",
   "settingsAppearanceLight": "בהיר",
   "settingsAppearanceDark": "כהה",
+  "settingsNetCarbLimit": "מגבלת פחמימות נטו",
+  "settingsNetCarbLimitBody": "מנות מעל המגבלה לעולם לא יסומנו בירוק. שינוי שלה ינתח מחדש את התפריט הבא שתפתחו.",
+  "settingsNetCarbLimitValue": "{grams} גרם",
+  "@settingsNetCarbLimitValue": {
+    "placeholders": { "grams": { "type": "int" } }
+  },
+  "settingsNetCarbLimitDecrease": "הורדת מגבלת הפחמימות נטו",
+  "settingsNetCarbLimitIncrease": "העלאת מגבלת הפחמימות נטו",
   "settingsFilter": "סינון ברירת מחדל",
   "settingsClearCache": "נקה תפריטים שמורים",
   "settingsCacheCleared": "התפריטים השמורים נוקו.",
@@ -129,7 +137,21 @@
   "scanPlaceholderTitle": "סריקת תפריט",
   "scanPlaceholderBody": "צילום תפריט פיזי יתאפשר בעדכון עתידי. בינתיים, הדביקו קישור למשלוח במסך גילוי.",
   "savedPlaceholderTitle": "מסעדות שמורות",
-  "savedPlaceholderBody": "שמרו מסעדה כדי למצוא אותה כאן בהמשך. האפשרות הזו תגיע בעדכון עתידי.",
+  "savedPlaceholderBody": "פתחו תפריט של מסעדה והוא יופיע כאן אוטומטית, זמין ליממה — גם ללא חיבור לאינטרנט.",
+  "savedEntryDishCount": "{count, plural, one{מנה אחת} two{שתי מנות} other{{count} מנות}}",
+  "@savedEntryDishCount": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "savedRemove": "הסר",
+  "savedRemoveSemanticLabel": "הסר את {venue}",
+  "@savedRemoveSemanticLabel": {
+    "placeholders": { "venue": { "type": "String" } }
+  },
+  "savedRemovedMessage": "{venue} הוסרה.",
+  "@savedRemovedMessage": {
+    "placeholders": { "venue": { "type": "String" } }
+  },
+  "savedUndo": "בטל",
 
   "discoveryTitle": "איפה לאכול",
   "discoveryEmptyTitle": "הדביקו קישור כדי להתחיל",

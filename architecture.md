@@ -617,8 +617,8 @@ no physical device has exercised it (`HANDOFF.md`).
 | Store | Package | Holds | Lifetime |
 |---|---|---|---|
 | `InstallIdStore` | `shared_preferences` | a random 32-hex-character anonymous install id (D12), generated on first use, never in a constructor | until the app's storage is cleared |
-| `MenuCache` | `hive` | `venueRef → {menu, analysis, fetchedAt, engine}` | 24 h for the menu; analysis kept as long as the menu it was computed from |
-| `SettingsStore` | `shared_preferences` | UI language, filter defaults, consent flag, last venue | until cleared |
+| `MenuCache` | `hive` | `venueRef → {menu, analysis, fetchedAt, engine}`; the analysis also records the options it was made under (net-carb limit, dietary constraints; issue #57) | 24 h for the menu; analysis kept as long as the menu it was computed from, and reused by `MenuController` only for an unchanged menu, an AI result, consent still given and matching options |
+| `SettingsStore` | `shared_preferences` | UI language, filter defaults, consent flag, last venue, appearance, net-carb limit (2–25 g, default 6) | until cleared |
 
 The install id is unlinkable to a person (D8 stays true in spirit) and is sent
 only as `X-KetoClub-Install-Id` to KetoClub's own backend, for its per-install
@@ -860,7 +860,10 @@ One request per menu. The **system** prompt (in `menu_analysis_prompt.dart`) sta
 
 - The three verdicts and their definitions, taken verbatim from `constants.dart` so
   the model and the UI legend say the same thing.
-- The keto rules: net carbs ≤ 6 g per dish for green; starchy sides, root vegetables,
+- The keto rules: net carbs ≤ the user's limit per dish for green (6 g unless changed
+  in Settings, issue #57; `MenuResponseParser` also demotes a green whose own
+  `net_carbs_estimate` exceeds it — to yellow when an instruction came with it,
+  otherwise to unclassified); starchy sides, root vegetables,
   sugary sauces and glazes, breading and buns make a dish yellow when the core is
   compliant; pasta, pizza, rice bowls, noodles, breaded proteins, pastry, sandwiches
   on bread are red.

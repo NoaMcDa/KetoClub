@@ -70,21 +70,51 @@ void main() {
     });
 
     group('systemPrompt', () {
-      test('systemPrompt contains promptVerdictDefinitions verbatim', () {
+      test('systemPrompt contains the verdict definitions at the default '
+          'limit verbatim', () {
         // Act
         final prompt = MenuAnalysisPrompt.systemPrompt();
 
         // Assert
-        expect(prompt, contains(promptVerdictDefinitions));
+        expect(
+          prompt,
+          contains(promptVerdictDefinitionsFor(defaultNetCarbLimitGrams)),
+        );
       });
 
-      test('systemPrompt contains promptKetoRules verbatim', () {
+      test('systemPrompt contains the keto rules at the default limit '
+          'verbatim', () {
         // Act
         final prompt = MenuAnalysisPrompt.systemPrompt();
 
         // Assert
-        expect(prompt, contains(promptKetoRules));
+        expect(prompt, contains(promptKetoRulesFor(defaultNetCarbLimitGrams)));
       });
+
+      test('systemPrompt never leaves the limit placeholder unfilled', () {
+        // Act
+        final prompt = MenuAnalysisPrompt.systemPrompt(
+          options: const ClassificationOptions(netCarbLimitGrams: 11),
+        );
+
+        // Assert
+        expect(prompt, isNot(contains(netCarbLimitPlaceholder)));
+      });
+
+      for (final limit in <int>[3, 20]) {
+        test('systemPrompt given a ${limit}g limit states it in both the '
+            'green definition and the keto rules', () {
+          // Act
+          final prompt = MenuAnalysisPrompt.systemPrompt(
+            options: ClassificationOptions(netCarbLimitGrams: limit),
+          );
+
+          // Assert
+          expect(prompt, contains('net carbohydrates ${limit}g or less'));
+          expect(prompt, contains('Net carbs of ${limit}g or less per dish'));
+          expect(prompt, isNot(contains('6g')));
+        });
+      }
 
       test('systemPrompt states every modifiable dish must carry a '
           'modification', () {
@@ -142,8 +172,11 @@ void main() {
         final prompt = MenuAnalysisPrompt.systemPrompt(options: options);
 
         // Assert
-        expect(prompt, contains(promptVerdictDefinitions));
-        expect(prompt, contains(promptKetoRules));
+        expect(
+          prompt,
+          contains(promptVerdictDefinitionsFor(defaultNetCarbLimitGrams)),
+        );
+        expect(prompt, contains(promptKetoRulesFor(defaultNetCarbLimitGrams)));
       });
     });
 

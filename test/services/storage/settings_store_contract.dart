@@ -32,11 +32,22 @@ void runSettingsStoreContract(String name, SettingsStore Function() build) {
         estimationConsentGiven: true,
         lastVenue: VenueRef(source: MenuSource.wolt, platformId: 'v1'),
         themeMode: AppThemeMode.dark,
+        netCarbLimitGrams: 14,
       );
 
       await store.write(settings);
 
       expect(await store.read(), equals(settings));
+    });
+
+    test('write then read round-trips the net-carb limit bounds', () async {
+      final store = build();
+
+      for (final grams in <int>[2, 6, 25]) {
+        await store.write(AppSettings(netCarbLimitGrams: grams));
+
+        expect((await store.read()).netCarbLimitGrams, equals(grams));
+      }
     });
 
     test('write then read round-trips every AppThemeMode value', () async {

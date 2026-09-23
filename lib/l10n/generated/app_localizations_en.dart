@@ -133,6 +133,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAppearanceDark => 'Dark';
 
   @override
+  String get settingsNetCarbLimit => 'Net carb limit';
+
+  @override
+  String get settingsNetCarbLimitBody =>
+      'Dishes above this are never green. Changing it re-analyses the next menu you open.';
+
+  @override
+  String settingsNetCarbLimitValue(int grams) {
+    return '$grams g';
+  }
+
+  @override
+  String get settingsNetCarbLimitDecrease => 'Lower the net carb limit';
+
+  @override
+  String get settingsNetCarbLimitIncrease => 'Raise the net carb limit';
+
+  @override
   String get settingsFilter => 'Default filter';
 
   @override
@@ -283,7 +301,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get savedPlaceholderBody =>
-      'Save a venue to find it here later. This is coming in a later update.';
+      'Open a venue\'s menu and it appears here automatically, available for a day — even offline.';
+
+  @override
+  String savedEntryDishCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dishes',
+      one: '1 dish',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get savedRemove => 'Remove';
+
+  @override
+  String savedRemoveSemanticLabel(String venue) {
+    return 'Remove $venue';
+  }
+
+  @override
+  String savedRemovedMessage(String venue) {
+    return 'Removed $venue.';
+  }
+
+  @override
+  String get savedUndo => 'Undo';
 
   @override
   String get discoveryTitle => 'Where to eat';

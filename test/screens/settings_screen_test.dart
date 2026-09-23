@@ -374,6 +374,151 @@ void main() {
       },
     );
 
+    group('net carb limit stepper (issue #57)', () {
+      /// The enabled state of the stepper button keyed [key].
+      bool enabled(WidgetTester tester, Key key) =>
+          tester.widget<IconButton>(find.byKey(key)).onPressed != null;
+
+      /// Taps the stepper button keyed [key] after scrolling it into view.
+      Future<void> tapStepper(WidgetTester tester, Key key) async {
+        await tester.ensureVisible(find.byKey(key));
+        await tester.tap(find.byKey(key));
+        await tester.pumpAndSettle();
+      }
+
+      testWidgets('build shows the section, its explanation and "6 g" by '
+          'default', (tester) async {
+        // Act
+        await _pump(tester, _controllerFor());
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_en.settingsNetCarbLimit), findsOneWidget);
+        expect(find.text(_en.settingsNetCarbLimitBody), findsOneWidget);
+        expect(find.text('6 g'), findsOneWidget);
+        expect(
+          tester.widget<Text>(find.byKey(netCarbLimitValueKey)).data,
+          equals(_en.settingsNetCarbLimitValue(6)),
+        );
+      });
+
+      testWidgets('the section sits under Appearance and above the default '
+          'filter', (tester) async {
+        // Act
+        await _pump(tester, _controllerFor());
+        await tester.pumpAndSettle();
+
+        // Assert
+        final appearanceY = tester
+            .getTopLeft(find.text(_en.settingsAppearance))
+            .dy;
+        final limitY = tester
+            .getTopLeft(find.text(_en.settingsNetCarbLimit))
+            .dy;
+        final filterY = tester.getTopLeft(find.text(_en.settingsFilter)).dy;
+        expect(limitY, greaterThan(appearanceY));
+        expect(limitY, lessThan(filterY));
+      });
+
+      testWidgets('plus and minus step the limit by one gram and persist '
+          'it', (tester) async {
+        // Arrange
+        final store = FakeSettingsStore();
+        final controller = _controllerFor(settingsStore: store);
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Act
+        await tapStepper(tester, netCarbLimitIncreaseKey);
+        await tapStepper(tester, netCarbLimitIncreaseKey);
+
+        // Assert
+        expect(find.text('8 g'), findsOneWidget);
+        expect((await store.read()).netCarbLimitGrams, equals(8));
+
+        // Act
+        await tapStepper(tester, netCarbLimitDecreaseKey);
+
+        // Assert
+        expect(find.text('7 g'), findsOneWidget);
+        expect((await store.read()).netCarbLimitGrams, equals(7));
+      });
+
+      testWidgets('minus is disabled at 2 g, so the limit stays at 2 g', (
+        tester,
+      ) async {
+        // Arrange: one gram above the floor.
+        final store = FakeSettingsStore(
+          initial: const AppSettings(netCarbLimitGrams: 3),
+        );
+        await _pump(tester, _controllerFor(settingsStore: store));
+        await tester.pumpAndSettle();
+        expect(enabled(tester, netCarbLimitDecreaseKey), isTrue);
+
+        // Act: step down to the floor, then try once more.
+        await tapStepper(tester, netCarbLimitDecreaseKey);
+        await tapStepper(tester, netCarbLimitDecreaseKey);
+
+        // Assert
+        expect(find.text('2 g'), findsOneWidget);
+        expect(enabled(tester, netCarbLimitDecreaseKey), isFalse);
+        expect(enabled(tester, netCarbLimitIncreaseKey), isTrue);
+        expect((await store.read()).netCarbLimitGrams, equals(2));
+      });
+
+      testWidgets('plus is disabled at 25 g, so the limit stays at 25 g', (
+        tester,
+      ) async {
+        // Arrange: one gram below the ceiling.
+        final store = FakeSettingsStore(
+          initial: const AppSettings(netCarbLimitGrams: 24),
+        );
+        await _pump(tester, _controllerFor(settingsStore: store));
+        await tester.pumpAndSettle();
+        expect(enabled(tester, netCarbLimitIncreaseKey), isTrue);
+
+        // Act: step up to the ceiling, then try once more.
+        await tapStepper(tester, netCarbLimitIncreaseKey);
+        await tapStepper(tester, netCarbLimitIncreaseKey);
+
+        // Assert
+        expect(find.text('25 g'), findsOneWidget);
+        expect(enabled(tester, netCarbLimitIncreaseKey), isFalse);
+        expect(enabled(tester, netCarbLimitDecreaseKey), isTrue);
+        expect((await store.read()).netCarbLimitGrams, equals(25));
+      });
+
+      testWidgets('both buttons carry a localized tooltip', (tester) async {
+        // Act
+        await _pump(tester, _controllerFor());
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(
+          tester
+              .widget<IconButton>(find.byKey(netCarbLimitDecreaseKey))
+              .tooltip,
+          equals(_en.settingsNetCarbLimitDecrease),
+        );
+        expect(
+          tester
+              .widget<IconButton>(find.byKey(netCarbLimitIncreaseKey))
+              .tooltip,
+          equals(_en.settingsNetCarbLimitIncrease),
+        );
+      });
+
+      testWidgets('under Locale(he) the value reads in Hebrew', (tester) async {
+        // Act
+        await _pump(tester, _controllerFor(), locale: const Locale('he'));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_he.settingsNetCarbLimit), findsOneWidget);
+        expect(find.text(_he.settingsNetCarbLimitValue(6)), findsOneWidget);
+      });
+    });
+
     testWidgets('build under Locale(he) renders the Hebrew title', (
       tester,
     ) async {

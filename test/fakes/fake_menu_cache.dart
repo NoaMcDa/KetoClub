@@ -1,3 +1,4 @@
+import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 
@@ -42,4 +43,27 @@ final class FakeMenuCache implements MenuCache {
 
   @override
   Future<int> size() async => _entries.length;
+
+  @override
+  Future<int> count() async => _entries.length;
+
+  @override
+  Future<void> remove(VenueRef ref) async {
+    _entries.remove(ref.cacheKey);
+  }
+
+  @override
+  Future<List<CachedMenuEntry>> entries() async => [
+    for (final cached in _entries.values)
+      CachedMenuEntry(
+        ref: cached.menu.venueRef,
+        venueName: cached.menu.venueName,
+        fetchedAt: cached.menu.fetchedAt,
+        dishCount: cached.menu.allDishes.length,
+        engine: switch (cached.analysis) {
+          final MenuAnalysed analysed => analysed.engine,
+          _ => null,
+        },
+      ),
+  ];
 }

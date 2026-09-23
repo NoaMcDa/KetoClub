@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/utils/constants.dart';
 
 /// Screen state for the Settings screen (architecture.md §6.6).
 ///
@@ -47,6 +48,9 @@ final class SettingsController extends ChangeNotifier {
 
   /// The appearance choice: system, light, or dark (issue #58).
   AppThemeMode get themeMode => _appSettings.themeMode;
+
+  /// The net-carb limit in grams above which no dish is green (issue #57).
+  int get netCarbLimitGrams => _appSettings.netCarbLimitGrams;
 
   /// Reads the [SettingsStore], populating every other getter.
   Future<void> load() async {
@@ -112,6 +116,26 @@ final class SettingsController extends ChangeNotifier {
     notifyListeners();
 
     _appSettings = _appSettings.copyWith(themeMode: mode);
+    await _settings.write(_appSettings);
+
+    _isBusy = false;
+    notifyListeners();
+  }
+
+  /// Sets the net-carb limit to [grams], clamped to
+  /// [minNetCarbLimitGrams]..[maxNetCarbLimitGrams] (issue #57).
+  ///
+  /// Clamped here as well as on decode, so no caller — the Settings
+  /// stepper or anything after it — can persist a limit the stepper could
+  /// not show. The next menu opened is re-analysed under the new limit;
+  /// see `MenuController.open`.
+  Future<void> setNetCarbLimit(int grams) async {
+    _isBusy = true;
+    notifyListeners();
+
+    _appSettings = _appSettings.copyWith(
+      netCarbLimitGrams: clampNetCarbLimitGrams(grams),
+    );
     await _settings.write(_appSettings);
 
     _isBusy = false;

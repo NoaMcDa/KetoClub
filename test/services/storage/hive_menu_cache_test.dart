@@ -238,5 +238,106 @@ void main() {
       // Assert
       expect(result, equals(entry));
     });
+
+    test('count returns 0 when opening the box throws', () async {
+      // Arrange
+      final cache = HiveMenuCache(
+        openBox: () => Future<Box<String>>.error(HiveError('boom')),
+      );
+
+      // Act
+      final result = await cache.count();
+
+      // Assert
+      expect(result, equals(0));
+    });
+
+    test('count returns 0 once the box is closed underneath it', () async {
+      // Arrange
+      final closedBox = await _openTestBox();
+      await closedBox.close();
+      final cache = HiveMenuCache(openBox: () async => closedBox);
+
+      // Act & Assert
+      await expectLater(cache.count(), completion(equals(0)));
+    });
+
+    test('entries returns an empty list when opening the box throws', () async {
+      // Arrange
+      final cache = HiveMenuCache(
+        openBox: () => Future<Box<String>>.error(HiveError('boom')),
+      );
+
+      // Act
+      final result = await cache.entries();
+
+      // Assert
+      expect(result, isEmpty);
+    });
+
+    test('entries returns an empty list once the box is closed underneath '
+        'it', () async {
+      // Arrange
+      final closedBox = await _openTestBox();
+      await closedBox.close();
+      final cache = HiveMenuCache(openBox: () async => closedBox);
+
+      // Act & Assert
+      await expectLater(cache.entries(), completion(isEmpty));
+    });
+
+    test('entries skips a corrupt value rather than failing the whole '
+        'list', () async {
+      // Arrange
+      final box = await _openTestBox();
+      await box.put(tenbisRef.cacheKey, 'not valid json{');
+      final cache = _buildCache();
+      final goodEntry = CachedMenu(menu: _menuFor(woltRef));
+      await cache.write(goodEntry);
+
+      // Act
+      final result = await cache.entries();
+
+      // Assert
+      expect(result, hasLength(1));
+      expect(result.single.ref, equals(woltRef));
+    });
+
+    test('entries skips a JSON value shaped wrong rather than failing the '
+        'whole list', () async {
+      // Arrange
+      final box = await _openTestBox();
+      await box.put(tenbisRef.cacheKey, '"just a string, not a map"');
+      final cache = _buildCache();
+      final goodEntry = CachedMenu(menu: _menuFor(woltRef));
+      await cache.write(goodEntry);
+
+      // Act
+      final result = await cache.entries();
+
+      // Assert
+      expect(result, hasLength(1));
+      expect(result.single.ref, equals(woltRef));
+    });
+
+    test('remove does nothing when opening the box throws', () async {
+      // Arrange
+      final cache = HiveMenuCache(
+        openBox: () => Future<Box<String>>.error(HiveError('boom')),
+      );
+
+      // Act & Assert
+      await expectLater(cache.remove(woltRef), completes);
+    });
+
+    test('remove degrades once the box is closed underneath it', () async {
+      // Arrange
+      final closedBox = await _openTestBox();
+      await closedBox.close();
+      final cache = HiveMenuCache(openBox: () async => closedBox);
+
+      // Act & Assert
+      await expectLater(cache.remove(woltRef), completes);
+    });
   });
 }

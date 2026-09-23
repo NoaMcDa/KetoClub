@@ -315,6 +315,81 @@ AnalysisEngine? _engineFrom(Map<String, Object?> json) {
   return null;
 }
 
+/// The classification options a [MenuAnalysed] was produced with, recorded
+/// beside it in the cache (issue #57).
+///
+/// Only the options that change what a verdict *means* are recorded: the
+/// net-carb limit that decides green, and the dietary constraints the
+/// prompt appends (issue #56 fills [dietaryConstraints]). A cached analysis
+/// whose snapshot differs from the options the user holds now answered a
+/// different question, so `MenuController` re-analyses rather than reusing
+/// it. Consent is deliberately absent: it decides which engine runs, and
+/// the engine is already recorded in [MenuAnalysed.engine].
+///
+/// This is the models-layer mirror of the service layer's
+/// `ClassificationOptions`, which `models/` may not import
+/// (architecture.md §5); `ClassificationOptions.snapshot` builds one.
+@immutable
+final class AnalysisOptionsSnapshot {
+  /// Creates a snapshot of a [netCarbLimitGrams] limit and
+  /// [dietaryConstraints].
+  const new({
+    required this.netCarbLimitGrams,
+    this.dietaryConstraints = const <String>[],
+  });
+
+  /// Reads a snapshot written by [toJson].
+  ///
+  /// Returns null for any shape mismatch and never throws. An absent
+  /// `dietaryConstraints` reads as none, so a snapshot written before
+  /// issue #56 fills that list still decodes.
+  static AnalysisOptionsSnapshot? tryFrom(Map<String, Object?> json) {
+    final rawLimit = json['netCarbLimitGrams'];
+    if (rawLimit is! int) return null;
+    final rawConstraints = json['dietaryConstraints'];
+    final constraints = <String>[];
+    if (rawConstraints != null) {
+      if (rawConstraints is! List<Object?>) return null;
+      for (final constraint in rawConstraints) {
+        if (constraint is! String) return null;
+        constraints.add(constraint);
+      }
+    }
+    return AnalysisOptionsSnapshot(
+      netCarbLimitGrams: rawLimit,
+      dietaryConstraints: constraints,
+    );
+  }
+
+  /// The net-carb limit in grams above which no dish was green.
+  final int netCarbLimitGrams;
+
+  /// The extra dietary constraints the prompt carried, in order. Callers
+  /// must not mutate the list passed to the constructor.
+  final List<String> dietaryConstraints;
+
+  /// Writes a form [tryFrom] can read back.
+  Map<String, Object?> toJson() => <String, Object?>{
+    'netCarbLimitGrams': netCarbLimitGrams,
+    'dietaryConstraints': dietaryConstraints,
+  };
+
+  @override
+  bool operator ==(Object other) =>
+      other is AnalysisOptionsSnapshot &&
+      other.netCarbLimitGrams == netCarbLimitGrams &&
+      _listEquals(other.dietaryConstraints, dietaryConstraints);
+
+  @override
+  int get hashCode =>
+      Object.hash(netCarbLimitGrams, Object.hashAll(dietaryConstraints));
+
+  @override
+  String toString() =>
+      'AnalysisOptionsSnapshot(limit: ${netCarbLimitGrams}g, '
+      'constraints: $dietaryConstraints)';
+}
+
 /// The result of running a [Menu] through the classifier
 /// (architecture.md §6.2, §7).
 ///
@@ -330,18 +405,23 @@ sealed class MenuAnalysis {
 @immutable
 final class MenuAnalysed extends MenuAnalysis {
   /// Creates a result for [dishes], noting [unclassified] names and
-  /// which [engine] produced it at [analysedAt].
+  /// which [engine] produced it at [analysedAt], with the [options] it was
+  /// produced under when those are known.
   const new({
     required this.dishes,
     required this.unclassified,
     required this.engine,
     required this.analysedAt,
+    this.options,
   });
 
   /// Reads a result written by [toJson].
   ///
   /// Returns null for any shape mismatch, including a malformed dish
-  /// verdict or engine tag, and never throws.
+  /// verdict, engine tag or [options] snapshot, and never throws. An
+  /// absent or null `options` reads as a null [options] rather than
+  /// invalidating the record: every analysis cached before issue #57
+  /// has none, and each of those was made under the defaults.
   static MenuAnalysed? tryFrom(Map<String, Object?> json) {
     final rawDishes = json['dishes'];
     final rawUnclassified = json['unclassified'];
@@ -367,11 +447,19 @@ final class MenuAnalysed extends MenuAnalysis {
     if (rawAnalysedAt is! String) return null;
     final analysedAt = DateTime.tryParse(rawAnalysedAt);
     if (analysedAt == null) return null;
+    final rawOptions = json['options'];
+    AnalysisOptionsSnapshot? options;
+    if (rawOptions != null) {
+      if (rawOptions is! Map<String, Object?>) return null;
+      options = AnalysisOptionsSnapshot.tryFrom(rawOptions);
+      if (options == null) return null;
+    }
     return MenuAnalysed(
       dishes: dishes,
       unclassified: unclassified,
       engine: engine,
       analysedAt: analysedAt,
+      options: options,
     );
   }
 
@@ -394,6 +482,14 @@ final class MenuAnalysed extends MenuAnalysis {
   /// When this analysis was produced.
   final DateTime analysedAt;
 
+  /// The options this analysis was produced under (issue #57), or null
+  /// when they were not recorded: an analysis cached before issue #57,
+  /// which was necessarily made under the defaults, or one built by hand
+  /// (a test's scripted result). Every `MenuClassifier` records the
+  /// options it was given here; `MenuController` compares them with the
+  /// user's current ones before reusing a cached analysis.
+  final AnalysisOptionsSnapshot? options;
+
   /// A copy of this result with [engine] replaced.
   ///
   /// Used by the router to re-stamp the fallback reason after the fact.
@@ -402,6 +498,21 @@ final class MenuAnalysed extends MenuAnalysis {
     unclassified: unclassified,
     engine: engine,
     analysedAt: analysedAt,
+    options: options,
+  );
+
+  /// A copy of this result recording [options] as the options it was
+  /// produced under (issue #57).
+  ///
+  /// Used by `LlmMenuClassifier`, whose parser builds the result without
+  /// knowing the options, so a later open can tell whether the user has
+  /// since changed what a verdict means.
+  MenuAnalysed copyWithOptions(AnalysisOptionsSnapshot options) => MenuAnalysed(
+    dishes: dishes,
+    unclassified: unclassified,
+    engine: engine,
+    analysedAt: analysedAt,
+    options: options,
   );
 
   /// Writes a form [tryFrom] can read back.
@@ -413,6 +524,7 @@ final class MenuAnalysed extends MenuAnalysis {
       final RulesEngine rules => rules.toJson(),
     },
     'analysedAt': analysedAt.toIso8601String(),
+    'options': options?.toJson(),
   };
 
   @override
@@ -421,7 +533,8 @@ final class MenuAnalysed extends MenuAnalysis {
       _listEquals(other.dishes, dishes) &&
       _listEquals(other.unclassified, unclassified) &&
       other.engine == engine &&
-      other.analysedAt == analysedAt;
+      other.analysedAt == analysedAt &&
+      other.options == options;
 
   @override
   int get hashCode => Object.hash(
@@ -429,6 +542,7 @@ final class MenuAnalysed extends MenuAnalysis {
     Object.hashAll(unclassified),
     engine,
     analysedAt,
+    options,
   );
 
   @override

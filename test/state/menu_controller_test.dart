@@ -4,14 +4,19 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
+import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/menu_controller.dart';
+import 'package:ketoclub/utils/constants.dart';
 
 import '../fakes/fake_clock.dart';
+import '../fakes/fake_menu_cache.dart';
 import '../fakes/fake_menu_classifier.dart';
 import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_notes_store.dart';
+import '../fakes/fake_platform_menu_adapter.dart';
 import '../fakes/fake_settings_store.dart';
 
 /// The venue every test opens, unless a test builds its own.
@@ -683,6 +688,27 @@ void main() {
         );
       });
 
+      test('refresh with an unchanged fingerprint still reclassifies when '
+          'the net-carb limit changed since open (issue #57)', () async {
+        // Arrange: open under the default limit; the fake records it.
+        final dish = _dish('Steak');
+        repository.stub(_ref, MenuFetched(menu: _menuOf([dish])));
+        await controller.open(_ref);
+        expect(classifier.calls, hasLength(1));
+
+        // Arrange: the user raises the limit, then pulls to refresh an
+        // unchanged menu.
+        await settings.write(const AppSettings(netCarbLimitGrams: 12));
+
+        // Act
+        await controller.refresh();
+
+        // Assert
+        expect(classifier.calls, hasLength(2));
+        expect(classifier.calls.last.$2.netCarbLimitGrams, equals(12));
+        expect(controller.netCarbLimitGrams, equals(12));
+      });
+
       test('refresh with a changed dish-text fingerprint reclassifies and '
           'persists the new analysis', () async {
         // Arrange
@@ -1005,6 +1031,271 @@ void main() {
       // "use defaults" (architecture.md §6.4), so this is what keeps a
       // stored value it no longer recognises from crashing the app.
       expect(decoded, isNull);
+    });
+  });
+
+  // Issue #57: the cached analysis records the options it was made with,
+  // and a mismatch on open re-analyses. Driven through the real
+  // CachedMenuRepository over a FakeMenuCache, so the analysis the second
+  // open finds is the one the first open actually persisted.
+  group('MenuController options invalidation (issue #57)', () {
+    final steak = _dish('Steak');
+    final menu = _menuOf([steak]);
+
+    late FakeMenuCache cache;
+    late FakePlatformMenuAdapter adapter;
+    late CachedMenuRepository repository;
+    late FakeMenuClassifier classifier;
+    late FakeSettingsStore settings;
+    late MenuController controller;
+
+    setUp(() {
+      cache = FakeMenuCache();
+      adapter = FakePlatformMenuAdapter()..queueFetched(menu);
+      repository = CachedMenuRepository(
+        adapters: [adapter],
+        cache: cache,
+        // Same instant as the menu's fetchedAt, so the second open is a
+        // fresh cache hit and the menu itself is not refetched.
+        clock: FakeClock(DateTime.utc(2026)),
+      );
+      classifier = FakeMenuClassifier()
+        ..derivedEngine = const LlmEngine(model: 'served-model');
+      settings = FakeSettingsStore(
+        initial: const AppSettings(estimationConsentGiven: true),
+      );
+      controller = MenuController(
+        repository,
+        classifier,
+        settings,
+        FakeNotesStore(),
+      );
+    });
+
+    test('open passes the stored limit to the classifier', () async {
+      // Arrange
+      await settings.write(
+        const AppSettings(estimationConsentGiven: true, netCarbLimitGrams: 9),
+      );
+
+      // Act
+      await controller.open(_ref);
+
+      // Assert
+      expect(classifier.calls.single.$2.netCarbLimitGrams, equals(9));
+      expect(classifier.calls.single.$2.estimationConsentGiven, isTrue);
+    });
+
+    test('an unchanged limit reuses the cached analysis on the next open, '
+        'spending no classifier call', () async {
+      // Arrange
+      await controller.open(_ref);
+      final first = controller.analysis;
+
+      // Act
+      final reopened = MenuController(
+        repository,
+        classifier,
+        settings,
+        FakeNotesStore(),
+      );
+      await reopened.open(_ref);
+
+      // Assert
+      expect(classifier.calls, hasLength(1));
+      expect(reopened.analysis, equals(first));
+      expect(
+        (reopened.analysis! as MenuAnalysed).options,
+        equals(const AnalysisOptionsSnapshot(netCarbLimitGrams: 6)),
+      );
+    });
+
+    test('a changed limit re-analyses on the next open under the new '
+        'limit, and caches the new result with it', () async {
+      // Arrange
+      await controller.open(_ref);
+      await settings.write(
+        const AppSettings(estimationConsentGiven: true, netCarbLimitGrams: 9),
+      );
+
+      // Act
+      final reopened = MenuController(
+        repository,
+        classifier,
+        settings,
+        FakeNotesStore(),
+      );
+      await reopened.open(_ref);
+
+      // Assert
+      expect(classifier.calls, hasLength(2));
+      expect(classifier.calls.last.$2.netCarbLimitGrams, equals(9));
+      expect(reopened.netCarbLimitGrams, equals(9));
+      final cached = await cache.read(_ref);
+      expect(
+        (cached!.analysis! as MenuAnalysed).options?.netCarbLimitGrams,
+        equals(9),
+      );
+    });
+
+    test('changing the limit back reuses nothing stale: the 9 g result is '
+        'replaced when the user returns to 6 g', () async {
+      // Arrange
+      await settings.write(
+        const AppSettings(estimationConsentGiven: true, netCarbLimitGrams: 9),
+      );
+      await controller.open(_ref);
+      await settings.write(const AppSettings(estimationConsentGiven: true));
+
+      // Act
+      await controller.open(_ref);
+
+      // Assert
+      expect(classifier.calls, hasLength(2));
+      expect(
+        classifier.calls.last.$2.netCarbLimitGrams,
+        equals(defaultNetCarbLimitGrams),
+      );
+    });
+
+    test('a rules-engine result is never reused: the heuristic is free and '
+        'the LLM may be reachable now', () async {
+      // Arrange
+      classifier.derivedEngine = const RulesEngine(
+        reason: MenuAnalysisFailureReason.offline,
+      );
+      await controller.open(_ref);
+
+      // Act
+      await controller.open(_ref);
+
+      // Assert
+      expect(classifier.calls, hasLength(2));
+    });
+
+    test(
+      'a cached LLM result is not reused once consent is withdrawn',
+      () async {
+        // Arrange
+        await controller.open(_ref);
+        await settings.write(const AppSettings());
+
+        // Act
+        await controller.open(_ref);
+
+        // Assert
+        expect(classifier.calls, hasLength(2));
+        expect(classifier.calls.last.$2.estimationConsentGiven, isFalse);
+      },
+    );
+
+    test('netCarbLimitGrams is the default before any analysis', () {
+      // Assert
+      expect(controller.netCarbLimitGrams, equals(defaultNetCarbLimitGrams));
+    });
+  });
+
+  group('MenuController reuse checks against the cached entry', () {
+    final steak = _dish('Steak');
+    final menu = _menuOf([steak]);
+
+    /// An LLM analysis of [menu] recording [options], as a cache would
+    /// hold it.
+    MenuAnalysed llmAnalysis({AnalysisOptionsSnapshot? options}) =>
+        MenuAnalysed(
+          dishes: [_verdictFor(steak, DishVerdict.orderAsIs)],
+          unclassified: const <String>[],
+          engine: const LlmEngine(model: 'served-model'),
+          analysedAt: DateTime.utc(2026),
+          options: options,
+        );
+
+    late FakeMenuRepository repository;
+    late FakeMenuClassifier classifier;
+    late FakeSettingsStore settings;
+    late MenuController controller;
+
+    setUp(() {
+      repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: menu, fromCache: true));
+      classifier = FakeMenuClassifier();
+      settings = FakeSettingsStore(
+        initial: const AppSettings(estimationConsentGiven: true),
+      );
+      controller = MenuController(
+        repository,
+        classifier,
+        settings,
+        FakeNotesStore(),
+      );
+    });
+
+    test('an analysis cached before issue #57, with no options, is reused '
+        'at the default limit it was made under', () async {
+      // Arrange
+      final legacy = llmAnalysis();
+      repository.seedCache(CachedMenu(menu: menu, analysis: legacy));
+
+      // Act
+      await controller.open(_ref);
+
+      // Assert
+      expect(classifier.calls, isEmpty);
+      expect(controller.analysis, equals(legacy));
+      expect(controller.netCarbLimitGrams, equals(defaultNetCarbLimitGrams));
+    });
+
+    test('an analysis cached before issue #57 is re-analysed once the '
+        'user has chosen another limit', () async {
+      // Arrange
+      repository.seedCache(CachedMenu(menu: menu, analysis: llmAnalysis()));
+      await settings.write(
+        const AppSettings(estimationConsentGiven: true, netCarbLimitGrams: 4),
+      );
+
+      // Act
+      await controller.open(_ref);
+
+      // Assert
+      expect(classifier.calls, hasLength(1));
+      expect(classifier.calls.single.$2.netCarbLimitGrams, equals(4));
+    });
+
+    test('an analysis of different dish text is re-analysed even when its '
+        'options match', () async {
+      // Arrange: the cache holds an analysis of an older menu.
+      repository.seedCache(
+        CachedMenu(
+          menu: _menuOf([_dish('Pasta', id: 'old')]),
+          analysis: llmAnalysis(
+            options: const AnalysisOptionsSnapshot(netCarbLimitGrams: 6),
+          ),
+        ),
+      );
+
+      // Act
+      await controller.open(_ref);
+
+      // Assert
+      expect(classifier.calls, hasLength(1));
+    });
+
+    test('a cached failed analysis is never reused', () async {
+      // Arrange
+      repository.seedCache(
+        CachedMenu(
+          menu: menu,
+          analysis: const MenuAnalysisFailed(
+            reason: MenuAnalysisFailureReason.timeout,
+          ),
+        ),
+      );
+
+      // Act
+      await controller.open(_ref);
+
+      // Assert
+      expect(classifier.calls, hasLength(1));
     });
   });
 }

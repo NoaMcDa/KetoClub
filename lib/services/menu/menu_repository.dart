@@ -45,6 +45,16 @@ abstract interface class MenuRepository {
 
   /// Forgets every cached menu and analysis. Never throws.
   Future<void> clearCache();
+
+  /// A summary of every menu currently cached, in no particular order —
+  /// issue #48's Saved tab is the caller and sorts this itself. Reads
+  /// only, through the cache; never touches the network. Never throws.
+  Future<List<CachedMenuEntry>> savedMenus();
+
+  /// Removes [ref]'s cached menu and analysis, leaving every other cached
+  /// menu untouched. A no-op, not a throw, when nothing is cached for
+  /// [ref]. Never throws.
+  Future<void> remove(VenueRef ref);
 }
 
 /// Cache-first [MenuRepository] (architecture.md §6.1, §6.4, §10).
@@ -134,6 +144,12 @@ final class CachedMenuRepository implements MenuRepository {
 
   @override
   Future<void> clearCache() => cache.clear();
+
+  @override
+  Future<List<CachedMenuEntry>> savedMenus() => cache.entries();
+
+  @override
+  Future<void> remove(VenueRef ref) => cache.remove(ref);
 
   /// The first registered adapter that handles [ref], or null when none
   /// does.

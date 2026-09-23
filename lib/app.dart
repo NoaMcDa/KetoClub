@@ -15,6 +15,7 @@ import 'package:ketoclub/screens/venue_search_screen.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/menu_controller.dart';
+import 'package:ketoclub/state/saved_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 import 'package:ketoclub/state/theme_mode_controller.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
@@ -171,9 +172,12 @@ Route<void>? generateRoute(
   if (name == savedRoutePath) {
     return MaterialPageRoute<void>(
       settings: settings,
-      builder: (_) => const AppShell(
+      builder: (_) => AppShell(
         currentIndex: AppShell.savedIndex,
-        child: SavedScreen(),
+        child: ChangeNotifierProvider<SavedController>(
+          create: (_) => SavedController(dependencies.menuRepository),
+          child: const SavedScreen(),
+        ),
       ),
     );
   }

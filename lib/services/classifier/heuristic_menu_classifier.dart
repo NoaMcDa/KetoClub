@@ -19,10 +19,15 @@ import 'package:ketoclub/utils/text_normaliser.dart';
 
 /// The offline, rule-based [MenuClassifier] (architecture.md §6.2).
 ///
-/// [ClassificationOptions] is accepted (to satisfy the interface) but
-/// unused: the rule vocabulary has no consent gate and no dietary-
-/// constraint hook — those are LLM-prompt concerns (architecture.md
-/// §9.1). Never throws, places every dish it is given, and so never
+/// [ClassificationOptions] does not steer a verdict here: the rule
+/// vocabulary has no consent gate and no dietary-constraint hook — those
+/// are LLM-prompt concerns (architecture.md §9.1). Nor does
+/// [ClassificationOptions.netCarbLimitGrams] (issue #57): the vocabulary is
+/// keyword-based and never estimates grams, so there is no numeric green
+/// threshold here for the limit to move; it reaches the LLM's prompt and
+/// `MenuResponseParser` instead. The options are still recorded in
+/// [MenuAnalysed.options], as the interface requires. Never throws, places
+/// every dish it is given, and so never
 /// reports [MenuAnalysed.unclassified].
 ///
 /// This class does not know *why* it is running instead of the LLM
@@ -56,6 +61,7 @@ final class HeuristicMenuClassifier implements MenuClassifier {
         reason: MenuAnalysisFailureReason.notConfigured,
       ),
       analysedAt: clock.now(),
+      options: options.snapshot,
     );
   }
 
