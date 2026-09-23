@@ -390,7 +390,7 @@ final class MenuController extends ChangeNotifier {
 
     _openRef = ref;
     final appSettings = await _settings.read();
-    _filter = appSettings.filter;
+    _filter = appSettings.lastFilter ?? appSettings.filter;
     _dishNotes = await _notes.readAll(ref);
 
     final fetchResult = await _repository.load(ref, forceRefresh: forceRefresh);
@@ -405,6 +405,9 @@ final class MenuController extends ChangeNotifier {
         _staleReason = staleReason;
         _fetchFailure = null;
         _fetchStatusCode = null;
+        // A successful open is remembered so the Explore screen can offer
+        // to resume it (issue #55); a failed one is not.
+        await _settings.write(appSettings.copyWith(lastVenue: ref));
 
         final options = _optionsFrom(appSettings);
         final reusable = _reusableAnalysis(
@@ -578,11 +581,14 @@ final class MenuController extends ChangeNotifier {
     return analysis;
   }
 
-  /// Changes [filter] and notifies listeners. Does not refetch or
-  /// reclassify.
-  void setFilter(MenuFilter filter) {
+  /// Changes [filter], persists it as [AppSettings.lastFilter] (issue
+  /// #55) so the next [open] restores it, and notifies listeners. Does
+  /// not refetch or reclassify.
+  Future<void> setFilter(MenuFilter filter) async {
     _filter = filter;
     notifyListeners();
+    final appSettings = await _settings.read();
+    await _settings.write(appSettings.copyWith(lastFilter: filter));
   }
 
   /// Changes [query] and notifies listeners (issue #51). Does not refetch

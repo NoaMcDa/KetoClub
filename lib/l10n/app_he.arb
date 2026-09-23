@@ -14,6 +14,10 @@
   "venueSearchHint": "הדביקו קישור מוולט, או מזהה מסעדה",
   "venueSearchInvalid": "קטוקלאב לא יודע לקרוא תפריט משם עדיין. הדביקו קישור למסעדה בוולט או את המזהה שלה.",
   "venueSearchOpen": "הצג תפריט קטוגני",
+  "venueSearchContinueWith": "המשיכו עם {venue}",
+  "@venueSearchContinueWith": {
+    "placeholders": { "venue": { "type": "String" } }
+  },
 
   "menuLoading": "קורא את התפריט…",
   "menuEmpty": "בתפריט הזה אין מנות.",
