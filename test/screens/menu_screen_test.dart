@@ -437,6 +437,132 @@ void main() {
       },
     );
 
+    testWidgets('the source line renders the platform name and age for a 10bis '
+        'VenueRef (issue #47)', (tester) async {
+      // Arrange: a 10bis venue, fetched five minutes ago.
+      const tenBisRef = VenueRef(source: MenuSource.tenbis, platformId: 'r1');
+      final fetchedAt = DateTime.now().toUtc().subtract(
+        const Duration(minutes: 5),
+      );
+      final repository = FakeMenuRepository()
+        ..stub(
+          tenBisRef,
+          MenuFetched(
+            menu: _menuOf(
+              [_dish('Steak')],
+              ref: tenBisRef,
+              fetchedAt: fetchedAt,
+            ),
+          ),
+        );
+      final controller = _controllerFor(repository: repository);
+
+      // Act
+      await _pump(tester, controller, ref: tenBisRef);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(
+        find.text(_en.menuSourceLine('10bis', _en.ageMinutes(5))),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('tapping the refresh action reaches the repository with '
+        'forceRefresh: true (issue #47)', (tester) async {
+      // Arrange
+      final repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+      final controller = _controllerFor(repository: repository);
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+      final loadCallsBefore = repository.loadCalls.length;
+
+      // Act: tap the refresh action beside the source line, found by its
+      // tooltip / semantics label rather than by icon, since the icon is
+      // not itself asserted on here.
+      await tester.tap(find.byTooltip(_en.actionRefreshMenu));
+      await tester.pumpAndSettle();
+
+      // Assert: a second, forced load beyond the one initState's open()
+      // already made — the same contract MenuController.refresh itself
+      // upholds (issue #49), now reached from the header action too.
+      expect(repository.loadCalls.length, greaterThan(loadCallsBefore));
+      expect(
+        repository.loadCalls.last,
+        equals((ref: _ref, forceRefresh: true)),
+      );
+    });
+
+    testWidgets(
+      'the age label updates after a successful refresh (issue #47)',
+      (tester) async {
+        // Arrange: fetched two minutes ago.
+        final firstFetchedAt = DateTime.now().toUtc().subtract(
+          const Duration(minutes: 2),
+        );
+        final repository = FakeMenuRepository()
+          ..stub(
+            _ref,
+            MenuFetched(
+              menu: _menuOf([_dish('Steak')], fetchedAt: firstFetchedAt),
+            ),
+          );
+        final controller = _controllerFor(repository: repository);
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+        expect(
+          find.text(_en.menuSourceLine('Wolt', _en.ageMinutes(2))),
+          findsOneWidget,
+        );
+
+        // Arrange: the refetch this tap triggers returns a fresher
+        // fetchedAt — overwriting the single-ref stub the same way the
+        // controller-level refresh tests do.
+        final secondFetchedAt = DateTime.now().toUtc();
+        repository.stub(
+          _ref,
+          MenuFetched(
+            menu: _menuOf([_dish('Steak')], fetchedAt: secondFetchedAt),
+          ),
+        );
+
+        // Act
+        await tester.tap(find.byTooltip(_en.actionRefreshMenu));
+        await tester.pumpAndSettle();
+
+        // Assert: the age reads "just now", derived from the fresh
+        // MenuController.fetchedAt this screen already rebuilds on — no
+        // separate wiring needed for the label to move forward.
+        expect(
+          find.text(_en.menuSourceLine('Wolt', _en.ageJustNow)),
+          findsOneWidget,
+        );
+        expect(
+          find.text(_en.menuSourceLine('Wolt', _en.ageMinutes(2))),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
+      'the refresh action carries a semantics label / tooltip in Hebrew '
+      'too (issue #47)',
+      (tester) async {
+        // Arrange
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        final controller = _controllerFor(repository: repository);
+
+        // Act
+        await _pump(tester, controller, locale: const Locale('he'));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byTooltip(_he.actionRefreshMenu), findsOneWidget);
+      },
+    );
+
     testWidgets(
       'the keto score badge renders no digit when the analysis has not '
       'produced one — never a fallback 0.0',
