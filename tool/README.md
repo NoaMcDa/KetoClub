@@ -13,6 +13,47 @@ first key). This script records a real `menu/data` payload from a given venue
 slug as a checked-in fixture, from any machine that can reach
 `restaurant-api.wolt.com` — this repository's build environment cannot.
 
+## `perf_menu.dart`: main-thread timings for a 60-dish menu (issue #65)
+
+Times the CPU-bound steps of opening a menu, on the thread that also draws
+frames, over generated 60-dish menus:
+
+| Step | What runs | Budget |
+|---|---|---|
+| decode + map (Wolt / 10bis) | `jsonDecode` then `WoltMenuMapper.toMenu` / `TenBisMenuMapper.toMenu` | 16 ms |
+| fingerprint | `TextNormaliser.menuFingerprint` (a refresh runs it twice) | none, informational |
+| rules engine | `HeuristicMenuClassifier.classify` | none, informational |
+| reply parse | `MenuResponseParser.parse` of a 60-dish AI reply | 16 ms |
+
+The 16 ms budget is one frame at 60 Hz. Issue #65's rule: if decode + map
+or the reply parse takes longer than that **on a phone**, that step moves to
+`compute`. Nothing has been moved yet. The move depends on a phone
+measurement, and `compute` gains nothing on web, where it runs on the
+main thread anyway.
+
+It cannot be run with `dart run`: everything it times imports
+`package:flutter/foundation.dart`, which needs `dart:ui`.
+
+- **On a phone (the numbers that count)**:
+  ```bash
+  flutter run --profile -t tool/perf_menu.dart -d <device>
+  ```
+  The table prints to the `flutter run` console. The screen stays blank
+  because the entry point never calls `runApp`. The 60-dish payloads are
+  generated in code, so nothing has to be copied to the device. Copy the
+  medians into `docs/RELEASE.md` §5.
+- **On the host** (relative cost and regressions only, not the budget):
+  ```bash
+  flutter test test/tool/perf_menu_test.dart --reporter expanded
+  ```
+  One test prints the same table with the two checked-in fixtures
+  (`test/fixtures/wolt_vitrina_lilinblum_menu.json`,
+  `tenbis_synthetic_menu.json`) added as extra decode + map rows. These are
+  unoptimised JIT timings on a desktop CPU. The test asserts no duration,
+  so CI never fails on a slow runner.
+
+A row ending in `OVER` has a median above its budget.
+
 ## Model verification moved to the backend (D12)
 
 **There is no `measure_model_latency.dart` any more.** Before D12, this

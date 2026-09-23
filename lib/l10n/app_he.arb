@@ -10,6 +10,7 @@
   "actionRefreshMenu": "רענן תפריט",
   "actionBackToSearch": "חזרה לחיפוש",
   "offlineBannerMessage": "אין חיבור לאינטרנט.",
+  "actionCancel": "ביטול",
 
   "venueSearchLabel": "קישור למסעדה",
   "venueSearchHint": "הדביקו קישור מוולט, או מזהה מסעדה",
@@ -18,6 +19,9 @@
 
   "menuLoading": "קורא את התפריט…",
   "menuEmpty": "בתפריט הזה אין מנות.",
+  "menuProgressAnalysing": "מנתח את התפריט…",
+  "menuProgressAskingAi": "שואל את הבינה המלאכותית…",
+  "menuProgressApplyingRules": "מפעיל את הכללים…",
   "filterGreenOnly": "רק מנות להזמנה כמו שהן",
   "filterGreenAndYellow": "כמו שהן ועם שינוי",
   "filterAll": "הכול",
@@ -65,7 +69,14 @@
   "settingsNetCarbLimitDecrease": "הורדת מגבלת הפחמימות נטו",
   "settingsNetCarbLimitIncrease": "העלאת מגבלת הפחמימות נטו",
   "settingsFilter": "סינון ברירת מחדל",
+  "settingsCacheSummary": "{count, plural, one{תפריט אחד שמור · עובד גם ללא חיבור לאינטרנט} two{שני תפריטים שמורים · עובד גם ללא חיבור לאינטרנט} other{{count} תפריטים שמורים · עובד גם ללא חיבור לאינטרנט}}",
+  "@settingsCacheSummary": {
+    "placeholders": { "count": { "type": "num" } }
+  },
   "settingsClearCache": "נקה תפריטים שמורים",
+  "settingsClearCacheConfirmTitle": "לנקות את התפריטים השמורים?",
+  "settingsClearCacheConfirmBody": "פעולה זו תמחק את כל התפריטים השמורים במכשיר הזה, כולל כל תפריט שאפשר לפתוח כרגע בלי אינטרנט. אפשר לשמור מסעדה מחדש בכל עת, על ידי פתיחתה כשיש חיבור.",
+  "settingsClearCacheConfirmAction": "נקה",
   "settingsCacheCleared": "התפריטים השמורים נוקו.",
 
   "fetchFailedOffline": "אין חיבור, ולכן לא היה אפשר לקרוא את התפריט.",

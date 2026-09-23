@@ -152,6 +152,12 @@ abstract class AppLocalizations {
   /// **'No internet connection.'**
   String get offlineBannerMessage;
 
+  /// No description provided for @actionCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get actionCancel;
+
   /// No description provided for @venueSearchLabel.
   ///
   /// In en, this message translates to:
@@ -187,6 +193,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This menu has no dishes.'**
   String get menuEmpty;
+
+  /// No description provided for @menuProgressAnalysing.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysing the menu…'**
+  String get menuProgressAnalysing;
+
+  /// No description provided for @menuProgressAskingAi.
+  ///
+  /// In en, this message translates to:
+  /// **'Asking the AI…'**
+  String get menuProgressAskingAi;
+
+  /// No description provided for @menuProgressApplyingRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Applying the rules…'**
+  String get menuProgressApplyingRules;
 
   /// No description provided for @filterGreenOnly.
   ///
@@ -380,11 +404,35 @@ abstract class AppLocalizations {
   /// **'Default filter'**
   String get settingsFilter;
 
+  /// No description provided for @settingsCacheSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 menu cached · works offline} other{{count} menus cached · works offline}}'**
+  String settingsCacheSummary(num count);
+
   /// No description provided for @settingsClearCache.
   ///
   /// In en, this message translates to:
   /// **'Clear saved menus'**
   String get settingsClearCache;
+
+  /// No description provided for @settingsClearCacheConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear saved menus?'**
+  String get settingsClearCacheConfirmTitle;
+
+  /// No description provided for @settingsClearCacheConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This removes every menu saved on this device, including any you can currently open offline. You can save a venue again by opening it once you have a connection.'**
+  String get settingsClearCacheConfirmBody;
+
+  /// No description provided for @settingsClearCacheConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get settingsClearCacheConfirmAction;
 
   /// No description provided for @settingsCacheCleared.
   ///

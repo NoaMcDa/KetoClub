@@ -4,7 +4,10 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_he.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/settings_screen.dart';
+import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
+import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
@@ -352,11 +355,93 @@ void main() {
       },
     );
 
-    testWidgets(
-      'clearing the cache calls the repository and shows settingsCacheCleared',
-      (tester) async {
+    group('saved menus block (issue #61)', () {
+      /// Seeds [repository] with one cached menu for a fresh [VenueRef],
+      /// so the count section has something to show besides zero.
+      Future<void> seedOneMenu(FakeMenuRepository repository) async {
+        const ref = VenueRef(source: MenuSource.wolt, platformId: 'x');
+        final fetched = await repository.load(ref) as MenuFetched;
+        repository.seedCache(CachedMenu(menu: fetched.menu));
+      }
+
+      testWidgets('build shows 0 menus cached with nothing saved', (
+        tester,
+      ) async {
+        // Act
+        await _pump(tester, _controllerFor());
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_en.settingsCacheSummary(0)), findsOneWidget);
+      });
+
+      testWidgets('build shows the seeded count', (tester) async {
         // Arrange
         final repository = FakeMenuRepository();
+        await seedOneMenu(repository);
+        final controller = _controllerFor(repository: repository);
+
+        // Act
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_en.settingsCacheSummary(1)), findsOneWidget);
+      });
+
+      testWidgets(
+        'tapping Clear opens a confirmation dialog that clears nothing '
+        'by itself',
+        (tester) async {
+          // Arrange
+          final repository = FakeMenuRepository();
+          await seedOneMenu(repository);
+          final controller = _controllerFor(repository: repository);
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+
+          // Act
+          final clearCache = find.text(_en.settingsClearCache);
+          await tester.ensureVisible(clearCache);
+          await tester.tap(clearCache);
+          await tester.pumpAndSettle();
+
+          // Assert
+          expect(find.text(_en.settingsClearCacheConfirmTitle), findsOneWidget);
+          expect(find.text(_en.settingsClearCacheConfirmBody), findsOneWidget);
+          expect(repository.clearCacheCallCount, equals(0));
+        },
+      );
+
+      testWidgets('cancelling the confirmation dialog clears nothing', (
+        tester,
+      ) async {
+        // Arrange
+        final repository = FakeMenuRepository();
+        await seedOneMenu(repository);
+        final controller = _controllerFor(repository: repository);
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Act
+        final clearCache = find.text(_en.settingsClearCache);
+        await tester.ensureVisible(clearCache);
+        await tester.tap(clearCache);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(_en.actionCancel));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(repository.clearCacheCallCount, equals(0));
+        expect(find.text(_en.settingsCacheCleared), findsNothing);
+        expect(find.text(_en.settingsCacheSummary(1)), findsOneWidget);
+      });
+
+      testWidgets('confirming the dialog calls the repository, shows '
+          'settingsCacheCleared and updates the count to 0', (tester) async {
+        // Arrange
+        final repository = FakeMenuRepository();
+        await seedOneMenu(repository);
         final controller = _controllerFor(repository: repository);
         await _pump(tester, controller);
         await tester.pumpAndSettle();
@@ -367,12 +452,15 @@ void main() {
         await tester.ensureVisible(clearCache);
         await tester.tap(clearCache);
         await tester.pumpAndSettle();
+        await tester.tap(find.text(_en.settingsClearCacheConfirmAction));
+        await tester.pumpAndSettle();
 
         // Assert
         expect(repository.clearCacheCallCount, equals(1));
         expect(find.text(_en.settingsCacheCleared), findsOneWidget);
-      },
-    );
+        expect(find.text(_en.settingsCacheSummary(0)), findsOneWidget);
+      });
+    });
 
     group('net carb limit stepper (issue #57)', () {
       /// The enabled state of the stepper button keyed [key].
