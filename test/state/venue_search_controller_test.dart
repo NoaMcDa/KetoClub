@@ -1,13 +1,23 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/storage/menu_cache.dart';
+import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
+
+import '../fakes/fake_menu_repository.dart';
+import '../fakes/fake_settings_store.dart';
 
 void main() {
   group('VenueSearchController', () {
+    late FakeSettingsStore settings;
+    late FakeMenuRepository repository;
     late VenueSearchController controller;
 
     setUp(() {
-      controller = VenueSearchController();
+      settings = FakeSettingsStore();
+      repository = FakeMenuRepository();
+      controller = VenueSearchController(settings, repository);
     });
 
     test('setInput with a Wolt url resolves to a wolt VenueRef', () {
@@ -84,6 +94,66 @@ void main() {
 
       // Assert
       expect(notifyCount, 3);
+    });
+
+    test('load leaves lastVenue null when nothing has been opened '
+        '(issue #55)', () async {
+      // Act
+      await controller.load();
+
+      // Assert
+      expect(controller.lastVenue, isNull);
+      expect(controller.lastVenueName, isNull);
+    });
+
+    test('load exposes AppSettings.lastVenue and its cached name '
+        '(issue #55)', () async {
+      // Arrange
+      const ref = VenueRef(source: MenuSource.wolt, platformId: 'vitrina');
+      await settings.write(const AppSettings(lastVenue: ref));
+      repository.seedCache(
+        CachedMenu(
+          menu: Menu(
+            venueRef: ref,
+            venueName: 'Vitrina',
+            currency: 'ILS',
+            fetchedAt: DateTime.utc(2026),
+            categories: const <MenuCategory>[],
+          ),
+        ),
+      );
+
+      // Act
+      await controller.load();
+
+      // Assert
+      expect(controller.lastVenue, equals(ref));
+      expect(controller.lastVenueName, equals('Vitrina'));
+    });
+
+    test('load falls back to the platform id when the cached menu names '
+        'no venue, or nothing is cached for it (issue #55)', () async {
+      // Arrange
+      const ref = VenueRef(source: MenuSource.wolt, platformId: 'vitrina');
+      await settings.write(const AppSettings(lastVenue: ref));
+
+      // Act: nothing seeded in the repository at all.
+      await controller.load();
+
+      // Assert
+      expect(controller.lastVenueName, equals('vitrina'));
+    });
+
+    test('load notifies listeners exactly once', () async {
+      // Arrange
+      var notifyCount = 0;
+      controller.addListener(() => notifyCount++);
+
+      // Act
+      await controller.load();
+
+      // Assert
+      expect(notifyCount, 1);
     });
   });
 }
