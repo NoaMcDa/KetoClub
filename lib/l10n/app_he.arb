@@ -7,6 +7,7 @@
   "actionOpenSettings": "פתח הגדרות",
   "actionCopy": "העתק",
   "actionCopied": "הועתק",
+  "actionRefreshMenu": "רענן תפריט",
 
   "venueSearchLabel": "קישור למסעדה",
   "venueSearchHint": "הדביקו קישור מוולט, או מזהה מסעדה",
