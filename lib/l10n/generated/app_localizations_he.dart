@@ -403,4 +403,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String waiterCardAfterText(String grams) {
     return 'עם השינויים האלו, בערך $grams גרם פחמימות נטו (הערכה) — בטוח להזמין.';
   }
+
+  @override
+  String get dishCardAddNote => 'הוסף הערה';
+
+  @override
+  String dishCardEditNoteSemanticLabel(String note) {
+    return 'ערוך את ההערה שלך: $note';
+  }
+
+  @override
+  String get noteEditorTitle => 'הערה אישית';
+
+  @override
+  String get noteEditorHint => 'לדוגמה: הצוות החליף בשמחה לכרובית';
+
+  @override
+  String get noteEditorSave => 'שמור';
+
+  @override
+  String get noteEditorClear => 'מחק הערה';
 }

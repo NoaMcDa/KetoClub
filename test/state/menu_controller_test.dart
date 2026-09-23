@@ -11,6 +11,7 @@ import 'package:ketoclub/state/menu_controller.dart';
 import '../fakes/fake_clock.dart';
 import '../fakes/fake_menu_classifier.dart';
 import '../fakes/fake_menu_repository.dart';
+import '../fakes/fake_notes_store.dart';
 import '../fakes/fake_settings_store.dart';
 
 /// The venue every test opens, unless a test builds its own.
@@ -56,6 +57,7 @@ void main() {
     late FakeMenuRepository repository;
     late FakeMenuClassifier classifier;
     late FakeSettingsStore settings;
+    late FakeNotesStore notes;
     late FakeClock clock;
     late MenuController controller;
 
@@ -63,8 +65,9 @@ void main() {
       repository = FakeMenuRepository();
       classifier = FakeMenuClassifier();
       settings = FakeSettingsStore();
+      notes = FakeNotesStore();
       clock = FakeClock(DateTime.utc(2026));
-      controller = MenuController(repository, classifier, settings);
+      controller = MenuController(repository, classifier, settings, notes);
     });
 
     test(
@@ -523,7 +526,7 @@ void main() {
       settings = FakeSettingsStore(
         initial: const AppSettings(filter: MenuFilter.greenOnly),
       );
-      controller = MenuController(repository, classifier, settings);
+      controller = MenuController(repository, classifier, settings, notes);
       repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
 
       // Act
@@ -539,7 +542,7 @@ void main() {
       settings = FakeSettingsStore(
         initial: const AppSettings(estimationConsentGiven: true),
       );
-      controller = MenuController(repository, classifier, settings);
+      controller = MenuController(repository, classifier, settings, notes);
       repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
 
       // Act
@@ -621,6 +624,147 @@ void main() {
       expect(visible, isEmpty);
       expect(unclassified, isEmpty);
       expect(controller.engine, isNull);
+    });
+
+    group('personal notes (issue #52)', () {
+      test('noteFor returns null before anything is opened', () {
+        // Assert
+        expect(controller.noteFor('d1'), isNull);
+      });
+
+      test('open loads any notes already stored for that venue', () async {
+        // Arrange
+        await notes.write(_ref, 'd1', 'Ask for no cheese.');
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+
+        // Act
+        await controller.open(_ref);
+
+        // Assert
+        expect(controller.noteFor('d1'), equals('Ask for no cheese.'));
+      });
+
+      test('setNote writes through the store and updates noteFor '
+          'immediately', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+
+        // Act
+        await controller.setNote(
+          'd1',
+          'Waitstaff happily substituted '
+              'cauliflower.',
+        );
+
+        // Assert
+        expect(
+          controller.noteFor('d1'),
+          equals('Waitstaff happily substituted cauliflower.'),
+        );
+        expect(
+          await notes.read(_ref, 'd1'),
+          equals('Waitstaff happily substituted cauliflower.'),
+        );
+      });
+
+      test('setNote trims the note before storing it', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+
+        // Act
+        await controller.setNote('d1', '  spaced out note  ');
+
+        // Assert
+        expect(controller.noteFor('d1'), equals('spaced out note'));
+      });
+
+      test('setNote notifies listeners', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        var notifyCount = 0;
+        controller.addListener(() => notifyCount++);
+
+        // Act
+        await controller.setNote('d1', 'A note.');
+
+        // Assert
+        expect(notifyCount, 1);
+      });
+
+      test('setNote with a blank note clears it instead of storing an '
+          'empty string', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        await controller.setNote('d1', 'First.');
+
+        // Act
+        await controller.setNote('d1', '   ');
+
+        // Assert
+        expect(controller.noteFor('d1'), isNull);
+        expect(await notes.read(_ref, 'd1'), isNull);
+      });
+
+      test('clearNote removes the note through the store and from '
+          'noteFor', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        await controller.setNote('d1', 'A note.');
+
+        // Act
+        await controller.clearNote('d1');
+
+        // Assert
+        expect(controller.noteFor('d1'), isNull);
+        expect(await notes.read(_ref, 'd1'), isNull);
+      });
+
+      test('clearNote on a dish with no note is a no-op, including no '
+          'notify', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        var notifyCount = 0;
+        controller.addListener(() => notifyCount++);
+
+        // Act
+        await controller.clearNote('never_noted');
+
+        // Assert
+        expect(notifyCount, 0);
+        expect(notes.deleteCalls, isEmpty);
+      });
+
+      test('setNote and clearNote before any open are no-ops, not a '
+          'crash', () async {
+        // Act & Assert
+        await expectLater(controller.setNote('d1', 'x'), completes);
+        await expectLater(controller.clearNote('d1'), completes);
+        expect(controller.noteFor('d1'), isNull);
+        expect(notes.writeCalls, isEmpty);
+      });
+
+      test('notes are scoped per venue: opening a second venue does not '
+          "carry the first venue's notes over", () async {
+        // Arrange
+        const otherRef = VenueRef(source: MenuSource.wolt, platformId: 'v2');
+        repository
+          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])))
+          ..stub(otherRef, MenuFetched(menu: _menuOf([_dish('Fish')])));
+        await controller.open(_ref);
+        await controller.setNote('d1', 'For venue one.');
+
+        // Act
+        await controller.open(otherRef);
+
+        // Assert
+        expect(controller.noteFor('d1'), isNull);
+      });
     });
   });
 

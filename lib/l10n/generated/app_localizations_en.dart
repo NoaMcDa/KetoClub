@@ -398,4 +398,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String waiterCardAfterText(String grams) {
     return 'With these changes, about ${grams}g net carbs (estimate) — safe to order.';
   }
+
+  @override
+  String get dishCardAddNote => 'Add a note';
+
+  @override
+  String dishCardEditNoteSemanticLabel(String note) {
+    return 'Edit your note: $note';
+  }
+
+  @override
+  String get noteEditorTitle => 'Personal note';
+
+  @override
+  String get noteEditorHint => 'e.g. Waitstaff happily substituted cauliflower';
+
+  @override
+  String get noteEditorSave => 'Save';
+
+  @override
+  String get noteEditorClear => 'Clear note';
 }

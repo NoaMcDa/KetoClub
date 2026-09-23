@@ -15,6 +15,7 @@ import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/install_id_store.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
+import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:screen_brightness/screen_brightness.dart' as plugin;
@@ -137,6 +138,7 @@ AppDependencies buildDependencies() {
     ),
     menuClassifier: RoutingMenuClassifier(llm, heuristic, connectivity),
     settingsStore: PrefsSettingsStore(load: SharedPreferences.getInstance),
+    notesStore: PrefsNotesStore(load: SharedPreferences.getInstance),
     clock: clock,
     logger: const DeveloperLogAppLogger(),
     screenBrightness: screenBrightness,
