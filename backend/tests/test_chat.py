@@ -562,7 +562,8 @@ def test_over_the_per_install_limit_is_rate_limited(
     assert second.status_code == 429
     assert second.json() == _error(429, "rateLimited")
     assert other_install.status_code == 200
-    assert route.call_count == 3
+    # The rate-limited second call never reaches Gemini.
+    assert route.call_count == 2
 
 
 # --- logging -------------------------------------------------------------------
