@@ -223,6 +223,7 @@ class _MenuScreenState extends State<MenuScreen> {
       return _refreshable(
         controller,
         ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(16),
           children: [
             header,
@@ -249,6 +250,9 @@ class _MenuScreenState extends State<MenuScreen> {
       controller,
       ListView(
         controller: _scrollController,
+        // Always scrollable, so a menu shorter than the screen can still
+        // be pulled down to refresh (RefreshIndicator's own requirement).
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
         children: [
           header,

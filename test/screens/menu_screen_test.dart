@@ -1319,8 +1319,13 @@ void main() {
           expect(find.byType(NoteEditorSheet), findsOneWidget);
 
           // Act: type a note and save.
+          // Scoped to the sheet: the menu's search field (issue #51) is a
+          // TextField too, and it is still in the tree under the sheet.
           await tester.enterText(
-            find.byType(TextField),
+            find.descendant(
+              of: find.byType(NoteEditorSheet),
+              matching: find.byType(TextField),
+            ),
             'Waitstaff happily substituted cauliflower.',
           );
           await tester.tap(find.text(_en.noteEditorSave));
@@ -1508,9 +1513,18 @@ void main() {
           await tester.tap(find.text('Category 7'));
           await tester.pumpAndSettle();
 
-          // Assert: the chip and the now-built, now-visible header both
-          // carry the label.
-          expect(find.text('Category 7'), findsNWidgets(2));
+          // Assert: the header is now built and on screen. The chip row
+          // scrolls with the list, so it has left the built range by now
+          // and the one match is the header, not the chip.
+          final header = find.text('Category 7');
+          expect(header, findsOneWidget);
+          expect(
+            find.descendant(of: find.byType(ActionChip), matching: header),
+            findsNothing,
+          );
+          final headerRect = tester.getRect(header);
+          final screen = tester.getRect(find.byType(MenuScreen));
+          expect(screen.overlaps(headerRect), isTrue);
         },
       );
     });
