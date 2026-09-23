@@ -3,6 +3,7 @@
 // revisit of the same venue — through the flow fake `NotesStore`, never
 // through a controller reached from the side.
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
@@ -99,7 +100,7 @@ void main() {
         await tapAndSettle(tester, find.text(_en.dishCardAddNote));
         expect(find.byType(NoteEditorSheet), findsOneWidget);
         // Typed into the sheet's own field: the menu's search field
-        // (issue #51) is the first EditableText on screen, under the sheet.
+        // (issue #51) is the first text field on screen, under the sheet.
         await tester.enterText(
           find.descendant(
             of: find.byType(NoteEditorSheet),
