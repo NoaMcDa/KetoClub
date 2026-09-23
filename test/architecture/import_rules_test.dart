@@ -198,6 +198,7 @@ const _boundaries = <_Boundary>[
   _Boundary('restaurant-api.wolt.com', {
     'services/menu/wolt/wolt_adapter.dart',
   }),
+  _Boundary('www.10bis.co.il', {'services/menu/tenbis/tenbis_adapter.dart'}),
   _Boundary('/v1/chat', {'services/llm/backend_chat_client.dart'}),
   _Boundary('KETOCLUB_BACKEND_URL', {'di.dart'}),
   _Boundary(

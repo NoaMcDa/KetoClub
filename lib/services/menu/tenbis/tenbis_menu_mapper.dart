@@ -7,7 +7,7 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 /// (architecture.md §6.1, §18.1, issue #45).
 ///
 /// **The shape below is unverified — issue #44 is still open.**
-/// `www.10bis.co.il` is unreachable from this build environment, so this
+/// The 10bis API is unreachable from this build environment, so this
 /// mapper is written against a synthetic fixture
 /// (`test/fixtures/tenbis_synthetic_menu.json`), built from
 /// `menu_api_research` §3.2 and issue #44's own body text (which names
