@@ -28,24 +28,30 @@ class CategoryChips extends StatelessWidget {
   Widget build(BuildContext context) {
     if (categories.isEmpty) return const SizedBox.shrink();
     final l10n = AppLocalizations.of(context)!;
+    // A scrollable Row rather than a horizontal ListView: a menu has a
+    // handful of categories, so building every chip up front costs
+    // nothing, and it keeps the loaded menu's one ListView the only one
+    // on the screen — a widget test can still find it by type alone.
     return SizedBox(
       height: 36,
-      child: ListView.separated(
+      child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (_, index) {
-          final category = categories[index];
-          return Semantics(
-            button: true,
-            label: l10n.categoryChipSemanticLabel(category),
-            excludeSemantics: true,
-            child: ActionChip(
-              label: Text(category),
-              onPressed: () => onSelected(category),
-            ),
-          );
-        },
+        child: Row(
+          children: [
+            for (var i = 0; i < categories.length; i++) ...[
+              if (i > 0) const SizedBox(width: 8),
+              Semantics(
+                button: true,
+                label: l10n.categoryChipSemanticLabel(categories[i]),
+                excludeSemantics: true,
+                child: ActionChip(
+                  label: Text(categories[i]),
+                  onPressed: () => onSelected(categories[i]),
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

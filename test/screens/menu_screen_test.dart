@@ -85,6 +85,20 @@ MenuController _controllerFor({
   notes ?? FakeNotesStore(),
 );
 
+/// Gives the test surface a phone-tall viewport for the rest of the test.
+///
+/// The default 800×600 surface fits the header, the verdict tiles, the
+/// legend, the search field, the chip row and a category heading with
+/// room for only one dish card underneath; a lazy [ListView] then never
+/// builds the second card, and every `find` for it comes back empty. The
+/// size is reset when the test ends.
+void _useTallSurface(WidgetTester tester) {
+  tester.view.physicalSize = const Size(800, 1600);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+}
+
 /// Pumps a [MenuScreen] for [ref] over [controller], inside a localised
 /// [MaterialApp] with [controller] provided through `provider` — the
 /// shape every test in this file uses.
@@ -95,6 +109,7 @@ Future<void> _pump(
   Locale locale = const Locale('en'),
   ScreenBrightness? screenBrightness,
 }) {
+  _useTallSurface(tester);
   return tester.pumpWidget(
     MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -124,6 +139,7 @@ Future<void> _pumpWithRoutes(
   MenuController controller,
   List<String> pushedNames,
 ) {
+  _useTallSurface(tester);
   return tester.pumpWidget(
     MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
