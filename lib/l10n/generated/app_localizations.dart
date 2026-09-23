@@ -392,6 +392,12 @@ abstract class AppLocalizations {
   /// **'KetoClub cannot read menus from that site yet.'**
   String get fetchFailedUnsupportedSource;
 
+  /// No description provided for @fetchFailedBackendUnreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub\'s server could not be reached, so the menu could not be read.'**
+  String get fetchFailedBackendUnreachable;
+
   /// No description provided for @analysisNotConfigured.
   ///
   /// In en, this message translates to:

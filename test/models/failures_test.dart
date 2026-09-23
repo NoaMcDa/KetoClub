@@ -11,6 +11,7 @@ void main() {
         'notFound',
         'platformChanged',
         'unsupportedSource',
+        'backendUnreachable',
       ];
 
       // Act

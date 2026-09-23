@@ -23,6 +23,37 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// The name of the Hive box holding cached menus and their analyses.
 const String _menuCacheBoxName = 'menu_cache';
 
+/// KetoClub's own backend, read at build time (`backend_plan.md` §4.1).
+/// Empty when the app was built with no `--dart-define=KETOCLUB_BACKEND_URL=…`,
+/// which is every build until issue #99 adds a Settings override — mobile
+/// builds in particular never set this, since native HTTP has no CORS
+/// problem to route around.
+const String _configuredBackendUrl = String.fromEnvironment(
+  'KETOCLUB_BACKEND_URL',
+);
+
+/// Whether [WoltMenuAdapter] should route through KetoClub's own backend
+/// instead of calling Wolt directly, and at what address
+/// (`backend_plan.md` §3.3, §4.1).
+///
+/// The proxy is used only in a browser — native HTTP has no CORS problem
+/// to route around, and D1's "client-only" claim would be muddied by a
+/// mobile build silently depending on a backend it does not need — and
+/// only when [configured] parses as an absolute `http` or `https` URI; a
+/// blank, malformed or non-http(s) value is treated the same as "not
+/// configured" rather than risking a request to a nonsense address.
+///
+/// A pure, top-level function rather than a private helper so
+/// `di_test.dart` can cover every branch without a `--dart-define` of its
+/// own.
+Uri? menuProxyBase({required bool runsInBrowser, required String configured}) {
+  if (!runsInBrowser || configured.isEmpty) return null;
+  final uri = Uri.tryParse(configured);
+  if (uri == null || !uri.isAbsolute || uri.host.isEmpty) return null;
+  if (uri.scheme != 'http' && uri.scheme != 'https') return null;
+  return uri;
+}
+
 /// Composition root (architecture.md §18.1).
 ///
 /// This is the only file under lib/ that may construct a concrete service,
@@ -58,7 +89,15 @@ AppDependencies buildDependencies() {
 
   return AppDependencies(
     menuRepository: CachedMenuRepository(
-      adapters: [WoltMenuAdapter(client: client)],
+      adapters: [
+        WoltMenuAdapter(
+          client: client,
+          proxyBase: menuProxyBase(
+            runsInBrowser: kIsWeb,
+            configured: _configuredBackendUrl,
+          ),
+        ),
+      ],
       cache: HiveMenuCache(
         openBox: () async {
           await Hive.initFlutter();

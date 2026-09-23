@@ -176,6 +176,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'KetoClub cannot read menus from that site yet.';
 
   @override
+  String get fetchFailedBackendUnreachable =>
+      'KetoClub\'s server could not be reached, so the menu could not be read.';
+
+  @override
   String get analysisNotConfigured =>
       'Add an OpenRouter key in Settings for AI analysis.';
 
