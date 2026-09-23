@@ -28,6 +28,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionCopied => 'Copied';
 
   @override
+  String get actionRefreshMenu => 'Refresh menu';
+
+  @override
   String get venueSearchLabel => 'Restaurant link';
 
   @override

@@ -28,6 +28,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get actionCopied => 'הועתק';
 
   @override
+  String get actionRefreshMenu => 'רענן תפריט';
+
+  @override
   String get venueSearchLabel => 'קישור למסעדה';
 
   @override
