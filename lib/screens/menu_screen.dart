@@ -13,11 +13,13 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
+import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/menu_share_text.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/category_chips.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
@@ -98,6 +100,7 @@ class MenuScreen extends StatefulWidget {
     required this.screenBrightness,
     required this.connectivity,
     required this.externalLinkOpener,
+    required this.menuSharer,
     super.key,
   });
 
@@ -115,6 +118,10 @@ class MenuScreen extends StatefulWidget {
   /// Opens the venue's own page on its platform when the "open on
   /// {platform}" action beside the source line is tapped (issue #53).
   final ExternalLinkOpener externalLinkOpener;
+
+  /// Shares [MenuShareText.build]'s summary of the green and yellow
+  /// dishes when the app bar's share action is tapped (issue #54).
+  final MenuSharer menuSharer;
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -169,9 +176,22 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final controller = context.watch<MenuController>();
+    // The share action needs at least one green or yellow dish to build a
+    // non-empty summary from (issue #54); a failed or not-yet-run analysis
+    // — where every count below reads 0 — hides it rather than sharing an
+    // empty card.
+    final canShare =
+        controller.analysis is MenuAnalysed &&
+        (controller.greenCount > 0 || controller.yellowCount > 0);
     return Scaffold(
       appBar: AppBar(
         actions: [
+          if (canShare)
+            IconButton(
+              icon: const Icon(Icons.share),
+              tooltip: l10n.actionShareMenu,
+              onPressed: () => unawaited(_shareMenu(controller)),
+            ),
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: l10n.actionOpenSettings,
@@ -189,6 +209,28 @@ class _MenuScreenState extends State<MenuScreen> {
         ],
       ),
     );
+  }
+
+  /// Builds [MenuShareText.build]'s summary of [controller]'s current
+  /// green and yellow dishes and hands it to `widget.menuSharer` (issue
+  /// #54).
+  ///
+  /// A no-op when [MenuController.menu] or [MenuController.analysis] is
+  /// not in the shape [build]'s `canShare` check already requires before
+  /// this action is even shown — defensive only, since a listener could in
+  /// principle rebuild between that check and a tap reaching here, but no
+  /// test exercises it. The venue name follows the same fallback [_header]
+  /// uses, so the shared text names the venue exactly as the header does.
+  Future<void> _shareMenu(MenuController controller) async {
+    final menu = controller.menu;
+    final analysis = controller.analysis;
+    if (menu == null || analysis is! MenuAnalysed) return;
+    final text = MenuShareText.build(
+      venueName: controller.venueName ?? widget.ref.platformId,
+      menu: menu,
+      analysis: analysis,
+    );
+    await widget.menuSharer.shareText(text);
   }
 
   /// The screen body for the controller's current state: loading, a

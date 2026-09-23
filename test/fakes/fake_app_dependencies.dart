@@ -6,6 +6,7 @@ import 'fake_connectivity.dart';
 import 'fake_external_link_opener.dart';
 import 'fake_menu_classifier.dart';
 import 'fake_menu_repository.dart';
+import 'fake_menu_sharer.dart';
 import 'fake_notes_store.dart';
 import 'fake_settings_store.dart';
 
@@ -25,7 +26,8 @@ final class FakeAppDependencies {
       clock = FakeClock(startedAt ?? DateTime.utc(2026)),
       logger = FakeAppLogger(),
       connectivity = FakeConnectivity(),
-      externalLinkOpener = FakeExternalLinkOpener();
+      externalLinkOpener = FakeExternalLinkOpener(),
+      menuSharer = FakeMenuSharer();
 
   /// The faked menu repository.
   final FakeMenuRepository repository;
@@ -53,6 +55,9 @@ final class FakeAppDependencies {
   /// [FakeExternalLinkOpener.openCalls].
   final FakeExternalLinkOpener externalLinkOpener;
 
+  /// The faked menu sharer; inspect [FakeMenuSharer.shareCalls].
+  final FakeMenuSharer menuSharer;
+
   /// The dependency set to hand to the app widget.
   AppDependencies get dependencies => AppDependencies(
     menuRepository: repository,
@@ -63,5 +68,6 @@ final class FakeAppDependencies {
     logger: logger,
     connectivity: connectivity,
     externalLinkOpener: externalLinkOpener,
+    menuSharer: menuSharer,
   );
 }

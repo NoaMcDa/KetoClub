@@ -204,6 +204,30 @@ const String redWhyEn = 'Built on {base}, which cannot be made keto.';
 const String redWhyHe = 'המנה מבוססת על {base}, ואי אפשר להפוך אותה לקטוגנית.';
 
 // ---------------------------------------------------------------------------
+// Shareable menu card text (issue #54)
+// ---------------------------------------------------------------------------
+
+/// Heading for the "order as-is" (green) group in `MenuShareText`'s
+/// output, English. Bilingual and Dart-literal like the waiter templates
+/// above, and for the same documented reason (this file's own doc
+/// comment): the shared text follows the **menu's** language, detected
+/// from the dish text, not the reader's UI locale, so it cannot be an ARB
+/// key resolved against the current `Locale`.
+const String shareGreenHeadingEn = 'Order as-is:';
+
+/// Heading for the "order as-is" (green) group in `MenuShareText`'s
+/// output, Hebrew. See [shareGreenHeadingEn].
+const String shareGreenHeadingHe = 'להזמין כמו שהוא:';
+
+/// Heading for the "order with changes" (yellow) group in
+/// `MenuShareText`'s output, English. See [shareGreenHeadingEn].
+const String shareYellowHeadingEn = 'Order with changes:';
+
+/// Heading for the "order with changes" (yellow) group in
+/// `MenuShareText`'s output, Hebrew. See [shareGreenHeadingEn].
+const String shareYellowHeadingHe = 'להזמין עם שינויים:';
+
+// ---------------------------------------------------------------------------
 // Guard and suppression relation shapes (`vocabulary_spec.md`)
 // ---------------------------------------------------------------------------
 

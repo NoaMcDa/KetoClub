@@ -37,6 +37,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get offlineBannerMessage => 'אין חיבור לאינטרנט.';
 
   @override
+  String get actionShareMenu => 'שתף תפריט';
+
+  @override
   String get actionCancel => 'ביטול';
 
   @override

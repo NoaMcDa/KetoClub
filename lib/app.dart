@@ -217,6 +217,7 @@ Route<void>? generateRoute(
           screenBrightness: dependencies.screenBrightness,
           connectivity: dependencies.connectivity,
           externalLinkOpener: dependencies.externalLinkOpener,
+          menuSharer: dependencies.menuSharer,
         ),
       ),
     );

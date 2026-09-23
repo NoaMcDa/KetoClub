@@ -152,6 +152,12 @@ abstract class AppLocalizations {
   /// **'No internet connection.'**
   String get offlineBannerMessage;
 
+  /// No description provided for @actionShareMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Share menu'**
+  String get actionShareMenu;
+
   /// No description provided for @actionCancel.
   ///
   /// In en, this message translates to:
