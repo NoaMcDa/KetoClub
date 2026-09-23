@@ -17,16 +17,20 @@ __all__ = ["Base", "ChatCache", "MenuCache"]
 
 
 class MenuCache(Base):
-    """A cached raw Wolt menu response, keyed by venue slug (issue #95).
+    """A cached raw menu response, keyed by ``(source, slug)`` (#95, #122).
 
-    Only a 2xx upstream response is ever written here; a failed fetch is
-    never cached (``backend_plan.md`` §3.3). ``fetched_at`` is stored as a
-    naive UTC timestamp — the proxy route treats a row older than
-    ``Settings.MENU_CACHE_TTL_SECONDS`` as a miss and replaces it.
+    ``source`` distinguishes which proxy route wrote the row (``"wolt"``,
+    ``"tenbis"``) so a Wolt venue slug and a 10bis restaurant id that happen
+    to be the same string cannot collide — the primary key is the pair, not
+    ``slug`` alone. Only a 2xx upstream response is ever written here; a
+    failed fetch is never cached (``backend_plan.md`` §3.3). ``fetched_at``
+    is stored as a naive UTC timestamp — the proxy route treats a row older
+    than ``Settings.MENU_CACHE_TTL_SECONDS`` as a miss and replaces it.
     """
 
     __tablename__ = "menu_cache"
 
+    source: Mapped[str] = mapped_column(String, primary_key=True)
     slug: Mapped[str] = mapped_column(String, primary_key=True)
     status_code: Mapped[int] = mapped_column(Integer, nullable=False)
     content_type: Mapped[str] = mapped_column(String, nullable=False)

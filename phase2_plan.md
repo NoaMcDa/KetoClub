@@ -272,3 +272,28 @@ Each with the default this plan assumes.
 | 8 | Which model runs #40, #56, #57, #64, #42, #65? | Opus. Everything else Sonnet |
 | 9 | Should the venue-search proxy (B2) be rate limited per install like `/v1/chat`? | Decide after #38 shows how heavy the endpoint is. Default no |
 | 10 | #99 (Settings backend URL override) is Phase 3 and low priority, but the phone end-to-end check in §6 needs a LAN base URL. Pull it forward? | Use `--dart-define` for now. Pull #99 forward only if the user tests on a phone often |
+
+## 8. Run 1 decisions (2026-09-23)
+
+The user answered the open questions above before the first run. What run 1
+does and does not cover:
+
+| Question | Decision |
+|---|---|
+| 1, 10bis fixture | Build #45 and #46 now against a synthetic fixture; re-record through #122 when the user runs the curl |
+| Discovery chain | **Deferred.** #38 is a browser capture only the user can do, so #37, #39, #40, #41, #42, #43, #50, #63, #64 and #123 stay open and untouched |
+| 2, #59 | Closed as completed after checking the three radio labels in both ARB files |
+| 4, B1 and B2 | Filed as #122 (runs in wave 1) and #123 (blocked by #38) |
+| 5 to 10 | Plan defaults accepted |
+
+Run 1 waves, in order of dependency, with the worker model per issue:
+
+| Wave | Issues | Opus | Sonnet |
+|---|---|---|---|
+| 1 | #119, #49, #48, #58, #45, #122, #52, #66 | none | all |
+| 2 | #46, #57, #61, #47, #69, #65 | #57, #65 | #46, #61, #47, #69 |
+| 3 | #56, #55, #51, #53, #68, #54 | #56 | #55, #51, #53, #68, #54 |
+
+Merge order inside a wave follows the conflict hotspots in §3: #119 before
+#49, #48 before #49, #57 before #61 and #65, and the `menu_screen.dart` PRs of
+wave 3 one at a time.
