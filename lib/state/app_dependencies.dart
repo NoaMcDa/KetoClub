@@ -4,7 +4,6 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
-import 'package:ketoclub/services/storage/key_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 
 /// The set of service interfaces the app is built on (architecture.md §18.1).
@@ -24,7 +23,6 @@ class AppDependencies {
   const new({
     required this.menuRepository,
     required this.menuClassifier,
-    required this.keyStore,
     required this.settingsStore,
     required this.clock,
     required this.logger,
@@ -38,17 +36,14 @@ class AppDependencies {
   /// fallback (architecture.md §6.2).
   final MenuClassifier menuClassifier;
 
-  /// The OpenRouter key. Read by the LLM client and by Settings, which asks
-  /// only whether one exists (architecture.md §11).
-  final KeyStore keyStore;
-
   /// Non-secret settings: language, default filter, consent, last venue.
   final SettingsStore settingsStore;
 
   /// The only source of the current time, so tests control it.
   final Clock clock;
 
-  /// Structured logging; never receives the key or an upstream error body.
+  /// Structured logging; never receives a credential or an upstream error
+  /// body.
   final AppLogger logger;
 
   /// Raises and restores the screen brightness while the Waiter Card is

@@ -30,9 +30,10 @@ void main() {
         'offline',
         'timeout',
         'rateLimited',
-        'unauthorised',
         'badResponse',
         'noDishesFound',
+        'backendUnreachable',
+        'consentWithheld',
       ];
 
       // Act
@@ -44,15 +45,14 @@ void main() {
       expect(names, equals(expectedNames));
     });
 
-    test('unauthorised is distinct from every other reason', () {
-      // Arrange
-      const reason = MenuAnalysisFailureReason.unauthorised;
+    test('consentWithheld is distinct from notConfigured', () {
+      // Arrange: the user can fix one in Settings; the other is the build's
+      // or the server's, so the two must never collapse into one reason.
+      const reason = MenuAnalysisFailureReason.consentWithheld;
 
-      // Act
-      final others = MenuAnalysisFailureReason.values.where((r) => r != reason);
-
-      // Assert
-      expect(others, isNot(contains(reason)));
+      // Act & Assert
+      expect(reason, isNot(equals(MenuAnalysisFailureReason.notConfigured)));
+      expect(reason.name, isNot(equals('notConfigured')));
     });
   });
 }

@@ -31,16 +31,6 @@ void main() {
       expect(llmRequestTimeout, equals(const Duration(seconds: 120)));
     });
 
-    test('llmMaxOutputTokens is 6000', () {
-      // Assert
-      expect(llmMaxOutputTokens, equals(6000));
-    });
-
-    test('llmReleaseCheckSeconds is 20', () {
-      // Assert
-      expect(llmReleaseCheckSeconds, equals(20));
-    });
-
     test('maxAnalysedDishes is 150', () {
       // Assert
       expect(maxAnalysedDishes, equals(150));

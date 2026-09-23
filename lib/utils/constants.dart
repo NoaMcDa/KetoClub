@@ -40,18 +40,6 @@ const Duration menuCacheTtl = Duration(hours: 24);
 /// to `offline`.
 const Duration llmRequestTimeout = Duration(seconds: 120);
 
-/// `max_tokens` sent with every LLM request (architecture.md §9.3). A
-/// 60-dish menu is several thousand output tokens; a truncated array is
-/// an unrecoverable `badResponse`, so this is set generously and
-/// explicitly rather than left to the provider's default.
-const int llmMaxOutputTokens = 6000;
-
-/// The response-time budget, in seconds, for the pre-release check that
-/// runs the real system prompt against the pinned model id before every
-/// release (architecture.md §9.3). Not a request timeout — a slower
-/// answer here is a signal to re-pin the model, not a runtime failure.
-const int llmReleaseCheckSeconds = 20;
-
 /// The parser rejects a response naming more than this many dishes as
 /// `badResponse` (architecture.md §9.4 rule 6).
 const int maxAnalysedDishes = 150;

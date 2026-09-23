@@ -1022,7 +1022,7 @@ languages. Collapsing reasons is a bug.
 | `MenuFetch.unsupportedSource` | repository | "KetoClub cannot read menus from this site yet." | paste text (Phase 4) |
 | `MenuFetch.backendUnreachable` | adapter, `ClientException` reaching the backend itself (D11) | "KetoClub's server could not be reached, so the menu could not be read." | retry, or unset the backend define |
 | `Analysis.notConfigured` | router, no backend URL compiled in, or the backend has no Gemini key (D12) | rules result + "AI analysis is not available on this build or server. Showing rule-based results." | none from the app; a mobile build with no `KETOCLUB_BACKEND_URL` define is rules-only by this path |
-| `Analysis.consentWithheld` | router, consent toggle off (client-only, §11) | rules result + "Allow AI analysis in Settings to send this menu for analysis. Showing rule-based results." | settings |
+| `Analysis.consentWithheld` | router, consent toggle off (client-only, §11) | rules result + "Allow AI analysis in Settings to analyse this menu. Showing rule-based results." | settings |
 | `Analysis.offline` | router / client, no route, or the backend's own 502 (Gemini unreachable) | rules result + "Offline. Showing rule-based results." | retry |
 | `Analysis.timeout` | client, > 120 s, or the backend's 504 (Gemini did not answer within its own budget) | rules result + "The AI model was too slow. Showing rule-based results." | retry |
 | `Analysis.rateLimited` | client, 429 — either Gemini's own rate limit or the backend's per-install limiter | rules result + "Daily AI limit reached." (no "for this key": there is no key) | wait |
@@ -1037,6 +1037,11 @@ produces — and both fall back to rules like every reason but `noDishesFound`.
 There is no "no rules fallback" case left in the analysis table: a rejected
 server key is the operator's problem, not something the user can be shown as a
 dead end.
+
+**Where the rules-result copy appears today.** A rules result carrying a reason
+currently shows that reason only on the engine chip ("Rules (server unreachable)");
+the full sentences in the table above are rendered only for a hard
+`MenuAnalysisFailed`. Showing them as a banner on a degraded result is issue #119.
 
 `ChatFailed` carries a status code and a short category, never the upstream
 body: an upstream error body can still echo prompt text or other detail that
@@ -1143,7 +1148,6 @@ should not reach a log or a widget, even with no bearer token left to leak.
   sit in the **main** manifest: the debug and profile manifests Flutter generates
   grant it only to those build types, and a release build without it fails every
   fetch as `MenuFetch.offline`.
-- `minSdk` 21 or higher for `flutter_secure_storage`.
 
 ---
 
@@ -1214,11 +1218,12 @@ over the `connectivity_plus` plugin (added to the §5 dependency table and named
 in §8 as the one dependency that is local rather than an external endpoint), with
 a settable `FakeConnectivity` in `test/fakes/`. `RoutingMenuClassifier`'s rule 2
 (§6.2, restored to its original position) asks it before ever building an
-OpenRouter request, falling back to the heuristic — stamped `offline`, the same
+model request (OpenRouter then, the backend since D12), falling back to the heuristic — stamped `offline`, the same
 reason a failed call already produced — when it answers false.
 
 **The cost:** one more plugin (§5), one more service threaded through
-`di.dart` and the router's constructor (now four instead of three), and one more
+`di.dart` and the router's constructor (four arguments then; three since D12
+removed the `KeyStore`), and one more
 abstraction whose fake can disagree with the device it stands in for.
 `isOnline()` is documented on the interface itself as a hint, never a verdict,
 precisely because of that last point: a `true` reading can still be followed by
@@ -1229,8 +1234,8 @@ means.
 
 **What it buys:** the device being plainly offline — a lift, a restaurant with
 a dead signal, the app opened before the phone reconnects — used to cost one
-OpenRouter request every time, which is also one unit of the user's 50-a-day
-free-tier quota (D3, D6) spent on a call that could not have succeeded. That
+model request every time, which was one unit of the user's 50-a-day OpenRouter
+quota (D3, D6) and is now one unit of the per-install limit (D12) spent on a call that could not have succeeded. That
 case is common enough that the recurring cost of the wasted requests it
 prevents was judged larger than the cost of the extra abstraction. `Clock`
 stayed injected throughout both versions of this decision — cache freshness
@@ -1672,7 +1677,7 @@ following, and the rest of the document has been updated to match:
   services are constructed; `main.dart` calls it. Previously wiring was implied to
   live in `main.dart` with services free to construct their own dependencies.
 - **Every service is an interface**, not only the three that had obvious
-  alternatives. `MenuRepository`, `KeyStore`, `MenuCache`, `SettingsStore`,
+  alternatives. `MenuRepository`, `InstallIdStore`, `MenuCache`, `SettingsStore`,
   `LocationService`, `VenueSearchService` each have an interface, one production
   implementation, and one fake. This is what makes flow tests possible without a
   mocking library.

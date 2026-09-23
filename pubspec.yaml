@@ -19,9 +19,6 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  # The OpenRouter key: Keychain on iOS, Keystore on Android, browser storage
-  # on web (architecture.md §6.4, §11).
-  flutter_secure_storage: ^11.1.1
   geolocator: ^11.0.0
   # Menu and analysis cache (architecture.md §6.4). Pure Dart; only di.dart
   # touches hive_flutter, so the cache is testable without a binding.

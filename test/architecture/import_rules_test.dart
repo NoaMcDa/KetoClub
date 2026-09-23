@@ -4,6 +4,11 @@
 // This file is checked in before any application code so that the first
 // import that breaks the layering fails CI. Adding a layer or a services
 // sub-package means editing the rank tables below in the same pull request.
+//
+// It also holds the network-boundary checks (issue #98, folded into #102):
+// each outside address the app talks to is named in exactly one file, so a
+// change of endpoint touches one place and a stray call to somewhere else
+// fails CI.
 
 import 'dart:io';
 
@@ -163,6 +168,67 @@ List<String> _flutterImportsOf(String relativePath) {
       .toList();
 }
 
+/// A string that may appear in the source of at most the files listed in
+/// [allowedIn] (lib-relative paths), and in no other file under lib/.
+class _Boundary {
+  const new(this.needle, this.allowedIn, {this.caseSensitive = true});
+
+  /// The text being policed.
+  final String needle;
+
+  /// The only files allowed to contain [needle]; empty means none may.
+  final Set<String> allowedIn;
+
+  /// Whether [needle] is matched case-sensitively.
+  final bool caseSensitive;
+
+  /// Whether [source] contains [needle].
+  bool foundIn(String source) => caseSensitive
+      ? source.contains(needle)
+      : source.toLowerCase().contains(needle.toLowerCase());
+}
+
+/// The network boundaries of the app (issue #98): where each outside
+/// address may be named, and which may not be named at all.
+///
+/// The two forbidden names of the removed bring-your-own-key gateway are
+/// written as adjacent string literals so this file itself does not
+/// contain them: a repository-wide grep for either must come back empty.
+const _boundaries = <_Boundary>[
+  _Boundary('restaurant-api.wolt.com', {
+    'services/menu/wolt/wolt_adapter.dart',
+  }),
+  _Boundary('/v1/chat', {'services/llm/backend_chat_client.dart'}),
+  _Boundary('KETOCLUB_BACKEND_URL', {'di.dart'}),
+  _Boundary(
+    'open'
+    'router',
+    <String>{},
+    caseSensitive: false,
+  ),
+  _Boundary(
+    'sk-'
+    'or-',
+    <String>{},
+  ),
+  _Boundary('googleapis.com', <String>{}),
+];
+
+/// Every authored .dart file under lib/, as lib-relative path to source.
+/// Generated code is skipped, as it is for the import rules.
+Map<String, String> _readLibSources() {
+  final lib = Directory('lib');
+  if (!lib.existsSync()) return <String, String>{};
+  final sources = <String, String>{};
+  for (final file in lib.listSync(recursive: true).whereType<File>()) {
+    if (!file.path.endsWith('.dart')) continue;
+    final relative = _toLibRelative(file.path);
+    if (isGenerated(relative)) continue;
+    sources[relative] = file.readAsStringSync();
+  }
+  return sources;
+}
+
 /// Finds one cycle in the graph, or null if the graph is acyclic.
 List<String>? _findCycle(Map<String, _LibFile> files) {
   const white = 0;
@@ -296,5 +362,48 @@ void main() {
   test('the import graph of lib/ has no cycles', () {
     final cycle = _findCycle(files);
     expect(cycle, isNull, reason: 'Import cycle: ${cycle?.join(' -> ')}');
+  });
+
+  group('network boundaries (issue #98)', () {
+    final sources = _readLibSources();
+
+    test('lib/ has authored sources to check', () {
+      expect(sources, isNotEmpty);
+    });
+
+    for (final boundary in _boundaries) {
+      final where = boundary.allowedIn.isEmpty
+          ? 'nowhere under lib/'
+          : 'only in ${boundary.allowedIn.join(', ')}';
+      test('"${boundary.needle}" appears $where', () {
+        final offenders = <String>[
+          for (final MapEntry(key: path, value: source) in sources.entries)
+            if (boundary.foundIn(source) && !boundary.allowedIn.contains(path))
+              path,
+        ]..sort();
+        expect(
+          offenders,
+          isEmpty,
+          reason:
+              '"${boundary.needle}" must appear $where, but was found in: '
+              '${offenders.join(', ')}',
+        );
+      });
+    }
+
+    test('every file a boundary allows still exists under lib/', () {
+      final missing = <String>[
+        for (final boundary in _boundaries)
+          for (final path in boundary.allowedIn)
+            if (!sources.containsKey(path)) path,
+      ];
+      expect(
+        missing,
+        isEmpty,
+        reason:
+            'A boundary names a file that no longer exists: '
+            '${missing.join(', ')}. Update _boundaries in the same change.',
+      );
+    });
   });
 }

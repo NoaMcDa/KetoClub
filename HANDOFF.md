@@ -25,7 +25,7 @@ appended beside the old text (§18.6 forbids code and this document disagreeing)
 - **`Connectivity` is reinstated** (`architecture.md` §14 D10). It previously
   recorded that this abstraction was deliberately cut; `services/platform/
   connectivity.dart` now exists and `RoutingMenuClassifier` asks it before ever
-  spending an OpenRouter request, to avoid burning the 50-a-day free-tier quota on
+  spending a model request, to avoid burning the per-install rate limit (D12) on
   a call that cannot succeed. It is a hint, never a verdict: a failed call still
   reports `offline` exactly as before.
 - **`net_carbs_estimate` now renders** (`architecture.md` §17.4). It previously

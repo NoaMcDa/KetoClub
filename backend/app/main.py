@@ -66,6 +66,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_methods=["GET", "POST"],
         allow_headers=["Content-Type", "Accept", "X-KetoClub-Install-Id"],
         allow_credentials=False,
+        # A browser hides every response header from JS unless it is listed
+        # here (issue #103): both /v1/chat and the Wolt proxy answer
+        # X-KetoClub-Cache, and the client needs to read it.
+        expose_headers=["X-KetoClub-Cache"],
     )
 
     app.include_router(health.router, prefix="/v1")

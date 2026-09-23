@@ -33,7 +33,6 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
-import 'package:ketoclub/services/storage/key_store.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
@@ -76,7 +75,6 @@ final class FakeAppDependencies {
   new()
     : repository = FlowFakeMenuRepository(),
       classifier = FlowFakeMenuClassifier(),
-      keyStore = FlowFakeKeyStore(),
       settingsStore = FlowFakeSettingsStore(),
       clock = FlowFakeClock(),
       logger = FlowFakeAppLogger();
@@ -87,9 +85,6 @@ final class FakeAppDependencies {
   /// The faked classifier; script it with
   /// [FlowFakeMenuClassifier.respondWith].
   final FlowFakeMenuClassifier classifier;
-
-  /// The faked key store.
-  final FlowFakeKeyStore keyStore;
 
   /// The faked settings store.
   final FlowFakeSettingsStore settingsStore;
@@ -108,14 +103,15 @@ final class FakeAppDependencies {
   /// `RoutingMenuClassifier` degrading to a real `HeuristicMenuClassifier`
   /// over a faked LLM engine and a faked `Connectivity`, rather than a
   /// classifier scripted with the finished answer — sets this instead
-  /// (see `offline_analysis_flow_test.dart`).
+  /// (see `offline_analysis_flow_test.dart`,
+  /// `consent_withheld_flow_test.dart` and
+  /// `backend_unreachable_analysis_flow_test.dart`).
   MenuClassifier? classifierOverride;
 
   /// The dependency set to hand to the app widget.
   AppDependencies get dependencies => AppDependencies(
     menuRepository: repository,
     menuClassifier: classifierOverride ?? classifier,
-    keyStore: keyStore,
     settingsStore: settingsStore,
     clock: clock,
     logger: logger,
@@ -200,23 +196,6 @@ final class FlowFakeMenuClassifier implements MenuClassifier {
       analysedAt: DateTime.utc(2026),
     );
   }
-}
-
-/// A [KeyStore] backed by a single nullable string.
-final class FlowFakeKeyStore implements KeyStore {
-  String? _key;
-
-  @override
-  Future<String?> read() async => _key;
-
-  @override
-  Future<void> write(String key) async => _key = key;
-
-  @override
-  Future<void> delete() async => _key = null;
-
-  @override
-  Future<bool> hasKey() async => _key != null;
 }
 
 /// A [SettingsStore] backed by one in-memory value.

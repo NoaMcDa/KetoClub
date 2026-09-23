@@ -34,10 +34,10 @@ void main() {
         sink: (message, {required level, error}) {
           sunk.add(message);
         },
-      ).info('key was sk-or-v1-abcdefgh');
+      ).info('header was Bearer abcdefgh-token');
 
       // Assert
-      expect(sunk.single, isNot(contains('sk-or-v1-abcdefgh')));
+      expect(sunk.single, isNot(contains('abcdefgh-token')));
     });
 
     test('warn sends the sink a redacted message and level', () {
@@ -84,13 +84,13 @@ void main() {
   });
 
   group('redactSecrets', () {
-    test('replaces an OpenRouter key with a placeholder', () {
+    test('replaces every bearer value in one string', () {
       // Act
-      final result = redactSecrets('key: sk-or-v1-abcdefghijklmnop end');
+      final result = redactSecrets('first Bearer aaa111 then Bearer bbb222');
 
       // Assert
-      expect(result, isNot(contains('sk-or-v1-abcdefghijklmnop')));
-      expect(result, contains('[REDACTED]'));
+      expect(result, isNot(contains('aaa111')));
+      expect(result, isNot(contains('bbb222')));
     });
 
     test('replaces a bearer header value with a placeholder', () {

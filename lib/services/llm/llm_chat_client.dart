@@ -2,22 +2,33 @@ import 'package:flutter/foundation.dart';
 
 /// Why an [LlmChatClient] call produced a [ChatFailed] result instead of
 /// a [ChatCompleted] one (architecture.md §9.3, §10).
+///
+/// Five of these — [notConfigured], [offline], [timeout], [rateLimited]
+/// and [badResponse] — are also the `reason` vocabulary KetoClub's
+/// backend answers with, so a client can map the wire value by name.
+/// [backendUnreachable] never comes from the wire: it is what a client
+/// reports when it could not reach the backend at all.
 enum ChatFailureReason {
-  /// No network route was available.
+  /// No model is available: this build has no backend URL, or the
+  /// backend has no model credentials configured (it answers 503).
+  notConfigured,
+
+  /// No network route was available between the backend and the model
+  /// provider.
   offline,
 
   /// The request exceeded its time budget.
   timeout,
 
-  /// The gateway answered 429.
+  /// The model provider's quota is exhausted; the backend answered 429.
   rateLimited,
 
-  /// The gateway answered 401 or 403.
-  unauthorised,
-
-  /// Another 4xx/5xx from the gateway, or a response the client could
-  /// not use.
+  /// Another error status, or a response the client could not use.
   badResponse,
+
+  /// KetoClub's backend could not be reached: a socket or DNS error
+  /// before any HTTP status was received.
+  backendUnreachable,
 }
 
 /// The outcome of one [LlmChatClient.complete] call (architecture.md §9,
@@ -58,8 +69,8 @@ final class ChatCompleted extends ChatResult {
 /// A failed chat completion.
 ///
 /// Never carries the upstream response body: it can echo request
-/// headers, including the bearer token (architecture.md §10, §11). A
-/// [statusCode] is the only detail this type can carry beyond [reason].
+/// content or headers (architecture.md §10, §11). A [statusCode] is the
+/// only detail this type can carry beyond [reason].
 @immutable
 final class ChatFailed extends ChatResult {
   /// Creates a failure for [reason], with the HTTP [statusCode] received,
@@ -88,9 +99,9 @@ final class ChatFailed extends ChatResult {
   String toString() => 'ChatFailed($reason)';
 }
 
-/// A single chat completion call to the LLM gateway (architecture.md
-/// §9). Implementations authenticate with the API key but never return
-/// it, log it, or let it reach a [ChatFailed].
+/// A single chat completion call to a hosted language model
+/// (architecture.md §9). Implementations never let a response body reach
+/// a [ChatFailed] or a log.
 abstract interface class LlmChatClient {
   /// Sends [systemPrompt] and [userPrompt] as one chat completion,
   /// requesting structured output shaped by [responseSchema] under

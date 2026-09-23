@@ -260,48 +260,6 @@ abstract class AppLocalizations {
   /// **'Say this to the waiter'**
   String get waiterCardTitle;
 
-  /// No description provided for @settingsKeySection.
-  ///
-  /// In en, this message translates to:
-  /// **'OpenRouter key'**
-  String get settingsKeySection;
-
-  /// No description provided for @settingsKeyHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Paste your OpenRouter key'**
-  String get settingsKeyHint;
-
-  /// No description provided for @settingsKeySave.
-  ///
-  /// In en, this message translates to:
-  /// **'Save key'**
-  String get settingsKeySave;
-
-  /// No description provided for @settingsKeyPresent.
-  ///
-  /// In en, this message translates to:
-  /// **'A key is stored on this device.'**
-  String get settingsKeyPresent;
-
-  /// No description provided for @settingsKeyAbsent.
-  ///
-  /// In en, this message translates to:
-  /// **'No key stored. KetoClub will use on-device rules.'**
-  String get settingsKeyAbsent;
-
-  /// No description provided for @settingsKeyDelete.
-  ///
-  /// In en, this message translates to:
-  /// **'Remove key'**
-  String get settingsKeyDelete;
-
-  /// No description provided for @settingsWebStorageNote.
-  ///
-  /// In en, this message translates to:
-  /// **'On the web the key is kept in browser storage, which protects it less well than a phone\'s keychain.'**
-  String get settingsWebStorageNote;
-
   /// No description provided for @settingsConsentTitle.
   ///
   /// In en, this message translates to:
@@ -311,7 +269,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsConsentBody.
   ///
   /// In en, this message translates to:
-  /// **'With a key, dish names, descriptions and option labels from the menu you open are sent to OpenRouter for analysis. Nothing about you, your location or your history is sent. Menus are read straight from the restaurant platform, which receives only the venue identifier. There is no other server and no analytics.'**
+  /// **'When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you, your location or your history is sent. There are no analytics.'**
   String get settingsConsentBody;
 
   /// No description provided for @settingsConsentAccept.
@@ -401,7 +359,7 @@ abstract class AppLocalizations {
   /// No description provided for @analysisNotConfigured.
   ///
   /// In en, this message translates to:
-  /// **'Add an OpenRouter key in Settings for AI analysis.'**
+  /// **'AI analysis is not available on this build or server. Showing rule-based results.'**
   String get analysisNotConfigured;
 
   /// No description provided for @analysisOffline.
@@ -419,14 +377,8 @@ abstract class AppLocalizations {
   /// No description provided for @analysisRateLimited.
   ///
   /// In en, this message translates to:
-  /// **'The daily AI limit for this key is used up. Showing rule-based results.'**
+  /// **'The daily AI limit is used up. Showing rule-based results.'**
   String get analysisRateLimited;
-
-  /// No description provided for @analysisUnauthorised.
-  ///
-  /// In en, this message translates to:
-  /// **'OpenRouter rejected your key, so nothing was analysed.'**
-  String get analysisUnauthorised;
 
   /// No description provided for @analysisBadResponse.
   ///
@@ -439,6 +391,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The AI could not identify any dishes on this menu.'**
   String get analysisNoDishesFound;
+
+  /// No description provided for @analysisBackendUnreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub\'s server could not be reached. Showing rule-based results.'**
+  String get analysisBackendUnreachable;
+
+  /// No description provided for @analysisConsentWithheld.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow AI analysis in Settings to analyse this menu. Showing rule-based results.'**
+  String get analysisConsentWithheld;
 
   /// No description provided for @pillSemanticLabel.
   ///
@@ -491,7 +455,7 @@ abstract class AppLocalizations {
   /// No description provided for @engineChipReasonNotConfigured.
   ///
   /// In en, this message translates to:
-  /// **'no key'**
+  /// **'not configured'**
   String get engineChipReasonNotConfigured;
 
   /// No description provided for @engineChipReasonOffline.
@@ -512,12 +476,6 @@ abstract class AppLocalizations {
   /// **'rate limited'**
   String get engineChipReasonRateLimited;
 
-  /// No description provided for @engineChipReasonUnauthorised.
-  ///
-  /// In en, this message translates to:
-  /// **'key rejected'**
-  String get engineChipReasonUnauthorised;
-
   /// No description provided for @engineChipReasonBadResponse.
   ///
   /// In en, this message translates to:
@@ -529,6 +487,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'no dishes found'**
   String get engineChipReasonNoDishesFound;
+
+  /// No description provided for @engineChipReasonBackendUnreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'server unreachable'**
+  String get engineChipReasonBackendUnreachable;
+
+  /// No description provided for @engineChipReasonConsentWithheld.
+  ///
+  /// In en, this message translates to:
+  /// **'AI not allowed'**
+  String get engineChipReasonConsentWithheld;
 
   /// No description provided for @navExplore.
   ///

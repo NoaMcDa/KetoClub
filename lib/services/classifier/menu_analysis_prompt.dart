@@ -36,7 +36,7 @@ const String _dietaryConstraintsPreamble =
     'it modifiable or nonKeto, whichever fits:';
 
 /// Builds the system prompt, user prompt, and strict JSON schema
-/// `LlmMenuClassifier` sends to the LLM gateway through `LlmChatClient`
+/// `LlmMenuClassifier` sends to the model through `LlmChatClient`
 /// (architecture.md §9.1, §9.2, §9.3).
 ///
 /// Static and pure: no field, no constructor, nothing to fake.
@@ -131,12 +131,12 @@ abstract final class MenuAnalysisPrompt {
   /// analyser that echoed the dish description back on every reply; this
   /// parser never reads one back — `MenuResponseParser` has no use for
   /// it — so requiring it here would only force the model to spend
-  /// output tokens re-typing text this app discards, against the exact
-  /// `max_tokens: 6000` budget [llmMaxOutputTokens] sets, which
+  /// output tokens re-typing text this app discards, against the output
+  /// token budget the server sets for every request, which
   /// `m16_structured_output_fix.md`'s own "what was not verified"
   /// section names as the remaining suspect if a real request still
   /// fails. Do not add a `description` property back without also
-  /// raising [llmMaxOutputTokens].
+  /// raising that budget on the server.
   static Map<String, Object?> responseSchema() => <String, Object?>{
     'type': 'object',
     'additionalProperties': false,

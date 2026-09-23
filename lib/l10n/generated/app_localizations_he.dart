@@ -100,34 +100,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get waiterCardTitle => 'זה מה שאומרים למלצר';
 
   @override
-  String get settingsKeySection => 'מפתח OpenRouter';
-
-  @override
-  String get settingsKeyHint => 'הדביקו את מפתח ה‑OpenRouter שלכם';
-
-  @override
-  String get settingsKeySave => 'שמור מפתח';
-
-  @override
-  String get settingsKeyPresent => 'מפתח שמור במכשיר הזה.';
-
-  @override
-  String get settingsKeyAbsent =>
-      'אין מפתח שמור. קטוקלאב ישתמש בכללים שעל המכשיר.';
-
-  @override
-  String get settingsKeyDelete => 'הסר מפתח';
-
-  @override
-  String get settingsWebStorageNote =>
-      'בדפדפן המפתח נשמר באחסון הדפדפן, שמגן עליו פחות טוב מהכספת של הטלפון.';
-
-  @override
   String get settingsConsentTitle => 'מה יוצא מהמכשיר הזה';
 
   @override
   String get settingsConsentBody =>
-      'כשיש מפתח, שמות המנות, התיאורים ושמות התוספות מהתפריט שאתם פותחים נשלחים ל‑OpenRouter לניתוח. שום דבר עליכם, על מקומכם או על ההיסטוריה שלכם לא נשלח. התפריטים נקראים ישירות מפלטפורמת המסעדה, שמקבלת רק את מזהה המסעדה. אין שרת אחר ואין איסוף נתונים.';
+      'כשאתם מאשרים ניתוח בינה מלאכותית, שמות המנות, התיאורים ושמות התוספות מהתפריט שאתם פותחים נשלחים לשרת של קטוקלאב, שמעביר אותם לניתוח ב‑Gemini API של Google. שום דבר עליכם, על מקומכם או על ההיסטוריה שלכם לא נשלח. אין איסוף נתונים.';
 
   @override
   String get settingsConsentAccept => 'הבנתי';
@@ -182,7 +159,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get analysisNotConfigured =>
-      'הוסיפו מפתח OpenRouter בהגדרות כדי לקבל ניתוח בינה מלאכותית.';
+      'ניתוח בינה מלאכותית אינו זמין בגרסה הזו או בשרת. מוצגות תוצאות על בסיס כללים.';
 
   @override
   String get analysisOffline => 'לא מחוברים. מוצגות תוצאות על בסיס כללים.';
@@ -193,11 +170,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get analysisRateLimited =>
-      'המגבלה היומית של הבינה המלאכותית למפתח הזה נגמרה. מוצגות תוצאות על בסיס כללים.';
-
-  @override
-  String get analysisUnauthorised =>
-      'OpenRouter דחתה את המפתח שלכם, ולכן שום דבר לא נותח.';
+      'המגבלה היומית של הבינה המלאכותית נגמרה. מוצגות תוצאות על בסיס כללים.';
 
   @override
   String analysisBadResponse(String detail) {
@@ -207,6 +180,14 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get analysisNoDishesFound =>
       'הבינה המלאכותית לא הצליחה לזהות מנות בתפריט הזה.';
+
+  @override
+  String get analysisBackendUnreachable =>
+      'לא ניתן היה להתחבר לשרת של קטוקלאב. מוצגות תוצאות על בסיס כללים.';
+
+  @override
+  String get analysisConsentWithheld =>
+      'אשרו ניתוח בינה מלאכותית בהגדרות כדי לנתח את התפריט הזה. מוצגות תוצאות על בסיס כללים.';
 
   @override
   String pillSemanticLabel(String verdict) {
@@ -244,7 +225,7 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get engineChipReasonNotConfigured => 'אין מפתח';
+  String get engineChipReasonNotConfigured => 'לא מוגדר';
 
   @override
   String get engineChipReasonOffline => 'לא מקוון';
@@ -256,13 +237,16 @@ class AppLocalizationsHe extends AppLocalizations {
   String get engineChipReasonRateLimited => 'המכסה היומית נוצלה';
 
   @override
-  String get engineChipReasonUnauthorised => 'המפתח נדחה';
-
-  @override
   String get engineChipReasonBadResponse => 'שגיאת בינה מלאכותית';
 
   @override
   String get engineChipReasonNoDishesFound => 'לא נמצאו מנות';
+
+  @override
+  String get engineChipReasonBackendUnreachable => 'השרת לא זמין';
+
+  @override
+  String get engineChipReasonConsentWithheld => 'בינה מלאכותית לא אושרה';
 
   @override
   String get navExplore => 'גילוי';
