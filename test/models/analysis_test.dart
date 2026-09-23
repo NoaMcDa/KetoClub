@@ -617,6 +617,241 @@ void main() {
       // Assert
       expect(result, contains('1 dishes'));
     });
+
+    group('options (issue #57)', () {
+      const optionsJson = <String, Object?>{
+        'netCarbLimitGrams': 9,
+        'dietaryConstraints': ['dairy-free'],
+      };
+      const snapshot = AnalysisOptionsSnapshot(
+        netCarbLimitGrams: 9,
+        dietaryConstraints: ['dairy-free'],
+      );
+
+      test('tryFrom reads a recorded options snapshot', () {
+        // Arrange
+        final json = <String, Object?>{...validJson, 'options': optionsJson};
+
+        // Act
+        final result = MenuAnalysed.tryFrom(json);
+
+        // Assert
+        expect(result?.options, equals(snapshot));
+      });
+
+      test('tryFrom reads a result cached before issue #57, with no '
+          'options key, as null options rather than rejecting it', () {
+        // Act
+        final result = MenuAnalysed.tryFrom(validJson);
+
+        // Assert
+        expect(result, isNotNull);
+        expect(result!.options, isNull);
+      });
+
+      test('tryFrom reads an explicit null options as null', () {
+        // Arrange
+        final json = <String, Object?>{...validJson, 'options': null};
+
+        // Act
+        final result = MenuAnalysed.tryFrom(json);
+
+        // Assert
+        expect(result, isNotNull);
+        expect(result!.options, isNull);
+      });
+
+      test('tryFrom returns null when options is not a map', () {
+        // Arrange
+        final json = <String, Object?>{...validJson, 'options': 'six'};
+
+        // Act & Assert
+        expect(MenuAnalysed.tryFrom(json), isNull);
+      });
+
+      test('tryFrom returns null when options is a malformed map', () {
+        // Arrange
+        final json = <String, Object?>{
+          ...validJson,
+          'options': <String, Object?>{'netCarbLimitGrams': 'six'},
+        };
+
+        // Act & Assert
+        expect(MenuAnalysed.tryFrom(json), isNull);
+      });
+
+      test('tryFrom(x.toJson()) round-trips a result with options', () {
+        // Arrange
+        final analysed = MenuAnalysed.tryFrom(validJson)!
+            .copyWithOptions(snapshot);
+
+        // Act
+        final result = MenuAnalysed.tryFrom(analysed.toJson());
+
+        // Assert
+        expect(result, equals(analysed));
+        expect(result!.options, equals(snapshot));
+      });
+
+      test('copyWithOptions replaces only the options', () {
+        // Arrange
+        final analysed = MenuAnalysed.tryFrom(validJson)!;
+
+        // Act
+        final result = analysed.copyWithOptions(snapshot);
+
+        // Assert
+        expect(result.options, equals(snapshot));
+        expect(result.dishes, equals(analysed.dishes));
+        expect(result.unclassified, equals(analysed.unclassified));
+        expect(result.engine, equals(analysed.engine));
+        expect(result.analysedAt, equals(analysed.analysedAt));
+      });
+
+      test('copyWithEngine keeps the options', () {
+        // Arrange
+        final analysed = MenuAnalysed.tryFrom(validJson)!
+            .copyWithOptions(snapshot);
+
+        // Act
+        final result = analysed.copyWithEngine(
+          const RulesEngine(reason: MenuAnalysisFailureReason.offline),
+        );
+
+        // Assert
+        expect(result.options, equals(snapshot));
+      });
+
+      test('== returns false for results differing only in options', () {
+        // Arrange
+        final a = MenuAnalysed.tryFrom(validJson)!;
+        final b = a.copyWithOptions(snapshot);
+
+        // Act & Assert
+        expect(a, isNot(equals(b)));
+      });
+    });
+  });
+
+  group('AnalysisOptionsSnapshot', () {
+    test('defaults to no dietary constraints', () {
+      // Arrange
+      const snapshot = AnalysisOptionsSnapshot(netCarbLimitGrams: 6);
+
+      // Assert
+      expect(snapshot.dietaryConstraints, isEmpty);
+    });
+
+    test('tryFrom(x.toJson()) round-trips a snapshot', () {
+      // Arrange
+      const snapshot = AnalysisOptionsSnapshot(
+        netCarbLimitGrams: 12,
+        dietaryConstraints: ['seed-oil free', 'carnivore'],
+      );
+
+      // Act
+      final result = AnalysisOptionsSnapshot.tryFrom(snapshot.toJson());
+
+      // Assert
+      expect(result, equals(snapshot));
+    });
+
+    test('tryFrom reads a missing dietaryConstraints as none', () {
+      // Act
+      final result = AnalysisOptionsSnapshot.tryFrom(<String, Object?>{
+        'netCarbLimitGrams': 6,
+      });
+
+      // Assert
+      expect(
+        result,
+        equals(const AnalysisOptionsSnapshot(netCarbLimitGrams: 6)),
+      );
+    });
+
+    test('tryFrom returns null when netCarbLimitGrams is missing', () {
+      // Act & Assert
+      expect(AnalysisOptionsSnapshot.tryFrom(<String, Object?>{}), isNull);
+    });
+
+    test('tryFrom returns null when netCarbLimitGrams is not an int', () {
+      // Act & Assert
+      expect(
+        AnalysisOptionsSnapshot.tryFrom(<String, Object?>{
+          'netCarbLimitGrams': 6.5,
+        }),
+        isNull,
+      );
+    });
+
+    test('tryFrom returns null when dietaryConstraints is not a list', () {
+      // Act & Assert
+      expect(
+        AnalysisOptionsSnapshot.tryFrom(<String, Object?>{
+          'netCarbLimitGrams': 6,
+          'dietaryConstraints': 'dairy-free',
+        }),
+        isNull,
+      );
+    });
+
+    test('tryFrom returns null when a dietary constraint is not a '
+        'string', () {
+      // Act & Assert
+      expect(
+        AnalysisOptionsSnapshot.tryFrom(<String, Object?>{
+          'netCarbLimitGrams': 6,
+          'dietaryConstraints': <Object?>['dairy-free', 3],
+        }),
+        isNull,
+      );
+    });
+
+    test('== compares the limit and the constraints element-wise', () {
+      // Arrange
+      const a = AnalysisOptionsSnapshot(
+        netCarbLimitGrams: 6,
+        dietaryConstraints: ['dairy-free'],
+      );
+      const b = AnalysisOptionsSnapshot(
+        netCarbLimitGrams: 6,
+        dietaryConstraints: ['dairy-free'],
+      );
+      const differentLimit = AnalysisOptionsSnapshot(
+        netCarbLimitGrams: 7,
+        dietaryConstraints: ['dairy-free'],
+      );
+      const differentLength = AnalysisOptionsSnapshot(
+        netCarbLimitGrams: 6,
+        dietaryConstraints: ['dairy-free', 'carnivore'],
+      );
+      const differentConstraint = AnalysisOptionsSnapshot(
+        netCarbLimitGrams: 6,
+        dietaryConstraints: ['carnivore'],
+      );
+
+      // Assert
+      expect(a, equals(b));
+      expect(a.hashCode, equals(b.hashCode));
+      expect(a, isNot(equals(differentLimit)));
+      expect(a, isNot(equals(differentLength)));
+      expect(a, isNot(equals(differentConstraint)));
+    });
+
+    test('toString mentions the limit and the constraints', () {
+      // Arrange
+      const snapshot = AnalysisOptionsSnapshot(
+        netCarbLimitGrams: 11,
+        dietaryConstraints: ['dairy-free'],
+      );
+
+      // Act
+      final result = snapshot.toString();
+
+      // Assert
+      expect(result, contains('11g'));
+      expect(result, contains('dairy-free'));
+    });
   });
 
   group('MenuAnalysisFailed', () {

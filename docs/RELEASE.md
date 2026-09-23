@@ -207,12 +207,12 @@ Time from the tap that opens the menu to the frame where verdicts appear
   backend running, then reopen within the hour. The response carries
   `X-KetoClub-Cache: hit`.
 - **Hive-cached open**: reopen the same menu within 24 hours without
-  clearing anything. This is the one held to the 3 s budget. As of #65,
-  `MenuController.open` still runs the classifier on every open, even
-  when Hive already holds an analysis for the menu, so this number
-  includes one analysis round trip. With consent given, the backend
-  usually answers it from its completion cache. Write down which engine
-  chip was showing next to the number.
+  clearing anything. This is the one held to the 3 s budget. It measures
+  a cached *analysis* only when `MenuController.open` reuses one (#57):
+  the cached result must come from the AI, consent must still be on, the
+  dish text must be unchanged and the net-carb limit must be the same. A
+  rules result is never reused, so with consent off this open runs the
+  rule engine again. Note the engine chip next to the number.
 - **AI analysis cold**: a menu the backend's completion cache has not seen.
   Time how long "Asking the AI…" stays on screen.
 - **AI analysis server-cached**: "Clear saved menus", then reopen the same

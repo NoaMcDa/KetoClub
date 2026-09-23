@@ -135,16 +135,32 @@ final class FlowFakeMenuRepository implements MenuRepository {
     _stubs[ref.cacheKey] = result;
   }
 
+  /// Seeds the entry [cached] reads back, so a flow can start with an
+  /// analysis already saved beside its menu (issue #57).
+  void seedCache(CachedMenu entry) {
+    _cached[entry.menu.venueRef.cacheKey] = entry;
+  }
+
   @override
   Future<MenuFetchResult> load(
     VenueRef ref, {
     bool forceRefresh = false,
   }) async {
     final stubbed = _stubs[ref.cacheKey];
-    if (stubbed != null) return stubbed;
-    return const MenuFetchFailed(
-      reason: MenuFetchFailureReason.unsupportedSource,
-    );
+    if (stubbed == null) {
+      return const MenuFetchFailed(
+        reason: MenuFetchFailureReason.unsupportedSource,
+      );
+    }
+    // Mirrors CachedMenuRepository.load: a successful fetch is cached, so
+    // a flow test that opens a venue and then visits Saved
+    // (`saved_tab_flow_test.dart`) finds it there exactly as it would over
+    // the real repository — a plain `MenuFetched` stub is enough; nothing
+    // has to call `saveAnalysis` first just to seed the list.
+    if (stubbed case MenuFetched(menu: final fetched)) {
+      _cached[ref.cacheKey] = CachedMenu(menu: fetched);
+    }
+    return stubbed;
   }
 
   @override
@@ -160,6 +176,24 @@ final class FlowFakeMenuRepository implements MenuRepository {
 
   @override
   Future<void> clearCache() async => _cached.clear();
+
+  @override
+  Future<List<CachedMenuEntry>> savedMenus() async => [
+    for (final entry in _cached.values)
+      CachedMenuEntry(
+        ref: entry.menu.venueRef,
+        venueName: entry.menu.venueName,
+        fetchedAt: entry.menu.fetchedAt,
+        dishCount: entry.menu.allDishes.length,
+        engine: switch (entry.analysis) {
+          final MenuAnalysed analysed => analysed.engine,
+          _ => null,
+        },
+      ),
+  ];
+
+  @override
+  Future<void> remove(VenueRef ref) async => _cached.remove(ref.cacheKey);
 }
 
 /// A [MenuClassifier] that returns whatever was scripted, or an all-green
@@ -170,12 +204,16 @@ final class FlowFakeMenuClassifier implements MenuClassifier {
   /// Every menu this classifier was asked about, in order.
   final List<Menu> calls = <Menu>[];
 
+  /// The options each call in [calls] carried, in the same order.
+  final List<ClassificationOptions> optionCalls = <ClassificationOptions>[];
+
   /// Scripts [classify] to return [analysis] for every later call, and
   /// forgets the calls recorded so far, so a test can script mid-journey and
   /// then assert on what the app asked for afterwards.
   void respondWith(MenuAnalysis analysis) {
     _scripted = analysis;
     calls.clear();
+    optionCalls.clear();
   }
 
   @override
@@ -184,6 +222,7 @@ final class FlowFakeMenuClassifier implements MenuClassifier {
     ClassificationOptions options = const ClassificationOptions(),
   }) async {
     calls.add(menu);
+    optionCalls.add(options);
     final scripted = _scripted;
     if (scripted != null) return scripted;
     return MenuAnalysed(
@@ -201,6 +240,7 @@ final class FlowFakeMenuClassifier implements MenuClassifier {
         reason: MenuAnalysisFailureReason.notConfigured,
       ),
       analysedAt: DateTime.utc(2026),
+      options: options.snapshot,
     );
   }
 }

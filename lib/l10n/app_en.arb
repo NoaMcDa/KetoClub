@@ -56,6 +56,14 @@
   "settingsAppearanceSystem": "Follow device theme",
   "settingsAppearanceLight": "Light",
   "settingsAppearanceDark": "Dark",
+  "settingsNetCarbLimit": "Net carb limit",
+  "settingsNetCarbLimitBody": "Dishes above this are never green. Changing it re-analyses the next menu you open.",
+  "settingsNetCarbLimitValue": "{grams} g",
+  "@settingsNetCarbLimitValue": {
+    "placeholders": { "grams": { "type": "int" } }
+  },
+  "settingsNetCarbLimitDecrease": "Lower the net carb limit",
+  "settingsNetCarbLimitIncrease": "Raise the net carb limit",
   "settingsFilter": "Default filter",
   "settingsClearCache": "Clear saved menus",
   "settingsCacheCleared": "Saved menus cleared.",
@@ -132,7 +140,21 @@
   "scanPlaceholderTitle": "Scan a menu",
   "scanPlaceholderBody": "Photographing a physical menu is coming in a later update. For now, paste a delivery link on Explore.",
   "savedPlaceholderTitle": "Saved venues",
-  "savedPlaceholderBody": "Save a venue to find it here later. This is coming in a later update.",
+  "savedPlaceholderBody": "Open a venue's menu and it appears here automatically, available for a day — even offline.",
+  "savedEntryDishCount": "{count, plural, one{1 dish} other{{count} dishes}}",
+  "@savedEntryDishCount": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "savedRemove": "Remove",
+  "savedRemoveSemanticLabel": "Remove {venue}",
+  "@savedRemoveSemanticLabel": {
+    "placeholders": { "venue": { "type": "String" } }
+  },
+  "savedRemovedMessage": "Removed {venue}.",
+  "@savedRemovedMessage": {
+    "placeholders": { "venue": { "type": "String" } }
+  },
+  "savedUndo": "Undo",
 
   "discoveryTitle": "Where to eat",
   "discoveryEmptyTitle": "Paste a link to get started",

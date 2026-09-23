@@ -56,6 +56,41 @@ MenuAnalysis _parse(String body, Menu source) => MenuResponseParser.parse(
   engine: _engine,
 );
 
+/// A one-dish reply for `dish-steak` with [verdict], [modification] and
+/// [netCarbsEstimate], for the issue #57 net-carb limit post-rule.
+String _steakReply({
+  String verdict = 'orderAsIs',
+  String? modification,
+  num? netCarbsEstimate,
+}) => jsonEncode(<String, Object?>{
+  'dishes': <Object?>[
+    <String, Object?>{
+      'id': 'dish-steak',
+      'name': 'Grilled Steak',
+      'verdict': verdict,
+      'why': 'Grilled protein, glaze on top.',
+      'modification': modification,
+      'net_carbs_estimate': netCarbsEstimate,
+    },
+  ],
+});
+
+/// Parses [body] against a one-steak menu under [netCarbLimitGrams], or
+/// under the parser's own default when it is omitted.
+MenuAnalysed _parseSteak(String body, {int? netCarbLimitGrams}) {
+  final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
+  final result = netCarbLimitGrams == null
+      ? _parse(body, source)
+      : MenuResponseParser.parse(
+          body,
+          source: source,
+          analysedAt: _analysedAt,
+          engine: _engine,
+          netCarbLimitGrams: netCarbLimitGrams,
+        );
+  return result as MenuAnalysed;
+}
+
 void main() {
   group('MenuResponseParser', () {
     group('parse given a fenced reply (rule 1)', () {
@@ -630,6 +665,138 @@ void main() {
         final byId = {for (final dish in result.dishes) dish.dishId: dish};
         expect(byId['dish-steak']!.netCarbsEstimate, isNull);
         expect(byId['dish-salmon']!.netCarbsEstimate, 2.5);
+      });
+    });
+
+    group('parse given a net-carb limit (issue #57 post-rule)', () {
+      test('a green over the limit with an instruction is demoted to '
+          'modifiable, keeping that instruction and its estimate', () {
+        // Arrange
+        final body = _steakReply(
+          modification: 'Ask for the honey glaze to be left off.',
+          netCarbsEstimate: 9,
+        );
+
+        // Act
+        final result = _parseSteak(body, netCarbLimitGrams: 6);
+
+        // Assert
+        final dish = result.dishes.single;
+        expect(dish.verdict, DishVerdict.modifiable);
+        expect(dish.modification, 'Ask for the honey glaze to be left off.');
+        expect(dish.netCarbsEstimate, 9);
+        expect(result.unclassified, isEmpty);
+      });
+
+      test('a green over the limit with no instruction is unclassified, '
+          'never a yellow without one', () {
+        // Arrange
+        final body = _steakReply(netCarbsEstimate: 9);
+
+        // Act
+        final result = _parseSteak(body, netCarbLimitGrams: 6);
+
+        // Assert
+        expect(result.dishes, isEmpty);
+        expect(result.unclassified, ['Grilled Steak']);
+      });
+
+      test('a green over the limit with a blank instruction is '
+          'unclassified', () {
+        // Arrange
+        final body = _steakReply(modification: '   ', netCarbsEstimate: 9);
+
+        // Act
+        final result = _parseSteak(body, netCarbLimitGrams: 6);
+
+        // Assert
+        expect(result.dishes, isEmpty);
+        expect(result.unclassified, ['Grilled Steak']);
+      });
+
+      test('a green over the limit with an over-length instruction is '
+          'unclassified, not truncated', () {
+        // Arrange
+        final body = _steakReply(
+          modification: 'x' * (maxModificationLength + 1),
+          netCarbsEstimate: 9,
+        );
+
+        // Act
+        final result = _parseSteak(body, netCarbLimitGrams: 6);
+
+        // Assert
+        expect(result.dishes, isEmpty);
+        expect(result.unclassified, ['Grilled Steak']);
+      });
+
+      test('a green exactly at the limit stays green: the limit is "or '
+          'less"', () {
+        // Arrange
+        final body = _steakReply(
+          modification: 'Ask for the glaze on the side.',
+          netCarbsEstimate: 6,
+        );
+
+        // Act
+        final result = _parseSteak(body, netCarbLimitGrams: 6);
+
+        // Assert
+        final dish = result.dishes.single;
+        expect(dish.verdict, DishVerdict.orderAsIs);
+        expect(dish.modification, isNull);
+      });
+
+      test('a green with no estimate stays green whatever the limit', () {
+        // Arrange
+        final body = _steakReply();
+
+        // Act
+        final result = _parseSteak(body, netCarbLimitGrams: 2);
+
+        // Assert
+        expect(result.dishes.single.verdict, DishVerdict.orderAsIs);
+      });
+
+      test('the same 9 g green stays green under a 12 g limit', () {
+        // Arrange
+        final body = _steakReply(netCarbsEstimate: 9);
+
+        // Act
+        final result = _parseSteak(body, netCarbLimitGrams: 12);
+
+        // Assert
+        expect(result.dishes.single.verdict, DishVerdict.orderAsIs);
+      });
+
+      test('with no limit given the parser applies the 6 g default', () {
+        // Arrange
+        final body = _steakReply(netCarbsEstimate: 6.5);
+
+        // Act
+        final result = _parseSteak(body);
+
+        // Assert
+        expect(result.dishes, isEmpty);
+        expect(result.unclassified, ['Grilled Steak']);
+      });
+
+      test('a yellow or red over the limit keeps its own verdict', () {
+        // Arrange
+        final yellow = _steakReply(
+          verdict: 'modifiable',
+          modification: 'Swap the fries for a salad.',
+          netCarbsEstimate: 30,
+        );
+        final red = _steakReply(verdict: 'nonKeto', netCarbsEstimate: 80);
+
+        // Act
+        final yellowResult = _parseSteak(yellow, netCarbLimitGrams: 6);
+        final redResult = _parseSteak(red, netCarbLimitGrams: 6);
+
+        // Assert
+        expect(yellowResult.dishes.single.verdict, DishVerdict.modifiable);
+        expect(redResult.dishes.single.verdict, DishVerdict.nonKeto);
       });
     });
 

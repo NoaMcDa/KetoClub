@@ -110,6 +110,62 @@ final class CachedMenu {
   String toString() => 'CachedMenu(${menu.venueRef.cacheKey})';
 }
 
+/// One [CachedMenu] summarised for a list of every cached menu (issue #48's
+/// Saved tab), without the dishes, categories or full analysis a screen
+/// listing many entries has no use for.
+///
+/// [engine] is non-null exactly when the cached entry's analysis is a
+/// [MenuAnalysed] — a failed analysis, or no analysis at all, both read as
+/// null here, and a caller after only "was this analysed" reads that off
+/// [analysed] rather than testing [engine] for null itself.
+@immutable
+final class CachedMenuEntry {
+  /// Creates a summary for [ref], as fetched at [fetchedAt].
+  const new({
+    required this.ref,
+    required this.venueName,
+    required this.fetchedAt,
+    required this.dishCount,
+    required this.engine,
+  });
+
+  /// Which venue, on which platform, this entry is for.
+  final VenueRef ref;
+
+  /// The venue name from the cached [Menu], or null when the source
+  /// platform did not supply one ([Menu.venueName]'s own doc comment).
+  final String? venueName;
+
+  /// When the cached menu was fetched ([Menu.fetchedAt]) — not when it was
+  /// last opened; [MenuCache] tracks no separate "last opened" timestamp.
+  final DateTime fetchedAt;
+
+  /// How many dishes the cached menu has, across every category.
+  final int dishCount;
+
+  /// Which engine produced the cached analysis, or null when the entry
+  /// has none, or has only a failed one.
+  final AnalysisEngine? engine;
+
+  /// Whether the cached menu carries a completed ([MenuAnalysed]) analysis.
+  bool get analysed => engine != null;
+
+  @override
+  bool operator ==(Object other) =>
+      other is CachedMenuEntry &&
+      other.ref == ref &&
+      other.venueName == venueName &&
+      other.fetchedAt == fetchedAt &&
+      other.dishCount == dishCount &&
+      other.engine == engine;
+
+  @override
+  int get hashCode => Object.hash(ref, venueName, fetchedAt, dishCount, engine);
+
+  @override
+  String toString() => 'CachedMenuEntry(${ref.cacheKey}, $dishCount dishes)';
+}
+
 /// On-device storage for one [CachedMenu] per [VenueRef] (architecture.md
 /// §6.4). Backed by Hive; a storage failure reads back as a miss, never a
 /// throw, so a broken cache degrades instead of crashing the repository
@@ -148,6 +204,30 @@ abstract interface class MenuCache {
   /// Never throws; a storage failure reads as `0`, the same as an empty
   /// cache.
   Future<int> size();
+
+  /// A [CachedMenuEntry] for every menu currently cached, in no
+  /// particular order — a caller wanting them sorted (issue #48's Saved
+  /// tab shows newest first) sorts this list itself.
+  ///
+  /// A corrupt entry is left out rather than failing the whole list,
+  /// matching [read]'s "a broken box degrades" rule. Never throws; a
+  /// storage failure reads as an empty list.
+  Future<List<CachedMenuEntry>> entries();
+
+  /// How many menus are currently cached — the same figure [size] already
+  /// reports. Added under its own name for issue #61's Settings section,
+  /// which reads plainly as "count, size, clear" and would otherwise have
+  /// to call a method named for the wrong one of those three words.
+  ///
+  /// Never throws; a storage failure reads as `0`.
+  Future<int> count();
+
+  /// Deletes the single entry cached for [ref], leaving every other entry
+  /// untouched. A no-op, not a throw, when nothing is cached for [ref] —
+  /// the same "already gone" tolerance [clear] has for an empty cache.
+  ///
+  /// Never throws.
+  Future<void> remove(VenueRef ref);
 }
 
 /// A [MenuCache] in a Hive box of JSON strings.
@@ -244,6 +324,25 @@ final class HiveMenuCache implements MenuCache {
   }
 
   @override
+  Future<void> remove(VenueRef ref) async {
+    final Box<String> box;
+    try {
+      box = await _openedBox();
+      // Nothing to remove if the box itself never opened.
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      return;
+    }
+    try {
+      await box.delete(ref.cacheKey);
+      // An entry that cannot be deleted just stays stale.
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      // Nothing to do: the delete above never landed.
+    }
+  }
+
+  @override
   Future<int> size() async {
     final Box<String> box;
     try {
@@ -260,5 +359,53 @@ final class HiveMenuCache implements MenuCache {
     } on HiveError {
       return 0;
     }
+  }
+
+  @override
+  Future<int> count() => size();
+
+  @override
+  Future<List<CachedMenuEntry>> entries() async {
+    final Box<String> box;
+    try {
+      box = await _openedBox();
+      // A box that never opened holds nothing readable: [], not a throw.
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      return const <CachedMenuEntry>[];
+    }
+    List<String> raw;
+    try {
+      raw = box.values.toList();
+      // A closed or otherwise broken box reads as empty, never throws.
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      return const <CachedMenuEntry>[];
+    }
+    final result = <CachedMenuEntry>[];
+    for (final value in raw) {
+      final Object? decoded;
+      try {
+        decoded = jsonDecode(value);
+      } on FormatException {
+        continue;
+      }
+      if (decoded is! Map<String, Object?>) continue;
+      final cached = CachedMenu.tryFrom(decoded);
+      if (cached == null) continue;
+      result.add(
+        CachedMenuEntry(
+          ref: cached.menu.venueRef,
+          venueName: cached.menu.venueName,
+          fetchedAt: cached.menu.fetchedAt,
+          dishCount: cached.menu.allDishes.length,
+          engine: switch (cached.analysis) {
+            final MenuAnalysed analysed => analysed.engine,
+            _ => null,
+          },
+        ),
+      );
+    }
+    return result;
   }
 }

@@ -68,5 +68,36 @@ void main() {
         expect((await repository.cached(ref))?.analysis, analysis);
       },
     );
+
+    test('savedMenus lists every seeded ref as a summary', () async {
+      // Arrange
+      final repository = FakeMenuRepository();
+      const ref = VenueRef(source: MenuSource.wolt, platformId: 'x');
+      final fetched = await repository.load(ref) as MenuFetched;
+      repository.seedCache(CachedMenu(menu: fetched.menu));
+
+      // Act
+      final saved = await repository.savedMenus();
+
+      // Assert
+      expect(saved, hasLength(1));
+      expect(saved.single.ref, ref);
+      expect(saved.single.dishCount, fetched.menu.allDishes.length);
+    });
+
+    test('remove records the ref and drops it from the cache', () async {
+      // Arrange
+      final repository = FakeMenuRepository();
+      const ref = VenueRef(source: MenuSource.wolt, platformId: 'x');
+      final fetched = await repository.load(ref) as MenuFetched;
+      repository.seedCache(CachedMenu(menu: fetched.menu));
+
+      // Act
+      await repository.remove(ref);
+
+      // Assert
+      expect(repository.removedRefs, [ref]);
+      expect(await repository.cached(ref), isNull);
+    });
   });
 }

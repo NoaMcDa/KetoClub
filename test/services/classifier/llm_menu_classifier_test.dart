@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
@@ -8,9 +10,11 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/llm_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_analysis_prompt.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/llm/backend_chat_client.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
 
 import '../../fakes/fake_clock.dart';
+import '../../fakes/fake_install_id_store.dart';
 import '../../fakes/fake_llm_chat_client.dart';
 import 'menu_classifier_contract.dart';
 
@@ -41,6 +45,7 @@ String _validReplyBody({
   String verdict = 'orderAsIs',
   String why = 'Lean protein with no carb sides.',
   String? modification,
+  double? netCarbsEstimate,
 }) => jsonEncode(<String, Object?>{
   'dishes': <Object?>[
     <String, Object?>{
@@ -49,10 +54,30 @@ String _validReplyBody({
       'verdict': verdict,
       'why': why,
       'modification': modification,
-      'net_carbs_estimate': null,
+      'net_carbs_estimate': netCarbsEstimate,
     },
   ],
 });
+
+/// The exact `system_prompt` a 9 g limit produces (issue #57's golden):
+/// the role preamble, the verdict definitions and keto rules with 9 in
+/// place of the default 6, then the output rules. Typed out in full,
+/// never rebuilt from the constants it tests, so a change to any of that
+/// text has to be made here too, on purpose.
+const String _goldenSystemPromptAt9g = '''
+You are the keto-diet menu analyst for KetoClub. Classify every dish in the user message into exactly one of three verdicts.
+
+orderAsIs — net carbohydrates 9g or less, a healthy fat-and-protein base, and no starchy side, sugary sauce, or flour coating: order it exactly as printed.
+modifiable — the core protein, fish, egg, or salad is keto-compliant, but the dish arrives with a starchy side (fries, mash, rice, bread), a root vegetable (carrot, beet, corn), or a sugary sauce or glaze (teriyaki, honey, barbecue): order it with the stated substitution or removal.
+nonKeto — the dish is built on a high-carbohydrate foundation no substitution can fix, such as pasta, pizza crust, a rice bowl, noodles, a breaded or battered protein, or a pastry or dessert base: skip it.
+
+Net carbs of 9g or less per dish make it green (orderAsIs).
+Starchy sides, root vegetables, sugary sauces and glazes, breading, and bread that only carries the dish (a bun, pita, toast) make an otherwise-compliant dish yellow (modifiable): name the exact component to remove and the exact substitute to ask for.
+Pasta, pizza, rice bowls, noodles, breaded or battered proteins, and pastry make a dish red (nonKeto), even with modifications, and get no modification text.
+Write "why" and "modification" in the language the menu is written in, each under 300 characters. Return only dishes present in the input, using their given id and exact printed name.
+
+Every "modifiable" dish must carry a non-empty "modification" naming the exact component to remove and the exact substitute to ask for. A dish with no compliant path is "nonKeto" and must not carry a "modification".
+Respond with JSON matching the supplied schema and nothing else: no markdown fence, no heading, no commentary before or after the JSON object.''';
 
 /// Builds an [LlmMenuClassifier] over a fresh [FakeLlmChatClient] that
 /// always answers with an empty `dishes` array — a reply the parser
@@ -223,6 +248,80 @@ void main() {
       }
     });
 
+    test('classify records the options it was given on a placed '
+        'result', () async {
+      // Arrange
+      final client = FakeLlmChatClient()
+        ..fallback = ChatCompleted(
+          content: _validReplyBody(dishId: 'dish-1', dishName: 'Salmon'),
+          model: 'm',
+        );
+      final classifier = LlmMenuClassifier(
+        client,
+        FakeClock(DateTime.utc(2026)),
+      );
+      const options = ClassificationOptions(
+        estimationConsentGiven: true,
+        netCarbLimitGrams: 14,
+        dietaryConstraints: ['dairy-free'],
+      );
+
+      // Act
+      final result = await classifier.classify(
+        _menuOf([_dishNamed('dish-1', 'Salmon')]),
+        options: options,
+      );
+
+      // Assert
+      expect(
+        (result as MenuAnalysed).options,
+        equals(
+          const AnalysisOptionsSnapshot(
+            netCarbLimitGrams: 14,
+            dietaryConstraints: ['dairy-free'],
+          ),
+        ),
+      );
+    });
+
+    test('classify holds a green to the limit it was given: 8 g is over '
+        'the default 6 g but within a 10 g limit', () async {
+      // Arrange: the same green reply, estimated at 8 g, with a usable
+      // instruction, classified under the default limit and under 10 g.
+      ChatResult reply() => ChatCompleted(
+        content: _validReplyBody(
+          dishId: 'dish-1',
+          dishName: 'Salmon',
+          modification: 'Ask for the glaze on the side.',
+          netCarbsEstimate: 8,
+        ),
+        model: 'm',
+      );
+      final client = FakeLlmChatClient()
+        ..enqueue(reply())
+        ..enqueue(reply());
+      final classifier = LlmMenuClassifier(
+        client,
+        FakeClock(DateTime.utc(2026)),
+      );
+      final menu = _menuOf([_dishNamed('dish-1', 'Salmon')]);
+
+      // Act
+      final atDefault = await classifier.classify(menu);
+      final atTen = await classifier.classify(
+        menu,
+        options: const ClassificationOptions(netCarbLimitGrams: 10),
+      );
+
+      // Assert
+      final defaultDish = (atDefault as MenuAnalysed).dishes.single;
+      expect(defaultDish.verdict, DishVerdict.modifiable);
+      expect(defaultDish.modification, 'Ask for the glaze on the side.');
+      final tenDish = (atTen as MenuAnalysed).dishes.single;
+      expect(tenDish.verdict, DishVerdict.orderAsIs);
+      expect(tenDish.modification, isNull);
+    });
+
     test('classify given a reply the parser rejects returns '
         'MenuAnalysisFailed(badResponse)', () async {
       // Arrange
@@ -247,6 +346,82 @@ void main() {
           const MenuAnalysisFailed(
             reason: MenuAnalysisFailureReason.badResponse,
           ),
+        ),
+      );
+    });
+  });
+
+  group('LlmMenuClassifier over BackendChatClient (issue #57 golden)', () {
+    test(
+      'a non-default limit posts exactly the golden system_prompt',
+      () async {
+        // Arrange: the real transport client over a mock HTTP client, so
+        // the assertion is on the JSON body that actually leaves the app.
+        Map<String, Object?>? posted;
+        final chat = BackendChatClient(
+          client: MockClient((request) async {
+            posted = jsonDecode(request.body) as Map<String, Object?>;
+            return http.Response(
+              jsonEncode(<String, Object?>{
+                'content': '{"dishes":[]}',
+                'model': 'served-model',
+              }),
+              200,
+            );
+          }),
+          baseUrl: Uri.parse('https://api.ketoclub.test'),
+          installIdStore: FakeInstallIdStore(),
+        );
+        final classifier = LlmMenuClassifier(
+          chat,
+          FakeClock(DateTime.utc(2026)),
+        );
+
+        // Act
+        await classifier.classify(
+          _menuOf([_dishNamed('dish-1', 'Salmon')]),
+          options: const ClassificationOptions(
+            estimationConsentGiven: true,
+            netCarbLimitGrams: 9,
+          ),
+        );
+
+        // Assert
+        expect(posted, isNotNull);
+        expect(posted!['system_prompt'], equals(_goldenSystemPromptAt9g));
+      },
+    );
+
+    test('the default limit posts the same prompt with 6g, byte for byte, '
+        'as before the limit became a setting', () async {
+      // Arrange
+      Map<String, Object?>? posted;
+      final chat = BackendChatClient(
+        client: MockClient((request) async {
+          posted = jsonDecode(request.body) as Map<String, Object?>;
+          return http.Response(
+            jsonEncode(<String, Object?>{
+              'content': '{"dishes":[]}',
+              'model': 'served-model',
+            }),
+            200,
+          );
+        }),
+        baseUrl: Uri.parse('https://api.ketoclub.test'),
+        installIdStore: FakeInstallIdStore(),
+      );
+      final classifier = LlmMenuClassifier(chat, FakeClock(DateTime.utc(2026)));
+
+      // Act
+      await classifier.classify(_menuOf([_dishNamed('dish-1', 'Salmon')]));
+
+      // Assert: the golden with only its two limit figures changed back.
+      expect(
+        posted!['system_prompt'],
+        equals(
+          _goldenSystemPromptAt9g
+              .replaceAll('net carbohydrates 9g', 'net carbohydrates 6g')
+              .replaceAll('Net carbs of 9g', 'Net carbs of 6g'),
         ),
       );
     });

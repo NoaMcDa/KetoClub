@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/utils/constants.dart';
 
 /// Element-wise list equality, used by the equality operator on
 /// [ClassificationOptions].
@@ -31,12 +32,23 @@ enum ClassifyingEngine {
 
 /// Options steering one [MenuClassifier.classify] call (architecture.md
 /// §6.2, §9.1).
+///
+/// [netCarbLimitGrams] and [dietaryConstraints] change what a verdict
+/// means, so they are what [snapshot] records beside a cached analysis and
+/// what [matches] compares against (issue #57; issue #56 reuses the same
+/// seam for its dietary toggles). [estimationConsentGiven] only picks the
+/// engine, which the analysis already records itself.
 @immutable
 final class ClassificationOptions {
   /// Creates options for one [MenuClassifier.classify] call.
+  ///
+  /// [netCarbLimitGrams] is taken as given; `AppSettings` clamps the
+  /// user's choice to [minNetCarbLimitGrams]..[maxNetCarbLimitGrams]
+  /// before it reaches here.
   const new({
     this.estimationConsentGiven = false,
     this.dietaryConstraints = const <String>[],
+    this.netCarbLimitGrams = defaultNetCarbLimitGrams,
     this.onEngineStarted,
   });
 
@@ -67,20 +79,45 @@ final class ClassificationOptions {
   /// [toString]. Null when nobody is listening.
   final void Function(ClassifyingEngine engine)? onEngineStarted;
 
+  /// The net-carb limit in grams above which no dish is green (issue #57):
+  /// stated in the LLM prompt's green definition, and applied by
+  /// `MenuResponseParser` to the model's own `net_carbs_estimate`.
+  final int netCarbLimitGrams;
+
+  /// The options that shape a verdict, as the models-layer value a cached
+  /// [MenuAnalysed] records (issue #57).
+  AnalysisOptionsSnapshot get snapshot => AnalysisOptionsSnapshot(
+    netCarbLimitGrams: netCarbLimitGrams,
+    dietaryConstraints: dietaryConstraints,
+  );
+
+  /// Whether an analysis recorded under [recorded] answered the same
+  /// question these options ask, so it may be reused (issue #57).
+  ///
+  /// A null [recorded] is an analysis cached before issue #57 recorded
+  /// options at all; every such analysis was made under the defaults
+  /// (a 6 g limit, no dietary constraints), so it is compared as those.
+  bool matches(AnalysisOptionsSnapshot? recorded) =>
+      (recorded ?? const ClassificationOptions().snapshot) == snapshot;
+
   @override
   bool operator ==(Object other) =>
       other is ClassificationOptions &&
       other.estimationConsentGiven == estimationConsentGiven &&
-      _listEquals(other.dietaryConstraints, dietaryConstraints);
+      _listEquals(other.dietaryConstraints, dietaryConstraints) &&
+      other.netCarbLimitGrams == netCarbLimitGrams;
 
   @override
-  int get hashCode =>
-      Object.hash(estimationConsentGiven, Object.hashAll(dietaryConstraints));
+  int get hashCode => Object.hash(
+    estimationConsentGiven,
+    Object.hashAll(dietaryConstraints),
+    netCarbLimitGrams,
+  );
 
   @override
   String toString() =>
       'ClassificationOptions(consent: $estimationConsentGiven, '
-      'constraints: $dietaryConstraints)';
+      'constraints: $dietaryConstraints, limit: ${netCarbLimitGrams}g)';
 }
 
 /// Classifies a menu's dishes by keto-compatibility (architecture.md
@@ -91,6 +128,11 @@ final class ClassificationOptions {
 /// throws across its boundary.
 abstract interface class MenuClassifier {
   /// Classifies every dish in [menu], steered by [options].
+  ///
+  /// A [MenuAnalysed] result records [options]'s
+  /// [ClassificationOptions.snapshot] in [MenuAnalysed.options] (issue
+  /// #57), so a cached result can later be checked against the options
+  /// the user holds then.
   ///
   /// Never throws: every failure is reported as a [MenuAnalysisFailed]
   /// result rather than an exception. Callers make exactly one call per

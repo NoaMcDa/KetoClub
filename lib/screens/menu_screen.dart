@@ -59,7 +59,7 @@ String _ageLabel(DateTime fetchedAt, DateTime now, AppLocalizations l10n) {
   return l10n.ageDays(elapsed.inDays);
 }
 
-/// The definition text of one [promptVerdictDefinitions] line, stripped of
+/// The definition text of one [promptVerdictDefinitionsFor] line, stripped of
 /// its leading `verdictName — ` prefix. Returns the whole line, trimmed,
 /// when no em dash is present, rather than failing — this is display
 /// text, not a value anything downstream depends on being exact.
@@ -265,7 +265,10 @@ class _MenuScreenState extends State<MenuScreen> {
               ?sourceLine,
             ],
           ),
-          if (analysed) ...[const SizedBox(height: 4), _legend(context, l10n)],
+          if (analysed) ...[
+            const SizedBox(height: 4),
+            _legend(context, l10n, controller.netCarbLimitGrams),
+          ],
           const SizedBox(height: 8),
           AnalysisProgressRow(phase: controller.phase),
           ...banners,
@@ -367,11 +370,19 @@ class _MenuScreenState extends State<MenuScreen> {
 
   /// The verdict legend (issue #17): a toggle, and — once expanded — the
   /// same three verdict definitions the system prompt sends
-  /// ([promptVerdictDefinitions]), so the legend the UI shows and the
+  /// ([promptVerdictDefinitionsFor]), so the legend the UI shows and the
   /// definitions the prompt sends can never drift apart. See this
   /// screen's final report for why this reads that constant directly
   /// rather than a re-translated copy of it.
-  Widget _legend(BuildContext context, AppLocalizations l10n) {
+  ///
+  /// [netCarbLimitGrams] is the limit the shown analysis was made under
+  /// (issue #57), so the green definition states the same figure the
+  /// model was given.
+  Widget _legend(
+    BuildContext context,
+    AppLocalizations l10n,
+    int netCarbLimitGrams,
+  ) {
     final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -397,18 +408,22 @@ class _MenuScreenState extends State<MenuScreen> {
             ),
           ),
         ),
-        if (_legendExpanded) _legendBody(context, l10n),
+        if (_legendExpanded) _legendBody(context, l10n, netCarbLimitGrams),
       ],
     );
   }
 
   /// The expanded legend body: one line per verdict, parsed from
-  /// [promptVerdictDefinitions] — never re-typed — plus `l10n.legendNote`
+  /// [promptVerdictDefinitionsFor] — never re-typed — plus `l10n.legendNote`
   /// naming that source. Renders nothing if that constant is ever
   /// reshaped away from its documented one-line-per-verdict form, rather
   /// than guessing at a malformed split.
-  Widget _legendBody(BuildContext context, AppLocalizations l10n) {
-    final lines = promptVerdictDefinitions.split('\n');
+  Widget _legendBody(
+    BuildContext context,
+    AppLocalizations l10n,
+    int netCarbLimitGrams,
+  ) {
+    final lines = promptVerdictDefinitionsFor(netCarbLimitGrams).split('\n');
     if (lines.length != 3) return const SizedBox.shrink();
     final labels = [
       l10n.verdictOrderAsIs,

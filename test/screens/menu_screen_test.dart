@@ -665,6 +665,53 @@ void main() {
     });
 
     testWidgets(
+      'the legend states the net-carb limit the analysis was made under '
+      '(issue #57), not a fixed 6g',
+      (tester) async {
+        // Arrange: an analysis recorded under a 9 g limit.
+        final green = _dish('Steak', id: 'green');
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([green])));
+        final classifier = FakeMenuClassifier()
+          ..respondWith(
+            MenuAnalysed(
+              dishes: [_verdictFor(green, DishVerdict.orderAsIs)],
+              unclassified: const <String>[],
+              engine: const LlmEngine(model: 'served-model'),
+              analysedAt: DateTime.utc(2026),
+              options: const AnalysisOptionsSnapshot(netCarbLimitGrams: 9),
+            ),
+          );
+        final controller = _controllerFor(
+          repository: repository,
+          classifier: classifier,
+        );
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Act
+        await tester.tap(find.text(_en.legendToggle));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(
+          find.textContaining(
+            'net carbohydrates 9g or less',
+            findRichText: true,
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.textContaining(
+            'net carbohydrates 6g or less',
+            findRichText: true,
+          ),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
       'tapping the legend toggle shows the same three verdict definitions '
       'the system prompt sends (issue #17), and hides them again',
       (tester) async {
@@ -701,7 +748,7 @@ void main() {
         await tester.tap(find.text(_en.legendToggle));
         await tester.pumpAndSettle();
 
-        // Assert: the definitions come from promptVerdictDefinitions
+        // Assert: the definitions come from promptVerdictDefinitionsFor
         // itself, not a re-typed copy.
         expect(find.text(_en.legendHide), findsOneWidget);
         expect(

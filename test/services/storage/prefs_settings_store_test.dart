@@ -313,6 +313,47 @@ void main() {
       expect(result.languageTag, equals('he'));
     });
 
+    test(
+      'an install that persisted settings before issue #57 added '
+      'netCarbLimitGrams reads a 6 g limit and keeps every other field',
+      () async {
+        // Arrange: the JSON shape written before the limit existed.
+        SharedPreferences.setMockInitialValues(<String, Object>{
+          'flutter.ketoclub_settings':
+              '{"languageTag":"he","filter":"greenOnly",'
+              '"estimationConsentGiven":true,"lastVenue":null,'
+              '"themeMode":"dark"}',
+        });
+        final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
+
+        // Act
+        final result = await store.read();
+
+        // Assert
+        expect(result.netCarbLimitGrams, equals(6));
+        expect(result.themeMode, equals(AppThemeMode.dark));
+        expect(result.languageTag, equals('he'));
+        expect(result.estimationConsentGiven, isTrue);
+      },
+    );
+
+    test('read clamps a stored limit outside 2..25 g', () async {
+      // Arrange
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        'flutter.ketoclub_settings':
+            '{"languageTag":null,"filter":"all",'
+            '"estimationConsentGiven":false,"lastVenue":null,'
+            '"netCarbLimitGrams":40}',
+      });
+      final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
+
+      // Act
+      final result = await store.read();
+
+      // Assert
+      expect(result.netCarbLimitGrams, equals(25));
+    });
+
     test('write then read round-trips a non-default themeMode', () async {
       // Arrange
       final store = _buildStore();

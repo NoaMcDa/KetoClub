@@ -109,5 +109,29 @@ void runMenuRepositoryContract(
       await expectLater(repository.load(refItHandles), completes);
       await expectLater(repository.load(refItHandles), completes);
     });
+
+    test('savedMenus resolves without throwing', () async {
+      await expectLater(repository.savedMenus(), completes);
+    });
+
+    test('savedMenus is empty on a freshly built repository', () async {
+      // Act
+      final saved = await repository.savedMenus();
+
+      // Assert
+      expect(saved, isEmpty);
+    });
+
+    test('remove never throws for a ref nothing was cached under', () async {
+      await expectLater(repository.remove(refItRejects), completes);
+    });
+
+    test('remove leaves savedMenus resolvable afterwards', () async {
+      // Act
+      await repository.remove(refItHandles);
+
+      // Assert
+      await expectLater(repository.savedMenus(), completes);
+    });
   });
 }

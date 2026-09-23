@@ -143,6 +143,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settingsAppearanceDark => 'כהה';
 
   @override
+  String get settingsNetCarbLimit => 'מגבלת פחמימות נטו';
+
+  @override
+  String get settingsNetCarbLimitBody =>
+      'מנות מעל המגבלה לעולם לא יסומנו בירוק. שינוי שלה ינתח מחדש את התפריט הבא שתפתחו.';
+
+  @override
+  String settingsNetCarbLimitValue(int grams) {
+    return '$grams גרם';
+  }
+
+  @override
+  String get settingsNetCarbLimitDecrease => 'הורדת מגבלת הפחמימות נטו';
+
+  @override
+  String get settingsNetCarbLimitIncrease => 'העלאת מגבלת הפחמימות נטו';
+
+  @override
   String get settingsFilter => 'סינון ברירת מחדל';
 
   @override
@@ -293,7 +311,35 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get savedPlaceholderBody =>
-      'שמרו מסעדה כדי למצוא אותה כאן בהמשך. האפשרות הזו תגיע בעדכון עתידי.';
+      'פתחו תפריט של מסעדה והוא יופיע כאן אוטומטית, זמין ליממה — גם ללא חיבור לאינטרנט.';
+
+  @override
+  String savedEntryDishCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count מנות',
+      two: 'שתי מנות',
+      one: 'מנה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get savedRemove => 'הסר';
+
+  @override
+  String savedRemoveSemanticLabel(String venue) {
+    return 'הסר את $venue';
+  }
+
+  @override
+  String savedRemovedMessage(String venue) {
+    return '$venue הוסרה.';
+  }
+
+  @override
+  String get savedUndo => 'בטל';
 
   @override
   String get discoveryTitle => 'איפה לאכול';
