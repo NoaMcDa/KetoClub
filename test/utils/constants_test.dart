@@ -456,4 +456,122 @@ void main() {
       expect(triggerSuppresses['דבש תמרים'], equals(['דבש']));
     });
   });
+
+  group('dietary rule toggles (issue #56)', () {
+    /// A Hebrew letter, to tell which language a sentence is in.
+    final hebrewLetter = RegExp('[א-ת]');
+
+    test('the three prompt fragments are distinct, one-line and English', () {
+      // Arrange
+      const fragments = [
+        seedOilFreePromptFragment,
+        dairyFreePromptFragment,
+        carnivoreOnlyPromptFragment,
+      ];
+
+      // Assert
+      expect(fragments.toSet(), hasLength(3));
+      for (final fragment in fragments) {
+        expect(fragment.trim(), isNotEmpty);
+        expect(fragment, isNot(contains('\n')));
+        expect(hebrewLetter.hasMatch(fragment), isFalse);
+      }
+    });
+
+    test('each fragment names its rule and the verdicts it asks for', () {
+      // Assert
+      expect(seedOilFreePromptFragment, startsWith('Strict seed-oil free:'));
+      expect(dairyFreePromptFragment, startsWith('Dairy-free keto:'));
+      expect(carnivoreOnlyPromptFragment, startsWith('Carnivore only:'));
+      for (final fragment in [
+        seedOilFreePromptFragment,
+        dairyFreePromptFragment,
+        carnivoreOnlyPromptFragment,
+      ]) {
+        expect(fragment, contains('modifiable'));
+        expect(fragment, contains('nonKeto'));
+      }
+    });
+
+    test('every waiter sentence is non-empty, within the modification '
+        'limit, and in its own language', () {
+      // Arrange
+      const english = [
+        seedOilFreeModificationEn,
+        dairyFreeModificationEn,
+        carnivoreOnlyModificationEn,
+        dietaryRuleWhyEn,
+      ];
+      const hebrew = [
+        seedOilFreeModificationHe,
+        dairyFreeModificationHe,
+        carnivoreOnlyModificationHe,
+        dietaryRuleWhyHe,
+      ];
+
+      // Assert
+      for (final sentence in [...english, ...hebrew]) {
+        expect(sentence.trim(), isNotEmpty);
+        expect(sentence.length, lessThanOrEqualTo(maxModificationLength));
+      }
+      for (final sentence in english) {
+        expect(hebrewLetter.hasMatch(sentence), isFalse, reason: sentence);
+      }
+      for (final sentence in hebrew) {
+        expect(hebrewLetter.hasMatch(sentence), isTrue, reason: sentence);
+      }
+    });
+
+    test('every trigger list is non-empty, trimmed and free of '
+        'duplicates', () {
+      // Arrange
+      const lists = {
+        'seedOilTriggersEn': seedOilTriggersEn,
+        'seedOilTriggersHe': seedOilTriggersHe,
+        'dairyTriggersEn': dairyTriggersEn,
+        'dairyTriggersHe': dairyTriggersHe,
+        'plantTriggersEn': plantTriggersEn,
+        'plantTriggersHe': plantTriggersHe,
+      };
+
+      // Assert
+      for (final MapEntry(key: name, value: triggers) in lists.entries) {
+        expect(triggers, isNotEmpty, reason: name);
+        expect(triggers.toSet(), hasLength(triggers.length), reason: name);
+        for (final trigger in triggers) {
+          expect(trigger, isNotEmpty, reason: name);
+          expect(trigger, equals(trigger.trim()), reason: name);
+        }
+      }
+    });
+
+    test('the English trigger lists are lower-case and hold no Hebrew', () {
+      // Assert
+      for (final trigger in [
+        ...seedOilTriggersEn,
+        ...dairyTriggersEn,
+        ...plantTriggersEn,
+      ]) {
+        expect(trigger, equals(trigger.toLowerCase()));
+        expect(hebrewLetter.hasMatch(trigger), isFalse, reason: trigger);
+      }
+    });
+
+    test('the Hebrew trigger lists are all Hebrew', () {
+      // Assert
+      for (final trigger in [
+        ...seedOilTriggersHe,
+        ...dairyTriggersHe,
+        ...plantTriggersHe,
+      ]) {
+        expect(hebrewLetter.hasMatch(trigger), isTrue, reason: trigger);
+      }
+    });
+
+    test('every dairy guard key is itself a dairy trigger', () {
+      // Assert
+      expect(dairyTriggersEn, containsAll(dairyGuardsEn.keys));
+      expect(dairyTriggersHe, containsAll(dairyGuardsHe.keys));
+    });
+  });
 }

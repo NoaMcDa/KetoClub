@@ -30,9 +30,20 @@ const Key netCarbLimitIncreaseKey = Key('settingsNetCarbLimitIncrease');
 /// The net-carb limit stepper's value label (issue #57), e.g. "6 g".
 const Key netCarbLimitValueKey = Key('settingsNetCarbLimitValue');
 
+/// The "Strict seed-oil free" switch (issue #56), public so a test can tap
+/// it without a text lookup that the hint line could make ambiguous.
+const Key seedOilFreeSwitchKey = Key('settingsSeedOilFreeSwitch');
+
+/// The "Dairy-free keto" switch (issue #56).
+const Key dairyFreeSwitchKey = Key('settingsDairyFreeSwitch');
+
+/// The "Carnivore only" switch (issue #56).
+const Key carnivoreOnlySwitchKey = Key('settingsCarnivoreOnlySwitch');
+
 /// The Settings screen: the AI-analysis consent disclosure, the UI
-/// language, the appearance, the net-carb limit, the default menu filter,
-/// and cache clearing (architecture.md §6.6, §11, §12, §13).
+/// language, the appearance, the net-carb limit, the "Your keto rules"
+/// dietary toggles, the default menu filter, and cache clearing
+/// (architecture.md §6.6, §11, §12, §13).
 ///
 /// Reads its [SettingsController] from `provider` and calls
 /// [SettingsController.load] once, after the first frame, the same way
@@ -97,6 +108,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _appearanceSection(context, l10n, controller),
             const SizedBox(height: 24),
             _netCarbLimitSection(context, l10n, controller),
+            const SizedBox(height: 24),
+            _ketoRulesSection(context, l10n, controller),
             const SizedBox(height: 24),
             _filterSection(context, l10n, controller),
             const SizedBox(height: 24),
@@ -327,6 +340,68 @@ class _SettingsScreenState extends State<SettingsScreen> {
               icon: const Icon(Icons.add),
             ),
           ],
+        ),
+      ],
+    );
+  }
+
+  /// The "Your keto rules" section (issue #56, `.design/Settings.dc.html`):
+  /// three switches — strict seed-oil free, dairy-free keto, carnivore
+  /// only — each with its one-line hint, under a line saying a change
+  /// applies from the next menu opened.
+  ///
+  /// Each switch writes through its own [SettingsController] setter and is
+  /// disabled while the controller is busy, like every other control on
+  /// this screen, so two quick taps cannot race one write. Which prompt
+  /// text and which rules each toggle adds is `constants.dart`'s business
+  /// (architecture.md §9.1); this section only records the choice.
+  Widget _ketoRulesSection(
+    BuildContext context,
+    AppLocalizations l10n,
+    SettingsController controller,
+  ) {
+    final busy = controller.isBusy;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.settingsKetoRules,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        Text(l10n.settingsKetoRulesBody),
+        SwitchListTile(
+          key: seedOilFreeSwitchKey,
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.settingsSeedOilFree),
+          subtitle: Text(l10n.settingsSeedOilFreeHint),
+          value: controller.seedOilFree,
+          onChanged: busy
+              ? null
+              : (enabled) =>
+                    unawaited(controller.setSeedOilFree(enabled: enabled)),
+        ),
+        SwitchListTile(
+          key: dairyFreeSwitchKey,
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.settingsDairyFree),
+          subtitle: Text(l10n.settingsDairyFreeHint),
+          value: controller.dairyFree,
+          onChanged: busy
+              ? null
+              : (enabled) =>
+                    unawaited(controller.setDairyFree(enabled: enabled)),
+        ),
+        SwitchListTile(
+          key: carnivoreOnlySwitchKey,
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.settingsCarnivoreOnly),
+          subtitle: Text(l10n.settingsCarnivoreOnlyHint),
+          value: controller.carnivoreOnly,
+          onChanged: busy
+              ? null
+              : (enabled) =>
+                    unawaited(controller.setCarnivoreOnly(enabled: enabled)),
         ),
       ],
     );

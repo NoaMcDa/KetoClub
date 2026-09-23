@@ -33,12 +33,35 @@ void runSettingsStoreContract(String name, SettingsStore Function() build) {
         lastVenue: VenueRef(source: MenuSource.wolt, platformId: 'v1'),
         themeMode: AppThemeMode.dark,
         netCarbLimitGrams: 14,
+        seedOilFree: true,
+        dairyFree: true,
         lastFilter: MenuFilter.yellowOnly,
       );
 
       await store.write(settings);
 
       expect(await store.read(), equals(settings));
+    });
+
+    test('write then read round-trips every combination of the dietary '
+        'toggles (issue #56)', () async {
+      final store = build();
+
+      for (final seedOil in <bool>[false, true]) {
+        for (final dairy in <bool>[false, true]) {
+          for (final carnivore in <bool>[false, true]) {
+            final settings = AppSettings(
+              seedOilFree: seedOil,
+              dairyFree: dairy,
+              carnivoreOnly: carnivore,
+            );
+
+            await store.write(settings);
+
+            expect(await store.read(), equals(settings));
+          }
+        }
+      }
     });
 
     test(

@@ -607,6 +607,166 @@ void main() {
       });
     });
 
+    group('Your keto rules toggles (issue #56)', () {
+      /// The [SwitchListTile] keyed [key].
+      SwitchListTile tile(WidgetTester tester, Key key) =>
+          tester.widget<SwitchListTile>(find.byKey(key));
+
+      /// Taps the switch keyed [key] after scrolling it into view.
+      Future<void> tapSwitch(WidgetTester tester, Key key) async {
+        await tester.ensureVisible(find.byKey(key));
+        await tester.tap(find.byKey(key));
+        await tester.pumpAndSettle();
+      }
+
+      testWidgets('build shows the section, its three rules and their '
+          'hints, every switch off by default', (tester) async {
+        // Act
+        await _pump(tester, _controllerFor());
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_en.settingsKetoRules), findsOneWidget);
+        expect(find.text(_en.settingsKetoRulesBody), findsOneWidget);
+        expect(find.text(_en.settingsSeedOilFree), findsOneWidget);
+        expect(find.text(_en.settingsSeedOilFreeHint), findsOneWidget);
+        expect(find.text(_en.settingsDairyFree), findsOneWidget);
+        expect(find.text(_en.settingsDairyFreeHint), findsOneWidget);
+        expect(find.text(_en.settingsCarnivoreOnly), findsOneWidget);
+        expect(find.text(_en.settingsCarnivoreOnlyHint), findsOneWidget);
+        expect(tile(tester, seedOilFreeSwitchKey).value, isFalse);
+        expect(tile(tester, dairyFreeSwitchKey).value, isFalse);
+        expect(tile(tester, carnivoreOnlySwitchKey).value, isFalse);
+      });
+
+      testWidgets('the section sits under the net carb limit and above the '
+          'default filter', (tester) async {
+        // Act
+        await _pump(tester, _controllerFor());
+        await tester.pumpAndSettle();
+
+        // Assert
+        final limitY = tester
+            .getTopLeft(find.text(_en.settingsNetCarbLimit))
+            .dy;
+        final rulesY = tester.getTopLeft(find.text(_en.settingsKetoRules)).dy;
+        final filterY = tester.getTopLeft(find.text(_en.settingsFilter)).dy;
+        expect(rulesY, greaterThan(limitY));
+        expect(rulesY, lessThan(filterY));
+      });
+
+      testWidgets('load shows a stored toggle as on', (tester) async {
+        // Arrange
+        final store = FakeSettingsStore(
+          initial: const AppSettings(dairyFree: true),
+        );
+
+        // Act
+        await _pump(tester, _controllerFor(settingsStore: store));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(tile(tester, dairyFreeSwitchKey).value, isTrue);
+        expect(tile(tester, seedOilFreeSwitchKey).value, isFalse);
+        expect(tile(tester, carnivoreOnlySwitchKey).value, isFalse);
+      });
+
+      testWidgets('tapping seed-oil free calls the controller and persists '
+          'only that toggle', (tester) async {
+        // Arrange
+        final store = FakeSettingsStore();
+        final controller = _controllerFor(settingsStore: store);
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Act
+        await tapSwitch(tester, seedOilFreeSwitchKey);
+
+        // Assert
+        expect(controller.seedOilFree, isTrue);
+        expect(tile(tester, seedOilFreeSwitchKey).value, isTrue);
+        final stored = await store.read();
+        expect(stored.seedOilFree, isTrue);
+        expect(stored.dairyFree, isFalse);
+        expect(stored.carnivoreOnly, isFalse);
+      });
+
+      testWidgets('tapping dairy-free calls the controller and persists '
+          'only that toggle', (tester) async {
+        // Arrange
+        final store = FakeSettingsStore();
+        final controller = _controllerFor(settingsStore: store);
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Act
+        await tapSwitch(tester, dairyFreeSwitchKey);
+
+        // Assert
+        expect(controller.dairyFree, isTrue);
+        final stored = await store.read();
+        expect(stored.dairyFree, isTrue);
+        expect(stored.seedOilFree, isFalse);
+        expect(stored.carnivoreOnly, isFalse);
+      });
+
+      testWidgets('tapping carnivore only calls the controller and persists '
+          'only that toggle', (tester) async {
+        // Arrange
+        final store = FakeSettingsStore();
+        final controller = _controllerFor(settingsStore: store);
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Act
+        await tapSwitch(tester, carnivoreOnlySwitchKey);
+
+        // Assert
+        expect(controller.carnivoreOnly, isTrue);
+        final stored = await store.read();
+        expect(stored.carnivoreOnly, isTrue);
+        expect(stored.seedOilFree, isFalse);
+        expect(stored.dairyFree, isFalse);
+      });
+
+      testWidgets('tapping a switch that is on turns it off again', (
+        tester,
+      ) async {
+        // Arrange
+        final store = FakeSettingsStore(
+          initial: const AppSettings(carnivoreOnly: true),
+        );
+        await _pump(tester, _controllerFor(settingsStore: store));
+        await tester.pumpAndSettle();
+
+        // Act
+        await tapSwitch(tester, carnivoreOnlySwitchKey);
+
+        // Assert
+        expect(tile(tester, carnivoreOnlySwitchKey).value, isFalse);
+        expect((await store.read()).carnivoreOnly, isFalse);
+      });
+
+      testWidgets('under Locale(he) the section renders in Hebrew', (
+        tester,
+      ) async {
+        // Act
+        await _pump(tester, _controllerFor(), locale: const Locale('he'));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_he.settingsKetoRules), findsOneWidget);
+        expect(find.text(_he.settingsKetoRulesBody), findsOneWidget);
+        expect(find.text(_he.settingsSeedOilFree), findsOneWidget);
+        expect(find.text(_he.settingsSeedOilFreeHint), findsOneWidget);
+        expect(find.text(_he.settingsDairyFree), findsOneWidget);
+        expect(find.text(_he.settingsDairyFreeHint), findsOneWidget);
+        expect(find.text(_he.settingsCarnivoreOnly), findsOneWidget);
+        expect(find.text(_he.settingsCarnivoreOnlyHint), findsOneWidget);
+        expect(find.text(_en.settingsKetoRules), findsNothing);
+      });
+    });
+
     testWidgets('build under Locale(he) renders the Hebrew title', (
       tester,
     ) async {

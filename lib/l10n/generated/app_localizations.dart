@@ -392,6 +392,54 @@ abstract class AppLocalizations {
   /// **'Raise the net carb limit'**
   String get settingsNetCarbLimitIncrease;
 
+  /// No description provided for @settingsKetoRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Your keto rules'**
+  String get settingsKetoRules;
+
+  /// No description provided for @settingsKetoRulesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Each rule you turn on applies from the next menu you open.'**
+  String get settingsKetoRulesBody;
+
+  /// No description provided for @settingsSeedOilFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Strict seed-oil free'**
+  String get settingsSeedOilFree;
+
+  /// No description provided for @settingsSeedOilFreeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Flags canola, sunflower and soybean oil in fried dishes.'**
+  String get settingsSeedOilFreeHint;
+
+  /// No description provided for @settingsDairyFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Dairy-free keto'**
+  String get settingsDairyFree;
+
+  /// No description provided for @settingsDairyFreeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Treats cream, butter and cheese as a modification.'**
+  String get settingsDairyFreeHint;
+
+  /// No description provided for @settingsCarnivoreOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Carnivore only'**
+  String get settingsCarnivoreOnly;
+
+  /// No description provided for @settingsCarnivoreOnlyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Greens only meat, fish, eggs — vegetables become yellow.'**
+  String get settingsCarnivoreOnlyHint;
+
   /// No description provided for @settingsFilter.
   ///
   /// In en, this message translates to:

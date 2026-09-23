@@ -57,15 +57,17 @@ enum LoadPhase {
 /// restaurant serves even when it could not be judged.
 ///
 /// **Options change invalidates the cached analysis (issue #57).** Every
-/// [open] builds [ClassificationOptions] from the user's settings — consent,
-/// and the net-carb limit — and reuses the analysis cached beside the menu
-/// only when that analysis answered the same question: see [open] for the
-/// full rule. The comparison is [ClassificationOptions.matches] against the
-/// [MenuAnalysed.options] every classifier records, so issue #56's dietary
-/// toggles invalidate the same way once they reach [ClassificationOptions],
-/// with no change here. This controller owns the rule, not the repository:
-/// [MenuRepository.load] only decides whether the *menu* is fresh, and
-/// only this controller knows the options the user holds now.
+/// [open] builds [ClassificationOptions] from the user's settings —
+/// consent, the net-carb limit and the dietary toggles — and reuses the
+/// analysis cached beside the menu only when that analysis answered the
+/// same question: see [open] for the full rule. The comparison is
+/// [ClassificationOptions.matches] against the [MenuAnalysed.options] every
+/// classifier records, so issue #56's dietary toggles, which reach
+/// [ClassificationOptions.dietaryConstraints] through [_optionsFrom],
+/// invalidate exactly as a changed limit does. This controller owns the
+/// rule, not the repository: [MenuRepository.load] only decides whether
+/// the *menu* is fresh, and only this controller knows the options the
+/// user holds now.
 ///
 /// Never throws — both services behind it return sealed results — and does
 /// no I/O, JSON parsing, price formatting or regex work of its own
@@ -548,12 +550,19 @@ final class MenuController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// The [ClassificationOptions] [settings] ask for: consent, and the
-  /// net-carb limit (issue #57).
+  /// The [ClassificationOptions] [settings] ask for: consent, the
+  /// net-carb limit (issue #57), and the dietary constraints the three
+  /// "Your keto rules" toggles switch on (issue #56), in the fixed order
+  /// [ClassificationOptions.dietaryConstraintsFor] gives them.
   ClassificationOptions _optionsFrom(AppSettings settings) =>
       ClassificationOptions(
         estimationConsentGiven: settings.estimationConsentGiven,
         netCarbLimitGrams: settings.netCarbLimitGrams,
+        dietaryConstraints: ClassificationOptions.dietaryConstraintsFor(
+          seedOilFree: settings.seedOilFree,
+          dairyFree: settings.dairyFree,
+          carnivoreOnly: settings.carnivoreOnly,
+        ),
         // The engine that picks up these options reports itself here, so
         // [phase] can name it (issue #65). An observer only: it takes no
         // part in [ClassificationOptions.matches] or equality.

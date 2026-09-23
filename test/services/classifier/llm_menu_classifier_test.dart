@@ -79,6 +79,47 @@ Write "why" and "modification" in the language the menu is written in, each unde
 Every "modifiable" dish must carry a non-empty "modification" naming the exact component to remove and the exact substitute to ask for. A dish with no compliant path is "nonKeto" and must not carry a "modification".
 Respond with JSON matching the supplied schema and nothing else: no markdown fence, no heading, no commentary before or after the JSON object.''';
 
+/// The dietary-constraints section the "Strict seed-oil free" toggle
+/// alone appends after the default prompt (issue #56's golden): a blank
+/// line, the section preamble, then the toggle's fragment as one `- `
+/// line. Typed out in full for the same reason as
+/// [_goldenSystemPromptAt9g].
+const String _goldenSeedOilFreeSection = '''
+
+
+The user has these additional dietary constraints. A dish that violates one is not orderAsIs even if it otherwise would be — mark it modifiable or nonKeto, whichever fits:
+- Strict seed-oil free: the user avoids industrial seed oils (canola, rapeseed, soybean, sunflower, corn, cottonseed and generic vegetable oil). A dish that is fried, deep-fried or cooked in one of them is modifiable, with a modification asking for it to be cooked in olive oil, butter or tallow instead, unless it is already nonKeto.''';
+
+/// The section the "Dairy-free keto" toggle alone appends (issue #56).
+const String _goldenDairyFreeSection = '''
+
+
+The user has these additional dietary constraints. A dish that violates one is not orderAsIs even if it otherwise would be — mark it modifiable or nonKeto, whichever fits:
+- Dairy-free keto: the user eats no dairy. A dish containing cheese, cream, butter, milk or yogurt is modifiable, with a modification asking for it without the dairy component, unless it is already nonKeto.''';
+
+/// The section the "Carnivore only" toggle alone appends (issue #56).
+const String _goldenCarnivoreOnlySection = '''
+
+
+The user has these additional dietary constraints. A dish that violates one is not orderAsIs even if it otherwise would be — mark it modifiable or nonKeto, whichever fits:
+- Carnivore only: the user eats only animal foods (meat, fish, seafood, eggs and animal fats). A dish that includes any vegetable, salad, fruit, legume, herb garnish or other plant is modifiable, with a modification asking for only the meat, fish or eggs, with no plants, unless it is already nonKeto.''';
+
+/// The section all three toggles together append (issue #56): one line
+/// each, always seed-oil, dairy, carnivore.
+const String _goldenAllTogglesSection = '''
+
+
+The user has these additional dietary constraints. A dish that violates one is not orderAsIs even if it otherwise would be — mark it modifiable or nonKeto, whichever fits:
+- Strict seed-oil free: the user avoids industrial seed oils (canola, rapeseed, soybean, sunflower, corn, cottonseed and generic vegetable oil). A dish that is fried, deep-fried or cooked in one of them is modifiable, with a modification asking for it to be cooked in olive oil, butter or tallow instead, unless it is already nonKeto.
+- Dairy-free keto: the user eats no dairy. A dish containing cheese, cream, butter, milk or yogurt is modifiable, with a modification asking for it without the dairy component, unless it is already nonKeto.
+- Carnivore only: the user eats only animal foods (meat, fish, seafood, eggs and animal fats). A dish that includes any vegetable, salad, fruit, legume, herb garnish or other plant is modifiable, with a modification asking for only the meat, fish or eggs, with no plants, unless it is already nonKeto.''';
+
+/// [_goldenSystemPromptAt9g] at the default 6 g limit: only its two limit
+/// figures changed back, exactly as issue #57's default-limit test does.
+final String _goldenSystemPromptAt6g = _goldenSystemPromptAt9g
+    .replaceAll('net carbohydrates 9g', 'net carbohydrates 6g')
+    .replaceAll('Net carbs of 9g', 'Net carbs of 6g');
+
 /// Builds an [LlmMenuClassifier] over a fresh [FakeLlmChatClient] that
 /// always answers with an empty `dishes` array — a reply the parser
 /// accepts for any menu (every source dish lands in `unclassified`,
@@ -423,6 +464,103 @@ void main() {
               .replaceAll('net carbohydrates 9g', 'net carbohydrates 6g')
               .replaceAll('Net carbs of 9g', 'Net carbs of 6g'),
         ),
+      );
+    });
+  });
+
+  group('LlmMenuClassifier over BackendChatClient (issue #56 goldens)', () {
+    /// Classifies a one-dish menu under [options] through the real
+    /// transport client over a mock HTTP client, and returns the
+    /// `system_prompt` it posted.
+    Future<Object?> postedSystemPrompt(ClassificationOptions options) async {
+      Map<String, Object?>? posted;
+      final chat = BackendChatClient(
+        client: MockClient((request) async {
+          posted = jsonDecode(request.body) as Map<String, Object?>;
+          return http.Response(
+            jsonEncode(<String, Object?>{
+              'content': '{"dishes":[]}',
+              'model': 'served-model',
+            }),
+            200,
+          );
+        }),
+        baseUrl: Uri.parse('https://api.ketoclub.test'),
+        installIdStore: FakeInstallIdStore(),
+      );
+      final classifier = LlmMenuClassifier(chat, FakeClock(DateTime.utc(2026)));
+      await classifier.classify(
+        _menuOf([_dishNamed('dish-1', 'Salmon')]),
+        options: options,
+      );
+      expect(posted, isNotNull);
+      return posted!['system_prompt'];
+    }
+
+    /// The options MenuController builds for these toggles, with consent
+    /// given.
+    ClassificationOptions toggles({
+      bool seedOilFree = false,
+      bool dairyFree = false,
+      bool carnivoreOnly = false,
+    }) => ClassificationOptions(
+      estimationConsentGiven: true,
+      dietaryConstraints: ClassificationOptions.dietaryConstraintsFor(
+        seedOilFree: seedOilFree,
+        dairyFree: dairyFree,
+        carnivoreOnly: carnivoreOnly,
+      ),
+    );
+
+    test('every toggle off posts the default prompt byte for byte', () async {
+      // Act
+      final prompt = await postedSystemPrompt(toggles());
+
+      // Assert
+      expect(prompt, equals(_goldenSystemPromptAt6g));
+    });
+
+    test('seed-oil free posts exactly the golden system_prompt', () async {
+      // Act
+      final prompt = await postedSystemPrompt(toggles(seedOilFree: true));
+
+      // Assert
+      expect(
+        prompt,
+        equals(_goldenSystemPromptAt6g + _goldenSeedOilFreeSection),
+      );
+    });
+
+    test('dairy-free posts exactly the golden system_prompt', () async {
+      // Act
+      final prompt = await postedSystemPrompt(toggles(dairyFree: true));
+
+      // Assert
+      expect(prompt, equals(_goldenSystemPromptAt6g + _goldenDairyFreeSection));
+    });
+
+    test('carnivore only posts exactly the golden system_prompt', () async {
+      // Act
+      final prompt = await postedSystemPrompt(toggles(carnivoreOnly: true));
+
+      // Assert
+      expect(
+        prompt,
+        equals(_goldenSystemPromptAt6g + _goldenCarnivoreOnlySection),
+      );
+    });
+
+    test('all three toggles post exactly the golden system_prompt, in the '
+        'fixed order', () async {
+      // Act
+      final prompt = await postedSystemPrompt(
+        toggles(seedOilFree: true, dairyFree: true, carnivoreOnly: true),
+      );
+
+      // Assert
+      expect(
+        prompt,
+        equals(_goldenSystemPromptAt6g + _goldenAllTogglesSection),
       );
     });
   });
