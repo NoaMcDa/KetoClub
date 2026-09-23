@@ -24,6 +24,14 @@ enum MenuFetchFailureReason {
   /// The repository was asked to read a site with no adapter for it.
   /// Shown as "KetoClub cannot read menus from this site yet."
   unsupportedSource,
+
+  /// The adapter was configured with a proxy base (architecture.md D11,
+  /// `backend_plan.md` §4.1) and could not reach KetoClub's own backend —
+  /// a socket or DNS error talking to it, never a status Wolt itself
+  /// returned. KetoClub's own backend could not be reached; only possible
+  /// when a proxy base is configured. Shown as "KetoClub's server could not
+  /// be reached, so the menu could not be read."
+  backendUnreachable,
 }
 
 /// Why menu analysis could not be produced, or fell back to the rules
