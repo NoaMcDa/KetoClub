@@ -372,3 +372,5 @@ Built, but not confirmed end to end, and not to be reported as done:
 4. `README.md` for the product narrative and the original keto vocabulary. Its
    classification pseudo-code is superseded — see `architecture.md` §6.2 and
    `lib/utils/constants.dart`, which fixed several defects in it.
+5. `docs/RELEASE.md` — the pre-release checklist and device test matrix, for
+   when a release is actually being cut.
