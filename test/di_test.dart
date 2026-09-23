@@ -44,4 +44,73 @@ void main() {
       expect(buildDependencies, returnsNormally);
     });
   });
+
+  group('menuProxyBase', () {
+    test('returns the parsed base in a browser with a configured url', () {
+      // Act
+      final base = menuProxyBase(
+        runsInBrowser: true,
+        configured: 'http://localhost:8000',
+      );
+
+      // Assert
+      expect(base, equals(Uri.parse('http://localhost:8000')));
+    });
+
+    test('returns null in a browser with no configured url', () {
+      // Act
+      final base = menuProxyBase(runsInBrowser: true, configured: '');
+
+      // Assert
+      expect(base, isNull);
+    });
+
+    test('returns null outside a browser even with a configured url', () {
+      // Act: native HTTP has no CORS problem to route around, so a
+      // mobile build never uses the proxy even if one is configured.
+      final base = menuProxyBase(
+        runsInBrowser: false,
+        configured: 'http://localhost:8000',
+      );
+
+      // Assert
+      expect(base, isNull);
+    });
+
+    test('returns null outside a browser with no configured url', () {
+      // Act
+      final base = menuProxyBase(runsInBrowser: false, configured: '');
+
+      // Assert
+      expect(base, isNull);
+    });
+
+    test('returns null for a malformed configured url', () {
+      // Act & Assert: neither a relative path nor a schemeless host:port
+      // is an address a request can be sent to.
+      expect(
+        menuProxyBase(runsInBrowser: true, configured: 'not a url'),
+        isNull,
+      );
+      expect(
+        menuProxyBase(runsInBrowser: true, configured: 'localhost:8000'),
+        isNull,
+      );
+      expect(
+        menuProxyBase(runsInBrowser: true, configured: '/relative/path'),
+        isNull,
+      );
+    });
+
+    test('returns null for a non-http(s) scheme', () {
+      // Act
+      final base = menuProxyBase(
+        runsInBrowser: true,
+        configured: 'ftp://localhost:8000',
+      );
+
+      // Assert
+      expect(base, isNull);
+    });
+  });
 }

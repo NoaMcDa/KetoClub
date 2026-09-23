@@ -22,9 +22,13 @@ import 'package:ketoclub/utils/constants.dart';
 /// sees a response. The browser surfaces that block as the same
 /// [http.ClientException] a dead network would raise, so [fetch] reports
 /// it as [MenuFetchFailureReason.blockedByBrowser] rather than `offline`
-/// whenever it [runsInBrowser]: the user's way out is the phone app, not
-/// a retry (architecture.md §10, §13). This adapter is a mobile-first
-/// path; the web build takes menus by paste instead.
+/// whenever it [runsInBrowser] and no [proxyBase] is configured: the
+/// user's way out is the phone app, not a retry (architecture.md §10,
+/// §13). When [proxyBase] is set — the web build routes through
+/// KetoClub's own CORS-forwarding backend (`backend_plan.md` §4.1) — that
+/// caveat no longer applies: the browser talks to KetoClub's own origin,
+/// which grants itself CORS, and a request failure there is reported as
+/// [MenuFetchFailureReason.backendUnreachable] instead.
 final class WoltMenuAdapter implements PlatformMenuAdapter {
   /// Creates an adapter that sends its requests through [client]. The
   /// parameter is named `client`, not `_client`, so it cannot be an
@@ -33,7 +37,18 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
   /// [runsInBrowser] defaults to [kIsWeb] and exists so a test can
   /// exercise both the browser and the native mapping of a failed
   /// request on one platform.
-  new({required http.Client client, this.runsInBrowser = kIsWeb})
+  ///
+  /// [proxyBase] is null by default, meaning every request goes straight
+  /// to Wolt exactly as before this parameter existed — every existing
+  /// call site stays valid. When set, [fetch] instead asks KetoClub's own
+  /// backend at [proxyBase] to fetch the menu on the client's behalf
+  /// (`backend_plan.md` §3.3, §4.1), which is how the web build works
+  /// around Wolt's missing CORS headers.
+  new({
+    required http.Client client,
+    this.proxyBase,
+    this.runsInBrowser = kIsWeb,
+  })
     // The field is private and the parameter is not, so `this._client` is
     // not available; see the constructor doc above.
     // ignore: prefer_initializing_formals
@@ -53,6 +68,12 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
   /// [fetch] must not confuse with being offline (architecture.md §13).
   final bool runsInBrowser;
 
+  /// KetoClub's own backend, when [fetch] should go through it rather
+  /// than straight to Wolt (`backend_plan.md` §3.3, §4.1). Null means
+  /// direct to Wolt, the only behaviour this adapter had before this
+  /// field existed.
+  final Uri? proxyBase;
+
   @override
   MenuSource get source => MenuSource.wolt;
 
@@ -61,10 +82,13 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
 
   @override
   Future<MenuFetchResult> fetch(VenueRef ref) async {
-    final uri = Uri.https(
-      'restaurant-api.wolt.com',
-      '/v4/venues/slug/${ref.platformId}/menu/data',
-    );
+    final proxyBase = this.proxyBase;
+    final uri = proxyBase != null
+        ? _proxyUri(proxyBase, ref.platformId)
+        : Uri.https(
+            'restaurant-api.wolt.com',
+            '/v4/venues/slug/${ref.platformId}/menu/data',
+          );
 
     http.Response response;
     try {
@@ -72,12 +96,23 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
           .get(
             uri,
             headers: <String, String>{
-              if (!runsInBrowser) 'User-Agent': browserUserAgent,
+              // The backend sets its own User-Agent (`backend_plan.md`
+              // §3.3); a browser could not set one here regardless.
+              if (proxyBase == null && !runsInBrowser)
+                'User-Agent': browserUserAgent,
               'Accept': 'application/json',
             },
           )
           .timeout(_timeout);
     } on http.ClientException {
+      if (proxyBase != null) {
+        // KetoClub's own backend could not be reached at all — distinct
+        // from Wolt being unreachable, which the backend reports as a
+        // 502/504 status below, not an exception here.
+        return const MenuFetchFailed(
+          reason: MenuFetchFailureReason.backendUnreachable,
+        );
+      }
       // A browser reports a CORS refusal exactly as it reports a dead
       // network, and Wolt refuses every foreign origin, so in a browser a
       // client-side failure is the block, not the network
@@ -92,6 +127,12 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
     }
 
     final statusCode = response.statusCode;
+    if (proxyBase != null && (statusCode == 502 || statusCode == 504)) {
+      // The backend's own proxy-originated statuses for "Wolt was
+      // unreachable" and "Wolt timed out" (`backend_plan.md` §3.3): both
+      // are the same "try again" story as a direct offline result.
+      return const MenuFetchFailed(reason: MenuFetchFailureReason.offline);
+    }
     if (statusCode == 404) {
       return const MenuFetchFailed(
         reason: MenuFetchFailureReason.notFound,
@@ -120,5 +161,19 @@ final class WoltMenuAdapter implements PlatformMenuAdapter {
     }
 
     return WoltMenuMapper.toMenu(decoded, ref: ref, fetchedAt: DateTime.now());
+  }
+
+  /// The proxied request URL for [platformId] under [base]
+  /// (`backend_plan.md` §3.3): `{base}/v1/proxy/wolt/v4/venues/slug/
+  /// {platformId}/menu/data`, whether or not [base] itself ends with a
+  /// trailing slash.
+  static Uri _proxyUri(Uri base, String platformId) {
+    final rendered = base.toString();
+    final trimmed = rendered.endsWith('/')
+        ? rendered.substring(0, rendered.length - 1)
+        : rendered;
+    return Uri.parse(
+      '$trimmed/v1/proxy/wolt/v4/venues/slug/$platformId/menu/data',
+    );
   }
 }
