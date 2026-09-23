@@ -53,6 +53,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get menuEmpty => 'This menu has no dishes.';
 
   @override
+  String get menuProgressAnalysing => 'Analysing the menu…';
+
+  @override
+  String get menuProgressAskingAi => 'Asking the AI…';
+
+  @override
+  String get menuProgressApplyingRules => 'Applying the rules…';
+
+  @override
   String get filterGreenOnly => 'Order as-is only';
 
   @override
@@ -406,6 +415,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String menuSourceLine(String platform, String age) {
     return '$platform · $age';
+  }
+
+  @override
+  String menuOpenOnPlatform(String platform) {
+    return 'Open on $platform';
   }
 
   @override

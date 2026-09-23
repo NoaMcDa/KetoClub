@@ -11,10 +11,13 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
+import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
+import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
@@ -85,7 +88,12 @@ String _definitionTextFrom(String line) {
 /// without first going back.
 class MenuScreen extends StatefulWidget {
   /// Creates a screen that loads and classifies the menu for [ref].
-  const new({required this.ref, required this.screenBrightness, super.key});
+  const new({
+    required this.ref,
+    required this.screenBrightness,
+    required this.externalLinkOpener,
+    super.key,
+  });
 
   /// Which venue, on which platform, to load a menu for.
   final VenueRef ref;
@@ -94,6 +102,10 @@ class MenuScreen extends StatefulWidget {
   /// card stays readable across a restaurant table, and restores it on
   /// close. A no-op on web, chosen in `di.dart` (architecture.md §6.6).
   final ScreenBrightness screenBrightness;
+
+  /// Opens the venue's own page on its platform when the "open on
+  /// {platform}" action beside the source line is tapped (issue #53).
+  final ExternalLinkOpener externalLinkOpener;
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -267,6 +279,7 @@ class _MenuScreenState extends State<MenuScreen> {
             _legend(context, l10n, controller.netCarbLimitGrams),
           ],
           const SizedBox(height: 8),
+          AnalysisProgressRow(phase: controller.phase),
           ...banners,
           if (controller.engine != null) ...[
             RulesReasonBanner(engine: controller.engine!),
@@ -335,20 +348,24 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   /// The persistent source line, e.g. "Wolt · 4 min ago"
-  /// (`.design/Main.dc.html`), plus the refresh action beside it (issue
-  /// #47). Null before any menu is loaded — [MenuController.fetchedAt] is
-  /// null then, and there is nothing to date or refresh yet. Otherwise
-  /// shows for every loaded menu, fresh or cached, from that same getter
-  /// — see its own doc comment for why it, not [MenuController.cachedAt],
-  /// is the right source.
+  /// (`.design/Main.dc.html`), plus the refresh action (issue #47) and the
+  /// "open on {platform}" action (issue #53) beside it. Null before any
+  /// menu is loaded — [MenuController.fetchedAt] is null then, and there
+  /// is nothing to date, refresh or link out to yet. Otherwise shows for
+  /// every loaded menu, fresh or cached, from that same getter — see its
+  /// own doc comment for why it, not [MenuController.cachedAt], is the
+  /// right source.
   ///
-  /// The action calls [MenuController.refresh] directly: the same
+  /// The refresh action calls [MenuController.refresh] directly: the same
   /// refetch-and-reuse [_refreshable]'s [RefreshIndicator] already pulls
   /// (issue #49), so a tap and a pull-down behave identically rather than
   /// this screen duplicating that logic. The age label re-derives from
   /// [MenuController.fetchedAt] on every rebuild this widget already
   /// listens for, so a successful refresh moves it forward with no extra
-  /// wiring here.
+  /// wiring here. The "open on {platform}" action is built by
+  /// [_openOnPlatformAction], its own small method, so the two actions
+  /// merge onto this Row without either PR having to rewrite the other's
+  /// body.
   Widget? _sourceLine(
     BuildContext context,
     AppLocalizations l10n,
@@ -372,7 +389,34 @@ class _MenuScreenState extends State<MenuScreen> {
           visualDensity: VisualDensity.compact,
           onPressed: () => unawaited(controller.refresh()),
         ),
+        ?_openOnPlatformAction(l10n),
       ],
+    );
+  }
+
+  /// The "open on {platform}" icon action beside the source line (issue
+  /// #53): opens `VenueRefResolver.platformUrl` for `widget.ref` in an
+  /// external app or browser through `widget.externalLinkOpener`, never
+  /// inside KetoClub itself.
+  ///
+  /// Returns null — rendering nothing — when `VenueRefResolver.platformUrl`
+  /// has no URL form for this source yet (Tabit, Ontopo): a missing button
+  /// is a better failure than a link that goes nowhere.
+  ///
+  /// A small private method of its own, per the issue's own scoping note,
+  /// so the concurrent PRs also touching this header (refresh, search) do
+  /// not have to merge around this one's body.
+  Widget? _openOnPlatformAction(AppLocalizations l10n) {
+    final url = VenueRefResolver.platformUrl(widget.ref);
+    if (url == null) return null;
+    final label = l10n.menuOpenOnPlatform(_platformName(widget.ref.source));
+    return IconButton(
+      icon: const Icon(Icons.open_in_new, size: 18),
+      tooltip: label,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+      visualDensity: VisualDensity.compact,
+      onPressed: () => unawaited(widget.externalLinkOpener.open(url)),
     );
   }
 

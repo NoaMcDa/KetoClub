@@ -53,6 +53,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get menuEmpty => 'בתפריט הזה אין מנות.';
 
   @override
+  String get menuProgressAnalysing => 'מנתח את התפריט…';
+
+  @override
+  String get menuProgressAskingAi => 'שואל את הבינה המלאכותית…';
+
+  @override
+  String get menuProgressApplyingRules => 'מפעיל את הכללים…';
+
+  @override
   String get filterGreenOnly => 'רק מנות להזמנה כמו שהן';
 
   @override
@@ -409,6 +418,11 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String menuSourceLine(String platform, String age) {
     return '$platform · $age';
+  }
+
+  @override
+  String menuOpenOnPlatform(String platform) {
+    return 'פתח ב-$platform';
   }
 
   @override

@@ -15,6 +15,12 @@ import 'package:ketoclub/services/classifier/menu_classifier.dart';
 /// a result by hand. Call
 /// [respondWith] to make every subsequent call return a specific
 /// [MenuAnalysis] instead. Every call is recorded in [calls].
+///
+/// Like the real engines, it can announce itself through
+/// [ClassificationOptions.onEngineStarted]: set [announces] to the
+/// engines to announce, in order, at the start of each call (issue #65).
+/// Set [gate] to hold every call open until that future completes, so a
+/// test can look at the screen while classification is still running.
 class FakeMenuClassifier implements MenuClassifier {
   /// Creates a fake with no scripted result.
   new();
@@ -25,6 +31,15 @@ class FakeMenuClassifier implements MenuClassifier {
       'FakeMenuClassifier default verdict; no real analysis performed.';
 
   MenuAnalysis? _scripted;
+
+  /// The engines each [classify] call announces, in order, before it
+  /// answers; empty (the default) announces nothing, the way a
+  /// classifier that predates issue #65 behaved.
+  List<ClassifyingEngine> announces = const <ClassifyingEngine>[];
+
+  /// When non-null, every [classify] call waits for this future — after
+  /// announcing [announces] — before it answers.
+  Future<void>? gate;
 
   /// The engine a default-derived result is stamped with. A
   /// [RulesEngine] unless a test needs an LLM-shaped result — the only
@@ -51,6 +66,10 @@ class FakeMenuClassifier implements MenuClassifier {
     ClassificationOptions options = const ClassificationOptions(),
   }) async {
     calls.add((menu, options));
+    final listener = options.onEngineStarted;
+    if (listener != null) announces.forEach(listener);
+    final pending = gate;
+    if (pending != null) await pending;
     final scripted = _scripted;
     if (scripted != null) return scripted;
     return MenuAnalysed(

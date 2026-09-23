@@ -45,6 +45,29 @@ void main() {
       expect(a, isNot(equals(b)));
     });
 
+    test('onEngineStarted takes no part in equality, hashCode or toString '
+        '— it observes a call, it does not steer it (issue #65)', () {
+      // Arrange
+      final heard = <ClassifyingEngine>[];
+      final withListener = ClassificationOptions(
+        estimationConsentGiven: true,
+        onEngineStarted: heard.add,
+      );
+      const withoutListener = ClassificationOptions(
+        estimationConsentGiven: true,
+      );
+
+      // Act
+      withListener.onEngineStarted?.call(ClassifyingEngine.rules);
+
+      // Assert
+      expect(withListener, equals(withoutListener));
+      expect(withListener.hashCode, equals(withoutListener.hashCode));
+      expect(withListener.toString(), equals(withoutListener.toString()));
+      expect(withoutListener.onEngineStarted, isNull);
+      expect(heard, equals([ClassifyingEngine.rules]));
+    });
+
     test('the net-carb limit defaults to 6 g', () {
       expect(
         const ClassificationOptions().netCarbLimitGrams,

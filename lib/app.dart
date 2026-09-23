@@ -212,6 +212,7 @@ Route<void>? generateRoute(
         child: MenuScreen(
           ref: ref,
           screenBrightness: dependencies.screenBrightness,
+          externalLinkOpener: dependencies.externalLinkOpener,
         ),
       ),
     );

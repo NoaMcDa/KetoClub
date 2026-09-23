@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart' hide MenuController;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
@@ -10,9 +12,12 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/menu_screen.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
+import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
+import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/menu_controller.dart';
+import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
@@ -21,6 +26,7 @@ import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
 
+import '../fakes/fake_external_link_opener.dart';
 import '../fakes/fake_menu_classifier.dart';
 import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_notes_store.dart';
@@ -94,6 +100,7 @@ Future<void> _pump(
   VenueRef ref = _ref,
   Locale locale = const Locale('en'),
   ScreenBrightness? screenBrightness,
+  FakeExternalLinkOpener? externalLinkOpener,
 }) {
   return tester.pumpWidget(
     MaterialApp(
@@ -110,6 +117,7 @@ Future<void> _pump(
           key: ValueKey(ref.cacheKey),
           ref: ref,
           screenBrightness: screenBrightness ?? FakeScreenBrightness(),
+          externalLinkOpener: externalLinkOpener ?? FakeExternalLinkOpener(),
         ),
       ),
     ),
@@ -130,7 +138,11 @@ Future<void> _pumpWithRoutes(
       supportedLocales: AppLocalizations.supportedLocales,
       home: ChangeNotifierProvider<MenuController>.value(
         value: controller,
-        child: MenuScreen(ref: _ref, screenBrightness: FakeScreenBrightness()),
+        child: MenuScreen(
+          ref: _ref,
+          screenBrightness: FakeScreenBrightness(),
+          externalLinkOpener: FakeExternalLinkOpener(),
+        ),
       ),
       onGenerateRoute: (settings) {
         pushedNames.add(settings.name ?? '');
@@ -141,6 +153,34 @@ Future<void> _pumpWithRoutes(
       },
     ),
   );
+}
+
+/// Pumps a [MenuScreen] whose classifier announces [announces] and then
+/// holds its answer until [gate] completes, and pumps on until the
+/// screen shows the menu under a progress row (issue #65).
+///
+/// Plain `pump`s, never `pumpAndSettle`: the progress row's spinner
+/// animates for as long as [gate] is open, so the tree never settles.
+Future<void> _pumpWhileClassifying(
+  WidgetTester tester, {
+  required List<ClassifyingEngine> announces,
+  required Future<void> gate,
+  Locale locale = const Locale('en'),
+}) async {
+  final repository = FakeMenuRepository()
+    ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+  final classifier = FakeMenuClassifier()
+    ..announces = announces
+    ..gate = gate;
+  final controller = _controllerFor(
+    repository: repository,
+    classifier: classifier,
+  );
+  await _pump(tester, controller, locale: locale);
+  // The first pump runs the post-frame open() and its microtasks up to
+  // the gate; the second renders the frame that state produced.
+  await tester.pump();
+  await tester.pump();
 }
 
 void main() {
@@ -187,6 +227,148 @@ void main() {
       // Assert
       expect(find.text(_en.menuLoading), findsOneWidget);
       expect(find.byType(DishCard), findsNothing);
+    });
+
+    group('progress while the menu is analysed (issue #65)', () {
+      testWidgets(
+        'while the AI engine runs the screen says "Asking the AI" above '
+        'the unjudged menu',
+        (tester) async {
+          // Arrange
+          final gate = Completer<void>();
+
+          // Act
+          await _pumpWhileClassifying(
+            tester,
+            announces: const [ClassifyingEngine.llm],
+            gate: gate.future,
+          );
+
+          // Assert: the menu itself is already readable, judged or not.
+          expect(find.text(_en.menuProgressAskingAi), findsOneWidget);
+          expect(find.text(_en.menuProgressApplyingRules), findsNothing);
+          expect(find.byType(DishCard), findsOneWidget);
+          expect(find.byType(EngineChip), findsNothing);
+          expect(find.byType(VerdictCounterTiles), findsNothing);
+
+          // Cleanup: let the analysis finish so no timer outlives the test.
+          gate.complete();
+          await tester.pumpAndSettle();
+        },
+      );
+
+      testWidgets(
+        'while only the rules engine runs the screen says "Applying the '
+        'rules"',
+        (tester) async {
+          // Arrange
+          final gate = Completer<void>();
+
+          // Act
+          await _pumpWhileClassifying(
+            tester,
+            announces: const [ClassifyingEngine.rules],
+            gate: gate.future,
+          );
+
+          // Assert
+          expect(find.text(_en.menuProgressApplyingRules), findsOneWidget);
+          expect(find.text(_en.menuProgressAskingAi), findsNothing);
+
+          gate.complete();
+          await tester.pumpAndSettle();
+        },
+      );
+
+      testWidgets(
+        'after an AI call falls back the screen names the rules, not the AI',
+        (tester) async {
+          // Arrange
+          final gate = Completer<void>();
+
+          // Act
+          await _pumpWhileClassifying(
+            tester,
+            announces: const [ClassifyingEngine.llm, ClassifyingEngine.rules],
+            gate: gate.future,
+          );
+
+          // Assert
+          expect(find.text(_en.menuProgressApplyingRules), findsOneWidget);
+          expect(find.text(_en.menuProgressAskingAi), findsNothing);
+
+          gate.complete();
+          await tester.pumpAndSettle();
+        },
+      );
+
+      testWidgets(
+        'before any engine announces itself the screen says "Analysing the '
+        'menu" and names no engine',
+        (tester) async {
+          // Arrange
+          final gate = Completer<void>();
+
+          // Act
+          await _pumpWhileClassifying(
+            tester,
+            announces: const <ClassifyingEngine>[],
+            gate: gate.future,
+          );
+
+          // Assert
+          expect(find.text(_en.menuProgressAnalysing), findsOneWidget);
+          expect(find.text(_en.menuProgressAskingAi), findsNothing);
+          expect(find.text(_en.menuProgressApplyingRules), findsNothing);
+
+          gate.complete();
+          await tester.pumpAndSettle();
+        },
+      );
+
+      testWidgets('the progress row is gone once the analysis lands', (
+        tester,
+      ) async {
+        // Arrange
+        final gate = Completer<void>();
+        await _pumpWhileClassifying(
+          tester,
+          announces: const [ClassifyingEngine.llm],
+          gate: gate.future,
+        );
+        expect(find.text(_en.menuProgressAskingAi), findsOneWidget);
+
+        // Act
+        gate.complete();
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_en.menuProgressAskingAi), findsNothing);
+        expect(find.byType(CircularProgressIndicator), findsNothing);
+        expect(find.byType(EngineChip), findsOneWidget);
+      });
+
+      testWidgets('the progress copy is Hebrew under the he locale', (
+        tester,
+      ) async {
+        // Arrange
+        final gate = Completer<void>();
+
+        // Act
+        await _pumpWhileClassifying(
+          tester,
+          announces: const [ClassifyingEngine.llm],
+          gate: gate.future,
+          locale: const Locale('he'),
+        );
+
+        // Assert
+        expect(find.text(_he.menuProgressAskingAi), findsOneWidget);
+        expect(find.byType(AnalysisProgressRow), findsOneWidget);
+
+        gate.complete();
+        await tester.pumpAndSettle();
+      });
     });
 
     testWidgets(
@@ -262,6 +444,93 @@ void main() {
         );
       },
     );
+
+    group('open on platform (issue #53)', () {
+      testWidgets(
+        'the open-on-platform action appears beside the source line for a '
+        'Wolt ref and opens the derived Wolt URL through the external link '
+        'opener',
+        (tester) async {
+          // Arrange
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+          final controller = _controllerFor(repository: repository);
+          final opener = FakeExternalLinkOpener();
+
+          // Act
+          await _pump(tester, controller, externalLinkOpener: opener);
+          await tester.pumpAndSettle();
+
+          // Assert: the action is present, tooltipped with the platform
+          // name — the same string a screen reader reads as its label.
+          final label = _en.menuOpenOnPlatform('Wolt');
+          expect(find.byTooltip(label), findsOneWidget);
+          expect(find.byIcon(Icons.open_in_new), findsOneWidget);
+
+          // Act: tap it.
+          await tester.tap(find.byIcon(Icons.open_in_new));
+          await tester.pumpAndSettle();
+
+          // Assert: opened through the fake opener with the URL
+          // VenueRefResolver.platformUrl derives for this ref, never
+          // handled inside the app itself.
+          expect(
+            opener.openCalls,
+            equals([VenueRefResolver.platformUrl(_ref)]),
+          );
+        },
+      );
+
+      testWidgets(
+        'the open-on-platform action opens the derived 10bis URL for a '
+        '10bis ref',
+        (tester) async {
+          // Arrange
+          const ref = VenueRef(source: MenuSource.tenbis, platformId: '999');
+          final repository = FakeMenuRepository()
+            ..stub(ref, MenuFetched(menu: _menuOf([_dish('Steak')], ref: ref)));
+          final controller = _controllerFor(repository: repository);
+          final opener = FakeExternalLinkOpener();
+
+          // Act
+          await _pump(tester, controller, ref: ref, externalLinkOpener: opener);
+          await tester.pumpAndSettle();
+          final label = _en.menuOpenOnPlatform('10bis');
+          expect(find.byTooltip(label), findsOneWidget);
+          await tester.tap(find.byIcon(Icons.open_in_new));
+          await tester.pumpAndSettle();
+
+          // Assert
+          expect(opener.openCalls, equals([VenueRefResolver.platformUrl(ref)]));
+        },
+      );
+
+      testWidgets(
+        'the open-on-platform action is hidden for a source with no known '
+        'URL form (Tabit)',
+        (tester) async {
+          // Arrange
+          const ref = VenueRef(source: MenuSource.tabit, platformId: 't1');
+          final repository = FakeMenuRepository()
+            ..stub(ref, MenuFetched(menu: _menuOf([_dish('Steak')], ref: ref)));
+          final controller = _controllerFor(repository: repository);
+
+          // Act
+          await _pump(tester, controller, ref: ref);
+          await tester.pumpAndSettle();
+
+          // Assert: no icon and no tooltip for any platform name renders
+          // the action.
+          expect(find.byIcon(Icons.open_in_new), findsNothing);
+          for (final platform in ['Wolt', '10bis', 'Tabit', 'Ontopo']) {
+            expect(
+              find.byTooltip(_en.menuOpenOnPlatform(platform)),
+              findsNothing,
+            );
+          }
+        },
+      );
+    });
 
     testWidgets('the source line renders the platform name and age for a 10bis '
         'VenueRef (issue #47)', (tester) async {

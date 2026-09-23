@@ -17,6 +17,9 @@
 
   "menuLoading": "קורא את התפריט…",
   "menuEmpty": "בתפריט הזה אין מנות.",
+  "menuProgressAnalysing": "מנתח את התפריט…",
+  "menuProgressAskingAi": "שואל את הבינה המלאכותית…",
+  "menuProgressApplyingRules": "מפעיל את הכללים…",
   "filterGreenOnly": "רק מנות להזמנה כמו שהן",
   "filterGreenAndYellow": "כמו שהן ועם שינוי",
   "filterAll": "הכול",
@@ -184,6 +187,10 @@
       "platform": { "type": "String" },
       "age": { "type": "String" }
     }
+  },
+  "menuOpenOnPlatform": "פתח ב-{platform}",
+  "@menuOpenOnPlatform": {
+    "placeholders": { "platform": { "type": "String" } }
   },
   "menuShowingAll": "{count, plural, one{מוצגת מנה אחת} two{מוצגות שתי מנות} other{מוצגות {count} מנות}}",
   "@menuShowingAll": {

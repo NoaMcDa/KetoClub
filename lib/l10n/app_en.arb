@@ -17,6 +17,9 @@
 
   "menuLoading": "Reading the menu…",
   "menuEmpty": "This menu has no dishes.",
+  "menuProgressAnalysing": "Analysing the menu…",
+  "menuProgressAskingAi": "Asking the AI…",
+  "menuProgressApplyingRules": "Applying the rules…",
   "filterGreenOnly": "Order as-is only",
   "filterGreenAndYellow": "As-is and with changes",
   "filterAll": "Everything",
@@ -184,6 +187,10 @@
       "platform": { "type": "String" },
       "age": { "type": "String" }
     }
+  },
+  "menuOpenOnPlatform": "Open on {platform}",
+  "@menuOpenOnPlatform": {
+    "placeholders": { "platform": { "type": "String" } }
   },
   "menuShowingAll": "{count, plural, one{Showing 1 dish} other{Showing {count} dishes}}",
   "@menuShowingAll": {
