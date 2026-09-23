@@ -213,6 +213,7 @@ Route<void>? generateRoute(
           ref: ref,
           screenBrightness: dependencies.screenBrightness,
           connectivity: dependencies.connectivity,
+          externalLinkOpener: dependencies.externalLinkOpener,
         ),
       ),
     );

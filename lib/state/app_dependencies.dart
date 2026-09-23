@@ -4,6 +4,7 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
+import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -30,6 +31,7 @@ class AppDependencies {
     required this.clock,
     required this.logger,
     required this.connectivity,
+    required this.externalLinkOpener,
     this.screenBrightness = const NoOpScreenBrightness(),
   });
 
@@ -65,4 +67,7 @@ class AppDependencies {
   /// open (architecture.md §6.3). A no-op on platforms with no brightness
   /// API of their own, such as web.
   final ScreenBrightness screenBrightness;
+
+  /// Opens a venue's own page on its platform outside KetoClub (issue #53).
+  final ExternalLinkOpener externalLinkOpener;
 }

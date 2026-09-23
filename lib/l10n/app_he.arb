@@ -182,6 +182,10 @@
       "age": { "type": "String" }
     }
   },
+  "menuOpenOnPlatform": "פתח ב-{platform}",
+  "@menuOpenOnPlatform": {
+    "placeholders": { "platform": { "type": "String" } }
+  },
   "menuShowingAll": "{count, plural, one{מוצגת מנה אחת} two{מוצגות שתי מנות} other{מוצגות {count} מנות}}",
   "@menuShowingAll": {
     "placeholders": { "count": { "type": "num" } }

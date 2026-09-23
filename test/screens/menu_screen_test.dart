@@ -16,6 +16,7 @@ import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
+import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
@@ -28,6 +29,7 @@ import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
 
 import '../fakes/fake_connectivity.dart';
+import '../fakes/fake_external_link_opener.dart';
 import '../fakes/fake_menu_classifier.dart';
 import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_notes_store.dart';
@@ -102,6 +104,7 @@ Future<void> _pump(
   Locale locale = const Locale('en'),
   ScreenBrightness? screenBrightness,
   Connectivity? connectivity,
+  FakeExternalLinkOpener? externalLinkOpener,
 }) {
   return tester.pumpWidget(
     MaterialApp(
@@ -119,6 +122,7 @@ Future<void> _pump(
           ref: ref,
           screenBrightness: screenBrightness ?? FakeScreenBrightness(),
           connectivity: connectivity ?? FakeConnectivity(),
+          externalLinkOpener: externalLinkOpener ?? FakeExternalLinkOpener(),
         ),
       ),
     ),
@@ -145,6 +149,7 @@ Future<void> _pumpWithRoutes(
           ref: _ref,
           screenBrightness: FakeScreenBrightness(),
           connectivity: connectivity ?? FakeConnectivity(),
+          externalLinkOpener: FakeExternalLinkOpener(),
         ),
       ),
       onGenerateRoute: (settings) {
@@ -448,6 +453,93 @@ void main() {
       },
     );
 
+    group('open on platform (issue #53)', () {
+      testWidgets(
+        'the open-on-platform action appears beside the source line for a '
+        'Wolt ref and opens the derived Wolt URL through the external link '
+        'opener',
+        (tester) async {
+          // Arrange
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+          final controller = _controllerFor(repository: repository);
+          final opener = FakeExternalLinkOpener();
+
+          // Act
+          await _pump(tester, controller, externalLinkOpener: opener);
+          await tester.pumpAndSettle();
+
+          // Assert: the action is present, tooltipped with the platform
+          // name — the same string a screen reader reads as its label.
+          final label = _en.menuOpenOnPlatform('Wolt');
+          expect(find.byTooltip(label), findsOneWidget);
+          expect(find.byIcon(Icons.open_in_new), findsOneWidget);
+
+          // Act: tap it.
+          await tester.tap(find.byIcon(Icons.open_in_new));
+          await tester.pumpAndSettle();
+
+          // Assert: opened through the fake opener with the URL
+          // VenueRefResolver.platformUrl derives for this ref, never
+          // handled inside the app itself.
+          expect(
+            opener.openCalls,
+            equals([VenueRefResolver.platformUrl(_ref)]),
+          );
+        },
+      );
+
+      testWidgets(
+        'the open-on-platform action opens the derived 10bis URL for a '
+        '10bis ref',
+        (tester) async {
+          // Arrange
+          const ref = VenueRef(source: MenuSource.tenbis, platformId: '999');
+          final repository = FakeMenuRepository()
+            ..stub(ref, MenuFetched(menu: _menuOf([_dish('Steak')], ref: ref)));
+          final controller = _controllerFor(repository: repository);
+          final opener = FakeExternalLinkOpener();
+
+          // Act
+          await _pump(tester, controller, ref: ref, externalLinkOpener: opener);
+          await tester.pumpAndSettle();
+          final label = _en.menuOpenOnPlatform('10bis');
+          expect(find.byTooltip(label), findsOneWidget);
+          await tester.tap(find.byIcon(Icons.open_in_new));
+          await tester.pumpAndSettle();
+
+          // Assert
+          expect(opener.openCalls, equals([VenueRefResolver.platformUrl(ref)]));
+        },
+      );
+
+      testWidgets(
+        'the open-on-platform action is hidden for a source with no known '
+        'URL form (Tabit)',
+        (tester) async {
+          // Arrange
+          const ref = VenueRef(source: MenuSource.tabit, platformId: 't1');
+          final repository = FakeMenuRepository()
+            ..stub(ref, MenuFetched(menu: _menuOf([_dish('Steak')], ref: ref)));
+          final controller = _controllerFor(repository: repository);
+
+          // Act
+          await _pump(tester, controller, ref: ref);
+          await tester.pumpAndSettle();
+
+          // Assert: no icon and no tooltip for any platform name renders
+          // the action.
+          expect(find.byIcon(Icons.open_in_new), findsNothing);
+          for (final platform in ['Wolt', '10bis', 'Tabit', 'Ontopo']) {
+            expect(
+              find.byTooltip(_en.menuOpenOnPlatform(platform)),
+              findsNothing,
+            );
+          }
+        },
+      );
+    });
+
     testWidgets('the source line renders the platform name and age for a 10bis '
         'VenueRef (issue #47)', (tester) async {
       // Arrange: a 10bis venue, fetched five minutes ago.
@@ -745,6 +837,7 @@ void main() {
                 ref: _ref,
                 screenBrightness: FakeScreenBrightness(),
                 connectivity: FakeConnectivity(),
+                externalLinkOpener: FakeExternalLinkOpener(),
               ),
             ),
           ),
@@ -791,6 +884,7 @@ void main() {
                     ref: _ref,
                     screenBrightness: FakeScreenBrightness(),
                     connectivity: FakeConnectivity(),
+                    externalLinkOpener: FakeExternalLinkOpener(),
                   ),
                 ),
               ),

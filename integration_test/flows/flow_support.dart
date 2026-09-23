@@ -34,6 +34,7 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
+import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -82,7 +83,8 @@ final class FakeAppDependencies {
       notesStore = FlowFakeNotesStore(),
       clock = FlowFakeClock(),
       logger = FlowFakeAppLogger(),
-      connectivity = FlowFakeConnectivity();
+      connectivity = FlowFakeConnectivity(),
+      externalLinkOpener = FlowFakeExternalLinkOpener();
 
   /// The faked menu repository; script it with [FlowFakeMenuRepository.stub].
   final FlowFakeMenuRepository repository;
@@ -108,6 +110,9 @@ final class FakeAppDependencies {
   /// drive the persistent offline banner (issue #68).
   final FlowFakeConnectivity connectivity;
 
+  /// The faked external link opener.
+  final FlowFakeExternalLinkOpener externalLinkOpener;
+
   /// When set, [dependencies] wires this in place of [classifier].
   ///
   /// Every flow test that only needs to script "what the top-level
@@ -130,6 +135,7 @@ final class FakeAppDependencies {
     clock: clock,
     logger: logger,
     connectivity: connectivity,
+    externalLinkOpener: externalLinkOpener,
   );
 }
 
@@ -312,6 +318,19 @@ final class FlowFakeAppLogger implements AppLogger {
 
   @override
   void warn(String message, {Object? error}) => warnings.add(message);
+}
+
+/// An [ExternalLinkOpener] that records every call and never touches a
+/// real platform channel (issue #53).
+final class FlowFakeExternalLinkOpener implements ExternalLinkOpener {
+  /// Every URI [open] was called with, in call order.
+  final List<Uri> openCalls = <Uri>[];
+
+  @override
+  Future<bool> open(Uri uri) async {
+    openCalls.add(uri);
+    return true;
+  }
 }
 
 /// A [NotesStore] backed by an in-memory map, keyed by [VenueRef.cacheKey]

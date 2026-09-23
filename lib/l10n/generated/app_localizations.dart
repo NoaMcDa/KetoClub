@@ -734,6 +734,12 @@ abstract class AppLocalizations {
   /// **'{platform} · {age}'**
   String menuSourceLine(String platform, String age);
 
+  /// No description provided for @menuOpenOnPlatform.
+  ///
+  /// In en, this message translates to:
+  /// **'Open on {platform}'**
+  String menuOpenOnPlatform(String platform);
+
   /// No description provided for @menuShowingAll.
   ///
   /// In en, this message translates to:

@@ -5,6 +5,7 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
+import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -35,6 +36,7 @@ void main() {
       // implementation, not NoOpScreenBrightness.
       expect(dependencies.screenBrightness, isA<DeviceScreenBrightness>());
       expect(dependencies.connectivity, isA<DeviceConnectivity>());
+      expect(dependencies.externalLinkOpener, isA<UrlLauncherLinkOpener>());
     });
 
     test('performs no plugin I/O while building the graph', () {
