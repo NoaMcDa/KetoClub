@@ -4,6 +4,7 @@ import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
+import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
@@ -34,6 +35,7 @@ void main() {
       // The test VM is not web, so the kIsWeb branch picks the device
       // implementation, not NoOpScreenBrightness.
       expect(dependencies.screenBrightness, isA<DeviceScreenBrightness>());
+      expect(dependencies.connectivity, isA<DeviceConnectivity>());
       expect(dependencies.externalLinkOpener, isA<UrlLauncherLinkOpener>());
     });
 

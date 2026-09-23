@@ -2,6 +2,7 @@ import 'package:ketoclub/state/app_dependencies.dart';
 
 import 'fake_app_logger.dart';
 import 'fake_clock.dart';
+import 'fake_connectivity.dart';
 import 'fake_external_link_opener.dart';
 import 'fake_menu_classifier.dart';
 import 'fake_menu_repository.dart';
@@ -23,6 +24,7 @@ final class FakeAppDependencies {
       notesStore = FakeNotesStore(),
       clock = FakeClock(startedAt ?? DateTime.utc(2026)),
       logger = FakeAppLogger(),
+      connectivity = FakeConnectivity(),
       externalLinkOpener = FakeExternalLinkOpener();
 
   /// The faked menu repository.
@@ -43,6 +45,10 @@ final class FakeAppDependencies {
   /// The faked logger; inspect its records.
   final FakeAppLogger logger;
 
+  /// The faked connectivity check; flip [FakeConnectivity.online] to
+  /// drive the persistent offline banner (issue #68).
+  final FakeConnectivity connectivity;
+
   /// The faked external link opener; inspect
   /// [FakeExternalLinkOpener.openCalls].
   final FakeExternalLinkOpener externalLinkOpener;
@@ -55,6 +61,7 @@ final class FakeAppDependencies {
     notesStore: notesStore,
     clock: clock,
     logger: logger,
+    connectivity: connectivity,
     externalLinkOpener: externalLinkOpener,
   );
 }

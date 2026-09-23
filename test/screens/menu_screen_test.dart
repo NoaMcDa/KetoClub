@@ -14,6 +14,7 @@ import 'package:ketoclub/screens/menu_screen.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
+import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/menu_controller.dart';
@@ -22,10 +23,12 @@ import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
+import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
 
+import '../fakes/fake_connectivity.dart';
 import '../fakes/fake_external_link_opener.dart';
 import '../fakes/fake_menu_classifier.dart';
 import '../fakes/fake_menu_repository.dart';
@@ -114,6 +117,7 @@ Future<void> _pump(
   VenueRef ref = _ref,
   Locale locale = const Locale('en'),
   ScreenBrightness? screenBrightness,
+  Connectivity? connectivity,
   FakeExternalLinkOpener? externalLinkOpener,
 }) {
   _useTallSurface(tester);
@@ -132,6 +136,7 @@ Future<void> _pump(
           key: ValueKey(ref.cacheKey),
           ref: ref,
           screenBrightness: screenBrightness ?? FakeScreenBrightness(),
+          connectivity: connectivity ?? FakeConnectivity(),
           externalLinkOpener: externalLinkOpener ?? FakeExternalLinkOpener(),
         ),
       ),
@@ -141,12 +146,14 @@ Future<void> _pump(
 
 /// Pumps a [MenuScreen] like [_pump], but with a route table that records
 /// every pushed route name into [pushedNames] instead of building it — for
-/// the one test that taps an app bar action rather than reading the body.
+/// tests that tap an app bar action or check where a route push landed,
+/// rather than reading the body.
 Future<void> _pumpWithRoutes(
   WidgetTester tester,
   MenuController controller,
-  List<String> pushedNames,
-) {
+  List<String> pushedNames, {
+  Connectivity? connectivity,
+}) {
   _useTallSurface(tester);
   return tester.pumpWidget(
     MaterialApp(
@@ -157,6 +164,7 @@ Future<void> _pumpWithRoutes(
         child: MenuScreen(
           ref: _ref,
           screenBrightness: FakeScreenBrightness(),
+          connectivity: connectivity ?? FakeConnectivity(),
           externalLinkOpener: FakeExternalLinkOpener(),
         ),
       ),
@@ -704,17 +712,93 @@ void main() {
       },
     );
 
+    testWidgets('build shows fetchFailureMessage and a retry affordance for a '
+        'reason that retries (issue #68)', (tester) async {
+      // Arrange
+      final repository = FakeMenuRepository()
+        ..stub(
+          _ref,
+          const MenuFetchFailed(
+            reason: MenuFetchFailureReason.offline,
+            statusCode: 404,
+          ),
+        );
+      final controller = _controllerFor(repository: repository);
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      final message = fetchFailureMessage(
+        MenuFetchFailureReason.offline,
+        _en,
+        platform: 'Wolt',
+        statusCode: 404,
+      );
+      expect(find.text(message), findsOneWidget);
+      expect(find.text(_en.actionRetry), findsOneWidget);
+    });
+
     testWidgets(
-      'build shows fetchFailureMessage and a retry affordance on a failed '
-      'fetch',
+      'every MenuFetchFailureReason renders its own action (issue #68)',
+      (tester) async {
+        const retryable = <MenuFetchFailureReason>{
+          MenuFetchFailureReason.offline,
+          MenuFetchFailureReason.backendUnreachable,
+        };
+        const backToSearch = <MenuFetchFailureReason>{
+          MenuFetchFailureReason.notFound,
+          MenuFetchFailureReason.platformChanged,
+          MenuFetchFailureReason.unsupportedSource,
+        };
+
+        for (final reason in MenuFetchFailureReason.values) {
+          // Arrange
+          final ref = VenueRef(source: MenuSource.wolt, platformId: '$reason');
+          final repository = FakeMenuRepository()
+            ..stub(ref, MenuFetchFailed(reason: reason, statusCode: 404));
+          final controller = _controllerFor(repository: repository);
+
+          // Act
+          await _pump(tester, controller, ref: ref);
+          await tester.pumpAndSettle();
+
+          // Assert
+          if (retryable.contains(reason)) {
+            expect(
+              find.text(_en.actionRetry),
+              findsOneWidget,
+              reason: '$reason should offer Retry',
+            );
+            expect(find.text(_en.actionBackToSearch), findsNothing);
+          } else if (backToSearch.contains(reason)) {
+            expect(
+              find.text(_en.actionBackToSearch),
+              findsOneWidget,
+              reason: '$reason should offer Back to search',
+            );
+            expect(find.text(_en.actionRetry), findsNothing);
+          } else {
+            // blockedByBrowser: no action button at all, only the copy
+            // naming the phone app.
+            expect(find.text(_en.actionRetry), findsNothing);
+            expect(find.text(_en.actionBackToSearch), findsNothing);
+          }
+        }
+      },
+    );
+
+    testWidgets(
+      'blockedByBrowser shows no action, only the copy pointing at the '
+      'phone app (issue #68)',
       (tester) async {
         // Arrange
         final repository = FakeMenuRepository()
           ..stub(
             _ref,
             const MenuFetchFailed(
-              reason: MenuFetchFailureReason.notFound,
-              statusCode: 404,
+              reason: MenuFetchFailureReason.blockedByBrowser,
             ),
           );
         final controller = _controllerFor(repository: repository);
@@ -724,14 +808,122 @@ void main() {
         await tester.pumpAndSettle();
 
         // Assert
-        final message = fetchFailureMessage(
-          MenuFetchFailureReason.notFound,
-          _en,
-          platform: 'Wolt',
-          statusCode: 404,
+        expect(
+          find.text(
+            fetchFailureMessage(
+              MenuFetchFailureReason.blockedByBrowser,
+              _en,
+              platform: 'Wolt',
+            ),
+          ),
+          findsOneWidget,
         );
-        expect(find.text(message), findsOneWidget);
-        expect(find.text(_en.actionRetry), findsOneWidget);
+        expect(find.text(_en.actionRetry), findsNothing);
+        expect(find.text(_en.actionBackToSearch), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'tapping Back to search on notFound pops back to the previous route '
+      'when there is one (issue #68)',
+      (tester) async {
+        // Arrange: a MenuScreen pushed on top of a root route, matching
+        // how the real app always reaches it (app.dart's own route
+        // table) — MenuScreen never sits at the bottom of a stack.
+        final repository = FakeMenuRepository()
+          ..stub(
+            _ref,
+            const MenuFetchFailed(reason: MenuFetchFailureReason.notFound),
+          );
+        final controller = _controllerFor(repository: repository);
+        final rootKey = GlobalKey<NavigatorState>();
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            navigatorKey: rootKey,
+            home: const Scaffold(body: Text('root')),
+          ),
+        );
+        rootKey.currentState!.push(
+          MaterialPageRoute<void>(
+            builder: (_) => ChangeNotifierProvider<MenuController>.value(
+              value: controller,
+              child: MenuScreen(
+                ref: _ref,
+                screenBrightness: FakeScreenBrightness(),
+                connectivity: FakeConnectivity(),
+                externalLinkOpener: FakeExternalLinkOpener(),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Act
+        await tester.tap(find.text(_en.actionBackToSearch));
+        await tester.pumpAndSettle();
+
+        // Assert: back on the root route, MenuScreen gone.
+        expect(find.text('root'), findsOneWidget);
+        expect(find.byType(MenuScreen), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'tapping Back to search on notFound navigates to "/" when MenuScreen '
+      'has no previous route to pop back to (issue #68)',
+      (tester) async {
+        // Arrange
+        final repository = FakeMenuRepository()
+          ..stub(
+            _ref,
+            const MenuFetchFailed(reason: MenuFetchFailureReason.notFound),
+          );
+        final controller = _controllerFor(repository: repository);
+        final pushedNames = <String>[];
+        // No `home`: a MaterialApp with one answers "/" itself without
+        // consulting onGenerateRoute, so the replacement would never be
+        // recorded here. The app's own router (app.dart) has no `home`
+        // either — every route, "/" included, goes through generateRoute.
+        // onGenerateInitialRoutes makes MenuScreen the only route on the
+        // stack, so there is nothing for Back to search to pop back to.
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            onGenerateInitialRoutes: (_) => [
+              MaterialPageRoute<void>(
+                builder: (_) => ChangeNotifierProvider<MenuController>.value(
+                  value: controller,
+                  child: MenuScreen(
+                    ref: _ref,
+                    screenBrightness: FakeScreenBrightness(),
+                    connectivity: FakeConnectivity(),
+                    externalLinkOpener: FakeExternalLinkOpener(),
+                  ),
+                ),
+              ),
+            ],
+            onGenerateRoute: (settings) {
+              pushedNames.add(settings.name ?? '');
+              return MaterialPageRoute<void>(
+                builder: (_) => const Text('root'),
+                settings: settings,
+              );
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Act
+        await tester.tap(find.text(_en.actionBackToSearch));
+        await tester.pumpAndSettle();
+
+        // Assert: "/" was generated, and it replaced this screen.
+        expect(pushedNames, contains('/'));
+        expect(find.text('root'), findsOneWidget);
+        expect(find.byType(MenuScreen), findsNothing);
       },
     );
 
@@ -899,6 +1091,144 @@ void main() {
       for (final reason in MenuAnalysisFailureReason.values) {
         expect(find.text(analysisFailureMessage(reason, _en)), findsNothing);
       }
+    });
+
+    testWidgets(
+      'tapping the RulesReasonBanner Retry action re-runs the classifier '
+      'without refetching the menu (issue #68)',
+      (tester) async {
+        // Arrange
+        final green = _dish('Steak', id: 'green');
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([green])));
+        final classifier = FakeMenuClassifier()
+          ..respondWith(
+            MenuAnalysed(
+              dishes: [_verdictFor(green, DishVerdict.orderAsIs)],
+              unclassified: const <String>[],
+              engine: const RulesEngine(
+                reason: MenuAnalysisFailureReason.timeout,
+              ),
+              analysedAt: DateTime.utc(2026),
+            ),
+          );
+        final controller = _controllerFor(
+          repository: repository,
+          classifier: classifier,
+        );
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+        final loadCallsBefore = repository.loadCalls.length;
+        final classifyCallsBefore = classifier.calls.length;
+
+        // Act
+        await tester.tap(find.text(_en.actionRetry));
+        await tester.pumpAndSettle();
+
+        // Assert: reclassified, but no new fetch.
+        expect(repository.loadCalls.length, equals(loadCallsBefore));
+        expect(classifier.calls.length, greaterThan(classifyCallsBefore));
+      },
+    );
+
+    testWidgets(
+      'the RulesReasonBanner offers no Retry action for notConfigured '
+      '(issue #68)',
+      (tester) async {
+        // Arrange
+        final green = _dish('Steak', id: 'green');
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([green])));
+        final classifier = FakeMenuClassifier()
+          ..respondWith(
+            MenuAnalysed(
+              dishes: [_verdictFor(green, DishVerdict.orderAsIs)],
+              unclassified: const <String>[],
+              engine: const RulesEngine(
+                reason: MenuAnalysisFailureReason.notConfigured,
+              ),
+              analysedAt: DateTime.utc(2026),
+            ),
+          );
+        final controller = _controllerFor(
+          repository: repository,
+          classifier: classifier,
+        );
+
+        // Act
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_en.actionRetry), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'build shows the offline banner while Connectivity reports offline '
+      '(issue #68)',
+      (tester) async {
+        // Arrange
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        final controller = _controllerFor(repository: repository);
+
+        // Act
+        await _pump(
+          tester,
+          controller,
+          connectivity: FakeConnectivity(online: false),
+        );
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(OfflineBanner), findsOneWidget);
+        expect(find.text(_en.offlineBannerMessage), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'build shows no offline banner while Connectivity reports online '
+      '(issue #68)',
+      (tester) async {
+        // Arrange
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        final controller = _controllerFor(repository: repository);
+
+        // Act
+        await _pump(tester, controller, connectivity: FakeConnectivity());
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_en.offlineBannerMessage), findsNothing);
+      },
+    );
+
+    testWidgets('the offline banner clears once a retry finds the device back '
+        'online (issue #68)', (tester) async {
+      // Arrange: offline at first, so the fetch fails and the banner
+      // shows; the fake flips to online before the retry.
+      final fakeConnectivity = FakeConnectivity(online: false);
+      final repository = FakeMenuRepository()
+        ..stub(
+          _ref,
+          const MenuFetchFailed(reason: MenuFetchFailureReason.offline),
+        );
+      final controller = _controllerFor(repository: repository);
+      await _pump(tester, controller, connectivity: fakeConnectivity);
+      await tester.pumpAndSettle();
+      expect(find.text(_en.offlineBannerMessage), findsOneWidget);
+
+      // Act: back online, then retry.
+      fakeConnectivity.online = true;
+      repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+      await tester.tap(find.text(_en.actionRetry));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.offlineBannerMessage), findsNothing);
+      expect(find.text('Steak'), findsOneWidget);
     });
 
     testWidgets(

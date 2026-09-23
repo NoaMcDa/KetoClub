@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:provider/provider.dart';
 
 /// The first screen: paste a venue link and open its menu
@@ -38,8 +40,14 @@ import 'package:provider/provider.dart';
 /// first frame, not from `build`, so this screen defers it from
 /// `initState` the same way theirs do.
 class VenueSearchScreen extends StatefulWidget {
-  /// Creates the venue search screen.
-  const new({super.key});
+  /// Creates the venue search screen, showing the persistent offline
+  /// banner (issue #68) over [connectivity].
+  const new({required this.connectivity, super.key});
+
+  /// Backs the persistent offline banner (issue #68). This screen makes
+  /// no fetch of its own to retry, so it checks once, on screen open,
+  /// and never again — see [OfflineBanner]'s own doc comment.
+  final Connectivity connectivity;
 
   @override
   State<VenueSearchScreen> createState() => _VenueSearchScreenState();
@@ -69,6 +77,7 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              OfflineBanner(connectivity: widget.connectivity),
               Text(appName, style: Theme.of(context).textTheme.labelSmall),
               const SizedBox(height: 4),
               Text(

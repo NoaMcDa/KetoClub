@@ -158,7 +158,7 @@ Route<void>? generateRoute(
             dependencies.settingsStore,
             dependencies.menuRepository,
           ),
-          child: const VenueSearchScreen(),
+          child: VenueSearchScreen(connectivity: dependencies.connectivity),
         ),
       ),
     );
@@ -215,6 +215,7 @@ Route<void>? generateRoute(
         child: MenuScreen(
           ref: ref,
           screenBrightness: dependencies.screenBrightness,
+          connectivity: dependencies.connectivity,
           externalLinkOpener: dependencies.externalLinkOpener,
         ),
       ),

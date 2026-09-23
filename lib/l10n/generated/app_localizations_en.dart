@@ -31,6 +31,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionRefreshMenu => 'Refresh menu';
 
   @override
+  String get actionBackToSearch => 'Back to search';
+
+  @override
+  String get offlineBannerMessage => 'No internet connection.';
+
+  @override
   String get actionCancel => 'Cancel';
 
   @override

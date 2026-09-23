@@ -1166,6 +1166,114 @@ void main() {
       });
     });
 
+    group('reanalyse (issue #68)', () {
+      test('reanalyse before any open is a no-op: no repository call, no '
+          'classifier call, and no notification', () async {
+        // Arrange
+        var notifyCount = 0;
+        controller.addListener(() => notifyCount++);
+
+        // Act
+        await controller.reanalyse();
+
+        // Assert
+        expect(repository.loadCalls, isEmpty);
+        expect(classifier.calls, isEmpty);
+        expect(notifyCount, 0);
+      });
+
+      test('reanalyse re-runs the classifier on the loaded menu without a '
+          'second repository.load call', () async {
+        // Arrange
+        final dish = _dish('Steak');
+        repository.stub(_ref, MenuFetched(menu: _menuOf([dish])));
+        classifier.respondWith(
+          const MenuAnalysisFailed(reason: MenuAnalysisFailureReason.timeout),
+        );
+        await controller.open(_ref);
+        expect(classifier.calls, hasLength(1));
+        final loadCallsBefore = repository.loadCalls.length;
+
+        // Arrange: the retry succeeds this time.
+        final newAnalysis = MenuAnalysed(
+          dishes: [_verdictFor(dish, DishVerdict.orderAsIs)],
+          unclassified: const <String>[],
+          engine: const LlmEngine(model: 'test-model'),
+          analysedAt: clock.now(),
+        );
+        classifier.respondWith(newAnalysis);
+
+        // Act
+        await controller.reanalyse();
+
+        // Assert: reclassified, no new fetch, and the fresh analysis is
+        // both shown and persisted.
+        expect(repository.loadCalls.length, equals(loadCallsBefore));
+        expect(classifier.calls, hasLength(2));
+        expect(classifier.calls.last.$1, equals(_menuOf([dish])));
+        expect(controller.analysis, equals(newAnalysis));
+        expect(
+          repository.savedAnalyses.last,
+          equals((ref: _ref, analysis: newAnalysis)),
+        );
+      });
+
+      test('reanalyse reads the current settings, so a changed net-carb '
+          'limit reaches the classifier (issue #57)', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        await settings.write(const AppSettings(netCarbLimitGrams: 15));
+
+        // Act
+        await controller.reanalyse();
+
+        // Assert
+        expect(classifier.calls.last.$2.netCarbLimitGrams, equals(15));
+      });
+
+      test('reanalyse does not persist a still-failed analysis', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        classifier.respondWith(
+          const MenuAnalysisFailed(
+            reason: MenuAnalysisFailureReason.badResponse,
+          ),
+        );
+        await controller.open(_ref);
+
+        // Act
+        await controller.reanalyse();
+
+        // Assert
+        expect(controller.analysis, isA<MenuAnalysisFailed>());
+        expect(repository.savedAnalyses, isEmpty);
+      });
+
+      test('reanalyse toggles isLoading and notifies listeners exactly '
+          'twice', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        var notifyCount = 0;
+        controller.addListener(() => notifyCount++);
+        final loadingDuringReanalyse = <bool>[];
+        controller.addListener(
+          () => loadingDuringReanalyse.add(controller.isLoading),
+        );
+
+        // Act
+        final future = controller.reanalyse();
+        expect(controller.isLoading, isTrue);
+        await future;
+
+        // Assert
+        expect(notifyCount, 2);
+        expect(loadingDuringReanalyse, [true, false]);
+        expect(controller.isLoading, isFalse);
+      });
+    });
+
     group('personal notes (issue #52)', () {
       test('noteFor returns null before anything is opened', () {
         // Assert

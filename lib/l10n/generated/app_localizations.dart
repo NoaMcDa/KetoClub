@@ -140,6 +140,18 @@ abstract class AppLocalizations {
   /// **'Refresh menu'**
   String get actionRefreshMenu;
 
+  /// No description provided for @actionBackToSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to search'**
+  String get actionBackToSearch;
+
+  /// No description provided for @offlineBannerMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection.'**
+  String get offlineBannerMessage;
+
   /// No description provided for @actionCancel.
   ///
   /// In en, this message translates to:
