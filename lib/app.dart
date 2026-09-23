@@ -17,6 +17,7 @@ import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/state/saved_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
+import 'package:ketoclub/state/theme_mode_controller.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/constants.dart';
@@ -30,12 +31,13 @@ import 'package:provider/provider.dart';
 /// the whole app with fakes.
 ///
 /// A `StatefulWidget` for exactly one reason: it owns a [LocaleController]
-/// for the lifetime of the app, created once in `initState` rather than
-/// rebuilt on every `build`. A `StatelessWidget` has no such hook —
-/// `provider`'s `create` runs once per *provider*, but there would be
-/// nothing to host that provider above without a place to call `dispose` —
-/// so this mirrors why `SettingsScreen` and `MenuScreen` are themselves
-/// stateful for their own single post-frame load.
+/// and a [ThemeModeController] for the lifetime of the app, both created
+/// once in `initState` rather than rebuilt on every `build`. A
+/// `StatelessWidget` has no such hook — `provider`'s `create` runs once per
+/// *provider*, but there would be nothing to host that provider above
+/// without a place to call `dispose` — so this mirrors why `SettingsScreen`
+/// and `MenuScreen` are themselves stateful for their own single
+/// post-frame load.
 class KetoClubApp extends StatefulWidget {
   /// Creates the app on top of [dependencies].
   const new({required this.dependencies, super.key});
@@ -49,43 +51,54 @@ class KetoClubApp extends StatefulWidget {
 
 class _KetoClubAppState extends State<KetoClubApp> {
   late final LocaleController _localeController;
+  late final ThemeModeController _themeModeController;
 
   @override
   void initState() {
     super.initState();
     _localeController = LocaleController(widget.dependencies.settingsStore);
-    // Fire-and-forget: the first frame renders in the device locale and
-    // flips once this resolves (LocaleController's class doc, issue #8).
+    _themeModeController = ThemeModeController(
+      widget.dependencies.settingsStore,
+    );
+    // Fire-and-forget: the first frame renders in the device locale (and,
+    // for appearance, ThemeMode.system) and flips once each resolves
+    // (LocaleController's and ThemeModeController's class docs, issue #8,
+    // #58).
     unawaited(_localeController.load());
+    unawaited(_themeModeController.load());
   }
 
   @override
   void dispose() {
     _localeController.dispose();
+    _themeModeController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     // ChangeNotifierProvider.value (not `create`) because this state class,
-    // not provider, owns the controller's lifecycle — see the class doc.
-    // AnimatedBuilder is what actually makes MaterialApp rebuild when the
-    // locale changes; the provider only makes the controller reachable
-    // from SettingsScreen, several routes below.
-    return ChangeNotifierProvider<LocaleController>.value(
-      value: _localeController,
+    // not provider, owns each controller's lifecycle — see the class doc.
+    // AnimatedBuilder (over Listenable.merge of both controllers) is what
+    // actually makes MaterialApp rebuild when the locale or the appearance
+    // mode changes; the providers only make the controllers reachable from
+    // SettingsScreen, several routes below.
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<LocaleController>.value(
+          value: _localeController,
+        ),
+        ChangeNotifierProvider<ThemeModeController>.value(
+          value: _themeModeController,
+        ),
+      ],
       child: AnimatedBuilder(
-        animation: _localeController,
+        animation: Listenable.merge([_localeController, _themeModeController]),
         builder: (context, _) => MaterialApp(
           title: appName,
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
-          // Explicit even though it matches MaterialApp's own default: it
-          // is the acceptance criterion for issue #9, and stating it here
-          // means a future default change upstream can never silently
-          // change it.
-          // ignore: avoid_redundant_argument_values
-          themeMode: ThemeMode.system,
+          themeMode: _themeModeController.themeMode,
           locale: _localeController.locale,
           localizationsDelegates: const <LocalizationsDelegate<Object>>[
             AppLocalizations.delegate,
@@ -194,6 +207,7 @@ Route<void>? generateRoute(
           dependencies.menuRepository,
           dependencies.menuClassifier,
           dependencies.settingsStore,
+          dependencies.notesStore,
         ),
         child: MenuScreen(
           ref: ref,

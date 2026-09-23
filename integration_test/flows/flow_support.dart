@@ -34,6 +34,7 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
+import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 
@@ -76,6 +77,7 @@ final class FakeAppDependencies {
     : repository = FlowFakeMenuRepository(),
       classifier = FlowFakeMenuClassifier(),
       settingsStore = FlowFakeSettingsStore(),
+      notesStore = FlowFakeNotesStore(),
       clock = FlowFakeClock(),
       logger = FlowFakeAppLogger();
 
@@ -88,6 +90,10 @@ final class FakeAppDependencies {
 
   /// The faked settings store.
   final FlowFakeSettingsStore settingsStore;
+
+  /// The faked notes store; persists across a screen revisit the same way
+  /// `PrefsNotesStore` does, so a flow can assert a note survives.
+  final FlowFakeNotesStore notesStore;
 
   /// The faked clock, fixed so nothing in a flow test reads wall time.
   final FlowFakeClock clock;
@@ -113,6 +119,7 @@ final class FakeAppDependencies {
     menuRepository: repository,
     menuClassifier: classifierOverride ?? classifier,
     settingsStore: settingsStore,
+    notesStore: notesStore,
     clock: clock,
     logger: logger,
   );
@@ -256,4 +263,32 @@ final class FlowFakeAppLogger implements AppLogger {
 
   @override
   void warn(String message, {Object? error}) => warnings.add(message);
+}
+
+/// A [NotesStore] backed by an in-memory map, keyed by [VenueRef.cacheKey]
+/// then dish id — persists for the lifetime of one flow test the same way
+/// `PrefsNotesStore` persists across a real app session.
+final class FlowFakeNotesStore implements NotesStore {
+  final Map<String, Map<String, String>> _notes =
+      <String, Map<String, String>>{};
+
+  @override
+  Future<String?> read(VenueRef ref, String dishId) async =>
+      _notes[ref.cacheKey]?[dishId];
+
+  @override
+  Future<void> write(VenueRef ref, String dishId, String note) async {
+    (_notes[ref.cacheKey] ??= <String, String>{})[dishId] = note;
+  }
+
+  @override
+  Future<void> delete(VenueRef ref, String dishId) async {
+    _notes[ref.cacheKey]?.remove(dishId);
+  }
+
+  @override
+  Future<Map<String, String>> readAll(VenueRef ref) async =>
+      Map<String, String>.from(
+        _notes[ref.cacheKey] ?? const <String, String>{},
+      );
 }

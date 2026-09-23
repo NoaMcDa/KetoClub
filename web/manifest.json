@@ -1,11 +1,11 @@
 {
-    "name": "ketoclub",
-    "short_name": "ketoclub",
+    "name": "KetoClub",
+    "short_name": "KetoClub",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#3C7847",
+    "theme_color": "#3C7847",
+    "description": "Restaurant menu analyzer for keto dieters. Classify dishes by keto-compatibility and generate waiter instructions for modifications.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

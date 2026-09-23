@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- KetoClub is a brand name and is kept unlocalized (see values-he/,
+         issue #66): the launcher label reads "KetoClub" under any device
+         language, the same way "Wolt" or "10bis" would. -->
+    <string name="app_name">KetoClub</string>
+</resources>

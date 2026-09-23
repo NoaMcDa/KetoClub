@@ -1,0 +1,5 @@
+{
+  "_synthetic": "SYNTHETIC. A 2xx body 10bis has never been observed to send, used to exercise the platformChanged path when the response is valid JSON but not the Restaurants/{id}/Menu shape this mapper knows (architecture.md §8).",
+  "errorCode": 1,
+  "errorMessage": "restaurant temporarily closed"
+}
