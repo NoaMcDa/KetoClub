@@ -599,15 +599,47 @@ void main() {
           );
         final controller = _controllerFor(repository: repository);
         final pushedNames = <String>[];
-        await _pumpWithRoutes(tester, controller, pushedNames);
+        // No `home`: a MaterialApp with one answers "/" itself without
+        // consulting onGenerateRoute, so the replacement would never be
+        // recorded here. The app's own router (app.dart) has no `home`
+        // either — every route, "/" included, goes through generateRoute.
+        // onGenerateInitialRoutes makes MenuScreen the only route on the
+        // stack, so there is nothing for Back to search to pop back to.
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            onGenerateInitialRoutes: (_) => [
+              MaterialPageRoute<void>(
+                builder: (_) => ChangeNotifierProvider<MenuController>.value(
+                  value: controller,
+                  child: MenuScreen(
+                    ref: _ref,
+                    screenBrightness: FakeScreenBrightness(),
+                    connectivity: FakeConnectivity(),
+                  ),
+                ),
+              ),
+            ],
+            onGenerateRoute: (settings) {
+              pushedNames.add(settings.name ?? '');
+              return MaterialPageRoute<void>(
+                builder: (_) => const Text('root'),
+                settings: settings,
+              );
+            },
+          ),
+        );
         await tester.pumpAndSettle();
 
         // Act
         await tester.tap(find.text(_en.actionBackToSearch));
         await tester.pumpAndSettle();
 
-        // Assert
+        // Assert: "/" was generated, and it replaced this screen.
         expect(pushedNames, contains('/'));
+        expect(find.text('root'), findsOneWidget);
+        expect(find.byType(MenuScreen), findsNothing);
       },
     );
 
