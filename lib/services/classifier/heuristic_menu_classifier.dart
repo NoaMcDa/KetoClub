@@ -19,9 +19,11 @@ import 'package:ketoclub/utils/text_normaliser.dart';
 
 /// The offline, rule-based [MenuClassifier] (architecture.md §6.2).
 ///
-/// [ClassificationOptions] does not steer a verdict here: the rule
-/// vocabulary has no consent gate and no dietary-constraint hook — those
-/// are LLM-prompt concerns (architecture.md §9.1). Nor does
+/// Of [ClassificationOptions], only the three dietary toggles (issue #56)
+/// steer a verdict here: [ClassificationOptions.seedOilFree],
+/// [ClassificationOptions.dairyFree] and
+/// [ClassificationOptions.carnivoreOnly] each switch on one extra rule
+/// (see [_dietarySentences]). Consent is not a rules concern. Nor is
 /// [ClassificationOptions.netCarbLimitGrams] (issue #57): the vocabulary is
 /// keyword-based and never estimates grams, so there is no numeric green
 /// threshold here for the limit to move; it reaches the LLM's prompt and
@@ -52,7 +54,7 @@ final class HeuristicMenuClassifier implements MenuClassifier {
     ClassificationOptions options = const ClassificationOptions(),
   }) async {
     final dishes = <AnalysedDish>[
-      for (final dish in menu.allDishes) _analyse(dish),
+      for (final dish in menu.allDishes) _analyse(dish, options),
     ];
     return MenuAnalysed(
       dishes: dishes,
@@ -65,8 +67,17 @@ final class HeuristicMenuClassifier implements MenuClassifier {
     );
   }
 
-  /// Classifies one dish against the bilingual rule vocabulary.
-  AnalysedDish _analyse(Dish dish) {
+  /// Classifies one dish against the bilingual rule vocabulary, plus the
+  /// dietary rules [options] switch on (issue #56).
+  ///
+  /// A red dish stays red with no script: no substitution rescues a
+  /// non-keto base, whatever else it contains. Otherwise the carb
+  /// sentences come first and each triggered dietary rule's sentence
+  /// follows, so a green dish a rule catches becomes yellow and a yellow
+  /// one gains the extra ask. A dish yellow only because of a dietary rule
+  /// gets [dietaryRuleWhyEn]/[dietaryRuleWhyHe], since the carb-component
+  /// `why` would not be true of it.
+  AnalysedDish _analyse(Dish dish, ClassificationOptions options) {
     final text = TextNormaliser.dishSearchText(dish);
     // The script a waiter script is read in follows the dish's own
     // text, not the UI locale (architecture.md §12): a Hebrew menu
@@ -84,13 +95,20 @@ final class HeuristicMenuClassifier implements MenuClassifier {
       );
     }
 
-    if (match.instructions.isNotEmpty) {
+    final dietary = _dietarySentences(text, options, isHebrew: isHebrew);
+    if (match.instructions.isNotEmpty || dietary.isNotEmpty) {
+      final String why;
+      if (match.instructions.isNotEmpty) {
+        why = isHebrew ? yellowWhyHe : yellowWhyEn;
+      } else {
+        why = isHebrew ? dietaryRuleWhyHe : dietaryRuleWhyEn;
+      }
       return AnalysedDish(
         dishId: dish.id,
         name: dish.name,
         verdict: DishVerdict.modifiable,
-        why: isHebrew ? yellowWhyHe : yellowWhyEn,
-        modification: _joinInstructions(match.instructions),
+        why: why,
+        modification: _joinInstructions([...match.instructions, ...dietary]),
       );
     }
 
@@ -100,6 +118,44 @@ final class HeuristicMenuClassifier implements MenuClassifier {
       verdict: DishVerdict.orderAsIs,
       why: isHebrew ? greenWhyHe : greenWhyEn,
     );
+  }
+
+  /// The waiter sentence of every dietary rule [options] switches on
+  /// whose triggers [text] names (issue #56), in the fixed order seed-oil,
+  /// dairy, carnivore, each in the dish's language ([isHebrew]) exactly
+  /// like the `why` strings: the script is read aloud in that restaurant
+  /// (architecture.md §12).
+  ///
+  /// - Seed-oil free: frying or a named seed oil
+  ///   ([ClassificationRules.mentionsSeedOil]) asks for olive oil, butter
+  ///   or tallow.
+  /// - Dairy-free: cheese, cream, butter, milk or yogurt not rescued by a
+  ///   plant word ([ClassificationRules.mentionsDairy]) asks for no dairy.
+  /// - Carnivore only: any vegetable, salad or other plant
+  ///   ([ClassificationRules.mentionsPlant]) asks for only the meat, fish
+  ///   or eggs.
+  List<String> _dietarySentences(
+    String text,
+    ClassificationOptions options, {
+    required bool isHebrew,
+  }) {
+    final sentences = <String>[];
+    if (options.seedOilFree && ClassificationRules.mentionsSeedOil(text)) {
+      sentences.add(
+        isHebrew ? seedOilFreeModificationHe : seedOilFreeModificationEn,
+      );
+    }
+    if (options.dairyFree && ClassificationRules.mentionsDairy(text)) {
+      sentences.add(
+        isHebrew ? dairyFreeModificationHe : dairyFreeModificationEn,
+      );
+    }
+    if (options.carnivoreOnly && ClassificationRules.mentionsPlant(text)) {
+      sentences.add(
+        isHebrew ? carnivoreOnlyModificationHe : carnivoreOnlyModificationEn,
+      );
+    }
+    return sentences;
   }
 
   /// Joins several waiter sentences into one script read aloud to a

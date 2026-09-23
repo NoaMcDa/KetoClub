@@ -53,7 +53,11 @@ abstract final class MenuAnalysisPrompt {
   /// [ClassificationOptions.netCarbLimitGrams] as the green threshold
   /// (issue #57), this prompt's own output rules, and — when [options]
   /// carries any — its [ClassificationOptions.dietaryConstraints] appended
-  /// as a final section.
+  /// as a final section, one `- ` line each. The Settings toggles (issue
+  /// #56) supply [seedOilFreePromptFragment], [dairyFreePromptFragment]
+  /// and [carnivoreOnlyPromptFragment] there, in that order; with every
+  /// toggle off the list is empty and no section is written, so the
+  /// prompt is byte-for-byte the default one.
   ///
   /// The three verdicts and the keto rules are never restated or
   /// paraphrased here: they are read from `constants.dart` so the model

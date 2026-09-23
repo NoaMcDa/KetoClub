@@ -42,9 +42,44 @@ final class ClassificationOptions {
   final bool estimationConsentGiven;
 
   /// Extra user constraints appended to the LLM system prompt, e.g.
-  /// "seed-oil free" (architecture.md §9.1, Tier C). Callers must not
-  /// mutate the list passed to the constructor.
+  /// [seedOilFreePromptFragment] (architecture.md §9.1, Tier C). Callers
+  /// must not mutate the list passed to the constructor.
+  ///
+  /// The Settings toggles (issue #56) reach here through
+  /// [dietaryConstraintsFor], which fixes their order, so the same toggles
+  /// always produce the same list — and so the same prompt, the same
+  /// [snapshot] and the same server-side cache key.
   final List<String> dietaryConstraints;
+
+  /// The [dietaryConstraints] the three "Your keto rules" toggles ask for
+  /// (issue #56): each switched-on toggle's prompt fragment from
+  /// `constants.dart`, always in the order seed-oil free, dairy-free,
+  /// carnivore only. All three off yields an empty list, so the prompt
+  /// carries no dietary section at all and is byte-for-byte the default.
+  static List<String> dietaryConstraintsFor({
+    required bool seedOilFree,
+    required bool dairyFree,
+    required bool carnivoreOnly,
+  }) => List<String>.unmodifiable(<String>[
+    if (seedOilFree) seedOilFreePromptFragment,
+    if (dairyFree) dairyFreePromptFragment,
+    if (carnivoreOnly) carnivoreOnlyPromptFragment,
+  ]);
+
+  /// Whether the "Strict seed-oil free" toggle is among
+  /// [dietaryConstraints] (issue #56), for `HeuristicMenuClassifier`'s
+  /// seed-oil rule.
+  bool get seedOilFree =>
+      dietaryConstraints.contains(seedOilFreePromptFragment);
+
+  /// Whether the "Dairy-free keto" toggle is among [dietaryConstraints]
+  /// (issue #56).
+  bool get dairyFree => dietaryConstraints.contains(dairyFreePromptFragment);
+
+  /// Whether the "Carnivore only" toggle is among [dietaryConstraints]
+  /// (issue #56).
+  bool get carnivoreOnly =>
+      dietaryConstraints.contains(carnivoreOnlyPromptFragment);
 
   /// The net-carb limit in grams above which no dish is green (issue #57):
   /// stated in the LLM prompt's green definition, and applied by

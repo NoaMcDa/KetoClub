@@ -447,4 +447,104 @@ void main() {
       expect(result.instructions.single, contains('pur'));
     });
   });
+
+  // Issue #56: the three dietary rules' vocabularies. Every trigger must
+  // fire in both wrappers, and every Hebrew one with a prefix glued on
+  // too — the unicode-lookaround check that `\b` would silently fail.
+  group('ClassificationRules.mentionsSeedOil (issue #56)', () {
+    for (final trigger in seedOilTriggersEn) {
+      test('"$trigger" is a seed-oil mention', () {
+        // Act & Assert
+        expect(ClassificationRules.mentionsSeedOil(_enText(trigger)), isTrue);
+      });
+    }
+
+    for (final trigger in seedOilTriggersHe) {
+      test('"$trigger" is a seed-oil mention, bare and with a prefix', () {
+        // Act & Assert
+        expect(ClassificationRules.mentionsSeedOil(_heText(trigger)), isTrue);
+        expect(
+          ClassificationRules.mentionsSeedOil(_heText('ה$trigger')),
+          isTrue,
+        );
+      });
+    }
+
+    for (final text in <String>[
+      'Salmon with soy sauce',
+      'Salad with sunflower seeds',
+      'Grilled steak with olive oil',
+      'סלמון ברוטב סויה',
+      'סטייק צלוי בשמן זית',
+    ]) {
+      test('"$text" is not a seed-oil mention', () {
+        // Act & Assert
+        expect(ClassificationRules.mentionsSeedOil(text), isFalse);
+      });
+    }
+  });
+
+  group('ClassificationRules.mentionsDairy (issue #56)', () {
+    for (final trigger in dairyTriggersEn) {
+      test('"$trigger" is a dairy mention', () {
+        // Act & Assert
+        expect(ClassificationRules.mentionsDairy(_enText(trigger)), isTrue);
+      });
+    }
+
+    for (final trigger in dairyTriggersHe) {
+      test('"$trigger" is a dairy mention, bare and with a prefix', () {
+        // Act & Assert
+        expect(ClassificationRules.mentionsDairy(_heText(trigger)), isTrue);
+        expect(ClassificationRules.mentionsDairy(_heText('ה$trigger')), isTrue);
+      });
+    }
+
+    for (final text in <String>[
+      'Chicken curry in coconut cream',
+      'Chia pudding with almond milk',
+      'Celery with peanut butter',
+      'Tomato salad with vegan cheese',
+      'Beef carpaccio with balsamic cream',
+      'עוף בחלב קוקוס',
+      'סלרי עם חמאת בוטנים',
+      'סלט עם גבינה טבעונית',
+      'קרפצ׳יו עם קרם בלסמי',
+      'שייק חלבון',
+    ]) {
+      test('"$text" is not a dairy mention', () {
+        // Act & Assert
+        expect(ClassificationRules.mentionsDairy(text), isFalse);
+      });
+    }
+  });
+
+  group('ClassificationRules.mentionsPlant (issue #56)', () {
+    for (final trigger in plantTriggersEn) {
+      test('"$trigger" is a plant mention', () {
+        // Act & Assert
+        expect(ClassificationRules.mentionsPlant(_enText(trigger)), isTrue);
+      });
+    }
+
+    for (final trigger in plantTriggersHe) {
+      test('"$trigger" is a plant mention, bare and with a prefix', () {
+        // Act & Assert
+        expect(ClassificationRules.mentionsPlant(_heText(trigger)), isTrue);
+        expect(ClassificationRules.mentionsPlant(_heText('ה$trigger')), isTrue);
+      });
+    }
+
+    for (final text in <String>[
+      'Ribeye steak with black pepper',
+      'Scrambled eggs with butter',
+      'אנטריקוט עם פלפל שחור',
+      'חביתה מביצים',
+    ]) {
+      test('"$text" is not a plant mention', () {
+        // Act & Assert
+        expect(ClassificationRules.mentionsPlant(text), isFalse);
+      });
+    }
+  });
 }
