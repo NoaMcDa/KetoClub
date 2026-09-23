@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["dishes"],
+  "properties": {
+    "dishes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "verdict",
+          "why",
+          "modification",
+          "net_carbs_estimate"
+        ],
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "verdict": {
+            "type": "string",
+            "enum": ["orderAsIs", "modifiable", "nonKeto"]
+          },
+          "why": {"type": "string"},
+          "modification": {"type": ["string", "null"]},
+          "net_carbs_estimate": {"type": ["number", "null"]}
+        }
+      }
+    }
+  }
+}

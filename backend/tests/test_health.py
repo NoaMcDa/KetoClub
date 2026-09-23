@@ -23,9 +23,7 @@ def test_health_reports_ok_with_no_key_configured(client: TestClient) -> None:
 
 def test_health_reports_llm_configured_when_key_set() -> None:
     app = create_app(
-        settings=Settings(
-            DATABASE_URL="sqlite:///:memory:", OPENROUTER_API_KEY="sk-test"
-        )
+        settings=Settings(DATABASE_URL="sqlite:///:memory:", GEMINI_API_KEY="sk-test")
     )
     with TestClient(app) as client:
         response = client.get("/v1/health")
