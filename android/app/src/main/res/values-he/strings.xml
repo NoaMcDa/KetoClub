@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand name, unlocalized — see values/strings.xml. This file exists
+         so the launcher label resolves correctly (not just "falls back")
+         under a Hebrew device locale. -->
+    <string name="app_name">KetoClub</string>
+</resources>
