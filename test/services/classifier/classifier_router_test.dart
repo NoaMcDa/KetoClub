@@ -4,9 +4,14 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/classifier_router.dart';
+import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
+import 'package:ketoclub/services/classifier/llm_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/llm/llm_chat_client.dart';
 
+import '../../fakes/fake_clock.dart';
 import '../../fakes/fake_connectivity.dart';
+import '../../fakes/fake_llm_chat_client.dart';
 import '../../fakes/fake_menu_classifier.dart';
 import 'menu_classifier_contract.dart';
 
@@ -354,6 +359,97 @@ void main() {
 
       // Act & Assert
       expect(covered, equals(MenuAnalysisFailureReason.values.toSet()));
+    });
+  });
+
+  group('RoutingMenuClassifier engine announcements (issue #65)', () {
+    late FakeLlmChatClient client;
+    late FakeConnectivity connectivity;
+    late RoutingMenuClassifier router;
+    late List<ClassifyingEngine> heard;
+    late Menu menu;
+
+    setUp(() {
+      // The real engines, not fakes: each announces itself, and these
+      // tests pin that the router's choice reaches a listener that way.
+      client = FakeLlmChatClient();
+      connectivity = FakeConnectivity();
+      final clock = FakeClock(DateTime.utc(2026));
+      router = RoutingMenuClassifier(
+        LlmMenuClassifier(client, clock),
+        HeuristicMenuClassifier(clock: clock),
+        connectivity,
+      );
+      heard = <ClassifyingEngine>[];
+      menu = _menuOf([_dishNamed('dish-1', 'Salmon')]);
+    });
+
+    test('classify with consent withheld announces only the rules', () async {
+      // Arrange
+      final options = ClassificationOptions(onEngineStarted: heard.add);
+
+      // Act
+      await router.classify(menu, options: options);
+
+      // Assert
+      expect(heard, equals([ClassifyingEngine.rules]));
+      expect(client.requests, isEmpty);
+    });
+
+    test('classify with consent while offline announces only the rules — '
+        'the pre-check skips the AI before it starts', () async {
+      // Arrange
+      connectivity.online = false;
+      final options = ClassificationOptions(
+        estimationConsentGiven: true,
+        onEngineStarted: heard.add,
+      );
+
+      // Act
+      await router.classify(menu, options: options);
+
+      // Assert
+      expect(heard, equals([ClassifyingEngine.rules]));
+      expect(client.requests, isEmpty);
+    });
+
+    test('classify with consent and a successful AI call announces only '
+        'the AI', () async {
+      // Arrange: an empty dishes array is a reply the parser accepts.
+      client.fallback = const ChatCompleted(
+        content: '{"dishes": []}',
+        model: 'served-model',
+      );
+      final options = ClassificationOptions(
+        estimationConsentGiven: true,
+        onEngineStarted: heard.add,
+      );
+
+      // Act
+      await router.classify(menu, options: options);
+
+      // Assert
+      expect(heard, equals([ClassifyingEngine.llm]));
+    });
+
+    test('classify with consent and a failed AI call announces the AI and '
+        'then the rules it fell back to', () async {
+      // Arrange
+      client.fallback = const ChatFailed(reason: ChatFailureReason.timeout);
+      final options = ClassificationOptions(
+        estimationConsentGiven: true,
+        onEngineStarted: heard.add,
+      );
+
+      // Act
+      final result = await router.classify(menu, options: options);
+
+      // Assert
+      expect(heard, equals([ClassifyingEngine.llm, ClassifyingEngine.rules]));
+      expect(
+        (result as MenuAnalysed).engine,
+        equals(const RulesEngine(reason: MenuAnalysisFailureReason.timeout)),
+      );
     });
   });
 }

@@ -13,6 +13,42 @@ import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/keto_score.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 
+/// Which step of loading a menu [MenuController] is in (issue #65), so the
+/// menu screen can say what it is waiting for rather than show a bare
+/// spinner.
+///
+/// The three classifying values come from the engines themselves, never
+/// from a guess in the controller: the controller enters [classifying]
+/// when it calls the classifier, and moves to [classifyingLlm] or
+/// [classifyingRules] only when an engine announces itself through
+/// [ClassificationOptions.onEngineStarted]. A fallback after a failed AI
+/// call therefore reads as [classifyingLlm] then [classifyingRules], and
+/// the brief connectivity pre-check before the AI is tried stays
+/// [classifying] — the controller never restates the router's rules to
+/// predict which engine will run.
+enum LoadPhase {
+  /// Nothing is loading: no call is in flight, or the last one finished.
+  idle,
+
+  /// The menu itself is being fetched (or read from cache).
+  fetching,
+
+  /// The classifier has been called, but no engine has announced itself
+  /// yet.
+  classifying,
+
+  /// The AI engine is running.
+  classifyingLlm,
+
+  /// The on-device rule engine is running — because it was the only one
+  /// allowed, or because the AI call just failed and it is the fallback.
+  classifyingRules;
+
+  /// Whether this is one of the three classifying phases.
+  bool get isClassifying =>
+      this == classifying || this == classifyingLlm || this == classifyingRules;
+}
+
 /// Screen state for the classified menu screen (architecture.md §6.6).
 ///
 /// Loads a venue's [Menu] through a [MenuRepository], classifies it
@@ -61,7 +97,7 @@ final class MenuController extends ChangeNotifier {
   final SettingsStore _settings;
   final NotesStore _notes;
 
-  bool _isLoading = false;
+  LoadPhase _phase = LoadPhase.idle;
   Menu? _menu;
   MenuAnalysis? _analysis;
   MenuFetchFailureReason? _fetchFailure;
@@ -76,8 +112,12 @@ final class MenuController extends ChangeNotifier {
   /// call — [refresh] has nothing to refetch until then.
   VenueRef? _ref;
 
-  /// Whether [open] is currently loading or classifying a menu.
-  bool get isLoading => _isLoading;
+  /// Whether [open] or [refresh] is currently loading or classifying a
+  /// menu; true exactly when [phase] is not [LoadPhase.idle].
+  bool get isLoading => _phase != LoadPhase.idle;
+
+  /// Which step of loading the menu is in progress (issue #65).
+  LoadPhase get phase => _phase;
 
   /// The venue's menu, or null before the first successful fetch, or after
   /// a fetch that failed outright.
@@ -301,7 +341,7 @@ final class MenuController extends ChangeNotifier {
   /// Never throws.
   Future<void> open(VenueRef ref, {bool forceRefresh = false}) async {
     _ref = ref;
-    _isLoading = true;
+    _phase = LoadPhase.fetching;
     notifyListeners();
 
     _openRef = ref;
@@ -331,14 +371,7 @@ final class MenuController extends ChangeNotifier {
         if (reusable != null) {
           _analysis = reusable;
         } else {
-          final analysis = await _classifier.classify(
-            fetchedMenu,
-            options: options,
-          );
-          _analysis = analysis;
-          if (analysis is MenuAnalysed) {
-            await _repository.saveAnalysis(ref, analysis);
-          }
+          await _classify(ref, fetchedMenu, options);
         }
       case MenuFetchFailed(:final reason, :final statusCode):
         _menu = null;
@@ -349,7 +382,7 @@ final class MenuController extends ChangeNotifier {
         _fetchStatusCode = statusCode;
     }
 
-    _isLoading = false;
+    _phase = LoadPhase.idle;
     notifyListeners();
   }
 
@@ -384,7 +417,7 @@ final class MenuController extends ChangeNotifier {
     final previousMenu = _menu;
     final previousAnalysis = _analysis;
 
-    _isLoading = true;
+    _phase = LoadPhase.fetching;
     notifyListeners();
 
     final fetchResult = await _repository.load(currentRef, forceRefresh: true);
@@ -414,14 +447,7 @@ final class MenuController extends ChangeNotifier {
           // (architecture.md §6.4).
           _analysis = previousAnalysis;
         } else {
-          final analysis = await _classifier.classify(
-            fetchedMenu,
-            options: options,
-          );
-          _analysis = analysis;
-          if (analysis is MenuAnalysed) {
-            await _repository.saveAnalysis(currentRef, analysis);
-          }
+          await _classify(currentRef, fetchedMenu, options);
         }
       case MenuFetchFailed(:final reason):
         // Nothing fresh, and nothing stale either: keep exactly what was
@@ -430,16 +456,61 @@ final class MenuController extends ChangeNotifier {
         _isFromCache = true;
     }
 
-    _isLoading = false;
+    _phase = LoadPhase.idle;
+    notifyListeners();
+  }
+
+  /// Classifies [menu] — already assigned to [menu] by the caller — and
+  /// persists a successful result under [ref], moving [phase] through the
+  /// classifying values on the way (issue #65).
+  ///
+  /// Clears [analysis] first and notifies, so the screen shows [menu]
+  /// unjudged under a progress row while the engine runs, rather than
+  /// the previous analysis — which may describe other dish text — or
+  /// nothing at all.
+  Future<void> _classify(
+    VenueRef ref,
+    Menu menu,
+    ClassificationOptions options,
+  ) async {
+    _analysis = null;
+    _phase = LoadPhase.classifying;
+    notifyListeners();
+
+    final analysis = await _classifier.classify(menu, options: options);
+    _analysis = analysis;
+    if (analysis is MenuAnalysed) {
+      await _repository.saveAnalysis(ref, analysis);
+    }
+  }
+
+  /// Moves [phase] to the classifying value naming [engine], notifying
+  /// only when that changes it.
+  ///
+  /// Ignored outside the classifying phases, so a listener invoked after
+  /// the load it belonged to has finished cannot put the screen back
+  /// into a progress state.
+  void _onEngineStarted(ClassifyingEngine engine) {
+    if (!_phase.isClassifying) return;
+    final next = switch (engine) {
+      ClassifyingEngine.llm => LoadPhase.classifyingLlm,
+      ClassifyingEngine.rules => LoadPhase.classifyingRules,
+    };
+    if (next == _phase) return;
+    _phase = next;
     notifyListeners();
   }
 
   /// The [ClassificationOptions] [settings] ask for: consent, and the
   /// net-carb limit (issue #57).
-  static ClassificationOptions _optionsFrom(AppSettings settings) =>
+  ClassificationOptions _optionsFrom(AppSettings settings) =>
       ClassificationOptions(
         estimationConsentGiven: settings.estimationConsentGiven,
         netCarbLimitGrams: settings.netCarbLimitGrams,
+        // The engine that picks up these options reports itself here, so
+        // [phase] can name it (issue #65). An observer only: it takes no
+        // part in [ClassificationOptions.matches] or equality.
+        onEngineStarted: _onEngineStarted,
       );
 
   /// [cached]'s analysis when [open] may show it for [fetched] under
