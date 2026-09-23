@@ -26,6 +26,7 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 
 import 'flow_support.dart';
@@ -141,6 +142,10 @@ void main() {
         expect(find.text(' (${_en.engineChipReasonOffline})'), findsNothing);
         expect(find.text(_dishName), findsOneWidget);
         expect(find.byType(StatusBadge), findsOneWidget);
+        // The full sentence, not only the engine chip's short reason
+        // (issue #119).
+        expect(find.byType(RulesReasonBanner), findsOneWidget);
+        expect(find.text(_en.analysisBackendUnreachable), findsOneWidget);
       },
     );
   });
