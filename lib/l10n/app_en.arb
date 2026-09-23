@@ -244,5 +244,14 @@
   "noteEditorTitle": "Personal note",
   "noteEditorHint": "e.g. Waitstaff happily substituted cauliflower",
   "noteEditorSave": "Save",
-  "noteEditorClear": "Clear note"
+  "noteEditorClear": "Clear note",
+
+  "menuSearchHint": "Search dishes",
+  "menuSearchSemanticLabel": "Search dishes by name or description",
+  "menuSearchClear": "Clear search",
+  "menuNoResults": "No dishes match your search.",
+  "categoryChipSemanticLabel": "Jump to {category}",
+  "@categoryChipSemanticLabel": {
+    "placeholders": { "category": { "type": "String" } }
+  }
 }

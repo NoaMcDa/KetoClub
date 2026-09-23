@@ -1306,6 +1306,168 @@ void main() {
         expect(controller.noteFor('d1'), isNull);
       });
     });
+
+    group('search (issue #51)', () {
+      test('query defaults to blank, so visibleRows narrows nothing by '
+          'it', () {
+        // Assert
+        expect(controller.query, '');
+      });
+
+      test('setQuery narrows visibleRows by a case-insensitive match on '
+          'the dish name', () async {
+        // Arrange
+        final steak = _dish('Grilled Steak', id: 'steak');
+        final salad = _dish('Greek Salad', id: 'salad');
+        repository.stub(_ref, MenuFetched(menu: _menuOf([steak, salad])));
+        await controller.open(_ref);
+
+        // Act
+        controller.setQuery('STEAK');
+
+        // Assert
+        expect(controller.visibleRows.map((row) => row.dish.id), ['steak']);
+      });
+
+      test('setQuery matches Hebrew text regardless of niqqud, on either side '
+          "— TextNormaliser's own pipeline, not a copy of it", () async {
+        // Arrange: the menu carries niqqud; the typed query does not.
+        final dish = _dish('סטֵייק');
+        repository.stub(_ref, MenuFetched(menu: _menuOf([dish])));
+        await controller.open(_ref);
+
+        // Act
+        controller.setQuery('סטייק');
+
+        // Assert
+        expect(controller.visibleRows.map((row) => row.dish.id), ['d1']);
+      });
+
+      test(
+        'setQuery matches text found only in the dish description',
+        () async {
+          // Arrange
+          const dish = Dish(
+            id: 'd1',
+            name: 'Chef special',
+            description: 'Served with a side of asparagus',
+            price: 10,
+            options: <DishOption>[],
+          );
+          repository.stub(_ref, MenuFetched(menu: _menuOf([dish])));
+          await controller.open(_ref);
+
+          // Act
+          controller.setQuery('asparagus');
+
+          // Assert
+          expect(controller.visibleRows.map((row) => row.dish.id), ['d1']);
+        },
+      );
+
+      test('setQuery combines with the active verdict filter — both must '
+          'match for a dish to show', () async {
+        // Arrange: two dishes with the same searchable name, different
+        // verdicts.
+        final greenFries = _dish('Fries', id: 'green-fries');
+        final yellowFries = _dish('Fries', id: 'yellow-fries');
+        final menu = _menuOf([greenFries, yellowFries]);
+        repository.stub(_ref, MenuFetched(menu: menu));
+        classifier.respondWith(
+          MenuAnalysed(
+            dishes: [
+              _verdictFor(greenFries, DishVerdict.orderAsIs),
+              _verdictFor(
+                yellowFries,
+                DishVerdict.modifiable,
+                modification: 'x',
+              ),
+            ],
+            unclassified: const <String>[],
+            engine: const RulesEngine(
+              reason: MenuAnalysisFailureReason.notConfigured,
+            ),
+            analysedAt: clock.now(),
+          ),
+        );
+        await controller.open(_ref);
+        await controller.setFilter(MenuFilter.greenOnly);
+        expect(controller.filter, MenuFilter.greenOnly);
+
+        // Act: both dishes match the query, but only one matches the
+        // filter too.
+        controller.setQuery('fries');
+
+        // Assert
+        expect(controller.visibleRows.map((row) => row.dish.id), [
+          'green-fries',
+        ]);
+      });
+
+      test("clearing the query (setQuery('')) restores every row the filter "
+          'alone would keep', () async {
+        // Arrange
+        final steak = _dish('Grilled Steak', id: 'steak');
+        final salad = _dish('Greek Salad', id: 'salad');
+        repository.stub(_ref, MenuFetched(menu: _menuOf([steak, salad])));
+        await controller.open(_ref);
+        controller.setQuery('steak');
+        expect(controller.visibleRows, hasLength(1));
+
+        // Act
+        controller.setQuery('');
+
+        // Assert
+        expect(controller.query, '');
+        expect(controller.visibleRows.map((row) => row.dish.id).toSet(), {
+          'steak',
+          'salad',
+        });
+      });
+
+      test('setQuery notifies listeners', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        var notifyCount = 0;
+        controller.addListener(() => notifyCount++);
+        expect(notifyCount, 0);
+
+        // Act
+        controller.setQuery('steak');
+
+        // Assert
+        expect(notifyCount, 1);
+      });
+
+      test('visibleCategories lists only categories with a visible row, in '
+          'menu order', () async {
+        // Arrange: two categories, one of which the query removes
+        // entirely.
+        final steak = _dish('Steak', id: 'steak');
+        final salad = _dish('Salad', id: 'salad');
+        final menu = Menu(
+          venueRef: _ref,
+          currency: 'ILS',
+          fetchedAt: DateTime.utc(2026),
+          categories: [
+            MenuCategory(id: 'c1', name: 'Mains', dishes: [steak]),
+            MenuCategory(id: 'c2', name: 'Sides', dishes: [salad]),
+          ],
+        );
+        repository.stub(_ref, MenuFetched(menu: menu));
+        await controller.open(_ref);
+
+        // Assert: both categories show with no query.
+        expect(controller.visibleCategories, ['Mains', 'Sides']);
+
+        // Act
+        controller.setQuery('steak');
+
+        // Assert: only the category with a matching row remains.
+        expect(controller.visibleCategories, ['Mains']);
+      });
+    });
   });
 
   // Issue #29 adds MenuFilter.yellowOnly and MenuFilter.redOnly. Placed

@@ -244,5 +244,14 @@
   "noteEditorTitle": "הערה אישית",
   "noteEditorHint": "לדוגמה: הצוות החליף בשמחה לכרובית",
   "noteEditorSave": "שמור",
-  "noteEditorClear": "מחק הערה"
+  "noteEditorClear": "מחק הערה",
+
+  "menuSearchHint": "חפשו מנות",
+  "menuSearchSemanticLabel": "חיפוש מנות לפי שם או תיאור",
+  "menuSearchClear": "נקה חיפוש",
+  "menuNoResults": "אין מנות שמתאימות לחיפוש שלכם.",
+  "categoryChipSemanticLabel": "עברו אל {category}",
+  "@categoryChipSemanticLabel": {
+    "placeholders": { "category": { "type": "String" } }
+  }
 }

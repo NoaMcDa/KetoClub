@@ -18,10 +18,12 @@ import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
+import 'package:ketoclub/widgets/category_chips.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
+import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
@@ -122,6 +124,20 @@ class _MenuScreenState extends State<MenuScreen> {
   /// with [MenuFilter.redOnly].
   bool _legendExpanded = false;
 
+  /// Scrolls the loaded-menu list for [_scrollToCategory] (issue #51).
+  final ScrollController _scrollController = ScrollController();
+
+  /// The stable [GlobalKey] for each category header currently or
+  /// previously shown, keyed by category name — see [_categoryKeyFor]
+  /// (issue #51).
+  final Map<String, GlobalKey> _categoryKeys = <String, GlobalKey>{};
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -219,6 +235,7 @@ class _MenuScreenState extends State<MenuScreen> {
       return _refreshable(
         controller,
         ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(16),
           children: [
             header,
@@ -244,10 +261,16 @@ class _MenuScreenState extends State<MenuScreen> {
     return _refreshable(
       controller,
       ListView(
+        controller: _scrollController,
+        // Always scrollable, so a menu shorter than the screen can still
+        // be pulled down to refresh (RefreshIndicator's own requirement).
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
         children: [
           header,
           const SizedBox(height: 4),
+          MenuSearchField(onChanged: controller.setQuery),
+          const SizedBox(height: 8),
           if (analysed) ...[
             const SizedBox(height: 8),
             VerdictCounterTiles(
@@ -286,17 +309,15 @@ class _MenuScreenState extends State<MenuScreen> {
             EngineChip(engine: controller.engine!),
             const SizedBox(height: 12),
           ],
-          for (final row in rows)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: DishCard(
-                row: row,
-                localeTag: localeTag,
-                onShowScript: (shown) => unawaited(_openWaiterCard(shown)),
-                note: controller.noteFor(row.dish.id),
-                onEditNote: (edited) => unawaited(_openNoteEditor(edited)),
-              ),
-            ),
+          CategoryChips(
+            categories: controller.visibleCategories,
+            onSelected: (category) => unawaited(_scrollToCategory(category)),
+          ),
+          const SizedBox(height: 8),
+          if (rows.isEmpty)
+            Center(child: Text(l10n.menuNoResults))
+          else
+            ..._dishRows(context, controller, localeTag, rows),
           if (analysed && controller.unclassifiedNames.isNotEmpty)
             _unclassifiedSection(context, l10n, controller),
         ],
@@ -572,6 +593,99 @@ class _MenuScreenState extends State<MenuScreen> {
         ),
       ),
     ];
+  }
+
+  /// One widget per row in [rows], with a keyed category header inserted
+  /// before the first row of each category (issue #51) — the same
+  /// [GlobalKey] [CategoryChips.onSelected] scrolls to through
+  /// [_scrollToCategory].
+  List<Widget> _dishRows(
+    BuildContext context,
+    MenuController controller,
+    String localeTag,
+    List<DishRow> rows,
+  ) {
+    final widgets = <Widget>[];
+    String? lastCategory;
+    for (final row in rows) {
+      if (row.category != lastCategory) {
+        lastCategory = row.category;
+        widgets.add(_categoryHeader(context, row.category));
+      }
+      widgets.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: DishCard(
+            row: row,
+            localeTag: localeTag,
+            onShowScript: (shown) => unawaited(_openWaiterCard(shown)),
+            note: controller.noteFor(row.dish.id),
+            onEditNote: (edited) => unawaited(_openNoteEditor(edited)),
+          ),
+        ),
+      );
+    }
+    return widgets;
+  }
+
+  /// The keyed heading shown before a category's first visible row
+  /// (issue #51). The [GlobalKey] comes from [_categoryKeyFor] rather than
+  /// a fresh one, so it stays stable across rebuilds as the filter or the
+  /// search narrows and widens what is visible — [_scrollToCategory] needs
+  /// the same key to keep pointing at the same element.
+  Widget _categoryHeader(BuildContext context, String category) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4, bottom: 8),
+      child: KeyedSubtree(
+        key: _categoryKeyFor(category),
+        child: Text(category, style: Theme.of(context).textTheme.titleSmall),
+      ),
+    );
+  }
+
+  /// The stable [GlobalKey] for [category]'s header, created once and
+  /// reused from [_categoryKeys] on every later call (issue #51).
+  GlobalKey _categoryKeyFor(String category) =>
+      _categoryKeys.putIfAbsent(category, GlobalKey.new);
+
+  /// Scrolls the loaded-menu list so [category]'s header is on screen
+  /// (issue #51's chip jump).
+  ///
+  /// The list is an ordinary [ListView], which — like every [ListView] —
+  /// builds only the rows near the viewport (CLAUDE.md's own trap): a
+  /// header far below the fold may not exist in the element tree yet, so
+  /// [Scrollable.ensureVisible] on its [GlobalKey] would have nothing to
+  /// scroll to. [ScrollPosition.maxScrollExtent] is itself only an
+  /// estimate until every row is built, so jumping to it once can still
+  /// land short of a header many rows further down; jumping to the
+  /// *current* estimate, waiting a frame, and reading the (now larger,
+  /// since more rows just got built to satisfy that jump) estimate again
+  /// converges on the true end after a few rounds — each jump forces the
+  /// rows between the last one and this one to be built, in the order a
+  /// [ListView]'s sliver always builds to satisfy a new offset. The loop
+  /// stops once the estimate stops growing (every row is now built) or
+  /// the header is found, whichever comes first; a header already built —
+  /// on screen, or just off it — skips the loop and goes straight to
+  /// [Scrollable.ensureVisible].
+  Future<void> _scrollToCategory(String category) async {
+    final key = _categoryKeyFor(category);
+    if (_scrollController.hasClients) {
+      var knownMaxExtent = -1.0;
+      while (key.currentContext == null) {
+        final maxExtent = _scrollController.position.maxScrollExtent;
+        if (maxExtent <= knownMaxExtent) break;
+        knownMaxExtent = maxExtent;
+        _scrollController.jumpTo(maxExtent);
+        await WidgetsBinding.instance.endOfFrame;
+      }
+    }
+    final target = key.currentContext;
+    if (target == null || !target.mounted) return;
+    await Scrollable.ensureVisible(
+      target,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
   }
 
   /// The unclassified section: a neutral heading naming

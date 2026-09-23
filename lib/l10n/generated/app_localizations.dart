@@ -925,6 +925,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear note'**
   String get noteEditorClear;
+
+  /// No description provided for @menuSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search dishes'**
+  String get menuSearchHint;
+
+  /// No description provided for @menuSearchSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Search dishes by name or description'**
+  String get menuSearchSemanticLabel;
+
+  /// No description provided for @menuSearchClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get menuSearchClear;
+
+  /// No description provided for @menuNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No dishes match your search.'**
+  String get menuNoResults;
+
+  /// No description provided for @categoryChipSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Jump to {category}'**
+  String categoryChipSemanticLabel(String category);
 }
 
 class _AppLocalizationsDelegate
