@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
@@ -10,8 +13,9 @@ import 'package:provider/provider.dart';
 /// (architecture.md §6.5 Tier A, §6.6; `.design/Discovery.dc.html`).
 ///
 /// Nearby search (Tier B) is out of scope for this screen; it reads a
-/// [VenueSearchController] for the current input and its resolution and
-/// otherwise does no work of its own.
+/// [VenueSearchController] for the current input and its resolution, and
+/// for the last venue opened (issue #55), and otherwise does no work of
+/// its own.
 ///
 /// This screen is a tab root under `AppShell` (`widgets/app_shell.dart`),
 /// which already supplies a Settings tab in the bottom navigation — the
@@ -30,7 +34,12 @@ import 'package:provider/provider.dart';
 /// would look broken rather than merely unfinished — so the space they
 /// would occupy is a single honest empty state explaining that only a
 /// pasted link works today, instead.
-class VenueSearchScreen extends StatelessWidget {
+///
+/// A `StatefulWidget` for the same one reason `SavedScreen` and
+/// `SettingsScreen` are: [VenueSearchController.load] must run after the
+/// first frame, not from `build`, so this screen defers it from
+/// `initState` the same way theirs do.
+class VenueSearchScreen extends StatefulWidget {
   /// Creates the venue search screen, showing the persistent offline
   /// banner (issue #68) over [connectivity].
   const new({required this.connectivity, super.key});
@@ -41,10 +50,25 @@ class VenueSearchScreen extends StatelessWidget {
   final Connectivity connectivity;
 
   @override
+  State<VenueSearchScreen> createState() => _VenueSearchScreenState();
+}
+
+class _VenueSearchScreenState extends State<VenueSearchScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(context.read<VenueSearchController>().load());
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final controller = context.watch<VenueSearchController>();
     final resolved = controller.resolved;
+    final lastVenue = controller.lastVenue;
 
     return Scaffold(
       body: SafeArea(
@@ -53,13 +77,17 @@ class VenueSearchScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              OfflineBanner(connectivity: connectivity),
+              OfflineBanner(connectivity: widget.connectivity),
               Text(appName, style: Theme.of(context).textTheme.labelSmall),
               const SizedBox(height: 4),
               Text(
                 l10n.discoveryTitle,
                 style: Theme.of(context).textTheme.displaySmall,
               ),
+              if (lastVenue != null) ...[
+                const SizedBox(height: 16),
+                _continueRow(context, l10n, lastVenue),
+              ],
               const SizedBox(height: 20),
               TextField(
                 onChanged: controller.setInput,
@@ -86,6 +114,31 @@ class VenueSearchScreen extends StatelessWidget {
               _emptyState(context, l10n),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  /// The "Continue with {venue}" row (issue #55): tapping it opens
+  /// [lastVenue]'s menu route exactly as the search field's own submit
+  /// affordance does, using [VenueSearchController.lastVenueName] for
+  /// the venue's display name.
+  Widget _continueRow(
+    BuildContext context,
+    AppLocalizations l10n,
+    VenueRef lastVenue,
+  ) {
+    final name =
+        context.read<VenueSearchController>().lastVenueName ??
+        lastVenue.platformId;
+    return Card(
+      margin: EdgeInsets.zero,
+      child: ListTile(
+        leading: const Icon(Icons.history),
+        title: Text(l10n.venueSearchContinueWith(name)),
+        onTap: () => Navigator.pushNamed(
+          context,
+          '/venue/${lastVenue.source.name}/${lastVenue.platformId}',
         ),
       ),
     );

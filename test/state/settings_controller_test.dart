@@ -279,6 +279,28 @@ void main() {
       expect(repository.clearCacheCallCount, 1);
     });
 
+    test('clearCache resets lastVenue and lastFilter without clobbering '
+        'other settings (issue #55)', () async {
+      // Arrange
+      await settings.write(
+        const AppSettings(
+          languageTag: 'he',
+          lastVenue: VenueRef(source: MenuSource.wolt, platformId: 'v1'),
+          lastFilter: MenuFilter.redOnly,
+        ),
+      );
+      await controller.load();
+
+      // Act
+      await controller.clearCache();
+
+      // Assert
+      final stored = await settings.read();
+      expect(stored.lastVenue, isNull);
+      expect(stored.lastFilter, isNull);
+      expect(stored.languageTag, 'he');
+    });
+
     test('clearCache refreshes cachedMenuCount to 0', () async {
       // Arrange
       const ref = VenueRef(source: MenuSource.wolt, platformId: 'a');

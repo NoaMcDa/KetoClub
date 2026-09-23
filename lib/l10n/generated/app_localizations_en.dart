@@ -53,6 +53,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get venueSearchOpen => 'Show the keto menu';
 
   @override
+  String venueSearchContinueWith(String venue) {
+    return 'Continue with $venue';
+  }
+
+  @override
   String get menuLoading => 'Reading the menu…';
 
   @override
