@@ -51,6 +51,13 @@ abstract interface class MenuRepository {
   /// only, through the cache; never touches the network. Never throws.
   Future<List<CachedMenuEntry>> savedMenus();
 
+  /// How many menus are currently cached — issue #61's Settings section
+  /// is the caller, and reads only this count, never the entries
+  /// themselves ([MenuCache.count]'s own doc comment explains why this is
+  /// a count of entries, never a byte figure). Reads only, through the
+  /// cache; never touches the network. Never throws.
+  Future<int> cachedMenuCount();
+
   /// Removes [ref]'s cached menu and analysis, leaving every other cached
   /// menu untouched. A no-op, not a throw, when nothing is cached for
   /// [ref]. Never throws.
@@ -147,6 +154,9 @@ final class CachedMenuRepository implements MenuRepository {
 
   @override
   Future<List<CachedMenuEntry>> savedMenus() => cache.entries();
+
+  @override
+  Future<int> cachedMenuCount() => cache.count();
 
   @override
   Future<void> remove(VenueRef ref) => cache.remove(ref);

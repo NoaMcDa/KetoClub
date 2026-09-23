@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
+import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 
@@ -247,6 +249,28 @@ void main() {
       expect(states, [true, false]);
     });
 
+    test('initial cachedMenuCount before load is 0', () {
+      // Assert
+      expect(controller.cachedMenuCount, equals(0));
+    });
+
+    test('load populates cachedMenuCount from the repository', () async {
+      // Arrange: two distinct venues cached.
+      const refA = VenueRef(source: MenuSource.wolt, platformId: 'a');
+      const refB = VenueRef(source: MenuSource.wolt, platformId: 'b');
+      final fetchedA = await repository.load(refA) as MenuFetched;
+      final fetchedB = await repository.load(refB) as MenuFetched;
+      repository
+        ..seedCache(CachedMenu(menu: fetchedA.menu))
+        ..seedCache(CachedMenu(menu: fetchedB.menu));
+
+      // Act
+      await controller.load();
+
+      // Assert
+      expect(controller.cachedMenuCount, equals(2));
+    });
+
     test('clearCache delegates to the repository', () async {
       // Act
       await controller.clearCache();
@@ -275,6 +299,21 @@ void main() {
       expect(stored.lastVenue, isNull);
       expect(stored.lastFilter, isNull);
       expect(stored.languageTag, 'he');
+    });
+
+    test('clearCache refreshes cachedMenuCount to 0', () async {
+      // Arrange
+      const ref = VenueRef(source: MenuSource.wolt, platformId: 'a');
+      final fetched = await repository.load(ref) as MenuFetched;
+      repository.seedCache(CachedMenu(menu: fetched.menu));
+      await controller.load();
+      expect(controller.cachedMenuCount, equals(1));
+
+      // Act
+      await controller.clearCache();
+
+      // Assert
+      expect(controller.cachedMenuCount, equals(0));
     });
 
     test('setConsent toggles isBusy true then false', () async {

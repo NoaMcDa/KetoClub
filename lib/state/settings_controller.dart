@@ -30,6 +30,7 @@ final class SettingsController extends ChangeNotifier {
 
   bool _isBusy = false;
   AppSettings _appSettings = const AppSettings();
+  int _cachedMenuCount = 0;
 
   /// Whether an operation is currently reading from or writing to a
   /// store.
@@ -52,12 +53,19 @@ final class SettingsController extends ChangeNotifier {
   /// The net-carb limit in grams above which no dish is green (issue #57).
   int get netCarbLimitGrams => _appSettings.netCarbLimitGrams;
 
-  /// Reads the [SettingsStore], populating every other getter.
+  /// How many menus are currently cached (issue #61's Settings section). A
+  /// count of entries, never a byte figure —
+  /// [MenuRepository.cachedMenuCount]'s own doc comment explains why.
+  int get cachedMenuCount => _cachedMenuCount;
+
+  /// Reads the [SettingsStore] and the cached-menu count, populating every
+  /// other getter.
   Future<void> load() async {
     _isBusy = true;
     notifyListeners();
 
     _appSettings = await _settings.read();
+    _cachedMenuCount = await _repository.cachedMenuCount();
 
     _isBusy = false;
     notifyListeners();
@@ -142,15 +150,18 @@ final class SettingsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Forgets every cached menu and analysis, through the repository, and
-  /// clears the last-opened venue and last-used filter (issue #55) — a
-  /// stale [AppSettings.lastVenue] would otherwise offer to resume a
-  /// venue whose cached menu this call just removed.
+  /// Forgets every cached menu and analysis, through the repository, then
+  /// re-reads [cachedMenuCount] so the Settings screen's count reflects
+  /// the clear immediately, without a second [load] call. Also clears the
+  /// last-opened venue and last-used filter (issue #55) — a stale
+  /// [AppSettings.lastVenue] would otherwise offer to resume a venue whose
+  /// cached menu this call just removed.
   Future<void> clearCache() async {
     _isBusy = true;
     notifyListeners();
 
     await _repository.clearCache();
+    _cachedMenuCount = await _repository.cachedMenuCount();
     _appSettings = _appSettings.copyWith(lastVenue: null, lastFilter: null);
     await _settings.write(_appSettings);
 

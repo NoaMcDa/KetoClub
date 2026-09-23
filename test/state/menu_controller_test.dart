@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
@@ -101,8 +103,8 @@ void main() {
         expect(controller.isLoading, isTrue);
         await future;
 
-        // Assert
-        expect(loadingDuringOpen, [true, false]);
+        // Assert: fetching, then classifying, then done (issue #65).
+        expect(loadingDuringOpen, [true, true, false]);
         expect(controller.isLoading, isFalse);
         expect(controller.menu, equals(menu));
         expect(controller.analysis, equals(analysis));
@@ -639,21 +641,20 @@ void main() {
       );
     });
 
-    test(
-      'open notifies listeners exactly twice on a full round trip',
-      () async {
-        // Arrange
-        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
-        var notifyCount = 0;
-        controller.addListener(() => notifyCount++);
+    test('open notifies listeners exactly three times on a full round trip '
+        'with a classifier that announces no engine — fetching, '
+        'classifying, done (issue #65)', () async {
+      // Arrange
+      repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+      var notifyCount = 0;
+      controller.addListener(() => notifyCount++);
 
-        // Act
-        await controller.open(_ref);
+      // Act
+      await controller.open(_ref);
 
-        // Assert
-        expect(notifyCount, 2);
-      },
-    );
+      // Assert
+      expect(notifyCount, 3);
+    });
 
     test('open notifies listeners exactly twice on a failed fetch', () async {
       // Arrange
@@ -929,6 +930,239 @@ void main() {
         expect(controller.isFromCache, isTrue);
         expect(controller.staleReason, MenuFetchFailureReason.offline);
         expect(controller.analysis, equals(newAnalysis));
+      });
+    });
+
+    group('load phase (issue #65)', () {
+      /// Every [LoadPhase] [controller] notifies with, in order.
+      List<LoadPhase> recordPhases() {
+        final phases = <LoadPhase>[];
+        controller.addListener(() => phases.add(controller.phase));
+        return phases;
+      }
+
+      test('phase is idle before anything is opened', () {
+        // Assert
+        expect(controller.phase, LoadPhase.idle);
+        expect(controller.isLoading, isFalse);
+      });
+
+      test('open with a classifier that announces no engine moves through '
+          'fetching and classifying back to idle', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        final phases = recordPhases();
+
+        // Act
+        await controller.open(_ref);
+
+        // Assert
+        expect(phases, [
+          LoadPhase.fetching,
+          LoadPhase.classifying,
+          LoadPhase.idle,
+        ]);
+      });
+
+      test('open moves to classifyingLlm when the AI engine announces '
+          'itself', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        classifier.announces = const [ClassifyingEngine.llm];
+        final phases = recordPhases();
+
+        // Act
+        await controller.open(_ref);
+
+        // Assert
+        expect(phases, [
+          LoadPhase.fetching,
+          LoadPhase.classifying,
+          LoadPhase.classifyingLlm,
+          LoadPhase.idle,
+        ]);
+      });
+
+      test('open moves to classifyingRules when only the rules engine '
+          'announces itself', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        classifier.announces = const [ClassifyingEngine.rules];
+        final phases = recordPhases();
+
+        // Act
+        await controller.open(_ref);
+
+        // Assert
+        expect(phases, [
+          LoadPhase.fetching,
+          LoadPhase.classifying,
+          LoadPhase.classifyingRules,
+          LoadPhase.idle,
+        ]);
+      });
+
+      test('open reads an AI call that fell back as classifyingLlm then '
+          'classifyingRules', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        classifier.announces = const [
+          ClassifyingEngine.llm,
+          ClassifyingEngine.rules,
+        ];
+        final phases = recordPhases();
+
+        // Act
+        await controller.open(_ref);
+
+        // Assert
+        expect(phases, [
+          LoadPhase.fetching,
+          LoadPhase.classifying,
+          LoadPhase.classifyingLlm,
+          LoadPhase.classifyingRules,
+          LoadPhase.idle,
+        ]);
+      });
+
+      test('the same engine announced twice notifies only once', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        classifier.announces = const [
+          ClassifyingEngine.rules,
+          ClassifyingEngine.rules,
+        ];
+        final phases = recordPhases();
+
+        // Act
+        await controller.open(_ref);
+
+        // Assert
+        expect(
+          phases.where((phase) => phase == LoadPhase.classifyingRules),
+          hasLength(1),
+        );
+      });
+
+      test('while the engine runs the menu is shown unjudged and isLoading '
+          'is true', () async {
+        // Arrange: the previous venue's analysis must not linger on the
+        // new menu while it is being classified.
+        final menu = _menuOf([_dish('Steak')]);
+        repository.stub(_ref, MenuFetched(menu: menu));
+        await controller.open(_ref);
+        expect(controller.analysis, isA<MenuAnalysed>());
+        final gate = Completer<void>();
+        classifier
+          ..announces = const [ClassifyingEngine.llm]
+          ..gate = gate.future;
+
+        // Act
+        final future = controller.open(_ref);
+        await pumpEventQueue();
+
+        // Assert
+        expect(controller.phase, LoadPhase.classifyingLlm);
+        expect(controller.isLoading, isTrue);
+        expect(controller.menu, equals(menu));
+        expect(controller.analysis, isNull);
+        expect(controller.visibleRows, hasLength(1));
+
+        gate.complete();
+        await future;
+        expect(controller.phase, LoadPhase.idle);
+        expect(controller.analysis, isA<MenuAnalysed>());
+      });
+
+      test('open on a failed fetch never enters a classifying phase', () async {
+        // Arrange
+        repository.stub(
+          _ref,
+          const MenuFetchFailed(reason: MenuFetchFailureReason.offline),
+        );
+        final phases = recordPhases();
+
+        // Act
+        await controller.open(_ref);
+
+        // Assert
+        expect(phases, [LoadPhase.fetching, LoadPhase.idle]);
+      });
+
+      test('open hands the classifier an onEngineStarted listener', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+
+        // Act
+        await controller.open(_ref);
+
+        // Assert
+        expect(classifier.calls.single.$2.onEngineStarted, isNotNull);
+      });
+
+      test('an announcement arriving after the load finished is ignored '
+          'and does not notify', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        final lateListener = classifier.calls.single.$2.onEngineStarted!;
+        final phases = recordPhases();
+
+        // Act
+        lateListener(ClassifyingEngine.llm);
+
+        // Assert
+        expect(controller.phase, LoadPhase.idle);
+        expect(phases, isEmpty);
+      });
+
+      test('refresh with a changed fingerprint moves through the '
+          'classifying phases', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Salmon')])));
+        classifier.announces = const [ClassifyingEngine.rules];
+        final phases = recordPhases();
+
+        // Act
+        await controller.refresh();
+
+        // Assert
+        expect(phases, [
+          LoadPhase.fetching,
+          LoadPhase.classifying,
+          LoadPhase.classifyingRules,
+          LoadPhase.idle,
+        ]);
+      });
+
+      test('refresh with an unchanged fingerprint never enters a '
+          'classifying phase', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        final phases = recordPhases();
+
+        // Act
+        await controller.refresh();
+
+        // Assert
+        expect(phases, [LoadPhase.fetching, LoadPhase.idle]);
+      });
+
+      test('isClassifying is true for exactly the three classifying '
+          'phases', () {
+        // Act
+        final classifying = LoadPhase.values.where((p) => p.isClassifying);
+
+        // Assert
+        expect(classifying, [
+          LoadPhase.classifying,
+          LoadPhase.classifyingLlm,
+          LoadPhase.classifyingRules,
+        ]);
       });
     });
 
