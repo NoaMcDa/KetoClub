@@ -255,6 +255,21 @@ void main() {
       );
     });
 
+    test('menuFingerprint is unaffected by a whitespace-only difference — '
+        'the case the menu-cache staleness comparison relies on '
+        '(architecture.md §6.4, issue #49)', () {
+      // Arrange
+      final before = _menu([_dish(name: 'Steak', description: 'Rare cut')]);
+      final after = _menu([
+        _dish(name: '  Steak  ', description: 'Rare   cut\n'),
+      ]);
+      // Act, Assert
+      expect(
+        TextNormaliser.menuFingerprint(before),
+        equals(TextNormaliser.menuFingerprint(after)),
+      );
+    });
+
     test('menuFingerprint changes when a dish name changes', () {
       // Arrange
       final before = _menu([_dish(name: 'Steak', description: 'Rare')]);

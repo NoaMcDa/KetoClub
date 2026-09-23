@@ -886,6 +886,76 @@ void main() {
     });
 
     testWidgets(
+      'pulling the loaded menu down triggers a RefreshIndicator that calls '
+      'MenuController.refresh (issue #49)',
+      (tester) async {
+        // Arrange
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        final controller = _controllerFor(repository: repository);
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+        final loadCallsBefore = repository.loadCalls.length;
+
+        // Act: drag the list down far and fast enough to cross
+        // RefreshIndicator's trigger threshold.
+        await tester.fling(find.byType(ListView), const Offset(0, 300), 1000);
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pumpAndSettle();
+
+        // Assert: a second, forced load — MenuController.refresh's own
+        // contract — beyond the one initState's open() already made.
+        expect(repository.loadCalls.length, greaterThan(loadCallsBefore));
+        expect(
+          repository.loadCalls.last,
+          equals((ref: _ref, forceRefresh: true)),
+        );
+      },
+    );
+
+    testWidgets(
+      'pulling to refresh is not disabled by the active filter (issue #49)',
+      (tester) async {
+        // Arrange: filter narrowed to a verdict with no matching dish, so
+        // visibleRows is empty, but the RefreshIndicator must still work.
+        final green = _dish('Steak', id: 'green');
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([green])));
+        final classifier = FakeMenuClassifier()
+          ..respondWith(
+            MenuAnalysed(
+              dishes: [_verdictFor(green, DishVerdict.orderAsIs)],
+              unclassified: const <String>[],
+              engine: const RulesEngine(
+                reason: MenuAnalysisFailureReason.notConfigured,
+              ),
+              analysedAt: DateTime.utc(2026),
+            ),
+          );
+        final controller = _controllerFor(
+          repository: repository,
+          classifier: classifier,
+        );
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+        controller.setFilter(MenuFilter.redOnly);
+        await tester.pumpAndSettle();
+        expect(find.byType(DishCard), findsNothing);
+        final loadCallsBefore = repository.loadCalls.length;
+
+        // Act
+        await tester.fling(find.byType(ListView), const Offset(0, 300), 1000);
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(repository.loadCalls.length, greaterThan(loadCallsBefore));
+      },
+    );
+
+    testWidgets(
       'retry after a failed fetch calls open again with forceRefresh true',
       (tester) async {
         // Arrange

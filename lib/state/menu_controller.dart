@@ -8,6 +8,7 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/utils/keto_score.dart';
+import 'package:ketoclub/utils/text_normaliser.dart';
 
 /// Screen state for the classified menu screen (architecture.md §6.6).
 ///
@@ -51,6 +52,10 @@ final class MenuController extends ChangeNotifier {
   bool _isFromCache = false;
   MenuFetchFailureReason? _staleReason;
   MenuFilter _filter = MenuFilter.all;
+
+  /// The venue [open] most recently loaded, or null before the first
+  /// call — [refresh] has nothing to refetch until then.
+  VenueRef? _ref;
 
   /// Whether [open] is currently loading or classifying a menu.
   bool get isLoading => _isLoading;
@@ -244,6 +249,7 @@ final class MenuController extends ChangeNotifier {
   /// [filter] is reset from the user's stored default on every call.
   /// Never throws.
   Future<void> open(VenueRef ref, {bool forceRefresh = false}) async {
+    _ref = ref;
     _isLoading = true;
     notifyListeners();
 
@@ -281,6 +287,83 @@ final class MenuController extends ChangeNotifier {
         _staleReason = null;
         _fetchFailure = reason;
         _fetchStatusCode = statusCode;
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  /// Force-refetches the venue last passed to [open], skipping
+  /// classification when the refetched menu's dish text is unchanged
+  /// (architecture.md §6.4, §10 row 1).
+  ///
+  /// A no-op when [open] has never been called — there is nothing to
+  /// refetch. Compares [TextNormaliser.menuFingerprint] of the menu shown
+  /// before this call against the refetched one: equal fingerprints keep
+  /// [analysis] exactly as it was (only [menu] — and so [fetchedAt] —
+  /// moves forward), spending no classifier call; a changed fingerprint
+  /// reclassifies and persists the new result exactly as [open] does.
+  ///
+  /// A refetch that fails outright (no adapter succeeded and nothing was
+  /// cached to fall back to — the only way [MenuRepository.load] returns
+  /// [MenuFetchFailed] once a menu is already showing) leaves [menu] and
+  /// [analysis] untouched and surfaces the failure reason through
+  /// [staleReason], the same "still shows the last good menu" contract
+  /// [MenuRepository.load] itself upholds when a cached menu exists. It
+  /// is far more common for that contract to be upheld one layer down:
+  /// [MenuRepository.load] itself falls back to a cached menu on a
+  /// failed fetch, returning [MenuFetched] with `fromCache: true` rather
+  /// than [MenuFetchFailed] — that path is handled by the same branch
+  /// [open] uses, below.
+  Future<void> refresh() async {
+    final currentRef = _ref;
+    if (currentRef == null) return;
+    final previousMenu = _menu;
+    final previousAnalysis = _analysis;
+
+    _isLoading = true;
+    notifyListeners();
+
+    final fetchResult = await _repository.load(currentRef, forceRefresh: true);
+    switch (fetchResult) {
+      case MenuFetched(
+        menu: final fetchedMenu,
+        :final fromCache,
+        :final staleReason,
+      ):
+        final unchanged =
+            previousMenu != null &&
+            TextNormaliser.menuFingerprint(previousMenu) ==
+                TextNormaliser.menuFingerprint(fetchedMenu);
+        _menu = fetchedMenu;
+        _isFromCache = fromCache;
+        _staleReason = staleReason;
+        _fetchFailure = null;
+        _fetchStatusCode = null;
+        if (unchanged && previousAnalysis is MenuAnalysed) {
+          // The dish text did not change: keep the analysis already on
+          // hand — only fetchedAt (read from _menu) moves forward — and
+          // spend no classifier call (architecture.md §6.4).
+          _analysis = previousAnalysis;
+        } else {
+          final appSettings = await _settings.read();
+          final options = ClassificationOptions(
+            estimationConsentGiven: appSettings.estimationConsentGiven,
+          );
+          final analysis = await _classifier.classify(
+            fetchedMenu,
+            options: options,
+          );
+          _analysis = analysis;
+          if (analysis is MenuAnalysed) {
+            await _repository.saveAnalysis(currentRef, analysis);
+          }
+        }
+      case MenuFetchFailed(:final reason):
+        // Nothing fresh, and nothing stale either: keep exactly what was
+        // already shown, and say why a refresh could not improve on it.
+        _staleReason = reason;
+        _isFromCache = true;
     }
 
     _isLoading = false;

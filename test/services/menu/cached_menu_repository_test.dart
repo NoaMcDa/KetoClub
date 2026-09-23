@@ -323,6 +323,64 @@ void main() {
       expect(entry?.menu, equals(refetched));
     });
 
+    test("load keeps the existing analysis when the refetched menu's dish "
+        "text differs only by whitespace — issue #49's acceptance "
+        'criterion', () async {
+      // Arrange
+      final oldMenu = _menuWith(_woltRef, clock.now(), dishText: 'Steak');
+      await cache.write(CachedMenu(menu: oldMenu, analysis: _someAnalysis));
+      final refetched = _menuWith(
+        _woltRef,
+        clock.now().add(const Duration(hours: 1)),
+        dishText: '  Steak  ',
+      );
+      adapter.queueFetched(refetched);
+
+      // Act
+      await repository.load(_woltRef, forceRefresh: true);
+
+      // Assert
+      final entry = await cache.read(_woltRef);
+      expect(entry?.analysis, equals(_someAnalysis));
+      expect(entry?.menu, equals(refetched));
+    });
+
+    test('load drops the existing analysis when the refetched menu gains '
+        "a dish — issue #49's acceptance criterion", () async {
+      // Arrange
+      final oldMenu = _menuWith(_woltRef, clock.now());
+      await cache.write(CachedMenu(menu: oldMenu, analysis: _someAnalysis));
+      final refetched = Menu(
+        venueRef: _woltRef,
+        currency: 'ILS',
+        fetchedAt: clock.now().add(const Duration(hours: 1)),
+        categories: <MenuCategory>[
+          ...oldMenu.categories,
+          const MenuCategory(
+            id: 'c2',
+            name: 'Extras',
+            dishes: <Dish>[
+              Dish(
+                id: 'd2',
+                name: 'Extra dish',
+                description: '',
+                price: 5,
+                options: <DishOption>[],
+              ),
+            ],
+          ),
+        ],
+      );
+      adapter.queueFetched(refetched);
+
+      // Act
+      await repository.load(_woltRef, forceRefresh: true);
+
+      // Assert
+      final entry = await cache.read(_woltRef);
+      expect(entry?.analysis, isNull);
+    });
+
     test("load drops the existing analysis when the refetched menu's "
         'fingerprint changes', () async {
       // Arrange
