@@ -399,5 +399,7 @@ flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
 # or, with no backend running: flutter run -d chrome
 # or a device: flutter run -d <device>
 
+Cutting a release? See `docs/RELEASE.md` for the checklist and device test matrix.
+
 License
 Distributed under the MIT License. See LICENSE for details.
