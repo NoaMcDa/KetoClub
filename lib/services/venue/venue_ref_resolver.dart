@@ -45,6 +45,12 @@ final RegExp _digitsOnly = RegExp(r'^[0-9]+$');
 /// and so still fails with `unsupportedSource` — recognising the URL is
 /// this class's whole job; fetching from it is Phase 2 (architecture.md
 /// §17, "What is NOT built yet").
+///
+/// [platformUrl] is [resolve]'s inverse: it derives the venue's own page
+/// on its platform from an already-resolved [VenueRef], for the "open on
+/// {platform}" action in the menu header (issue #53). It answers null for
+/// a source [resolve] can produce but this class cannot yet turn back
+/// into a URL (Tabit, Ontopo).
 abstract final class VenueRefResolver {
   /// Returns null when [input] is not something KetoClub can read:
   /// empty or whitespace-only input, a URL on a host this class does
@@ -132,4 +138,45 @@ abstract final class VenueRefResolver {
     }
     return null;
   }
+
+  /// Wolt's own venue page for [slug] (issue #53):
+  /// `https://wolt.com/en/isr/tel-aviv/restaurant/{slug}`.
+  ///
+  /// The locale and city segments are Wolt's own path shape, not a
+  /// KetoClub encoding of anything — [_fromWoltUri] reads any locale and
+  /// any city back the same way, so hard-coding `en` and `tel-aviv` here
+  /// costs nothing at read time. **The city segment is unverified**:
+  /// `wolt.com` was unreachable from the build environment (the same
+  /// limitation this class's own doc comment already records for the
+  /// 10bis shape below), so this assumes Wolt redirects a URL with the
+  /// wrong city to the venue's real city rather than 404ing on it. This
+  /// is unconfirmed; the user should verify it against a real Wolt link
+  /// before release.
+  static Uri _woltUrl(String slug) =>
+      Uri.https('wolt.com', '/en/isr/tel-aviv/restaurant/$slug');
+
+  /// 10bis's own venue page for [id] (issue #53):
+  /// `https://www.10bis.co.il/next/restaurants/menu/delivery/{id}`, the
+  /// same `menu/delivery` shape [_fromTenBisUri] already tolerates when
+  /// reading a pasted 10bis URL back. Unverified for the same reason
+  /// [_woltUrl] gives for Wolt's city segment — see also this class's own
+  /// doc comment on the 10bis URL shape.
+  static Uri _tenBisUrl(String id) =>
+      Uri.https('www.10bis.co.il', '/next/restaurants/menu/delivery/$id');
+
+  /// The venue's own page on the platform [ref] names, for an "open on
+  /// {platform}" action in the menu header (issue #53) — or null when
+  /// [VenueRef.source] has no known URL form yet (Tabit, Ontopo).
+  ///
+  /// Pure, like [resolve]: no I/O, so a caller can decide whether to show
+  /// the button the instant a menu loads. Round-trips through [resolve]
+  /// for every source this answers non-null for —
+  /// `resolve(platformUrl(ref).toString())` gives back a [VenueRef] equal
+  /// to [ref] — which this class's tests assert directly, since a broken
+  /// link the header ships is worse than no button at all.
+  static Uri? platformUrl(VenueRef ref) => switch (ref.source) {
+    MenuSource.wolt => _woltUrl(ref.platformId),
+    MenuSource.tenbis => _tenBisUrl(ref.platformId),
+    MenuSource.tabit || MenuSource.ontopo => null,
+  };
 }

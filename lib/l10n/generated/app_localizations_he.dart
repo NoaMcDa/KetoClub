@@ -359,6 +359,11 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String menuOpenOnPlatform(String platform) {
+    return 'פתח ב-$platform';
+  }
+
+  @override
   String menuShowingAll(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
