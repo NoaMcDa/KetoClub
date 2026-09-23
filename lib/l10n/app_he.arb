@@ -180,5 +180,15 @@
   "waiterCardAfterText": "עם השינויים האלו, בערך {grams} גרם פחמימות נטו (הערכה) — בטוח להזמין.",
   "@waiterCardAfterText": {
     "placeholders": { "grams": { "type": "String" } }
-  }
+  },
+
+  "dishCardAddNote": "הוסף הערה",
+  "dishCardEditNoteSemanticLabel": "ערוך את ההערה שלך: {note}",
+  "@dishCardEditNoteSemanticLabel": {
+    "placeholders": { "note": { "type": "String" } }
+  },
+  "noteEditorTitle": "הערה אישית",
+  "noteEditorHint": "לדוגמה: הצוות החליף בשמחה לכרובית",
+  "noteEditorSave": "שמור",
+  "noteEditorClear": "מחק הערה"
 }

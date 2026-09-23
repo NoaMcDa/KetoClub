@@ -190,6 +190,7 @@ Route<void>? generateRoute(
           dependencies.menuRepository,
           dependencies.menuClassifier,
           dependencies.settingsStore,
+          dependencies.notesStore,
         ),
         child: MenuScreen(
           ref: ref,

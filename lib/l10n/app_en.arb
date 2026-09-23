@@ -180,5 +180,15 @@
   "waiterCardAfterText": "With these changes, about {grams}g net carbs (estimate) — safe to order.",
   "@waiterCardAfterText": {
     "placeholders": { "grams": { "type": "String" } }
-  }
+  },
+
+  "dishCardAddNote": "Add a note",
+  "dishCardEditNoteSemanticLabel": "Edit your note: {note}",
+  "@dishCardEditNoteSemanticLabel": {
+    "placeholders": { "note": { "type": "String" } }
+  },
+  "noteEditorTitle": "Personal note",
+  "noteEditorHint": "e.g. Waitstaff happily substituted cauliflower",
+  "noteEditorSave": "Save",
+  "noteEditorClear": "Clear note"
 }
