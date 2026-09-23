@@ -146,6 +146,10 @@ class _SavedScreenState extends State<SavedScreen> {
           .showSnackBar(
             SnackBar(
               content: Text(l10n.savedRemovedMessage(title)),
+              // A SnackBar with an action persists by default in this SDK,
+              // which would leave the undo window open forever; the
+              // removal must commit once the default duration runs out.
+              persist: false,
               action: SnackBarAction(
                 label: l10n.savedUndo,
                 onPressed: () {

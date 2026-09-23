@@ -283,7 +283,9 @@ void main() {
         // The SnackBar's auto-dismiss timer starts only once its entrance
         // animation completes, so settle that first, then advance the fake
         // clock past the timer, then settle the exit animation so `closed`
-        // completes and the removal is committed.
+        // completes and the removal is committed. The screen passes
+        // `persist: false`, because a SnackBar with an action would
+        // otherwise never time out.
         await tester.pumpAndSettle();
         await tester.pump(const Duration(seconds: 5));
         await tester.pumpAndSettle();
