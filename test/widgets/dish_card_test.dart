@@ -431,5 +431,132 @@ void main() {
       // Assert
       expect(find.text('הצג כרטיס למלצר'), findsOneWidget);
     });
+
+    group('personal notes (issue #52)', () {
+      testWidgets(
+        'build renders no note affordance when onEditNote is not given',
+        (tester) async {
+          // Arrange
+          final row = DishRow(dish: _dish(), category: 'Mains');
+
+          // Act
+          await _pump(
+            tester,
+            DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+          );
+
+          // Assert: existing call sites that predate this field compile and
+          // render unchanged.
+          expect(find.text('Add a note'), findsNothing);
+        },
+      );
+
+      testWidgets(
+        'build shows "Add a note" when onEditNote is given but note is null',
+        (tester) async {
+          // Arrange
+          final row = DishRow(dish: _dish(), category: 'Mains');
+
+          // Act
+          await _pump(
+            tester,
+            DishCard(
+              row: row,
+              localeTag: 'en',
+              onShowScript: (_) {},
+              onEditNote: (_) {},
+            ),
+          );
+
+          // Assert
+          expect(find.text('Add a note'), findsOneWidget);
+        },
+      );
+
+      testWidgets('build shows the note text when one is given', (
+        tester,
+      ) async {
+        // Arrange
+        final row = DishRow(dish: _dish(), category: 'Mains');
+
+        // Act
+        await _pump(
+          tester,
+          DishCard(
+            row: row,
+            localeTag: 'en',
+            onShowScript: (_) {},
+            note: 'Waitstaff happily substituted cauliflower.',
+            onEditNote: (_) {},
+          ),
+        );
+
+        // Assert
+        expect(
+          find.text('Waitstaff happily substituted cauliflower.'),
+          findsOneWidget,
+        );
+        expect(find.text('Add a note'), findsNothing);
+      });
+
+      testWidgets('tapping the note row calls onEditNote with this row', (
+        tester,
+      ) async {
+        // Arrange
+        final row = DishRow(dish: _dish(), category: 'Mains');
+        DishRow? tapped;
+
+        // Act
+        await _pump(
+          tester,
+          DishCard(
+            row: row,
+            localeTag: 'en',
+            onShowScript: (_) {},
+            onEditNote: (edited) => tapped = edited,
+          ),
+        );
+        await tester.tap(find.text('Add a note'));
+        await tester.pump();
+
+        // Assert
+        expect(tapped, equals(row));
+      });
+
+      testWidgets(
+        'build shows the note affordance for a non-keto dish too, unlike '
+        'the waiter-script button',
+        (tester) async {
+          // Arrange: a note is the user's own annotation, not tied to a
+          // verdict, so it must not be hidden the way the modifiable-only
+          // waiter-script disclosure is.
+          final row = DishRow(
+            dish: _dish(),
+            category: 'Mains',
+            analysis: const AnalysedDish(
+              dishId: 'dish_1',
+              name: 'Spaghetti Carbonara',
+              verdict: DishVerdict.nonKeto,
+              why: 'Pasta is a non-keto base.',
+            ),
+          );
+
+          // Act
+          await _pump(
+            tester,
+            DishCard(
+              row: row,
+              localeTag: 'en',
+              onShowScript: (_) {},
+              note: 'Skip it.',
+              onEditNote: (_) {},
+            ),
+          );
+
+          // Assert
+          expect(find.text('Skip it.'), findsOneWidget);
+        },
+      );
+    });
   });
 }
