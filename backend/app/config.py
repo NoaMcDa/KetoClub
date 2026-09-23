@@ -47,6 +47,9 @@ class Settings(BaseSettings):
     # Never taken from a request — hard-coded here so a misconfigured client
     # cannot redirect the proxy to an arbitrary host.
     WOLT_BASE_URL: str = "https://restaurant-api.wolt.com"
+    # Upstream 10bis host for the proxy route (#122).
+    # Never taken from a request, for the same reason as WOLT_BASE_URL.
+    TENBIS_BASE_URL: str = "https://www.10bis.co.il"
 
     # --- Database -------------------------------------------------------------
     DATABASE_URL: str = "sqlite:///./ketoclub.db"

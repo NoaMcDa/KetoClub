@@ -20,6 +20,7 @@ import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
+import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
 
@@ -262,6 +263,7 @@ class _MenuScreenState extends State<MenuScreen> {
         const SizedBox(height: 8),
         ...banners,
         if (controller.engine != null) ...[
+          RulesReasonBanner(engine: controller.engine!),
           EngineChip(engine: controller.engine!),
           const SizedBox(height: 12),
         ],

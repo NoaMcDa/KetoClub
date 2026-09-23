@@ -14,6 +14,7 @@ Routes shipped so far:
 |---|---|---|
 | `GET /v1/health` | #94 | `{status, version, llm_configured}` |
 | `GET /v1/proxy/wolt/v4/venues/slug/{slug}/menu/data` | #95 | The Wolt menu proxy for the web build, see below |
+| `GET /v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu` | #122 | The 10bis menu proxy for the web build, see below |
 | `POST /v1/chat` | #100 | Hosted classification: forwards one completion to Gemini `generateContent` with the server's key |
 
 Community routes are later issues (`backend_plan.md` §5).
@@ -101,6 +102,36 @@ curl -sS localhost:8000/v1/proxy/wolt/v4/venues/slug/vitrina-lilinblum/menu/data
   -o test/fixtures/wolt_vitrina_lilinblum_menu.json
 ```
 
+## The 10bis menu proxy
+
+`GET /v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu` forwards to
+`{TENBIS_BASE_URL}/api/v1.0/Restaurants/{restaurantId}/Menu` and returns
+10bis's status, body and `Content-Type` unchanged, 404 included — shaped
+exactly like the Wolt proxy above (issue #122). The upstream host always
+comes from `TENBIS_BASE_URL` in config, never from the request.
+
+- `restaurantId` is validated against `^[0-9]{1,12}$`; anything else is 422
+  before any upstream call is made.
+- Upstream request headers are built from scratch (`User-Agent`, `Accept`)
+  — nothing from the inbound request is forwarded, the same rule as Wolt's.
+- A connect failure is 502 (`{"reason": "offline", ...}`); an upstream
+  timeout is 504 (`{"reason": "timeout", ...}`).
+- 2xx responses are cached per restaurant id for `MENU_CACHE_TTL_SECONDS`;
+  the response carries `X-KetoClub-Cache: hit` or `miss`. Failures are
+  never cached. The cache table is shared with the Wolt proxy but keyed by
+  `(source, id)`, so a Wolt slug and a 10bis id that happen to be the same
+  string never collide.
+
+The synthetic 10bis fixture used in `lib/` tests has never been recorded
+from a real restaurant (issue #44); this proxy can do that from a machine
+that can reach `www.10bis.co.il` (the sandbox this backend was built in
+cannot):
+
+```bash
+curl -sS localhost:8000/v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu \
+  -o test/fixtures/tenbis_{id}_menu.json
+```
+
 ## Running locally
 
 ```bash
@@ -142,6 +173,8 @@ that need them (`/v1/chat`, and `/v1/admin/*` in a later issue). See
 | `GEMINI_MAX_OUTPUT_TOKENS` | `8192` | `generationConfig.maxOutputTokens` |
 | `GEMINI_THINKING_BUDGET` | `0` | Thinking tokens count against the output budget, and this is a classification task |
 | `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_PER_DAY` | `5`, `40` | Per install id on `/v1/chat`, in memory |
+| `WOLT_BASE_URL` | `https://restaurant-api.wolt.com` | Upstream host for the Wolt proxy; never taken from a request |
+| `TENBIS_BASE_URL` | `https://www.10bis.co.il` | Upstream host for the 10bis proxy; never taken from a request |
 
 ## Smoke test against the real API
 

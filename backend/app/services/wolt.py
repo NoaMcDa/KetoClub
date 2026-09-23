@@ -4,6 +4,11 @@
 ``app/routers/proxy.py`` is the only caller; this module has no FastAPI
 imports so the request/response shaping stays in the router and the
 upstream/caching mechanics stay here.
+
+The cache functions (``read_cached_menu``/``write_cached_menu``) are shared
+with ``app.services.tenbis`` (#122): they take a ``source`` so Wolt and
+10bis rows in one ``menu_cache`` table cannot collide, rather than each
+platform module duplicating the read/write logic.
 """
 
 from collections.abc import Callable
@@ -40,6 +45,9 @@ WOLT_HEADERS: dict[str, str] = {
 # connect 5s, read/write 15s, pool 5s (backend_plan.md §3.3's connect/read
 # bounds; write and pool are not specified upstream and are set to match).
 WOLT_TIMEOUT = httpx.Timeout(connect=5.0, read=15.0, write=15.0, pool=5.0)
+
+# The ``source`` this platform writes into ``MenuCache`` rows (#122).
+SOURCE = "wolt"
 
 
 def wolt_menu_url(base_url: str, slug: str) -> str:
@@ -80,15 +88,18 @@ def _run_in_session[T](engine: Engine, fn: Callable[[Session], T]) -> T:
 
 
 def read_cached_menu(
-    engine: Engine, slug: str, ttl_seconds: int
+    engine: Engine, source: str, slug: str, ttl_seconds: int
 ) -> CachedMenuResponse | None:
-    """Return the cached response for ``slug`` if it exists and is fresh.
+    """Return the cached response for ``(source, slug)`` if fresh.
 
-    A missing row, or one older than ``ttl_seconds``, is a cache miss.
+    ``source`` (``"wolt"``, ``"tenbis"``, ...) plus ``slug`` is the table's
+    primary key (#122), so identical ids from different platforms never
+    collide. A missing row, or one older than ``ttl_seconds``, is a cache
+    miss.
     """
 
     def _read(session: Session) -> CachedMenuResponse | None:
-        row = session.get(MenuCache, slug)
+        row = session.get(MenuCache, (source, slug))
         if row is None:
             return None
         fetched_at = row.fetched_at
@@ -107,12 +118,13 @@ def read_cached_menu(
 
 def write_cached_menu(
     engine: Engine,
+    source: str,
     slug: str,
     status_code: int,
     content_type: str,
     body: str,
 ) -> None:
-    """Insert or replace the cached response for ``slug``.
+    """Insert or replace the cached response for ``(source, slug)``.
 
     Only ever called for a 2xx upstream response (``backend_plan.md`` §3.3):
     a failed fetch is never cached.
@@ -121,6 +133,7 @@ def write_cached_menu(
     def _write(session: Session) -> None:
         session.merge(
             MenuCache(
+                source=source,
                 slug=slug,
                 status_code=status_code,
                 content_type=content_type,

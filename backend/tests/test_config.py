@@ -12,6 +12,7 @@ def test_defaults_match_documented_values() -> None:
     assert settings.GEMINI_MAX_OUTPUT_TOKENS == 8192
     assert settings.GEMINI_THINKING_BUDGET == 0
     assert settings.WOLT_BASE_URL == "https://restaurant-api.wolt.com"
+    assert settings.TENBIS_BASE_URL == "https://www.10bis.co.il"
     assert settings.DATABASE_URL == "sqlite:///./ketoclub.db"
     assert settings.CORS_ORIGIN_REGEX == r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
     assert settings.ADMIN_TOKEN == ""
