@@ -32,6 +32,9 @@ final class FakeMenuRepository implements MenuRepository {
   /// How many times [clearCache] has been called.
   int clearCacheCallCount = 0;
 
+  /// Every [VenueRef] passed to [remove], in order.
+  final List<VenueRef> removedRefs = <VenueRef>[];
+
   /// Scripts [load] to answer [result] for [ref].
   void stub(VenueRef ref, MenuFetchResult result) {
     _stubs[ref.cacheKey] = result;
@@ -76,5 +79,26 @@ final class FakeMenuRepository implements MenuRepository {
   Future<void> clearCache() async {
     clearCacheCallCount++;
     _cached.clear();
+  }
+
+  @override
+  Future<List<CachedMenuEntry>> savedMenus() async => [
+    for (final cached in _cached.values)
+      CachedMenuEntry(
+        ref: cached.menu.venueRef,
+        venueName: cached.menu.venueName,
+        fetchedAt: cached.menu.fetchedAt,
+        dishCount: cached.menu.allDishes.length,
+        engine: switch (cached.analysis) {
+          final MenuAnalysed analysed => analysed.engine,
+          _ => null,
+        },
+      ),
+  ];
+
+  @override
+  Future<void> remove(VenueRef ref) async {
+    removedRefs.add(ref);
+    _cached.remove(ref.cacheKey);
   }
 }

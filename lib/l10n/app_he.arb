@@ -125,7 +125,21 @@
   "scanPlaceholderTitle": "סריקת תפריט",
   "scanPlaceholderBody": "צילום תפריט פיזי יתאפשר בעדכון עתידי. בינתיים, הדביקו קישור למשלוח במסך גילוי.",
   "savedPlaceholderTitle": "מסעדות שמורות",
-  "savedPlaceholderBody": "שמרו מסעדה כדי למצוא אותה כאן בהמשך. האפשרות הזו תגיע בעדכון עתידי.",
+  "savedPlaceholderBody": "פתחו תפריט של מסעדה והוא יופיע כאן אוטומטית, זמין ליממה — גם ללא חיבור לאינטרנט.",
+  "savedEntryDishCount": "{count, plural, one{מנה אחת} two{שתי מנות} other{{count} מנות}}",
+  "@savedEntryDishCount": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "savedRemove": "הסר",
+  "savedRemoveSemanticLabel": "הסר את {venue}",
+  "@savedRemoveSemanticLabel": {
+    "placeholders": { "venue": { "type": "String" } }
+  },
+  "savedRemovedMessage": "{venue} הוסרה.",
+  "@savedRemovedMessage": {
+    "placeholders": { "venue": { "type": "String" } }
+  },
+  "savedUndo": "בטל",
 
   "discoveryTitle": "איפה לאכול",
   "discoveryEmptyTitle": "הדביקו קישור כדי להתחיל",
