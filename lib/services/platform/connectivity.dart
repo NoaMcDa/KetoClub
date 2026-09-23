@@ -1,6 +1,7 @@
 /// Whether the device currently appears to have a network route, used as a
-/// pre-flight hint before `RoutingMenuClassifier` spends an OpenRouter
-/// request (architecture.md §6.2, §14 D10 — reinstated in Phase 1).
+/// pre-flight hint before `RoutingMenuClassifier` spends a request to
+/// KetoClub's server (architecture.md §6.2, §14 D10 — reinstated in
+/// Phase 1).
 library;
 
 import 'package:connectivity_plus/connectivity_plus.dart' as plus;
@@ -32,7 +33,7 @@ abstract interface class Connectivity {
 /// touched: `connectivity_plus`'s `Connectivity()` constructor only
 /// assembles a singleton wrapper and never opens a platform channel, so
 /// `di.dart` may construct it directly while assembling the dependency
-/// graph, exactly as it does for `FlutterSecureStorage()` (`key_store.dart`).
+/// graph.
 /// Every channel call happens inside [isOnline], never from this
 /// constructor.
 final class DeviceConnectivity implements Connectivity {
@@ -40,7 +41,7 @@ final class DeviceConnectivity implements Connectivity {
   ///
   /// Positional and private: Dart cannot express a private named
   /// initializing formal, so the choice was positional or a suppressed lint
-  /// — see `SecureKeyStore` (`key_store.dart`) for the same call.
+  /// — see `RoutingMenuClassifier` for the same call.
   const new(this._probe);
 
   final plus.Connectivity _probe;

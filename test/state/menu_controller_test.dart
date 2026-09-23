@@ -135,7 +135,7 @@ void main() {
       final menu = _menuOf([_dish('Steak')]);
       repository.stub(_ref, MenuFetched(menu: menu));
       const failure = MenuAnalysisFailed(
-        reason: MenuAnalysisFailureReason.unauthorised,
+        reason: MenuAnalysisFailureReason.noDishesFound,
       );
       classifier.respondWith(failure);
 

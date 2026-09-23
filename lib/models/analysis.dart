@@ -240,14 +240,14 @@ sealed class AnalysisEngine {
 }
 
 /// Tags a result as produced by the primary engine: an LLM call through
-/// OpenRouter.
+/// KetoClub's server.
 @immutable
 final class LlmEngine extends AnalysisEngine {
-  /// Creates a tag naming the OpenRouter [model] that produced the
-  /// result.
+  /// Creates a tag naming the [model] that produced the result, as the
+  /// server reported it.
   const new({required this.model});
 
-  /// The OpenRouter model id that produced this result.
+  /// The model id that produced this result, as the server reported it.
   final String model;
 
   /// Writes a form [_engineFrom] can read back.

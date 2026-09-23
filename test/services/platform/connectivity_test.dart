@@ -11,7 +11,7 @@ import '../../fakes/fake_connectivity.dart';
 /// channel — rather than swapping out `plus.Connectivity` for a fake —
 /// exercises [DeviceConnectivity] exactly as it runs in the app: a real
 /// `connectivity_plus.Connectivity` over a real (mocked) platform channel,
-/// the same approach `secure_key_store_test.dart` takes for `KeyStore`.
+/// the same approach a plugin-backed store's test takes for its plugin.
 const MethodChannel _channel = MethodChannel(
   'dev.fluttercommunity.plus/connectivity',
 );

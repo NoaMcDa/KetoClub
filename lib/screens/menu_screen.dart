@@ -78,9 +78,9 @@ String _definitionTextFrom(String line) {
 /// menu".
 ///
 /// The app bar carries the Settings action, as every screen does: the
-/// analysis banners on this screen ("Add an OpenRouter key in Settings…",
-/// "OpenRouter rejected your key") name Settings as the way out, so it
-/// must be reachable from here without first going back.
+/// analysis banners on this screen ("Allow AI analysis in Settings…")
+/// name Settings as the way out, so it must be reachable from here
+/// without first going back.
 class MenuScreen extends StatefulWidget {
   /// Creates a screen that loads and classifies the menu for [ref].
   const new({required this.ref, required this.screenBrightness, super.key});

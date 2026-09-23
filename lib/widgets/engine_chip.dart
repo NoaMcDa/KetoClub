@@ -99,7 +99,7 @@ class EngineChip extends StatelessWidget {
 /// An exhaustive switch with no `default`: adding a
 /// [MenuAnalysisFailureReason] value without updating this function is a
 /// compile error (architecture.md §10). [MenuAnalysisFailureReason
-/// .unauthorised] never reaches [RulesEngine] in practice — the router
+/// .noDishesFound] never reaches [RulesEngine] in practice — the router
 /// never falls back for it (architecture.md §6.2) — but the switch still
 /// covers it so this stays exhaustive if that ever changes.
 String _reasonLabel(
@@ -110,7 +110,10 @@ String _reasonLabel(
   MenuAnalysisFailureReason.offline => l10n.engineChipReasonOffline,
   MenuAnalysisFailureReason.timeout => l10n.engineChipReasonTimeout,
   MenuAnalysisFailureReason.rateLimited => l10n.engineChipReasonRateLimited,
-  MenuAnalysisFailureReason.unauthorised => l10n.engineChipReasonUnauthorised,
   MenuAnalysisFailureReason.badResponse => l10n.engineChipReasonBadResponse,
   MenuAnalysisFailureReason.noDishesFound => l10n.engineChipReasonNoDishesFound,
+  MenuAnalysisFailureReason.backendUnreachable =>
+    l10n.engineChipReasonBackendUnreachable,
+  MenuAnalysisFailureReason.consentWithheld =>
+    l10n.engineChipReasonConsentWithheld,
 };

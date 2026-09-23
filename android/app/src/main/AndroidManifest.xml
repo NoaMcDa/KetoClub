@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Menus are read straight from the restaurant platforms and analysis
-         goes to OpenRouter, so every build needs the network
+         goes to KetoClub's server, so every build needs the network
          (architecture.md §13). The debug and profile manifests grant this
          for the Flutter tool's own use; without it here a release build
          cannot open a socket and every fetch reports "no connection". -->

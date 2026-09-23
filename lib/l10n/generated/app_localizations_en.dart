@@ -99,34 +99,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get waiterCardTitle => 'Say this to the waiter';
 
   @override
-  String get settingsKeySection => 'OpenRouter key';
-
-  @override
-  String get settingsKeyHint => 'Paste your OpenRouter key';
-
-  @override
-  String get settingsKeySave => 'Save key';
-
-  @override
-  String get settingsKeyPresent => 'A key is stored on this device.';
-
-  @override
-  String get settingsKeyAbsent =>
-      'No key stored. KetoClub will use on-device rules.';
-
-  @override
-  String get settingsKeyDelete => 'Remove key';
-
-  @override
-  String get settingsWebStorageNote =>
-      'On the web the key is kept in browser storage, which protects it less well than a phone\'s keychain.';
-
-  @override
   String get settingsConsentTitle => 'What leaves this device';
 
   @override
   String get settingsConsentBody =>
-      'With a key, dish names, descriptions and option labels from the menu you open are sent to OpenRouter for analysis. Nothing about you, your location or your history is sent. Menus are read straight from the restaurant platform, which receives only the venue identifier. There is no other server and no analytics.';
+      'When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you, your location or your history is sent. There are no analytics.';
 
   @override
   String get settingsConsentAccept => 'I understand';
@@ -181,7 +158,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get analysisNotConfigured =>
-      'Add an OpenRouter key in Settings for AI analysis.';
+      'AI analysis is not available on this build or server. Showing rule-based results.';
 
   @override
   String get analysisOffline => 'Offline. Showing rule-based results.';
@@ -192,11 +169,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get analysisRateLimited =>
-      'The daily AI limit for this key is used up. Showing rule-based results.';
-
-  @override
-  String get analysisUnauthorised =>
-      'OpenRouter rejected your key, so nothing was analysed.';
+      'The daily AI limit is used up. Showing rule-based results.';
 
   @override
   String analysisBadResponse(String detail) {
@@ -206,6 +179,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get analysisNoDishesFound =>
       'The AI could not identify any dishes on this menu.';
+
+  @override
+  String get analysisBackendUnreachable =>
+      'KetoClub\'s server could not be reached. Showing rule-based results.';
+
+  @override
+  String get analysisConsentWithheld =>
+      'Allow AI analysis in Settings to analyse this menu. Showing rule-based results.';
 
   @override
   String pillSemanticLabel(String verdict) {
@@ -243,7 +224,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get engineChipReasonNotConfigured => 'no key';
+  String get engineChipReasonNotConfigured => 'not configured';
 
   @override
   String get engineChipReasonOffline => 'offline';
@@ -255,13 +236,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get engineChipReasonRateLimited => 'rate limited';
 
   @override
-  String get engineChipReasonUnauthorised => 'key rejected';
-
-  @override
   String get engineChipReasonBadResponse => 'AI error';
 
   @override
   String get engineChipReasonNoDishesFound => 'no dishes found';
+
+  @override
+  String get engineChipReasonBackendUnreachable => 'server unreachable';
+
+  @override
+  String get engineChipReasonConsentWithheld => 'AI not allowed';
 
   @override
   String get navExplore => 'Explore';

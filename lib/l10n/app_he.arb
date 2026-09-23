@@ -42,15 +42,8 @@
   "waiterCardOpen": "הצג כרטיס למלצר",
   "waiterCardTitle": "זה מה שאומרים למלצר",
 
-  "settingsKeySection": "מפתח OpenRouter",
-  "settingsKeyHint": "הדביקו את מפתח ה‑OpenRouter שלכם",
-  "settingsKeySave": "שמור מפתח",
-  "settingsKeyPresent": "מפתח שמור במכשיר הזה.",
-  "settingsKeyAbsent": "אין מפתח שמור. קטוקלאב ישתמש בכללים שעל המכשיר.",
-  "settingsKeyDelete": "הסר מפתח",
-  "settingsWebStorageNote": "בדפדפן המפתח נשמר באחסון הדפדפן, שמגן עליו פחות טוב מהכספת של הטלפון.",
   "settingsConsentTitle": "מה יוצא מהמכשיר הזה",
-  "settingsConsentBody": "כשיש מפתח, שמות המנות, התיאורים ושמות התוספות מהתפריט שאתם פותחים נשלחים ל‑OpenRouter לניתוח. שום דבר עליכם, על מקומכם או על ההיסטוריה שלכם לא נשלח. התפריטים נקראים ישירות מפלטפורמת המסעדה, שמקבלת רק את מזהה המסעדה. אין שרת אחר ואין איסוף נתונים.",
+  "settingsConsentBody": "כשאתם מאשרים ניתוח בינה מלאכותית, שמות המנות, התיאורים ושמות התוספות מהתפריט שאתם פותחים נשלחים לשרת של קטוקלאב, שמעביר אותם לניתוח ב‑Gemini API של Google. שום דבר עליכם, על מקומכם או על ההיסטוריה שלכם לא נשלח. אין איסוף נתונים.",
   "settingsConsentAccept": "הבנתי",
   "settingsLanguage": "שפה",
   "settingsLanguageSystem": "לפי המכשיר",
@@ -79,16 +72,17 @@
   "fetchFailedUnsupportedSource": "קטוקלאב לא יודע לקרוא תפריטים מהאתר הזה עדיין.",
   "fetchFailedBackendUnreachable": "השרת של KetoClub לא היה זמין, ולכן לא ניתן היה לקרוא את התפריט.",
 
-  "analysisNotConfigured": "הוסיפו מפתח OpenRouter בהגדרות כדי לקבל ניתוח בינה מלאכותית.",
+  "analysisNotConfigured": "ניתוח בינה מלאכותית אינו זמין בגרסה הזו או בשרת. מוצגות תוצאות על בסיס כללים.",
   "analysisOffline": "לא מחוברים. מוצגות תוצאות על בסיס כללים.",
   "analysisTimeout": "מודל הבינה המלאכותית היה אטי מדי. מוצגות תוצאות על בסיס כללים.",
-  "analysisRateLimited": "המגבלה היומית של הבינה המלאכותית למפתח הזה נגמרה. מוצגות תוצאות על בסיס כללים.",
-  "analysisUnauthorised": "OpenRouter דחתה את המפתח שלכם, ולכן שום דבר לא נותח.",
+  "analysisRateLimited": "המגבלה היומית של הבינה המלאכותית נגמרה. מוצגות תוצאות על בסיס כללים.",
   "analysisBadResponse": "ניתוח הבינה המלאכותית נכשל ({detail}). מוצגות תוצאות על בסיס כללים.",
   "@analysisBadResponse": {
     "placeholders": { "detail": { "type": "String" } }
   },
   "analysisNoDishesFound": "הבינה המלאכותית לא הצליחה לזהות מנות בתפריט הזה.",
+  "analysisBackendUnreachable": "לא ניתן היה להתחבר לשרת של קטוקלאב. מוצגות תוצאות על בסיס כללים.",
+  "analysisConsentWithheld": "אשרו ניתוח בינה מלאכותית בהגדרות כדי לנתח את התפריט הזה. מוצגות תוצאות על בסיס כללים.",
 
   "pillSemanticLabel": "פסיקה: {verdict}",
   "@pillSemanticLabel": {
@@ -116,13 +110,14 @@
   "@engineChipRulesSemanticLabel": {
     "placeholders": { "reason": { "type": "String" } }
   },
-  "engineChipReasonNotConfigured": "אין מפתח",
+  "engineChipReasonNotConfigured": "לא מוגדר",
   "engineChipReasonOffline": "לא מקוון",
   "engineChipReasonTimeout": "פסק זמן",
   "engineChipReasonRateLimited": "המכסה היומית נוצלה",
-  "engineChipReasonUnauthorised": "המפתח נדחה",
   "engineChipReasonBadResponse": "שגיאת בינה מלאכותית",
   "engineChipReasonNoDishesFound": "לא נמצאו מנות",
+  "engineChipReasonBackendUnreachable": "השרת לא זמין",
+  "engineChipReasonConsentWithheld": "בינה מלאכותית לא אושרה",
   "navExplore": "גילוי",
   "navScan": "סריקה",
   "navSaved": "שמורים",

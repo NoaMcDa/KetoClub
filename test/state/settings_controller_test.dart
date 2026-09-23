@@ -3,40 +3,37 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 
-import '../fakes/fake_key_store.dart';
 import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_settings_store.dart';
 
 void main() {
   group('SettingsController', () {
-    late FakeKeyStore keyStore;
     late FakeSettingsStore settings;
     late FakeMenuRepository repository;
     late SettingsController controller;
 
     setUp(() {
-      keyStore = FakeKeyStore();
       settings = FakeSettingsStore();
       repository = FakeMenuRepository();
-      controller = SettingsController(keyStore, settings, repository);
+      controller = SettingsController(settings, repository);
     });
 
-    test('initial state before load has no key and defaults', () {
-      // Arrange: keyStore seeded before load() is ever called.
-      final seeded = FakeKeyStore(seed: 'sk-existing');
-      final freshController = SettingsController(seeded, settings, repository);
+    test('initial state before load has the defaults', () async {
+      // Arrange: settings seeded before load() is ever called.
+      await settings.write(
+        const AppSettings(languageTag: 'he', estimationConsentGiven: true),
+      );
+      final freshController = SettingsController(settings, repository);
 
       // Act / Assert: nothing has been read yet.
-      expect(freshController.hasKey, isFalse);
       expect(freshController.consentGiven, isFalse);
       expect(freshController.languageTag, isNull);
       expect(freshController.filter, MenuFilter.all);
       expect(freshController.isBusy, isFalse);
     });
 
-    test('load populates hasKey consentGiven languageTag and filter', () async {
+    test('load populates consentGiven languageTag and filter', () async {
       // Arrange
-      await keyStore.write('sk-abc123');
       await settings.write(
         const AppSettings(
           languageTag: 'he',
@@ -49,7 +46,6 @@ void main() {
       await controller.load();
 
       // Assert
-      expect(controller.hasKey, isTrue);
       expect(controller.consentGiven, isTrue);
       expect(controller.languageTag, 'he');
       expect(controller.filter, MenuFilter.greenOnly);
@@ -78,79 +74,6 @@ void main() {
 
       // Assert
       expect(count, 2);
-    });
-
-    test('saveKey with a non-empty key writes it and flips hasKey', () async {
-      // Act
-      await controller.saveKey('sk-new-key');
-
-      // Assert
-      expect(keyStore.writeCallCount, 1);
-      expect(controller.hasKey, isTrue);
-    });
-
-    test(
-      'saveKey with an empty key does not write and hasKey stays false',
-      () async {
-        // Act
-        await controller.saveKey('');
-
-        // Assert
-        expect(keyStore.writeCallCount, 0);
-        expect(controller.hasKey, isFalse);
-      },
-    );
-
-    test('saveKey with a whitespace-only key does not write and hasKey stays '
-        'false', () async {
-      // Act
-      await controller.saveKey('   \t  ');
-
-      // Assert
-      expect(keyStore.writeCallCount, 0);
-      expect(controller.hasKey, isFalse);
-    });
-
-    test('saveKey trims surrounding whitespace before writing', () async {
-      // Act
-      await controller.saveKey('  sk-trimmed  ');
-
-      // Assert
-      expect(await keyStore.read(), 'sk-trimmed');
-    });
-
-    test('deleteKey clears the stored key and hasKey goes false', () async {
-      // Arrange
-      await controller.saveKey('sk-to-delete');
-      expect(controller.hasKey, isTrue);
-
-      // Act
-      await controller.deleteKey();
-
-      // Assert
-      expect(keyStore.deleteCallCount, 1);
-      expect(controller.hasKey, isFalse);
-      expect(await keyStore.read(), isNull);
-    });
-
-    test('no public member or toString ever returns the stored key', () async {
-      // Arrange
-      const secret = 'sk-super-secret-value';
-
-      // Act
-      await controller.saveKey(secret);
-      await controller.load();
-
-      // Assert: every exposed value and toString is checked for the
-      // secret substring (architecture.md §11 — the key is never
-      // exposed by this controller, only its presence is).
-      expect(controller.hasKey, isTrue);
-      expect(controller.hasKey.toString(), isNot(contains(secret)));
-      expect(controller.isBusy.toString(), isNot(contains(secret)));
-      expect(controller.consentGiven.toString(), isNot(contains(secret)));
-      expect(controller.languageTag?.toString() ?? '', isNot(contains(secret)));
-      expect(controller.filter.toString(), isNot(contains(secret)));
-      expect(controller.toString(), isNot(contains(secret)));
     });
 
     test(

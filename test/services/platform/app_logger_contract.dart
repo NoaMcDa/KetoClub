@@ -15,20 +15,20 @@ class _Case {
 
 const List<_Case> _cases = <_Case>[
   _Case(
-    'an OpenRouter key',
-    'request failed with key sk-or-v1-abcdefghijklmnop in the header',
-    'sk-or-v1-abcdefghijklmnop',
-  ),
-  _Case(
     'a bearer header value',
     'sent header Authorization: Bearer abc123XYZ.token-value',
     'Bearer abc123XYZ.token-value',
+  ),
+  _Case(
+    'a lower-case bearer value echoed in an upstream error',
+    'request failed: upstream echoed bearer zz9-plural-z-alpha back',
+    'zz9-plural-z-alpha',
   ),
 ];
 
 /// Asserts the secret-redaction contract every [AppLogger] implementation
 /// must uphold (issue #7, architecture.md §11 and §18.3): a message
-/// containing an OpenRouter key or a bearer header value must never let
+/// containing a bearer header value must never let
 /// that secret reach wherever the implementation actually sends its
 /// output.
 ///

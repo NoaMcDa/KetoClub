@@ -5,7 +5,6 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
-import 'package:ketoclub/services/storage/key_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 
@@ -28,7 +27,6 @@ void main() {
       expect(dependencies.menuClassifier, isA<RoutingMenuClassifier>());
       expect(dependencies.clock, isA<SystemClock>());
       expect(dependencies.logger, isA<DeveloperLogAppLogger>());
-      expect(dependencies.keyStore, isA<SecureKeyStore>());
       expect(dependencies.settingsStore, isA<PrefsSettingsStore>());
       // The test VM is not web, so the kIsWeb branch picks the device
       // implementation, not NoOpScreenBrightness.
@@ -38,10 +36,52 @@ void main() {
     test('performs no plugin I/O while building the graph', () {
       // Assert: this test runs with no plugin binding, so a constructor that
       // touched a platform channel — Hive.initFlutter, SharedPreferences,
-      // secure storage — would throw MissingPluginException here. Plugin work
+      // connectivity — would throw MissingPluginException here. Plugin work
       // belongs in a closure invoked on first use, not in a constructor.
       // main_test.dart and the launch flow test depend on this too.
       expect(buildDependencies, returnsNormally);
+    });
+  });
+
+  group('backendBaseUrl', () {
+    test('returns the parsed base for an http url', () {
+      // Act
+      final base = backendBaseUrl('http://localhost:8000');
+
+      // Assert
+      expect(base, equals(Uri.parse('http://localhost:8000')));
+    });
+
+    test('returns the parsed base for an https url with a path', () {
+      // Act
+      final base = backendBaseUrl('https://api.example.test/ketoclub/');
+
+      // Assert
+      expect(base, equals(Uri.parse('https://api.example.test/ketoclub/')));
+    });
+
+    test('returns null for an empty value', () {
+      // Act
+      final base = backendBaseUrl('');
+
+      // Assert
+      expect(base, isNull);
+    });
+
+    test('returns null for a malformed or relative value', () {
+      // Act & Assert
+      expect(backendBaseUrl('not a url'), isNull);
+      expect(backendBaseUrl('localhost:8000'), isNull);
+      expect(backendBaseUrl('/relative/path'), isNull);
+      expect(backendBaseUrl('http://'), isNull);
+    });
+
+    test('returns null for a non-http(s) scheme', () {
+      // Act
+      final base = backendBaseUrl('ftp://localhost:8000');
+
+      // Assert
+      expect(base, isNull);
     });
   });
 

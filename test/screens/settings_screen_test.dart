@@ -10,7 +10,6 @@ import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 import 'package:provider/provider.dart';
 
-import '../fakes/fake_key_store.dart';
 import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_settings_store.dart';
 
@@ -21,18 +20,12 @@ final AppLocalizations _en = AppLocalizationsEn();
 /// The Hebrew strings for the one Locale('he') test.
 final AppLocalizations _he = AppLocalizationsHe();
 
-/// A distinctive value used by the tests that save a key, chosen so it
-/// cannot appear anywhere else in the rendered tree by coincidence.
-const String _secretKey = 'sk-or-v1-zzz-not-a-real-key-zzz';
-
 /// Builds the [SettingsController] the widget under test is pumped over,
 /// from fresh fakes unless the caller seeds one.
 SettingsController _controllerFor({
-  FakeKeyStore? keyStore,
   FakeSettingsStore? settingsStore,
   FakeMenuRepository? repository,
 }) => SettingsController(
-  keyStore ?? FakeKeyStore(),
   settingsStore ?? FakeSettingsStore(),
   repository ?? FakeMenuRepository(),
 );
@@ -72,72 +65,25 @@ Future<void> _pump(
 
 void main() {
   group('SettingsScreen', () {
-    testWidgets('build with no key shows settingsKeyAbsent', (tester) async {
-      // Arrange
-      final controller = _controllerFor();
-
-      // Act
-      await _pump(tester, controller);
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(find.text(_en.settingsKeyAbsent), findsOneWidget);
-      expect(find.text(_en.settingsKeyDelete), findsNothing);
-    });
-
-    testWidgets('build with no key hides the delete action', (tester) async {
-      // Arrange
-      final controller = _controllerFor();
-
-      // Act
-      await _pump(tester, controller);
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(
-        find.widgetWithText(OutlinedButton, _en.settingsKeyDelete),
-        findsNothing,
-      );
-    });
-
-    testWidgets('saveKey with a typed key calls through to the KeyStore', (
-      tester,
-    ) async {
-      // Arrange
-      final keyStore = FakeKeyStore();
-      final controller = _controllerFor(keyStore: keyStore);
-      await _pump(tester, controller);
-      await tester.pumpAndSettle();
-
-      // Act
-      await tester.enterText(find.byType(TextField), _secretKey);
-      await tester.tap(find.widgetWithText(FilledButton, _en.settingsKeySave));
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(keyStore.writeCallCount, equals(1));
-      expect(await keyStore.read(), equals(_secretKey));
-    });
-
-    testWidgets('saving a key flips the status to settingsKeyPresent', (
+    testWidgets('build shows the consent disclosure and its checkbox', (
       tester,
     ) async {
       // Arrange
       final controller = _controllerFor();
+
+      // Act
       await _pump(tester, controller);
       await tester.pumpAndSettle();
 
-      // Act
-      await tester.enterText(find.byType(TextField), _secretKey);
-      await tester.tap(find.widgetWithText(FilledButton, _en.settingsKeySave));
-      await tester.pumpAndSettle();
-
       // Assert
-      expect(find.text(_en.settingsKeyPresent), findsOneWidget);
-      expect(find.text(_en.settingsKeyAbsent), findsNothing);
+      expect(find.text(_en.settingsConsentTitle), findsOneWidget);
+      expect(find.text(_en.settingsConsentBody), findsOneWidget);
+      expect(find.byType(CheckboxListTile), findsOneWidget);
     });
 
-    testWidgets('the key field is obscured', (tester) async {
+    testWidgets('the consent section comes before every other section', (
+      tester,
+    ) async {
       // Arrange
       final controller = _controllerFor();
 
@@ -146,59 +92,21 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      final field = tester.widget<TextField>(find.byType(TextField));
-      expect(field.obscureText, isTrue);
+      final consentTop = tester.getTopLeft(find.text(_en.settingsConsentTitle));
+      final languageTop = tester.getTopLeft(find.text(_en.settingsLanguage));
+      expect(consentTop.dy, lessThan(languageTop.dy));
     });
 
-    testWidgets(
-      'a saved key never appears as text anywhere in the widget tree',
-      (tester) async {
-        // Arrange
-        final keyStore = FakeKeyStore();
-        final controller = _controllerFor(keyStore: keyStore);
-        await _pump(tester, controller);
-        await tester.pumpAndSettle();
-
-        // Act
-        await tester.enterText(find.byType(TextField), _secretKey);
-        await tester.tap(
-          find.widgetWithText(FilledButton, _en.settingsKeySave),
-        );
-        await tester.pumpAndSettle();
-
-        // Assert: the key really was stored (this is not a no-op save)…
-        expect(await keyStore.read(), equals(_secretKey));
-        // …yet the plaintext is nowhere in the rendered tree, and the
-        // field itself was cleared after the save completed.
-        expect(find.text(_secretKey), findsNothing);
-        final field = tester.widget<TextField>(find.byType(TextField));
-        expect(field.controller!.text, isEmpty);
-      },
-    );
-
-    testWidgets('deleteKey removes the key and flips the status back', (
-      tester,
-    ) async {
+    testWidgets('build offers no field to enter a credential', (tester) async {
       // Arrange
-      final keyStore = FakeKeyStore(seed: _secretKey);
-      final controller = _controllerFor(keyStore: keyStore);
-      await _pump(tester, controller);
-      await tester.pumpAndSettle();
-      expect(find.text(_en.settingsKeyPresent), findsOneWidget);
+      final controller = _controllerFor();
 
       // Act
-      await tester.tap(
-        find.widgetWithText(OutlinedButton, _en.settingsKeyDelete),
-      );
+      await _pump(tester, controller);
       await tester.pumpAndSettle();
 
-      // Assert
-      expect(keyStore.deleteCallCount, equals(1));
-      expect(find.text(_en.settingsKeyAbsent), findsOneWidget);
-      expect(
-        find.widgetWithText(OutlinedButton, _en.settingsKeyDelete),
-        findsNothing,
-      );
+      // Assert: the model key lives on KetoClub's server, never here.
+      expect(find.byType(TextField), findsNothing);
     });
 
     testWidgets('the consent checkbox calls setConsent and the flag persists', (
@@ -374,7 +282,7 @@ void main() {
 
       // Assert
       expect(find.text(_he.settingsTitle), findsOneWidget);
-      expect(find.text(_he.settingsKeySection), findsOneWidget);
+      expect(find.text(_he.settingsConsentTitle), findsOneWidget);
     });
   });
 }

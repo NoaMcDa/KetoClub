@@ -9,13 +9,11 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 
 import '../services/llm/llm_chat_client_contract.dart';
 import '../services/storage/install_id_store_contract.dart';
-import '../services/storage/key_store_contract.dart';
 import '../services/storage/menu_cache_contract.dart';
 import '../services/storage/settings_store_contract.dart';
 import 'fake_app_logger.dart';
 import 'fake_clock.dart';
 import 'fake_install_id_store.dart';
-import 'fake_key_store.dart';
 import 'fake_llm_chat_client.dart';
 import 'fake_menu_cache.dart';
 import 'fake_settings_store.dart';
@@ -516,13 +514,12 @@ void main() {
     });
 
     test('toString mentions the reason', () {
-      const result = ChatFailed(reason: ChatFailureReason.unauthorised);
+      const result = ChatFailed(reason: ChatFailureReason.backendUnreachable);
 
-      expect(result.toString(), contains('unauthorised'));
+      expect(result.toString(), contains('backendUnreachable'));
     });
   });
 
-  runKeyStoreContract('FakeKeyStore', FakeKeyStore.new);
   runMenuCacheContract('FakeMenuCache', FakeMenuCache.new);
   runSettingsStoreContract('FakeSettingsStore', FakeSettingsStore.new);
   runLlmChatClientContract('FakeLlmChatClient', FakeLlmChatClient.new);

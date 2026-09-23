@@ -53,27 +53,11 @@ String analysisFailureMessage(
   MenuAnalysisFailureReason.offline => l10n.analysisOffline,
   MenuAnalysisFailureReason.timeout => l10n.analysisTimeout,
   MenuAnalysisFailureReason.rateLimited => l10n.analysisRateLimited,
-  MenuAnalysisFailureReason.unauthorised => l10n.analysisUnauthorised,
   MenuAnalysisFailureReason.badResponse => l10n.analysisBadResponse(
     detail ?? '',
   ),
   MenuAnalysisFailureReason.noDishesFound => l10n.analysisNoDishesFound,
-};
-
-/// Whether the app may fall back to rule-based results for [reason].
-///
-/// False only for [MenuAnalysisFailureReason.unauthorised]: a rejected key
-/// must be shown to the user as-is, never quietly papered over with a
-/// weaker rules answer (architecture.md §6.2, §10).
-///
-/// An exhaustive switch with no `default`, for the same reason as
-/// [analysisFailureMessage].
-bool allowsRulesFallback(MenuAnalysisFailureReason reason) => switch (reason) {
-  MenuAnalysisFailureReason.unauthorised => false,
-  MenuAnalysisFailureReason.notConfigured ||
-  MenuAnalysisFailureReason.offline ||
-  MenuAnalysisFailureReason.timeout ||
-  MenuAnalysisFailureReason.rateLimited ||
-  MenuAnalysisFailureReason.badResponse ||
-  MenuAnalysisFailureReason.noDishesFound => true,
+  MenuAnalysisFailureReason.backendUnreachable =>
+    l10n.analysisBackendUnreachable,
+  MenuAnalysisFailureReason.consentWithheld => l10n.analysisConsentWithheld,
 };
