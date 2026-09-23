@@ -31,6 +31,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get actionRefreshMenu => 'רענן תפריט';
 
   @override
+  String get actionCancel => 'ביטול';
+
+  @override
   String get venueSearchLabel => 'קישור למסעדה';
 
   @override
@@ -186,7 +189,29 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settingsFilter => 'סינון ברירת מחדל';
 
   @override
+  String settingsCacheSummary(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count תפריטים שמורים · עובד גם ללא חיבור לאינטרנט',
+      two: 'שני תפריטים שמורים · עובד גם ללא חיבור לאינטרנט',
+      one: 'תפריט אחד שמור · עובד גם ללא חיבור לאינטרנט',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settingsClearCache => 'נקה תפריטים שמורים';
+
+  @override
+  String get settingsClearCacheConfirmTitle => 'לנקות את התפריטים השמורים?';
+
+  @override
+  String get settingsClearCacheConfirmBody =>
+      'פעולה זו תמחק את כל התפריטים השמורים במכשיר הזה, כולל כל תפריט שאפשר לפתוח כרגע בלי אינטרנט. אפשר לשמור מסעדה מחדש בכל עת, על ידי פתיחתה כשיש חיבור.';
+
+  @override
+  String get settingsClearCacheConfirmAction => 'נקה';
 
   @override
   String get settingsCacheCleared => 'התפריטים השמורים נוקו.';

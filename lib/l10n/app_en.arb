@@ -8,6 +8,7 @@
   "actionCopy": "Copy",
   "actionCopied": "Copied",
   "actionRefreshMenu": "Refresh menu",
+  "actionCancel": "Cancel",
 
   "venueSearchLabel": "Restaurant link",
   "venueSearchHint": "Paste a Wolt link, or a venue slug",
@@ -71,7 +72,14 @@
   "settingsCarnivoreOnly": "Carnivore only",
   "settingsCarnivoreOnlyHint": "Greens only meat, fish, eggs — vegetables become yellow.",
   "settingsFilter": "Default filter",
+  "settingsCacheSummary": "{count, plural, one{1 menu cached · works offline} other{{count} menus cached · works offline}}",
+  "@settingsCacheSummary": {
+    "placeholders": { "count": { "type": "num" } }
+  },
   "settingsClearCache": "Clear saved menus",
+  "settingsClearCacheConfirmTitle": "Clear saved menus?",
+  "settingsClearCacheConfirmBody": "This removes every menu saved on this device, including any you can currently open offline. You can save a venue again by opening it once you have a connection.",
+  "settingsClearCacheConfirmAction": "Clear",
   "settingsCacheCleared": "Saved menus cleared.",
 
   "fetchFailedOffline": "No connection, so the menu could not be read.",

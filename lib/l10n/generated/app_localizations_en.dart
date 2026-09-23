@@ -31,6 +31,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionRefreshMenu => 'Refresh menu';
 
   @override
+  String get actionCancel => 'Cancel';
+
+  @override
   String get venueSearchLabel => 'Restaurant link';
 
   @override
@@ -185,7 +188,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsFilter => 'Default filter';
 
   @override
+  String settingsCacheSummary(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count menus cached · works offline',
+      one: '1 menu cached · works offline',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settingsClearCache => 'Clear saved menus';
+
+  @override
+  String get settingsClearCacheConfirmTitle => 'Clear saved menus?';
+
+  @override
+  String get settingsClearCacheConfirmBody =>
+      'This removes every menu saved on this device, including any you can currently open offline. You can save a venue again by opening it once you have a connection.';
+
+  @override
+  String get settingsClearCacheConfirmAction => 'Clear';
 
   @override
   String get settingsCacheCleared => 'Saved menus cleared.';

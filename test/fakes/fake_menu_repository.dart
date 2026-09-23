@@ -97,6 +97,9 @@ final class FakeMenuRepository implements MenuRepository {
   ];
 
   @override
+  Future<int> cachedMenuCount() async => _cached.length;
+
+  @override
   Future<void> remove(VenueRef ref) async {
     removedRefs.add(ref);
     _cached.remove(ref.cacheKey);

@@ -206,6 +206,9 @@ final class FlowFakeMenuRepository implements MenuRepository {
   ];
 
   @override
+  Future<int> cachedMenuCount() async => _cached.length;
+
+  @override
   Future<void> remove(VenueRef ref) async => _cached.remove(ref.cacheKey);
 }
 

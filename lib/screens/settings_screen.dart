@@ -113,7 +113,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 24),
             _filterSection(context, l10n, controller),
             const SizedBox(height: 24),
-            _cacheSection(l10n, controller),
+            _cacheSection(context, l10n, controller),
           ],
         ),
       ),
@@ -456,14 +456,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  /// The clear-cache action and its one-shot confirmation line.
-  Widget _cacheSection(AppLocalizations l10n, SettingsController controller) {
+  /// The cached-menu count and its "works offline" note (issue #61), the
+  /// Clear action gated by a confirmation dialog, and the one-shot
+  /// confirmation line shown once clearing has actually happened.
+  ///
+  /// The count comes from [SettingsController.cachedMenuCount], read on
+  /// [SettingsController.load] and refreshed by
+  /// [SettingsController.clearCache] itself, so this widget renders
+  /// whatever the controller already holds and never counts anything on
+  /// its own.
+  Widget _cacheSection(
+    BuildContext context,
+    AppLocalizations l10n,
+    SettingsController controller,
+  ) {
     final busy = controller.isBusy;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text(l10n.settingsCacheSummary(controller.cachedMenuCount)),
+        const SizedBox(height: 8),
         FilledButton(
-          onPressed: busy ? null : () => unawaited(_clearCache(controller)),
+          onPressed: busy
+              ? null
+              : () => unawaited(_confirmAndClearCache(context, controller)),
           child: Text(l10n.settingsClearCache),
         ),
         if (_cacheCleared) ...[
@@ -472,6 +488,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ],
     );
+  }
+
+  /// Asks for confirmation before clearing every saved menu — an
+  /// irreversible action, since a cached menu is what makes the Saved tab
+  /// (issue #48) work offline in the first place. Clears through
+  /// [_clearCache] only when the dialog's own confirm action is chosen;
+  /// dismissing the dialog any other way (its cancel action, the barrier,
+  /// or the back gesture) clears nothing.
+  Future<void> _confirmAndClearCache(
+    BuildContext context,
+    SettingsController controller,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.settingsClearCacheConfirmTitle),
+        content: Text(l10n.settingsClearCacheConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l10n.actionCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l10n.settingsClearCacheConfirmAction),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    if (!mounted) return;
+    await _clearCache(controller);
   }
 
   /// Clears the cache through [controller], then shows the confirmation
