@@ -23,6 +23,7 @@ import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 
 import 'flow_support.dart';
@@ -137,6 +138,10 @@ void _expectConsentWithheldRulesResult(
   );
   expect(find.text(_dishName), findsOneWidget);
   expect(find.byType(StatusBadge), findsOneWidget);
+  // The full sentence, not only the engine chip's short reason (issue
+  // #119).
+  expect(find.byType(RulesReasonBanner), findsOneWidget);
+  expect(find.text(_en.analysisConsentWithheld), findsOneWidget);
 }
 
 void main() {
