@@ -122,6 +122,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settingsLanguageHebrew => 'עברית';
 
   @override
+  String get settingsAppearance => 'מראה';
+
+  @override
+  String get settingsAppearanceSystem => 'לפי ערכת הנושא של המכשיר';
+
+  @override
+  String get settingsAppearanceLight => 'בהיר';
+
+  @override
+  String get settingsAppearanceDark => 'כהה';
+
+  @override
   String get settingsFilter => 'סינון ברירת מחדל';
 
   @override

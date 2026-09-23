@@ -45,6 +45,9 @@ final class SettingsController extends ChangeNotifier {
   /// Which verdicts the menu view keeps by default.
   MenuFilter get filter => _appSettings.filter;
 
+  /// The appearance choice: system, light, or dark (issue #58).
+  AppThemeMode get themeMode => _appSettings.themeMode;
+
   /// Reads the [SettingsStore], populating every other getter.
   Future<void> load() async {
     _isBusy = true;
@@ -97,6 +100,18 @@ final class SettingsController extends ChangeNotifier {
     notifyListeners();
 
     _appSettings = _appSettings.copyWith(filter: filter);
+    await _settings.write(_appSettings);
+
+    _isBusy = false;
+    notifyListeners();
+  }
+
+  /// Sets the appearance mode to [mode] (issue #58).
+  Future<void> setThemeMode(AppThemeMode mode) async {
+    _isBusy = true;
+    notifyListeners();
+
+    _appSettings = _appSettings.copyWith(themeMode: mode);
     await _settings.write(_appSettings);
 
     _isBusy = false;
