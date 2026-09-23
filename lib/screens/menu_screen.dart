@@ -201,9 +201,7 @@ class _MenuScreenState extends State<MenuScreen> {
     // read; neither depends on a successful analysis, so both render for
     // an empty menu and for a failed analysis alike.
     final header = _header(context, l10n, controller);
-    final sourceLine = controller.fetchedAt == null
-        ? null
-        : _sourceLine(context, l10n, controller.fetchedAt!);
+    final sourceLine = _sourceLine(context, l10n, controller);
 
     if (menu.allDishes.isEmpty) {
       return _refreshable(
@@ -337,19 +335,44 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   /// The persistent source line, e.g. "Wolt · 4 min ago"
-  /// (`.design/Main.dc.html`): unlike the old cache-only notice, this
-  /// shows for every loaded menu, fresh or cached, from
-  /// [MenuController.fetchedAt] — see that getter's own doc comment for
-  /// why it, not [MenuController.cachedAt], is the right source.
-  Widget _sourceLine(
+  /// (`.design/Main.dc.html`), plus the refresh action beside it (issue
+  /// #47). Null before any menu is loaded — [MenuController.fetchedAt] is
+  /// null then, and there is nothing to date or refresh yet. Otherwise
+  /// shows for every loaded menu, fresh or cached, from that same getter
+  /// — see its own doc comment for why it, not [MenuController.cachedAt],
+  /// is the right source.
+  ///
+  /// The action calls [MenuController.refresh] directly: the same
+  /// refetch-and-reuse [_refreshable]'s [RefreshIndicator] already pulls
+  /// (issue #49), so a tap and a pull-down behave identically rather than
+  /// this screen duplicating that logic. The age label re-derives from
+  /// [MenuController.fetchedAt] on every rebuild this widget already
+  /// listens for, so a successful refresh moves it forward with no extra
+  /// wiring here.
+  Widget? _sourceLine(
     BuildContext context,
     AppLocalizations l10n,
-    DateTime fetchedAt,
+    MenuController controller,
   ) {
+    final fetchedAt = controller.fetchedAt;
+    if (fetchedAt == null) return null;
     final age = _ageLabel(fetchedAt, DateTime.now(), l10n);
-    return Text(
-      l10n.menuSourceLine(_platformName(widget.ref.source), age),
-      style: Theme.of(context).textTheme.bodySmall,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          l10n.menuSourceLine(_platformName(widget.ref.source), age),
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        IconButton(
+          icon: const Icon(Icons.refresh, size: 16),
+          tooltip: l10n.actionRefreshMenu,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+          visualDensity: VisualDensity.compact,
+          onPressed: () => unawaited(controller.refresh()),
+        ),
+      ],
     );
   }
 
