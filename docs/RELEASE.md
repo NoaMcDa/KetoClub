@@ -177,3 +177,85 @@ Also worth a line if still true at release time: no human has reviewed the
 code (`HANDOFF.md`), and the pinned Gemini model's behaviour against the
 real prompt is only as trustworthy as the last time someone actually ran
 the smoke curl in §1 above.
+
+## 5. Performance budget (#65)
+
+The Phase 2 success criterion. Nothing below has been measured yet: every
+cell is blank until someone runs it on the target and writes the number in.
+Do not copy a number from one target into another.
+
+### Budgets
+
+| What | Budget |
+|---|---|
+| Re-opening a menu whose analysis is already in the Hive cache, on 4G | under 3 s from tap to classified dishes |
+| Decode + map of a 60-dish payload, and parsing a 60-dish AI reply, on a phone | 16 ms each (one frame at 60 Hz) |
+| Any single frame while a menu renders | 32 ms |
+| AI analysis | no fixed budget (the backend waits up to 110 s for the model, the client 120 s), but the screen must say "Asking the AI…" or "Applying the rules…" the whole time |
+
+### How to take each number
+
+Use a 60-dish menu. Run the app with `flutter run --profile` (not debug)
+and the backend define from §2. On web, throttle to "Fast 4G" in the
+DevTools network panel; on a phone, use a real 4G connection with Wi-Fi off.
+Time from the tap that opens the menu to the frame where verdicts appear
+(the DevTools Performance view, or a screen recording, both work).
+
+- **Cold fetch**: Settings → "Clear saved menus", and restart the backend
+  so its Wolt proxy cache is empty, then open the menu.
+- **Proxy-cached fetch** (web only): "Clear saved menus" again but leave the
+  backend running, then reopen within the hour. The response carries
+  `X-KetoClub-Cache: hit`.
+- **Hive-cached open**: reopen the same menu within 24 hours without
+  clearing anything. This is the one held to the 3 s budget. It measures
+  a cached *analysis* only when `MenuController.open` reuses one (#57):
+  the cached result must come from the AI, consent must still be on, the
+  dish text must be unchanged and the net-carb limit must be the same. A
+  rules result is never reused, so with consent off this open runs the
+  rule engine again. Note the engine chip next to the number.
+- **AI analysis cold**: a menu the backend's completion cache has not seen.
+  Time how long "Asking the AI…" stays on screen.
+- **AI analysis server-cached**: "Clear saved menus", then reopen the same
+  menu so the app asks again and the backend answers from its completion
+  cache (#103). Same measurement.
+
+| Target | Cold fetch | Proxy-cached fetch | Hive-cached open | AI analysis cold | AI analysis server-cached |
+|---|---|---|---|---|---|
+| Web via local backend | | | | | |
+| iOS | | n/a unless via backend | | | |
+| Android | | n/a unless via backend | | | |
+
+iOS and Android fetch Wolt directly unless the build routes them through
+the backend, so the proxy-cached column only applies to them in that case.
+
+### Main-thread steps on a phone
+
+`tool/perf_menu.dart` times decode + map (Wolt and 10bis), the menu
+fingerprint, the rules engine and the AI-reply parser over generated 60-dish
+menus. `tool/README.md` has the commands. Only a `--profile` run on the
+device counts; the host numbers from `flutter test` do not.
+
+| Step (60 dishes) | iOS median / max ms | Android median / max ms |
+|---|---|---|
+| decode + map (Wolt, synthetic) | | |
+| decode + map (10bis, synthetic) | | |
+| fingerprint | | |
+| rules engine | | |
+| reply parse | | |
+
+If a decode + map or reply-parse median exceeds 16 ms on either phone,
+that step moves to `compute` (the last criterion of #65). Until a phone
+says so, nothing moves: `compute` runs on the main thread on web anyway, and
+the move is only worth its cost against a measured stall.
+
+### Frame check (32 ms)
+
+With `flutter run --profile`, open the DevTools Performance view, record
+while a 60-dish menu opens and scrolls from top to bottom, and read the
+slowest frame (UI and raster).
+
+| Target | Slowest frame while rendering (ms) | Pass (under 32 ms)? |
+|---|---|---|
+| Web via local backend | | |
+| iOS | | |
+| Android | | |

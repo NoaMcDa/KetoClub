@@ -68,6 +68,9 @@ final class LlmMenuClassifier implements MenuClassifier {
     Menu menu, {
     ClassificationOptions options = const ClassificationOptions(),
   }) async {
+    // Announced before any await, so a listener hears it in the same
+    // turn the call starts (issue #65).
+    options.onEngineStarted?.call(ClassifyingEngine.llm);
     final systemPrompt = MenuAnalysisPrompt.systemPrompt(options: options);
     final userPrompt = MenuAnalysisPrompt.userPrompt(menu);
     final result = await _client.complete(

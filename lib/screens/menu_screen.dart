@@ -17,6 +17,7 @@ import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
@@ -278,6 +279,7 @@ class _MenuScreenState extends State<MenuScreen> {
             _legend(context, l10n, controller.netCarbLimitGrams),
           ],
           const SizedBox(height: 8),
+          AnalysisProgressRow(phase: controller.phase),
           ...banners,
           if (controller.engine != null) ...[
             RulesReasonBanner(engine: controller.engine!),

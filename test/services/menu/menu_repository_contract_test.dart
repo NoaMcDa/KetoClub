@@ -85,6 +85,20 @@ void main() {
       expect(saved.single.dishCount, fetched.menu.allDishes.length);
     });
 
+    test('cachedMenuCount counts every seeded ref', () async {
+      // Arrange
+      final repository = FakeMenuRepository();
+      const ref = VenueRef(source: MenuSource.wolt, platformId: 'x');
+      final fetched = await repository.load(ref) as MenuFetched;
+      repository.seedCache(CachedMenu(menu: fetched.menu));
+
+      // Act
+      final count = await repository.cachedMenuCount();
+
+      // Assert
+      expect(count, 1);
+    });
+
     test('remove records the ref and drops it from the cache', () async {
       // Arrange
       final repository = FakeMenuRepository();
