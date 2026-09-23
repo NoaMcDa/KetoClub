@@ -284,7 +284,35 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get savedPlaceholderBody =>
-      'שמרו מסעדה כדי למצוא אותה כאן בהמשך. האפשרות הזו תגיע בעדכון עתידי.';
+      'פתחו תפריט של מסעדה והוא יופיע כאן אוטומטית, זמין ליממה — גם ללא חיבור לאינטרנט.';
+
+  @override
+  String savedEntryDishCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count מנות',
+      two: 'שתי מנות',
+      one: 'מנה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get savedRemove => 'הסר';
+
+  @override
+  String savedRemoveSemanticLabel(String venue) {
+    return 'הסר את $venue';
+  }
+
+  @override
+  String savedRemovedMessage(String venue) {
+    return '$venue הוסרה.';
+  }
+
+  @override
+  String get savedUndo => 'בטל';
 
   @override
   String get discoveryTitle => 'איפה לאכול';

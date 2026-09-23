@@ -283,7 +283,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get savedPlaceholderBody =>
-      'Save a venue to find it here later. This is coming in a later update.';
+      'Open a venue\'s menu and it appears here automatically, available for a day — even offline.';
+
+  @override
+  String savedEntryDishCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dishes',
+      one: '1 dish',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get savedRemove => 'Remove';
+
+  @override
+  String savedRemoveSemanticLabel(String venue) {
+    return 'Remove $venue';
+  }
+
+  @override
+  String savedRemovedMessage(String venue) {
+    return 'Removed $venue.';
+  }
+
+  @override
+  String get savedUndo => 'Undo';
 
   @override
   String get discoveryTitle => 'Where to eat';

@@ -462,5 +462,33 @@ void main() {
       expect(await repository.cached(_woltRef), isNull);
       expect(cache.clearCallCount, 1);
     });
+
+    test('savedMenus delegates to the cache', () async {
+      // Arrange
+      await cache.write(CachedMenu(menu: _menuWith(_woltRef, clock.now())));
+      await cache.write(CachedMenu(menu: _menuWith(_tenbisRef, clock.now())));
+
+      // Act
+      final saved = await repository.savedMenus();
+
+      // Assert
+      expect(
+        saved.map((entry) => entry.ref),
+        unorderedEquals(<VenueRef>[_woltRef, _tenbisRef]),
+      );
+    });
+
+    test('remove deletes only the given ref from the cache', () async {
+      // Arrange
+      await cache.write(CachedMenu(menu: _menuWith(_woltRef, clock.now())));
+      await cache.write(CachedMenu(menu: _menuWith(_tenbisRef, clock.now())));
+
+      // Act
+      await repository.remove(_woltRef);
+
+      // Assert
+      expect(await cache.read(_woltRef), isNull);
+      expect(await cache.read(_tenbisRef), isNotNull);
+    });
   });
 }

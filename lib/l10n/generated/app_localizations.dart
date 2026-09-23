@@ -569,8 +569,38 @@ abstract class AppLocalizations {
   /// No description provided for @savedPlaceholderBody.
   ///
   /// In en, this message translates to:
-  /// **'Save a venue to find it here later. This is coming in a later update.'**
+  /// **'Open a venue\'s menu and it appears here automatically, available for a day — even offline.'**
   String get savedPlaceholderBody;
+
+  /// No description provided for @savedEntryDishCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 dish} other{{count} dishes}}'**
+  String savedEntryDishCount(num count);
+
+  /// No description provided for @savedRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get savedRemove;
+
+  /// No description provided for @savedRemoveSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {venue}'**
+  String savedRemoveSemanticLabel(String venue);
+
+  /// No description provided for @savedRemovedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed {venue}.'**
+  String savedRemovedMessage(String venue);
+
+  /// No description provided for @savedUndo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get savedUndo;
 
   /// No description provided for @discoveryTitle.
   ///

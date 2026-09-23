@@ -141,10 +141,20 @@ final class FlowFakeMenuRepository implements MenuRepository {
     bool forceRefresh = false,
   }) async {
     final stubbed = _stubs[ref.cacheKey];
-    if (stubbed != null) return stubbed;
-    return const MenuFetchFailed(
-      reason: MenuFetchFailureReason.unsupportedSource,
-    );
+    if (stubbed == null) {
+      return const MenuFetchFailed(
+        reason: MenuFetchFailureReason.unsupportedSource,
+      );
+    }
+    // Mirrors CachedMenuRepository.load: a successful fetch is cached, so
+    // a flow test that opens a venue and then visits Saved
+    // (`saved_tab_flow_test.dart`) finds it there exactly as it would over
+    // the real repository — a plain `MenuFetched` stub is enough; nothing
+    // has to call `saveAnalysis` first just to seed the list.
+    if (stubbed case MenuFetched(menu: final fetched)) {
+      _cached[ref.cacheKey] = CachedMenu(menu: fetched);
+    }
+    return stubbed;
   }
 
   @override
@@ -160,6 +170,24 @@ final class FlowFakeMenuRepository implements MenuRepository {
 
   @override
   Future<void> clearCache() async => _cached.clear();
+
+  @override
+  Future<List<CachedMenuEntry>> savedMenus() async => [
+    for (final entry in _cached.values)
+      CachedMenuEntry(
+        ref: entry.menu.venueRef,
+        venueName: entry.menu.venueName,
+        fetchedAt: entry.menu.fetchedAt,
+        dishCount: entry.menu.allDishes.length,
+        engine: switch (entry.analysis) {
+          final MenuAnalysed analysed => analysed.engine,
+          _ => null,
+        },
+      ),
+  ];
+
+  @override
+  Future<void> remove(VenueRef ref) async => _cached.remove(ref.cacheKey);
 }
 
 /// A [MenuClassifier] that returns whatever was scripted, or an all-green
