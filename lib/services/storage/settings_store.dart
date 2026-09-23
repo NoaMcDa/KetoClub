@@ -49,8 +49,9 @@ enum AppThemeMode {
 
 /// The user's on-device preferences (architecture.md §6.4): UI language,
 /// filter default, AI-estimation consent, the last venue opened, the
-/// appearance (issue #58), the net-carb limit (issue #57) and the three
-/// "Your keto rules" toggles (issue #56).
+/// appearance (issue #58), the net-carb limit (issue #57), the
+/// last-used filter (issue #55) and the three "Your keto rules"
+/// toggles (issue #56).
 @immutable
 final class AppSettings {
   /// Creates settings. Every field defaults to the "nothing set yet"
@@ -65,6 +66,7 @@ final class AppSettings {
     this.seedOilFree = false,
     this.dairyFree = false,
     this.carnivoreOnly = false,
+    this.lastFilter,
   });
 
   /// Reads settings written by [toJson].
@@ -88,6 +90,11 @@ final class AppSettings {
   /// the same rule: each was added after installs already existed, so a
   /// missing or non-boolean value reads as false (the toggle off) rather
   /// than invalidating the record.
+  ///
+  /// [lastFilter] (issue #55) follows the same "added later" rule as
+  /// [themeMode] and [netCarbLimitGrams]: a missing key, or one whose
+  /// value [MenuFilter.tryParse] does not recognise, decodes to null —
+  /// "no last-used filter yet" — rather than invalidating the record.
   static AppSettings? tryFrom(Map<String, Object?> json) {
     final rawLanguageTag = json['languageTag'];
     if (rawLanguageTag != null && rawLanguageTag is! String) return null;
@@ -112,6 +119,10 @@ final class AppSettings {
     final netCarbLimitGrams = rawLimit is int
         ? clampNetCarbLimitGrams(rawLimit)
         : defaultNetCarbLimitGrams;
+    final rawLastFilter = json['lastFilter'];
+    final lastFilter = rawLastFilter is String
+        ? MenuFilter.tryParse(rawLastFilter)
+        : null;
     return AppSettings(
       languageTag: rawLanguageTag is String ? rawLanguageTag : null,
       filter: filter,
@@ -122,6 +133,7 @@ final class AppSettings {
       seedOilFree: json['seedOilFree'] == true,
       dairyFree: json['dairyFree'] == true,
       carnivoreOnly: json['carnivoreOnly'] == true,
+      lastFilter: lastFilter,
     );
   }
 
@@ -155,16 +167,24 @@ final class AppSettings {
   /// Whether the "Carnivore only" toggle is on (issue #56).
   final bool carnivoreOnly;
 
+  /// The verdict filter most recently chosen on the menu screen (issue
+  /// #55), or null before any has been chosen. Kept separate from
+  /// [filter] — the *default* filter set on the Settings screen — so the
+  /// two never fight: `MenuController.setFilter` writes this field, and
+  /// `MenuController.open` restores it over [filter] when it is set,
+  /// falling back to [filter] otherwise.
+  final MenuFilter? lastFilter;
+
   /// Returns a copy with the given fields replaced.
   ///
-  /// Omitting [languageTag] or [lastVenue] leaves the current value in
-  /// place; passing `null` explicitly for either clears it. This is done
-  /// by defaulting both to a private sentinel distinct from `null`, so
-  /// "not passed" and "passed null" can be told apart. [themeMode] has no
-  /// such "clear it" meaning — it always names a real mode — so it uses
-  /// the ordinary "omit to keep" default every other non-nullable field
-  /// here would use, as do [netCarbLimitGrams] and the three dietary
-  /// toggles.
+  /// Omitting [languageTag], [lastVenue] or [lastFilter] leaves the
+  /// current value in place; passing `null` explicitly for any of them
+  /// clears it. This is done by defaulting all three to a private
+  /// sentinel distinct from `null`, so "not passed" and "passed null" can
+  /// be told apart. [themeMode] has no such "clear it" meaning — it
+  /// always names a real mode — so it uses the ordinary "omit to keep"
+  /// default every other non-nullable field here would use, as do
+  /// [netCarbLimitGrams] and the three dietary toggles.
   AppSettings copyWith({
     Object? languageTag = _unset,
     MenuFilter? filter,
@@ -175,6 +195,7 @@ final class AppSettings {
     bool? seedOilFree,
     bool? dairyFree,
     bool? carnivoreOnly,
+    Object? lastFilter = _unset,
   }) => AppSettings(
     languageTag: identical(languageTag, _unset)
         ? this.languageTag
@@ -190,6 +211,9 @@ final class AppSettings {
     seedOilFree: seedOilFree ?? this.seedOilFree,
     dairyFree: dairyFree ?? this.dairyFree,
     carnivoreOnly: carnivoreOnly ?? this.carnivoreOnly,
+    lastFilter: identical(lastFilter, _unset)
+        ? this.lastFilter
+        : lastFilter as MenuFilter?,
   );
 
   /// Writes a form [tryFrom] can read back.
@@ -203,6 +227,7 @@ final class AppSettings {
     'seedOilFree': seedOilFree,
     'dairyFree': dairyFree,
     'carnivoreOnly': carnivoreOnly,
+    'lastFilter': lastFilter?.name,
   };
 
   @override
@@ -216,7 +241,8 @@ final class AppSettings {
       other.netCarbLimitGrams == netCarbLimitGrams &&
       other.seedOilFree == seedOilFree &&
       other.dairyFree == dairyFree &&
-      other.carnivoreOnly == carnivoreOnly;
+      other.carnivoreOnly == carnivoreOnly &&
+      other.lastFilter == lastFilter;
 
   @override
   int get hashCode => Object.hash(
@@ -229,14 +255,16 @@ final class AppSettings {
     seedOilFree,
     dairyFree,
     carnivoreOnly,
+    lastFilter,
   );
 
   @override
   String toString() =>
       'AppSettings(lang: $languageTag, filter: $filter, '
       'consent: $estimationConsentGiven, themeMode: $themeMode, '
-      'netCarbLimit: ${netCarbLimitGrams}g, seedOilFree: $seedOilFree, '
-      'dairyFree: $dairyFree, carnivoreOnly: $carnivoreOnly)';
+      'netCarbLimit: ${netCarbLimitGrams}g, lastFilter: $lastFilter, '
+      'seedOilFree: $seedOilFree, dairyFree: $dairyFree, '
+      'carnivoreOnly: $carnivoreOnly)';
 }
 
 /// On-device storage for [AppSettings] (architecture.md §6.4). Backed by

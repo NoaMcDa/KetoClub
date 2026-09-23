@@ -449,5 +449,50 @@ void main() {
       // Assert
       expect(result, isNotNull);
     });
+
+    test(
+      'an install that persisted settings before issue #55 added '
+      'lastFilter decodes lastFilter as null and keeps every other field',
+      () async {
+        // Arrange: the exact JSON shape PrefsSettingsStore wrote before
+        // lastFilter existed — no "lastFilter" key at all.
+        SharedPreferences.setMockInitialValues(<String, Object>{
+          'flutter.ketoclub_settings':
+              '{"languageTag":"he","filter":"greenOnly",'
+              '"estimationConsentGiven":true,"lastVenue":null,'
+              '"themeMode":"dark","netCarbLimitGrams":9}',
+        });
+        final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
+
+        // Act
+        final result = await store.read();
+
+        // Assert
+        expect(result.lastFilter, isNull);
+        expect(result.themeMode, equals(AppThemeMode.dark));
+        expect(result.netCarbLimitGrams, equals(9));
+        expect(result.languageTag, equals('he'));
+        expect(result.filter, equals(MenuFilter.greenOnly));
+      },
+    );
+
+    test('read decodes an unrecognised lastFilter as null rather than '
+        "falling back to today's defaults for the whole record", () async {
+      // Arrange
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        'flutter.ketoclub_settings':
+            '{"languageTag":"he","filter":"all",'
+            '"estimationConsentGiven":false,"lastVenue":null,'
+            '"lastFilter":"somethingUnknown"}',
+      });
+      final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
+
+      // Act
+      final result = await store.read();
+
+      // Assert
+      expect(result.lastFilter, isNull);
+      expect(result.languageTag, equals('he'));
+    });
   });
 }

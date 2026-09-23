@@ -35,6 +35,7 @@ void runSettingsStoreContract(String name, SettingsStore Function() build) {
         netCarbLimitGrams: 14,
         seedOilFree: true,
         dairyFree: true,
+        lastFilter: MenuFilter.yellowOnly,
       );
 
       await store.write(settings);
@@ -61,6 +62,28 @@ void runSettingsStoreContract(String name, SettingsStore Function() build) {
           }
         }
       }
+    });
+
+    test(
+      'write then read round-trips every MenuFilter as lastFilter',
+      () async {
+        final store = build();
+
+        for (final filter in MenuFilter.values) {
+          await store.write(AppSettings(lastFilter: filter));
+
+          expect((await store.read()).lastFilter, equals(filter));
+        }
+      },
+    );
+
+    test('write then read round-trips lastFilter as null when unset', () async {
+      final store = build();
+
+      await store.write(const AppSettings(lastFilter: MenuFilter.redOnly));
+      await store.write(const AppSettings());
+
+      expect((await store.read()).lastFilter, isNull);
     });
 
     test('write then read round-trips the net-carb limit bounds', () async {

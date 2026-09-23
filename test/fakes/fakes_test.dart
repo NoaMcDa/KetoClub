@@ -633,6 +633,90 @@ void main() {
         );
       });
     });
+
+    group('lastFilter (issue #55)', () {
+      /// The JSON an install wrote before issue #55, plus [extra].
+      Map<String, Object?> json([Map<String, Object?> extra = const {}]) =>
+          <String, Object?>{
+            'filter': 'all',
+            'estimationConsentGiven': false,
+            ...extra,
+          };
+
+      test('defaults to null', () {
+        expect(const AppSettings().lastFilter, isNull);
+      });
+
+      test('tryFrom(x.toJson()) round-trips every MenuFilter value', () {
+        for (final filter in MenuFilter.values) {
+          final settings = AppSettings(lastFilter: filter);
+
+          expect(AppSettings.tryFrom(settings.toJson()), equals(settings));
+        }
+      });
+
+      test('toJson writes the filter name under lastFilter', () {
+        const settings = AppSettings(lastFilter: MenuFilter.yellowOnly);
+
+        expect(settings.toJson()['lastFilter'], equals('yellowOnly'));
+      });
+
+      test('toJson writes null when unset', () {
+        expect(const AppSettings().toJson()['lastFilter'], isNull);
+      });
+
+      test('tryFrom reads a missing lastFilter as null without '
+          'invalidating the record', () {
+        final result = AppSettings.tryFrom(json({'languageTag': 'he'}));
+
+        expect(result, isNotNull);
+        expect(result!.lastFilter, isNull);
+        expect(result.languageTag, equals('he'));
+      });
+
+      test('tryFrom reads an unrecognised lastFilter as null rather than '
+          'invalidating the whole record', () {
+        final result = AppSettings.tryFrom(
+          json({'lastFilter': 'greenOnlyish'}),
+        );
+
+        expect(result, isNotNull);
+        expect(result!.lastFilter, isNull);
+      });
+
+      test('copyWith replaces lastFilter, and omitting it keeps it', () {
+        const settings = AppSettings(lastFilter: MenuFilter.redOnly);
+
+        expect(
+          settings.copyWith(lastFilter: MenuFilter.greenOnly).lastFilter,
+          equals(MenuFilter.greenOnly),
+        );
+        expect(
+          settings.copyWith(filter: MenuFilter.all).lastFilter,
+          equals(MenuFilter.redOnly),
+        );
+      });
+
+      test('copyWith(lastFilter: null) clears it', () {
+        const settings = AppSettings(lastFilter: MenuFilter.redOnly);
+
+        expect(settings.copyWith(lastFilter: null).lastFilter, isNull);
+      });
+
+      test('== returns false for settings differing only in lastFilter', () {
+        expect(
+          const AppSettings(),
+          isNot(equals(const AppSettings(lastFilter: MenuFilter.redOnly))),
+        );
+      });
+
+      test('toString mentions lastFilter', () {
+        expect(
+          const AppSettings(lastFilter: MenuFilter.redOnly).toString(),
+          contains('redOnly'),
+        );
+      });
+    });
   });
 
   group('ChatCompleted', () {
