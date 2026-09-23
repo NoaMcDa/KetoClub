@@ -237,7 +237,7 @@ ketoclub/
 │   │   ├── venue_search_screen.dart      # location + name search, paste-a-URL field
 │   │   ├── menu_screen.dart              # classified menu, filters (green / green+yellow / all)
 │   │   ├── waiter_card_sheet.dart        # full-screen high-contrast script + copy button
-│   │   ├── settings_screen.dart          # consent text, dietary toggles (later) — no key section (D12)
+│   │   ├── settings_screen.dart          # consent text, net-carb limit, dietary toggles (#56) — no key section (D12)
 │   │   ├── scan_screen.dart              # Scan tab placeholder (Phase 4, issue #11)
 │   │   └── saved_screen.dart             # Saved tab placeholder (Phase 3, issue #11)
 │   │
@@ -524,6 +524,12 @@ must never be loosened: `toasted almonds` and `Sacramento tomato salad` would tu
 red. `text_normaliser.dart` also folds diacritics, without which README's own worked
 example, "butter-infused potato purée", failed its own `puree` trigger.
 
+*(Issue #56)* The three "Your keto rules" toggles in Settings each add one more
+rule here, active only while on — seed-oil, dairy and plant vocabularies that make
+a green dish yellow with their own bilingual sentence and never touch a red one.
+The table in §9.1 lists each toggle's prompt fragment, rule and hint copy side by
+side.
+
 **`RoutingMenuClassifier`** — decides, per call, in this order (revised by D12;
 there is no key to check any more, only consent, connectivity, and the backend's
 own answer):
@@ -618,7 +624,7 @@ no physical device has exercised it (`HANDOFF.md`).
 |---|---|---|---|
 | `InstallIdStore` | `shared_preferences` | a random 32-hex-character anonymous install id (D12), generated on first use, never in a constructor | until the app's storage is cleared |
 | `MenuCache` | `hive` | `venueRef → {menu, analysis, fetchedAt, engine}`; the analysis also records the options it was made under (net-carb limit, dietary constraints; issue #57) | 24 h for the menu; analysis kept as long as the menu it was computed from, and reused by `MenuController` only for an unchanged menu, an AI result, consent still given and matching options |
-| `SettingsStore` | `shared_preferences` | UI language, filter defaults, consent flag, last venue, appearance, net-carb limit (2–25 g, default 6) | until cleared |
+| `SettingsStore` | `shared_preferences` | UI language, filter defaults, consent flag, last venue, appearance, net-carb limit (2–25 g, default 6), dietary toggles (seed-oil free, dairy-free, carnivore only; all off by default, a missing key reads as off) | until cleared |
 
 The install id is unlinkable to a person (D8 stays true in spirit) and is sent
 only as `X-KetoClub-Install-Id` to KetoClub's own backend, for its per-install
@@ -872,7 +878,30 @@ One request per menu. The **system** prompt (in `menu_analysis_prompt.dart`) sta
   `why` and `modification` in the language the menu is written in; keep each under
   300 characters; return JSON matching the schema and nothing else.
 - Optional dietary constraints appended from Settings (Tier C: seed-oil free,
-  dairy-free, carnivore).
+  dairy-free, carnivore). *(Issue #56)* Each "Your keto rules" toggle that is
+  on appends one fixed English fragment from `constants.dart`, as a `- ` line
+  under the section preamble in `menu_analysis_prompt.dart`, always in the
+  order below (`ClassificationOptions.dietaryConstraintsFor`). With every
+  toggle off no section is written, so the prompt — and the server's chat
+  cache key — is byte-for-byte the default one; each combination that is on
+  is its own cache key (`phase2_plan.md` open question 7). The fragments are
+  also what a cached analysis's options snapshot records, so turning a toggle
+  on or off re-analyses the next menu opened, exactly as a changed net-carb
+  limit does (issue #57). The same toggles switch on one rule each in
+  `HeuristicMenuClassifier`, so a rules result honours them too:
+
+  | Toggle | Prompt fragment (`constants.dart`) | Rules engine (`constants.dart`, `classification_rules.dart`) | Hint (en / he) |
+  |---|---|---|---|
+  | Strict seed-oil free | `seedOilFreePromptFragment`: avoid canola, rapeseed, soybean, sunflower, corn, cottonseed and generic vegetable oil; a fried, deep-fried or seed-oil dish is modifiable, asking for olive oil, butter or tallow, unless already nonKeto | `seedOilTriggers{En,He}` (fried/`מטוגן`, `טיגון`, canola/`קנולה`, soybean/sunflower/vegetable oil, `שמן סויה`, …) → yellow with `seedOilFreeModification{En,He}` | "Flags canola, sunflower and soybean oil in fried dishes." / "מסמן שמן קנולה, חמניות וסויה במנות מטוגנות." |
+  | Dairy-free keto | `dairyFreePromptFragment`: no dairy; a dish with cheese, cream, butter, milk or yogurt is modifiable, asking for it without the dairy, unless already nonKeto | `dairyTriggers{En,He}` (cheese/`גבינה`, cream/`שמנת`, butter/`חמאה`, yogurt, milk, named cheeses), with `dairyGuards{En,He}` sparing coconut cream, almond milk, peanut butter, vegan cheese, `קרם בלסמי` → yellow with `dairyFreeModification{En,He}` | "Treats cream, butter and cheese as a modification." / "שמנת, חמאה וגבינה יסומנו כמנה שדורשת שינוי." |
+  | Carnivore only | `carnivoreOnlyPromptFragment`: animal foods only; any vegetable, salad, fruit, legume, herb or other plant makes a dish modifiable, asking for only the meat, fish or eggs, unless already nonKeto | `plantTriggers{En,He}` (salad/`סלט`, vegetables/`ירקות`, tomato, onion, mushrooms, avocado, tahini, …; not bare pepper or olive oil) → yellow with `carnivoreOnlyModification{En,He}` | "Greens only meat, fish, eggs — vegetables become yellow." / "רק בשר, דגים וביצים בירוק — ירקות הופכים לצהוב." |
+
+  In the rules engine a red dish stays red with no script; a green dish a
+  rule catches turns yellow with the rule's sentence and a dietary `why`
+  (`dietaryRuleWhy{En,He}`, since the carb-component `why` would be untrue);
+  a yellow dish keeps its carb sentences and gains the rule's after them.
+  Sentences are chosen by the dish's language (§6.3, §12). Hebrew triggers
+  use the same unicode lookaround as the carb vocabulary, never `\b`.
 
 The **user** prompt is the normalised menu, one line per dish:
 `id | category | name | description | options`. Prices are omitted; they are

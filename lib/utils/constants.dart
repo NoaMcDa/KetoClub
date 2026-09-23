@@ -128,6 +128,47 @@ int clampNetCarbLimitGrams(int grams) =>
     grams.clamp(minNetCarbLimitGrams, maxNetCarbLimitGrams);
 
 // ---------------------------------------------------------------------------
+// Dietary rule toggles — prompt fragments (issue #56, architecture.md §9.1)
+// ---------------------------------------------------------------------------
+
+/// The dietary constraint the "Strict seed-oil free" toggle appends to the
+/// system prompt (issue #56), as one line under the prompt's dietary
+/// constraints section.
+///
+/// Model-facing English, like every other prompt text here: the prompt
+/// already tells the model to write `why` and `modification` in the
+/// menu's language, so this instruction is bilingual-agnostic. It is also
+/// the value recorded in `ClassificationOptions.dietaryConstraints` and in
+/// a cached analysis's options snapshot, so editing it re-analyses every
+/// menu cached under the old wording — which is the point: a changed
+/// instruction may change a verdict.
+const String seedOilFreePromptFragment =
+    'Strict seed-oil free: the user avoids industrial seed oils (canola, '
+    'rapeseed, soybean, sunflower, corn, cottonseed and generic vegetable '
+    'oil). A dish that is fried, deep-fried or cooked in one of them is '
+    'modifiable, with a modification asking for it to be cooked in olive '
+    'oil, butter or tallow instead, unless it is already nonKeto.';
+
+/// The dietary constraint the "Dairy-free keto" toggle appends to the
+/// system prompt (issue #56). See [seedOilFreePromptFragment] for why it
+/// is English and why editing it re-analyses cached menus.
+const String dairyFreePromptFragment =
+    'Dairy-free keto: the user eats no dairy. A dish containing cheese, '
+    'cream, butter, milk or yogurt is modifiable, with a modification '
+    'asking for it without the dairy component, unless it is already '
+    'nonKeto.';
+
+/// The dietary constraint the "Carnivore only" toggle appends to the
+/// system prompt (issue #56). See [seedOilFreePromptFragment] for why it
+/// is English and why editing it re-analyses cached menus.
+const String carnivoreOnlyPromptFragment =
+    'Carnivore only: the user eats only animal foods (meat, fish, seafood, '
+    'eggs and animal fats). A dish that includes any vegetable, salad, '
+    'fruit, legume, herb garnish or other plant is modifiable, with a '
+    'modification asking for only the meat, fish or eggs, with no plants, '
+    'unless it is already nonKeto.';
+
+// ---------------------------------------------------------------------------
 // Verdict explanation strings (`vocabulary_spec.md` "why strings")
 // ---------------------------------------------------------------------------
 
@@ -776,3 +817,339 @@ const Map<String, List<String>> triggerSuppresses = <String, List<String>>{
   "צ'יפס": ['תפוח אדמה', 'תפוחי אדמה'],
   'דבש תמרים': ['דבש'],
 };
+
+// ---------------------------------------------------------------------------
+// Dietary rule toggles — rules-engine vocabulary (issue #56)
+// ---------------------------------------------------------------------------
+//
+// Each toggle in Settings ("Your keto rules") adds one rule to the
+// heuristic engine, active only while that toggle is on. A rule never
+// turns a red dish into anything else; it turns a green dish yellow, and
+// adds its sentence to a yellow one's script, whenever one of its
+// triggers survives its guards. The triggers compile exactly like the
+// carb vocabulary above (`classification_rules.dart`): a Latin word
+// boundary for English, the unicode lookaround for Hebrew — never `\b`,
+// which is ASCII-only in Dart.
+
+/// Seed-oil triggers, English (issue #56): frying, and the industrial
+/// seed oils by name. `fried` alone covers `deep fried`, `pan fried` and
+/// `stir fried` once the normaliser has turned their hyphens into spaces.
+/// Bare `corn`, `soy` and `sunflower` are deliberately absent: corn is
+/// already a carb trigger, soy sauce is not an oil, and sunflower seeds
+/// are not a cooking fat.
+const List<String> seedOilTriggersEn = <String>[
+  'fried',
+  'deep fried',
+  'canola',
+  'rapeseed',
+  'soybean oil',
+  'soy oil',
+  'sunflower oil',
+  'vegetable oil',
+  'corn oil',
+  'cottonseed',
+  'seed oil',
+  'seed oils',
+];
+
+/// Seed-oil triggers, Hebrew (issue #56), mirroring [seedOilTriggersEn]:
+/// the four forms of "fried", "frying" (`טיגון`, which also covers
+/// `בטיגון עמוק`), and the oils by name. Bare `סויה` is absent for the
+/// same reason as English `soy`: `רוטב סויה` is soy sauce.
+const List<String> seedOilTriggersHe = <String>[
+  'מטוגן',
+  'מטוגנת',
+  'מטוגנים',
+  'מטוגנות',
+  'טיגון',
+  'קנולה',
+  'שמן סויה',
+  'שמן חמניות',
+  'שמן צמחי',
+  'שמן תירס',
+  'שמן זרעים',
+];
+
+/// Dairy triggers, English (issue #56): the words the issue names —
+/// cheese, cream, butter, yogurt — plus milk and the cheeses a menu names
+/// without saying "cheese".
+const List<String> dairyTriggersEn = <String>[
+  'cheese',
+  'cheeses',
+  'cheesy',
+  'cream',
+  'creamy',
+  'butter',
+  'buttery',
+  'buttermilk',
+  'yogurt',
+  'yoghurt',
+  'milk',
+  'feta',
+  'parmesan',
+  'mozzarella',
+  'burrata',
+  'cheddar',
+  'ricotta',
+  'labneh',
+  'halloumi',
+  'mascarpone',
+  'gorgonzola',
+  'brie',
+  'camembert',
+  'gouda',
+  'creme fraiche',
+  'kefir',
+  'tzatziki',
+  'paneer',
+];
+
+/// Dairy triggers, Hebrew (issue #56), mirroring [dairyTriggersEn]. The
+/// construct forms `גבינת` and `חמאת` are their own keys ("goat cheese"
+/// is `גבינת עיזים`, "garlic butter" `חמאת שום`), because the strict
+/// right-hand boundary rightly refuses to match `גבינה` inside them.
+/// `לבנה` (labneh) is absent: it is also the feminine "white", as in
+/// `בירה לבנה`; `לאבנה` is the unambiguous spelling.
+const List<String> dairyTriggersHe = <String>[
+  'גבינה',
+  'גבינות',
+  'גבינת',
+  'שמנת',
+  'חמאה',
+  'חמאת',
+  'יוגורט',
+  'חלב',
+  'פטה',
+  'פרמזן',
+  'מוצרלה',
+  'בוראטה',
+  "צ'דר",
+  'ריקוטה',
+  'לאבנה',
+  'חלומי',
+  'מסקרפונה',
+  'גורגונזולה',
+  'קממבר',
+  'גאודה',
+  'רוקפור',
+  'צפתית',
+  'בולגרית',
+  "קוטג'",
+  'קרם',
+  'קרמי',
+  'קרמית',
+  'קפיר',
+  'צזיקי',
+];
+
+/// Plant words that make a dairy word something else: `coconut cream`,
+/// `almond milk`, `peanut butter`, `vegan cheese`, `balsamic cream`
+/// (issue #56). Same shape and window as [ketoQualifierGuardsEn].
+const Map<String, GuardWords> dairyGuardsEn = <String, GuardWords>{
+  'cream': (
+    before: ['coconut', 'cashew', 'oat', 'soy', 'vegan', 'balsamic'],
+    after: [],
+  ),
+  'milk': (
+    before: ['coconut', 'almond', 'oat', 'soy', 'cashew', 'vegan'],
+    after: [],
+  ),
+  'butter': (
+    before: ['peanut', 'almond', 'cashew', 'nut', 'cocoa', 'vegan'],
+    after: [],
+  ),
+  'cheese': (before: ['vegan', 'cashew'], after: []),
+  'yogurt': (before: ['coconut', 'soy', 'almond', 'vegan'], after: []),
+  'yoghurt': (before: ['coconut', 'soy', 'almond', 'vegan'], after: []),
+};
+
+/// See [dairyGuardsHe] — `חלב`, `יוגורט`, `שמנת`, `קרם`.
+final GuardWords _hePlantMilkGuard = _heGuard(const [
+  'קוקוס',
+  'שקדים',
+  'סויה',
+  'שיבולת',
+  'קשיו',
+  'טבעוני',
+  'טבעונית',
+  'בלסמי',
+  'בלסמית',
+]);
+
+/// See [dairyGuardsHe] — `חמאה`, `חמאת`.
+final GuardWords _heNutButterGuard = _heGuard(const [
+  'בוטנים',
+  'שקדים',
+  'קשיו',
+  'קקאו',
+  'טבעונית',
+]);
+
+/// See [dairyGuardsHe] — `גבינה`, `גבינות`, `גבינת`.
+final GuardWords _heVeganCheeseGuard = _heGuard(const [
+  'טבעונית',
+  'טבעוניות',
+  'קשיו',
+]);
+
+/// The Hebrew mirror of [dairyGuardsEn] (issue #56): `חלב קוקוס`,
+/// `חמאת בוטנים`, `גבינה טבעונית`, `קרם בלסמי`. Bidirectional for the
+/// reason [_heGuard] gives: a Hebrew modifier follows its noun.
+final Map<String, GuardWords> dairyGuardsHe = <String, GuardWords>{
+  'חלב': _hePlantMilkGuard,
+  'יוגורט': _hePlantMilkGuard,
+  'שמנת': _hePlantMilkGuard,
+  'קרם': _hePlantMilkGuard,
+  'חמאה': _heNutButterGuard,
+  'חמאת': _heNutButterGuard,
+  'גבינה': _heVeganCheeseGuard,
+  'גבינות': _heVeganCheeseGuard,
+  'גבינת': _heVeganCheeseGuard,
+};
+
+/// Plant triggers, English (issue #56): any vegetable, salad, fruit,
+/// legume, herb or other plant a carnivore does not eat. Spices are
+/// deliberately absent (`pepper` alone is almost always black pepper),
+/// and so is `olive oil`: fats are the prompt's call, not the rules'.
+const List<String> plantTriggersEn = <String>[
+  'salad',
+  'salads',
+  'slaw',
+  'coleslaw',
+  'vegetable',
+  'vegetables',
+  'veggies',
+  'greens',
+  'lettuce',
+  'tomato',
+  'tomatoes',
+  'cucumber',
+  'cucumbers',
+  'onion',
+  'onions',
+  'peppers',
+  'bell pepper',
+  'zucchini',
+  'courgette',
+  'eggplant',
+  'aubergine',
+  'mushroom',
+  'mushrooms',
+  'spinach',
+  'broccoli',
+  'cauliflower',
+  'kale',
+  'arugula',
+  'cabbage',
+  'avocado',
+  'olives',
+  'asparagus',
+  'celery',
+  'radish',
+  'artichoke',
+  'pickles',
+  'beans',
+  'chickpeas',
+  'tahini',
+  'herbs',
+  'fruit',
+];
+
+/// Plant triggers, Hebrew (issue #56), mirroring [plantTriggersEn].
+/// `פלפל` alone is absent for the same reason as English `pepper`
+/// (`פלפל שחור` is black pepper); `פלפלים` and `פלפל קלוי` are kept.
+const List<String> plantTriggersHe = <String>[
+  'סלט',
+  'סלטים',
+  'ירק',
+  'ירקות',
+  'עלים',
+  'חסה',
+  'עגבניה',
+  'עגבנייה',
+  'עגבניות',
+  'מלפפון',
+  'מלפפונים',
+  'בצל',
+  'בצלים',
+  'פלפלים',
+  'פלפל קלוי',
+  'קישוא',
+  'קישואים',
+  'חציל',
+  'חצילים',
+  'פטריה',
+  'פטרייה',
+  'פטריות',
+  'תרד',
+  'ברוקולי',
+  'כרובית',
+  'קייל',
+  'ארוגולה',
+  'רוקט',
+  'כרוב',
+  'אבוקדו',
+  'זיתים',
+  'אספרגוס',
+  'סלרי',
+  'צנון',
+  'צנוניות',
+  'ארטישוק',
+  'חמוצים',
+  'שעועית',
+  'גרגרי חומוס',
+  'טחינה',
+  'עשבי תיבול',
+  'פירות',
+];
+
+// ---------------------------------------------------------------------------
+// Dietary rule toggles — waiter sentences and why strings (issue #56)
+// ---------------------------------------------------------------------------
+//
+// Chosen by the dish's own language, like every other sentence the
+// heuristic reads aloud (architecture.md §6.3, §12), which is why they
+// live here and not in ARB.
+
+/// The waiter sentence the seed-oil rule adds, English (issue #56).
+const String seedOilFreeModificationEn =
+    'Please cook it in olive oil, butter or tallow, with no canola, '
+    'soybean, sunflower or other seed oil.';
+
+/// The waiter sentence the seed-oil rule adds, Hebrew (issue #56).
+const String seedOilFreeModificationHe =
+    'אפשר בבקשה להכין את המנה בשמן זית, בחמאה או בשומן בקר, '
+    'בלי שמן קנולה, סויה, חמניות או כל שמן זרעים אחר?';
+
+/// The waiter sentence the dairy-free rule adds, English (issue #56).
+const String dairyFreeModificationEn =
+    'Please make it with no dairy: no cheese, cream, butter, milk or '
+    'yogurt.';
+
+/// The waiter sentence the dairy-free rule adds, Hebrew (issue #56).
+const String dairyFreeModificationHe =
+    'אפשר בבקשה להכין את המנה בלי מוצרי חלב: בלי גבינה, '
+    'שמנת, חמאה, חלב או יוגורט?';
+
+/// The waiter sentence the carnivore rule adds, English (issue #56).
+const String carnivoreOnlyModificationEn =
+    'Please serve only the meat, fish or eggs, with no vegetables, salad '
+    'or other plants on the plate.';
+
+/// The waiter sentence the carnivore rule adds, Hebrew (issue #56).
+const String carnivoreOnlyModificationHe =
+    'אפשר בבקשה להגיש רק את הבשר, הדג או הביצים, בלי ירקות, '
+    'סלט או צמחים אחרים בצלחת?';
+
+/// Shown for a dish a dietary rule alone made yellow, English (issue
+/// #56). [yellowWhyEn] speaks of a carb component, which would be untrue
+/// of a dairy or plant ingredient; a dish with a carb component as well
+/// keeps [yellowWhyEn].
+const String dietaryRuleWhyEn =
+    'This dish is keto, but it breaks one of the rules you turned on in '
+    'Settings. Ask for the change below.';
+
+/// Shown for a dish a dietary rule alone made yellow, Hebrew (issue #56).
+const String dietaryRuleWhyHe =
+    'המנה מתאימה לקטו, אבל לא לאחד הכללים שהפעלתם '
+    'בהגדרות. בקשו את השינוי שמופיע כאן.';

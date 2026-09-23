@@ -175,6 +175,34 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settingsNetCarbLimitIncrease => 'העלאת מגבלת הפחמימות נטו';
 
   @override
+  String get settingsKetoRules => 'כללי הקטו שלכם';
+
+  @override
+  String get settingsKetoRulesBody =>
+      'כל כלל שתפעילו יחול החל מהתפריט הבא שתפתחו.';
+
+  @override
+  String get settingsSeedOilFree => 'ללא שמני זרעים, בהקפדה';
+
+  @override
+  String get settingsSeedOilFreeHint =>
+      'מסמן שמן קנולה, חמניות וסויה במנות מטוגנות.';
+
+  @override
+  String get settingsDairyFree => 'קטו ללא מוצרי חלב';
+
+  @override
+  String get settingsDairyFreeHint =>
+      'שמנת, חמאה וגבינה יסומנו כמנה שדורשת שינוי.';
+
+  @override
+  String get settingsCarnivoreOnly => 'קרניבור בלבד';
+
+  @override
+  String get settingsCarnivoreOnlyHint =>
+      'רק בשר, דגים וביצים בירוק — ירקות הופכים לצהוב.';
+
+  @override
   String get settingsFilter => 'סינון ברירת מחדל';
 
   @override

@@ -121,6 +121,30 @@ List<_CompiledModifier> _compileCarbHe() => carbModifiersHe.entries
     )
     .toList(growable: false);
 
+/// Compiles a dietary-rule trigger list (issue #56) in English, same
+/// rule as [_compileBasesEn]. Reuses [_CompiledBase]: a dietary trigger
+/// is, like a base, a key plus a pattern, with no sentence of its own —
+/// the rule's one sentence is chosen by the dish's language instead.
+List<_CompiledBase> _compileDietaryEn(List<String> triggers) => triggers
+    .map(
+      (key) => (
+        key: key,
+        pattern: _latinTriggerPattern(TextNormaliser.normalise(key)),
+      ),
+    )
+    .toList(growable: false);
+
+/// Compiles a dietary-rule trigger list (issue #56) in Hebrew, through
+/// [_hebrewTriggerPattern]'s unicode lookaround — never `\b`.
+List<_CompiledBase> _compileDietaryHe(List<String> triggers) => triggers
+    .map(
+      (key) => (
+        key: key,
+        pattern: _hebrewTriggerPattern(TextNormaliser.normalise(key)),
+      ),
+    )
+    .toList(growable: false);
+
 /// Compiled once, on first use of this library (Dart top-level `final`
 /// fields initialise lazily).
 final List<_CompiledBase> _baseEn = _compileBasesEn();
@@ -133,6 +157,28 @@ final List<_CompiledModifier> _carbEn = _compileCarbEn();
 
 /// See [_baseEn].
 final List<_CompiledModifier> _carbHe = _compileCarbHe();
+
+/// See [_baseEn]; the seed-oil rule's triggers (issue #56).
+final List<_CompiledBase> _seedOilEn = _compileDietaryEn(seedOilTriggersEn);
+
+/// See [_seedOilEn].
+final List<_CompiledBase> _seedOilHe = _compileDietaryHe(seedOilTriggersHe);
+
+/// See [_baseEn]; the dairy-free rule's triggers (issue #56).
+final List<_CompiledBase> _dairyEn = _compileDietaryEn(dairyTriggersEn);
+
+/// See [_dairyEn].
+final List<_CompiledBase> _dairyHe = _compileDietaryHe(dairyTriggersHe);
+
+/// See [_baseEn]; the carnivore rule's plant triggers (issue #56).
+final List<_CompiledBase> _plantEn = _compileDietaryEn(plantTriggersEn);
+
+/// See [_plantEn].
+final List<_CompiledBase> _plantHe = _compileDietaryHe(plantTriggersHe);
+
+/// No dietary rule but dairy has guards; the seed-oil and plant tables
+/// scan against this empty map.
+const Map<String, GuardWords> _noGuards = <String, GuardWords>{};
 
 /// The words in [windowWords], padded with spaces, joined into a single
 /// string — matched against each of [phrases] (already normalised) with
@@ -206,6 +252,24 @@ bool _isGuarded(String haystack, int start, int end, GuardWords? guard) {
   scan(_baseEn, ketoQualifierGuardsEn, nonKetoBaseLabelsEn);
   scan(_baseHe, ketoQualifierGuardsHe, nonKetoBaseLabelsHe);
   return best;
+}
+
+/// Whether any trigger in [tables] — each paired with its guard map —
+/// survives its guards somewhere in [haystack] (issue #56).
+bool _anyUnguardedMatch(
+  String haystack,
+  List<(List<_CompiledBase>, Map<String, GuardWords>)> tables,
+) {
+  for (final (table, guards) in tables) {
+    for (final entry in table) {
+      for (final match in entry.pattern.allMatches(haystack)) {
+        if (!_isGuarded(haystack, match.start, match.end, guards[entry.key])) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
 }
 
 /// Every unguarded carb-modifier occurrence in [haystack], across both
@@ -332,4 +396,30 @@ abstract final class ClassificationRules {
       instructions: _sentencesAfterSuppression(occurrences),
     );
   }
+
+  /// Whether [rawText] names frying or an industrial seed oil
+  /// ([seedOilTriggersEn], [seedOilTriggersHe]) — the "Strict seed-oil
+  /// free" rule (issue #56). Both languages, unconditionally, like
+  /// [match]. Never throws.
+  static bool mentionsSeedOil(String rawText) => _anyUnguardedMatch(
+    TextNormaliser.normalise(rawText),
+    [(_seedOilEn, _noGuards), (_seedOilHe, _noGuards)],
+  );
+
+  /// Whether [rawText] names a dairy ingredient ([dairyTriggersEn],
+  /// [dairyTriggersHe]) that no plant word beside it rescues
+  /// ([dairyGuardsEn], [dairyGuardsHe]: `coconut cream`, `חלב שקדים`) —
+  /// the "Dairy-free keto" rule (issue #56). Never throws.
+  static bool mentionsDairy(String rawText) => _anyUnguardedMatch(
+    TextNormaliser.normalise(rawText),
+    [(_dairyEn, dairyGuardsEn), (_dairyHe, dairyGuardsHe)],
+  );
+
+  /// Whether [rawText] names a vegetable, salad, fruit, legume or other
+  /// plant ([plantTriggersEn], [plantTriggersHe]) — the "Carnivore only"
+  /// rule (issue #56). Never throws.
+  static bool mentionsPlant(String rawText) => _anyUnguardedMatch(
+    TextNormaliser.normalise(rawText),
+    [(_plantEn, _noGuards), (_plantHe, _noGuards)],
+  );
 }

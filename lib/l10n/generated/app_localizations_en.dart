@@ -174,6 +174,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsNetCarbLimitIncrease => 'Raise the net carb limit';
 
   @override
+  String get settingsKetoRules => 'Your keto rules';
+
+  @override
+  String get settingsKetoRulesBody =>
+      'Each rule you turn on applies from the next menu you open.';
+
+  @override
+  String get settingsSeedOilFree => 'Strict seed-oil free';
+
+  @override
+  String get settingsSeedOilFreeHint =>
+      'Flags canola, sunflower and soybean oil in fried dishes.';
+
+  @override
+  String get settingsDairyFree => 'Dairy-free keto';
+
+  @override
+  String get settingsDairyFreeHint =>
+      'Treats cream, butter and cheese as a modification.';
+
+  @override
+  String get settingsCarnivoreOnly => 'Carnivore only';
+
+  @override
+  String get settingsCarnivoreOnlyHint =>
+      'Greens only meat, fish, eggs — vegetables become yellow.';
+
+  @override
   String get settingsFilter => 'Default filter';
 
   @override
