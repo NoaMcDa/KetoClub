@@ -31,11 +31,22 @@ void runSettingsStoreContract(String name, SettingsStore Function() build) {
         filter: MenuFilter.greenOnly,
         estimationConsentGiven: true,
         lastVenue: VenueRef(source: MenuSource.wolt, platformId: 'v1'),
+        themeMode: AppThemeMode.dark,
       );
 
       await store.write(settings);
 
       expect(await store.read(), equals(settings));
+    });
+
+    test('write then read round-trips every AppThemeMode value', () async {
+      final store = build();
+
+      for (final mode in AppThemeMode.values) {
+        await store.write(AppSettings(themeMode: mode));
+
+        expect((await store.read()).themeMode, equals(mode));
+      }
     });
 
     test('write then read round-trips settings at their defaults', () async {

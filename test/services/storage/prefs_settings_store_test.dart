@@ -269,6 +269,62 @@ void main() {
       },
     );
 
+    test(
+      'an install that persisted settings before issue #58 added themeMode '
+      'decodes themeMode as system rather than failing the whole record',
+      () async {
+        // Arrange: the exact JSON shape PrefsSettingsStore wrote before
+        // AppThemeMode existed — no "themeMode" key at all.
+        SharedPreferences.setMockInitialValues(<String, Object>{
+          'flutter.ketoclub_settings':
+              '{"languageTag":"he","filter":"greenOnly",'
+              '"estimationConsentGiven":true,"lastVenue":null}',
+        });
+        final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
+
+        // Act
+        final result = await store.read();
+
+        // Assert: every pre-existing field survives, and the new field
+        // defaults rather than invalidating the record.
+        expect(result.themeMode, equals(AppThemeMode.system));
+        expect(result.languageTag, equals('he'));
+        expect(result.filter, equals(MenuFilter.greenOnly));
+        expect(result.estimationConsentGiven, isTrue);
+      },
+    );
+
+    test('read decodes an unrecognised themeMode as system rather than '
+        "falling back to today's defaults for the whole record", () async {
+      // Arrange
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        'flutter.ketoclub_settings':
+            '{"languageTag":"he","filter":"all",'
+            '"estimationConsentGiven":false,"lastVenue":null,'
+            '"themeMode":"sepia"}',
+      });
+      final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
+
+      // Act
+      final result = await store.read();
+
+      // Assert
+      expect(result.themeMode, equals(AppThemeMode.system));
+      expect(result.languageTag, equals('he'));
+    });
+
+    test('write then read round-trips a non-default themeMode', () async {
+      // Arrange
+      final store = _buildStore();
+
+      // Act
+      await store.write(const AppSettings(themeMode: AppThemeMode.dark));
+      final result = await store.read();
+
+      // Assert
+      expect(result.themeMode, equals(AppThemeMode.dark));
+    });
+
     test('read never returns null even on a virgin store', () async {
       // Arrange
       final store = _buildStore();

@@ -1,13 +1,19 @@
-import 'package:flutter/material.dart' show NavigationBar, TextDirection;
+import 'package:flutter/material.dart'
+    show MaterialApp, NavigationBar, TextDirection, ThemeMode;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/app.dart';
+import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/app_shell.dart';
 
 import 'fakes/fake_app_dependencies.dart';
+
+/// The English strings this file reads expected copy from.
+final AppLocalizations _en = AppLocalizationsEn();
 
 void main() {
   group('KetoClubApp', () {
@@ -79,6 +85,67 @@ void main() {
       // Assert
       final context = tester.element(find.text(appName));
       expect(Directionality.of(context), TextDirection.ltr);
+    });
+
+    testWidgets('uses ThemeMode.system before any mode has loaded', (
+      tester,
+    ) async {
+      // Arrange / Act: the very first frame, before
+      // `ThemeModeController.load` has resolved — mirrors the locale
+      // test above (issue #8, #58).
+      await tester.pumpWidget(
+        KetoClubApp(dependencies: FakeAppDependencies().dependencies),
+      );
+
+      // Assert
+      final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
+      expect(app.themeMode, equals(ThemeMode.system));
+    });
+
+    testWidgets('applies a previously stored dark theme mode on launch', (
+      tester,
+    ) async {
+      // Arrange: pre-seeding the store the way a completed
+      // `SettingsController.setThemeMode(AppThemeMode.dark)` write would
+      // leave it, exactly as the stored-locale tests above do.
+      final fakes = FakeAppDependencies();
+      await fakes.settingsStore.write(
+        const AppSettings(themeMode: AppThemeMode.dark),
+      );
+
+      // Act
+      await tester.pumpWidget(KetoClubApp(dependencies: fakes.dependencies));
+      await tester.pumpAndSettle();
+
+      // Assert
+      final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
+      expect(app.themeMode, equals(ThemeMode.dark));
+    });
+
+    testWidgets('choosing Dark in Settings changes MaterialApp.themeMode', (
+      tester,
+    ) async {
+      // Arrange: a real navigation into Settings, the same way the
+      // direct-route test below reaches it.
+      await tester.pumpWidget(
+        KetoClubApp(dependencies: FakeAppDependencies().dependencies),
+      );
+      await tester.pumpAndSettle();
+      final navigatorFinder = find.byType(Navigator).first;
+      tester
+          .state<NavigatorState>(navigatorFinder)
+          .pushReplacementNamed(settingsRoutePath);
+      await tester.pumpAndSettle();
+
+      // Act
+      final dark = find.text(_en.settingsAppearanceDark);
+      await tester.ensureVisible(dark);
+      await tester.tap(dark);
+      await tester.pumpAndSettle();
+
+      // Assert
+      final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
+      expect(app.themeMode, equals(ThemeMode.dark));
     });
 
     testWidgets('a direct route to /settings lands on the Settings tab', (

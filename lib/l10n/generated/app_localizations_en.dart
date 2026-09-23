@@ -121,6 +121,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLanguageHebrew => 'Hebrew';
 
   @override
+  String get settingsAppearance => 'Appearance';
+
+  @override
+  String get settingsAppearanceSystem => 'Match my device';
+
+  @override
+  String get settingsAppearanceLight => 'Light';
+
+  @override
+  String get settingsAppearanceDark => 'Dark';
+
+  @override
   String get settingsFilter => 'Default filter';
 
   @override

@@ -20,6 +20,32 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// accident.
 const Object _unset = Object();
 
+/// The app-level appearance choice (issue #58), kept free of
+/// `package:flutter/material.dart`'s `ThemeMode` so `services/` never
+/// imports it (architecture.md §5) — `state/` maps this to `ThemeMode` for
+/// `MaterialApp.themeMode`.
+enum AppThemeMode {
+  /// Follows the platform brightness.
+  system,
+
+  /// Always light.
+  light,
+
+  /// Always dark.
+  dark;
+
+  /// The mode whose [name] equals [wire], or null when none does.
+  ///
+  /// Matches by string, never by ordinal, so reordering this enum cannot
+  /// silently re-map cached data.
+  static AppThemeMode? tryParse(String wire) {
+    for (final mode in AppThemeMode.values) {
+      if (mode.name == wire) return mode;
+    }
+    return null;
+  }
+}
+
 /// The user's on-device preferences (architecture.md §6.4): UI language,
 /// filter default, AI-estimation consent, and the last venue opened.
 @immutable
@@ -31,12 +57,18 @@ final class AppSettings {
     this.filter = MenuFilter.all,
     this.estimationConsentGiven = false,
     this.lastVenue,
+    this.themeMode = AppThemeMode.system,
   });
 
   /// Reads settings written by [toJson].
   ///
   /// Returns null for any shape mismatch, including a malformed
-  /// [lastVenue] or an unknown [filter] name, and never throws.
+  /// [lastVenue] or an unknown [filter] name, and never throws. [themeMode]
+  /// is the one exception (issue #58): it was added after installs already
+  /// existed without it, so a missing or unrecognised value decodes to
+  /// [AppThemeMode.system] rather than invalidating the whole record —
+  /// unlike [filter], whose own unknown value already fails this way for
+  /// data written before that field existed too.
   static AppSettings? tryFrom(Map<String, Object?> json) {
     final rawLanguageTag = json['languageTag'];
     if (rawLanguageTag != null && rawLanguageTag is! String) return null;
@@ -53,11 +85,16 @@ final class AppSettings {
       lastVenue = VenueRef.tryFrom(rawLastVenue);
       if (lastVenue == null) return null;
     }
+    final rawThemeMode = json['themeMode'];
+    final themeMode = rawThemeMode is String
+        ? AppThemeMode.tryParse(rawThemeMode) ?? AppThemeMode.system
+        : AppThemeMode.system;
     return AppSettings(
       languageTag: rawLanguageTag is String ? rawLanguageTag : null,
       filter: filter,
       estimationConsentGiven: rawConsent,
       lastVenue: lastVenue,
+      themeMode: themeMode,
     );
   }
 
@@ -74,17 +111,24 @@ final class AppSettings {
   /// The last venue opened, or null before any venue has been.
   final VenueRef? lastVenue;
 
+  /// The appearance choice: system, light, or dark (issue #58).
+  final AppThemeMode themeMode;
+
   /// Returns a copy with the given fields replaced.
   ///
   /// Omitting [languageTag] or [lastVenue] leaves the current value in
   /// place; passing `null` explicitly for either clears it. This is done
   /// by defaulting both to a private sentinel distinct from `null`, so
-  /// "not passed" and "passed null" can be told apart.
+  /// "not passed" and "passed null" can be told apart. [themeMode] has no
+  /// such "clear it" meaning — it always names a real mode — so it uses
+  /// the ordinary "omit to keep" default every other non-nullable field
+  /// here would use.
   AppSettings copyWith({
     Object? languageTag = _unset,
     MenuFilter? filter,
     bool? estimationConsentGiven,
     Object? lastVenue = _unset,
+    AppThemeMode? themeMode,
   }) => AppSettings(
     languageTag: identical(languageTag, _unset)
         ? this.languageTag
@@ -95,6 +139,7 @@ final class AppSettings {
     lastVenue: identical(lastVenue, _unset)
         ? this.lastVenue
         : lastVenue as VenueRef?,
+    themeMode: themeMode ?? this.themeMode,
   );
 
   /// Writes a form [tryFrom] can read back.
@@ -103,6 +148,7 @@ final class AppSettings {
     'filter': filter.name,
     'estimationConsentGiven': estimationConsentGiven,
     'lastVenue': lastVenue?.toJson(),
+    'themeMode': themeMode.name,
   };
 
   @override
@@ -111,16 +157,22 @@ final class AppSettings {
       other.languageTag == languageTag &&
       other.filter == filter &&
       other.estimationConsentGiven == estimationConsentGiven &&
-      other.lastVenue == lastVenue;
+      other.lastVenue == lastVenue &&
+      other.themeMode == themeMode;
 
   @override
-  int get hashCode =>
-      Object.hash(languageTag, filter, estimationConsentGiven, lastVenue);
+  int get hashCode => Object.hash(
+    languageTag,
+    filter,
+    estimationConsentGiven,
+    lastVenue,
+    themeMode,
+  );
 
   @override
   String toString() =>
       'AppSettings(lang: $languageTag, filter: $filter, '
-      'consent: $estimationConsentGiven)';
+      'consent: $estimationConsentGiven, themeMode: $themeMode)';
 }
 
 /// On-device storage for [AppSettings] (architecture.md §6.4). Backed by
