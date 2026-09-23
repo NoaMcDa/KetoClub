@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/venue_search_screen.dart';
+import 'package:ketoclub/services/storage/menu_cache.dart';
+import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:provider/provider.dart';
+
+import '../fakes/fake_menu_repository.dart';
+import '../fakes/fake_settings_store.dart';
 
 /// Pumps the real [VenueSearchScreen] over a real
 /// [VenueSearchController], recording every route name pushed via
@@ -37,11 +44,15 @@ Future<void> _pump(
 
 void main() {
   group('VenueSearchScreen', () {
+    late FakeSettingsStore settingsStore;
+    late FakeMenuRepository repository;
     late VenueSearchController controller;
     late List<String> pushedNames;
 
     setUp(() {
-      controller = VenueSearchController();
+      settingsStore = FakeSettingsStore();
+      repository = FakeMenuRepository();
+      controller = VenueSearchController(settingsStore, repository);
       pushedNames = <String>[];
     });
 
@@ -191,5 +202,56 @@ void main() {
       expect(find.text(l10n.discoveryTitle), findsOneWidget);
       expect(find.text(l10n.discoveryEmptyBody), findsOneWidget);
     });
+
+    testWidgets('no lastVenue stored shows no Continue row (issue #55)', (
+      tester,
+    ) async {
+      // Act
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byIcon(Icons.history), findsNothing);
+    });
+
+    testWidgets(
+      'launch with a stored lastVenue shows the Continue row and tapping '
+      'it navigates to the venue route (issue #55)',
+      (tester) async {
+        // Arrange
+        const ref = VenueRef(source: MenuSource.wolt, platformId: 'vitrina');
+        await settingsStore.write(const AppSettings(lastVenue: ref));
+        repository.seedCache(
+          CachedMenu(
+            menu: Menu(
+              venueRef: ref,
+              venueName: 'Vitrina',
+              currency: 'ILS',
+              fetchedAt: DateTime.utc(2026),
+              categories: const <MenuCategory>[],
+            ),
+          ),
+        );
+
+        // Act
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await tester.pumpAndSettle();
+        final context = tester.element(find.byType(VenueSearchScreen));
+        final l10n = AppLocalizations.of(context)!;
+
+        // Assert: the row shows the cached venue name.
+        expect(
+          find.text(l10n.venueSearchContinueWith('Vitrina')),
+          findsOneWidget,
+        );
+
+        // Act: tap it.
+        await tester.tap(find.text(l10n.venueSearchContinueWith('Vitrina')));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(pushedNames, contains('/venue/wolt/vitrina'));
+      },
+    );
   });
 }

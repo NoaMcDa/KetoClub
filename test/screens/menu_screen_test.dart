@@ -1074,7 +1074,7 @@ void main() {
         );
         await _pump(tester, controller);
         await tester.pumpAndSettle();
-        controller.setFilter(MenuFilter.redOnly);
+        await controller.setFilter(MenuFilter.redOnly);
         await tester.pumpAndSettle();
         expect(find.byType(DishCard), findsNothing);
         final loadCallsBefore = repository.loadCalls.length;

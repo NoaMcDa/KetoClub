@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 
@@ -252,6 +253,28 @@ void main() {
 
       // Assert
       expect(repository.clearCacheCallCount, 1);
+    });
+
+    test('clearCache resets lastVenue and lastFilter without clobbering '
+        'other settings (issue #55)', () async {
+      // Arrange
+      await settings.write(
+        const AppSettings(
+          languageTag: 'he',
+          lastVenue: VenueRef(source: MenuSource.wolt, platformId: 'v1'),
+          lastFilter: MenuFilter.redOnly,
+        ),
+      );
+      await controller.load();
+
+      // Act
+      await controller.clearCache();
+
+      // Assert
+      final stored = await settings.read();
+      expect(stored.lastVenue, isNull);
+      expect(stored.lastFilter, isNull);
+      expect(stored.languageTag, 'he');
     });
 
     test('setConsent toggles isBusy true then false', () async {

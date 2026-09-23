@@ -154,7 +154,10 @@ Route<void>? generateRoute(
       builder: (_) => AppShell(
         currentIndex: AppShell.exploreIndex,
         child: ChangeNotifierProvider<VenueSearchController>(
-          create: (_) => VenueSearchController(),
+          create: (_) => VenueSearchController(
+            dependencies.settingsStore,
+            dependencies.menuRepository,
+          ),
           child: const VenueSearchScreen(),
         ),
       ),

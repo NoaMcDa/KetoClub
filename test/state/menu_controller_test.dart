@@ -277,7 +277,7 @@ void main() {
       await controller.open(_ref);
 
       // Act
-      controller.setFilter(MenuFilter.greenOnly);
+      await controller.setFilter(MenuFilter.greenOnly);
 
       // Assert
       expect(controller.greenCount, 2);
@@ -335,7 +335,7 @@ void main() {
       await controller.open(_ref);
 
       // Act
-      controller.setFilter(MenuFilter.greenOnly);
+      await controller.setFilter(MenuFilter.greenOnly);
 
       // Assert
       expect(controller.visibleRows.map((row) => row.dish.id), ['green']);
@@ -365,7 +365,7 @@ void main() {
       await controller.open(_ref);
 
       // Act
-      controller.setFilter(MenuFilter.yellowOnly);
+      await controller.setFilter(MenuFilter.yellowOnly);
 
       // Assert
       expect(controller.visibleRows.map((row) => row.dish.id), ['yellow']);
@@ -395,7 +395,7 @@ void main() {
       await controller.open(_ref);
 
       // Act
-      controller.setFilter(MenuFilter.redOnly);
+      await controller.setFilter(MenuFilter.redOnly);
 
       // Assert
       expect(controller.visibleRows.map((row) => row.dish.id), ['red']);
@@ -428,7 +428,7 @@ void main() {
       await controller.open(_ref);
 
       // Act
-      controller.setFilter(MenuFilter.greenAndYellow);
+      await controller.setFilter(MenuFilter.greenAndYellow);
 
       // Assert
       expect(controller.visibleRows.map((row) => row.dish.id).toSet(), {
@@ -463,7 +463,7 @@ void main() {
         await controller.open(_ref);
 
         // Act
-        controller.setFilter(MenuFilter.all);
+        await controller.setFilter(MenuFilter.all);
 
         // Assert
         expect(controller.visibleRows.map((row) => row.dish.id).toSet(), {
@@ -497,7 +497,7 @@ void main() {
         ),
       );
       await controller.open(_ref);
-      controller.setFilter(MenuFilter.all);
+      await controller.setFilter(MenuFilter.all);
 
       // Act
       final rows = controller.visibleRows;
@@ -518,7 +518,7 @@ void main() {
       expect(notifyCount, 0);
 
       // Act
-      controller.setFilter(MenuFilter.all);
+      await controller.setFilter(MenuFilter.all);
 
       // Assert
       expect(controller.filter, MenuFilter.all);
@@ -539,6 +539,84 @@ void main() {
 
       // Assert
       expect(controller.filter, MenuFilter.greenOnly);
+    });
+
+    test('open restores lastFilter over the default filter when set '
+        '(issue #55)', () async {
+      // Arrange
+      settings = FakeSettingsStore(
+        initial: const AppSettings(
+          filter: MenuFilter.greenOnly,
+          lastFilter: MenuFilter.redOnly,
+        ),
+      );
+      controller = MenuController(repository, classifier, settings, notes);
+      repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+
+      // Act
+      await controller.open(_ref);
+
+      // Assert
+      expect(controller.filter, MenuFilter.redOnly);
+    });
+
+    test(
+      'open falls back to the default filter when lastFilter is unset',
+      () async {
+        // Arrange
+        settings = FakeSettingsStore(
+          initial: const AppSettings(filter: MenuFilter.yellowOnly),
+        );
+        controller = MenuController(repository, classifier, settings, notes);
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+
+        // Act
+        await controller.open(_ref);
+
+        // Assert
+        expect(controller.filter, MenuFilter.yellowOnly);
+      },
+    );
+
+    test('open writes lastVenue on a successful open (issue #55)', () async {
+      // Arrange
+      repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+
+      // Act
+      await controller.open(_ref);
+
+      // Assert
+      expect((await settings.read()).lastVenue, equals(_ref));
+    });
+
+    test(
+      'open does not write lastVenue when the fetch fails outright',
+      () async {
+        // Arrange
+        repository.stub(
+          _ref,
+          const MenuFetchFailed(reason: MenuFetchFailureReason.offline),
+        );
+
+        // Act
+        await controller.open(_ref);
+
+        // Assert
+        expect((await settings.read()).lastVenue, isNull);
+      },
+    );
+
+    test('setFilter persists the choice as lastFilter through SettingsStore '
+        '(issue #55)', () async {
+      // Arrange
+      repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+      await controller.open(_ref);
+
+      // Act
+      await controller.setFilter(MenuFilter.yellowOnly);
+
+      // Assert
+      expect((await settings.read()).lastFilter, MenuFilter.yellowOnly);
     });
 
     test('open passes estimationConsentGiven from SettingsStore into '

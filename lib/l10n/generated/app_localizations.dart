@@ -158,6 +158,12 @@ abstract class AppLocalizations {
   /// **'Show the keto menu'**
   String get venueSearchOpen;
 
+  /// No description provided for @venueSearchContinueWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with {venue}'**
+  String venueSearchContinueWith(String venue);
+
   /// No description provided for @menuLoading.
   ///
   /// In en, this message translates to:

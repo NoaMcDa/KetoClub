@@ -142,12 +142,17 @@ final class SettingsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Forgets every cached menu and analysis, through the repository.
+  /// Forgets every cached menu and analysis, through the repository, and
+  /// clears the last-opened venue and last-used filter (issue #55) — a
+  /// stale [AppSettings.lastVenue] would otherwise offer to resume a
+  /// venue whose cached menu this call just removed.
   Future<void> clearCache() async {
     _isBusy = true;
     notifyListeners();
 
     await _repository.clearCache();
+    _appSettings = _appSettings.copyWith(lastVenue: null, lastFilter: null);
+    await _settings.write(_appSettings);
 
     _isBusy = false;
     notifyListeners();

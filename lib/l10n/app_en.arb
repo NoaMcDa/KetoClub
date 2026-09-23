@@ -12,6 +12,10 @@
   "venueSearchHint": "Paste a Wolt link, or a venue slug",
   "venueSearchInvalid": "KetoClub cannot read a menu from that yet. Paste a Wolt restaurant link or its slug.",
   "venueSearchOpen": "Show the keto menu",
+  "venueSearchContinueWith": "Continue with {venue}",
+  "@venueSearchContinueWith": {
+    "placeholders": { "venue": { "type": "String" } }
+  },
 
   "menuLoading": "Reading the menu…",
   "menuEmpty": "This menu has no dishes.",

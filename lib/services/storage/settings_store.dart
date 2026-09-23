@@ -49,7 +49,8 @@ enum AppThemeMode {
 
 /// The user's on-device preferences (architecture.md §6.4): UI language,
 /// filter default, AI-estimation consent, the last venue opened, the
-/// appearance (issue #58) and the net-carb limit (issue #57).
+/// appearance (issue #58), the net-carb limit (issue #57) and the
+/// last-used filter (issue #55).
 @immutable
 final class AppSettings {
   /// Creates settings. Every field defaults to the "nothing set yet"
@@ -61,6 +62,7 @@ final class AppSettings {
     this.lastVenue,
     this.themeMode = AppThemeMode.system,
     this.netCarbLimitGrams = defaultNetCarbLimitGrams,
+    this.lastFilter,
   });
 
   /// Reads settings written by [toJson].
@@ -79,6 +81,11 @@ final class AppSettings {
   /// [minNetCarbLimitGrams]..[maxNetCarbLimitGrams] is clamped into that
   /// range rather than rejected, so a hand-edited or future value still
   /// lands on the nearest limit the stepper can show.
+  ///
+  /// [lastFilter] (issue #55) follows the same "added later" rule as
+  /// [themeMode] and [netCarbLimitGrams]: a missing key, or one whose
+  /// value [MenuFilter.tryParse] does not recognise, decodes to null —
+  /// "no last-used filter yet" — rather than invalidating the record.
   static AppSettings? tryFrom(Map<String, Object?> json) {
     final rawLanguageTag = json['languageTag'];
     if (rawLanguageTag != null && rawLanguageTag is! String) return null;
@@ -103,6 +110,10 @@ final class AppSettings {
     final netCarbLimitGrams = rawLimit is int
         ? clampNetCarbLimitGrams(rawLimit)
         : defaultNetCarbLimitGrams;
+    final rawLastFilter = json['lastFilter'];
+    final lastFilter = rawLastFilter is String
+        ? MenuFilter.tryParse(rawLastFilter)
+        : null;
     return AppSettings(
       languageTag: rawLanguageTag is String ? rawLanguageTag : null,
       filter: filter,
@@ -110,6 +121,7 @@ final class AppSettings {
       lastVenue: lastVenue,
       themeMode: themeMode,
       netCarbLimitGrams: netCarbLimitGrams,
+      lastFilter: lastFilter,
     );
   }
 
@@ -134,15 +146,24 @@ final class AppSettings {
   /// read back through [tryFrom] or set through `SettingsController`.
   final int netCarbLimitGrams;
 
+  /// The verdict filter most recently chosen on the menu screen (issue
+  /// #55), or null before any has been chosen. Kept separate from
+  /// [filter] — the *default* filter set on the Settings screen — so the
+  /// two never fight: `MenuController.setFilter` writes this field, and
+  /// `MenuController.open` restores it over [filter] when it is set,
+  /// falling back to [filter] otherwise.
+  final MenuFilter? lastFilter;
+
   /// Returns a copy with the given fields replaced.
   ///
-  /// Omitting [languageTag] or [lastVenue] leaves the current value in
-  /// place; passing `null` explicitly for either clears it. This is done
-  /// by defaulting both to a private sentinel distinct from `null`, so
-  /// "not passed" and "passed null" can be told apart. [themeMode] has no
-  /// such "clear it" meaning — it always names a real mode — so it uses
-  /// the ordinary "omit to keep" default every other non-nullable field
-  /// here would use, as does [netCarbLimitGrams].
+  /// Omitting [languageTag], [lastVenue] or [lastFilter] leaves the
+  /// current value in place; passing `null` explicitly for any of them
+  /// clears it. This is done by defaulting all three to a private
+  /// sentinel distinct from `null`, so "not passed" and "passed null" can
+  /// be told apart. [themeMode] has no such "clear it" meaning — it
+  /// always names a real mode — so it uses the ordinary "omit to keep"
+  /// default every other non-nullable field here would use, as does
+  /// [netCarbLimitGrams].
   AppSettings copyWith({
     Object? languageTag = _unset,
     MenuFilter? filter,
@@ -150,6 +171,7 @@ final class AppSettings {
     Object? lastVenue = _unset,
     AppThemeMode? themeMode,
     int? netCarbLimitGrams,
+    Object? lastFilter = _unset,
   }) => AppSettings(
     languageTag: identical(languageTag, _unset)
         ? this.languageTag
@@ -162,6 +184,9 @@ final class AppSettings {
         : lastVenue as VenueRef?,
     themeMode: themeMode ?? this.themeMode,
     netCarbLimitGrams: netCarbLimitGrams ?? this.netCarbLimitGrams,
+    lastFilter: identical(lastFilter, _unset)
+        ? this.lastFilter
+        : lastFilter as MenuFilter?,
   );
 
   /// Writes a form [tryFrom] can read back.
@@ -172,6 +197,7 @@ final class AppSettings {
     'lastVenue': lastVenue?.toJson(),
     'themeMode': themeMode.name,
     'netCarbLimitGrams': netCarbLimitGrams,
+    'lastFilter': lastFilter?.name,
   };
 
   @override
@@ -182,7 +208,8 @@ final class AppSettings {
       other.estimationConsentGiven == estimationConsentGiven &&
       other.lastVenue == lastVenue &&
       other.themeMode == themeMode &&
-      other.netCarbLimitGrams == netCarbLimitGrams;
+      other.netCarbLimitGrams == netCarbLimitGrams &&
+      other.lastFilter == lastFilter;
 
   @override
   int get hashCode => Object.hash(
@@ -192,13 +219,14 @@ final class AppSettings {
     lastVenue,
     themeMode,
     netCarbLimitGrams,
+    lastFilter,
   );
 
   @override
   String toString() =>
       'AppSettings(lang: $languageTag, filter: $filter, '
       'consent: $estimationConsentGiven, themeMode: $themeMode, '
-      'netCarbLimit: ${netCarbLimitGrams}g)';
+      'netCarbLimit: ${netCarbLimitGrams}g, lastFilter: $lastFilter)';
 }
 
 /// On-device storage for [AppSettings] (architecture.md §6.4). Backed by

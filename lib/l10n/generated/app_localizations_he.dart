@@ -41,6 +41,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get venueSearchOpen => 'הצג תפריט קטוגני';
 
   @override
+  String venueSearchContinueWith(String venue) {
+    return 'המשיכו עם $venue';
+  }
+
+  @override
   String get menuLoading => 'קורא את התפריט…';
 
   @override
