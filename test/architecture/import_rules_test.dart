@@ -198,7 +198,12 @@ const _boundaries = <_Boundary>[
   _Boundary('restaurant-api.wolt.com', {
     'services/menu/wolt/wolt_adapter.dart',
   }),
-  _Boundary('www.10bis.co.il', {'services/menu/tenbis/tenbis_adapter.dart'}),
+  _Boundary('www.10bis.co.il', {
+    'services/menu/tenbis/tenbis_adapter.dart',
+    // The "open on 10bis" link (issue #53) is a literal 10bis URL, not a
+    // fetch endpoint, but it names the same host.
+    'services/venue/venue_ref_resolver.dart',
+  }),
   _Boundary('/v1/chat', {'services/llm/backend_chat_client.dart'}),
   _Boundary('KETOCLUB_BACKEND_URL', {'di.dart'}),
   _Boundary(

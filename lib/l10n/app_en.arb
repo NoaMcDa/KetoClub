@@ -180,6 +180,10 @@
       "age": { "type": "String" }
     }
   },
+  "menuOpenOnPlatform": "Open on {platform}",
+  "@menuOpenOnPlatform": {
+    "placeholders": { "platform": { "type": "String" } }
+  },
   "menuShowingAll": "{count, plural, one{Showing 1 dish} other{Showing {count} dishes}}",
   "@menuShowingAll": {
     "placeholders": { "count": { "type": "num" } }

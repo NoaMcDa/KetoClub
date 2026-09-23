@@ -171,4 +171,87 @@ void main() {
       expect(first, equals(second));
     });
   });
+
+  group('VenueRefResolver.platformUrl (issue #53)', () {
+    test('returns the Wolt venue page for a Wolt ref', () {
+      // Arrange
+      const ref = VenueRef(
+        source: MenuSource.wolt,
+        platformId: 'vitrina-lilinblum',
+      );
+
+      // Act
+      final url = VenueRefResolver.platformUrl(ref);
+
+      // Assert
+      expect(
+        url,
+        equals(
+          Uri.parse(
+            'https://wolt.com/en/isr/tel-aviv/restaurant/vitrina-lilinblum',
+          ),
+        ),
+      );
+    });
+
+    test('returns the 10bis venue page for a 10bis ref', () {
+      // Arrange
+      const ref = VenueRef(source: MenuSource.tenbis, platformId: '123456');
+
+      // Act
+      final url = VenueRefResolver.platformUrl(ref);
+
+      // Assert
+      expect(
+        url,
+        equals(
+          Uri.parse(
+            'https://www.10bis.co.il/next/restaurants/menu/delivery/123456',
+          ),
+        ),
+      );
+    });
+
+    test('returns null for Tabit and Ontopo, which have no known URL form '
+        'yet', () {
+      for (final source in [MenuSource.tabit, MenuSource.ontopo]) {
+        // Act
+        final url = VenueRefResolver.platformUrl(
+          VenueRef(source: source, platformId: 'anything'),
+        );
+
+        // Assert
+        expect(url, isNull);
+      }
+    });
+
+    test('round-trips through resolve for a Wolt ref: platformUrl then '
+        'resolve gives back an equal ref', () {
+      // Arrange
+      const ref = VenueRef(
+        source: MenuSource.wolt,
+        platformId: 'vitrina-lilinblum',
+      );
+
+      // Act
+      final url = VenueRefResolver.platformUrl(ref);
+      final roundTripped = VenueRefResolver.resolve(url!.toString());
+
+      // Assert
+      expect(roundTripped, equals(ref));
+    });
+
+    test('round-trips through resolve for a 10bis ref: platformUrl then '
+        'resolve gives back an equal ref', () {
+      // Arrange
+      const ref = VenueRef(source: MenuSource.tenbis, platformId: '123456');
+
+      // Act
+      final url = VenueRefResolver.platformUrl(ref);
+      final roundTripped = VenueRefResolver.resolve(url!.toString());
+
+      // Assert
+      expect(roundTripped, equals(ref));
+    });
+  });
 }
