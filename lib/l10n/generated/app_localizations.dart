@@ -170,6 +170,24 @@ abstract class AppLocalizations {
   /// **'This menu has no dishes.'**
   String get menuEmpty;
 
+  /// No description provided for @menuProgressAnalysing.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysing the menu…'**
+  String get menuProgressAnalysing;
+
+  /// No description provided for @menuProgressAskingAi.
+  ///
+  /// In en, this message translates to:
+  /// **'Asking the AI…'**
+  String get menuProgressAskingAi;
+
+  /// No description provided for @menuProgressApplyingRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Applying the rules…'**
+  String get menuProgressApplyingRules;
+
   /// No description provided for @filterGreenOnly.
   ///
   /// In en, this message translates to:

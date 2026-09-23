@@ -15,6 +15,20 @@ bool _listEquals<T>(List<T> a, List<T> b) {
   return true;
 }
 
+/// Which engine a [MenuClassifier] has started running, as announced
+/// through [ClassificationOptions.onEngineStarted] (issue #65).
+///
+/// Deliberately not [AnalysisEngine]: that type describes a finished
+/// result (the model that answered, the reason rules were used), and at
+/// the moment an engine starts neither is known yet.
+enum ClassifyingEngine {
+  /// The hosted language model, reached through KetoClub's server.
+  llm,
+
+  /// The on-device rule engine.
+  rules,
+}
+
 /// Options steering one [MenuClassifier.classify] call (architecture.md
 /// §6.2, §9.1).
 @immutable
@@ -23,6 +37,7 @@ final class ClassificationOptions {
   const new({
     this.estimationConsentGiven = false,
     this.dietaryConstraints = const <String>[],
+    this.onEngineStarted,
   });
 
   /// Whether the user has consented to sending menu text to a
@@ -33,6 +48,24 @@ final class ClassificationOptions {
   /// "seed-oil free" (architecture.md §9.1, Tier C). Callers must not
   /// mutate the list passed to the constructor.
   final List<String> dietaryConstraints;
+
+  /// Called by an engine as it starts work on this call, so a screen can
+  /// name the engine while it runs ("Asking the AI…" against "Applying
+  /// the rules…", issue #65).
+  ///
+  /// **Each engine announces itself; the router announces nothing.**
+  /// `LlmMenuClassifier` calls this with [ClassifyingEngine.llm] and
+  /// `HeuristicMenuClassifier` with [ClassifyingEngine.rules], each as
+  /// the first statement of its own `classify`. The router's choice —
+  /// consent, the connectivity pre-check, the fallback after a failed
+  /// LLM call — therefore shows up here as the order the engines start
+  /// in, with none of its rules restated anywhere else. A fallback
+  /// reads as `llm` followed by `rules`.
+  ///
+  /// An observer, not an option: it cannot change what the engines
+  /// return, so it takes no part in [operator ==], [hashCode] or
+  /// [toString]. Null when nobody is listening.
+  final void Function(ClassifyingEngine engine)? onEngineStarted;
 
   @override
   bool operator ==(Object other) =>

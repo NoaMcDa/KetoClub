@@ -15,6 +15,9 @@
 
   "menuLoading": "Reading the menu…",
   "menuEmpty": "This menu has no dishes.",
+  "menuProgressAnalysing": "Analysing the menu…",
+  "menuProgressAskingAi": "Asking the AI…",
+  "menuProgressApplyingRules": "Applying the rules…",
   "filterGreenOnly": "Order as-is only",
   "filterGreenAndYellow": "As-is and with changes",
   "filterAll": "Everything",

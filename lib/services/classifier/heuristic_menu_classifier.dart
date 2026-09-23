@@ -46,6 +46,9 @@ final class HeuristicMenuClassifier implements MenuClassifier {
     Menu menu, {
     ClassificationOptions options = const ClassificationOptions(),
   }) async {
+    // Announced before any work, so a listener hears it in the same turn
+    // the call starts (issue #65).
+    options.onEngineStarted?.call(ClassifyingEngine.rules);
     final dishes = <AnalysedDish>[
       for (final dish in menu.allDishes) _analyse(dish),
     ];
