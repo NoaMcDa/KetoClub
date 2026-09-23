@@ -53,16 +53,88 @@ void main() {
   });
 
   group('prompt text', () {
-    test('promptVerdictDefinitions names all three verdicts', () {
+    test('promptVerdictDefinitionsTemplate names all three verdicts', () {
       // Assert
-      expect(promptVerdictDefinitions, contains('orderAsIs'));
-      expect(promptVerdictDefinitions, contains('modifiable'));
-      expect(promptVerdictDefinitions, contains('nonKeto'));
+      expect(promptVerdictDefinitionsTemplate, contains('orderAsIs'));
+      expect(promptVerdictDefinitionsTemplate, contains('modifiable'));
+      expect(promptVerdictDefinitionsTemplate, contains('nonKeto'));
     });
 
-    test('promptKetoRules states the net-carb threshold', () {
+    test('both templates carry the limit placeholder and no fixed figure', () {
+      // Assert: the green threshold is the placeholder, never a
+      // hard-coded 6g the user's limit would silently fail to replace.
+      expect(promptVerdictDefinitionsTemplate, contains('{limit}g or less'));
+      expect(promptKetoRulesTemplate, contains('{limit}g or less'));
+      expect(promptVerdictDefinitionsTemplate, isNot(contains('6g')));
+      expect(promptKetoRulesTemplate, isNot(contains('6g')));
+    });
+
+    test('promptKetoRulesFor states the given net-carb threshold', () {
+      // Act
+      final rules = promptKetoRulesFor(12);
+
       // Assert
-      expect(promptKetoRules, contains('6g'));
+      expect(rules, contains('Net carbs of 12g or less per dish'));
+      expect(rules, isNot(contains(netCarbLimitPlaceholder)));
+    });
+
+    test('promptVerdictDefinitionsFor states the given threshold in the '
+        'green definition only', () {
+      // Act
+      final lines = promptVerdictDefinitionsFor(4).split('\n');
+
+      // Assert: still one line per verdict, which the legend relies on.
+      expect(lines, hasLength(3));
+      expect(lines[0], contains('net carbohydrates 4g or less'));
+      expect(lines[1], isNot(contains('4g')));
+      expect(lines[2], isNot(contains('4g')));
+    });
+
+    test('at the default limit both texts read exactly as the fixed-6g '
+        'prompt did, so the default chat-cache key is unchanged', () {
+      // Act
+      final definitions = promptVerdictDefinitionsFor(defaultNetCarbLimitGrams);
+      final rules = promptKetoRulesFor(defaultNetCarbLimitGrams);
+
+      // Assert
+      expect(
+        definitions,
+        startsWith(
+          'orderAsIs — net carbohydrates 6g or less, a healthy '
+          'fat-and-protein base,',
+        ),
+      );
+      expect(
+        rules,
+        startsWith(
+          'Net carbs of 6g or less per dish make it green (orderAsIs).\n',
+        ),
+      );
+    });
+  });
+
+  group('net carb limit', () {
+    test('the default is 6 g inside a 2..25 g range', () {
+      // Assert
+      expect(defaultNetCarbLimitGrams, equals(6));
+      expect(minNetCarbLimitGrams, equals(2));
+      expect(maxNetCarbLimitGrams, equals(25));
+    });
+
+    test('clampNetCarbLimitGrams keeps an in-range value', () {
+      // Assert
+      expect(clampNetCarbLimitGrams(2), equals(2));
+      expect(clampNetCarbLimitGrams(9), equals(9));
+      expect(clampNetCarbLimitGrams(25), equals(25));
+    });
+
+    test('clampNetCarbLimitGrams pulls an out-of-range value to the '
+        'nearest bound', () {
+      // Assert
+      expect(clampNetCarbLimitGrams(1), equals(minNetCarbLimitGrams));
+      expect(clampNetCarbLimitGrams(-40), equals(minNetCarbLimitGrams));
+      expect(clampNetCarbLimitGrams(26), equals(maxNetCarbLimitGrams));
+      expect(clampNetCarbLimitGrams(1000), equals(maxNetCarbLimitGrams));
     });
   });
 

@@ -134,6 +134,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settingsAppearanceDark => 'כהה';
 
   @override
+  String get settingsNetCarbLimit => 'מגבלת פחמימות נטו';
+
+  @override
+  String get settingsNetCarbLimitBody =>
+      'מנות מעל המגבלה לעולם לא יסומנו בירוק. שינוי שלה ינתח מחדש את התפריט הבא שתפתחו.';
+
+  @override
+  String settingsNetCarbLimitValue(int grams) {
+    return '$grams גרם';
+  }
+
+  @override
+  String get settingsNetCarbLimitDecrease => 'הורדת מגבלת הפחמימות נטו';
+
+  @override
+  String get settingsNetCarbLimitIncrease => 'העלאת מגבלת הפחמימות נטו';
+
+  @override
   String get settingsFilter => 'סינון ברירת מחדל';
 
   @override

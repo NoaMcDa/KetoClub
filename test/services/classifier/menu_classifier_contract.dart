@@ -167,6 +167,23 @@ void runMenuClassifierContract(String name, MenuClassifier Function() build) {
       }
     });
 
+    test('a placed result records the options it was given', () async {
+      // Issue #57: a cached analysis is only reused under the options it
+      // was made with, so every classifier must say what those were.
+      final classifier = build();
+      const options = ClassificationOptions(
+        netCarbLimitGrams: 13,
+        dietaryConstraints: ['dairy-free'],
+      );
+      final result = await classifier.classify(
+        _populatedMenu,
+        options: options,
+      );
+      if (result is MenuAnalysed) {
+        expect(result.options, equals(options.snapshot));
+      }
+    });
+
     test('classifying the same menu twice resolves both times', () async {
       final classifier = build();
       await expectLater(classifier.classify(_populatedMenu), completes);

@@ -53,6 +53,14 @@
   "settingsAppearanceSystem": "Follow device theme",
   "settingsAppearanceLight": "Light",
   "settingsAppearanceDark": "Dark",
+  "settingsNetCarbLimit": "Net carb limit",
+  "settingsNetCarbLimitBody": "Dishes above this are never green. Changing it re-analyses the next menu you open.",
+  "settingsNetCarbLimitValue": "{grams} g",
+  "@settingsNetCarbLimitValue": {
+    "placeholders": { "grams": { "type": "int" } }
+  },
+  "settingsNetCarbLimitDecrease": "Lower the net carb limit",
+  "settingsNetCarbLimitIncrease": "Raise the net carb limit",
   "settingsFilter": "Default filter",
   "settingsClearCache": "Clear saved menus",
   "settingsCacheCleared": "Saved menus cleared.",

@@ -326,6 +326,36 @@ abstract class AppLocalizations {
   /// **'Dark'**
   String get settingsAppearanceDark;
 
+  /// No description provided for @settingsNetCarbLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Net carb limit'**
+  String get settingsNetCarbLimit;
+
+  /// No description provided for @settingsNetCarbLimitBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Dishes above this are never green. Changing it re-analyses the next menu you open.'**
+  String get settingsNetCarbLimitBody;
+
+  /// No description provided for @settingsNetCarbLimitValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{grams} g'**
+  String settingsNetCarbLimitValue(int grams);
+
+  /// No description provided for @settingsNetCarbLimitDecrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Lower the net carb limit'**
+  String get settingsNetCarbLimitDecrease;
+
+  /// No description provided for @settingsNetCarbLimitIncrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Raise the net carb limit'**
+  String get settingsNetCarbLimitIncrease;
+
   /// No description provided for @settingsFilter.
   ///
   /// In en, this message translates to:

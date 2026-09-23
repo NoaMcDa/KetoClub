@@ -6,8 +6,10 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
+import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/keto_score.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 
@@ -17,6 +19,17 @@ import 'package:ketoclub/utils/text_normaliser.dart';
 /// through a [MenuClassifier], and holds the two separately: a failed
 /// [MenuAnalysis] still leaves [menu] populated, so the user sees what the
 /// restaurant serves even when it could not be judged.
+///
+/// **Options change invalidates the cached analysis (issue #57).** Every
+/// [open] builds [ClassificationOptions] from the user's settings — consent,
+/// and the net-carb limit — and reuses the analysis cached beside the menu
+/// only when that analysis answered the same question: see [open] for the
+/// full rule. The comparison is [ClassificationOptions.matches] against the
+/// [MenuAnalysed.options] every classifier records, so issue #56's dietary
+/// toggles invalidate the same way once they reach [ClassificationOptions],
+/// with no change here. This controller owns the rule, not the repository:
+/// [MenuRepository.load] only decides whether the *menu* is fresh, and
+/// only this controller knows the options the user holds now.
 ///
 /// Never throws — both services behind it return sealed results — and does
 /// no I/O, JSON parsing, price formatting or regex work of its own
@@ -175,6 +188,16 @@ final class MenuController extends ChangeNotifier {
         .length;
   }
 
+  /// The net-carb limit in grams [analysis] was produced under (issue #57),
+  /// for the legend's green definition; [defaultNetCarbLimitGrams] when
+  /// there is no [MenuAnalysed] result or it recorded no options.
+  int get netCarbLimitGrams {
+    final currentAnalysis = _analysis;
+    if (currentAnalysis is! MenuAnalysed) return defaultNetCarbLimitGrams;
+    return currentAnalysis.options?.netCarbLimitGrams ??
+        defaultNetCarbLimitGrams;
+  }
+
   /// Which engine produced [analysis], or null before a [MenuAnalysed]
   /// result exists.
   AnalysisEngine? get engine {
@@ -255,9 +278,25 @@ final class MenuController extends ChangeNotifier {
   /// each step so a caller can render a spinner and then the result.
   ///
   /// A failed fetch leaves [menu] null and sets [fetchFailure] and
-  /// [fetchStatusCode]; no classification is attempted. A successful
-  /// fetch always runs the classifier, and a successful [MenuAnalysed] is
-  /// persisted through the repository so a revisit costs no LLM request.
+  /// [fetchStatusCode]; no classification is attempted. After a successful
+  /// fetch, the analysis cached for [ref] is reused — spending no
+  /// classifier call — only when all of these hold (issue #57):
+  ///
+  /// - it is a [MenuAnalysed] from the LLM engine ([LlmEngine]), and the
+  ///   user still consents to AI analysis. A rules result is never reused:
+  ///   re-running the heuristic is free, and whatever made the LLM
+  ///   unavailable last time (no consent, offline, a timeout) may have
+  ///   passed, so a fresh open deserves a fresh try;
+  /// - the cached menu's dish text fingerprints the same as the fetched
+  ///   menu's ([TextNormaliser.menuFingerprint]), so it describes these
+  ///   dishes; and
+  /// - its recorded [MenuAnalysed.options] match the options built from
+  ///   the settings now ([ClassificationOptions.matches]). A changed
+  ///   net-carb limit therefore re-analyses on the next open even when
+  ///   the menu itself is unchanged.
+  ///
+  /// Otherwise the classifier runs, and a successful [MenuAnalysed] is
+  /// persisted through the repository for the next open to reuse.
   /// [filter] is reset from the user's stored default on every call.
   /// Never throws.
   Future<void> open(VenueRef ref, {bool forceRefresh = false}) async {
@@ -283,16 +322,23 @@ final class MenuController extends ChangeNotifier {
         _fetchFailure = null;
         _fetchStatusCode = null;
 
-        final options = ClassificationOptions(
-          estimationConsentGiven: appSettings.estimationConsentGiven,
-        );
-        final analysis = await _classifier.classify(
+        final options = _optionsFrom(appSettings);
+        final reusable = _reusableAnalysis(
+          await _repository.cached(ref),
           fetchedMenu,
-          options: options,
+          options,
         );
-        _analysis = analysis;
-        if (analysis is MenuAnalysed) {
-          await _repository.saveAnalysis(ref, analysis);
+        if (reusable != null) {
+          _analysis = reusable;
+        } else {
+          final analysis = await _classifier.classify(
+            fetchedMenu,
+            options: options,
+          );
+          _analysis = analysis;
+          if (analysis is MenuAnalysed) {
+            await _repository.saveAnalysis(ref, analysis);
+          }
         }
       case MenuFetchFailed(:final reason, :final statusCode):
         _menu = null;
@@ -316,7 +362,10 @@ final class MenuController extends ChangeNotifier {
   /// before this call against the refetched one: equal fingerprints keep
   /// [analysis] exactly as it was (only [menu] — and so [fetchedAt] —
   /// moves forward), spending no classifier call; a changed fingerprint
-  /// reclassifies and persists the new result exactly as [open] does.
+  /// reclassifies and persists the new result exactly as [open] does. So
+  /// does an unchanged fingerprint whose analysis was made under options
+  /// other than the user's current ones — a net-carb limit changed since
+  /// [open], say (issue #57).
   ///
   /// A refetch that fails outright (no adapter succeeded and nothing was
   /// cached to fall back to — the only way [MenuRepository.load] returns
@@ -354,16 +403,17 @@ final class MenuController extends ChangeNotifier {
         _staleReason = staleReason;
         _fetchFailure = null;
         _fetchStatusCode = null;
-        if (unchanged && previousAnalysis is MenuAnalysed) {
-          // The dish text did not change: keep the analysis already on
-          // hand — only fetchedAt (read from _menu) moves forward — and
-          // spend no classifier call (architecture.md §6.4).
+        final options = _optionsFrom(await _settings.read());
+        if (unchanged &&
+            previousAnalysis is MenuAnalysed &&
+            options.matches(previousAnalysis.options)) {
+          // The dish text did not change, and neither did the options
+          // that decide what a verdict means (issue #57): keep the
+          // analysis already on hand — only fetchedAt (read from _menu)
+          // moves forward — and spend no classifier call
+          // (architecture.md §6.4).
           _analysis = previousAnalysis;
         } else {
-          final appSettings = await _settings.read();
-          final options = ClassificationOptions(
-            estimationConsentGiven: appSettings.estimationConsentGiven,
-          );
           final analysis = await _classifier.classify(
             fetchedMenu,
             options: options,
@@ -382,6 +432,35 @@ final class MenuController extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  /// The [ClassificationOptions] [settings] ask for: consent, and the
+  /// net-carb limit (issue #57).
+  static ClassificationOptions _optionsFrom(AppSettings settings) =>
+      ClassificationOptions(
+        estimationConsentGiven: settings.estimationConsentGiven,
+        netCarbLimitGrams: settings.netCarbLimitGrams,
+      );
+
+  /// [cached]'s analysis when [open] may show it for [fetched] under
+  /// [options] instead of classifying again, or null when it must
+  /// classify. See [open] for the three conditions.
+  static MenuAnalysed? _reusableAnalysis(
+    CachedMenu? cached,
+    Menu fetched,
+    ClassificationOptions options,
+  ) {
+    if (cached == null) return null;
+    final analysis = cached.analysis;
+    if (analysis is! MenuAnalysed) return null;
+    if (analysis.engine is! LlmEngine) return null;
+    if (!options.estimationConsentGiven) return null;
+    if (TextNormaliser.menuFingerprint(cached.menu) !=
+        TextNormaliser.menuFingerprint(fetched)) {
+      return null;
+    }
+    if (!options.matches(analysis.options)) return null;
+    return analysis;
   }
 
   /// Changes [filter] and notifies listeners. Does not refetch or

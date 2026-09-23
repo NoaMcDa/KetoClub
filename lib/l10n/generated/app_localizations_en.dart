@@ -133,6 +133,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAppearanceDark => 'Dark';
 
   @override
+  String get settingsNetCarbLimit => 'Net carb limit';
+
+  @override
+  String get settingsNetCarbLimitBody =>
+      'Dishes above this are never green. Changing it re-analyses the next menu you open.';
+
+  @override
+  String settingsNetCarbLimitValue(int grams) {
+    return '$grams g';
+  }
+
+  @override
+  String get settingsNetCarbLimitDecrease => 'Lower the net carb limit';
+
+  @override
+  String get settingsNetCarbLimitIncrease => 'Raise the net carb limit';
+
+  @override
   String get settingsFilter => 'Default filter';
 
   @override

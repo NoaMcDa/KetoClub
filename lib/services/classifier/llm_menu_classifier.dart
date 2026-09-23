@@ -80,12 +80,21 @@ final class LlmMenuClassifier implements MenuClassifier {
       case ChatCompleted(:final content, :final model):
         // The model the server reports as having served the reply:
         // the app never names a model itself (architecture.md §9.3).
-        return MenuResponseParser.parse(
+        final parsed = MenuResponseParser.parse(
           content,
           source: menu,
           analysedAt: _clock.now(),
           engine: LlmEngine(model: model),
+          // The same limit the prompt stated, so the parser holds the
+          // model to its own green definition (issue #57).
+          netCarbLimitGrams: options.netCarbLimitGrams,
         );
+        return switch (parsed) {
+          final MenuAnalysed analysed => analysed.copyWithOptions(
+            options.snapshot,
+          ),
+          final MenuAnalysisFailed failed => failed,
+        };
       case ChatFailed(:final reason):
         return MenuAnalysisFailed(reason: _failureReasonFor(reason));
     }
