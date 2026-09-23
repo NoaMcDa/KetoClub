@@ -77,6 +77,69 @@ runs against every `wolt_*_menu.json` fixture automatically (except
 `wolt_malformed_menu.json`), so a new file needs no test-file edit to be
 covered.
 
+## 10bis
+
+`tenbis_synthetic_menu.json` and `tenbis_malformed_menu.json` are
+**synthetic**, not recorded responses, for the same reason as the Wolt
+pair above and tracked the same way: issue #44, not #22.
+
+Both files say so in their own first key, `_synthetic` (10bis's
+equivalent of the Wolt fixtures' `_fixture_note`), which
+`test/services/menu/tenbis/tenbis_menu_mapper_test.dart` also asserts is
+ignored by the mapper.
+
+### Why these are synthetic
+
+`www.10bis.co.il` is blocked from this build environment the same way
+`restaurant-api.wolt.com` is, so a real response could not be recorded
+from here. `tenbis_synthetic_menu.json` is hand-built from the payload
+`menu_api_research` §3.2 documents and issue #44's own body text (which
+names `categoriesList → dishList`, decimal prices, kosher flags,
+`dishOptionsList`, and image fields), extended with every shape
+variation `TenBisMenuMapper` needs to survive: a numeric `dishId` and a
+string one, a dish with no `dishOptionsList` at all, a dish with no
+`dishDescription` key, `"price": 0`, a dish id listed under two
+categories (dedupe, first category wins), an empty category (`Coming
+Soon`), Hebrew category and dish names, and unknown keys at the top
+level, inside a category, and inside a dish.
+
+`tenbis_malformed_menu.json` is a plausible 2xx body of the wrong shape
+(an error envelope with no `categoriesList`), used to exercise the
+`platformChanged` path in `tenbis_menu_mapper_test.dart`.
+
+**Neither file has ever been a real 10bis response, and neither proves
+anything about what 10bis's real API actually returns.** Issue #44
+tracks recording one — through the backend's 10bis proxy route
+(`phase2_plan.md` §5 B1) once it lands:
+
+```bash
+curl -sS localhost:8000/v1/proxy/tenbis/api/v1.0/Restaurants/{id}/Menu \
+  -o test/fixtures/tenbis_{id}_menu.json
+```
+
+or directly, from any machine that can reach `www.10bis.co.il`:
+
+```bash
+curl -sS -H 'Accept: application/json' \
+  'https://www.10bis.co.il/api/v1.0/Restaurants/{id}/Menu' \
+  -o test/fixtures/tenbis_{id}_menu.json
+```
+
+Before committing the result: skim it for anything worth redacting,
+check whether `TenBisMenuMapper`'s assumed field names
+(`categoriesList`, `categoryName`, `dishList`, `dishId`, `dishName`,
+`dishDescription`, `price`, `dishOptionsList`, `dishImageUrl`,
+`restaurantName`) match the real payload — if they do not, this is the
+schema-drift signal architecture.md §15 asks for, and the mapper (and
+its tests) need updating to match before the fixture replaces the
+synthetic one — and re-check that the fixture still exercises every
+shape variation listed above; a real venue may not happen to have a
+duplicated dish id or an empty category, so keep a couple of
+hand-added dishes alongside the real ones rather than losing that
+coverage. Keep the `_synthetic` key, or remove it and the assertion in
+`tenbis_menu_mapper_test.dart` that checks an unknown top-level key is
+ignored — either is fine as long as they change together.
+
 ## LLM response fixtures (`llm_*.json`)
 
 These are **synthetic by design**, not recordings. Each one is a hand-built
