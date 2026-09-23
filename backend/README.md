@@ -8,8 +8,44 @@ request before it leaves; this service forwards it (`backend_plan.md` §1).
 configured, the app behaves exactly as it does without one, including the
 web build's paste-a-link path.
 
-Currently ships `GET /v1/health` only (#94). The menu proxy, hosted
-classification and community routes are later issues (`backend_plan.md` §5).
+Currently ships:
+
+- `GET /v1/health` (#94) — liveness and configuration probe.
+- `GET /v1/proxy/wolt/v4/venues/slug/{slug}/menu/data` (#95) — the Wolt menu
+  proxy, see below.
+
+Hosted classification and community routes are later issues
+(`backend_plan.md` §5).
+
+## The Wolt menu proxy
+
+`GET /v1/proxy/wolt/v4/venues/slug/{slug}/menu/data` forwards to
+`{WOLT_BASE_URL}/v4/venues/slug/{slug}/menu/data` and returns Wolt's status,
+body and `Content-Type` unchanged, 404 included — the Dart adapter's status
+mapping needs no change whether it talks to Wolt directly or through this
+proxy. It is the **only** proxy route: the upstream host always comes from
+`WOLT_BASE_URL` in config, never from the request.
+
+- `slug` is validated against `^[a-z0-9][a-z0-9-]{0,99}$`; anything else is
+  422 before any upstream call is made.
+- Upstream request headers are built from scratch (`User-Agent`, `Accept`)
+  — nothing from the inbound request (`Origin`, `Cookie`, `Authorization`,
+  the install id) is forwarded.
+- A connect failure is 502 (`{"reason": "offline", ...}`); an upstream
+  timeout is 504 (`{"reason": "timeout", ...}`).
+- 2xx responses are cached per slug for `MENU_CACHE_TTL_SECONDS`; the
+  response carries `X-KetoClub-Cache: hit` or `miss`. Failures are never
+  cached.
+
+The synthetic Wolt fixture used in `lib/` tests has never been recorded from
+a real venue (issue #22); this proxy can do that from a machine that can
+reach `restaurant-api.wolt.com` (the sandbox this backend was built in
+cannot):
+
+```bash
+curl -sS localhost:8000/v1/proxy/wolt/v4/venues/slug/vitrina-lilinblum/menu/data \
+  -o test/fixtures/wolt_vitrina_lilinblum_menu.json
+```
 
 ## Running locally
 

@@ -18,7 +18,7 @@ from app import __version__
 from app.config import Settings, get_settings
 from app.db import build_engine
 from app.models import Base
-from app.routers import health
+from app.routers import health, proxy
 from app.services.request_logging import RequestLoggingMiddleware
 
 
@@ -60,6 +60,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     app.include_router(health.router, prefix="/v1")
+    app.include_router(proxy.router, prefix="/v1")
 
     return app
 
