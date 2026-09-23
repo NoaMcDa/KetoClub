@@ -1,9 +1,11 @@
-# KetoClub — handoff after Phase 1
+# KetoClub — handoff after Phase 1, and the Phase 3 backend
 
-Written at the end of the session that built Phase 1, and updated at the close of
-issue #36 after a second wave of parallel work substantially extended it. It says
-what exists, what is deliberately unfinished, and which mistakes are already paid
-for so nobody pays for them twice.
+Written at the end of the session that built Phase 1, updated at the close of
+issue #36 after a second wave of parallel work substantially extended it, and
+updated again at the close of issue #97 after the Phase 3 backend foundations
+and hosted-classification milestones landed (D11, D12). It says what exists,
+what is deliberately unfinished, and which mistakes are already paid for so
+nobody pays for them twice.
 
 `architecture.md` is the authoritative design. Where it and `README.md` or
 `CLAUDE.md` disagree, architecture.md wins; where architecture.md and the code
@@ -54,25 +56,32 @@ Waiter Card to read to a server.
 
 | | |
 |---|---|
-| Tests | 1707 unit, widget and architecture, plus 6 flow tests on real headless Chrome |
-| Coverage | 98.5% of 2331 instrumented lines (gate is 80%) |
+| Tests | 1707+ unit, widget and architecture on the Flutter side (figure as of the Phase 1 close-out; the backend work since added its own suite, see below), plus flow tests on real headless Chrome |
+| Coverage | 98.5% of 2331 instrumented lines as of Phase 1 close-out (gate is 80%, both `tool/check.sh` and `backend/check.sh`) |
 | CI | seven checks: backend, format/analyze, tests, integration, build web, build apk, build iOS (main only) |
 
-The **`backend` CI check is new and is not Phase 1 work**: a separate,
-parallel-running effort (PR #111) started the Phase 3 FastAPI backend
-`backend_plan.md` designs — `backend/` is a real project with its own gate and
-tests, serving `GET /v1/health` only (issue #94). **Nothing in `lib/` references
-it** (no `KETOCLUB_BACKEND_URL` dart-define is read anywhere), so the Flutter app
-remains exactly as client-only as `architecture.md` D1 describes; see
-`backend_plan.md`'s status banner before assuming otherwise.
+**The `backend` CI check, started as scaffolding-only Phase 1 work (PR #111,
+issue #94, `GET /v1/health` only), is now doing the job it was built for**: the
+Phase 3 FastAPI backend `backend_plan.md` designs is built out — the Wolt menu
+proxy (#95), `WoltMenuAdapter` taking a `proxyBase` so the web build routes
+through it (#96), and `POST /v1/chat` forwarding to Google Gemini with the
+server's own key, an anonymous install id and a per-install rate limit
+(#100–#103). `lib/` now reads `KETOCLUB_BACKEND_URL` (in `di.dart` only) and
+`BackendChatClient` replaced `OpenRouterClient` — the bring-your-own-key path is
+gone entirely (D12). The backend remains an accelerator, never a dependency: with
+no backend URL configured the app still behaves exactly as the fully
+client-only version did. `architecture.md` D11 and D12 (§14) are the
+authoritative record of what shipped; `backend_plan.md`'s own status banner may
+lag behind them.
 
 What is **not** built: 10bis, Tabit and Ontopo adapters (10bis is its own GitHub
 milestone, `Phase 2: 10bis Integration` — see `MILESTONE_CONVENTIONS.md` for the
 real milestone names, which an earlier draft of that document did not match);
 nearby venue search; any geolocation (the `geolocator` dependency is present but
-unused); OCR; and anything else in Phases 3–4 beyond the backend health-check
-scaffold above. None of it is stubbed — the files simply do not exist, which keeps
-them out of the coverage denominator.
+unused); OCR; Phase 3's community database, user reviews and venue submissions
+(`backend_plan.md` §5 milestone C, issues #105–#108); and hosting the backend
+anywhere beyond `localhost` (issue #109). None of it is stubbed — the files
+simply do not exist, which keeps them out of the coverage denominator.
 
 ---
 
@@ -82,21 +91,22 @@ Four things are genuinely unfinished. None is a surprise; each is unfinished for
 stated reason, and issues #16 and #22 are still **open** on GitHub — this pass
 gave both of them one-command tooling, it did not close either of them.
 
-1. **The pinned OpenRouter model has never been verified** (§9.3, §17 open
-   question 1 — issue #16). `nex-agi/nex-n2.5-pro:free` is pinned with two
-   documented fallbacks. The 8–12 second figure in its doc comment comes from
-   `m15_openrouter_models_fix.md`, **not from a measurement made here** —
-   `openrouter.ai` is blocked from the build environment (the egress proxy
-   answers 403 to the `CONNECT`). §9.3 asks for the real system prompt to be run
-   against the pinned id and to answer in under 20 seconds. **This is now a
-   one-command job for whoever has a network path to OpenRouter**:
-   `tool/measure_model_latency.dart` (see `tool/README.md`) sends the real
-   prompt to the pinned model and both documented fallbacks, in English and
-   Hebrew, checks the reply against the real parser rules, and estimates cost —
-   `OPENROUTER_API_KEY=sk-or-... dart run tool/measure_model_latency.dart` is the
-   whole command. Nobody has run it yet. Free-tier ids retire without notice,
-   and the m15 post-mortem records that when one did, users saw "no internet".
-   The model is a constructor parameter, so swapping it is one line in `di.dart`.
+1. **The pinned Gemini model has never been called from this environment**
+   (§9.3, §17 open question 1 — closed as posed by D12, but the verification it
+   always asked for is still owed, now against a different provider).
+   `GEMINI_MODEL` defaults to `gemini-2.5-flash`, a backend environment
+   variable, not a Dart constant — swapping it is a redeploy, not a code
+   change. `generativelanguage.googleapis.com` is blocked from the build
+   environment the same way `openrouter.ai` was (the egress proxy answers 403
+   to the `CONNECT`), so the real system prompt has never been run against it
+   from here. **The one-command check now lives in `backend/README.md`**, in
+   its "Manual end-to-end check" section: with `GEMINI_API_KEY` set and the
+   server running, a `curl` against `/v1/chat` with a two-dish prompt is the
+   whole command, for anyone with a network path to Google. Nobody has run it
+   yet. `tool/measure_model_latency.dart`, the OpenRouter-specific version of
+   this check, was deleted along with `OpenRouterClient` (#102, D12) — there is
+   no client-side model to measure any more, since the app never calls a model
+   provider directly.
 2. **The Wolt fixture is synthetic** (§18.4 — issue #22).
    `test/fixtures/wolt_vitrina_lilinblum_menu.json` says so in its first key, and
    `test/fixtures/README.md` carries the reasoning. It was built to contain the
@@ -131,10 +141,14 @@ confirmed the UI against the `.design/Main.dc.html` artboards. Token fidelity
   cauliflower"` produces a needless yellow ("omit the rice" on a dish with no rice).
   That fails in the safe direction — a pointless modification request, not the wrong
   green architecture.md constraint 5 names as the failure that matters.
-- **The web build cannot fetch menus at all.** The restaurant APIs send no CORS
-  headers, so live fetching is a mobile feature until a CORS-forwarding proxy exists
-  (§13, D9). The web build's classifier works, because OpenRouter permits
-  browser-origin calls.
+- **The web build cannot fetch menus only without the backend running.** The
+  restaurant APIs send no CORS headers, so live fetching needed a CORS-forwarding
+  proxy (§13, D9); D11 shipped one (`backend/`'s `/v1/proxy/wolt/…` route). With
+  `KETOCLUB_BACKEND_URL` configured and the backend up, the web build fetches
+  live Wolt menus like any other target; with neither, it is still a mobile
+  feature and paste-a-menu is the fallback. The web build's classifier has
+  always worked regardless, because it always went through a backend that
+  permits browser-origin calls — KetoClub's own since D12, OpenRouter before it.
 - **`net_carbs_estimate` is an LLM-only figure the user is told is an estimate**
   (§17.4, reversed this pass from "never rendered"). `DishCard` now shows it as
   `"~{n}g net carbs (estimate)"`, hidden entirely when null — always true for a
@@ -150,16 +164,19 @@ confirmed the UI against the `.design/Main.dc.html` artboards. Token fidelity
 
 ## Where to start next
 
-Build-order §16 continues at step 6, **but the backend comes first**: the web
-build cannot fetch Wolt menus (CORS), so a local Python backend is planned in
-`backend_plan.md` — issues #94–#109 across three "Phase 3" milestones. **#94 has
-landed** (`backend/`, a health endpoint only, see `backend_plan.md`'s status
-banner); continue at #95 and #96, the menu-proxy route. Once that lands,
-`flutter run -d chrome` with `--dart-define=KETOCLUB_BACKEND_URL=http://
-localhost:8000` should show a live menu — nothing in `lib/` reads that
-dart-define yet, so this is still the *next* step, not a done one.
+**The backend came first, and it has landed** (build-order §16 steps 6–7, D11,
+D12): `backend/` now serves `GET /v1/health`, the Wolt menu proxy (#95, D11),
+and `POST /v1/chat` against Google Gemini with the server's own key, an
+anonymous install id and a per-install rate limit (#100–#103, D12).
+`WoltMenuAdapter` takes a `proxyBase` and the web build routes through it when
+configured (#96); `BackendChatClient` replaced `OpenRouterClient` and the
+bring-your-own-key path is gone entirely (#102). `flutter run -d chrome
+--dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000` against a running
+backend shows a live menu with AI analysis and no key entered anywhere — see
+`backend/README.md`'s manual end-to-end check for the exact steps. Build-order
+§16 continues at **step 8**:
 
-- **Step 6 — the 10bis adapter**, tracked as its own GitHub milestone,
+- **Step 8 — the 10bis adapter**, tracked as its own GitHub milestone,
   `Phase 2: 10bis Integration` (see `MILESTONE_CONVENTIONS.md`), not a Phase 1
   one. Blocked on a live capture: the shape of `dishOptionsList` is undocumented
   anywhere in this repo, there is no stable category id (only `categoryName`),
@@ -170,11 +187,16 @@ dart-define yet, so this is still the *next* step, not a done one.
   real response first; the adapter is otherwise a direct analogue of the Wolt
   one, and the `PlatformMenuAdapter` interface plus its shared contract suite
   already exist.
-- **Step 7 — location and nearby search.** Also blocked: §17.2 records that no Wolt
+- **Step 9 — location and nearby search.** Also blocked: §17.2 records that no Wolt
   venue-search endpoint is known. `menu_api_research` covers menus only. Paste-a-link
   (Tier A) already ships, so this is Tier B polish rather than a gap in the product.
-- **Step 8 — platform setup** and a run on a physical iOS and Android device against
+- **Step 10 — platform setup** and a run on a physical iOS and Android device against
   a real Wolt venue.
+
+Once those resume, the remaining Phase 3 milestone — community database, ratings,
+submissions (`backend_plan.md` §5 milestone C, #105–#108) — and hosting the
+backend beyond `localhost` (#109) are still open, tracked separately from the
+build order above.
 
 ---
 
@@ -191,8 +213,10 @@ dart-define yet, so this is still the *next* step, not a done one.
   80-column limit and `public_member_api_docs` apply to `test/` and
   `integration_test/` too.
 - **The egress proxy blocks `restaurant-api.wolt.com`, `www.10bis.co.il` and
-  `openrouter.ai`.** Nothing can be verified against a live service from CI or from
-  a Claude Code session. `pub.dev` and `storage.googleapis.com` are reachable.
+  `generativelanguage.googleapis.com`** (the last one since D12; it blocked
+  `openrouter.ai` before that). Nothing can be verified against a live service
+  from CI or from a Claude Code session. `pub.dev` and `storage.googleapis.com`
+  are reachable.
 - **Running several agents in one worktree:** serialise test runs with
   `flock /tmp/ketoclub.lock -c 'flutter test …'`. Concurrent `flutter test` races on
   `.dart_tool` and `coverage/lcov.info` and produces failures that are not real.
@@ -247,29 +271,45 @@ this is the short list.
 
 ## Where the reasoning lives
 
-- `architecture.md` §14 — the decisions log, D1 to D10, each recording what was
-  decided, why, and what it supersedes. The `(Phase 1)` markers throughout were
-  added across both waves of this work. D10 was rewritten in place, not
+- `architecture.md` §14 — the decisions log, now D1 to D12, each recording what
+  was decided, why, and what it supersedes. The `(Phase 1)` markers throughout
+  were added across both waves of that work. D10 was rewritten in place, not
   appended to: it first recorded that a connectivity pre-check was deliberately
   cut, then — in the second wave — that decision was reversed and the old
   paragraph replaced, per §18.6's rule that code and this document may not
-  disagree.
+  disagree. D11 and D12, added in this pass (issue #97), record the backend
+  (an accelerator amending D1/D9/D10) and the move to a backend-held Google
+  Gemini key (superseding D3) the same way — as decisions with reasoning and a
+  named cost, not a silent rewrite.
 - `architecture.md` §17 — open questions, each with the default the code
-  follows. Open question 1 (which model to pin) is still open — it stays
-  outstanding until someone runs `tool/measure_model_latency.dart` from a
-  machine that can reach OpenRouter. Question 4 (`net_carbs_estimate`) was
-  answered in the second wave (issue #30). Question 5 (cache TTL) has not
-  changed since the first wave: still 24 hours, still recorded as a guess, just
-  a guess in one named place (`menuCacheTtl`).
+  follows. Open question 1 ("which OpenRouter model to pin") is closed as posed
+  by D12 — there is no OpenRouter model any more — but the pre-release
+  verification it always asked for is still outstanding against Gemini; see
+  `backend/README.md`'s manual end-to-end check. Question 4 (`net_carbs_estimate`)
+  was answered in the second Phase 1 wave (issue #30). Question 5 (cache TTL) has
+  not changed since the first wave: still 24 hours, still recorded as a guess,
+  just a guess in one named place (`menuCacheTtl`). This pass added question 6
+  (hosting the backend beyond `localhost`, issue #109), left open on purpose:
+  D11's "accelerator, never a dependency" is exactly what makes that safe to
+  leave open.
 - The commit messages on #90, #91, and the pull requests merged into
   `claude/phase-1-milestones-parallel-26wbh2` carry the reasoning for individual
-  decisions, including the corrections made to agents' first attempts and why.
-- Issue #36 (this documentation pass) is what reconciled `CLAUDE.md`,
+  Phase 1 decisions; the pull requests closing #94–#103 carry the same for the
+  backend and D11/D12, including the corrections made to agents' first attempts
+  and why.
+- Issue #36 (the first documentation pass) reconciled `CLAUDE.md`,
   `architecture.md`, `MILESTONE_CONVENTIONS.md` and this file against the code
-  as it stood after that second wave — including three reversed decisions, a
-  parallel-track backend scaffold that landed with no client wiring, and a
-  `MILESTONE_CONVENTIONS.md` phase breakdown that had drifted from the
-  milestones actually created on GitHub.
-- `m15_openrouter_models_fix.md` and `m16_structured_output_fix.md` are post-mortems
-  from a different application, but they are the best evidence available on
-  OpenRouter's behaviour and their lessons are encoded as rules in §9.
+  as it stood after the second Phase 1 wave — including three reversed
+  decisions, a parallel-track backend scaffold that landed with no client
+  wiring, and a `MILESTONE_CONVENTIONS.md` phase breakdown that had drifted
+  from the milestones actually created on GitHub. Issue #97 (this pass) did the
+  same after the backend foundations and hosted-classification milestones
+  landed, adding D11 and D12 and correcting every reference to OpenRouter, a
+  user-supplied key, or a client-only web build across these documents,
+  `backend_plan.md`, `MILESTONE_CONVENTIONS.md` and `tool/README.md`.
+- `m15_openrouter_models_fix.md` and `m16_structured_output_fix.md` are
+  post-mortems from a different application and a different provider, but they
+  are still the best evidence available on hosted-LLM failure modes in
+  general, and their lessons — distinct failure reasons, a strict-schema
+  request with a fallback, verifying the pinned model before release — are
+  encoded as rules in §9, now against Gemini rather than OpenRouter.

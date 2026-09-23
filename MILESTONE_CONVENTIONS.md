@@ -83,26 +83,37 @@ and filtering. **Status**: next; not started.
 
 ### Phase 3: Community Database & Reviews
 
-**Goal**: Add the CORS-forwarding backend (blocking the web build today), persistent
-user feedback, and venue ratings. **Status**: planned — see `backend_plan.md` for
-the backend's design and its own issue range (#94–#109).
+**Goal**: Add the CORS-forwarding backend (unblocking the web build), persistent
+user feedback, and venue ratings. **Status**: the first two milestones are
+**built and merged**; see `architecture.md` §14 D11/D12 and `backend_plan.md`
+for the backend's design and its own issue range (#94–#109).
 
 **Milestones (as created on GitHub):**
-1. `Phase 3: Backend Foundations` — the menu-proxy backend that unblocks web
-   fetching (`backend_plan.md` §1; `architecture.md` gains D11 when this lands)
-2. `Phase 3: Hosted Classification` — a shared, backend-held model key as an
-   alternative to bring-your-own-key
+1. `Phase 3: Backend Foundations` — **shipped.** The menu-proxy backend that
+   unblocks web fetching (`backend_plan.md` §1; `architecture.md` D11).
+   Issue #98 (the `openrouter.ai` single-file boundary, since generalised to
+   four host-string rules) was folded into #102's scope rather than done as
+   its own issue; #99 (a Settings backend-URL override) is still open.
+2. `Phase 3: Hosted Classification` — **shipped.** A backend-held Google Gemini
+   key replaces bring-your-own-key entirely (`architecture.md` D12) — there is
+   no fallback to a user-supplied key, unlike this milestone's original plan.
+   Issue #104 (reword Settings and failure copy for a served model) was folded
+   into #102's scope for the same reason as #98: one worker owning the whole
+   reason-enum change made more sense than reviewing it twice.
 3. `Phase 3: Community API` — the server side of ratings, reviews and submissions
 4. `Phase 3: User Ratings & Reviews` — post-visit feedback mechanism
 5. `Phase 3: Venue Submission` — crowdsourced venue directory
 6. `Phase 3: Verified Badges` — keto-friendly venue verification
 
 **Success Criteria:**
-- Web build fetches live menus without a local proxy
-- Users can rate venues after dining
-- Community ratings influence venue ranking
-- Verified keto-friendly badges visible to users
-- Support for user submissions of new venues
+- ✅ Web build fetches live menus through the local backend proxy when
+  configured (not "without a local proxy" — a local proxy is exactly how this
+  shipped; see `architecture.md` §13)
+- ✅ Classification works with no key entered anywhere, hosted by the backend
+- Users can rate venues after dining — not built (milestone 3–6 territory)
+- Community ratings influence venue ranking — not built
+- Verified keto-friendly badges visible to users — not built
+- Support for user submissions of new venues — not built
 
 ### Phase 4: Advanced Features
 

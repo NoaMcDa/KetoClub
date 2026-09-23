@@ -176,3 +176,58 @@ an always-green one.
 (`sqlite:///:memory:`, `StaticPool`) with respx blocking any real network
 call — no test in this suite ever reaches the network
 (`architecture.md` constraint 12).
+
+## Manual end-to-end check
+
+Every automated test above mocks Wolt and Gemini, because neither is reachable
+from this repository's build environment. This is the one way to confirm the
+whole path really works, from a machine that has a real network: linked from
+`README.md` and `HANDOFF.md` as *the* place this check lives, so it is written
+once.
+
+1. **Set a real key.** `cp .env.example .env` (if not already done) and set
+   `GEMINI_API_KEY` to a real Google Gemini API key.
+2. **Start the backend.**
+   ```bash
+   cd backend
+   uv sync
+   uv run uvicorn app.main:app --reload --port 8000
+   ```
+3. **Health check.**
+   ```bash
+   curl -sS localhost:8000/v1/health
+   # {"status":"ok","version":"0.1.0","llm_configured":true}
+   ```
+   `llm_configured` must read `true` — if it reads `false`, `GEMINI_API_KEY`
+   was not picked up (check `.env` is in `backend/`, not the repository root).
+4. **Proxy check**, against a real Wolt venue slug:
+   ```bash
+   curl -sS localhost:8000/v1/proxy/wolt/v4/venues/slug/vitrina-lilinblum/menu/data \
+     -D - -o /dev/null
+   # HTTP/1.1 200 OK
+   # x-ketoclub-cache: miss
+   ```
+   Run it again: the second response carries `x-ketoclub-cache: hit`.
+5. **Chat smoke test.** Use the curl in "Smoke test against the real API"
+   above. A real completion comes back as `{"content":"{\"dishes\": [...]}",
+   "model":"gemini-2.5-flash"}` (or whatever `GEMINI_MODEL` names).
+6. **The Flutter app, end to end:**
+   ```bash
+   flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
+   ```
+   Paste a real Wolt venue link. The menu loads live (not from the synthetic
+   fixture) and is classified with the engine chip showing the Gemini model
+   name — with no key entered anywhere in the app, because there is nowhere
+   to enter one (D12).
+7. **The unreachable-backend path.** Stop the `uvicorn` process (Ctrl-C) and
+   retry the same paste in the still-running Flutter app: the fetch fails with
+   "KetoClub's server could not be reached, so the menu could not be read.",
+   and a fresh classification attempt falls back to the rule engine with the
+   `backendUnreachable` reason shown on the engine chip — never a bare "no
+   internet" message, per `architecture.md` constraint 10.
+
+Nobody has run this checklist from inside this repository's build
+environment: `restaurant-api.wolt.com` and `generativelanguage.googleapis.com`
+are both unreachable through its egress proxy (`HANDOFF.md`, `architecture.md`
+§17 open question 1). It is written here, once, for whoever next has a network
+path to both.

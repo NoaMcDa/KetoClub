@@ -6,15 +6,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **KetoClub** is a restaurant menu analysis platform designed to help keto dieters find safe dining options. The app ingests live menus from restaurant delivery platforms, classifies dishes by keto-compatibility, and generates automatic waiter instructions for modifications.
 
-> **Status: Phase 1 is built and merged.** Build-order steps 1–5 of
+> **Status: Phase 1 is built and merged, and Phase 3 backend foundations and
+> hosted classification have landed on top of it.** Build-order steps 1–5 of
 > `architecture.md` §16 ship: models and service contracts, the bilingual heuristic
 > engine, Wolt ingestion with a Hive cache, the classified menu screen and Waiter
-> Card, and the OpenRouter client with its router and Settings. 1707 tests, 98.5% of
-> 2331 instrumented lines (six flow tests in `integration_test/flows/`). Three
-> recorded decisions were reversed in this close-out pass (`architecture.md`): D10
-> reinstates `Connectivity`, §17.4 now renders `net_carbs_estimate` as a labelled
-> chip, and §6.6's collapsed red-dish group is gone — the verdict counter tiles are
-> the filter now.
+> Card, and the LLM client with its router and Settings. Steps 6–7 add a local
+> FastAPI backend (`backend/`, D11) that proxies Wolt for the web build and
+> forwards one chat completion per menu to Google Gemini (D12) — the app no longer
+> holds a model key at all; `BackendChatClient` replaced `OpenRouterClient`,
+> `KeyStore` and `flutter_secure_storage` are gone. Three earlier decisions were
+> reversed in the Phase 1 close-out pass (`architecture.md`): D10 reinstates
+> `Connectivity`, §17.4 now renders `net_carbs_estimate` as a labelled chip, and
+> §6.6's collapsed red-dish group is gone — the verdict counter tiles are the
+> filter now.
 >
 > **Read `architecture.md` first — it is authoritative.** This file and `README.md`
 > predate the code in places; where any of them disagrees with `architecture.md`,
@@ -23,25 +27,37 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture & Core Components
 
-### Client-Only Architecture (No Backend)
+### Client + optional local backend
 
-Single Flutter codebase for web, iOS, and Android with:
+Single Flutter codebase for web, iOS, and Android, plus a small optional FastAPI
+backend (`backend/`, D11) that is an accelerator, never a dependency — with no
+`KETOCLUB_BACKEND_URL` define, the app behaves exactly as it would with none:
 - **Classification Engine**: **a hosted language model is the primary classifier, with
-  an on-device rule engine as the fallback** (`architecture.md` D2). The user supplies
-  their own OpenRouter key; when there is no key, no consent, or no network, the rule
-  engine answers and the UI labels the result "rules". Both sit behind one
-  `MenuClassifier` interface and a router picks per call. A `Connectivity` pre-check
-  (`architecture.md` D10, reinstated in this pass) asks the device whether it looks
-  online before ever spending an OpenRouter request; it is a hint, never a verdict,
-  so a failed call still reports `offline` exactly as it did before this check
-  existed.
-- **API Integration**: Direct calls to restaurant platform APIs from the client.
+  an on-device rule engine as the fallback** (`architecture.md` D2). Since D12 the
+  model is Google Gemini, reached only through KetoClub's own backend, which holds
+  the Gemini key server-side — **the app never holds a model key**. When there is
+  no backend configured, no consent, or no network, the rule engine answers and
+  the UI labels the result "rules". Both sit behind one `MenuClassifier` interface
+  and a router picks per call. A `Connectivity` pre-check (`architecture.md` D10,
+  reinstated in the Phase 1 close-out pass, extended to the backend call by D11)
+  asks the device whether it looks online before ever spending a backend request;
+  it is a hint, never a verdict, so a failed call still reports `offline` exactly
+  as it did before this check existed. D11's "the call is the probe" applies to
+  the backend itself too: nothing pre-checks whether the server is up, so an
+  unreachable backend surfaces as `backendUnreachable` from the failing call.
+- **API Integration**: Direct calls to restaurant platform APIs from the client on
+  iOS/Android; the web build routes Wolt through the backend's proxy route when
+  configured (D11), because `restaurant-api.wolt.com` sends no CORS headers.
   **Only Wolt is implemented**; 10bis, Tabit and Ontopo are not built.
 - **Local Storage**: Hive caches the normalised menu and its analysis for 24 hours;
-  `flutter_secure_storage` holds the OpenRouter key; `shared_preferences` holds
-  non-secret settings.
-- **No server, no database**: All menu analysis and data processing happens on the
-  user's device.
+  `shared_preferences` holds non-secret settings and, since D12, an anonymous
+  install id (`InstallIdStore`) sent to the backend only for rate limiting.
+  There is no secure-storage dependency any more — `flutter_secure_storage` was
+  removed along with the key store it backed.
+- **No client-side database**: menu analysis happens on the user's device; the
+  backend, when configured, keeps only a short-lived Wolt-proxy cache and a
+  shared completion cache keyed by request hash (D12, issue #103), never a
+  per-user record.
 
 ### Menu Ingestion & API Integration
 
@@ -105,8 +121,10 @@ Future additions: user ratings, review feedback loop, OCR/vision processing for 
 
 ### Current status
 
-Phase 1 is built and merged (see the banner at the top). The repository holds a
-working Flutter app plus the planning documents it was built from.
+Phase 1 is built and merged, and Phase 3 backend foundations and hosted
+classification have landed on top of it (see the banner at the top). The
+repository holds a working Flutter app, an optional local FastAPI backend
+(`backend/`), plus the planning documents both were built from.
 
 ### Actual project structure
 
@@ -121,25 +139,30 @@ lib/
 │                              # classification_rules, price_format, keto_score
 ├── services/
 │   ├── platform/              # clock, app_logger, connectivity (D10), screen_brightness
-│   ├── storage/               # key_store, menu_cache, settings_store (interface + impl each)
-│   ├── llm/                   # llm_chat_client, open_router_client
+│   ├── storage/               # install_id_store, menu_cache, settings_store (interface + impl each)
+│   ├── llm/                   # llm_chat_client, backend_chat_client (D12; no key store)
 │   ├── venue/                 # venue_ref_resolver (paste-a-URL, pure)
-│   ├── menu/                  # platform_menu_adapter, menu_repository, wolt/
+│   ├── menu/                  # platform_menu_adapter, menu_repository, wolt/ (proxyBase, D11)
 │   └── classifier/            # menu_classifier, heuristic, llm, router, prompt, parser
 ├── theme/                     # app_tokens, verdict_colors, app_typography, app_theme
 ├── state/                     # app_dependencies, locale_controller + one ChangeNotifier per screen
 ├── widgets/                   # dish_card, status_badge, engine_chip, waiter_script,
 │                              # verdict_counter_tiles, keto_score_badge, app_shell, failure_copy
-└── screens/                   # venue_search, menu, waiter_card_sheet, settings,
+└── screens/                   # venue_search, menu, waiter_card_sheet, settings (no key section),
                                # scan and saved (bottom-nav placeholders, issue #11)
 
-test/                          # mirrors lib/, plus architecture/, fakes/, fixtures/, l10n/, tool/
-integration_test/flows/        # six flow tests + flow_support.dart (same-directory helper)
+test/                          # mirrors lib/, plus architecture/, fakes/, fixtures/, l10n/
+integration_test/flows/        # flow tests + flow_support.dart (same-directory helper)
 tool/                          # check.sh (the gate), coverage_gate.sh, gen_coverage_helper.sh,
-                                # measure_model_latency.dart (issue #16), record_wolt_fixture.sh (issue #22)
+                                # record_wolt_fixture.sh (issue #22)
+
+backend/                       # optional local FastAPI service (D11, D12) — see backend/README.md
+├── app/                       # main.py, config.py, routers/ (health, proxy, chat), services/
+├── tests/                     # respx-mocked; no real network call
+└── check.sh                   # mirrors tool/check.sh; its own required CI job
 ```
 
-`architecture.md` §5 carries the same tree with the layer-rank rules the
+`architecture.md` §5 carries the same `lib/` tree with the layer-rank rules the
 architecture test enforces.
 
 ### Setup and the gate
@@ -147,9 +170,26 @@ architecture test enforces.
 ```bash
 flutter pub get
 tool/check.sh          # format, analyze --fatal-infos --fatal-warnings, tests, 80% coverage gate
-flutter run -d chrome  # web; live menu fetching is blocked by CORS, see architecture.md §13
+flutter run -d chrome  # web; live menu fetching needs the backend running, see architecture.md §13
 flutter run -d <device>
 ```
+
+For live Wolt menus (and AI analysis) on the web build, run the backend first
+(`backend/README.md` has the full setup and a manual end-to-end check):
+
+```bash
+cd backend && cp .env.example .env   # set GEMINI_API_KEY
+uv sync
+uv run uvicorn app.main:app --reload --port 8000
+```
+
+```bash
+flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
+```
+
+With no backend running and no define set, the app still works exactly as the
+fully client-only version did (D11): iOS/Android fetch Wolt directly, and every
+platform falls back to the on-device rule engine for classification.
 
 **Flutter 3.47.4 / Dart 3.13.3**, pinned in `.github/workflows/ci.yml` and
 `pubspec.yaml`; bump both in one commit. `tool/check.sh` runs exactly what the
@@ -186,12 +226,16 @@ The section this replaces described a heuristic-first design that predates the c
 `architecture.md` §6 and §9 are the real reference; this is the short version.
 
 1. **Two classifiers behind one interface.** `MenuClassifier.classify(menu)` is one
-   call per menu, never one per dish — the OpenRouter free tier is 50 requests a day
-   (D6). `RoutingMenuClassifier` chooses: no key or no consent means the heuristic
-   stamped `notConfigured`; otherwise the LLM, falling back to the heuristic on
-   `offline`, `timeout`, `rateLimited` and `badResponse` with that reason carried
-   through so the UI can say why. **`unauthorised` does not fall back** — a rejected
-   key must be visible, not quietly answered with a weaker result.
+   call per menu, never one per dish — the backend's per-install rate limit is
+   5/minute, 40/day (D6, D12). `RoutingMenuClassifier` chooses: consent withheld
+   means the heuristic stamped `consentWithheld`; no backend configured or offline
+   means the heuristic stamped `notConfigured` / `offline`; otherwise the LLM path
+   via `BackendChatClient`, falling back to the heuristic on `offline`, `timeout`,
+   `rateLimited`, `badResponse`, `backendUnreachable` and `notConfigured` with that
+   reason carried through so the UI can say why. **There is no `unauthorised`
+   reason any more** — there is no user-supplied key left to reject (D12); a
+   server-side key problem reads as `notConfigured` and falls back like everything
+   else.
 2. **The model's reply is untrusted input.** `MenuResponseParser` is static, pure and
    never throws, and implements §9.4's eight rules: a dish the menu does not contain
    is an invention and is never given a verdict; a yellow whose instruction is
@@ -213,24 +257,31 @@ The section this replaces described a heuristic-first design that predates the c
    reasons share copy in either language.
 7. **`di.dart` is the only file that constructs a concrete service**, and nothing it
    calls performs plugin I/O — see the traps above.
-8. **The key** lives in `flutter_secure_storage`, is read only by `OpenRouterClient`,
-   and never reaches a log, a failure value, the cache or the widget tree. Settings
-   exposes `hasKey`, never the key; there are tests asserting the string appears
-   nowhere it should not.
+8. **There is no key on the device (D12).** The Gemini key lives only in the
+   backend's `GEMINI_API_KEY` environment variable and never reaches a Dart file,
+   a log, a failure value, the cache or the widget tree; `BackendChatClient` sends
+   an install id, never a key, and never an `Authorization` header. Settings has
+   no key section any more — there are tests asserting `openrouter`, `sk-or-` and
+   `googleapis.com` appear nowhere under `lib/`.
 
 ## Planning & Research Documents
 
 **Core Documentation:**
-- `architecture.md`: The authoritative architecture (client-only Flutter app, LLM-primary classifier with heuristic fallback, adapters, storage, failure handling, decisions log). Read this before the README where they disagree
+- `architecture.md`: The authoritative architecture (a client app with an optional
+  local backend, D11; a hosted Gemini classifier reached only through that backend
+  with an on-device heuristic fallback, D2/D12; adapters, storage, failure
+  handling, decisions log). Read this before the README where they disagree
 - `README.md`: Full project narrative, API endpoints, database schema, keto classification rules, Phase roadmap
 - Engineering standards (SOLID, acyclic imports, clean code, tests, CI) are `architecture.md` §18. Run `tool/check.sh` before pushing; it runs exactly what CI runs.
 
-- `backend_plan.md`: The planned Python (FastAPI) backend — why (CORS on web), the
-  API contract, the client seams, and issues #94–#109 in priority order.
-  Scaffolding has started (`backend/`, issue #94: a health endpoint, its own
-  `check.sh` and a required CI job) but the menu proxy is not built and nothing
-  in `lib/` talks to it yet — the Flutter app is still client-only in practice.
-  `architecture.md` gains D11 when #97 lands
+- `backend_plan.md`: The Python (FastAPI) backend's design — why (CORS on web),
+  the API contract, the client seams, and issues #94–#109 in priority order.
+  `backend/` now serves `GET /v1/health`, the Wolt menu proxy (#95) and
+  `POST /v1/chat` against Google Gemini (#100); the Flutter app talks to it when
+  `KETOCLUB_BACKEND_URL` is configured (#96, #102) and behaves exactly as
+  client-only otherwise. `architecture.md` D11 and D12 (§14) are the authoritative
+  record of what shipped; `backend_plan.md` is design history and its status
+  banner may lag behind them.
 
 **Research & Analysis:**
 - `m16_menu_scanner_research.md`: Computer vision and OCR strategy for physical menu scanning (Phase 4)
@@ -249,8 +300,10 @@ When reading research docs (m15/m16), note that prefixes indicate iteration/mile
   Nearby search is blocked on discovery: no Wolt venue-search endpoint is known
   (`architecture.md` §17.2). See `MILESTONE_CONVENTIONS.md` for the real GitHub
   milestone names — they differ from earlier drafts of this document.
-- **Phase 3**: Community database, user reviews, restaurant submissions, and the
-  CORS-forwarding backend the web build needs (`backend_plan.md`) → **Planned**
+- **Phase 3**: the backend (`backend_plan.md`) → **Foundations and hosted
+  classification landed** (D11, D12: the Wolt CORS proxy and Gemini-backed
+  chat). Community database, user reviews, restaurant submissions and hosting
+  beyond `localhost` → **Planned**
 - **Phase 4**: OCR/vision, configurable dietary rules → **Planned**
 
 Phase 1 is built. Phase 2 is next; `feature_prioratization` has the tier breakdown.
@@ -266,12 +319,16 @@ Phase 1 is built. Phase 2 is next; `feature_prioratization` has the tier breakdo
   `Phase 2: 10bis Integration` — not Phase 1.)
 - Nearby venue search and any geolocation. `geolocator` is in `pubspec.yaml` but no
   code uses it. Paste-a-link (Tier A) is what ships.
-- OCR and the photographed-menu path (Phase 4), community features and any backend
-  (Phase 3). The Scan and Saved bottom-nav tabs exist only as localized placeholder
-  screens explaining that (issue #11) — they are not stubs left blank.
-- The pinned OpenRouter model has never been run against the real prompt from this
-  environment: `openrouter.ai` is unreachable through the egress proxy here. See
-  "What is NOT verified yet" below.
+- OCR and the photographed-menu path (Phase 4), and community features — venue
+  ratings, reviews, submissions (Phase 3, `backend_plan.md` §5's milestone C).
+  The Scan and Saved bottom-nav tabs exist only as localized placeholder screens
+  explaining that (issue #11) — they are not stubs left blank.
+- Backend hosting beyond `localhost` (issue #109, `architecture.md` §17.6). The
+  backend is designed to be run locally by whoever has the repository checked
+  out; nothing yet says where it runs for anyone else.
+- The pinned Gemini model has never been called against the real prompt from this
+  environment: `generativelanguage.googleapis.com` is unreachable through the
+  egress proxy here. See "What is NOT verified yet" below.
 
 Nothing above is stubbed — the files simply do not exist, which keeps them out of
 the coverage denominator.
@@ -280,13 +337,15 @@ the coverage denominator.
 
 Built, but not confirmed end to end, and not to be reported as done:
 
-- **The pinned OpenRouter model** (`architecture.md` §17 open question 1).
-  `tool/measure_model_latency.dart` and `tool/README.md` now make this a one
-  command job (`OPENROUTER_API_KEY=... dart run tool/measure_model_latency.dart`)
-  for anyone with a network path to `openrouter.ai` — this container does not have
-  one. Until someone runs it, the pinned model's latency and structured-output
-  behaviour are still carried over from `m15_openrouter_models_fix.md`, not
-  measured against this app's real prompt.
+- **Gemini has never been called from this environment** (`architecture.md` §17
+  open question 1, closed as posed by D12 but not verified in practice).
+  `generativelanguage.googleapis.com` is blocked through the egress proxy here,
+  the same way `openrouter.ai` was before it. `backend/README.md`'s "Manual
+  end-to-end check" section, and its `/v1/chat` smoke curl within it, is the
+  one-command check for anyone with a network path to Google — nobody has run
+  it yet, so the pinned model's (`GEMINI_MODEL`, default `gemini-2.5-flash`)
+  latency and structured-output behaviour against this app's real prompt are
+  unmeasured.
 - **The Wolt fixture is synthetic**, not a recorded response (issue #22).
   `tool/record_wolt_fixture.sh` exists to re-record it from a real venue, but has
   never been run — `restaurant-api.wolt.com` is also unreachable here.
@@ -303,8 +362,8 @@ Built, but not confirmed end to end, and not to be reported as done:
 
 1. **`HANDOFF.md`** — what exists, what is unfinished and why, the traps.
 2. **`architecture.md`** — the authoritative design. §16 is the build order (continue
-   at step 6, the 10bis adapter), §14 the decisions log D1–D10, §17 the open
-   questions with the default the code follows.
+   at step 8, the 10bis adapter — steps 6–7 added the backend), §14 the decisions
+   log D1–D12, §17 the open questions with the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing
