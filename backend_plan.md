@@ -1,20 +1,24 @@
 # KetoClub backend — plan, API contract and prioritisation
 
-> **Status: scaffolding started, the menu proxy is not built.** Decided
-> 2026-09-13. The issues are #94–#109 in three milestones: *Phase 3: Backend
-> Foundations* (#94–#99), *Phase 3: Hosted Classification* (#100–#104) and
-> *Phase 3: Community API* (#105–#109). #94 has landed: `backend/` is a real
-> FastAPI project (`uv`, tests, its own `backend/check.sh`, and a required
-> `backend` job in `.github/workflows/ci.yml`) serving `GET /v1/health` only —
-> see `backend/README.md`. The menu-proxy route (#95–#96) that would actually
-> unblock the web build's CORS problem is not built, and **nothing in `lib/`
-> references the backend yet**: no `KETOCLUB_BACKEND_URL` dart-define is read
-> anywhere in the Flutter app, so the client remains exactly as client-only as
-> `architecture.md` D1 describes until that wiring lands. This document is the
-> design the issues cite; `architecture.md` stays authoritative and gains D11
-> when #97 lands. Until then, where this document and `architecture.md`
-> disagree, this document describes the intended future and `architecture.md`
-> the code as it is.
+> **Status: Backend Foundations and Hosted Classification have landed.**
+> Decided 2026-09-13. The issues are #94–#109 in three milestones: *Phase 3:
+> Backend Foundations* (#94–#99), *Phase 3: Hosted Classification* (#100–#104)
+> and *Phase 3: Community API* (#105–#109). Shipped: #94 (`backend/` scaffold,
+> its own gate and a required CI job), #95/#96 (the Wolt menu proxy and the
+> Dart `proxyBase` wiring that unblocks the web build's CORS problem), #100
+> (`POST /v1/chat` against Google Gemini), #101 (the anonymous
+> `InstallIdStore`), #102 (`BackendChatClient` replaces `OpenRouterClient`
+> entirely — there is no bring-your-own-key fallback chain, §4 below is
+> corrected accordingly) and #103 (the shared, server-side completion cache).
+> #98 and #104 were folded into #102's scope rather than done separately (see
+> `MILESTONE_CONVENTIONS.md`). `KETOCLUB_BACKEND_URL` is read in `lib/di.dart`
+> and the web build fetches live Wolt menus and hosted-model analysis through
+> it when configured; with no backend URL the app is exactly the client-only
+> app D1 first described. **This document's design is now largely history**:
+> `architecture.md` is authoritative (D11, D12 in §14) and this plan is kept
+> for the reasoning and the milestone/issue breakdown, corrected below where it
+> named OpenRouter or a bring-your-own-key path that no longer exists. Still
+> open: #105–#109 (community API, hosting beyond `localhost`).
 
 ## 1. Why a backend, and why now
 
@@ -38,7 +42,8 @@ the full Phase 3 backend so the work is planned once.
 | Scope | Full Phase 3 backend: menu proxy, hosted model key, shared analysis cache, community data |
 | Stack | Python 3.11+, FastAPI, in `backend/` of this repository; run locally on `localhost:8000` for now; hosting is #109 |
 | Routing | The **web** build fetches menus through the backend. **Mobile keeps calling Wolt directly**; the backend URL is simply not defined in mobile builds |
-| Model owner | The backend holds one OpenRouter key. The user's own key (BYOK, D3) stays as the fallback; the on-device rules engine stays as the last fallback |
+| Model owner | **Decided (D12), supersedes the row below as originally written.** The backend holds one Google Gemini key. There is no bring-your-own-key fallback: the app never holds a model key at all, `KeyStore` and `flutter_secure_storage` are removed, and the on-device rules engine is the only fallback, reached through the router exactly as it always was for every other failure reason |
+| ~~Model owner (original)~~ | ~~The backend holds one OpenRouter key. The user's own key (BYOK, D3) stays as the fallback; the on-device rules engine stays as the last fallback~~ — superseded by D12 before #100 was built; struck through rather than deleted so the decision that was reversed stays visible |
 | Identity | Anonymous per-install ID sent as a header. No accounts, no login |
 | Old issues | #67, #70–#73 closed; this plan replaces them |
 
@@ -57,7 +62,7 @@ probe, and the client never pre-checks whether the server is up.
 - Python ≥ 3.11, FastAPI, uvicorn, httpx, SQLAlchemy 2, pydantic-settings.
 - `uv` for the lockfile and virtualenv (`uv.lock` committed), ruff for lint and
   format, mypy strict, pytest with pytest-cov and an 80% floor, respx to fake
-  Wolt and OpenRouter. No test makes a network call (constraint 12 applies).
+  Wolt and Gemini. No test makes a network call (constraint 12 applies).
 - `backend/check.sh` is the gate, mirroring `tool/check.sh`:
   `uv sync --frozen && ruff check && ruff format --check && mypy app && pytest --cov=app --cov-fail-under=80`.
 - A `backend` job in `.github/workflows/ci.yml` that **always runs** (about a
@@ -75,7 +80,7 @@ backend/
 │   ├── models.py        # menu_cache, chat_cache, venues, ratings, dish_feedback, submissions
 │   ├── schemas.py
 │   ├── routers/         # health, proxy, chat, venues, submissions, admin
-│   └── services/        # wolt, openrouter, cache, rate_limit, install_id
+│   └── services/        # wolt, gemini, cache, rate_limit, install_id
 └── tests/               # conftest: app over in-memory SQLite (StaticPool) + respx router
 ```
 
@@ -83,8 +88,11 @@ backend/
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `OPENROUTER_API_KEY` | unset | The server's key. Unset means `/v1/chat` answers `notConfigured` |
-| `OPENROUTER_MODEL` | the pinned id in `open_router_client.dart` | Model requested upstream |
+| `GEMINI_API_KEY` | unset | The server's key, sent only as `x-goog-api-key`. Unset means `/v1/chat` answers `notConfigured` (superseded `OPENROUTER_API_KEY`, D12) |
+| `GEMINI_MODEL` | `gemini-2.5-flash` | Model requested at `generateContent` (superseded `OPENROUTER_MODEL`) |
+| `GEMINI_BASE_URL` | `https://generativelanguage.googleapis.com` | Upstream host; never taken from a request |
+| `GEMINI_MAX_OUTPUT_TOKENS` | `8192` | `generationConfig.maxOutputTokens` |
+| `GEMINI_THINKING_BUDGET` | `0` | Thinking tokens count against the output budget, and this is a classification task |
 | `WOLT_BASE_URL` | `https://restaurant-api.wolt.com` | Upstream host for the proxy; never taken from a request |
 | `DATABASE_URL` | `sqlite:///./ketoclub.db` | Postgres is an env-var swap later; Alembic arrives with it |
 | `CORS_ORIGIN_REGEX` | `^https?://(localhost\|127\.0\.0\.1)(:\d+)?$` | Flutter's dev server picks a random port |
@@ -116,26 +124,33 @@ The custom header forces a preflight; the middleware answers it.
 - 2xx bodies are cached per slug for `MENU_CACHE_TTL_SECONDS`; the response
   carries `X-KetoClub-Cache: hit|miss`. Failures are never cached.
 
-**`POST /chat`** — the hosted-key endpoint. The body mirrors
-`LlmChatClient.complete` one to one: `{system_prompt, user_prompt,
-response_schema?, schema_name?}`, with `max_length` bounds (422). Any inbound
-`Authorization` header is rejected with 400.
-- Forwarded with `Authorization: Bearer <server key>`, `HTTP-Referer` and
-  `X-Title` as the Dart client sends them, model from config, read timeout 110 s
-  (the Dart client's 120 s is the outer bound).
-- Same retry rule as `OpenRouterClient`: strict `json_schema` first; on 400, 404
-  or 422 exactly one re-send with `response_format: json_object`; 401, 403, 429
-  and 5xx are never retried (§9.3).
-- 200 → `{content, model}`, `model` from the upstream reply.
+**`POST /chat`** — the hosted-key endpoint, **built against Google Gemini, not
+OpenRouter (D12 — this whole section was written before that decision and is
+corrected here)**. The body mirrors `LlmChatClient.complete` one to one:
+`{system_prompt, user_prompt, response_schema?, schema_name?}`, with
+`max_length` bounds (422). Any inbound `Authorization` header is rejected with
+400: the server holds the only key there is, and the client never sends one.
+- Forwarded as `POST {GEMINI_BASE_URL}/v1beta/models/{GEMINI_MODEL}
+  :generateContent` with header `x-goog-api-key` (never a `?key=` query
+  parameter), `generationConfig.maxOutputTokens` and `.thinkingConfig
+  .thinkingBudget` from config, `temperature: 0`; read timeout 110 s (the Dart
+  client's 120 s is the outer bound).
+- Retry rule: strict `responseSchema` first; on an upstream 400 whose error body
+  is **not** `API_KEY_INVALID`, exactly one re-send with `responseMimeType`
+  only and no schema; 401, 403, 429 and 5xx are never retried (§9.3). The JSON
+  schema Dart sends is converted to Gemini's `responseSchema` subset by a pure
+  `to_gemini_schema` function before either attempt.
+- 200 → `{content, model}`, `model` from the upstream `modelVersion`, else the
+  configured `GEMINI_MODEL`.
 - Errors → `{reason, status_code}` with `reason` a `ChatFailureReason` name:
 
 | Status | `reason` | When |
 |---|---|---|
-| 503 | `notConfigured` | No server key, **or** upstream 401/403. Never `unauthorised`: that client copy says "*your* key was rejected" |
+| 503 | `notConfigured` | No server key, or upstream 400 `API_KEY_INVALID`/401/403. There is no `unauthorised` reason — a rejected server key is the operator's problem, not something client copy can tell the user to fix |
 | 502 | `offline` | Upstream connect error |
 | 504 | `timeout` | Upstream read timeout |
 | 429 | `rateLimited` | Upstream 429, or the per-install limit |
-| 502 | `badResponse` | Any other upstream status, or an unusable body |
+| 502 | `badResponse` | Any other upstream status, a non-`STOP` finish reason, or an unusable body |
 
 - **Shared cache** (`feature_prioratization` Tier D, for free): key = sha256 of
   canonical JSON `{model, system_prompt, user_prompt, response_schema,
@@ -201,25 +216,29 @@ Everything plugs into seams that already exist. Nothing above the adapters
    only when both hold. Run the web build with
    `flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000`.
    A Settings override for LAN testing from a phone is #99.
-3. **Hosted classification** (#102). `BackendChatClient implements LlmChatClient`
-   posts to `/v1/chat`; `FallbackChatClient(primary, secondary)` tries the
-   backend, then the user's key: on primary `backendUnreachable`,
-   `notConfigured` or `rateLimited` it tries the secondary, and if the secondary
-   answers `notConfigured` (no user key) it returns the primary's failure so the
-   user reads "server unreachable" rather than "add a key", unless the primary's
-   own failure was `notConfigured`. `timeout`, `badResponse` and `unauthorised`
-   from the primary return as-is. Neither client needs a `KeyStore` beyond what
-   `OpenRouterClient` already holds.
-   `ChatFailureReason` gains `notConfigured` and `backendUnreachable`;
-   `OpenRouterClient` with no stored key answers `notConfigured` (it answered
-   `unauthorised`, unreachable in practice because the router pre-checked).
-   `MenuAnalysisFailureReason` gains `backendUnreachable`, which falls back to
-   rules with the reason carried, like `offline`.
-4. **Router** (#102). `RoutingMenuClassifier` drops its `KeyStore`. Rule 1 is
-   only "no consent → rules stamped `notConfigured`"; `notConfigured` from the
-   LLM path arrives through the branch that already exists. Credentials live
-   inside `LlmChatClient` implementations, which is what §6.2 already claims.
-   `di.dart` wires `url.isEmpty ? OpenRouterClient : FallbackChatClient(BackendChatClient, OpenRouterClient)`.
+3. **Hosted classification** (#102). **No fallback chain — corrected from this
+   section's original design, which planned a `FallbackChatClient` trying the
+   backend and then the user's own OpenRouter key. D12 removed the
+   bring-your-own-key path entirely, so there is no secondary client to fall
+   back to.** `BackendChatClient implements LlmChatClient` posts to `/v1/chat`
+   with an `X-KetoClub-Install-Id` header and no `Authorization` header ever; a
+   null `baseUrl` (no `KETOCLUB_BACKEND_URL` configured) answers
+   `ChatFailed(notConfigured)` with no I/O. Non-2xx responses map by the
+   backend's `reason` name; `ClientException` → `backendUnreachable`;
+   `TimeoutException` → `timeout`. `ChatFailureReason` loses `unauthorised`
+   (there is no key left to reject) and gains `notConfigured` and
+   `backendUnreachable`. `OpenRouterClient` and `KeyStore` are deleted, not kept
+   as a fallback.
+   `MenuAnalysisFailureReason` loses `unauthorised`, gains `backendUnreachable`
+   and `consentWithheld`; both fall back to rules with the reason carried, like
+   `offline`.
+4. **Router** (#102). `RoutingMenuClassifier` drops its `KeyStore` entirely (not
+   just its use as a fallback secondary). Rule 1 is "consent withheld → rules
+   stamped `consentWithheld`"; `notConfigured` now means "no backend URL
+   compiled in, or the server has no key" and arrives through the LLM-path
+   branch that already exists, exactly like every other backend failure reason.
+   `di.dart` wires `BackendChatClient(baseUrl: backendBaseUrl(...), ...)`
+   directly — no fallback wrapper.
 5. **Install ID** (#101). `lib/services/storage/install_id_store.dart`,
    interface + `PrefsInstallIdStore` with the lazy `load` closure copied from
    `PrefsSettingsStore`; generated on first `id()` call, never in a constructor.
@@ -231,17 +250,22 @@ Everything plugs into seams that already exist. Nothing above the adapters
    `import_rules_test.dart` gains `community: 0`. `AppDependencies` gains a
    **required** `communityClient`, constructed in `test/fakes/fake_app_dependencies.dart`
    and, with its own same-directory fake, in `integration_test/flows/flow_support.dart`.
-7. **Failure copy** (#96, #102, #104). New reasons need distinct strings in both
-   ARB files, distinct across both enums (the uniqueness test spans them): fetch
+7. **Failure copy** (#96, #102 — #104 folded into #102's scope, not done as a
+   separate issue). New reasons need distinct strings in both ARB files,
+   distinct across both enums (the uniqueness test spans them): fetch
    "KetoClub's server could not be reached, so the menu could not be read." and
    analysis "KetoClub's server could not be reached. Showing rule-based
-   results." Regenerate `lib/l10n/generated/` with `flutter gen-l10n`. Three
-   strings become false with a backend and are reworded in #104:
-   `settingsKeyAbsent`, `settingsConsentBody` ("there is no other server"),
-   `analysisRateLimited` ("for this key").
-8. **Boundary test** (#98). §5 says `openrouter.ai` appears in one file only;
-   nothing enforces it. `import_rules_test.dart` gains that check, and the same
-   for `restaurant-api.wolt.com`.
+   results." plus `analysisConsentWithheld`. Regenerate `lib/l10n/generated/`
+   with `flutter gen-l10n`. The key-related strings this bullet originally
+   flagged as merely needing a reword (`settingsKeyAbsent` and friends) are
+   removed outright instead, along with the Settings key section they belonged
+   to — there is no key to have a string about.
+8. **Boundary test** (#98 — folded into #102's scope, not done as a separate
+   issue). §5's single-file rule is now four host-string rules, all enforced by
+   `import_rules_test.dart`: `restaurant-api.wolt.com` only in
+   `wolt_adapter.dart`, `/v1/chat` only in `backend_chat_client.dart`,
+   `KETOCLUB_BACKEND_URL` only in `di.dart`, and `openrouter`, `sk-or-` and
+   `googleapis.com` nowhere under `lib/` at all.
 
 ## 5. Milestones, issues and priority
 
@@ -251,24 +275,24 @@ because milestone A is what makes Wolt work on web.
 
 ### A — Phase 3: Backend Foundations (target 2026-10-04)
 
-| # | Issue | Priority |
-|---|---|---|
-| #94 | Scaffold the Python backend and the CI job | critical |
-| #95 | Wolt menu proxy route | critical |
-| #96 | `WoltMenuAdapter` proxy base; web build routes through the backend | critical |
-| #97 | Record the decision: D11 and the document reconciliation | high |
-| #98 | Enforce the `openrouter.ai` single-file boundary | medium |
-| #99 | Backend URL override in Settings | low |
+| # | Issue | Priority | Status |
+|---|---|---|---|
+| #94 | Scaffold the Python backend and the CI job | critical | ✅ shipped |
+| #95 | Wolt menu proxy route | critical | ✅ shipped |
+| #96 | `WoltMenuAdapter` proxy base; web build routes through the backend | critical | ✅ shipped |
+| #97 | Record the decision: D11, D12 and the document reconciliation | high | ✅ shipped (this document) |
+| #98 | Enforce the host-string boundaries | medium | folded into #102 |
+| #99 | Backend URL override in Settings | low | open |
 
 ### B — Phase 3: Hosted Classification (target 2026-10-25)
 
-| # | Issue | Priority |
-|---|---|---|
-| #100 | `POST /v1/chat` with the server key and the strict-schema retry | critical |
-| #101 | Anonymous install ID and per-install rate limit | high |
-| #102 | `BackendChatClient`, the BYOK fallback chain, the router change | critical |
-| #103 | Server-side completion cache by request hash | high |
-| #104 | Reword Settings and failure copy for a served model | medium |
+| # | Issue | Priority | Status |
+|---|---|---|---|
+| #100 | `POST /v1/chat` with the server key and the strict-schema retry, against Google Gemini | critical | ✅ shipped |
+| #101 | Anonymous install ID and per-install rate limit | high | ✅ shipped |
+| #102 | `BackendChatClient` replaces `OpenRouterClient` entirely (no BYOK fallback, D12), the router change | critical | ✅ shipped |
+| #103 | Server-side completion cache by request hash | high | ✅ shipped |
+| #104 | Reword Settings and failure copy for a served model | medium | folded into #102 |
 
 ### C — Phase 3: Community API (target 2026-11-15)
 
@@ -282,15 +306,15 @@ because milestone A is what makes Wolt work on web.
 
 ### Build order
 
-1. **#94 → #95 → #96.** After these, `flutter run -d chrome` with the define
-   shows a live Wolt menu. That is the stated goal.
-2. **#97, #98.** The decision record and the boundary test before more backend
-   code lands.
-3. **#100 → #101 → #102.** Web users no longer paste a key.
-4. **#103, #104.** Shared cache; honest copy.
+1. **#94 → #95 → #96.** ✅ Done. `flutter run -d chrome` with the define shows a
+   live Wolt menu.
+2. **#100 → #101 → #102** (#98 and #104 folded into #102). ✅ Done. Web and
+   mobile users never enter a key at all.
+3. **#103.** ✅ Done. Shared cache.
+4. **#97.** ✅ Done — this document.
 5. **#105, #106, #108, then #107.** Community data, which unblocks the existing
-   Phase 3 UI issues #74–#80.
-6. **#99, #109.**
+   Phase 3 UI issues #74–#80. Still open.
+6. **#99, #109.** Still open.
 7. Then the existing Phase 2 milestones resume unchanged.
 
 Dependency edges are recorded on each issue ("Blocked by" / "Blocks").
@@ -302,12 +326,15 @@ cd backend && uv run uvicorn app.main:app --reload --port 8000
 flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
 ```
 
-Paste a Wolt link: the menu loads and is classified with the "AI" chip and no
-key entered (after milestone B). Stop the backend: the fetch shows "KetoClub's
-server could not be reached"; with a key entered, classification still works
-through the user's key; with none, rules. `backend/check.sh` and `tool/check.sh`
-are both green, and a web-proxy flow test under `integration_test/flows/` runs
-with the adapter faked.
+Paste a Wolt link: the menu loads and is classified with the "AI" chip — there
+is no key to enter anywhere (D12; milestone B shipped this). Stop the backend:
+the fetch shows "KetoClub's server could not be reached, so the menu could not
+be read", and a fresh classification falls back to rules with the
+`backendUnreachable` reason. There is no user-key path to fall back to instead
+— that design was superseded by D12 before it was built. `backend/README.md`'s
+manual end-to-end check has the full walkthrough with exact commands.
+`backend/check.sh` and `tool/check.sh` are both green, and a web-proxy flow
+test under `integration_test/flows/` runs with the adapter faked.
 
 ## 7. Superseded issues
 

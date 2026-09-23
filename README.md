@@ -363,28 +363,41 @@ Roadmap & Milestone Tracking
     * [ ] Computer Vision & OCR: Snap a photo of a physical printed paper menu to receive the same color-coded breakdown.
     * [ ] Configurable dietary rules: Support for carnivore, pesco-keto, and strict seed-oil avoidance modes.
 Development Setup & Installation
+
+**This section describes the actual repository layout, corrected from an
+earlier draft that named a different clone URL, a `frontend/` directory and
+`pip`/`requirements.txt` — none of which this repository uses. See
+`architecture.md` D11/D12 for why a backend and a Python toolchain exist at
+all: it is an optional local accelerator (CORS proxy for Wolt, hosted Gemini
+classification), not a requirement — the app works with neither.**
+
 Prerequisites
-* Python: Version 3.11 or later
-* Flutter SDK: Version 3.19 or later (for mobile client)
-* PostgreSQL: Version 15+ (for local venue persistence)
+* Python 3.11+ with `uv` installed (no PostgreSQL — the backend uses SQLite by
+  default; see `backend/README.md`)
+* Flutter 3.47.4 / Dart 3.13.3 (pinned versions; see `CLAUDE.md`)
+
 1. Repository Clone
 Bash
 
-git clone [https://github.com/your-org/ketoclub.git](https://github.com/your-org/ketoclub.git)
-cd ketoclub
-2. Backend Service Setup
+git clone https://github.com/NoaMcDa/KetoClub.git
+cd KetoClub
+
+2. Backend Setup (optional — see `backend/README.md` for the full walkthrough
+   and a manual end-to-end check)
 Bash
 
 cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-3. Mobile Client Setup
+cp .env.example .env   # set GEMINI_API_KEY for hosted classification
+uv sync
+uv run uvicorn app.main:app --reload --port 8000
+
+3. Flutter App Setup
 Bash
 
-cd ../frontend
 flutter pub get
-flutter run
+flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
+# or, with no backend running: flutter run -d chrome
+# or a device: flutter run -d <device>
+
 License
 Distributed under the MIT License. See LICENSE for details.
