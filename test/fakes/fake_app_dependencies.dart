@@ -4,6 +4,7 @@ import 'fake_app_logger.dart';
 import 'fake_clock.dart';
 import 'fake_menu_classifier.dart';
 import 'fake_menu_repository.dart';
+import 'fake_notes_store.dart';
 import 'fake_settings_store.dart';
 
 /// Builds an [AppDependencies] of fakes, for widget and flow tests.
@@ -18,6 +19,7 @@ final class FakeAppDependencies {
     : repository = FakeMenuRepository(),
       classifier = FakeMenuClassifier(),
       settingsStore = FakeSettingsStore(),
+      notesStore = FakeNotesStore(),
       clock = FakeClock(startedAt ?? DateTime.utc(2026)),
       logger = FakeAppLogger();
 
@@ -30,6 +32,9 @@ final class FakeAppDependencies {
   /// The faked settings store.
   final FakeSettingsStore settingsStore;
 
+  /// The faked notes store.
+  final FakeNotesStore notesStore;
+
   /// The faked clock; advance it to control cache freshness.
   final FakeClock clock;
 
@@ -41,6 +46,7 @@ final class FakeAppDependencies {
     menuRepository: repository,
     menuClassifier: classifier,
     settingsStore: settingsStore,
+    notesStore: notesStore,
     clock: clock,
     logger: logger,
   );

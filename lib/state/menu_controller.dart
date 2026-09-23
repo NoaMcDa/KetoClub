@@ -7,6 +7,7 @@ import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
+import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/keto_score.dart';
@@ -36,10 +37,12 @@ import 'package:ketoclub/utils/text_normaliser.dart';
 /// the widgets above it.
 final class MenuController extends ChangeNotifier {
   /// Creates a controller that loads menus through a [MenuRepository],
-  /// classifies them through a [MenuClassifier], and reads the user's default
-  /// filter and AI-estimation consent from a [SettingsStore] on every [open].
+  /// classifies them through a [MenuClassifier], reads the user's default
+  /// filter and AI-estimation consent from a [SettingsStore] on every
+  /// [open], and reads and writes the open venue's personal dish notes
+  /// through a [NotesStore] (issue #52).
   ///
-  /// The three services are positional and private. Private, because a widget
+  /// The four services are positional and private. Private, because a widget
   /// reaches a service only through a controller's own API (architecture.md
   /// §5) and public fields would hand it a way around this class; positional,
   /// because a private field cannot be a named initializing formal in Dart and
@@ -51,11 +54,12 @@ final class MenuController extends ChangeNotifier {
   /// `Menu.fetchedAt`, `analysedAt` from the classifier — so a clock here
   /// would be a dependency nothing reads. Rendering "4 min ago" from
   /// [fetchedAt] is left to whoever displays it, against its own clock.
-  new(this._repository, this._classifier, this._settings);
+  new(this._repository, this._classifier, this._settings, this._notes);
 
   final MenuRepository _repository;
   final MenuClassifier _classifier;
   final SettingsStore _settings;
+  final NotesStore _notes;
 
   bool _isLoading = false;
   Menu? _menu;
@@ -65,6 +69,12 @@ final class MenuController extends ChangeNotifier {
   bool _isFromCache = false;
   MenuFetchFailureReason? _staleReason;
   MenuFilter _filter = MenuFilter.all;
+  VenueRef? _openRef;
+  Map<String, String> _dishNotes = const <String, String>{};
+
+  /// The venue [open] most recently loaded, or null before the first
+  /// call — [refresh] has nothing to refetch until then.
+  VenueRef? _ref;
 
   /// Whether [open] is currently loading or classifying a menu.
   bool get isLoading => _isLoading;
@@ -258,6 +268,12 @@ final class MenuController extends ChangeNotifier {
         : const <String>[];
   }
 
+  /// The user's personal note for the dish [dishId], on the currently
+  /// open venue, or null when none has been written (issue #52). Local
+  /// only: see [NotesStore]'s own doc comment for the privacy boundary
+  /// this never crosses.
+  String? noteFor(String dishId) => _dishNotes[dishId];
+
   /// Loads [ref]'s menu, then classifies it, notifying listeners after
   /// each step so a caller can render a spinner and then the result.
   ///
@@ -284,11 +300,14 @@ final class MenuController extends ChangeNotifier {
   /// [filter] is reset from the user's stored default on every call.
   /// Never throws.
   Future<void> open(VenueRef ref, {bool forceRefresh = false}) async {
+    _ref = ref;
     _isLoading = true;
     notifyListeners();
 
+    _openRef = ref;
     final appSettings = await _settings.read();
     _filter = appSettings.filter;
+    _dishNotes = await _notes.readAll(ref);
 
     final fetchResult = await _repository.load(ref, forceRefresh: forceRefresh);
     switch (fetchResult) {
@@ -334,6 +353,87 @@ final class MenuController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Force-refetches the venue last passed to [open], skipping
+  /// classification when the refetched menu's dish text is unchanged
+  /// (architecture.md §6.4, §10 row 1).
+  ///
+  /// A no-op when [open] has never been called — there is nothing to
+  /// refetch. Compares [TextNormaliser.menuFingerprint] of the menu shown
+  /// before this call against the refetched one: equal fingerprints keep
+  /// [analysis] exactly as it was (only [menu] — and so [fetchedAt] —
+  /// moves forward), spending no classifier call; a changed fingerprint
+  /// reclassifies and persists the new result exactly as [open] does. So
+  /// does an unchanged fingerprint whose analysis was made under options
+  /// other than the user's current ones — a net-carb limit changed since
+  /// [open], say (issue #57).
+  ///
+  /// A refetch that fails outright (no adapter succeeded and nothing was
+  /// cached to fall back to — the only way [MenuRepository.load] returns
+  /// [MenuFetchFailed] once a menu is already showing) leaves [menu] and
+  /// [analysis] untouched and surfaces the failure reason through
+  /// [staleReason], the same "still shows the last good menu" contract
+  /// [MenuRepository.load] itself upholds when a cached menu exists. It
+  /// is far more common for that contract to be upheld one layer down:
+  /// [MenuRepository.load] itself falls back to a cached menu on a
+  /// failed fetch, returning [MenuFetched] with `fromCache: true` rather
+  /// than [MenuFetchFailed] — that path is handled by the same branch
+  /// [open] uses, below.
+  Future<void> refresh() async {
+    final currentRef = _ref;
+    if (currentRef == null) return;
+    final previousMenu = _menu;
+    final previousAnalysis = _analysis;
+
+    _isLoading = true;
+    notifyListeners();
+
+    final fetchResult = await _repository.load(currentRef, forceRefresh: true);
+    switch (fetchResult) {
+      case MenuFetched(
+        menu: final fetchedMenu,
+        :final fromCache,
+        :final staleReason,
+      ):
+        final unchanged =
+            previousMenu != null &&
+            TextNormaliser.menuFingerprint(previousMenu) ==
+                TextNormaliser.menuFingerprint(fetchedMenu);
+        _menu = fetchedMenu;
+        _isFromCache = fromCache;
+        _staleReason = staleReason;
+        _fetchFailure = null;
+        _fetchStatusCode = null;
+        final options = _optionsFrom(await _settings.read());
+        if (unchanged &&
+            previousAnalysis is MenuAnalysed &&
+            options.matches(previousAnalysis.options)) {
+          // The dish text did not change, and neither did the options
+          // that decide what a verdict means (issue #57): keep the
+          // analysis already on hand — only fetchedAt (read from _menu)
+          // moves forward — and spend no classifier call
+          // (architecture.md §6.4).
+          _analysis = previousAnalysis;
+        } else {
+          final analysis = await _classifier.classify(
+            fetchedMenu,
+            options: options,
+          );
+          _analysis = analysis;
+          if (analysis is MenuAnalysed) {
+            await _repository.saveAnalysis(currentRef, analysis);
+          }
+        }
+      case MenuFetchFailed(:final reason):
+        // Nothing fresh, and nothing stale either: keep exactly what was
+        // already shown, and say why a refresh could not improve on it.
+        _staleReason = reason;
+        _isFromCache = true;
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
   /// The [ClassificationOptions] [settings] ask for: consent, and the
   /// net-carb limit (issue #57).
   static ClassificationOptions _optionsFrom(AppSettings settings) =>
@@ -367,6 +467,40 @@ final class MenuController extends ChangeNotifier {
   /// reclassify.
   void setFilter(MenuFilter filter) {
     _filter = filter;
+    notifyListeners();
+  }
+
+  /// Saves [note] as the personal note for [dishId] on the open venue
+  /// (issue #52), and notifies listeners once it is written.
+  ///
+  /// A blank [note] (empty once trimmed) clears the note instead of
+  /// writing an empty string — the note editor's Save and Clear actions
+  /// end up doing the same thing when the field was emptied by hand.
+  /// A no-op, including no notify, when [open] has never been called:
+  /// there is no venue to attribute the note to.
+  Future<void> setNote(String dishId, String note) async {
+    final ref = _openRef;
+    if (ref == null) return;
+    final trimmed = note.trim();
+    if (trimmed.isEmpty) {
+      await clearNote(dishId);
+      return;
+    }
+    await _notes.write(ref, dishId, trimmed);
+    _dishNotes = {..._dishNotes, dishId: trimmed};
+    notifyListeners();
+  }
+
+  /// Removes the personal note for [dishId] on the open venue, and
+  /// notifies listeners once it is removed. A no-op, including no
+  /// notify, when [open] has never been called or when [dishId] carries
+  /// no note.
+  Future<void> clearNote(String dishId) async {
+    final ref = _openRef;
+    if (ref == null || !_dishNotes.containsKey(dishId)) return;
+    await _notes.delete(ref, dishId);
+    final updated = Map<String, String>.from(_dishNotes)..remove(dishId);
+    _dishNotes = updated;
     notifyListeners();
   }
 

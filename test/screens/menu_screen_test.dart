@@ -16,12 +16,14 @@ import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
+import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
 
 import '../fakes/fake_menu_classifier.dart';
 import '../fakes/fake_menu_repository.dart';
+import '../fakes/fake_notes_store.dart';
 import '../fakes/fake_screen_brightness.dart';
 import '../fakes/fake_settings_store.dart';
 
@@ -75,10 +77,12 @@ MenuController _controllerFor({
   required FakeMenuRepository repository,
   FakeMenuClassifier? classifier,
   FakeSettingsStore? settings,
+  FakeNotesStore? notes,
 }) => MenuController(
   repository,
   classifier ?? FakeMenuClassifier(),
   settings ?? FakeSettingsStore(),
+  notes ?? FakeNotesStore(),
 );
 
 /// Pumps a [MenuScreen] for [ref] over [controller], inside a localised
@@ -1017,6 +1021,76 @@ void main() {
     });
 
     testWidgets(
+      'pulling the loaded menu down triggers a RefreshIndicator that calls '
+      'MenuController.refresh (issue #49)',
+      (tester) async {
+        // Arrange
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        final controller = _controllerFor(repository: repository);
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+        final loadCallsBefore = repository.loadCalls.length;
+
+        // Act: drag the list down far and fast enough to cross
+        // RefreshIndicator's trigger threshold.
+        await tester.fling(find.byType(ListView), const Offset(0, 300), 1000);
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pumpAndSettle();
+
+        // Assert: a second, forced load — MenuController.refresh's own
+        // contract — beyond the one initState's open() already made.
+        expect(repository.loadCalls.length, greaterThan(loadCallsBefore));
+        expect(
+          repository.loadCalls.last,
+          equals((ref: _ref, forceRefresh: true)),
+        );
+      },
+    );
+
+    testWidgets(
+      'pulling to refresh is not disabled by the active filter (issue #49)',
+      (tester) async {
+        // Arrange: filter narrowed to a verdict with no matching dish, so
+        // visibleRows is empty, but the RefreshIndicator must still work.
+        final green = _dish('Steak', id: 'green');
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([green])));
+        final classifier = FakeMenuClassifier()
+          ..respondWith(
+            MenuAnalysed(
+              dishes: [_verdictFor(green, DishVerdict.orderAsIs)],
+              unclassified: const <String>[],
+              engine: const RulesEngine(
+                reason: MenuAnalysisFailureReason.notConfigured,
+              ),
+              analysedAt: DateTime.utc(2026),
+            ),
+          );
+        final controller = _controllerFor(
+          repository: repository,
+          classifier: classifier,
+        );
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+        controller.setFilter(MenuFilter.redOnly);
+        await tester.pumpAndSettle();
+        expect(find.byType(DishCard), findsNothing);
+        final loadCallsBefore = repository.loadCalls.length;
+
+        // Act
+        await tester.fling(find.byType(ListView), const Offset(0, 300), 1000);
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(repository.loadCalls.length, greaterThan(loadCallsBefore));
+      },
+    );
+
+    testWidgets(
       'retry after a failed fetch calls open again with forceRefresh true',
       (tester) async {
         // Arrange
@@ -1043,5 +1117,145 @@ void main() {
         );
       },
     );
+
+    group('personal notes (issue #52)', () {
+      testWidgets('a dish with no note shows the "Add a note" prompt', (
+        tester,
+      ) async {
+        // Arrange
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        final controller = _controllerFor(repository: repository);
+
+        // Act
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_en.dishCardAddNote), findsOneWidget);
+      });
+
+      testWidgets(
+        'a dish with a stored note shows it on the card, not the prompt',
+        (tester) async {
+          // Arrange
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+          final notes = FakeNotesStore();
+          await notes.write(_ref, 'd1', 'Ask for no cheese.');
+          final controller = _controllerFor(
+            repository: repository,
+            notes: notes,
+          );
+
+          // Act
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+
+          // Assert
+          expect(find.text('Ask for no cheese.'), findsOneWidget);
+          expect(find.text(_en.dishCardAddNote), findsNothing);
+        },
+      );
+
+      testWidgets(
+        'tapping the note prompt opens the note editor, and saving shows '
+        'the note on the card afterwards',
+        (tester) async {
+          // Arrange
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+          final controller = _controllerFor(repository: repository);
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+
+          // Act: open the editor.
+          await tester.tap(find.text(_en.dishCardAddNote));
+          await tester.pumpAndSettle();
+
+          // Assert: the sheet is open.
+          expect(find.byType(NoteEditorSheet), findsOneWidget);
+
+          // Act: type a note and save.
+          await tester.enterText(
+            find.byType(TextField),
+            'Waitstaff happily substituted cauliflower.',
+          );
+          await tester.tap(find.text(_en.noteEditorSave));
+          await tester.pumpAndSettle();
+
+          // Assert: the sheet closed and the card now shows the note.
+          expect(find.byType(NoteEditorSheet), findsNothing);
+          expect(
+            find.text('Waitstaff happily substituted cauliflower.'),
+            findsOneWidget,
+          );
+        },
+      );
+
+      testWidgets(
+        'clearing an existing note in the editor removes it from the card',
+        (tester) async {
+          // Arrange
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+          final notes = FakeNotesStore();
+          await notes.write(_ref, 'd1', 'Ask for no cheese.');
+          final controller = _controllerFor(
+            repository: repository,
+            notes: notes,
+          );
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+
+          // Act: open the editor and clear.
+          await tester.tap(find.text('Ask for no cheese.'));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text(_en.noteEditorClear));
+          await tester.pumpAndSettle();
+
+          // Assert
+          expect(find.byType(NoteEditorSheet), findsNothing);
+          expect(find.text('Ask for no cheese.'), findsNothing);
+          expect(find.text(_en.dishCardAddNote), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'a note is shown for a non-keto dish too, not only a modifiable '
+        'one',
+        (tester) async {
+          // Arrange
+          final red = _dish('Pasta', id: 'red');
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([red])));
+          final classifier = FakeMenuClassifier()
+            ..respondWith(
+              MenuAnalysed(
+                dishes: [_verdictFor(red, DishVerdict.nonKeto)],
+                unclassified: const <String>[],
+                engine: const RulesEngine(
+                  reason: MenuAnalysisFailureReason.notConfigured,
+                ),
+                analysedAt: DateTime.utc(2026),
+              ),
+            );
+          final notes = FakeNotesStore();
+          await notes.write(_ref, 'red', 'Skip it.');
+          final controller = _controllerFor(
+            repository: repository,
+            classifier: classifier,
+            notes: notes,
+          );
+
+          // Act
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+
+          // Assert
+          expect(find.text('Skip it.'), findsOneWidget);
+        },
+      );
+    });
   });
 }

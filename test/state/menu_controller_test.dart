@@ -15,6 +15,7 @@ import '../fakes/fake_clock.dart';
 import '../fakes/fake_menu_cache.dart';
 import '../fakes/fake_menu_classifier.dart';
 import '../fakes/fake_menu_repository.dart';
+import '../fakes/fake_notes_store.dart';
 import '../fakes/fake_platform_menu_adapter.dart';
 import '../fakes/fake_settings_store.dart';
 
@@ -61,6 +62,7 @@ void main() {
     late FakeMenuRepository repository;
     late FakeMenuClassifier classifier;
     late FakeSettingsStore settings;
+    late FakeNotesStore notes;
     late FakeClock clock;
     late MenuController controller;
 
@@ -68,8 +70,9 @@ void main() {
       repository = FakeMenuRepository();
       classifier = FakeMenuClassifier();
       settings = FakeSettingsStore();
+      notes = FakeNotesStore();
       clock = FakeClock(DateTime.utc(2026));
-      controller = MenuController(repository, classifier, settings);
+      controller = MenuController(repository, classifier, settings, notes);
     });
 
     test(
@@ -528,7 +531,7 @@ void main() {
       settings = FakeSettingsStore(
         initial: const AppSettings(filter: MenuFilter.greenOnly),
       );
-      controller = MenuController(repository, classifier, settings);
+      controller = MenuController(repository, classifier, settings, notes);
       repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
 
       // Act
@@ -544,7 +547,7 @@ void main() {
       settings = FakeSettingsStore(
         initial: const AppSettings(estimationConsentGiven: true),
       );
-      controller = MenuController(repository, classifier, settings);
+      controller = MenuController(repository, classifier, settings, notes);
       repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
 
       // Act
@@ -627,6 +630,370 @@ void main() {
       expect(unclassified, isEmpty);
       expect(controller.engine, isNull);
     });
+
+    group('refresh (issue #49)', () {
+      test('refresh before any open is a no-op: no repository call and no '
+          'notification', () async {
+        // Arrange
+        var notifyCount = 0;
+        controller.addListener(() => notifyCount++);
+
+        // Act
+        await controller.refresh();
+
+        // Assert
+        expect(repository.loadCalls, isEmpty);
+        expect(notifyCount, 0);
+        expect(controller.menu, isNull);
+      });
+
+      test('refresh with an unchanged dish-text fingerprint keeps the '
+          'existing analysis and calls the classifier zero times', () async {
+        // Arrange: open with one menu and a scripted analysis.
+        final dish = _dish('Steak');
+        final firstFetchedAt = DateTime.utc(2026);
+        repository.stub(
+          _ref,
+          MenuFetched(menu: _menuOf([dish], fetchedAt: firstFetchedAt)),
+        );
+        final firstAnalysis = MenuAnalysed(
+          dishes: [_verdictFor(dish, DishVerdict.orderAsIs)],
+          unclassified: const <String>[],
+          engine: const LlmEngine(model: 'test-model'),
+          analysedAt: clock.now(),
+        );
+        classifier.respondWith(firstAnalysis);
+        await controller.open(_ref);
+        expect(classifier.calls, hasLength(1));
+
+        // Arrange: a refetch whose dish text is identical (only fetchedAt
+        // moves forward) — the normalised fingerprint does not change.
+        final secondFetchedAt = DateTime.utc(2026, 1, 2);
+        repository.stub(
+          _ref,
+          MenuFetched(menu: _menuOf([dish], fetchedAt: secondFetchedAt)),
+        );
+
+        // Act
+        await controller.refresh();
+
+        // Assert: no second classifier call, the old analysis is kept
+        // verbatim, and only fetchedAt moved forward.
+        expect(classifier.calls, hasLength(1));
+        expect(controller.analysis, same(firstAnalysis));
+        expect(controller.fetchedAt, equals(secondFetchedAt));
+        expect(
+          repository.loadCalls.last,
+          equals((ref: _ref, forceRefresh: true)),
+        );
+      });
+
+      test('refresh with an unchanged fingerprint still reclassifies when '
+          'the net-carb limit changed since open (issue #57)', () async {
+        // Arrange: open under the default limit; the fake records it.
+        final dish = _dish('Steak');
+        repository.stub(_ref, MenuFetched(menu: _menuOf([dish])));
+        await controller.open(_ref);
+        expect(classifier.calls, hasLength(1));
+
+        // Arrange: the user raises the limit, then pulls to refresh an
+        // unchanged menu.
+        await settings.write(const AppSettings(netCarbLimitGrams: 12));
+
+        // Act
+        await controller.refresh();
+
+        // Assert
+        expect(classifier.calls, hasLength(2));
+        expect(classifier.calls.last.$2.netCarbLimitGrams, equals(12));
+        expect(controller.netCarbLimitGrams, equals(12));
+      });
+
+      test('refresh with a changed dish-text fingerprint reclassifies and '
+          'persists the new analysis', () async {
+        // Arrange
+        final oldDish = _dish('Steak');
+        repository.stub(_ref, MenuFetched(menu: _menuOf([oldDish])));
+        final oldAnalysis = MenuAnalysed(
+          dishes: [_verdictFor(oldDish, DishVerdict.orderAsIs)],
+          unclassified: const <String>[],
+          engine: const LlmEngine(model: 'test-model'),
+          analysedAt: clock.now(),
+        );
+        classifier.respondWith(oldAnalysis);
+        await controller.open(_ref);
+
+        // Arrange: a refetch with a different dish name — a changed
+        // fingerprint — and a new scripted analysis to match it.
+        final newDish = _dish('Chicken');
+        repository.stub(_ref, MenuFetched(menu: _menuOf([newDish])));
+        final newAnalysis = MenuAnalysed(
+          dishes: [_verdictFor(newDish, DishVerdict.orderAsIs)],
+          unclassified: const <String>[],
+          engine: const LlmEngine(model: 'test-model'),
+          analysedAt: clock.now(),
+        );
+        classifier.respondWith(newAnalysis);
+
+        // Act
+        await controller.refresh();
+
+        // Assert: a second classifier call over the new menu, and the new
+        // analysis both shown and persisted.
+        expect(classifier.calls, hasLength(2));
+        expect(classifier.calls.last.$1, equals(_menuOf([newDish])));
+        expect(controller.analysis, equals(newAnalysis));
+        expect(
+          repository.savedAnalyses.last,
+          equals((ref: _ref, analysis: newAnalysis)),
+        );
+      });
+
+      test('refresh on a failed fetch keeps the previously shown menu and '
+          'analysis, and surfaces the reason as staleReason', () async {
+        // Arrange
+        final dish = _dish('Steak');
+        final menu = _menuOf([dish]);
+        repository.stub(_ref, MenuFetched(menu: menu));
+        final analysis = MenuAnalysed(
+          dishes: [_verdictFor(dish, DishVerdict.orderAsIs)],
+          unclassified: const <String>[],
+          engine: const LlmEngine(model: 'test-model'),
+          analysedAt: clock.now(),
+        );
+        classifier.respondWith(analysis);
+        await controller.open(_ref);
+
+        // Arrange: the refresh's fetch fails outright (no adapter success,
+        // nothing cached to fall back to).
+        repository.stub(
+          _ref,
+          const MenuFetchFailed(reason: MenuFetchFailureReason.offline),
+        );
+
+        // Act
+        await controller.refresh();
+
+        // Assert: the menu and analysis already on screen are untouched.
+        expect(controller.menu, equals(menu));
+        expect(controller.analysis, equals(analysis));
+        expect(controller.staleReason, MenuFetchFailureReason.offline);
+        expect(controller.isFromCache, isTrue);
+        expect(classifier.calls, hasLength(1));
+      });
+
+      test('refresh toggles isLoading and notifies listeners exactly '
+          'twice', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        var notifyCount = 0;
+        controller.addListener(() => notifyCount++);
+        final loadingDuringRefresh = <bool>[];
+        controller.addListener(
+          () => loadingDuringRefresh.add(controller.isLoading),
+        );
+
+        // Act
+        final future = controller.refresh();
+        expect(controller.isLoading, isTrue);
+        await future;
+
+        // Assert
+        expect(notifyCount, 2);
+        expect(loadingDuringRefresh, [true, false]);
+        expect(controller.isLoading, isFalse);
+      });
+
+      test('refresh on a fetch that falls back to a stale cached menu — '
+          'the ordinary path load itself takes on an adapter failure — '
+          'still reclassifies when the served menu changed and updates '
+          'isFromCache/staleReason from the result', () async {
+        // Arrange
+        final oldDish = _dish('Steak');
+        repository.stub(_ref, MenuFetched(menu: _menuOf([oldDish])));
+        classifier.respondWith(
+          MenuAnalysed(
+            dishes: [_verdictFor(oldDish, DishVerdict.orderAsIs)],
+            unclassified: const <String>[],
+            engine: const LlmEngine(model: 'test-model'),
+            analysedAt: clock.now(),
+          ),
+        );
+        await controller.open(_ref);
+
+        // Arrange: load() itself served a stale cached menu with a
+        // different dish (e.g. cached before the network failed) — the
+        // fromCache/staleReason branch of MenuFetched, not
+        // MenuFetchFailed.
+        final newDish = _dish('Chicken');
+        repository.stub(
+          _ref,
+          MenuFetched(
+            menu: _menuOf([newDish]),
+            fromCache: true,
+            staleReason: MenuFetchFailureReason.offline,
+          ),
+        );
+        final newAnalysis = MenuAnalysed(
+          dishes: [_verdictFor(newDish, DishVerdict.orderAsIs)],
+          unclassified: const <String>[],
+          engine: const LlmEngine(model: 'test-model'),
+          analysedAt: clock.now(),
+        );
+        classifier.respondWith(newAnalysis);
+
+        // Act
+        await controller.refresh();
+
+        // Assert
+        expect(controller.isFromCache, isTrue);
+        expect(controller.staleReason, MenuFetchFailureReason.offline);
+        expect(controller.analysis, equals(newAnalysis));
+      });
+    });
+
+    group('personal notes (issue #52)', () {
+      test('noteFor returns null before anything is opened', () {
+        // Assert
+        expect(controller.noteFor('d1'), isNull);
+      });
+
+      test('open loads any notes already stored for that venue', () async {
+        // Arrange
+        await notes.write(_ref, 'd1', 'Ask for no cheese.');
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+
+        // Act
+        await controller.open(_ref);
+
+        // Assert
+        expect(controller.noteFor('d1'), equals('Ask for no cheese.'));
+      });
+
+      test('setNote writes through the store and updates noteFor '
+          'immediately', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+
+        // Act
+        await controller.setNote(
+          'd1',
+          'Waitstaff happily substituted '
+              'cauliflower.',
+        );
+
+        // Assert
+        expect(
+          controller.noteFor('d1'),
+          equals('Waitstaff happily substituted cauliflower.'),
+        );
+        expect(
+          await notes.read(_ref, 'd1'),
+          equals('Waitstaff happily substituted cauliflower.'),
+        );
+      });
+
+      test('setNote trims the note before storing it', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+
+        // Act
+        await controller.setNote('d1', '  spaced out note  ');
+
+        // Assert
+        expect(controller.noteFor('d1'), equals('spaced out note'));
+      });
+
+      test('setNote notifies listeners', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        var notifyCount = 0;
+        controller.addListener(() => notifyCount++);
+
+        // Act
+        await controller.setNote('d1', 'A note.');
+
+        // Assert
+        expect(notifyCount, 1);
+      });
+
+      test('setNote with a blank note clears it instead of storing an '
+          'empty string', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        await controller.setNote('d1', 'First.');
+
+        // Act
+        await controller.setNote('d1', '   ');
+
+        // Assert
+        expect(controller.noteFor('d1'), isNull);
+        expect(await notes.read(_ref, 'd1'), isNull);
+      });
+
+      test('clearNote removes the note through the store and from '
+          'noteFor', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        await controller.setNote('d1', 'A note.');
+
+        // Act
+        await controller.clearNote('d1');
+
+        // Assert
+        expect(controller.noteFor('d1'), isNull);
+        expect(await notes.read(_ref, 'd1'), isNull);
+      });
+
+      test('clearNote on a dish with no note is a no-op, including no '
+          'notify', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        var notifyCount = 0;
+        controller.addListener(() => notifyCount++);
+
+        // Act
+        await controller.clearNote('never_noted');
+
+        // Assert
+        expect(notifyCount, 0);
+        expect(notes.deleteCalls, isEmpty);
+      });
+
+      test('setNote and clearNote before any open are no-ops, not a '
+          'crash', () async {
+        // Act & Assert
+        await expectLater(controller.setNote('d1', 'x'), completes);
+        await expectLater(controller.clearNote('d1'), completes);
+        expect(controller.noteFor('d1'), isNull);
+        expect(notes.writeCalls, isEmpty);
+      });
+
+      test('notes are scoped per venue: opening a second venue does not '
+          "carry the first venue's notes over", () async {
+        // Arrange
+        const otherRef = VenueRef(source: MenuSource.wolt, platformId: 'v2');
+        repository
+          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])))
+          ..stub(otherRef, MenuFetched(menu: _menuOf([_dish('Fish')])));
+        await controller.open(_ref);
+        await controller.setNote('d1', 'For venue one.');
+
+        // Act
+        await controller.open(otherRef);
+
+        // Assert
+        expect(controller.noteFor('d1'), isNull);
+      });
+    });
   });
 
   // Issue #29 adds MenuFilter.yellowOnly and MenuFilter.redOnly. Placed
@@ -697,7 +1064,12 @@ void main() {
       settings = FakeSettingsStore(
         initial: const AppSettings(estimationConsentGiven: true),
       );
-      controller = MenuController(repository, classifier, settings);
+      controller = MenuController(
+        repository,
+        classifier,
+        settings,
+        FakeNotesStore(),
+      );
     });
 
     test('open passes the stored limit to the classifier', () async {
@@ -721,7 +1093,12 @@ void main() {
       final first = controller.analysis;
 
       // Act
-      final reopened = MenuController(repository, classifier, settings);
+      final reopened = MenuController(
+        repository,
+        classifier,
+        settings,
+        FakeNotesStore(),
+      );
       await reopened.open(_ref);
 
       // Assert
@@ -742,7 +1119,12 @@ void main() {
       );
 
       // Act
-      final reopened = MenuController(repository, classifier, settings);
+      final reopened = MenuController(
+        repository,
+        classifier,
+        settings,
+        FakeNotesStore(),
+      );
       await reopened.open(_ref);
 
       // Assert
@@ -840,7 +1222,12 @@ void main() {
       settings = FakeSettingsStore(
         initial: const AppSettings(estimationConsentGiven: true),
       );
-      controller = MenuController(repository, classifier, settings);
+      controller = MenuController(
+        repository,
+        classifier,
+        settings,
+        FakeNotesStore(),
+      );
     });
 
     test('an analysis cached before issue #57, with no options, is reused '

@@ -19,6 +19,7 @@ import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
+import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
@@ -205,16 +206,19 @@ class _MenuScreenState extends State<MenuScreen> {
         : _sourceLine(context, l10n, controller.fetchedAt!);
 
     if (menu.allDishes.isEmpty) {
-      return ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          header,
-          const SizedBox(height: 4),
-          ?sourceLine,
-          const SizedBox(height: 12),
-          ...banners,
-          Center(child: Text(l10n.menuEmpty)),
-        ],
+      return _refreshable(
+        controller,
+        ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            header,
+            const SizedBox(height: 4),
+            ?sourceLine,
+            const SizedBox(height: 12),
+            ...banners,
+            Center(child: Text(l10n.menuEmpty)),
+          ],
+        ),
       );
     }
 
@@ -227,61 +231,77 @@ class _MenuScreenState extends State<MenuScreen> {
     final localeTag = Localizations.localeOf(context).toLanguageTag();
     final rows = controller.visibleRows;
 
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        header,
-        const SizedBox(height: 4),
-        if (analysed) ...[
-          const SizedBox(height: 8),
-          VerdictCounterTiles(
-            greenCount: controller.greenCount,
-            yellowCount: controller.yellowCount,
-            redCount: controller.redCount,
-            filter: controller.filter,
-            onFilterChanged: controller.setFilter,
-          ),
-          const SizedBox(height: 10),
-        ],
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (analysed)
-              Expanded(
-                child: Text(
-                  _showingLabel(l10n, controller),
-                  style: Theme.of(context).textTheme.labelMedium,
-                ),
-              )
-            else
-              const Spacer(),
-            ?sourceLine,
-          ],
-        ),
-        if (analysed) ...[
+    return _refreshable(
+      controller,
+      ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          header,
           const SizedBox(height: 4),
-          _legend(context, l10n, controller.netCarbLimitGrams),
-        ],
-        const SizedBox(height: 8),
-        ...banners,
-        if (controller.engine != null) ...[
-          RulesReasonBanner(engine: controller.engine!),
-          EngineChip(engine: controller.engine!),
-          const SizedBox(height: 12),
-        ],
-        for (final row in rows)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: DishCard(
-              row: row,
-              localeTag: localeTag,
-              onShowScript: (shown) => unawaited(_openWaiterCard(shown)),
+          if (analysed) ...[
+            const SizedBox(height: 8),
+            VerdictCounterTiles(
+              greenCount: controller.greenCount,
+              yellowCount: controller.yellowCount,
+              redCount: controller.redCount,
+              filter: controller.filter,
+              onFilterChanged: controller.setFilter,
             ),
+            const SizedBox(height: 10),
+          ],
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (analysed)
+                Expanded(
+                  child: Text(
+                    _showingLabel(l10n, controller),
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
+                )
+              else
+                const Spacer(),
+              ?sourceLine,
+            ],
           ),
-        if (analysed && controller.unclassifiedNames.isNotEmpty)
-          _unclassifiedSection(context, l10n, controller),
-      ],
+          if (analysed) ...[
+            const SizedBox(height: 4),
+            _legend(context, l10n, controller.netCarbLimitGrams),
+          ],
+          const SizedBox(height: 8),
+          ...banners,
+          if (controller.engine != null) ...[
+            RulesReasonBanner(engine: controller.engine!),
+            EngineChip(engine: controller.engine!),
+            const SizedBox(height: 12),
+          ],
+          for (final row in rows)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: DishCard(
+                row: row,
+                localeTag: localeTag,
+                onShowScript: (shown) => unawaited(_openWaiterCard(shown)),
+                note: controller.noteFor(row.dish.id),
+                onEditNote: (edited) => unawaited(_openNoteEditor(edited)),
+              ),
+            ),
+          if (analysed && controller.unclassifiedNames.isNotEmpty)
+            _unclassifiedSection(context, l10n, controller),
+        ],
+      ),
     );
+  }
+
+  /// Wraps [child] — the loaded-menu [ListView], empty or not — in a
+  /// [RefreshIndicator] that pulls [MenuController.refresh] regardless of
+  /// the active filter: the filter narrows [MenuController.visibleRows],
+  /// never whether a refresh can be pulled (issue #49). Not offered on
+  /// the failed-fetch or still-loading states in [_body], which have no
+  /// scrollable list to pull down in the first place; the dedicated retry
+  /// button there covers a hard failure instead.
+  Widget _refreshable(MenuController controller, Widget child) {
+    return RefreshIndicator(onRefresh: controller.refresh, child: child);
   }
 
   /// The venue name and keto score (issue #29's header row,
@@ -521,6 +541,26 @@ class _MenuScreenState extends State<MenuScreen> {
       isScrollControlled: true,
       builder: (_) =>
           WaiterCardSheet(row: row, screenBrightness: widget.screenBrightness),
+    );
+  }
+
+  /// Opens [NoteEditorSheet] for [row]'s dish as a modal, saving or
+  /// clearing the note through this screen's [MenuController] (issue
+  /// #52). Reads the controller once, before the sheet opens, rather than
+  /// inside the builder: a bottom sheet's `builder` is not itself
+  /// rebuilt by `context.watch` the way this screen's own `build` is, so
+  /// the callbacks below close over the controller instance directly.
+  Future<void> _openNoteEditor(DishRow row) {
+    final controller = context.read<MenuController>();
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => NoteEditorSheet(
+        dishName: row.dish.name,
+        initialNote: controller.noteFor(row.dish.id),
+        onSave: (note) => unawaited(controller.setNote(row.dish.id, note)),
+        onClear: () => unawaited(controller.clearNote(row.dish.id)),
+      ),
     );
   }
 }
