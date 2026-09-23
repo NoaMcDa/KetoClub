@@ -16,6 +16,7 @@ import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
+import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
 
@@ -400,6 +401,89 @@ void main() {
       expect(find.byType(VerdictCounterTiles), findsOneWidget);
       expect(find.byType(EngineChip), findsOneWidget);
       expect(find.byType(DishCard), findsNWidgets(2));
+    });
+
+    testWidgets('a RulesEngine result shows the RulesReasonBanner with '
+        'analysisFailureMessage and a Settings action for consentWithheld '
+        '(issue #119)', (tester) async {
+      // Arrange
+      final green = _dish('Steak', id: 'green');
+      final repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: _menuOf([green])));
+      final classifier = FakeMenuClassifier()
+        ..respondWith(
+          MenuAnalysed(
+            dishes: [_verdictFor(green, DishVerdict.orderAsIs)],
+            unclassified: const <String>[],
+            engine: const RulesEngine(
+              reason: MenuAnalysisFailureReason.consentWithheld,
+            ),
+            analysedAt: DateTime.utc(2026),
+          ),
+        );
+      final controller = _controllerFor(
+        repository: repository,
+        classifier: classifier,
+      );
+      final pushedNames = <String>[];
+
+      // Act
+      await _pumpWithRoutes(tester, controller, pushedNames);
+      await tester.pumpAndSettle();
+
+      // Assert: the full sentence renders, not only the engine chip's
+      // short reason.
+      expect(find.byType(RulesReasonBanner), findsOneWidget);
+      expect(
+        find.text(
+          analysisFailureMessage(
+            MenuAnalysisFailureReason.consentWithheld,
+            _en,
+          ),
+        ),
+        findsOneWidget,
+      );
+      expect(find.text(_en.actionOpenSettings), findsOneWidget);
+
+      // Act: tap the Settings action.
+      await tester.tap(find.text(_en.actionOpenSettings));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(pushedNames, contains('/settings'));
+    });
+
+    testWidgets('an LlmEngine result shows no RulesReasonBanner (issue #119)', (
+      tester,
+    ) async {
+      // Arrange
+      final green = _dish('Steak', id: 'green');
+      final repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: _menuOf([green])));
+      final classifier = FakeMenuClassifier()
+        ..respondWith(
+          MenuAnalysed(
+            dishes: [_verdictFor(green, DishVerdict.orderAsIs)],
+            unclassified: const <String>[],
+            engine: const LlmEngine(model: 'test-model'),
+            analysedAt: DateTime.utc(2026),
+          ),
+        );
+      final controller = _controllerFor(
+        repository: repository,
+        classifier: classifier,
+      );
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert: EngineChip still shows the AI result, but the sentence
+      // banner is only for a rules result.
+      expect(find.byType(EngineChip), findsOneWidget);
+      for (final reason in MenuAnalysisFailureReason.values) {
+        expect(find.text(analysisFailureMessage(reason, _en)), findsNothing);
+      }
     });
 
     testWidgets(
