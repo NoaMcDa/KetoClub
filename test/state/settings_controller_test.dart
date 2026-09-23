@@ -340,4 +340,117 @@ void main() {
       expect(count, 2);
     });
   });
+
+  group('SettingsController dietary toggles (issue #56)', () {
+    late FakeSettingsStore settings;
+    late SettingsController controller;
+
+    setUp(() {
+      settings = FakeSettingsStore();
+      controller = SettingsController(settings, FakeMenuRepository());
+    });
+
+    test('every toggle is off before load', () {
+      // Assert
+      expect(controller.seedOilFree, isFalse);
+      expect(controller.dairyFree, isFalse);
+      expect(controller.carnivoreOnly, isFalse);
+    });
+
+    test('load populates every toggle', () async {
+      // Arrange
+      await settings.write(
+        const AppSettings(seedOilFree: true, dairyFree: true),
+      );
+
+      // Act
+      await controller.load();
+
+      // Assert
+      expect(controller.seedOilFree, isTrue);
+      expect(controller.dairyFree, isTrue);
+      expect(controller.carnivoreOnly, isFalse);
+    });
+
+    test('setSeedOilFree persists the toggle without clobbering the other '
+        'settings', () async {
+      // Arrange
+      await controller.setLanguage('he');
+      await controller.setNetCarbLimit(9);
+
+      // Act
+      await controller.setSeedOilFree(enabled: true);
+
+      // Assert
+      expect(controller.seedOilFree, isTrue);
+      final stored = await settings.read();
+      expect(stored.seedOilFree, isTrue);
+      expect(stored.dairyFree, isFalse);
+      expect(stored.carnivoreOnly, isFalse);
+      expect(stored.languageTag, equals('he'));
+      expect(stored.netCarbLimitGrams, equals(9));
+    });
+
+    test('setDairyFree persists the toggle and leaves the others', () async {
+      // Arrange
+      await controller.setSeedOilFree(enabled: true);
+
+      // Act
+      await controller.setDairyFree(enabled: true);
+
+      // Assert
+      expect(controller.dairyFree, isTrue);
+      final stored = await settings.read();
+      expect(stored.dairyFree, isTrue);
+      expect(stored.seedOilFree, isTrue);
+      expect(stored.carnivoreOnly, isFalse);
+    });
+
+    test(
+      'setCarnivoreOnly persists the toggle and leaves the others',
+      () async {
+        // Act
+        await controller.setCarnivoreOnly(enabled: true);
+
+        // Assert
+        expect(controller.carnivoreOnly, isTrue);
+        final stored = await settings.read();
+        expect(stored.carnivoreOnly, isTrue);
+        expect(stored.seedOilFree, isFalse);
+        expect(stored.dairyFree, isFalse);
+      },
+    );
+
+    test('each setter turns its toggle back off', () async {
+      // Arrange
+      await controller.setSeedOilFree(enabled: true);
+      await controller.setDairyFree(enabled: true);
+      await controller.setCarnivoreOnly(enabled: true);
+
+      // Act
+      await controller.setSeedOilFree(enabled: false);
+      await controller.setDairyFree(enabled: false);
+      await controller.setCarnivoreOnly(enabled: false);
+
+      // Assert
+      final stored = await settings.read();
+      expect(stored.seedOilFree, isFalse);
+      expect(stored.dairyFree, isFalse);
+      expect(stored.carnivoreOnly, isFalse);
+    });
+
+    test('each setter toggles isBusy true then false', () async {
+      // Arrange
+      final states = <bool>[];
+      controller.addListener(() => states.add(controller.isBusy));
+
+      // Act
+      await controller.setSeedOilFree(enabled: true);
+      await controller.setDairyFree(enabled: true);
+      await controller.setCarnivoreOnly(enabled: true);
+
+      // Assert
+      expect(states, [true, false, true, false, true, false]);
+    });
+  });
 }

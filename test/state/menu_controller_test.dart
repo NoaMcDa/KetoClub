@@ -1880,4 +1880,164 @@ void main() {
       expect(classifier.calls, hasLength(1));
     });
   });
+
+  // Issue #56: the dietary toggles reach the classifier as prompt
+  // fragments in ClassificationOptions.dietaryConstraints, and so ride
+  // issue #57's options-snapshot comparison: a changed toggle re-analyses,
+  // an unchanged one spends nothing. Driven through the real
+  // CachedMenuRepository over a FakeMenuCache, like the group above.
+  group('MenuController dietary toggles (issue #56)', () {
+    final steak = _dish('Steak');
+    final menu = _menuOf([steak]);
+
+    late FakeMenuCache cache;
+    late CachedMenuRepository repository;
+    late FakeMenuClassifier classifier;
+    late FakeSettingsStore settings;
+
+    setUp(() {
+      cache = FakeMenuCache();
+      repository = CachedMenuRepository(
+        adapters: [FakePlatformMenuAdapter()..queueFetched(menu)],
+        cache: cache,
+        // Same instant as the menu's fetchedAt, so every later open is a
+        // fresh cache hit and the menu itself is not refetched.
+        clock: FakeClock(DateTime.utc(2026)),
+      );
+      classifier = FakeMenuClassifier()
+        ..derivedEngine = const LlmEngine(model: 'served-model');
+      settings = FakeSettingsStore(
+        initial: const AppSettings(estimationConsentGiven: true),
+      );
+    });
+
+    /// A fresh controller over the shared repository, as a new visit to
+    /// the menu screen would build.
+    MenuController newController() =>
+        MenuController(repository, classifier, settings, FakeNotesStore());
+
+    test('open passes every toggle on as its prompt fragment, in the fixed '
+        'order', () async {
+      // Arrange
+      await settings.write(
+        const AppSettings(
+          estimationConsentGiven: true,
+          carnivoreOnly: true,
+          seedOilFree: true,
+          dairyFree: true,
+        ),
+      );
+
+      // Act
+      await newController().open(_ref);
+
+      // Assert
+      expect(
+        classifier.calls.single.$2.dietaryConstraints,
+        equals([
+          seedOilFreePromptFragment,
+          dairyFreePromptFragment,
+          carnivoreOnlyPromptFragment,
+        ]),
+      );
+    });
+
+    test('open with every toggle off passes no dietary constraint', () async {
+      // Act
+      await newController().open(_ref);
+
+      // Assert
+      expect(classifier.calls.single.$2.dietaryConstraints, isEmpty);
+    });
+
+    test('unchanged toggles reuse the cached analysis on the next open, '
+        'spending no classifier call', () async {
+      // Arrange
+      await settings.write(
+        const AppSettings(estimationConsentGiven: true, dairyFree: true),
+      );
+      final first = newController();
+      await first.open(_ref);
+
+      // Act
+      final reopened = newController();
+      await reopened.open(_ref);
+
+      // Assert
+      expect(classifier.calls, hasLength(1));
+      expect(reopened.analysis, equals(first.analysis));
+    });
+
+    for (final (name, turnedOn) in <(String, AppSettings)>[
+      (
+        'seed-oil free',
+        const AppSettings(estimationConsentGiven: true, seedOilFree: true),
+      ),
+      (
+        'dairy-free',
+        const AppSettings(estimationConsentGiven: true, dairyFree: true),
+      ),
+      (
+        'carnivore only',
+        const AppSettings(estimationConsentGiven: true, carnivoreOnly: true),
+      ),
+    ]) {
+      test('turning $name on re-analyses on the next open, and caches the '
+          'new result with the toggle recorded', () async {
+        // Arrange
+        await newController().open(_ref);
+        await settings.write(turnedOn);
+
+        // Act
+        await newController().open(_ref);
+
+        // Assert
+        expect(classifier.calls, hasLength(2));
+        final constraints = classifier.calls.last.$2.dietaryConstraints;
+        expect(constraints, hasLength(1));
+        final cached = await cache.read(_ref);
+        expect(
+          (cached!.analysis! as MenuAnalysed).options?.dietaryConstraints,
+          equals(constraints),
+        );
+      });
+    }
+
+    test('turning a toggle back off re-analyses rather than reusing the '
+        'result made with it on', () async {
+      // Arrange
+      await settings.write(
+        const AppSettings(estimationConsentGiven: true, carnivoreOnly: true),
+      );
+      await newController().open(_ref);
+      await settings.write(const AppSettings(estimationConsentGiven: true));
+
+      // Act
+      await newController().open(_ref);
+
+      // Assert
+      expect(classifier.calls, hasLength(2));
+      expect(classifier.calls.last.$2.dietaryConstraints, isEmpty);
+    });
+
+    test('refresh with an unchanged fingerprint still reclassifies when a '
+        'toggle changed since open', () async {
+      // Arrange
+      final controller = newController();
+      await controller.open(_ref);
+      await settings.write(
+        const AppSettings(estimationConsentGiven: true, seedOilFree: true),
+      );
+
+      // Act
+      await controller.refresh();
+
+      // Assert
+      expect(classifier.calls, hasLength(2));
+      expect(
+        classifier.calls.last.$2.dietaryConstraints,
+        equals([seedOilFreePromptFragment]),
+      );
+    });
+  });
 }

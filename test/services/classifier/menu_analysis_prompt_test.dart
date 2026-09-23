@@ -577,4 +577,77 @@ void main() {
       });
     });
   });
+
+  group('MenuAnalysisPrompt.systemPrompt dietary toggles (issue #56)', () {
+    /// The options MenuController builds for these three toggles.
+    ClassificationOptions togglesOn({
+      bool seedOilFree = false,
+      bool dairyFree = false,
+      bool carnivoreOnly = false,
+    }) => ClassificationOptions(
+      dietaryConstraints: ClassificationOptions.dietaryConstraintsFor(
+        seedOilFree: seedOilFree,
+        dairyFree: dairyFree,
+        carnivoreOnly: carnivoreOnly,
+      ),
+    );
+
+    test('with every toggle off the prompt is byte-for-byte the default '
+        'one, so the server keeps its default cache key', () {
+      // Act
+      final prompt = MenuAnalysisPrompt.systemPrompt(options: togglesOn());
+
+      // Assert
+      expect(prompt, equals(MenuAnalysisPrompt.systemPrompt()));
+      expect(prompt, isNot(contains('dietary constraints')));
+    });
+
+    for (final (name, options, fragment)
+        in <(String, ClassificationOptions, String)>[
+          (
+            'seed-oil free',
+            togglesOn(seedOilFree: true),
+            seedOilFreePromptFragment,
+          ),
+          ('dairy-free', togglesOn(dairyFree: true), dairyFreePromptFragment),
+          (
+            'carnivore only',
+            togglesOn(carnivoreOnly: true),
+            carnivoreOnlyPromptFragment,
+          ),
+        ]) {
+      test('$name alone appends exactly its fragment after the default '
+          'prompt', () {
+        // Act
+        final prompt = MenuAnalysisPrompt.systemPrompt(options: options);
+
+        // Assert
+        expect(prompt, startsWith(MenuAnalysisPrompt.systemPrompt()));
+        expect(prompt, endsWith(':\n- $fragment'));
+        expect('\n- '.allMatches(prompt), hasLength(1));
+      });
+    }
+
+    test('all three toggles append their fragments in the fixed order '
+        'seed-oil, dairy, carnivore', () {
+      // Act
+      final prompt = MenuAnalysisPrompt.systemPrompt(
+        options: togglesOn(
+          carnivoreOnly: true,
+          dairyFree: true,
+          seedOilFree: true,
+        ),
+      );
+
+      // Assert
+      expect(
+        prompt,
+        endsWith(
+          ':\n- $seedOilFreePromptFragment'
+          '\n- $dairyFreePromptFragment'
+          '\n- $carnivoreOnlyPromptFragment',
+        ),
+      );
+    });
+  });
 }

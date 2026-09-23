@@ -354,6 +354,79 @@ void main() {
       expect(result.netCarbLimitGrams, equals(25));
     });
 
+    test(
+      'an install that persisted settings before issue #56 added the '
+      'dietary toggles reads all three as off and keeps every other field',
+      () async {
+        // Arrange: the JSON shape written before the toggles existed.
+        SharedPreferences.setMockInitialValues(<String, Object>{
+          'flutter.ketoclub_settings':
+              '{"languageTag":"he","filter":"greenOnly",'
+              '"estimationConsentGiven":true,"lastVenue":null,'
+              '"themeMode":"dark","netCarbLimitGrams":9}',
+        });
+        final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
+
+        // Act
+        final result = await store.read();
+
+        // Assert
+        expect(result.seedOilFree, isFalse);
+        expect(result.dairyFree, isFalse);
+        expect(result.carnivoreOnly, isFalse);
+        expect(result.netCarbLimitGrams, equals(9));
+        expect(result.languageTag, equals('he'));
+        expect(result.estimationConsentGiven, isTrue);
+      },
+    );
+
+    test('read treats a non-boolean toggle value as off', () async {
+      // Arrange
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        'flutter.ketoclub_settings':
+            '{"languageTag":null,"filter":"all",'
+            '"estimationConsentGiven":false,"lastVenue":null,'
+            '"seedOilFree":"yes","dairyFree":1,"carnivoreOnly":true}',
+      });
+      final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
+
+      // Act
+      final result = await store.read();
+
+      // Assert
+      expect(result.seedOilFree, isFalse);
+      expect(result.dairyFree, isFalse);
+      expect(result.carnivoreOnly, isTrue);
+    });
+
+    test('AppSettings JSON round-trips the dietary toggles', () {
+      // Arrange
+      const settings = AppSettings(seedOilFree: true, carnivoreOnly: true);
+
+      // Act
+      final json = settings.toJson();
+      final decoded = AppSettings.tryFrom(json);
+
+      // Assert
+      expect(json['seedOilFree'], isTrue);
+      expect(json['dairyFree'], isFalse);
+      expect(json['carnivoreOnly'], isTrue);
+      expect(decoded, equals(settings));
+    });
+
+    test('AppSettings.tryFrom reads missing toggle keys as off', () {
+      // Act
+      final decoded = AppSettings.tryFrom(<String, Object?>{
+        'languageTag': null,
+        'filter': 'all',
+        'estimationConsentGiven': false,
+        'lastVenue': null,
+      });
+
+      // Assert
+      expect(decoded, equals(const AppSettings()));
+    });
+
     test('write then read round-trips a non-default themeMode', () async {
       // Arrange
       final store = _buildStore();

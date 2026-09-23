@@ -53,6 +53,15 @@ final class SettingsController extends ChangeNotifier {
   /// The net-carb limit in grams above which no dish is green (issue #57).
   int get netCarbLimitGrams => _appSettings.netCarbLimitGrams;
 
+  /// Whether the "Strict seed-oil free" rule is on (issue #56).
+  bool get seedOilFree => _appSettings.seedOilFree;
+
+  /// Whether the "Dairy-free keto" rule is on (issue #56).
+  bool get dairyFree => _appSettings.dairyFree;
+
+  /// Whether the "Carnivore only" rule is on (issue #56).
+  bool get carnivoreOnly => _appSettings.carnivoreOnly;
+
   /// How many menus are currently cached (issue #61's Settings section). A
   /// count of entries, never a byte figure —
   /// [MenuRepository.cachedMenuCount]'s own doc comment explains why.
@@ -144,6 +153,38 @@ final class SettingsController extends ChangeNotifier {
     _appSettings = _appSettings.copyWith(
       netCarbLimitGrams: clampNetCarbLimitGrams(grams),
     );
+    await _settings.write(_appSettings);
+
+    _isBusy = false;
+    notifyListeners();
+  }
+
+  /// Turns the "Strict seed-oil free" rule on or off (issue #56).
+  ///
+  /// Like every dietary toggle, it changes the options the next menu is
+  /// analysed under, so that open re-analyses rather than reusing a
+  /// cached result; see `MenuController.open`. Named rather than
+  /// positional for the reason [setConsent] gives.
+  Future<void> setSeedOilFree({required bool enabled}) =>
+      _update(_appSettings.copyWith(seedOilFree: enabled));
+
+  /// Turns the "Dairy-free keto" rule on or off (issue #56). See
+  /// [setSeedOilFree].
+  Future<void> setDairyFree({required bool enabled}) =>
+      _update(_appSettings.copyWith(dairyFree: enabled));
+
+  /// Turns the "Carnivore only" rule on or off (issue #56). See
+  /// [setSeedOilFree].
+  Future<void> setCarnivoreOnly({required bool enabled}) =>
+      _update(_appSettings.copyWith(carnivoreOnly: enabled));
+
+  /// Replaces the held settings with [next] and persists them, marking
+  /// [isBusy] around the write exactly as every other setter here does.
+  Future<void> _update(AppSettings next) async {
+    _isBusy = true;
+    notifyListeners();
+
+    _appSettings = next;
     await _settings.write(_appSettings);
 
     _isBusy = false;
