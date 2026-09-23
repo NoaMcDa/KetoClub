@@ -1176,7 +1176,9 @@ void main() {
 
         // Act: drag the list down far and fast enough to cross
         // RefreshIndicator's trigger threshold.
-        await tester.fling(find.byType(ListView), const Offset(0, 300), 1000);
+        // RefreshIndicator arms once the overscroll passes a sixth of the
+        // viewport, which is ~260 px on the tall test surface _pump sets.
+        await tester.fling(find.byType(ListView), const Offset(0, 600), 1000);
         await tester.pump();
         await tester.pump(const Duration(seconds: 1));
         await tester.pumpAndSettle();
@@ -1222,7 +1224,9 @@ void main() {
         final loadCallsBefore = repository.loadCalls.length;
 
         // Act
-        await tester.fling(find.byType(ListView), const Offset(0, 300), 1000);
+        // RefreshIndicator arms once the overscroll passes a sixth of the
+        // viewport, which is ~260 px on the tall test surface _pump sets.
+        await tester.fling(find.byType(ListView), const Offset(0, 600), 1000);
         await tester.pump();
         await tester.pump(const Duration(seconds: 1));
         await tester.pumpAndSettle();
@@ -1509,19 +1513,24 @@ void main() {
           // for the same category, far down the list, has not been built.
           expect(find.text('Category 7'), findsOneWidget);
 
-          // Act
+          // Act: the eighth chip sits past the right edge of the chip
+          // row, so scroll it into view first — a tap on an off-screen
+          // widget lands on nothing.
+          await tester.ensureVisible(find.text('Category 7'));
+          await tester.pumpAndSettle();
           await tester.tap(find.text('Category 7'));
           await tester.pumpAndSettle();
 
-          // Assert: the header is now built and on screen. The chip row
-          // scrolls with the list, so it has left the built range by now
-          // and the one match is the header, not the chip.
-          final header = find.text('Category 7');
-          expect(header, findsOneWidget);
-          expect(
-            find.descendant(of: find.byType(ActionChip), matching: header),
-            findsNothing,
+          // Assert: the header (the styled Text; the chip's label has no
+          // style of its own) is now built and on screen.
+          final header = find.byWidgetPredicate(
+            (widget) =>
+                widget is Text &&
+                widget.data == 'Category 7' &&
+                widget.style != null,
+            description: "the 'Category 7' heading",
           );
+          expect(header, findsOneWidget);
           final headerRect = tester.getRect(header);
           final screen = tester.getRect(find.byType(MenuScreen));
           expect(screen.overlaps(headerRect), isTrue);
