@@ -7,6 +7,7 @@
   "actionOpenSettings": "Open Settings",
   "actionCopy": "Copy",
   "actionCopied": "Copied",
+  "actionRefreshMenu": "Refresh menu",
 
   "venueSearchLabel": "Restaurant link",
   "venueSearchHint": "Paste a Wolt link, or a venue slug",
