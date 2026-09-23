@@ -515,4 +515,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noteEditorClear => 'Clear note';
+
+  @override
+  String get menuSearchHint => 'Search dishes';
+
+  @override
+  String get menuSearchSemanticLabel => 'Search dishes by name or description';
+
+  @override
+  String get menuSearchClear => 'Clear search';
+
+  @override
+  String get menuNoResults => 'No dishes match your search.';
+
+  @override
+  String categoryChipSemanticLabel(String category) {
+    return 'Jump to $category';
+  }
 }

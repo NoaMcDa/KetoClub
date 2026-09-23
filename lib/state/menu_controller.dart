@@ -105,6 +105,7 @@ final class MenuController extends ChangeNotifier {
   bool _isFromCache = false;
   MenuFetchFailureReason? _staleReason;
   MenuFilter _filter = MenuFilter.all;
+  String _query = '';
   VenueRef? _openRef;
   Map<String, String> _dishNotes = const <String, String>{};
 
@@ -248,14 +249,23 @@ final class MenuController extends ChangeNotifier {
   /// Which verdicts [visibleRows] keeps.
   MenuFilter get filter => _filter;
 
-  /// The dishes to render, honouring [filter].
+  /// The user's search text over a dish's name and description (issue
+  /// #51). Combines with [filter] in [visibleRows]: both must match for a
+  /// dish to show. `''` (the default) matches every dish.
+  String get query => _query;
+
+  /// The dishes to render, honouring [filter] and, once it is non-blank,
+  /// [query].
   ///
   /// [MenuFilter.greenOnly] keeps [DishVerdict.orderAsIs] dishes;
   /// [MenuFilter.yellowOnly] keeps [DishVerdict.modifiable] ones;
   /// [MenuFilter.redOnly] keeps [DishVerdict.nonKeto] ones;
   /// [MenuFilter.greenAndYellow] keeps the first two together (see its own
   /// doc: no longer offered by a control, but still honoured); and
-  /// [MenuFilter.all] keeps every dish, judged or not.
+  /// [MenuFilter.all] keeps every dish, judged or not. Independently,
+  /// [query] — normalised through [TextNormaliser.normalise], so it is
+  /// case- and niqqud-insensitive — must appear in the dish's normalised
+  /// name or description; a blank [query] applies no such test.
   ///
   /// **Issue #29 replaced the menu screen's separate, always-shown
   /// "collapsed red group" with [MenuFilter.redOnly] as a tile like any
@@ -267,22 +277,28 @@ final class MenuController extends ChangeNotifier {
   /// instead.
   ///
   /// **When there is no successful analysis, every dish is returned with a
-  /// null verdict, whatever the filter says.** A filter selects verdicts, and
-  /// with no analysis there are none to select, so applying it would return an
-  /// empty list and a failed analysis would cost the user the menu — which
-  /// architecture.md §6.6 forbids. Keeping that rule here rather than in a
-  /// screen means no screen has to reach around this controller to rebuild
-  /// rows for itself.
+  /// null verdict, whatever the filter says** — [query] still applies. A
+  /// filter selects verdicts, and with no analysis there are none to select,
+  /// so applying it would return an empty list and a failed analysis would
+  /// cost the user the menu — which architecture.md §6.6 forbids. Keeping
+  /// that rule here rather than in a screen means no screen has to reach
+  /// around this controller to rebuild rows for itself.
   List<DishRow> get visibleRows {
     final currentMenu = _menu;
     if (currentMenu == null) return const <DishRow>[];
-    if (analysis is! MenuAnalysed) return _allRows(currentMenu);
+    final normalisedQuery = TextNormaliser.normalise(_query);
+    if (analysis is! MenuAnalysed) {
+      return _allRows(currentMenu)
+          .where((row) => _matchesQuery(row.dish, normalisedQuery))
+          .toList();
+    }
     final analysedById = _analysedById();
     final rows = <DishRow>[];
     for (final category in currentMenu.categories) {
       for (final dish in category.dishes) {
         final verdict = analysedById[dish.id];
         if (!_matchesFilter(verdict)) continue;
+        if (!_matchesQuery(dish, normalisedQuery)) continue;
         rows.add(
           DishRow(dish: dish, category: category.name, analysis: verdict),
         );
@@ -291,12 +307,40 @@ final class MenuController extends ChangeNotifier {
     return rows;
   }
 
+  /// The categories that still have at least one row in [visibleRows], in
+  /// menu order (issue #51's category jump) — the same order
+  /// [visibleRows] itself already walks categories in, so this needs no
+  /// filter logic of its own beyond reading that result.
+  List<String> get visibleCategories {
+    final seen = <String>{};
+    final ordered = <String>[];
+    for (final row in visibleRows) {
+      if (seen.add(row.category)) ordered.add(row.category);
+    }
+    return ordered;
+  }
+
   /// Every dish in [menu] as an unjudged row, in category order.
   List<DishRow> _allRows(Menu menu) => <DishRow>[
     for (final category in menu.categories)
       for (final dish in category.dishes)
         DishRow(dish: dish, category: category.name),
   ];
+
+  /// Whether [dish]'s name or description contains [normalisedQuery] once
+  /// both are run through [TextNormaliser.normalise] — the same
+  /// case-fold/niqqud-strip/whitespace-collapse pipeline the heuristic
+  /// classifier and the cache fingerprint already share (issue #51). An
+  /// empty [normalisedQuery] (the common case: no search typed) matches
+  /// every dish, so [visibleRows] does no extra work when [query] is
+  /// blank.
+  bool _matchesQuery(Dish dish, String normalisedQuery) {
+    if (normalisedQuery.isEmpty) return true;
+    final haystack =
+        '${TextNormaliser.normalise(dish.name)} '
+        '${TextNormaliser.normalise(dish.description)}';
+    return haystack.contains(normalisedQuery);
+  }
 
   /// Dish names [analysis] saw on the menu but could not place, shown
   /// under their own heading regardless of [filter] (architecture.md
@@ -572,6 +616,14 @@ final class MenuController extends ChangeNotifier {
     notifyListeners();
     final appSettings = await _settings.read();
     await _settings.write(appSettings.copyWith(lastFilter: filter));
+  }
+
+  /// Changes [query] and notifies listeners (issue #51). Does not refetch
+  /// or reclassify — matching is done on [menu]'s already-loaded text, not
+  /// sent anywhere.
+  void setQuery(String query) {
+    _query = query;
+    notifyListeners();
   }
 
   /// Saves [note] as the personal note for [dishId] on the open venue
