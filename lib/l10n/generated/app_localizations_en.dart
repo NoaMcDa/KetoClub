@@ -390,6 +390,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String menuOpenOnPlatform(String platform) {
+    return 'Open on $platform';
+  }
+
+  @override
   String menuShowingAll(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
