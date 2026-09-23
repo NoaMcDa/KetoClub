@@ -30,6 +30,9 @@ dependencies:
   # Raises screen brightness while the Waiter Card is open so a waiter can read
   # it across a table; restored on close, and a no-op on web.
   screen_brightness: ^2.1.11
+  # Shares the classified menu's text summary through the platform's own
+  # share sheet (issue #54).
+  share_plus: ^13.3.0
   # Non-secret settings: filters, language, consent, last venue.
   shared_preferences: ^2.5.5
   # Opens the venue on its source platform.

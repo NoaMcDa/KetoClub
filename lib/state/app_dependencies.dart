@@ -4,6 +4,7 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
+import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -30,6 +31,7 @@ class AppDependencies {
     required this.clock,
     required this.logger,
     required this.externalLinkOpener,
+    required this.menuSharer,
     this.screenBrightness = const NoOpScreenBrightness(),
   });
 
@@ -62,4 +64,8 @@ class AppDependencies {
 
   /// Opens a venue's own page on its platform outside KetoClub (issue #53).
   final ExternalLinkOpener externalLinkOpener;
+
+  /// Shares the classified menu's green and yellow dishes as plain text
+  /// through the platform's own share sheet (issue #54).
+  final MenuSharer menuSharer;
 }

@@ -34,6 +34,7 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
+import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -82,7 +83,8 @@ final class FakeAppDependencies {
       notesStore = FlowFakeNotesStore(),
       clock = FlowFakeClock(),
       logger = FlowFakeAppLogger(),
-      externalLinkOpener = FlowFakeExternalLinkOpener();
+      externalLinkOpener = FlowFakeExternalLinkOpener(),
+      menuSharer = FlowFakeMenuSharer();
 
   /// The faked menu repository; script it with [FlowFakeMenuRepository.stub].
   final FlowFakeMenuRepository repository;
@@ -107,6 +109,9 @@ final class FakeAppDependencies {
   /// The faked external link opener.
   final FlowFakeExternalLinkOpener externalLinkOpener;
 
+  /// The faked menu sharer (issue #54).
+  final FlowFakeMenuSharer menuSharer;
+
   /// When set, [dependencies] wires this in place of [classifier].
   ///
   /// Every flow test that only needs to script "what the top-level
@@ -129,6 +134,7 @@ final class FakeAppDependencies {
     clock: clock,
     logger: logger,
     externalLinkOpener: externalLinkOpener,
+    menuSharer: menuSharer,
   );
 }
 
@@ -308,6 +314,20 @@ final class FlowFakeExternalLinkOpener implements ExternalLinkOpener {
   @override
   Future<bool> open(Uri uri) async {
     openCalls.add(uri);
+    return true;
+  }
+}
+
+/// A [MenuSharer] that records every call and never touches a real
+/// platform channel (issue #54).
+final class FlowFakeMenuSharer implements MenuSharer {
+  /// Every call [shareText] received, in call order.
+  final List<({String text, String? subject})> shareCalls =
+      <({String text, String? subject})>[];
+
+  @override
+  Future<bool> shareText(String text, {String? subject}) async {
+    shareCalls.add((text: text, subject: subject));
     return true;
   }
 }

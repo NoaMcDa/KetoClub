@@ -17,6 +17,7 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/menu_controller.dart';
+import 'package:ketoclub/utils/menu_share_text.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
@@ -29,6 +30,7 @@ import 'package:provider/provider.dart';
 import '../fakes/fake_external_link_opener.dart';
 import '../fakes/fake_menu_classifier.dart';
 import '../fakes/fake_menu_repository.dart';
+import '../fakes/fake_menu_sharer.dart';
 import '../fakes/fake_notes_store.dart';
 import '../fakes/fake_screen_brightness.dart';
 import '../fakes/fake_settings_store.dart';
@@ -115,6 +117,7 @@ Future<void> _pump(
   Locale locale = const Locale('en'),
   ScreenBrightness? screenBrightness,
   FakeExternalLinkOpener? externalLinkOpener,
+  FakeMenuSharer? menuSharer,
 }) {
   _useTallSurface(tester);
   return tester.pumpWidget(
@@ -133,6 +136,7 @@ Future<void> _pump(
           ref: ref,
           screenBrightness: screenBrightness ?? FakeScreenBrightness(),
           externalLinkOpener: externalLinkOpener ?? FakeExternalLinkOpener(),
+          menuSharer: menuSharer ?? FakeMenuSharer(),
         ),
       ),
     ),
@@ -145,8 +149,9 @@ Future<void> _pump(
 Future<void> _pumpWithRoutes(
   WidgetTester tester,
   MenuController controller,
-  List<String> pushedNames,
-) {
+  List<String> pushedNames, {
+  FakeMenuSharer? menuSharer,
+}) {
   _useTallSurface(tester);
   return tester.pumpWidget(
     MaterialApp(
@@ -158,6 +163,7 @@ Future<void> _pumpWithRoutes(
           ref: _ref,
           screenBrightness: FakeScreenBrightness(),
           externalLinkOpener: FakeExternalLinkOpener(),
+          menuSharer: menuSharer ?? FakeMenuSharer(),
         ),
       ),
       onGenerateRoute: (settings) {
@@ -1676,6 +1682,113 @@ void main() {
           expect(find.text('Skip it.'), findsOneWidget);
         },
       );
+    });
+
+    group('share action (issue #54)', () {
+      testWidgets('the share action is absent without a MenuAnalysed result', (
+        tester,
+      ) async {
+        // Arrange
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        final classifier = FakeMenuClassifier()
+          ..respondWith(
+            const MenuAnalysisFailed(
+              reason: MenuAnalysisFailureReason.badResponse,
+            ),
+          );
+        final controller = _controllerFor(
+          repository: repository,
+          classifier: classifier,
+        );
+
+        // Act
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Assert: a failed analysis has no green or yellow dish to
+        // share, so the action is hidden.
+        expect(find.byIcon(Icons.share), findsNothing);
+      });
+
+      testWidgets('the share action appears once the analysis has at least one '
+          'green or yellow dish', (tester) async {
+        // Arrange
+        final green = _dish('Steak', id: 'green');
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([green])));
+        final classifier = FakeMenuClassifier()
+          ..respondWith(
+            MenuAnalysed(
+              dishes: [_verdictFor(green, DishVerdict.orderAsIs)],
+              unclassified: const <String>[],
+              engine: const RulesEngine(
+                reason: MenuAnalysisFailureReason.notConfigured,
+              ),
+              analysedAt: DateTime.utc(2026),
+            ),
+          );
+        final controller = _controllerFor(
+          repository: repository,
+          classifier: classifier,
+        );
+
+        // Act
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byIcon(Icons.share), findsOneWidget);
+        expect(find.byTooltip(_en.actionShareMenu), findsOneWidget);
+      });
+
+      testWidgets('tapping the share action hands the sharer the text '
+          'MenuShareText.build produces', (tester) async {
+        // Arrange
+        final green = _dish('Steak', id: 'green');
+        final yellow = _dish('Fries', id: 'yellow');
+        final menu = _menuOf([green, yellow]);
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: menu));
+        final analysis = MenuAnalysed(
+          dishes: [
+            _verdictFor(green, DishVerdict.orderAsIs),
+            _verdictFor(
+              yellow,
+              DishVerdict.modifiable,
+              modification: 'Ask for a salad instead of fries.',
+            ),
+          ],
+          unclassified: const <String>[],
+          engine: const RulesEngine(
+            reason: MenuAnalysisFailureReason.notConfigured,
+          ),
+          analysedAt: DateTime.utc(2026),
+        );
+        final classifier = FakeMenuClassifier()..respondWith(analysis);
+        final controller = _controllerFor(
+          repository: repository,
+          classifier: classifier,
+        );
+        final sharer = FakeMenuSharer();
+        await _pump(tester, controller, menuSharer: sharer);
+        await tester.pumpAndSettle();
+
+        // Act
+        await tester.tap(find.byIcon(Icons.share));
+        await tester.pumpAndSettle();
+
+        // Assert: the exact text MenuShareText.build produces for the
+        // same inputs the screen itself reads — the pasted ref's own
+        // platform id, since _menuOf never sets venueName.
+        final expected = MenuShareText.build(
+          venueName: _ref.platformId,
+          menu: menu,
+          analysis: analysis,
+        );
+        expect(sharer.shareCalls, hasLength(1));
+        expect(sharer.shareCalls.single.text, equals(expected));
+      });
     });
 
     group('search and category jump (issue #51)', () {

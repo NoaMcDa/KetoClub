@@ -31,6 +31,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionRefreshMenu => 'Refresh menu';
 
   @override
+  String get actionShareMenu => 'Share menu';
+
+  @override
   String get actionCancel => 'Cancel';
 
   @override

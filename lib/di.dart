@@ -13,6 +13,7 @@ import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
+import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/install_id_store.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
@@ -144,5 +145,6 @@ AppDependencies buildDependencies() {
     logger: const DeveloperLogAppLogger(),
     screenBrightness: screenBrightness,
     externalLinkOpener: const UrlLauncherLinkOpener(),
+    menuSharer: const SharePlusMenuSharer(),
   );
 }

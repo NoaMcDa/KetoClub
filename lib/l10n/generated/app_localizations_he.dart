@@ -31,6 +31,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get actionRefreshMenu => 'רענן תפריט';
 
   @override
+  String get actionShareMenu => 'שתף תפריט';
+
+  @override
   String get actionCancel => 'ביטול';
 
   @override

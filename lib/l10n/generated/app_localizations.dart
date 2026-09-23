@@ -140,6 +140,12 @@ abstract class AppLocalizations {
   /// **'Refresh menu'**
   String get actionRefreshMenu;
 
+  /// No description provided for @actionShareMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Share menu'**
+  String get actionShareMenu;
+
   /// No description provided for @actionCancel.
   ///
   /// In en, this message translates to:
