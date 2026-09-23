@@ -41,8 +41,35 @@ Every error the route originates is `{reason, status_code}`:
 | 504 | `timeout` | Gemini did not answer within 110 s |
 
 A body that fails validation (empty prompt, prompt over its bound) is
-FastAPI's own 422. Logs carry the install id's first 8 characters and
-upstream status codes only: never the key, prompt text or an upstream body.
+FastAPI's own 422. Logs carry the install id's first 8 characters, the
+`cache=hit|miss` outcome and upstream status codes only: never the key,
+prompt text or an upstream body.
+
+#### The shared completion cache (#103)
+
+Identical menus produce identical prompts, so a completion is cached
+server-side by request hash and served to every caller who asks the same
+question — the free-tier quota (D6, 50 requests a day in the app's own
+router) goes much further this way.
+
+- **Key**: sha256 of the canonical JSON (sorted keys, no whitespace) of
+  `{model, system_prompt, user_prompt, response_schema, schema_name}`,
+  using the server's own `GEMINI_MODEL`. The key is stable across dict key
+  order, including inside a nested `response_schema`.
+- **Lookup order**: the cache is checked first — before the Authorization
+  rejection's sibling checks have any cost, before the rate limiter and
+  before the "no key configured" check. A hit answers directly and spends
+  no install quota; a miss falls through to the limiter and then Gemini as
+  before.
+- **TTL**: `CHAT_CACHE_TTL_SECONDS` (default 86400, matching the app's own
+  `menuCacheTtl`). A row older than the TTL is a miss and is replaced.
+- **What is cached**: only a successful (200) completion — `content` and
+  `model`, exactly what `ChatResponse` holds. A `BackendError` (any failure
+  reason) is never cached. The stored row holds no install id and no
+  install-identifying data at all; the cache serves every install
+  identically once warm.
+- **Header**: every `/v1/chat` response carries `X-KetoClub-Cache: hit` or
+  `miss`, exposed to browser JS via CORS `expose_headers`.
 
 ## The Wolt menu proxy
 
