@@ -14,7 +14,7 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 class MenuSearchField extends StatefulWidget {
   /// Creates a search field that reports every change, including the
   /// clear button's tap, through [onChanged].
-  const MenuSearchField({required this.onChanged, super.key});
+  const new({required this.onChanged, super.key});
 
   /// Called with the field's current text on every change. Called with
   /// `''` when the clear button is tapped, even if the field already read
@@ -58,7 +58,7 @@ class _MenuSearchFieldState extends State<MenuSearchField> {
           // with no extra state to keep in sync.
           suffixIcon: ValueListenableBuilder<TextEditingValue>(
             valueListenable: _controller,
-            builder: (_, value, __) => value.text.isEmpty
+            builder: (_, value, _) => value.text.isEmpty
                 ? const SizedBox.shrink()
                 : IconButton(
                     icon: const Icon(Icons.clear),

@@ -16,11 +16,7 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 class CategoryChips extends StatelessWidget {
   /// Creates a chip row for [categories], reporting a tap through
   /// [onSelected].
-  const CategoryChips({
-    required this.categories,
-    required this.onSelected,
-    super.key,
-  });
+  const new({required this.categories, required this.onSelected, super.key});
 
   /// The categories to show a chip for, in the order they should appear.
   final List<String> categories;
@@ -37,7 +33,7 @@ class CategoryChips extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (_, index) {
           final category = categories[index];
           return Semantics(

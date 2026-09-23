@@ -1383,5 +1383,120 @@ void main() {
         },
       );
     });
+
+    group('search and category jump (issue #51)', () {
+      testWidgets('typing in the search field narrows the dish cards', (
+        tester,
+      ) async {
+        // Arrange
+        final steak = _dish('Grilled Steak', id: 'steak');
+        final salad = _dish('Greek Salad', id: 'salad');
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([steak, salad])));
+        final controller = _controllerFor(repository: repository);
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+        expect(find.byType(DishCard), findsNWidgets(2));
+
+        // Act
+        await tester.enterText(find.byType(TextField), 'steak');
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(DishCard), findsOneWidget);
+        expect(find.text('Grilled Steak'), findsOneWidget);
+        expect(find.text('Greek Salad'), findsNothing);
+      });
+
+      testWidgets(
+        'a search with no matching dish shows menuNoResults instead of an '
+        'empty list',
+        (tester) async {
+          // Arrange
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+          final controller = _controllerFor(repository: repository);
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+
+          // Act
+          await tester.enterText(find.byType(TextField), 'sushi');
+          await tester.pumpAndSettle();
+
+          // Assert
+          expect(find.byType(DishCard), findsNothing);
+          expect(find.text(_en.menuNoResults), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'clearing the search field with its clear button restores every '
+        'dish card',
+        (tester) async {
+          // Arrange
+          final steak = _dish('Grilled Steak', id: 'steak');
+          final salad = _dish('Greek Salad', id: 'salad');
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([steak, salad])));
+          final controller = _controllerFor(repository: repository);
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+          await tester.enterText(find.byType(TextField), 'steak');
+          await tester.pumpAndSettle();
+          expect(find.byType(DishCard), findsOneWidget);
+
+          // Act
+          await tester.tap(find.byIcon(Icons.clear));
+          await tester.pumpAndSettle();
+
+          // Assert
+          expect(find.byType(DishCard), findsNWidgets(2));
+        },
+      );
+
+      testWidgets(
+        "tapping a category chip brings that category's header on screen "
+        '— it is not there before the tap, since a ListView is lazy and '
+        'this menu is long enough to keep it off the built range',
+        (tester) async {
+          // Arrange: eight categories of five dishes each — long enough
+          // that the last category's header is not yet in the element
+          // tree when the screen first settles.
+          final categories = <MenuCategory>[
+            for (var c = 0; c < 8; c++)
+              MenuCategory(
+                id: 'cat$c',
+                name: 'Category $c',
+                dishes: [
+                  for (var d = 0; d < 5; d++) _dish('Dish $c-$d', id: 'd$c-$d'),
+                ],
+              ),
+          ];
+          final menu = Menu(
+            venueRef: _ref,
+            currency: 'ILS',
+            fetchedAt: DateTime.utc(2026),
+            categories: categories,
+          );
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: menu));
+          final controller = _controllerFor(repository: repository);
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+
+          // Assert: only the chip carries this label so far — the header
+          // for the same category, far down the list, has not been built.
+          expect(find.text('Category 7'), findsOneWidget);
+
+          // Act
+          await tester.tap(find.text('Category 7'));
+          await tester.pumpAndSettle();
+
+          // Assert: the chip and the now-built, now-visible header both
+          // carry the label.
+          expect(find.text('Category 7'), findsNWidgets(2));
+        },
+      );
+    });
   });
 }
