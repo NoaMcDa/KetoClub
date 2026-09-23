@@ -280,11 +280,11 @@ void main() {
 
         // Act
         await tester.tap(find.byTooltip(_en.savedRemove));
-        // pumpAndSettle's argument is the frame step, not elapsed time, so
-        // it returns once the SnackBar's entrance animation ends, before
-        // its auto-dismiss timer fires. Advance the clock past that timer,
-        // then settle the exit animation so `closed` completes.
-        await tester.pump();
+        // The SnackBar's auto-dismiss timer starts only once its entrance
+        // animation completes, so settle that first, then advance the fake
+        // clock past the timer, then settle the exit animation so `closed`
+        // completes and the removal is committed.
+        await tester.pumpAndSettle();
         await tester.pump(const Duration(seconds: 5));
         await tester.pumpAndSettle();
 
