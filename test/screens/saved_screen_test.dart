@@ -280,7 +280,13 @@ void main() {
 
         // Act
         await tester.tap(find.byTooltip(_en.savedRemove));
-        await tester.pumpAndSettle(const Duration(seconds: 6));
+        // pumpAndSettle's argument is the frame step, not elapsed time, so
+        // it returns once the SnackBar's entrance animation ends, before
+        // its auto-dismiss timer fires. Advance the clock past that timer,
+        // then settle the exit animation so `closed` completes.
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 5));
+        await tester.pumpAndSettle();
 
         // Assert
         expect(repository.removedRefs, [_woltRef]);
