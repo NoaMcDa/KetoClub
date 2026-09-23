@@ -532,21 +532,37 @@ def test_invalid_body_is_422_without_an_upstream_call(
 # --- rate limit ----------------------------------------------------------------
 
 
+def _prompt_variant(suffix: str) -> dict[str, object]:
+    """``_request_body()`` with a distinct ``user_prompt``.
+
+    A distinct prompt means a distinct #103 cache key, so a test that needs
+    a genuine upstream miss (rather than a cache hit) uses this instead of
+    repeating the same default body.
+    """
+    body = _request_body()
+    body["user_prompt"] = f"{_USER} {suffix}"
+    return body
+
+
 def test_over_the_per_install_limit_is_rate_limited(
     gemini: respx.MockRouter,
 ) -> None:
     route = gemini.post(_URL).mock(return_value=httpx.Response(200, json=_reply()))
 
     with _client(_settings(per_minute=1)) as client:
-        first = _post(client)
-        second = _post(client)
-        other_install = _post(client, headers={"X-KetoClub-Install-Id": "f" * 32})
+        first = _post(client, body=_prompt_variant("A"))
+        second = _post(client, body=_prompt_variant("B"))
+        other_install = _post(
+            client,
+            body=_prompt_variant("C"),
+            headers={"X-KetoClub-Install-Id": "f" * 32},
+        )
 
     assert first.status_code == 200
     assert second.status_code == 429
     assert second.json() == _error(429, "rateLimited")
     assert other_install.status_code == 200
-    assert route.call_count == 2
+    assert route.call_count == 3
 
 
 # --- logging -------------------------------------------------------------------
@@ -566,8 +582,10 @@ def test_logs_never_carry_the_key_prompts_upstream_body_or_full_install_id(
     )
 
     with caplog.at_level(logging.DEBUG):
+        # A distinct prompt on the second call: the same body would be a
+        # #103 cache hit and never reach the third mocked (500) response.
         assert _post(chat_client).status_code == 200
-        assert _post(chat_client).status_code == 502
+        assert _post(chat_client, body=_prompt_variant("second")).status_code == 502
 
     text = caplog.text
     assert _KEY not in text
