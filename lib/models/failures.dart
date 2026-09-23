@@ -37,37 +37,50 @@ enum MenuFetchFailureReason {
 /// Why menu analysis could not be produced, or fell back to the rules
 /// engine (architecture.md §6.2, §10).
 enum MenuAnalysisFailureReason {
-  /// No OpenRouter key is stored, or estimation consent was not given.
-  /// The router falls back to the rules engine; the user sees "Add an
-  /// OpenRouter key in Settings for AI analysis."
+  /// AI analysis is not available: this build has no backend URL, or
+  /// KetoClub's server has no model key configured (it answers 503). The
+  /// router falls back to the rules engine; the user sees "AI analysis is
+  /// not available on this build or server. Showing rule-based results."
   notConfigured,
 
-  /// The LLM client or router found no network route. The router falls
-  /// back to the rules engine; the user sees "Offline. Showing
-  /// rule-based results."
+  /// No network route was found — by the device's connectivity
+  /// pre-check, or by the server talking to the model provider. The
+  /// router falls back to the rules engine; the user sees "Offline.
+  /// Showing rule-based results."
   offline,
 
-  /// The LLM client waited past its 120-second budget. The router falls
-  /// back to the rules engine; the user sees "The AI model was too
-  /// slow. Showing rule-based results."
+  /// The model call waited past its 120-second budget. The router falls
+  /// back to the rules engine; the user sees "The AI model was too slow.
+  /// Showing rule-based results."
   timeout,
 
-  /// The LLM gateway answered 429. The router falls back to the rules
-  /// engine; the user sees "Daily AI limit reached for this key."
+  /// The model provider's quota is exhausted (the server answered 429).
+  /// The router falls back to the rules engine; the user sees "Daily AI
+  /// limit reached."
   rateLimited,
 
-  /// The LLM gateway answered 401 or 403. There is no rules fallback;
-  /// the user sees "Your OpenRouter key was rejected."
-  unauthorised,
-
-  /// The LLM gateway answered another 4xx/5xx, or the response parser
+  /// The server answered another error status, or the response parser
   /// rejected the body. The router falls back to the rules engine; the
   /// user sees "AI analysis failed ({detail}). Showing rule-based
   /// results."
   badResponse,
 
   /// The response parser found no dishes and nothing unclassified
-  /// either. The user sees "The AI could not identify any dishes on
-  /// this menu."
+  /// either. The only reason with no rules fallback; the user sees "The
+  /// AI could not identify any dishes on this menu."
   noDishesFound,
+
+  /// KetoClub's server could not be reached — a socket or DNS error
+  /// before any HTTP status was received. Never sent by the server
+  /// itself. The router falls back to the rules engine; the user sees
+  /// "KetoClub's server could not be reached. Showing rule-based
+  /// results."
+  backendUnreachable,
+
+  /// The user has not allowed AI analysis in Settings. Client-only: the
+  /// server is never asked, and the user can fix it themselves. The
+  /// router falls back to the rules engine; the user sees "Allow AI
+  /// analysis in Settings to analyse this menu. Showing rule-based
+  /// results."
+  consentWithheld,
 }

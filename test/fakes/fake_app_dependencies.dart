@@ -2,7 +2,6 @@ import 'package:ketoclub/state/app_dependencies.dart';
 
 import 'fake_app_logger.dart';
 import 'fake_clock.dart';
-import 'fake_key_store.dart';
 import 'fake_menu_classifier.dart';
 import 'fake_menu_repository.dart';
 import 'fake_settings_store.dart';
@@ -18,7 +17,6 @@ final class FakeAppDependencies {
   new({DateTime? startedAt})
     : repository = FakeMenuRepository(),
       classifier = FakeMenuClassifier(),
-      keyStore = FakeKeyStore(),
       settingsStore = FakeSettingsStore(),
       clock = FakeClock(startedAt ?? DateTime.utc(2026)),
       logger = FakeAppLogger();
@@ -28,9 +26,6 @@ final class FakeAppDependencies {
 
   /// The faked classifier.
   final FakeMenuClassifier classifier;
-
-  /// The faked key store; write to it to simulate a configured key.
-  final FakeKeyStore keyStore;
 
   /// The faked settings store.
   final FakeSettingsStore settingsStore;
@@ -45,7 +40,6 @@ final class FakeAppDependencies {
   AppDependencies get dependencies => AppDependencies(
     menuRepository: repository,
     menuClassifier: classifier,
-    keyStore: keyStore,
     settingsStore: settingsStore,
     clock: clock,
     logger: logger,

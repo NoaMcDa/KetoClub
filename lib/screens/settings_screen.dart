@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
@@ -8,8 +7,8 @@ import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 import 'package:provider/provider.dart';
 
-/// The Settings screen: the OpenRouter key, the AI-estimation consent
-/// disclosure, the UI language, the default menu filter, and cache
+/// The Settings screen: the AI-analysis consent disclosure, the UI
+/// language, the default menu filter, and cache
 /// clearing (architecture.md §6.6, §11, §12, §13).
 ///
 /// Reads its [SettingsController] from `provider` and calls
@@ -33,8 +32,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final TextEditingController _keyField = TextEditingController();
-
   /// Whether [SettingsController.clearCache] has completed since this
   /// screen was built, so [AppLocalizations.settingsCacheCleared] can be
   /// shown once. Local UI state, not part of [SettingsController]: the
@@ -55,12 +52,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   @override
-  void dispose() {
-    _keyField.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final controller = context.watch<SettingsController>();
@@ -76,8 +67,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _keySection(context, l10n, controller),
-            const SizedBox(height: 24),
             _consentSection(context, l10n, controller),
             const SizedBox(height: 24),
             _languageSection(context, l10n, controller),
@@ -89,76 +78,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     );
-  }
-
-  /// The OpenRouter key field, its save and delete actions, the
-  /// present/absent status line, and — on web — the storage-strength note
-  /// (architecture.md §11, §13).
-  ///
-  /// The field is [TextField.obscureText] and is never given an
-  /// `initialValue` or `controller` text derived from [controller]: the
-  /// controller exposes only [SettingsController.hasKey], never the key
-  /// itself, so there is nothing to prefill and nothing to reveal. The
-  /// field is cleared after a save completes, so a key that was just
-  /// typed does not linger on screen once it is stored.
-  Widget _keySection(
-    BuildContext context,
-    AppLocalizations l10n,
-    SettingsController controller,
-  ) {
-    final busy = controller.isBusy;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.settingsKeySection,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: _keyField,
-          obscureText: true,
-          enabled: !busy,
-          decoration: InputDecoration(hintText: l10n.settingsKeyHint),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          controller.hasKey ? l10n.settingsKeyPresent : l10n.settingsKeyAbsent,
-        ),
-        if (kIsWeb) ...[
-          const SizedBox(height: 4),
-          Text(l10n.settingsWebStorageNote),
-        ],
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          children: [
-            FilledButton(
-              onPressed: busy ? null : () => unawaited(_saveKey(controller)),
-              child: Text(l10n.settingsKeySave),
-            ),
-            if (controller.hasKey)
-              OutlinedButton(
-                onPressed: busy
-                    ? null
-                    : () => unawaited(controller.deleteKey()),
-                child: Text(l10n.settingsKeyDelete),
-              ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  /// Saves the field's current text through [controller], then clears the
-  /// field — whether or not the text was empty, since a whitespace-only
-  /// entry is already a silent no-op in [SettingsController.saveKey] and
-  /// there is nothing worth leaving behind either way.
-  Future<void> _saveKey(SettingsController controller) async {
-    final text = _keyField.text;
-    await controller.saveKey(text);
-    if (!mounted) return;
-    _keyField.clear();
   }
 
   /// The consent disclosure: what leaves the device, and the

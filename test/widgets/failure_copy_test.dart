@@ -175,33 +175,4 @@ void main() {
       });
     }
   });
-
-  group('allowsRulesFallback', () {
-    test('unauthorised is false', () {
-      // Arrange
-      const reason = MenuAnalysisFailureReason.unauthorised;
-
-      // Act
-      final allowed = allowsRulesFallback(reason);
-
-      // Assert: a rejected key must be shown as-is, never papered over.
-      expect(allowed, isFalse);
-    });
-
-    test('every other reason is true', () {
-      for (final reason in MenuAnalysisFailureReason.values) {
-        if (reason == MenuAnalysisFailureReason.unauthorised) continue;
-
-        // Act
-        final allowed = allowsRulesFallback(reason);
-
-        // Assert
-        expect(
-          allowed,
-          isTrue,
-          reason: '$reason should allow a rules fallback',
-        );
-      }
-    });
-  });
 }

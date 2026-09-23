@@ -41,12 +41,6 @@ import 'flow_support.dart';
 /// same way the app itself does.
 final AppLocalizations _en = AppLocalizationsEn();
 
-/// The OpenRouter key stubbed into the key store — a real key must be on
-/// file, and consent given, before the router ever consults connectivity
-/// (rule 1 in `classifier_router.dart` routes "no key"/"no consent"
-/// straight to the heuristic under `notConfigured`, not `offline`).
-const String _storedKey = 'sk-or-v1-flow-test-not-a-real-key';
-
 /// A plain grilled protein — confirmed elsewhere
 /// (`test/services/classifier/heuristic_menu_classifier_test.dart`) to
 /// classify `orderAsIs` under the real rule vocabulary, so this flow can
@@ -136,7 +130,9 @@ void main() {
         const ref = VenueRef(source: MenuSource.wolt, platformId: 'no-route');
         final fakes = FakeAppDependencies();
         fakes.repository.stub(ref, MenuFetched(menu: _menuOf(ref)));
-        await fakes.keyStore.write(_storedKey);
+        // Consent must be given before the router ever consults
+        // connectivity: rule 1 in `classifier_router.dart` routes "no
+        // consent" straight to the heuristic under `consentWithheld`.
         await fakes.settingsStore.write(
           const AppSettings(estimationConsentGiven: true),
         );
@@ -145,7 +141,6 @@ void main() {
         fakes.classifierOverride = RoutingMenuClassifier(
           llm,
           HeuristicMenuClassifier(clock: fakes.clock),
-          fakes.keyStore,
           connectivity,
         );
         await pumpApp(tester, fakes);
@@ -182,7 +177,9 @@ void main() {
         );
         final fakes = FakeAppDependencies();
         fakes.repository.stub(ref, MenuFetched(menu: _menuOf(ref)));
-        await fakes.keyStore.write(_storedKey);
+        // Consent must be given before the router ever consults
+        // connectivity: rule 1 in `classifier_router.dart` routes "no
+        // consent" straight to the heuristic under `consentWithheld`.
         await fakes.settingsStore.write(
           const AppSettings(estimationConsentGiven: true),
         );
@@ -194,7 +191,6 @@ void main() {
         fakes.classifierOverride = RoutingMenuClassifier(
           llm,
           HeuristicMenuClassifier(clock: fakes.clock),
-          fakes.keyStore,
           connectivity,
         );
         await pumpApp(tester, fakes);

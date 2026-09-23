@@ -7,7 +7,6 @@ import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 
 import '../../fakes/fake_connectivity.dart';
-import '../../fakes/fake_key_store.dart';
 import '../../fakes/fake_menu_classifier.dart';
 import 'menu_classifier_contract.dart';
 
@@ -78,6 +77,8 @@ const List<MenuAnalysisFailureReason> _fallbackReasons =
       MenuAnalysisFailureReason.timeout,
       MenuAnalysisFailureReason.rateLimited,
       MenuAnalysisFailureReason.badResponse,
+      MenuAnalysisFailureReason.backendUnreachable,
+      MenuAnalysisFailureReason.notConfigured,
     ];
 
 void main() {
@@ -86,54 +87,17 @@ void main() {
     () => RoutingMenuClassifier(
       FakeMenuClassifier(),
       FakeMenuClassifier(),
-      FakeKeyStore(seed: 'contract-key'),
       FakeConnectivity(),
     ),
   );
 
   group('RoutingMenuClassifier', () {
-    test('classify given no key stored returns the heuristic result stamped '
-        'notConfigured, and the LLM was never called', () async {
+    test('classify given withheld consent returns the heuristic result '
+        'stamped consentWithheld, and the LLM was never called', () async {
       // Arrange
       final llm = FakeMenuClassifier();
       final heuristic = FakeMenuClassifier();
-      final keyStore = FakeKeyStore();
-      final router = RoutingMenuClassifier(
-        llm,
-        heuristic,
-        keyStore,
-        FakeConnectivity(),
-      );
-      final menu = _menuOf([_dishNamed('dish-1', 'Salmon')]);
-      const options = ClassificationOptions(estimationConsentGiven: true);
-
-      // Act
-      final result = await router.classify(menu, options: options);
-
-      // Assert
-      expect(llm.calls, isEmpty);
-      expect(heuristic.calls, hasLength(1));
-      final analysed = result as MenuAnalysed;
-      expect(
-        analysed.engine,
-        equals(
-          const RulesEngine(reason: MenuAnalysisFailureReason.notConfigured),
-        ),
-      );
-    });
-
-    test('classify given a key but withheld consent returns the heuristic '
-        'result stamped notConfigured, and the LLM was never called', () async {
-      // Arrange
-      final llm = FakeMenuClassifier();
-      final heuristic = FakeMenuClassifier();
-      final keyStore = FakeKeyStore(seed: 'stored-key');
-      final router = RoutingMenuClassifier(
-        llm,
-        heuristic,
-        keyStore,
-        FakeConnectivity(),
-      );
+      final router = RoutingMenuClassifier(llm, heuristic, FakeConnectivity());
       final menu = _menuOf([_dishNamed('dish-1', 'Salmon')]);
 
       // Act
@@ -146,25 +110,19 @@ void main() {
       expect(
         analysed.engine,
         equals(
-          const RulesEngine(reason: MenuAnalysisFailureReason.notConfigured),
+          const RulesEngine(reason: MenuAnalysisFailureReason.consentWithheld),
         ),
       );
     });
 
-    test('classify given a key and consent, with the LLM succeeding, returns '
+    test('classify given consent, with the LLM succeeding, returns '
         "the LLM's result stamped LlmEngine", () async {
       // Arrange
       final dishes = [_dishNamed('dish-1', 'Salmon')];
       final llmResult = _llmAnalysis(dishes, model: 'served-model');
       final llm = FakeMenuClassifier()..respondWith(llmResult);
       final heuristic = FakeMenuClassifier();
-      final keyStore = FakeKeyStore(seed: 'stored-key');
-      final router = RoutingMenuClassifier(
-        llm,
-        heuristic,
-        keyStore,
-        FakeConnectivity(),
-      );
+      final router = RoutingMenuClassifier(llm, heuristic, FakeConnectivity());
       final menu = _menuOf(dishes);
       const options = ClassificationOptions(estimationConsentGiven: true);
 
@@ -189,11 +147,9 @@ void main() {
             ..respondWith(MenuAnalysisFailed(reason: reason));
           final heuristicResult = _heuristicAnalysis(dishes);
           final heuristic = FakeMenuClassifier()..respondWith(heuristicResult);
-          final keyStore = FakeKeyStore(seed: 'stored-key');
           final router = RoutingMenuClassifier(
             llm,
             heuristic,
-            keyStore,
             FakeConnectivity(),
           );
           final menu = _menuOf(dishes);
@@ -211,42 +167,6 @@ void main() {
       }
     });
 
-    test('classify given the LLM fails with unauthorised returns '
-        'MenuAnalysisFailed(unauthorised), and the heuristic was never '
-        'called', () async {
-      // Arrange
-      final llm = FakeMenuClassifier()
-        ..respondWith(
-          const MenuAnalysisFailed(
-            reason: MenuAnalysisFailureReason.unauthorised,
-          ),
-        );
-      final heuristic = FakeMenuClassifier();
-      final keyStore = FakeKeyStore(seed: 'stored-key');
-      final router = RoutingMenuClassifier(
-        llm,
-        heuristic,
-        keyStore,
-        FakeConnectivity(),
-      );
-      final menu = _menuOf([_dishNamed('dish-1', 'Salmon')]);
-      const options = ClassificationOptions(estimationConsentGiven: true);
-
-      // Act
-      final result = await router.classify(menu, options: options);
-
-      // Assert
-      expect(heuristic.calls, isEmpty);
-      expect(
-        result,
-        equals(
-          const MenuAnalysisFailed(
-            reason: MenuAnalysisFailureReason.unauthorised,
-          ),
-        ),
-      );
-    });
-
     test('classify given the LLM fails with noDishesFound returns the '
         'failure unchanged, and the heuristic was never called', () async {
       // Arrange
@@ -257,13 +177,7 @@ void main() {
           ),
         );
       final heuristic = FakeMenuClassifier();
-      final keyStore = FakeKeyStore(seed: 'stored-key');
-      final router = RoutingMenuClassifier(
-        llm,
-        heuristic,
-        keyStore,
-        FakeConnectivity(),
-      );
+      final router = RoutingMenuClassifier(llm, heuristic, FakeConnectivity());
       final menu = _menuOf([_dishNamed('dish-1', 'Salmon')]);
       const options = ClassificationOptions(estimationConsentGiven: true);
 
@@ -281,47 +195,6 @@ void main() {
         ),
       );
     });
-
-    test(
-      'classify given the LLM fails with notConfigured (unreachable in '
-      'practice) falls back to the heuristic stamped notConfigured',
-      () async {
-        // Arrange: defensive coverage of a reason `LlmMenuClassifier`
-        // never actually produces (see classifier_router.dart).
-        final dishes = [_dishNamed('dish-1', 'Salmon')];
-        final llm = FakeMenuClassifier()
-          ..respondWith(
-            const MenuAnalysisFailed(
-              reason: MenuAnalysisFailureReason.notConfigured,
-            ),
-          );
-        final heuristicResult = _heuristicAnalysis(dishes);
-        final heuristic = FakeMenuClassifier()..respondWith(heuristicResult);
-        final keyStore = FakeKeyStore(seed: 'stored-key');
-        final router = RoutingMenuClassifier(
-          llm,
-          heuristic,
-          keyStore,
-          FakeConnectivity(),
-        );
-        final menu = _menuOf(dishes);
-        const options = ClassificationOptions(estimationConsentGiven: true);
-
-        // Act
-        final result = await router.classify(menu, options: options);
-
-        // Assert
-        expect(heuristic.calls, hasLength(1));
-        final analysed = result as MenuAnalysed;
-        expect(analysed.dishes, equals(heuristicResult.dishes));
-        expect(
-          analysed.engine,
-          equals(
-            const RulesEngine(reason: MenuAnalysisFailureReason.notConfigured),
-          ),
-        );
-      },
-    );
 
     test('re-stamping keeps the heuristic result a copy, not a rebuild: '
         'unclassified names survive too', () async {
@@ -340,13 +213,7 @@ void main() {
         analysedAt: DateTime.utc(2026),
       );
       final heuristic = FakeMenuClassifier()..respondWith(heuristicResult);
-      final keyStore = FakeKeyStore(seed: 'stored-key');
-      final router = RoutingMenuClassifier(
-        llm,
-        heuristic,
-        keyStore,
-        FakeConnectivity(),
-      );
+      final router = RoutingMenuClassifier(llm, heuristic, FakeConnectivity());
       final menu = _menuOf(dishes);
       const options = ClassificationOptions(estimationConsentGiven: true);
 
@@ -375,11 +242,9 @@ void main() {
           reason: MenuAnalysisFailureReason.noDishesFound,
         );
         final heuristic = FakeMenuClassifier()..respondWith(heuristicFailure);
-        final keyStore = FakeKeyStore();
         final router = RoutingMenuClassifier(
           llm,
           heuristic,
-          keyStore,
           FakeConnectivity(),
         );
         final menu = _menuOf([_dishNamed('dish-1', 'Salmon')]);
@@ -399,14 +264,8 @@ void main() {
       final llm = FakeMenuClassifier();
       final heuristicResult = _heuristicAnalysis(dishes);
       final heuristic = FakeMenuClassifier()..respondWith(heuristicResult);
-      final keyStore = FakeKeyStore(seed: 'stored-key');
       final connectivity = FakeConnectivity(online: false);
-      final router = RoutingMenuClassifier(
-        llm,
-        heuristic,
-        keyStore,
-        connectivity,
-      );
+      final router = RoutingMenuClassifier(llm, heuristic, connectivity);
       final menu = _menuOf(dishes);
       const options = ClassificationOptions(estimationConsentGiven: true);
 
@@ -425,23 +284,17 @@ void main() {
     });
 
     test(
-      'classify given no key stamps notConfigured even when the device '
-      'is also offline: rule 1 is decided before rule 2 is ever reached',
+      'classify given withheld consent stamps consentWithheld even when the '
+      'device is also offline: rule 1 is decided before rule 2 is reached',
       () async {
         // Arrange: connectivity reports offline too, so a stamp of
-        // `offline` rather than `notConfigured` would mean rule 2 ran
+        // `offline` rather than `consentWithheld` would mean rule 2 ran
         // first — that is the only way to tell the two rules apart from
         // the outside.
         final llm = FakeMenuClassifier();
         final heuristic = FakeMenuClassifier();
-        final keyStore = FakeKeyStore();
         final connectivity = FakeConnectivity(online: false);
-        final router = RoutingMenuClassifier(
-          llm,
-          heuristic,
-          keyStore,
-          connectivity,
-        );
+        final router = RoutingMenuClassifier(llm, heuristic, connectivity);
         final menu = _menuOf([_dishNamed('dish-1', 'Salmon')]);
 
         // Act
@@ -452,7 +305,9 @@ void main() {
         expect(
           analysed.engine,
           equals(
-            const RulesEngine(reason: MenuAnalysisFailureReason.notConfigured),
+            const RulesEngine(
+              reason: MenuAnalysisFailureReason.consentWithheld,
+            ),
           ),
         );
       },
@@ -469,14 +324,8 @@ void main() {
         );
       final heuristicResult = _heuristicAnalysis(dishes);
       final heuristic = FakeMenuClassifier()..respondWith(heuristicResult);
-      final keyStore = FakeKeyStore(seed: 'stored-key');
       final connectivity = FakeConnectivity();
-      final router = RoutingMenuClassifier(
-        llm,
-        heuristic,
-        keyStore,
-        connectivity,
-      );
+      final router = RoutingMenuClassifier(llm, heuristic, connectivity);
       final menu = _menuOf(dishes);
       const options = ClassificationOptions(estimationConsentGiven: true);
 
@@ -492,6 +341,19 @@ void main() {
         analysed.engine,
         equals(const RulesEngine(reason: MenuAnalysisFailureReason.offline)),
       );
+    });
+
+    test('every reason is either a fallback reason above, noDishesFound, or '
+        "the router's own consentWithheld", () {
+      // Arrange
+      final covered = <MenuAnalysisFailureReason>{
+        ..._fallbackReasons,
+        MenuAnalysisFailureReason.noDishesFound,
+        MenuAnalysisFailureReason.consentWithheld,
+      };
+
+      // Act & Assert
+      expect(covered, equals(MenuAnalysisFailureReason.values.toSet()));
     });
   });
 }

@@ -207,14 +207,16 @@ void main() {
 
           // Assert
           final expectedReason = switch (chatReason) {
+            ChatFailureReason.notConfigured =>
+              MenuAnalysisFailureReason.notConfigured,
             ChatFailureReason.offline => MenuAnalysisFailureReason.offline,
             ChatFailureReason.timeout => MenuAnalysisFailureReason.timeout,
             ChatFailureReason.rateLimited =>
               MenuAnalysisFailureReason.rateLimited,
-            ChatFailureReason.unauthorised =>
-              MenuAnalysisFailureReason.unauthorised,
             ChatFailureReason.badResponse =>
               MenuAnalysisFailureReason.badResponse,
+            ChatFailureReason.backendUnreachable =>
+              MenuAnalysisFailureReason.backendUnreachable,
           };
           expect(result, equals(MenuAnalysisFailed(reason: expectedReason)));
         });

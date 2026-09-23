@@ -3,8 +3,8 @@
 /// Sequences three pieces it does not own: [MenuAnalysisPrompt] builds
 /// the request text and schema, [LlmChatClient] sends it, and
 /// [MenuResponseParser] turns the reply into a [MenuAnalysis]. This
-/// class touches none of the HTTP transport and never sees the
-/// OpenRouter API key — both live behind [LlmChatClient].
+/// class touches none of the HTTP transport, and none of the backend
+/// address or install id — all of that lives behind [LlmChatClient].
 library;
 
 import 'package:flutter/foundation.dart';
@@ -17,8 +17,8 @@ import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 
-/// The [ChatFailureReason] a [ChatFailed] carried, mapped 1:1 to the
-/// [MenuAnalysisFailureReason] this classifier reports for it
+/// The [ChatFailureReason] a [ChatFailed] carried, mapped 1:1 by name to
+/// the [MenuAnalysisFailureReason] this classifier reports for it
 /// (architecture.md §10).
 ///
 /// An exhaustive switch with no `default`, so a new [ChatFailureReason]
@@ -26,25 +26,27 @@ import 'package:ketoclub/services/platform/clock.dart';
 /// reason to the user.
 MenuAnalysisFailureReason _failureReasonFor(ChatFailureReason reason) {
   switch (reason) {
+    case ChatFailureReason.notConfigured:
+      return MenuAnalysisFailureReason.notConfigured;
     case ChatFailureReason.offline:
       return MenuAnalysisFailureReason.offline;
     case ChatFailureReason.timeout:
       return MenuAnalysisFailureReason.timeout;
     case ChatFailureReason.rateLimited:
       return MenuAnalysisFailureReason.rateLimited;
-    case ChatFailureReason.unauthorised:
-      return MenuAnalysisFailureReason.unauthorised;
     case ChatFailureReason.badResponse:
       return MenuAnalysisFailureReason.badResponse;
+    case ChatFailureReason.backendUnreachable:
+      return MenuAnalysisFailureReason.backendUnreachable;
   }
 }
 
 /// The LLM-backed [MenuClassifier] (architecture.md §6.2, §9).
 ///
 /// Sends exactly one chat completion per [classify] call, whatever the
-/// menu's dish count (architecture.md constraint D6: the free tier is
-/// 50 requests a day, and a per-dish call would burn a whole visit's
-/// quota on one menu). Never throws: a transport failure is reported as
+/// menu's dish count (architecture.md constraint D6: the model's daily
+/// quota is small, and a per-dish call would burn a whole visit's quota
+/// on one menu). Never throws: a transport failure is reported as
 /// [MenuAnalysisFailed] and a reply the parser rejects is reported the
 /// same way [MenuResponseParser] already reports it.
 @immutable
@@ -76,9 +78,8 @@ final class LlmMenuClassifier implements MenuClassifier {
     );
     switch (result) {
       case ChatCompleted(:final content, :final model):
-        // The model that actually served the reply, not the one asked
-        // for: OpenRouter can route a request to a different model
-        // than the one pinned in the request (architecture.md §9.3).
+        // The model the server reports as having served the reply:
+        // the app never names a model itself (architecture.md §9.3).
         return MenuResponseParser.parse(
           content,
           source: menu,

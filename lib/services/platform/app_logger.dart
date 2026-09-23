@@ -12,10 +12,6 @@ const int _warnLevel = 900;
 /// are easy to filter out of plugin noise.
 const String _logName = 'ketoclub';
 
-/// Matches an OpenRouter key wherever one appears in a string, e.g.
-/// inside an upstream error message that echoed the request header back.
-final RegExp _openRouterKeyPattern = RegExp('sk-or-[A-Za-z0-9._-]+');
-
 /// Matches a bearer/authorization header value wherever one appears in
 /// a string, case-insensitively (`bearer` and `Bearer` both occur across
 /// the platform APIs this app talks to).
@@ -24,20 +20,19 @@ final RegExp _bearerTokenPattern = RegExp(
   caseSensitive: false,
 );
 
-/// Replaces anything in [text] that looks like an OpenRouter key
-/// (`sk-or-...`) or a bearer header value (`Bearer ...`) with a fixed
-/// placeholder; everything else is returned unchanged.
+/// Replaces anything in [text] that looks like a bearer header value
+/// (`Bearer ...`) with a fixed placeholder; everything else is returned
+/// unchanged.
 ///
 /// Pure, and the one function either [AppLogger] implementation in this
 /// file may route caller-supplied text through before it reaches a real
 /// sink. This is the backstop for architecture.md §11 and §18.3's rule
-/// that the OpenRouter key must never reach a log: `OpenRouterClient` is
-/// the key's only reader and is not expected to log it, but a future
-/// caller logging a raw upstream error message (which can echo a
-/// request's own headers back) must not leak it either.
-String redactSecrets(String text) => text
-    .replaceAll(_openRouterKeyPattern, '[REDACTED]')
-    .replaceAll(_bearerTokenPattern, '[REDACTED]');
+/// that a credential must never reach a log: the app itself holds none
+/// (the model key lives on KetoClub's server), but a future caller
+/// logging a raw upstream error message (which can echo a request's own
+/// headers back) must not leak one either.
+String redactSecrets(String text) =>
+    text.replaceAll(_bearerTokenPattern, '[REDACTED]');
 
 /// The shape `dart:developer`'s `log` is called through in
 /// [DeveloperLogAppLogger], factored out so a test can inject a capture
@@ -56,8 +51,8 @@ void _developerLogSink(String message, {required int level, Object? error}) {
 }
 
 /// Structured logging through one seam (architecture.md §18.3): nothing
-/// in `services/` calls `print`, and nothing logged here may include the
-/// OpenRouter key, a bearer header, or an upstream response body.
+/// in `services/` calls `print`, and nothing logged here may include a
+/// credential, a bearer header, or an upstream response body.
 abstract interface class AppLogger {
   /// Logs a routine informational message.
   ///

@@ -8,7 +8,6 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
-import 'package:ketoclub/services/storage/key_store.dart';
 
 /// Re-stamps [heuristicResult] with a [RulesEngine] tag naming [reason],
 /// the way the router shows "why" it fell back instead of using the
@@ -34,33 +33,40 @@ MenuAnalysis _toRulesResult(
 /// Picks the LLM or heuristic engine per call, and degrades between them
 /// on failure (architecture.md §6.2).
 ///
-/// **The `Connectivity` pre-check (architecture.md §14 D10, reinstated).**
-/// Before ever building an OpenRouter request, [classify] asks
-/// [_connectivity] whether the device appears to have a route at all; a
-/// `false` reading skips the LLM call entirely — and the free-tier request
-/// it would have spent — falling straight to the heuristic stamped
-/// [MenuAnalysisFailureReason.offline]. [Connectivity.isOnline] is a hint,
-/// never a verdict, so a `true` reading that turns out wrong is not a bug in
-/// this router: the LLM call is still attempted, still fails, and still maps
-/// to the same [MenuAnalysisFailureReason.offline] through
-/// [_handleLlmFailure] below — the UI's copy cannot tell the two paths
-/// apart, and it is not supposed to be able to.
+/// Three rules, in order:
+///
+/// 1. **No consent.** When the user has not allowed AI analysis in
+///    Settings, the heuristic answers, stamped
+///    [MenuAnalysisFailureReason.consentWithheld]. Neither
+///    [_connectivity] nor [_llm] is consulted: no dish text leaves the
+///    device.
+/// 2. **The `Connectivity` pre-check (architecture.md §14 D10).** Before
+///    ever sending a request to KetoClub's server, [classify] asks
+///    [_connectivity] whether the device appears to have a route at all;
+///    a `false` reading skips the LLM call entirely, falling straight to
+///    the heuristic stamped [MenuAnalysisFailureReason.offline].
+///    [Connectivity.isOnline] is a hint, never a verdict, so a `true`
+///    reading that turns out wrong is not a bug in this router: the LLM
+///    call is still attempted and still fails with its own reason.
+/// 3. **The LLM.** Every failure except
+///    [MenuAnalysisFailureReason.noDishesFound] falls back to the
+///    heuristic with the reason carried, so the UI can say why it is
+///    showing rule-based results. Nothing pre-checks whether the server
+///    is up: the call is the probe.
 @immutable
 final class RoutingMenuClassifier implements MenuClassifier {
   /// Creates a router that sends the primary engine's requests through
-  /// [_llm], falls back to [_heuristic], checks [_keyStore] for a stored
-  /// OpenRouter key before every call, and consults [_connectivity] before
-  /// ever calling [_llm].
+  /// [_llm], falls back to [_heuristic], and consults [_connectivity]
+  /// before ever calling [_llm].
   ///
   /// Positional and private, matching every other service constructor
   /// in this layer (see `HeuristicMenuClassifier`, `MenuController`):
   /// Dart has no way to make a named initializing formal private at the
   /// call site, so the choice is positional or a suppressed lint.
-  const new(this._llm, this._heuristic, this._keyStore, this._connectivity);
+  const new(this._llm, this._heuristic, this._connectivity);
 
   final MenuClassifier _llm;
   final MenuClassifier _heuristic;
-  final KeyStore _keyStore;
   final Connectivity _connectivity;
 
   @override
@@ -68,26 +74,20 @@ final class RoutingMenuClassifier implements MenuClassifier {
     Menu menu, {
     ClassificationOptions options = const ClassificationOptions(),
   }) async {
-    final hasKey = await _keyStore.hasKey();
-    if (!hasKey || !options.estimationConsentGiven) {
-      // Rule 1 (architecture.md §6.2, §11): no key or no consent is
-      // routed to the heuristic identically — the router treats "no
-      // consent" exactly like "no key".
-      final heuristicResult = await _heuristic.classify(menu, options: options);
+    if (!options.estimationConsentGiven) {
+      // Rule 1 (architecture.md §6.2, §11): the user has not allowed dish
+      // text to leave the device, so the server is never asked.
       return _toRulesResult(
-        heuristicResult,
-        MenuAnalysisFailureReason.notConfigured,
+        await _heuristic.classify(menu, options: options),
+        MenuAnalysisFailureReason.consentWithheld,
       );
     }
 
     final online = await _connectivity.isOnline();
     if (!online) {
-      // Rule 2 (architecture.md §6.2, §14 D10 — reinstated): the device
-      // plainly has no route, so the LLM call — and the free-tier
-      // request it would spend — is skipped entirely, straight to the
-      // heuristic. Stamped with the exact reason `_handleLlmFailure`
-      // uses for a call that failed after being attempted, so the UI's
-      // copy never reveals which path produced it.
+      // Rule 2 (architecture.md §6.2, §14 D10): the device plainly has
+      // no route, so the request — and the quota it would spend — is
+      // skipped entirely, straight to the heuristic.
       return _toRulesResult(
         await _heuristic.classify(menu, options: options),
         MenuAnalysisFailureReason.offline,
@@ -107,58 +107,39 @@ final class RoutingMenuClassifier implements MenuClassifier {
 
   /// Decides what the router shows after [failed] came back from the
   /// LLM engine (architecture.md §6.2, §10).
+  ///
+  /// An exhaustive switch with no `default`, so a new reason has to be
+  /// placed on one side or the other deliberately.
   Future<MenuAnalysis> _handleLlmFailure(
     MenuAnalysisFailed failed,
     Menu menu,
     ClassificationOptions options,
   ) async {
     switch (failed.reason) {
+      case MenuAnalysisFailureReason.notConfigured:
       case MenuAnalysisFailureReason.offline:
       case MenuAnalysisFailureReason.timeout:
       case MenuAnalysisFailureReason.rateLimited:
+      case MenuAnalysisFailureReason.badResponse:
+      case MenuAnalysisFailureReason.backendUnreachable:
+      case MenuAnalysisFailureReason.consentWithheld:
         // The reason is surfaced on the rules result so the UI can say
         // why it is showing rule-based results (architecture.md §10).
+        // §6.2 says a bad response is "not silently papered over"; it is
+        // not, because the failure is named on the result, never hidden.
+        // `consentWithheld` cannot come from the LLM engine in practice —
+        // only rule 1 above produces it — but if it ever did, falling
+        // back is what that reason means.
         return _toRulesResult(
           await _heuristic.classify(menu, options: options),
           failed.reason,
         );
-      case MenuAnalysisFailureReason.badResponse:
-        // §6.2 says a bad response is "not silently papered over"; §10's
-        // table shows the user rules plus "AI analysis failed
-        // ({detail})". Both are satisfied by falling back with the
-        // reason attached, same as the three cases above: the failure
-        // is named, never hidden.
-        return _toRulesResult(
-          await _heuristic.classify(menu, options: options),
-          failed.reason,
-        );
-      case MenuAnalysisFailureReason.unauthorised:
-        // §6.2 and §10 agree this reason does not degrade: the user's
-        // key was rejected and must see that, not a quietly weaker
-        // rules-based answer. The heuristic is never called.
-        return failed;
       case MenuAnalysisFailureReason.noDishesFound:
-        // Can arise from `LlmMenuClassifier` (its parser reports this
-        // when the model saw dishes but placed none). §10's table gives
-        // it a bare failure message with "try rules" as a *manual* way
-        // out, unlike the `rules result + ...` phrasing on the four
-        // cases above — so, like `unauthorised`, this reason is
-        // returned as-is rather than auto-falling back; the heuristic
-        // is never called for it.
+        // The parser reports this when the model saw dishes but placed
+        // none. §10's table gives it a bare failure message with "try
+        // rules" as a *manual* way out, so it is returned as-is rather
+        // than auto-falling back; the heuristic is never called for it.
         return failed;
-      case MenuAnalysisFailureReason.notConfigured:
-        // Cannot arise from `LlmMenuClassifier` in practice: it is
-        // never in `_failureReasonFor`'s `ChatFailureReason` map and
-        // `MenuResponseParser` never produces it either — only the
-        // router's own rule 1 does. Handled explicitly (not as a
-        // `default`) so a real occurrence is not silently swallowed:
-        // treated the same as rule 1, since that is exactly what this
-        // reason means — fall back to the heuristic, re-stamped
-        // `notConfigured`.
-        return _toRulesResult(
-          await _heuristic.classify(menu, options: options),
-          MenuAnalysisFailureReason.notConfigured,
-        );
     }
   }
 }

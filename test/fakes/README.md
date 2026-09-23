@@ -14,7 +14,7 @@ or `fake_platform_menu_adapter.dart` for a worked example; the rules below are
 inferred from them and from the rest of the directory, not aspirational.
 
 1. **A fake is a real, minimal implementation, not a proxy.** It implements
-   the interface directly (`implements KeyStore`, `implements MenuCache`, …)
+   the interface directly (`implements SettingsStore`, `implements MenuCache`, …)
    and gives every method a small, deterministic body — usually an in-memory
    `Map` or a `List` acting as a queue. It never wraps or delegates to the real
    service.
@@ -30,7 +30,7 @@ inferred from them and from the rest of the directory, not aspirational.
    instead recorded as an `int ...CallCount` field (`writeCallCount`,
    `clearCacheCallCount`). Not every method needs a counter or a list — a pure
    read that always answers from the same in-memory state (`read()` on
-   `FakeKeyStore`, `now()` on `FakeClock`) is not interesting to have called
+   `FakeSettingsStore`, `now()` on `FakeClock`) is not interesting to have called
    twice, so it is left unrecorded; record a call only when a test could
    plausibly assert on it.
 
@@ -54,7 +54,7 @@ inferred from them and from the rest of the directory, not aspirational.
 
 4. **Naming.** The file is `test/fakes/fake_<thing>.dart`; the class is
    `Fake<Thing>`, matching the interface it implements
-   (`fake_key_store.dart` → `FakeKeyStore implements KeyStore`). A small
+   (`fake_settings_store.dart` → `FakeSettingsStore implements SettingsStore`). A small
    value type built only to hold one fake's recorded call
    (`RecordedChatRequest`) lives in the same file as the fake that produces
    it, not in its own file.
@@ -69,7 +69,7 @@ inferred from them and from the rest of the directory, not aspirational.
 
 A `..._contract.dart` file (there is one per service interface, living next
 to that interface's other tests — e.g.
-`test/services/storage/key_store_contract.dart`,
+`test/services/storage/settings_store_contract.dart`,
 `test/services/menu/platform_menu_adapter_contract.dart`,
 `test/services/classifier/menu_classifier_contract.dart`) is not itself a
 test file `flutter test` collects. It exports one function:
@@ -107,8 +107,8 @@ Every implementation of that interface — every production implementation
 *and* the fake — runs the same suite, called from its own test file:
 
 ```dart
-// test/services/storage/secure_key_store_test.dart
-runKeyStoreContract('SecureKeyStore', _buildStore);
+// test/services/storage/prefs_settings_store_test.dart
+runSettingsStoreContract('PrefsSettingsStore', _buildStore);
 
 // test/services/classifier/menu_classifier_contract_test.dart
 runMenuClassifierContract('FakeMenuClassifier', FakeMenuClassifier.new);
@@ -119,7 +119,7 @@ constructor is enough, or as a closure (`() => CachedMenuRepository(...)`)
 when the implementation needs fixtures wired in. This is what keeps a fake
 from silently drifting away from the interface it stands in for (Liskov
 substitution, `architecture.md` §18.1): the fake is held to exactly the same
-executable contract as `SecureKeyStore` or `HiveMenuCache`, not just to
+executable contract as `PrefsSettingsStore` or `HiveMenuCache`, not just to
 "implements the interface" as the analyzer checks it.
 
 A fake with no natural contract suite of its own — `FakeAppLogger` (its

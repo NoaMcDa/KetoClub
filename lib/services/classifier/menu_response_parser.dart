@@ -23,7 +23,7 @@ final RegExp _fencedJson = RegExp(
   caseSensitive: false,
 );
 
-/// Parses the LLM gateway's reply against the menu it was computed from
+/// Parses the model's reply against the menu it was computed from
 /// (architecture.md §9.4).
 ///
 /// Static, pure, and never throws: every rule below either places a

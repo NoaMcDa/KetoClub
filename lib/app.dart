@@ -172,7 +172,6 @@ Route<void>? generateRoute(
         currentIndex: AppShell.settingsIndex,
         child: ChangeNotifierProvider<SettingsController>(
           create: (_) => SettingsController(
-            dependencies.keyStore,
             dependencies.settingsStore,
             dependencies.menuRepository,
           ),

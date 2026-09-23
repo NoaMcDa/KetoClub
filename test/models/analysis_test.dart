@@ -647,10 +647,10 @@ void main() {
     test('== returns true for failures with equal fields', () {
       // Arrange
       const a = MenuAnalysisFailed(
-        reason: MenuAnalysisFailureReason.unauthorised,
+        reason: MenuAnalysisFailureReason.backendUnreachable,
       );
       const b = MenuAnalysisFailed(
-        reason: MenuAnalysisFailureReason.unauthorised,
+        reason: MenuAnalysisFailureReason.backendUnreachable,
       );
 
       // Act & Assert
