@@ -9,8 +9,10 @@ import 'package:ketoclub/services/classifier/menu_classifier.dart';
 /// [MenuAnalysed] from the menu it is given: every dish is verdict
 /// [DishVerdict.orderAsIs] with a fixed non-empty [defaultWhy], nothing
 /// is [MenuAnalysed.unclassified], and the result is stamped
-/// [RulesEngine] — so it satisfies the classifier contract suite on any
-/// input without a test having to build a result by hand. Call
+/// [derivedEngine] (a [RulesEngine] by default), recording the options it
+/// was given the way every real classifier does — so it satisfies the
+/// classifier contract suite on any input without a test having to build
+/// a result by hand. Call
 /// [respondWith] to make every subsequent call return a specific
 /// [MenuAnalysis] instead. Every call is recorded in [calls].
 class FakeMenuClassifier implements MenuClassifier {
@@ -23,6 +25,13 @@ class FakeMenuClassifier implements MenuClassifier {
       'FakeMenuClassifier default verdict; no real analysis performed.';
 
   MenuAnalysis? _scripted;
+
+  /// The engine a default-derived result is stamped with. A
+  /// [RulesEngine] unless a test needs an LLM-shaped result — the only
+  /// kind `MenuController` ever reuses from the cache (issue #57).
+  AnalysisEngine derivedEngine = const RulesEngine(
+    reason: MenuAnalysisFailureReason.notConfigured,
+  );
 
   /// Every menu and options this fake was asked to classify, in call
   /// order.
@@ -55,10 +64,9 @@ class FakeMenuClassifier implements MenuClassifier {
           ),
       ],
       unclassified: const <String>[],
-      engine: const RulesEngine(
-        reason: MenuAnalysisFailureReason.notConfigured,
-      ),
+      engine: derivedEngine,
       analysedAt: DateTime.utc(2026),
+      options: options.snapshot,
     );
   }
 }

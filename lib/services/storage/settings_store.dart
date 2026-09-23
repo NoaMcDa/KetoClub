@@ -12,6 +12,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Marks "leave this field unchanged" in [AppSettings.copyWith], distinct
@@ -47,7 +48,8 @@ enum AppThemeMode {
 }
 
 /// The user's on-device preferences (architecture.md §6.4): UI language,
-/// filter default, AI-estimation consent, and the last venue opened.
+/// filter default, AI-estimation consent, the last venue opened, the
+/// appearance (issue #58) and the net-carb limit (issue #57).
 @immutable
 final class AppSettings {
   /// Creates settings. Every field defaults to the "nothing set yet"
@@ -58,6 +60,7 @@ final class AppSettings {
     this.estimationConsentGiven = false,
     this.lastVenue,
     this.themeMode = AppThemeMode.system,
+    this.netCarbLimitGrams = defaultNetCarbLimitGrams,
   });
 
   /// Reads settings written by [toJson].
@@ -69,6 +72,13 @@ final class AppSettings {
   /// [AppThemeMode.system] rather than invalidating the whole record —
   /// unlike [filter], whose own unknown value already fails this way for
   /// data written before that field existed too.
+  ///
+  /// [netCarbLimitGrams] (issue #57) follows [themeMode]'s rule for the
+  /// same reason: a missing or non-integer value decodes to
+  /// [defaultNetCarbLimitGrams]. An integer outside
+  /// [minNetCarbLimitGrams]..[maxNetCarbLimitGrams] is clamped into that
+  /// range rather than rejected, so a hand-edited or future value still
+  /// lands on the nearest limit the stepper can show.
   static AppSettings? tryFrom(Map<String, Object?> json) {
     final rawLanguageTag = json['languageTag'];
     if (rawLanguageTag != null && rawLanguageTag is! String) return null;
@@ -89,12 +99,17 @@ final class AppSettings {
     final themeMode = rawThemeMode is String
         ? AppThemeMode.tryParse(rawThemeMode) ?? AppThemeMode.system
         : AppThemeMode.system;
+    final rawLimit = json['netCarbLimitGrams'];
+    final netCarbLimitGrams = rawLimit is int
+        ? clampNetCarbLimitGrams(rawLimit)
+        : defaultNetCarbLimitGrams;
     return AppSettings(
       languageTag: rawLanguageTag is String ? rawLanguageTag : null,
       filter: filter,
       estimationConsentGiven: rawConsent,
       lastVenue: lastVenue,
       themeMode: themeMode,
+      netCarbLimitGrams: netCarbLimitGrams,
     );
   }
 
@@ -114,6 +129,11 @@ final class AppSettings {
   /// The appearance choice: system, light, or dark (issue #58).
   final AppThemeMode themeMode;
 
+  /// The net-carb limit in grams above which no dish is green (issue #57),
+  /// within [minNetCarbLimitGrams]..[maxNetCarbLimitGrams] whenever it was
+  /// read back through [tryFrom] or set through `SettingsController`.
+  final int netCarbLimitGrams;
+
   /// Returns a copy with the given fields replaced.
   ///
   /// Omitting [languageTag] or [lastVenue] leaves the current value in
@@ -122,13 +142,14 @@ final class AppSettings {
   /// "not passed" and "passed null" can be told apart. [themeMode] has no
   /// such "clear it" meaning — it always names a real mode — so it uses
   /// the ordinary "omit to keep" default every other non-nullable field
-  /// here would use.
+  /// here would use, as does [netCarbLimitGrams].
   AppSettings copyWith({
     Object? languageTag = _unset,
     MenuFilter? filter,
     bool? estimationConsentGiven,
     Object? lastVenue = _unset,
     AppThemeMode? themeMode,
+    int? netCarbLimitGrams,
   }) => AppSettings(
     languageTag: identical(languageTag, _unset)
         ? this.languageTag
@@ -140,6 +161,7 @@ final class AppSettings {
         ? this.lastVenue
         : lastVenue as VenueRef?,
     themeMode: themeMode ?? this.themeMode,
+    netCarbLimitGrams: netCarbLimitGrams ?? this.netCarbLimitGrams,
   );
 
   /// Writes a form [tryFrom] can read back.
@@ -149,6 +171,7 @@ final class AppSettings {
     'estimationConsentGiven': estimationConsentGiven,
     'lastVenue': lastVenue?.toJson(),
     'themeMode': themeMode.name,
+    'netCarbLimitGrams': netCarbLimitGrams,
   };
 
   @override
@@ -158,7 +181,8 @@ final class AppSettings {
       other.filter == filter &&
       other.estimationConsentGiven == estimationConsentGiven &&
       other.lastVenue == lastVenue &&
-      other.themeMode == themeMode;
+      other.themeMode == themeMode &&
+      other.netCarbLimitGrams == netCarbLimitGrams;
 
   @override
   int get hashCode => Object.hash(
@@ -167,12 +191,14 @@ final class AppSettings {
     estimationConsentGiven,
     lastVenue,
     themeMode,
+    netCarbLimitGrams,
   );
 
   @override
   String toString() =>
       'AppSettings(lang: $languageTag, filter: $filter, '
-      'consent: $estimationConsentGiven, themeMode: $themeMode)';
+      'consent: $estimationConsentGiven, themeMode: $themeMode, '
+      'netCarbLimit: ${netCarbLimitGrams}g)';
 }
 
 /// On-device storage for [AppSettings] (architecture.md §6.4). Backed by

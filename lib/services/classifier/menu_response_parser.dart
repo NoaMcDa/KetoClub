@@ -55,6 +55,20 @@ abstract final class MenuResponseParser {
   ///    drops the field regardless of what the model sent.
   /// 6. `why` is truncated at [maxWhyLength], never rejected for length
   ///    alone.
+  ///
+  /// Then one post-rule (issue #57): a [DishVerdict.orderAsIs] verdict
+  /// whose own `net_carbs_estimate` exceeds [netCarbLimitGrams] contradicts
+  /// the green definition the prompt stated, so it is not kept green. It
+  /// is demoted to [DishVerdict.modifiable] when the model also sent a
+  /// usable `modification` (non-blank, within [maxModificationLength]) —
+  /// the instruction a yellow needs — and to [MenuAnalysed.unclassified]
+  /// otherwise, since a yellow without an instruction does not exist
+  /// (constraint 7). An estimate at or under the limit, or no estimate at
+  /// all, leaves the verdict alone: the limit is "N g or less", and the
+  /// parser never invents a figure the model did not send.
+  ///
+  /// Finally:
+  ///
   /// 7. Every dish in [source] the reply never mentioned is added to
   ///    [MenuAnalysed.unclassified] by name, so the user can see the
   ///    model skipped it.
@@ -68,6 +82,7 @@ abstract final class MenuResponseParser {
     required Menu source,
     required DateTime analysedAt,
     required AnalysisEngine engine,
+    int netCarbLimitGrams = defaultNetCarbLimitGrams,
   }) {
     final decoded = _decode(body);
     if (decoded == null) return _badResponse();
@@ -84,6 +99,7 @@ abstract final class MenuResponseParser {
       _processElement(
         rawDish,
         source: source,
+        netCarbLimitGrams: netCarbLimitGrams,
         placedSourceIds: placedSourceIds,
         dishes: dishes,
         unclassified: unclassified,
@@ -145,6 +161,7 @@ abstract final class MenuResponseParser {
   static void _processElement(
     Object? rawDish, {
     required Menu source,
+    required int netCarbLimitGrams,
     required Set<String> placedSourceIds,
     required List<AnalysedDish> dishes,
     required List<String> unclassified,
@@ -190,11 +207,29 @@ abstract final class MenuResponseParser {
         ? rawModification.trim()
         : null;
 
+    final hasUsableModification =
+        modification != null &&
+        modification.isNotEmpty &&
+        modification.length <= maxModificationLength;
+
+    final rawNetCarbs = rawDish['net_carbs_estimate'];
+    final netCarbsEstimate = rawNetCarbs is num ? rawNetCarbs.toDouble() : null;
+
+    var finalVerdict = verdict;
+    if (verdict == DishVerdict.orderAsIs &&
+        netCarbsEstimate != null &&
+        netCarbsEstimate > netCarbLimitGrams) {
+      // Issue #57's post-rule: the model's own figure is over the limit
+      // the prompt gave it, so this cannot stay green. With an
+      // instruction it becomes the yellow that instruction describes;
+      // without one it falls through to the demotion below, because a
+      // yellow without an instruction does not exist (constraint 7).
+      finalVerdict = DishVerdict.modifiable;
+    }
+
     String? finalModification;
-    if (verdict == DishVerdict.modifiable) {
-      if (modification == null ||
-          modification.isEmpty ||
-          modification.length > maxModificationLength) {
+    if (finalVerdict == DishVerdict.modifiable) {
+      if (!hasUsableModification) {
         // Constraint 7: a yellow without an instruction does not exist.
         // An over-length instruction is demoted, not truncated: cutting
         // a waiter script off mid-sentence could leave a shorter
@@ -209,14 +244,11 @@ abstract final class MenuResponseParser {
     // Any other verdict keeps it and drops the field: a green or red
     // carrying a `modification` is not demoted for it.
 
-    final rawNetCarbs = rawDish['net_carbs_estimate'];
-    final netCarbsEstimate = rawNetCarbs is num ? rawNetCarbs.toDouble() : null;
-
     dishes.add(
       AnalysedDish(
         dishId: matched.id,
         name: matched.name,
-        verdict: verdict,
+        verdict: finalVerdict,
         why: _truncated(why, maxWhyLength),
         modification: finalModification,
         netCarbsEstimate: netCarbsEstimate,

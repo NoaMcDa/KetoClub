@@ -7,6 +7,7 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 import 'package:ketoclub/state/theme_mode_controller.dart';
+import 'package:ketoclub/utils/constants.dart';
 import 'package:provider/provider.dart';
 
 /// Scopes a test's finder to the language section's radio group, so a
@@ -19,9 +20,19 @@ const Key languageRadioGroupKey = Key('settingsLanguageRadioGroup');
 /// same reason as [languageRadioGroupKey].
 const Key appearanceRadioGroupKey = Key('settingsAppearanceRadioGroup');
 
+/// The net-carb limit stepper's minus button (issue #57), public so a test
+/// can tap it without relying on an icon or tooltip lookup.
+const Key netCarbLimitDecreaseKey = Key('settingsNetCarbLimitDecrease');
+
+/// The net-carb limit stepper's plus button (issue #57).
+const Key netCarbLimitIncreaseKey = Key('settingsNetCarbLimitIncrease');
+
+/// The net-carb limit stepper's value label (issue #57), e.g. "6 g".
+const Key netCarbLimitValueKey = Key('settingsNetCarbLimitValue');
+
 /// The Settings screen: the AI-analysis consent disclosure, the UI
-/// language, the default menu filter, and cache
-/// clearing (architecture.md §6.6, §11, §12, §13).
+/// language, the appearance, the net-carb limit, the default menu filter,
+/// and cache clearing (architecture.md §6.6, §11, §12, §13).
 ///
 /// Reads its [SettingsController] from `provider` and calls
 /// [SettingsController.load] once, after the first frame, the same way
@@ -84,6 +95,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _languageSection(context, l10n, controller),
             const SizedBox(height: 24),
             _appearanceSection(context, l10n, controller),
+            const SizedBox(height: 24),
+            _netCarbLimitSection(context, l10n, controller),
             const SizedBox(height: 24),
             _filterSection(context, l10n, controller),
             const SizedBox(height: 24),
@@ -257,6 +270,66 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await controller.setThemeMode(mode);
     if (!context.mounted) return;
     context.read<ThemeModeController>().applyMode(mode);
+  }
+
+  /// The net-carb limit stepper (issue #57): minus, the value ("6 g"),
+  /// plus, bounded by [minNetCarbLimitGrams] and [maxNetCarbLimitGrams],
+  /// under a one-line explanation that dishes above it are never green and
+  /// that a change re-analyses the next menu opened.
+  ///
+  /// Each button is disabled at its own bound — not merely clamped on
+  /// tap — so the control shows the user where the range ends, and while
+  /// the controller is busy, so two quick taps cannot race one write.
+  /// [SettingsController.setNetCarbLimit] clamps as well, so the bound
+  /// holds even for a caller that is not this stepper.
+  Widget _netCarbLimitSection(
+    BuildContext context,
+    AppLocalizations l10n,
+    SettingsController controller,
+  ) {
+    final busy = controller.isBusy;
+    final grams = controller.netCarbLimitGrams;
+    final canDecrease = !busy && grams > minNetCarbLimitGrams;
+    final canIncrease = !busy && grams < maxNetCarbLimitGrams;
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.settingsNetCarbLimit, style: theme.textTheme.titleMedium),
+        const SizedBox(height: 8),
+        Text(l10n.settingsNetCarbLimitBody),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            IconButton.outlined(
+              key: netCarbLimitDecreaseKey,
+              tooltip: l10n.settingsNetCarbLimitDecrease,
+              onPressed: canDecrease
+                  ? () => unawaited(controller.setNetCarbLimit(grams - 1))
+                  : null,
+              icon: const Icon(Icons.remove),
+            ),
+            SizedBox(
+              width: 72,
+              child: Text(
+                l10n.settingsNetCarbLimitValue(grams),
+                key: netCarbLimitValueKey,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            IconButton.outlined(
+              key: netCarbLimitIncreaseKey,
+              tooltip: l10n.settingsNetCarbLimitIncrease,
+              onPressed: canIncrease
+                  ? () => unawaited(controller.setNetCarbLimit(grams + 1))
+                  : null,
+              icon: const Icon(Icons.add),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   /// The [MenuFilter] default, offering exactly the four values the menu

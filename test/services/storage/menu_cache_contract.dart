@@ -65,6 +65,33 @@ void runMenuCacheContract(String name, MenuCache Function() build) {
       expect(await cache.read(woltRef), equals(entry));
     });
 
+    test('write then read keeps the options an analysis was made under, '
+        'issue #57', () async {
+      final cache = build();
+      final entry = CachedMenu(
+        menu: _menuFor(woltRef),
+        analysis: MenuAnalysed(
+          dishes: const <AnalysedDish>[],
+          unclassified: const <String>['Mystery dish'],
+          engine: const LlmEngine(model: 'test/model'),
+          analysedAt: DateTime.utc(2026, 1, 1, 12),
+          options: const AnalysisOptionsSnapshot(
+            netCarbLimitGrams: 15,
+            dietaryConstraints: <String>['dairy-free'],
+          ),
+        ),
+      );
+
+      await cache.write(entry);
+
+      final read = await cache.read(woltRef);
+      expect(read, equals(entry));
+      expect(
+        (read!.analysis! as MenuAnalysed).options?.netCarbLimitGrams,
+        equals(15),
+      );
+    });
+
     test(
       'write then read round-trips an entry carrying a failed analysis',
       () async {

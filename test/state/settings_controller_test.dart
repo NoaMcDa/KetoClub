@@ -185,6 +185,67 @@ void main() {
       expect(controller.themeMode, equals(AppThemeMode.dark));
     });
 
+    test('initial netCarbLimitGrams before load defaults to 6 g', () {
+      // Assert
+      expect(controller.netCarbLimitGrams, equals(6));
+    });
+
+    test('load populates netCarbLimitGrams', () async {
+      // Arrange
+      await settings.write(const AppSettings(netCarbLimitGrams: 10));
+
+      // Act
+      await controller.load();
+
+      // Assert
+      expect(controller.netCarbLimitGrams, equals(10));
+    });
+
+    test('setNetCarbLimit persists the limit without clobbering the '
+        'other settings', () async {
+      // Arrange
+      await controller.setLanguage('he');
+      await controller.setThemeMode(AppThemeMode.dark);
+
+      // Act
+      await controller.setNetCarbLimit(9);
+
+      // Assert
+      expect(controller.netCarbLimitGrams, equals(9));
+      final stored = await settings.read();
+      expect(stored.netCarbLimitGrams, equals(9));
+      expect(stored.languageTag, equals('he'));
+      expect(stored.themeMode, equals(AppThemeMode.dark));
+    });
+
+    test('setNetCarbLimit clamps below 2 g and above 25 g', () async {
+      // Act
+      await controller.setNetCarbLimit(1);
+
+      // Assert
+      expect(controller.netCarbLimitGrams, equals(2));
+      expect((await settings.read()).netCarbLimitGrams, equals(2));
+
+      // Act
+      await controller.setNetCarbLimit(26);
+
+      // Assert
+      expect(controller.netCarbLimitGrams, equals(25));
+      expect((await settings.read()).netCarbLimitGrams, equals(25));
+    });
+
+    test('setNetCarbLimit toggles isBusy true then false', () async {
+      // Arrange
+      final states = <bool>[];
+      controller.addListener(() => states.add(controller.isBusy));
+
+      // Act
+      await controller.setNetCarbLimit(7);
+
+      // Assert
+      expect(states, [true, false]);
+    });
+
     test('clearCache delegates to the repository', () async {
       // Act
       await controller.clearCache();

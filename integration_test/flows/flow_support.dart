@@ -128,6 +128,12 @@ final class FlowFakeMenuRepository implements MenuRepository {
     _stubs[ref.cacheKey] = result;
   }
 
+  /// Seeds the entry [cached] reads back, so a flow can start with an
+  /// analysis already saved beside its menu (issue #57).
+  void seedCache(CachedMenu entry) {
+    _cached[entry.menu.venueRef.cacheKey] = entry;
+  }
+
   @override
   Future<MenuFetchResult> load(
     VenueRef ref, {
@@ -163,12 +169,16 @@ final class FlowFakeMenuClassifier implements MenuClassifier {
   /// Every menu this classifier was asked about, in order.
   final List<Menu> calls = <Menu>[];
 
+  /// The options each call in [calls] carried, in the same order.
+  final List<ClassificationOptions> optionCalls = <ClassificationOptions>[];
+
   /// Scripts [classify] to return [analysis] for every later call, and
   /// forgets the calls recorded so far, so a test can script mid-journey and
   /// then assert on what the app asked for afterwards.
   void respondWith(MenuAnalysis analysis) {
     _scripted = analysis;
     calls.clear();
+    optionCalls.clear();
   }
 
   @override
@@ -177,6 +187,7 @@ final class FlowFakeMenuClassifier implements MenuClassifier {
     ClassificationOptions options = const ClassificationOptions(),
   }) async {
     calls.add(menu);
+    optionCalls.add(options);
     final scripted = _scripted;
     if (scripted != null) return scripted;
     return MenuAnalysed(
@@ -194,6 +205,7 @@ final class FlowFakeMenuClassifier implements MenuClassifier {
         reason: MenuAnalysisFailureReason.notConfigured,
       ),
       analysedAt: DateTime.utc(2026),
+      options: options.snapshot,
     );
   }
 }

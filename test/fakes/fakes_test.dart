@@ -6,6 +6,7 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/utils/constants.dart';
 
 import '../services/llm/llm_chat_client_contract.dart';
 import '../services/storage/install_id_store_contract.dart';
@@ -533,6 +534,102 @@ void main() {
       expect(settings.toString(), contains('he'));
       expect(settings.toString(), contains('all'));
       expect(settings.toString(), contains('dark'));
+    });
+
+    group('netCarbLimitGrams (issue #57)', () {
+      /// The JSON an install wrote before issue #57, plus [extra].
+      Map<String, Object?> json([Map<String, Object?> extra = const {}]) =>
+          <String, Object?>{
+            'filter': 'all',
+            'estimationConsentGiven': false,
+            ...extra,
+          };
+
+      test('defaults to 6 g', () {
+        expect(
+          const AppSettings().netCarbLimitGrams,
+          equals(defaultNetCarbLimitGrams),
+        );
+      });
+
+      test('tryFrom(x.toJson()) round-trips a non-default limit', () {
+        const settings = AppSettings(netCarbLimitGrams: 12);
+
+        final result = AppSettings.tryFrom(settings.toJson());
+
+        expect(result, equals(settings));
+        expect(result!.netCarbLimitGrams, equals(12));
+      });
+
+      test('toJson writes the limit under netCarbLimitGrams', () {
+        const settings = AppSettings(netCarbLimitGrams: 9);
+
+        expect(settings.toJson()['netCarbLimitGrams'], equals(9));
+      });
+
+      test('tryFrom reads a missing limit as 6 g without invalidating '
+          'the record', () {
+        final result = AppSettings.tryFrom(json({'languageTag': 'he'}));
+
+        expect(result, isNotNull);
+        expect(result!.netCarbLimitGrams, equals(defaultNetCarbLimitGrams));
+        expect(result.languageTag, equals('he'));
+      });
+
+      test('tryFrom reads a non-integer limit as 6 g', () {
+        final asText = AppSettings.tryFrom(json({'netCarbLimitGrams': '9'}));
+        final asDouble = AppSettings.tryFrom(json({'netCarbLimitGrams': 9.5}));
+
+        expect(asText!.netCarbLimitGrams, equals(defaultNetCarbLimitGrams));
+        expect(asDouble!.netCarbLimitGrams, equals(defaultNetCarbLimitGrams));
+      });
+
+      test('tryFrom clamps a limit below 2 g up to 2 g', () {
+        final result = AppSettings.tryFrom(json({'netCarbLimitGrams': 0}));
+
+        expect(result!.netCarbLimitGrams, equals(minNetCarbLimitGrams));
+      });
+
+      test('tryFrom clamps a limit above 25 g down to 25 g', () {
+        final result = AppSettings.tryFrom(json({'netCarbLimitGrams': 90}));
+
+        expect(result!.netCarbLimitGrams, equals(maxNetCarbLimitGrams));
+      });
+
+      test('tryFrom keeps both bounds exactly', () {
+        final low = AppSettings.tryFrom(json({'netCarbLimitGrams': 2}));
+        final high = AppSettings.tryFrom(json({'netCarbLimitGrams': 25}));
+
+        expect(low!.netCarbLimitGrams, equals(2));
+        expect(high!.netCarbLimitGrams, equals(25));
+      });
+
+      test('copyWith replaces the limit, and omitting it keeps it', () {
+        const settings = AppSettings(netCarbLimitGrams: 8);
+
+        expect(
+          settings.copyWith(netCarbLimitGrams: 4).netCarbLimitGrams,
+          equals(4),
+        );
+        expect(
+          settings.copyWith(filter: MenuFilter.greenOnly).netCarbLimitGrams,
+          equals(8),
+        );
+      });
+
+      test('== returns false for settings differing in the limit', () {
+        expect(
+          const AppSettings(),
+          isNot(equals(const AppSettings(netCarbLimitGrams: 7))),
+        );
+      });
+
+      test('toString mentions the limit', () {
+        expect(
+          const AppSettings(netCarbLimitGrams: 11).toString(),
+          contains('11g'),
+        );
+      });
     });
   });
 

@@ -3,9 +3,12 @@
 ///
 /// Every model-facing rule this class states about the verdicts and the
 /// keto vocabulary is read from `constants.dart`
-/// ([promptVerdictDefinitions], [promptKetoRules]) rather than restated
-/// here, so the system prompt and the UI legend cannot drift apart
-/// (architecture.md §9.1).
+/// ([promptVerdictDefinitionsFor], [promptKetoRulesFor]) rather than
+/// restated here, so the system prompt and the UI legend cannot drift apart
+/// (architecture.md §9.1). The net-carb limit those two texts state is the
+/// caller's [ClassificationOptions.netCarbLimitGrams] (issue #57); at the
+/// default limit the prompt is byte-for-byte the one sent before the limit
+/// became a setting, so the server's chat cache keeps its default key.
 library;
 
 import 'package:ketoclub/models/analysis.dart';
@@ -14,7 +17,7 @@ import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 /// Output rules architecture.md §9.1 states beyond the verdict
-/// definitions and keto rules already in [promptKetoRules]: the
+/// definitions and keto rules already in [promptKetoRulesTemplate]: the
 /// modification/schema/format requirements that are this prompt's own
 /// contribution rather than shared vocabulary.
 const String _outputRules = '''
@@ -22,8 +25,8 @@ Every "modifiable" dish must carry a non-empty "modification" naming the exact c
 Respond with JSON matching the supplied schema and nothing else: no markdown fence, no heading, no commentary before or after the JSON object.''';
 
 /// Introduces the model's role and the three-verdict task, before
-/// [promptVerdictDefinitions] and [promptKetoRules] are appended verbatim
-/// (architecture.md §9.1).
+/// [promptVerdictDefinitionsFor] and [promptKetoRulesFor] are appended
+/// verbatim (architecture.md §9.1).
 const String _rolePreamble =
     'You are the keto-diet menu analyst for KetoClub. Classify every dish '
     'in the user message into exactly one of three verdicts.';
@@ -45,11 +48,12 @@ abstract final class MenuAnalysisPrompt {
   /// (architecture.md §9.3).
   static const String schemaName = 'menu_analysis';
 
-  /// The system prompt: [promptVerdictDefinitions] and [promptKetoRules]
-  /// verbatim from `constants.dart`, this prompt's own output rules, and
-  /// — when [options] carries any — its
-  /// [ClassificationOptions.dietaryConstraints] appended as a final
-  /// section.
+  /// The system prompt: [promptVerdictDefinitionsFor] and
+  /// [promptKetoRulesFor] verbatim from `constants.dart`, both stating
+  /// [ClassificationOptions.netCarbLimitGrams] as the green threshold
+  /// (issue #57), this prompt's own output rules, and — when [options]
+  /// carries any — its [ClassificationOptions.dietaryConstraints] appended
+  /// as a final section.
   ///
   /// The three verdicts and the keto rules are never restated or
   /// paraphrased here: they are read from `constants.dart` so the model
@@ -58,12 +62,13 @@ abstract final class MenuAnalysisPrompt {
   static String systemPrompt({
     ClassificationOptions options = const ClassificationOptions(),
   }) {
+    final limit = options.netCarbLimitGrams;
     final buffer = StringBuffer()
       ..writeln(_rolePreamble)
       ..writeln()
-      ..writeln(promptVerdictDefinitions)
+      ..writeln(promptVerdictDefinitionsFor(limit))
       ..writeln()
-      ..writeln(promptKetoRules)
+      ..writeln(promptKetoRulesFor(limit))
       ..writeln()
       ..write(_outputRules);
     final constraints = options.dietaryConstraints;

@@ -61,25 +61,71 @@ const int minOverlapWordLength = 3;
 // LLM prompt text (architecture.md §9.1)
 // ---------------------------------------------------------------------------
 
+/// The net-carb limit, in grams, a dish must not exceed to be green
+/// (`DishVerdict.orderAsIs`) when the user has not chosen one (issue #57).
+/// README.md lines 64-69's traffic-light table sets it at 6 g.
+const int defaultNetCarbLimitGrams = 6;
+
+/// The lowest net-carb limit the Settings stepper offers (issue #57). A
+/// stored value below it is clamped up to it on decode.
+const int minNetCarbLimitGrams = 2;
+
+/// The highest net-carb limit the Settings stepper offers (issue #57). A
+/// stored value above it is clamped down to it on decode.
+const int maxNetCarbLimitGrams = 25;
+
+/// The placeholder [promptVerdictDefinitionsTemplate] and
+/// [promptKetoRulesTemplate] carry where the net-carb limit goes, replaced
+/// by [promptVerdictDefinitionsFor] and [promptKetoRulesFor].
+const String netCarbLimitPlaceholder = '{limit}';
+
 /// The three verdicts and their definitions, in the model-facing English
 /// the system prompt sends verbatim (architecture.md §9.1) — so the model
 /// and the UI legend describe the same three verdicts the same way.
 /// Sourced from README.md lines 64-69 (the Traffic-Light Classification
 /// table).
-const String promptVerdictDefinitions = '''
-orderAsIs — net carbohydrates 6g or less, a healthy fat-and-protein base, and no starchy side, sugary sauce, or flour coating: order it exactly as printed.
+///
+/// A template: the green definition's net-carb figure is
+/// [netCarbLimitPlaceholder], filled by [promptVerdictDefinitionsFor] with
+/// the user's limit (issue #57), so the prompt and the legend share one
+/// text rather than forking it per limit. One line per verdict, in
+/// `DishVerdict` order; the menu screen's legend splits on that.
+const String promptVerdictDefinitionsTemplate = '''
+orderAsIs — net carbohydrates {limit}g or less, a healthy fat-and-protein base, and no starchy side, sugary sauce, or flour coating: order it exactly as printed.
 modifiable — the core protein, fish, egg, or salad is keto-compliant, but the dish arrives with a starchy side (fries, mash, rice, bread), a root vegetable (carrot, beet, corn), or a sugary sauce or glaze (teriyaki, honey, barbecue): order it with the stated substitution or removal.
 nonKeto — the dish is built on a high-carbohydrate foundation no substitution can fix, such as pasta, pizza crust, a rice bowl, noodles, a breaded or battered protein, or a pastry or dessert base: skip it.''';
 
-/// The keto rules the system prompt states alongside
-/// [promptVerdictDefinitions] (architecture.md §9.1): net-carb threshold,
-/// what makes a dish yellow, and what makes a dish red, plus the output
-/// rules the parser (architecture.md §9.4) depends on.
-const String promptKetoRules = '''
-Net carbs of 6g or less per dish make it green (orderAsIs).
+/// The keto rules the system prompt states alongside the verdict
+/// definitions (architecture.md §9.1): net-carb threshold, what makes a
+/// dish yellow, and what makes a dish red, plus the output rules the
+/// parser (architecture.md §9.4) depends on.
+///
+/// A template, like [promptVerdictDefinitionsTemplate]: the threshold is
+/// [netCarbLimitPlaceholder], filled by [promptKetoRulesFor].
+const String promptKetoRulesTemplate = '''
+Net carbs of {limit}g or less per dish make it green (orderAsIs).
 Starchy sides, root vegetables, sugary sauces and glazes, breading, and bread that only carries the dish (a bun, pita, toast) make an otherwise-compliant dish yellow (modifiable): name the exact component to remove and the exact substitute to ask for.
 Pasta, pizza, rice bowls, noodles, breaded or battered proteins, and pastry make a dish red (nonKeto), even with modifications, and get no modification text.
 Write "why" and "modification" in the language the menu is written in, each under 300 characters. Return only dishes present in the input, using their given id and exact printed name.''';
+
+/// [promptVerdictDefinitionsTemplate] with [netCarbLimitGrams] in place of
+/// [netCarbLimitPlaceholder] — the text both the system prompt and the
+/// menu screen's legend show (issue #57).
+String promptVerdictDefinitionsFor(int netCarbLimitGrams) =>
+    promptVerdictDefinitionsTemplate.replaceAll(
+      netCarbLimitPlaceholder,
+      '$netCarbLimitGrams',
+    );
+
+/// [promptKetoRulesTemplate] with [netCarbLimitGrams] in place of
+/// [netCarbLimitPlaceholder] (issue #57).
+String promptKetoRulesFor(int netCarbLimitGrams) => promptKetoRulesTemplate
+    .replaceAll(netCarbLimitPlaceholder, '$netCarbLimitGrams');
+
+/// [grams] clamped to [minNetCarbLimitGrams]..[maxNetCarbLimitGrams], the
+/// range the Settings stepper offers (issue #57).
+int clampNetCarbLimitGrams(int grams) =>
+    grams.clamp(minNetCarbLimitGrams, maxNetCarbLimitGrams);
 
 // ---------------------------------------------------------------------------
 // Verdict explanation strings (`vocabulary_spec.md` "why strings")
