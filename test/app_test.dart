@@ -6,6 +6,7 @@ import 'package:ketoclub/app.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/settings_screen.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/app_shell.dart';
@@ -137,8 +138,14 @@ void main() {
           .pushReplacementNamed(settingsRoutePath);
       await tester.pumpAndSettle();
 
-      // Act
-      final dark = find.text(_en.settingsAppearanceDark);
+      // Act: scoped to the appearance radio group, so a label the
+      // language and appearance sections happen to share can never make
+      // this finder ambiguous (settings_screen.dart's
+      // `appearanceRadioGroupKey`).
+      final dark = find.descendant(
+        of: find.byKey(appearanceRadioGroupKey),
+        matching: find.text(_en.settingsAppearanceDark),
+      );
       await tester.ensureVisible(dark);
       await tester.tap(dark);
       await tester.pumpAndSettle();

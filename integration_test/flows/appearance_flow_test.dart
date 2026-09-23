@@ -20,6 +20,15 @@ import 'flow_support.dart';
 /// same way the app itself does.
 final AppLocalizations _en = AppLocalizationsEn();
 
+/// The `find.text` match for [label], scoped to the appearance section's
+/// own radio group (`settings_screen.dart`'s `appearanceRadioGroupKey`),
+/// so a label the language and appearance sections happen to share can
+/// never make this finder ambiguous.
+Finder _appearanceOption(String label) => find.descendant(
+  of: find.byKey(appearanceRadioGroupKey),
+  matching: find.text(label),
+);
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -34,7 +43,7 @@ void main() {
 
       // Act: go to Settings and choose Dark.
       await tapAndSettle(tester, navDestination(_en.navSettings));
-      final dark = find.text(_en.settingsAppearanceDark);
+      final dark = _appearanceOption(_en.settingsAppearanceDark);
       await tester.ensureVisible(dark);
       await tapAndSettle(tester, dark);
 
@@ -57,7 +66,7 @@ void main() {
         // `KetoClubApp`'s `ThemeModeController` reads the store anew in
         // its own `initState`.
         await tapAndSettle(tester, navDestination(_en.navSettings));
-        final dark = find.text(_en.settingsAppearanceDark);
+        final dark = _appearanceOption(_en.settingsAppearanceDark);
         await tester.ensureVisible(dark);
         await tapAndSettle(tester, dark);
         await pumpApp(tester, fakes);

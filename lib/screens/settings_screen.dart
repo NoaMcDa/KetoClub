@@ -9,6 +9,16 @@ import 'package:ketoclub/state/settings_controller.dart';
 import 'package:ketoclub/state/theme_mode_controller.dart';
 import 'package:provider/provider.dart';
 
+/// Scopes a test's finder to the language section's radio group, so a
+/// label the language and appearance sections happen to share (both offer
+/// a "follow the device" choice) cannot make `find.text(...)` match two
+/// widgets. Public so tests can reach it without a brittle text lookup.
+const Key languageRadioGroupKey = Key('settingsLanguageRadioGroup');
+
+/// Scopes a test's finder to the appearance section's radio group, for the
+/// same reason as [languageRadioGroupKey].
+const Key appearanceRadioGroupKey = Key('settingsAppearanceRadioGroup');
+
 /// The Settings screen: the AI-analysis consent disclosure, the UI
 /// language, the default menu filter, and cache
 /// clearing (architecture.md §6.6, §11, §12, §13).
@@ -139,6 +149,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         RadioGroup<String?>(
+          key: languageRadioGroupKey,
           groupValue: controller.languageTag,
           onChanged: (tag) => unawaited(_setLanguage(context, controller, tag)),
           child: Column(
@@ -202,6 +213,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         RadioGroup<AppThemeMode>(
+          key: appearanceRadioGroupKey,
           groupValue: controller.themeMode,
           onChanged: (mode) =>
               unawaited(_setThemeMode(context, controller, mode)),

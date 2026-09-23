@@ -50,7 +50,7 @@
   "settingsLanguageEnglish": "אנגלית",
   "settingsLanguageHebrew": "עברית",
   "settingsAppearance": "מראה",
-  "settingsAppearanceSystem": "לפי המכשיר",
+  "settingsAppearanceSystem": "לפי ערכת הנושא של המכשיר",
   "settingsAppearanceLight": "בהיר",
   "settingsAppearanceDark": "כהה",
   "settingsFilter": "סינון ברירת מחדל",

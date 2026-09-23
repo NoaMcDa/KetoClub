@@ -125,7 +125,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settingsAppearance => 'מראה';
 
   @override
-  String get settingsAppearanceSystem => 'לפי המכשיר';
+  String get settingsAppearanceSystem => 'לפי ערכת הנושא של המכשיר';
 
   @override
   String get settingsAppearanceLight => 'בהיר';

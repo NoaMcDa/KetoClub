@@ -311,7 +311,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsAppearanceSystem.
   ///
   /// In en, this message translates to:
-  /// **'Match my device'**
+  /// **'Follow device theme'**
   String get settingsAppearanceSystem;
 
   /// No description provided for @settingsAppearanceLight.

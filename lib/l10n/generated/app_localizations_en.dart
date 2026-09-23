@@ -124,7 +124,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAppearance => 'Appearance';
 
   @override
-  String get settingsAppearanceSystem => 'Match my device';
+  String get settingsAppearanceSystem => 'Follow device theme';
 
   @override
   String get settingsAppearanceLight => 'Light';

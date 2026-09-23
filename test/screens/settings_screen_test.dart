@@ -21,6 +21,23 @@ final AppLocalizations _en = AppLocalizationsEn();
 /// The Hebrew strings for the one Locale('he') test.
 final AppLocalizations _he = AppLocalizationsHe();
 
+/// The `find.text` match for [label], scoped to the language section's
+/// radio group ([languageRadioGroupKey]), so a label that happens to
+/// match another section's (as `settingsLanguageSystem` and
+/// `settingsAppearanceSystem` once did) can never make `find.text`
+/// ambiguous.
+Finder _languageOption(String label) => find.descendant(
+  of: find.byKey(languageRadioGroupKey),
+  matching: find.text(label),
+);
+
+/// The `find.text` match for [label], scoped to the appearance section's
+/// radio group ([appearanceRadioGroupKey]); see [_languageOption].
+Finder _appearanceOption(String label) => find.descendant(
+  of: find.byKey(appearanceRadioGroupKey),
+  matching: find.text(label),
+);
+
 /// Builds the [SettingsController] the widget under test is pumped over,
 /// from fresh fakes unless the caller seeds one.
 SettingsController _controllerFor({
@@ -145,7 +162,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Act
-      final english = find.text(_en.settingsLanguageEnglish);
+      final english = _languageOption(_en.settingsLanguageEnglish);
       await tester.ensureVisible(english);
       await tester.tap(english);
       await tester.pumpAndSettle();
@@ -168,7 +185,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Act
-      final hebrew = find.text(_en.settingsLanguageHebrew);
+      final hebrew = _languageOption(_en.settingsLanguageHebrew);
       await tester.ensureVisible(hebrew);
       await tester.tap(hebrew);
       await tester.pumpAndSettle();
@@ -193,7 +210,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Act
-        final system = find.text(_en.settingsLanguageSystem);
+        final system = _languageOption(_en.settingsLanguageSystem);
         await tester.ensureVisible(system);
         await tester.tap(system);
         await tester.pumpAndSettle();
@@ -216,7 +233,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Act
-      final dark = find.text(_en.settingsAppearanceDark);
+      final dark = _appearanceOption(_en.settingsAppearanceDark);
       await tester.ensureVisible(dark);
       await tester.tap(dark);
       await tester.pumpAndSettle();
@@ -240,7 +257,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Act
-      final light = find.text(_en.settingsAppearanceLight);
+      final light = _appearanceOption(_en.settingsAppearanceLight);
       await tester.ensureVisible(light);
       await tester.tap(light);
       await tester.pumpAndSettle();
@@ -268,7 +285,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Act
-        final system = find.text(_en.settingsAppearanceSystem);
+        final system = _appearanceOption(_en.settingsAppearanceSystem);
         await tester.ensureVisible(system);
         await tester.tap(system);
         await tester.pumpAndSettle();
