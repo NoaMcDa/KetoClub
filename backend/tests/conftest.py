@@ -20,7 +20,7 @@ def settings() -> Settings:
     """Settings for tests: in-memory database, no keys configured."""
     return Settings(
         DATABASE_URL="sqlite:///:memory:",
-        OPENROUTER_API_KEY="",
+        GEMINI_API_KEY="",
         ADMIN_TOKEN="",
     )
 

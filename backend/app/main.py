@@ -17,8 +17,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import __version__
 from app.config import Settings, get_settings
 from app.db import build_engine
+from app.errors import BackendError, handle_backend_error
 from app.models import Base
-from app.routers import health
+from app.routers import chat, health, proxy
+from app.services.rate_limit import RateLimiter
 from app.services.request_logging import RequestLoggingMiddleware
 
 
@@ -49,6 +51,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     app.state.settings = resolved_settings
+    # Built here rather than in the lifespan so a test can reach it before the
+    # first request; in memory, so it resets whenever the process restarts.
+    app.state.rate_limiter = RateLimiter(
+        per_minute=resolved_settings.RATE_LIMIT_PER_MINUTE,
+        per_day=resolved_settings.RATE_LIMIT_PER_DAY,
+    )
+    app.add_exception_handler(BackendError, handle_backend_error)
 
     app.add_middleware(RequestLoggingMiddleware)
     app.add_middleware(
@@ -60,6 +69,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     app.include_router(health.router, prefix="/v1")
+    app.include_router(chat.router, prefix="/v1")
+    app.include_router(proxy.router, prefix="/v1")
 
     return app
 
