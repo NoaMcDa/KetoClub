@@ -2,6 +2,7 @@
 // journey of pasting a Wolt link and seeing the resulting menu classified
 // into keto verdicts, filtered, and turned into a waiter script.
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -108,6 +109,13 @@ _buildFixture() {
   );
 }
 
+/// The loaded menu's list. Named explicitly because the screen holds
+/// other scrollables too — the search field and the category chip row
+/// (issue #51) — and `scrollUntilVisible` needs exactly one.
+final Finder _menuList = find
+    .descendant(of: find.byType(ListView), matching: find.byType(Scrollable))
+    .first;
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -160,7 +168,11 @@ void main() {
       expect(find.textContaining('Wolt'), findsWidgets);
       expect(find.text(fixture.green.name), findsOneWidget);
       expect(find.text(fixture.yellow.name), findsOneWidget);
-      await tester.scrollUntilVisible(find.text(fixture.red.name), 200);
+      await tester.scrollUntilVisible(
+        find.text(fixture.red.name),
+        200,
+        scrollable: _menuList,
+      );
       await tester.pumpAndSettle();
       expect(find.text(fixture.red.name), findsOneWidget);
       expect(find.byType(DishCard), findsNWidgets(3));
@@ -173,6 +185,7 @@ void main() {
       await tester.scrollUntilVisible(
         find.text(_en.tileYellowLabel.toUpperCase()),
         -200,
+        scrollable: _menuList,
       );
       await tester.pumpAndSettle();
 
@@ -196,14 +209,22 @@ void main() {
       // scrolled into view before a widget below the fold is findable.
       expect(find.text(fixture.green.name), findsOneWidget);
       expect(find.text(fixture.yellow.name), findsOneWidget);
-      await tester.scrollUntilVisible(find.text(fixture.red.name), 200);
+      await tester.scrollUntilVisible(
+        find.text(fixture.red.name),
+        200,
+        scrollable: _menuList,
+      );
       await tester.pumpAndSettle();
       expect(find.text(fixture.red.name), findsOneWidget);
 
       // Act: scroll back up to the modifiable dish and open its Waiter
       // Card — the scroll above may have taken its button out of the
       // lazy list's built range.
-      await tester.scrollUntilVisible(find.text(_en.waiterCardOpen), -200);
+      await tester.scrollUntilVisible(
+        find.text(_en.waiterCardOpen),
+        -200,
+        scrollable: _menuList,
+      );
       await tester.pumpAndSettle();
       await tapAndSettle(tester, find.text(_en.waiterCardOpen));
 
