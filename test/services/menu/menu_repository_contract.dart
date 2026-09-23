@@ -133,5 +133,25 @@ void runMenuRepositoryContract(
       // Assert
       await expectLater(repository.savedMenus(), completes);
     });
+
+    test('cachedMenuCount resolves without throwing', () async {
+      await expectLater(repository.cachedMenuCount(), completes);
+    });
+
+    test('cachedMenuCount is 0 on a freshly built repository', () async {
+      // Act
+      final count = await repository.cachedMenuCount();
+
+      // Assert
+      expect(count, 0);
+    });
+
+    test('clearCache leaves cachedMenuCount at 0', () async {
+      // Act
+      await repository.clearCache();
+
+      // Assert
+      expect(await repository.cachedMenuCount(), 0);
+    });
   });
 }
