@@ -53,6 +53,12 @@ MenuAnalysis _toRulesResult(
 ///    heuristic with the reason carried, so the UI can say why it is
 ///    showing rule-based results. Nothing pre-checks whether the server
 ///    is up: the call is the probe.
+///
+/// The router announces nothing through
+/// [ClassificationOptions.onEngineStarted] itself: it passes `options`
+/// through unchanged and each engine announces itself as it starts, so
+/// a listener learns the outcome of the three rules above without any
+/// of them being restated outside this class (issue #65).
 @immutable
 final class RoutingMenuClassifier implements MenuClassifier {
   /// Creates a router that sends the primary engine's requests through
