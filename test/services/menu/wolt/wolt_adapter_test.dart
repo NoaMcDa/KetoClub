@@ -306,4 +306,274 @@ void main() {
       );
     });
   });
+
+  group('WoltMenuAdapter with a proxy base', () {
+    /// The proxied ref used throughout this group.
+    const ref = VenueRef(source: MenuSource.wolt, platformId: 'my-venue');
+
+    /// The proxy request URL a base with no trailing slash should produce.
+    final expectedProxyUri = Uri.parse(
+      'http://localhost:8000/v1/proxy/wolt/v4/venues/slug/my-venue/'
+      'menu/data',
+    );
+
+    runPlatformMenuAdapterContract(
+      'WoltMenuAdapter (proxy)',
+      () => WoltMenuAdapter(
+        client: MockClient((request) async {
+          return http.Response(_emptyMenuBody, 200);
+        }),
+        proxyBase: Uri.parse('http://localhost:8000'),
+      ),
+      refItHandles: _refItHandles,
+      refItRejects: _refItRejects,
+    );
+
+    test('fetch sends the exact proxy URL for a base with no trailing '
+        'slash', () async {
+      // Arrange
+      Uri? capturedUri;
+      final adapter = WoltMenuAdapter(
+        client: MockClient((request) async {
+          capturedUri = request.url;
+          return http.Response(_emptyMenuBody, 200);
+        }),
+        proxyBase: Uri.parse('http://localhost:8000'),
+      );
+
+      // Act
+      await adapter.fetch(ref);
+
+      // Assert
+      expect(capturedUri, equals(expectedProxyUri));
+    });
+
+    test('fetch sends the exact proxy URL for a base with a trailing '
+        'slash', () async {
+      // Arrange
+      Uri? capturedUri;
+      final adapter = WoltMenuAdapter(
+        client: MockClient((request) async {
+          capturedUri = request.url;
+          return http.Response(_emptyMenuBody, 200);
+        }),
+        proxyBase: Uri.parse('http://localhost:8000/'),
+      );
+
+      // Act
+      await adapter.fetch(ref);
+
+      // Assert
+      expect(capturedUri, equals(expectedProxyUri));
+    });
+
+    test('fetch sends no User-Agent header with a proxy configured', () async {
+      // Arrange
+      Map<String, String>? capturedHeaders;
+      final adapter = WoltMenuAdapter(
+        client: MockClient((request) async {
+          capturedHeaders = request.headers;
+          return http.Response(_emptyMenuBody, 200);
+        }),
+        proxyBase: Uri.parse('http://localhost:8000'),
+        runsInBrowser: false,
+      );
+
+      // Act
+      await adapter.fetch(ref);
+
+      // Assert: the backend sets its own User-Agent
+      // (`backend_plan.md` §3.3).
+      expect(capturedHeaders, isNotNull);
+      expect(capturedHeaders!.containsKey('User-Agent'), isFalse);
+      expect(capturedHeaders!['Accept'], equals('application/json'));
+    });
+
+    test(
+      'fetch maps a ClientException to backendUnreachable in a browser',
+      () async {
+        // Arrange
+        final adapter = WoltMenuAdapter(
+          client: MockClient((request) async {
+            throw http.ClientException('Failed to fetch', request.url);
+          }),
+          proxyBase: Uri.parse('http://localhost:8000'),
+          runsInBrowser: true,
+        );
+
+        // Act
+        final result = await adapter.fetch(ref);
+
+        // Assert: distinct from blockedByBrowser — the browser now talks to
+        // KetoClub's own origin, which grants itself CORS.
+        expect(
+          result,
+          equals(
+            const MenuFetchFailed(
+              reason: MenuFetchFailureReason.backendUnreachable,
+            ),
+          ),
+        );
+      },
+    );
+
+    test(
+      'fetch maps a ClientException to backendUnreachable outside a browser',
+      () async {
+        // Arrange
+        final adapter = WoltMenuAdapter(
+          client: MockClient((request) async {
+            throw http.ClientException('Connection failed', request.url);
+          }),
+          proxyBase: Uri.parse('http://localhost:8000'),
+          runsInBrowser: false,
+        );
+
+        // Act
+        final result = await adapter.fetch(ref);
+
+        // Assert
+        expect(
+          result,
+          equals(
+            const MenuFetchFailed(
+              reason: MenuFetchFailureReason.backendUnreachable,
+            ),
+          ),
+        );
+      },
+    );
+
+    test('fetch maps a proxy 502 to offline', () async {
+      // Arrange: the backend's own "Wolt unreachable" status
+      // (`backend_plan.md` §3.3).
+      final adapter = WoltMenuAdapter(
+        client: MockClient((request) async {
+          return http.Response('{"reason":"offline"}', 502);
+        }),
+        proxyBase: Uri.parse('http://localhost:8000'),
+      );
+
+      // Act
+      final result = await adapter.fetch(ref);
+
+      // Assert
+      expect(
+        result,
+        equals(const MenuFetchFailed(reason: MenuFetchFailureReason.offline)),
+      );
+    });
+
+    test('fetch maps a proxy 504 to offline', () async {
+      // Arrange: the backend's own "Wolt timed out" status
+      // (`backend_plan.md` §3.3).
+      final adapter = WoltMenuAdapter(
+        client: MockClient((request) async {
+          return http.Response('{"reason":"timeout"}', 504);
+        }),
+        proxyBase: Uri.parse('http://localhost:8000'),
+      );
+
+      // Act
+      final result = await adapter.fetch(ref);
+
+      // Assert
+      expect(
+        result,
+        equals(const MenuFetchFailed(reason: MenuFetchFailureReason.offline)),
+      );
+    });
+
+    test(
+      'fetch maps a TimeoutException to offline with a proxy configured',
+      () async {
+        // Arrange
+        final adapter = WoltMenuAdapter(
+          client: MockClient((request) async {
+            throw TimeoutException('Timed out');
+          }),
+          proxyBase: Uri.parse('http://localhost:8000'),
+        );
+
+        // Act
+        final result = await adapter.fetch(ref);
+
+        // Assert
+        expect(
+          result,
+          equals(const MenuFetchFailed(reason: MenuFetchFailureReason.offline)),
+        );
+      },
+    );
+
+    test('fetch maps a proxied 404 to notFound with the status code', () async {
+      // Arrange: Wolt's own 404 passes through the backend unchanged
+      // (`backend_plan.md` §3.3), so the mapping needs no change.
+      final adapter = WoltMenuAdapter(
+        client: MockClient((request) async {
+          return http.Response('not found', 404);
+        }),
+        proxyBase: Uri.parse('http://localhost:8000'),
+      );
+
+      // Act
+      final result = await adapter.fetch(ref);
+
+      // Assert
+      expect(
+        result,
+        equals(
+          const MenuFetchFailed(
+            reason: MenuFetchFailureReason.notFound,
+            statusCode: 404,
+          ),
+        ),
+      );
+    });
+
+    test(
+      'fetch maps a proxied 500 to platformChanged with the status code',
+      () async {
+        // Arrange
+        final adapter = WoltMenuAdapter(
+          client: MockClient((request) async {
+            return http.Response('server error', 500);
+          }),
+          proxyBase: Uri.parse('http://localhost:8000'),
+        );
+
+        // Act
+        final result = await adapter.fetch(ref);
+
+        // Assert
+        expect(
+          result,
+          equals(
+            const MenuFetchFailed(
+              reason: MenuFetchFailureReason.platformChanged,
+              statusCode: 500,
+            ),
+          ),
+        );
+      },
+    );
+
+    test('fetch returns a menu carrying the requested ref through a '
+        'proxy', () async {
+      // Arrange
+      final adapter = WoltMenuAdapter(
+        client: MockClient((request) async {
+          return http.Response(_emptyMenuBody, 200);
+        }),
+        proxyBase: Uri.parse('http://localhost:8000'),
+      );
+
+      // Act
+      final result = await adapter.fetch(ref);
+
+      // Assert
+      expect(result, isA<MenuFetched>());
+      expect((result as MenuFetched).menu.venueRef, equals(ref));
+    });
+  });
 }
