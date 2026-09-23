@@ -155,7 +155,7 @@ Route<void>? generateRoute(
         currentIndex: AppShell.exploreIndex,
         child: ChangeNotifierProvider<VenueSearchController>(
           create: (_) => VenueSearchController(),
-          child: const VenueSearchScreen(),
+          child: VenueSearchScreen(connectivity: dependencies.connectivity),
         ),
       ),
     );
@@ -212,6 +212,7 @@ Route<void>? generateRoute(
         child: MenuScreen(
           ref: ref,
           screenBrightness: dependencies.screenBrightness,
+          connectivity: dependencies.connectivity,
         ),
       ),
     );

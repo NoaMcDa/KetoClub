@@ -11,6 +11,7 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
+import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/theme/app_typography.dart';
@@ -18,8 +19,10 @@ import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
+import 'package:ketoclub/widgets/fetch_failure_action.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
+import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
@@ -85,7 +88,12 @@ String _definitionTextFrom(String line) {
 /// without first going back.
 class MenuScreen extends StatefulWidget {
   /// Creates a screen that loads and classifies the menu for [ref].
-  const new({required this.ref, required this.screenBrightness, super.key});
+  const new({
+    required this.ref,
+    required this.screenBrightness,
+    required this.connectivity,
+    super.key,
+  });
 
   /// Which venue, on which platform, to load a menu for.
   final VenueRef ref;
@@ -94,6 +102,9 @@ class MenuScreen extends StatefulWidget {
   /// card stays readable across a restaurant table, and restores it on
   /// close. A no-op on web, chosen in `di.dart` (architecture.md §6.6).
   final ScreenBrightness screenBrightness;
+
+  /// Backs the persistent offline banner (issue #68).
+  final Connectivity connectivity;
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -109,6 +120,14 @@ class _MenuScreenState extends State<MenuScreen> {
   /// group's expansion flag local before issue #29 replaced that group
   /// with [MenuFilter.redOnly].
   bool _legendExpanded = false;
+
+  /// Bumped on every retry action on this screen — the failed-fetch
+  /// retry, the [RulesReasonBanner] retry, and pull-to-refresh — so the
+  /// [OfflineBanner] above the body re-checks connectivity exactly when
+  /// this screen makes a fresh attempt (issue #68). [Connectivity
+  /// .isOnline] is a one-shot check, not a stream, so nothing else would
+  /// tell that banner a retry just happened.
+  int _recheckToken = 0;
 
   @override
   void initState() {
@@ -136,7 +155,15 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
         ],
       ),
-      body: _body(context, l10n, controller),
+      body: Column(
+        children: [
+          OfflineBanner(
+            connectivity: widget.connectivity,
+            recheckToken: _recheckToken,
+          ),
+          Expanded(child: _body(context, l10n, controller)),
+        ],
+      ),
     );
   }
 
@@ -151,14 +178,17 @@ class _MenuScreenState extends State<MenuScreen> {
     if (menu == null) {
       final failure = controller.fetchFailure;
       if (failure == null) return Center(child: Text(l10n.menuLoading));
-      return _fetchFailureView(l10n, controller, failure);
+      return _fetchFailureView(context, l10n, controller, failure);
     }
     return _loadedView(context, l10n, controller, menu);
   }
 
-  /// A failed fetch: [fetchFailureMessage] plus a retry affordance that
-  /// re-opens this screen's venue with `forceRefresh: true`.
+  /// A failed fetch: [fetchFailureMessage] plus the action
+  /// [failure] calls for — a [FetchFailureAction] retries the same fetch,
+  /// goes back to paste a different venue, or offers nothing at all,
+  /// depending on the reason (issue #68).
   Widget _fetchFailureView(
+    BuildContext context,
     AppLocalizations l10n,
     MenuController controller,
     MenuFetchFailureReason failure,
@@ -177,15 +207,36 @@ class _MenuScreenState extends State<MenuScreen> {
           children: [
             Text(message, textAlign: TextAlign.center),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () =>
-                  unawaited(controller.open(widget.ref, forceRefresh: true)),
-              child: Text(l10n.actionRetry),
+            FetchFailureAction(
+              reason: failure,
+              onRetry: () =>
+                  _retry(() => controller.open(widget.ref, forceRefresh: true)),
+              onBackToSearch: () => _backToSearch(context),
             ),
           ],
         ),
       ),
     );
+  }
+
+  /// Bumps [_recheckToken] — so the [OfflineBanner] above re-checks
+  /// connectivity — then runs [attempt] (issue #68). Every retry action
+  /// on this screen goes through this one place.
+  void _retry(Future<void> Function() attempt) {
+    setState(() => _recheckToken++);
+    unawaited(attempt());
+  }
+
+  /// Returns to the venue search screen: pops this route when there is
+  /// one to pop back to (the normal case — this screen is always pushed
+  /// on top of it), or replaces this route with it when there is not
+  /// (this screen reached directly, e.g. a restored deep link).
+  void _backToSearch(BuildContext context) {
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    } else {
+      Navigator.pushReplacementNamed(context, '/');
+    }
   }
 
   /// A menu that was fetched, whether or not it was analysed
@@ -269,7 +320,10 @@ class _MenuScreenState extends State<MenuScreen> {
           const SizedBox(height: 8),
           ...banners,
           if (controller.engine != null) ...[
-            RulesReasonBanner(engine: controller.engine!),
+            RulesReasonBanner(
+              engine: controller.engine!,
+              onRetry: () => _retry(controller.reanalyse),
+            ),
             EngineChip(engine: controller.engine!),
             const SizedBox(height: 12),
           ],
@@ -299,7 +353,13 @@ class _MenuScreenState extends State<MenuScreen> {
   /// scrollable list to pull down in the first place; the dedicated retry
   /// button there covers a hard failure instead.
   Widget _refreshable(MenuController controller, Widget child) {
-    return RefreshIndicator(onRefresh: controller.refresh, child: child);
+    return RefreshIndicator(
+      onRefresh: () {
+        setState(() => _recheckToken++);
+        return controller.refresh();
+      },
+      child: child,
+    );
   }
 
   /// The venue name and keto score (issue #29's header row,
@@ -370,7 +430,7 @@ class _MenuScreenState extends State<MenuScreen> {
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
           visualDensity: VisualDensity.compact,
-          onPressed: () => unawaited(controller.refresh()),
+          onPressed: () => _retry(controller.refresh),
         ),
       ],
     );

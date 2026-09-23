@@ -3,6 +3,7 @@ import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
+import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -28,6 +29,7 @@ class AppDependencies {
     required this.notesStore,
     required this.clock,
     required this.logger,
+    required this.connectivity,
     this.screenBrightness = const NoOpScreenBrightness(),
   });
 
@@ -52,6 +54,12 @@ class AppDependencies {
   /// Structured logging; never receives a credential or an upstream error
   /// body.
   final AppLogger logger;
+
+  /// Whether the device currently appears to have a route to the network
+  /// (architecture.md §14 D10). A hint, never a verdict — see
+  /// [Connectivity]'s own doc comment — used both by the classifier
+  /// router and by the persistent offline banner (issue #68).
+  final Connectivity connectivity;
 
   /// Raises and restores the screen brightness while the Waiter Card is
   /// open (architecture.md §6.3). A no-op on platforms with no brightness

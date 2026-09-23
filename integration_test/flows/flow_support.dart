@@ -33,10 +33,12 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
+import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
+import 'package:ketoclub/utils/text_normaliser.dart';
 
 /// Pumps the whole app over [fakes] and settles it.
 ///
@@ -79,7 +81,8 @@ final class FakeAppDependencies {
       settingsStore = FlowFakeSettingsStore(),
       notesStore = FlowFakeNotesStore(),
       clock = FlowFakeClock(),
-      logger = FlowFakeAppLogger();
+      logger = FlowFakeAppLogger(),
+      connectivity = FlowFakeConnectivity();
 
   /// The faked menu repository; script it with [FlowFakeMenuRepository.stub].
   final FlowFakeMenuRepository repository;
@@ -100,6 +103,10 @@ final class FakeAppDependencies {
 
   /// The faked logger.
   final FlowFakeAppLogger logger;
+
+  /// The faked connectivity check; flip [FlowFakeConnectivity.online] to
+  /// drive the persistent offline banner (issue #68).
+  final FlowFakeConnectivity connectivity;
 
   /// When set, [dependencies] wires this in place of [classifier].
   ///
@@ -122,6 +129,7 @@ final class FakeAppDependencies {
     notesStore: notesStore,
     clock: clock,
     logger: logger,
+    connectivity: connectivity,
   );
 }
 
@@ -156,9 +164,21 @@ final class FlowFakeMenuRepository implements MenuRepository {
     // a flow test that opens a venue and then visits Saved
     // (`saved_tab_flow_test.dart`) finds it there exactly as it would over
     // the real repository — a plain `MenuFetched` stub is enough; nothing
-    // has to call `saveAnalysis` first just to seed the list.
+    // has to call `saveAnalysis` first just to seed the list. And, as the
+    // real repository does (architecture.md §6.4), an analysis already
+    // cached for the same dish text survives the refetch, so a flow that
+    // seeds one (`net_carb_limit_flow_test.dart`) sees it reused rather
+    // than silently dropped.
     if (stubbed case MenuFetched(menu: final fetched)) {
-      _cached[ref.cacheKey] = CachedMenu(menu: fetched);
+      final previous = _cached[ref.cacheKey];
+      final sameMenu =
+          previous != null &&
+          TextNormaliser.menuFingerprint(previous.menu) ==
+              TextNormaliser.menuFingerprint(fetched);
+      _cached[ref.cacheKey] = CachedMenu(
+        menu: fetched,
+        analysis: sameMenu ? previous.analysis : null,
+      );
     }
     return stubbed;
   }
@@ -243,6 +263,20 @@ final class FlowFakeMenuClassifier implements MenuClassifier {
       options: options.snapshot,
     );
   }
+}
+
+/// A [Connectivity] whose answer is settable — mirrors `test/fakes`'
+/// `FakeConnectivity`, duplicated here for the reason this file's own top
+/// doc comment gives.
+final class FlowFakeConnectivity implements Connectivity {
+  /// Creates a connectivity fake reporting [online].
+  new({this.online = true});
+
+  /// Settable so a flow can flip it mid-journey.
+  bool online;
+
+  @override
+  Future<bool> isOnline() async => online;
 }
 
 /// A [SettingsStore] backed by one in-memory value.

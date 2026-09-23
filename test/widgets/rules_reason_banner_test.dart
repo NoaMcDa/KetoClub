@@ -129,5 +129,87 @@ void main() {
         );
       }
     });
+
+    group('Retry action (issue #68)', () {
+      const retryable = <MenuAnalysisFailureReason>{
+        MenuAnalysisFailureReason.offline,
+        MenuAnalysisFailureReason.timeout,
+        MenuAnalysisFailureReason.rateLimited,
+        MenuAnalysisFailureReason.badResponse,
+        MenuAnalysisFailureReason.backendUnreachable,
+      };
+
+      for (final reason in retryable) {
+        testWidgets('offers a Retry action for $reason that calls onRetry when '
+            'tapped', (tester) async {
+          // Arrange
+          var retried = false;
+          final pushedNames = <String>[];
+
+          // Act
+          await _pump(
+            tester,
+            RulesReasonBanner(
+              engine: RulesEngine(reason: reason),
+              onRetry: () => retried = true,
+            ),
+            pushedNames,
+          );
+
+          // Assert
+          expect(find.text(_en.actionRetry), findsOneWidget);
+
+          // Act
+          await tester.tap(find.text(_en.actionRetry));
+          await tester.pump();
+
+          // Assert
+          expect(retried, isTrue);
+        });
+      }
+
+      for (final reason in [
+        MenuAnalysisFailureReason.notConfigured,
+        MenuAnalysisFailureReason.consentWithheld,
+        MenuAnalysisFailureReason.noDishesFound,
+      ]) {
+        testWidgets('offers no Retry action for $reason even with onRetry '
+            'given', (tester) async {
+          // Arrange
+          final pushedNames = <String>[];
+
+          // Act
+          await _pump(
+            tester,
+            RulesReasonBanner(
+              engine: RulesEngine(reason: reason),
+              onRetry: () {},
+            ),
+            pushedNames,
+          );
+
+          // Assert
+          expect(find.text(_en.actionRetry), findsNothing);
+        });
+      }
+
+      testWidgets('offers no Retry action for a retryable reason when no '
+          'onRetry is given', (tester) async {
+        // Arrange
+        final pushedNames = <String>[];
+
+        // Act
+        await _pump(
+          tester,
+          const RulesReasonBanner(
+            engine: RulesEngine(reason: MenuAnalysisFailureReason.offline),
+          ),
+          pushedNames,
+        );
+
+        // Assert
+        expect(find.text(_en.actionRetry), findsNothing);
+      });
+    });
   });
 }

@@ -31,6 +31,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get actionRefreshMenu => 'רענן תפריט';
 
   @override
+  String get actionBackToSearch => 'חזרה לחיפוש';
+
+  @override
+  String get offlineBannerMessage => 'אין חיבור לאינטרנט.';
+
+  @override
   String get venueSearchLabel => 'קישור למסעדה';
 
   @override

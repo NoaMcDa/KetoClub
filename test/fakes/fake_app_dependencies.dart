@@ -2,6 +2,7 @@ import 'package:ketoclub/state/app_dependencies.dart';
 
 import 'fake_app_logger.dart';
 import 'fake_clock.dart';
+import 'fake_connectivity.dart';
 import 'fake_menu_classifier.dart';
 import 'fake_menu_repository.dart';
 import 'fake_notes_store.dart';
@@ -21,7 +22,8 @@ final class FakeAppDependencies {
       settingsStore = FakeSettingsStore(),
       notesStore = FakeNotesStore(),
       clock = FakeClock(startedAt ?? DateTime.utc(2026)),
-      logger = FakeAppLogger();
+      logger = FakeAppLogger(),
+      connectivity = FakeConnectivity();
 
   /// The faked menu repository.
   final FakeMenuRepository repository;
@@ -41,6 +43,10 @@ final class FakeAppDependencies {
   /// The faked logger; inspect its records.
   final FakeAppLogger logger;
 
+  /// The faked connectivity check; flip [FakeConnectivity.online] to
+  /// drive the persistent offline banner (issue #68).
+  final FakeConnectivity connectivity;
+
   /// The dependency set to hand to the app widget.
   AppDependencies get dependencies => AppDependencies(
     menuRepository: repository,
@@ -49,5 +55,6 @@ final class FakeAppDependencies {
     notesStore: notesStore,
     clock: clock,
     logger: logger,
+    connectivity: connectivity,
   );
 }

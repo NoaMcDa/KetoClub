@@ -141,6 +141,10 @@ AppDependencies buildDependencies() {
     notesStore: PrefsNotesStore(load: SharedPreferences.getInstance),
     clock: clock,
     logger: const DeveloperLogAppLogger(),
+    // The same instance the classifier router already pre-checks with
+    // (architecture.md §14 D10) — the persistent offline banner (issue
+    // #68) reads it too, rather than opening a second platform channel.
+    connectivity: connectivity,
     screenBrightness: screenBrightness,
   );
 }

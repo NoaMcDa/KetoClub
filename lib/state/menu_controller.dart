@@ -434,6 +434,35 @@ final class MenuController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Re-runs classification on the already-loaded [menu], spending no
+  /// new fetch (issue #68) — the retry action for an analysis failure
+  /// shown above the dish list. Unlike [refresh], this never calls
+  /// [MenuRepository.load]: the menu itself was not the problem, so
+  /// there is nothing about it worth refetching, and a second Wolt
+  /// request would cost a cache-freshness check the user never asked for.
+  ///
+  /// A no-op when [open] has not yet produced a [menu]. Persists a
+  /// successful [MenuAnalysed] through the repository exactly as [open]
+  /// does, so the next [open] can reuse it.
+  Future<void> reanalyse() async {
+    final currentMenu = _menu;
+    final currentRef = _ref;
+    if (currentMenu == null || currentRef == null) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    final options = _optionsFrom(await _settings.read());
+    final analysis = await _classifier.classify(currentMenu, options: options);
+    _analysis = analysis;
+    if (analysis is MenuAnalysed) {
+      await _repository.saveAnalysis(currentRef, analysis);
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
   /// The [ClassificationOptions] [settings] ask for: consent, and the
   /// net-carb limit (issue #57).
   static ClassificationOptions _optionsFrom(AppSettings settings) =>

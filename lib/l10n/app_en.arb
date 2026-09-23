@@ -8,6 +8,8 @@
   "actionCopy": "Copy",
   "actionCopied": "Copied",
   "actionRefreshMenu": "Refresh menu",
+  "actionBackToSearch": "Back to search",
+  "offlineBannerMessage": "No internet connection.",
 
   "venueSearchLabel": "Restaurant link",
   "venueSearchHint": "Paste a Wolt link, or a venue slug",

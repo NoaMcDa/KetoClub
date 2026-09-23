@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/screens/venue_search_screen.dart';
+import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:provider/provider.dart';
+
+import '../fakes/fake_connectivity.dart';
 
 /// Pumps the real [VenueSearchScreen] over a real
 /// [VenueSearchController], recording every route name pushed via
@@ -14,6 +18,7 @@ Future<void> _pump(
   required VenueSearchController controller,
   required List<String> pushedNames,
   Locale locale = const Locale('en'),
+  Connectivity? connectivity,
 }) {
   return tester.pumpWidget(
     ChangeNotifierProvider<VenueSearchController>.value(
@@ -22,7 +27,9 @@ Future<void> _pump(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: locale,
-        home: const VenueSearchScreen(),
+        home: VenueSearchScreen(
+          connectivity: connectivity ?? FakeConnectivity(),
+        ),
         onGenerateRoute: (settings) {
           pushedNames.add(settings.name ?? '');
           return MaterialPageRoute<void>(
@@ -170,6 +177,47 @@ void main() {
 
         // Assert
         expect(pushedNames, contains('/venue/tenbis/123456'));
+      },
+    );
+
+    testWidgets(
+      'build shows the offline banner while Connectivity reports offline '
+      '(issue #68)',
+      (tester) async {
+        // Act
+        await _pump(
+          tester,
+          controller: controller,
+          pushedNames: pushedNames,
+          connectivity: FakeConnectivity(online: false),
+        );
+        await tester.pumpAndSettle();
+        final context = tester.element(find.byType(VenueSearchScreen));
+        final l10n = AppLocalizations.of(context)!;
+
+        // Assert
+        expect(find.byType(OfflineBanner), findsOneWidget);
+        expect(find.text(l10n.offlineBannerMessage), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'build shows no offline banner while Connectivity reports online '
+      '(issue #68)',
+      (tester) async {
+        // Act
+        await _pump(
+          tester,
+          controller: controller,
+          pushedNames: pushedNames,
+          connectivity: FakeConnectivity(),
+        );
+        await tester.pumpAndSettle();
+        final context = tester.element(find.byType(VenueSearchScreen));
+        final l10n = AppLocalizations.of(context)!;
+
+        // Assert
+        expect(find.text(l10n.offlineBannerMessage), findsNothing);
       },
     );
 
