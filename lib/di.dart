@@ -7,6 +7,7 @@ import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/llm_menu_classifier.dart';
 import 'package:ketoclub/services/llm/backend_chat_client.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
+import 'package:ketoclub/services/menu/tenbis/tenbis_adapter.dart';
 import 'package:ketoclub/services/menu/wolt/wolt_adapter.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
@@ -51,9 +52,11 @@ Uri? backendBaseUrl(String configured) {
   return uri;
 }
 
-/// Whether [WoltMenuAdapter] should route through KetoClub's own backend
-/// instead of calling Wolt directly, and at what address
-/// (`backend_plan.md` §3.3, §4.1).
+/// Whether [WoltMenuAdapter] or `TenBisAdapter` should route through
+/// KetoClub's own backend instead of calling the platform directly, and
+/// at what address (`backend_plan.md` §3.3, §4.1, issue #122). Both
+/// adapters share this one value, the same registration-order pairing
+/// `di_test.dart` covers for Wolt.
 ///
 /// The proxy is used only in a browser — native HTTP has no CORS problem
 /// to route around, so a mobile build reads menus straight from the
@@ -110,6 +113,13 @@ AppDependencies buildDependencies() {
     menuRepository: CachedMenuRepository(
       adapters: [
         WoltMenuAdapter(
+          client: client,
+          proxyBase: menuProxyBase(
+            runsInBrowser: kIsWeb,
+            configured: _configuredBackendUrl,
+          ),
+        ),
+        TenBisAdapter(
           client: client,
           proxyBase: menuProxyBase(
             runsInBrowser: kIsWeb,
