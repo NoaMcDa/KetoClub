@@ -1391,7 +1391,7 @@ void main() {
           ),
         );
         await controller.open(_ref);
-        controller.setFilter(MenuFilter.greenOnly);
+        await controller.setFilter(MenuFilter.greenOnly);
         expect(controller.filter, MenuFilter.greenOnly);
 
         // Act: both dishes match the query, but only one matches the
