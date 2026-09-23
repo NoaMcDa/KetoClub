@@ -8,6 +8,8 @@
   "actionCopy": "העתק",
   "actionCopied": "הועתק",
   "actionRefreshMenu": "רענן תפריט",
+  "actionBackToSearch": "חזרה לחיפוש",
+  "offlineBannerMessage": "אין חיבור לאינטרנט.",
   "actionShareMenu": "שתף תפריט",
   "actionCancel": "ביטול",
 

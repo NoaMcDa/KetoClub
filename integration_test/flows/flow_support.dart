@@ -33,6 +33,7 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
+import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
@@ -83,6 +84,7 @@ final class FakeAppDependencies {
       notesStore = FlowFakeNotesStore(),
       clock = FlowFakeClock(),
       logger = FlowFakeAppLogger(),
+      connectivity = FlowFakeConnectivity(),
       externalLinkOpener = FlowFakeExternalLinkOpener(),
       menuSharer = FlowFakeMenuSharer();
 
@@ -105,6 +107,10 @@ final class FakeAppDependencies {
 
   /// The faked logger.
   final FlowFakeAppLogger logger;
+
+  /// The faked connectivity check; flip [FlowFakeConnectivity.online] to
+  /// drive the persistent offline banner (issue #68).
+  final FlowFakeConnectivity connectivity;
 
   /// The faked external link opener.
   final FlowFakeExternalLinkOpener externalLinkOpener;
@@ -133,6 +139,7 @@ final class FakeAppDependencies {
     notesStore: notesStore,
     clock: clock,
     logger: logger,
+    connectivity: connectivity,
     externalLinkOpener: externalLinkOpener,
     menuSharer: menuSharer,
   );
@@ -271,6 +278,20 @@ final class FlowFakeMenuClassifier implements MenuClassifier {
       options: options.snapshot,
     );
   }
+}
+
+/// A [Connectivity] whose answer is settable — mirrors `test/fakes`'
+/// `FakeConnectivity`, duplicated here for the reason this file's own top
+/// doc comment gives.
+final class FlowFakeConnectivity implements Connectivity {
+  /// Creates a connectivity fake reporting [online].
+  new({this.online = true});
+
+  /// Settable so a flow can flip it mid-journey.
+  bool online;
+
+  @override
+  Future<bool> isOnline() async => online;
 }
 
 /// A [SettingsStore] backed by one in-memory value.
