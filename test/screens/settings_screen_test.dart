@@ -8,6 +8,7 @@ import 'package:ketoclub/screens/settings_screen.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
+import 'package:ketoclub/state/theme_mode_controller.dart';
 import 'package:provider/provider.dart';
 
 import '../fakes/fake_menu_repository.dart';
@@ -19,6 +20,23 @@ final AppLocalizations _en = AppLocalizationsEn();
 
 /// The Hebrew strings for the one Locale('he') test.
 final AppLocalizations _he = AppLocalizationsHe();
+
+/// The `find.text` match for [label], scoped to the language section's
+/// radio group ([languageRadioGroupKey]), so a label that happens to
+/// match another section's (as `settingsLanguageSystem` and
+/// `settingsAppearanceSystem` once did) can never make `find.text`
+/// ambiguous.
+Finder _languageOption(String label) => find.descendant(
+  of: find.byKey(languageRadioGroupKey),
+  matching: find.text(label),
+);
+
+/// The `find.text` match for [label], scoped to the appearance section's
+/// radio group ([appearanceRadioGroupKey]); see [_languageOption].
+Finder _appearanceOption(String label) => find.descendant(
+  of: find.byKey(appearanceRadioGroupKey),
+  matching: find.text(label),
+);
 
 /// Builds the [SettingsController] the widget under test is pumped over,
 /// from fresh fakes unless the caller seeds one.
@@ -44,6 +62,7 @@ Future<void> _pump(
   SettingsController controller, {
   Locale locale = const Locale('en'),
   LocaleController? localeController,
+  ThemeModeController? themeModeController,
 }) {
   return tester.pumpWidget(
     MaterialApp(
@@ -55,6 +74,10 @@ Future<void> _pump(
           ChangeNotifierProvider<SettingsController>.value(value: controller),
           ChangeNotifierProvider<LocaleController>.value(
             value: localeController ?? LocaleController(FakeSettingsStore()),
+          ),
+          ChangeNotifierProvider<ThemeModeController>.value(
+            value:
+                themeModeController ?? ThemeModeController(FakeSettingsStore()),
           ),
         ],
         child: const SettingsScreen(),
@@ -139,7 +162,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Act
-      final english = find.text(_en.settingsLanguageEnglish);
+      final english = _languageOption(_en.settingsLanguageEnglish);
       await tester.ensureVisible(english);
       await tester.tap(english);
       await tester.pumpAndSettle();
@@ -162,7 +185,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Act
-      final hebrew = find.text(_en.settingsLanguageHebrew);
+      final hebrew = _languageOption(_en.settingsLanguageHebrew);
       await tester.ensureVisible(hebrew);
       await tester.tap(hebrew);
       await tester.pumpAndSettle();
@@ -187,7 +210,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Act
-        final system = find.text(_en.settingsLanguageSystem);
+        final system = _languageOption(_en.settingsLanguageSystem);
         await tester.ensureVisible(system);
         await tester.tap(system);
         await tester.pumpAndSettle();
@@ -196,6 +219,84 @@ void main() {
         expect(controller.languageTag, isNull);
         expect((await settingsStore.read()).languageTag, isNull);
         expect(localeController.locale, isNull);
+      },
+    );
+
+    testWidgets('choosing Dark sets the theme mode and applies it', (
+      tester,
+    ) async {
+      // Arrange
+      final settingsStore = FakeSettingsStore();
+      final controller = _controllerFor(settingsStore: settingsStore);
+      final themeModeController = ThemeModeController(settingsStore);
+      await _pump(tester, controller, themeModeController: themeModeController);
+      await tester.pumpAndSettle();
+
+      // Act
+      final dark = _appearanceOption(_en.settingsAppearanceDark);
+      await tester.ensureVisible(dark);
+      await tester.tap(dark);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(controller.themeMode, equals(AppThemeMode.dark));
+      expect((await settingsStore.read()).themeMode, equals(AppThemeMode.dark));
+      // The app-level controller picks the change up without a second
+      // write to the store (mirrors the language section's own test).
+      expect(themeModeController.mode, equals(AppThemeMode.dark));
+    });
+
+    testWidgets('choosing Light sets the theme mode and applies it', (
+      tester,
+    ) async {
+      // Arrange
+      final settingsStore = FakeSettingsStore();
+      final controller = _controllerFor(settingsStore: settingsStore);
+      final themeModeController = ThemeModeController(settingsStore);
+      await _pump(tester, controller, themeModeController: themeModeController);
+      await tester.pumpAndSettle();
+
+      // Act
+      final light = _appearanceOption(_en.settingsAppearanceLight);
+      await tester.ensureVisible(light);
+      await tester.tap(light);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(controller.themeMode, equals(AppThemeMode.light));
+      expect(themeModeController.mode, equals(AppThemeMode.light));
+    });
+
+    testWidgets(
+      'choosing "match my device" restores the theme mode to system',
+      (tester) async {
+        // Arrange
+        final settingsStore = FakeSettingsStore(
+          initial: const AppSettings(themeMode: AppThemeMode.dark),
+        );
+        final controller = _controllerFor(settingsStore: settingsStore);
+        final themeModeController = ThemeModeController(settingsStore)
+          ..applyMode(AppThemeMode.dark);
+        await _pump(
+          tester,
+          controller,
+          themeModeController: themeModeController,
+        );
+        await tester.pumpAndSettle();
+
+        // Act
+        final system = _appearanceOption(_en.settingsAppearanceSystem);
+        await tester.ensureVisible(system);
+        await tester.tap(system);
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(controller.themeMode, equals(AppThemeMode.system));
+        expect(
+          (await settingsStore.read()).themeMode,
+          equals(AppThemeMode.system),
+        );
+        expect(themeModeController.mode, equals(AppThemeMode.system));
       },
     );
 

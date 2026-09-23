@@ -4,6 +4,7 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
+import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 
 /// The set of service interfaces the app is built on (architecture.md §18.1).
@@ -24,6 +25,7 @@ class AppDependencies {
     required this.menuRepository,
     required this.menuClassifier,
     required this.settingsStore,
+    required this.notesStore,
     required this.clock,
     required this.logger,
     this.screenBrightness = const NoOpScreenBrightness(),
@@ -38,6 +40,11 @@ class AppDependencies {
 
   /// Non-secret settings: language, default filter, consent, last venue.
   final SettingsStore settingsStore;
+
+  /// Personal, on-device notes per dish (issue #52, architecture.md D8).
+  /// Never read by [menuClassifier] and never sent anywhere — see
+  /// [NotesStore]'s own doc comment for that boundary.
+  final NotesStore notesStore;
 
   /// The only source of the current time, so tests control it.
   final Clock clock;

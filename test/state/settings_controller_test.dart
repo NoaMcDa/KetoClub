@@ -140,6 +140,51 @@ void main() {
       expect((await settings.read()).languageTag, isNull);
     });
 
+    test(
+      'setThemeMode persists the mode without clobbering prior language',
+      () async {
+        // Arrange
+        await controller.setLanguage('he');
+
+        // Act
+        await controller.setThemeMode(AppThemeMode.dark);
+
+        // Assert: the language set first survives the mode write second.
+        expect(controller.languageTag, 'he');
+        expect(controller.themeMode, AppThemeMode.dark);
+        expect((await settings.read()).languageTag, 'he');
+        expect((await settings.read()).themeMode, AppThemeMode.dark);
+      },
+    );
+
+    test('setThemeMode toggles isBusy true then false', () async {
+      // Arrange
+      final states = <bool>[];
+      controller.addListener(() => states.add(controller.isBusy));
+
+      // Act
+      await controller.setThemeMode(AppThemeMode.light);
+
+      // Assert
+      expect(states, [true, false]);
+    });
+
+    test('initial themeMode before load defaults to system', () {
+      // Assert
+      expect(controller.themeMode, equals(AppThemeMode.system));
+    });
+
+    test('load populates themeMode', () async {
+      // Arrange
+      await settings.write(const AppSettings(themeMode: AppThemeMode.dark));
+
+      // Act
+      await controller.load();
+
+      // Assert
+      expect(controller.themeMode, equals(AppThemeMode.dark));
+    });
+
     test('clearCache delegates to the repository', () async {
       // Act
       await controller.clearCache();

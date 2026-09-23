@@ -302,6 +302,30 @@ abstract class AppLocalizations {
   /// **'Hebrew'**
   String get settingsLanguageHebrew;
 
+  /// No description provided for @settingsAppearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get settingsAppearance;
+
+  /// No description provided for @settingsAppearanceSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow device theme'**
+  String get settingsAppearanceSystem;
+
+  /// No description provided for @settingsAppearanceLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get settingsAppearanceLight;
+
+  /// No description provided for @settingsAppearanceDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get settingsAppearanceDark;
+
   /// No description provided for @settingsFilter.
   ///
   /// In en, this message translates to:
@@ -691,6 +715,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'With these changes, about {grams}g net carbs (estimate) — safe to order.'**
   String waiterCardAfterText(String grams);
+
+  /// No description provided for @dishCardAddNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a note'**
+  String get dishCardAddNote;
+
+  /// No description provided for @dishCardEditNoteSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit your note: {note}'**
+  String dishCardEditNoteSemanticLabel(String note);
+
+  /// No description provided for @noteEditorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal note'**
+  String get noteEditorTitle;
+
+  /// No description provided for @noteEditorHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Waitstaff happily substituted cauliflower'**
+  String get noteEditorHint;
+
+  /// No description provided for @noteEditorSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get noteEditorSave;
+
+  /// No description provided for @noteEditorClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear note'**
+  String get noteEditorClear;
 }
 
 class _AppLocalizationsDelegate

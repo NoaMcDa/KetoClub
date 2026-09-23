@@ -10,12 +10,14 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 import '../services/llm/llm_chat_client_contract.dart';
 import '../services/storage/install_id_store_contract.dart';
 import '../services/storage/menu_cache_contract.dart';
+import '../services/storage/notes_store_contract.dart';
 import '../services/storage/settings_store_contract.dart';
 import 'fake_app_logger.dart';
 import 'fake_clock.dart';
 import 'fake_install_id_store.dart';
 import 'fake_llm_chat_client.dart';
 import 'fake_menu_cache.dart';
+import 'fake_notes_store.dart';
 import 'fake_settings_store.dart';
 
 void main() {
@@ -315,14 +317,28 @@ void main() {
     });
   });
 
+  group('AppThemeMode', () {
+    test('tryParse finds every value by its own name', () {
+      for (final mode in AppThemeMode.values) {
+        expect(AppThemeMode.tryParse(mode.name), equals(mode));
+      }
+    });
+
+    test('tryParse returns null for an unknown name', () {
+      expect(AppThemeMode.tryParse('sepia'), isNull);
+    });
+  });
+
   group('AppSettings', () {
-    test('defaults are all, no consent, no venue, no language', () {
+    test('defaults are all, no consent, no venue, no language, system '
+        'appearance', () {
       const settings = AppSettings();
 
       expect(settings.languageTag, isNull);
       expect(settings.filter, equals(MenuFilter.all));
       expect(settings.estimationConsentGiven, isFalse);
       expect(settings.lastVenue, isNull);
+      expect(settings.themeMode, equals(AppThemeMode.system));
     });
 
     test('tryFrom(x.toJson()) round-trips settings with every field set', () {
@@ -331,9 +347,45 @@ void main() {
         filter: MenuFilter.greenOnly,
         estimationConsentGiven: true,
         lastVenue: VenueRef(source: MenuSource.tenbis, platformId: '9'),
+        themeMode: AppThemeMode.dark,
       );
 
       expect(AppSettings.tryFrom(settings.toJson()), equals(settings));
+    });
+
+    test('tryFrom(x.toJson()) round-trips every AppThemeMode value', () {
+      for (final mode in AppThemeMode.values) {
+        final settings = AppSettings(themeMode: mode);
+
+        expect(AppSettings.tryFrom(settings.toJson()), equals(settings));
+      }
+    });
+
+    test('tryFrom decodes a missing themeMode as system, issue #58 (added '
+        'after installs already existed without it)', () {
+      final json = <String, Object?>{
+        'filter': 'all',
+        'estimationConsentGiven': false,
+      };
+
+      final result = AppSettings.tryFrom(json);
+
+      expect(result, isNotNull);
+      expect(result!.themeMode, equals(AppThemeMode.system));
+    });
+
+    test('tryFrom decodes an unrecognised themeMode as system rather than '
+        'invalidating the whole record', () {
+      final json = <String, Object?>{
+        'filter': 'all',
+        'estimationConsentGiven': false,
+        'themeMode': 'sepia',
+      };
+
+      final result = AppSettings.tryFrom(json);
+
+      expect(result, isNotNull);
+      expect(result!.themeMode, equals(AppThemeMode.system));
     });
 
     test('tryFrom(x.toJson()) round-trips default settings', () {
@@ -436,6 +488,29 @@ void main() {
       expect(result.lastVenue, isNull);
     });
 
+    test('copyWith replaces themeMode', () {
+      const settings = AppSettings();
+
+      final result = settings.copyWith(themeMode: AppThemeMode.dark);
+
+      expect(result.themeMode, equals(AppThemeMode.dark));
+    });
+
+    test('copyWith omitting themeMode leaves it unchanged', () {
+      const settings = AppSettings(themeMode: AppThemeMode.light);
+
+      final result = settings.copyWith(filter: MenuFilter.all);
+
+      expect(result.themeMode, equals(AppThemeMode.light));
+    });
+
+    test('== returns false for settings differing in themeMode', () {
+      const a = AppSettings();
+      const b = AppSettings(themeMode: AppThemeMode.dark);
+
+      expect(a, isNot(equals(b)));
+    });
+
     test('== returns true for settings with equal fields', () {
       const a = AppSettings(languageTag: 'he');
       const b = AppSettings(languageTag: 'he');
@@ -451,11 +526,15 @@ void main() {
       expect(a, isNot(equals(b)));
     });
 
-    test('toString mentions the language and filter', () {
-      const settings = AppSettings(languageTag: 'he');
+    test('toString mentions the language, filter and theme mode', () {
+      const settings = AppSettings(
+        languageTag: 'he',
+        themeMode: AppThemeMode.dark,
+      );
 
       expect(settings.toString(), contains('he'));
       expect(settings.toString(), contains('all'));
+      expect(settings.toString(), contains('dark'));
     });
   });
 
@@ -524,6 +603,7 @@ void main() {
   runSettingsStoreContract('FakeSettingsStore', FakeSettingsStore.new);
   runLlmChatClientContract('FakeLlmChatClient', FakeLlmChatClient.new);
   runInstallIdStoreContract('FakeInstallIdStore', FakeInstallIdStore.new);
+  runNotesStoreContract('FakeNotesStore', FakeNotesStore.new);
 
   group('FakeMenuCache degradation switches', () {
     test('failOnRead makes every read miss without throwing', () async {

@@ -6,6 +6,7 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
+import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/utils/keto_score.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
@@ -23,10 +24,12 @@ import 'package:ketoclub/utils/text_normaliser.dart';
 /// the widgets above it.
 final class MenuController extends ChangeNotifier {
   /// Creates a controller that loads menus through a [MenuRepository],
-  /// classifies them through a [MenuClassifier], and reads the user's default
-  /// filter and AI-estimation consent from a [SettingsStore] on every [open].
+  /// classifies them through a [MenuClassifier], reads the user's default
+  /// filter and AI-estimation consent from a [SettingsStore] on every
+  /// [open], and reads and writes the open venue's personal dish notes
+  /// through a [NotesStore] (issue #52).
   ///
-  /// The three services are positional and private. Private, because a widget
+  /// The four services are positional and private. Private, because a widget
   /// reaches a service only through a controller's own API (architecture.md
   /// §5) and public fields would hand it a way around this class; positional,
   /// because a private field cannot be a named initializing formal in Dart and
@@ -38,11 +41,12 @@ final class MenuController extends ChangeNotifier {
   /// `Menu.fetchedAt`, `analysedAt` from the classifier — so a clock here
   /// would be a dependency nothing reads. Rendering "4 min ago" from
   /// [fetchedAt] is left to whoever displays it, against its own clock.
-  new(this._repository, this._classifier, this._settings);
+  new(this._repository, this._classifier, this._settings, this._notes);
 
   final MenuRepository _repository;
   final MenuClassifier _classifier;
   final SettingsStore _settings;
+  final NotesStore _notes;
 
   bool _isLoading = false;
   Menu? _menu;
@@ -52,6 +56,8 @@ final class MenuController extends ChangeNotifier {
   bool _isFromCache = false;
   MenuFetchFailureReason? _staleReason;
   MenuFilter _filter = MenuFilter.all;
+  VenueRef? _openRef;
+  Map<String, String> _dishNotes = const <String, String>{};
 
   /// The venue [open] most recently loaded, or null before the first
   /// call — [refresh] has nothing to refetch until then.
@@ -239,6 +245,12 @@ final class MenuController extends ChangeNotifier {
         : const <String>[];
   }
 
+  /// The user's personal note for the dish [dishId], on the currently
+  /// open venue, or null when none has been written (issue #52). Local
+  /// only: see [NotesStore]'s own doc comment for the privacy boundary
+  /// this never crosses.
+  String? noteFor(String dishId) => _dishNotes[dishId];
+
   /// Loads [ref]'s menu, then classifies it, notifying listeners after
   /// each step so a caller can render a spinner and then the result.
   ///
@@ -253,8 +265,10 @@ final class MenuController extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
+    _openRef = ref;
     final appSettings = await _settings.read();
     _filter = appSettings.filter;
+    _dishNotes = await _notes.readAll(ref);
 
     final fetchResult = await _repository.load(ref, forceRefresh: forceRefresh);
     switch (fetchResult) {
@@ -374,6 +388,40 @@ final class MenuController extends ChangeNotifier {
   /// reclassify.
   void setFilter(MenuFilter filter) {
     _filter = filter;
+    notifyListeners();
+  }
+
+  /// Saves [note] as the personal note for [dishId] on the open venue
+  /// (issue #52), and notifies listeners once it is written.
+  ///
+  /// A blank [note] (empty once trimmed) clears the note instead of
+  /// writing an empty string — the note editor's Save and Clear actions
+  /// end up doing the same thing when the field was emptied by hand.
+  /// A no-op, including no notify, when [open] has never been called:
+  /// there is no venue to attribute the note to.
+  Future<void> setNote(String dishId, String note) async {
+    final ref = _openRef;
+    if (ref == null) return;
+    final trimmed = note.trim();
+    if (trimmed.isEmpty) {
+      await clearNote(dishId);
+      return;
+    }
+    await _notes.write(ref, dishId, trimmed);
+    _dishNotes = {..._dishNotes, dishId: trimmed};
+    notifyListeners();
+  }
+
+  /// Removes the personal note for [dishId] on the open venue, and
+  /// notifies listeners once it is removed. A no-op, including no
+  /// notify, when [open] has never been called or when [dishId] carries
+  /// no note.
+  Future<void> clearNote(String dishId) async {
+    final ref = _openRef;
+    if (ref == null || !_dishNotes.containsKey(dishId)) return;
+    await _notes.delete(ref, dishId);
+    final updated = Map<String, String>.from(_dishNotes)..remove(dishId);
+    _dishNotes = updated;
     notifyListeners();
   }
 

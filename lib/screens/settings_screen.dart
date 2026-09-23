@@ -3,9 +3,21 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
+import 'package:ketoclub/state/theme_mode_controller.dart';
 import 'package:provider/provider.dart';
+
+/// Scopes a test's finder to the language section's radio group, so a
+/// label the language and appearance sections happen to share (both offer
+/// a "follow the device" choice) cannot make `find.text(...)` match two
+/// widgets. Public so tests can reach it without a brittle text lookup.
+const Key languageRadioGroupKey = Key('settingsLanguageRadioGroup');
+
+/// Scopes a test's finder to the appearance section's radio group, for the
+/// same reason as [languageRadioGroupKey].
+const Key appearanceRadioGroupKey = Key('settingsAppearanceRadioGroup');
 
 /// The Settings screen: the AI-analysis consent disclosure, the UI
 /// language, the default menu filter, and cache
@@ -71,6 +83,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 24),
             _languageSection(context, l10n, controller),
             const SizedBox(height: 24),
+            _appearanceSection(context, l10n, controller),
+            const SizedBox(height: 24),
             _filterSection(context, l10n, controller),
             const SizedBox(height: 24),
             _cacheSection(l10n, controller),
@@ -135,6 +149,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         RadioGroup<String?>(
+          key: languageRadioGroupKey,
           groupValue: controller.languageTag,
           onChanged: (tag) => unawaited(_setLanguage(context, controller, tag)),
           child: Column(
@@ -177,6 +192,71 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await controller.setLanguage(tag);
     if (!context.mounted) return;
     context.read<LocaleController>().applyTag(tag);
+  }
+
+  /// The three-way appearance choice: system, light, or dark
+  /// (issue #58). Copies [_languageSection]'s shape exactly, down to the
+  /// same "persist through the screen's own controller, then relay to the
+  /// app-level controller" pattern — see [_setThemeMode] and
+  /// [_setLanguage].
+  Widget _appearanceSection(
+    BuildContext context,
+    AppLocalizations l10n,
+    SettingsController controller,
+  ) {
+    final busy = controller.isBusy;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.settingsAppearance,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        RadioGroup<AppThemeMode>(
+          key: appearanceRadioGroupKey,
+          groupValue: controller.themeMode,
+          onChanged: (mode) =>
+              unawaited(_setThemeMode(context, controller, mode)),
+          child: Column(
+            children: [
+              RadioListTile<AppThemeMode>(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l10n.settingsAppearanceSystem),
+                value: AppThemeMode.system,
+                enabled: !busy,
+              ),
+              RadioListTile<AppThemeMode>(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l10n.settingsAppearanceLight),
+                value: AppThemeMode.light,
+                enabled: !busy,
+              ),
+              RadioListTile<AppThemeMode>(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l10n.settingsAppearanceDark),
+                value: AppThemeMode.dark,
+                enabled: !busy,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Persists [mode] through [controller] — the sole writer of the stored
+  /// appearance mode — then applies it to the app-level
+  /// [ThemeModeController], so `MaterialApp.themeMode` picks it up. Never
+  /// the other way around, for the same reason [_setLanguage] documents.
+  Future<void> _setThemeMode(
+    BuildContext context,
+    SettingsController controller,
+    AppThemeMode? mode,
+  ) async {
+    if (mode == null) return;
+    await controller.setThemeMode(mode);
+    if (!context.mounted) return;
+    context.read<ThemeModeController>().applyMode(mode);
   }
 
   /// The [MenuFilter] default, offering exactly the four values the menu

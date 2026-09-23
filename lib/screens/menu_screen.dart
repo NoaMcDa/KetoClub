@@ -19,6 +19,7 @@ import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
+import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
@@ -278,6 +279,8 @@ class _MenuScreenState extends State<MenuScreen> {
                 row: row,
                 localeTag: localeTag,
                 onShowScript: (shown) => unawaited(_openWaiterCard(shown)),
+                note: controller.noteFor(row.dish.id),
+                onEditNote: (edited) => unawaited(_openNoteEditor(edited)),
               ),
             ),
           if (analysed && controller.unclassifiedNames.isNotEmpty)
@@ -523,6 +526,26 @@ class _MenuScreenState extends State<MenuScreen> {
       isScrollControlled: true,
       builder: (_) =>
           WaiterCardSheet(row: row, screenBrightness: widget.screenBrightness),
+    );
+  }
+
+  /// Opens [NoteEditorSheet] for [row]'s dish as a modal, saving or
+  /// clearing the note through this screen's [MenuController] (issue
+  /// #52). Reads the controller once, before the sheet opens, rather than
+  /// inside the builder: a bottom sheet's `builder` is not itself
+  /// rebuilt by `context.watch` the way this screen's own `build` is, so
+  /// the callbacks below close over the controller instance directly.
+  Future<void> _openNoteEditor(DishRow row) {
+    final controller = context.read<MenuController>();
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => NoteEditorSheet(
+        dishName: row.dish.name,
+        initialNote: controller.noteFor(row.dish.id),
+        onSave: (note) => unawaited(controller.setNote(row.dish.id, note)),
+        onClear: () => unawaited(controller.clearNote(row.dish.id)),
+      ),
     );
   }
 }

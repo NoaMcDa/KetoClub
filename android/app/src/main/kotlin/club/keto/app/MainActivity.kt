@@ -1,4 +1,4 @@
-package com.ketoclub.ketoclub
+package club.keto.app
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,0 +1,81 @@
+{
+  "_synthetic": "SYNTHETIC. Built from menu_api_research §3.2 and issue #44's own body text (categoriesList -> dishList, decimal prices, kosher flags, dishOptionsList, image fields), not a recorded response. www.10bis.co.il is blocked from the build environment, so this could not be recorded. Re-record once #44's proxy route (phase2_plan.md §5 B1) lands: curl -sS localhost:8000/v1/proxy/tenbis/api/v1.0/Restaurants/{id}/Menu -o test/fixtures/tenbis_{id}_menu.json",
+  "restaurantName": "Vitrina Tel Aviv",
+  "unknown_top_level_field": "10bis may add fields; the mapper must ignore this",
+  "categoriesList": [
+    {
+      "categoryName": "Steaks",
+      "unknown_category_field": true,
+      "dishList": [
+        {
+          "dishId": 1001,
+          "dishName": "Entrecôte 300g",
+          "dishDescription": "Served with butter-infused potato purée",
+          "price": 142.0,
+          "kosher": false,
+          "dishOptionsList": [
+            {
+              "name": "Choice of Side",
+              "values": [
+                {"name": "Potato Purée", "unknown_value_field": "extra"},
+                {"name": "Green Salad"}
+              ]
+            }
+          ],
+          "dishImageUrl": "https://example.invalid/entrecote.jpg"
+        },
+        {
+          "dishId": "1002-shared",
+          "dishName": "Grilled Halloumi Salad",
+          "price": 56.0,
+          "dishOptionsList": [
+            {
+              "name": "Add Extras",
+              "values": [
+                {"name": "Extra Halloumi"},
+                {"name": "Olives"}
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "categoryName": "Chef's Specials",
+      "dishList": [
+        {
+          "dishId": "1002-shared",
+          "dishName": "Grilled Halloumi Salad (duplicate listing)",
+          "price": 56.0
+        },
+        {
+          "dishId": 1003,
+          "dishName": "Bread Basket (complimentary)",
+          "dishDescription": "On the house",
+          "price": 0,
+          "kosher": true
+        }
+      ]
+    },
+    {
+      "categoryName": "סלטים",
+      "dishList": [
+        {
+          "dishId": "1004",
+          "dishName": "סלט ירקות",
+          "dishDescription": "עגבניות, מלפפון, שמנים",
+          "price": 38.0
+        },
+        {
+          "dishId": "1005",
+          "dishName": "Baby Gem with Tahini",
+          "price": 42.0
+        }
+      ]
+    },
+    {
+      "categoryName": "Coming Soon",
+      "dishList": []
+    }
+  ]
+}

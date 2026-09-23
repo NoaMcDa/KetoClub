@@ -26,6 +26,8 @@ class DishCard extends StatefulWidget {
     required this.row,
     required this.localeTag,
     required this.onShowScript,
+    this.note,
+    this.onEditNote,
     super.key,
   });
 
@@ -38,6 +40,18 @@ class DishCard extends StatefulWidget {
   /// Called with [row] when the user asks to open the full waiter card
   /// for a [DishVerdict.modifiable] dish.
   final ValueChanged<DishRow> onShowScript;
+
+  /// The user's personal note for this dish (issue #52), or null when
+  /// none has been written. Shown for every verdict, not only
+  /// [DishVerdict.modifiable] — a note is the user's own annotation, not
+  /// part of the classifier's verdict. Local only: see `NotesStore`'s own
+  /// doc comment for the privacy boundary it never crosses.
+  final String? note;
+
+  /// Called with [row] when the user taps to add or edit [note]. Null
+  /// hides the note affordance entirely, so every existing call site that
+  /// predates this field renders exactly as it did before.
+  final ValueChanged<DishRow>? onEditNote;
 
   @override
   State<DishCard> createState() => _DishCardState();
@@ -109,6 +123,10 @@ class _DishCardState extends State<DishCard> {
               ],
             ],
           ),
+          if (widget.onEditNote != null) ...[
+            const SizedBox(height: 8),
+            _NoteRow(note: widget.note, onTap: () => widget.onEditNote!(row)),
+          ],
           if (isModifiable && tone != null) ...[
             const SizedBox(height: 8),
             _ScriptDisclosure(
@@ -328,6 +346,65 @@ class _ScriptDisclosure extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The personal-note affordance (issue #52): a small tappable icon-and-text
+/// row, showing the note itself once one exists or an "add a note" prompt
+/// before that. Neutral for every verdict — a note is the user's own
+/// annotation, not a verdict colour — so it reads from the theme's own
+/// on-surface-variant colour rather than a [VerdictTone].
+class _NoteRow extends StatelessWidget {
+  const new({required this.note, required this.onTap});
+
+  /// The note to show, or null/empty to show the "add a note" prompt
+  /// instead.
+  final String? note;
+
+  /// Called when the row is tapped, to open the note editor.
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final hasNote = note != null && note!.isNotEmpty;
+    final color = theme.colorScheme.onSurfaceVariant;
+    final label = hasNote ? note! : l10n.dishCardAddNote;
+    return Semantics(
+      button: true,
+      label: hasNote
+          ? l10n.dishCardEditNoteSemanticLabel(note!)
+          : l10n.dishCardAddNote,
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              Icon(
+                hasNote
+                    ? Icons.sticky_note_2_outlined
+                    : Icons.note_add_outlined,
+                size: 15,
+                color: color,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(color: color),
+                ),
+              ),
+            ],
           ),
         ),
       ),
