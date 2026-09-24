@@ -295,16 +295,22 @@ class _YellowCount extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // The parent `Wrap` hands this row the card's full width as its
+    // bound; at a large text scale (architecture.md §8.3) the label alone
+    // can be wider than that, so it is `Flexible` and wraps onto a second
+    // line rather than overflowing the row's trailing edge.
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(Icons.edit_note, size: 13, color: color),
         const SizedBox(width: 5),
-        Text(
-          text,
-          style: theme.textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: theme.colorScheme.onSurfaceVariant,
+        Flexible(
+          child: Text(
+            text,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
       ],

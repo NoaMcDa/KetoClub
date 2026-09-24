@@ -163,6 +163,7 @@ void main() {
             label: 'Skip: 3',
             hint: 'Double tap to clear the filter',
             isButton: true,
+            hasSelectedState: true,
             isSelected: true,
             hasTapAction: true,
           ),
@@ -173,6 +174,9 @@ void main() {
             label: 'Order as-is: 1',
             hint: 'Double tap to filter',
             isButton: true,
+            // `selected: false` is still a selected *state*, which is
+            // what lets a screen reader say "not selected" for this tile.
+            hasSelectedState: true,
             hasTapAction: true,
           ),
         );
