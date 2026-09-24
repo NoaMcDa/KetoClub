@@ -55,7 +55,18 @@ at hand-off — **verify it is green first**; if red, fix on a new branch via PR
 Worktrees from the previous session (`.claude/worktrees/agent-*`) are gone in a
 new session; the branches are on `origin`.
 
-## 4. Wave 3 — launch once #40 is on `main`
+## 3a. Wave 3 launched (09:46 UTC) — #154 merged by the user, main CI green on `cc6c052`
+
+Six workers in parallel; branches on `origin` once each pushes: #42
+`claude/estimate-list-42` (Opus), #43 `claude/discovery-flows-43`, #63
+`claude/skeletons-63`, #64 remainder `claude/a11y-audit-64`, follow-ups
+`claude/location-settings-phototile` (Open Settings on permanent denial +
+`VenueCard` → `PhotoTile`), docs `claude/docs-refresh-phase2`. Merge #42/#43
+any time on green; #63, #64 and the follow-ups PR one at a time (they share
+`venue_search_screen.dart`/`venue_card.dart`), each merging `origin/main`
+first; the docs refresh last, then delete this file.
+
+## 4. Wave 3 — the briefs that were given
 
 All four in parallel, then merge `#42` any time on green and the two
 screen-touching PRs (**#63, #64**) one at a time, each merging `origin/main`
