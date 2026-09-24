@@ -55,6 +55,14 @@ at hand-off — **verify it is green first**; if red, fix on a new branch via PR
 Worktrees from the previous session (`.claude/worktrees/agent-*`) are gone in a
 new session; the branches are on `origin`.
 
+## 3b. Wave 3 progress (10:07 UTC)
+
+PRs: #156 (#43 flows; one lazy-list fix pushed, re-running), **#158 (#42)
+merged `542ab0f`**, #159 (location settings + PhotoTile; main merged in
+after #158), #160 (docs refresh), #161 (#64; two failing tests sent back to
+the worker), #157 (run guides, separate from #153). #63 skeletons not yet
+reported.
+
 ## 3a. Wave 3 launched (09:46 UTC) — #154 merged by the user, main CI green on `cc6c052`
 
 Six workers in parallel; branches on `origin` once each pushes: #42
