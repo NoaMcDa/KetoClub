@@ -4,6 +4,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/price_format.dart';
+import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
 
@@ -90,37 +91,53 @@ class _DishCardState extends State<DishCard> {
     final neutralSurfaces = NeutralSurfaces.of(context);
 
     final cardEdge = _cardEdge(theme, neutralSurfaces, verdict, tone);
+    // The badge/name/description/price block and the photo tile sit in one
+    // row, per the artboard's dish row (`.design/Main.dc.html`); the note
+    // and script-disclosure rows below stay full width, outside it.
+    final textColumn = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (analysis != null) ...[
+          StatusBadge(verdict: analysis.verdict),
+          const SizedBox(height: 8),
+        ],
+        Text(dish.name, style: theme.textTheme.titleMedium),
+        if (dish.description.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(dish.description, style: theme.textTheme.bodySmall),
+        ],
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            Text(
+              formatPrice(dish.price, localeTag: widget.localeTag),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            if (netCarbs != null && tone != null && verdict != null) ...[
+              const SizedBox(width: 9),
+              _NetCarbsChip(
+                estimate: netCarbs,
+                tone: tone,
+                background: _carbChipBackground(theme, verdict, tone),
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
     final content = Padding(
       padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (analysis != null) ...[
-            StatusBadge(verdict: analysis.verdict),
-            const SizedBox(height: 8),
-          ],
-          Text(dish.name, style: theme.textTheme.titleMedium),
-          if (dish.description.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(dish.description, style: theme.textTheme.bodySmall),
-          ],
-          const SizedBox(height: 6),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                formatPrice(dish.price, localeTag: widget.localeTag),
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              if (netCarbs != null && tone != null && verdict != null) ...[
-                const SizedBox(width: 9),
-                _NetCarbsChip(
-                  estimate: netCarbs,
-                  tone: tone,
-                  background: _carbChipBackground(theme, verdict, tone),
-                ),
-              ],
+              Expanded(child: textColumn),
+              const SizedBox(width: 12),
+              PhotoTile(imageUrl: dish.imageUrl, size: 72),
             ],
           ),
           if (widget.onEditNote != null) ...[
