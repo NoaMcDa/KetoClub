@@ -62,13 +62,12 @@ Merged: #157 (run guides, `514405c`), #158 (#42, `542ab0f`), #159
 #162 (#63 skeletons, `7269521`). Main CI green on `64f209d`; not yet seen
 on `7269521`.
 
-Still open: **#156** (#43 flows, head `caee1fc`: the third Discovery card is
-below the fold on the 800×600 surface, so the test now `ensureVisible`s it
-before tapping; integration job was still running at 10:40) and **#161**
-(#64 remainder, head `95c6ce2`, main re-merged after #162; the two CI
-failures were the "{N} with changes" row overflowing at 2× text scale — its
-text is now `Flexible` — and the counter-tile semantics matcher missing
-`hasSelectedState`). Merge each on green with the full head SHA.
+**11:00 UTC: wave 3 is fully merged.** #156 (#43 flows, `38bbd79`: the
+third Discovery card is below the fold on the 800×600 surface, so the test
+`ensureVisible`s it before tapping) and #161 (#64 remainder, `5771075`; its
+two CI failures were the "{N} with changes" row overflowing at 2× text
+scale — its text is now `Flexible` — and the counter-tile semantics matcher
+missing `hasSelectedState`). Main CI green on `38bbd79`; verify `5771075`.
 
 A visual-audit worker (task #14) is running on branch `claude/visual-audit`:
 stub Wolt upstream from the fixtures → backend → `flutter build web` →
