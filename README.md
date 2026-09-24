@@ -3,6 +3,8 @@ KetoClub 🥑
 Have you ever been on keto and struggled to decipher what you could actually order from a restaurant?
 
 Well, fear no more! Introducing KetoClub — the app designed to make a day out eating easy, stress-free, and accessible to keto pals like us!
+
+To run it: `docs/RUNNING.md`.
 ⸻
 Table of Contents
 
@@ -351,10 +353,18 @@ Roadmap & Milestone Tracking
     * [x] Reverse-engineer major delivery and POS API feeds (Wolt, 10bis, Tabit).
     * [x] Heuristic classification engine (Green vs. Yellow vs. Red).
     * [x] Dynamic generation of waitstaff modification instructions.
-* [ ] Phase 2: Mobile Interface & Discovery Engine
-    * [ ] Cross-platform mobile client (Flutter).
-    * [ ] Geolocation integration and address-based venue search.
-    * [ ] Search filtering by dish type (e.g., "Show only steakhouses with Green ratings").
+* [ ] Phase 2: Mobile Interface & Discovery Engine (built, except the item below)
+    * [x] Cross-platform mobile client (Flutter).
+    * [x] Geolocation integration and address-based venue search (the Discovery
+      screen, `LocationService`, `WoltVenueSearchService`; the 10bis adapter
+      shipped alongside it). The discovery and 10bis fixtures this was built
+      against are still synthetic, pending a live recording (issues #38, #44).
+    * [ ] Search filtering by dish type (e.g., "Show only steakhouses with Green
+      ratings"). The Discovery screen's filter chips (one active at a time)
+      cover distance (the default), "open now", a *Keto 8+* score (D13) and
+      the single most common cuisine tag among the current results — not an
+      arbitrary dish type, and not combinable with the score filter the way
+      the example asks.
 * [ ] Phase 3: Persistent Community Database
     * [ ] Verified directory of keto-dedicated and keto-accessible restaurants.
     * [ ] User review feedback loop ("Did the restaurant accommodate your substitution?").
