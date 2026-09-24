@@ -172,6 +172,7 @@
   "scanPlaceholderBody": "Photographing a physical menu is coming in a later update. For now, paste a delivery link on Explore.",
   "savedPlaceholderTitle": "Saved venues",
   "savedPlaceholderBody": "Open a venue's menu and it appears here automatically, available for a day — even offline.",
+  "savedLoading": "Loading your saved menus…",
   "savedEntryDishCount": "{count, plural, one{1 dish} other{{count} dishes}}",
   "@savedEntryDishCount": {
     "placeholders": { "count": { "type": "num" } }
@@ -311,6 +312,7 @@
   "menuSearchSemanticLabel": "Search dishes by name or description",
   "menuSearchClear": "Clear search",
   "menuNoResults": "No dishes match your search.",
+  "menuClearFilter": "Clear filter",
   "categoryChipSemanticLabel": "Jump to {category}",
   "@categoryChipSemanticLabel": {
     "placeholders": { "category": { "type": "String" } }

@@ -49,6 +49,12 @@ final class FakeMenuRepository implements MenuRepository {
   /// Every [VenueRef] passed to [remove], in order.
   final List<VenueRef> removedRefs = <VenueRef>[];
 
+  /// When non-null, [savedMenus] waits for this future before it answers
+  /// — the same shape `FakeMenuClassifier.gate` uses, so a test can look
+  /// at the screen while `SavedController.load` is still in flight
+  /// (issue #63).
+  Future<void>? savedMenusGate;
+
   /// Scripts [load] to answer [result] for [ref].
   void stub(VenueRef ref, MenuFetchResult result) {
     _stubs[ref.cacheKey] = result;
@@ -105,19 +111,23 @@ final class FakeMenuRepository implements MenuRepository {
   }
 
   @override
-  Future<List<CachedMenuEntry>> savedMenus() async => [
-    for (final cached in _cached.values)
-      CachedMenuEntry(
-        ref: cached.menu.venueRef,
-        venueName: cached.menu.venueName,
-        fetchedAt: cached.menu.fetchedAt,
-        dishCount: cached.menu.allDishes.length,
-        engine: switch (cached.analysis) {
-          final MenuAnalysed analysed => analysed.engine,
-          _ => null,
-        },
-      ),
-  ];
+  Future<List<CachedMenuEntry>> savedMenus() async {
+    final pending = savedMenusGate;
+    if (pending != null) await pending;
+    return [
+      for (final cached in _cached.values)
+        CachedMenuEntry(
+          ref: cached.menu.venueRef,
+          venueName: cached.menu.venueName,
+          fetchedAt: cached.menu.fetchedAt,
+          dishCount: cached.menu.allDishes.length,
+          engine: switch (cached.analysis) {
+            final MenuAnalysed analysed => analysed.engine,
+            _ => null,
+          },
+        ),
+    ];
+  }
 
   @override
   Future<int> cachedMenuCount() async => _cached.length;

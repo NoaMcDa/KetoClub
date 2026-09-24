@@ -408,6 +408,9 @@ class AppLocalizationsHe extends AppLocalizations {
       'פתחו תפריט של מסעדה והוא יופיע כאן אוטומטית, זמין ליממה — גם ללא חיבור לאינטרנט.';
 
   @override
+  String get savedLoading => 'טוען את התפריטים השמורים שלך…';
+
+  @override
   String savedEntryDishCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -718,6 +721,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get menuNoResults => 'אין מנות שמתאימות לחיפוש שלכם.';
+
+  @override
+  String get menuClearFilter => 'נקה סינון';
 
   @override
   String categoryChipSemanticLabel(String category) {
