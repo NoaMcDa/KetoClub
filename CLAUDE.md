@@ -311,6 +311,11 @@ The section this replaces described a heuristic-first design that predates the c
 - `m15_meal_entry_research.md`: User flow design for meal logging and macro tracking
 - `m15_openrouter_models_fix.md` / `m16_structured_output_fix.md`: LLM model evaluation and structured output schemas (if integrating AI for edge cases)
 - `menu_api_research`: Platform API comparison and reverse-engineering notes
+- `docs/menu_sources_research.md`: Where else menus can come from beyond Wolt,
+  10bis and ordering apps (Israeli platforms, restaurant websites and PDFs,
+  licensed APIs, open data, vision and QR codes, community and self-serve,
+  chain nutrition), with per-source legal risk, a ranked comparison and a
+  build order (2026-09-24)
 - `feature_prioratization`: Phase breakdown and feature prioritization
 
 **Conventions:**
