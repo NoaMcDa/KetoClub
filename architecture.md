@@ -687,7 +687,15 @@ gracefully to "type an address or a venue name" on denial or on web without HTTP
    — so paste recognition and platform support are independent claims.
 2. **Search nearby** (Tier B). Queries Wolt's venue search with the device position
    or a typed string and lists results with a name, address, and distance. Results are
-   filtered client-side; no radius endpoint is assumed.
+   filtered client-side; no radius endpoint is assumed. The endpoints are
+   documented from third-party evidence in `phase2_discovery_research.md` §2.1 —
+   `GET consumer-api.wolt.com/v1/pages/restaurants?lat=&lon=` for "near me" and
+   `POST restaurant-api.wolt.com/v1/pages/search` for a typed name, both
+   anonymous, origin-locked (so the web build goes through the backend, as menus
+   do under D11) and not yet confirmed by a recording (§17 question 2). What a
+   result card shows before its menu is opened is D13: a score and counts only
+   from an analysis already in the device cache, and no menu fetch on scroll or
+   on load.
 
 Venues are not persisted beyond "last opened" until Phase 3 adds a community
 directory.
@@ -1334,6 +1342,74 @@ reason than it was (no backend URL compiled in, *or* the server has no key),
 which is a coarser signal than the old "you have no key" but is the honest one:
 the user cannot fix a missing server key either way.
 
+**D13 — Venue cards show only numbers already computed.** *(Answers issue
+#41; rescopes #42; extends §6.5's "Search nearby" to what a result card may
+show. The comparison behind it is `phase2_discovery_research.md` §7.)* The
+Discovery artboard (`.design/Discovery.dc.html`) shows a keto score and green/yellow counts on
+every venue card, before any menu has been opened. Two facts make that
+expensive to honour literally. Each AI analysis is one `POST /v1/chat`,
+limited to 5 a minute and 40 a day per install (D12), so AI numbers for a list
+of twenty venues would spend half a day's allowance on menus nobody asked to
+see. And Wolt's user terms forbid "systematic retrieval, such as use of any
+robot, spider, web crawler, extraction software, automated process and/or
+device to scrape, copy and/or monitor" the service
+(`phase2_discovery_research.md` §2.3): one fetch per user action is the
+exposure the shipped menu fetch already carries, but fetching N menus in the
+background for every list is a different category, and bursty callers are the
+ones Wolt throttles.
+
+Three options were compared:
+
+| Option | Cost | Accuracy | Latency | Privacy / terms |
+|---|---|---|---|---|
+| **A. Rules pre-analysis** — fetch every visible venue's menu in the background, run `HeuristicMenuClassifier` | N Wolt menu calls per list (proxied and 1 h-cached on web, direct on phones); no `/v1/chat` spend | Rules only, so a card promises a score the menu screen then revises | Numbers pop in over seconds (20 cards at concurrency 3) | The "systematic retrieval" pattern; every scroll fans out to Wolt |
+| **B. Server-cached AI analyses** — the backend reports which slugs have a fresh shared completion (#103) and their counts | One backend call per list; phones would need the backend for this, a first | AI-grade, identical to the menu screen | One call, no popping | No Wolt traffic; needs a new route mapping slug → cached counts, which a cache keyed by request hash does not have today |
+| **C. Cached-only** — numbers only for venues whose analysis is already in the device cache | Zero | Exact for what it shows; shows nothing it cannot back | None | None |
+
+**Decision: C now, B later, A only on request.**
+
+- **C ships now.** A venue card shows a score and counts **only** when
+  `MenuRepository.cached(ref)` holds a `MenuAnalysed` for that venue;
+  otherwise the card shows neither, never a placeholder `0`. Reading the
+  device cache performs no network call.
+- **B follows once the backend is hosted (#109)**: a backend route mapping a
+  Wolt slug to the verdict counts of a fresh shared completion, so "someone
+  analysed it" has a population behind it. Until the backend runs somewhere
+  other than `localhost` (§17 question 6), that population is one developer.
+- **A is never background behaviour.** At most it is an explicit "Estimate
+  this list" action the user taps: it fetches the visible venues' menus once,
+  bounded by a concurrency constant in `constants.dart`, runs only the
+  heuristic classifier, and is cancelled when the list changes. It never runs
+  on scroll or on load, so the retrieval is something the user asked for.
+
+**The score formula is kept exactly as `utils/keto_score.dart` computes it**:
+`10 × (green + 0.5 × yellow) / (green + yellow + red)`, rounded to one
+decimal, with unclassified dishes in neither numerator nor denominator, and
+null — nothing rendered — when no dish was placed. The card reuses that
+function; there is no second formula. Its status is stated plainly: **it is a
+UI ranking heuristic with no nutrition basis, never a health claim.** No
+source says a dish needing one swap is worth half a safe one; #41 was meant
+to give the 0.5 weight a basis and found none, so the weight stays as a
+ranking convenience rather than being dressed up as evidence. Numbers that
+came from the rules engine always carry the "estimate" marker, through the
+existing engine label (`RulesEngine` → the rules variant of `EngineChip`'s
+copy) rather than a new one — under C that happens whenever the cached
+analysis was rules-only, and under A it is always the case.
+
+**Consequences.** #40's *Keto 8+* chip filters on the card score, so it is
+hidden until at least one visible card has numbers, rather than offered as a
+filter that always returns an empty list. #42 is rescoped from "fetch menus
+for the visible venues in the background" to "read cached analyses for the
+visible venues, plus the explicit estimate action". The Discovery list's
+performance budget gains a hard rule: **no menu fetch on scroll or on load** —
+scrolling reads the device cache and nothing else.
+
+**What it costs:** most cards on a first visit show no score, which is further
+from the artboard than any other option; the artboard's every-card score is
+honoured only as far as the device (and, after B, the backend) has actually
+analysed. That gap is the point: a number on a card is a claim about food
+someone is about to order, and D13 only makes claims it can back.
+
 ---
 
 ## 15. Testing strategy
@@ -1464,7 +1540,14 @@ default the implementation follows until answered.
 2. **Exact Wolt venue-search endpoint** for nearby search. `menu_api_research` covers
    menus only. Default: ship paste-a-URL first (Tier A) and discover the search
    endpoint with the reverse-engineering protocol in `README.md` when building
-   step 9.
+   step 9. *(Answered as far as third-party evidence goes — see
+   `phase2_discovery_research.md` §2: `GET /v1/pages/restaurants?lat=&lon=` for
+   nearby venues and `POST /v1/pages/search` for a typed name, anonymous, with
+   CORS locked to `https://wolt.com`, so the web build proxies them through the
+   backend as D11 does for menus. Nothing there was verified by a live call from
+   this environment; the browser recording (#38) that confirms the shape and
+   supplies a recorded fixture is still outstanding. What the resulting cards may
+   show before a menu is opened is D13.)*
 3. **Tabit token flow details.** Unverified beyond "a session token is issued on the
    QR landing page". Default: defer the adapter until a real payload has been
    captured.
