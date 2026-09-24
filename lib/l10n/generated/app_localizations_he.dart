@@ -267,6 +267,30 @@ class AppLocalizationsHe extends AppLocalizations {
       'השרת של KetoClub לא היה זמין, ולכן לא ניתן היה לקרוא את התפריט.';
 
   @override
+  String get venueSearchFailedOffline =>
+      'אין חיבור, ולכן קטוקלאב לא הצליח לחפש מסעדות.';
+
+  @override
+  String get venueSearchFailedTimeout =>
+      'וולט לא ענתה לחיפוש בזמן. נסו שוב בעוד רגע.';
+
+  @override
+  String get venueSearchFailedRateLimited =>
+      'יותר מדי חיפושים ברצף. חכו דקה ונסו שוב.';
+
+  @override
+  String get venueSearchFailedPlatformChanged =>
+      'וולט שינתה את אופן החיפוש שלה, ולכן קטוקלאב לא הצליח לקרוא את התוצאות. אנא דווחו על זה.';
+
+  @override
+  String get venueSearchFailedBlockedByBrowser =>
+      'דפדפן לא יכול לחפש בוולט ישירות. השתמשו באפליקציית קטוקלאב בטלפון, או הדביקו קישור מוולט.';
+
+  @override
+  String get venueSearchFailedBackendUnreachable =>
+      'השרת של קטוקלאב לא היה זמין, ולכן לא ניתן היה לחפש.';
+
+  @override
   String get analysisNotConfigured =>
       'ניתוח בינה מלאכותית אינו זמין בגרסה הזו או בשרת. מוצגות תוצאות על בסיס כללים.';
 

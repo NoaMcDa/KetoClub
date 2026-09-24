@@ -197,6 +197,19 @@ class _Boundary {
 const _boundaries = <_Boundary>[
   _Boundary('restaurant-api.wolt.com', {
     'services/menu/wolt/wolt_adapter.dart',
+    // The by-name venue search POST (issue #39).
+    'services/venue/wolt/wolt_venue_search_service.dart',
+  }),
+  // Wolt's discovery host and page paths (issue #39,
+  // phase2_discovery_research.md §5): venue search only.
+  _Boundary('consumer-api.wolt.com', {
+    'services/venue/wolt/wolt_venue_search_service.dart',
+  }),
+  _Boundary('/v1/pages/', {
+    'services/venue/wolt/wolt_venue_search_service.dart',
+  }),
+  _Boundary('/v1/proxy/wolt/pages/', {
+    'services/venue/wolt/wolt_venue_search_service.dart',
   }),
   _Boundary('www.10bis.co.il', {
     'services/menu/tenbis/tenbis_adapter.dart',

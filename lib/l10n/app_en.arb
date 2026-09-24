@@ -111,6 +111,13 @@
   "fetchFailedUnsupportedSource": "KetoClub cannot read menus from that site yet.",
   "fetchFailedBackendUnreachable": "KetoClub's server could not be reached, so the menu could not be read.",
 
+  "venueSearchFailedOffline": "No connection, so KetoClub could not search for restaurants.",
+  "venueSearchFailedTimeout": "Wolt took too long to answer the search. Try again in a moment.",
+  "venueSearchFailedRateLimited": "Too many searches in a row. Wait a minute, then try again.",
+  "venueSearchFailedPlatformChanged": "Wolt changed how its restaurant search works, so KetoClub could not read the results. Please report this.",
+  "venueSearchFailedBlockedByBrowser": "A web browser cannot search Wolt directly. Use the KetoClub phone app, or paste a Wolt link instead.",
+  "venueSearchFailedBackendUnreachable": "KetoClub's server could not be reached, so the search could not run.",
+
   "analysisNotConfigured": "AI analysis is not available on this build or server. Showing rule-based results.",
   "analysisOffline": "Offline. Showing rule-based results.",
   "analysisTimeout": "The AI model was too slow. Showing rule-based results.",

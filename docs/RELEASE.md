@@ -171,7 +171,7 @@ through.
 | Discovery not built | No nearby venue search or geolocation. Paste-a-link is the only way in. Blocked on finding a Wolt venue-search endpoint (`architecture.md` §17.2) |
 | 10bis fixture is synthetic | `test/fixtures/tenbis_synthetic_menu.json` says so in its first key. Re-record through the 10bis proxy (#122, merged) once a real restaurant id is captured (#44) |
 | Mobile without the backend define is rules-only | iOS and Android call Wolt directly for menus, but AI classification always goes through the backend (`/v1/chat`). With no `KETOCLUB_BACKEND_URL` set at build time, every platform, including phones, falls back to the on-device rule engine and shows "Rules (notConfigured)" |
-| Two WCAG AA contrast failures | Tracked as issue #64, not fixed: the green status pill's own text on its green fill measures 4.08:1, and light-mode `ink3` on `bg` measures 2.78:1. Documented in `lib/theme/app_tokens.dart` |
+| WCAG AA contrast failures | Fixed (issue #64, contrast half): the green status pill's own text on its green fill, light-mode `ink3` on `bg`, and dark-mode `ink3` on `bg` all now clear 4.5:1. Pinned by `test/theme/contrast_test.dart`; see `lib/theme/app_tokens.dart` |
 
 Also worth a line if still true at release time: no human has reviewed the
 code (`HANDOFF.md`), and the pinned Gemini model's behaviour against the

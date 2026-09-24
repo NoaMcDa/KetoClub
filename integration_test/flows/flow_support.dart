@@ -40,6 +40,7 @@ import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 
@@ -88,7 +89,8 @@ final class FakeAppDependencies {
       connectivity = FlowFakeConnectivity(),
       externalLinkOpener = FlowFakeExternalLinkOpener(),
       menuSharer = FlowFakeMenuSharer(),
-      locationService = FlowFakeLocationService();
+      locationService = FlowFakeLocationService(),
+      venueSearchService = FlowFakeVenueSearchService();
 
   /// The faked menu repository; script it with [FlowFakeMenuRepository.stub].
   final FlowFakeMenuRepository repository;
@@ -124,6 +126,10 @@ final class FakeAppDependencies {
   /// [FlowFakeLocationService.result].
   final FlowFakeLocationService locationService;
 
+  /// The faked venue search (issue #39); script it with
+  /// [FlowFakeVenueSearchService.result].
+  final FlowFakeVenueSearchService venueSearchService;
+
   /// When set, [dependencies] wires this in place of [classifier].
   ///
   /// Every flow test that only needs to script "what the top-level
@@ -149,6 +155,7 @@ final class FakeAppDependencies {
     externalLinkOpener: externalLinkOpener,
     menuSharer: menuSharer,
     locationService: locationService,
+    venueSearchService: venueSearchService,
   );
 }
 
@@ -406,4 +413,41 @@ final class FlowFakeNotesStore implements NotesStore {
       Map<String, String>.from(
         _notes[ref.cacheKey] ?? const <String, String>{},
       );
+}
+
+/// A [VenueSearchService] answering one settable [result] and recording
+/// every query — mirrors `test/fakes`' `FakeVenueSearchService`,
+/// duplicated here for the reason this file's own top doc comment gives.
+final class FlowFakeVenueSearchService implements VenueSearchService {
+  /// What every search answers; an empty list until a flow sets it.
+  VenueSearchResult result = const VenuesFound(<Venue>[]);
+
+  /// Every position [nearby] was asked about, in call order.
+  final List<({double latitude, double longitude})> nearbyCalls =
+      <({double latitude, double longitude})>[];
+
+  /// Every query [byName] was asked for, in call order.
+  final List<String> byNameCalls = <String>[];
+
+  @override
+  Future<VenueSearchResult> nearby({
+    required double latitude,
+    required double longitude,
+    required String language,
+  }) async {
+    nearbyCalls.add((latitude: latitude, longitude: longitude));
+    return result;
+  }
+
+  @override
+  Future<VenueSearchResult> byName(
+    String query, {
+    required String language,
+    double? latitude,
+    double? longitude,
+  }) async {
+    byNameCalls.add(query);
+    if (query.trim().isEmpty) return const VenuesFound(<Venue>[]);
+    return result;
+  }
 }

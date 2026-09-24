@@ -265,6 +265,30 @@ class AppLocalizationsEn extends AppLocalizations {
       'KetoClub\'s server could not be reached, so the menu could not be read.';
 
   @override
+  String get venueSearchFailedOffline =>
+      'No connection, so KetoClub could not search for restaurants.';
+
+  @override
+  String get venueSearchFailedTimeout =>
+      'Wolt took too long to answer the search. Try again in a moment.';
+
+  @override
+  String get venueSearchFailedRateLimited =>
+      'Too many searches in a row. Wait a minute, then try again.';
+
+  @override
+  String get venueSearchFailedPlatformChanged =>
+      'Wolt changed how its restaurant search works, so KetoClub could not read the results. Please report this.';
+
+  @override
+  String get venueSearchFailedBlockedByBrowser =>
+      'A web browser cannot search Wolt directly. Use the KetoClub phone app, or paste a Wolt link instead.';
+
+  @override
+  String get venueSearchFailedBackendUnreachable =>
+      'KetoClub\'s server could not be reached, so the search could not run.';
+
+  @override
   String get analysisNotConfigured =>
       'AI analysis is not available on this build or server. Showing rule-based results.';
 

@@ -111,6 +111,13 @@
   "fetchFailedUnsupportedSource": "קטוקלאב לא יודע לקרוא תפריטים מהאתר הזה עדיין.",
   "fetchFailedBackendUnreachable": "השרת של KetoClub לא היה זמין, ולכן לא ניתן היה לקרוא את התפריט.",
 
+  "venueSearchFailedOffline": "אין חיבור, ולכן קטוקלאב לא הצליח לחפש מסעדות.",
+  "venueSearchFailedTimeout": "וולט לא ענתה לחיפוש בזמן. נסו שוב בעוד רגע.",
+  "venueSearchFailedRateLimited": "יותר מדי חיפושים ברצף. חכו דקה ונסו שוב.",
+  "venueSearchFailedPlatformChanged": "וולט שינתה את אופן החיפוש שלה, ולכן קטוקלאב לא הצליח לקרוא את התוצאות. אנא דווחו על זה.",
+  "venueSearchFailedBlockedByBrowser": "דפדפן לא יכול לחפש בוולט ישירות. השתמשו באפליקציית קטוקלאב בטלפון, או הדביקו קישור מוולט.",
+  "venueSearchFailedBackendUnreachable": "השרת של קטוקלאב לא היה זמין, ולכן לא ניתן היה לחפש.",
+
   "analysisNotConfigured": "ניתוח בינה מלאכותית אינו זמין בגרסה הזו או בשרת. מוצגות תוצאות על בסיס כללים.",
   "analysisOffline": "לא מחוברים. מוצגות תוצאות על בסיס כללים.",
   "analysisTimeout": "מודל הבינה המלאכותית היה אטי מדי. מוצגות תוצאות על בסיס כללים.",

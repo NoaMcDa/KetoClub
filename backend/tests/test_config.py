@@ -13,13 +13,17 @@ def test_defaults_match_documented_values() -> None:
     assert settings.GEMINI_THINKING_BUDGET == 0
     assert settings.WOLT_BASE_URL == "https://restaurant-api.wolt.com"
     assert settings.TENBIS_BASE_URL == "https://www.10bis.co.il"
+    assert settings.WOLT_CONSUMER_BASE_URL == "https://consumer-api.wolt.com"
+    assert settings.WOLT_CLIENT_VERSION == "1.16.125"
     assert settings.DATABASE_URL == "sqlite:///./ketoclub.db"
     assert settings.CORS_ORIGIN_REGEX == r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
     assert settings.ADMIN_TOKEN == ""
     assert settings.MENU_CACHE_TTL_SECONDS == 3600
     assert settings.CHAT_CACHE_TTL_SECONDS == 86400
+    assert settings.DISCOVERY_CACHE_TTL_SECONDS == 300
     assert settings.RATE_LIMIT_PER_MINUTE == 5
     assert settings.RATE_LIMIT_PER_DAY == 40
+    assert settings.DISCOVERY_RATE_LIMIT_PER_MINUTE == 20
 
 
 def test_llm_configured_is_false_with_no_key() -> None:

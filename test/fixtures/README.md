@@ -77,6 +77,34 @@ runs against every `wolt_*_menu.json` fixture automatically (except
 `wolt_malformed_menu.json`), so a new file needs no test-file edit to be
 covered.
 
+## Wolt discovery
+
+`wolt_pages_restaurants.json` (the `GET pages/restaurants` "near me" list)
+and `wolt_pages_search.json` (the `POST pages/search` by-name result) are
+**synthetic**, not recorded responses, for the same reason as the menu
+fixture above: neither `consumer-api.wolt.com` nor
+`restaurant-api.wolt.com` is reachable from this build environment. Both
+say so in their own first key, `_fixture_note`, which
+`test/services/venue/wolt/wolt_venue_mapper_test.dart` asserts is ignored.
+
+They are hand-built from the venue object `phase2_discovery_research.md`
+§2.1 documents (the union of what 2026 clients read), extended with every
+shape variation `WoltVenueMapper` must survive: two sections, a venue
+listed in both (dedupe, first wins), an item with no `venue` at all (a
+promo tile, a dish result), a venue with no `location`, one with
+`online: false`, one with neither an item `image` nor a `brand_image`, an
+integer `rating.score`, Hebrew and English names, and unknown keys at the
+top level and inside a section, an item, a venue and a rating.
+
+**Neither file has ever been a real Wolt response.** Re-record both per
+`phase2_discovery_research.md` §2.4 (steps 1, 2 and 5: copy the two
+requests' JSON responses from wolt.com's own traffic in DevTools, redact
+with `tool/record_wolt_fixture.sh`'s rules, keep a `_fixture_note` first
+key) before release. `wolt_venue_fixture_shape_test.dart` then checks the
+recorded shape against every field the mapper reads. A real response may
+not contain every variation above; keep a few hand-added items alongside
+the real ones rather than losing that coverage.
+
 ## 10bis
 
 `tenbis_synthetic_menu.json` and `tenbis_malformed_menu.json` are

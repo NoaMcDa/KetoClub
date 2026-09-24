@@ -20,6 +20,7 @@ import 'package:ketoclub/services/storage/install_id_store.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/venue/wolt/wolt_venue_search_service.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:screen_brightness/screen_brightness.dart' as plugin;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -60,7 +61,8 @@ Uri? backendBaseUrl(String configured) {
 /// KetoClub's own backend instead of calling the platform directly, and
 /// at what address (`backend_plan.md` §3.3, §4.1, issue #122). Both
 /// adapters share this one value, the same registration-order pairing
-/// `di_test.dart` covers for Wolt.
+/// `di_test.dart` covers for Wolt. `WoltVenueSearchService` (issue #39)
+/// shares it too: Wolt's discovery endpoints have the same CORS lock.
 ///
 /// The proxy is used only in a browser — native HTTP has no CORS problem
 /// to route around, so a mobile build reads menus straight from the
@@ -156,5 +158,15 @@ AppDependencies buildDependencies() {
     // (its own doc comment) — this is also why `di.dart` needs no import
     // of `package:geolocator`.
     locationService: GeolocatorLocationService(),
+    // Same routing rule as the menu adapters (issue #39): through the
+    // backend in a browser when one is configured, straight to Wolt
+    // otherwise. The constructor sends nothing and draws no randomness.
+    venueSearchService: WoltVenueSearchService(
+      client: client,
+      proxyBase: menuProxyBase(
+        runsInBrowser: kIsWeb,
+        configured: _configuredBackendUrl,
+      ),
+    ),
   );
 }
