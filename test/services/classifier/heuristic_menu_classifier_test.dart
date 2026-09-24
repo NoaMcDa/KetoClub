@@ -680,7 +680,7 @@ void main() {
       expect(
         analysed.modification,
         equals(
-          '$seedOilFreeModificationEn $dairyFreeModificationEn '
+          '$seedOilFreeModificationEn\n$dairyFreeModificationEn\n'
           '$carnivoreOnlyModificationEn',
         ),
       );

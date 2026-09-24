@@ -96,7 +96,7 @@ AppDependencies buildDependencies() {
   // Passed to the chat client and the venue search: the install id is
   // sent nowhere but the `X-KetoClub-Install-Id` header on a request to
   // KetoClub's own backend (`backend_plan.md` §3.4), which rate-limits
-  // both `/v1/chat` and the discovery routes by it.
+  // both the chat route and the discovery routes by it.
   final installIdStore = PrefsInstallIdStore(
     load: SharedPreferences.getInstance,
   );
