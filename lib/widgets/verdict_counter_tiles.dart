@@ -154,6 +154,13 @@ class _Tile extends StatelessWidget {
       selected: active,
       label: l10n.tileSemanticLabel(label, count),
       hint: active ? l10n.tileSemanticHintClear : l10n.tileSemanticHintFilter,
+      // `excludeSemantics: true` (below) hides this tile's own children
+      // from the semantics tree, including the `tap` action `InkWell`
+      // would otherwise have contributed on its own — without wiring
+      // `onTap` here directly, this node's `button`/`hint` would promise
+      // a screen-reader user something to double-tap that in fact carries
+      // no action, a real gap this pass's own semantics test caught.
+      onTap: onTap,
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,
