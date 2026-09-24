@@ -49,7 +49,7 @@ at hand-off — **verify it is green first**; if red, fix on a new branch via PR
 
 | PR / branch | Issue | State | Next action |
 |---|---|---|---|
-| **#152** `claude/photos-50` | #50 | CI running (backend green) | Subscribe; merge on green |
+| ~~#152~~ | #50 | **Merged** (`63ea9d6`), all checks green | Nothing; `VenueCard` in #154 should switch its private `_VenuePhoto` to `PhotoTile` in a follow-up |
 | **#154** `claude/discovery-screen-40` | #40 | Opened at hand-off; CI not yet seen | Subscribe; after #152 merges, merge `origin/main` into it (ARB conflicts: keep both, `flutter gen-l10n`), drive to green, merge. Worker's own CI worries: `getSemantics` label matches on `VenueCard`, `find.byTooltip` on the header button, flow tests now see a "No restaurants found" panel after typing a slug (search runs after 400 ms with an empty fake), plural ARB keys `venueCardGreenCount`/`venueCardYellowCount`. Design choices to know: bare words are searched by name AND still resolve as a slug; text with `/` or all digits is a paste; no location prompt on open; card uses a private `_VenuePhoto` — swap for `PhotoTile` from #152 in a follow-up |
 
 Worktrees from the previous session (`.claude/worktrees/agent-*`) are gone in a
