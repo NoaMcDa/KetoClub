@@ -633,6 +633,24 @@ human's laptop sit off the critical path.
 Steps 1–3 are captures, not code, and the same thirty-minute session on one
 laptop can do all three plus the two pending fixture recorders (#22, #44).
 
+**Filed on GitHub (2026-09-24).** The 2026-09-24 roadmap re-plan had already
+filed several of these steps, so only the new ones were created:
+
+| Step | Issue |
+|---|---|
+| 0 | #179 (new) |
+| 1, 11 | #177 (existing; findings added as a comment) |
+| 2, 10 | #176 (existing; findings added as a comment) |
+| 3 | #180 (new) |
+| 4 | #170 (existing; PDFs go to Gemini as `application/pdf`, so no rasteriser) |
+| 5 | #181 (new) |
+| 6 | #88 and #89 (existing; Hebrew and PDF findings added to #88) |
+| 7 | folded into #180's recommendation |
+| 8 | #82 (existing Scan tab) plus #182 (new, the QR-code classifier) |
+| 9 | #183 (new, as research first) |
+| 12, 13 | deferred by #164 (findings added as a comment) |
+| 14 | #184 (new) |
+
 ## 8. What only a machine with network access can settle
 
 Each of these was blocked here and changes a ranking in §5 if the answer goes
