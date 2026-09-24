@@ -104,6 +104,38 @@ void main() {
       );
     });
 
+    testWidgets(
+      'build does not overflow at a 2x text scale (architecture.md §8.3)',
+      (tester) async {
+        for (final verdict in DishVerdict.values) {
+          // Arrange: a narrow, phone-width host so a doubled label has the
+          // least room to grow into — the realistic worst case for the
+          // large-text audit, not the wide default test surface.
+          await tester.pumpWidget(
+            MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: Builder(
+                  builder: (context) => MediaQuery(
+                    data: MediaQuery.of(context)
+                        .copyWith(textScaler: const TextScaler.linear(2)),
+                    child: SizedBox(
+                      width: 160,
+                      child: StatusBadge(verdict: verdict),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+
+          // Assert: no RenderFlex overflow exception was thrown.
+          expect(tester.takeException(), isNull);
+        }
+      },
+    );
+
     testWidgets('build paints the pill background from VerdictColors.pill, not '
         'VerdictColors.rail', (tester) async {
       // Arrange: green and amber render their pill on the loud base

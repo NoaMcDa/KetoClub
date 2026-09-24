@@ -131,7 +131,14 @@ class _DishCardState extends State<DishCard> {
           ),
         ],
         const SizedBox(height: 7),
-        Row(
+        // A Wrap, not a Row: at a large text scale the price and the
+        // net-carb chip can outgrow one line together (architecture.md
+        // §8.3's large-text pass) — wrapping the chip to its own line
+        // reads better than a RenderFlex overflow.
+        Wrap(
+          spacing: 9,
+          runSpacing: 4,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             Text(
               formatPrice(dish.price, localeTag: widget.localeTag),
@@ -140,14 +147,12 @@ class _DishCardState extends State<DishCard> {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            if (netCarbs != null && tone != null && verdict != null) ...[
-              const SizedBox(width: 9),
+            if (netCarbs != null && tone != null && verdict != null)
               _NetCarbsChip(
                 estimate: netCarbs,
                 tone: tone,
                 background: _carbChipBackground(theme, verdict, tone),
               ),
-            ],
           ],
         ),
       ],

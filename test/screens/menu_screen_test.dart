@@ -1,4 +1,11 @@
 import 'dart:async';
+// `intl` (imported below for `DateFormat`) also declares its own
+// `TextDirection` class (`LTR`/`RTL`/`UNKNOWN`), which otherwise wins over
+// `dart:ui`'s `TextDirection` (lowercase `ltr`/`rtl`, the type
+// `Directionality.of` actually returns) for the bare, unprefixed name —
+// this prefix import is only for the one RTL test below that needs the
+// real one.
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart' hide MenuController;
 import 'package:flutter_test/flutter_test.dart';
@@ -24,6 +31,7 @@ import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
+import 'package:ketoclub/widgets/keto_score_badge.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
@@ -2369,6 +2377,33 @@ void main() {
           final headerRect = tester.getRect(header);
           final screen = tester.getRect(find.byType(MenuScreen));
           expect(screen.overlaps(headerRect), isTrue);
+        },
+      );
+    });
+
+    group('right-to-left (architecture.md §8.3)', () {
+      testWidgets(
+        'under Locale(he) the screen renders under RTL directionality and '
+        "mirrors the header: the score sits left of the venue's name",
+        (tester) async {
+          // Arrange
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+          final controller = _controllerFor(repository: repository);
+
+          // Act
+          await _pump(tester, controller, locale: const Locale('he'));
+          await tester.pumpAndSettle();
+
+          // Assert: real layout mirroring, not only Hebrew strings under
+          // an LTR frame — the same claim `waiter_card_sheet_test.dart`
+          // and `venue_card_test.dart` already pin for their own screens.
+          final context = tester.element(find.byType(MenuScreen));
+          expect(Directionality.of(context), ui.TextDirection.rtl);
+          final name = tester.getCenter(find.text('v1'));
+          final score = tester.getCenter(find.byType(KetoScoreBadge));
+          expect(score.dx, lessThan(name.dx));
+          expect(tester.takeException(), isNull);
         },
       );
     });

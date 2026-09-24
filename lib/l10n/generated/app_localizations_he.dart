@@ -639,6 +639,12 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get tileSemanticHintFilter => 'הקשה כפולה כדי לסנן';
+
+  @override
+  String get tileSemanticHintClear => 'הקשה כפולה כדי לנקות את הסינון';
+
+  @override
   String get ageJustNow => 'הרגע';
 
   @override

@@ -144,7 +144,7 @@ class VenueCard extends StatelessWidget {
                   if (cardNumbers != null)
                     _YellowCount(
                       text: l10n.venueCardYellowCount(cardNumbers.yellow),
-                      dot: verdictColors.amber.rail,
+                      color: verdictColors.amber.rail,
                     ),
                   if (cardNumbers?.engine case final RulesEngine engine)
                     EngineChip(engine: engine),
@@ -239,29 +239,36 @@ class _GreenPill extends StatelessWidget {
   }
 }
 
-/// The artboard's amber dot and "{N} with changes" count.
+/// The artboard's amber "{N} with changes" count, an icon (matching the
+/// [DishVerdict.modifiable] pill's own icon) beside its own colour rather
+/// than the colour standing alone (architecture.md §6.6).
 class _YellowCount extends StatelessWidget {
-  const new({required this.text, required this.dot});
+  const new({required this.text, required this.color});
 
   final String text;
-  final Color dot;
+
+  /// This count's colour, shared by its icon and its text.
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // The parent `Wrap` hands this row the card's full width as its
+    // bound; at a large text scale (architecture.md §8.3) the label alone
+    // can be wider than that, so it is `Flexible` and wraps onto a second
+    // line rather than overflowing the row's trailing edge.
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        DecoratedBox(
-          decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
-          child: const SizedBox.square(dimension: 8),
-        ),
+        Icon(Icons.edit_note, size: 13, color: color),
         const SizedBox(width: 5),
-        Text(
-          text,
-          style: theme.textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: theme.colorScheme.onSurfaceVariant,
+        Flexible(
+          child: Text(
+            text,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
       ],

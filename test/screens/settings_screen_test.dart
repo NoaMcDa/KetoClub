@@ -778,5 +778,35 @@ void main() {
       expect(find.text(_he.settingsTitle), findsOneWidget);
       expect(find.text(_he.settingsConsentTitle), findsOneWidget);
     });
+
+    group('right-to-left (architecture.md §8.3)', () {
+      testWidgets(
+        'under Locale(he) the screen renders under RTL directionality and '
+        'mirrors the net-carb stepper: minus sits right of plus',
+        (tester) async {
+          // Act
+          await _pump(tester, _controllerFor(), locale: const Locale('he'));
+          await tester.pumpAndSettle();
+
+          // Assert: real layout mirroring, not only Hebrew strings under
+          // an LTR frame — the same claim `waiter_card_sheet_test.dart`
+          // and `venue_card_test.dart` already pin for their own screens.
+          // Under LTR the stepper reads minus, value, plus, left to
+          // right; under RTL `Row` reverses that order, so the minus
+          // button (first in source order) ends up to the right of plus
+          // (last in source order) rather than to its left.
+          final context = tester.element(find.byType(SettingsScreen));
+          expect(Directionality.of(context), TextDirection.rtl);
+          final decrease = tester.getCenter(
+            find.byKey(netCarbLimitDecreaseKey),
+          );
+          final increase = tester.getCenter(
+            find.byKey(netCarbLimitIncreaseKey),
+          );
+          expect(decrease.dx, greaterThan(increase.dx));
+          expect(tester.takeException(), isNull);
+        },
+      );
+    });
   });
 }

@@ -62,18 +62,40 @@ class KetoScoreBadge extends StatelessWidget {
     return Semantics(
       label: l10n.menuKetoScoreSemanticLabel(formatted),
       excludeSemantics: true,
-      child: inline
-          ? Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [number, const SizedBox(width: 4), label],
-            )
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [number, label],
-            ),
+      // Both call sites (`VenueCard`'s header, `MenuScreen`'s header)
+      // place this badge as a non-flexible sibling of an `Expanded` name,
+      // itself often inside a `Column` — the chain hands a non-flex
+      // child unbounded constraints on *both* axes for measurement
+      // (Flutter's own Flex layout algorithm), so a bare `FittedBox`
+      // here would itself throw ("was given an infinite size during
+      // layout") rather than merely overflow. Capping both `maxWidth`
+      // and `maxHeight` below is what makes the constraints `FittedBox`
+      // sees always finite, regardless of what an ambient Row/Column
+      // offers; at a large text scale (architecture.md §8.3's pass), the
+      // "KETO SCORE" label is the widest part of the badge and can by
+      // itself outgrow that cap, so `FittedBox` shrinks the whole badge
+      // to fit it rather than overflowing the header `Row` on its
+      // trailing side. Neither bound clips this badge at a normal text
+      // scale — its natural size is well under both.
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 160, maxHeight: 80),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: AlignmentDirectional.topEnd,
+          child: inline
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [number, const SizedBox(width: 4), label],
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [number, label],
+                ),
+        ),
+      ),
     );
   }
 }

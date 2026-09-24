@@ -190,6 +190,49 @@ void main() {
       expect(Directionality.of(context), TextDirection.rtl);
     });
 
+    testWidgets(
+      'build does not overflow at a 2x text scale on a narrow phone width '
+      '(architecture.md §8.3)',
+      (tester) async {
+        // Arrange: a long dish name, a multi-line script and the
+        // net-carb after-text together — the busiest shape this sheet
+        // renders — on a 320-wide surface, a small phone, at 2x text
+        // scale.
+        tester.view.physicalSize = const Size(320, 700);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        final row = _row(
+          'Grilled Sea Bass with Roasted Root Vegetable Medley',
+          modification:
+              'Replace the mashed potatoes with a green salad or steamed '
+              'vegetables.\n'
+              'Ask for the sauce to be served on the side.',
+          netCarbsEstimate: 6.4,
+        );
+
+        // Act
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => MediaQuery(
+                  data: MediaQuery.of(context)
+                      .copyWith(textScaler: const TextScaler.linear(2)),
+                  child: WaiterCardSheet(row: row),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        // Assert
+        expect(tester.takeException(), isNull);
+      },
+    );
+
     testWidgets('raises the brightness on open and restores it on close', (
       tester,
     ) async {

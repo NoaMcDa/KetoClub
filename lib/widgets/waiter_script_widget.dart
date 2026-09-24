@@ -71,17 +71,36 @@ class WaiterScriptWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        for (var i = 0; i < lines.length; i++)
-          Padding(
-            padding: EdgeInsetsDirectional.only(
-              bottom: i == lines.length - 1 ? 0 : 12,
-            ),
-            child: _NumberedLine(
-              number: i + 1,
-              text: lines[i],
-              prominent: prominent,
-            ),
+        // One Semantics node for every numbered line, so a screen reader
+        // announces the whole script as a single block rather than each
+        // ordinal circle and line of text as its own disjoint node
+        // (architecture.md §8.3). The label is the script's own lines,
+        // in the menu's language, exactly as printed — never translated
+        // or re-worded, per this widget's own doc comment. Visual
+        // selection (SelectableText) and the copy button below are
+        // unaffected: excludeSemantics only replaces what a screen reader
+        // announces, not what a sighted user can tap or select.
+        Semantics(
+          label: lines.join(' '),
+          excludeSemantics: true,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var i = 0; i < lines.length; i++)
+                Padding(
+                  padding: EdgeInsetsDirectional.only(
+                    bottom: i == lines.length - 1 ? 0 : 12,
+                  ),
+                  child: _NumberedLine(
+                    number: i + 1,
+                    text: lines[i],
+                    prominent: prominent,
+                  ),
+                ),
+            ],
           ),
+        ),
         const SizedBox(height: 12),
         Align(
           alignment: AlignmentDirectional.centerEnd,
