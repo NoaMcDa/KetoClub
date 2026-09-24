@@ -23,6 +23,7 @@ final class FakeAppDependencies {
   new({DateTime? startedAt})
     : repository = FakeMenuRepository(),
       classifier = FakeMenuClassifier(),
+      estimateClassifier = FakeMenuClassifier(),
       settingsStore = FakeSettingsStore(),
       notesStore = FakeNotesStore(),
       clock = FakeClock(startedAt ?? DateTime.utc(2026)),
@@ -38,6 +39,11 @@ final class FakeAppDependencies {
 
   /// The faked classifier.
   final FakeMenuClassifier classifier;
+
+  /// The faked rule engine behind "Estimate this list" (issue #42): a
+  /// separate instance from [classifier], so a test can assert the
+  /// explicit action never reached the router.
+  final FakeMenuClassifier estimateClassifier;
 
   /// The faked settings store.
   final FakeSettingsStore settingsStore;
@@ -74,6 +80,7 @@ final class FakeAppDependencies {
   AppDependencies get dependencies => AppDependencies(
     menuRepository: repository,
     menuClassifier: classifier,
+    estimateClassifier: estimateClassifier,
     settingsStore: settingsStore,
     notesStore: notesStore,
     clock: clock,
