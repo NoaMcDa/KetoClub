@@ -377,8 +377,10 @@ void main() {
 
       // Assert
       final analysed = result.dishes.single;
+      // One instruction per line: the waiter script's separator
+      // (architecture.md §6.3), which WaiterScriptWidget numbers.
       final expected =
-          '${carbModifiersEn['teriyaki']} ${carbModifiersEn['honey']}';
+          '${carbModifiersEn['teriyaki']}\n${carbModifiersEn['honey']}';
       expect(analysed.modification, expected);
     });
 
@@ -664,7 +666,7 @@ void main() {
       expect(analysed.why, yellowWhyEn);
       expect(
         analysed.modification,
-        equals('${carbModifiersEn['rice']} $seedOilFreeModificationEn'),
+        equals('${carbModifiersEn['rice']}\n$seedOilFreeModificationEn'),
       );
     });
 
@@ -678,7 +680,7 @@ void main() {
       expect(
         analysed.modification,
         equals(
-          '$seedOilFreeModificationEn $dairyFreeModificationEn '
+          '$seedOilFreeModificationEn\n$dairyFreeModificationEn\n'
           '$carnivoreOnlyModificationEn',
         ),
       );

@@ -220,6 +220,11 @@ Route<void>? generateRoute(
         ),
         child: MenuScreen(
           ref: ref,
+          // A venue card passes the name it already shows (see
+          // VenueSearchScreen._openVenue); a deep link carries none.
+          venueNameHint: settings.arguments is String
+              ? settings.arguments! as String
+              : null,
           screenBrightness: dependencies.screenBrightness,
           connectivity: dependencies.connectivity,
           externalLinkOpener: dependencies.externalLinkOpener,

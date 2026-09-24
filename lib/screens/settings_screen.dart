@@ -7,6 +7,7 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 import 'package:ketoclub/state/theme_mode_controller.dart';
+import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:provider/provider.dart';
 
@@ -97,22 +98,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
       // screen reader) can find a control without first scrolling it
       // into the sliver viewport's cache extent.
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _consentSection(context, l10n, controller),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             _languageSection(context, l10n, controller),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             _appearanceSection(context, l10n, controller),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             _netCarbLimitSection(context, l10n, controller),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             _ketoRulesSection(context, l10n, controller),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             _filterSection(context, l10n, controller),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             _cacheSection(context, l10n, controller),
           ],
         ),
@@ -132,21 +133,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n.settingsConsentTitle,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 8),
-        Text(l10n.settingsConsentBody),
-        CheckboxListTile(
-          contentPadding: EdgeInsets.zero,
-          controlAffinity: ListTileControlAffinity.leading,
-          value: controller.consentGiven,
-          onChanged: busy
-              ? null
-              : (given) =>
-                    unawaited(controller.setConsent(given: given ?? false)),
-          title: Text(l10n.settingsConsentAccept),
+        _SectionLabel(l10n.settingsConsentTitle),
+        _SettingsGroup(
+          children: [
+            _GroupNote(l10n.settingsConsentBody),
+            CheckboxListTile(
+              controlAffinity: ListTileControlAffinity.leading,
+              value: controller.consentGiven,
+              onChanged: busy
+                  ? null
+                  : (given) =>
+                        unawaited(controller.setConsent(given: given ?? false)),
+              title: Text(l10n.settingsConsentAccept),
+            ),
+          ],
         ),
       ],
     );
@@ -170,36 +170,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n.settingsLanguage,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        RadioGroup<String?>(
-          key: languageRadioGroupKey,
-          groupValue: controller.languageTag,
-          onChanged: (tag) => unawaited(_setLanguage(context, controller, tag)),
-          child: Column(
-            children: [
-              RadioListTile<String?>(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.settingsLanguageSystem),
-                value: null,
-                enabled: !busy,
+        _SectionLabel(l10n.settingsLanguage),
+        _SettingsGroup(
+          children: [
+            RadioGroup<String?>(
+              key: languageRadioGroupKey,
+              groupValue: controller.languageTag,
+              onChanged: (tag) =>
+                  unawaited(_setLanguage(context, controller, tag)),
+              child: Column(
+                children: [
+                  RadioListTile<String?>(
+                    title: Text(l10n.settingsLanguageSystem),
+                    value: null,
+                    enabled: !busy,
+                  ),
+                  RadioListTile<String?>(
+                    title: Text(l10n.settingsLanguageEnglish),
+                    value: 'en',
+                    enabled: !busy,
+                  ),
+                  RadioListTile<String?>(
+                    title: Text(l10n.settingsLanguageHebrew),
+                    value: 'he',
+                    enabled: !busy,
+                  ),
+                ],
               ),
-              RadioListTile<String?>(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.settingsLanguageEnglish),
-                value: 'en',
-                enabled: !busy,
-              ),
-              RadioListTile<String?>(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.settingsLanguageHebrew),
-                value: 'he',
-                enabled: !busy,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ],
     );
@@ -234,37 +233,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n.settingsAppearance,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        RadioGroup<AppThemeMode>(
-          key: appearanceRadioGroupKey,
-          groupValue: controller.themeMode,
-          onChanged: (mode) =>
-              unawaited(_setThemeMode(context, controller, mode)),
-          child: Column(
-            children: [
-              RadioListTile<AppThemeMode>(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.settingsAppearanceSystem),
-                value: AppThemeMode.system,
-                enabled: !busy,
+        _SectionLabel(l10n.settingsAppearance),
+        _SettingsGroup(
+          children: [
+            RadioGroup<AppThemeMode>(
+              key: appearanceRadioGroupKey,
+              groupValue: controller.themeMode,
+              onChanged: (mode) =>
+                  unawaited(_setThemeMode(context, controller, mode)),
+              child: Column(
+                children: [
+                  RadioListTile<AppThemeMode>(
+                    title: Text(l10n.settingsAppearanceSystem),
+                    value: AppThemeMode.system,
+                    enabled: !busy,
+                  ),
+                  RadioListTile<AppThemeMode>(
+                    title: Text(l10n.settingsAppearanceLight),
+                    value: AppThemeMode.light,
+                    enabled: !busy,
+                  ),
+                  RadioListTile<AppThemeMode>(
+                    title: Text(l10n.settingsAppearanceDark),
+                    value: AppThemeMode.dark,
+                    enabled: !busy,
+                  ),
+                ],
               ),
-              RadioListTile<AppThemeMode>(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.settingsAppearanceLight),
-                value: AppThemeMode.light,
-                enabled: !busy,
-              ),
-              RadioListTile<AppThemeMode>(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.settingsAppearanceDark),
-                value: AppThemeMode.dark,
-                enabled: !busy,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ],
     );
@@ -308,36 +305,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.settingsNetCarbLimit, style: theme.textTheme.titleMedium),
-        const SizedBox(height: 8),
-        Text(l10n.settingsNetCarbLimitBody),
-        const SizedBox(height: 8),
-        Row(
+        _SectionLabel(l10n.settingsNetCarbLimit),
+        _SettingsGroup(
           children: [
-            IconButton.outlined(
-              key: netCarbLimitDecreaseKey,
-              tooltip: l10n.settingsNetCarbLimitDecrease,
-              onPressed: canDecrease
-                  ? () => unawaited(controller.setNetCarbLimit(grams - 1))
-                  : null,
-              icon: const Icon(Icons.remove),
-            ),
-            SizedBox(
-              width: 72,
-              child: Text(
-                l10n.settingsNetCarbLimitValue(grams),
-                key: netCarbLimitValueKey,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.titleMedium,
+            _GroupNote(l10n.settingsNetCarbLimitBody),
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(8, 0, 8, 10),
+              child: Row(
+                children: [
+                  IconButton.outlined(
+                    key: netCarbLimitDecreaseKey,
+                    tooltip: l10n.settingsNetCarbLimitDecrease,
+                    onPressed: canDecrease
+                        ? () => unawaited(controller.setNetCarbLimit(grams - 1))
+                        : null,
+                    icon: const Icon(Icons.remove),
+                  ),
+                  SizedBox(
+                    width: 72,
+                    child: Text(
+                      l10n.settingsNetCarbLimitValue(grams),
+                      key: netCarbLimitValueKey,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  ),
+                  IconButton.outlined(
+                    key: netCarbLimitIncreaseKey,
+                    tooltip: l10n.settingsNetCarbLimitIncrease,
+                    onPressed: canIncrease
+                        ? () => unawaited(controller.setNetCarbLimit(grams + 1))
+                        : null,
+                    icon: const Icon(Icons.add),
+                  ),
+                ],
               ),
-            ),
-            IconButton.outlined(
-              key: netCarbLimitIncreaseKey,
-              tooltip: l10n.settingsNetCarbLimitIncrease,
-              onPressed: canIncrease
-                  ? () => unawaited(controller.setNetCarbLimit(grams + 1))
-                  : null,
-              icon: const Icon(Icons.add),
             ),
           ],
         ),
@@ -364,44 +366,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n.settingsKetoRules,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 8),
-        Text(l10n.settingsKetoRulesBody),
-        SwitchListTile(
-          key: seedOilFreeSwitchKey,
-          contentPadding: EdgeInsets.zero,
-          title: Text(l10n.settingsSeedOilFree),
-          subtitle: Text(l10n.settingsSeedOilFreeHint),
-          value: controller.seedOilFree,
-          onChanged: busy
-              ? null
-              : (enabled) =>
-                    unawaited(controller.setSeedOilFree(enabled: enabled)),
-        ),
-        SwitchListTile(
-          key: dairyFreeSwitchKey,
-          contentPadding: EdgeInsets.zero,
-          title: Text(l10n.settingsDairyFree),
-          subtitle: Text(l10n.settingsDairyFreeHint),
-          value: controller.dairyFree,
-          onChanged: busy
-              ? null
-              : (enabled) =>
-                    unawaited(controller.setDairyFree(enabled: enabled)),
-        ),
-        SwitchListTile(
-          key: carnivoreOnlySwitchKey,
-          contentPadding: EdgeInsets.zero,
-          title: Text(l10n.settingsCarnivoreOnly),
-          subtitle: Text(l10n.settingsCarnivoreOnlyHint),
-          value: controller.carnivoreOnly,
-          onChanged: busy
-              ? null
-              : (enabled) =>
-                    unawaited(controller.setCarnivoreOnly(enabled: enabled)),
+        _SectionLabel(l10n.settingsKetoRules),
+        _SettingsGroup(
+          children: [
+            _GroupNote(l10n.settingsKetoRulesBody),
+            SwitchListTile(
+              key: seedOilFreeSwitchKey,
+              title: Text(l10n.settingsSeedOilFree),
+              subtitle: Text(l10n.settingsSeedOilFreeHint),
+              value: controller.seedOilFree,
+              onChanged: busy
+                  ? null
+                  : (enabled) =>
+                        unawaited(controller.setSeedOilFree(enabled: enabled)),
+            ),
+            SwitchListTile(
+              key: dairyFreeSwitchKey,
+              title: Text(l10n.settingsDairyFree),
+              subtitle: Text(l10n.settingsDairyFreeHint),
+              value: controller.dairyFree,
+              onChanged: busy
+                  ? null
+                  : (enabled) =>
+                        unawaited(controller.setDairyFree(enabled: enabled)),
+            ),
+            SwitchListTile(
+              key: carnivoreOnlySwitchKey,
+              title: Text(l10n.settingsCarnivoreOnly),
+              subtitle: Text(l10n.settingsCarnivoreOnlyHint),
+              value: controller.carnivoreOnly,
+              onChanged: busy
+                  ? null
+                  : (enabled) => unawaited(
+                      controller.setCarnivoreOnly(enabled: enabled),
+                    ),
+            ),
+          ],
         ),
       ],
     );
@@ -426,31 +426,45 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n.settingsFilter,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 8),
-        SegmentedButton<MenuFilter>(
-          segments: [
-            ButtonSegment(
-              value: MenuFilter.greenOnly,
-              label: Text(l10n.tileGreenLabel),
+        _SectionLabel(l10n.settingsFilter),
+        // At phone width the four segments were forced into equal quarters
+        // and their labels broke mid-word ("Ever/ythin/g") — found by the
+        // visual audit. The artboard's chip-sized label and tighter
+        // padding let all four fit a 390px screen; the sideways scroll is
+        // only the fallback for a narrower one or a longer translation.
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SegmentedButton<MenuFilter>(
+            showSelectedIcon: false,
+            style: SegmentedButton.styleFrom(
+              visualDensity: VisualDensity.compact,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              textStyle: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            ButtonSegment(
-              value: MenuFilter.yellowOnly,
-              label: Text(l10n.tileYellowLabel),
-            ),
-            ButtonSegment(
-              value: MenuFilter.redOnly,
-              label: Text(l10n.tileRedLabel),
-            ),
-            ButtonSegment(value: MenuFilter.all, label: Text(l10n.filterAll)),
-          ],
-          selected: <MenuFilter>{controller.filter},
-          onSelectionChanged: busy
-              ? null
-              : (selection) => unawaited(controller.setFilter(selection.first)),
+            segments: [
+              ButtonSegment(
+                value: MenuFilter.greenOnly,
+                label: Text(l10n.tileGreenLabel),
+              ),
+              ButtonSegment(
+                value: MenuFilter.yellowOnly,
+                label: Text(l10n.tileYellowLabel),
+              ),
+              ButtonSegment(
+                value: MenuFilter.redOnly,
+                label: Text(l10n.tileRedLabel),
+              ),
+              ButtonSegment(value: MenuFilter.all, label: Text(l10n.filterAll)),
+            ],
+            selected: <MenuFilter>{controller.filter},
+            onSelectionChanged: busy
+                ? null
+                : (selection) =>
+                      unawaited(controller.setFilter(selection.first)),
+          ),
         ),
       ],
     );
@@ -474,13 +488,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.settingsCacheSummary(controller.cachedMenuCount)),
-        const SizedBox(height: 8),
-        FilledButton(
-          onPressed: busy
-              ? null
-              : () => unawaited(_confirmAndClearCache(context, controller)),
-          child: Text(l10n.settingsClearCache),
+        _SettingsGroup(
+          children: [
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(15, 8, 6, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.settingsCacheSummary(controller.cachedMenuCount),
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                  ),
+                  // The artboard's "Clear" is a quiet `--red-ink` text
+                  // action at the row's end, not a filled button: it is
+                  // destructive, and the dialog behind it asks first.
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: VerdictColors.of(context).red.ink,
+                    ),
+                    onPressed: busy
+                        ? null
+                        : () => unawaited(
+                            _confirmAndClearCache(context, controller),
+                          ),
+                    child: Text(l10n.settingsClearCache),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         if (_cacheCleared) ...[
           const SizedBox(height: 8),
@@ -529,5 +566,75 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await controller.clearCache();
     if (!mounted) return;
     setState(() => _cacheCleared = true);
+  }
+}
+
+/// A section heading in the artboard's style (`.design/Settings.dc.html`):
+/// small, extra-bold, letter-spaced and muted, sitting just above its
+/// group rather than a full-size title. The artboard also upper-cases it;
+/// Flutter has no text-transform, and the string must stay findable
+/// verbatim, so it keeps its own case.
+class _SectionLabel extends StatelessWidget {
+  const new(this.text);
+
+  /// The section's title.
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(start: 2, bottom: 8),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.labelSmall
+            ?.copyWith(fontSize: 12, letterSpacing: 0.6),
+      ),
+    );
+  }
+}
+
+/// One of the artboard's grouped cards: `--surface`, a `--line` edge and
+/// a 15px radius, holding a section's controls. A themed [Card] (a
+/// [Material]), so the list tiles inside it keep their ink splashes.
+class _SettingsGroup extends StatelessWidget {
+  const new({required this.children});
+
+  /// The section's controls, top to bottom.
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: children,
+        ),
+      ),
+    );
+  }
+}
+
+/// A section's explanatory line inside its group, in the artboard's
+/// muted hint style (13px `--ink2`).
+class _GroupNote extends StatelessWidget {
+  const new(this.text);
+
+  /// The explanation.
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(16, 10, 16, 4),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.bodySmall
+            ?.copyWith(fontSize: 13, height: 1.45),
+      ),
+    );
   }
 }

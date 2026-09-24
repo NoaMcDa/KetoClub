@@ -67,5 +67,31 @@ void main() {
         expect(errorSize, const Size(72, 72));
       },
     );
+
+    testWidgets('a width of double.infinity fills the parent at [size] '
+        'tall — the venue card banner, not a square', (tester) async {
+      // Arrange: a Stack hands its child loose constraints, as the venue
+      // card's does, so a square tile would not be stretched.
+      await _pump(
+        tester,
+        const Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: 300,
+            child: Stack(
+              children: [
+                PhotoTile(imageUrl: null, size: 118, width: double.infinity),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      // Act
+      final size = tester.getSize(find.byType(PhotoTile));
+
+      // Assert
+      expect(size, const Size(300, 118));
+    });
   });
 }

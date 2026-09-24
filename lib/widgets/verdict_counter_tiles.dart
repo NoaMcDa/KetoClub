@@ -138,12 +138,10 @@ class _Tile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    // Unselected reads the theme's own secondary text colour for the
-    // label — the artboard's muted `--ink3` has no direct `ThemeData`
-    // counterpart (see `app_tokens.dart`), so this uses the same
-    // muted-label token `EngineChip`'s rules variant already reads.
+    // Unselected reads the artboard's muted `--ink3`, which the theme
+    // carries as `labelSmall`'s colour (and `onSurfaceVariant`).
     final mutedLabel =
-        theme.textTheme.bodySmall?.color ?? theme.colorScheme.onSurfaceVariant;
+        theme.textTheme.labelSmall?.color ?? theme.colorScheme.onSurfaceVariant;
     final numberColor = active
         ? tone.ink
         : (theme.textTheme.titleLarge?.color ?? theme.colorScheme.onSurface);
@@ -195,7 +193,11 @@ class _Tile extends StatelessWidget {
                       const SizedBox(width: 6),
                       Text(
                         '$count',
+                        // The artboard's tile count: 18px extra-bold, line
+                        // height 1 (`.design/Main.dc.html`).
                         style: theme.textTheme.titleLarge?.copyWith(
+                          fontSize: 18,
+                          height: 1,
                           fontWeight: FontWeight.w800,
                           color: numberColor,
                         ),
@@ -207,8 +209,9 @@ class _Tile extends StatelessWidget {
                 Text(
                   label.toUpperCase(),
                   style: theme.textTheme.labelSmall?.copyWith(
+                    fontSize: 9.5,
                     color: labelColor,
-                    letterSpacing: 0.4,
+                    letterSpacing: 0.5,
                   ),
                 ),
               ],

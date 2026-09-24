@@ -616,7 +616,11 @@ step:
   remove and the exact substitute to ask for.
 - The heuristic engine composes it from `CARB_MODIFIERS` templates in
   `constants.dart`, deduplicated, **in the menu's language** — detected per §12 from
-  the dish's own text, not from the UI locale. *(Phase 1: this sentence used to say
+  the dish's own text, not from the UI locale — one template per line: a newline
+  is the script's instruction separator, which `WaiterScriptWidget` numbers, and
+  the templates carry no terminal punctuation to separate them any other way
+  (the visual audit, `docs/VISUAL_AUDIT.md`, found them joined by a space into one
+  run-on line). *(Phase 1: this sentence used to say
   "in the UI language", which contradicted §12. §12 wins: the script is read aloud
   to a waiter in that restaurant, and the LLM engine already writes in the menu's
   language, so both engines now agree. The consequence is that the template

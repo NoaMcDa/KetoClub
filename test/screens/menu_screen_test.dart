@@ -133,6 +133,7 @@ Future<void> _pump(
   FakeExternalLinkOpener? externalLinkOpener,
   FakeMenuSharer? menuSharer,
   ThemeData? theme,
+  String? venueNameHint,
 }) {
   _useTallSurface(tester);
   return tester.pumpWidget(
@@ -154,6 +155,7 @@ Future<void> _pump(
           connectivity: connectivity ?? FakeConnectivity(),
           externalLinkOpener: externalLinkOpener ?? FakeExternalLinkOpener(),
           menuSharer: menuSharer ?? FakeMenuSharer(),
+          venueNameHint: venueNameHint,
         ),
       ),
     ),
@@ -442,6 +444,22 @@ void main() {
         expect(find.text('Restaurant'), findsNothing);
       },
     );
+
+    testWidgets('the header shows the name a venue card passed along '
+        'before falling back to the reference', (tester) async {
+      // Arrange: the menu names no venue, as every real Wolt fetch today.
+      final repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+      final controller = _controllerFor(repository: repository);
+
+      // Act
+      await _pump(tester, controller, venueNameHint: 'Vitrina');
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Vitrina'), findsOneWidget);
+      expect(find.text(_ref.platformId), findsNothing);
+    });
 
     testWidgets('the header shows Menu.venueName when the platform named '
         'the venue', (tester) async {

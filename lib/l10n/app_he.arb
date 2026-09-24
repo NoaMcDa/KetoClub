@@ -211,6 +211,7 @@
   "discoveryTypeNameInstead": "הקלד שם במקום",
   "discoveryOpenSettings": "פתח הגדרות",
   "discoveryTurnOnLocation": "הפעל מיקום",
+  "discoveryOpenSettingsUnavailable": "לא ניתן לפתוח את ההגדרות מכאן. אפשרו מיקום ל-KetoClub בהגדרות הדפדפן או המכשיר, ונסו שוב.",
   "discoveryNoResultsTitle": "לא נמצאו מסעדות",
   "discoveryNoResultsBody": "נסו שם אחר, או נקו את החיפוש.",
   "discoveryClearSearch": "נקה חיפוש",

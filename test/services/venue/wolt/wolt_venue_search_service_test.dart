@@ -7,10 +7,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/llm/backend_chat_client.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/services/venue/wolt/wolt_venue_search_service.dart';
 import 'package:ketoclub/utils/constants.dart';
 
+import '../../../fakes/fake_install_id_store.dart';
 import '../venue_search_service_contract.dart';
 
 /// The position every search here is made from (Rabin Square, Tel Aviv).
@@ -539,6 +541,60 @@ void main() {
         }),
       );
       expect(request.headers['Content-Type'], startsWith('application/json'));
+    });
+
+    test('sends the install id header the backend requires on both '
+        'routes', () async {
+      // Arrange: the backend's discovery routes answer 400 badResponse to
+      // a request without it (backend/app/routers/discovery.py).
+      final requests = <http.Request>[];
+      final store = FakeInstallIdStore(
+        installId: '0123456789abcdef0123456789abcdef',
+      );
+      final service = WoltVenueSearchService(
+        client: _fixtureClient(requests),
+        proxyBase: _proxy,
+        runsInBrowser: true,
+        installIdStore: store,
+      );
+
+      // Act
+      await _nearby(service);
+      await service.byName('pizza', language: 'en');
+
+      // Assert
+      expect(requests, hasLength(2));
+      for (final request in requests) {
+        expect(
+          request.headers[BackendChatClient.installIdHeader],
+          equals('0123456789abcdef0123456789abcdef'),
+        );
+      }
+    });
+
+    test('never sends the install id on a direct call', () async {
+      // Arrange
+      final requests = <http.Request>[];
+      final store = FakeInstallIdStore();
+      final service = WoltVenueSearchService(
+        client: _fixtureClient(requests),
+        runsInBrowser: false,
+        installIdStore: store,
+      );
+
+      // Act
+      await _nearby(service);
+      await service.byName('pizza', language: 'en');
+
+      // Assert: the id is for KetoClub's backend and nowhere else (D12).
+      expect(requests, hasLength(2));
+      for (final request in requests) {
+        expect(
+          request.headers.containsKey(BackendChatClient.installIdHeader),
+          isFalse,
+        );
+      }
+      expect(store.calls, equals(0));
     });
 
     test('sends none of the Wolt headers, in a browser or not', () async {

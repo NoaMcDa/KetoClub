@@ -105,8 +105,16 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
   /// The UI language code every search is made in.
   String get _language => Localizations.localeOf(context).languageCode;
 
-  void _openVenue(VenueRef ref) {
-    Navigator.pushNamed(context, '/venue/${ref.source.name}/${ref.platformId}');
+  /// Opens [ref]'s menu route. [name], when the screen already knows the
+  /// venue's display name (a venue card), rides along as the route's
+  /// arguments so the menu header can show it: no documented menu payload
+  /// names the venue, so without it the header falls back to the slug.
+  void _openVenue(VenueRef ref, {String? name}) {
+    Navigator.pushNamed(
+      context,
+      '/venue/${ref.source.name}/${ref.platformId}',
+      arguments: name,
+    );
   }
 
   void _locate() {
@@ -127,10 +135,20 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
 
   /// Opens the platform's own settings (issue #40) — the app's permission
   /// page for `servicesOff: false`, the device's location toggle for
-  /// `servicesOff: true`. Fire-and-forget: the screen has nothing to show
-  /// for the result, whether the user grants it or backs out again.
-  void _openSettings({required bool servicesOff}) {
-    unawaited(widget.locationService.openSettings(servicesOff: servicesOff));
+  /// `servicesOff: true`. Nothing is shown when the page opens, whether
+  /// the user then grants access or backs out again; when it could not be
+  /// opened at all — always the case in a browser, which has no settings
+  /// page to deep-link to — a snack bar says where to go instead, so the
+  /// tap is never silently a no-op (found by the visual audit).
+  Future<void> _openSettings({required bool servicesOff}) async {
+    final opened = await widget.locationService.openSettings(
+      servicesOff: servicesOff,
+    );
+    if (opened || !mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+      SnackBar(content: Text(l10n.discoveryOpenSettingsUnavailable)),
+    );
   }
 
   void _clearSearch() {
@@ -158,7 +176,14 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
               const SizedBox(height: 12),
               Text(appName, style: textTheme.labelSmall),
               const SizedBox(height: 4),
-              Text(l10n.discoveryTitle, style: textTheme.displaySmall),
+              // The artboard's 34px serif heading.
+              Text(
+                l10n.discoveryTitle,
+                style: textTheme.displaySmall?.copyWith(
+                  fontSize: 34,
+                  height: 1.08,
+                ),
+              ),
               if (lastVenue != null) ...[
                 const SizedBox(height: 16),
                 _continueRow(context, l10n, lastVenue),
@@ -376,7 +401,7 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
             venue: visible[i],
             numbers: controller.cardNumbers(visible[i]),
             distanceKm: controller.distanceKmTo(visible[i]),
-            onTap: () => _openVenue(visible[i].ref),
+            onTap: () => _openVenue(visible[i].ref, name: visible[i].name),
           ),
         ],
       ],
@@ -438,7 +463,7 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
         ),
         if (outcome.permanently)
           OutlinedButton(
-            onPressed: () => _openSettings(servicesOff: false),
+            onPressed: () => unawaited(_openSettings(servicesOff: false)),
             child: Text(l10n.discoveryOpenSettings),
           )
         else
@@ -482,7 +507,7 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
         ),
         if (reason == LocationUnavailableReason.servicesOff)
           OutlinedButton(
-            onPressed: () => _openSettings(servicesOff: true),
+            onPressed: () => unawaited(_openSettings(servicesOff: true)),
             child: Text(l10n.discoveryTurnOnLocation),
           ),
         if (canRetry)
@@ -558,7 +583,7 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
       child: ListTile(
         leading: const Icon(Icons.history),
         title: Text(l10n.venueSearchContinueWith(name)),
-        onTap: () => _openVenue(lastVenue),
+        onTap: () => _openVenue(lastVenue, name: name),
       ),
     );
   }

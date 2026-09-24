@@ -51,10 +51,11 @@ class VenueCard extends StatelessWidget {
   /// Called when the card is tapped; the screen opens the venue's menu.
   final VoidCallback onTap;
 
-  /// The photo tile's fixed height, from the artboard, and the square
-  /// [PhotoTile.size] it is built from — the surrounding
-  /// [CrossAxisAlignment.stretch] column forces that square tile to the
-  /// card's full width, reproducing the artboard's banner (issue #50).
+  /// The photo tile's fixed height, from the artboard; its width is the
+  /// card's full width ([PhotoTile.width] `double.infinity`), reproducing
+  /// the artboard's banner (issue #50). The [Stack] the tile sits in hands
+  /// it loose constraints, so a square tile would *not* be stretched — the
+  /// visual audit (`docs/VISUAL_AUDIT.md`) found it drawn 118px square.
   /// Fixed so an image arriving late never shifts the list.
   static const double photoHeight = 118;
 
@@ -86,6 +87,7 @@ class VenueCard extends StatelessWidget {
                 PhotoTile(
                   imageUrl: venue.imageUrl,
                   size: photoHeight,
+                  width: double.infinity,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 if (cardNumbers != null)
@@ -115,13 +117,20 @@ class VenueCard extends StatelessWidget {
                 ),
                 if (cardNumbers != null) ...[
                   const SizedBox(width: 10),
-                  KetoScoreBadge(score: cardNumbers.score),
+                  KetoScoreBadge(score: cardNumbers.score, inline: true),
                 ],
               ],
             ),
             if (blurb != null && blurb.trim().isNotEmpty) ...[
               const SizedBox(height: 4),
-              Text(blurb, style: theme.textTheme.bodyMedium),
+              Text(
+                blurb,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontSize: 13,
+                  height: 1.45,
+                  color: theme.textTheme.bodySmall?.color,
+                ),
+              ),
             ],
             if (meta.isNotEmpty || cardNumbers != null) ...[
               const SizedBox(height: 6),

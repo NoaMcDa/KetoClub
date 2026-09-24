@@ -5,6 +5,8 @@ import 'dart:math';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/llm/backend_chat_client.dart';
+import 'package:ketoclub/services/storage/install_id_store.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/services/venue/wolt/wolt_venue_mapper.dart';
 import 'package:ketoclub/utils/constants.dart';
@@ -26,7 +28,10 @@ import 'package:ketoclub/utils/geo.dart';
 /// - [proxyBase] set: KetoClub's backend at
 ///   `{proxyBase}/v1/proxy/wolt/pages/restaurants?lat=&lon=&lang=` and
 ///   `POST {proxyBase}/v1/proxy/wolt/pages/search` (§3). The backend
-///   builds Wolt's headers itself, so none are sent from here.
+///   builds Wolt's headers itself, so none are sent from here — only
+///   KetoClub's own install id, which both discovery routes require for
+///   their per-install rate limit (a request without it is refused with
+///   `400 badResponse`, `backend/app/routers/discovery.py`).
 /// - [proxyBase] null in a browser: Wolt grants CORS only to wolt.com, so
 ///   the request could never succeed; it is not sent, and the search
 ///   answers [VenueSearchFailureReason.blockedByBrowser] at once.
@@ -43,6 +48,7 @@ final class WoltVenueSearchService implements VenueSearchService {
     this.proxyBase,
     this.runsInBrowser = kIsWeb,
     Random? random,
+    InstallIdStore? installIdStore,
   })
     // The fields are private and the parameters are not, so initializing
     // formals are not available.
@@ -50,7 +56,10 @@ final class WoltVenueSearchService implements VenueSearchService {
     : _client = client,
        // Same reason as above: a private field, a public parameter name.
        // ignore: prefer_initializing_formals
-       _random = random;
+       _random = random,
+       // Same reason as above.
+       // ignore: prefer_initializing_formals
+       _installIdStore = installIdStore;
 
   /// How long a search waits for an answer before reporting
   /// [VenueSearchFailureReason.timeout]; the same budget as the menu
@@ -60,6 +69,21 @@ final class WoltVenueSearchService implements VenueSearchService {
   final http.Client _client;
 
   final Random? _random;
+
+  /// Where the `X-KetoClub-Install-Id` header's value comes from on a
+  /// request through [proxyBase] — the same store, and the same header,
+  /// `BackendChatClient` uses. Null sends no install id (a direct call
+  /// never sends one: it is for KetoClub's backend and nowhere else,
+  /// D12).
+  final InstallIdStore? _installIdStore;
+
+  /// The install id to send with a proxied request, or null for a direct
+  /// one. Read per request, like `BackendChatClient`'s, so the first read
+  /// — which touches plugin storage — never happens at construction.
+  Future<String?> _installId() async {
+    if (proxyBase == null) return null;
+    return await _installIdStore?.id();
+  }
 
   /// KetoClub's own backend, when searches go through it rather than
   /// straight to Wolt. Null means direct.
@@ -102,8 +126,12 @@ final class WoltVenueSearchService implements VenueSearchService {
         'lon': '$longitude',
       });
     }
+    final installId = await _installId();
     final result = await _send(
-      () => _client.get(uri, headers: _headers(language, isPost: false)),
+      () => _client.get(
+        uri,
+        headers: _headers(language, isPost: false, installId: installId),
+      ),
     );
     return _sorted(result, latitude, longitude);
   }
@@ -132,10 +160,11 @@ final class WoltVenueSearchService implements VenueSearchService {
     final uri = proxyBase != null
         ? _proxyUri(proxyBase, 'search')
         : Uri.https('restaurant-api.wolt.com', '/v1/pages/search');
+    final installId = await _installId();
     final result = await _send(
       () => _client.post(
         uri,
-        headers: _headers(language, isPost: true),
+        headers: _headers(language, isPost: true, installId: installId),
         body: jsonEncode(body),
       ),
     );
@@ -144,24 +173,29 @@ final class WoltVenueSearchService implements VenueSearchService {
   }
 
   /// The request headers: §2.2's web set on a direct call, only
-  /// `Accept`/`Content-Type` through the proxy, which sets Wolt's headers
-  /// itself and must receive nothing it would have to strip.
-  Map<String, String> _headers(String language, {required bool isPost}) =>
-      <String, String>{
-        'Accept': 'application/json',
-        if (isPost) 'Content-Type': 'application/json',
-        if (proxyBase == null) ...<String, String>{
-          'platform': 'Web',
-          'client-version': woltClientVersion,
-          'clientversionnumber': woltClientVersion,
-          'app-language': language,
-          'x-wolt-web-clientid': _webClientId,
-          'w-wolt-session-id': woltSessionIdNoConsent,
-          // A direct call only ever happens natively (a browser is
-          // refused above), where the User-Agent is ours to set.
-          'User-Agent': browserUserAgent,
-        },
-      };
+  /// `Accept`/`Content-Type` and the [installId] through the proxy, which
+  /// sets Wolt's headers itself and must receive nothing it would have to
+  /// strip.
+  Map<String, String> _headers(
+    String language, {
+    required bool isPost,
+    String? installId,
+  }) => <String, String>{
+    'Accept': 'application/json',
+    if (isPost) 'Content-Type': 'application/json',
+    BackendChatClient.installIdHeader: ?installId,
+    if (proxyBase == null) ...<String, String>{
+      'platform': 'Web',
+      'client-version': woltClientVersion,
+      'clientversionnumber': woltClientVersion,
+      'app-language': language,
+      'x-wolt-web-clientid': _webClientId,
+      'w-wolt-session-id': woltSessionIdNoConsent,
+      // A direct call only ever happens natively (a browser is
+      // refused above), where the User-Agent is ours to set.
+      'User-Agent': browserUserAgent,
+    },
+  };
 
   /// Sends one request and maps every outcome to a result. Never throws.
   Future<VenueSearchResult> _send(

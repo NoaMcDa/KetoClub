@@ -472,6 +472,31 @@ void main() {
       expect(location.openSettingsCalls, [false]);
     });
 
+    testWidgets('Open Settings says where to go when the settings page '
+        'cannot be opened, as in a browser', (tester) async {
+      // Arrange
+      location
+        ..result = const LocationDenied(permanently: true)
+        ..openSettingsResult = false;
+      await _pump(
+        tester,
+        controller: controller,
+        pushedNames: pushedNames,
+        locationService: location,
+      );
+      final l10n = _l10n(tester);
+      await locate(tester);
+
+      // Act
+      await tester.tap(find.text(l10n.discoveryOpenSettings));
+      await tester.pump();
+      await tester.pump();
+
+      // Assert: the tap is never a silent no-op.
+      expect(location.openSettingsCalls, [false]);
+      expect(find.text(l10n.discoveryOpenSettingsUnavailable), findsOneWidget);
+    });
+
     testWidgets('a non-permanent denial offers no Open Settings action', (
       tester,
     ) async {

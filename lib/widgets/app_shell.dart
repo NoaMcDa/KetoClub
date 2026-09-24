@@ -9,8 +9,10 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 /// reaches no service of its own — `app.dart`'s `generateRoute` is the only
 /// place that decides which index a route gets.
 ///
-/// A tab tap uses [Navigator.pushReplacementNamed], so the stack never grows
-/// and the web URL tracks the active tab; "active tab reflects the route"
+/// A tab tap uses [Navigator.pushNamedAndRemoveUntil], clearing every route
+/// beneath it, so the stack never grows — even when the shell was reached
+/// as a pushed route, such as the menu screen's Settings action — and the
+/// web URL tracks the active tab; "active tab reflects the route"
 /// then needs no route observer, since the index is simply passed in by
 /// whichever route built this shell.
 ///
@@ -70,7 +72,13 @@ class AppShell extends StatelessWidget {
         selectedIndex: currentIndex,
         onDestinationSelected: (index) {
           if (index == currentIndex) return;
-          Navigator.of(context).pushReplacementNamed(_routes[index]);
+          // Removes every route, not just this one: the shell is also
+          // reached as a pushed route (the menu screen's Settings
+          // action), and replacing only the top would leave the menu
+          // and everything under it stacked beneath the new tab — each
+          // such round trip grew the stack by a whole menu screen.
+          Navigator.of(context)
+              .pushNamedAndRemoveUntil(_routes[index], (_) => false);
         },
         destinations: [
           NavigationDestination(
