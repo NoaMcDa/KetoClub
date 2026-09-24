@@ -4,11 +4,13 @@ import 'fake_app_logger.dart';
 import 'fake_clock.dart';
 import 'fake_connectivity.dart';
 import 'fake_external_link_opener.dart';
+import 'fake_location_service.dart';
 import 'fake_menu_classifier.dart';
 import 'fake_menu_repository.dart';
 import 'fake_menu_sharer.dart';
 import 'fake_notes_store.dart';
 import 'fake_settings_store.dart';
+import 'fake_venue_search_service.dart';
 
 /// Builds an [AppDependencies] of fakes, for widget and flow tests.
 ///
@@ -27,7 +29,9 @@ final class FakeAppDependencies {
       logger = FakeAppLogger(),
       connectivity = FakeConnectivity(),
       externalLinkOpener = FakeExternalLinkOpener(),
-      menuSharer = FakeMenuSharer();
+      menuSharer = FakeMenuSharer(),
+      locationService = FakeLocationService(),
+      venueSearchService = FakeVenueSearchService();
 
   /// The faked menu repository.
   final FakeMenuRepository repository;
@@ -58,6 +62,14 @@ final class FakeAppDependencies {
   /// The faked menu sharer; inspect [FakeMenuSharer.shareCalls].
   final FakeMenuSharer menuSharer;
 
+  /// The faked location service; script it by setting
+  /// [FakeLocationService.result].
+  final FakeLocationService locationService;
+
+  /// The faked venue search (issue #39); script it with
+  /// [FakeVenueSearchService.queueFound] and friends.
+  final FakeVenueSearchService venueSearchService;
+
   /// The dependency set to hand to the app widget.
   AppDependencies get dependencies => AppDependencies(
     menuRepository: repository,
@@ -69,5 +81,7 @@ final class FakeAppDependencies {
     connectivity: connectivity,
     externalLinkOpener: externalLinkOpener,
     menuSharer: menuSharer,
+    locationService: locationService,
+    venueSearchService: venueSearchService,
   );
 }

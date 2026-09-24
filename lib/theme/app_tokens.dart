@@ -27,7 +27,7 @@ import 'package:flutter/material.dart';
 /// |---|---|---|---|
 /// | light accent | 0.52 0.10 148 | `0xFF3C7847` | |
 /// | light accent-hover | 0.42 0.10 148 | `0xFF1D5B2B` | |
-/// | light green | 0.56 0.13 148 | `0xFF338946` | |
+/// | light green | 0.56 0.13 148 | `0xFF338946` | superseded, see below |
 /// | light green-tint | 0.965 0.022 152 | `0xFFE9F8EC` | |
 /// | light green-ink | 0.40 0.10 150 | `0xFF115629` | |
 /// | light amber | 0.75 0.14 74 | `0xFFE29F36` | |
@@ -48,22 +48,26 @@ import 'package:flutter/material.dart';
 /// | dark red-tint | 0.29 0.065 25 | `0xFF461D1A` | |
 /// | dark red-ink | 0.78 0.14 27 | `0xFFFF968A` | mapped, C 0.140→0.1285 |
 ///
-/// ## Known contrast failures — see issue #64
+/// ## Contrast fixes — see issue #64
 ///
-/// Two light-mode pairs fail WCAG AA and are kept exactly as the artboard
-/// specifies anyway: visual fidelity to the design is the requirement for
-/// this issue, and fixing contrast would mean changing token values the
-/// design does not authorise. Both are measured, not estimated:
+/// Three pairs measured below WCAG AA on `main` (`phase2_discovery_research
+/// .md` §8.3) were darkened/lightened to clear 4.5:1, diverging from the
+/// artboard's own literal values by design — visual fidelity lost out to
+/// legibility for these three tokens only. Every drawn pair, including
+/// these three, is now pinned to one decimal by `test/theme/contrast_test
+/// .dart`, which implements WCAG 2.x relative luminance and contrast ratio
+/// itself rather than trusting the numbers below to stay true:
 ///
-/// - `lightGreenOn` (`0xFFFAF7F0`) on `lightGreen` (`0xFF338946`) — the
-///   green status pill's own 10px bold text — measures **4.08:1**, below the
-///   4.5:1 AA threshold for text that size.
-/// - `lightInk3` (`0xFFA09484`) on `lightBg` (`0xFFFAF7F0`) — small labels —
-///   measures **2.78:1**, well below AA.
+/// - `lightGreen` was `0xFF338946`, now `0xFF2A7A3B` — `lightGreenOn`
+///   (`0xFFFAF7F0`) on it, the green status pill's own 10px bold text, was
+///   4.08:1 and is now **4.97:1**.
+/// - `lightInk3` was `0xFFA09484`, now `0xFF7C6F5F` — on `lightBg`
+///   (`0xFFFAF7F0`) it was 2.78:1 and is now **4.57:1**.
+/// - `darkInk3` was `0xFF7D7364`, now `0xFF8E8474` — on `darkBg`
+///   (`0xFF14120E`) it was 4.02:1 and is now **5.08:1**.
 ///
-/// Dark mode has no equivalent failure. Both are recorded here rather than
-/// silently corrected so that issue #64 (the Phase 2 RTL and accessibility
-/// audit) has a fixed starting point instead of having to re-measure.
+/// `lightGreenTint` and `lightGreenInk` are unchanged; only the saturated
+/// `lightGreen` (the pill/rail colour) moved.
 @immutable
 abstract final class AppTokens {
   // Achromatic tokens — already hex in the snippet, copied verbatim.
@@ -83,15 +87,14 @@ abstract final class AppTokens {
   /// Light `--ink2`.
   static const Color lightInk2 = Color(0xFF6F675B);
 
-  /// Light `--ink3`. See the contrast note above: this fails AA on
-  /// [lightBg] and is kept anyway per the design.
-  static const Color lightInk3 = Color(0xFFA09484);
+  /// Light `--ink3`. Darkened from the artboard's `0xFFA09484` to pass AA
+  /// on [lightBg] — see the class doc comment's contrast-fixes note.
+  static const Color lightInk3 = Color(0xFF7C6F5F);
 
   /// Light `--accent-ink` — text drawn on [lightAccent].
   static const Color lightAccentInk = Color(0xFFFAF7F0);
 
-  /// Light `--green-on` — text drawn on [lightGreen]. See the contrast note
-  /// above: this fails AA at 10px bold and is kept anyway per the design.
+  /// Light `--green-on` — text drawn on [lightGreen].
   static const Color lightGreenOn = Color(0xFFFAF7F0);
 
   /// Light `--amber-on` — text drawn on [lightAmber].
@@ -128,8 +131,9 @@ abstract final class AppTokens {
   /// Dark `--ink2`.
   static const Color darkInk2 = Color(0xFFA99E8C);
 
-  /// Dark `--ink3`.
-  static const Color darkInk3 = Color(0xFF7D7364);
+  /// Dark `--ink3`. Lightened from the artboard's `0xFF7D7364` to pass AA
+  /// on [darkBg] — see the class doc comment's contrast-fixes note.
+  static const Color darkInk3 = Color(0xFF8E8474);
 
   /// Dark `--accent-ink` — text drawn on [darkAccent].
   static const Color darkAccentInk = Color(0xFF14120E);
@@ -164,8 +168,10 @@ abstract final class AppTokens {
   /// Light `--accent-hover`.
   static const Color lightAccentHover = Color(0xFF1D5B2B);
 
-  /// Light `--green`.
-  static const Color lightGreen = Color(0xFF338946);
+  /// Light `--green`. Darkened from the artboard's `0xFF338946` to pass AA
+  /// against [lightGreenOn] — see the class doc comment's contrast-fixes
+  /// note.
+  static const Color lightGreen = Color(0xFF2A7A3B);
 
   /// Light `--green-tint`.
   static const Color lightGreenTint = Color(0xFFE9F8EC);

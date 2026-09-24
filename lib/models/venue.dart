@@ -82,6 +82,9 @@ final class VenueRef {
 @immutable
 final class Venue {
   /// Creates a venue addressed by [ref].
+  ///
+  /// Every field after [name] is optional, because a platform may supply
+  /// none of them; [cuisineTags] is empty rather than null when absent.
   const new({
     required this.ref,
     required this.name,
@@ -89,6 +92,12 @@ final class Venue {
     this.latitude,
     this.longitude,
     this.sourceUrl,
+    this.cuisineTags = const <String>[],
+    this.isOnline,
+    this.imageUrl,
+    this.shortDescription,
+    this.platformRating,
+    this.estimateMinutes,
   });
 
   /// How to fetch this venue's menu.
@@ -109,6 +118,32 @@ final class Venue {
   /// A deep link back to the venue's page on its platform.
   final String? sourceUrl;
 
+  /// The platform's own cuisine labels (Wolt's `tags`, e.g. `sushi`),
+  /// in the platform's order. Empty when the platform gives none.
+  final List<String> cuisineTags;
+
+  /// Whether the venue is taking orders right now, when the platform
+  /// says (Wolt's `online`). This is the live state, not opening hours.
+  final bool? isOnline;
+
+  /// A photo or logo of the venue, when the platform supplies one.
+  final String? imageUrl;
+
+  /// The platform's one-line blurb about the venue, in the language the
+  /// search asked for.
+  final String? shortDescription;
+
+  /// The platform's own customer rating (Wolt's `rating.score`, 0–10).
+  ///
+  /// **Not a keto score.** It says how much customers liked the venue,
+  /// nothing about what it serves; KetoClub's own keto score is computed
+  /// from a classified menu (`utils/keto_score.dart`) and never from this.
+  final double? platformRating;
+
+  /// The platform's own delivery-time estimate in minutes (Wolt's
+  /// `estimate`), when it gives one.
+  final int? estimateMinutes;
+
   @override
   bool operator ==(Object other) =>
       other is Venue &&
@@ -117,11 +152,29 @@ final class Venue {
       other.address == address &&
       other.latitude == latitude &&
       other.longitude == longitude &&
-      other.sourceUrl == sourceUrl;
+      other.sourceUrl == sourceUrl &&
+      listEquals(other.cuisineTags, cuisineTags) &&
+      other.isOnline == isOnline &&
+      other.imageUrl == imageUrl &&
+      other.shortDescription == shortDescription &&
+      other.platformRating == platformRating &&
+      other.estimateMinutes == estimateMinutes;
 
   @override
-  int get hashCode =>
-      Object.hash(ref, name, address, latitude, longitude, sourceUrl);
+  int get hashCode => Object.hash(
+    ref,
+    name,
+    address,
+    latitude,
+    longitude,
+    sourceUrl,
+    Object.hashAll(cuisineTags),
+    isOnline,
+    imageUrl,
+    shortDescription,
+    platformRating,
+    estimateMinutes,
+  );
 
   @override
   String toString() => 'Venue(${ref.cacheKey}: $name)';

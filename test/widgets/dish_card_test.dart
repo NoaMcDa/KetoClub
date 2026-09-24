@@ -7,6 +7,7 @@ import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/price_format.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
+import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
 
@@ -30,12 +31,13 @@ Future<void> _pump(
   );
 }
 
-Dish _dish({String description = ''}) => Dish(
+Dish _dish({String description = '', String? imageUrl}) => Dish(
   id: 'dish_1',
   name: 'Grilled Salmon',
   description: description,
   price: 64,
   options: const [],
+  imageUrl: imageUrl,
 );
 
 void main() {
@@ -267,6 +269,46 @@ void main() {
       // Assert
       expect(find.text('300g, served with lemon butter'), findsOneWidget);
     });
+
+    testWidgets('build passes the dish image URL to PhotoTile (issue #50)', (
+      tester,
+    ) async {
+      // Arrange
+      const imageUrl = 'https://images.wolt.com/salmon.jpg';
+      final row = DishRow(
+        dish: _dish(imageUrl: imageUrl),
+        category: 'Mains',
+      );
+
+      // Act
+      await _pump(
+        tester,
+        DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+      );
+
+      // Assert
+      final tile = tester.widget<PhotoTile>(find.byType(PhotoTile));
+      expect(tile.imageUrl, imageUrl);
+    });
+
+    testWidgets(
+      'build passes a null image URL to PhotoTile when the dish has none '
+      '(issue #50)',
+      (tester) async {
+        // Arrange
+        final row = DishRow(dish: _dish(), category: 'Mains');
+
+        // Act
+        await _pump(
+          tester,
+          DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+        );
+
+        // Assert
+        final tile = tester.widget<PhotoTile>(find.byType(PhotoTile));
+        expect(tile.imageUrl, isNull);
+      },
+    );
 
     testWidgets('build hides the net-carb chip when netCarbsEstimate is null', (
       tester,

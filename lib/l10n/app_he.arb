@@ -13,8 +13,8 @@
   "actionShareMenu": "שתף תפריט",
   "actionCancel": "ביטול",
 
-  "venueSearchLabel": "קישור למסעדה",
-  "venueSearchHint": "הדביקו קישור מוולט, או מזהה מסעדה",
+  "venueSearchLabel": "חיפוש מסעדה",
+  "venueSearchHint": "חפשו לפי שם, או הדביקו קישור מוולט",
   "venueSearchInvalid": "קטוקלאב לא יודע לקרוא תפריט משם עדיין. הדביקו קישור למסעדה בוולט או את המזהה שלה.",
   "venueSearchOpen": "הצג תפריט קטוגני",
   "venueSearchContinueWith": "המשיכו עם {venue}",
@@ -55,7 +55,7 @@
   "waiterCardTitle": "זה מה שאומרים למלצר",
 
   "settingsConsentTitle": "מה יוצא מהמכשיר הזה",
-  "settingsConsentBody": "כשאתם מאשרים ניתוח בינה מלאכותית, שמות המנות, התיאורים ושמות התוספות מהתפריט שאתם פותחים נשלחים לשרת של קטוקלאב, שמעביר אותם לניתוח ב‑Gemini API של Google. שום דבר עליכם, על מקומכם או על ההיסטוריה שלכם לא נשלח. אין איסוף נתונים.",
+  "settingsConsentBody": "כשאתם מאשרים ניתוח בינה מלאכותית, שמות המנות, התיאורים ושמות התוספות מהתפריט שאתם פותחים נשלחים לשרת של קטוקלאב, שמעביר אותם לניתוח ב‑Gemini API של Google. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים.",
   "settingsConsentAccept": "הבנתי",
   "settingsLanguage": "שפה",
   "settingsLanguageSystem": "לפי המכשיר",
@@ -110,6 +110,13 @@
   },
   "fetchFailedUnsupportedSource": "קטוקלאב לא יודע לקרוא תפריטים מהאתר הזה עדיין.",
   "fetchFailedBackendUnreachable": "השרת של KetoClub לא היה זמין, ולכן לא ניתן היה לקרוא את התפריט.",
+
+  "venueSearchFailedOffline": "אין חיבור, ולכן קטוקלאב לא הצליח לחפש מסעדות.",
+  "venueSearchFailedTimeout": "וולט לא ענתה לחיפוש בזמן. נסו שוב בעוד רגע.",
+  "venueSearchFailedRateLimited": "יותר מדי חיפושים ברצף. חכו דקה ונסו שוב.",
+  "venueSearchFailedPlatformChanged": "וולט שינתה את אופן החיפוש שלה, ולכן קטוקלאב לא הצליח לקרוא את התוצאות. אנא דווחו על זה.",
+  "venueSearchFailedBlockedByBrowser": "דפדפן לא יכול לחפש בוולט ישירות. השתמשו באפליקציית קטוקלאב בטלפון, או הדביקו קישור מוולט.",
+  "venueSearchFailedBackendUnreachable": "השרת של קטוקלאב לא היה זמין, ולכן לא ניתן היה לחפש.",
 
   "analysisNotConfigured": "ניתוח בינה מלאכותית אינו זמין בגרסה הזו או בשרת. מוצגות תוצאות על בסיס כללים.",
   "analysisOffline": "לא מחוברים. מוצגות תוצאות על בסיס כללים.",
@@ -181,8 +188,48 @@
   "savedUndo": "בטל",
 
   "discoveryTitle": "איפה לאכול",
-  "discoveryEmptyTitle": "הדביקו קישור כדי להתחיל",
-  "discoveryEmptyBody": "חיפוש עדיין לא זמין — הדביקו למעלה קישור למסעדה בוולט, או את המזהה שלה, כדי לראות תפריט מסווג לפי קטו.",
+  "discoveryEmptyTitle": "מצאו איפה לאכול",
+  "discoveryEmptyBody": "השתמשו במיקום שלכם כדי לראות מסעדות בסביבה, חפשו לפי שם, או הדביקו למעלה קישור מוולט כדי לפתוח את התפריט המסווג לפי קטו.",
+  "discoveryLookingAround": "מחפשים סביב",
+  "discoveryAroundYou": "המיקום שלך",
+  "discoveryLocationNotSet": "לא נקבע מיקום",
+  "discoveryUseLocation": "השתמש במיקום שלי",
+  "discoveryChipNearby": "בסביבה",
+  "discoveryChipKetoEightPlus": "קטו 8+",
+  "discoveryChipOpenNow": "פתוח עכשיו",
+  "discoveryLocating": "מאתר את המיקום שלך…",
+  "discoverySearching": "מחפש מסעדות…",
+  "discoveryLocationDeniedTitle": "המיקום כבוי עבור קטוקלאב",
+  "discoveryLocationDeniedBody": "אפשרו גישה למיקום כדי לראות מסעדות בסביבה, או חפשו לפי שם במקום.",
+  "discoveryLocationDeniedForeverBody": "הגישה למיקום כבויה עבור קטוקלאב. אפשר להפעיל אותה מחדש בהגדרות המכשיר, או לחפש לפי שם במקום.",
+  "discoveryLocationUnavailableTitle": "לא הצלחנו למצוא את המיקום שלך",
+  "discoveryLocationServicesOff": "שירותי המיקום במכשיר כבויים. הפעילו אותם ונסו שוב, או חפשו לפי שם במקום.",
+  "discoveryLocationInsecureContext": "הדף הזה לא יכול לבקש את המיקום שלך כי החיבור אינו מאובטח (https). חפשו לפי שם במקום.",
+  "discoveryLocationTimeout": "איתור המיקום לקח יותר מדי זמן. נסו שוב, או חפשו לפי שם במקום.",
+  "discoveryLocationUnsupported": "המכשיר לא הצליח לספק מיקום. חפשו לפי שם במקום.",
+  "discoveryTypeNameInstead": "הקלד שם במקום",
+  "discoveryNoResultsTitle": "לא נמצאו מסעדות",
+  "discoveryNoResultsBody": "נסו שם אחר, או נקו את החיפוש.",
+  "discoveryClearSearch": "נקה חיפוש",
+  "discoveryNoChipResults": "אף מסעדה ברשימה לא מתאימה לסינון הזה.",
+  "venueCardOpenNow": "פתוח עכשיו",
+  "venueCardClosed": "סגור",
+  "venueCardMinutes": "{minutes} דק׳",
+  "@venueCardMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "venueCardWalkMinutes": "{minutes} דק׳ הליכה",
+  "@venueCardWalkMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "venueCardGreenCount": "{count, plural, one{מנה אחת כמו שהיא} other{{count} מנות כמו שהן}}",
+  "@venueCardGreenCount": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "venueCardYellowCount": "{count, plural, one{אחת עם שינויים} other{{count} עם שינויים}}",
+  "@venueCardYellowCount": {
+    "placeholders": { "count": { "type": "num" } }
+  },
   "menuKetoScoreLabel": "ציון קטוגני",
   "menuKetoScoreSemanticLabel": "ציון קטוגני: {score} מתוך 10",
   "@menuKetoScoreSemanticLabel": {

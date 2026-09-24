@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
@@ -9,6 +10,7 @@ import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/venue/venue_search_service.dart';
 
 /// The set of service interfaces the app is built on (architecture.md §18.1).
 ///
@@ -34,6 +36,8 @@ class AppDependencies {
     required this.connectivity,
     required this.externalLinkOpener,
     required this.menuSharer,
+    required this.locationService,
+    required this.venueSearchService,
     this.screenBrightness = const NoOpScreenBrightness(),
   });
 
@@ -76,4 +80,14 @@ class AppDependencies {
   /// Shares the classified menu's green and yellow dishes as plain text
   /// through the platform's own share sheet (issue #54).
   final MenuSharer menuSharer;
+
+  /// Reads the device's current position for nearby search
+  /// (architecture.md §6.5, issue #37), for the Discovery screen's
+  /// location button (issue #40).
+  final LocationService locationService;
+
+  /// Finds venues near a position or by name (issue #39,
+  /// `phase2_discovery_research.md` §5). One call per user action; never
+  /// fanned out over venues.
+  final VenueSearchService venueSearchService;
 }

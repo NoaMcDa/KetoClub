@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/di.dart';
 import 'package:ketoclub/services/classifier/classifier_router.dart';
+import 'package:ketoclub/services/location/geolocator_location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
@@ -10,6 +11,7 @@ import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/venue/wolt/wolt_venue_search_service.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 
 void main() {
@@ -39,6 +41,8 @@ void main() {
       expect(dependencies.connectivity, isA<DeviceConnectivity>());
       expect(dependencies.externalLinkOpener, isA<UrlLauncherLinkOpener>());
       expect(dependencies.menuSharer, isA<SharePlusMenuSharer>());
+      expect(dependencies.locationService, isA<GeolocatorLocationService>());
+      expect(dependencies.venueSearchService, isA<WoltVenueSearchService>());
     });
 
     test('performs no plugin I/O while building the graph', () {
@@ -48,6 +52,18 @@ void main() {
       // belongs in a closure invoked on first use, not in a constructor.
       // main_test.dart and the launch flow test depend on this too.
       expect(buildDependencies, returnsNormally);
+    });
+  });
+
+  group('buildDependencies venue search wiring (issue #39)', () {
+    test('routes venue search straight to Wolt outside a browser', () {
+      // Act: the test VM is not web, so menuProxyBase answers null.
+      final service =
+          buildDependencies().venueSearchService as WoltVenueSearchService;
+
+      // Assert
+      expect(service.proxyBase, isNull);
+      expect(service.runsInBrowser, isFalse);
     });
   });
 

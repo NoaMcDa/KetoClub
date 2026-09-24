@@ -13,8 +13,8 @@
   "actionShareMenu": "Share menu",
   "actionCancel": "Cancel",
 
-  "venueSearchLabel": "Restaurant link",
-  "venueSearchHint": "Paste a Wolt link, or a venue slug",
+  "venueSearchLabel": "Find a restaurant",
+  "venueSearchHint": "Search by name, or paste a Wolt link",
   "venueSearchInvalid": "KetoClub cannot read a menu from that yet. Paste a Wolt restaurant link or its slug.",
   "venueSearchOpen": "Show the keto menu",
   "venueSearchContinueWith": "Continue with {venue}",
@@ -55,7 +55,7 @@
   "waiterCardTitle": "Say this to the waiter",
 
   "settingsConsentTitle": "What leaves this device",
-  "settingsConsentBody": "When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent to KetoClub's server, which forwards them to Google's Gemini API for analysis. Nothing about you, your location or your history is sent. There are no analytics.",
+  "settingsConsentBody": "When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent to KetoClub's server, which forwards them to Google's Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics.",
   "settingsConsentAccept": "I understand",
   "settingsLanguage": "Language",
   "settingsLanguageSystem": "Match my device",
@@ -110,6 +110,13 @@
   },
   "fetchFailedUnsupportedSource": "KetoClub cannot read menus from that site yet.",
   "fetchFailedBackendUnreachable": "KetoClub's server could not be reached, so the menu could not be read.",
+
+  "venueSearchFailedOffline": "No connection, so KetoClub could not search for restaurants.",
+  "venueSearchFailedTimeout": "Wolt took too long to answer the search. Try again in a moment.",
+  "venueSearchFailedRateLimited": "Too many searches in a row. Wait a minute, then try again.",
+  "venueSearchFailedPlatformChanged": "Wolt changed how its restaurant search works, so KetoClub could not read the results. Please report this.",
+  "venueSearchFailedBlockedByBrowser": "A web browser cannot search Wolt directly. Use the KetoClub phone app, or paste a Wolt link instead.",
+  "venueSearchFailedBackendUnreachable": "KetoClub's server could not be reached, so the search could not run.",
 
   "analysisNotConfigured": "AI analysis is not available on this build or server. Showing rule-based results.",
   "analysisOffline": "Offline. Showing rule-based results.",
@@ -181,8 +188,48 @@
   "savedUndo": "Undo",
 
   "discoveryTitle": "Where to eat",
-  "discoveryEmptyTitle": "Paste a link to get started",
-  "discoveryEmptyBody": "Search isn't available yet — paste a Wolt restaurant link, or its slug, above to see its keto-classified menu.",
+  "discoveryEmptyTitle": "Find somewhere to eat",
+  "discoveryEmptyBody": "Use your location to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.",
+  "discoveryLookingAround": "Looking around",
+  "discoveryAroundYou": "Your location",
+  "discoveryLocationNotSet": "Location not set",
+  "discoveryUseLocation": "Use my location",
+  "discoveryChipNearby": "Nearby",
+  "discoveryChipKetoEightPlus": "Keto 8+",
+  "discoveryChipOpenNow": "Open now",
+  "discoveryLocating": "Finding your location…",
+  "discoverySearching": "Looking for restaurants…",
+  "discoveryLocationDeniedTitle": "Location is off for KetoClub",
+  "discoveryLocationDeniedBody": "Allow location to see restaurants near you, or search by name instead.",
+  "discoveryLocationDeniedForeverBody": "Location access is turned off for KetoClub. You can turn it back on in your device's settings, or search by name instead.",
+  "discoveryLocationUnavailableTitle": "Could not find your location",
+  "discoveryLocationServicesOff": "Your device's location is turned off. Turn it on and try again, or search by name instead.",
+  "discoveryLocationInsecureContext": "This page cannot ask for your location because it is not on a secure (https) connection. Search by name instead.",
+  "discoveryLocationTimeout": "Finding your location took too long. Try again, or search by name instead.",
+  "discoveryLocationUnsupported": "This device could not provide a location. Search by name instead.",
+  "discoveryTypeNameInstead": "Type a name instead",
+  "discoveryNoResultsTitle": "No restaurants found",
+  "discoveryNoResultsBody": "Try a different name, or clear the search.",
+  "discoveryClearSearch": "Clear search",
+  "discoveryNoChipResults": "No restaurant in this list matches that filter.",
+  "venueCardOpenNow": "Open now",
+  "venueCardClosed": "Closed",
+  "venueCardMinutes": "{minutes} min",
+  "@venueCardMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "venueCardWalkMinutes": "{minutes} min walk",
+  "@venueCardWalkMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "venueCardGreenCount": "{count, plural, one{1 dish as-is} other{{count} dishes as-is}}",
+  "@venueCardGreenCount": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "venueCardYellowCount": "{count, plural, one{1 with changes} other{{count} with changes}}",
+  "@venueCardYellowCount": {
+    "placeholders": { "count": { "type": "num" } }
+  },
   "menuKetoScoreLabel": "Keto score",
   "menuKetoScoreSemanticLabel": "Keto score: {score} out of 10",
   "@menuKetoScoreSemanticLabel": {

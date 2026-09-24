@@ -27,6 +27,35 @@ const String browserUserAgent =
     'AppleWebKit/537.36 (KHTML, like Gecko) '
     'Chrome/120.0.0.0 Safari/537.36';
 
+/// The web-client version sent as both `client-version` and
+/// `clientversionnumber` on Wolt's discovery endpoints
+/// (`phase2_discovery_research.md` §2.2). Values seen in 2026 run from
+/// `1.16.75` to `1.16.125`; Wolt answers an outdated one with HTTP 430 or
+/// a 410, which the venue search reports as `platformChanged`. Pinned in
+/// one place so bumping it is a one-line change; the backend's
+/// `WOLT_CLIENT_VERSION` setting is its counterpart for the proxy.
+const String woltClientVersion = '1.16.125';
+
+/// The value of the `w-wolt-session-id` header on Wolt's discovery
+/// endpoints (`phase2_discovery_research.md` §2.2): what wolt.com itself
+/// sends for a visitor who declined analytics.
+const String woltSessionIdNoConsent = 'no-analytics-consent';
+
+/// The longest venue-search query sent, in characters. The backend's
+/// search proxy rejects anything longer (`phase2_discovery_research.md`
+/// §3), so a longer query is cut rather than failing the whole search.
+const int venueSearchMaxQueryLength = 80;
+
+/// How long the Discovery search field waits after the last keystroke
+/// before searching by name (`phase2_discovery_research.md` §6), so a
+/// typed word is one search rather than one per letter.
+const Duration venueSearchDebounce = Duration(milliseconds: 400);
+
+/// The lowest keto score the Discovery screen's *Keto 8+* chip keeps
+/// (issue #40, D13). Compared against `utils/keto_score.dart`'s score,
+/// inclusive.
+const double ketoEightPlusThreshold = 8;
+
 // ---------------------------------------------------------------------------
 // Cache and LLM request tuning (architecture.md §6.4, §9.3, §9.4)
 // ---------------------------------------------------------------------------

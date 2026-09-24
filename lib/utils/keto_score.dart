@@ -46,9 +46,13 @@ const double _yellowWeight = 0.5;
 /// source for "a dish that needs one swap is worth exactly half a safe
 /// one" beyond it sounding reasonable. It renders as a single, confident
 /// decimal next to food a person is about to order and eat, which claims
-/// more precision and authority than the formula actually has. Issue #41
-/// (Phase 2) is where this gets a real basis, changes, or is removed
-/// outright; nothing here should be read as settled.
+/// more precision and authority than the formula actually has. Decision
+/// D13 (architecture.md §14, issue #41) looked for a basis, found none,
+/// and kept the formula unchanged with that status stated plainly: a UI
+/// ranking heuristic with no nutrition basis, never a health claim. The
+/// venue cards reuse this function rather than a second formula, show it
+/// only from an analysis already cached, and mark rules-only numbers as
+/// an estimate through the engine label.
 double? ketoScore({
   required int greenCount,
   required int yellowCount,

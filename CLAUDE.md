@@ -355,8 +355,12 @@ Built, but not confirmed end to end, and not to be reported as done:
 - **No screenshot or narrow-width run has confirmed the UI against the artboards.**
   Token fidelity (colours, spacing) is enforced by a test; pixel fidelity is not.
 - **No human has reviewed this code.**
-- Two light-mode colour pairs in `lib/theme/app_tokens.dart` fail WCAG AA contrast
-  (green-on-green at 4.08:1, ink3-on-bg at 2.78:1) — tracked as issue #64, not fixed.
+- The three colour pairs that failed WCAG AA contrast (green-on-green at
+  4.08:1, light `ink3`-on-bg at 2.78:1, dark `ink3`-on-bg at 4.02:1) were
+  fixed and are now pinned by `test/theme/contrast_test.dart`, along with
+  every other `on`/surface pair `VerdictColors` produces — see the
+  "Contrast fixes" note in `lib/theme/app_tokens.dart` (issue #64, the
+  contrast half; semantics/RTL/large text are a later PR).
 
 ## Getting started
 

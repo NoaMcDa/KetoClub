@@ -43,10 +43,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionCancel => 'Cancel';
 
   @override
-  String get venueSearchLabel => 'Restaurant link';
+  String get venueSearchLabel => 'Find a restaurant';
 
   @override
-  String get venueSearchHint => 'Paste a Wolt link, or a venue slug';
+  String get venueSearchHint => 'Search by name, or paste a Wolt link';
 
   @override
   String get venueSearchInvalid =>
@@ -132,7 +132,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsConsentBody =>
-      'When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you, your location or your history is sent. There are no analytics.';
+      'When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics.';
 
   @override
   String get settingsConsentAccept => 'I understand';
@@ -263,6 +263,30 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get fetchFailedBackendUnreachable =>
       'KetoClub\'s server could not be reached, so the menu could not be read.';
+
+  @override
+  String get venueSearchFailedOffline =>
+      'No connection, so KetoClub could not search for restaurants.';
+
+  @override
+  String get venueSearchFailedTimeout =>
+      'Wolt took too long to answer the search. Try again in a moment.';
+
+  @override
+  String get venueSearchFailedRateLimited =>
+      'Too many searches in a row. Wait a minute, then try again.';
+
+  @override
+  String get venueSearchFailedPlatformChanged =>
+      'Wolt changed how its restaurant search works, so KetoClub could not read the results. Please report this.';
+
+  @override
+  String get venueSearchFailedBlockedByBrowser =>
+      'A web browser cannot search Wolt directly. Use the KetoClub phone app, or paste a Wolt link instead.';
+
+  @override
+  String get venueSearchFailedBackendUnreachable =>
+      'KetoClub\'s server could not be reached, so the search could not run.';
 
   @override
   String get analysisNotConfigured =>
@@ -412,11 +436,124 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoveryTitle => 'Where to eat';
 
   @override
-  String get discoveryEmptyTitle => 'Paste a link to get started';
+  String get discoveryEmptyTitle => 'Find somewhere to eat';
 
   @override
   String get discoveryEmptyBody =>
-      'Search isn\'t available yet — paste a Wolt restaurant link, or its slug, above to see its keto-classified menu.';
+      'Use your location to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.';
+
+  @override
+  String get discoveryLookingAround => 'Looking around';
+
+  @override
+  String get discoveryAroundYou => 'Your location';
+
+  @override
+  String get discoveryLocationNotSet => 'Location not set';
+
+  @override
+  String get discoveryUseLocation => 'Use my location';
+
+  @override
+  String get discoveryChipNearby => 'Nearby';
+
+  @override
+  String get discoveryChipKetoEightPlus => 'Keto 8+';
+
+  @override
+  String get discoveryChipOpenNow => 'Open now';
+
+  @override
+  String get discoveryLocating => 'Finding your location…';
+
+  @override
+  String get discoverySearching => 'Looking for restaurants…';
+
+  @override
+  String get discoveryLocationDeniedTitle => 'Location is off for KetoClub';
+
+  @override
+  String get discoveryLocationDeniedBody =>
+      'Allow location to see restaurants near you, or search by name instead.';
+
+  @override
+  String get discoveryLocationDeniedForeverBody =>
+      'Location access is turned off for KetoClub. You can turn it back on in your device\'s settings, or search by name instead.';
+
+  @override
+  String get discoveryLocationUnavailableTitle =>
+      'Could not find your location';
+
+  @override
+  String get discoveryLocationServicesOff =>
+      'Your device\'s location is turned off. Turn it on and try again, or search by name instead.';
+
+  @override
+  String get discoveryLocationInsecureContext =>
+      'This page cannot ask for your location because it is not on a secure (https) connection. Search by name instead.';
+
+  @override
+  String get discoveryLocationTimeout =>
+      'Finding your location took too long. Try again, or search by name instead.';
+
+  @override
+  String get discoveryLocationUnsupported =>
+      'This device could not provide a location. Search by name instead.';
+
+  @override
+  String get discoveryTypeNameInstead => 'Type a name instead';
+
+  @override
+  String get discoveryNoResultsTitle => 'No restaurants found';
+
+  @override
+  String get discoveryNoResultsBody =>
+      'Try a different name, or clear the search.';
+
+  @override
+  String get discoveryClearSearch => 'Clear search';
+
+  @override
+  String get discoveryNoChipResults =>
+      'No restaurant in this list matches that filter.';
+
+  @override
+  String get venueCardOpenNow => 'Open now';
+
+  @override
+  String get venueCardClosed => 'Closed';
+
+  @override
+  String venueCardMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String venueCardWalkMinutes(int minutes) {
+    return '$minutes min walk';
+  }
+
+  @override
+  String venueCardGreenCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dishes as-is',
+      one: '1 dish as-is',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String venueCardYellowCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count with changes',
+      one: '1 with changes',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get menuKetoScoreLabel => 'Keto score';

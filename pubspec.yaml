@@ -19,7 +19,7 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  geolocator: ^11.0.0
+  geolocator: ^14.0.0
   # Menu and analysis cache (architecture.md §6.4). Pure Dart; only di.dart
   # touches hive_flutter, so the cache is testable without a binding.
   hive: ^2.2.3
