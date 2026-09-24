@@ -154,11 +154,14 @@ confirmed the UI against the `.design/Main.dc.html` artboards. Token fidelity
   `"~{n}g net carbs (estimate)"`, hidden entirely when null — always true for a
   rules-engine result — because the model can produce a number but it cannot be
   trusted as fact, and the copy and `Semantics` label both say so.
-- **Two light-mode colour pairs fail WCAG AA contrast**, kept exactly as the
-  artboard specifies rather than silently drifting from it: the green status
-  pill's own text on its green fill measures 4.08:1, and light `ink3` on `bg`
-  measures 2.78:1 — both documented in `lib/theme/app_tokens.dart` and tracked as
-  issue #64, not fixed here.
+- **The three colour pairs that failed WCAG AA contrast are fixed**: the
+  green status pill's own text on its green fill was 4.08:1 (now 4.97:1),
+  light `ink3` on `bg` was 2.78:1 (now 4.57:1), and dark `ink3` on `bg` was
+  4.02:1 (now 5.08:1). The new values and the reasoning are in
+  `lib/theme/app_tokens.dart`'s "Contrast fixes" note, and every drawn
+  `on`/surface pair — these three plus every other one `VerdictColors`
+  produces — is pinned by `test/theme/contrast_test.dart` (issue #64's
+  contrast half; semantics/RTL/large text are a later PR).
 
 ---
 
