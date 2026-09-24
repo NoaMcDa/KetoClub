@@ -434,6 +434,9 @@ tests the issue lists (scheduler with fakes, cancellation on a new query,
 the LLM fake never called, the estimate marker) all still apply to the
 explicit action.
 
+*Recorded as D13 in `architecture.md` §14 on 2026-09-24 (PR #147, closing
+#41), exactly as recommended above; #42 was rescoped to match.*
+
 ## 8. Flows, skeletons, accessibility, photos
 
 ### 8.1 Discovery flow tests (#43)
