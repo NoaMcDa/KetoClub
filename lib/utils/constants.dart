@@ -46,6 +46,16 @@ const String woltSessionIdNoConsent = 'no-analytics-consent';
 /// §3), so a longer query is cut rather than failing the whole search.
 const int venueSearchMaxQueryLength = 80;
 
+/// How long the Discovery search field waits after the last keystroke
+/// before searching by name (`phase2_discovery_research.md` §6), so a
+/// typed word is one search rather than one per letter.
+const Duration venueSearchDebounce = Duration(milliseconds: 400);
+
+/// The lowest keto score the Discovery screen's *Keto 8+* chip keeps
+/// (issue #40, D13). Compared against `utils/keto_score.dart`'s score,
+/// inclusive.
+const double ketoEightPlusThreshold = 8;
+
 // ---------------------------------------------------------------------------
 // Cache and LLM request tuning (architecture.md §6.4, §9.3, §9.4)
 // ---------------------------------------------------------------------------

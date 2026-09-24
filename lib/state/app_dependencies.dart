@@ -82,9 +82,8 @@ class AppDependencies {
   final MenuSharer menuSharer;
 
   /// Reads the device's current position for nearby search
-  /// (architecture.md §6.5, issue #37). Nothing consumes this yet — the
-  /// Discovery screen and `VenueSearchService` that will (issues #39,
-  /// #40) are separate work.
+  /// (architecture.md §6.5, issue #37), for the Discovery screen's
+  /// location button (issue #40).
   final LocationService locationService;
 
   /// Finds venues near a position or by name (issue #39,

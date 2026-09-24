@@ -157,6 +157,8 @@ Route<void>? generateRoute(
           create: (_) => VenueSearchController(
             dependencies.settingsStore,
             dependencies.menuRepository,
+            locationService: dependencies.locationService,
+            venueSearchService: dependencies.venueSearchService,
           ),
           child: VenueSearchScreen(connectivity: dependencies.connectivity),
         ),

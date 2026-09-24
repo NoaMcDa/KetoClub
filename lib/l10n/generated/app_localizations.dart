@@ -167,13 +167,13 @@ abstract class AppLocalizations {
   /// No description provided for @venueSearchLabel.
   ///
   /// In en, this message translates to:
-  /// **'Restaurant link'**
+  /// **'Find a restaurant'**
   String get venueSearchLabel;
 
   /// No description provided for @venueSearchHint.
   ///
   /// In en, this message translates to:
-  /// **'Paste a Wolt link, or a venue slug'**
+  /// **'Search by name, or paste a Wolt link'**
   String get venueSearchHint;
 
   /// No description provided for @venueSearchInvalid.
@@ -803,14 +803,182 @@ abstract class AppLocalizations {
   /// No description provided for @discoveryEmptyTitle.
   ///
   /// In en, this message translates to:
-  /// **'Paste a link to get started'**
+  /// **'Find somewhere to eat'**
   String get discoveryEmptyTitle;
 
   /// No description provided for @discoveryEmptyBody.
   ///
   /// In en, this message translates to:
-  /// **'Search isn\'t available yet — paste a Wolt restaurant link, or its slug, above to see its keto-classified menu.'**
+  /// **'Use your location to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.'**
   String get discoveryEmptyBody;
+
+  /// No description provided for @discoveryLookingAround.
+  ///
+  /// In en, this message translates to:
+  /// **'Looking around'**
+  String get discoveryLookingAround;
+
+  /// No description provided for @discoveryAroundYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Your location'**
+  String get discoveryAroundYou;
+
+  /// No description provided for @discoveryLocationNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Location not set'**
+  String get discoveryLocationNotSet;
+
+  /// No description provided for @discoveryUseLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Use my location'**
+  String get discoveryUseLocation;
+
+  /// No description provided for @discoveryChipNearby.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby'**
+  String get discoveryChipNearby;
+
+  /// No description provided for @discoveryChipKetoEightPlus.
+  ///
+  /// In en, this message translates to:
+  /// **'Keto 8+'**
+  String get discoveryChipKetoEightPlus;
+
+  /// No description provided for @discoveryChipOpenNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Open now'**
+  String get discoveryChipOpenNow;
+
+  /// No description provided for @discoveryLocating.
+  ///
+  /// In en, this message translates to:
+  /// **'Finding your location…'**
+  String get discoveryLocating;
+
+  /// No description provided for @discoverySearching.
+  ///
+  /// In en, this message translates to:
+  /// **'Looking for restaurants…'**
+  String get discoverySearching;
+
+  /// No description provided for @discoveryLocationDeniedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is off for KetoClub'**
+  String get discoveryLocationDeniedTitle;
+
+  /// No description provided for @discoveryLocationDeniedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow location to see restaurants near you, or search by name instead.'**
+  String get discoveryLocationDeniedBody;
+
+  /// No description provided for @discoveryLocationDeniedForeverBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Location access is turned off for KetoClub. You can turn it back on in your device\'s settings, or search by name instead.'**
+  String get discoveryLocationDeniedForeverBody;
+
+  /// No description provided for @discoveryLocationUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not find your location'**
+  String get discoveryLocationUnavailableTitle;
+
+  /// No description provided for @discoveryLocationServicesOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Your device\'s location is turned off. Turn it on and try again, or search by name instead.'**
+  String get discoveryLocationServicesOff;
+
+  /// No description provided for @discoveryLocationInsecureContext.
+  ///
+  /// In en, this message translates to:
+  /// **'This page cannot ask for your location because it is not on a secure (https) connection. Search by name instead.'**
+  String get discoveryLocationInsecureContext;
+
+  /// No description provided for @discoveryLocationTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Finding your location took too long. Try again, or search by name instead.'**
+  String get discoveryLocationTimeout;
+
+  /// No description provided for @discoveryLocationUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This device could not provide a location. Search by name instead.'**
+  String get discoveryLocationUnsupported;
+
+  /// No description provided for @discoveryTypeNameInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a name instead'**
+  String get discoveryTypeNameInstead;
+
+  /// No description provided for @discoveryNoResultsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No restaurants found'**
+  String get discoveryNoResultsTitle;
+
+  /// No description provided for @discoveryNoResultsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different name, or clear the search.'**
+  String get discoveryNoResultsBody;
+
+  /// No description provided for @discoveryClearSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get discoveryClearSearch;
+
+  /// No description provided for @discoveryNoChipResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No restaurant in this list matches that filter.'**
+  String get discoveryNoChipResults;
+
+  /// No description provided for @venueCardOpenNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Open now'**
+  String get venueCardOpenNow;
+
+  /// No description provided for @venueCardClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get venueCardClosed;
+
+  /// No description provided for @venueCardMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String venueCardMinutes(int minutes);
+
+  /// No description provided for @venueCardWalkMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min walk'**
+  String venueCardWalkMinutes(int minutes);
+
+  /// No description provided for @venueCardGreenCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 dish as-is} other{{count} dishes as-is}}'**
+  String venueCardGreenCount(num count);
+
+  /// No description provided for @venueCardYellowCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 with changes} other{{count} with changes}}'**
+  String venueCardYellowCount(num count);
 
   /// No description provided for @menuKetoScoreLabel.
   ///
