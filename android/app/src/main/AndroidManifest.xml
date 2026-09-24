@@ -5,6 +5,14 @@
          for the Flutter tool's own use; without it here a release build
          cannot open a socket and every fetch reports "no connection". -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Device position for nearby search (architecture.md §6.5, issue
+         #37): read once, used only to list nearby restaurants and sent
+         only to the restaurant platform as a search parameter, never
+         stored. Both grades are declared so Android 12+'s "approximate"
+         option is offered — declaring only the fine permission makes the
+         platform deny approximate outright. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <application
         android:label="@string/app_name"
         android:name="${applicationName}"

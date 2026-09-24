@@ -278,7 +278,8 @@ ketoclub/
 │   │   │   ├── llm_chat_client.dart      # interface, ChatResult, ChatFailureReason
 │   │   │   └── backend_chat_client.dart  # the ONLY file naming `/v1/chat`; replaces open_router_client.dart (D12)
 │   │   ├── location/                     # rank 0
-│   │   │   └── location_service.dart     # interface + GeolocatorLocationService
+│   │   │   ├── location_service.dart     # interface + sealed LocationResult (issue #37)
+│   │   │   └── geolocator_location_service.dart # GeolocatorLocationService; the ONLY file importing package:geolocator
 │   │   ├── venue/                        # rank 0
 │   │   │   ├── venue_ref_resolver.dart   # pure: pasted URL / slug / ID → VenueRef
 │   │   │   └── venue_search_service.dart # interface + WoltVenueSearchService

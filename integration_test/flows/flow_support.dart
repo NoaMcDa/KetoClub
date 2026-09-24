@@ -29,6 +29,7 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
@@ -86,7 +87,8 @@ final class FakeAppDependencies {
       logger = FlowFakeAppLogger(),
       connectivity = FlowFakeConnectivity(),
       externalLinkOpener = FlowFakeExternalLinkOpener(),
-      menuSharer = FlowFakeMenuSharer();
+      menuSharer = FlowFakeMenuSharer(),
+      locationService = FlowFakeLocationService();
 
   /// The faked menu repository; script it with [FlowFakeMenuRepository.stub].
   final FlowFakeMenuRepository repository;
@@ -118,6 +120,10 @@ final class FakeAppDependencies {
   /// The faked menu sharer (issue #54).
   final FlowFakeMenuSharer menuSharer;
 
+  /// The faked location service (issue #37); settable via
+  /// [FlowFakeLocationService.result].
+  final FlowFakeLocationService locationService;
+
   /// When set, [dependencies] wires this in place of [classifier].
   ///
   /// Every flow test that only needs to script "what the top-level
@@ -142,6 +148,7 @@ final class FakeAppDependencies {
     connectivity: connectivity,
     externalLinkOpener: externalLinkOpener,
     menuSharer: menuSharer,
+    locationService: locationService,
   );
 }
 
@@ -351,6 +358,26 @@ final class FlowFakeMenuSharer implements MenuSharer {
     shareCalls.add((text: text, subject: subject));
     return true;
   }
+}
+
+/// A [LocationService] whose answer is settable — mirrors `test/fakes`'
+/// `FakeLocationService`, duplicated here for the reason this file's own
+/// top doc comment gives.
+final class FlowFakeLocationService implements LocationService {
+  /// Creates a location fake reporting [result].
+  new({
+    this.result = const LocationFound(
+      latitude: 32.0809,
+      longitude: 34.7806,
+      accuracyMetres: 20,
+    ),
+  });
+
+  /// Settable so a flow can steer it mid-journey.
+  LocationResult result;
+
+  @override
+  Future<LocationResult> current() async => result;
 }
 
 /// A [NotesStore] backed by an in-memory map, keyed by [VenueRef.cacheKey]

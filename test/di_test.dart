@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/di.dart';
 import 'package:ketoclub/services/classifier/classifier_router.dart';
+import 'package:ketoclub/services/location/geolocator_location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
@@ -39,6 +40,7 @@ void main() {
       expect(dependencies.connectivity, isA<DeviceConnectivity>());
       expect(dependencies.externalLinkOpener, isA<UrlLauncherLinkOpener>());
       expect(dependencies.menuSharer, isA<SharePlusMenuSharer>());
+      expect(dependencies.locationService, isA<GeolocatorLocationService>());
     });
 
     test('performs no plugin I/O while building the graph', () {

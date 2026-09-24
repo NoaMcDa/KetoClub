@@ -55,7 +55,7 @@
   "waiterCardTitle": "Say this to the waiter",
 
   "settingsConsentTitle": "What leaves this device",
-  "settingsConsentBody": "When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent to KetoClub's server, which forwards them to Google's Gemini API for analysis. Nothing about you, your location or your history is sent. There are no analytics.",
+  "settingsConsentBody": "When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent to KetoClub's server, which forwards them to Google's Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics.",
   "settingsConsentAccept": "I understand",
   "settingsLanguage": "Language",
   "settingsLanguageSystem": "Match my device",
