@@ -14,6 +14,7 @@ platform module duplicating the read/write logic.
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from typing import Literal
 
 import httpx
 from sqlalchemy import Engine
@@ -53,6 +54,75 @@ SOURCE = "wolt"
 def wolt_menu_url(base_url: str, slug: str) -> str:
     """Build the upstream Wolt menu URL for ``slug`` under ``base_url``."""
     return f"{base_url}/v4/venues/slug/{slug}/menu/data"
+
+
+# --- Discovery (#123) -------------------------------------------------------
+#
+# The two "pages" venue-search endpoints are a second, separate contract
+# from the menu fetch above: a different upstream host, a header set the
+# menu proxy does not need, and their own cache/rate-limit rows. Kept in
+# this module rather than a new service file because they still share the
+# menu proxy's ``WOLT_USER_AGENT``, ``WOLT_TIMEOUT`` and cache functions —
+# see ``phase2_discovery_research.md`` §2, §3.
+
+# The two languages Wolt's web client accepts as `app-language` for
+# discovery (phase2_discovery_research.md §2.2). The menu proxy carries no
+# language of its own, so this is new.
+WoltLang = Literal["en", "he"]
+
+# Every 2026 capture of a Wolt web-client request sends this literal value
+# when analytics consent was never granted; this backend never asks for
+# consent, so it is a constant rather than a setting.
+_WOLT_DISCOVERY_SESSION_ID = "no-analytics-consent"
+
+# ``MenuCache.source`` for the two discovery routes, distinct from the menu
+# proxy's ``"wolt"``/``"tenbis"`` so a discovery cache row can never collide
+# with a menu cache row for what happens to be the same key string.
+SOURCE_RESTAURANTS = "wolt-restaurants"
+SOURCE_SEARCH = "wolt-search"
+
+
+def wolt_discovery_headers(
+    *, lang: WoltLang, client_id: str, client_version: str
+) -> dict[str, str]:
+    """Build the Wolt web-client header set for one discovery request.
+
+    Built from scratch on every call, the same rule as ``WOLT_HEADERS``:
+    nothing of the inbound browser request (``Origin``, ``Cookie``,
+    ``Authorization``, the KetoClub install id) reaches Wolt. Unlike the
+    menu proxy, a bare discovery request is reported to answer 410 "update
+    the app" without the full web-client identity
+    (``phase2_discovery_research.md`` §2.2), so this always sends
+    ``platform``, the client version under both header names Wolt reads it
+    from, ``app-language``, a per-process ``client_id`` (never the KetoClub
+    install id — a separate uuid4, generated once at backend start) and the
+    session-id placeholder.
+    """
+    return {
+        "platform": "Web",
+        "client-version": client_version,
+        "clientversionnumber": client_version,
+        "app-language": lang,
+        "x-wolt-web-clientid": client_id,
+        "w-wolt-session-id": _WOLT_DISCOVERY_SESSION_ID,
+        "Accept": "application/json",
+        "User-Agent": WOLT_USER_AGENT,
+    }
+
+
+def wolt_restaurants_url(base_url: str) -> str:
+    """Build the upstream "venues near a point" URL under ``base_url``.
+
+    ``lat``/``lon`` are sent by the caller as query parameters, not baked
+    into this string, so httpx encodes them rather than this module
+    reimplementing float-to-query-string formatting.
+    """
+    return f"{base_url}/v1/pages/restaurants"
+
+
+def wolt_search_url(base_url: str) -> str:
+    """Build the upstream "search venues by name" URL under ``base_url``."""
+    return f"{base_url}/v1/pages/search"
 
 
 @dataclass(frozen=True)

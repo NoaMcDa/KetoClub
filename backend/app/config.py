@@ -50,6 +50,16 @@ class Settings(BaseSettings):
     # Upstream 10bis host for the proxy route (#122).
     # Never taken from a request, for the same reason as WOLT_BASE_URL.
     TENBIS_BASE_URL: str = "https://www.10bis.co.il"
+    # Second Wolt host: the "pages" venue-discovery endpoints live here,
+    # not on WOLT_BASE_URL (#123). Never taken from a request, for the
+    # same reason as WOLT_BASE_URL.
+    WOLT_CONSUMER_BASE_URL: str = "https://consumer-api.wolt.com"
+    # Wolt's own web-client version string, sent as both `client-version`
+    # and `clientversionnumber`. A bare discovery request without it is
+    # reported to answer 410 "update the app"
+    # (phase2_discovery_research.md §2.2); bump this when Wolt's web
+    # client moves on.
+    WOLT_CLIENT_VERSION: str = "1.16.125"
 
     # --- Database -------------------------------------------------------------
     DATABASE_URL: str = "sqlite:///./ketoclub.db"
@@ -68,11 +78,20 @@ class Settings(BaseSettings):
     MENU_CACHE_TTL_SECONDS: int = 3600
     # Shared LLM completion cache TTL seconds (#103).
     CHAT_CACHE_TTL_SECONDS: int = 86400
+    # Discovery response cache TTL seconds (#123). Shorter than
+    # MENU_CACHE_TTL_SECONDS: a venue list (opens/closes, online state)
+    # changes far more often than a menu.
+    DISCOVERY_CACHE_TTL_SECONDS: int = 300
 
     # --- Rate limits ----------------------------------------------------------
     # Per-install-ID limits on /v1/chat and write endpoints (#101).
     RATE_LIMIT_PER_MINUTE: int = 5
     RATE_LIMIT_PER_DAY: int = 40
+    # Per-install-ID, minute-window-only limit on the two discovery routes
+    # (#123) — no daily cap. Wolt itself throttles a bursty caller
+    # (phase2_discovery_research.md §2.3), so this exists to protect the
+    # backend's own IP, not to ration a scarce upstream quota.
+    DISCOVERY_RATE_LIMIT_PER_MINUTE: int = 20
 
     @property
     def llm_configured(self) -> bool:
