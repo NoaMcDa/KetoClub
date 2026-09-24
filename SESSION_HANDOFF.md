@@ -50,7 +50,7 @@ at hand-off — **verify it is green first**; if red, fix on a new branch via PR
 | PR / branch | Issue | State | Next action |
 |---|---|---|---|
 | **#152** `claude/photos-50` | #50 | CI running (backend green) | Subscribe; merge on green |
-| `claude/discovery-screen-40` (an Opus worker was writing it; no PR yet at hand-off — the worker dies with the old session) | #40 | `git fetch origin` and look for the branch / an open PR | If a PR exists: subscribe, merge `origin/main` into it (ARB conflicts: keep both, `flutter gen-l10n`), drive to green, merge. If no branch exists, relaunch the worker with the brief in §5. It should not conflict with #152 (#40 touches `venue_search_screen.dart`, `venue_search_controller.dart`, new `widgets/venue_card.dart`, ARBs, `app.dart`; #152 touches `dish_card.dart` and new `widgets/photo_tile.dart`) |
+| **#154** `claude/discovery-screen-40` | #40 | Opened at hand-off; CI not yet seen | Subscribe; after #152 merges, merge `origin/main` into it (ARB conflicts: keep both, `flutter gen-l10n`), drive to green, merge. Worker's own CI worries: `getSemantics` label matches on `VenueCard`, `find.byTooltip` on the header button, flow tests now see a "No restaurants found" panel after typing a slug (search runs after 400 ms with an empty fake), plural ARB keys `venueCardGreenCount`/`venueCardYellowCount`. Design choices to know: bare words are searched by name AND still resolve as a slug; text with `/` or all digits is a paste; no location prompt on open; card uses a private `_VenuePhoto` — swap for `PhotoTile` from #152 in a follow-up |
 
 Worktrees from the previous session (`.claude/worktrees/agent-*`) are gone in a
 new session; the branches are on `origin`.
