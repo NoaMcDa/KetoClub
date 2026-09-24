@@ -56,6 +56,12 @@ const Duration venueSearchDebounce = Duration(milliseconds: 400);
 /// inclusive.
 const double ketoEightPlusThreshold = 8;
 
+/// How many menus the Discovery screen's explicit "Estimate this list"
+/// action fetches at once (issue #42, D13). The action runs only when the
+/// user taps it, never on load or scroll; this bound keeps even that one
+/// request from arriving at the platform as a burst.
+const int venueEstimateConcurrency = 3;
+
 // ---------------------------------------------------------------------------
 // Cache and LLM request tuning (architecture.md §6.4, §9.3, §9.4)
 // ---------------------------------------------------------------------------

@@ -28,6 +28,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
@@ -82,6 +83,7 @@ final class FakeAppDependencies {
   new()
     : repository = FlowFakeMenuRepository(),
       classifier = FlowFakeMenuClassifier(),
+      estimateClassifier = HeuristicMenuClassifier(clock: FlowFakeClock()),
       settingsStore = FlowFakeSettingsStore(),
       notesStore = FlowFakeNotesStore(),
       clock = FlowFakeClock(),
@@ -143,10 +145,17 @@ final class FakeAppDependencies {
   /// `backend_unreachable_analysis_flow_test.dart`).
   MenuClassifier? classifierOverride;
 
+  /// The engine behind "Estimate this list" (issue #42, D13): the real
+  /// on-device rule engine over the same fixed time as [clock], exactly
+  /// as `di.dart` wires it, so a flow sees real rules verdicts while
+  /// [classifier] records that the router was never asked.
+  final HeuristicMenuClassifier estimateClassifier;
+
   /// The dependency set to hand to the app widget.
   AppDependencies get dependencies => AppDependencies(
     menuRepository: repository,
     menuClassifier: classifierOverride ?? classifier,
+    estimateClassifier: estimateClassifier,
     settingsStore: settingsStore,
     notesStore: notesStore,
     clock: clock,
@@ -385,6 +394,9 @@ final class FlowFakeLocationService implements LocationService {
 
   @override
   Future<LocationResult> current() async => result;
+
+  @override
+  Future<bool> openSettings({required bool servicesOff}) async => true;
 }
 
 /// A [NotesStore] backed by an in-memory map, keyed by [VenueRef.cacheKey]

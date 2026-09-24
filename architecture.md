@@ -234,12 +234,13 @@ ketoclub/
 │   ├── app.dart                          # MaterialApp, routes, theme, RTL/LTR, provider tree
 │   │
 │   ├── screens/
-│   │   ├── venue_search_screen.dart      # location + name search, paste-a-URL field
+│   │   ├── venue_search_screen.dart      # the Discovery screen (issue #40, D13): location
+│   │   │                                 # header, search, filter chips, venue cards
 │   │   ├── menu_screen.dart              # classified menu, filters (green / green+yellow / all)
 │   │   ├── waiter_card_sheet.dart        # full-screen high-contrast script + copy button
 │   │   ├── settings_screen.dart          # consent text, net-carb limit, dietary toggles (#56) — no key section (D12)
 │   │   ├── scan_screen.dart              # Scan tab placeholder (Phase 4, issue #11)
-│   │   └── saved_screen.dart             # Saved tab placeholder (Phase 3, issue #11)
+│   │   └── saved_screen.dart             # Saved tab: cached menus, offline access, remove (issue #48)
 │   │
 │   ├── theme/                            # design tokens as the app theme (rank 4, see below)
 │   │   ├── app_tokens.dart               # raw sRGB constants converted from the artboard's oklch tokens
@@ -255,13 +256,24 @@ ketoclub/
 │   │   ├── verdict_counter_tiles.dart    # the three counters double as the green/yellow/red filter (§6.6)
 │   │   ├── keto_score_badge.dart         # renders nothing when the score is null, never a fallback 0.0
 │   │   ├── app_shell.dart                # bottom-nav shell around the four tab-root routes (issue #11)
-│   │   └── failure_copy.dart             # pure: failure reason → message; exhaustive, no default
+│   │   ├── failure_copy.dart             # pure: failure reason → message; exhaustive, no default
+│   │   ├── venue_card.dart               # Discovery result card; numbers only per D13
+│   │   ├── category_chips.dart           # jump-to-category chips above a menu's dish list (#140)
+│   │   ├── photo_tile.dart               # dish/venue photo with a placeholder tile (#50)
+│   │   ├── offline_banner.dart           # persistent offline banner (issue #68)
+│   │   ├── fetch_failure_action.dart     # retry action for a failed fetch (#144)
+│   │   ├── analysis_progress_row.dart    # names the engine while a menu is analysed (#137)
+│   │   ├── menu_search_field.dart        # search within a loaded menu (#140)
+│   │   ├── note_editor_sheet.dart        # personal, local-only notes on a dish (#131)
+│   │   └── rules_reason_banner.dart      # why a menu fell back to the rule engine (#125)
 │   │
 │   ├── state/                            # ChangeNotifiers; constructor-injected with interfaces
 │   │   ├── app_dependencies.dart         # immutable holder of service interfaces; filled by di.dart
-│   │   ├── venue_search_controller.dart
+│   │   ├── venue_search_controller.dart  # the Discovery screen (issue #40, D13)
 │   │   ├── menu_controller.dart
+│   │   ├── saved_controller.dart         # the Saved tab (issue #48)
 │   │   ├── settings_controller.dart
+│   │   ├── theme_mode_controller.dart    # Light/Dark/System appearance setting (#129)
 │   │   └── locale_controller.dart        # the app-wide language switch (not tied to one screen)
 │   │
 │   ├── services/                         # every folder: interface(s) + implementations + fakes-friendly seams
@@ -273,6 +285,7 @@ ketoclub/
 │   │   ├── storage/                      # rank 0
 │   │   │   ├── install_id_store.dart     # interface + PrefsInstallIdStore; replaces key_store.dart (D12)
 │   │   │   ├── menu_cache.dart           # interface + HiveMenuCache
+│   │   │   ├── notes_store.dart          # interface + PrefsNotesStore: personal, local-only dish notes (#131)
 │   │   │   └── settings_store.dart       # interface + PrefsSettingsStore
 │   │   ├── llm/                          # rank 0
 │   │   │   ├── llm_chat_client.dart      # interface, ChatResult, ChatFailureReason
@@ -282,16 +295,19 @@ ketoclub/
 │   │   │   └── geolocator_location_service.dart # GeolocatorLocationService; the ONLY file importing package:geolocator
 │   │   ├── venue/                        # rank 0
 │   │   │   ├── venue_ref_resolver.dart   # pure: pasted URL / slug / ID → VenueRef
-│   │   │   └── venue_search_service.dart # interface + WoltVenueSearchService
+│   │   │   ├── venue_search_service.dart # interface only (issue #39)
+│   │   │   └── wolt/
+│   │   │       ├── wolt_venue_search_service.dart # HTTP only; delegates to the mapper
+│   │   │       └── wolt_venue_mapper.dart # pure: Wolt discovery JSON → Venue (fixture-tested, no I/O)
 │   │   ├── menu/                         # rank 1 — may import storage/ and platform/
 │   │   │   ├── menu_repository.dart      # interface + CachedMenuRepository (cache-first, adapter registry)
 │   │   │   ├── platform_menu_adapter.dart# interface: fetch(VenueRef) → MenuFetchResult
 │   │   │   ├── wolt/
 │   │   │   │   ├── wolt_adapter.dart     # HTTP only; delegates to the mapper
 │   │   │   │   └── wolt_menu_mapper.dart # pure: Wolt JSON → Menu (fixture-tested, no I/O)
-│   │   │   ├── tenbis/                   # same split
-│   │   │   ├── tabit/                    # Phase 2+
-│   │   │   └── ontopo/                   # Phase 4 (PDF links only)
+│   │   │   ├── tenbis/                   # same split: TenBisAdapter + TenBisMenuMapper (#126, #127, #134)
+│   │   │   ├── tabit/                    # not built; a future phase
+│   │   │   └── ontopo/                   # Phase 4 (PDF links only), not built
 │   │   └── classifier/                   # rank 1 — may import llm/ and platform/
 │   │       ├── menu_classifier.dart      # interface only
 │   │       ├── classifier_router.dart    # RoutingMenuClassifier: picks LLM or rules per call
@@ -1462,8 +1478,9 @@ This section lists what each part of the system must be tested for.
 ## 16. Build order and extension points
 
 Build in this order; each step is demonstrable on its own. **Steps 0 to 5 are
-done** *(Phase 1)*, and the backend steps below them (D11, D12) are also done;
-step 6 (10bis) onwards is next.
+done** *(Phase 1)*, the backend steps below them (D11, D12) are done, and
+**steps 8 to 10 (Phase 2) are done too** — see each step below for the PRs
+and what is still owed (fixture recordings, a phone run).
 
 0. **Day zero (already committed)** — `.github/workflows/ci.yml`,
    `analysis_options.yaml`, `test/architecture/import_rules_test.dart`,
@@ -1501,10 +1518,23 @@ step 6 (10bis) onwards is next.
    `flutter_secure_storage` are deleted, the router drops its key dependency, and
    Settings loses its key section (#102); a server-side completion cache shared
    across users (#103). This is the step this document (#97) reconciles against.
-8. **10bis adapter.**
-9. **Location and nearby search.**
-10. **Platform setup** — permissions, icons, store metadata; test on a physical iOS
-   and Android device with a real Wolt venue.
+8. ✅ **10bis adapter** (#126 proxy route, #127 `TenBisMenuMapper`, #134
+   `TenBisAdapter` + `di.dart` registration). `VenueRefResolver`'s existing
+   10bis recognition now reaches a real adapter instead of
+   `unsupportedSource`. Built against a synthetic fixture
+   (`tenbis_synthetic_menu.json`, issue #44) — the live capture this step
+   once said was required turned out not to block the code, only the
+   pre-release confidence in it.
+9. ✅ **Location and nearby search** (#37/#151 `LocationService`, #123/#149
+   the Wolt venue-search proxy, #39/#150 `WoltVenueSearchService`, #40/#154
+   the Discovery screen, #147 D13). §17.2's "no Wolt venue-search endpoint is
+   known" was answered by `phase2_discovery_research.md`'s third-party
+   research rather than a live capture; both discovery fixtures
+   (`wolt_pages_restaurants.json`, `wolt_pages_search.json`) are synthetic
+   pending that recording (issue #38).
+10. ✅ **Platform setup** (#130) — permissions, icons, splash, bundle ids for
+   iOS, Android and web. Still owed: a test on a physical iOS and Android
+   device with a real Wolt venue (`docs/RELEASE.md`'s device matrix).
 
 Extension points already designed in:
 

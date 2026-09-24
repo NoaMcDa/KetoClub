@@ -142,6 +142,9 @@ AppDependencies buildDependencies() {
       clock: clock,
     ),
     menuClassifier: RoutingMenuClassifier(llm, heuristic, connectivity),
+    // The rule engine on its own, for "Estimate this list" (issue #42,
+    // D13): the explicit action must never reach the language model.
+    estimateClassifier: heuristic,
     settingsStore: PrefsSettingsStore(load: SharedPreferences.getInstance),
     notesStore: PrefsNotesStore(load: SharedPreferences.getInstance),
     clock: clock,

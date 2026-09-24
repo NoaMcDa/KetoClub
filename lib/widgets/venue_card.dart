@@ -3,13 +3,12 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
-import 'package:ketoclub/theme/app_theme.dart';
-import 'package:ketoclub/theme/app_tokens.dart';
 import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/geo.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
+import 'package:ketoclub/widgets/photo_tile.dart';
 
 /// One venue in the Discovery list (issue #40, `.design/Discovery.dc.html`):
 /// a photo tile, the name, the keto score, the platform's blurb, a
@@ -52,8 +51,11 @@ class VenueCard extends StatelessWidget {
   /// Called when the card is tapped; the screen opens the venue's menu.
   final VoidCallback onTap;
 
-  /// The photo tile's fixed height, from the artboard. Fixed so an image
-  /// arriving late never shifts the list.
+  /// The photo tile's fixed height, from the artboard, and the square
+  /// [PhotoTile.size] it is built from — the surrounding
+  /// [CrossAxisAlignment.stretch] column forces that square tile to the
+  /// card's full width, reproducing the artboard's banner (issue #50).
+  /// Fixed so an image arriving late never shifts the list.
   static const double photoHeight = 118;
 
   @override
@@ -81,7 +83,11 @@ class VenueCard extends StatelessWidget {
           children: [
             Stack(
               children: [
-                _VenuePhoto(imageUrl: venue.imageUrl, height: photoHeight),
+                PhotoTile(
+                  imageUrl: venue.imageUrl,
+                  size: photoHeight,
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 if (cardNumbers != null)
                   PositionedDirectional(
                     top: 11,
@@ -181,63 +187,6 @@ class VenueCard extends StatelessWidget {
   /// in lower case (`sushi`). A no-op for Hebrew, which has no case.
   static String cuisineLabel(String tag) =>
       tag.isEmpty ? tag : tag[0].toUpperCase() + tag.substring(1);
-}
-
-/// The photo tile: the venue's image when it loads, the artboard's
-/// `--photo` gradient otherwise, at a fixed height either way.
-///
-/// Kept private and self-contained so the shared photo tile of issue #50
-/// can replace it in one line.
-class _VenuePhoto extends StatelessWidget {
-  const new({required this.imageUrl, required this.height});
-
-  final String? imageUrl;
-  final double height;
-
-  @override
-  Widget build(BuildContext context) {
-    final url = imageUrl;
-    final placeholder = _placeholder(context);
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: SizedBox(
-        height: height,
-        width: double.infinity,
-        child: url == null || url.isEmpty
-            ? placeholder
-            : Image.network(
-                url,
-                fit: BoxFit.cover,
-                webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
-                errorBuilder: (_, _, _) => placeholder,
-                loadingBuilder: (_, child, progress) =>
-                    progress == null ? child : placeholder,
-              ),
-      ),
-    );
-  }
-
-  Widget _placeholder(BuildContext context) {
-    final style = Theme.of(context).extension<PhotoPlaceholder>();
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient:
-            style?.gradient ??
-            const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [AppTokens.lightPhotoStart, AppTokens.lightPhotoEnd],
-            ),
-      ),
-      child: Center(
-        child: Icon(
-          Icons.restaurant,
-          size: 28,
-          color: style?.ink ?? AppTokens.lightPhotoInk,
-        ),
-      ),
-    );
-  }
 }
 
 /// The artboard's green "{N} dishes as-is" pill over the photo.

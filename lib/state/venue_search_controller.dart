@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
+import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
@@ -72,10 +74,15 @@ typedef VenueCardNumbers = ({
 /// is kept in [locationOutcome] for the screen's copy, and the screen
 /// degrades to search by name.
 ///
-/// **D13: no menu fetch, ever.** A card's numbers come from
-/// [MenuRepository.cached] alone, read once per result set in
-/// [cardNumbers]; this class never calls [MenuRepository.load] and holds
-/// no classifier.
+/// **D13: no menu fetch unless the user asks.** A card's numbers come
+/// from [MenuRepository.cached] alone, read once per result set in
+/// [cardNumbers]. The one exception is [estimateVisible], the explicit
+/// "Estimate this list" action (issue #42): only it calls
+/// [MenuRepository.load], at most [venueEstimateConcurrency] at a time,
+/// and only it classifies — with the rule engine it was given as
+/// `estimateClassifier`, never the router and never the language model.
+/// Nothing on load, locate, search, scroll or a chip change fetches a
+/// menu; each of those instead cancels an estimate still running.
 ///
 /// It also reads [AppSettings.lastVenue] (issue #55) so the screen can
 /// offer a "Continue with {venue}" row instead of opening it directly on
@@ -95,20 +102,30 @@ final class VenueSearchController extends ChangeNotifier {
   /// [locate] and [venueSearchService] for the searches. `debounce` is
   /// how long [search] waits after the last keystroke, defaulting to
   /// [venueSearchDebounce].
+  ///
+  /// `estimateClassifier` is the rule engine [estimateVisible] classifies
+  /// with — `HeuristicMenuClassifier` in production, never the router —
+  /// and `estimateConcurrency` how many menus it fetches at once,
+  /// defaulting to [venueEstimateConcurrency].
   new(
     this._settings,
     this._repository, {
     required LocationService locationService,
     required VenueSearchService venueSearchService,
+    required MenuClassifier estimateClassifier,
     this._debounce = venueSearchDebounce,
+    this._estimateConcurrency = venueEstimateConcurrency,
   }) : _location = locationService,
-       _search = venueSearchService;
+       _search = venueSearchService,
+       _estimator = estimateClassifier;
 
   final SettingsStore _settings;
   final MenuRepository _repository;
   final LocationService _location;
   final VenueSearchService _search;
+  final MenuClassifier _estimator;
   final Duration _debounce;
+  final int _estimateConcurrency;
 
   String _input = '';
   VenueRef? _resolved;
@@ -131,6 +148,9 @@ final class VenueSearchController extends ChangeNotifier {
   bool _lastRequestWasNearby = false;
   Timer? _debounceTimer;
   int _generation = 0;
+  int _estimateRun = 0;
+  int _estimateTotal = 0;
+  int _estimateDone = 0;
   bool _disposed = false;
 
   /// What the user has typed or pasted.
@@ -231,6 +251,22 @@ final class VenueSearchController extends ChangeNotifier {
     DiscoveryChip.cuisine => _byCuisine(topCuisine),
   };
 
+  /// Whether some venue in [visibleResults] has no card numbers — the
+  /// condition for offering "Estimate this list" (issue #42).
+  bool get hasVisibleWithoutNumbers =>
+      visibleResults.any((venue) => !_numbers.containsKey(venue.ref));
+
+  /// Whether an [estimateVisible] run is in progress.
+  bool get isEstimating => _estimateDone < _estimateTotal;
+
+  /// How many venues the running estimate has finished — fetched and
+  /// classified, or failed — out of [estimateTotal]; 0 when none runs.
+  int get estimatedCount => isEstimating ? _estimateDone : 0;
+
+  /// How many venues the running estimate set out to cover; 0 when none
+  /// runs.
+  int get estimateTotal => isEstimating ? _estimateTotal : 0;
+
   /// The score and counts a card for [venue] may show (D13): from the
   /// analysis already cached for it when that is a [MenuAnalysed] with at
   /// least one placed dish, else null — never a placeholder zero.
@@ -250,7 +286,11 @@ final class VenueSearchController extends ChangeNotifier {
   }
 
   /// Records [value] and re-resolves. Notifies listeners.
+  ///
+  /// A changed query cancels a running [estimateVisible]: the list it was
+  /// estimating is about to be replaced.
   void setInput(String value) {
+    if (value != _input) _cancelEstimate();
     _input = value;
     _resolved = VenueRefResolver.resolve(value);
     notifyListeners();
@@ -299,6 +339,7 @@ final class VenueSearchController extends ChangeNotifier {
   /// Clears the query and puts back the last nearby list, if any, with no
   /// new request. Notifies listeners.
   void clearSearch() {
+    _cancelEstimate();
     _debounceTimer?.cancel();
     _debounceTimer = null;
     _generation++;
@@ -310,6 +351,7 @@ final class VenueSearchController extends ChangeNotifier {
   /// Reads one position and, when there is one, lists the venues around
   /// it in [language]. Anything else is kept in [locationOutcome].
   Future<void> locate({required String language}) async {
+    _cancelEstimate();
     _debounceTimer?.cancel();
     _debounceTimer = null;
     final generation = ++_generation;
@@ -352,7 +394,11 @@ final class VenueSearchController extends ChangeNotifier {
   /// Makes [chip] the active one, or goes back to [DiscoveryChip.nearby]
   /// when [chip] is already active — tap again to clear. Notifies
   /// listeners.
+  ///
+  /// A running [estimateVisible] is cancelled: it was estimating the list
+  /// the chip no longer shows.
   void selectChip(DiscoveryChip chip) {
+    _cancelEstimate();
     _activeChip = chip == _activeChip ? DiscoveryChip.nearby : chip;
     _notify();
   }
@@ -366,9 +412,73 @@ final class VenueSearchController extends ChangeNotifier {
     _notify();
   }
 
+  /// "Estimate this list" (issue #42, D13): fetches the menu of every
+  /// venue in [visibleResults] that has no card numbers yet, at most
+  /// `estimateConcurrency` at a time, classifies each with the rule
+  /// engine alone, saves the analysis beside its menu exactly as
+  /// `MenuController` does, and shows the numbers as each one lands —
+  /// marked as estimates by their [RulesEngine].
+  ///
+  /// Only ever called from the user's tap. A no-op while a search is in
+  /// flight, while an estimate already runs, or when every visible card
+  /// already has numbers. A venue whose menu cannot be read or classified
+  /// is counted as done and left without numbers; it does not stop the
+  /// others. A new query, locate, search result, clear or chip change
+  /// cancels the run: no further menu is fetched, and a result still in
+  /// flight is dropped rather than shown against a list it no longer
+  /// belongs to.
+  Future<void> estimateVisible() async {
+    if (_phase != DiscoveryPhase.idle || isEstimating) return;
+    final seen = <VenueRef>{};
+    final pending = <VenueRef>[
+      for (final venue in visibleResults)
+        if (!_numbers.containsKey(venue.ref) && seen.add(venue.ref)) venue.ref,
+    ];
+    if (pending.isEmpty) return;
+
+    final run = ++_estimateRun;
+    _estimateTotal = pending.length;
+    _estimateDone = 0;
+    _notify();
+
+    final settings = await _settings.read();
+    if (_isEstimateStale(run)) return;
+    // What shapes a verdict (issues #56, #57), as `MenuController` passes
+    // it; consent stays at its default, since the rule engine never sends
+    // anything anywhere.
+    final options = ClassificationOptions(
+      netCarbLimitGrams: settings.netCarbLimitGrams,
+      dietaryConstraints: ClassificationOptions.dietaryConstraintsFor(
+        seedOilFree: settings.seedOilFree,
+        dairyFree: settings.dairyFree,
+        carnivoreOnly: settings.carnivoreOnly,
+      ),
+    );
+
+    // A small worker pool: each worker takes the next venue only once its
+    // previous one is done, so no more than the bound are ever in flight,
+    // and a cancelled run stops taking new ones at once.
+    var next = 0;
+    Future<void> worker() async {
+      while (!_isEstimateStale(run) && next < pending.length) {
+        final ref = pending[next++];
+        await _estimateOne(ref, options, run);
+        if (_isEstimateStale(run)) return;
+        _estimateDone++;
+        _notify();
+      }
+    }
+
+    final workers = _estimateConcurrency < pending.length
+        ? _estimateConcurrency
+        : pending.length;
+    await Future.wait([for (var i = 0; i < workers; i++) worker()]);
+  }
+
   @override
   void dispose() {
     _disposed = true;
+    _cancelEstimate();
     _debounceTimer?.cancel();
     super.dispose();
   }
@@ -396,6 +506,7 @@ final class VenueSearchController extends ChangeNotifier {
     required int generation,
     required bool isNearby,
   }) async {
+    _cancelEstimate();
     _lastRequest = request;
     _lastRequestWasNearby = isNearby;
     _phase = DiscoveryPhase.searching;
@@ -434,22 +545,9 @@ final class VenueSearchController extends ChangeNotifier {
     final entries = await Future.wait(
       venues.map((venue) async {
         final cached = await _repository.cached(venue.ref);
-        final analysis = cached?.analysis;
-        if (analysis is! MenuAnalysed) return null;
-        final green = _count(analysis, DishVerdict.orderAsIs);
-        final yellow = _count(analysis, DishVerdict.modifiable);
-        final score = ketoScore(
-          greenCount: green,
-          yellowCount: yellow,
-          redCount: _count(analysis, DishVerdict.nonKeto),
-        );
-        if (score == null) return null;
-        return MapEntry<VenueRef, VenueCardNumbers>(venue.ref, (
-          score: score,
-          green: green,
-          yellow: yellow,
-          engine: analysis.engine,
-        ));
+        final numbers = _numbersFrom(cached?.analysis);
+        if (numbers == null) return null;
+        return MapEntry<VenueRef, VenueCardNumbers>(venue.ref, numbers);
       }),
     );
     return <VenueRef, VenueCardNumbers>{
@@ -457,6 +555,66 @@ final class VenueSearchController extends ChangeNotifier {
         if (entry != null) entry.key: entry.value,
     };
   }
+
+  /// The card numbers [analysis] supports: its counts and score when it
+  /// is a [MenuAnalysed] that placed at least one dish, else null.
+  static VenueCardNumbers? _numbersFrom(MenuAnalysis? analysis) {
+    if (analysis is! MenuAnalysed) return null;
+    final green = _count(analysis, DishVerdict.orderAsIs);
+    final yellow = _count(analysis, DishVerdict.modifiable);
+    final score = ketoScore(
+      greenCount: green,
+      yellowCount: yellow,
+      redCount: _count(analysis, DishVerdict.nonKeto),
+    );
+    if (score == null) return null;
+    return (
+      score: score,
+      green: green,
+      yellow: yellow,
+      engine: analysis.engine,
+    );
+  }
+
+  /// One venue of an [estimateVisible] run: fetch, classify with the
+  /// rule engine, save beside the menu, and show — each step skipped once
+  /// [run] is cancelled, so a late answer is dropped.
+  Future<void> _estimateOne(
+    VenueRef ref,
+    ClassificationOptions options,
+    int run,
+  ) async {
+    final fetched = await _repository.load(ref);
+    if (_isEstimateStale(run)) return;
+    if (fetched is! MenuFetched) return;
+    final analysis = await _estimator.classify(fetched.menu, options: options);
+    if (_isEstimateStale(run)) return;
+    if (analysis is! MenuAnalysed) return;
+    await _repository.saveAnalysis(ref, analysis);
+    if (_isEstimateStale(run)) return;
+    final numbers = _numbersFrom(analysis);
+    if (numbers == null) return;
+    _numbers = <VenueRef, VenueCardNumbers>{..._numbers, ref: numbers};
+    // The same numbers stand when a cleared search puts the nearby list
+    // back.
+    if (_nearbyResults?.any((venue) => venue.ref == ref) ?? false) {
+      _nearbyNumbers = <VenueRef, VenueCardNumbers>{
+        ..._nearbyNumbers,
+        ref: numbers,
+      };
+    }
+  }
+
+  /// Stops a running [estimateVisible]: no further menu is fetched and
+  /// any answer still in flight is dropped. Does not notify: every caller
+  /// notifies for its own change straight afterwards.
+  void _cancelEstimate() {
+    _estimateRun++;
+    _estimateTotal = 0;
+    _estimateDone = 0;
+  }
+
+  bool _isEstimateStale(int run) => _disposed || run != _estimateRun;
 
   static int _count(MenuAnalysed analysis, DishVerdict verdict) =>
       analysis.dishes.where((dish) => dish.verdict == verdict).length;

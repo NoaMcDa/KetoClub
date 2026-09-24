@@ -41,12 +41,16 @@ import 'package:provider/provider.dart';
 ///
 /// **Card numbers follow D13**: a score and counts only for venues whose
 /// analysis is already cached on the device, the *Keto 8+* chip only once
-/// some card has them, and no menu fetched on load or on scroll.
+/// some card has them, and no menu fetched on load or on scroll. Above
+/// the cards, while any visible card lacks numbers, an "Estimate this
+/// list" button (issue #42) fetches those menus once, on the user's tap
+/// only, and scores them with the on-device rules; the numbers it adds
+/// carry the rules engine's estimate marker.
 ///
-/// A permanently denied permission shows its copy and "Type a name
-/// instead" only; a deep link to the platform's own Settings would need a
-/// `LocationService` method this screen does not have yet, and is a
-/// follow-up.
+/// A permanently denied permission (issue #40) also offers "Open Settings",
+/// which deep-links to the platform's own permission page through
+/// [LocationService.openSettings]; a location service that is off offers
+/// "Turn on location", the same call with `servicesOff: true`.
 ///
 /// This screen is a tab root under `AppShell` (`widgets/app_shell.dart`),
 /// which supplies the bottom navigation. The venue list is a [Column] in
@@ -55,12 +59,23 @@ import 'package:provider/provider.dart';
 /// for tests and for screen readers alike.
 class VenueSearchScreen extends StatefulWidget {
   /// Creates the Discovery screen, showing the persistent offline banner
-  /// (issue #68) over [connectivity].
-  const new({required this.connectivity, super.key});
+  /// (issue #68) over [connectivity], and reaching the platform's own
+  /// settings (issue #40) through [locationService].
+  const new({
+    required this.connectivity,
+    required this.locationService,
+    super.key,
+  });
 
   /// Backs the persistent offline banner (issue #68). It checks once, on
   /// screen open — see [OfflineBanner]'s own doc comment.
   final Connectivity connectivity;
+
+  /// Opens the platform's own settings on a permanent denial or a location
+  /// service that is off (issue #40). The same instance
+  /// `VenueSearchController` reads a position from — `di.dart` and the
+  /// tests both pass one [LocationService] to both.
+  final LocationService locationService;
 
   @override
   State<VenueSearchScreen> createState() => _VenueSearchScreenState();
@@ -107,6 +122,14 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
       return;
     }
     controller.search(value, language: _language, immediate: true);
+  }
+
+  /// Opens the platform's own settings (issue #40) — the app's permission
+  /// page for `servicesOff: false`, the device's location toggle for
+  /// `servicesOff: true`. Fire-and-forget: the screen has nothing to show
+  /// for the result, whether the user grants it or backs out again.
+  void _openSettings({required bool servicesOff}) {
+    unawaited(widget.locationService.openSettings(servicesOff: servicesOff));
   }
 
   void _clearSearch() {
@@ -342,6 +365,10 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (controller.isEstimating || controller.hasVisibleWithoutNumbers) ...[
+          _estimateRow(context, l10n, controller),
+          const SizedBox(height: 16),
+        ],
         for (var i = 0; i < visible.length; i++) ...[
           if (i > 0) const SizedBox(height: 19),
           VenueCard(
@@ -351,6 +378,42 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
             onTap: () => _openVenue(visible[i].ref),
           ),
         ],
+      ],
+    );
+  }
+
+  /// The "Estimate this list" action (issue #42, D13) and the line saying
+  /// what it does: rules on this device, not the AI. While it runs, the
+  /// button is disabled and reads "Estimating {done} of {total}…"; a
+  /// static icon rather than a spinner, so nothing animates forever.
+  Widget _estimateRow(
+    BuildContext context,
+    AppLocalizations l10n,
+    VenueSearchController controller,
+  ) {
+    final estimating = controller.isEstimating;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OutlinedButton.icon(
+          onPressed: estimating
+              ? null
+              : () => unawaited(controller.estimateVisible()),
+          icon: Icon(estimating ? Icons.hourglass_top : Icons.rule),
+          label: Text(
+            estimating
+                ? l10n.discoveryEstimating(
+                    controller.estimatedCount,
+                    controller.estimateTotal,
+                  )
+                : l10n.discoveryEstimateList,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          l10n.discoveryEstimateHint,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
       ],
     );
   }
@@ -372,7 +435,12 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
           onPressed: _fieldFocus.requestFocus,
           child: Text(l10n.discoveryTypeNameInstead),
         ),
-        if (!outcome.permanently)
+        if (outcome.permanently)
+          OutlinedButton(
+            onPressed: () => _openSettings(servicesOff: false),
+            child: Text(l10n.discoveryOpenSettings),
+          )
+        else
           OutlinedButton(onPressed: _locate, child: Text(l10n.actionRetry)),
       ],
     );
@@ -411,6 +479,11 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
           onPressed: _fieldFocus.requestFocus,
           child: Text(l10n.discoveryTypeNameInstead),
         ),
+        if (reason == LocationUnavailableReason.servicesOff)
+          OutlinedButton(
+            onPressed: () => _openSettings(servicesOff: true),
+            child: Text(l10n.discoveryTurnOnLocation),
+          ),
         if (canRetry)
           OutlinedButton(onPressed: _locate, child: Text(l10n.actionRetry)),
       ],
