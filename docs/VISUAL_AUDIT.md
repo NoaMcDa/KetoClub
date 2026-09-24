@@ -93,7 +93,10 @@ The "before" set was taken from `main` at `7269521` with one workaround:
 that build never sent the install id the backend's discovery routes
 require (finding D1), so the driver added the header itself (`INJECT=1`)
 to get past the error and see the cards at all. The "after" set is this
-branch with no workaround.
+branch with no workaround, taken before `main`'s accessibility pass
+(#161, `docs/ACCESSIBILITY.md`) was merged in: that pass's verdict icons
+on the tiles and its large-text caps are in the code but not in these
+screenshots.
 
 ## 2. Findings
 
