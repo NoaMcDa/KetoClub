@@ -16,6 +16,8 @@ Routes shipped so far:
 | `GET /v1/proxy/wolt/v4/venues/slug/{slug}/menu/data` | #95 | The Wolt menu proxy for the web build, see below |
 | `GET /v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu` | #122 | The 10bis menu proxy for the web build, see below |
 | `POST /v1/chat` | #100 | Hosted classification: forwards one completion to Gemini `generateContent` with the server's key |
+| `GET /v1/proxy/wolt/pages/restaurants` | #123 | Nearby-venue search for the web build, see below |
+| `POST /v1/proxy/wolt/pages/search` | #123 | By-name venue search for the web build, see below |
 
 Community routes are later issues (`backend_plan.md` §5).
 
@@ -132,6 +134,55 @@ curl -sS localhost:8000/v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu
   -o test/fixtures/tenbis_{id}_menu.json
 ```
 
+## The Wolt venue-discovery proxies
+
+`GET /v1/proxy/wolt/pages/restaurants?lat=&lon=&lang=` and
+`POST /v1/proxy/wolt/pages/search` are the two routes the Discovery screen
+uses on the web build (#123): Wolt's "pages" endpoints are unofficial,
+origin-locked to `https://wolt.com` and are reported to answer 410 without
+the full web-client header set
+(`phase2_discovery_research.md` §2.2, §2.3). Both are literal allow-list
+entries, forwarding only the parameters below — no wildcard passthrough.
+
+- `GET` forwards to `{WOLT_CONSUMER_BASE_URL}/v1/pages/restaurants?lat=&lon=`.
+  `lat` (`-90..90`) and `lon` (`-180..180`) are required floats; `lang` is
+  `en` or `he` (default `en`). Any value outside those bounds is 422 before
+  any upstream call is made.
+- `POST` takes `{"q", "lat", "lon", "lang"}` and forwards to
+  `{WOLT_BASE_URL}/v1/pages/search` as `{"q", "target": "venues", "lat",
+  "lon"}` — `target` is fixed here, never taken from the client. `q` is
+  trimmed and must be 1–80 characters after trimming; `lat`/`lon`/`lang`
+  share the `GET` route's bounds.
+- Upstream request headers are the Wolt web-client identity, built from
+  scratch every call (`platform: Web`, `client-version` and
+  `clientversionnumber` from `WOLT_CLIENT_VERSION`, `app-language` from
+  `lang`, a per-process `x-wolt-web-clientid` uuid4 generated once at
+  startup — never the KetoClub install id — `w-wolt-session-id:
+  no-analytics-consent`, `Accept`, `User-Agent`). Nothing from the inbound
+  request (`Origin`, `Cookie`, `Authorization`, the install id) is
+  forwarded, the same rule as the menu proxies.
+- Wolt's status, body and `Content-Type` come back unchanged, 410 included.
+  A connect failure is 502 (`{"reason": "offline", ...}`); an upstream
+  timeout is 504 (`{"reason": "timeout", ...}`).
+- 2xx responses are cached for `DISCOVERY_CACHE_TTL_SECONDS` (default 300 s,
+  shorter than the menu proxy's), keyed on the canonical query
+  (`{lat},{lon},{lang}` or `{q lowercased},{lat},{lon},{lang}`); the
+  response carries `X-KetoClub-Cache: hit|miss`. Failures are never cached.
+- Every request needs `X-KetoClub-Install-Id`, the same rule as `/v1/chat`;
+  missing or malformed is 400 `badResponse`. Each install is limited to
+  `DISCOVERY_RATE_LIMIT_PER_MINUTE` (default 20, no daily cap) across both
+  routes — a cache hit never spends the quota.
+
+```bash
+curl -sS 'localhost:8000/v1/proxy/wolt/pages/restaurants?lat=32.07&lon=34.77&lang=en' \
+  -H 'X-KetoClub-Install-Id: 0123456789abcdef0123456789abcdef'
+
+curl -sS localhost:8000/v1/proxy/wolt/pages/search \
+  -H 'Content-Type: application/json' \
+  -H 'X-KetoClub-Install-Id: 0123456789abcdef0123456789abcdef' \
+  -d '{"q": "vitrina", "lat": 32.07, "lon": 34.77, "lang": "en"}'
+```
+
 ## Running locally
 
 ```bash
@@ -173,8 +224,12 @@ that need them (`/v1/chat`, and `/v1/admin/*` in a later issue). See
 | `GEMINI_MAX_OUTPUT_TOKENS` | `8192` | `generationConfig.maxOutputTokens` |
 | `GEMINI_THINKING_BUDGET` | `0` | Thinking tokens count against the output budget, and this is a classification task |
 | `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_PER_DAY` | `5`, `40` | Per install id on `/v1/chat`, in memory |
-| `WOLT_BASE_URL` | `https://restaurant-api.wolt.com` | Upstream host for the Wolt proxy; never taken from a request |
+| `WOLT_BASE_URL` | `https://restaurant-api.wolt.com` | Upstream host for the Wolt menu proxy and the by-name discovery route; never taken from a request |
 | `TENBIS_BASE_URL` | `https://www.10bis.co.il` | Upstream host for the 10bis proxy; never taken from a request |
+| `WOLT_CONSUMER_BASE_URL` | `https://consumer-api.wolt.com` | Upstream host for the nearby-venue discovery route; never taken from a request |
+| `WOLT_CLIENT_VERSION` | `1.16.125` | Wolt web-client version sent on discovery requests |
+| `DISCOVERY_CACHE_TTL_SECONDS` | `300` | Discovery response cache TTL |
+| `DISCOVERY_RATE_LIMIT_PER_MINUTE` | `20` | Per install id, across both discovery routes; no daily cap |
 
 ## Smoke test against the real API
 
@@ -271,6 +326,11 @@ once.
 5. **Chat smoke test.** Use the curl in "Smoke test against the real API"
    above. A real completion comes back as `{"content":"{\"dishes\": [...]}",
    "model":"gemini-2.5-flash"}` (or whatever `GEMINI_MODEL` names).
+5a. **Search for a venue on the web build**, against real Wolt discovery
+   endpoints: use the two curls in "The Wolt venue-discovery proxies" above,
+   or run the Flutter app and search by name or "near me" once #40 lands.
+   A real response carries a `sections` list of venues; run either curl
+   twice to see `x-ketoclub-cache` flip from `miss` to `hit`.
 6. **The Flutter app, end to end:**
    ```bash
    flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000

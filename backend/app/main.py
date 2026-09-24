@@ -7,6 +7,7 @@ environment variables, so tests never share state through the process-wide
 ``get_settings`` cache.
 """
 
+import uuid
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -19,9 +20,13 @@ from app.config import Settings, get_settings
 from app.db import build_engine
 from app.errors import BackendError, handle_backend_error
 from app.models import Base
-from app.routers import chat, health, proxy
+from app.routers import chat, discovery, health, proxy
 from app.services.rate_limit import RateLimiter
 from app.services.request_logging import RequestLoggingMiddleware
+
+# "No daily cap" (#123) expressed as a bound no real install could reach in
+# a day, so the discovery limiter's day window never binds.
+_DISCOVERY_NO_DAILY_CAP = 10**9
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -51,11 +56,24 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     app.state.settings = resolved_settings
+    # One id per process, generated at startup and never persisted or
+    # reused: Wolt's web client sends a per-install uuid on every discovery
+    # request (#123, phase2_discovery_research.md §2.2), and it must never
+    # be the KetoClub install id — that one is sent only to this backend.
+    app.state.wolt_web_client_id = str(uuid.uuid4())
     # Built here rather than in the lifespan so a test can reach it before the
     # first request; in memory, so it resets whenever the process restarts.
     app.state.rate_limiter = RateLimiter(
         per_minute=resolved_settings.RATE_LIMIT_PER_MINUTE,
         per_day=resolved_settings.RATE_LIMIT_PER_DAY,
+    )
+    # The discovery routes' own bucket (#123): Wolt itself throttles a
+    # bursty caller (phase2_discovery_research.md §2.3), so this limiter
+    # protects the backend's own IP rather than rationing a scarce quota,
+    # and so it has no daily cap.
+    app.state.discovery_rate_limiter = RateLimiter(
+        per_minute=resolved_settings.DISCOVERY_RATE_LIMIT_PER_MINUTE,
+        per_day=_DISCOVERY_NO_DAILY_CAP,
     )
     app.add_exception_handler(BackendError, handle_backend_error)
 
@@ -75,6 +93,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(health.router, prefix="/v1")
     app.include_router(chat.router, prefix="/v1")
     app.include_router(proxy.router, prefix="/v1")
+    app.include_router(discovery.router, prefix="/v1")
 
     return app
 
