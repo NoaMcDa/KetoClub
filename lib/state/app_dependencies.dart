@@ -29,6 +29,7 @@ class AppDependencies {
   const new({
     required this.menuRepository,
     required this.menuClassifier,
+    required this.estimateClassifier,
     required this.settingsStore,
     required this.notesStore,
     required this.clock,
@@ -47,6 +48,13 @@ class AppDependencies {
   /// Classifies a whole menu in one call, LLM first and rules as the
   /// fallback (architecture.md §6.2).
   final MenuClassifier menuClassifier;
+
+  /// The on-device rule engine alone, for the Discovery screen's explicit
+  /// "Estimate this list" action (issue #42, D13) — never the router and
+  /// never the language model, so estimating a list spends no AI request.
+  /// `di.dart` hands it the same `HeuristicMenuClassifier` instance the
+  /// router falls back to.
+  final MenuClassifier estimateClassifier;
 
   /// Non-secret settings: language, default filter, consent, last venue.
   final SettingsStore settingsStore;

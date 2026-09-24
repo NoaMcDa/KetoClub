@@ -209,10 +209,21 @@
   "discoveryLocationTimeout": "איתור המיקום לקח יותר מדי זמן. נסו שוב, או חפשו לפי שם במקום.",
   "discoveryLocationUnsupported": "המכשיר לא הצליח לספק מיקום. חפשו לפי שם במקום.",
   "discoveryTypeNameInstead": "הקלד שם במקום",
+  "discoveryOpenSettings": "פתח הגדרות",
+  "discoveryTurnOnLocation": "הפעל מיקום",
   "discoveryNoResultsTitle": "לא נמצאו מסעדות",
   "discoveryNoResultsBody": "נסו שם אחר, או נקו את החיפוש.",
   "discoveryClearSearch": "נקה חיפוש",
   "discoveryNoChipResults": "אף מסעדה ברשימה לא מתאימה לסינון הזה.",
+  "discoveryEstimateList": "הערך את הרשימה",
+  "discoveryEstimateHint": "קורא פעם אחת את התפריט של כל מסעדה ברשימה ומדרג אותו לפי הכללים שבמכשיר, לא בבינה מלאכותית. לניתוח המלא, פתחו את המסעדה.",
+  "discoveryEstimating": "מעריך {done} מתוך {total}…",
+  "@discoveryEstimating": {
+    "placeholders": {
+      "done": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
   "venueCardOpenNow": "פתוח עכשיו",
   "venueCardClosed": "סגור",
   "venueCardMinutes": "{minutes} דק׳",

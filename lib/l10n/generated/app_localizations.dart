@@ -926,6 +926,18 @@ abstract class AppLocalizations {
   /// **'Type a name instead'**
   String get discoveryTypeNameInstead;
 
+  /// No description provided for @discoveryOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get discoveryOpenSettings;
+
+  /// No description provided for @discoveryTurnOnLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on location'**
+  String get discoveryTurnOnLocation;
+
   /// No description provided for @discoveryNoResultsTitle.
   ///
   /// In en, this message translates to:
@@ -949,6 +961,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No restaurant in this list matches that filter.'**
   String get discoveryNoChipResults;
+
+  /// No description provided for @discoveryEstimateList.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimate this list'**
+  String get discoveryEstimateList;
+
+  /// No description provided for @discoveryEstimateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Reads each menu on this list once and scores it with the on-device rules, not the AI. Open a restaurant for the full analysis.'**
+  String get discoveryEstimateHint;
+
+  /// No description provided for @discoveryEstimating.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimating {done} of {total}…'**
+  String discoveryEstimating(int done, int total);
 
   /// No description provided for @venueCardOpenNow.
   ///

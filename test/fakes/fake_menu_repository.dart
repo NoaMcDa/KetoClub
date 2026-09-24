@@ -11,6 +11,10 @@ import 'package:ketoclub/services/storage/menu_cache.dart';
 /// asked for, so the venueRef-provenance invariant holds without a test having
 /// to build one. Use [stub] to script a specific outcome per ref, or
 /// [stubAll] for every ref.
+///
+/// Set [loadGate] to hold every [load] open until that future completes,
+/// so a test can see how many loads are in flight at once;
+/// [maxConcurrentLoads] records the most there ever were (issue #42).
 final class FakeMenuRepository implements MenuRepository {
   /// Creates a repository with nothing cached and nothing scripted.
   new();
@@ -28,6 +32,16 @@ final class FakeMenuRepository implements MenuRepository {
   /// Every `(ref, analysis)` pair [saveAnalysis] was called with, in order.
   final List<({VenueRef ref, MenuAnalysis analysis})> savedAnalyses =
       <({VenueRef ref, MenuAnalysis analysis})>[];
+
+  /// When non-null, every [load] waits for this future — after being
+  /// recorded in [loadCalls] — before it answers.
+  Future<void>? loadGate;
+
+  /// How many [load] calls are waiting on [loadGate] right now.
+  int concurrentLoads = 0;
+
+  /// The largest [concurrentLoads] has ever been.
+  int maxConcurrentLoads = 0;
 
   /// How many times [clearCache] has been called.
   int clearCacheCallCount = 0;
@@ -57,6 +71,15 @@ final class FakeMenuRepository implements MenuRepository {
     bool forceRefresh = false,
   }) async {
     loadCalls.add((ref: ref, forceRefresh: forceRefresh));
+    final gate = loadGate;
+    if (gate != null) {
+      concurrentLoads++;
+      if (concurrentLoads > maxConcurrentLoads) {
+        maxConcurrentLoads = concurrentLoads;
+      }
+      await gate;
+      concurrentLoads--;
+    }
     final stubbed = _stubs[ref.cacheKey] ?? stubAll;
     if (stubbed != null) return stubbed;
     return MenuFetched(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
@@ -5,6 +7,7 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/location/location_service.dart';
+import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
@@ -70,12 +73,38 @@ CachedMenu _analysed(
   );
 }
 
+/// A fetched menu for [ref] holding one dish, so a classifier has
+/// something to place.
+MenuFetched _fetchedWithOneDish(VenueRef ref) => MenuFetched(
+  menu: Menu(
+    venueRef: ref,
+    currency: 'ILS',
+    fetchedAt: DateTime.utc(2026),
+    categories: const <MenuCategory>[
+      MenuCategory(
+        id: 'mains',
+        name: 'Mains',
+        dishes: <Dish>[
+          Dish(
+            id: 'steak',
+            name: 'Steak',
+            description: '',
+            price: 80,
+            options: <DishOption>[],
+          ),
+        ],
+      ),
+    ],
+  ),
+);
+
 void main() {
   group('VenueSearchController', () {
     late FakeSettingsStore settings;
     late FakeMenuRepository repository;
     late FakeLocationService location;
     late FakeVenueSearchService search;
+    late FakeMenuClassifier estimator;
     late VenueSearchController controller;
 
     VenueSearchController build() => VenueSearchController(
@@ -83,6 +112,7 @@ void main() {
       repository,
       locationService: location,
       venueSearchService: search,
+      estimateClassifier: estimator,
     );
 
     setUp(() {
@@ -90,6 +120,7 @@ void main() {
       repository = FakeMenuRepository();
       location = FakeLocationService();
       search = FakeVenueSearchService();
+      estimator = FakeMenuClassifier();
       controller = build();
     });
 
@@ -437,6 +468,7 @@ void main() {
                   repository,
                   locationService: location,
                   venueSearchService: search,
+                  estimateClassifier: estimator,
                   debounce: const Duration(seconds: 2),
                 )
                 // Act
@@ -710,10 +742,10 @@ void main() {
       });
 
       test('never fetch a menu or touch a classifier', () async {
-        // Arrange: a classifier fake exists and is never handed to the
-        // controller — the assertion is that nothing in this flow could
-        // reach one, and that the repository is only ever read.
-        final classifier = FakeMenuClassifier();
+        // Arrange: the controller holds the rule engine for "Estimate
+        // this list" (issue #42); nothing but that explicit action may
+        // reach it, and the repository is otherwise only ever read.
+        final classifier = estimator;
         repository.seedCache(_analysed(venue.ref, green: 3, yellow: 1, red: 1));
         search
           ..queueFound([venue, _venue('other')])
@@ -735,6 +767,275 @@ void main() {
         expect(repository.loadCalls, isEmpty);
         expect(repository.savedAnalyses, isEmpty);
         expect(classifier.calls, isEmpty);
+      });
+    });
+
+    group('estimateVisible (issue #42, D13)', () {
+      /// [count] venues named `v0`, `v1`, …, each scripted to load a menu
+      /// with one dish, so the default [FakeMenuClassifier] answer places
+      /// one green dish and scores it 10.0.
+      List<Venue> venuesWithMenus(int count) {
+        final venues = [for (var i = 0; i < count; i++) _venue('v$i')];
+        for (final venue in venues) {
+          repository.stub(venue.ref, _fetchedWithOneDish(venue.ref));
+        }
+        return venues;
+      }
+
+      Future<void> list(List<Venue> venues) async {
+        search.queueFound(venues);
+        await controller.locate(language: 'en');
+      }
+
+      test('fetches every visible venue without numbers, at most '
+          'venueEstimateConcurrency at a time', () async {
+        // Arrange: seven venues, one already scored from the cache.
+        final venues = venuesWithMenus(7);
+        repository.seedCache(
+          _analysed(venues.first.ref, green: 1, yellow: 0, red: 0),
+        );
+        await list(venues);
+        final gate = Completer<void>();
+        repository.loadGate = gate.future;
+
+        // Act
+        final run = controller.estimateVisible();
+        await pumpEventQueue();
+
+        // Assert: only the bound is in flight, and progress says so.
+        expect(repository.loadCalls, hasLength(venueEstimateConcurrency));
+        expect(controller.isEstimating, isTrue);
+        expect(controller.estimatedCount, 0);
+        expect(controller.estimateTotal, 6);
+
+        // Act
+        gate.complete();
+        await run;
+
+        // Assert: all six loaded, never more than the bound at once, and
+        // the cached one not fetched at all.
+        expect(repository.maxConcurrentLoads, venueEstimateConcurrency);
+        expect(
+          repository.loadCalls.map((call) => call.ref),
+          unorderedEquals(venues.skip(1).map((venue) => venue.ref)),
+        );
+        expect(controller.isEstimating, isFalse);
+        expect(controller.estimatedCount, 0);
+        expect(controller.estimateTotal, 0);
+      });
+
+      test('classifies with the injected rule engine only, saves the '
+          'analysis and shows numbers marked as estimates', () async {
+        // Arrange
+        await settings.write(
+          const AppSettings(netCarbLimitGrams: 10, seedOilFree: true),
+        );
+        final venues = venuesWithMenus(2);
+        await list(venues);
+        expect(controller.hasVisibleWithoutNumbers, isTrue);
+
+        // Act
+        await controller.estimateVisible();
+
+        // Assert: one rules classification per venue, under the user's
+        // own verdict-shaping settings and with no AI consent passed on.
+        expect(estimator.calls, hasLength(2));
+        final options = estimator.calls.first.$2;
+        expect(options.netCarbLimitGrams, 10);
+        expect(options.seedOilFree, isTrue);
+        expect(options.estimationConsentGiven, isFalse);
+        expect(
+          repository.savedAnalyses.map((saved) => saved.ref),
+          unorderedEquals(venues.map((venue) => venue.ref)),
+        );
+        for (final venue in venues) {
+          final numbers = controller.cardNumbers(venue);
+          expect(numbers?.score, 10.0);
+          expect(numbers?.green, 1);
+          expect(numbers?.engine, isA<RulesEngine>());
+        }
+        expect(controller.hasAnyNumbers, isTrue);
+        expect(controller.hasVisibleWithoutNumbers, isFalse);
+      });
+
+      test('reports progress as each venue finishes', () async {
+        // Arrange
+        await list(venuesWithMenus(2));
+        final progress = <(int, int)>[];
+        controller.addListener(
+          () => progress.add((
+            controller.estimatedCount,
+            controller.estimateTotal,
+          )),
+        );
+
+        // Act
+        await controller.estimateVisible();
+
+        // Assert: started at 0 of 2, then 1 of 2, then done.
+        expect(progress.first, (0, 2));
+        expect(progress, contains((1, 2)));
+        expect(progress.last, (0, 0));
+      });
+
+      test('one venue failing does not stop the others', () async {
+        // Arrange: a fetch failure, and a menu the engine places nothing
+        // in (the fake repository's default empty menu).
+        final venues = venuesWithMenus(3);
+        final broken = _venue('broken');
+        final empty = _venue('empty');
+        repository.stub(
+          broken.ref,
+          const MenuFetchFailed(reason: MenuFetchFailureReason.offline),
+        );
+        await list([broken, ...venues, empty]);
+
+        // Act
+        await controller.estimateVisible();
+
+        // Assert
+        expect(repository.loadCalls, hasLength(5));
+        for (final venue in venues) {
+          expect(controller.cardNumbers(venue), isNotNull);
+        }
+        expect(controller.cardNumbers(broken), isNull);
+        expect(controller.cardNumbers(empty), isNull);
+        expect(controller.isEstimating, isFalse);
+      });
+
+      test('an analysis the engine could not produce is not saved', () async {
+        // Arrange
+        estimator.respondWith(
+          const MenuAnalysisFailed(
+            reason: MenuAnalysisFailureReason.noDishesFound,
+          ),
+        );
+        final venue = venuesWithMenus(1).single;
+        await list([venue]);
+
+        // Act
+        await controller.estimateVisible();
+
+        // Assert
+        expect(repository.savedAnalyses, isEmpty);
+        expect(controller.cardNumbers(venue), isNull);
+      });
+
+      test('a new query cancels it: no further load, and late results are '
+          'dropped', () async {
+        // Arrange
+        final venues = venuesWithMenus(6);
+        await list(venues);
+        final gate = Completer<void>();
+        repository.loadGate = gate.future;
+        final run = controller.estimateVisible();
+        await pumpEventQueue();
+        search.queueFound([_venue('sushi-bar')]);
+
+        // Act
+        controller.search('sushi', language: 'en', immediate: true);
+        gate.complete();
+        await run;
+        await pumpEventQueue();
+
+        // Assert
+        expect(repository.loadCalls, hasLength(venueEstimateConcurrency));
+        expect(estimator.calls, isEmpty);
+        expect(repository.savedAnalyses, isEmpty);
+        expect(controller.isEstimating, isFalse);
+        expect(controller.results.single.name, 'sushi-bar');
+        expect(controller.cardNumbers(venues.first), isNull);
+      });
+
+      test('a chip change cancels it too', () async {
+        // Arrange
+        await list(venuesWithMenus(6));
+        final gate = Completer<void>();
+        repository.loadGate = gate.future;
+        final run = controller.estimateVisible();
+        await pumpEventQueue();
+
+        // Act
+        controller.selectChip(DiscoveryChip.openNow);
+        gate.complete();
+        await run;
+
+        // Assert
+        expect(repository.loadCalls, hasLength(venueEstimateConcurrency));
+        expect(estimator.calls, isEmpty);
+        expect(controller.isEstimating, isFalse);
+      });
+
+      test('a new location cancels it too', () async {
+        // Arrange
+        await list(venuesWithMenus(6));
+        final gate = Completer<void>();
+        repository.loadGate = gate.future;
+        final run = controller.estimateVisible();
+        await pumpEventQueue();
+
+        // Act
+        final located = controller.locate(language: 'en');
+        gate.complete();
+        await run;
+        await located;
+
+        // Assert
+        expect(repository.loadCalls, hasLength(venueEstimateConcurrency));
+        expect(estimator.calls, isEmpty);
+      });
+
+      test('a second tap while one runs starts nothing new', () async {
+        // Arrange
+        await list(venuesWithMenus(2));
+
+        // Act
+        final first = controller.estimateVisible();
+        final second = controller.estimateVisible();
+        await Future.wait([first, second]);
+
+        // Assert
+        expect(repository.loadCalls, hasLength(2));
+      });
+
+      test('does nothing with no list, or when every card has '
+          'numbers', () async {
+        // Act: no list yet.
+        await controller.estimateVisible();
+
+        // Assert
+        expect(repository.loadCalls, isEmpty);
+        expect(controller.hasVisibleWithoutNumbers, isFalse);
+
+        // Arrange: a list whose only venue is already scored.
+        final venue = _venue('scored');
+        repository.seedCache(_analysed(venue.ref, green: 2, yellow: 0, red: 0));
+        await list([venue]);
+
+        // Act
+        await controller.estimateVisible();
+
+        // Assert
+        expect(repository.loadCalls, isEmpty);
+        expect(controller.isEstimating, isFalse);
+      });
+
+      test('estimated numbers survive clearing a search back to the nearby '
+          'list', () async {
+        // Arrange
+        final venue = venuesWithMenus(1).single;
+        await list([venue]);
+        await controller.estimateVisible();
+        search.queueFound([_venue('other')]);
+        controller.search('other', language: 'en', immediate: true);
+        await pumpEventQueue();
+
+        // Act
+        controller.clearSearch();
+
+        // Assert
+        expect(controller.results.single, venue);
+        expect(controller.cardNumbers(venue)?.engine, isA<RulesEngine>());
       });
     });
 

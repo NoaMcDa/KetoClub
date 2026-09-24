@@ -155,6 +155,36 @@ void main() {
       expect(app.themeMode, equals(ThemeMode.dark));
     });
 
+    testWidgets('Estimate this list reaches the rule engine alone, never the '
+        'routing classifier (issue #42, D13)', (tester) async {
+      // Arrange: the real Explore route over faked services, so this
+      // checks the wiring in generateRoute, not a controller built by
+      // hand.
+      final fakes = FakeAppDependencies();
+      const ref = VenueRef(source: MenuSource.wolt, platformId: 'ember');
+      fakes.venueSearchService.queueFound(const [
+        Venue(ref: ref, name: 'Ember'),
+      ]);
+      await tester.pumpWidget(KetoClubApp(dependencies: fakes.dependencies));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip(_en.discoveryUseLocation));
+      await tester.pumpAndSettle();
+
+      // Assert: listing fetched nothing.
+      expect(fakes.repository.loadCalls, isEmpty);
+
+      // Act
+      final estimate = find.text(_en.discoveryEstimateList);
+      await tester.ensureVisible(estimate);
+      await tester.tap(estimate);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(fakes.repository.loadCalls.single.ref, ref);
+      expect(fakes.estimateClassifier.calls, hasLength(1));
+      expect(fakes.classifier.calls, isEmpty);
+    });
+
     testWidgets('a direct route to /settings lands on the Settings tab', (
       tester,
     ) async {

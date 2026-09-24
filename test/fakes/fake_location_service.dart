@@ -25,11 +25,24 @@ final class FakeLocationService implements LocationService {
   /// #63).
   Future<void>? gate;
 
+  /// What [openSettings] answers. Settable so a test can script a
+  /// platform that reports it could not open its settings page.
+  bool openSettingsResult = true;
+
+  /// The `servicesOff` argument of every [openSettings] call, in order.
+  final List<bool> openSettingsCalls = <bool>[];
+
   @override
   Future<LocationResult> current() async {
     currentCallCount++;
     final pending = gate;
     if (pending != null) await pending;
     return result;
+  }
+
+  @override
+  Future<bool> openSettings({required bool servicesOff}) async {
+    openSettingsCalls.add(servicesOff);
+    return openSettingsResult;
   }
 }

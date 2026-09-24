@@ -44,6 +44,8 @@ GeolocatorLocationService _buildService({
   Future<geo.LocationPermission> Function()? requestPermission,
   Future<geo.Position> Function({geo.LocationSettings? locationSettings})?
   getCurrentPosition,
+  Future<bool> Function()? openAppSettings,
+  Future<bool> Function()? openLocationSettings,
 }) => GeolocatorLocationService(
   runsInBrowser: runsInBrowser,
   isLocationServiceEnabled: isLocationServiceEnabled,
@@ -51,6 +53,8 @@ GeolocatorLocationService _buildService({
   requestPermission: requestPermission ?? _whileInUse,
   getCurrentPosition:
       getCurrentPosition ?? ({locationSettings}) async => _samplePosition,
+  openAppSettings: openAppSettings ?? () async => true,
+  openLocationSettings: openLocationSettings ?? () async => true,
 );
 
 void main() {
@@ -319,6 +323,101 @@ void main() {
     });
   });
 
+  group('GeolocatorLocationService.openSettings', () {
+    test(
+      'returns false without calling the plugin when runsInBrowser',
+      () async {
+        // Arrange
+        var calls = 0;
+        final service = _buildService(
+          runsInBrowser: true,
+          openAppSettings: () async {
+            calls++;
+            return true;
+          },
+          openLocationSettings: () async {
+            calls++;
+            return true;
+          },
+        );
+
+        // Act
+        final opened = await service.openSettings(servicesOff: false);
+
+        // Assert
+        expect(opened, isFalse);
+        expect(calls, 0);
+      },
+    );
+
+    test(
+      'calls openAppSettings for a permanent denial (servicesOff: false)',
+      () async {
+        // Arrange
+        var appSettingsCalls = 0;
+        var locationSettingsCalls = 0;
+        final service = _buildService(
+          openAppSettings: () async {
+            appSettingsCalls++;
+            return true;
+          },
+          openLocationSettings: () async {
+            locationSettingsCalls++;
+            return true;
+          },
+        );
+
+        // Act
+        final opened = await service.openSettings(servicesOff: false);
+
+        // Assert
+        expect(opened, isTrue);
+        expect(appSettingsCalls, 1);
+        expect(locationSettingsCalls, 0);
+      },
+    );
+
+    test('calls openLocationSettings for servicesOff: true', () async {
+      // Arrange
+      var appSettingsCalls = 0;
+      var locationSettingsCalls = 0;
+      final service = _buildService(
+        openAppSettings: () async {
+          appSettingsCalls++;
+          return true;
+        },
+        openLocationSettings: () async {
+          locationSettingsCalls++;
+          return true;
+        },
+      );
+
+      // Act
+      final opened = await service.openSettings(servicesOff: true);
+
+      // Assert
+      expect(opened, isTrue);
+      expect(appSettingsCalls, 0);
+      expect(locationSettingsCalls, 1);
+    });
+
+    test(
+      'returns false — never throws — when the plugin call throws',
+      () async {
+        // Arrange
+        final service = _buildService(
+          openAppSettings: () => Future<bool>.error(Exception('channel gone')),
+        );
+
+        // Act
+        final opened = await service.openSettings(servicesOff: false);
+
+        // Assert
+        expect(opened, isFalse);
+      },
+    );
+  });
+
   group('FakeLocationService', () {
     test('current defaults to a plausible found position', () async {
       final service = FakeLocationService();
@@ -360,6 +459,22 @@ void main() {
       await service.current();
 
       expect(service.currentCallCount, equals(2));
+    });
+
+    test('openSettings defaults to true and records the servicesOff '
+        'argument', () async {
+      final service = FakeLocationService();
+
+      final opened = await service.openSettings(servicesOff: true);
+
+      expect(opened, isTrue);
+      expect(service.openSettingsCalls, [true]);
+    });
+
+    test('openSettings returns the scripted result', () async {
+      final service = FakeLocationService()..openSettingsResult = false;
+
+      expect(await service.openSettings(servicesOff: false), isFalse);
     });
   });
 }

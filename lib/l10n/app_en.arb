@@ -209,10 +209,21 @@
   "discoveryLocationTimeout": "Finding your location took too long. Try again, or search by name instead.",
   "discoveryLocationUnsupported": "This device could not provide a location. Search by name instead.",
   "discoveryTypeNameInstead": "Type a name instead",
+  "discoveryOpenSettings": "Open Settings",
+  "discoveryTurnOnLocation": "Turn on location",
   "discoveryNoResultsTitle": "No restaurants found",
   "discoveryNoResultsBody": "Try a different name, or clear the search.",
   "discoveryClearSearch": "Clear search",
   "discoveryNoChipResults": "No restaurant in this list matches that filter.",
+  "discoveryEstimateList": "Estimate this list",
+  "discoveryEstimateHint": "Reads each menu on this list once and scores it with the on-device rules, not the AI. Open a restaurant for the full analysis.",
+  "discoveryEstimating": "Estimating {done} of {total}…",
+  "@discoveryEstimating": {
+    "placeholders": {
+      "done": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
   "venueCardOpenNow": "Open now",
   "venueCardClosed": "Closed",
   "venueCardMinutes": "{minutes} min",

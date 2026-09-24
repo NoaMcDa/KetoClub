@@ -8,6 +8,7 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/venue_search_screen.dart';
 import 'package:ketoclub/services/location/location_service.dart';
+import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -15,6 +16,7 @@ import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
@@ -23,6 +25,7 @@ import 'package:provider/provider.dart';
 
 import '../fakes/fake_connectivity.dart';
 import '../fakes/fake_location_service.dart';
+import '../fakes/fake_menu_classifier.dart';
 import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_settings_store.dart';
 import '../fakes/fake_venue_search_service.dart';
@@ -46,6 +49,7 @@ Future<void> _pump(
   Locale locale = const Locale('en'),
   Connectivity? connectivity,
   ThemeData? theme,
+  LocationService? locationService,
 }) {
   _useTallSurface(tester);
   return tester.pumpWidget(
@@ -58,6 +62,7 @@ Future<void> _pump(
         locale: locale,
         home: VenueSearchScreen(
           connectivity: connectivity ?? FakeConnectivity(),
+          locationService: locationService ?? FakeLocationService(),
         ),
         onGenerateRoute: (settings) {
           pushedNames.add(settings.name ?? '');
@@ -97,6 +102,7 @@ void main() {
     late FakeMenuRepository repository;
     late FakeLocationService location;
     late FakeVenueSearchService search;
+    late FakeMenuClassifier estimator;
     late VenueSearchController controller;
     late List<String> pushedNames;
 
@@ -105,11 +111,13 @@ void main() {
       repository = FakeMenuRepository();
       location = FakeLocationService();
       search = FakeVenueSearchService();
+      estimator = FakeMenuClassifier();
       controller = VenueSearchController(
         settingsStore,
         repository,
         locationService: location,
         venueSearchService: search,
+        estimateClassifier: estimator,
       );
       pushedNames = <String>[];
     });
@@ -432,12 +440,16 @@ void main() {
       expect(field.focusNode?.hasFocus, isTrue);
     });
 
-    testWidgets('a permanent denial offers no retry, only a name search', (
-      tester,
-    ) async {
+    testWidgets('a permanent denial offers no retry, only a name search and '
+        'Open Settings', (tester) async {
       // Arrange
       location.result = const LocationDenied(permanently: true);
-      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      await _pump(
+        tester,
+        controller: controller,
+        pushedNames: pushedNames,
+        locationService: location,
+      );
       final l10n = _l10n(tester);
 
       // Act
@@ -450,16 +462,48 @@ void main() {
       );
       expect(find.text(l10n.discoveryTypeNameInstead), findsOneWidget);
       expect(find.text(l10n.actionRetry), findsNothing);
+      expect(find.text(l10n.discoveryOpenSettings), findsOneWidget);
+
+      // Act: tapping it opens the app's own permission settings.
+      await tester.tap(find.text(l10n.discoveryOpenSettings));
+      await tester.pump();
+
+      // Assert
+      expect(location.openSettingsCalls, [false]);
     });
 
-    testWidgets('an unavailable location shows the copy for its reason', (
+    testWidgets('a non-permanent denial offers no Open Settings action', (
       tester,
     ) async {
+      // Arrange
+      location.result = const LocationDenied(permanently: false);
+      await _pump(
+        tester,
+        controller: controller,
+        pushedNames: pushedNames,
+        locationService: location,
+      );
+      final l10n = _l10n(tester);
+
+      // Act
+      await locate(tester);
+
+      // Assert
+      expect(find.text(l10n.discoveryOpenSettings), findsNothing);
+    });
+
+    testWidgets('an unavailable location shows the copy for its reason and '
+        'offers Turn on location', (tester) async {
       // Arrange
       location.result = const LocationUnavailable(
         reason: LocationUnavailableReason.servicesOff,
       );
-      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      await _pump(
+        tester,
+        controller: controller,
+        pushedNames: pushedNames,
+        locationService: location,
+      );
       final l10n = _l10n(tester);
 
       // Act
@@ -469,6 +513,31 @@ void main() {
       expect(find.text(l10n.discoveryLocationUnavailableTitle), findsOneWidget);
       expect(find.text(l10n.discoveryLocationServicesOff), findsOneWidget);
       expect(find.text(l10n.discoveryTypeNameInstead), findsOneWidget);
+      expect(find.text(l10n.discoveryTurnOnLocation), findsOneWidget);
+
+      // Act: tapping it opens the device's location-services toggle.
+      await tester.tap(find.text(l10n.discoveryTurnOnLocation));
+      await tester.pump();
+
+      // Assert
+      expect(location.openSettingsCalls, [true]);
+    });
+
+    testWidgets('an unsupported location offers no Turn on location action', (
+      tester,
+    ) async {
+      // Arrange
+      location.result = const LocationUnavailable(
+        reason: LocationUnavailableReason.unsupported,
+      );
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      final l10n = _l10n(tester);
+
+      // Act
+      await locate(tester);
+
+      // Assert
+      expect(find.text(l10n.discoveryTurnOnLocation), findsNothing);
     });
 
     testWidgets('a failed search shows its reason, and Retry searches '
@@ -743,5 +812,152 @@ void main() {
         expect(pushedNames, contains('/venue/wolt/vitrina'));
       },
     );
+
+    group('Estimate this list (issue #42)', () {
+      /// Scripts [venues] to load a one-dish menu each.
+      void stubMenus(List<Venue> venues) {
+        for (final venue in venues) {
+          repository.stub(
+            venue.ref,
+            MenuFetched(
+              menu: Menu(
+                venueRef: venue.ref,
+                currency: 'ILS',
+                fetchedAt: DateTime.utc(2026),
+                categories: const <MenuCategory>[
+                  MenuCategory(
+                    id: 'mains',
+                    name: 'Mains',
+                    dishes: <Dish>[
+                      Dish(
+                        id: 'steak',
+                        name: 'Steak',
+                        description: '',
+                        price: 80,
+                        options: <DishOption>[],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+      }
+
+      testWidgets('is offered, with its rules-not-AI copy, while a card has '
+          'no numbers, and fetches nothing until tapped', (tester) async {
+        // Arrange
+        search.queueFound([_venue('a'), _venue('b')]);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+        // Act
+        await locate(tester);
+
+        // Assert
+        final l10n = _l10n(tester);
+        expect(find.text(l10n.discoveryEstimateList), findsOneWidget);
+        expect(find.text(l10n.discoveryEstimateHint), findsOneWidget);
+        expect(repository.loadCalls, isEmpty);
+        expect(estimator.calls, isEmpty);
+      });
+
+      testWidgets('tapping it shows progress with the button disabled, then '
+          'numbers marked as rules estimates', (tester) async {
+        // Arrange
+        final venues = [_venue('a'), _venue('b')];
+        stubMenus(venues);
+        search.queueFound(venues);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await locate(tester);
+        final l10n = _l10n(tester);
+        final gate = Completer<void>();
+        repository.loadGate = gate.future;
+
+        // Act
+        await tester.tap(find.text(l10n.discoveryEstimateList));
+        await tester.pump();
+
+        // Assert: progress, and no second run can be started.
+        final progress = find.text(l10n.discoveryEstimating(0, 2));
+        expect(progress, findsOneWidget);
+        final button = tester.widget<ButtonStyleButton>(
+          find.ancestor(
+            of: progress,
+            matching: find.byWidgetPredicate((w) => w is ButtonStyleButton),
+          ),
+        );
+        expect(button.onPressed, isNull);
+
+        // Act
+        gate.complete();
+        await tester.pumpAndSettle();
+
+        // Assert: both cards scored, each with the rules marker, and the
+        // action gone now that no card lacks numbers.
+        expect(find.text('10.0'), findsNWidgets(2));
+        expect(find.byType(EngineChip), findsNWidgets(2));
+        expect(find.text(l10n.discoveryEstimateList), findsNothing);
+        expect(estimator.calls, hasLength(2));
+      });
+
+      testWidgets('is not offered when every card already has numbers', (
+        tester,
+      ) async {
+        // Arrange
+        final venue = _venue('scored');
+        repository.seedCache(
+          CachedMenu(
+            menu: Menu(
+              venueRef: venue.ref,
+              currency: 'ILS',
+              fetchedAt: DateTime.utc(2026),
+              categories: const <MenuCategory>[],
+            ),
+            analysis: MenuAnalysed(
+              dishes: const <AnalysedDish>[
+                AnalysedDish(
+                  dishId: '1',
+                  name: 'Steak',
+                  verdict: DishVerdict.orderAsIs,
+                  why: 'why',
+                ),
+              ],
+              unclassified: const <String>[],
+              engine: const LlmEngine(model: 'test-model'),
+              analysedAt: DateTime.utc(2026),
+            ),
+          ),
+        );
+        search.queueFound([venue]);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+        // Act
+        await locate(tester);
+
+        // Assert
+        expect(find.text(_l10n(tester).discoveryEstimateList), findsNothing);
+      });
+
+      testWidgets('under Hebrew the action reads in Hebrew', (tester) async {
+        // Arrange
+        search.queueFound([_venue('a')]);
+        await _pump(
+          tester,
+          controller: controller,
+          pushedNames: pushedNames,
+          locale: const Locale('he'),
+        );
+
+        // Act
+        await locate(tester);
+
+        // Assert
+        final l10n = _l10n(tester);
+        expect(l10n.localeName, 'he');
+        expect(find.text(l10n.discoveryEstimateList), findsOneWidget);
+        expect(find.text(l10n.discoveryEstimateHint), findsOneWidget);
+      });
+    });
   });
 }
