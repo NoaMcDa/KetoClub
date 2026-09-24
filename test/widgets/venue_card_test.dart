@@ -9,6 +9,7 @@ import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
+import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/venue_card.dart';
 
 /// The English strings this file reads expected copy from.
@@ -173,14 +174,14 @@ void main() {
       expect(find.textContaining('min'), findsNothing);
     });
 
-    testWidgets('shows the placeholder gradient when there is no photo', (
-      tester,
-    ) async {
+    testWidgets('shows PhotoTile, which falls back to the placeholder '
+        'gradient when there is no photo', (tester) async {
       // Act
       await _pump(tester, VenueCard(venue: _venue, onTap: () {}));
 
       // Assert
-      expect(find.byIcon(Icons.restaurant), findsOneWidget);
+      expect(find.byType(PhotoTile), findsOneWidget);
+      expect(find.byIcon(Icons.image_outlined), findsOneWidget);
       expect(find.byType(Image), findsNothing);
     });
 

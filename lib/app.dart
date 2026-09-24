@@ -160,7 +160,10 @@ Route<void>? generateRoute(
             locationService: dependencies.locationService,
             venueSearchService: dependencies.venueSearchService,
           ),
-          child: VenueSearchScreen(connectivity: dependencies.connectivity),
+          child: VenueSearchScreen(
+            connectivity: dependencies.connectivity,
+            locationService: dependencies.locationService,
+          ),
         ),
       ),
     );

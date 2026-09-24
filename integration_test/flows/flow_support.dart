@@ -385,6 +385,9 @@ final class FlowFakeLocationService implements LocationService {
 
   @override
   Future<LocationResult> current() async => result;
+
+  @override
+  Future<bool> openSettings({required bool servicesOff}) async => true;
 }
 
 /// A [NotesStore] backed by an in-memory map, keyed by [VenueRef.cacheKey]

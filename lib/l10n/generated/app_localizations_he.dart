@@ -507,6 +507,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get discoveryTypeNameInstead => 'הקלד שם במקום';
 
   @override
+  String get discoveryOpenSettings => 'פתח הגדרות';
+
+  @override
+  String get discoveryTurnOnLocation => 'הפעל מיקום';
+
+  @override
   String get discoveryNoResultsTitle => 'לא נמצאו מסעדות';
 
   @override

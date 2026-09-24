@@ -133,4 +133,15 @@ abstract interface class LocationService {
   ///
   /// Never throws.
   Future<LocationResult> current();
+
+  /// Opens the platform's own settings so the user can grant what KetoClub
+  /// cannot re-request itself (issue #40): the app's permission page for a
+  /// permanent [LocationDenied] (`servicesOff: false`), or the device's
+  /// location toggle for [LocationUnavailableReason.servicesOff]
+  /// (`servicesOff: true`).
+  ///
+  /// Returns whether the platform reports having opened it. Never throws:
+  /// on the web, where there is no such settings page to open, this
+  /// returns false without any platform call at all.
+  Future<bool> openSettings({required bool servicesOff});
 }

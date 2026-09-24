@@ -36,11 +36,10 @@ const Duration _positionTimeLimit = Duration(seconds: 10);
 /// documentation, but this class never produces it).
 ///
 /// [current] never calls `getLastKnownPosition`, `openAppSettings` or
-/// `openLocationSettings`: none of them is needed to read one position,
-/// and all three throw on web. [runsInBrowser] is kept on this class for
-/// whichever later caller — the "open Settings" affordance on a permanent
-/// denial (issue #40) is the likely one — adds a call to one of them and
-/// needs to gate it there.
+/// `openLocationSettings`: none of them is needed to read one position.
+/// [openSettings] is the one method that does call the latter two — both
+/// throw on web, which is why it checks [runsInBrowser] before ever
+/// reaching the seam (issue #40).
 final class GeolocatorLocationService implements LocationService {
   /// Creates a location service over the given geolocator seam.
   ///
@@ -58,6 +57,8 @@ final class GeolocatorLocationService implements LocationService {
     this.checkPermission = geo.Geolocator.checkPermission,
     this.requestPermission = geo.Geolocator.requestPermission,
     this.getCurrentPosition = geo.Geolocator.getCurrentPosition,
+    this.openAppSettings = geo.Geolocator.openAppSettings,
+    this.openLocationSettings = geo.Geolocator.openLocationSettings,
   });
 
   /// Whether this instance runs in a browser (defaults to [kIsWeb]).
@@ -75,6 +76,27 @@ final class GeolocatorLocationService implements LocationService {
   /// Reads one position.
   final Future<geo.Position> Function({geo.LocationSettings? locationSettings})
   getCurrentPosition;
+
+  /// Opens the app's own permission settings page. Used by [openSettings]
+  /// for a permanent denial.
+  final Future<bool> Function() openAppSettings;
+
+  /// Opens the device's location-services toggle. Used by [openSettings]
+  /// for [LocationUnavailableReason.servicesOff].
+  final Future<bool> Function() openLocationSettings;
+
+  @override
+  Future<bool> openSettings({required bool servicesOff}) async {
+    if (runsInBrowser) return false;
+    try {
+      return await (servicesOff ? openLocationSettings : openAppSettings)();
+      // Both plugin methods throw on an unsupported platform; caught
+      // broadly for the same reason `current` catches `Exception` broadly
+      // — see this class's own doc comment on that clause.
+    } on Exception {
+      return false;
+    }
+  }
 
   @override
   Future<LocationResult> current() async {
