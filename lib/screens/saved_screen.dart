@@ -6,6 +6,7 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/state/saved_controller.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:provider/provider.dart';
 
 /// The brand name shown for [source] (architecture.md §10) — the same
@@ -75,9 +76,33 @@ class _SavedScreenState extends State<SavedScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.savedPlaceholderTitle)),
-      body: controller.entries.isEmpty
-          ? _emptyState(l10n)
+      body: controller.isLoading
+          ? _loadingList(l10n)
+          : controller.entries.isEmpty
+          ? _emptyState(context, l10n)
           : _list(context, l10n, controller),
+    );
+  }
+
+  /// Three [SavedEntrySkeleton]s in place of a spinner while
+  /// [SavedController.load] is in flight (issue #63), wrapped in one live
+  /// [Semantics] label — the skeletons themselves exclude their own
+  /// semantics, so a screen reader hears [l10n]'s `savedLoading` copy
+  /// once, not three times.
+  Widget _loadingList(AppLocalizations l10n) {
+    return Semantics(
+      liveRegion: true,
+      label: l10n.savedLoading,
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: const [
+          SavedEntrySkeleton(),
+          SizedBox(height: 8),
+          SavedEntrySkeleton(),
+          SizedBox(height: 8),
+          SavedEntrySkeleton(),
+        ],
+      ),
     );
   }
 
@@ -85,7 +110,13 @@ class _SavedScreenState extends State<SavedScreen> {
   /// been opened, or once every entry has been removed. The same icon and
   /// layout issue #11's original placeholder used; only the body copy
   /// changed, since this screen is no longer "coming in a later update".
-  Widget _emptyState(AppLocalizations l10n) => Center(
+  ///
+  /// The "Find a restaurant" action (issue #63) switches to the Explore
+  /// tab the same way `AppShell`'s own destination tap does — a
+  /// [Navigator.pushReplacementNamed] to `/`, so the tab stack never
+  /// grows and the bottom navigation bar picks up Explore as active on
+  /// the very next frame.
+  Widget _emptyState(BuildContext context, AppLocalizations l10n) => Center(
     child: Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -94,6 +125,11 @@ class _SavedScreenState extends State<SavedScreen> {
           const Icon(Icons.bookmark_border, size: 48),
           const SizedBox(height: 16),
           Text(l10n.savedPlaceholderBody, textAlign: TextAlign.center),
+          const SizedBox(height: 16),
+          OutlinedButton(
+            onPressed: () => Navigator.of(context).pushReplacementNamed('/'),
+            child: Text(l10n.venueSearchLabel),
+          ),
         ],
       ),
     ),

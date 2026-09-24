@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
@@ -11,9 +13,11 @@ import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
+import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
+import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/venue_card.dart';
 import 'package:provider/provider.dart';
 
@@ -41,12 +45,14 @@ Future<void> _pump(
   required List<String> pushedNames,
   Locale locale = const Locale('en'),
   Connectivity? connectivity,
+  ThemeData? theme,
 }) {
   _useTallSurface(tester);
   return tester.pumpWidget(
     ChangeNotifierProvider<VenueSearchController>.value(
       value: controller,
       child: MaterialApp(
+        theme: theme,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: locale,
@@ -112,6 +118,71 @@ void main() {
     Future<void> locate(WidgetTester tester) async {
       await tester.tap(find.byTooltip(_l10n(tester).discoveryUseLocation));
       await tester.pumpAndSettle();
+    }
+
+    for (final entry in {
+      'light': AppTheme.light(),
+      'dark': AppTheme.dark(),
+    }.entries) {
+      testWidgets('tapping the location button shows three VenueCardSkeletons '
+          'under the ${entry.key} theme while locating (issue #63)', (
+        tester,
+      ) async {
+        // Arrange: hold the locate call open so the transient
+        // DiscoveryPhase.locating state stays on screen.
+        final gate = Completer<void>();
+        location.gate = gate.future;
+        await _pump(
+          tester,
+          controller: controller,
+          pushedNames: pushedNames,
+          theme: entry.value,
+        );
+        final l10n = _l10n(tester);
+
+        // Act
+        await tester.tap(find.byTooltip(l10n.discoveryUseLocation));
+        await tester.pump();
+
+        // Assert: the skeletons stand in for the old spinner, announced
+        // once through a Semantics label.
+        expect(find.byType(VenueCardSkeleton), findsNWidgets(3));
+        expect(find.bySemanticsLabel(l10n.discoveryLocating), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsNothing);
+
+        // Cleanup: release the gate so no timer/future is left pending.
+        gate.complete();
+        await tester.pumpAndSettle();
+      });
+
+      testWidgets('typing a name shows three VenueCardSkeletons under the '
+          '${entry.key} theme while searching (issue #63)', (tester) async {
+        // Arrange: hold the byName call open so the transient
+        // DiscoveryPhase.searching state stays on screen.
+        final gate = Completer<void>();
+        search.gate = gate.future;
+        await _pump(
+          tester,
+          controller: controller,
+          pushedNames: pushedNames,
+          theme: entry.value,
+        );
+        final l10n = _l10n(tester);
+
+        // Act
+        await tester.enterText(find.byType(TextField), 'sushi');
+        await tester.pump(venueSearchDebounce);
+        await tester.pump();
+
+        // Assert
+        expect(find.byType(VenueCardSkeleton), findsNWidgets(3));
+        expect(find.bySemanticsLabel(l10n.discoverySearching), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsNothing);
+
+        // Cleanup
+        gate.complete();
+        await tester.pumpAndSettle();
+      });
     }
 
     testWidgets('build renders the brand, the title and the search field', (

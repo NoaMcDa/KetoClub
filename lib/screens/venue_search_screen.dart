@@ -9,6 +9,7 @@ import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
+import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/venue_card.dart';
 import 'package:provider/provider.dart';
 
@@ -272,9 +273,9 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
   ) {
     switch (controller.phase) {
       case DiscoveryPhase.locating:
-        return _progress(context, l10n.discoveryLocating);
+        return _skeletons(l10n.discoveryLocating);
       case DiscoveryPhase.searching:
-        return _progress(context, l10n.discoverySearching);
+        return _skeletons(l10n.discoverySearching);
       case DiscoveryPhase.idle:
         break;
     }
@@ -417,19 +418,26 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     );
   }
 
-  /// A spinner with [label], for a locate or a search in flight.
-  Widget _progress(BuildContext context, String label) {
-    return Row(
-      children: [
-        const SizedBox.square(
-          dimension: 20,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
-        ),
-      ],
+  /// Three [VenueCardSkeleton]s in place of the old spinner, for a locate
+  /// or a search in flight (issue #63): a run of static, two-tone cards
+  /// shaped like the ones about to load, rather than a bare progress
+  /// ring. Wrapped in one live [Semantics] label naming what is loading,
+  /// since the cards themselves exclude their own semantics — a screen
+  /// reader hears [label] once, not three times.
+  Widget _skeletons(String label) {
+    return Semantics(
+      liveRegion: true,
+      label: label,
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          VenueCardSkeleton(),
+          SizedBox(height: 19),
+          VenueCardSkeleton(),
+          SizedBox(height: 19),
+          VenueCardSkeleton(),
+        ],
+      ),
     );
   }
 

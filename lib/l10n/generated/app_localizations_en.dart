@@ -406,6 +406,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Open a venue\'s menu and it appears here automatically, available for a day — even offline.';
 
   @override
+  String get savedLoading => 'Loading your saved menus…';
+
+  @override
   String savedEntryDishCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -695,6 +698,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get menuNoResults => 'No dishes match your search.';
+
+  @override
+  String get menuClearFilter => 'Clear filter';
 
   @override
   String categoryChipSemanticLabel(String category) {

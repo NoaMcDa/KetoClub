@@ -18,6 +18,7 @@ import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/menu_controller.dart';
+import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
@@ -26,6 +27,7 @@ import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
+import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
 
@@ -122,10 +124,12 @@ Future<void> _pump(
   Connectivity? connectivity,
   FakeExternalLinkOpener? externalLinkOpener,
   FakeMenuSharer? menuSharer,
+  ThemeData? theme,
 }) {
   _useTallSurface(tester);
   return tester.pumpWidget(
     MaterialApp(
+      theme: theme,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: locale,
@@ -242,22 +246,31 @@ void main() {
       },
     );
 
-    testWidgets('build shows menuLoading before the fetch resolves', (
-      tester,
-    ) async {
-      // Arrange
-      final repository = FakeMenuRepository();
-      final controller = _controllerFor(repository: repository);
+    for (final entry in {
+      'light': AppTheme.light(),
+      'dark': AppTheme.dark(),
+    }.entries) {
+      testWidgets('build shows three DishCardSkeletons under the ${entry.key} '
+          'theme before the fetch resolves, instead of the old '
+          'menuLoading text (issue #63)', (tester) async {
+        // Arrange
+        final repository = FakeMenuRepository();
+        final controller = _controllerFor(repository: repository);
 
-      // Act: a single pumpWidget renders the first frame, built before the
-      // post-frame callback's open() call has had a chance to resolve —
-      // the fake repository answers on a microtask, not this frame.
-      await _pump(tester, controller);
+        // Act: a single pumpWidget renders the first frame, built
+        // before the post-frame callback's open() call has had a
+        // chance to resolve — the fake repository answers on a
+        // microtask, not this frame.
+        await _pump(tester, controller, theme: entry.value);
 
-      // Assert
-      expect(find.text(_en.menuLoading), findsOneWidget);
-      expect(find.byType(DishCard), findsNothing);
-    });
+        // Assert: the skeletons stand in for the text, announced once
+        // through a Semantics label carrying the same copy.
+        expect(find.byType(DishCardSkeleton), findsNWidgets(3));
+        expect(find.bySemanticsLabel(_en.menuLoading), findsOneWidget);
+        expect(find.text(_en.menuLoading), findsNothing);
+        expect(find.byType(DishCard), findsNothing);
+      });
+    }
 
     group('progress while the menu is analysed (issue #65)', () {
       testWidgets(
@@ -1438,20 +1451,45 @@ void main() {
       },
     );
 
-    testWidgets('build shows menuEmpty for a menu with no dishes', (
-      tester,
-    ) async {
+    for (final entry in {
+      'light': AppTheme.light(),
+      'dark': AppTheme.dark(),
+    }.entries) {
+      testWidgets(
+        'build shows menuEmpty and a Refresh action for a menu with no '
+        'dishes under the ${entry.key} theme (issue #63)',
+        (tester) async {
+          // Arrange
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf(const <Dish>[])));
+          final controller = _controllerFor(repository: repository);
+
+          // Act
+          await _pump(tester, controller, theme: entry.value);
+          await tester.pumpAndSettle();
+
+          // Assert
+          expect(find.text(_en.menuEmpty), findsOneWidget);
+          expect(find.text(_en.actionRefreshMenu), findsOneWidget);
+        },
+      );
+    }
+
+    testWidgets("tapping the empty menu's Refresh action re-fetches with "
+        'forceRefresh (issue #63)', (tester) async {
       // Arrange
       final repository = FakeMenuRepository()
         ..stub(_ref, MenuFetched(menu: _menuOf(const <Dish>[])));
       final controller = _controllerFor(repository: repository);
-
-      // Act
       await _pump(tester, controller);
       await tester.pumpAndSettle();
 
+      // Act
+      await tester.tap(find.text(_en.actionRefreshMenu));
+      await tester.pumpAndSettle();
+
       // Assert
-      expect(find.text(_en.menuEmpty), findsOneWidget);
+      expect(repository.loadCalls.last.forceRefresh, isTrue);
     });
 
     testWidgets(
@@ -1634,6 +1672,71 @@ void main() {
         expect(find.text(_en.menuShowingYellow), findsOneWidget);
       },
     );
+
+    testWidgets(
+      'filtering to a tile with no matching dish shows menuNoResults and '
+      'a Clear filter action (issue #63)',
+      (tester) async {
+        // Arrange: every dish is green, so the yellow tile leaves nothing
+        // visible.
+        final green = _dish('Steak', id: 'green');
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([green])));
+        final classifier = FakeMenuClassifier()
+          ..respondWith(
+            MenuAnalysed(
+              dishes: [_verdictFor(green, DishVerdict.orderAsIs)],
+              unclassified: const <String>[],
+              engine: const RulesEngine(
+                reason: MenuAnalysisFailureReason.notConfigured,
+              ),
+              analysedAt: DateTime.utc(2026),
+            ),
+          );
+        final controller = _controllerFor(
+          repository: repository,
+          classifier: classifier,
+        );
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Act
+        await tester.tap(find.text(_en.tileYellowLabel.toUpperCase()));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_en.menuNoResults), findsOneWidget);
+        expect(find.text(_en.menuClearFilter), findsOneWidget);
+
+        // Act: tapping it returns to the all filter and the dish
+        // reappears.
+        await tester.tap(find.text(_en.menuClearFilter));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text('Steak'), findsOneWidget);
+        expect(find.text(_en.menuClearFilter), findsNothing);
+      },
+    );
+
+    testWidgets('menuNoResults from a search query alone (filter already all) '
+        'shows no Clear filter action — the search field has its own '
+        'clear button', (tester) async {
+      // Arrange
+      final repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+      final controller = _controllerFor(repository: repository);
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.enterText(find.byType(TextField), 'sushi');
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.menuNoResults), findsOneWidget);
+      expect(find.text(_en.menuClearFilter), findsNothing);
+    });
 
     testWidgets(
       'tapping a yellow card opens the Waiter Card and the script text is '
