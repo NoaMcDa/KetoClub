@@ -4,6 +4,7 @@
 // (D13), and opening a card shows that venue's real menu, from the fake
 // repository, not a placeholder.
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
@@ -22,6 +23,13 @@ import 'flow_support.dart';
 /// The English strings this test reads expected copy from, computed the
 /// same way the app itself does.
 final AppLocalizations _en = AppLocalizationsEn();
+
+/// The loaded menu's list, named the way `menu_display_flow_test.dart`
+/// names it: the screen holds other scrollables (the search field, the
+/// category chip row) and `scrollUntilVisible` needs exactly one.
+final Finder _menuList = find
+    .descendant(of: find.byType(ListView), matching: find.byType(Scrollable))
+    .first;
 
 /// A Wolt venue addressed by [slug], with [address] and [isOnline] as the
 /// search service would report them.
@@ -118,7 +126,16 @@ void main() {
         await tapAndSettle(tester, find.text(plain.name));
 
         // Assert: its real menu, from the fake repository, is shown —
-        // not a placeholder and not another venue's.
+        // not a placeholder and not another venue's. The dish sits below
+        // the header, the rules banner, the tiles, the search field and
+        // the chips, so on the web-server surface it is off screen and the
+        // lazy list has not built it yet (CLAUDE.md) — scroll to it first.
+        await tester.scrollUntilVisible(
+          find.text(plainMenuDish.name),
+          200,
+          scrollable: _menuList,
+        );
+        await tester.pumpAndSettle();
         expect(find.text(plainMenuDish.name), findsOneWidget);
       },
     );
