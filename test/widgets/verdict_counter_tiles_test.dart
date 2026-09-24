@@ -113,6 +113,113 @@ void main() {
       expect(find.bySemanticsLabel('Order as-is: 7'), findsOneWidget);
     });
 
+    testWidgets(
+      'every tile shows an icon beside its colour, never colour alone '
+      '(architecture.md §6.6)',
+      (tester) async {
+        // Arrange & Act
+        await _pump(
+          tester,
+          VerdictCounterTiles(
+            greenCount: 1,
+            yellowCount: 2,
+            redCount: 3,
+            filter: MenuFilter.all,
+            onFilterChanged: (_) {},
+          ),
+        );
+
+        // Assert: one icon per tile, plus its own text label — a
+        // colour-blind user can read every tile from shape and text alone.
+        expect(find.byType(Icon), findsNWidgets(3));
+      },
+    );
+
+    testWidgets(
+      'an inactive tile carries a "double tap to filter" semantics hint, '
+      'an active one "double tap to clear the filter"',
+      (tester) async {
+        // Arrange
+        final handle = tester.ensureSemantics();
+
+        // Act
+        await _pump(
+          tester,
+          VerdictCounterTiles(
+            greenCount: 1,
+            yellowCount: 2,
+            redCount: 3,
+            filter: MenuFilter.redOnly,
+            onFilterChanged: (_) {},
+          ),
+        );
+
+        // Assert: the Skip tile is active under redOnly, so it alone
+        // carries the "clear" hint, and reports selected — the other two
+        // tiles carry the "filter" hint and report not selected.
+        expect(
+          tester.getSemantics(find.text('SKIP')).getSemanticsData(),
+          matchesSemantics(
+            label: 'Skip: 3',
+            hint: 'Double tap to clear the filter',
+            isButton: true,
+            isSelected: true,
+            hasTapAction: true,
+          ),
+        );
+        expect(
+          tester.getSemantics(find.text('ORDER AS-IS')).getSemanticsData(),
+          matchesSemantics(
+            label: 'Order as-is: 1',
+            hint: 'Double tap to filter',
+            isButton: true,
+            hasTapAction: true,
+          ),
+        );
+        handle.dispose();
+      },
+    );
+
+    testWidgets(
+      'build does not overflow at a 2x text scale with three-digit counts '
+      'on a narrow phone width (architecture.md §8.3)',
+      (tester) async {
+        // Arrange: a 340-wide surface (a small phone) and a 2x text scale
+        // together squeeze each tile — one third of the row minus its
+        // gaps — the least room a real device gives this widget.
+        tester.view.physicalSize = const Size(340, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        // Act
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => MediaQuery(
+                  data: MediaQuery.of(context)
+                      .copyWith(textScaler: const TextScaler.linear(2)),
+                  child: VerdictCounterTiles(
+                    greenCount: 128,
+                    yellowCount: 46,
+                    redCount: 999,
+                    filter: MenuFilter.all,
+                    onFilterChanged: (_) {},
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        // Assert
+        expect(tester.takeException(), isNull);
+      },
+    );
+
     testWidgets('build shows the Hebrew labels in the he locale', (
       tester,
     ) async {

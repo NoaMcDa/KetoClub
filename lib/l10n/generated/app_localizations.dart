@@ -1058,6 +1058,18 @@ abstract class AppLocalizations {
   /// **'{label}: {count}'**
   String tileSemanticLabel(String label, int count);
 
+  /// No description provided for @tileSemanticHintFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Double tap to filter'**
+  String get tileSemanticHintFilter;
+
+  /// No description provided for @tileSemanticHintClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Double tap to clear the filter'**
+  String get tileSemanticHintClear;
+
   /// No description provided for @ageJustNow.
   ///
   /// In en, this message translates to:

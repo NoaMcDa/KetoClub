@@ -264,6 +264,8 @@
       "count": { "type": "int" }
     }
   },
+  "tileSemanticHintFilter": "הקשה כפולה כדי לסנן",
+  "tileSemanticHintClear": "הקשה כפולה כדי לנקות את הסינון",
   "ageJustNow": "הרגע",
   "ageMinutes": "{count, plural, one{לפני דקה} two{לפני דקתיים} other{לפני {count} דקות}}",
   "@ageMinutes": {
