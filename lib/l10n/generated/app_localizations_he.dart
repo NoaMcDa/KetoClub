@@ -525,6 +525,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get discoveryNoChipResults => 'אף מסעדה ברשימה לא מתאימה לסינון הזה.';
 
   @override
+  String get discoveryEstimateList => 'הערך את הרשימה';
+
+  @override
+  String get discoveryEstimateHint =>
+      'קורא פעם אחת את התפריט של כל מסעדה ברשימה ומדרג אותו לפי הכללים שבמכשיר, לא בבינה מלאכותית. לניתוח המלא, פתחו את המסעדה.';
+
+  @override
+  String discoveryEstimating(int done, int total) {
+    return 'מעריך $done מתוך $total…';
+  }
+
+  @override
   String get venueCardOpenNow => 'פתוח עכשיו';
 
   @override

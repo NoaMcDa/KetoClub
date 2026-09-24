@@ -524,6 +524,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'No restaurant in this list matches that filter.';
 
   @override
+  String get discoveryEstimateList => 'Estimate this list';
+
+  @override
+  String get discoveryEstimateHint =>
+      'Reads each menu on this list once and scores it with the on-device rules, not the AI. Open a restaurant for the full analysis.';
+
+  @override
+  String discoveryEstimating(int done, int total) {
+    return 'Estimating $done of $total…';
+  }
+
+  @override
   String get venueCardOpenNow => 'Open now';
 
   @override

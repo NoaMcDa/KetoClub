@@ -41,7 +41,11 @@ import 'package:provider/provider.dart';
 ///
 /// **Card numbers follow D13**: a score and counts only for venues whose
 /// analysis is already cached on the device, the *Keto 8+* chip only once
-/// some card has them, and no menu fetched on load or on scroll.
+/// some card has them, and no menu fetched on load or on scroll. Above
+/// the cards, while any visible card lacks numbers, an "Estimate this
+/// list" button (issue #42) fetches those menus once, on the user's tap
+/// only, and scores them with the on-device rules; the numbers it adds
+/// carry the rules engine's estimate marker.
 ///
 /// A permanently denied permission (issue #40) also offers "Open Settings",
 /// which deep-links to the platform's own permission page through
@@ -361,6 +365,10 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (controller.isEstimating || controller.hasVisibleWithoutNumbers) ...[
+          _estimateRow(context, l10n, controller),
+          const SizedBox(height: 16),
+        ],
         for (var i = 0; i < visible.length; i++) ...[
           if (i > 0) const SizedBox(height: 19),
           VenueCard(
@@ -370,6 +378,42 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
             onTap: () => _openVenue(visible[i].ref),
           ),
         ],
+      ],
+    );
+  }
+
+  /// The "Estimate this list" action (issue #42, D13) and the line saying
+  /// what it does: rules on this device, not the AI. While it runs, the
+  /// button is disabled and reads "Estimating {done} of {total}…"; a
+  /// static icon rather than a spinner, so nothing animates forever.
+  Widget _estimateRow(
+    BuildContext context,
+    AppLocalizations l10n,
+    VenueSearchController controller,
+  ) {
+    final estimating = controller.isEstimating;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OutlinedButton.icon(
+          onPressed: estimating
+              ? null
+              : () => unawaited(controller.estimateVisible()),
+          icon: Icon(estimating ? Icons.hourglass_top : Icons.rule),
+          label: Text(
+            estimating
+                ? l10n.discoveryEstimating(
+                    controller.estimatedCount,
+                    controller.estimateTotal,
+                  )
+                : l10n.discoveryEstimateList,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          l10n.discoveryEstimateHint,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
       ],
     );
   }

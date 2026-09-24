@@ -159,6 +159,7 @@ Route<void>? generateRoute(
             dependencies.menuRepository,
             locationService: dependencies.locationService,
             venueSearchService: dependencies.venueSearchService,
+            estimateClassifier: dependencies.estimateClassifier,
           ),
           child: VenueSearchScreen(
             connectivity: dependencies.connectivity,
