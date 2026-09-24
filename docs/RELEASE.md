@@ -54,11 +54,10 @@ adapter or mapper.
       curl -sS localhost:8000/v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu \
         -o test/fixtures/tenbis_{id}_menu.json
       ```
-      As of this writing the 10bis proxy route and `TenBisMenuMapper` are
-      merged, but `TenBisAdapter` is not registered in `di.dart` yet (#46).
-      Recording the fixture ahead of the adapter is still useful: it is
-      what the mapper's fixture test runs against once re-pointed at the
-      real file.
+      The 10bis proxy route, `TenBisMenuMapper` and `TenBisAdapter` (registered
+      in `di.dart`, #134) are all merged against a synthetic fixture; the
+      recording (#44) is what the mapper's fixture test runs against once
+      re-pointed at the real file.
 - [ ] Both curls need a machine with a real network path to
       `restaurant-api.wolt.com` and `www.10bis.co.il`; neither is reachable
       from this repository's sandbox or CI.
@@ -132,7 +131,7 @@ on the same network as the phone. There is no hosted backend yet (#109);
 | Flow | Steps | What "pass" looks like | Platforms |
 |---|---|---|---|
 | Paste a Wolt link | Open the app, paste a real Wolt venue URL | Menu loads, dishes are classified, engine chip reads "AI · {model}" when the backend is up | All four targets |
-| Paste a 10bis link | Paste a real 10bis venue URL or restaurant id | Until #46 (`TenBisAdapter`) ships: fails with "KetoClub cannot read menus from this site yet." After #46: a live menu loads like Wolt's | All four targets |
+| Paste a 10bis link | Paste a real 10bis venue URL or restaurant id | A live menu loads like Wolt's (`TenBisAdapter`, #134); on web only through the backend proxy | All four targets |
 | Saved tab offline | Open a menu, let it cache, turn off networking (airplane mode on a phone, DevTools offline on web), open the Saved tab | The cached menu opens and reads normally with no network error | All four targets |
 | Settings: appearance | Settings → Appearance, switch Light / Dark / System | The whole app re-themes immediately, choice persists across a restart | All four targets |
 | Settings: language | Settings → Language, switch English / Hebrew / System | UI text switches language and layout direction (see RTL row); choice persists across a restart | All four targets |
@@ -168,7 +167,7 @@ through.
 
 | Limitation | Detail |
 |---|---|
-| Discovery not built | No nearby venue search or geolocation. Paste-a-link is the only way in. Blocked on finding a Wolt venue-search endpoint (`architecture.md` §17.2) |
+| Discovery runs on synthetic fixtures | Nearby and by-name search ship (#154) against Wolt endpoints documented from third-party clients, not recorded (#38); on web, Discovery needs the backend and is broken until #155 lands |
 | 10bis fixture is synthetic | `test/fixtures/tenbis_synthetic_menu.json` says so in its first key. Re-record through the 10bis proxy (#122, merged) once a real restaurant id is captured (#44) |
 | Mobile without the backend define is rules-only | iOS and Android call Wolt directly for menus, but AI classification always goes through the backend (`/v1/chat`). With no `KETOCLUB_BACKEND_URL` set at build time, every platform, including phones, falls back to the on-device rule engine and shows "Rules (notConfigured)" |
 | WCAG AA contrast failures | Fixed (issue #64, contrast half): the green status pill's own text on its green fill, light-mode `ink3` on `bg`, and dark-mode `ink3` on `bg` all now clear 4.5:1. Pinned by `test/theme/contrast_test.dart`; see `lib/theme/app_tokens.dart` |

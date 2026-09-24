@@ -83,8 +83,9 @@ const int maxAnalysedDishes = 150;
 /// alone (architecture.md §9.4 rule 6, §9.1).
 const int maxWhyLength = 300;
 
-/// `modification` is truncated at this many characters, never rejected
-/// for length alone (architecture.md §9.4 rule 6, §9.1).
+/// A `modification` longer than this demotes its yellow dish to
+/// unclassified rather than being truncated: a cut-off waiter instruction
+/// is worse than none (architecture.md §9.4 rule 6, §9.1).
 const int maxModificationLength = 300;
 
 /// The minimum word length counted when the parser checks whether an

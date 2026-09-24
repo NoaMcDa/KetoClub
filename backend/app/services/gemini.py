@@ -87,7 +87,8 @@ async def complete(
 ) -> ChatResponse:
     """Forward ``request`` to Gemini and return its text, or raise ``BackendError``.
 
-    The retry rule mirrors the Dart ``OpenRouterClient``: a request carrying a
+    The retry rule is the one D4 carried over from the m15 post-mortems (the
+    Dart client that predated the backend applied it too): a request carrying a
     schema that is answered 400, for any reason other than an invalid key, is
     re-sent exactly once with ``responseMimeType`` only. 401, 403, 429 and 5xx
     are answers about the key, the quota or the provider and are never

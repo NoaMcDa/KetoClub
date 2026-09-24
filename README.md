@@ -365,13 +365,17 @@ Roadmap & Milestone Tracking
       the single most common cuisine tag among the current results — not an
       arbitrary dish type, and not combinable with the score filter the way
       the example asks.
-* [ ] Phase 3: Persistent Community Database
-    * [ ] Verified directory of keto-dedicated and keto-accessible restaurants.
-    * [ ] User review feedback loop ("Did the restaurant accommodate your substitution?").
-    * [ ] User submissions for unlisted restaurants and manual review tagging.
-* [ ] Phase 4: Advanced Nutritional Intelligence
-    * [ ] Computer Vision & OCR: Snap a photo of a physical printed paper menu to receive the same color-coded breakdown.
-    * [ ] Configurable dietary rules: Support for carnivore, pesco-keto, and strict seed-oil avoidance modes.
+* [ ] Phase 3: The personal backend, verified end to end (re-planned 2026-09-24, `ROADMAP.md`)
+    * [x] Backend foundations and hosted Gemini classification (`architecture.md` D11, D12).
+    * [ ] Person-run checks: a real Wolt and 10bis response, the Gemini smoke test, a phone run (#178).
+    * [ ] AI analysis on by default with the disclosure (#167); a LAN backend URL in Settings (#99).
+* [ ] Phase 4: Menu scanning and dietary customisation
+    * [ ] Paste a menu (#83), then photograph or pick pages and let Gemini read them through the backend (#170, #89, #82). No on-device OCR (D15).
+    * [x] Dietary rules: strict seed-oil free, dairy-free keto and carnivore modes shipped in Phase 2 (#56).
+    * [ ] Pesco-keto (#85), a custom constraint (#86), and naming the rule behind a verdict (#87).
+* [ ] Phase 5: Hosted service (#109, #171–#175)
+    * [ ] Then, re-planned on top of it: the review feedback loop, a verified directory and venue submissions (#164). The design filed earlier stored a per-install record and was withdrawn.
+* [ ] Phase 6: More platforms — Tabit (#176) and Ontopo (#177).
 Development Setup & Installation
 
 **This section describes the actual repository layout, corrected from an

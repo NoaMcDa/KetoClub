@@ -329,24 +329,37 @@ When reading research docs (m15/m16), note that prefixes indicate iteration/mile
   GitHub milestone names — they differ from earlier drafts of this document.
 - **Phase 3**: the backend (`backend_plan.md`) → **Foundations and hosted
   classification landed** (D11, D12: the Wolt CORS proxy and Gemini-backed
-  chat). Community database, user reviews, restaurant submissions and hosting
-  beyond `localhost` → **Planned**
-- **Phase 4**: OCR/vision, configurable dietary rules → **Planned**
+  chat). **Re-planned 2026-09-24 (`ROADMAP.md`, D18):** Phase 3 now means
+  *the personal backend, verified end to end* — the person-run checks (#178:
+  Wolt fixture #22, discovery #38, 10bis #44, Gemini smoke test #165, phone
+  run #166), AI on by default (#167, D16) and a Settings backend-URL override
+  for a phone on the LAN (#99, D17). Community features (ratings, feedback,
+  submissions, badges) are **deferred** to after hosting; #164 carries them.
+- **Phase 4**: menu scanning via Gemini's vision (paste-text first #83, image
+  parts on `/v1/chat` #170, `ScannedMenuClassifier` #89, the Scan tab #82;
+  D14, D15 — on-device OCR is not built) and dietary customisation (pesco-keto
+  #85, custom constraints #86, rule naming #87) → **Planned**
+- **Phase 5**: the hosted service (#109 and #171–#175, then #164) → **Planned**
+- **Phase 6**: Tabit and Ontopo (#176, #177) → **Planned**
 
-Phase 1 and Phase 2 are built; `feature_prioratization` has the tier breakdown
-for what Phase 3's remaining milestone (#105–#108) and Phase 4 pick up next.
+Phase 1 and Phase 2 are built; `ROADMAP.md` is the current plan and the order
+of work.
 
 ## What is NOT built yet
 
-- Tabit and Ontopo adapters. Wolt and 10bis ship; `MenuRepository` has an
-  adapter registered for each (`di.dart`). The `PlatformMenuAdapter`
-  interface and its shared contract suite already exist, so a new platform is
-  a new adapter plus a registration in `di.dart`.
-- OCR and the photographed-menu path (Phase 4), and community features — venue
-  ratings, reviews, submissions (Phase 3, `backend_plan.md` §5's milestone C).
-  The Scan bottom-nav tab is still only a localized placeholder screen (issue
-  #11) explaining that — Saved is no longer a placeholder alongside it; it
-  became a real cached-menus tab in Phase 2 (issue #48; `saved_screen.dart`).
+- Tabit and Ontopo adapters (Phase 6, #176, #177). Wolt and 10bis ship;
+  `MenuRepository` has an adapter registered for each (`di.dart`). The
+  `PlatformMenuAdapter` interface and its shared contract suite already
+  exist, so a new platform is a new adapter plus a registration in `di.dart`.
+- The scan path (Phase 4): paste-a-menu (#83), image parts on `/v1/chat`
+  (#170), the vision classifier (#89) and the Scan tab (#82). The Scan
+  bottom-nav tab is still only a localized placeholder screen explaining that
+  — Saved is no longer a placeholder alongside it; it became a real
+  cached-menus tab in Phase 2 (issue #48; `saved_screen.dart`). There is no
+  on-device OCR and none is planned (D15).
+- Community features — venue ratings, reviews, submissions, verified badges —
+  are deferred until the backend is hosted and their storage keeps no
+  per-install record (D18, #164).
 - Backend hosting beyond `localhost` (issue #109, `architecture.md` §17.6). The
   backend is designed to be run locally by whoever has the repository checked
   out; nothing yet says where it runs for anyone else.
@@ -419,9 +432,10 @@ Built, but not confirmed end to end, and not to be reported as done:
    steps 6–7 added the backend, and steps 8–10 (the 10bis adapter, location and
    nearby search, platform setup) are now done too, modulo the fixture
    recordings and phone run in "What is NOT verified yet" above. What's next
-   is Phase 3's remaining milestone (community database, reviews, submissions;
-   `backend_plan.md` §5 milestone C, issues #105–#108). §14 has the decisions
-   log D1–D13, §17 the open questions with the default the code follows.
+   is `ROADMAP.md`'s order: #155, the person-run checks (#178), AI on by
+   default (#167), the LAN URL override (#99), then the scan path (#83, #170,
+   #89, #82). §14 has the decisions log D1–D18, §17 the open questions with
+   the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing

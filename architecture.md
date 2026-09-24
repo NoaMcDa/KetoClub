@@ -1,16 +1,20 @@
 # KetoClub — Architecture
 
-**Status:** living design document. **Phase 1 is built** — build-order steps 1 to 5
-(§16): the models and service contracts, the bilingual heuristic engine, Wolt
-ingestion with a Hive cache, the classified menu screen and Waiter Card, and the
-LLM client with its router and Settings. **Phase 3 backend foundations and hosted
-classification landed next** (D11, D12): a local FastAPI backend (`backend/`)
-proxies Wolt for the web build and forwards one chat completion per menu to
-Google Gemini, and the bring-your-own-key path is gone — the app never holds a
-model key. Phase 2 (10bis, nearby search) is still to come. When code and this
+**Status:** living design document. **Phases 1 and 2 are built** — build-order
+steps 1 to 10 (§16): the models and service contracts, the bilingual heuristic
+engine, Wolt and 10bis ingestion with a Hive cache, the classified menu screen
+and Waiter Card, the LLM client with its router and Settings, location and the
+Discovery screen, and platform setup. **Phase 3 backend foundations and hosted
+classification landed underneath** (D11, D12): a local FastAPI backend
+(`backend/`) proxies Wolt and 10bis for the web build and forwards one chat
+completion per menu to Google Gemini, and the bring-your-own-key path is gone —
+the app never holds a model key. **The roadmap was re-planned on 2026-09-24**
+(`ROADMAP.md`, D14–D18): the backend stays personal-use until Phase 5 hosts it,
+community features are deferred, menu scanning goes through Gemini's vision
+rather than on-device OCR, and AI analysis is on by default. When code and this
 document disagree, fix one of them in the same pull request; the entries marked
-*(Phase 1)* below record where that already happened, and D11/D12 in §14 record
-the backend addition.
+*(Phase 1)* below record where that already happened, and D11–D18 in §14 record
+what came after.
 
 **Audience:** anyone about to write the first line of Dart for KetoClub, and anyone
 reviewing it.
@@ -1431,6 +1435,68 @@ honoured only as far as the device (and, after B, the backend) has actually
 analysed. That gap is the point: a number on a card is a claim about food
 someone is about to order, and D13 only makes claims it can back.
 
+**D14 — Scanned menus are a `MenuSource`, not a platform.** *(2026-09-24,
+`ROADMAP.md`; issue #83.)* Pasted text and, later, photographed pages produce
+a `Menu` under `MenuSource.scan`. A scan is cache-only (there is no upstream to
+refetch or be stale against), shows no prices (a scanned or pasted price is
+never a fact the app can vouch for), offers no "open on platform" link, and
+is otherwise classified, cached and rendered exactly like a Wolt or 10bis
+menu. A paste's `platformId` is the menu fingerprint, so the same text opens
+the same cache entry and produces the same prompt.
+
+**D15 — Menu scanning goes through Gemini's vision; on-device OCR is not
+built.** *(Amends D5 for the scan source only; supersedes the M16 OCR plan and
+closes issue #81.)* `m16_menu_scanner_research.md` chose on-device Tesseract
+because the user's own OpenRouter key had a 50-a-day quota and free vision
+models rotated. Under D12 the operator's `gemini-2.5-flash` key is multimodal
+and held by the backend, and the one real OCR measurement (m16 §10.2: 9 of 23
+dish names exact, prices wrong) is the weakest link in that plan. So pages
+travel as base64 `inline_data` parts on the existing `POST /v1/chat` (#170) —
+never cached server-side, never logged — and a `ScannedMenuClassifier`
+sibling interface (#89) has the model transcribe and classify in one request
+with the unchanged response schema. Provenance rule 3 of §9.4 cannot apply
+when the page is the only source; its substitute is that the page *is* the
+source: nameless elements are dropped, duplicates keep the first, and the menu
+header shows the pages so the user can check the transcription. There is no
+rules fallback for a photo. **What it costs:** photographs leave the device
+for KetoClub's server and Google, which the Scan screen says above the
+Analyse button; constraint 11 ("only text leaves the device for
+classification") is amended to "only menu text and menu pages".
+
+**D16 — AI analysis is on by default, disclosed once, and can be turned off; a
+stored refusal always wins.** *(Issue #167; amends §11's "the user confirms
+once".)* `estimationConsentGiven` defaulted to `false`, so every fresh install
+saw rules-only verdicts and the "why not AI" banner until it found the switch —
+which made D2's "the LLM is the primary classifier" untrue in practice. The
+default becomes `true` for an install that has never saved settings; a stored
+`false` is never re-defaulted (the store always writes the key). The
+disclosure is shown once on first launch with an "OK" and a "Turn off"
+action, and stays in Settings.
+
+**D17 — A runtime backend URL override lives in Settings and reaches every
+client as a resolver.** *(Issue #99; amends D11's "the host string is threaded
+through `di.dart` and nowhere else".)* The compile-time define stays in
+`di.dart`; `AppSettings.backendUrl` may override it; both reach
+`BackendChatClient`, the two adapters and the venue search as a
+`Future<Uri?> Function()` resolved once per call, never at construction, so
+`buildDependencies()` stays synchronous and plugin-free. The browser-only
+proxy asymmetry (D11) is preserved: on a phone the override changes the chat
+base and nothing else.
+
+**D18 — The backend stays personal-use; hosting is Phase 5; community
+features are deferred.** *(2026-09-24, `ROADMAP.md`; issue #109 and its
+sub-issues #171–#175, #164.)* Nothing in the product's primary classifier
+reached a user: the backend URL came only from a define no build passed, and
+no host existed. Rather than build community endpoints against a server with
+one user, the order is: the personal backend proven end to end (Phase 3:
+#178, #165, #166, #167, #99), then a hosted service with a persistent
+limiter, a global Gemini spend cap and an abuse posture for the spoofable
+install id (Phase 5), then community features re-planned on top. The
+community design as filed (ratings and feedback upserted on `install_id`,
+#106) also contradicted constraint 1, D8, D11 and §11 — the backend keeps
+caches, never a per-user record — and must be redesigned before it reopens;
+#164 carries that. Tabit and Ontopo are Phase 6 (#176, #177).
+
 ---
 
 ## 15. Testing strategy
@@ -1544,11 +1610,11 @@ Extension points already designed in:
 
 | Future feature | Where it plugs in | What must not change |
 |---|---|---|
-| Tabit, Ontopo | a new `PlatformMenuAdapter` | `Menu` model, classifier |
-| Photographed or PDF menus (Phase 4) | a new source that yields `Menu` from OCR text; the M16 research is the reference | the prompt and parser |
-| Vision-model classification | a second `MenuClassifier`; router chooses | the UI |
+| Tabit, Ontopo (Phase 6, #176, #177) | a new `PlatformMenuAdapter`; Ontopo's PDF menus go through the scan path below | `Menu` model, classifier |
+| Pasted menus (Phase 4, #83) | `TextMenuSource` yields a `Menu` under `MenuSource.scan` (D14); no OCR | the prompt and parser |
+| Photographed or PDF menus (Phase 4, #82, #89) | pages go as image parts on `POST /v1/chat` (#170) and a `ScannedMenuClassifier` sibling interface reads and classifies them in one request (D15); the M16 OCR research is superseded | the response schema, the UI |
 | Custom dietary rules (Tier C) | `ClassificationOptions` → appended to the system prompt and to the rules table | schema |
-| Community ratings, venue directory (Phase 3) | a backend with its own client under `services/community/`; `Venue` gains the README's rating fields | everything above stays client-only |
+| Community ratings, venue directory | **Deferred (D18, #164)** until the backend is hosted (Phase 5, #109) and the storage keeps no per-install record; the client would live under `services/community/` and `Venue` would gain the README's rating fields | everything above stays client-only |
 | CORS proxy for web | **Shipped (D11).** `backend/`'s `/v1/proxy/wolt/…` route; `WoltMenuAdapter` took a configurable `proxyBase`, exactly as this row predicted | adapter logic (unchanged, as predicted) |
 | Shared analysis cache (Tier D) | **Shipped (D12, issue #103).** The backend's own `chat_cache`, keyed by a hash of the request — not a remote tier of the device's `MenuCache`, which stays exactly as before; each device still caches its own `Menu` and `MenuAnalysis` locally | parser, models (unchanged — the cache sits below `LlmChatClient`, invisible to both) |
 
@@ -1604,6 +1670,17 @@ default the implementation follows until answered.
    its own issue (#109, `backend_plan.md` §5), and the app's "the backend is an
    accelerator, never a dependency" property (D11) is exactly what makes leaving
    this open safe — every build works with no backend configured at all.
+   *(D18: still `localhost`/LAN only, by decision; hosting is Phase 5 with
+   #109 as its entry point and #171–#175 as the work.)*
+7. **Does the shipped Wolt menu endpoint still answer anonymously?**
+   `phase2_discovery_research.md` §2.5 reports two clients seeing `200` with
+   an empty body from `/v4/venues/slug/{slug}/menu/data` without a user token.
+   Default: the shipped endpoint, until `tool/record_wolt_fixture.sh` (#22)
+   says otherwise; the port to the assortment endpoint is drafted as #168.
+8. **Reverse geocoding for the Discovery header.** The header shows
+   coordinates-derived copy, not a street name (`docs/VISUAL_AUDIT.md`,
+   "Left"). Default: no reverse geocoding — it would send the position to a
+   third service §11 does not name.
 
 ---
 

@@ -110,14 +110,19 @@ Use `geolocator` because:
 
 ## Phase Assignment
 
-Assign issues to one of the four project phases:
+Assign issues to one of the six project phases (re-planned 2026-09-24,
+`ROADMAP.md`):
 
-- **Phase 1**: Core parsing, heuristic engine, waiter script generation
-- **Phase 2**: Mobile interface, geolocation, search filtering
-- **Phase 3**: Community database, user reviews, restaurant submissions
-- **Phase 4**: OCR/vision, configurable dietary rules
+- **Phase 1**: Core parsing, heuristic engine, waiter script generation (built)
+- **Phase 2**: Mobile interface, geolocation, search filtering (built)
+- **Phase 3**: The personal backend, verified end to end (backend foundations
+  and hosted classification are built; the person-run checks, AI on by
+  default and the LAN URL override remain)
+- **Phase 4**: Menu scanning via Gemini's vision, configurable dietary rules
+- **Phase 5**: The hosted service, then community features re-planned on it
+- **Phase 6**: More platforms (Tabit, Ontopo)
 
-See `feature_prioratization` and `CLAUDE.md` for phase details.
+See `ROADMAP.md` and `CLAUDE.md` for phase details.
 
 ## Priority Labels
 

@@ -17,8 +17,13 @@
 > app D1 first described. **This document's design is now largely history**:
 > `architecture.md` is authoritative (D11, D12 in §14) and this plan is kept
 > for the reasoning and the milestone/issue breakdown, corrected below where it
-> named OpenRouter or a bring-your-own-key path that no longer exists. Still
-> open: #105–#109 (community API, hosting beyond `localhost`).
+> named OpenRouter or a bring-your-own-key path that no longer exists.
+> **2026-09-24 (`ROADMAP.md`, D18):** milestone C (#105–#108) was closed as
+> not planned — its per-install upserts contradicted D8/§11 and it had no
+> population without a host; #164 carries the re-plan. Hosting (#109) is now
+> the Phase 5 entry point with #171–#175 as the work. Since this document was
+> written the backend also gained a 10bis menu proxy (#126) and two Wolt
+> discovery proxy routes (#149), so "the only proxy route" in §3.3 is stale.
 
 ## 1. Why a backend, and why now
 

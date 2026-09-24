@@ -18,7 +18,7 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 ///
 /// This is deliberately not an `IndexedStack`: every route in `generateRoute`
 /// already builds a fresh controller on purpose (so two visits to a screen
-/// start clean), Scan and Saved are stateless placeholders, and an
+/// start clean), Scan is still a stateless placeholder (issue #82), and an
 /// `IndexedStack` would have to own `/settings` as one of its children,
 /// breaking the direct deep link `test/app_test.dart` asserts. The accepted
 /// trade-off is that switching tabs discards whatever was typed into the

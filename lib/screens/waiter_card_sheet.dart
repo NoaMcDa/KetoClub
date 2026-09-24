@@ -27,11 +27,10 @@ import 'package:ketoclub/widgets/waiter_script_widget.dart';
 /// **Two constructors, one screen.** [WaiterCardSheet.new] takes a single
 /// [DishRow], the shape `menu_screen.dart`'s dish-card affordance already
 /// calls this with; it keeps compiling unchanged and defaults
-/// [screenBrightness] to [NoOpScreenBrightness] since that call site has
-/// no [ScreenBrightness] of its own to pass yet (issue #31's follow-up:
-/// thread `AppDependencies.screenBrightness` down to it, then pass it
-/// through here, for the brightness raise to actually happen from that
-/// path). [WaiterCardSheet.forRows] is the shape a sticky bar offering
+/// [screenBrightness] to [NoOpScreenBrightness]; `menu_screen.dart` passes
+/// `AppDependencies.screenBrightness` through, so the brightness raise
+/// happens from that path (issue #31's follow-up, done).
+/// [WaiterCardSheet.forRows] is the shape a sticky bar offering
 /// every modifiable dish needs — a list plus which one to open on —
 /// and always takes its [ScreenBrightness] explicitly, since every new
 /// call site can supply one from the start.

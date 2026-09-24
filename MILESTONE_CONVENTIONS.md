@@ -18,7 +18,8 @@ Phase N: [Feature Group Name]
 - `Phase 1: Menu Classifier Engine`
 - `Phase 2: Geolocation & Venue Search`
 - `Phase 2: 10bis Integration`
-- `Phase 3: User Ratings & Reviews`
+- `Phase 3: Verified End to End`
+- `Phase 5: Hosted Service`
 
 > **These are the milestones actually created on GitHub** (verified against the
 > repository's milestone list while closing issue #36), not an illustrative plan.
@@ -61,25 +62,27 @@ Phase N: [Feature Group Name]
 ### Phase 2: Mobile Interface & Discovery
 
 **Goal**: Complete the user-facing mobile app with geolocation, the 10bis adapter,
-and filtering. **Status**: next; not started.
+and filtering. **Status**: built and merged (2026-09-24); what remains in its
+open milestones is person-run recording and measurement.
 
 **Milestones (as created on GitHub):**
 1. `Phase 2: Geolocation & Venue Search` — device location + venue discovery.
-   Blocked on discovery: no Wolt venue-search endpoint is known
-   (`architecture.md` §17 open question 2)
-2. `Phase 2: 10bis Integration` — the 10bis adapter. Blocked on a live capture:
-   `dishOptionsList`'s shape, a stable category id, and a real restaurant id/URL
-   are all unverified (`HANDOFF.md`)
-3. `Phase 2: Menu Display & Navigation` — improved UI, search filtering, bookmarks
-4. `Phase 2: Settings & Preferences` — user settings, dietary rule customization
-5. `Phase 2: Polish & Performance` — responsive design, loading states, error handling
+   Built (#154, D13) against synthetic fixtures; open: #38 (the recording) and
+   #155 (the web proxy header bug)
+2. `Phase 2: 10bis Integration` — the 10bis adapter. Built (#134) against a
+   synthetic fixture; open: #44 (the recording)
+3. `Phase 2: Menu Display & Navigation` — closed
+4. `Phase 2: Settings & Preferences` — closed (the three dietary toggles shipped
+   here, #56)
+5. `Phase 2: Polish & Performance` — open: #65 (phone timings) and #169
+   (visual-audit follow-ups)
 
 **Success Criteria:**
-- Users can search nearby restaurants by location
-- 10bis menus fetch and classify the same way Wolt's do
-- App displays filtered results (Green/Yellow/Red)
-- Works offline for cached menus
-- <3s load time on 4G network
+- ✅ Users can search nearby restaurants by location
+- ✅ 10bis menus fetch and classify the same way Wolt's do
+- ✅ App displays filtered results (Green/Yellow/Red)
+- ✅ Works offline for cached menus
+- ⏳ <3s load time on 4G network — unmeasured until #65 runs on a phone
 
 ### Phase 3: Community Database & Reviews
 
@@ -100,20 +103,26 @@ for the backend's design and its own issue range (#94–#109).
    Issue #104 (reword Settings and failure copy for a served model) was folded
    into #102's scope for the same reason as #98: one worker owning the whole
    reason-enum change made more sense than reviewing it twice.
-3. `Phase 3: Community API` — the server side of ratings, reviews and submissions
-4. `Phase 3: User Ratings & Reviews` — post-visit feedback mechanism
-5. `Phase 3: Venue Submission` — crowdsourced venue directory
-6. `Phase 3: Verified Badges` — keto-friendly venue verification
+3. `Phase 3: Verified End to End` — **the re-planned remainder of Phase 3**
+   (2026-09-24, `ROADMAP.md`, D18): the personal backend proven against real
+   Gemini, real Wolt and 10bis responses and a real phone (#178, #165, #166,
+   #168), AI on by default (#167), the LAN URL override (#99, still filed under
+   *Backend Foundations*)
+4. ~~`Phase 3: Community API`~~, ~~`Phase 3: User Ratings & Reviews`~~,
+   ~~`Phase 3: Venue Submission`~~, ~~`Phase 3: Verified Badges`~~ — **closed
+   2026-09-24.** Community features are deferred until the backend is hosted
+   (Phase 5) and redesigned so the server keeps no per-install record; #164
+   carries the re-plan and lists the closed issues
 
 **Success Criteria:**
 - ✅ Web build fetches live menus through the local backend proxy when
   configured (not "without a local proxy" — a local proxy is exactly how this
   shipped; see `architecture.md` §13)
 - ✅ Classification works with no key entered anywhere, hosted by the backend
-- Users can rate venues after dining — not built (milestone 3–6 territory)
-- Community ratings influence venue ranking — not built
-- Verified keto-friendly badges visible to users — not built
-- Support for user submissions of new venues — not built
+- ⏳ The real prompt has run against the pinned Gemini model (#165)
+- ⏳ A real Wolt and a real 10bis response are checked in as fixtures (#22, #44)
+- ⏳ A phone has run the app against the LAN backend (#166, #99)
+- ⏳ A fresh install uses AI analysis by default (#167)
 
 ### Phase 4: Advanced Features
 
@@ -121,22 +130,41 @@ for the backend's design and its own issue range (#94–#109).
 **Status**: planned.
 
 **Milestones (as created on GitHub):**
-1. `Phase 4: OCR Menu Scanning` — snap a photo of a physical menu, extract text
-   (`m16_menu_scanner_research.md`)
-2. `Phase 4: Dietary Customization` — carnivore, pesco-keto, seed-oil avoidance
-   modes (Tier C in `feature_prioratization`)
-3. `Phase 4: Vision Classifier` — a vision-model `MenuClassifier` for OCR'd text,
-   behind the same interface as the two Phase 1 engines (`architecture.md` §16's
-   extension-points table)
+1. `Phase 4: Menu Scanning` (renamed from *OCR Menu Scanning*; absorbed the
+   *Vision Classifier* milestone, now closed) — paste a menu (#83), then
+   photographed and PDF pages sent as image parts on `POST /v1/chat` (#170) and
+   read by a `ScannedMenuClassifier` (#89) behind the Scan tab (#82), with the
+   vision smoke test (#88) as the go/no-go. On-device OCR is not built
+   (`architecture.md` D15; `m16_menu_scanner_research.md` is superseded on
+   the engine choice)
+2. `Phase 4: Dietary Customization` — pesco-keto (#85; seed-oil, dairy-free and
+   carnivore shipped in Phase 2), a custom constraint (#86), rule naming (#87)
 
 **There is no Phase 4 "Meal Logging" milestone.** `architecture.md` D8 rules meal
 logging and macro tracking out of scope for KetoClub entirely — that design in
 `m15_meal_entry_research.md` belongs to a different application.
 
 **Success Criteria:**
-- OCR extracts 95%+ of readable text from menu photos
+- A pasted menu classifies like a fetched one, with no prices shown
+- Photographed and PDF pages are read by Gemini with dish-name recall measured
+  on real Israeli menus (#88); no on-device OCR
 - Users can switch between dietary rulesets
-- A vision-model classifier handles menus with no extractable text
+
+### Phase 5: Hosted Service
+
+**Goal**: Run the backend on a public host so the primary classifier reaches
+users without a LAN. **Status**: planned; #109 is the entry point.
+
+**Milestone:** `Phase 5: Hosted Service` — deploy config, HTTPS and CORS
+(#171), a persistent limiter and a global Gemini spend cap (#172), the abuse
+posture for a spoofable install id (#173), the backend URL per build flavour
+(#174), D13 option B (#175), then the community re-plan (#164).
+
+### Phase 6: More Platforms
+
+**Goal**: Tabit and Ontopo. **Status**: planned, research first.
+
+**Milestone:** `Phase 6: More Platforms` — #176 (Tabit), #177 (Ontopo).
 
 ## Milestone Properties
 
@@ -239,7 +267,7 @@ None currently. Nice to have: consider caching for offline support (Phase 2).
 
 Use these labels alongside milestones to organize work:
 
-- **Phase 1**, **Phase 2**, **Phase 3**, **Phase 4** — Indicates which phase the issue belongs to
+- **Phase 1** … **Phase 6** — Indicates which phase the issue belongs to
 - **priority: critical/high/medium/low** — Within a phase, indicates urgency
 - **type: feature/bug/chore/docs** — Type of work
 - **platform: web/ios/android** — Which platform(s) are affected

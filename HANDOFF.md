@@ -130,20 +130,22 @@ offline banner, cached-menu fallback copy (#144). `docs/RELEASE.md` (#133)
 is the pre-release checklist and device-test matrix that names what a real
 device run still needs to confirm.
 
-What is **not** built: Tabit and Ontopo adapters — Wolt and 10bis both ship
-now, with an adapter registered in `di.dart` for each; OCR; Phase 3's
-community database, user reviews and venue submissions (`backend_plan.md` §5
-milestone C, issues #105–#108); and hosting the backend anywhere beyond
-`localhost` (issue #109). None of it is stubbed — the files simply do not
-exist, which keeps them out of the coverage denominator.
+What is **not** built: Tabit and Ontopo adapters (Phase 6, #176, #177) —
+Wolt and 10bis both ship now, with an adapter registered in `di.dart` for
+each; the scan path (Phase 4: #83, #170, #89, #82 — through Gemini's vision,
+never on-device OCR, D15); community features (deferred until the backend is
+hosted, D18, #164); and hosting the backend anywhere beyond `localhost`
+(Phase 5, #109). None of it is stubbed — the files simply do not exist, which
+keeps them out of the coverage denominator.
 
 ---
 
 ## Outstanding before release
 
 Several things are genuinely unfinished. None is a surprise; each is unfinished
-for a stated reason, and issues #16, #22, #38, #44 and #65 are still **open**
-on GitHub — tooling exists for several of them, it did not close any of them.
+for a stated reason, and issues #22, #38, #44, #65, #165 and #166 are still
+**open** on GitHub, tracked together by #178 — tooling exists for several of
+them, it did not close any of them.
 
 1. **The pinned Gemini model has never been called from this environment**
    (§9.3, §17 open question 1 — closed as posed by D12, but the verification it
@@ -297,15 +299,28 @@ what this section previously called blocked:
   permissions. A run on a physical iOS and Android device against a real
   Wolt venue is still owed — see "Outstanding before release" item 5.
 
-What resumes now is the remaining Phase 3 milestone — community database,
-ratings, submissions (`backend_plan.md` §5 milestone C, #105–#108) — and
-hosting the backend beyond `localhost` (#109), both still open and tracked
-separately from the build order above, plus the recordings and phone/device
-work "Outstanding before release" lists.
+**The roadmap was re-planned on 2026-09-24 — read `ROADMAP.md`.** The
+community milestone was deferred (D18, #164) and Phase 3 now means proving
+the personal backend end to end: the person-run checks (#178), AI on by
+default (#167), the LAN URL override (#99). Phase 4 is the scan path through
+Gemini's vision (#83, #170, #89, #82), Phase 5 the hosted service (#109),
+Phase 6 Tabit and Ontopo. The first thing to do is #155, then #22 — its
+result decides whether the Wolt menu adapter must be ported (#168).
 
 ---
 
 ## Environment and workflow
+
+- **The orchestrated-build rules that Phase 2 ran under** (kept from the
+  session handoff that file replaced): one PR per GitHub issue into `main`,
+  on branches `claude/<slug>-<issue#>`; CI is the judge; squash-merge on
+  green with the full head SHA. Before any push: `flutter pub get`,
+  `flutter gen-l10n` after ARB edits, `dart format lib test
+  integration_test test_driver tool`, `flutter analyze --fatal-infos
+  --fatal-warnings`; backend: `uv sync --frozen`, `ruff check`, `ruff format
+  --check`, `mypy app tests`. Merge `origin/main` into a PR branch (never
+  rebase or force-push a worker's branch); PRs that touch the same screen
+  merge one at a time. No model name anywhere in repository content.
 
 - **Flutter 3.47.4 / Dart 3.13.3**, pinned in two places that must agree:
   `flutter-version` in `.github/workflows/ci.yml` and `environment: flutter` in

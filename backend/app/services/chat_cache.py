@@ -1,8 +1,8 @@
 """Shared Gemini completion cache, keyed by request hash (issue #103).
 
 Identical menus produce identical prompts, so one completion cached here
-serves every caller who asks the same question — the OpenRouter/Gemini
-free-tier quota (D6) goes much further. ``app/routers/proxy.py`` and
+serves every caller who asks the same question — the operator's Gemini
+spend and the per-install limit (D6, D12) go much further. ``app/routers/proxy.py`` and
 ``app/services/wolt.py`` are the model for the read/write shape: sync
 functions run over a session obtained from ``app.db.get_session``, called
 from the async route through ``run_in_threadpool``.
