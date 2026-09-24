@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/di.dart';
 import 'package:ketoclub/services/classifier/classifier_router.dart';
+import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/location/geolocator_location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
@@ -31,6 +32,8 @@ void main() {
       // Assert
       expect(dependencies.menuRepository, isA<CachedMenuRepository>());
       expect(dependencies.menuClassifier, isA<RoutingMenuClassifier>());
+      // "Estimate this list" gets the rule engine alone (issue #42, D13).
+      expect(dependencies.estimateClassifier, isA<HeuristicMenuClassifier>());
       expect(dependencies.clock, isA<SystemClock>());
       expect(dependencies.logger, isA<DeveloperLogAppLogger>());
       expect(dependencies.settingsStore, isA<PrefsSettingsStore>());
