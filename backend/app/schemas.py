@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from pydantic import BaseModel, Field, StringConstraints
+from pydantic import BaseModel, Field, StringConstraints, model_validator
 
 from app.services.wolt import WoltLang
 
@@ -49,14 +49,23 @@ class DiscoverySearchRequest(BaseModel):
     """Request body for ``POST /v1/proxy/wolt/pages/search`` (#123).
 
     ``q`` is trimmed and bounded before it ever reaches Wolt. ``lat``/``lon``
-    share the ``GET /v1/proxy/wolt/pages/restaurants`` route's range. There
-    is no ``target`` field: the route itself fixes it to ``"venues"``, so a
-    client cannot ask this backend to proxy a dish search instead.
+    share the ``GET /v1/proxy/wolt/pages/restaurants`` route's range and are
+    optional together: the app searches by name without a position when
+    location was denied (#37), and Wolt ranks by proximity only when both
+    are given, so one without the other is rejected rather than half-sent.
+    There is no ``target`` field: the route itself fixes it to ``"venues"``,
+    so a client cannot ask this backend to proxy a dish search instead.
     """
 
     q: Annotated[
         str, StringConstraints(strip_whitespace=True, min_length=1, max_length=80)
     ]
-    lat: float = Field(ge=-90, le=90)
-    lon: float = Field(ge=-180, le=180)
+    lat: float | None = Field(default=None, ge=-90, le=90)
+    lon: float | None = Field(default=None, ge=-180, le=180)
     lang: WoltLang = "en"
+
+    @model_validator(mode="after")
+    def _position_is_all_or_nothing(self) -> "DiscoverySearchRequest":
+        if (self.lat is None) != (self.lon is None):
+            raise ValueError("lat and lon must be given together or not at all")
+        return self

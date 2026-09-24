@@ -98,7 +98,15 @@ async def search_wolt_by_name(
         client_id=request.app.state.wolt_web_client_id,
         client_version=settings.WOLT_CLIENT_VERSION,
     )
-    cache_key = f"{body.q.lower()},{body.lat:.4f},{body.lon:.4f},{body.lang}"
+    # A search without a position (location denied, #37) is its own cache
+    # row and is forwarded without `lat`/`lon` rather than with nulls.
+    has_position = body.lat is not None and body.lon is not None
+    position = f"{body.lat:.4f},{body.lon:.4f}" if has_position else "none"
+    cache_key = f"{body.q.lower()},{position},{body.lang}"
+    json_body: dict[str, object] = {"q": body.q, "target": "venues"}
+    if has_position:
+        json_body["lat"] = body.lat
+        json_body["lon"] = body.lon
     return await _proxy_discovery(
         request=request,
         install_id=install_id,
@@ -108,7 +116,7 @@ async def search_wolt_by_name(
         url=wolt_search_url(settings.WOLT_BASE_URL),
         headers=headers,
         params=None,
-        json_body={"q": body.q, "target": "venues", "lat": body.lat, "lon": body.lon},
+        json_body=json_body,
     )
 
 

@@ -495,6 +495,50 @@ def test_search_target_is_fixed_server_side(
     }
 
 
+def test_search_without_a_position_forwards_no_lat_lon(
+    client: TestClient, wolt_discovery: respx.MockRouter
+) -> None:
+    wolt_discovery.post(_UPSTREAM_SEARCH).mock(
+        return_value=httpx.Response(200, json={})
+    )
+
+    response = client.post(
+        _SEARCH_PATH, json={"q": "vitrina", "lang": "en"}, headers=_headers()
+    )
+
+    assert response.status_code == 200
+    sent_body = json.loads(wolt_discovery.calls.last.request.content)
+    assert sent_body == {"q": "vitrina", "target": "venues"}
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        {"q": "vitrina", "lat": _LAT},
+        {"q": "vitrina", "lon": _LON},
+    ],
+)
+def test_search_with_half_a_position_is_422(
+    client: TestClient, body: dict[str, object]
+) -> None:
+    response = client.post(_SEARCH_PATH, json=body, headers=_headers())
+
+    assert response.status_code == 422
+
+
+def test_search_with_and_without_a_position_do_not_share_a_cache_key(
+    client: TestClient, wolt_discovery: respx.MockRouter
+) -> None:
+    route = wolt_discovery.post(_UPSTREAM_SEARCH).mock(
+        return_value=httpx.Response(200, json={})
+    )
+
+    client.post(_SEARCH_PATH, json=_search_body(), headers=_headers())
+    client.post(_SEARCH_PATH, json={"q": "vitrina", "lang": "en"}, headers=_headers())
+
+    assert route.call_count == 2
+
+
 def test_search_second_call_is_served_from_cache(
     client: TestClient, wolt_discovery: respx.MockRouter
 ) -> None:
