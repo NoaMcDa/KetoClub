@@ -265,6 +265,46 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets(
+      'build does not overflow at a 2x text scale on a narrow phone width '
+      '(architecture.md §8.3)',
+      (tester) async {
+        // Arrange: a 340-wide surface, a small phone, at 2x text scale.
+        tester.view.physicalSize = const Size(340, 900);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        // Act
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.light(),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => MediaQuery(
+                  data: MediaQuery.of(context)
+                      .copyWith(textScaler: const TextScaler.linear(2)),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: VenueCard(
+                      venue: _venue,
+                      numbers: _llmNumbers,
+                      onTap: () {},
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        // Assert
+        expect(tester.takeException(), isNull);
+      },
+    );
+
     testWidgets('left-to-right keeps the score right of the name', (
       tester,
     ) async {

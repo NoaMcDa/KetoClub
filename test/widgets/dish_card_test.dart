@@ -447,6 +447,65 @@ void main() {
       });
     }
 
+    testWidgets(
+      'build does not overflow at a 2x text scale on a narrow phone width '
+      '(architecture.md §8.3)',
+      (tester) async {
+        // Arrange: a modifiable row with a net-carb estimate — the busiest
+        // shape this card renders — on a 340-wide surface, a small phone,
+        // at 2x text scale together.
+        tester.view.physicalSize = const Size(340, 900);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        final row = DishRow(
+          dish: _dish(
+            description: '300g, served with lemon butter and a long side',
+          ),
+          category: 'Mains',
+          analysis: const AnalysedDish(
+            dishId: 'dish_1',
+            name: 'Grilled Salmon',
+            verdict: DishVerdict.modifiable,
+            why: 'Mostly protein, with a starchy side to swap.',
+            modification:
+                'Replace the mashed potatoes with a green salad.\n'
+                'Ask for the sauce on the side.',
+            netCarbsEstimate: 6.4,
+          ),
+        );
+
+        // Act
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => MediaQuery(
+                  data: MediaQuery.of(context)
+                      .copyWith(textScaler: const TextScaler.linear(2)),
+                  child: SingleChildScrollView(
+                    child: DishCard(
+                      row: row,
+                      localeTag: 'en',
+                      onShowScript: (_) {},
+                      onEditNote: (_) {},
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.tap(find.text('Ask your waiter'));
+        await tester.pump();
+
+        // Assert
+        expect(tester.takeException(), isNull);
+      },
+    );
+
     testWidgets('build renders the Hebrew waiter-card label in the he locale', (
       tester,
     ) async {

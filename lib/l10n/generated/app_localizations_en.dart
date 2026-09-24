@@ -633,6 +633,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get tileSemanticHintFilter => 'Double tap to filter';
+
+  @override
+  String get tileSemanticHintClear => 'Double tap to clear the filter';
+
+  @override
   String get ageJustNow => 'Just now';
 
   @override

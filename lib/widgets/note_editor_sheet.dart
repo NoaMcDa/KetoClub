@@ -76,9 +76,9 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
         widget.initialNote != null && widget.initialNote!.isNotEmpty;
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.only(
-          left: 24,
-          right: 24,
+        padding: EdgeInsetsDirectional.only(
+          start: 24,
+          end: 24,
           top: 24,
           bottom: 24 + MediaQuery.of(context).viewInsets.bottom,
         ),

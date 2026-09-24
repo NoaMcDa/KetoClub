@@ -59,6 +59,7 @@ class VerdictCounterTiles extends StatelessWidget {
           child: _Tile(
             count: greenCount,
             label: l10n.tileGreenLabel,
+            icon: Icons.check_circle,
             tone: verdictColors.green,
             active: filter == MenuFilter.greenOnly,
             onTap: () => onFilterChanged(
@@ -73,6 +74,7 @@ class VerdictCounterTiles extends StatelessWidget {
           child: _Tile(
             count: yellowCount,
             label: l10n.tileYellowLabel,
+            icon: Icons.edit_note,
             tone: verdictColors.amber,
             active: filter == MenuFilter.yellowOnly,
             onTap: () => onFilterChanged(
@@ -87,6 +89,7 @@ class VerdictCounterTiles extends StatelessWidget {
           child: _Tile(
             count: redCount,
             label: l10n.tileRedLabel,
+            icon: Icons.cancel,
             tone: verdictColors.red,
             active: filter == MenuFilter.redOnly,
             onTap: () => onFilterChanged(
@@ -101,13 +104,21 @@ class VerdictCounterTiles extends StatelessWidget {
   }
 }
 
-/// One counter tile: a coloured dot, the count, and the verdict label,
-/// tinted and bordered in [tone] when [active] (`.design/Main.dc.html`'s
-/// per-tile `bg`/`border`/`numColor`/`labelColor`).
+/// One counter tile: a verdict icon in [tone]'s rail colour, the count, and
+/// the verdict label, tinted and bordered in [tone] when [active]
+/// (`.design/Main.dc.html`'s per-tile `bg`/`border`/`numColor`/
+/// `labelColor`).
+///
+/// The icon pairs with the tile's colour rather than standing alone — the
+/// same icon-and-colour rule the verdict pill follows (architecture.md
+/// §6.6) — so a colour-blind user reading this tile still gets a second,
+/// shape-based signal for which verdict it counts, on top of the label
+/// text itself.
 class _Tile extends StatelessWidget {
   const new({
     required this.count,
     required this.label,
+    required this.icon,
     required this.tone,
     required this.active,
     required this.onTap,
@@ -115,6 +126,10 @@ class _Tile extends StatelessWidget {
 
   final int count;
   final String label;
+
+  /// The verdict icon shown beside the count, matching the verdict pill's
+  /// own icon for the same verdict.
+  final IconData icon;
   final VerdictTone tone;
   final bool active;
   final VoidCallback onTap;
@@ -138,6 +153,14 @@ class _Tile extends StatelessWidget {
       button: true,
       selected: active,
       label: l10n.tileSemanticLabel(label, count),
+      hint: active ? l10n.tileSemanticHintClear : l10n.tileSemanticHintFilter,
+      // `excludeSemantics: true` (below) hides this tile's own children
+      // from the semantics tree, including the `tap` action `InkWell`
+      // would otherwise have contributed on its own — without wiring
+      // `onTap` here directly, this node's `button`/`hint` would promise
+      // a screen-reader user something to double-tap that in fact carries
+      // no action, a real gap this pass's own semantics test caught.
+      onTap: onTap,
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,
@@ -157,26 +180,28 @@ class _Tile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 11,
-                      height: 11,
-                      decoration: BoxDecoration(
-                        color: tone.rail,
-                        shape: BoxShape.circle,
+                // Scaled down rather than left to overflow: at a large text
+                // scale, a three-digit count plus this icon can outgrow a
+                // narrow tile's own width (each tile is one third of the
+                // row, per architecture.md §8.3's large-text pass) — a
+                // shrunk pair reads better than a RenderFlex overflow.
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(icon, size: 13, color: tone.rail),
+                      const SizedBox(width: 6),
+                      Text(
+                        '$count',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: numberColor,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      '$count',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: numberColor,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 3),
                 Text(

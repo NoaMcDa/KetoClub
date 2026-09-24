@@ -154,6 +154,74 @@ void main() {
       expect(arguments['text'], script);
     });
 
+    testWidgets(
+      'build announces the whole script as one block, not one node per '
+      'numbered line (architecture.md §8.3)',
+      (tester) async {
+        // Arrange
+        final handle = tester.ensureSemantics();
+        const script =
+            'Replace the fries with a green salad.\n'
+            'Ask for the sauce on the side.';
+
+        // Act
+        await _pump(tester, const WaiterScriptWidget(script: script));
+
+        // Assert: one merged label for both lines together, read from the
+        // dish name's own ancestor upward — the numbered circles and
+        // selectable text underneath carry no semantics of their own.
+        final label = tester
+            .getSemantics(find.text('Replace the fries with a green salad.'))
+            .getSemanticsData()
+            .label;
+        expect(
+          label,
+          'Replace the fries with a green salad. '
+          'Ask for the sauce on the side.',
+        );
+        handle.dispose();
+      },
+    );
+
+    testWidgets(
+      'build does not overflow at a 2x text scale on a narrow phone width '
+      '(architecture.md §8.3)',
+      (tester) async {
+        // Arrange
+        tester.view.physicalSize = const Size(320, 700);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        const script =
+            'Replace the mashed potatoes with a green salad or steamed '
+            'vegetables.\n'
+            'Ask for the sauce to be served on the side, not poured over '
+            'the dish.';
+
+        // Act
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => MediaQuery(
+                  data: MediaQuery.of(context)
+                      .copyWith(textScaler: const TextScaler.linear(2)),
+                  child: const SingleChildScrollView(
+                    child: WaiterScriptWidget(script: script),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        // Assert
+        expect(tester.takeException(), isNull);
+      },
+    );
+
     testWidgets('build renders correctly in the he locale', (tester) async {
       // Arrange
       const script = 'החליפו את הצ׳יפס בסלט ירוק.';

@@ -276,6 +276,8 @@
       "count": { "type": "int" }
     }
   },
+  "tileSemanticHintFilter": "Double tap to filter",
+  "tileSemanticHintClear": "Double tap to clear the filter",
   "ageJustNow": "Just now",
   "ageMinutes": "{count, plural, one{1 minute ago} other{{count} minutes ago}}",
   "@ageMinutes": {

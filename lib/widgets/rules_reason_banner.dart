@@ -121,7 +121,7 @@ class RulesReasonBanner extends StatelessWidget {
     ColorScheme colorScheme,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(left: 8),
+      padding: const EdgeInsetsDirectional.only(start: 8),
       child: TextButton(
         onPressed: () => Navigator.pushNamed(context, '/settings'),
         style: TextButton.styleFrom(foregroundColor: colorScheme.primary),
@@ -137,7 +137,7 @@ class RulesReasonBanner extends StatelessWidget {
     VoidCallback onRetry,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(left: 8),
+      padding: const EdgeInsetsDirectional.only(start: 8),
       child: TextButton(
         onPressed: onRetry,
         style: TextButton.styleFrom(foregroundColor: colorScheme.primary),
