@@ -536,6 +536,42 @@ abstract class AppLocalizations {
   /// **'KetoClub\'s server could not be reached, so the menu could not be read.'**
   String get fetchFailedBackendUnreachable;
 
+  /// No description provided for @venueSearchFailedOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection, so KetoClub could not search for restaurants.'**
+  String get venueSearchFailedOffline;
+
+  /// No description provided for @venueSearchFailedTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Wolt took too long to answer the search. Try again in a moment.'**
+  String get venueSearchFailedTimeout;
+
+  /// No description provided for @venueSearchFailedRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many searches in a row. Wait a minute, then try again.'**
+  String get venueSearchFailedRateLimited;
+
+  /// No description provided for @venueSearchFailedPlatformChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Wolt changed how its restaurant search works, so KetoClub could not read the results. Please report this.'**
+  String get venueSearchFailedPlatformChanged;
+
+  /// No description provided for @venueSearchFailedBlockedByBrowser.
+  ///
+  /// In en, this message translates to:
+  /// **'A web browser cannot search Wolt directly. Use the KetoClub phone app, or paste a Wolt link instead.'**
+  String get venueSearchFailedBlockedByBrowser;
+
+  /// No description provided for @venueSearchFailedBackendUnreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub\'s server could not be reached, so the search could not run.'**
+  String get venueSearchFailedBackendUnreachable;
+
   /// No description provided for @analysisNotConfigured.
   ///
   /// In en, this message translates to:

@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/failures.dart';
+import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 
 const _locales = [Locale('en'), Locale('he')];
@@ -87,9 +88,56 @@ void main() {
     }
   });
 
-  group('fetchFailureMessage and analysisFailureMessage together', () {
+  group('venueSearchFailureMessage (issue #39)', () {
     for (final locale in _locales) {
-      test('never share copy across the two failure enums in $locale', () {
+      test('returns a non-empty message for every reason in $locale', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+
+        // Act & Assert
+        for (final reason in VenueSearchFailureReason.values) {
+          expect(
+            venueSearchFailureMessage(reason, l10n),
+            isNotEmpty,
+            reason: '$reason should have copy in ${locale.languageCode}',
+          );
+        }
+      });
+
+      test('gives every reason its own copy in ${locale.languageCode}', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+
+        // Act
+        final messages = [
+          for (final reason in VenueSearchFailureReason.values)
+            venueSearchFailureMessage(reason, l10n),
+        ];
+
+        // Assert: collapsing reasons is a bug (architecture.md §10).
+        expect(messages.toSet(), hasLength(messages.length));
+      });
+    }
+
+    test('the English and Hebrew copy differ for every reason', () {
+      // Arrange
+      final en = lookupAppLocalizations(const Locale('en'));
+      final he = lookupAppLocalizations(const Locale('he'));
+
+      // Act & Assert
+      for (final reason in VenueSearchFailureReason.values) {
+        expect(
+          venueSearchFailureMessage(reason, he),
+          isNot(equals(venueSearchFailureMessage(reason, en))),
+          reason: '$reason is not translated',
+        );
+      }
+    });
+  });
+
+  group('fetch, analysis and venue-search copy together', () {
+    for (final locale in _locales) {
+      test('never share copy across the three failure enums in $locale', () {
         // Arrange
         final l10n = lookupAppLocalizations(locale);
 
@@ -108,8 +156,17 @@ void main() {
             analysisFailureMessage(reason, l10n, detail: 'unexpected shape'),
         ];
 
+        final venueSearchMessages = [
+          for (final reason in VenueSearchFailureReason.values)
+            venueSearchFailureMessage(reason, l10n),
+        ];
+
         // Assert
-        final all = [...fetchMessages, ...analysisMessages];
+        final all = [
+          ...fetchMessages,
+          ...analysisMessages,
+          ...venueSearchMessages,
+        ];
         expect(all.toSet(), hasLength(all.length));
       });
     }
