@@ -122,7 +122,12 @@ void main() {
         expect(scoredY, lessThan(plainY));
         expect(find.text('10.0'), findsOneWidget);
 
-        // Act: open the plain venue's card.
+        // Act: open the plain venue's card. It is the third card, below the
+        // fold on the web-server surface: the Discovery list is a Column
+        // inside a scroll view, so the text exists but a tap at its centre
+        // lands outside the viewport and never reaches the card.
+        await tester.ensureVisible(find.text(plain.name));
+        await tester.pumpAndSettle();
         await tapAndSettle(tester, find.text(plain.name));
 
         // Assert: its real menu, from the fake repository, is shown —
