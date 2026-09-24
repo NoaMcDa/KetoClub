@@ -55,13 +55,26 @@ at hand-off — **verify it is green first**; if red, fix on a new branch via PR
 Worktrees from the previous session (`.claude/worktrees/agent-*`) are gone in a
 new session; the branches are on `origin`.
 
-## 3b. Wave 3 progress (10:07 UTC)
+## 3b. Wave 3 progress (10:40 UTC)
 
-PRs: #156 (#43 flows; one lazy-list fix pushed, re-running), **#158 (#42)
-merged `542ab0f`**, #159 (location settings + PhotoTile; main merged in
-after #158), #160 (docs refresh), #161 (#64; two failing tests sent back to
-the worker), #157 (run guides, separate from #153). #63 skeletons not yet
-reported.
+Merged: #157 (run guides, `514405c`), #158 (#42, `542ab0f`), #159
+(location settings + PhotoTile, `64f209d`), #160 (docs refresh, `d239b6b`),
+#162 (#63 skeletons, `7269521`). Main CI green on `64f209d`; not yet seen
+on `7269521`.
+
+Still open: **#156** (#43 flows, head `caee1fc`: the third Discovery card is
+below the fold on the 800×600 surface, so the test now `ensureVisible`s it
+before tapping; integration job was still running at 10:40) and **#161**
+(#64 remainder, head `95c6ce2`, main re-merged after #162; the two CI
+failures were the "{N} with changes" row overflowing at 2× text scale — its
+text is now `Flexible` — and the counter-tile semantics matcher missing
+`hasSelectedState`). Merge each on green with the full head SHA.
+
+A visual-audit worker (task #14) is running on branch `claude/visual-audit`:
+stub Wolt upstream from the fixtures → backend → `flutter build web` →
+Playwright screenshots at phone width, light/dark, en/he, compared with
+`.design/*.dc.html`; fixes + `docs/VISUAL_AUDIT.md` in one PR. Screenshots
+land in the session scratchpad under `visual-audit/`.
 
 ## 3a. Wave 3 launched (09:46 UTC) — #154 merged by the user, main CI green on `cc6c052`
 
