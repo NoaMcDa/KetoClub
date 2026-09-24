@@ -6,6 +6,7 @@ import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/llm_menu_classifier.dart';
 import 'package:ketoclub/services/llm/backend_chat_client.dart';
+import 'package:ketoclub/services/location/geolocator_location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/tenbis/tenbis_adapter.dart';
 import 'package:ketoclub/services/menu/wolt/wolt_adapter.dart';
@@ -152,6 +153,11 @@ AppDependencies buildDependencies() {
     screenBrightness: screenBrightness,
     externalLinkOpener: const UrlLauncherLinkOpener(),
     menuSharer: const SharePlusMenuSharer(),
+    // Every geolocator call defaults to the real plugin inside
+    // GeolocatorLocationService itself, so no arguments are needed here
+    // (its own doc comment) — this is also why `di.dart` needs no import
+    // of `package:geolocator`.
+    locationService: GeolocatorLocationService(),
     // Same routing rule as the menu adapters (issue #39): through the
     // backend in a browser when one is configured, straight to Wolt
     // otherwise. The constructor sends nothing and draws no randomness.

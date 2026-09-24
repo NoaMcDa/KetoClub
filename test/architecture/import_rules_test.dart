@@ -219,6 +219,9 @@ const _boundaries = <_Boundary>[
   }),
   _Boundary('/v1/chat', {'services/llm/backend_chat_client.dart'}),
   _Boundary('KETOCLUB_BACKEND_URL', {'di.dart'}),
+  _Boundary('package:geolocator/geolocator.dart', {
+    'services/location/geolocator_location_service.dart',
+  }),
   _Boundary(
     'open'
     'router',

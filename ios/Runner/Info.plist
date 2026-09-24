@@ -24,6 +24,17 @@
 		<string>????</string>
 		<key>CFBundleVersion</key>
 		<string>$(FLUTTER_BUILD_NUMBER)</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<!-- Device position for nearby search (architecture.md §6.5, issue
+		     #37): read once, used only to list nearby restaurants and sent
+		     only to the restaurant platform as a search parameter, never
+		     stored. English only: this project has no Info.plist string
+		     localisation set up (no InfoPlist.strings variant group in
+		     Runner.xcodeproj — only "en" and "Base" are registered
+		     `knownRegions`), and wiring one by hand-editing the pbxproj
+		     without Xcode risks corrupting a project file nothing here can
+		     build-test; see the PR description. -->
+		<string>KetoClub uses your location once to list nearby restaurants. It is sent only to the restaurant platform as a search parameter and is never stored.</string>
 		<key>LSApplicationQueriesSchemes</key>
 		<array>
 			<!-- Lets url_launcher open a venue's own page on Wolt or 10bis
