@@ -43,10 +43,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get actionCancel => 'ביטול';
 
   @override
-  String get venueSearchLabel => 'קישור למסעדה';
+  String get venueSearchLabel => 'חיפוש מסעדה';
 
   @override
-  String get venueSearchHint => 'הדביקו קישור מוולט, או מזהה מסעדה';
+  String get venueSearchHint => 'חפשו לפי שם, או הדביקו קישור מוולט';
 
   @override
   String get venueSearchInvalid =>
@@ -439,11 +439,122 @@ class AppLocalizationsHe extends AppLocalizations {
   String get discoveryTitle => 'איפה לאכול';
 
   @override
-  String get discoveryEmptyTitle => 'הדביקו קישור כדי להתחיל';
+  String get discoveryEmptyTitle => 'מצאו איפה לאכול';
 
   @override
   String get discoveryEmptyBody =>
-      'חיפוש עדיין לא זמין — הדביקו למעלה קישור למסעדה בוולט, או את המזהה שלה, כדי לראות תפריט מסווג לפי קטו.';
+      'השתמשו במיקום שלכם כדי לראות מסעדות בסביבה, חפשו לפי שם, או הדביקו למעלה קישור מוולט כדי לפתוח את התפריט המסווג לפי קטו.';
+
+  @override
+  String get discoveryLookingAround => 'מחפשים סביב';
+
+  @override
+  String get discoveryAroundYou => 'המיקום שלך';
+
+  @override
+  String get discoveryLocationNotSet => 'לא נקבע מיקום';
+
+  @override
+  String get discoveryUseLocation => 'השתמש במיקום שלי';
+
+  @override
+  String get discoveryChipNearby => 'בסביבה';
+
+  @override
+  String get discoveryChipKetoEightPlus => 'קטו 8+';
+
+  @override
+  String get discoveryChipOpenNow => 'פתוח עכשיו';
+
+  @override
+  String get discoveryLocating => 'מאתר את המיקום שלך…';
+
+  @override
+  String get discoverySearching => 'מחפש מסעדות…';
+
+  @override
+  String get discoveryLocationDeniedTitle => 'המיקום כבוי עבור קטוקלאב';
+
+  @override
+  String get discoveryLocationDeniedBody =>
+      'אפשרו גישה למיקום כדי לראות מסעדות בסביבה, או חפשו לפי שם במקום.';
+
+  @override
+  String get discoveryLocationDeniedForeverBody =>
+      'הגישה למיקום כבויה עבור קטוקלאב. אפשר להפעיל אותה מחדש בהגדרות המכשיר, או לחפש לפי שם במקום.';
+
+  @override
+  String get discoveryLocationUnavailableTitle =>
+      'לא הצלחנו למצוא את המיקום שלך';
+
+  @override
+  String get discoveryLocationServicesOff =>
+      'שירותי המיקום במכשיר כבויים. הפעילו אותם ונסו שוב, או חפשו לפי שם במקום.';
+
+  @override
+  String get discoveryLocationInsecureContext =>
+      'הדף הזה לא יכול לבקש את המיקום שלך כי החיבור אינו מאובטח (https). חפשו לפי שם במקום.';
+
+  @override
+  String get discoveryLocationTimeout =>
+      'איתור המיקום לקח יותר מדי זמן. נסו שוב, או חפשו לפי שם במקום.';
+
+  @override
+  String get discoveryLocationUnsupported =>
+      'המכשיר לא הצליח לספק מיקום. חפשו לפי שם במקום.';
+
+  @override
+  String get discoveryTypeNameInstead => 'הקלד שם במקום';
+
+  @override
+  String get discoveryNoResultsTitle => 'לא נמצאו מסעדות';
+
+  @override
+  String get discoveryNoResultsBody => 'נסו שם אחר, או נקו את החיפוש.';
+
+  @override
+  String get discoveryClearSearch => 'נקה חיפוש';
+
+  @override
+  String get discoveryNoChipResults => 'אף מסעדה ברשימה לא מתאימה לסינון הזה.';
+
+  @override
+  String get venueCardOpenNow => 'פתוח עכשיו';
+
+  @override
+  String get venueCardClosed => 'סגור';
+
+  @override
+  String venueCardMinutes(int minutes) {
+    return '$minutes דק׳';
+  }
+
+  @override
+  String venueCardWalkMinutes(int minutes) {
+    return '$minutes דק׳ הליכה';
+  }
+
+  @override
+  String venueCardGreenCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count מנות כמו שהן',
+      one: 'מנה אחת כמו שהיא',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String venueCardYellowCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count עם שינויים',
+      one: 'אחת עם שינויים',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get menuKetoScoreLabel => 'ציון קטוגני';
