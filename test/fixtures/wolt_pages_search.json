@@ -1,0 +1,295 @@
+{
+  "_fixture_note": "SYNTHETIC, not a recorded Wolt response. Hand-built from phase2_discovery_research.md section 2.1 (the pages/search venue object) because restaurant-api.wolt.com is unreachable from the build environment. Re-record per section 2.4 before release and keep this key or change wolt_venue_mapper_test.dart with it. See test/fixtures/README.md, 'Wolt discovery'.",
+  "query": "pizza",
+  "sections": [
+    {
+      "name": "search-results",
+      "title": "Restaurants",
+      "template": "venue-vertical-list",
+      "unknown_section_key": 1,
+      "items": [
+        {
+          "title": "Pizza Romana",
+          "template": "venue-large",
+          "track_id": "venue-pizza-romana",
+          "link": {
+            "target": "pizzaromana0001",
+            "type": "venue-id"
+          },
+          "unknown_item_key": "ignored",
+          "image": {
+            "url": "https://imageproxy.wolt.com/venue/pizza-romana.jpg",
+            "blurhash": "j2UeTQ1bJ3DaYWq"
+          },
+          "venue": {
+            "id": "pizzaromana0001",
+            "slug": "pizza-romana",
+            "name": "Pizza Romana",
+            "country": "ISR",
+            "city": "Tel Aviv",
+            "currency": "ILS",
+            "delivers": true,
+            "delivery_price_int": 1500,
+            "price_range": 2,
+            "product_line": "restaurant",
+            "badges": [],
+            "promotions": [],
+            "unknown_venue_key": {
+              "nested": [
+                1,
+                2,
+                3
+              ]
+            },
+            "address": "Ibn Gabirol St 60, Tel Aviv",
+            "location": [
+              34.7784,
+              32.0741
+            ],
+            "tags": [
+              "pizza",
+              "italian"
+            ],
+            "online": true,
+            "rating": {
+              "rating": 4,
+              "score": 8.9,
+              "volume": 250,
+              "unknown_rating_key": true
+            },
+            "estimate": 30,
+            "estimate_range": "25-35",
+            "short_description": "Roman-style pizza",
+            "brand_image": {
+              "url": "https://imageproxy.wolt.com/brand/pizza-romana.jpg",
+              "blurhash": "j2UeTQ1bJ3DaYWq"
+            }
+          }
+        },
+        {
+          "title": "פיצה לנה",
+          "template": "venue-large",
+          "track_id": "venue-pizza-lena",
+          "link": {
+            "target": "pizzalena0001",
+            "type": "venue-id"
+          },
+          "unknown_item_key": "ignored",
+          "venue": {
+            "id": "pizzalena0001",
+            "slug": "pizza-lena",
+            "name": "פיצה לנה",
+            "country": "ISR",
+            "city": "Tel Aviv",
+            "currency": "ILS",
+            "delivers": true,
+            "delivery_price_int": 1500,
+            "price_range": 2,
+            "product_line": "restaurant",
+            "badges": [],
+            "promotions": [],
+            "unknown_venue_key": {
+              "nested": [
+                1,
+                2,
+                3
+              ]
+            },
+            "address": "דיזנגוף 200, תל אביב",
+            "location": [
+              34.7805,
+              32.0856
+            ],
+            "tags": [
+              "pizza"
+            ],
+            "online": true,
+            "rating": {
+              "rating": 4,
+              "score": 9.1,
+              "volume": 250,
+              "unknown_rating_key": true
+            },
+            "estimate": 25,
+            "estimate_range": "20-30"
+          }
+        },
+        {
+          "title": "Tony Vespa",
+          "template": "venue-large",
+          "track_id": "venue-tony-vespa-allenby",
+          "link": {
+            "target": "tonyvespaall0001",
+            "type": "venue-id"
+          },
+          "unknown_item_key": "ignored",
+          "image": {
+            "url": "https://imageproxy.wolt.com/venue/tony-vespa-allenby.jpg",
+            "blurhash": "j2UeTQ1bJ3DaYWq"
+          },
+          "venue": {
+            "id": "tonyvespaall0001",
+            "slug": "tony-vespa-allenby",
+            "name": "Tony Vespa",
+            "country": "ISR",
+            "city": "Tel Aviv",
+            "currency": "ILS",
+            "delivers": true,
+            "delivery_price_int": 1500,
+            "price_range": 2,
+            "product_line": "restaurant",
+            "badges": [],
+            "promotions": [],
+            "unknown_venue_key": {
+              "nested": [
+                1,
+                2,
+                3
+              ]
+            },
+            "location": [
+              34.7717,
+              32.068
+            ],
+            "tags": [
+              "pizza"
+            ],
+            "online": false,
+            "rating": {
+              "rating": 4,
+              "score": 8.1,
+              "volume": 250,
+              "unknown_rating_key": true
+            },
+            "estimate": 20,
+            "estimate_range": "15-25",
+            "short_description": "Pizza by the slice",
+            "brand_image": {
+              "url": "https://imageproxy.wolt.com/brand/tony-vespa-allenby.jpg",
+              "blurhash": "j2UeTQ1bJ3DaYWq"
+            }
+          }
+        },
+        {
+          "title": "Pizza Cloud",
+          "template": "venue-large",
+          "track_id": "venue-pizza-cloud",
+          "link": {
+            "target": "pizzacloud0001",
+            "type": "venue-id"
+          },
+          "unknown_item_key": "ignored",
+          "image": {
+            "url": "https://imageproxy.wolt.com/venue/pizza-cloud.jpg",
+            "blurhash": "j2UeTQ1bJ3DaYWq"
+          },
+          "venue": {
+            "id": "pizzacloud0001",
+            "slug": "pizza-cloud",
+            "name": "Pizza Cloud",
+            "country": "ISR",
+            "city": "Tel Aviv",
+            "currency": "ILS",
+            "delivers": true,
+            "delivery_price_int": 1500,
+            "price_range": 2,
+            "product_line": "restaurant",
+            "badges": [],
+            "promotions": [],
+            "unknown_venue_key": {
+              "nested": [
+                1,
+                2,
+                3
+              ]
+            },
+            "tags": [
+              "pizza"
+            ],
+            "online": true,
+            "brand_image": {
+              "url": "https://imageproxy.wolt.com/brand/pizza-cloud.jpg",
+              "blurhash": "j2UeTQ1bJ3DaYWq"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "search-items",
+      "title": "Dishes",
+      "template": "menu-item-list",
+      "items": [
+        {
+          "title": "Margherita",
+          "template": "menu-item",
+          "track_id": "item-1",
+          "menu_item": {
+            "id": "m1",
+            "name": "Margherita",
+            "price": 5400,
+            "currency": "ILS",
+            "venue_name": "Pizza Romana",
+            "venue_id": "pizzaromana0001"
+          }
+        },
+        {
+          "title": "Tony Vespa (listed again)",
+          "template": "venue-large",
+          "track_id": "venue-tony-vespa-allenby",
+          "link": {
+            "target": "tonyvespaall0001",
+            "type": "venue-id"
+          },
+          "unknown_item_key": "ignored",
+          "image": {
+            "url": "https://imageproxy.wolt.com/venue/tony-vespa-allenby.jpg",
+            "blurhash": "j2UeTQ1bJ3DaYWq"
+          },
+          "venue": {
+            "id": "tonyvespaall0001",
+            "slug": "tony-vespa-allenby",
+            "name": "Tony Vespa (listed again)",
+            "country": "ISR",
+            "city": "Tel Aviv",
+            "currency": "ILS",
+            "delivers": true,
+            "delivery_price_int": 1500,
+            "price_range": 2,
+            "product_line": "restaurant",
+            "badges": [],
+            "promotions": [],
+            "unknown_venue_key": {
+              "nested": [
+                1,
+                2,
+                3
+              ]
+            },
+            "location": [
+              34.7717,
+              32.068
+            ],
+            "tags": [
+              "pizza"
+            ],
+            "online": false,
+            "rating": {
+              "rating": 4,
+              "score": 8.1,
+              "volume": 250,
+              "unknown_rating_key": true
+            },
+            "estimate": 20,
+            "estimate_range": "15-25",
+            "short_description": "Pizza by the slice",
+            "brand_image": {
+              "url": "https://imageproxy.wolt.com/brand/tony-vespa-allenby.jpg",
+              "blurhash": "j2UeTQ1bJ3DaYWq"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

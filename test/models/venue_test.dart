@@ -231,6 +231,57 @@ void main() {
       expect(a.hashCode, equals(b.hashCode));
     });
 
+    test('== and hashCode cover every field added for venue search '
+        '(issue #39)', () {
+      // Arrange
+      const ref = VenueRef(source: MenuSource.wolt, platformId: 'v1');
+      Venue build({
+        List<String> tags = const <String>['sushi'],
+        bool? isOnline = true,
+        String? imageUrl = 'https://example.test/v1.jpg',
+        String? shortDescription = 'Sushi bar',
+        double? platformRating = 9.1,
+        int? estimateMinutes = 25,
+      }) => Venue(
+        ref: ref,
+        name: 'Diner',
+        cuisineTags: List<String>.of(tags),
+        isOnline: isOnline,
+        imageUrl: imageUrl,
+        shortDescription: shortDescription,
+        platformRating: platformRating,
+        estimateMinutes: estimateMinutes,
+      );
+      final base = build();
+
+      // Act & Assert: equal when built separately, with separate lists.
+      expect(build(), equals(base));
+      expect(build().hashCode, equals(base.hashCode));
+      // Unequal when any one new field differs.
+      expect(build(tags: <String>['ramen']), isNot(equals(base)));
+      expect(build(isOnline: false), isNot(equals(base)));
+      expect(build(imageUrl: null), isNot(equals(base)));
+      expect(build(shortDescription: 'Other'), isNot(equals(base)));
+      expect(build(platformRating: 8), isNot(equals(base)));
+      expect(build(estimateMinutes: 30), isNot(equals(base)));
+    });
+
+    test('defaults the venue-search fields to empty or null', () {
+      // Arrange
+      const ref = VenueRef(source: MenuSource.wolt, platformId: 'v1');
+
+      // Act
+      const venue = Venue(ref: ref, name: 'Diner');
+
+      // Assert
+      expect(venue.cuisineTags, isEmpty);
+      expect(venue.isOnline, isNull);
+      expect(venue.imageUrl, isNull);
+      expect(venue.shortDescription, isNull);
+      expect(venue.platformRating, isNull);
+      expect(venue.estimateMinutes, isNull);
+    });
+
     test('toString mentions the cache key and the name', () {
       // Arrange
       const ref = VenueRef(source: MenuSource.wolt, platformId: 'v1');

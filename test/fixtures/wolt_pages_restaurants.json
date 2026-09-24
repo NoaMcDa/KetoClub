@@ -1,0 +1,419 @@
+{
+  "_fixture_note": "SYNTHETIC, not a recorded Wolt response. Hand-built from phase2_discovery_research.md section 2.1 (the pages/restaurants venue object) because consumer-api.wolt.com is unreachable from the build environment. Re-record per section 2.4 before release and keep this key or change wolt_venue_mapper_test.dart with it. See test/fixtures/README.md, 'Wolt discovery'.",
+  "created": {
+    "$date": 1790000000000
+  },
+  "expires_in_seconds": 300,
+  "city": "tel-aviv",
+  "sections": [
+    {
+      "name": "popular",
+      "title": "Popular right now",
+      "template": "venue-large-carousel",
+      "unknown_section_key": [
+        "ignored"
+      ],
+      "items": [
+        {
+          "title": "Free delivery this week",
+          "template": "banner",
+          "track_id": "promo-free-delivery",
+          "image": {
+            "url": "https://imageproxy.wolt.com/promo/free.jpg",
+            "blurhash": "j2UeTQ1bJ3DaYWq"
+          },
+          "link": {
+            "target": "promo-1",
+            "type": "url"
+          }
+        },
+        {
+          "title": "Vitrina",
+          "template": "venue-large",
+          "track_id": "venue-vitrina-lilinblum",
+          "link": {
+            "target": "vitrinalilin0001",
+            "type": "venue-id"
+          },
+          "unknown_item_key": "ignored",
+          "image": {
+            "url": "https://imageproxy.wolt.com/venue/vitrina-lilinblum.jpg",
+            "blurhash": "j2UeTQ1bJ3DaYWq"
+          },
+          "venue": {
+            "id": "vitrinalilin0001",
+            "slug": "vitrina-lilinblum",
+            "name": "Vitrina",
+            "country": "ISR",
+            "city": "Tel Aviv",
+            "currency": "ILS",
+            "delivers": true,
+            "delivery_price_int": 1500,
+            "price_range": 2,
+            "product_line": "restaurant",
+            "badges": [],
+            "promotions": [],
+            "unknown_venue_key": {
+              "nested": [
+                1,
+                2,
+                3
+              ]
+            },
+            "address": "Lilienblum St 36, Tel Aviv",
+            "location": [
+              34.7702,
+              32.0625
+            ],
+            "tags": [
+              "burgers",
+              "sandwiches"
+            ],
+            "online": true,
+            "rating": {
+              "rating": 4,
+              "score": 9.2,
+              "volume": 250,
+              "unknown_rating_key": true
+            },
+            "estimate": 25,
+            "estimate_range": "20-30",
+            "short_description": "Burgers and sandwiches",
+            "brand_image": {
+              "url": "https://imageproxy.wolt.com/brand/vitrina-lilinblum.jpg",
+              "blurhash": "j2UeTQ1bJ3DaYWq"
+            }
+          }
+        },
+        {
+          "title": "הקוסם",
+          "template": "venue-large",
+          "track_id": "venue-hakosem",
+          "link": {
+            "target": "hakosem0001",
+            "type": "venue-id"
+          },
+          "unknown_item_key": "ignored",
+          "image": {
+            "url": "https://imageproxy.wolt.com/venue/hakosem.jpg",
+            "blurhash": "j2UeTQ1bJ3DaYWq"
+          },
+          "venue": {
+            "id": "hakosem0001",
+            "slug": "hakosem",
+            "name": "הקוסם",
+            "country": "ISR",
+            "city": "Tel Aviv",
+            "currency": "ILS",
+            "delivers": true,
+            "delivery_price_int": 1500,
+            "price_range": 2,
+            "product_line": "restaurant",
+            "badges": [],
+            "promotions": [],
+            "unknown_venue_key": {
+              "nested": [
+                1,
+                2,
+                3
+              ]
+            },
+            "address": "שלמה המלך 1, תל אביב",
+            "location": [
+              34.773,
+              32.0795
+            ],
+            "tags": [
+              "falafel",
+              "מזרחי"
+            ],
+            "online": true,
+            "rating": {
+              "rating": 4,
+              "score": 9.6,
+              "volume": 250,
+              "unknown_rating_key": true
+            },
+            "estimate": 20,
+            "estimate_range": "15-25",
+            "short_description": "פלאפל ושווארמה",
+            "brand_image": {
+              "url": "https://imageproxy.wolt.com/brand/hakosem.jpg",
+              "blurhash": "j2UeTQ1bJ3DaYWq"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "restaurants",
+      "title": "All restaurants",
+      "template": "venue-vertical-list",
+      "items": [
+        {
+          "title": "Vitrina (listed again)",
+          "template": "venue-large",
+          "track_id": "venue-vitrina-lilinblum",
+          "link": {
+            "target": "vitrinalilin0001",
+            "type": "venue-id"
+          },
+          "unknown_item_key": "ignored",
+          "image": {
+            "url": "https://imageproxy.wolt.com/venue/vitrina-lilinblum.jpg",
+            "blurhash": "j2UeTQ1bJ3DaYWq"
+          },
+          "venue": {
+            "id": "vitrinalilin0001",
+            "slug": "vitrina-lilinblum",
+            "name": "Vitrina (listed again)",
+            "country": "ISR",
+            "city": "Tel Aviv",
+            "currency": "ILS",
+            "delivers": true,
+            "delivery_price_int": 1500,
+            "price_range": 2,
+            "product_line": "restaurant",
+            "badges": [],
+            "promotions": [],
+            "unknown_venue_key": {
+              "nested": [
+                1,
+                2,
+                3
+              ]
+            },
+            "address": "Lilienblum St 36, Tel Aviv",
+            "location": [
+              34.7702,
+              32.0625
+            ],
+            "tags": [
+              "burgers",
+              "sandwiches"
+            ],
+            "online": true,
+            "rating": {
+              "rating": 4,
+              "score": 9.2,
+              "volume": 250,
+              "unknown_rating_key": true
+            },
+            "estimate": 25,
+            "estimate_range": "20-30",
+            "short_description": "Burgers and sandwiches",
+            "brand_image": {
+              "url": "https://imageproxy.wolt.com/brand/vitrina-lilinblum.jpg",
+              "blurhash": "j2UeTQ1bJ3DaYWq"
+            }
+          }
+        },
+        {
+          "title": "Shila",
+          "template": "venue-large",
+          "track_id": "venue-shila-sharon-cohen",
+          "link": {
+            "target": "shilasharonc0001",
+            "type": "venue-id"
+          },
+          "unknown_item_key": "ignored",
+          "image": {
+            "url": "https://imageproxy.wolt.com/venue/shila-sharon-cohen.jpg",
+            "blurhash": "j2UeTQ1bJ3DaYWq"
+          },
+          "venue": {
+            "id": "shilasharonc0001",
+            "slug": "shila-sharon-cohen",
+            "name": "Shila",
+            "country": "ISR",
+            "city": "Tel Aviv",
+            "currency": "ILS",
+            "delivers": true,
+            "delivery_price_int": 1500,
+            "price_range": 2,
+            "product_line": "restaurant",
+            "badges": [],
+            "promotions": [],
+            "unknown_venue_key": {
+              "nested": [
+                1,
+                2,
+                3
+              ]
+            },
+            "address": "Ben Yehuda St 182, Tel Aviv",
+            "location": [
+              34.7738,
+              32.0874
+            ],
+            "tags": [
+              "seafood"
+            ],
+            "online": false,
+            "rating": {
+              "rating": 4,
+              "score": 8.8,
+              "volume": 250,
+              "unknown_rating_key": true
+            },
+            "estimate": 35,
+            "estimate_range": "30-40",
+            "short_description": "Seafood bar",
+            "brand_image": {
+              "url": "https://imageproxy.wolt.com/brand/shila-sharon-cohen.jpg",
+              "blurhash": "j2UeTQ1bJ3DaYWq"
+            }
+          }
+        },
+        {
+          "title": "משייה",
+          "template": "venue-large",
+          "track_id": "venue-mashya",
+          "link": {
+            "target": "mashya0001",
+            "type": "venue-id"
+          },
+          "unknown_item_key": "ignored",
+          "venue": {
+            "id": "mashya0001",
+            "slug": "mashya",
+            "name": "משייה",
+            "country": "ISR",
+            "city": "Tel Aviv",
+            "currency": "ILS",
+            "delivers": true,
+            "delivery_price_int": 1500,
+            "price_range": 2,
+            "product_line": "restaurant",
+            "badges": [],
+            "promotions": [],
+            "unknown_venue_key": {
+              "nested": [
+                1,
+                2,
+                3
+              ]
+            },
+            "address": "מנדלי מוכר ספרים 5, תל אביב",
+            "location": [
+              34.7685,
+              32.0822
+            ],
+            "tags": [
+              "israeli"
+            ],
+            "online": true,
+            "rating": {
+              "rating": 4,
+              "score": 9,
+              "volume": 250,
+              "unknown_rating_key": true
+            },
+            "estimate": 40,
+            "estimate_range": "35-45"
+          }
+        },
+        {
+          "title": "Ghost Kitchen",
+          "template": "venue-large",
+          "track_id": "venue-ghost-kitchen-tlv",
+          "link": {
+            "target": "ghostkitchen0001",
+            "type": "venue-id"
+          },
+          "unknown_item_key": "ignored",
+          "image": {
+            "url": "https://imageproxy.wolt.com/venue/ghost-kitchen-tlv.jpg",
+            "blurhash": "j2UeTQ1bJ3DaYWq"
+          },
+          "venue": {
+            "id": "ghostkitchen0001",
+            "slug": "ghost-kitchen-tlv",
+            "name": "Ghost Kitchen",
+            "country": "ISR",
+            "city": "Tel Aviv",
+            "currency": "ILS",
+            "delivers": true,
+            "delivery_price_int": 1500,
+            "price_range": 2,
+            "product_line": "restaurant",
+            "badges": [],
+            "promotions": [],
+            "unknown_venue_key": {
+              "nested": [
+                1,
+                2,
+                3
+              ]
+            },
+            "tags": [],
+            "online": true,
+            "rating": {
+              "rating": 4,
+              "score": 7.4,
+              "volume": 250,
+              "unknown_rating_key": true
+            },
+            "estimate": 30,
+            "estimate_range": "25-35",
+            "short_description": "Delivery only",
+            "brand_image": {
+              "url": "https://imageproxy.wolt.com/brand/ghost-kitchen-tlv.jpg",
+              "blurhash": "j2UeTQ1bJ3DaYWq"
+            }
+          }
+        },
+        {
+          "title": "פורט סעיד",
+          "template": "venue-large",
+          "track_id": "venue-port-said",
+          "link": {
+            "target": "portsaid0001",
+            "type": "venue-id"
+          },
+          "unknown_item_key": "ignored",
+          "image": {
+            "url": "https://imageproxy.wolt.com/venue/port-said.jpg",
+            "blurhash": "j2UeTQ1bJ3DaYWq"
+          },
+          "venue": {
+            "id": "portsaid0001",
+            "slug": "port-said",
+            "name": "פורט סעיד",
+            "country": "ISR",
+            "city": "Tel Aviv",
+            "currency": "ILS",
+            "delivers": true,
+            "delivery_price_int": 1500,
+            "price_range": 2,
+            "product_line": "restaurant",
+            "badges": [],
+            "promotions": [],
+            "unknown_venue_key": {
+              "nested": [
+                1,
+                2,
+                3
+              ]
+            },
+            "address": "הר סיני 5, תל אביב",
+            "location": [
+              34.7727,
+              32.0636
+            ],
+            "tags": [
+              "mediterranean"
+            ],
+            "online": true,
+            "estimate": 30,
+            "estimate_range": "25-35",
+            "brand_image": {
+              "url": "https://imageproxy.wolt.com/brand/port-said.jpg",
+              "blurhash": "j2UeTQ1bJ3DaYWq"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

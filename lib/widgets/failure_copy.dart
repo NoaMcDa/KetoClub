@@ -1,5 +1,6 @@
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/failures.dart';
+import 'package:ketoclub/services/venue/venue_search_service.dart';
 
 /// The message for a menu-fetch failure (architecture.md §10).
 ///
@@ -60,4 +61,28 @@ String analysisFailureMessage(
   MenuAnalysisFailureReason.backendUnreachable =>
     l10n.analysisBackendUnreachable,
   MenuAnalysisFailureReason.consentWithheld => l10n.analysisConsentWithheld,
+};
+
+/// The message for a venue-search failure (`phase2_discovery_research.md`
+/// §5, issue #39).
+///
+/// Takes no placeholders: venue search is Wolt's alone, and a status
+/// code on [VenueSearchFailed] is for a log, not for the user.
+///
+/// An exhaustive switch with no `default`: adding a reason without adding
+/// its copy here is a compile error, never a silently collapsed message
+/// (architecture.md §10, "collapsing reasons is a bug").
+String venueSearchFailureMessage(
+  VenueSearchFailureReason reason,
+  AppLocalizations l10n,
+) => switch (reason) {
+  VenueSearchFailureReason.offline => l10n.venueSearchFailedOffline,
+  VenueSearchFailureReason.timeout => l10n.venueSearchFailedTimeout,
+  VenueSearchFailureReason.rateLimited => l10n.venueSearchFailedRateLimited,
+  VenueSearchFailureReason.platformChanged =>
+    l10n.venueSearchFailedPlatformChanged,
+  VenueSearchFailureReason.blockedByBrowser =>
+    l10n.venueSearchFailedBlockedByBrowser,
+  VenueSearchFailureReason.backendUnreachable =>
+    l10n.venueSearchFailedBackendUnreachable,
 };
