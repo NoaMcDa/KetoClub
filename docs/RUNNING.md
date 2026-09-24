@@ -17,6 +17,9 @@ things are shaped this way; this page is only the commands.
 Check the Flutter version with `flutter --version`; if it differs, `flutter
 downgrade 3.47.4` or use `fvm`.
 
+iOS-specific steps (simulator, a physical iPhone, signing, ATS for a LAN
+backend) are in `docs/RUNNING_IOS.md`.
+
 ## 1. The app on its own (no backend)
 
 The backend is an accelerator, never a dependency (`architecture.md` D11).
