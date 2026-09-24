@@ -504,6 +504,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoveryTypeNameInstead => 'Type a name instead';
 
   @override
+  String get discoveryOpenSettings => 'Open Settings';
+
+  @override
+  String get discoveryTurnOnLocation => 'Turn on location';
+
+  @override
   String get discoveryNoResultsTitle => 'No restaurants found';
 
   @override

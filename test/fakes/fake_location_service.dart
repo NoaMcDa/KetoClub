@@ -19,9 +19,22 @@ final class FakeLocationService implements LocationService {
   /// How many times [current] has been called.
   int currentCallCount = 0;
 
+  /// What [openSettings] answers. Settable so a test can script a
+  /// platform that reports it could not open its settings page.
+  bool openSettingsResult = true;
+
+  /// The `servicesOff` argument of every [openSettings] call, in order.
+  final List<bool> openSettingsCalls = <bool>[];
+
   @override
   Future<LocationResult> current() async {
     currentCallCount++;
     return result;
+  }
+
+  @override
+  Future<bool> openSettings({required bool servicesOff}) async {
+    openSettingsCalls.add(servicesOff);
+    return openSettingsResult;
   }
 }

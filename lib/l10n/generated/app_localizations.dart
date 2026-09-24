@@ -920,6 +920,18 @@ abstract class AppLocalizations {
   /// **'Type a name instead'**
   String get discoveryTypeNameInstead;
 
+  /// No description provided for @discoveryOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get discoveryOpenSettings;
+
+  /// No description provided for @discoveryTurnOnLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on location'**
+  String get discoveryTurnOnLocation;
+
   /// No description provided for @discoveryNoResultsTitle.
   ///
   /// In en, this message translates to:

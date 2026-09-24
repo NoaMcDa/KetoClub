@@ -46,6 +46,7 @@ Future<void> _pump(
   required List<String> pushedNames,
   Locale locale = const Locale('en'),
   Connectivity? connectivity,
+  LocationService? locationService,
 }) {
   _useTallSurface(tester);
   return tester.pumpWidget(
@@ -57,6 +58,7 @@ Future<void> _pump(
         locale: locale,
         home: VenueSearchScreen(
           connectivity: connectivity ?? FakeConnectivity(),
+          locationService: locationService ?? FakeLocationService(),
         ),
         onGenerateRoute: (settings) {
           pushedNames.add(settings.name ?? '');
@@ -369,12 +371,16 @@ void main() {
       expect(field.focusNode?.hasFocus, isTrue);
     });
 
-    testWidgets('a permanent denial offers no retry, only a name search', (
-      tester,
-    ) async {
+    testWidgets('a permanent denial offers no retry, only a name search and '
+        'Open Settings', (tester) async {
       // Arrange
       location.result = const LocationDenied(permanently: true);
-      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      await _pump(
+        tester,
+        controller: controller,
+        pushedNames: pushedNames,
+        locationService: location,
+      );
       final l10n = _l10n(tester);
 
       // Act
@@ -387,16 +393,48 @@ void main() {
       );
       expect(find.text(l10n.discoveryTypeNameInstead), findsOneWidget);
       expect(find.text(l10n.actionRetry), findsNothing);
+      expect(find.text(l10n.discoveryOpenSettings), findsOneWidget);
+
+      // Act: tapping it opens the app's own permission settings.
+      await tester.tap(find.text(l10n.discoveryOpenSettings));
+      await tester.pump();
+
+      // Assert
+      expect(location.openSettingsCalls, [false]);
     });
 
-    testWidgets('an unavailable location shows the copy for its reason', (
+    testWidgets('a non-permanent denial offers no Open Settings action', (
       tester,
     ) async {
+      // Arrange
+      location.result = const LocationDenied(permanently: false);
+      await _pump(
+        tester,
+        controller: controller,
+        pushedNames: pushedNames,
+        locationService: location,
+      );
+      final l10n = _l10n(tester);
+
+      // Act
+      await locate(tester);
+
+      // Assert
+      expect(find.text(l10n.discoveryOpenSettings), findsNothing);
+    });
+
+    testWidgets('an unavailable location shows the copy for its reason and '
+        'offers Turn on location', (tester) async {
       // Arrange
       location.result = const LocationUnavailable(
         reason: LocationUnavailableReason.servicesOff,
       );
-      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      await _pump(
+        tester,
+        controller: controller,
+        pushedNames: pushedNames,
+        locationService: location,
+      );
       final l10n = _l10n(tester);
 
       // Act
@@ -406,6 +444,31 @@ void main() {
       expect(find.text(l10n.discoveryLocationUnavailableTitle), findsOneWidget);
       expect(find.text(l10n.discoveryLocationServicesOff), findsOneWidget);
       expect(find.text(l10n.discoveryTypeNameInstead), findsOneWidget);
+      expect(find.text(l10n.discoveryTurnOnLocation), findsOneWidget);
+
+      // Act: tapping it opens the device's location-services toggle.
+      await tester.tap(find.text(l10n.discoveryTurnOnLocation));
+      await tester.pump();
+
+      // Assert
+      expect(location.openSettingsCalls, [true]);
+    });
+
+    testWidgets('an unsupported location offers no Turn on location action', (
+      tester,
+    ) async {
+      // Arrange
+      location.result = const LocationUnavailable(
+        reason: LocationUnavailableReason.unsupported,
+      );
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      final l10n = _l10n(tester);
+
+      // Act
+      await locate(tester);
+
+      // Assert
+      expect(find.text(l10n.discoveryTurnOnLocation), findsNothing);
     });
 
     testWidgets('a failed search shows its reason, and Retry searches '
