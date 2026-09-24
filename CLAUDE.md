@@ -6,19 +6,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **KetoClub** is a restaurant menu analysis platform designed to help keto dieters find safe dining options. The app ingests live menus from restaurant delivery platforms, classifies dishes by keto-compatibility, and generates automatic waiter instructions for modifications.
 
-> **Status: Phase 1 is built and merged, and Phase 3 backend foundations and
-> hosted classification have landed on top of it.** Build-order steps 1–5 of
-> `architecture.md` §16 ship: models and service contracts, the bilingual heuristic
-> engine, Wolt ingestion with a Hive cache, the classified menu screen and Waiter
-> Card, and the LLM client with its router and Settings. Steps 6–7 add a local
-> FastAPI backend (`backend/`, D11) that proxies Wolt for the web build and
-> forwards one chat completion per menu to Google Gemini (D12) — the app no longer
-> holds a model key at all; `BackendChatClient` replaced `OpenRouterClient`,
-> `KeyStore` and `flutter_secure_storage` are gone. Three earlier decisions were
-> reversed in the Phase 1 close-out pass (`architecture.md`): D10 reinstates
-> `Connectivity`, §17.4 now renders `net_carbs_estimate` as a labelled chip, and
-> §6.6's collapsed red-dish group is gone — the verdict counter tiles are the
-> filter now.
+> **Status: Phase 1 and Phase 2 are built and merged, and Phase 3 backend
+> foundations and hosted classification have landed underneath both.**
+> Build-order steps 1–7 of `architecture.md` §16 (models and service
+> contracts, the bilingual heuristic engine, Wolt ingestion with a Hive
+> cache, the classified menu screen and Waiter Card, the LLM client with its
+> router and Settings, and a local FastAPI backend (`backend/`, D11) that
+> proxies Wolt for the web build and forwards one chat completion per menu to
+> Google Gemini, D12) shipped first. Steps 8–10 landed on top in Phase 2's
+> run: the 10bis adapter (`TenBisAdapter`, registered in `di.dart` — 10bis
+> links resolve and fetch end to end, not just parse), location and nearby
+> search (`LocationService` over `geolocator`, `WoltVenueSearchService`, and
+> a real Discovery screen at `venue_search_screen.dart` with a location
+> header, search, filter chips and venue cards — `architecture.md` D13), and
+> platform setup (icons, splash, bundle ids, permissions). The same run also
+> built a real Saved tab, dish/venue photos, and several Settings features
+> (appearance, net-carb limit, dietary rule toggles, saved-menus management)
+> that build-order steps 8–10 do not individually name. `BackendChatClient`
+> replaced `OpenRouterClient`; `KeyStore` and `flutter_secure_storage` are
+> gone. Three earlier decisions were reversed in the Phase 1 close-out pass
+> (`architecture.md`): D10 reinstates `Connectivity`, §17.4 now renders
+> `net_carbs_estimate` as a labelled chip, and §6.6's collapsed red-dish group
+> is gone — the verdict counter tiles are the filter now.
 >
 > **Read `architecture.md` first — it is authoritative.** This file and `README.md`
 > predate the code in places; where any of them disagrees with `architecture.md`,
@@ -46,9 +55,11 @@ backend (`backend/`, D11) that is an accelerator, never a dependency — with no
   the backend itself too: nothing pre-checks whether the server is up, so an
   unreachable backend surfaces as `backendUnreachable` from the failing call.
 - **API Integration**: Direct calls to restaurant platform APIs from the client on
-  iOS/Android; the web build routes Wolt through the backend's proxy route when
-  configured (D11), because `restaurant-api.wolt.com` sends no CORS headers.
-  **Only Wolt is implemented**; 10bis, Tabit and Ontopo are not built.
+  iOS/Android; the web build routes Wolt and 10bis through the backend's proxy
+  routes when configured (D11), because neither platform's API sends CORS
+  headers. **Wolt and 10bis are implemented**; Tabit and Ontopo are not built.
+  The backend also proxies Wolt's discovery ("nearby"/"by name") endpoints for
+  the web build (`architecture.md` §16 step 9, D13).
 - **Local Storage**: Hive caches the normalised menu and its analysis for 24 hours;
   `shared_preferences` holds non-secret settings and, since D12, an anonymous
   install id (`InstallIdStore`) sent to the backend only for rate limiting.
@@ -121,10 +132,10 @@ Future additions: user ratings, review feedback loop, OCR/vision processing for 
 
 ### Current status
 
-Phase 1 is built and merged, and Phase 3 backend foundations and hosted
-classification have landed on top of it (see the banner at the top). The
-repository holds a working Flutter app, an optional local FastAPI backend
-(`backend/`), plus the planning documents both were built from.
+Phase 1 and Phase 2 are built and merged, and Phase 3 backend foundations and
+hosted classification have landed underneath both (see the banner at the
+top). The repository holds a working Flutter app, an optional local FastAPI
+backend (`backend/`), plus the planning documents all three were built from.
 
 ### Actual project structure
 
@@ -139,17 +150,26 @@ lib/
 │                              # classification_rules, price_format, keto_score
 ├── services/
 │   ├── platform/              # clock, app_logger, connectivity (D10), screen_brightness
-│   ├── storage/               # install_id_store, menu_cache, settings_store (interface + impl each)
+│   ├── storage/               # install_id_store, menu_cache, settings_store, notes_store
 │   ├── llm/                   # llm_chat_client, backend_chat_client (D12; no key store)
-│   ├── venue/                 # venue_ref_resolver (paste-a-URL, pure)
-│   ├── menu/                  # platform_menu_adapter, menu_repository, wolt/ (proxyBase, D11)
+│   ├── location/              # location_service, geolocator_location_service (issue #37)
+│   ├── venue/                 # venue_ref_resolver (paste-a-URL, pure), venue_search_service
+│   │                          # (interface), wolt/ (WoltVenueSearchService + mapper, issue #39)
+│   ├── menu/                  # platform_menu_adapter, menu_repository, wolt/ and tenbis/
+│   │                          # (each split HTTP-adapter + pure mapper, proxyBase, D11)
 │   └── classifier/            # menu_classifier, heuristic, llm, router, prompt, parser
 ├── theme/                     # app_tokens, verdict_colors, app_typography, app_theme
-├── state/                     # app_dependencies, locale_controller + one ChangeNotifier per screen
+├── state/                     # app_dependencies, locale_controller + one ChangeNotifier per
+│                              # screen, including venue_search_controller and saved_controller
 ├── widgets/                   # dish_card, status_badge, engine_chip, waiter_script,
-│                              # verdict_counter_tiles, keto_score_badge, app_shell, failure_copy
-└── screens/                   # venue_search, menu, waiter_card_sheet, settings (no key section),
-                               # scan and saved (bottom-nav placeholders, issue #11)
+│                              # verdict_counter_tiles, keto_score_badge, app_shell, failure_copy,
+│                              # venue_card, category_chips, photo_tile, offline_banner,
+│                              # fetch_failure_action, analysis_progress_row, menu_search_field,
+│                              # note_editor_sheet, rules_reason_banner
+└── screens/                   # venue_search (the Discovery screen, D13), menu,
+                               # waiter_card_sheet, settings (no key section), saved (a real
+                               # cached-menus tab, issue #48) and scan (still a placeholder,
+                               # issue #11)
 
 test/                          # mirrors lib/, plus architecture/, fakes/, fixtures/, l10n/
 integration_test/flows/        # flow tests + flow_support.dart (same-directory helper)
@@ -166,6 +186,9 @@ backend/                       # optional local FastAPI service (D11, D12) — s
 architecture test enforces.
 
 ### Setup and the gate
+
+See `docs/RUNNING.md` for the full run guide (the app, the backend, the
+`--dart-define`, builds and troubleshooting); the essentials:
 
 ```bash
 flutter pub get
@@ -296,33 +319,34 @@ When reading research docs (m15/m16), note that prefixes indicate iteration/mile
 ## Project Phases
 
 - **Phase 1**: menu ingestion, classification and waiter scripts → **Built and merged**
-- **Phase 2**: geolocation and nearby search, plus the 10bis adapter → **Next.**
-  Nearby search is blocked on discovery: no Wolt venue-search endpoint is known
-  (`architecture.md` §17.2). See `MILESTONE_CONVENTIONS.md` for the real GitHub
-  milestone names — they differ from earlier drafts of this document.
+- **Phase 2**: geolocation and nearby search, plus the 10bis adapter → **Built.**
+  `TenBisAdapter` is registered in `di.dart` (#134); `LocationService` (#37),
+  the Wolt venue-search proxy (#123, #149) and `WoltVenueSearchService` (#39,
+  #150) back a real Discovery screen (#40, #154; `architecture.md` D13). What's
+  left is recordings, not code: the discovery and 10bis fixtures are still
+  synthetic (#38, #44) and the performance numbers (#65) need a real phone —
+  see "What is NOT verified yet". See `MILESTONE_CONVENTIONS.md` for the real
+  GitHub milestone names — they differ from earlier drafts of this document.
 - **Phase 3**: the backend (`backend_plan.md`) → **Foundations and hosted
   classification landed** (D11, D12: the Wolt CORS proxy and Gemini-backed
   chat). Community database, user reviews, restaurant submissions and hosting
   beyond `localhost` → **Planned**
 - **Phase 4**: OCR/vision, configurable dietary rules → **Planned**
 
-Phase 1 is built. Phase 2 is next; `feature_prioratization` has the tier breakdown.
+Phase 1 and Phase 2 are built; `feature_prioratization` has the tier breakdown
+for what Phase 3's remaining milestone (#105–#108) and Phase 4 pick up next.
 
 ## What is NOT built yet
 
-- 10bis, Tabit and Ontopo adapters. Only Wolt ships. `VenueRefResolver` already
-  recognises a pasted 10bis URL or bare restaurant id, but `MenuRepository` has no
-  adapter registered for it, so it fails with `unsupportedSource` — paste
-  recognition and platform support are independent claims. The `PlatformMenuAdapter`
-  interface and its shared contract suite already exist, so a new platform is a new
-  adapter plus a registration in `di.dart`. (10bis is its own GitHub milestone,
-  `Phase 2: 10bis Integration` — not Phase 1.)
-- Nearby venue search and any geolocation. `geolocator` is in `pubspec.yaml` but no
-  code uses it. Paste-a-link (Tier A) is what ships.
+- Tabit and Ontopo adapters. Wolt and 10bis ship; `MenuRepository` has an
+  adapter registered for each (`di.dart`). The `PlatformMenuAdapter`
+  interface and its shared contract suite already exist, so a new platform is
+  a new adapter plus a registration in `di.dart`.
 - OCR and the photographed-menu path (Phase 4), and community features — venue
   ratings, reviews, submissions (Phase 3, `backend_plan.md` §5's milestone C).
-  The Scan and Saved bottom-nav tabs exist only as localized placeholder screens
-  explaining that (issue #11) — they are not stubs left blank.
+  The Scan bottom-nav tab is still only a localized placeholder screen (issue
+  #11) explaining that — Saved is no longer a placeholder alongside it; it
+  became a real cached-menus tab in Phase 2 (issue #48; `saved_screen.dart`).
 - Backend hosting beyond `localhost` (issue #109, `architecture.md` §17.6). The
   backend is designed to be run locally by whoever has the repository checked
   out; nothing yet says where it runs for anyone else.
@@ -346,12 +370,34 @@ Built, but not confirmed end to end, and not to be reported as done:
   it yet, so the pinned model's (`GEMINI_MODEL`, default `gemini-2.5-flash`)
   latency and structured-output behaviour against this app's real prompt are
   unmeasured.
-- **The Wolt fixture is synthetic**, not a recorded response (issue #22).
+- **The Wolt menu fixture is synthetic**, not a recorded response (issue #22).
   `tool/record_wolt_fixture.sh` exists to re-record it from a real venue, but has
-  never been run — `restaurant-api.wolt.com` is also unreachable here.
+  never been run — `restaurant-api.wolt.com` is also unreachable here. A related
+  open question: two 2025–2026 third-party sources report that the shipped
+  `GET /v4/venues/slug/{slug}/menu/data` endpoint now returns `200` with an
+  **empty body** without a user token (`phase2_discovery_research.md` §2.5);
+  running the recorder settles whether the shipped menu path still works for
+  real users, and outranks the Discovery-chain recordings below if the body
+  really is empty.
+- **The Wolt discovery fixtures are synthetic too** (`wolt_pages_restaurants.json`,
+  `wolt_pages_search.json`; issue #38). Neither `consumer-api.wolt.com` nor
+  `restaurant-api.wolt.com` is reachable from this environment, so both were
+  hand-built from third-party documentation rather than recorded
+  (`test/fixtures/README.md`, `phase2_discovery_research.md` §2).
+- **The 10bis fixture is synthetic** (`tenbis_synthetic_menu.json`; issue #44,
+  tracked separately from #22). `www.10bis.co.il` is blocked the same way; see
+  `test/fixtures/README.md` for the curl to run once a machine can reach it.
 - **No physical iOS or Android device has ever run this app.** Screen-brightness
   raising for the Waiter Card in particular is evidenced only by a mocked method
-  channel and a fake.
+  channel and a fake, and the location-permission prompt (approximate/precise on
+  Android 12+, the "Never" path on iOS) is evidenced only by fakes. The iOS
+  `NSLocationWhenInUseUsageDescription` string is English-only — there is no
+  `InfoPlist.strings` variant group set up for Hebrew (`ios/Runner/Info.plist`'s
+  own comment explains why editing the pbxproj by hand was skipped).
+- **The performance budget numbers are unmeasured on a real device** (issue
+  #65). `tool/perf_menu.dart` and its 16 ms-per-frame budget table
+  (`tool/README.md`) exist, but the measurement itself needs a real phone on
+  a real network — see `docs/RELEASE.md` §5.
 - **No screenshot or narrow-width run has confirmed the UI against the artboards.**
   Token fidelity (colours, spacing) is enforced by a test; pixel fidelity is not.
 - **No human has reviewed this code.**
@@ -365,9 +411,13 @@ Built, but not confirmed end to end, and not to be reported as done:
 ## Getting started
 
 1. **`HANDOFF.md`** — what exists, what is unfinished and why, the traps.
-2. **`architecture.md`** — the authoritative design. §16 is the build order (continue
-   at step 8, the 10bis adapter — steps 6–7 added the backend), §14 the decisions
-   log D1–D12, §17 the open questions with the default the code follows.
+2. **`architecture.md`** — the authoritative design. §16 is the build order —
+   steps 6–7 added the backend, and steps 8–10 (the 10bis adapter, location and
+   nearby search, platform setup) are now done too, modulo the fixture
+   recordings and phone run in "What is NOT verified yet" above. What's next
+   is Phase 3's remaining milestone (community database, reviews, submissions;
+   `backend_plan.md` §5 milestone C, issues #105–#108). §14 has the decisions
+   log D1–D13, §17 the open questions with the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing
