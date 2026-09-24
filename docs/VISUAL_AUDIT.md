@@ -166,7 +166,7 @@ reason), or **Decision** — needs a product call before anyone changes it.
 |---|---|---|---|
 | S1 | a 32px serif "Settings" | a 22px sans app-bar title | **Fixed** — app-bar titles (Settings, Saved, Scan) are the serif display face |
 | S2 | small muted section labels over grouped `--surface` cards (15px radius, `--line` edge) | full-size titles over a flat list | **Fixed** |
-| S3 | — | "Default filter" forced its four segments into equal quarters and broke labels mid-word ("Ever / ythin / g") | **Fixed** — chip-sized labels fit at 390px; scrolls sideways if a translation is longer |
+| S3 | — | "Default filter" forced its four segments into equal quarters and broke labels mid-word ("Ever / ythin / g") | **Fixed** — chip-sized labels fit at 390px in English; the longer Hebrew "Order as-is" still wraps onto two lines, at a word boundary rather than mid-word |
 | S4 | "Clear" as a quiet `--red-ink` text action | a large filled green button | **Fixed** |
 | S5 | an "Analysis" group with an API key and a model picker | the consent section | **Left** — the artboard predates D12 (there is no key on the device); the artboard is what should change |
 | S6 | Appearance as a three-way segmented control | a radio list, as is Language | **Decision** — tests address both through `RadioGroup` keys |
@@ -199,7 +199,12 @@ reason), or **Decision** — needs a product call before anyone changes it.
 ## 4. Screenshots
 
 In the audit run's scratch directory, as `before/` and `after/` with the
-same names; `<scheme>` is `light`/`dark`, `<lang>` is `en`/`he`:
+same names; `<scheme>` is `light`/`dark`, `<lang>` is `en`/`he`. The
+`after/` set covers all four combinations; in `before/`, the flows the
+driver gained during the audit (`discovery_denied_open_settings_…`,
+`discovery_estimated_…`, `menu_tenbis_…`, `menu_from_card_…`,
+`settings_from_menu_…`, `explore_after_settings_…`) exist for `light_en`
+only.
 
 - `discovery_empty_…`, `discovery_nearby_…`, `discovery_nearby_scrolled_…`,
   `discovery_search_…`, `discovery_denied_…`,
