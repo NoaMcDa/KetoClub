@@ -203,9 +203,12 @@ on GitHub — tooling exists for several of them, it did not close any of them.
    not write it; none of #90, #91, the second wave, or Phase 2's run, was
    merged with one.
 
-Also unverified, lower stakes: no screenshot or narrow-width (390px) run has
-confirmed the UI against the `.design/Main.dc.html` artboards. Token fidelity
-(colours, spacing values) is enforced by a test; pixel fidelity is not.
+Also lower stakes: the UI has now been compared with the `.design/`
+artboards, on the web build at 390px, light and dark, English and Hebrew —
+`docs/VISUAL_AUDIT.md` has the recipe (`tool/visual_audit/`), the findings
+and what was deliberately left. It could render rules-engine results only
+(no model is reachable here) and ran on no phone. Token fidelity (colours,
+spacing values) is enforced by a test; pixel fidelity by no test at all.
 
 ---
 

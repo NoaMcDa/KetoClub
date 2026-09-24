@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/theme/verdict_colors.dart';
+import 'package:ketoclub/widgets/content_direction.dart';
 
 /// Splits a waiter script into its numbered instructions.
 ///
@@ -31,13 +34,24 @@ List<String> _splitScriptLines(String script) => script
 class WaiterScriptWidget extends StatelessWidget {
   /// Creates a widget showing [script] as numbered lines, calling
   /// [onCopied] once the text has been copied to the clipboard.
-  const new({required this.script, this.onCopied, super.key});
+  const new({
+    required this.script,
+    this.onCopied,
+    this.prominent = false,
+    super.key,
+  });
 
   /// The waiter instruction text, in the menu's language. Never empty.
   final String script;
 
   /// Called after [script] has been copied to the clipboard.
   final VoidCallback? onCopied;
+
+  /// Whether to draw the lines at the full-screen Waiter Card's size
+  /// (`.design/WaiterCard.dc.html`: 21px medium text, a 30px number)
+  /// rather than the dish card's inline size (`.design/Main.dc.html`:
+  /// 13px text at a 1.55 line height).
+  final bool prominent;
 
   /// Copies [script] verbatim to the clipboard, notifies [onCopied], and
   /// shows a brief confirmation when [context] has a [ScaffoldMessenger].
@@ -62,7 +76,11 @@ class WaiterScriptWidget extends StatelessWidget {
             padding: EdgeInsetsDirectional.only(
               bottom: i == lines.length - 1 ? 0 : 12,
             ),
-            child: _NumberedLine(number: i + 1, text: lines[i]),
+            child: _NumberedLine(
+              number: i + 1,
+              text: lines[i],
+              prominent: prominent,
+            ),
           ),
         const SizedBox(height: 12),
         Align(
@@ -78,42 +96,71 @@ class WaiterScriptWidget extends StatelessWidget {
   }
 }
 
-/// One numbered instruction: a circled ordinal beside its selectable text.
+/// One numbered instruction: a circled number in the modifiable verdict's
+/// amber — the artboards' colour for everything a waiter is asked to
+/// change — and the selectable instruction text beside it.
 class _NumberedLine extends StatelessWidget {
-  const new({required this.number, required this.text});
+  const new({
+    required this.number,
+    required this.text,
+    required this.prominent,
+  });
 
-  /// This line's 1-based position among the script's lines.
+  /// The 1-based line number shown in the leading circle.
   final int number;
 
-  /// This line's instruction text, verbatim from the script.
+  /// The instruction text for this line.
   final String text;
+
+  /// See [WaiterScriptWidget.prominent].
+  final bool prominent;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CircleAvatar(
-          radius: 14,
-          backgroundColor: theme.colorScheme.primary,
-          foregroundColor: theme.colorScheme.onPrimary,
-          child: Text(
-            number.toString(),
-            style: theme.textTheme.labelLarge?.copyWith(
-              color: theme.colorScheme.onPrimary,
-              fontWeight: FontWeight.w800,
+    final amber = VerdictColors.of(context).forVerdict(DishVerdict.modifiable);
+    final diameter = prominent ? 30.0 : 24.0;
+    final textStyle = prominent
+        ? theme.textTheme.bodyLarge?.copyWith(
+            fontSize: 21,
+            fontWeight: FontWeight.w500,
+            height: 1.38,
+          )
+        : theme.textTheme.bodyMedium?.copyWith(fontSize: 13, height: 1.55);
+    // The script is in the menu's language (architecture.md §12), so the
+    // whole numbered line — number first — follows that language's
+    // direction, not the UI's.
+    return Directionality(
+      textDirection: contentDirection(text, Directionality.of(context)),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: diameter,
+            height: diameter,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: amber.pill,
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              number.toString(),
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontSize: prominent ? 15 : 12,
+                color: amber.on,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: SelectableText(text, style: theme.textTheme.bodyLarge),
+          SizedBox(width: prominent ? 14 : 10),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(top: prominent ? 0 : 2),
+              child: SelectableText(text, style: textStyle),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

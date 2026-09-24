@@ -54,6 +54,16 @@ It cannot be run with `dart run`: everything it times imports
 
 A row ending in `OVER` has a median above its budget.
 
+## `visual_audit/` — render the web build and the artboards
+
+`stub_upstream.py` stands in for Wolt and 10bis with `test/fixtures/`,
+`shoot.py` drives the real web build in headless Chromium (Playwright) and
+screenshots every reachable screen at 390px, light and dark, English and
+Hebrew, and `render_artboards.py` (with `support.js`, a stand-in for the
+design canvas runtime) renders the `.design/` artboards at the same size.
+`docs/VISUAL_AUDIT.md` has the full recipe and what the first run found.
+None of it runs in CI.
+
 ## Model verification moved to the backend (D12)
 
 **There is no `measure_model_latency.dart` any more.** Before D12, this

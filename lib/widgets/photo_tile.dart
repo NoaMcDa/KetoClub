@@ -7,8 +7,8 @@ import 'package:ketoclub/theme/app_tokens.dart';
 /// while an image is loading, when it fails to load, and when there is no
 /// URL at all (`phase2_discovery_research.md` §8.4, issue #50).
 ///
-/// The tile's footprint is always [size] by [size] regardless of state, so
-/// an image arriving never shifts the surrounding layout. On web,
+/// The tile's footprint is always [width] by [size] regardless of state,
+/// so an image arriving never shifts the surrounding layout. On web,
 /// [WebHtmlElementStrategy.fallback] draws the photo through a
 /// platform-view `<img>` element when Flutter's own CORS-gated byte fetch
 /// fails, which is also why this widget never caches bytes itself — see
@@ -19,11 +19,13 @@ import 'package:ketoclub/theme/app_tokens.dart';
 /// Decorative: a dish or venue name is always printed beside the tile, so
 /// it carries no semantics of its own ([ExcludeSemantics]).
 class PhotoTile extends StatelessWidget {
-  /// Creates a tile [size] logical pixels square, showing [imageUrl] when
-  /// it is set, else the theme's placeholder gradient.
+  /// Creates a tile [size] logical pixels tall — and as wide, unless
+  /// [width] says otherwise — showing [imageUrl] when it is set, else the
+  /// theme's placeholder gradient.
   const new({
     required this.imageUrl,
     required this.size,
+    this.width,
     this.borderRadius = const BorderRadius.all(Radius.circular(12)),
     super.key,
   });
@@ -33,8 +35,14 @@ class PhotoTile extends StatelessWidget {
   /// never an attempted, guaranteed-to-fail request.
   final String? imageUrl;
 
-  /// The tile's fixed width and height.
+  /// The tile's fixed height, and its width when [width] is null.
   final double size;
+
+  /// The tile's width, when it is not square: `double.infinity` fills the
+  /// parent's width, as the venue card's full-bleed photo does
+  /// (`.design/Discovery.dc.html`: `width: 100%; height: 118px`). Null
+  /// keeps the tile [size] square, as the dish row's 72px tile is.
+  final double? width;
 
   /// The tile's corner radius. Defaults to 12, the artboard's dish-row
   /// photo tile (`.design/Main.dc.html`).
@@ -43,9 +51,10 @@ class PhotoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final url = imageUrl;
+    final width = this.width ?? size;
     return ExcludeSemantics(
       child: SizedBox(
-        width: size,
+        width: width,
         height: size,
         child: ClipRRect(
           borderRadius: borderRadius,
@@ -53,7 +62,7 @@ class PhotoTile extends StatelessWidget {
               ? const _PhotoPlaceholder()
               : Image.network(
                   url,
-                  width: size,
+                  width: width.isFinite ? width : null,
                   height: size,
                   fit: BoxFit.cover,
                   webHtmlElementStrategy: WebHtmlElementStrategy.fallback,

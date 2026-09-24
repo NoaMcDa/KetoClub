@@ -513,6 +513,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoveryTurnOnLocation => 'Turn on location';
 
   @override
+  String get discoveryOpenSettingsUnavailable =>
+      'This device could not open its settings from here. Allow location for KetoClub in your browser\'s or device\'s settings, then try again.';
+
+  @override
   String get discoveryNoResultsTitle => 'No restaurants found';
 
   @override

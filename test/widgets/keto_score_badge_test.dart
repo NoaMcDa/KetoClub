@@ -61,5 +61,27 @@ void main() {
       expect(find.text('5.0'), findsOneWidget);
       expect(find.text('ציון קטוגני'), findsOneWidget);
     });
+
+    testWidgets('inline sets the label beside the score, not under it — the '
+        'venue card layout', (tester) async {
+      // Arrange & Act
+      await _pump(
+        tester,
+        const Align(
+          alignment: Alignment.topLeft,
+          child: KetoScoreBadge(score: 9.1, inline: true),
+        ),
+      );
+
+      // Assert: same row, label after the number.
+      final number = tester.getRect(find.text('9.1'));
+      final label = tester.getRect(find.text('KETO SCORE'));
+      expect(label.left, greaterThan(number.right));
+      expect(label.top, lessThan(number.bottom));
+      expect(
+        find.bySemanticsLabel('Keto score: 9.1 out of 10'),
+        findsOneWidget,
+      );
+    });
   });
 }

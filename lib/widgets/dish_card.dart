@@ -4,6 +4,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/price_format.dart';
+import 'package:ketoclub/widgets/content_direction.dart';
 import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
@@ -89,6 +90,7 @@ class _DishCardState extends State<DishCard> {
         : null;
     final netCarbs = analysis?.netCarbsEstimate;
     final neutralSurfaces = NeutralSurfaces.of(context);
+    final ambient = Directionality.of(context);
 
     final cardEdge = _cardEdge(theme, neutralSurfaces, verdict, tone);
     // The badge/name/description/price block and the photo tile sit in one
@@ -97,21 +99,44 @@ class _DishCardState extends State<DishCard> {
     final textColumn = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Sizes and the 6px rhythm are the artboard's dish row
+        // (`.design/Main.dc.html`): a 15px bold name, a 12.5px `--ink2`
+        // description at 1.45 line height, and a 13.5px bold price.
         if (analysis != null) ...[
           StatusBadge(verdict: analysis.verdict),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
         ],
-        Text(dish.name, style: theme.textTheme.titleMedium),
+        // The name and description are menu content, laid out in the
+        // menu's own direction rather than the UI's (contentDirection).
+        SizedBox(
+          width: double.infinity,
+          child: Text(
+            dish.name,
+            textDirection: contentDirection(dish.name, ambient),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              height: 1.25,
+            ),
+          ),
+        ),
         if (dish.description.isNotEmpty) ...[
-          const SizedBox(height: 4),
-          Text(dish.description, style: theme.textTheme.bodySmall),
+          const SizedBox(height: 6),
+          SizedBox(
+            width: double.infinity,
+            child: Text(
+              dish.description,
+              textDirection: contentDirection(dish.description, ambient),
+              style: theme.textTheme.bodySmall?.copyWith(height: 1.45),
+            ),
+          ),
         ],
-        const SizedBox(height: 6),
+        const SizedBox(height: 7),
         Row(
           children: [
             Text(
               formatPrice(dish.price, localeTag: widget.localeTag),
               style: theme.textTheme.bodyMedium?.copyWith(
+                fontSize: 13.5,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -128,7 +153,7 @@ class _DishCardState extends State<DishCard> {
       ],
     );
     final content = Padding(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -40,7 +40,15 @@ abstract final class AppTypography {
   /// The base [TextTheme] over [uiFamily], for the given [ink] and [ink2]
   /// tokens (primary and secondary text colours differ between the light
   /// and dark themes).
-  static TextTheme textTheme({required Color ink, required Color ink2}) {
+  ///
+  /// [ink3], the artboards' muted `--ink3`, colours [TextTheme.labelSmall]
+  /// — the small upper-case labels ("LOOKING AROUND", "KETO SCORE") every
+  /// artboard draws in it. It falls back to [ink2] when not given.
+  static TextTheme textTheme({
+    required Color ink,
+    required Color ink2,
+    Color? ink3,
+  }) {
     TextStyle ui({
       required double size,
       required FontWeight weight,
@@ -70,7 +78,7 @@ abstract final class AppTypography {
       bodySmall: ui(size: 12.5, weight: FontWeight.w400, color: ink2),
       labelLarge: ui(size: 14, weight: FontWeight.w600, color: ink),
       labelMedium: ui(size: 12.5, weight: FontWeight.w600, color: ink2),
-      labelSmall: ui(size: 10, weight: FontWeight.w800, color: ink2),
+      labelSmall: ui(size: 10, weight: FontWeight.w800, color: ink3 ?? ink2),
     );
   }
 

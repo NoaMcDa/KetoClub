@@ -516,6 +516,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get discoveryTurnOnLocation => 'הפעל מיקום';
 
   @override
+  String get discoveryOpenSettingsUnavailable =>
+      'לא ניתן לפתוח את ההגדרות מכאן. אפשרו מיקום ל-KetoClub בהגדרות הדפדפן או המכשיר, ונסו שוב.';
+
+  @override
   String get discoveryNoResultsTitle => 'לא נמצאו מסעדות';
 
   @override

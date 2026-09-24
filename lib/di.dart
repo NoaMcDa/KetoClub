@@ -93,8 +93,10 @@ AppDependencies buildDependencies() {
   final client = http.Client();
   const clock = SystemClock();
   final connectivity = DeviceConnectivity(plus.Connectivity());
-  // Passed only to the chat client: the install id is sent nowhere but the
-  // `X-KetoClub-Install-Id` header (`backend_plan.md` §3.4).
+  // Passed to the chat client and the venue search: the install id is
+  // sent nowhere but the `X-KetoClub-Install-Id` header on a request to
+  // KetoClub's own backend (`backend_plan.md` §3.4), which rate-limits
+  // both `/v1/chat` and the discovery routes by it.
   final installIdStore = PrefsInstallIdStore(
     load: SharedPreferences.getInstance,
   );
@@ -166,6 +168,7 @@ AppDependencies buildDependencies() {
     // otherwise. The constructor sends nothing and draws no randomness.
     venueSearchService: WoltVenueSearchService(
       client: client,
+      installIdStore: installIdStore,
       proxyBase: menuProxyBase(
         runsInBrowser: kIsWeb,
         configured: _configuredBackendUrl,

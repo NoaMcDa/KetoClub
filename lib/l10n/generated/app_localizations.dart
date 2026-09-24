@@ -938,6 +938,12 @@ abstract class AppLocalizations {
   /// **'Turn on location'**
   String get discoveryTurnOnLocation;
 
+  /// No description provided for @discoveryOpenSettingsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This device could not open its settings from here. Allow location for KetoClub in your browser\'s or device\'s settings, then try again.'**
+  String get discoveryOpenSettingsUnavailable;
+
   /// No description provided for @discoveryNoResultsTitle.
   ///
   /// In en, this message translates to:

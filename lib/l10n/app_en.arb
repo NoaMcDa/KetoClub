@@ -211,6 +211,7 @@
   "discoveryTypeNameInstead": "Type a name instead",
   "discoveryOpenSettings": "Open Settings",
   "discoveryTurnOnLocation": "Turn on location",
+  "discoveryOpenSettingsUnavailable": "This device could not open its settings from here. Allow location for KetoClub in your browser's or device's settings, then try again.",
   "discoveryNoResultsTitle": "No restaurants found",
   "discoveryNoResultsBody": "Try a different name, or clear the search.",
   "discoveryClearSearch": "Clear search",

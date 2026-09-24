@@ -161,15 +161,18 @@ final class HeuristicMenuClassifier implements MenuClassifier {
     return sentences;
   }
 
-  /// Joins several waiter sentences into one script read aloud to a
-  /// waiter in one breath.
+  /// Joins several waiter sentences into one script, one instruction per
+  /// line.
   ///
-  /// Each sentence in `constants.dart` is already a complete, polite,
-  /// punctuated request (English "Please ...", Hebrew "אפשר בבקשה
-  /// ...?"), so a plain single space between them reads as a short run
-  /// of separate asks — "Please omit the beetroot from the dish. Ask
-  /// for barbecue glaze to be omitted." — rather than a bulleted list a
-  /// person would have to read out loud as bullets. No extra connective
-  /// word is needed in either language for that to sound natural.
-  String _joinInstructions(List<String> instructions) => instructions.join(' ');
+  /// A newline is the waiter script's line separator whichever engine
+  /// wrote it (architecture.md §6.3): `WaiterScriptWidget` splits on it
+  /// and numbers each line, as `.design/WaiterCard.dc.html` draws them,
+  /// and the LLM prompt asks for "one instruction per line" too. A single
+  /// space used to join them here, and README's templates carry no
+  /// terminal punctuation ("Swap potato purée for green salad or steamed
+  /// vegetables"), so two instructions rendered as one run-on line —
+  /// "…steamed vegetables Ask to leave out carrots…" — found by the
+  /// visual audit (`docs/VISUAL_AUDIT.md`).
+  String _joinInstructions(List<String> instructions) =>
+      instructions.join('\n');
 }

@@ -398,8 +398,12 @@ Built, but not confirmed end to end, and not to be reported as done:
   #65). `tool/perf_menu.dart` and its 16 ms-per-frame budget table
   (`tool/README.md`) exist, but the measurement itself needs a real phone on
   a real network — see `docs/RELEASE.md` §5.
-- **No screenshot or narrow-width run has confirmed the UI against the artboards.**
-  Token fidelity (colours, spacing) is enforced by a test; pixel fidelity is not.
+- **The UI has been compared with the artboards on the web build only.**
+  `docs/VISUAL_AUDIT.md` rendered every reachable screen at 390px, light and
+  dark, English and Hebrew, against stubbed upstreams, fixed what diverged
+  and lists what it left and why. It saw only rules-engine results (no
+  model is reachable here) and no phone; token fidelity is enforced by a
+  test, pixel fidelity by no test at all.
 - **No human has reviewed this code.**
 - The three colour pairs that failed WCAG AA contrast (green-on-green at
   4.08:1, light `ink3`-on-bg at 2.78:1, dark `ink3`-on-bg at 4.02:1) were

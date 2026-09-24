@@ -82,7 +82,9 @@ abstract final class MenuShareText {
     yield '- ${dish.name}';
     final modification = dish.modification;
     if (modification != null && modification.isNotEmpty) {
-      yield '  $modification';
+      // A script holds one instruction per line (architecture.md §6.3);
+      // each keeps the same indent under the dish name.
+      yield '  ${modification.replaceAll('\n', '\n  ')}';
     }
   }
 

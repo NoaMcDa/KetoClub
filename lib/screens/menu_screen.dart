@@ -102,11 +102,18 @@ class MenuScreen extends StatefulWidget {
     required this.connectivity,
     required this.externalLinkOpener,
     required this.menuSharer,
+    this.venueNameHint,
     super.key,
   });
 
   /// Which venue, on which platform, to load a menu for.
   final VenueRef ref;
+
+  /// The venue's display name when the screen that opened this one
+  /// already knew it (a Discovery venue card), shown in the header when
+  /// the menu itself names no venue — which no documented Wolt payload
+  /// does — ahead of the bare [VenueRef.platformId] slug.
+  final String? venueNameHint;
 
   /// Raises the screen brightness while the Waiter Card is open, so the
   /// card stays readable across a restaurant table, and restores it on
@@ -227,7 +234,8 @@ class _MenuScreenState extends State<MenuScreen> {
     final analysis = controller.analysis;
     if (menu == null || analysis is! MenuAnalysed) return;
     final text = MenuShareText.build(
-      venueName: controller.venueName ?? widget.ref.platformId,
+      venueName:
+          controller.venueName ?? widget.venueNameHint ?? widget.ref.platformId,
       menu: menu,
       analysis: analysis,
     );
@@ -257,7 +265,7 @@ class _MenuScreenState extends State<MenuScreen> {
   /// cards themselves exclude their own semantics.
   Widget _fetchingSkeleton(AppLocalizations l10n) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
       child: Semantics(
         liveRegion: true,
         label: l10n.menuLoading,
@@ -351,7 +359,7 @@ class _MenuScreenState extends State<MenuScreen> {
         controller,
         ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           children: [
             header,
             const SizedBox(height: 4),
@@ -395,7 +403,7 @@ class _MenuScreenState extends State<MenuScreen> {
         // Always scrollable, so a menu shorter than the screen can still
         // be pulled down to refresh (RefreshIndicator's own requirement).
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         children: [
           header,
           const SizedBox(height: 4),
@@ -439,7 +447,12 @@ class _MenuScreenState extends State<MenuScreen> {
               engine: controller.engine!,
               onRetry: () => _retry(controller.reanalyse),
             ),
-            EngineChip(engine: controller.engine!),
+            // Aligned rather than stretched: a ListView child is forced to
+            // the full width, which drew this pill as a full-width bar.
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: EngineChip(engine: controller.engine!),
+            ),
             const SizedBox(height: 12),
           ],
           CategoryChips(
@@ -488,7 +501,8 @@ class _MenuScreenState extends State<MenuScreen> {
     AppLocalizations l10n,
     MenuController controller,
   ) {
-    final name = controller.venueName ?? widget.ref.platformId;
+    final name =
+        controller.venueName ?? widget.venueNameHint ?? widget.ref.platformId;
     final theme = Theme.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,

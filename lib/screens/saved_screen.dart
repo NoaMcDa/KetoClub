@@ -94,7 +94,7 @@ class _SavedScreenState extends State<SavedScreen> {
       liveRegion: true,
       label: l10n.savedLoading,
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         children: const [
           SavedEntrySkeleton(),
           SizedBox(height: 8),
@@ -144,7 +144,7 @@ class _SavedScreenState extends State<SavedScreen> {
   ) {
     final entries = controller.entries;
     return ListView.separated(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
       itemCount: entries.length,
       separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemBuilder: (context, index) {

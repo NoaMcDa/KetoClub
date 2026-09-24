@@ -12,12 +12,23 @@ abstract final class AppTheme {
   /// `.design/theme-snippet.txt`.
   static ThemeData light() {
     const ink = AppTokens.lightInk;
+    final line = ink.withValues(alpha: AppTokens.lineAlpha);
     final colorScheme = ColorScheme.fromSeed(
       seedColor: AppTokens.lightAccent,
       primary: AppTokens.lightAccent,
       onPrimary: AppTokens.lightAccentInk,
+      secondaryContainer: AppTokens.lightAccent,
+      onSecondaryContainer: AppTokens.lightAccentInk,
       surface: AppTokens.lightSurface,
       onSurface: ink,
+      onSurfaceVariant: AppTokens.lightInk3,
+      surfaceTint: Colors.transparent,
+      surfaceContainerLowest: AppTokens.lightSurface,
+      surfaceContainerLow: AppTokens.lightBg,
+      surfaceContainer: AppTokens.lightBg,
+      surfaceContainerHigh: AppTokens.lightSurface2,
+      surfaceContainerHighest: AppTokens.lightSurface2,
+      outlineVariant: line,
       error: AppTokens.lightRed,
       onError: AppTokens.lightRedOn,
     );
@@ -26,9 +37,10 @@ abstract final class AppTheme {
       colorScheme: colorScheme,
       scaffoldBackground: AppTokens.lightBg,
       cardColor: AppTokens.lightSurface,
-      dividerColor: ink.withValues(alpha: AppTokens.lineAlpha),
+      dividerColor: line,
       ink: ink,
       ink2: AppTokens.lightInk2,
+      ink3: AppTokens.lightInk3,
       verdictColors: VerdictColors.light(),
       neutralSurfaces: NeutralSurfaces(
         surface2: AppTokens.lightSurface2,
@@ -47,13 +59,24 @@ abstract final class AppTheme {
   /// `.design/theme-snippet.txt`.
   static ThemeData dark() {
     const ink = AppTokens.darkInk;
+    final line = ink.withValues(alpha: AppTokens.lineAlpha);
     final colorScheme = ColorScheme.fromSeed(
       seedColor: AppTokens.darkAccent,
       brightness: Brightness.dark,
       primary: AppTokens.darkAccent,
       onPrimary: AppTokens.darkAccentInk,
+      secondaryContainer: AppTokens.darkAccent,
+      onSecondaryContainer: AppTokens.darkAccentInk,
       surface: AppTokens.darkSurface,
       onSurface: ink,
+      onSurfaceVariant: AppTokens.darkInk3,
+      surfaceTint: Colors.transparent,
+      surfaceContainerLowest: AppTokens.darkSurface,
+      surfaceContainerLow: AppTokens.darkBg,
+      surfaceContainer: AppTokens.darkBg,
+      surfaceContainerHigh: AppTokens.darkSurface2,
+      surfaceContainerHighest: AppTokens.darkSurface2,
+      outlineVariant: line,
       error: AppTokens.darkRed,
       onError: AppTokens.darkRedOn,
     );
@@ -62,9 +85,10 @@ abstract final class AppTheme {
       colorScheme: colorScheme,
       scaffoldBackground: AppTokens.darkBg,
       cardColor: AppTokens.darkSurface,
-      dividerColor: ink.withValues(alpha: AppTokens.lineAlpha),
+      dividerColor: line,
       ink: ink,
       ink2: AppTokens.darkInk2,
+      ink3: AppTokens.darkInk3,
       verdictColors: VerdictColors.dark(),
       neutralSurfaces: NeutralSurfaces(
         surface2: AppTokens.darkSurface2,
@@ -86,11 +110,43 @@ abstract final class AppTheme {
     required Color dividerColor,
     required Color ink,
     required Color ink2,
+    required Color ink3,
     required VerdictColors verdictColors,
     required NeutralSurfaces neutralSurfaces,
     required LinearGradient photoGradient,
     required Color photoInk,
   }) {
+    final accent = colorScheme.primary;
+    final accentInk = colorScheme.onPrimary;
+    // The artboards' `.chip` (`.design/theme-snippet.txt`): a pill, 12.5px
+    // semibold, `--surface` with a `--line` edge, and `--accent` filled
+    // with `--accent-ink` text once selected — no check mark.
+    bool selected(Set<WidgetState> states) =>
+        states.contains(WidgetState.selected);
+    const chipLabel = TextStyle(
+      fontFamily: AppTypography.uiFamily,
+      fontFamilyFallback: AppTypography.uiFallback,
+      fontSize: 12.5,
+      fontWeight: FontWeight.w600,
+    );
+    // The artboards' tab bar (`.design/Discovery.dc.html`): no indicator
+    // pill and no tinted surface; the active tab is `--accent`, the rest
+    // `--ink3`, with 10px labels.
+    TextStyle navLabel({required bool active}) => TextStyle(
+      fontFamily: AppTypography.uiFamily,
+      fontFamilyFallback: AppTypography.uiFallback,
+      fontSize: 10,
+      fontWeight: active ? FontWeight.w700 : FontWeight.w600,
+      color: active ? accent : ink3,
+    );
+    // The artboards' search field (`.design/Discovery.dc.html`): a
+    // `--surface` box with a `--line` edge and a 14px radius.
+    OutlineInputBorder fieldBorder(Color color, {double width = 1}) =>
+        OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: color, width: width),
+        );
+
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
@@ -100,12 +156,86 @@ abstract final class AppTheme {
       dividerColor: dividerColor,
       fontFamily: AppTypography.uiFamily,
       fontFamilyFallback: AppTypography.uiFallback,
-      textTheme: AppTypography.textTheme(ink: ink, ink2: ink2),
+      textTheme: AppTypography.textTheme(ink: ink, ink2: ink2, ink3: ink3),
+      // `scrolledUnderElevation` and the transparent tint keep the bar the
+      // page's own `--bg` once content scrolls under it, instead of
+      // Material 3's tinted "scrolled under" surface. A title, where one
+      // is shown (Settings, Saved, Scan), is the artboards' serif heading.
       appBarTheme: AppBarTheme(
         backgroundColor: scaffoldBackground,
         foregroundColor: ink,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        centerTitle: false,
+        titleTextStyle: AppTypography.displayStyle(size: 30, color: ink),
       ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: scaffoldBackground,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        height: 68,
+        indicatorColor: Colors.transparent,
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (states) => navLabel(active: selected(states)),
+        ),
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) =>
+              IconThemeData(size: 22, color: selected(states) ? accent : ink3),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        shape: const StadiumBorder(),
+        showCheckmark: false,
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+        labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+        color: WidgetStateProperty.resolveWith(
+          (states) => selected(states) ? accent : cardColor,
+        ),
+        side: WidgetStateBorderSide.resolveWith(
+          (states) =>
+              BorderSide(color: selected(states) ? accent : dividerColor),
+        ),
+        // A plain style whose *colour* is state-dependent: a chip resolves
+        // only `labelStyle.color` per state, so a WidgetStateTextStyle
+        // here would be merged as an all-null style and silently lost.
+        labelStyle: chipLabel.copyWith(
+          color: WidgetStateColor.resolveWith(
+            (states) => selected(states) ? accentInk : ink2,
+          ),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: cardColor,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 13,
+        ),
+        prefixIconColor: ink3,
+        suffixIconColor: ink3,
+        hintStyle: TextStyle(fontSize: 13.5, color: ink3),
+        border: fieldBorder(dividerColor),
+        enabledBorder: fieldBorder(dividerColor),
+        focusedBorder: fieldBorder(accent, width: 1.5),
+        errorBorder: fieldBorder(colorScheme.error),
+        focusedErrorBorder: fieldBorder(colorScheme.error, width: 1.5),
+      ),
+      cardTheme: CardThemeData(
+        color: cardColor,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+          side: BorderSide(color: dividerColor),
+        ),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: scaffoldBackground,
+        modalBackgroundColor: scaffoldBackground,
+        surfaceTintColor: Colors.transparent,
+      ),
+      dividerTheme: DividerThemeData(color: dividerColor),
       extensions: [
         verdictColors,
         neutralSurfaces,

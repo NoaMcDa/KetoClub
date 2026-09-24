@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
+import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
+import 'package:ketoclub/widgets/content_direction.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
 
 /// The full-screen waiter card: a tab per modifiable dish, each one's
@@ -110,51 +112,89 @@ class _WaiterCardSheetState extends State<WaiterCardSheet> {
     final row = widget.rows[_index];
     final script = row.analysis?.modification;
     final netCarbsEstimate = row.analysis?.netCarbsEstimate;
+    // Laid out as `.design/WaiterCard.dc.html`: a small muted title with
+    // a close button at its end, then — scrolling beneath them — the
+    // dish tabs, the dish name as a large serif heading, and the script
+    // in a card at the full-screen size. The Column fills the modal
+    // sheet's full height, so the card reads as a screen of its own
+    // rather than a strip along the bottom.
     return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsetsDirectional.fromSTEB(24, 24, 24, 32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.waiterCardTitle, style: theme.textTheme.labelLarge),
-            if (widget.rows.length > 1) ...[
-              const SizedBox(height: 16),
-              _TabRow(
-                rows: widget.rows,
-                activeIndex: _index,
-                onSelect: _selectTab,
-              ),
-            ],
-            const SizedBox(height: 8),
-            Text(row.dish.name, style: theme.textTheme.headlineSmall),
-            if (script != null) ...[
-              const SizedBox(height: 24),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface,
-                  border: Border.all(color: theme.colorScheme.outline),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: DefaultTextStyle.merge(
-                    style: TextStyle(
-                      fontSize: 21,
-                      fontWeight: FontWeight.w500,
-                      color: theme.colorScheme.onSurface,
-                      height: 1.35,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 12, 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.waiterCardTitle,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontSize: 12,
+                      letterSpacing: 0.6,
                     ),
-                    child: WaiterScriptWidget(script: script),
                   ),
                 ),
+                IconButton(
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                  color: theme.textTheme.bodySmall?.color,
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.maybePop(context),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsetsDirectional.fromSTEB(20, 0, 20, 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.rows.length > 1) ...[
+                    _TabRow(
+                      rows: widget.rows,
+                      activeIndex: _index,
+                      onSelect: _selectTab,
+                    ),
+                    const SizedBox(height: 18),
+                  ],
+                  Text(
+                    row.dish.name,
+                    textDirection: contentDirection(
+                      row.dish.name,
+                      Directionality.of(context),
+                    ),
+                    style: AppTypography.displayStyle(
+                      size: 34,
+                      color: theme.colorScheme.onSurface,
+                    ).copyWith(height: 1.1),
+                  ),
+                  if (script != null) ...[
+                    const SizedBox(height: 22),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        border: Border.all(color: theme.dividerColor),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
+                        child: WaiterScriptWidget(
+                          script: script,
+                          prominent: true,
+                        ),
+                      ),
+                    ),
+                  ],
+                  if (netCarbsEstimate != null) ...[
+                    const SizedBox(height: 18),
+                    _AfterText(estimate: netCarbsEstimate),
+                  ],
+                ],
               ),
-            ],
-            if (netCarbsEstimate != null) ...[
-              const SizedBox(height: 16),
-              _AfterText(estimate: netCarbsEstimate),
-            ],
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }

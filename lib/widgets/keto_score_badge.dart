@@ -17,11 +17,17 @@ import 'package:ketoclub/theme/verdict_colors.dart';
 class KetoScoreBadge extends StatelessWidget {
   /// Creates a badge for [score], out of 10, or an empty widget when
   /// [score] is null.
-  const new({required this.score, super.key});
+  const new({required this.score, this.inline = false, super.key});
 
   /// The score to show, out of 10 — see `MenuController.ketoScoreOutOfTen`
   /// for how it is computed — or null to render nothing.
   final double? score;
+
+  /// Whether to set the label beside the number, on its baseline, at the
+  /// venue card's smaller size (`.design/Discovery.dc.html`: a 17px number
+  /// then the label) rather than stacked under a 24px number as in the
+  /// menu header (`.design/Main.dc.html`).
+  final bool inline;
 
   @override
   Widget build(BuildContext context) {
@@ -38,26 +44,36 @@ class KetoScoreBadge extends StatelessWidget {
     final labelStyle = theme.textTheme.labelSmall;
     final formatted = currentScore.toStringAsFixed(1);
 
+    final number = Text(
+      formatted,
+      style: AppTypography.displayStyle(
+        size: inline ? 17 : 24,
+        color: scoreColor,
+      ),
+    );
+    final label = Text(
+      // `text-transform: uppercase` in the artboard is presentational
+      // only; `toUpperCase()` is a no-op on the Hebrew string, which
+      // has no case, so this stays correct in both languages.
+      l10n.menuKetoScoreLabel.toUpperCase(),
+      style: labelStyle?.copyWith(fontSize: 9, letterSpacing: 0.8),
+    );
+
     return Semantics(
       label: l10n.menuKetoScoreSemanticLabel(formatted),
       excludeSemantics: true,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text(
-            formatted,
-            style: AppTypography.displayStyle(size: 24, color: scoreColor),
-          ),
-          Text(
-            // `text-transform: uppercase` in the artboard is presentational
-            // only; `toUpperCase()` is a no-op on the Hebrew string, which
-            // has no case, so this stays correct in both languages.
-            l10n.menuKetoScoreLabel.toUpperCase(),
-            style: labelStyle?.copyWith(letterSpacing: 1.1),
-          ),
-        ],
-      ),
+      child: inline
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [number, const SizedBox(width: 4), label],
+            )
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [number, label],
+            ),
     );
   }
 }
