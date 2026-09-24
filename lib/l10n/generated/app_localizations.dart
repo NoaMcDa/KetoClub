@@ -764,6 +764,12 @@ abstract class AppLocalizations {
   /// **'Open a venue\'s menu and it appears here automatically, available for a day — even offline.'**
   String get savedPlaceholderBody;
 
+  /// No description provided for @savedLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your saved menus…'**
+  String get savedLoading;
+
   /// No description provided for @savedEntryDishCount.
   ///
   /// In en, this message translates to:
@@ -1213,6 +1219,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No dishes match your search.'**
   String get menuNoResults;
+
+  /// No description provided for @menuClearFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear filter'**
+  String get menuClearFilter;
 
   /// No description provided for @categoryChipSemanticLabel.
   ///

@@ -172,6 +172,7 @@
   "scanPlaceholderBody": "צילום תפריט פיזי יתאפשר בעדכון עתידי. בינתיים, הדביקו קישור למשלוח במסך גילוי.",
   "savedPlaceholderTitle": "מסעדות שמורות",
   "savedPlaceholderBody": "פתחו תפריט של מסעדה והוא יופיע כאן אוטומטית, זמין ליממה — גם ללא חיבור לאינטרנט.",
+  "savedLoading": "טוען את התפריטים השמורים שלך…",
   "savedEntryDishCount": "{count, plural, one{מנה אחת} two{שתי מנות} other{{count} מנות}}",
   "@savedEntryDishCount": {
     "placeholders": { "count": { "type": "num" } }
@@ -313,6 +314,7 @@
   "menuSearchSemanticLabel": "חיפוש מנות לפי שם או תיאור",
   "menuSearchClear": "נקה חיפוש",
   "menuNoResults": "אין מנות שמתאימות לחיפוש שלכם.",
+  "menuClearFilter": "נקה סינון",
   "categoryChipSemanticLabel": "עברו אל {category}",
   "@categoryChipSemanticLabel": {
     "placeholders": { "category": { "type": "String" } }

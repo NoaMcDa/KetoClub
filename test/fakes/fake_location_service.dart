@@ -19,6 +19,12 @@ final class FakeLocationService implements LocationService {
   /// How many times [current] has been called.
   int currentCallCount = 0;
 
+  /// When non-null, every [current] call waits for this future before it
+  /// answers — the same shape `FakeMenuClassifier.gate` uses, so a test
+  /// can look at the screen while a locate is still in flight (issue
+  /// #63).
+  Future<void>? gate;
+
   /// What [openSettings] answers. Settable so a test can script a
   /// platform that reports it could not open its settings page.
   bool openSettingsResult = true;
@@ -29,6 +35,8 @@ final class FakeLocationService implements LocationService {
   @override
   Future<LocationResult> current() async {
     currentCallCount++;
+    final pending = gate;
+    if (pending != null) await pending;
     return result;
   }
 

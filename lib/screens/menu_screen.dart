@@ -31,6 +31,7 @@ import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
+import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
 
@@ -243,10 +244,35 @@ class _MenuScreenState extends State<MenuScreen> {
     final menu = controller.menu;
     if (menu == null) {
       final failure = controller.fetchFailure;
-      if (failure == null) return Center(child: Text(l10n.menuLoading));
+      if (failure == null) return _fetchingSkeleton(l10n);
       return _fetchFailureView(context, l10n, controller, failure);
     }
     return _loadedView(context, l10n, controller, menu);
+  }
+
+  /// Three [DishCardSkeleton]s in place of the old "Reading the menu…"
+  /// text, for [LoadPhase.fetching] (issue #63): a run of static,
+  /// two-tone cards shaped like the ones about to load, wrapped in one
+  /// live [Semantics] label — [l10n]'s own `menuLoading` copy — since the
+  /// cards themselves exclude their own semantics.
+  Widget _fetchingSkeleton(AppLocalizations l10n) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Semantics(
+        liveRegion: true,
+        label: l10n.menuLoading,
+        child: const Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            DishCardSkeleton(),
+            SizedBox(height: 12),
+            DishCardSkeleton(),
+            SizedBox(height: 12),
+            DishCardSkeleton(),
+          ],
+        ),
+      ),
+    );
   }
 
   /// A failed fetch: [fetchFailureMessage] plus the action
@@ -332,7 +358,22 @@ class _MenuScreenState extends State<MenuScreen> {
             ?sourceLine,
             const SizedBox(height: 12),
             ...banners,
-            Center(child: Text(l10n.menuEmpty)),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(l10n.menuEmpty, textAlign: TextAlign.center),
+                    const SizedBox(height: 12),
+                    OutlinedButton(
+                      onPressed: () => _retry(controller.refresh),
+                      child: Text(l10n.actionRefreshMenu),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       );
@@ -407,7 +448,7 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
           const SizedBox(height: 8),
           if (rows.isEmpty)
-            Center(child: Text(l10n.menuNoResults))
+            _noVisibleRows(l10n, controller)
           else
             ..._dishRows(context, controller, localeTag, rows),
           if (analysed && controller.unclassifiedNames.isNotEmpty)
@@ -536,6 +577,39 @@ class _MenuScreenState extends State<MenuScreen> {
       constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
       visualDensity: VisualDensity.compact,
       onPressed: () => unawaited(widget.externalLinkOpener.open(url)),
+    );
+  }
+
+  /// The empty state for [MenuController.visibleRows] (issue #63): the
+  /// existing `menuNoResults` copy, plus a "Clear filter" action that
+  /// resets `controller.filter` to [MenuFilter.all] — shown only when a
+  /// verdict tile, not the search field, is what emptied the list.
+  ///
+  /// The search field already carries its own clear button
+  /// (`MenuSearchField`, issue #51) for the case where a typed query is
+  /// what narrowed the list to nothing, so this action does not also
+  /// reset [MenuController.query] — the two clears stay independent, each
+  /// next to the control it undoes.
+  Widget _noVisibleRows(AppLocalizations l10n, MenuController controller) {
+    final canClearFilter = controller.filter != MenuFilter.all;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(l10n.menuNoResults, textAlign: TextAlign.center),
+            if (canClearFilter) ...[
+              const SizedBox(height: 12),
+              OutlinedButton(
+                onPressed: () =>
+                    unawaited(controller.setFilter(MenuFilter.all)),
+                child: Text(l10n.menuClearFilter),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 

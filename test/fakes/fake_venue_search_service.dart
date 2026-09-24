@@ -40,6 +40,12 @@ class FakeVenueSearchService implements VenueSearchService {
   /// Every [byName] call, in call order.
   final List<ByNameCall> byNameCalls = <ByNameCall>[];
 
+  /// When non-null, every [nearby] or [byName] call waits for this future
+  /// before it answers — the same shape `FakeMenuClassifier.gate` uses,
+  /// so a test can look at the screen while a search is still in flight
+  /// (issue #63).
+  Future<void>? gate;
+
   /// Queues [result] to be returned starting with the next search.
   void queueResult(VenueSearchResult result) => _queue.add(result);
 
@@ -61,6 +67,8 @@ class FakeVenueSearchService implements VenueSearchService {
       longitude: longitude,
       language: language,
     ));
+    final pending = gate;
+    if (pending != null) await pending;
     return _next();
   }
 
@@ -80,6 +88,8 @@ class FakeVenueSearchService implements VenueSearchService {
     // The interface's promise: a blank query finds nothing. It does not
     // consume a queued result.
     if (query.trim().isEmpty) return const VenuesFound(<Venue>[]);
+    final pending = gate;
+    if (pending != null) await pending;
     return _next();
   }
 

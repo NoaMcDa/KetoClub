@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
@@ -9,7 +11,9 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/saved_screen.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/state/saved_controller.dart';
+import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:provider/provider.dart';
 
 import '../fakes/fake_menu_repository.dart';
@@ -60,12 +64,16 @@ Future<void> _pump(
   SavedController controller, {
   Locale locale = const Locale('en'),
   ValueChanged<String>? onNavigate,
+  ThemeData? theme,
+  List<NavigatorObserver> navigatorObservers = const <NavigatorObserver>[],
 }) {
   return tester.pumpWidget(
     MaterialApp(
+      theme: theme,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: locale,
+      navigatorObservers: navigatorObservers,
       onGenerateRoute: (settings) => MaterialPageRoute<void>(
         settings: settings,
         builder: (_) {
@@ -82,22 +90,94 @@ Future<void> _pump(
   );
 }
 
+/// A [NavigatorObserver] recording the name of every route a
+/// [Navigator.pushReplacementNamed] call replaces the current one with
+/// (issue #63) — the shape `AppShell`'s own tab switch uses, and the way
+/// [SavedScreen]'s "Find a restaurant" action switches to Explore.
+final class _ReplaceRecordingObserver extends NavigatorObserver {
+  /// Every replacement route's name, in call order.
+  final List<String?> replacedWith = <String?>[];
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    replacedWith.add(newRoute?.settings.name);
+  }
+}
+
 void main() {
   group('SavedScreen', () {
-    testWidgets('shows the reworked empty state when nothing is cached', (
-      tester,
-    ) async {
-      // Arrange
-      final controller = SavedController(FakeMenuRepository());
+    for (final entry in {
+      'light': AppTheme.light(),
+      'dark': AppTheme.dark(),
+    }.entries) {
+      testWidgets(
+        'shows three SavedEntrySkeletons under the ${entry.key} theme '
+        'while the initial load is in flight (issue #63)',
+        (tester) async {
+          // Arrange: hold savedMenus() open so the transient isLoading
+          // state stays on screen long enough to assert against.
+          final gate = Completer<void>();
+          final repository = FakeMenuRepository()..savedMenusGate = gate.future;
+          final controller = SavedController(repository);
 
-      // Act
-      await _pump(tester, controller);
-      await tester.pumpAndSettle();
+          // Act
+          await _pump(tester, controller, theme: entry.value);
+          await tester.pump();
 
-      // Assert
-      expect(find.text(_en.savedPlaceholderTitle), findsOneWidget);
-      expect(find.text(_en.savedPlaceholderBody), findsOneWidget);
-    });
+          // Assert: the skeletons stand in for a spinner, announced once
+          // through a Semantics label.
+          expect(find.byType(SavedEntrySkeleton), findsNWidgets(3));
+          expect(find.bySemanticsLabel(_en.savedLoading), findsOneWidget);
+
+          // Cleanup: release the gate so no timer/future is left pending.
+          gate.complete();
+          await tester.pumpAndSettle();
+        },
+      );
+    }
+
+    for (final entry in {
+      'light': AppTheme.light(),
+      'dark': AppTheme.dark(),
+    }.entries) {
+      testWidgets(
+        'shows the reworked empty state and a Find a restaurant action '
+        'under the ${entry.key} theme when nothing is cached (issue #63)',
+        (tester) async {
+          // Arrange
+          final controller = SavedController(FakeMenuRepository());
+
+          // Act
+          await _pump(tester, controller, theme: entry.value);
+          await tester.pumpAndSettle();
+
+          // Assert
+          expect(find.text(_en.savedPlaceholderTitle), findsOneWidget);
+          expect(find.text(_en.savedPlaceholderBody), findsOneWidget);
+          expect(find.text(_en.venueSearchLabel), findsOneWidget);
+        },
+      );
+    }
+
+    testWidgets(
+      "tapping the empty state's Find a restaurant action switches to "
+      "the Explore tab — a pushReplacementNamed('/'), the same route "
+      "AppShell's own tab tap uses (issue #63)",
+      (tester) async {
+        // Arrange
+        final controller = SavedController(FakeMenuRepository());
+        final observer = _ReplaceRecordingObserver();
+        await _pump(tester, controller, navigatorObservers: [observer]);
+        await tester.pumpAndSettle();
+
+        // Act
+        await tester.tap(find.text(_en.venueSearchLabel));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(observer.replacedWith, ['/']);
+      },
+    );
 
     testWidgets('lists a cached menu with its venue name, source line and '
         'dish count', (tester) async {
