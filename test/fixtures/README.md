@@ -2,8 +2,17 @@
 
 ## Wolt
 
-`wolt_vitrina_lilinblum_menu.json` and `wolt_malformed_menu.json` are
-**synthetic**, not recorded responses, contrary to the default rule in
+### `wolt_hamosad_assortment.json` — recorded, real
+
+A real recording of Wolt's consumer-assortment endpoint (`GET consumer-api.wolt.com/consumer-api/consumer-assortment/v1/venues/slug/hamosad/assortment`), captured 2026-09-25 with the browser `User-Agent` `browserUserAgent` sends. It is the payload of a real Tel Aviv venue on Wolt today and carries only public menu data — the redaction pass found no key or string value shaped like a token, session id, JWT or credential.
+
+This fixture is **not yet read by `WoltMenuMapper`**: the mapper still targets the retired `/v4/venues/slug/{slug}/menu/data` shape that `wolt_vitrina_lilinblum_menu.json` below covers. The port from `/v4` to the assortment endpoint is issue #168; this fixture is checked in ahead of that port so the assortment shape is version-controlled from the moment it was captured, and any drift between now and the port is a diff on this file. The filename ends `_assortment.json` rather than `_menu.json` on purpose, so `wolt_fixture_shape_test.dart` (which auto-picks up `wolt_*_menu.json`) does not run its `/v4`-shaped assertions against this file. Rename it — and update the shape test to know both shapes — as part of #168.
+
+The endpoint was chosen because the previously-shipped `/v4/venues/slug/{slug}/menu/data` endpoint now answers `HTTP 200` with a zero-byte body for every anonymous caller (measured against `hamosad` and `vitrina-lilinblum` on 2026-09-25, with and without the full web-client header set — see the diagnostic thread on #168). The `_fixture_note` first key names the venue, the endpoint, the timestamp, the headers sent, and what was redacted, and doubles as an unknown-top-level-key test once the mapper is ported.
+
+### `wolt_vitrina_lilinblum_menu.json` and `wolt_malformed_menu.json` — synthetic, `/v4` shape
+
+**Synthetic**, not recorded responses, contrary to the default rule in
 architecture.md §18.4 that a fixture is a recorded real response.
 
 Both files say so in their own first key, `_fixture_note`, which
