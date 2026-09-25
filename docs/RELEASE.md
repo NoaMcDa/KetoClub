@@ -38,17 +38,21 @@ KetoClub's own backend.
 
 ### Fixtures (#22, #44)
 
-The Wolt and 10bis fixtures in `test/fixtures/` are synthetic until
+The Wolt menu fixture (`wolt_hamosad_menu.json`) is a real recording of
+the consumer-assortment endpoint (#168); the 10bis one is synthetic until
 recorded from a real response. Re-record them when the upstream shape may
 have drifted, or at least once before a release that changes either
 adapter or mapper.
 
-- [ ] Wolt, through the proxy (needs the backend running, above):
+- [ ] Wolt: `tool/record_wolt_fixture.sh hamosad` directly against Wolt (it
+      sends the web-client headers, redacts, writes the `_fixture_note` and
+      runs the shape test). Through the proxy instead (needs the backend
+      running, above), then add a `_fixture_note` by hand:
       ```bash
-      curl -sS localhost:8000/v1/proxy/wolt/v4/venues/slug/vitrina-lilinblum/menu/data \
-        -o test/fixtures/wolt_vitrina_lilinblum_menu.json
+      curl -sS localhost:8000/v1/proxy/wolt/venues/slug/hamosad/assortment \
+        -o test/fixtures/wolt_hamosad_menu.json
       ```
-      or `tool/record_wolt_fixture.sh <venue-slug>` directly against Wolt.
+      An empty body means Wolt moved the menu endpoint again (#168).
 - [ ] 10bis, through the proxy:
       ```bash
       curl -sS localhost:8000/v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu \
@@ -60,7 +64,7 @@ adapter or mapper.
       what the mapper's fixture test runs against once re-pointed at the
       real file.
 - [ ] Both curls need a machine with a real network path to
-      `restaurant-api.wolt.com` and `www.10bis.co.il`; neither is reachable
+      `consumer-api.wolt.com` and `www.10bis.co.il`; neither is reachable
       from this repository's sandbox or CI.
 
 ### Release builds
@@ -103,7 +107,8 @@ adapter or mapper.
 ### Gates
 
 - [ ] `test/architecture/import_rules_test.dart` passes: the boundary test
-      that keeps `restaurant-api.wolt.com` inside `wolt_adapter.dart`,
+      that keeps Wolt's consumer-assortment path inside
+      `wolt_adapter.dart` and the retired `menu/data` path out of `lib/`,
       `/v1/chat` inside `backend_chat_client.dart`, and
       `KETOCLUB_BACKEND_URL` inside `di.dart` only, and asserts `openrouter`,
       `sk-or-` and `googleapis.com` appear nowhere in `lib/`.

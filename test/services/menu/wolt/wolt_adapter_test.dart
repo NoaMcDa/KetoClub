@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -9,13 +10,14 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/menu/wolt/wolt_adapter.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/wolt_headers.dart';
 
 import '../platform_menu_adapter_contract.dart';
 
 /// The ref used everywhere a working fetch is exercised.
 const VenueRef _refItHandles = VenueRef(
   source: MenuSource.wolt,
-  platformId: 'vitrina-lilinblum',
+  platformId: 'hamosad',
 );
 
 /// A ref on a different [MenuSource], for the shared contract suite.
@@ -24,9 +26,8 @@ const VenueRef _refItRejects = VenueRef(
   platformId: 'some-tenbis-id',
 );
 
-/// A minimal, valid, empty Wolt payload.
+/// A minimal, valid, empty consumer-assortment payload.
 final String _emptyMenuBody = jsonEncode(<String, Object?>{
-  'currency': 'ILS',
   'categories': <Object?>[],
   'items': <Object?>[],
   'options': <Object?>[],
@@ -34,8 +35,13 @@ final String _emptyMenuBody = jsonEncode(<String, Object?>{
 
 /// The expected request URL for [_refItHandles].
 final Uri _expectedUri = Uri.https(
-  'restaurant-api.wolt.com',
-  '/v4/venues/slug/vitrina-lilinblum/menu/data',
+  'consumer-api.wolt.com',
+  '/consumer-api/consumer-assortment/v1/venues/slug/hamosad/assortment',
+);
+
+/// A canonical lowercase version 4 UUID.
+final RegExp _uuid4 = RegExp(
+  r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
 );
 
 /// Builds an adapter whose client always answers with a valid, empty
@@ -69,7 +75,7 @@ void main() {
       expect(source, equals(MenuSource.wolt));
     });
 
-    test('fetch sends the exact venue/data URL', () async {
+    test('fetch sends the exact consumer-assortment URL', () async {
       // Arrange
       Uri? capturedUri;
       final adapter = WoltMenuAdapter(
@@ -105,6 +111,81 @@ void main() {
       expect(capturedHeaders, isNotNull);
       expect(capturedHeaders!['User-Agent'], equals(browserUserAgent));
       expect(capturedHeaders!['Accept'], equals('application/json'));
+    });
+
+    test("fetch sends wolt.com's web-client header set", () async {
+      // Arrange
+      Map<String, String>? capturedHeaders;
+      final adapter = WoltMenuAdapter(
+        client: MockClient((request) async {
+          capturedHeaders = request.headers;
+          return http.Response(_emptyMenuBody, 200);
+        }),
+        runsInBrowser: false,
+      );
+
+      // Act
+      await adapter.fetch(_refItHandles);
+
+      // Assert: the set the recorded fixture's _fixture_note names, plus
+      // the rest of what wolt.com sends (phase2_discovery_research.md
+      // §2.2).
+      final headers = capturedHeaders!;
+      expect(headers['platform'], equals('Web'));
+      expect(headers['app-language'], equals(woltDefaultAppLanguage));
+      expect(headers['client-version'], equals(woltClientVersion));
+      expect(headers['clientversionnumber'], equals(woltClientVersion));
+      expect(headers['w-wolt-session-id'], equals(woltSessionIdNoConsent));
+      expect(headers['x-wolt-web-clientid'], matches(_uuid4));
+    });
+
+    test('fetch keeps one web client id per adapter, drawn from the given '
+        'random source', () async {
+      // Arrange
+      final ids = <String?>[];
+      http.Client recordingClient() => MockClient((request) async {
+        ids.add(request.headers['x-wolt-web-clientid']);
+        return http.Response(_emptyMenuBody, 200);
+      });
+      final first = WoltMenuAdapter(
+        client: recordingClient(),
+        random: Random(1),
+        runsInBrowser: false,
+      );
+      final second = WoltMenuAdapter(
+        client: recordingClient(),
+        random: Random(2),
+        runsInBrowser: false,
+      );
+
+      // Act
+      await first.fetch(_refItHandles);
+      await first.fetch(_refItHandles);
+      await second.fetch(_refItHandles);
+
+      // Assert
+      expect(ids[0], equals(ids[1]));
+      expect(ids[2], isNot(equals(ids[0])));
+    });
+
+    test('fetch maps an empty 200 body to platformChanged, never an empty '
+        'menu', () async {
+      // Arrange: what Wolt's retired menu endpoint answers every anonymous
+      // caller with (issues #22, #168).
+      final adapter = WoltMenuAdapter(
+        client: MockClient((request) async => http.Response('', 200)),
+      );
+
+      // Act
+      final result = await adapter.fetch(_refItHandles);
+
+      // Assert
+      expect(
+        result,
+        equals(
+          const MenuFetchFailed(reason: MenuFetchFailureReason.platformChanged),
+        ),
+      );
     });
 
     test('fetch returns a menu carrying the requested ref', () async {
@@ -286,6 +367,7 @@ void main() {
       expect(capturedHeaders, isNotNull);
       expect(capturedHeaders!.containsKey('User-Agent'), isFalse);
       expect(capturedHeaders!['Accept'], equals('application/json'));
+      expect(capturedHeaders!['platform'], equals('Web'));
     });
 
     test('fetch maps a TimeoutException to offline', () async {
@@ -313,8 +395,7 @@ void main() {
 
     /// The proxy request URL a base with no trailing slash should produce.
     final expectedProxyUri = Uri.parse(
-      'http://localhost:8000/v1/proxy/wolt/v4/venues/slug/my-venue/'
-      'menu/data',
+      'http://localhost:8000/v1/proxy/wolt/venues/slug/my-venue/assortment',
     );
 
     runPlatformMenuAdapterContract(
@@ -382,11 +463,31 @@ void main() {
       // Act
       await adapter.fetch(ref);
 
-      // Assert: the backend sets its own User-Agent
-      // (`backend_plan.md` §3.3).
-      expect(capturedHeaders, isNotNull);
-      expect(capturedHeaders!.containsKey('User-Agent'), isFalse);
-      expect(capturedHeaders!['Accept'], equals('application/json'));
+      // Assert: the backend sets its own User-Agent and Wolt headers
+      // (`backend_plan.md` §3.3), so only Accept is sent.
+      expect(
+        capturedHeaders,
+        equals(<String, String>{'Accept': 'application/json'}),
+      );
+    });
+
+    test('fetch maps an empty proxied 200 body to platformChanged', () async {
+      // Arrange
+      final adapter = WoltMenuAdapter(
+        client: MockClient((request) async => http.Response('', 200)),
+        proxyBase: Uri.parse('http://localhost:8000'),
+      );
+
+      // Act
+      final result = await adapter.fetch(ref);
+
+      // Assert
+      expect(
+        result,
+        equals(
+          const MenuFetchFailed(reason: MenuFetchFailureReason.platformChanged),
+        ),
+      );
     });
 
     test(

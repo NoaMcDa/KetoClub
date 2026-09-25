@@ -11,6 +11,7 @@ import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/services/venue/wolt/wolt_venue_mapper.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/geo.dart';
+import 'package:ketoclub/utils/wolt_headers.dart';
 
 /// Searches Wolt's discovery endpoints for venues
 /// (`phase2_discovery_research.md` §2, §5, issue #39).
@@ -99,7 +100,7 @@ final class WoltVenueSearchService implements VenueSearchService {
   /// Deliberately **not** KetoClub's install id, which is sent to
   /// KetoClub's backend and nowhere else (D12,
   /// `phase2_discovery_research.md` §2.2).
-  late final String _webClientId = _uuid4(_random ?? Random.secure());
+  late final String _webClientId = woltWebClientId(_random ?? Random.secure());
 
   @override
   Future<VenueSearchResult> nearby({
@@ -172,10 +173,10 @@ final class WoltVenueSearchService implements VenueSearchService {
     return _sorted(result, latitude, longitude);
   }
 
-  /// The request headers: §2.2's web set on a direct call, only
-  /// `Accept`/`Content-Type` and the [installId] through the proxy, which
-  /// sets Wolt's headers itself and must receive nothing it would have to
-  /// strip.
+  /// The request headers: §2.2's web set ([woltWebHeaders]) on a direct
+  /// call, only `Accept`/`Content-Type` and the [installId] through the
+  /// proxy, which sets Wolt's headers itself and must receive nothing it
+  /// would have to strip.
   Map<String, String> _headers(
     String language, {
     required bool isPost,
@@ -184,17 +185,10 @@ final class WoltVenueSearchService implements VenueSearchService {
     'Accept': 'application/json',
     if (isPost) 'Content-Type': 'application/json',
     BackendChatClient.installIdHeader: ?installId,
-    if (proxyBase == null) ...<String, String>{
-      'platform': 'Web',
-      'client-version': woltClientVersion,
-      'clientversionnumber': woltClientVersion,
-      'app-language': language,
-      'x-wolt-web-clientid': _webClientId,
-      'w-wolt-session-id': woltSessionIdNoConsent,
-      // A direct call only ever happens natively (a browser is
-      // refused above), where the User-Agent is ours to set.
-      'User-Agent': browserUserAgent,
-    },
+    // A direct call only ever happens natively (a browser is refused
+    // above), where the User-Agent is ours to set.
+    if (proxyBase == null)
+      ...woltWebHeaders(language: language, webClientId: _webClientId),
   };
 
   /// Sends one request and maps every outcome to a result. Never throws.
@@ -282,17 +276,5 @@ final class WoltVenueSearchService implements VenueSearchService {
         ? rendered.substring(0, rendered.length - 1)
         : rendered;
     return Uri.parse('$trimmed/v1/proxy/wolt/pages/$page');
-  }
-
-  /// A random (version 4) UUID drawn from [random], in the canonical
-  /// lowercase 8-4-4-4-12 form.
-  static String _uuid4(Random random) {
-    final bytes = List<int>.generate(16, (_) => random.nextInt(256));
-    bytes[6] = (bytes[6] & 0x0f) | 0x40;
-    bytes[8] = (bytes[8] & 0x3f) | 0x80;
-    final hex = bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
-    return '${hex.substring(0, 8)}-${hex.substring(8, 12)}-'
-        '${hex.substring(12, 16)}-${hex.substring(16, 20)}-'
-        '${hex.substring(20)}';
   }
 }

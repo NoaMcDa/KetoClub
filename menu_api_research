@@ -26,6 +26,7 @@ Wolt offers the most accessible, consistent, and structured menu API among all d
 * HTTP Method: GET
 * Target Endpoint:
 * GET [https://restaurant-api.wolt.com/v4/venues/slug/](https://restaurant-api.wolt.com/v4/venues/slug/){venue_slug}/menu/data
+* Update 2026-09-25 (issues #22, #168): the endpoint above now answers every anonymous caller with HTTP 200 and a zero-byte body, with or without the web-client headers. KetoClub reads GET https://consumer-api.wolt.com/consumer-api/consumer-assortment/v1/venues/slug/{venue_slug}/assortment instead, with the headers platform: Web and app-language (plus the rest of the web-client set). Differences from the schema below, from the real recording in test/fixtures/wolt_hamosad_menu.json: there is no currency field anywhere (ILS is assumed); categories also carry subcategories (empty in the recording); an item's options are objects {id, option_id, name, prerequisite_values, multi_choice_config} whose option_id points into the top-level options, rather than bare ids; photos are images[].url, not image; option groups have type choice/multi_choice, not radio/checkbox; items carry disabled_info; no venue name is present. No item in the recording is malformed (no null price), so the mapper's "one malformed entry fails the fetch" trade stands.
 Schema Structure
 The response separates data into normalized relational collections:
 * categories: List of category objects containing id, name, description, and an array of item_ids.

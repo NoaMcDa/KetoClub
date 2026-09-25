@@ -29,9 +29,9 @@ String _fixture(String fileName) =>
 /// The two well-formed platform fixtures, as the harness takes them.
 List<perf.PerfFixture> _fixtures() => <perf.PerfFixture>[
   perf.PerfFixture(
-    name: 'wolt_vitrina_lilinblum_menu.json',
+    name: 'wolt_hamosad_menu.json',
     format: perf.PerfPayloadFormat.wolt,
-    json: _fixture('wolt_vitrina_lilinblum_menu.json'),
+    json: _fixture('wolt_hamosad_menu.json'),
   ),
   perf.PerfFixture(
     name: 'tenbis_synthetic_menu.json',
@@ -170,7 +170,7 @@ void main() {
       expect(results.map((r) => r.label), [
         'decode + map (Wolt, synthetic)',
         'decode + map (10bis, synthetic)',
-        'decode + map (wolt_vitrina_lilinblum_menu.json)',
+        'decode + map (wolt_hamosad_menu.json)',
         'decode + map (tenbis_synthetic_menu.json)',
         'fingerprint',
         'rules engine',

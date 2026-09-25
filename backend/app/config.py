@@ -43,19 +43,22 @@ class Settings(BaseSettings):
     GEMINI_THINKING_BUDGET: int = 0
 
     # --- Proxy ----------------------------------------------------------------
-    # Upstream Wolt host for the proxy route (#95).
+    # Wolt host of the by-name venue search POST (#123). The menu proxy
+    # (#95) called this host too until #168 moved it to the assortment
+    # endpoint on WOLT_CONSUMER_BASE_URL.
     # Never taken from a request — hard-coded here so a misconfigured client
     # cannot redirect the proxy to an arbitrary host.
     WOLT_BASE_URL: str = "https://restaurant-api.wolt.com"
     # Upstream 10bis host for the proxy route (#122).
     # Never taken from a request, for the same reason as WOLT_BASE_URL.
     TENBIS_BASE_URL: str = "https://www.10bis.co.il"
-    # Second Wolt host: the "pages" venue-discovery endpoints live here,
-    # not on WOLT_BASE_URL (#123). Never taken from a request, for the
-    # same reason as WOLT_BASE_URL.
+    # Wolt's consumer host: the menu proxy's consumer-assortment endpoint
+    # (#168) and the "venues near a point" discovery page (#123). Never
+    # taken from a request, for the same reason as WOLT_BASE_URL.
     WOLT_CONSUMER_BASE_URL: str = "https://consumer-api.wolt.com"
     # Wolt's own web-client version string, sent as both `client-version`
-    # and `clientversionnumber`. A bare discovery request without it is
+    # and `clientversionnumber` on menu and discovery requests (#123,
+    # #168). A bare discovery request without it is
     # reported to answer 410 "update the app"
     # (phase2_discovery_research.md §2.2); bump this when Wolt's web
     # client moves on.

@@ -101,7 +101,7 @@ about any individual user — see §11.
 └──────────────────┼──────────────────┼──────────────────────────────────────────────┘
                    │                  │
         OS location services   ┌──────┴──────────────────────────────────────────┐
-                               │ restaurant-api.wolt.com*  www.10bis.co.il        │
+                               │ consumer-api.wolt.com*    www.10bis.co.il        │
                                │ tgp-api.tabit.cloud       ontopo.com             │
                                │ {KETOCLUB_BACKEND_URL}/v1/chat, /v1/proxy/wolt/… │
                                │   (backend holds the Gemini key, D11/D12)        │
@@ -327,6 +327,7 @@ ketoclub/
 │   │   ├── classification_rules.dart     # compiled regexes for the heuristic engine
 │   │   ├── text_normaliser.dart          # lowercase, strip niqqud/punctuation, for provenance
 │   │   ├── price_format.dart             # agorot → ILS, locale-aware formatting
+│   │   ├── wolt_headers.dart             # wolt.com's web-client header set (#168)
 │   │   └── keto_score.dart               # menu-level score from the dish verdicts, for KetoScoreBadge
 │   │
 │   └── l10n/
@@ -398,8 +399,12 @@ literal.
 - The full import graph of `lib/` has no cycles.
 - Four host-string rules, enforced by `test/architecture/import_rules_test.dart`
   (D11, D12 — supersedes the single `openrouter.ai` rule this bullet used to
-  state): `restaurant-api.wolt.com` appears under `lib/` only in
-  `services/menu/wolt/wolt_adapter.dart`; `/v1/chat` only in
+  state): `restaurant-api.wolt.com` appears under `lib/` only in the venue
+  search (`services/venue/wolt/wolt_venue_search_service.dart`, its by-name
+  POST); `consumer-api.wolt.com` only there and in
+  `services/menu/wolt/wolt_adapter.dart`, whose consumer-assortment path
+  (direct and through `/v1/proxy/wolt/venues/…`) appears nowhere else, and
+  the retired `menu/data` path nowhere at all (#168); `/v1/chat` only in
   `services/llm/backend_chat_client.dart`; `KETOCLUB_BACKEND_URL` only in
   `di.dart`; and `openrouter`, `sk-or-` and `googleapis.com` appear nowhere
   under `lib/` at all — the app talks only to its own backend, never directly
@@ -451,7 +456,7 @@ The normalisation rules that matter:
 
 | Platform | Identifier | Price unit | Structure to flatten | Options |
 |---|---|---|---|---|
-| Wolt | `venue_slug` from the public URL | integer agorot → divide by 100 | `categories[].item_ids` → `items[]` by id | `options[]` by id; each value's `name` is appended to the dish's option text |
+| Wolt | `venue_slug` from the public URL | integer agorot → divide by 100; no currency in the payload, `ILS` assumed | `categories[].item_ids`, then each `subcategories[].item_ids` flattened into the parent → `items[]` by id | `items[].options[].option_id` → `options[]` by id; each value's `name` is appended to the dish's option text |
 | 10bis | numeric `restaurantId` | decimal ILS as-is | `categoriesList[].dishList[]` | `dishOptionsList[]` |
 | Tabit | `siteId` | check on first real payload | POS kitchen groups → categories | forced questions and modifiers |
 | Ontopo | `venue_id` | n/a | returns `menu_pdf_url` / `external_menu_url`, not items | n/a |
@@ -469,7 +474,25 @@ rules 3 and 7). An individually malformed `items[]` entry currently fails the wh
 fetch as `platformChanged`, on the grounds that a loud schema-drift signal beats a
 silently missing dish; if real payloads ship the occasional odd entry — a null price
 on a "call for price" item — that trade should be revisited against a real
-recording.
+recording. *(#168)* The one real recording, `wolt_hamosad_menu.json`, has no such
+entry, so the trade stands.
+
+*(#168)* Wolt's `/v4/venues/slug/{slug}/menu/data` endpoint began answering every
+anonymous caller with `200` and a zero-byte body (measured 2026-09-25 against two
+venues, with and without the web-client headers), so the Wolt adapter now reads the
+**consumer-assortment** endpoint wolt.com's own web app uses —
+`GET consumer-api.wolt.com/consumer-api/consumer-assortment/v1/venues/slug/{slug}/assortment`
+— sending the web-client header set §6.5's venue search already sent, now shared
+from `lib/utils/wolt_headers.dart`. The payload keeps the three flat collections, so
+the mapper's join survived; what changed is recorded in `wolt_menu_mapper.dart`'s
+class doc comment: no top-level `currency` (the mapper assumes `ILS`, the currency of
+every Wolt Israel venue), item options are objects whose `option_id` points into
+`options[]` (the item-level `name` labels the group when it differs), photos move to
+`images[0].url`, categories may carry `subcategories` (flattened into the parent,
+inferred — every recorded one is empty), a `disabled_info` item is kept, and no venue
+name is carried. An empty or non-JSON `2xx` body is still `platformChanged`, never an
+empty menu. Device cache keys (`wolt/<slug>`) did not change, so Saved entries and
+`lastVenue` survive the port.
 
 `MenuRepository` owns the adapter registry, resolves a pasted URL to a `VenueRef`,
 checks the cache first (§6.4), and is the only thing the controllers call.
@@ -851,11 +874,11 @@ fields and are not modelled until then.
 
 | Service | Endpoint | Auth | Priority | Notes |
 |---|---|---|---|---|
-| **Wolt** | `GET https://restaurant-api.wolt.com/v4/venues/slug/{slug}/menu/data` | none | Phase 1 | Cleanest schema; prices in agorot. iOS/Android call this directly; the web build calls it through the backend proxy below when configured (D11) |
+| **Wolt** | `GET https://consumer-api.wolt.com/consumer-api/consumer-assortment/v1/venues/slug/{slug}/assortment` | none; the web-client header set (`platform: Web`, `app-language`, client version, a per-process `x-wolt-web-clientid`) | Phase 1, ported in #168 | Cleanest schema; prices in agorot; no currency (`ILS` assumed). iOS/Android call this directly; the web build calls it through the backend proxy below when configured (D11). Replaced `restaurant-api.wolt.com/v4/venues/slug/{slug}/menu/data`, which answers every anonymous caller with an empty `200` |
 | **10bis** | `GET https://www.10bis.co.il/api/v1.0/Restaurants/{restaurantId}/Menu` | none | Phase 1–2 | `categoriesList → dishList`; decimal prices |
 | **Tabit** | `GET https://tgp-api.tabit.cloud/menu/v2/{siteId}` (alt: `online.tabit.cloud/api/v1/ordering/menu?siteId=`) | session / anonymous token from the QR landing | Phase 2+ | Dine-in venues absent from delivery apps |
 | **Ontopo** | `POST https://ontopo.com/api/loginAnonymously` → `GET https://ontopo.com/api/venue/{venueId}` | anonymous bearer | Phase 4 | Returns PDF/image links, needs the OCR path |
-| **KetoClub backend — Wolt proxy** | `GET {KETOCLUB_BACKEND_URL}/v1/proxy/wolt/v4/venues/slug/{slug}/menu/data` | none | Phase 3 (D11) | Allow-listed passthrough only — Wolt's status, body and `Content-Type` unchanged, 1 h server cache; used only by the web build with a backend configured |
+| **KetoClub backend — Wolt proxy** | `GET {KETOCLUB_BACKEND_URL}/v1/proxy/wolt/venues/slug/{slug}/assortment` | none | Phase 3 (D11), path moved in #168 | Allow-listed passthrough only — Wolt's status, body and `Content-Type` unchanged, 1 h server cache of non-empty `2xx` bodies; used only by the web build with a backend configured |
 | **KetoClub backend — chat** | `POST {KETOCLUB_BACKEND_URL}/v1/chat` | `X-KetoClub-Install-Id` (no model key from the client) | Phase 3 (D12) | Forwards one completion per menu to Google Gemini; see §9 |
 
 All restaurant endpoints are undocumented internal APIs discovered by network
@@ -1176,8 +1199,10 @@ should not reach a log or a widget, even with no bearer token left to leak.
     --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000` against a running
     `cd backend && uv run uvicorn app.main:app --reload --port 8000` (see
     `backend/README.md` for the full setup and its manual end-to-end check).
-    `GET /v1/proxy/wolt/v4/venues/slug/{slug}/menu/data` forwards to Wolt and
-    passes its status, body and `Content-Type` back unchanged, so
+    `GET /v1/proxy/wolt/venues/slug/{slug}/assortment` (#168; `/v4/venues/
+    slug/{slug}/menu/data` until Wolt emptied that endpoint) forwards to Wolt's
+    consumer-assortment endpoint with the web-client header set and passes its
+    status, body and `Content-Type` back unchanged, so
     `WoltMenuAdapter`'s existing 404/`notFound` and other-status/
     `platformChanged` mapping needs no change; a proxy-side 502/504 (Wolt itself
     unreachable or slow) maps to `offline`, and the backend being unreachable at
@@ -1306,8 +1331,12 @@ about that.
 **D11 — A backend exists, as an accelerator.** *(Amends D1, D9 and D10.)*
 `backend/` is a small FastAPI service, run locally on `localhost:8000` (hosting
 beyond that is still open, §17). It ships three routes: `GET /v1/health`;
-`GET /v1/proxy/wolt/v4/venues/slug/{slug}/menu/data`, an allow-listed passthrough
-that returns Wolt's status, body and `Content-Type` unchanged (404 included),
+`GET /v1/proxy/wolt/v4/venues/slug/{slug}/menu/data` — since #168
+`GET /v1/proxy/wolt/venues/slug/{slug}/assortment`, forwarding to Wolt's
+consumer-assortment endpoint on `WOLT_CONSUMER_BASE_URL`, because the `/v4` one
+began answering every anonymous caller with an empty `200` — an allow-listed
+passthrough that returns Wolt's status, body and `Content-Type` unchanged (404
+included),
 with a 1 h per-slug server cache (`X-KetoClub-Cache: hit|miss`) and its own
 originated statuses — 502 on a connect failure, 504 on an upstream timeout,
 never anything else; and `POST /v1/chat` (D12, below). The web build fetches

@@ -123,11 +123,12 @@ cd backend && uv run pytest
 ## 5. Things that need a real network path
 
 The CI runners and the cloud sandbox cannot reach `restaurant-api.wolt.com`,
-`consumer-api.wolt.com` or `www.10bis.co.il`, so the checked-in fixtures are
-synthetic. From a normal machine:
+`consumer-api.wolt.com` or `www.10bis.co.il`, so every checked-in fixture
+but the Wolt menu one (`wolt_hamosad_menu.json`, recorded on a laptop for
+issue #168) is synthetic. From a normal machine:
 
 ```bash
-tool/record_wolt_fixture.sh vitrina-lilinblum     # real Wolt menu fixture (issue #22)
+tool/record_wolt_fixture.sh hamosad     # re-record the real Wolt menu fixture
 ```
 
 `phase2_discovery_research.md` §2.4 has the two discovery requests to record

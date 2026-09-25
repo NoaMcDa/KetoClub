@@ -27,7 +27,8 @@ headless Chromium ──▶ build/web (static, :8080) ──▶ backend (:8000) 
 
 1. **The stub upstream** — `tool/visual_audit/stub_upstream.py` serves the
    fixtures at the paths `backend/app/services/wolt.py` and `tenbis.py`
-   call: the Wolt menu fixture for `vitrina-lilinblum`, a menu mirroring
+   call: the recorded Wolt menu fixture for `hamosad` (the
+   consumer-assortment path, issue #168), a menu mirroring
    `.design/Main.dc.html`'s dishes for any other slug, the two discovery
    fixtures at `/v1/pages/restaurants` and `/v1/pages/search`, the 10bis
    fixture, and generated dish photos under `/img/`.

@@ -142,7 +142,7 @@ exist, which keeps them out of the coverage denominator.
 ## Outstanding before release
 
 Several things are genuinely unfinished. None is a surprise; each is unfinished
-for a stated reason, and issues #16, #22, #38, #44 and #65 are still **open**
+for a stated reason, and issues #16, #38, #44 and #65 are still **open**
 on GitHub — tooling exists for several of them, it did not close any of them.
 
 1. **The pinned Gemini model has never been called from this environment**
@@ -161,19 +161,24 @@ on GitHub — tooling exists for several of them, it did not close any of them.
    this check, was deleted along with `OpenRouterClient` (#102, D12) — there is
    no client-side model to measure any more, since the app never calls a model
    provider directly.
-2. **The Wolt menu fixture is synthetic** (§18.4 — issue #22).
-   `test/fixtures/wolt_vitrina_lilinblum_menu.json` says so in its first key, and
-   `test/fixtures/README.md` carries the reasoning. It was built to contain the
-   shapes the mapper must survive, but it cannot tell you what Wolt actually
-   sends. **Also now a one-command job**: `tool/record_wolt_fixture.sh
-   <venue-slug>` records a real `menu/data` payload as a checked-in fixture, from
-   any machine that can reach `restaurant-api.wolt.com` (this one cannot).
-   Nobody has run it yet either. Raised stakes since Phase 2's discovery
-   research: two 2025–2026 third-party sources report this same endpoint now
-   answers `200` with an **empty body** without a user token
-   (`phase2_discovery_research.md` §2.5) — running the recorder either refutes
-   that or means the shipped menu path is broken for real users today, which
-   would outrank every other item on this list.
+2. **The Wolt menu fixture is real now; the endpoint moved** (issues #22,
+   #168, both closed by the port). Wolt's `/v4/venues/slug/{slug}/menu/data`
+   answers every anonymous caller with `200` and a zero-byte body — measured
+   2026-09-25 by the owner against two venues, with and without the web-client
+   header set — so every Wolt menu in the shipped app read `platformChanged`.
+   `WoltMenuAdapter` and the backend's menu proxy now call Wolt's
+   consumer-assortment endpoint (`consumer-api.wolt.com/consumer-api/
+   consumer-assortment/v1/venues/slug/{slug}/assortment`) with the web-client
+   header set (`lib/utils/wolt_headers.dart`), and `WoltMenuMapper` reads its
+   shape. `test/fixtures/wolt_hamosad_menu.json` is a **real recording** of it
+   (12 categories, 56 items), the fixture the mapper and shape tests run
+   against; the synthetic `/v4` fixture is gone. What the recording could not
+   settle: the payload names no currency (the mapper defaults to `ILS`), no
+   venue name, and every recorded `subcategories` list is empty, so the
+   flattening rule for them is inferred, not observed. Re-record with
+   `tool/record_wolt_fixture.sh <slug>` from any machine that can reach
+   `consumer-api.wolt.com` (this one cannot). The Discovery-chain
+   recordings below are still owed.
 3. **The Wolt discovery fixtures are synthetic too** (issue #38, tracked
    separately from #22). `wolt_pages_restaurants.json` and
    `wolt_pages_search.json` were hand-built from third-party client
@@ -217,8 +222,12 @@ spacing values) is enforced by a test; pixel fidelity by no test at all.
 - **A single malformed `items[]` entry fails a whole Wolt fetch** as
   `platformChanged`, on the theory that a loud schema-drift signal beats a silently
   missing dish. If real payloads ship the occasional odd entry — a null price on a
-  "call for price" item — this turns one bad dish into an unreadable menu. Revisit
-  when the fixture is re-recorded; the trade is documented in `wolt_menu_mapper.dart`.
+  "call for price" item — this turns one bad dish into an unreadable menu. The one
+  real recording (`wolt_hamosad_menu.json`, #168) has no such entry — every item has
+  an integer price, a string description and well-formed options — so the trade
+  stands; the two joins stay lenient (an unknown `item_id` or `option_id` is
+  skipped, and the recording does carry two dangling `option_id`s). The trade is
+  documented in `wolt_menu_mapper.dart`.
 - **The keto-substitute guard scans a two-word window**, so `"rice, made from
   cauliflower"` produces a needless yellow ("omit the rice" on a dish with no rice).
   That fails in the safe direction — a pointless modification request, not the wrong

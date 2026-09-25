@@ -1,39 +1,49 @@
 #!/usr/bin/env bash
-# Records a real Wolt `menu/data` payload as a checked-in test fixture
-# (issue #22; see test/fixtures/README.md for why the checked-in
-# wolt_vitrina_lilinblum_menu.json is synthetic instead).
+# Records a real Wolt consumer-assortment payload — the endpoint
+# WoltMenuAdapter fetches (issue #168) — as a checked-in test fixture
+# (issue #22; test/fixtures/README.md).
 #
-# `restaurant-api.wolt.com` is unreachable from the build environment this
+# `consumer-api.wolt.com` is unreachable from the build environment this
 # script was written in — the egress proxy answers 403 to the CONNECT —
-# so it could not be run there. Run it from any machine with normal
-# internet access instead:
+# so run it from any machine with normal internet access instead:
 #
 #   tool/record_wolt_fixture.sh <venue-slug>
 #
-# Example (the canonical slug used across this repo's docs and fixtures):
+# Example (the venue the checked-in fixture was recorded from):
 #
-#   tool/record_wolt_fixture.sh vitrina-lilinblum
+#   tool/record_wolt_fixture.sh hamosad
 #
 # Writes test/fixtures/wolt_{slug}_menu.json, pretty-printed, prefixed
-# with a `_fixture_note` key naming the venue, the recording date, the
-# endpoint, and what was redacted. WoltMenuMapper ignores unknown
-# top-level keys by contract (see wolt_menu_mapper.dart's class doc
-# comment and wolt_menu_mapper_test.dart), so `_fixture_note` sitting
+# with a `_fixture_note` object naming the venue, the recording time, the
+# endpoint, the headers sent and what was redacted. WoltMenuMapper ignores
+# unknown top-level keys by contract (see wolt_menu_mapper.dart's class
+# doc comment and wolt_menu_mapper_test.dart), so `_fixture_note` sitting
 # alongside the real payload never affects mapping.
 #
 # Then runs test/services/menu/wolt/wolt_fixture_shape_test.dart, which
 # checks every field WoltMenuMapper reads is present and correctly
 # typed — so a schema drift in the real payload shows up immediately,
 # not the next time someone happens to run the suite.
+#
+# Wolt's older `restaurant-api.wolt.com/v4/venues/slug/{slug}/menu/data`
+# endpoint answers every anonymous caller with HTTP 200 and a zero-byte
+# body (measured 2026-09-25, issues #22 and #168), so it is not tried: a
+# body from it would be the wrong shape for WoltMenuMapper anyway. An
+# empty body from the assortment endpoint fails this script loudly for
+# the same reason.
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-# The same header lib/utils/constants.dart's `browserUserAgent` sends —
-# several platform APIs reject a request with no browser-shaped UA. Keep
-# the two in sync if it ever changes (test/fixtures/README.md carries the
-# same note for the curl command this script replaces).
+# The header set lib/utils/wolt_headers.dart's `woltWebHeaders` sends,
+# with the values lib/utils/constants.dart pins (`browserUserAgent`,
+# `woltClientVersion`, `woltSessionIdNoConsent`) and wolt_headers.dart's
+# `woltDefaultAppLanguage`. Keep them in sync if any changes. The
+# recording checked in on 2026-09-25 needed only the first four.
 readonly user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+readonly client_version='1.16.125'
+readonly app_language='en'
+readonly session_id='no-analytics-consent'
 
 # Key names redacted wherever they appear in the payload, case-insensitive
 # — a menu endpoint should carry none of these, but a platform can add a
@@ -42,7 +52,7 @@ readonly redact_key_pattern='token|secret|auth|session|apikey|api[_-]?key|passwo
 
 usage() {
   echo "Usage: tool/record_wolt_fixture.sh <venue-slug>" >&2
-  echo "Example: tool/record_wolt_fixture.sh vitrina-lilinblum" >&2
+  echo "Example: tool/record_wolt_fixture.sh hamosad" >&2
 }
 
 if [ "$#" -ne 1 ] || [ -z "$1" ]; then
@@ -50,7 +60,7 @@ if [ "$#" -ne 1 ] || [ -z "$1" ]; then
   exit 1
 fi
 
-for cmd in curl jq; do
+for cmd in curl jq uuidgen; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
     echo "record_wolt_fixture: '$cmd' is required but not on PATH." >&2
     exit 1
@@ -58,8 +68,11 @@ for cmd in curl jq; do
 done
 
 slug="$1"
-url="https://restaurant-api.wolt.com/v4/venues/slug/${slug}/menu/data"
+url="https://consumer-api.wolt.com/consumer-api/consumer-assortment/v1/venues/slug/${slug}/assortment"
 out_file="test/fixtures/wolt_${slug}_menu.json"
+# A fresh id per run, the way wolt.com keeps one per browser. Never
+# KetoClub's install id (D12).
+web_client_id="$(uuidgen | tr '[:upper:]' '[:lower:]')"
 
 tmp_body="$(mktemp)"
 trap 'rm -f "$tmp_body"' EXIT
@@ -69,6 +82,12 @@ set +e
 http_status="$(curl -sS -o "$tmp_body" -w '%{http_code}' \
   -H "User-Agent: $user_agent" \
   -H 'Accept: application/json' \
+  -H 'platform: Web' \
+  -H "app-language: $app_language" \
+  -H "client-version: $client_version" \
+  -H "clientversionnumber: $client_version" \
+  -H "x-wolt-web-clientid: $web_client_id" \
+  -H "w-wolt-session-id: $session_id" \
   "$url")"
 curl_exit=$?
 set -e
@@ -84,6 +103,15 @@ if [ "$http_status" != "200" ]; then
   echo "Response body was:" >&2
   cat "$tmp_body" >&2
   echo >&2
+  exit 1
+fi
+
+if [ ! -s "$tmp_body" ]; then
+  echo "record_wolt_fixture: FAILED — $url returned HTTP 200 with an EMPTY body." >&2
+  echo "This is how Wolt retired its previous menu endpoint (issues #22, #168):" >&2
+  echo "the app now shows 'platform changed' for every Wolt menu. Find the" >&2
+  echo "endpoint wolt.com's own web app reads a menu from (DevTools, Network)" >&2
+  echo "and open an issue before re-recording." >&2
   exit 1
 fi
 
@@ -123,10 +151,35 @@ redacted="$(jq --arg keys "$redact_key_pattern" '
 ' "$tmp_body")"
 
 recorded_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-note="Recorded ${recorded_at} from ${url} for venue slug \"${slug}\" by tool/record_wolt_fixture.sh. NOT synthetic. Redacted: any field whose key matched /${redact_key_pattern}/i, and any bearer-token- or JWT-shaped string value found anywhere in the payload, each replaced with the literal string \"[REDACTED]\". Re-run this script to refresh; do not hand-edit the payload below without updating this note."
 
-jq --arg note "$note" '{_fixture_note: $note} + .' <<<"$redacted" > "$out_file"
+jq \
+  --arg slug "$slug" \
+  --arg endpoint "GET $url" \
+  --arg recorded_at "$recorded_at" \
+  --arg user_agent "$user_agent" \
+  --arg app_language "$app_language" \
+  --arg client_version "$client_version" \
+  --arg session_id "$session_id" \
+  --arg keys "$redact_key_pattern" \
+  '{_fixture_note: {
+      venue_slug: $slug,
+      endpoint: $endpoint,
+      recorded_at: $recorded_at,
+      recorded_headers: {
+        "User-Agent": $user_agent,
+        "Accept": "application/json",
+        "platform": "Web",
+        "app-language": $app_language,
+        "client-version": $client_version,
+        "clientversionnumber": $client_version,
+        "x-wolt-web-clientid": "<a fresh uuid4 per run>",
+        "w-wolt-session-id": $session_id
+      },
+      redactions: ("any field whose key matched /" + $keys + "/i, and any bearer-token- or JWT-shaped string value, each replaced with the literal string \"[REDACTED]\""),
+      purpose: "Real recording by tool/record_wolt_fixture.sh. NOT synthetic. Re-run the script to refresh; do not hand-edit the payload below without updating this note."
+    }} + .' <<<"$redacted" > "$out_file"
 
+echo "== endpoint that answered: $url"
 echo "== wrote $out_file"
 
 echo "== running the fixture-shape test"

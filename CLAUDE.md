@@ -82,7 +82,10 @@ KetoClub integrates with four restaurant platform APIs:
 | **Ontopo** | Anonymous bearer token | PDF/S3-hosted links (OCR-capable) | Reservation platform with menu links |
 
 Key fetch patterns:
-- **Wolt**: `GET https://restaurant-api.wolt.com/v4/venues/slug/{venue_slug}/menu/data`
+- **Wolt**: `GET https://consumer-api.wolt.com/consumer-api/consumer-assortment/v1/venues/slug/{venue_slug}/assortment`
+  with the web-client header set (`lib/utils/wolt_headers.dart`; issue #168). The older
+  `restaurant-api.wolt.com/v4/venues/slug/{slug}/menu/data` answers every anonymous
+  caller with `200` and an empty body and is no longer called
 - **10bis**: `GET https://www.10bis.co.il/api/v1.0/Restaurants/{restaurantId}/Menu`
 - **Tabit**: `GET https://tgp-api.tabit.cloud/menu/v2/{site_id}`
 - **Ontopo**: `POST /api/loginAnonymously` → `GET /api/venue/{venue_id}` with bearer token
@@ -147,7 +150,8 @@ lib/
 ├── l10n/                      # app_en.arb, app_he.arb + committed generated/ output
 ├── models/                    # venue, menu, analysis, failures — plain immutable Dart
 ├── utils/                     # constants (the keto vocabulary), text_normaliser,
-│                              # classification_rules, price_format, keto_score
+│                              # classification_rules, price_format, keto_score,
+│                              # wolt_headers (the web-client header set, #168)
 ├── services/
 │   ├── platform/              # clock, app_logger, connectivity (D10), screen_brightness
 │   ├── storage/               # install_id_store, menu_cache, settings_store, notes_store
@@ -370,16 +374,14 @@ Built, but not confirmed end to end, and not to be reported as done:
   it yet, so the pinned model's (`GEMINI_MODEL`, default `gemini-2.5-flash`)
   latency and structured-output behaviour against this app's real prompt are
   unmeasured.
-- **The Wolt menu fixture is synthetic**, not a recorded response (issue #22).
-  `tool/record_wolt_fixture.sh` exists to re-record it from a real venue, but has
-  never been run — `restaurant-api.wolt.com` is also unreachable here. A related
-  open question: two 2025–2026 third-party sources report that the shipped
-  `GET /v4/venues/slug/{slug}/menu/data` endpoint now returns `200` with an
-  **empty body** without a user token (`phase2_discovery_research.md` §2.5);
-  running the recorder settles whether the shipped menu path still works for
-  real users, and outranks the Discovery-chain recordings below if the body
-  really is empty.
-- **The Wolt discovery fixtures are synthetic too** (`wolt_pages_restaurants.json`,
+- **The Wolt menu fixture is real** (`wolt_hamosad_menu.json`, recorded
+  2026-09-25 from the consumer-assortment endpoint the app now calls; issues
+  #22, #168), but only one venue was recorded and only from a laptop — this
+  environment still cannot reach `consumer-api.wolt.com`. It carries no
+  currency (the mapper defaults to `ILS`) and every `subcategories` list in it
+  is empty, so how the mapper flattens a populated one is inferred, not
+  observed. The app itself has not yet fetched a live assortment on a phone.
+- **The Wolt discovery fixtures are still synthetic** (`wolt_pages_restaurants.json`,
   `wolt_pages_search.json`; issue #38). Neither `consumer-api.wolt.com` nor
   `restaurant-api.wolt.com` is reachable from this environment, so both were
   hand-built from third-party documentation rather than recorded

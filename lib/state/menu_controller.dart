@@ -166,12 +166,11 @@ final class MenuController extends ChangeNotifier {
   /// The restaurant name from [menu], when the source platform named it;
   /// null otherwise.
   ///
-  /// **Null is the normal case here, not the exception.** No documented
-  /// Wolt payload names the venue today (see `WoltMenuMapper`); only the
-  /// checked-in fixture is synthetic. A header reading this value falls
-  /// back to something else — the pasted venue reference, per
-  /// [Menu.venueName]'s own doc comment — never to a placeholder guessed
-  /// in this class.
+  /// **Null is the normal case here, not the exception.** Wolt's
+  /// consumer-assortment payload does not name the venue (see
+  /// `WoltMenuMapper`). A header reading this value falls back to
+  /// something else — the pasted venue reference, per [Menu.venueName]'s
+  /// own doc comment — never to a placeholder guessed in this class.
   String? get venueName => _menu?.venueName;
 
   /// A rough "how keto-friendly is this menu" score out of 10, or null

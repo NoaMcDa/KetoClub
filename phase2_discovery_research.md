@@ -189,7 +189,14 @@ Until step 5 happens, #39 runs on a synthetic fixture built from §2.1 whose
 
 ### 2.5 A side finding about the shipped menu adapter
 
-`WoltMenuAdapter` fetches `GET restaurant-api.wolt.com/v4/venues/slug/{slug}/menu/data`
+> **Settled 2026-09-25: empty body confirmed, ported in #168.** `/v4 … menu/data`
+> answered `200` with a zero-byte body for `hamosad` and `vitrina-lilinblum`,
+> with and without the §2.2 header set; the assortment endpoint answered with a
+> real menu (`test/fixtures/wolt_hamosad_menu.json`), which `WoltMenuAdapter`,
+> `WoltMenuMapper` and the backend proxy now read. The text below is the
+> pre-recording analysis, kept as written.
+
+`WoltMenuAdapter` fetched `GET restaurant-api.wolt.com/v4/venues/slug/{slug}/menu/data`
 with a browser User-Agent and nothing else. Two sources (OzTamir/wolt-api,
 2025-12-20: "the verified curl returned HTTP 200 with an empty body";
 r1nnegann/wolt-easy, 2026-09-06: the same, "without user token") say that
@@ -535,7 +542,7 @@ Wave 1 can start now. Everything in it is independent of the capture.
 2. **The `/v4 … menu/data` check** (§2.5): one run of
    `tool/record_wolt_fixture.sh vitrina-lilinblum`. If the body is empty,
    the shipped menu path is broken for real users today and that outranks
-   every Discovery issue.
+   every Discovery issue. *(Done 2026-09-25: empty; ported in #168, §2.5.)*
 3. **A phone run of the permission prompt** (#37): the approximate/precise
    choice on Android 12+ and the "Never" path on iOS are only evidenced by
    fakes until then (`docs/RELEASE.md`'s device matrix has the row).
