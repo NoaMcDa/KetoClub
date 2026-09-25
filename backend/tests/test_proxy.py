@@ -1,4 +1,4 @@
-"""Tests for ``GET /v1/proxy/wolt/v4/venues/slug/{slug}/menu/data`` (#95)."""
+"""Tests for ``GET /v1/proxy/wolt/venues/slug/{slug}/assortment`` (#95, #168)."""
 
 from collections.abc import Iterator
 
@@ -9,11 +9,16 @@ from fastapi.testclient import TestClient
 
 from app.config import Settings
 from app.main import create_app
-from app.services.wolt import WOLT_USER_AGENT
+from app.services.wolt import (
+    SOURCE,
+    WOLT_USER_AGENT,
+    read_cached_menu,
+    write_cached_menu,
+)
 
-SLUG = "vitrina-lilinblum"
-UPSTREAM_PATH = f"/v4/venues/slug/{SLUG}/menu/data"
-PROXY_PATH = f"/v1/proxy/wolt/v4/venues/slug/{SLUG}/menu/data"
+SLUG = "hamosad"
+UPSTREAM_PATH = f"/consumer-api/consumer-assortment/v1/venues/slug/{SLUG}/assortment"
+PROXY_PATH = f"/v1/proxy/wolt/venues/slug/{SLUG}/assortment"
 
 
 @pytest.fixture
@@ -23,13 +28,14 @@ def wolt() -> Iterator[respx.MockRouter]:
     The autouse ``_block_network`` fixture activates its own ``MockRouter``,
     so routes registered on the module-level ``respx.get(...)`` (which
     targets the *default* router, not the active one) never match. Opening a
-    second, nested router here — scoped to Wolt's own host — makes routes
-    registered against it the active ones for the duration of the test, and
-    an unmatched request still fails loudly (``assert_all_mocked`` stays at
-    its default of ``True`` on this router).
+    second, nested router here — scoped to Wolt's consumer host, where the
+    assortment endpoint lives — makes routes registered against it the
+    active ones for the duration of the test, and an unmatched request still
+    fails loudly (``assert_all_mocked`` stays at its default of ``True`` on
+    this router).
     """
     with respx.mock(
-        base_url="https://restaurant-api.wolt.com", assert_all_called=False
+        base_url="https://consumer-api.wolt.com", assert_all_called=False
     ) as router:
         yield router
 
@@ -71,8 +77,15 @@ def test_passthrough_500(client: TestClient, wolt: respx.MockRouter) -> None:
     assert response.json() == {"error": "boom"}
 
 
+def test_retired_v4_route_is_gone(client: TestClient, wolt: respx.MockRouter) -> None:
+    response = client.get(f"/v1/proxy/wolt/v4/venues/slug/{SLUG}/menu/data")
+
+    assert response.status_code == 404
+    assert len(wolt.calls) == 0
+
+
 def test_uppercase_slug_is_rejected(client: TestClient, wolt: respx.MockRouter) -> None:
-    response = client.get("/v1/proxy/wolt/v4/venues/slug/UPPER/menu/data")
+    response = client.get("/v1/proxy/wolt/venues/slug/UPPER/assortment")
 
     assert response.status_code == 422
     assert len(wolt.calls) == 0
@@ -81,7 +94,7 @@ def test_uppercase_slug_is_rejected(client: TestClient, wolt: respx.MockRouter) 
 def test_leading_dash_slug_is_rejected(
     client: TestClient, wolt: respx.MockRouter
 ) -> None:
-    response = client.get("/v1/proxy/wolt/v4/venues/slug/-abc/menu/data")
+    response = client.get("/v1/proxy/wolt/venues/slug/-abc/assortment")
 
     assert response.status_code == 422
     assert len(wolt.calls) == 0
@@ -90,7 +103,7 @@ def test_leading_dash_slug_is_rejected(
 def test_too_long_slug_is_rejected(client: TestClient, wolt: respx.MockRouter) -> None:
     too_long = "a" * 101
 
-    response = client.get(f"/v1/proxy/wolt/v4/venues/slug/{too_long}/menu/data")
+    response = client.get(f"/v1/proxy/wolt/venues/slug/{too_long}/assortment")
 
     assert response.status_code == 422
     assert len(wolt.calls) == 0
@@ -173,6 +186,53 @@ def test_failed_response_is_not_cached(
     assert route.call_count == 2
 
 
+def test_empty_200_is_passed_through_but_not_cached(
+    client: TestClient, wolt: respx.MockRouter
+) -> None:
+    # The zero-byte 200 Wolt's retired /v4 menu endpoint answers with
+    # (#168): the client must see it (and report platformChanged), but it
+    # must never be served from cache once the upstream recovers.
+    route = wolt.get(UPSTREAM_PATH).mock(
+        side_effect=[
+            httpx.Response(200, content=b""),
+            httpx.Response(200, json={"items": ["salad"]}),
+        ]
+    )
+
+    first = client.get(PROXY_PATH)
+    second = client.get(PROXY_PATH)
+
+    assert first.status_code == 200
+    assert first.content == b""
+    assert first.headers["X-KetoClub-Cache"] == "miss"
+    assert second.json() == {"items": ["salad"]}
+    assert second.headers["X-KetoClub-Cache"] == "miss"
+    assert route.call_count == 2
+
+
+def test_a_row_cached_under_the_retired_source_is_never_served(
+    settings: Settings, wolt: respx.MockRouter
+) -> None:
+    # A row the pre-#168 route cached under source "wolt" — an empty /v4
+    # body — must not answer the assortment route.
+    app = create_app(settings=settings)
+    route = wolt.get(UPSTREAM_PATH).mock(
+        return_value=httpx.Response(200, json={"items": ["salad"]})
+    )
+
+    with TestClient(app) as client:
+        engine = app.state.engine
+        write_cached_menu(engine, "wolt", SLUG, 200, "application/json", "")
+        response = client.get(PROXY_PATH)
+        cached = read_cached_menu(engine, SOURCE, SLUG, 3600)
+
+    assert SOURCE != "wolt"
+    assert response.headers["X-KetoClub-Cache"] == "miss"
+    assert response.json() == {"items": ["salad"]}
+    assert route.call_count == 1
+    assert cached is not None
+
+
 def test_inbound_credentials_and_origin_are_not_forwarded(
     client: TestClient, wolt: respx.MockRouter
 ) -> None:
@@ -195,13 +255,21 @@ def test_inbound_credentials_and_origin_are_not_forwarded(
     assert "x-ketoclub-install-id" not in sent_headers
 
 
-def test_upstream_request_carries_user_agent_and_accept(
+def test_upstream_request_carries_the_web_client_header_set(
     client: TestClient, wolt: respx.MockRouter
 ) -> None:
     wolt.get(UPSTREAM_PATH).mock(return_value=httpx.Response(200, json={}))
 
-    client.get(PROXY_PATH)
+    client.get(PROXY_PATH, headers={"X-KetoClub-Install-Id": "a" * 32})
 
-    sent_headers = wolt.calls.last.request.headers
-    assert sent_headers["user-agent"] == WOLT_USER_AGENT
-    assert sent_headers["accept"] == "application/json"
+    sent = wolt.calls.last.request.headers
+    assert sent["user-agent"] == WOLT_USER_AGENT
+    assert sent["accept"] == "application/json"
+    assert sent["platform"] == "Web"
+    assert sent["app-language"] == "en"
+    assert sent["client-version"] == "1.16.125"
+    assert sent["clientversionnumber"] == "1.16.125"
+    assert sent["w-wolt-session-id"] == "no-analytics-consent"
+    # A per-process uuid4, never the KetoClub install id.
+    assert sent["x-wolt-web-clientid"] != "a" * 32
+    assert len(sent["x-wolt-web-clientid"]) == 36

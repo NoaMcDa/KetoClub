@@ -195,16 +195,24 @@ class _Boundary {
 /// written as adjacent string literals so this file itself does not
 /// contain them: a repository-wide grep for either must come back empty.
 const _boundaries = <_Boundary>[
+  // The by-name venue search POST (issue #39) is the only call left on
+  // this host: the menu fetch moved to the assortment endpoint (#168).
   _Boundary('restaurant-api.wolt.com', {
-    'services/menu/wolt/wolt_adapter.dart',
-    // The by-name venue search POST (issue #39).
     'services/venue/wolt/wolt_venue_search_service.dart',
   }),
-  // Wolt's discovery host and page paths (issue #39,
-  // phase2_discovery_research.md §5): venue search only.
+  // Wolt's discovery host (issue #39, phase2_discovery_research.md §5)
+  // and, since #168, the menu fetch's consumer-assortment endpoint.
   _Boundary('consumer-api.wolt.com', {
+    'services/menu/wolt/wolt_adapter.dart',
     'services/venue/wolt/wolt_venue_search_service.dart',
   }),
+  // The menu endpoint's path, direct and through the backend's proxy
+  // (issue #168): the menu adapter only.
+  _Boundary('/consumer-assortment/', {'services/menu/wolt/wolt_adapter.dart'}),
+  _Boundary('/v1/proxy/wolt/venues/', {'services/menu/wolt/wolt_adapter.dart'}),
+  // Wolt's retired menu endpoint answers every anonymous caller with a
+  // zero-byte body (#22, #168); nothing under lib/ may name its path.
+  _Boundary('menu/data', <String>{}),
   _Boundary('/v1/pages/', {
     'services/venue/wolt/wolt_venue_search_service.dart',
   }),

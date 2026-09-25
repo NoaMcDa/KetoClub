@@ -57,9 +57,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.settings = resolved_settings
     # One id per process, generated at startup and never persisted or
-    # reused: Wolt's web client sends a per-install uuid on every discovery
-    # request (#123, phase2_discovery_research.md §2.2), and it must never
-    # be the KetoClub install id — that one is sent only to this backend.
+    # reused: Wolt's web client sends a per-install uuid on every menu and
+    # discovery request (#123, #168, phase2_discovery_research.md §2.2),
+    # and it must never be the KetoClub install id — that one is sent only
+    # to this backend.
     app.state.wolt_web_client_id = str(uuid.uuid4())
     # Built here rather than in the lifespan so a test can reach it before the
     # first request; in memory, so it resets whenever the process restarts.

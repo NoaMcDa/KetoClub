@@ -35,68 +35,50 @@ WOLT_USER_AGENT = (
     "Chrome/120.0.0.0 Safari/537.36"
 )
 
-# Built from scratch, never copied from the inbound request: nothing of the
-# browser's own request (Origin, Cookie, Authorization, the install id)
-# reaches Wolt (backend_plan.md §3.3).
-WOLT_HEADERS: dict[str, str] = {
-    "User-Agent": WOLT_USER_AGENT,
-    "Accept": "application/json",
-}
-
 # connect 5s, read/write 15s, pool 5s (backend_plan.md §3.3's connect/read
 # bounds; write and pool are not specified upstream and are set to match).
 WOLT_TIMEOUT = httpx.Timeout(connect=5.0, read=15.0, write=15.0, pool=5.0)
 
-# The ``source`` this platform writes into ``MenuCache`` rows (#122).
-SOURCE = "wolt"
-
-
-def wolt_menu_url(base_url: str, slug: str) -> str:
-    """Build the upstream Wolt menu URL for ``slug`` under ``base_url``."""
-    return f"{base_url}/v4/venues/slug/{slug}/menu/data"
-
-
-# --- Discovery (#123) -------------------------------------------------------
-#
-# The two "pages" venue-search endpoints are a second, separate contract
-# from the menu fetch above: a different upstream host, a header set the
-# menu proxy does not need, and their own cache/rate-limit rows. Kept in
-# this module rather than a new service file because they still share the
-# menu proxy's ``WOLT_USER_AGENT``, ``WOLT_TIMEOUT`` and cache functions —
-# see ``phase2_discovery_research.md`` §2, §3.
-
-# The two languages Wolt's web client accepts as `app-language` for
-# discovery (phase2_discovery_research.md §2.2). The menu proxy carries no
-# language of its own, so this is new.
+# The two languages Wolt's web client accepts as `app-language`
+# (phase2_discovery_research.md §2.2).
 WoltLang = Literal["en", "he"]
+
+# The `app-language` the menu proxy sends: the menu route carries no
+# language, and the recorded assortment (test/fixtures/wolt_hamosad_menu.json)
+# came back in the venue's own language with this value regardless. Keep
+# identical to `woltDefaultAppLanguage` in `lib/utils/wolt_headers.dart`.
+WOLT_MENU_LANG: WoltLang = "en"
 
 # Every 2026 capture of a Wolt web-client request sends this literal value
 # when analytics consent was never granted; this backend never asks for
 # consent, so it is a constant rather than a setting.
-_WOLT_DISCOVERY_SESSION_ID = "no-analytics-consent"
+_WOLT_SESSION_ID = "no-analytics-consent"
 
-# ``MenuCache.source`` for the two discovery routes, distinct from the menu
-# proxy's ``"wolt"``/``"tenbis"`` so a discovery cache row can never collide
-# with a menu cache row for what happens to be the same key string.
-SOURCE_RESTAURANTS = "wolt-restaurants"
-SOURCE_SEARCH = "wolt-search"
+# The ``source`` the menu proxy writes into ``MenuCache`` rows (#122).
+# Renamed from ``"wolt"`` when the route moved to the consumer-assortment
+# endpoint (#168), so a row cached from the retired ``/v4`` endpoint — a
+# zero-byte 200 — can never be served as an assortment.
+SOURCE = "wolt-assortment"
 
 
-def wolt_discovery_headers(
+def wolt_web_headers(
     *, lang: WoltLang, client_id: str, client_version: str
 ) -> dict[str, str]:
-    """Build the Wolt web-client header set for one discovery request.
+    """Build the Wolt web-client header set for one upstream request.
 
-    Built from scratch on every call, the same rule as ``WOLT_HEADERS``:
-    nothing of the inbound browser request (``Origin``, ``Cookie``,
-    ``Authorization``, the KetoClub install id) reaches Wolt. Unlike the
-    menu proxy, a bare discovery request is reported to answer 410 "update
-    the app" without the full web-client identity
-    (``phase2_discovery_research.md`` §2.2), so this always sends
-    ``platform``, the client version under both header names Wolt reads it
-    from, ``app-language``, a per-process ``client_id`` (never the KetoClub
-    install id — a separate uuid4, generated once at backend start) and the
-    session-id placeholder.
+    Shared by the menu proxy (#168) and the two discovery routes (#123):
+    the same set ``lib/utils/wolt_headers.dart`` sends from a phone. Built
+    from scratch on every call, never copied from the inbound request:
+    nothing of the browser's own request (``Origin``, ``Cookie``,
+    ``Authorization``, the KetoClub install id) reaches Wolt
+    (``backend_plan.md`` §3.3). A bare discovery request is reported to
+    answer 410 "update the app" without the full web-client identity
+    (``phase2_discovery_research.md`` §2.2), and the assortment endpoint was
+    recorded with ``platform`` and ``app-language`` set, so this always
+    sends ``platform``, the client version under both header names Wolt
+    reads it from, ``app-language``, a per-process ``client_id`` (never the
+    KetoClub install id — a separate uuid4, generated once at backend start)
+    and the session-id placeholder.
     """
     return {
         "platform": "Web",
@@ -104,10 +86,38 @@ def wolt_discovery_headers(
         "clientversionnumber": client_version,
         "app-language": lang,
         "x-wolt-web-clientid": client_id,
-        "w-wolt-session-id": _WOLT_DISCOVERY_SESSION_ID,
+        "w-wolt-session-id": _WOLT_SESSION_ID,
         "Accept": "application/json",
         "User-Agent": WOLT_USER_AGENT,
     }
+
+
+def wolt_assortment_url(base_url: str, slug: str) -> str:
+    """Build the upstream Wolt menu URL for ``slug`` under ``base_url``.
+
+    The consumer-assortment endpoint wolt.com's own web app reads a menu
+    from (#168). ``base_url`` is ``Settings.WOLT_CONSUMER_BASE_URL``: Wolt's
+    older ``restaurant-api`` menu endpoint answers every anonymous caller
+    with a zero-byte 200 and is no longer called.
+    """
+    return (
+        f"{base_url}/consumer-api/consumer-assortment/v1/venues/slug/{slug}/assortment"
+    )
+
+
+# --- Discovery (#123) -------------------------------------------------------
+#
+# The two "pages" venue-search endpoints are a second, separate contract
+# from the menu fetch above, with their own cache/rate-limit rows. Kept in
+# this module rather than a new service file because they share the menu
+# proxy's ``wolt_web_headers``, ``WOLT_TIMEOUT`` and cache functions — see
+# ``phase2_discovery_research.md`` §2, §3.
+
+# ``MenuCache.source`` for the two discovery routes, distinct from the menu
+# proxy's ``SOURCE`` and ``"tenbis"`` so a discovery cache row can never
+# collide with a menu cache row for what happens to be the same key string.
+SOURCE_RESTAURANTS = "wolt-restaurants"
+SOURCE_SEARCH = "wolt-search"
 
 
 def wolt_restaurants_url(base_url: str) -> str:

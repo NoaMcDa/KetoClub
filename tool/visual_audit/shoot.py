@@ -224,7 +224,7 @@ def run(browser, scheme, lang):
         ctx.close()
 
         ctx, page = new_page(browser, scheme, lang)
-        boot(page, "/venue/wolt/vitrina-lilinblum")
+        boot(page, "/venue/wolt/hamosad")
         page.wait_for_timeout(2000)
         shot(page, f"menu_fixture_{tag}")
         scroll(page, 500)

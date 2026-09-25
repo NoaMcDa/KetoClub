@@ -8,13 +8,14 @@ Point the backend's upstream hosts at it (WOLT_BASE_URL,
 WOLT_CONSUMER_BASE_URL, TENBIS_BASE_URL); the backend itself is unchanged.
 
 Routes, at the paths backend/app/services/{wolt,tenbis}.py call:
-  GET  /v4/venues/slug/vitrina-lilinblum/menu/data  the Wolt menu fixture
-  GET  /v4/venues/slug/<any other>/menu/data        a menu mirroring
-                                                    .design/Main.dc.html
-  GET  /v1/pages/restaurants                        wolt_pages_restaurants
-  POST /v1/pages/search                             wolt_pages_search
-  GET  /api/v1.0/Restaurants/<id>/Menu              the 10bis fixture
-  GET  /img/<name>.png                              a generated dish photo
+  GET  /consumer-api/consumer-assortment/v1/venues/slug/hamosad/assortment
+                                         the recorded Wolt menu fixture
+  GET  /consumer-api/consumer-assortment/v1/venues/slug/<other>/assortment
+                                         a menu mirroring .design/Main.dc.html
+  GET  /v1/pages/restaurants             wolt_pages_restaurants
+  POST /v1/pages/search                  wolt_pages_search
+  GET  /api/v1.0/Restaurants/<id>/Menu   the 10bis fixture
+  GET  /img/<name>.png                   a generated dish photo
 
 Needs Pillow only for /img/ (every other route is standard library).
 """
@@ -27,8 +28,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 FIXTURES = pathlib.Path(__file__).resolve().parents[2] / "test" / "fixtures"
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 9999
+_ASSORTMENT_PREFIX = "/consumer-api/consumer-assortment/v1/venues/slug/"
 
-# The dishes .design/Main.dc.html draws, as a Wolt-shaped menu, plus three
+# The dishes .design/Main.dc.html draws, as a Wolt assortment, plus three
 # more so every verdict and the photo placeholder all appear.
 _DISHES = [
     ("entrecote", "Prime Entrecôte 300g",
@@ -57,16 +59,20 @@ def _artboard_menu() -> bytes:
     items = []
     for dish_id, name, description, price, photo in _DISHES:
         item = {"id": dish_id, "name": name, "description": description,
-                "price": price, "options": []}
+                "price": price, "options": [], "images": []}
         if photo:
-            item["image"] = f"http://127.0.0.1:{PORT}/img/{dish_id}.png"
+            item["images"] = [
+                {"url": f"http://127.0.0.1:{PORT}/img/{dish_id}.png"}
+            ]
         items.append(item)
     ids = [d[0] for d in _DISHES]
+    # Consumer-assortment shape (issue #168): no top-level currency.
     menu = {
-        "currency": "ILS",
         "categories": [
-            {"id": "mains", "name": "Mains", "item_ids": ids[:5]},
-            {"id": "more", "name": "More", "item_ids": ids[5:]},
+            {"id": "mains", "name": "Mains", "item_ids": ids[:5],
+             "subcategories": []},
+            {"id": "more", "name": "More", "item_ids": ids[5:],
+             "subcategories": []},
         ],
         "items": items,
         "options": [],
@@ -104,9 +110,10 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self) -> None:  # noqa: N802 - http.server's naming
         path = self.path.split("?")[0]
-        if path.startswith("/v4/venues/slug/") and path.endswith("/menu/data"):
-            if path.split("/")[4] == "vitrina-lilinblum":
-                fixture = FIXTURES / "wolt_vitrina_lilinblum_menu.json"
+        if path.startswith(_ASSORTMENT_PREFIX) and path.endswith("/assortment"):
+            slug = path[len(_ASSORTMENT_PREFIX):-len("/assortment")]
+            if slug == "hamosad":
+                fixture = FIXTURES / "wolt_hamosad_menu.json"
                 return self._send(fixture.read_bytes())
             return self._send(_artboard_menu())
         if path == "/v1/pages/restaurants":

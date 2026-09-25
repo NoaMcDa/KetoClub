@@ -7,11 +7,13 @@ The gate. See `CLAUDE.md` / `architecture.md` §18.5 — run
 
 ## `record_wolt_fixture.sh` — re-record the Wolt fixture (issue #22)
 
-`test/fixtures/wolt_vitrina_lilinblum_menu.json` is synthetic, not a recorded
-response (`test/fixtures/README.md` explains why and says so in the fixture's
-first key). This script records a real `menu/data` payload from a given venue
-slug as a checked-in fixture, from any machine that can reach
-`restaurant-api.wolt.com` — this repository's build environment cannot.
+`test/fixtures/wolt_hamosad_menu.json` is a real recording of Wolt's
+consumer-assortment endpoint, the one `WoltMenuAdapter` fetches (issue #168).
+This script re-records it, or records another venue, from any machine that
+can reach `consumer-api.wolt.com` — this repository's build environment
+cannot. It sends the web-client header set the recording needed and fails
+loudly on an empty body, the symptom that retired Wolt's older menu
+endpoint.
 
 ## `perf_menu.dart`: main-thread timings for a 60-dish menu (issue #65)
 
@@ -47,7 +49,7 @@ It cannot be run with `dart run`: everything it times imports
   flutter test test/tool/perf_menu_test.dart --reporter expanded
   ```
   One test prints the same table with the two checked-in fixtures
-  (`test/fixtures/wolt_vitrina_lilinblum_menu.json`,
+  (`test/fixtures/wolt_hamosad_menu.json`,
   `tenbis_synthetic_menu.json`) added as extra decode + map rows. These are
   unoptimised JIT timings on a desktop CPU. The test asserts no duration,
   so CI never fails on a slow runner.

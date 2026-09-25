@@ -1,7 +1,7 @@
 # KetoClub backend
 
 A small FastAPI service that makes live Wolt menus work in the web build.
-`restaurant-api.wolt.com` sends no CORS headers, so a browser refuses the
+Wolt's APIs send no CORS headers for foreign origins, so a browser refuses the
 request before it leaves; this service forwards it (`backend_plan.md` §1).
 
 **The backend is an accelerator, never a dependency.** With no backend URL
@@ -13,7 +13,7 @@ Routes shipped so far:
 | Route | Issue | What it does |
 |---|---|---|
 | `GET /v1/health` | #94 | `{status, version, llm_configured}` |
-| `GET /v1/proxy/wolt/v4/venues/slug/{slug}/menu/data` | #95 | The Wolt menu proxy for the web build, see below |
+| `GET /v1/proxy/wolt/venues/slug/{slug}/assortment` | #95, #168 | The Wolt menu proxy for the web build, see below |
 | `GET /v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu` | #122 | The 10bis menu proxy for the web build, see below |
 | `POST /v1/chat` | #100 | Hosted classification: forwards one completion to Gemini `generateContent` with the server's key |
 | `GET /v1/proxy/wolt/pages/restaurants` | #123 | Nearby-venue search for the web build, see below |
@@ -76,32 +76,47 @@ router) goes much further this way.
 
 ## The Wolt menu proxy
 
-`GET /v1/proxy/wolt/v4/venues/slug/{slug}/menu/data` forwards to
-`{WOLT_BASE_URL}/v4/venues/slug/{slug}/menu/data` and returns Wolt's status,
-body and `Content-Type` unchanged, 404 included — the Dart adapter's status
-mapping needs no change whether it talks to Wolt directly or through this
-proxy. It is the **only** proxy route: the upstream host always comes from
-`WOLT_BASE_URL` in config, never from the request.
+`GET /v1/proxy/wolt/venues/slug/{slug}/assortment` forwards to
+`{WOLT_CONSUMER_BASE_URL}/consumer-api/consumer-assortment/v1/venues/slug/{slug}/assortment`
+— the endpoint wolt.com's own web app reads a menu from — and returns Wolt's
+status, body and `Content-Type` unchanged, 404 included — the Dart adapter's
+status mapping needs no change whether it talks to Wolt directly or through
+this proxy. The upstream host always comes from `WOLT_CONSUMER_BASE_URL` in
+config, never from the request.
+
+Until #168 this route was `GET /v1/proxy/wolt/v4/venues/slug/{slug}/menu/data`,
+forwarding to `{WOLT_BASE_URL}/v4/…/menu/data`. That upstream now answers every
+anonymous caller with `200` and a zero-byte body (measured 2026-09-25, with and
+without the web-client headers), so the old route was **removed**, not kept
+alongside: nothing calls it, and keeping it would only serve empty menus. Its
+cache rows were written under `source = "wolt"`; the new route writes
+`"wolt-assortment"`, so a cached empty `/v4` body can never be served.
 
 - `slug` is validated against `^[a-z0-9][a-z0-9-]{0,99}$`; anything else is
   422 before any upstream call is made.
-- Upstream request headers are built from scratch (`User-Agent`, `Accept`)
-  — nothing from the inbound request (`Origin`, `Cookie`, `Authorization`,
-  the install id) is forwarded.
+- Upstream request headers are built from scratch — the same web-client
+  set the discovery routes send (`platform: Web`, `app-language: en`,
+  `client-version`/`clientversionnumber` from `WOLT_CLIENT_VERSION`, the
+  per-process `x-wolt-web-clientid`, `w-wolt-session-id`, `User-Agent`,
+  `Accept`) — and nothing from the inbound request (`Origin`, `Cookie`,
+  `Authorization`, the install id) is forwarded.
 - A connect failure is 502 (`{"reason": "offline", ...}`); an upstream
   timeout is 504 (`{"reason": "timeout", ...}`).
-- 2xx responses are cached per slug for `MENU_CACHE_TTL_SECONDS`; the
-  response carries `X-KetoClub-Cache: hit` or `miss`. Failures are never
-  cached.
+- 2xx responses with a non-empty body are cached per slug for
+  `MENU_CACHE_TTL_SECONDS`; the response carries `X-KetoClub-Cache: hit` or
+  `miss`. Failures, and an empty 2xx body (passed through, so the app reports
+  `platformChanged`), are never cached. This applies to the 10bis proxy too.
 
-The synthetic Wolt fixture used in `lib/` tests has never been recorded from
-a real venue (issue #22); this proxy can do that from a machine that can
-reach `restaurant-api.wolt.com` (the sandbox this backend was built in
-cannot):
+The Wolt menu fixture the Dart tests run against,
+`test/fixtures/wolt_hamosad_menu.json`, is a real recording of this upstream
+(issue #168). This proxy can re-record it from a machine that can reach
+`consumer-api.wolt.com` (the sandbox this backend was built in cannot); add a
+`_fixture_note` first key by hand, or use `tool/record_wolt_fixture.sh`, which
+writes one:
 
 ```bash
-curl -sS localhost:8000/v1/proxy/wolt/v4/venues/slug/vitrina-lilinblum/menu/data \
-  -o test/fixtures/wolt_vitrina_lilinblum_menu.json
+curl -sS localhost:8000/v1/proxy/wolt/venues/slug/hamosad/assortment \
+  -o test/fixtures/wolt_hamosad_menu.json
 ```
 
 ## The 10bis menu proxy
@@ -109,7 +124,7 @@ curl -sS localhost:8000/v1/proxy/wolt/v4/venues/slug/vitrina-lilinblum/menu/data
 `GET /v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu` forwards to
 `{TENBIS_BASE_URL}/api/v1.0/Restaurants/{restaurantId}/Menu` and returns
 10bis's status, body and `Content-Type` unchanged, 404 included — shaped
-exactly like the Wolt proxy above (issue #122). The upstream host always
+like the Wolt proxy above (issue #122). The upstream host always
 comes from `TENBIS_BASE_URL` in config, never from the request.
 
 - `restaurantId` is validated against `^[0-9]{1,12}$`; anything else is 422
@@ -224,10 +239,10 @@ that need them (`/v1/chat`, and `/v1/admin/*` in a later issue). See
 | `GEMINI_MAX_OUTPUT_TOKENS` | `8192` | `generationConfig.maxOutputTokens` |
 | `GEMINI_THINKING_BUDGET` | `0` | Thinking tokens count against the output budget, and this is a classification task |
 | `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_PER_DAY` | `5`, `40` | Per install id on `/v1/chat`, in memory |
-| `WOLT_BASE_URL` | `https://restaurant-api.wolt.com` | Upstream host for the Wolt menu proxy and the by-name discovery route; never taken from a request |
+| `WOLT_BASE_URL` | `https://restaurant-api.wolt.com` | Upstream host for the by-name discovery route (the menu proxy left it in #168); never taken from a request |
 | `TENBIS_BASE_URL` | `https://www.10bis.co.il` | Upstream host for the 10bis proxy; never taken from a request |
-| `WOLT_CONSUMER_BASE_URL` | `https://consumer-api.wolt.com` | Upstream host for the nearby-venue discovery route; never taken from a request |
-| `WOLT_CLIENT_VERSION` | `1.16.125` | Wolt web-client version sent on discovery requests |
+| `WOLT_CONSUMER_BASE_URL` | `https://consumer-api.wolt.com` | Upstream host for the Wolt menu proxy (#168) and the nearby-venue discovery route; never taken from a request |
+| `WOLT_CLIENT_VERSION` | `1.16.125` | Wolt web-client version sent on menu and discovery requests |
 | `DISCOVERY_CACHE_TTL_SECONDS` | `300` | Discovery response cache TTL |
 | `DISCOVERY_RATE_LIMIT_PER_MINUTE` | `20` | Per install id, across both discovery routes; no daily cap |
 
@@ -317,7 +332,7 @@ once.
    was not picked up (check `.env` is in `backend/`, not the repository root).
 4. **Proxy check**, against a real Wolt venue slug:
    ```bash
-   curl -sS localhost:8000/v1/proxy/wolt/v4/venues/slug/vitrina-lilinblum/menu/data \
+   curl -sS localhost:8000/v1/proxy/wolt/venues/slug/hamosad/assortment \
      -D - -o /dev/null
    # HTTP/1.1 200 OK
    # x-ketoclub-cache: miss
@@ -335,7 +350,7 @@ once.
    ```bash
    flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
    ```
-   Paste a real Wolt venue link. The menu loads live (not from the synthetic
+   Paste a real Wolt venue link. The menu loads live (not from the checked-in
    fixture) and is classified with the engine chip showing the Gemini model
    name — with no key entered anywhere in the app, because there is nowhere
    to enter one (D12).
@@ -347,7 +362,7 @@ once.
    internet" message, per `architecture.md` constraint 10.
 
 Nobody has run this checklist from inside this repository's build
-environment: `restaurant-api.wolt.com` and `generativelanguage.googleapis.com`
+environment: `consumer-api.wolt.com` and `generativelanguage.googleapis.com`
 are both unreachable through its egress proxy (`HANDOFF.md`, `architecture.md`
 §17 open question 1). It is written here, once, for whoever next has a network
 path to both.

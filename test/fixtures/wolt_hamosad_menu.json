@@ -10,7 +10,7 @@
       "app-language": "en"
     },
     "redactions": "none; a scan for keys or string values shaped like a token, session id, JWT or credential returned zero hits. This response carries only public menu data (categories, items, images, options).",
-    "purpose": "Real recording of Wolt's consumer-assortment endpoint for issue #168 (the port of WoltMenuAdapter away from the retired /v4/venues/slug/{slug}/menu/data endpoint, which now returns 200 empty for anonymous callers). This fixture is not yet read by WoltMenuMapper: the mapper still targets the /v4 shape and the port itself is what #168 tracks. Kept in the tree ahead of that port so the shape is version-controlled at the moment it was captured and any drift between now and the port is a diff."
+    "purpose": "Real recording of Wolt's consumer-assortment endpoint for issue #168 (the port of WoltMenuAdapter away from the retired /v4/venues/slug/{slug}/menu/data endpoint, which now returns 200 empty for anonymous callers). Checked in by #185 as wolt_hamosad_assortment.json ahead of the port and renamed to wolt_hamosad_menu.json by it, so wolt_fixture_shape_test.dart picks it up; it is the fixture WoltMenuMapper is tested against. The payload below is byte-for-byte what #185 recorded; only this note's purpose line was edited."
   },
   "assortment_id": "5bf18ad4e88d79000a325668",
   "loading_strategy": "full",

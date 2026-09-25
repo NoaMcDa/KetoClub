@@ -19,8 +19,10 @@ PROXY_PATH = f"/v1/proxy/tenbis/api/v1.0/Restaurants/{RESTAURANT_ID}/Menu"
 # *and* a valid 10bis restaurant id (`^[0-9]{1,12}$`), so it can be used as
 # the same cache key on both platforms to prove they do not collide.
 SHARED_ID = "555555"
-WOLT_UPSTREAM_PATH = f"/v4/venues/slug/{SHARED_ID}/menu/data"
-WOLT_PROXY_PATH = f"/v1/proxy/wolt/v4/venues/slug/{SHARED_ID}/menu/data"
+WOLT_UPSTREAM_PATH = (
+    f"/consumer-api/consumer-assortment/v1/venues/slug/{SHARED_ID}/assortment"
+)
+WOLT_PROXY_PATH = f"/v1/proxy/wolt/venues/slug/{SHARED_ID}/assortment"
 
 
 @pytest.fixture
@@ -227,7 +229,7 @@ def test_wolt_and_tenbis_entries_with_the_same_id_do_not_collide(
     ``(source, id)``, not ``id`` alone.
     """
     with respx.mock(
-        base_url="https://restaurant-api.wolt.com", assert_all_called=False
+        base_url="https://consumer-api.wolt.com", assert_all_called=False
     ) as wolt:
         wolt_route = wolt.get(WOLT_UPSTREAM_PATH).mock(
             return_value=httpx.Response(200, json={"platform": "wolt"})

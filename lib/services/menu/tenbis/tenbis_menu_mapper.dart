@@ -96,9 +96,9 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 ///   (`menu_api_research` §3.2 says nothing about one), so it is read
 ///   tolerantly at the top level and defaults to `'ILS'` — 10bis is an
 ///   Israel-only platform — when absent or not a non-empty `String`.
-///   This is the one rule that is *more* lenient than `WoltMenuMapper`,
-///   which fails outright on a missing `currency`; that mapper's
-///   stricter rule reflects Wolt actually sending the field.
+///   `WoltMenuMapper` applies the same default since Wolt's
+///   consumer-assortment payload turned out to carry no currency either
+///   (issue #168).
 /// - [Menu.venueName] is read from a top-level `restaurantName` when it
 ///   is a non-empty `String`, and null otherwise. A missing or
 ///   malformed name is never a mapping failure.

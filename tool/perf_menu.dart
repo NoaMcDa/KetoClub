@@ -69,7 +69,7 @@ final DateTime _fixedNow = DateTime.utc(2026);
 
 /// Which platform mapper a [PerfFixture]'s payload is fed to.
 enum PerfPayloadFormat {
-  /// A Wolt `menu/data` payload, mapped by `WoltMenuMapper`.
+  /// A Wolt consumer-assortment payload, mapped by `WoltMenuMapper`.
   wolt,
 
   /// A 10bis `Menu` payload, mapped by `TenBisMenuMapper`.
@@ -171,9 +171,10 @@ bool _hasSides(int index) => index % 3 == 0;
 /// How many categories the [dishCount] synthetic dishes are spread over.
 int _categoryCount(int dishCount) => dishCount < 6 ? 1 : 6;
 
-/// A Wolt `menu/data` payload holding [dishCount] dishes in the shape
-/// `WoltMenuMapper` reads: flat `categories`, `items` and `options`
-/// joined by id, prices in agorot.
+/// A Wolt consumer-assortment payload holding [dishCount] dishes in the
+/// shape `WoltMenuMapper` reads: flat `categories`, `items` and `options`
+/// joined by id, item options pointing into `options` by `option_id`,
+/// prices in agorot, photos under `images[].url`.
 Map<String, Object?> syntheticWoltPayload({int dishCount = defaultDishCount}) {
   final categoryCount = _categoryCount(dishCount);
   final itemIdsByCategory = List.generate(categoryCount, (_) => <String>[]);
@@ -187,18 +188,27 @@ Map<String, Object?> syntheticWoltPayload({int dishCount = defaultDishCount}) {
       'name': '$name #$i',
       'description': description,
       'price': 4200 + i * 100,
-      'options': <String>[if (_hasSides(i)) 'opt_sides'],
-      'image': 'https://example.invalid/dish_$i.jpg',
+      'options': <Map<String, Object?>>[
+        if (_hasSides(i))
+          <String, Object?>{
+            'id': 'item_opt_$i',
+            'option_id': 'opt_sides',
+            'name': _sideGroupName,
+          },
+      ],
+      'images': <Map<String, Object?>>[
+        <String, Object?>{'url': 'https://example.invalid/dish_$i.jpg'},
+      ],
     });
   }
   return <String, Object?>{
-    'currency': 'ILS',
     'categories': <Map<String, Object?>>[
       for (var c = 0; c < categoryCount; c++)
         <String, Object?>{
           'id': 'cat_$c',
           'name': 'Category $c',
           'item_ids': itemIdsByCategory[c],
+          'subcategories': <Object?>[],
         },
     ],
     'items': items,

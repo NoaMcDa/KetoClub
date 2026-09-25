@@ -30,9 +30,9 @@ from app.services.wolt import (
     WOLT_TIMEOUT,
     WoltLang,
     read_cached_menu,
-    wolt_discovery_headers,
     wolt_restaurants_url,
     wolt_search_url,
+    wolt_web_headers,
     write_cached_menu,
 )
 
@@ -61,7 +61,7 @@ async def search_wolt_nearby(
     rate limiter; only a 2xx response is cached.
     """
     settings = request.app.state.settings
-    headers = wolt_discovery_headers(
+    headers = wolt_web_headers(
         lang=lang,
         client_id=request.app.state.wolt_web_client_id,
         client_version=settings.WOLT_CLIENT_VERSION,
@@ -93,7 +93,7 @@ async def search_wolt_by_name(
     like ``search_wolt_nearby`` above.
     """
     settings = request.app.state.settings
-    headers = wolt_discovery_headers(
+    headers = wolt_web_headers(
         lang=body.lang,
         client_id=request.app.state.wolt_web_client_id,
         client_version=settings.WOLT_CLIENT_VERSION,

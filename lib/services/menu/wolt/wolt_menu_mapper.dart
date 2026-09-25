@@ -3,39 +3,60 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 
-/// Normalises a Wolt `menu/data` payload into a [Menu]
-/// (architecture.md §6.1, §18.1).
+/// Normalises a Wolt consumer-assortment payload into a [Menu]
+/// (architecture.md §6.1, §18.1; issue #168).
 ///
-/// Pure: no I/O, and [toMenu] never throws. Wolt's payload is three flat
+/// Pure: no I/O, and [toMenu] never throws. The payload is three flat
 /// sibling collections — `categories`, `items`, `options` — joined by id
-/// rather than nested, so this mapper's job is entirely the join and the
-/// unit conversions in the table below. A change to Wolt's URL or headers
-/// belongs in `wolt_adapter.dart`, not here.
+/// rather than nested, so this mapper's job is the join and the unit
+/// conversions below. `test/fixtures/wolt_hamosad_menu.json` is a real
+/// recording of this shape. A change to Wolt's URL or headers belongs in
+/// `wolt_adapter.dart`, not here.
 ///
 /// Normalisation rules applied (architecture.md §6.1):
 ///
-/// - `currency` is copied verbatim onto [Menu.currency].
+/// - **Currency.** The assortment payload carries no currency anywhere —
+///   not at the top level, not in `compliance_info`, not per item
+///   (`unit_info` and `unit_price` are null on every recorded item) — so
+///   [Menu.currency] is `ILS`, the currency of every Wolt Israel venue,
+///   which is the only market KetoClub serves. A non-empty top-level
+///   `currency` string, should Wolt ever add one, wins over that default.
 /// - Each category's `item_ids` are resolved against `items[]` by id. An
 ///   id with no matching item is skipped, not an error — Wolt can list
 ///   fewer items than a category references.
+/// - **Subcategories** are flattened into their parent: a category's own
+///   `item_ids` come first, then each entry of its `subcategories` in
+///   order (recursively), all under the parent's name. [Menu] has one
+///   level of categories, and a heading per subcategory would split one
+///   Wolt section into several on a phone screen. Every recorded category
+///   has an empty `subcategories` list, so the shape of an entry is
+///   inferred rather than observed: an absent `subcategories` key, or an
+///   entry that is not a map with an `item_ids` list, is skipped rather
+///   than failing the whole menu.
 /// - `price` is integer agorot; it is divided by 100 to get [Dish.price]
 ///   in major units.
-/// - Each item's `options` are option-group id strings, resolved against
-///   the top-level `options[]` by id. Only the group's `name` and each
-///   value's `name` survive onto [DishOption]; ids and per-value prices
-///   are dropped, because a dish's yellow-ness often lives in the option
-///   text, not its price. Symmetrically with the item/category join, an
-///   option id with no matching group is skipped rather than failing the
-///   whole payload — this mapper extends the documented item/category
-///   leniency to this second join for the same reason: one dish missing
-///   one option group is not evidence Wolt changed its schema.
+/// - Each item's `options` are objects whose `option_id` points into the
+///   top-level `options[]`. The group's value `name`s survive onto
+///   [DishOption.values]; its label is the item-level `name` when that is
+///   a non-empty string (it can differ per dish: "Toppings — served in the
+///   dish only" on one burger for a group called "Burger toppings"), else
+///   the group's own `name`. Ids, prices, `prerequisite_values` and
+///   `multi_choice_config` are dropped: a dish's yellow-ness lives in the
+///   option text, and a group that only appears after another choice is
+///   still text the classifier should read. An `option_id` with no
+///   matching group is skipped rather than failing the payload — one dish
+///   missing one option group is not evidence Wolt changed its schema
+///   (the real recording has two such references).
 /// - A missing or null `description` becomes `''`, never null. A missing
-///   `options` list on an item (as opposed to a present-but-empty one) is
-///   also tolerated and treated as no options, for the same "an absent
-///   thing is not evidence of drift" reasoning as the two joins above.
-/// - An item's `image` becomes [Dish.imageUrl] when it is a non-empty
-///   String, and null for anything else — absent, null, the wrong type,
-///   or empty. A bad photo URL is never grounds to fail the whole fetch.
+///   item `options` list is treated as no options.
+/// - `images[0].url` becomes [Dish.imageUrl] when it is a non-empty
+///   String, and null for anything else — no `images`, an empty list, a
+///   first entry that is not a map, or a `url` that is absent, the wrong
+///   type or empty. A bad photo is never grounds to fail the whole fetch.
+/// - **Disabled items** (a non-null `disabled_info`, e.g. sold out today)
+///   are kept. A dish's keto verdict does not depend on whether it can be
+///   ordered this minute, and a menu that silently loses dishes between
+///   two opens reads as a bug; the field is not read at all.
 /// - A dish `id` already used by an earlier category is dropped from
 ///   every later category: first category wins. Wolt can list one item
 ///   under two categories, and a duplicate id would break the LLM
@@ -43,19 +64,20 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 /// - An empty `categories` list is a valid, empty menu.
 /// - Unknown keys anywhere, including a top-level `_fixture_note`, are
 ///   ignored: only the keys named above are ever read.
-/// - [Menu.venueName] is read tolerantly, trying `venue.name` first and
-///   then a top-level `name`, and is null when neither is a non-empty
-///   string. A missing or wrong-shaped name is never a mapping failure —
-///   `menu_api_research`'s documented `menu/data` shape does not carry
-///   the venue's name at all, so null is the ordinary case today, not a
-///   drift signal.
+/// - [Menu.venueName] is always null: the assortment payload does not
+///   carry the venue's name. The Discovery screen already knows it when
+///   the user arrived from a venue card.
 ///
-/// Anything else — a missing or wrong-typed `currency`/`categories`/
-/// `items`, or a present-but-malformed entry inside `categories[]`,
-/// `items[]`, or `options[]` — is treated as a shape this mapper does not
-/// know, so a schema drift is diagnosable rather than silently producing
-/// an empty menu (architecture.md §8).
+/// Anything else — a missing or wrong-typed `categories`/`items`, or a
+/// present-but-malformed entry inside `categories[]`, `items[]`,
+/// `options[]` or an item's `options` — is treated as a shape this mapper
+/// does not know, so a schema drift is diagnosable rather than silently
+/// producing an empty menu (architecture.md §8).
 abstract final class WoltMenuMapper {
+  /// The currency every Wolt Israel venue prices in; see the class doc
+  /// comment for why it is not read from the payload.
+  static const String defaultCurrency = 'ILS';
+
   /// Normalises [json] into a [Menu] for [ref], stamped [fetchedAt].
   ///
   /// Returns [MenuFetchFailed] with
@@ -80,11 +102,10 @@ abstract final class WoltMenuMapper {
     required VenueRef ref,
     required DateTime fetchedAt,
   }) {
-    final currency = json['currency'];
+    final rawCurrency = json['currency'];
     final rawCategories = json['categories'];
     final rawItems = json['items'];
     final rawOptions = json['options'];
-    if (currency is! String || currency.isEmpty) return null;
     if (rawCategories is! List<Object?>) return null;
     if (rawItems is! List<Object?>) return null;
     if (rawOptions != null && rawOptions is! List<Object?>) return null;
@@ -119,34 +140,19 @@ abstract final class WoltMenuMapper {
 
     return Menu(
       venueRef: ref,
-      currency: currency,
+      currency: rawCurrency is String && rawCurrency.isNotEmpty
+          ? rawCurrency
+          : defaultCurrency,
       fetchedAt: fetchedAt,
       categories: categories,
-      venueName: _tryReadVenueName(json),
     );
-  }
-
-  /// The venue's display name, tried first at `venue.name` and then at a
-  /// top-level `name`, or null when neither is a non-empty string.
-  ///
-  /// Tolerant by design (see the class doc comment): a missing or
-  /// malformed name must never fail the mapping, only leave
-  /// [Menu.venueName] null.
-  static String? _tryReadVenueName(Map<String, Object?> json) {
-    final rawVenue = json['venue'];
-    if (rawVenue is Map<String, Object?>) {
-      final nested = rawVenue['name'];
-      if (nested is String && nested.isNotEmpty) return nested;
-    }
-    final topLevel = json['name'];
-    if (topLevel is String && topLevel.isNotEmpty) return topLevel;
-    return null;
   }
 
   /// Builds one entry of the top-level `options[]` id-lookup table from
   /// one raw option-group object, or null when [raw] does not have the
-  /// `{id, name, values: [{name, ...}]}` shape. `type` and each value's
-  /// `id`/`price` are read nowhere: they are not part of [DishOption].
+  /// `{id, name, values: [{name, ...}]}` shape. `type`, `default_value`
+  /// and each value's `id`/`price` are read nowhere: they are not part of
+  /// [DishOption].
   static MapEntry<String, DishOption>? _tryBuildOptionGroup(Object? raw) {
     if (raw is! Map<String, Object?>) return null;
     final id = raw['id'];
@@ -177,20 +183,27 @@ abstract final class WoltMenuMapper {
     final name = raw['name'];
     final rawDescription = raw['description'];
     final rawPrice = raw['price'];
-    final rawOptionIds = raw['options'] ?? <Object?>[];
-    final rawImage = raw['image'];
+    final rawItemOptions = raw['options'] ?? <Object?>[];
     if (id is! String || id.isEmpty) return null;
     if (name is! String || name.isEmpty) return null;
     if (rawDescription != null && rawDescription is! String) return null;
     if (rawPrice is! num || rawPrice < 0) return null;
-    if (rawOptionIds is! List<Object?>) return null;
+    if (rawItemOptions is! List<Object?>) return null;
     final options = <DishOption>[];
-    for (final rawOptionId in rawOptionIds) {
-      if (rawOptionId is! String) return null;
-      final option = optionGroups[rawOptionId];
-      // An option id with no matching group is skipped, not an error;
+    for (final rawItemOption in rawItemOptions) {
+      if (rawItemOption is! Map<String, Object?>) return null;
+      final optionId = rawItemOption['option_id'];
+      if (optionId is! String) return null;
+      final group = optionGroups[optionId];
+      // An option_id with no matching group is skipped, not an error;
       // see the leniency note in the class doc comment above.
-      if (option != null) options.add(option);
+      if (group == null) continue;
+      final label = rawItemOption['name'];
+      options.add(
+        label is String && label.isNotEmpty && label != group.name
+            ? DishOption(name: label, values: group.values)
+            : group,
+      );
     }
     return Dish(
       id: id,
@@ -200,14 +213,25 @@ abstract final class WoltMenuMapper {
       options: options,
       // A missing or malformed image is never a mapping failure; see
       // the class doc comment.
-      imageUrl: rawImage is String && rawImage.isNotEmpty ? rawImage : null,
+      imageUrl: _tryReadImageUrl(raw['images']),
     );
   }
 
+  /// The first entry of an item's `images` list's `url`, or null when
+  /// there is no usable one. Never fails the mapping.
+  static String? _tryReadImageUrl(Object? rawImages) {
+    if (rawImages is! List<Object?> || rawImages.isEmpty) return null;
+    final first = rawImages.first;
+    if (first is! Map<String, Object?>) return null;
+    final url = first['url'];
+    return url is String && url.isNotEmpty ? url : null;
+  }
+
   /// Builds one `categories[]` entry into a [MenuCategory], resolving its
-  /// `item_ids` against [itemsById] and dropping any id already claimed
-  /// by an earlier category via [usedDishIds]. Returns null when [raw]
-  /// does not have the `{id, name, item_ids: [...]}` shape.
+  /// `item_ids` — then its subcategories' — against [itemsById] and
+  /// dropping any id already claimed by an earlier category via
+  /// [usedDishIds]. Returns null when [raw] does not have the
+  /// `{id, name, item_ids: [...]}` shape.
   static MenuCategory? _tryBuildCategory(
     Object? raw, {
     required Map<String, Dish> itemsById,
@@ -216,14 +240,13 @@ abstract final class WoltMenuMapper {
     if (raw is! Map<String, Object?>) return null;
     final id = raw['id'];
     final name = raw['name'];
-    final rawItemIds = raw['item_ids'];
     if (id is! String || id.isEmpty) return null;
     if (name is! String || name.isEmpty) return null;
-    if (rawItemIds is! List<Object?>) return null;
+    final itemIds = _tryReadItemIds(raw['item_ids']);
+    if (itemIds == null) return null;
     final dishes = <Dish>[];
-    for (final rawItemId in rawItemIds) {
-      if (rawItemId is! String) return null;
-      final dish = itemsById[rawItemId];
+    for (final itemId in [...itemIds, ..._subcategoryItemIds(raw)]) {
+      final dish = itemsById[itemId];
       // An item_id with no matching entry in items[] is skipped, not an
       // error (architecture.md §6.1).
       if (dish == null) continue;
@@ -233,5 +256,36 @@ abstract final class WoltMenuMapper {
       dishes.add(dish);
     }
     return MenuCategory(id: id, name: name, dishes: dishes);
+  }
+
+  /// [raw] as a list of item id strings, or null when it is not a list
+  /// or holds anything but strings.
+  static List<String>? _tryReadItemIds(Object? raw) {
+    if (raw is! List<Object?>) return null;
+    final ids = <String>[];
+    for (final id in raw) {
+      if (id is! String) return null;
+      ids.add(id);
+    }
+    return ids;
+  }
+
+  /// Every item id under [category]'s `subcategories`, depth first and in
+  /// order. Tolerant by design (see the class doc comment): an absent or
+  /// malformed `subcategories` list, or a malformed entry in it,
+  /// contributes nothing rather than failing the mapping.
+  static List<String> _subcategoryItemIds(Map<String, Object?> category) {
+    final rawSubcategories = category['subcategories'];
+    if (rawSubcategories is! List<Object?>) return const <String>[];
+    final ids = <String>[];
+    for (final rawSubcategory in rawSubcategories) {
+      if (rawSubcategory is! Map<String, Object?>) continue;
+      final itemIds = _tryReadItemIds(rawSubcategory['item_ids']);
+      if (itemIds == null) continue;
+      ids
+        ..addAll(itemIds)
+        ..addAll(_subcategoryItemIds(rawSubcategory));
+    }
+    return ids;
   }
 }
