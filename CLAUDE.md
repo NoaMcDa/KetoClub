@@ -372,15 +372,18 @@ the coverage denominator.
 
 Built, but not confirmed end to end, and not to be reported as done:
 
-- **Gemini has never been called from this environment** (`architecture.md` §17
-  open question 1, closed as posed by D12 but not verified in practice).
-  `generativelanguage.googleapis.com` is blocked through the egress proxy here,
-  the same way `openrouter.ai` was before it. `backend/README.md`'s "Manual
-  end-to-end check" section, and its `/v1/chat` smoke curl within it, is the
-  one-command check for anyone with a network path to Google — nobody has run
-  it yet, so the pinned model's (`GEMINI_MODEL`, default `gemini-2.5-flash`)
-  latency and structured-output behaviour against this app's real prompt are
-  unmeasured.
+- **Gemini smoke test run 2026-09-28** (`architecture.md` §17.1, #165). The
+  network is reachable from this environment after all. Findings changed the
+  default model: `gemini-2.5-flash` is 404 for new users (Google recommends
+  `gemini-3.8-flash`), so `GEMINI_MODEL` moved to `gemini-3.5-flash`
+  (`gemini-3.8-flash` and `gemini-flash-latest` return 503 for structured
+  output; `gemini-flash-lite-latest` rejects `thinkingConfig`). Measured on
+  a laptop through the local backend: 33.5 s cold for a 20-dish English
+  menu, 8.8 s for a 10-dish Hebrew menu (Hebrew `why`/`modification` came
+  back in Hebrew), 4 ms for a repeat via the shared completion cache. What
+  is still unverified: phone latency (#65 numbers) and a real 60-dish or
+  bigger menu (Gemini returned 503 UNAVAILABLE for the 56-dish attempt).
+  Redacted responses under `test/fixtures/llm/smoke_*.json`.
 - **The Wolt menu fixture is real** (`wolt_hamosad_menu.json`, recorded
   2026-09-25 from the consumer-assortment endpoint the app now calls; issues
   #22, #168), but only one venue was recorded and only from a laptop — this

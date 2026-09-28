@@ -249,7 +249,7 @@ that need them (`/v1/chat`, and `/v1/admin/*` in a later issue). See
 | Variable | Default | Meaning |
 |---|---|---|
 | `GEMINI_API_KEY` | unset | The server's key, sent only as `x-goog-api-key`. Unset → `/v1/chat` answers `notConfigured` |
-| `GEMINI_MODEL` | `gemini-2.5-flash` | Model in the `generateContent` path |
+| `GEMINI_MODEL` | `gemini-3.5-flash` | Model in the `generateContent` path. `gemini-2.5-flash` was retired for new users September 2026 (404 NOT_FOUND); see `.env.example` for why 3.5-flash was picked over `gemini-flash-latest` / `-lite-latest` / `-3.8-flash`. |
 | `GEMINI_BASE_URL` | `https://generativelanguage.googleapis.com` | Upstream host; never taken from a request |
 | `GEMINI_MAX_OUTPUT_TOKENS` | `65536` | `generationConfig.maxOutputTokens`; must exceed a full menu's verdicts (#188) |
 | `GEMINI_THINKING_BUDGET` | `0` | Thinking tokens count against the output budget, and this is a classification task |
@@ -296,7 +296,7 @@ curl -sS localhost:8000/v1/chat \
     },
     "schema_name": "menu_analysis"
   }'
-# {"content":"{\"dishes\": [...]}","model":"gemini-2.5-flash"}
+# {"content":"{\"dishes\": [...]}","model":"gemini-3.5-flash"}
 ```
 
 The default limit is 5 requests a minute per install id; change the id to
@@ -355,7 +355,7 @@ once.
    Run it again: the second response carries `x-ketoclub-cache: hit`.
 5. **Chat smoke test.** Use the curl in "Smoke test against the real API"
    above. A real completion comes back as `{"content":"{\"dishes\": [...]}",
-   "model":"gemini-2.5-flash"}` (or whatever `GEMINI_MODEL` names).
+   "model":"gemini-3.5-flash"}` (or whatever `GEMINI_MODEL` names).
 5a. **Search for a venue on the web build**, against real Wolt discovery
    endpoints: use the two curls in "The Wolt venue-discovery proxies" above,
    or run the Flutter app and search by name or "near me" once #40 lands.
