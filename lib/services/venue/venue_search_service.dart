@@ -33,9 +33,13 @@ enum VenueSearchFailureReason {
   /// no request is even attempted; the way out is the phone app.
   blockedByBrowser,
 
-  /// A backend is configured and could not be reached at all — a socket
-  /// or DNS error talking to KetoClub's own server, never a status Wolt
-  /// returned.
+  /// A backend is configured and either could not be reached at all (a
+  /// socket or DNS error talking to KetoClub's own server), or answered a
+  /// status Wolt could not have originated — most often a `400` because
+  /// the discovery routes require an install id the client did not send
+  /// (`backend/app/routers/discovery.py`, `require_install_id`). Never a
+  /// status Wolt itself returned: the two Wolt "update the app" codes
+  /// (`410`, `430`) pass through as [platformChanged].
   backendUnreachable,
 }
 

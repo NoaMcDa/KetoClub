@@ -221,8 +221,20 @@ final class WoltVenueSearchService implements VenueSearchService {
       return const VenueSearchFailed(VenueSearchFailureReason.rateLimited);
     }
     if (statusCode < 200 || statusCode >= 300) {
-      // Wolt's 410/430 "update the app" land here, as does any other
-      // status a working search never answers with.
+      // Through the proxy, only Wolt's own 410/430 "update the app" can
+      // reach us as a non-2xx (the backend passes them through unchanged
+      // — see `backend/app/routers/discovery.py`). Any other status has
+      // to be KetoClub's backend answering — most likely a 400 saying
+      // the install id was missing (`require_install_id`) — and reporting
+      // it as "Wolt changed how its search works" would blame Wolt for a
+      // KetoClub-to-KetoClub contract error.
+      final isWoltPassThrough = statusCode == 410 || statusCode == 430;
+      if (proxyBase != null && !isWoltPassThrough) {
+        return VenueSearchFailed(
+          VenueSearchFailureReason.backendUnreachable,
+          statusCode: statusCode,
+        );
+      }
       return VenueSearchFailed(
         VenueSearchFailureReason.platformChanged,
         statusCode: statusCode,
