@@ -139,6 +139,33 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settingsConsentAccept => 'הבנתי';
 
   @override
+  String get settingsConsentBodyDirect =>
+      'כשאתם מאשרים ניתוח בינה מלאכותית, שמות המנות, התיאורים ושמות התוספות מהתפריט שאתם פותחים נשלחים ישירות מהמכשיר הזה ל‑Gemini API של Google, עם מפתח ה‑API שלכם. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים.';
+
+  @override
+  String get settingsKeySection => 'מפתח Gemini API';
+
+  @override
+  String get settingsKeyBody =>
+      'בטלפון הזה, ניתוח בינה מלאכותית פונה ישירות ל‑Gemini API של Google עם המפתח שלכם. אפשר ליצור מפתח בחינם ב‑Google AI Studio. המפתח נשמר באחסון המאובטח של המכשיר ונשלח רק ל‑Google.';
+
+  @override
+  String get settingsKeyHint => 'הדביקו את מפתח ה‑Gemini API שלכם';
+
+  @override
+  String get settingsKeySave => 'שמור מפתח';
+
+  @override
+  String get settingsKeyPresent => 'מפתח שמור במכשיר הזה.';
+
+  @override
+  String get settingsKeyAbsent =>
+      'אין מפתח שמור. קטוקלאב ישתמש בכללים שעל המכשיר.';
+
+  @override
+  String get settingsKeyDelete => 'הסר מפתח';
+
+  @override
   String get settingsLanguage => 'שפה';
 
   @override
@@ -323,6 +350,14 @@ class AppLocalizationsHe extends AppLocalizations {
       'אשרו ניתוח בינה מלאכותית בהגדרות כדי לנתח את התפריט הזה. מוצגות תוצאות על בסיס כללים.';
 
   @override
+  String get analysisApiKeyMissing =>
+      'הוסיפו את מפתח ה‑Gemini API שלכם בהגדרות כדי לנתח את התפריט הזה. מוצגות תוצאות על בסיס כללים.';
+
+  @override
+  String get analysisApiKeyRejected =>
+      'Gemini דחתה את מפתח ה‑API שלכם. בדקו אותו בהגדרות. מוצגות תוצאות על בסיס כללים.';
+
+  @override
   String pillSemanticLabel(String verdict) {
     return 'פסיקה: $verdict';
   }
@@ -380,6 +415,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get engineChipReasonConsentWithheld => 'בינה מלאכותית לא אושרה';
+
+  @override
+  String get engineChipReasonApiKeyMissing => 'אין מפתח';
+
+  @override
+  String get engineChipReasonApiKeyRejected => 'המפתח נדחה';
 
   @override
   String get navExplore => 'גילוי';

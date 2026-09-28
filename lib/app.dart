@@ -200,6 +200,7 @@ Route<void>? generateRoute(
           create: (_) => SettingsController(
             dependencies.settingsStore,
             dependencies.menuRepository,
+            dependencies.apiKeyStore,
           ),
           child: const SettingsScreen(),
         ),

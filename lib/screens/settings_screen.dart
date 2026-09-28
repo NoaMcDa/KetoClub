@@ -41,10 +41,20 @@ const Key dairyFreeSwitchKey = Key('settingsDairyFreeSwitch');
 /// The "Carnivore only" switch (issue #56).
 const Key carnivoreOnlySwitchKey = Key('settingsCarnivoreOnlySwitch');
 
-/// The Settings screen: the AI-analysis consent disclosure, the UI
-/// language, the appearance, the net-carb limit, the "Your keto rules"
-/// dietary toggles, the default menu filter, and cache clearing
-/// (architecture.md §6.6, §11, §12, §13).
+/// The Gemini API key field (architecture.md D14), shown on iOS and
+/// Android only.
+const Key apiKeyFieldKey = Key('settingsApiKeyField');
+
+/// The "Save key" button beside [apiKeyFieldKey].
+const Key apiKeySaveKey = Key('settingsApiKeySave');
+
+/// The "Remove key" button, shown only while a key is saved.
+const Key apiKeyDeleteKey = Key('settingsApiKeyDelete');
+
+/// The Settings screen: the AI-analysis consent disclosure, the user's
+/// Gemini API key on iOS and Android, the UI language, the appearance, the
+/// net-carb limit, the "Your keto rules" dietary toggles, the default menu
+/// filter, and cache clearing (architecture.md §6.6, §11, §12, §13, D14).
 ///
 /// Reads its [SettingsController] from `provider` and calls
 /// [SettingsController.load] once, after the first frame, the same way
@@ -72,6 +82,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// shown once. Local UI state, not part of [SettingsController]: the
   /// controller has no notion of "just cleared", only of being busy.
   bool _cacheCleared = false;
+
+  /// The Gemini API key as the user types it. Never prefilled from the
+  /// controller, which exposes only [SettingsController.hasApiKey], and
+  /// cleared once a save completes, so a typed key does not linger on
+  /// screen after it is stored.
+  final TextEditingController _apiKeyField = TextEditingController();
+
+  @override
+  void dispose() {
+    _apiKeyField.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -104,6 +126,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             _consentSection(context, l10n, controller),
             const SizedBox(height: 20),
+            if (controller.supportsApiKey) ...[
+              _apiKeySection(context, l10n, controller),
+              const SizedBox(height: 20),
+            ],
             _languageSection(context, l10n, controller),
             const SizedBox(height: 20),
             _appearanceSection(context, l10n, controller),
@@ -123,7 +149,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   /// The consent disclosure: what leaves the device, and the
   /// acknowledgement checkbox wired to [SettingsController.setConsent]
-  /// (architecture.md §11).
+  /// (architecture.md §11). Where dish text goes depends on the build:
+  /// straight to Google with the user's key on iOS and Android (D14),
+  /// through KetoClub's server on web (D12) — so the disclosure follows
+  /// [SettingsController.supportsApiKey].
   Widget _consentSection(
     BuildContext context,
     AppLocalizations l10n,
@@ -136,7 +165,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _SectionLabel(l10n.settingsConsentTitle),
         _SettingsGroup(
           children: [
-            _GroupNote(l10n.settingsConsentBody),
+            _GroupNote(
+              controller.supportsApiKey
+                  ? l10n.settingsConsentBodyDirect
+                  : l10n.settingsConsentBody,
+            ),
             CheckboxListTile(
               controlAffinity: ListTileControlAffinity.leading,
               value: controller.consentGiven,
@@ -150,6 +183,82 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ],
     );
+  }
+
+  /// The Gemini API key field, its save and remove actions and the
+  /// saved/not-saved status line (architecture.md D14, §11). Built only
+  /// when [SettingsController.supportsApiKey] is true.
+  ///
+  /// The field is [TextField.obscureText] and never prefilled — see
+  /// [_apiKeyField].
+  Widget _apiKeySection(
+    BuildContext context,
+    AppLocalizations l10n,
+    SettingsController controller,
+  ) {
+    final busy = controller.isBusy;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionLabel(l10n.settingsKeySection),
+        _SettingsGroup(
+          children: [
+            _GroupNote(l10n.settingsKeyBody),
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(16, 6, 16, 4),
+              child: TextField(
+                key: apiKeyFieldKey,
+                controller: _apiKeyField,
+                obscureText: true,
+                autocorrect: false,
+                enableSuggestions: false,
+                enabled: !busy,
+                decoration: InputDecoration(hintText: l10n.settingsKeyHint),
+              ),
+            ),
+            _GroupNote(
+              controller.hasApiKey
+                  ? l10n.settingsKeyPresent
+                  : l10n.settingsKeyAbsent,
+            ),
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(16, 6, 16, 10),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  FilledButton(
+                    key: apiKeySaveKey,
+                    onPressed: busy
+                        ? null
+                        : () => unawaited(_saveApiKey(controller)),
+                    child: Text(l10n.settingsKeySave),
+                  ),
+                  if (controller.hasApiKey)
+                    OutlinedButton(
+                      key: apiKeyDeleteKey,
+                      onPressed: busy
+                          ? null
+                          : () => unawaited(controller.deleteApiKey()),
+                      child: Text(l10n.settingsKeyDelete),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// Saves the field's text through [controller], then clears the field —
+  /// whether or not the text was blank, since a blank entry is already a
+  /// no-op in [SettingsController.saveApiKey] and there is nothing worth
+  /// leaving on screen either way.
+  Future<void> _saveApiKey(SettingsController controller) async {
+    await controller.saveApiKey(_apiKeyField.text);
+    if (!mounted) return;
+    _apiKeyField.clear();
   }
 
   /// The three-way UI language choice: system, English, or Hebrew

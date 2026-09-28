@@ -116,4 +116,7 @@ String _reasonLabel(
     l10n.engineChipReasonBackendUnreachable,
   MenuAnalysisFailureReason.consentWithheld =>
     l10n.engineChipReasonConsentWithheld,
+  MenuAnalysisFailureReason.apiKeyMissing => l10n.engineChipReasonApiKeyMissing,
+  MenuAnalysisFailureReason.apiKeyRejected =>
+    l10n.engineChipReasonApiKeyRejected,
 };

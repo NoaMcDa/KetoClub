@@ -22,14 +22,22 @@ backend) are in `docs/RUNNING_IOS.md`.
 
 ## 1. The app on its own (no backend)
 
-The backend is an accelerator, never a dependency (`architecture.md` D11).
-With no backend configured the app still runs everywhere; what changes is
-what it can reach:
+The backend is for the web build only (`architecture.md` D11, D14). iOS and
+Android never call it, even when it is configured: they call Wolt and
+Google's Gemini API themselves. What each platform can reach with no backend:
 
 | Platform | Menus (Wolt, 10bis) | Nearby / by-name search | AI analysis |
 |---|---|---|---|
-| iOS, Android | direct calls to the platform | direct calls to Wolt | **no** — rules engine only (labelled "rules") |
+| iOS, Android | direct calls to the platform | direct calls to Wolt | **yes, with your own Gemini key** — see below; without one, rules engine only (labelled "rules") |
 | Web (Chrome) | **blocked by CORS** — paste-a-link shows the "open in the phone app" message | blocked by CORS | no |
+
+**AI analysis on a phone (D14).** Create a free API key in
+[Google AI Studio](https://aistudio.google.com/apikey), then in the app open
+**Settings**, paste it under **Gemini API key**, tap **Save key**, and tick
+**allow AI analysis**. The key is kept in the Keychain (iOS) or Keystore
+(Android) and sent only to Google, as the `x-goog-api-key` header. Without a
+key, a menu shows rule-based verdicts with "Add your Gemini API key in
+Settings" and a shortcut there.
 
 ```bash
 git clone https://github.com/NoaMcDa/KetoClub.git
@@ -44,9 +52,9 @@ flutter run -d <device-id>  # phone or simulator; `flutter devices` lists ids
 ## 2. The backend
 
 The backend gives the web build live menus and search (it forwards the
-requests Wolt and 10bis refuse from a browser) and gives **every** platform AI
-analysis, because it holds the Gemini key server-side — the app never holds a
-model key (D12).
+requests Wolt and 10bis refuse from a browser) and AI analysis, because it
+holds the Gemini key server-side, so the browser never holds one (D12). Phones
+do not use it (D14).
 
 ```bash
 cd backend
@@ -64,29 +72,20 @@ local SQLite file (`backend/ketoclub.db`, gitignored) holding only the
 menu/search/completion caches. `backend/README.md` documents every route,
 error and cache.
 
-## 3. The app talking to the backend
+## 3. The web app talking to the backend
 
 The backend URL is compiled in with a `--dart-define`; there is no in-app
-setting for it.
+setting for it. Only the web build reads it: a phone build ignores it (D14).
 
 ```bash
 # web, backend on the same machine
 flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
-
-# a phone on the same Wi-Fi: use the machine's LAN address, not localhost
-flutter run -d <device-id> --dart-define=KETOCLUB_BACKEND_URL=http://192.168.1.23:8000
 ```
-
-For a phone, also let the backend accept that origin: the default
-`CORS_ORIGIN_REGEX` in `.env` allows `localhost`/`127.0.0.1` only, which is
-enough for the web build; native apps send no `Origin`, so nothing changes for
-them. On iOS, a plain `http://` LAN URL needs an ATS exception for local
-networking — a simulator does not.
 
 Then in the app: open **Settings → allow AI analysis** (consent is off by
 default and is the only thing gating the AI path once a backend is configured),
 paste a Wolt link on the Discovery tab or tap the location button to search
-nearby.
+nearby. The web Settings screen has no key field: the key is the backend's.
 
 ### Builds
 
@@ -139,8 +138,10 @@ for issue #38, and `backend/README.md` the 10bis curl for issue #44.
 | Symptom | Cause | Fix |
 |---|---|---|
 | Web: "A web browser cannot read Wolt menus" | no backend configured | run §2 and add the `--dart-define` (§3) |
-| "AI analysis is not available on this build or server" | no backend URL compiled in, or `GEMINI_API_KEY` unset | §3 / `.env` |
-| "Showing rule-based results" after a wait | backend unreachable or Gemini timed out | `curl /v1/health`; check the LAN address on a phone |
+| Web: "AI analysis is not available on this build or server" | no backend URL compiled in, or `GEMINI_API_KEY` unset | §3 / `.env` |
+| Phone: "Add your Gemini API key in Settings" | no key saved | §1, "AI analysis on a phone" |
+| Phone: "Gemini rejected your API key" | the saved key is wrong, revoked, or not enabled for the Gemini API | paste a fresh key from Google AI Studio |
+| "Showing rule-based results" after a wait | web: backend unreachable or Gemini timed out; phone: Gemini timed out | web: `curl /v1/health` |
 | Nearby search says "blocked by browser" | web without a backend | §3 |
 | `flutter analyze` fails on an info | intended — CI runs `--fatal-infos` | fix the lint |
 | Location button does nothing on web | browser Geolocation needs `https://` or `localhost` | use `localhost`, not a LAN IP, for the web build |

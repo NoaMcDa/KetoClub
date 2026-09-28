@@ -1,7 +1,7 @@
 # Running KetoClub on iOS
 
-The iOS-specific steps: a simulator, a physical iPhone, and talking to the
-backend from the phone. `docs/RUNNING.md` covers everything that is the same
+The iOS-specific steps: a simulator, a physical iPhone, and turning on AI
+analysis with your own Gemini key. `docs/RUNNING.md` covers everything that is the same
 on every platform (the backend itself, the test gate, the recordings).
 
 **Nobody has run this app on a real iPhone yet** (`CLAUDE.md`, "What is NOT
@@ -51,7 +51,7 @@ What a simulator can and cannot show you:
 | Every screen, both languages (Settings → Language), light/dark (Settings → Appearance) | Screen brightness (no backlight; the Waiter Card's raise is a no-op) |
 | Wolt and 10bis menus fetched directly — no backend needed, no CORS on native | The location prompt is real, but the position is whatever *Features → Location* in the Simulator menu says (set "Custom Location…" to 32.07, 34.77 for Tel Aviv) |
 | Share sheet (simulator has a limited set of targets) | Opening the Wolt app (not installed on a simulator; the link falls back to Safari) |
-| AI analysis, with the backend on the Mac (§3) | Performance numbers for `docs/RELEASE.md` §5 — measure on a device |
+| AI analysis, with your own Gemini key (§3) | Performance numbers for `docs/RELEASE.md` §5 — measure on a device |
 
 ## 2. A physical iPhone
 
@@ -76,37 +76,21 @@ button on the Discovery tab — never on launch. Deny it once to see the
 permanent-denial state offers Open Settings (once PR `claude/location-settings-phototile`
 is merged).
 
-## 3. Talking to the backend from the phone
+## 3. AI analysis on the phone
 
-Native apps have no CORS, so menus and search work with no backend at all.
-The backend adds **AI analysis** (it holds the Gemini key). Start it on the Mac
-per `docs/RUNNING.md` §2, then point the phone at the Mac's LAN address, not
-`localhost`:
+The phone calls Wolt and Google's Gemini API itself and never talks to
+KetoClub's backend (`architecture.md` D14), so there is nothing to run on the
+Mac and no App Transport Security exception to add: every host it calls is
+`https://`.
 
-```bash
-ipconfig getifaddr en0      # the Mac's Wi-Fi address, e.g. 192.168.1.23
-flutter run -d <device-id> --dart-define=KETOCLUB_BACKEND_URL=http://192.168.1.23:8000
-```
+1. Create a free API key in [Google AI Studio](https://aistudio.google.com/apikey).
+2. In the app open **Settings**, paste it under **Gemini API key**, and tap
+   **Save key**. It is kept in the iOS Keychain and sent only to Google.
+3. Tick **allow AI analysis** (consent is off by default), open a menu, and
+   the engine chip should read "AI" instead of "rules".
 
-Both must be on the same Wi-Fi, and the backend must listen on all interfaces:
-`uv run uvicorn app.main:app --host 0.0.0.0 --port 8000`.
-
-**App Transport Security.** iOS blocks plain `http://` to a LAN host unless
-the app opts in. `Info.plist` does not currently carry an exception, so a LAN
-backend over `http://` fails with `backendUnreachable` on a device (a
-simulator is exempt). For a local test add, under the top-level `<dict>` of
-`ios/Runner/Info.plist`, and do not ship it:
-
-```xml
-<key>NSAppTransportSecurity</key>
-<dict>
-  <key>NSAllowsLocalNetworking</key>
-  <true/>
-</dict>
-```
-
-Then Settings → allow AI analysis (consent is off by default), open a menu,
-and the engine chip should read "AI" instead of "rules".
+Without a key the menu still opens with rule-based verdicts, and the banner
+says to add a key, with a shortcut to Settings.
 
 ## 4. Builds
 
@@ -115,9 +99,9 @@ flutter build ios --release --no-codesign   # what CI runs; proves it compiles
 flutter build ipa                            # signed archive for TestFlight; needs a paid account
 ```
 
-Add `--dart-define=KETOCLUB_BACKEND_URL=…` to any build that should reach a
-backend; there is no in-app setting for it. Whatever `.env` the backend runs
-with stays on the Mac — the app never holds a model key.
+An iOS build needs no `--dart-define`: `KETOCLUB_BACKEND_URL` is read only by
+the web build (D14). The Gemini key is never compiled in; each user pastes
+their own in Settings.
 
 ## 5. What to check on the first device run
 

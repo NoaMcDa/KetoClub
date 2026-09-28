@@ -14,6 +14,7 @@ import 'package:ketoclub/state/settings_controller.dart';
 import 'package:ketoclub/state/theme_mode_controller.dart';
 import 'package:provider/provider.dart';
 
+import '../fakes/fake_api_key_store.dart';
 import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_settings_store.dart';
 
@@ -43,12 +44,18 @@ Finder _appearanceOption(String label) => find.descendant(
 
 /// Builds the [SettingsController] the widget under test is pumped over,
 /// from fresh fakes unless the caller seeds one.
+///
+/// [apiKeyStore] stands in for a phone build (architecture.md D14): with
+/// one the screen shows the Gemini key section; without one — the web
+/// build, and every other test here — it does not.
 SettingsController _controllerFor({
   FakeSettingsStore? settingsStore,
   FakeMenuRepository? repository,
+  FakeApiKeyStore? apiKeyStore,
 }) => SettingsController(
   settingsStore ?? FakeSettingsStore(),
   repository ?? FakeMenuRepository(),
+  apiKeyStore,
 );
 
 /// Pumps the real [SettingsScreen] over a real [SettingsController] and a
@@ -807,6 +814,133 @@ void main() {
           expect(tester.takeException(), isNull);
         },
       );
+    });
+  });
+
+  group('SettingsScreen Gemini API key (architecture.md D14)', () {
+    testWidgets('web: no key section, and the via-server disclosure', (
+      tester,
+    ) async {
+      // Arrange
+      final controller = _controllerFor();
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.settingsKeySection), findsNothing);
+      expect(find.byKey(apiKeyFieldKey), findsNothing);
+      expect(find.text(_en.settingsConsentBody), findsOneWidget);
+      expect(find.text(_en.settingsConsentBodyDirect), findsNothing);
+    });
+
+    testWidgets('phone: the key section and the direct-to-Google '
+        'disclosure', (tester) async {
+      // Arrange
+      final controller = _controllerFor(apiKeyStore: FakeApiKeyStore());
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.settingsKeySection), findsOneWidget);
+      expect(find.text(_en.settingsKeyBody), findsOneWidget);
+      expect(find.text(_en.settingsKeyAbsent), findsOneWidget);
+      expect(find.byKey(apiKeySaveKey), findsOneWidget);
+      expect(find.byKey(apiKeyDeleteKey), findsNothing);
+      expect(find.text(_en.settingsConsentBodyDirect), findsOneWidget);
+      expect(find.text(_en.settingsConsentBody), findsNothing);
+    });
+
+    testWidgets('the key field is obscured and never prefilled', (
+      tester,
+    ) async {
+      // Arrange
+      const secret = 'AIza-already-saved';
+      final controller = _controllerFor(
+        apiKeyStore: FakeApiKeyStore(seed: secret),
+      );
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      final field = tester.widget<TextField>(find.byKey(apiKeyFieldKey));
+      expect(field.obscureText, isTrue);
+      expect(field.controller!.text, isEmpty);
+      expect(find.text(secret), findsNothing);
+      expect(find.text(_en.settingsKeyPresent), findsOneWidget);
+    });
+
+    testWidgets('saving stores the trimmed key, clears the field and '
+        'offers Remove', (tester) async {
+      // Arrange
+      final keys = FakeApiKeyStore();
+      final controller = _controllerFor(apiKeyStore: keys);
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.enterText(find.byKey(apiKeyFieldKey), '  AIza-typed  ');
+      await tester.tap(find.byKey(apiKeySaveKey));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(await keys.read(), 'AIza-typed');
+      final field = tester.widget<TextField>(find.byKey(apiKeyFieldKey));
+      expect(field.controller!.text, isEmpty);
+      expect(find.text(_en.settingsKeyPresent), findsOneWidget);
+      expect(find.byKey(apiKeyDeleteKey), findsOneWidget);
+    });
+
+    testWidgets('saving a blank field stores nothing', (tester) async {
+      // Arrange
+      final keys = FakeApiKeyStore();
+      final controller = _controllerFor(apiKeyStore: keys);
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.enterText(find.byKey(apiKeyFieldKey), '   ');
+      await tester.tap(find.byKey(apiKeySaveKey));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(keys.writeCallCount, 0);
+      expect(find.text(_en.settingsKeyAbsent), findsOneWidget);
+    });
+
+    testWidgets('Remove deletes the saved key', (tester) async {
+      // Arrange
+      final keys = FakeApiKeyStore(seed: 'AIza-saved');
+      final controller = _controllerFor(apiKeyStore: keys);
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(find.byKey(apiKeyDeleteKey));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(await keys.read(), isNull);
+      expect(find.text(_en.settingsKeyAbsent), findsOneWidget);
+      expect(find.byKey(apiKeyDeleteKey), findsNothing);
+    });
+
+    testWidgets('renders the key section in Hebrew', (tester) async {
+      // Arrange
+      final controller = _controllerFor(apiKeyStore: FakeApiKeyStore());
+
+      // Act
+      await _pump(tester, controller, locale: const Locale('he'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_he.settingsKeySection), findsOneWidget);
+      expect(find.text(_he.settingsConsentBodyDirect), findsOneWidget);
     });
   });
 }

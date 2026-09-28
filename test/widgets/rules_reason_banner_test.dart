@@ -80,36 +80,42 @@ void main() {
       );
     }
 
-    testWidgets('offers a Settings action only for consentWithheld, tapping it '
-        'pushes the settings route', (tester) async {
-      // Arrange
-      final pushedNames = <String>[];
+    // The reasons the user fixes in Settings: consent, and the Gemini key
+    // used on iOS and Android (architecture.md D14).
+    const fixableInSettings = <MenuAnalysisFailureReason>{
+      MenuAnalysisFailureReason.consentWithheld,
+      MenuAnalysisFailureReason.apiKeyMissing,
+      MenuAnalysisFailureReason.apiKeyRejected,
+    };
 
-      // Act
-      await _pump(
-        tester,
-        const RulesReasonBanner(
-          engine: RulesEngine(
-            reason: MenuAnalysisFailureReason.consentWithheld,
-          ),
-        ),
-        pushedNames,
-      );
+    for (final reason in fixableInSettings) {
+      testWidgets('offers a Settings action for ${reason.name}, tapping it '
+          'pushes the settings route', (tester) async {
+        // Arrange
+        final pushedNames = <String>[];
 
-      // Assert: the action is present.
-      expect(find.text(_en.actionOpenSettings), findsOneWidget);
+        // Act
+        await _pump(
+          tester,
+          RulesReasonBanner(engine: RulesEngine(reason: reason)),
+          pushedNames,
+        );
 
-      // Act: tap it.
-      await tester.tap(find.text(_en.actionOpenSettings));
-      await tester.pumpAndSettle();
+        // Assert: the action is present.
+        expect(find.text(_en.actionOpenSettings), findsOneWidget);
 
-      // Assert
-      expect(pushedNames, contains('/settings'));
-    });
+        // Act: tap it.
+        await tester.tap(find.text(_en.actionOpenSettings));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(pushedNames, contains('/settings'));
+      });
+    }
 
     testWidgets('every other reason offers no Settings action', (tester) async {
       for (final reason in MenuAnalysisFailureReason.values) {
-        if (reason == MenuAnalysisFailureReason.consentWithheld) continue;
+        if (fixableInSettings.contains(reason)) continue;
 
         // Arrange
         final pushedNames = <String>[];

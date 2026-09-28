@@ -138,6 +138,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsConsentAccept => 'I understand';
 
   @override
+  String get settingsConsentBodyDirect =>
+      'When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics.';
+
+  @override
+  String get settingsKeySection => 'Gemini API key';
+
+  @override
+  String get settingsKeyBody =>
+      'On this phone, AI analysis calls Google\'s Gemini API directly with your own key. You can create one for free in Google AI Studio. It is kept in this device\'s secure storage and sent only to Google.';
+
+  @override
+  String get settingsKeyHint => 'Paste your Gemini API key';
+
+  @override
+  String get settingsKeySave => 'Save key';
+
+  @override
+  String get settingsKeyPresent => 'A key is saved on this device.';
+
+  @override
+  String get settingsKeyAbsent =>
+      'No key saved. KetoClub will use on-device rules.';
+
+  @override
+  String get settingsKeyDelete => 'Remove key';
+
+  @override
   String get settingsLanguage => 'Language';
 
   @override
@@ -321,6 +348,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Allow AI analysis in Settings to analyse this menu. Showing rule-based results.';
 
   @override
+  String get analysisApiKeyMissing =>
+      'Add your Gemini API key in Settings to analyse this menu. Showing rule-based results.';
+
+  @override
+  String get analysisApiKeyRejected =>
+      'Gemini rejected your API key. Check it in Settings. Showing rule-based results.';
+
+  @override
   String pillSemanticLabel(String verdict) {
     return 'Verdict: $verdict';
   }
@@ -378,6 +413,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get engineChipReasonConsentWithheld => 'AI not allowed';
+
+  @override
+  String get engineChipReasonApiKeyMissing => 'no key';
+
+  @override
+  String get engineChipReasonApiKeyRejected => 'key rejected';
 
   @override
   String get navExplore => 'Explore';

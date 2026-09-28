@@ -7,7 +7,10 @@ import 'package:flutter/foundation.dart';
 /// and [badResponse] — are also the `reason` vocabulary KetoClub's
 /// backend answers with, so a client can map the wire value by name.
 /// [backendUnreachable] never comes from the wire: it is what a client
-/// reports when it could not reach the backend at all.
+/// reports when it could not reach the backend at all. [apiKeyMissing]
+/// and [apiKeyRejected] never come from the backend either: only the
+/// direct Gemini client used on iOS and Android reports them, because
+/// only there does the user supply the key (architecture.md D14).
 enum ChatFailureReason {
   /// No model is available: this build has no backend URL, or the
   /// backend has no model credentials configured (it answers 503).
@@ -29,6 +32,16 @@ enum ChatFailureReason {
   /// KetoClub's backend could not be reached: a socket or DNS error
   /// before any HTTP status was received.
   backendUnreachable,
+
+  /// No Gemini API key is saved on this device, so the direct client
+  /// sent nothing (architecture.md D14). The user can fix it in
+  /// Settings.
+  apiKeyMissing,
+
+  /// Gemini refused the key saved on this device: 401, 403, or a 400
+  /// naming an invalid key (architecture.md D14). The user can fix it in
+  /// Settings.
+  apiKeyRejected,
 }
 
 /// The outcome of one [LlmChatClient.complete] call (architecture.md §9,

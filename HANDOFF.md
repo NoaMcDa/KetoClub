@@ -53,8 +53,9 @@ failures kept intentionally rather than silently drifting from the artboard (see
 
 The app still does its job end to end: paste a Wolt link, fetch and cache the
 venue's menu, classify every dish 🟢 order-as-is / 🟡 order-with-a-change / 🔴 not
-keto with a hosted language model — or with an on-device bilingual rule engine
-when there is no key or no network — and show the verdicts with a full-screen
+keto with Google's Gemini model — called directly with the user's key on a
+phone, through the backend on web — or with an on-device bilingual rule engine
+when there is no key, no backend or no network — and show the verdicts with a full-screen
 Waiter Card to read to a server.
 
 | | |
@@ -76,6 +77,18 @@ no backend URL configured the app still behaves exactly as the fully
 client-only version did. `architecture.md` D11 and D12 (§14) are the
 authoritative record of what shipped; `backend_plan.md`'s own status banner may
 lag behind them.
+
+**Since D14 (issue #194) the backend serves the web build only.** iOS and
+Android call Wolt and Google's Gemini API themselves and ignore
+`KETOCLUB_BACKEND_URL`. The Wolt half was already true (`menuProxyBase` is null
+off the web). The Gemini half is new: `GeminiChatClient`
+(`services/llm/gemini_chat_client.dart`) is a Dart port of the backend's
+`services/gemini.py` and calls `generateContent` with a key the user pastes into
+a phone-only Settings section, kept in the Keychain/Keystore by
+`SecureApiKeyStore` (`flutter_secure_storage`, reinstated). `di.dart`'s
+`apiKeyStoreFor`/`chatClientFor` pick the phone or web path. Two failure
+reasons exist only on phones, `apiKeyMissing` and `apiKeyRejected`; both fall
+back to rules and offer "Open Settings". `architecture.md` D14 is the record.
 
 **Phase 2 — build-order steps 8 to 10, plus a run of features neither step
 names — has since landed too.** It shipped as a run of PRs (#124–#154) after
@@ -145,22 +158,20 @@ Several things are genuinely unfinished. None is a surprise; each is unfinished
 for a stated reason, and issues #16, #38, #44 and #65 are still **open**
 on GitHub — tooling exists for several of them, it did not close any of them.
 
-1. **The pinned Gemini model has never been called from this environment**
-   (§9.3, §17 open question 1 — closed as posed by D12, but the verification it
-   always asked for is still owed, now against a different provider).
-   `GEMINI_MODEL` defaults to `gemini-2.5-flash`, a backend environment
-   variable, not a Dart constant — swapping it is a redeploy, not a code
-   change. `generativelanguage.googleapis.com` is blocked from the build
-   environment the same way `openrouter.ai` was (the egress proxy answers 403
-   to the `CONNECT`), so the real system prompt has never been run against it
-   from here. **The one-command check now lives in `backend/README.md`**, in
-   its "Manual end-to-end check" section: with `GEMINI_API_KEY` set and the
-   server running, a `curl` against `/v1/chat` with a two-dish prompt is the
-   whole command, for anyone with a network path to Google. Nobody has run it
-   yet. `tool/measure_model_latency.dart`, the OpenRouter-specific version of
-   this check, was deleted along with `OpenRouterClient` (#102, D12) — there is
-   no client-side model to measure any more, since the app never calls a model
-   provider directly.
+1. **The pinned Gemini model has never answered a real request** (§9.3, §17
+   open question 1 — closed as posed by D12, but the verification it always
+   asked for is still owed). The model is `gemini-2.5-flash` on both paths:
+   the backend's `GEMINI_MODEL` default on web, and
+   `GeminiChatClient.defaultModel` on phones (D14) — a Dart constant there, so
+   swapping the phones' model is a release, not a redeploy. As of 2026-09-28
+   `generativelanguage.googleapis.com` **is** reachable from the build
+   environment (it was blocked before), and Google's real invalid-key 400 was
+   recorded into `gemini_chat_client_test.dart`, but no valid key has been
+   available, so no successful completion has been seen from either path. For
+   the web path, the one-command check is in `backend/README.md`'s "Manual
+   end-to-end check" section. For a phone, run the app on a device, paste a
+   key in Settings, allow AI analysis and open a Wolt menu; the engine chip
+   should read "AI".
 2. **The Wolt menu fixture is real now; the endpoint moved** (issues #22,
    #168, both closed by the port). Wolt's `/v4/venues/slug/{slug}/menu/data`
    answers every anonymous caller with `200` and a zero-byte body — measured
@@ -327,9 +338,11 @@ work "Outstanding before release" lists.
   80-column limit and `public_member_api_docs` apply to `test/` and
   `integration_test/` too.
 - **The egress proxy blocks `restaurant-api.wolt.com`, `consumer-api.wolt.com`,
-  `wolt.com`, `www.10bis.co.il` and `generativelanguage.googleapis.com`** (the
-  last one since D12; it blocked `openrouter.ai` before that). Nothing can be
-  verified against a live service from CI or from a Claude Code session —
+  `wolt.com` and `www.10bis.co.il`.** `generativelanguage.googleapis.com` was
+  blocked too until at least D12, but answered from here on 2026-09-28 (a fake
+  key got Google's real invalid-key 400); a real key is still needed to see a
+  completion. Nothing else can be verified against a live service from CI or
+  from a Claude Code session —
   including Phase 2's discovery endpoints, which is why
   `phase2_discovery_research.md` is confidence-rated third-party evidence
   rather than a capture. `pub.dev` and `storage.googleapis.com` are reachable.

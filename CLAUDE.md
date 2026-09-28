@@ -23,8 +23,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > built a real Saved tab, dish/venue photos, and several Settings features
 > (appearance, net-carb limit, dietary rule toggles, saved-menus management)
 > that build-order steps 8–10 do not individually name. `BackendChatClient`
-> replaced `OpenRouterClient`; `KeyStore` and `flutter_secure_storage` are
-> gone. Three earlier decisions were reversed in the Phase 1 close-out pass
+> replaced `OpenRouterClient` for the web build. Since D14 (issue #194) iOS and
+> Android call Wolt and Gemini themselves: `GeminiChatClient` calls Google
+> directly with a key the user pastes into Settings, kept by `ApiKeyStore` over
+> `flutter_secure_storage`, and the backend serves the web build only. Three earlier decisions were reversed in the Phase 1 close-out pass
 > (`architecture.md`): D10 reinstates `Connectivity`, §17.4 now renders
 > `net_carbs_estimate` as a labelled chip, and §6.6's collapsed red-dish group
 > is gone — the verdict counter tiles are the filter now.
@@ -42,29 +44,32 @@ Single Flutter codebase for web, iOS, and Android, plus a small optional FastAPI
 backend (`backend/`, D11) that is an accelerator, never a dependency — with no
 `KETOCLUB_BACKEND_URL` define, the app behaves exactly as it would with none:
 - **Classification Engine**: **a hosted language model is the primary classifier, with
-  an on-device rule engine as the fallback** (`architecture.md` D2). Since D12 the
-  model is Google Gemini, reached only through KetoClub's own backend, which holds
-  the Gemini key server-side — **the app never holds a model key**. When there is
-  no backend configured, no consent, or no network, the rule engine answers and
-  the UI labels the result "rules". Both sit behind one `MenuClassifier` interface
+  an on-device rule engine as the fallback** (`architecture.md` D2). The model is
+  Google Gemini. **On iOS and Android the app calls it directly** with the user's
+  own API key, pasted into Settings (D14); **on web it goes through KetoClub's own
+  backend**, which holds the Gemini key server-side, so the browser never holds
+  one (D12). When there is no key (phone) or no backend (web), no consent, or no
+  network, the rule engine answers and the UI labels the result "rules". Both sit behind one `MenuClassifier` interface
   and a router picks per call. A `Connectivity` pre-check (`architecture.md` D10,
   reinstated in the Phase 1 close-out pass, extended to the backend call by D11)
-  asks the device whether it looks online before ever spending a backend request;
+  asks the device whether it looks online before ever spending a model request;
   it is a hint, never a verdict, so a failed call still reports `offline` exactly
   as it did before this check existed. D11's "the call is the probe" applies to
   the backend itself too: nothing pre-checks whether the server is up, so an
-  unreachable backend surfaces as `backendUnreachable` from the failing call.
+  unreachable backend surfaces as `backendUnreachable` from the failing call. On
+  a phone there is no server in between: a failed call to Google is `offline`.
 - **API Integration**: Direct calls to restaurant platform APIs from the client on
-  iOS/Android; the web build routes Wolt and 10bis through the backend's proxy
+  iOS/Android, which never call the backend even when `KETOCLUB_BACKEND_URL` is
+  set (D14); the web build routes Wolt and 10bis through the backend's proxy
   routes when configured (D11), because neither platform's API sends CORS
   headers. **Wolt and 10bis are implemented**; Tabit and Ontopo are not built.
   The backend also proxies Wolt's discovery ("nearby"/"by name") endpoints for
   the web build (`architecture.md` §16 step 9, D13).
 - **Local Storage**: Hive caches the normalised menu and its analysis for 24 hours;
   `shared_preferences` holds non-secret settings and, since D12, an anonymous
-  install id (`InstallIdStore`) sent to the backend only for rate limiting.
-  There is no secure-storage dependency any more — `flutter_secure_storage` was
-  removed along with the key store it backed.
+  install id (`InstallIdStore`) the web build sends to the backend only for rate
+  limiting. On iOS and Android, `flutter_secure_storage` (reinstated by D14)
+  holds the user's Gemini key through `ApiKeyStore`; web has no key store.
 - **No client-side database**: menu analysis happens on the user's device; the
   backend, when configured, keeps only a short-lived Wolt-proxy cache and a
   shared completion cache keyed by request hash (D12, issue #103), never a
@@ -154,8 +159,10 @@ lib/
 │                              # wolt_headers (the web-client header set, #168)
 ├── services/
 │   ├── platform/              # clock, app_logger, connectivity (D10), screen_brightness
-│   ├── storage/               # install_id_store, menu_cache, settings_store, notes_store
-│   ├── llm/                   # llm_chat_client, backend_chat_client (D12; no key store)
+│   ├── storage/               # install_id_store, menu_cache, settings_store, notes_store,
+│   │                          # api_key_store (the user's Gemini key, phones only, D14)
+│   ├── llm/                   # llm_chat_client, backend_chat_client (web, D12),
+│   │                          # gemini_chat_client (phones, direct to Google, D14)
 │   ├── location/              # location_service, geolocator_location_service (issue #37)
 │   ├── venue/                 # venue_ref_resolver (paste-a-URL, pure), venue_search_service
 │   │                          # (interface), wolt/ (WoltVenueSearchService + mapper, issue #39)
@@ -171,7 +178,8 @@ lib/
 │                              # fetch_failure_action, analysis_progress_row, menu_search_field,
 │                              # note_editor_sheet, rules_reason_banner
 └── screens/                   # venue_search (the Discovery screen, D13), menu,
-                               # waiter_card_sheet, settings (no key section), saved (a real
+                               # waiter_card_sheet, settings (a Gemini key section on
+                               # phones only, D14), saved (a real
                                # cached-menus tab, issue #48) and scan (still a placeholder,
                                # issue #11)
 
@@ -254,15 +262,16 @@ The section this replaces described a heuristic-first design that predates the c
 
 1. **Two classifiers behind one interface.** `MenuClassifier.classify(menu)` is one
    call per menu, never one per dish — the backend's per-install rate limit is
-   5/minute, 40/day (D6, D12). `RoutingMenuClassifier` chooses: consent withheld
-   means the heuristic stamped `consentWithheld`; no backend configured or offline
-   means the heuristic stamped `notConfigured` / `offline`; otherwise the LLM path
-   via `BackendChatClient`, falling back to the heuristic on `offline`, `timeout`,
-   `rateLimited`, `badResponse`, `backendUnreachable` and `notConfigured` with that
-   reason carried through so the UI can say why. **There is no `unauthorised`
-   reason any more** — there is no user-supplied key left to reject (D12); a
-   server-side key problem reads as `notConfigured` and falls back like everything
-   else.
+   5/minute, 40/day on web (D6, D12), and a phone spends its user's own quota.
+   `RoutingMenuClassifier` chooses: consent withheld means the heuristic stamped
+   `consentWithheld`; offline means the heuristic stamped `offline`; otherwise the
+   LLM path via `GeminiChatClient` on a phone or `BackendChatClient` on web (D14),
+   falling back to the heuristic on `offline`, `timeout`, `rateLimited`,
+   `badResponse`, `backendUnreachable`, `notConfigured`, `apiKeyMissing` and
+   `apiKeyRejected` with that reason carried through so the UI can say why.
+   `apiKeyMissing` (no key saved; nothing sent) and `apiKeyRejected` (Google
+   refused it) exist only on phones and point the user to Settings; a web
+   server-side key problem still reads as `notConfigured`.
 2. **The model's reply is untrusted input.** `MenuResponseParser` is static, pure and
    never throws, and implements §9.4's eight rules: a dish the menu does not contain
    is an invention and is never given a verdict; a yellow whose instruction is
@@ -280,16 +289,20 @@ The section this replaces described a heuristic-first design that predates the c
    lives in "choice of side", not the description.
 6. **Everything at a service boundary returns a sealed result**, never throws, and
    every failure reason is distinct. Collapsing two reasons into one message is the
-   bug §10 names; `failure_copy.dart` has a test asserting no two of the eleven
-   reasons share copy in either language.
+   bug §10 names; `failure_copy.dart` has a test asserting no two reasons share
+   copy in either language.
 7. **`di.dart` is the only file that constructs a concrete service**, and nothing it
    calls performs plugin I/O — see the traps above.
-8. **There is no key on the device (D12).** The Gemini key lives only in the
-   backend's `GEMINI_API_KEY` environment variable and never reaches a Dart file,
-   a log, a failure value, the cache or the widget tree; `BackendChatClient` sends
-   an install id, never a key, and never an `Authorization` header. Settings has
-   no key section any more — there are tests asserting `openrouter`, `sk-or-` and
-   `googleapis.com` appear nowhere under `lib/`.
+8. **The key belongs to whoever calls Gemini (D12, D14).** On web the key lives
+   only in the backend's `GEMINI_API_KEY` environment variable, and
+   `BackendChatClient` sends an install id, never a key, and never an
+   `Authorization` header. On iOS and Android the user's own key lives in the
+   Keychain/Keystore via `ApiKeyStore`; `GeminiChatClient` reads it per call and
+   sends it only as `x-goog-api-key` to Google — never in a URL, a log, a
+   failure value, the cache or the widget tree, and Settings shows only whether
+   one is saved. The architecture test pins `googleapis.com` to
+   `gemini_chat_client.dart` alone and asserts `openrouter` and `sk-or-` appear
+   nowhere under `lib/`.
 
 ## Planning & Research Documents
 
@@ -354,9 +367,9 @@ for what Phase 3's remaining milestone (#105–#108) and Phase 4 pick up next.
 - Backend hosting beyond `localhost` (issue #109, `architecture.md` §17.6). The
   backend is designed to be run locally by whoever has the repository checked
   out; nothing yet says where it runs for anyone else.
-- The pinned Gemini model has never been called against the real prompt from this
-  environment: `generativelanguage.googleapis.com` is unreachable through the
-  egress proxy here. See "What is NOT verified yet" below.
+- The pinned Gemini model has never been called successfully against the real
+  prompt: no one has run it with a real key yet. See "What is NOT verified yet"
+  below.
 
 Nothing above is stubbed — the files simply do not exist, which keeps them out of
 the coverage denominator.
@@ -365,14 +378,17 @@ the coverage denominator.
 
 Built, but not confirmed end to end, and not to be reported as done:
 
-- **Gemini has never been called from this environment** (`architecture.md` §17
-  open question 1, closed as posed by D12 but not verified in practice).
-  `generativelanguage.googleapis.com` is blocked through the egress proxy here,
-  the same way `openrouter.ai` was before it. `backend/README.md`'s "Manual
-  end-to-end check" section, and its `/v1/chat` smoke curl within it, is the
-  one-command check for anyone with a network path to Google — nobody has run
-  it yet, so the pinned model's (`GEMINI_MODEL`, default `gemini-2.5-flash`)
-  latency and structured-output behaviour against this app's real prompt are
+- **Gemini has never answered a real request** (`architecture.md` §17 open
+  question 1, closed as posed by D12 but not verified in practice). As of
+  2026-09-28 `generativelanguage.googleapis.com` *is* reachable from this
+  environment, and Google's real invalid-key reply (a 400 naming
+  `API_KEY_INVALID`) was recorded and pinned in `gemini_chat_client_test.dart`
+  — but no valid key has been available here, so no successful completion has
+  been seen. Neither the phones' direct client (D14) nor the backend's
+  `/v1/chat` (`backend/README.md`'s "Manual end-to-end check") has been run
+  with a real key, so the pinned model's (`gemini-2.5-flash`) latency and
+  structured-output behaviour against this app's real prompt, and whether
+  Google accepts `toGeminiSchema`'s output for that prompt's schema, are
   unmeasured.
 - **The Wolt menu fixture is real** (`wolt_hamosad_menu.json`, recorded
   2026-09-25 from the consumer-assortment endpoint the app now calls; issues

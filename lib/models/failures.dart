@@ -83,4 +83,18 @@ enum MenuAnalysisFailureReason {
   /// analysis in Settings to analyse this menu. Showing rule-based
   /// results."
   consentWithheld,
+
+  /// No Gemini API key is saved on this device (iOS and Android only,
+  /// architecture.md D14). Client-only, and something the user can fix
+  /// in Settings. The router falls back to the rules engine; the user
+  /// sees "Add your Gemini API key in Settings to analyse this menu.
+  /// Showing rule-based results."
+  apiKeyMissing,
+
+  /// Gemini refused the API key saved on this device (iOS and Android
+  /// only, architecture.md D14). Something the user can fix in Settings.
+  /// The router falls back to the rules engine; the user sees "Gemini
+  /// rejected your API key. Check it in Settings. Showing rule-based
+  /// results."
+  apiKeyRejected,
 }
