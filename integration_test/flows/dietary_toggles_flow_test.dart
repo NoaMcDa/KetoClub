@@ -27,6 +27,7 @@ import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
+import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 
 import 'flow_support.dart';
@@ -126,6 +127,15 @@ void main() {
           llm,
           HeuristicMenuClassifier(clock: fakes.clock),
           _OnlineConnectivity(),
+        );
+        // D16 (issue #167) flipped the AppSettings default to true; seed a
+        // stored false so this flow's rules-engine journey is independent
+        // of the new default.
+        await fakes.settingsStore.write(
+          const AppSettings(
+            estimationConsentGiven: false,
+            disclosureSeen: true,
+          ),
         );
         await pumpApp(tester, fakes);
 
