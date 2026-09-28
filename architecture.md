@@ -1588,19 +1588,24 @@ Extension points already designed in:
 Things this document could not settle from the available material. Each has a
 default the implementation follows until answered.
 
-1. **Which OpenRouter model to pin.** *(Closed by D12: the question no longer
-   applies as posed — there is no OpenRouter model to pin, no free-tier id to
-   rotate, and no per-user quota. D12 pins `GEMINI_MODEL` (default
-   `gemini-2.5-flash`) as a backend environment variable instead of a Dart
-   constant, so changing it is a redeploy, not a release. **The pre-release
-   verification this question originally asked for is still outstanding, now
-   against Gemini**: `generativelanguage.googleapis.com` is unreachable from the
-   build environment (same as `openrouter.ai` was), so the real system prompt
-   has never been run against the pinned model from here. `backend/README.md`'s
-   manual end-to-end check is the one-command way to do that for anyone with a
-   network path to Google; the `m15_openrouter_models_fix.md`-derived latency
-   figures this question used to cite no longer apply to a different provider
-   and are not carried over as a guess.)*
+1. **Which OpenRouter model to pin.** *(Closed by D12 and then verified on
+   2026-09-28: the question no longer applies as posed — there is no
+   OpenRouter model to pin, no free-tier id to rotate, and no per-user quota.
+   D12 pins `GEMINI_MODEL` (default now `gemini-3.5-flash`) as a backend
+   environment variable instead of a Dart constant, so changing it is a
+   redeploy, not a release. The smoke test #165 ran on 2026-09-28 against
+   the real prompt: `gemini-2.5-flash` (the D12 default) is 404 for new
+   users — Google's API recommends `gemini-3.8-flash` as the successor, but
+   both `-3.8-flash` and `gemini-flash-latest` currently answer 503
+   UNAVAILABLE for structured-output requests, and `gemini-flash-lite-latest`
+   answers 400 INVALID_ARGUMENT for `generationConfig.thinkingConfig`. The
+   default was moved to `gemini-3.5-flash` on the same day. Round-trip
+   latencies from a laptop through the local backend: 33.5 s cold for a
+   20-dish English menu, 8.8 s for a 10-dish Hebrew menu, 4 ms for a cache
+   hit; the responses (redacted) are under `test/fixtures/llm/smoke_*.json`
+   and Hebrew `why`/`modification` came back in Hebrew. Phone numbers are
+   still #65, and the successor picking under #179 has not chosen a
+   permanent home yet.)*
 2. **Exact Wolt venue-search endpoint** for nearby search. `menu_api_research` covers
    menus only. Default: ship paste-a-URL first (Tier A) and discover the search
    endpoint with the reverse-engineering protocol in `README.md` when building

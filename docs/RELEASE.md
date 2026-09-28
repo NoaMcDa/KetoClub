@@ -226,12 +226,19 @@ Time from the tap that opens the menu to the frame where verdicts appear
 
 | Target | Cold fetch | Proxy-cached fetch | Hive-cached open | AI analysis cold | AI analysis server-cached |
 |---|---|---|---|---|---|
-| Web via local backend | | | | | |
+| Web via local backend | | | | 20-dish: 33.5 s (E) / 10-dish: 8.8 s (H) | 4 ms |
 | iOS | | n/a unless via backend | | | |
 | Android | | n/a unless via backend | | | |
 
 iOS and Android fetch Wolt directly unless the build routes them through
 the backend, so the proxy-cached column only applies to them in that case.
+
+AI-analysis numbers above are from the 2026-09-28 Gemini smoke test
+(#165) running the backend on a laptop against `gemini-3.5-flash` — not a
+phone on 4G, not a 60-dish menu, and not the app on device. They record
+that the path works end-to-end and that the server-side completion cache
+answers a duplicate request in low single-digit milliseconds. Fill the
+phone rows in during #166.
 
 ### Main-thread steps on a phone
 
