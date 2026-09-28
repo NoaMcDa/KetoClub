@@ -34,9 +34,13 @@ class Settings(BaseSettings):
     # Upstream Gemini host.  Never taken from a request, for the same reason
     # as WOLT_BASE_URL; tests point respx at the default.
     GEMINI_BASE_URL: str = "https://generativelanguage.googleapis.com"
-    # generationConfig.maxOutputTokens.  A full menu's verdicts fit well
-    # inside it; a reply that hits it ends MAX_TOKENS and is badResponse.
-    GEMINI_MAX_OUTPUT_TOKENS: int = 8192
+    # generationConfig.maxOutputTokens.  A reply that hits it ends MAX_TOKENS
+    # and is badResponse, so this must exceed what a full menu's verdicts
+    # take: a 118-dish Hebrew menu (why + modification per dish, Hebrew at
+    # roughly a token per character) needs well over the 8192 this once was
+    # (#188). 65536 is the Gemini 2.5 Flash family's documented ceiling; a
+    # successor with a lower one answers 400 and this must come down with it.
+    GEMINI_MAX_OUTPUT_TOKENS: int = 65536
     # generationConfig.thinkingConfig.thinkingBudget.  Thinking tokens count
     # against the output budget above, and this is a classification task
     # with a strict schema, so the default spends none on thinking.

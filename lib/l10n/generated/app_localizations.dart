@@ -602,6 +602,12 @@ abstract class AppLocalizations {
   /// **'AI analysis failed ({detail}). Showing rule-based results.'**
   String analysisBadResponse(String detail);
 
+  /// No description provided for @analysisBadResponseNoDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI model gave an unusable answer. Showing rule-based results.'**
+  String get analysisBadResponseNoDetail;
+
   /// No description provided for @analysisNoDishesFound.
   ///
   /// In en, this message translates to:

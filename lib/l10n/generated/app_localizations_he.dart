@@ -311,6 +311,10 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get analysisBadResponseNoDetail =>
+      'מודל הבינה המלאכותית החזיר תשובה לא שמישה. מוצגות תוצאות על בסיס כללים.';
+
+  @override
   String get analysisNoDishesFound =>
       'הבינה המלאכותית לא הצליחה לזהות מנות בתפריט הזה.';
 

@@ -144,3 +144,5 @@ for issue #38, and `backend/README.md` the 10bis curl for issue #44.
 | Nearby search says "blocked by browser" | web without a backend | §3 |
 | `flutter analyze` fails on an info | intended — CI runs `--fatal-infos` | fix the lint |
 | Location button does nothing on web | browser Geolocation needs `https://` or `localhost` | use `localhost`, not a LAN IP, for the web build |
+| Backend terminal shows `gemini upstream_status=404` | `GEMINI_MODEL` is not served for this key or API version (#179) | list what the key can use: `curl -sS https://generativelanguage.googleapis.com/v1beta/models -H "x-goog-api-key: $GEMINI_API_KEY"`, then set `GEMINI_MODEL` in `backend/.env` |
+| "AI analysis failed" on a very large menu | the `user_prompt` cap was 60,000 characters, raised to 400,000 (#188) | update to a build with the raised cap; a menu still past 400,000 characters needs #188's batching |

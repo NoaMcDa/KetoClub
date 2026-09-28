@@ -463,7 +463,11 @@ The normalisation rules that matter:
 
 Option labels ("Choice of side: potato purée / green salad") are part of the text the
 classifier sees, because a dish's yellow-ness often lives in the options, not the
-description.
+description — refined by D14 (§14): a non-keto **base** is never matched inside
+option text, only within the dish's own name and description, and an option
+**value** that names a removal ("No onions", "ללא אלף האיים") is dropped
+entirely rather than read as an ingredient the dish arrives with. §6.2 has the
+exact rule order the heuristic engine runs.
 
 *(Phase 1)* Two normalisation rules the Wolt payload forced, both in
 `wolt_menu_mapper.dart`: an `item_id` a category lists but `items[]` does not
@@ -524,12 +528,39 @@ key — there is no key on the device at all (D12): `BackendChatClient` posts to
 KetoClub's own backend, which holds the Gemini key server-side.
 
 **`HeuristicMenuClassifier`** — the fallback. A Dart port of the README's
-`analyze_dish`: word-boundary regex over `NON_KETO_BASES` → red; over
-`CARB_MODIFIERS` → yellow with the mapped template sentences; else green. It runs
-on-device, offline, in milliseconds, and its result is labelled as "rules" in the UI
-(`engine_chip.dart`) with its greens carrying a "not AI-verified" hint. Hebrew
-triggers live next to the English ones in `constants.dart` (פירה, צ'יפס, אורז,
-תפוח אדמה, פסטה, פיצה, לחמנייה, …).
+`analyze_dish`, run per dish through `ClassificationRules.matchDish` (D14, §14;
+issues #191, #192), in this order:
+
+1. A dish **name** that is nothing but an unguarded carb-modifier trigger plus
+   portion/qualifier words (`carbOnlyQualifiers{En,He}` — portion, bag, tray,
+   plain, regular, large, sourdough, gluten free, מנת, מגש, שקית, רגילה, ללא
+   גלוטן, מחמצת…) is red, labelled with the trigger itself: "Portion of
+   fries", "פיתה רגילה". Only the starches and breads in
+   `carbOnlyEligibleTriggers` can fire it — never a sauce or root vegetable
+   ("Carrots" is not "built on carrots"), and never the bread-carried
+   families (burger, sandwich, wrap, toast), which stay a D-V3 yellow. And
+   never when the description or a non-removal option names a filling
+   (`describesFilling`: a protein, a plant or dairy word): "לאפה" described
+   as "שווארמה, חומוס, סלט" is the dish D-V3 means, not the carb itself.
+2. Otherwise, `NON_KETO_BASES` is matched against
+   `TextNormaliser.dishCoreText` — the dish's name and description only,
+   never its options — so an option group named after a red base (an "ארוחת
+   נאגטס" meal upgrade on a burger) can never redden the dish on its own.
+3. Otherwise, `CARB_MODIFIERS` is matched against
+   `TextNormaliser.dishRulesText`: the core text plus every option group's
+   name and non-removal values (a "choice of side" value still counts, per
+   §6.1) but with every removal value dropped — one whose first word is
+   `no`/`without`/`skip`/`ללא`/`בלי` (`optionRemovalWordsEn/He`) — giving a
+   yellow with the mapped template sentence. Otherwise the dish is green.
+
+None of this changes `TextNormaliser.dishSearchText` or `menuFingerprint`
+(§6.4), which still hash the dish's full text including every option value
+regardless of removal wording, so no cached analysis is invalidated by D14.
+
+It runs on-device, offline, in milliseconds, and its result is labelled as "rules"
+in the UI (`engine_chip.dart`) with its greens carrying a "not AI-verified" hint.
+Hebrew triggers live next to the English ones in `constants.dart` (פירה, צ'יפס,
+אורז, תפוח אדמה, פסטה, פיצה, לחמנייה, …).
 
 *(Phase 1)* The vocabulary is no longer "deliberately small", and it needed three
 relations this section did not anticipate, all in `constants.dart`:
@@ -1032,9 +1063,11 @@ contract this section always described, only moved server-side:
   schema. 401, 403, 429 and 5xx are never retried — they are answers about the
   key, the quota and the provider, and are surfaced as such. Never a second
   retry.
-- `maxOutputTokens` is `GEMINI_MAX_OUTPUT_TOKENS` (default 8192); a reply that
-  hits it ends with `finishReason: MAX_TOKENS`, which is `badResponse` — a
-  truncated dish array is unrecoverable the same way it always was.
+- `maxOutputTokens` is `GEMINI_MAX_OUTPUT_TOKENS` (default 65536, the 2.5
+  Flash family's ceiling — it was 8192, which a 118-dish Hebrew menu's
+  verdicts overran, #188); a reply that hits it ends with `finishReason:
+  MAX_TOKENS`, which is `badResponse` — a truncated dish array is
+  unrecoverable the same way it always was.
 - Backend-side upstream timeout: connect 5 s, read 110 s — inside the Dart
   client's 120 s outer bound, so the backend's own `timeout` reason reaches the
   UI before the client's timeout would fire on a healthy connection.
@@ -1070,8 +1103,10 @@ tests free of a real clock.)* In order:
 5. `verdict == modifiable` with a null, blank, or over-length `modification` →
    `unclassified` (constraint 7). A green or red carrying a `modification` keeps the
    verdict and drops the field.
-6. Caps: more than 150 dishes → `badResponse`; `why` truncated at 300 characters,
-   never rejected for length alone.
+6. Caps: more than `maxAnalysedDishes` (1000; a sanity bound against a
+   runaway reply, not a menu size — raised from 150, which real Israeli Wolt
+   venues exceed, #188) dishes → `badResponse`; `why` truncated at 300
+   characters, never rejected for length alone.
 
    *(Phase 1)* Rules 5 and 6 read as contradicting each other on an over-length
    `modification`: rule 5 demotes the dish, rule 6 says to truncate rather than
@@ -1459,6 +1494,44 @@ from the artboard than any other option; the artboard's every-card score is
 honoured only as far as the device (and, after B, the backend) has actually
 analysed. That gap is the point: a number on a card is a claim about food
 someone is about to order, and D13 only makes claims it can back.
+
+**D14 — The heuristic engine judges a whole dish, not one flat string.**
+*(Amends §6.1's "option labels are part of the text the classifier sees" and
+D-V3's bread-carrier rule; answers issues #190, #191, #192.)* Two real-menu
+misreads showed `ClassificationRules.match(String)` was too blunt: an
+"ארוחת נאגטס" (nuggets meal) option group on a burger reddened the whole
+dish from its option text alone, and a plain "פיתה רגילה" or "Portion of
+fries" with no other words came out yellow with "serve it without the pita"
+— an instruction that cannot be followed — because nothing told the engine
+a dish could *be* the carb rather than merely contain one. Fixing both from one flat string
+was not possible — the fix needs to know which part of the dish a word came
+from — so `ClassificationRules.matchDish(Dish)` replaces `match` as the
+heuristic's entry point and runs three steps in order: (1) a dish **name**
+made only of unguarded carb-modifier triggers plus portion/qualifier words
+(`carbOnlyQualifiers{En,He}`) is red, labelled with the trigger, when the
+trigger is a starch or bread in `carbOnlyEligibleTriggers` (never a sauce or
+vegetable, never the bread-carried burger, sandwich, wrap and toast families
+— D-V3's yellow) and nothing in the description or options names a filling
+(`describesFilling`); (2) a
+non-keto base is matched on `TextNormaliser.dishCoreText` — name and
+description, never options; (3) a carb modifier is matched on
+`TextNormaliser.dishRulesText` — the core text plus option group names and
+values, with a removal value (first word `no`/`without`/`skip`/`ללא`/`בלי`)
+dropped, and a red base found only among the options ("Choice of side:
+pasta / salad") is a yellow asking for the other option, never a red.
+`match(String)` is kept for callers with only a string. The same
+pass also filled two vocabulary gaps the same real menus exposed: the pastry
+counter (danish, pastry, muffin, scone, מאפה, שמרים, דניש, …) as a red base,
+and the burger word families (`burger`, `hamburger`, `בורגר`, …) as bun
+carriers, so a bare "Cheeseburger" gets the bun sentence instead of reading
+green for want of the literal word "bun".
+
+**What it costs:** three ordered rules instead of one flat regex pass, and a
+`Dish` parameter where a `String` used to do — every heuristic call site now
+needs the whole dish object, not just its joined text. **What it does not
+touch:** `TextNormaliser.dishSearchText` and `menuFingerprint` (§6.4) are
+unchanged and still hash every option value regardless of removal wording,
+so no cached analysis is invalidated by this decision.
 
 ---
 

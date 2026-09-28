@@ -1,8 +1,9 @@
 /// The offline fallback engine (architecture.md §6.2).
 ///
 /// A Dart port of the README's `analyze_dish`: it runs
-/// [ClassificationRules.match] over each dish's search text
-/// ([TextNormaliser.dishSearchText]) and turns what it found into a
+/// [ClassificationRules.matchDish] over each dish (its name, description
+/// and non-removal option text, [TextNormaliser.dishRulesText]) and turns
+/// what it found into a
 /// verdict, a `why`, and — for a modifiable dish — a waiter script. It
 /// does no I/O, needs no key, and runs entirely on-device.
 library;
@@ -81,12 +82,15 @@ final class HeuristicMenuClassifier implements MenuClassifier {
   /// gets [dietaryRuleWhyEn]/[dietaryRuleWhyHe], since the carb-component
   /// `why` would not be true of it.
   AnalysedDish _analyse(Dish dish, ClassificationOptions options) {
-    final text = TextNormaliser.dishSearchText(dish);
+    // The rules read the dish minus its removal options (issue #192), and
+    // judge it as a whole dish rather than one flat string (issue #191):
+    // see ClassificationRules.matchDish for the three-step order.
+    final text = TextNormaliser.dishRulesText(dish);
     // The script a waiter script is read in follows the dish's own
     // text, not the UI locale (architecture.md §12): a Hebrew menu
     // read by an English-UI user still gets a Hebrew script.
     final isHebrew = TextNormaliser.containsHebrew(text);
-    final match = ClassificationRules.match(text);
+    final match = ClassificationRules.matchDish(dish);
 
     if (match.isNonKeto) {
       final template = isHebrew ? redWhyHe : redWhyEn;

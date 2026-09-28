@@ -212,4 +212,28 @@ void main() {
       });
     });
   });
+
+  group('RulesReasonBanner badResponse copy (issue #189)', () {
+    testWidgets('never renders empty parentheses', (tester) async {
+      // Arrange
+      final pushedNames = <String>[];
+
+      // Act
+      await _pump(
+        tester,
+        const RulesReasonBanner(
+          engine: RulesEngine(reason: MenuAnalysisFailureReason.badResponse),
+        ),
+        pushedNames,
+      );
+
+      // Assert
+      final texts = tester
+          .widgetList<Text>(find.byType(Text))
+          .map((text) => text.data ?? '')
+          .toList();
+      expect(texts.any((text) => text.contains('()')), isFalse);
+      expect(find.text(_en.analysisBadResponseNoDetail), findsOneWidget);
+    });
+  });
 }

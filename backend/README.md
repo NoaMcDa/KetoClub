@@ -44,9 +44,24 @@ Every error the route originates is `{reason, status_code}`:
 | 504 | `timeout` | Gemini did not answer within 110 s |
 
 A body that fails validation (empty prompt, prompt over its bound) is
-FastAPI's own 422. Logs carry the install id's first 8 characters, the
-`cache=hit|miss` outcome and upstream status codes only: never the key,
-prompt text or an upstream body.
+FastAPI's own 422. The `user_prompt` bound is 400,000 characters (#188) — an
+abuse guard, not a model limit, and not a promise: a menu that large is bound
+first by `GEMINI_MAX_OUTPUT_TOKENS` and the 110 s read timeout, so past a
+couple of hundred dishes the honest answer is #188's batching, not this cap.
+
+When the terminal shows `gemini upstream_status=404`, the configured
+`GEMINI_MODEL` is not served for this key or API version (a retired id, see
+#179): the log also prints `error_status=NOT_FOUND` and a one-line hint. List
+what the key can use and set `GEMINI_MODEL` in `.env`:
+
+```bash
+curl -sS https://generativelanguage.googleapis.com/v1beta/models \
+  -H "x-goog-api-key: $GEMINI_API_KEY" | grep '"name"'
+```
+
+Logs carry the install id's first 8 characters, the `cache=hit|miss`
+outcome, upstream status codes and, on an error, Google's `error.status`
+enum only: never the key, prompt text or an upstream body.
 
 #### The shared completion cache (#103)
 
@@ -236,7 +251,7 @@ that need them (`/v1/chat`, and `/v1/admin/*` in a later issue). See
 | `GEMINI_API_KEY` | unset | The server's key, sent only as `x-goog-api-key`. Unset → `/v1/chat` answers `notConfigured` |
 | `GEMINI_MODEL` | `gemini-2.5-flash` | Model in the `generateContent` path |
 | `GEMINI_BASE_URL` | `https://generativelanguage.googleapis.com` | Upstream host; never taken from a request |
-| `GEMINI_MAX_OUTPUT_TOKENS` | `8192` | `generationConfig.maxOutputTokens` |
+| `GEMINI_MAX_OUTPUT_TOKENS` | `65536` | `generationConfig.maxOutputTokens`; must exceed a full menu's verdicts (#188) |
 | `GEMINI_THINKING_BUDGET` | `0` | Thinking tokens count against the output budget, and this is a classification task |
 | `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_PER_DAY` | `5`, `40` | Per install id on `/v1/chat`, in memory |
 | `WOLT_BASE_URL` | `https://restaurant-api.wolt.com` | Upstream host for the by-name discovery route (the menu proxy left it in #168); never taken from a request |

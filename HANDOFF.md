@@ -232,6 +232,15 @@ spacing values) is enforced by a test; pixel fidelity by no test at all.
   cauliflower"` produces a needless yellow ("omit the rice" on a dish with no rice).
   That fails in the safe direction — a pointless modification request, not the wrong
   green architecture.md constraint 5 names as the failure that matters.
+- **The carb-only-dish rule (#191) fires on the dish name only**, and
+  stands down when the description or an option names a filling from a
+  fixed protein/plant/dairy vocabulary. A bread named "לאפה" and described
+  with a filling word the vocabulary lacks is still red, and a dish named
+  plainly but described as "just a basket of fries" still gets the D-V3
+  yellow. **The option-removal rule (#192) keys on a value's first word
+  only**, so "Bun, no sesame" — a removal that is not the first word — is
+  still read as an ingredient, not dropped. **`מאפה` is red** even for a
+  crustless "מאפה חצילים", accepted as the rarer reading.
 - **The web build cannot fetch menus only without the backend running.** The
   restaurant APIs send no CORS headers, so live fetching needed a CORS-forwarding
   proxy (§13, D9); D11 shipped one (`backend/`'s `/v1/proxy/wolt/…` route). With

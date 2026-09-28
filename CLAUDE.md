@@ -107,6 +107,10 @@ Every dish is evaluated against regex-based heuristics and classified:
 **Non-keto bases** that auto-fail:
 - pasta, spaghetti, pizza, calzone, risotto, noodles, ramen, brioche, sandwich, pancake, waffle
 
+The pastry counter also auto-fails: danish, pastry, muffin, scone, and Hebrew
+מאפה/שמרים/דניש (issue #190), since a plain bakery-counter dish has no other
+trigger to catch it.
+
 Classification generates automatic waiter scripts for Yellow dishes (e.g., "Replace potato purée with green salad or steamed vegetables").
 
 ### Database Schema
@@ -277,7 +281,10 @@ The section this replaces described a heuristic-first design that predates the c
    is a pure JSON→`Menu` function tested against a fixture with no HTTP at all. A URL
    change touches one file, a schema change the other.
 5. **Option text is part of what the classifier reads.** A dish's yellow-ness often
-   lives in "choice of side", not the description.
+   lives in "choice of side", not the description. Refined by issues #191/#192:
+   a non-keto base is matched only against the dish's own name and description,
+   never its options, and an option value that names a removal ("No onions") is
+   dropped rather than read as an ingredient.
 6. **Everything at a service boundary returns a sealed result**, never throws, and
    every failure reason is distinct. Collapsing two reasons into one message is the
    bug §10 names; `failure_copy.dart` has a test asserting no two of the eleven
@@ -423,7 +430,7 @@ Built, but not confirmed end to end, and not to be reported as done:
    recordings and phone run in "What is NOT verified yet" above. What's next
    is Phase 3's remaining milestone (community database, reviews, submissions;
    `backend_plan.md` §5 milestone C, issues #105–#108). §14 has the decisions
-   log D1–D13, §17 the open questions with the default the code follows.
+   log D1–D14, §17 the open questions with the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing
