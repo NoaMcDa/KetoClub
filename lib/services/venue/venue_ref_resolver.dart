@@ -4,6 +4,15 @@ import 'package:ketoclub/models/venue.dart';
 /// id is told apart from a pasted Wolt slug (see [VenueRefResolver]).
 final RegExp _digitsOnly = RegExp(r'^[0-9]+$');
 
+/// A bare Wolt slug: three or more lower-case ASCII alphanumerics or
+/// hyphens, starting with an alphanumeric, and carrying at least one
+/// hyphen. Issue #169: a bare single word like `pizza` used to be
+/// accepted as a slug and offered as "Show the keto menu", which read as
+/// KetoClub having a menu for anything you type. Requiring a hyphen means
+/// the input has to look like a real slug (`vitrina-lilinblum`,
+/// `hamosad-food`), not an English word.
+final RegExp _hyphenatedSlug = RegExp(r'^[a-z0-9][a-z0-9-]*-[a-z0-9-]*$');
+
 /// Turns what a user pasted into a [VenueRef] (architecture.md §6.5,
 /// Tier A: paste a URL or ID, shipped before venue search).
 ///
@@ -18,7 +27,11 @@ final RegExp _digitsOnly = RegExp(r'^[0-9]+$');
 ///   `restaurant` path segment itself rather than assuming a fixed path
 ///   depth, and reads the segment right after it as the slug.
 /// - A bare Wolt slug, e.g. `vitrina-lilinblum` — the canonical real
-///   slug used across this repo's docs.
+///   slug used across this repo's docs. Only a hyphenated form is
+///   accepted (issue #169): a single English word like `pizza` used to
+///   resolve as a Wolt slug and offered "Show the keto menu", reading as
+///   though KetoClub had a menu for the word itself. Requiring a hyphen
+///   filters that out without needing an explicit platform prefix.
 /// - A `10bis.co.il` restaurant URL. 10bis's own web app puts the
 ///   numeric restaurant id (the same id its `Restaurants/{id}/Menu` API
 ///   takes — `menu_api_research` §3.2) somewhere in the path after a
@@ -55,8 +68,9 @@ abstract final class VenueRefResolver {
   /// Returns null when [input] is not something KetoClub can read:
   /// empty or whitespace-only input, a URL on a host this class does
   /// not recognise, a recognised host with no landmark path segment (or
-  /// a `10bis.co.il` URL with no numeric id after it), or anything that
-  /// would otherwise resolve to an empty [VenueRef.platformId].
+  /// a `10bis.co.il` URL with no numeric id after it), anything that
+  /// would otherwise resolve to an empty [VenueRef.platformId], or a
+  /// bare token that carries no hyphen (issue #169: not slug-shaped).
   static VenueRef? resolve(String input) {
     final trimmed = input.trim();
     if (trimmed.isEmpty) return null;
@@ -67,7 +81,10 @@ abstract final class VenueRefResolver {
     if (_digitsOnly.hasMatch(trimmed)) {
       return VenueRef(source: MenuSource.tenbis, platformId: trimmed);
     }
-    return VenueRef(source: MenuSource.wolt, platformId: trimmed);
+    if (_hyphenatedSlug.hasMatch(trimmed)) {
+      return VenueRef(source: MenuSource.wolt, platformId: trimmed);
+    }
+    return null;
   }
 
   /// Parses [trimmed] as an absolute URI.

@@ -1,0 +1,8 @@
+/* NSLocationWhenInUseUsageDescription — Hebrew translation (issue #169).
+
+   Add this variant group to the pbxproj by opening
+   ios/Runner.xcworkspace in Xcode once (Editor → Add File to Project
+   … → Runner/he.lproj/InfoPlist.strings). Until it is discovered,
+   Info.plist's inline English value is what iOS shows on a phone in
+   any locale — see docs/RUNNING_IOS.md. */
+"NSLocationWhenInUseUsageDescription" = "‏KetoClub משתמש במיקום שלך פעם אחת כדי להציג מסעדות קרובות. הוא נשלח רק לפלטפורמת המשלוחים כפרמטר חיפוש ואינו נשמר.";

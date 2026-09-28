@@ -9,12 +9,15 @@ import 'package:flutter/material.dart';
 /// declared in `pubspec.yaml`; their SIL OFL 1.1 licences are registered
 /// with `LicenseRegistry` in `main.dart`.
 ///
-/// **Neither family has Hebrew glyphs**, and the app is bilingual
-/// (architecture.md D7), so every [TextStyle] here sets
+/// **Neither Public Sans nor Instrument Serif has Hebrew glyphs**, and the
+/// app is bilingual (architecture.md D7), so every [TextStyle] here sets
 /// [TextStyle.fontFamilyFallback] to a chain that reaches a Hebrew-capable
-/// system face. Without it, Hebrew text would silently fall back to
-/// whatever the platform default happens to be, which is untested and
-/// varies by platform.
+/// face. Rubik is bundled with the app (issue #169) and comes first so a
+/// Hebrew string always renders, even on a web build whose
+/// `fonts.gstatic.com` is unreachable — a system face like `Noto Sans
+/// Hebrew` may exist on native platforms but the web build cannot rely on
+/// it. `Arial Hebrew`, `David` and `Arial` follow as native-platform
+/// safety nets in case the bundled asset is somehow unavailable.
 abstract final class AppTypography {
   /// The UI face's family name, as declared in `pubspec.yaml`.
   static const String uiFamily = 'Public Sans';
@@ -24,16 +27,21 @@ abstract final class AppTypography {
 
   /// Fallback chain for [uiFamily] so Hebrew text reaches a real face.
   static const List<String> uiFallback = [
+    'Rubik',
     'Noto Sans Hebrew',
     'Arial Hebrew',
     'Arial',
   ];
 
   /// Fallback chain for [displayFamily] so Hebrew display text (the keto
-  /// score, serif headings) reaches a real face.
+  /// score, serif headings) reaches a real face. Rubik is not a serif, but
+  /// it covers Hebrew — a legible Hebrew rendering matters more than the
+  /// face's serif category when the artboard's Latin face has no Hebrew
+  /// glyphs at all.
   static const List<String> displayFallback = [
     'Noto Serif Hebrew',
     'David',
+    'Rubik',
     'serif',
   ];
 

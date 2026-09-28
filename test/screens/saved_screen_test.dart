@@ -64,6 +64,7 @@ Future<void> _pump(
   SavedController controller, {
   Locale locale = const Locale('en'),
   ValueChanged<String>? onNavigate,
+  ValueChanged<Object?>? onNavigateArguments,
   ThemeData? theme,
   List<NavigatorObserver> navigatorObservers = const <NavigatorObserver>[],
 }) {
@@ -77,7 +78,10 @@ Future<void> _pump(
       onGenerateRoute: (settings) => MaterialPageRoute<void>(
         settings: settings,
         builder: (_) {
-          if (settings.name != '/') onNavigate?.call(settings.name!);
+          if (settings.name != '/') {
+            onNavigate?.call(settings.name!);
+            onNavigateArguments?.call(settings.arguments);
+          }
           return settings.name == '/'
               ? ChangeNotifierProvider<SavedController>.value(
                   value: controller,
@@ -281,32 +285,43 @@ void main() {
       expect(newerTop.dy, lessThan(olderTop.dy));
     });
 
-    testWidgets('tapping an entry navigates to its venue route', (
-      tester,
-    ) async {
-      // Arrange
-      final repository = FakeMenuRepository()
-        ..seedCache(
-          CachedMenu(
-            menu: _menuWith(_woltRef, DateTime.now(), venueName: 'Vitrina'),
-          ),
+    testWidgets(
+      'tapping an entry navigates to its venue route and forwards the '
+      'cached venue name as arguments (issue #169)',
+      (tester) async {
+        // Arrange
+        final repository = FakeMenuRepository()
+          ..seedCache(
+            CachedMenu(
+              menu: _menuWith(_woltRef, DateTime.now(), venueName: 'Vitrina'),
+            ),
+          );
+        final controller = SavedController(repository);
+        String? navigated;
+        Object? forwardedArgs;
+
+        // Act
+        await _pump(
+          tester,
+          controller,
+          onNavigate: (name) => navigated = name,
+          onNavigateArguments: (args) => forwardedArgs = args,
         );
-      final controller = SavedController(repository);
-      String? navigated;
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Vitrina'));
+        await tester.pumpAndSettle();
 
-      // Act
-      await _pump(tester, controller, onNavigate: (name) => navigated = name);
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Vitrina'));
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(
-        navigated,
-        '/venue/${_woltRef.source.name}/${_woltRef.platformId}',
-      );
-      expect(find.text('pushed:$navigated'), findsOneWidget);
-    });
+        // Assert
+        expect(
+          navigated,
+          '/venue/${_woltRef.source.name}/${_woltRef.platformId}',
+        );
+        expect(find.text('pushed:$navigated'), findsOneWidget);
+        // Issue #169: the cached venue name rides along as the route's
+        // arguments, so the menu header can show it instead of the slug.
+        expect(forwardedArgs, 'Vitrina');
+      },
+    );
 
     testWidgets('removing via the trailing action hides the row, shows an '
         'undo SnackBar, and undo restores it without touching the '
