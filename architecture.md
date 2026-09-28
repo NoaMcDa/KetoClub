@@ -1186,11 +1186,22 @@ should not reach a log or a widget, even with no bearer token left to leak.
     it alongside the cached content, `backend_plan.md` §3.5). No location, no
     venue name, no user identity, ever.
   - Nowhere else. There is no telemetry.
-- **Consent.** Settings shows one disclosure stating the above in plain
-  language — that dish text leaves the device for KetoClub's server, which
-  forwards it to Google's Gemini API, and that nothing about the user is sent —
-  and the user confirms once. The router treats withheld consent as its own
-  reason, `consentWithheld` (§10), distinct from a server-side `notConfigured`.
+- **Consent (D16, issue #167).** AI analysis is **on by default** on a
+  fresh install: `AppSettings.estimationConsentGiven` defaults to `true`.
+  A one-off `ConsentDisclosureBanner` shown on Explore states in plain
+  language what leaves the device — dish text to KetoClub's server, which
+  forwards it to Google's Gemini API, and nothing else about the user —
+  and offers two buttons: **OK** acknowledges without changing consent;
+  **Turn off** sets consent to `false`. Either button persists
+  `AppSettings.disclosureSeen: true`, so the banner never appears twice
+  on the same install. The Settings toggle mirrors the same choice at
+  any later point. A stored `false` from before D16 (or one written by
+  "Turn off") always wins over the new default: an install that already
+  refused keeps its refusal. The router treats withheld consent as its
+  own reason, `consentWithheld` (§10), distinct from a server-side
+  `notConfigured`. `ClassificationOptions.estimationConsentGiven` keeps
+  its `false` default so a caller that forgets to pass consent still
+  never sends text — only the *settings-level* default flipped.
 - **The model's output is data.** It is parsed by rules and rendered as text. No
   field is ever executed, used as a URL, or used to choose code paths beyond the
   three-valued verdict.
@@ -1532,6 +1543,25 @@ needs the whole dish object, not just its joined text. **What it does not
 touch:** `TextNormaliser.dishSearchText` and `menuFingerprint` (§6.4) are
 unchanged and still hash every option value regardless of removal wording,
 so no cached analysis is invalidated by this decision.
+
+**D16 — AI analysis is on by default.** *(2026-09-28; answers issue #167;
+amends §11.)* D2 makes the language model the primary classifier, but
+`AppSettings.estimationConsentGiven` defaulted to `false`, so a fresh
+install always saw rules-engine verdicts and the "why not AI" banner until
+the user hunted for the Settings switch. That defeated the point of D2 for
+every new user and turned the model into an opt-in feature the app is not
+scoped around. The flip: on a fresh install `estimationConsentGiven`
+defaults to `true`, and a one-off `ConsentDisclosureBanner` on Explore
+tells the user in plain language what leaves the device (dish text to
+KetoClub's backend, on to Google Gemini) with two buttons — **OK**
+acknowledges, **Turn off** sets consent to `false`. Either dismisses the
+banner permanently through a new `AppSettings.disclosureSeen: true`. A
+stored `false` from before D16 (or one written by "Turn off") always wins
+over the new default; the Settings toggle mirrors the same choice at any
+later point. `ClassificationOptions.estimationConsentGiven` keeps its
+`false` default: a caller that forgets to pass consent still never sends
+text — only the *settings-level* default flipped, not the classifier's
+own contract.
 
 ---
 

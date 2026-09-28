@@ -114,9 +114,7 @@ void main() {
         // Setup: consent given, device online, server unreachable.
         final fakes = FakeAppDependencies();
         fakes.repository.stub(_ref, MenuFetched(menu: _menu()));
-        await fakes.settingsStore.write(
-          const AppSettings(estimationConsentGiven: true),
-        );
+        await fakes.settingsStore.write(const AppSettings());
         final llm = _UnreachableBackendLlmClassifier();
         fakes.classifierOverride = RoutingMenuClassifier(
           llm,

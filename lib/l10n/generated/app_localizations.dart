@@ -323,14 +323,26 @@ abstract class AppLocalizations {
   /// No description provided for @settingsConsentBody.
   ///
   /// In en, this message translates to:
-  /// **'When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics.'**
+  /// **'AI analysis is on by default: when you open a menu, dish names, descriptions and option labels are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.'**
   String get settingsConsentBody;
 
   /// No description provided for @settingsConsentAccept.
   ///
   /// In en, this message translates to:
-  /// **'I understand'**
+  /// **'Allow AI analysis'**
   String get settingsConsentAccept;
+
+  /// No description provided for @consentDisclosureOk.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get consentDisclosureOk;
+
+  /// No description provided for @consentDisclosureTurnOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off'**
+  String get consentDisclosureTurnOff;
 
   /// No description provided for @settingsLanguage.
   ///

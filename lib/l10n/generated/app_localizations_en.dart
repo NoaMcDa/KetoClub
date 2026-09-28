@@ -132,10 +132,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsConsentBody =>
-      'When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics.';
+      'AI analysis is on by default: when you open a menu, dish names, descriptions and option labels are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.';
 
   @override
-  String get settingsConsentAccept => 'I understand';
+  String get settingsConsentAccept => 'Allow AI analysis';
+
+  @override
+  String get consentDisclosureOk => 'OK';
+
+  @override
+  String get consentDisclosureTurnOff => 'Turn off';
 
   @override
   String get settingsLanguage => 'Language';

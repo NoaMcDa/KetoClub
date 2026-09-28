@@ -5,8 +5,10 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
+import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/widgets/consent_disclosure_banner.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
@@ -65,6 +67,7 @@ class VenueSearchScreen extends StatefulWidget {
   const new({
     required this.connectivity,
     required this.locationService,
+    required this.settingsStore,
     super.key,
   });
 
@@ -77,6 +80,13 @@ class VenueSearchScreen extends StatefulWidget {
   /// `VenueSearchController` reads a position from — `di.dart` and the
   /// tests both pass one [LocationService] to both.
   final LocationService locationService;
+
+  /// Backs the first-launch AI-disclosure banner (D16, issue #167). The
+  /// banner reads `disclosureSeen` and either persists an acknowledgement
+  /// or turns AI off, then hides itself. Route-local, matching every
+  /// other service on this screen — `SettingsController` is not
+  /// provided here.
+  final SettingsStore settingsStore;
 
   @override
   State<VenueSearchScreen> createState() => _VenueSearchScreenState();
@@ -172,6 +182,7 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               OfflineBanner(connectivity: widget.connectivity),
+              ConsentDisclosureBanner(settingsStore: widget.settingsStore),
               _header(context, l10n, controller),
               const SizedBox(height: 12),
               Text(appName, style: textTheme.labelSmall),

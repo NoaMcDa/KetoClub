@@ -83,10 +83,18 @@ enough for the web build; native apps send no `Origin`, so nothing changes for
 them. On iOS, a plain `http://` LAN URL needs an ATS exception for local
 networking — a simulator does not.
 
-Then in the app: open **Settings → allow AI analysis** (consent is off by
-default and is the only thing gating the AI path once a backend is configured),
-paste a Wolt link on the Discovery tab or tap the location button to search
-nearby.
+Then in the app: **AI analysis is on by default** on a fresh install (D16,
+issue #167). On first launch a one-off disclosure banner on the Discovery
+tab tells you what leaves the device (dish text to KetoClub's backend, on
+to Google Gemini) with two buttons: **OK** acknowledges without changing
+anything, **Turn off** switches AI analysis off in the same tap. Either
+button dismisses the banner permanently. You can flip the toggle any time
+in **Settings → What leaves this device**; a stored refusal always wins
+over the default, so an install that has already turned it off keeps it
+off.
+
+Paste a Wolt link on the Discovery tab or tap the location button to
+search nearby.
 
 ### Builds
 

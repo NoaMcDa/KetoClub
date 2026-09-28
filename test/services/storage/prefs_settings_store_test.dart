@@ -146,7 +146,6 @@ void main() {
         const settings = AppSettings(
           languageTag: 'he',
           filter: MenuFilter.greenOnly,
-          estimationConsentGiven: true,
           lastVenue: VenueRef(source: MenuSource.tabit, platformId: 'site-9'),
         );
 
@@ -166,9 +165,7 @@ void main() {
       () async {
         // Arrange
         final store = _buildStore();
-        await store.write(
-          const AppSettings(languageTag: 'en', estimationConsentGiven: true),
-        );
+        await store.write(const AppSettings(languageTag: 'en'));
 
         // Act
         await store.write(const AppSettings());
@@ -183,12 +180,15 @@ void main() {
     test(
       'write then write replaces the settings rather than merging them',
       () async {
-        // Arrange
+        // Arrange: the first write explicitly refuses consent so the
+        // second write is seen to *replace* it, not merge with it. D16
+        // (issue #167) flipped the default to true, so writing plain
+        // defaults after this must read as true again.
         final store = _buildStore();
         await store.write(
           const AppSettings(
             languageTag: 'he',
-            estimationConsentGiven: true,
+            estimationConsentGiven: false,
             lastVenue: VenueRef(source: MenuSource.wolt, platformId: 'v1'),
           ),
         );
@@ -199,7 +199,7 @@ void main() {
 
         // Assert
         expect(result, equals(const AppSettings(languageTag: 'en')));
-        expect(result.estimationConsentGiven, isFalse);
+        expect(result.estimationConsentGiven, isTrue);
         expect(result.lastVenue, isNull);
       },
     );
@@ -415,7 +415,25 @@ void main() {
     });
 
     test('AppSettings.tryFrom reads missing toggle keys as off', () {
-      // Act
+      // Act: pass the fields written by an install before the toggles
+      // existed. estimationConsentGiven is written explicitly here as
+      // true — D16 (issue #167) flipped the default — so this decodes
+      // as the modern defaults.
+      final decoded = AppSettings.tryFrom(<String, Object?>{
+        'languageTag': null,
+        'filter': 'all',
+        'estimationConsentGiven': true,
+        'lastVenue': null,
+      });
+
+      // Assert
+      expect(decoded, equals(const AppSettings()));
+    });
+
+    test('AppSettings.tryFrom decodes a stored consent value of false as '
+        'false, so an install that already refused before D16 keeps its '
+        'refusal (issue #167)', () {
+      // Act: the legacy JSON shape carrying a refusal.
       final decoded = AppSettings.tryFrom(<String, Object?>{
         'languageTag': null,
         'filter': 'all',
@@ -424,7 +442,54 @@ void main() {
       });
 
       // Assert
-      expect(decoded, equals(const AppSettings()));
+      expect(decoded, isNotNull);
+      expect(decoded!.estimationConsentGiven, isFalse);
+    });
+
+    test('AppSettings.tryFrom decodes a missing estimationConsentGiven key '
+        'as the D16 default of true (issue #167), so an install so old it '
+        'predates the field lands on the new default rather than being '
+        'invalidated for the whole record', () {
+      // Act
+      final decoded = AppSettings.tryFrom(<String, Object?>{
+        'languageTag': null,
+        'filter': 'all',
+        'lastVenue': null,
+      });
+
+      // Assert
+      expect(decoded, isNotNull);
+      expect(decoded!.estimationConsentGiven, isTrue);
+    });
+
+    test('AppSettings.tryFrom round-trips disclosureSeen through toJson '
+        'and back (issue #167)', () {
+      // Arrange
+      const settings = AppSettings(disclosureSeen: true);
+
+      // Act
+      final json = settings.toJson();
+      final decoded = AppSettings.tryFrom(json);
+
+      // Assert
+      expect(json['disclosureSeen'], isTrue);
+      expect(decoded, equals(settings));
+    });
+
+    test('AppSettings.tryFrom reads a missing disclosureSeen key as false '
+        "(issue #167), so an install that predates D16 keeps 'not seen "
+        "yet' and sees the banner once", () {
+      // Act
+      final decoded = AppSettings.tryFrom(<String, Object?>{
+        'languageTag': null,
+        'filter': 'all',
+        'estimationConsentGiven': true,
+        'lastVenue': null,
+      });
+
+      // Assert
+      expect(decoded, isNotNull);
+      expect(decoded!.disclosureSeen, isFalse);
     });
 
     test('write then read round-trips a non-default themeMode', () async {

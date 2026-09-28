@@ -50,6 +50,7 @@ Future<void> _pump(
   Connectivity? connectivity,
   ThemeData? theme,
   LocationService? locationService,
+  SettingsStore? settingsStore,
 }) {
   _useTallSurface(tester);
   return tester.pumpWidget(
@@ -63,6 +64,17 @@ Future<void> _pump(
         home: VenueSearchScreen(
           connectivity: connectivity ?? FakeConnectivity(),
           locationService: locationService ?? FakeLocationService(),
+          // Fresh install (D16, issue #167) → the disclosure banner is
+          // visible on the first frame. Every existing test in this
+          // file wrote AI copy that assumed the banner absent; seed a
+          // "seen" store here so the banner hides itself and this
+          // file's older assertions keep passing. Individual tests for
+          // the banner override this with a virgin store.
+          settingsStore:
+              settingsStore ??
+              FakeSettingsStore(
+                initial: const AppSettings(disclosureSeen: true),
+              ),
         ),
         onGenerateRoute: (settings) {
           pushedNames.add(settings.name ?? '');
