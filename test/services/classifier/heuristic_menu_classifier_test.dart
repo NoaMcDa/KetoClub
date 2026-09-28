@@ -769,4 +769,89 @@ void main() {
       );
     });
   });
+
+  group('HeuristicMenuClassifier carb-only dishes and options (issues #191, '
+      '#192)', () {
+    test(
+      'the Aroma bread counter is red, not "order without the bread"',
+      () async {
+        // Arrange: the rows from the owner's 2026-09-28 screenshots.
+        final menu = _menuOf([
+          _dishNamed('d1', 'פיתה רגילה'),
+          _dishNamed('d2', 'לחמניה ללא גלוטן'),
+          _dishNamed('d3', 'לחמניית מחמצת'),
+          _dishNamed('d4', "מגש צ'יפס"),
+          _dishNamed('d5', "שקית צ'יפס"),
+          _dishNamed('d6', 'דניש קינמון'),
+          _dishNamed('d7', 'שמרים גבינה'),
+        ]);
+
+        // Act
+        final result = await _classify(menu);
+
+        // Assert
+        for (final analysed in result.dishes) {
+          expect(
+            analysed.verdict,
+            DishVerdict.nonKeto,
+            reason: '${analysed.name} should be red',
+          );
+          expect(analysed.modification, isNull);
+          expect(analysed.why, contains('המנה מבוססת על'));
+        }
+      },
+    );
+
+    test('a removal option adds no waiter line', () async {
+      // Arrange
+      const burger = Dish(
+        id: 'burger',
+        name: 'המבורגר',
+        description: '',
+        price: 62,
+        options: [
+          DishOption(
+            name: 'שינויים אפשריים',
+            values: ['ללא חסה', 'ללא אלף האיים'],
+          ),
+        ],
+      );
+
+      // Act
+      final result = await _classify(_menuOf([burger]));
+
+      // Assert
+      final analysed = result.dishes.single;
+      expect(analysed.verdict, DishVerdict.modifiable);
+      expect(analysed.modification, equals(carbModifiersHe['לחמנייה']));
+    });
+
+    test('a dietary rule ignores a removal option value too', () async {
+      // Arrange: "no cheese" is not cheese on the plate.
+      const steak = Dish(
+        id: 'steak',
+        name: 'Ribeye steak',
+        description: '',
+        price: 120,
+        options: [
+          DishOption(name: 'Changes', values: ['No cheese']),
+        ],
+      );
+      final classifier = HeuristicMenuClassifier(
+        clock: FakeClock(DateTime.utc(2026)),
+      );
+
+      // Act
+      final result = await classifier.classify(
+        _menuOf([steak]),
+        options: const ClassificationOptions(
+          dietaryConstraints: [dairyFreePromptFragment],
+        ),
+      );
+
+      // Assert
+      final analysed = (result as MenuAnalysed).dishes.single;
+      expect(analysed.verdict, DishVerdict.orderAsIs);
+    });
+  });
 }

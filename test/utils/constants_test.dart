@@ -31,9 +31,9 @@ void main() {
       expect(llmRequestTimeout, equals(const Duration(seconds: 120)));
     });
 
-    test('maxAnalysedDishes is 150', () {
+    test('maxAnalysedDishes is 1000', () {
       // Assert
-      expect(maxAnalysedDishes, equals(150));
+      expect(maxAnalysedDishes, equals(1000));
     });
 
     test('maxWhyLength is 300', () {
@@ -159,9 +159,9 @@ void main() {
   });
 
   group('carbModifiersEn', () {
-    test('has 58 triggers', () {
+    test('has 62 triggers', () {
       // Assert
-      expect(carbModifiersEn, hasLength(58));
+      expect(carbModifiersEn, hasLength(62));
     });
 
     test('every trigger maps to a non-empty sentence', () {
@@ -188,9 +188,9 @@ void main() {
   });
 
   group('carbModifiersHe', () {
-    test('has 75 triggers', () {
+    test('has 80 triggers', () {
       // Assert
-      expect(carbModifiersHe, hasLength(75));
+      expect(carbModifiersHe, hasLength(80));
     });
 
     test('every trigger maps to a non-empty sentence', () {
@@ -221,9 +221,9 @@ void main() {
   });
 
   group('nonKetoBasesEn', () {
-    test('has 92 triggers', () {
+    test('has 100 triggers', () {
       // Assert
-      expect(nonKetoBasesEn, hasLength(92));
+      expect(nonKetoBasesEn, hasLength(100));
     });
 
     test('carries the battered-fish phrases D-V2 alone would miss', () {
@@ -260,9 +260,9 @@ void main() {
   });
 
   group('nonKetoBasesHe', () {
-    test('has 107 triggers', () {
+    test('has 116 triggers', () {
       // Assert
-      expect(nonKetoBasesHe, hasLength(107));
+      expect(nonKetoBasesHe, hasLength(116));
     });
 
     test('has no duplicate triggers', () {

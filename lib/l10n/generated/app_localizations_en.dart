@@ -309,6 +309,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get analysisBadResponseNoDetail =>
+      'The AI model gave an unusable answer. Showing rule-based results.';
+
+  @override
   String get analysisNoDishesFound =>
       'The AI could not identify any dishes on this menu.';
 

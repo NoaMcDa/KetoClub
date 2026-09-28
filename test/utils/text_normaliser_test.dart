@@ -311,4 +311,90 @@ void main() {
       expect(result, isA<int>());
     });
   });
+
+  group('TextNormaliser.dishCoreText (issue #192)', () {
+    test('joins the name and description and ignores every option', () {
+      // Arrange
+      final dish = _dish(
+        name: 'Burger',
+        description: 'With Purée',
+        options: const [
+          DishOption(name: 'Choice of side', values: ['Fries', 'Salad']),
+        ],
+      );
+      // Act
+      final result = TextNormaliser.dishCoreText(dish);
+      // Assert
+      expect(result, equals('burger with puree'));
+    });
+  });
+
+  group('TextNormaliser.dishRulesText (issue #192)', () {
+    test('keeps option names and ordinary values', () {
+      // Arrange
+      final dish = _dish(
+        name: 'Burger',
+        options: const [
+          DishOption(name: 'Choice of side', values: ['Fries', 'Salad']),
+        ],
+      );
+      // Act
+      final result = TextNormaliser.dishRulesText(dish);
+      // Assert
+      expect(result, equals('burger choice of side fries salad'));
+    });
+
+    test('drops removal values in either language', () {
+      // Arrange
+      final dish = _dish(
+        name: 'המבורגר',
+        options: const [
+          DishOption(
+            name: 'שינויים',
+            values: ['ללא חסה', 'בלי אלף האיים', 'No onions', 'Without bun'],
+          ),
+        ],
+      );
+      // Act
+      final result = TextNormaliser.dishRulesText(dish);
+      // Assert
+      // Final letters fold (ם → מ), like every normalised string.
+      expect(result, equals('המבורגר שינויימ'));
+    });
+
+    test('is a prefix-free subset of dishSearchText for a dish with no '
+        'removals', () {
+      // Arrange
+      final dish = _dish(
+        name: 'Café Steak',
+        description: 'With Purée',
+        options: const [
+          DishOption(name: 'Side', values: ['Rice']),
+        ],
+      );
+      // Act & Assert
+      expect(
+        TextNormaliser.dishRulesText(dish),
+        equals(TextNormaliser.dishSearchText(dish)),
+      );
+    });
+  });
+
+  group('TextNormaliser.isRemovalOptionValue (issue #192)', () {
+    test('recognises a leading removal word in either language', () {
+      expect(TextNormaliser.isRemovalOptionValue('ללא חסה'), isTrue);
+      expect(TextNormaliser.isRemovalOptionValue('בלי בצל'), isTrue);
+      expect(TextNormaliser.isRemovalOptionValue('No onions'), isTrue);
+      expect(TextNormaliser.isRemovalOptionValue('Without the bun'), isTrue);
+      expect(TextNormaliser.isRemovalOptionValue('  WITHOUT bun'), isTrue);
+    });
+
+    test('does not flag an ingredient, a blank, or a removal word inside '
+        'the value', () {
+      expect(TextNormaliser.isRemovalOptionValue('Potato purée'), isFalse);
+      expect(TextNormaliser.isRemovalOptionValue('צ׳יפס'), isFalse);
+      expect(TextNormaliser.isRemovalOptionValue(''), isFalse);
+      expect(TextNormaliser.isRemovalOptionValue('Bun, no sesame'), isFalse);
+    });
+  });
 }

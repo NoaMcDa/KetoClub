@@ -7,6 +7,7 @@
 library;
 
 import 'package:flutter/foundation.dart';
+import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 
@@ -19,7 +20,9 @@ typedef _CompiledBase = ({String key, RegExp pattern});
 typedef _CompiledModifier = ({String key, RegExp pattern, String sentence});
 
 /// One surviving (unguarded) carb-modifier occurrence, in match order.
-typedef _Occurrence = ({int start, String key, String sentence});
+/// `end` is exclusive, so `start`..`end` is the matched span — which the
+/// carb-only-dish rule blanks out to see what else a dish name says.
+typedef _Occurrence = ({int start, int end, String key, String sentence});
 
 /// Hebrew letters, including final forms — they are ordinary codepoints
 /// inside this range, not appended ones (`vocabulary_spec.md` "regex
@@ -176,6 +179,14 @@ final List<_CompiledBase> _plantEn = _compileDietaryEn(plantTriggersEn);
 /// See [_plantEn].
 final List<_CompiledBase> _plantHe = _compileDietaryHe(plantTriggersHe);
 
+/// Every carb-only qualifier word, both languages, normalised once
+/// (issue #191) — the set [ClassificationRules.carbOnlyBase] tests a dish
+/// name's leftover words against.
+final Set<String> _carbOnlyQualifiers = <String>{
+  for (final word in carbOnlyQualifiersEn) TextNormaliser.normalise(word),
+  for (final word in carbOnlyQualifiersHe) TextNormaliser.normalise(word),
+};
+
 /// No dietary rule but dairy has guards; the seed-oil and plant tables
 /// scan against this empty map.
 const Map<String, GuardWords> _noGuards = <String, GuardWords>{};
@@ -284,6 +295,7 @@ List<_Occurrence> _unguardedModifierOccurrences(String haystack) {
         }
         occurrences.add((
           start: match.start,
+          end: match.end,
           key: entry.key,
           sentence: entry.sentence,
         ));
@@ -395,6 +407,88 @@ abstract final class ClassificationRules {
       isNonKeto: false,
       instructions: _sentencesAfterSuppression(occurrences),
     );
+  }
+
+  /// Runs the vocabulary over one whole [dish] rather than a flat string
+  /// (issues #191, #192), in this order:
+  ///
+  /// 1. A name that is nothing but a carb ([carbOnlyBase]) is red: "פיתה
+  ///    רגילה", "Portion of fries". D-V3's "serve it without the pita"
+  ///    cannot be followed when the pita is the dish.
+  /// 2. A non-keto base is matched on [TextNormaliser.dishCoreText] —
+  ///    the name and description only. Option text can make a dish
+  ///    yellow, never red: an option group named after a red base is
+  ///    something the dish can be ordered *as*, not what it is.
+  /// 3. Carb modifiers are matched on [TextNormaliser.dishRulesText],
+  ///    which keeps a "choice of side" value and drops removal values
+  ///    ("ללא אלף האיים"), so a burger is not told to swap a dressing it
+  ///    only ever had the option to leave off.
+  ///
+  /// [match] stays for callers with only a string; the heuristic
+  /// classifier uses this. Never throws.
+  static RuleMatch matchDish(Dish dish) {
+    final carbOnly = carbOnlyBase(dish.name);
+    if (carbOnly != null) {
+      return RuleMatch(
+        isNonKeto: true,
+        baseLabel: carbOnly,
+        instructions: const <String>[],
+      );
+    }
+
+    final base = _firstUnguardedBaseMatch(TextNormaliser.dishCoreText(dish));
+    if (base != null) {
+      return RuleMatch(
+        isNonKeto: true,
+        baseLabel: base.label,
+        instructions: const <String>[],
+      );
+    }
+
+    final occurrences = _unguardedModifierOccurrences(
+      TextNormaliser.dishRulesText(dish),
+    );
+    return RuleMatch(
+      isNonKeto: false,
+      instructions: _sentencesAfterSuppression(occurrences),
+    );
+  }
+
+  /// The carb-modifier trigger a dish [name] consists of, when the name
+  /// is nothing but unguarded carb-modifier triggers and the portion or
+  /// qualifier words in [carbOnlyQualifiersEn]/[carbOnlyQualifiersHe]
+  /// (issue #191): "Plain pita", "Sourdough bun", "Large bag of chips",
+  /// "מגש צ'יפס", "לחמניה ללא גלוטן". Null for every other name, including
+  /// one with no carb trigger at all and one that names anything else
+  /// ("Chicken with pita", "שווארמה בפיתה" — those stay D-V3 yellows).
+  ///
+  /// The label returned is the earliest trigger's own dictionary key,
+  /// already the clean form the red `why` reads aloud. Only the **name**
+  /// is consulted, never the description or options: a description can
+  /// list a whole plate, and "bread" in it is the carrier D-V3 means.
+  static String? carbOnlyBase(String name) {
+    final haystack = TextNormaliser.normalise(name);
+    if (haystack.isEmpty) return null;
+    final occurrences = _unguardedModifierOccurrences(haystack);
+    if (occurrences.isEmpty) return null;
+    for (final occurrence in occurrences) {
+      if (carbOnlyExemptTriggers.contains(occurrence.key)) return null;
+    }
+
+    final units = haystack.codeUnits.toList(growable: false);
+    const space = 0x20;
+    for (final occurrence in occurrences) {
+      for (var i = occurrence.start; i < occurrence.end; i++) {
+        units[i] = space;
+      }
+    }
+    final remainder = String.fromCharCodes(units)
+        .split(' ')
+        .where((word) => word.isNotEmpty);
+    for (final word in remainder) {
+      if (!_carbOnlyQualifiers.contains(word)) return null;
+    }
+    return occurrences.first.key;
   }
 
   /// Whether [rawText] names frying or an industrial seed oil

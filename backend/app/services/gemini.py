@@ -162,7 +162,45 @@ async def _post(
         logger.info("gemini upstream transport error")
         raise BackendError(502, "badResponse") from error
     logger.info("gemini upstream_status=%d", response.status_code)
+    if response.status_code >= 400:
+        _log_upstream_error(response)
     return response
+
+
+def _log_upstream_error(response: httpx.Response) -> None:
+    """Name an upstream failure in the log without quoting Google's body.
+
+    Only ``error.status`` — Google's short enum such as ``NOT_FOUND`` or
+    ``RESOURCE_EXHAUSTED`` — is logged, never ``error.message`` (which
+    quotes the request) and never the body. A 404 gets one more fixed line:
+    it is what ``generateContent`` answers for a model id that is retired or
+    not served for this key, and until #187 the only trace of that was a
+    bare status code that the app rendered as "AI error".
+    """
+    status = _upstream_error_status(response)
+    if status is not None:
+        logger.info("gemini upstream error_status=%s", status)
+    if response.status_code == 404:
+        logger.warning(
+            "gemini answered 404: the configured GEMINI_MODEL is not served "
+            "for this key or API version; set GEMINI_MODEL in backend/.env "
+            "to a model the key can use (see #179)"
+        )
+
+
+def _upstream_error_status(response: httpx.Response) -> str | None:
+    """``error.status`` from a Google error body, or None when it has none."""
+    try:
+        body: object = response.json()
+    except ValueError:
+        return None
+    if not isinstance(body, dict):
+        return None
+    error = body.get("error")
+    if not isinstance(error, dict):
+        return None
+    status = error.get("status")
+    return status if isinstance(status, str) and status else None
 
 
 def _is_invalid_key(response: httpx.Response) -> bool:

@@ -126,6 +126,7 @@
   "@analysisBadResponse": {
     "placeholders": { "detail": { "type": "String" } }
   },
+  "analysisBadResponseNoDetail": "מודל הבינה המלאכותית החזיר תשובה לא שמישה. מוצגות תוצאות על בסיס כללים.",
   "analysisNoDishesFound": "הבינה המלאכותית לא הצליחה לזהות מנות בתפריט הזה.",
   "analysisBackendUnreachable": "לא ניתן היה להתחבר לשרת של קטוקלאב. מוצגות תוצאות על בסיס כללים.",
   "analysisConsentWithheld": "אשרו ניתוח בינה מלאכותית בהגדרות כדי לנתח את התפריט הזה. מוצגות תוצאות על בסיס כללים.",

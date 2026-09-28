@@ -126,6 +126,7 @@
   "@analysisBadResponse": {
     "placeholders": { "detail": { "type": "String" } }
   },
+  "analysisBadResponseNoDetail": "The AI model gave an unusable answer. Showing rule-based results.",
   "analysisNoDishesFound": "The AI could not identify any dishes on this menu.",
   "analysisBackendUnreachable": "KetoClub's server could not be reached. Showing rule-based results.",
   "analysisConsentWithheld": "Allow AI analysis in Settings to analyse this menu. Showing rule-based results.",

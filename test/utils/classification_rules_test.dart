@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/utils/classification_rules.dart';
 import 'package:ketoclub/utils/constants.dart';
 
@@ -546,5 +547,228 @@ void main() {
         expect(ClassificationRules.mentionsPlant(text), isFalse);
       });
     }
+  });
+
+  group('ClassificationRules.carbOnlyBase (issue #191)', () {
+    const carbOnlyNames = <String, String>{
+      'פיתה רגילה': 'פיתה',
+      'לחמניה ללא גלוטן': 'לחמניה',
+      'לחמניית מחמצת': 'לחמניית',
+      "מגש צ'יפס": "צ'יפס",
+      "שקית צ'יפס": "צ'יפס",
+      'מנת אורז': 'אורז',
+      'Plain pita': 'pita',
+      'Sourdough bun': 'bun',
+      'Portion of fries': 'fries',
+      'Large bag of chips': 'chips',
+      'Fries': 'fries',
+    };
+    for (final MapEntry(key: name, value: label) in carbOnlyNames.entries) {
+      test('"$name" is the carb itself, labelled "$label"', () {
+        // Act
+        final result = ClassificationRules.carbOnlyBase(name);
+        // Assert
+        expect(result, equals(label));
+      });
+    }
+
+    const notCarbOnly = <String>[
+      'המבורגר',
+      'שווארמה בפיתה',
+      'סלט טונה עם לחם',
+      'Chicken salad with pita on the side',
+      'Burger with fries',
+      'Burger',
+      'המבורגר',
+      'כריך',
+      'Toast',
+      'Grilled sea bream',
+      '',
+      '   ',
+    ];
+    for (final name in notCarbOnly) {
+      test('"$name" is not a carb-only dish', () {
+        // Act
+        final result = ClassificationRules.carbOnlyBase(name);
+        // Assert
+        expect(result, isNull);
+      });
+    }
+
+    test('a guarded trigger does not count: "Cauliflower rice" is null', () {
+      // Act
+      final result = ClassificationRules.carbOnlyBase('Cauliflower rice');
+      // Assert: `cauliflower` guards `rice`, so no trigger survives.
+      expect(result, isNull);
+    });
+  });
+
+  group('ClassificationRules.matchDish (issues #191, #192)', () {
+    Dish dish({
+      required String name,
+      String description = '',
+      List<DishOption> options = const [],
+    }) => Dish(
+      id: 'd',
+      name: name,
+      description: description,
+      price: 10,
+      options: options,
+    );
+
+    test('a carb-only name is red with the trigger as its label', () {
+      // Act
+      final result = ClassificationRules.matchDish(dish(name: 'פיתה רגילה'));
+      // Assert
+      expect(result.isNonKeto, isTrue);
+      expect(result.baseLabel, 'פיתה');
+      expect(result.instructions, isEmpty);
+    });
+
+    test('a removal option value does not add its sentence', () {
+      // Arrange: the real hamosad burger — the only "אלף האיים" is the
+      // option to leave it off.
+      final burger = dish(
+        name: 'המבורגר',
+        options: const [
+          DishOption(
+            name: 'שינויים אפשריים',
+            values: ['ללא חסה', 'ללא אלף האיים', 'ללא מלפפון חמוץ'],
+          ),
+        ],
+      );
+      // Act
+      final result = ClassificationRules.matchDish(burger);
+      // Assert
+      expect(result.isNonKeto, isFalse);
+      expect(
+        result.instructions,
+        isNot(contains(carbModifiersHe['אלף האיים'])),
+      );
+      expect(result.instructions, equals([carbModifiersHe['לחמנייה']]));
+    });
+
+    test('an English removal value ("No croutons") does not add its '
+        'sentence', () {
+      // Arrange
+      final salad = dish(
+        name: 'Caesar salad',
+        options: const [
+          DishOption(name: 'Changes', values: ['No croutons', 'No cheese']),
+        ],
+      );
+      // Act
+      final result = ClassificationRules.matchDish(salad);
+      // Assert
+      expect(result.instructions, isEmpty);
+    });
+
+    test('a choice-of-side value still makes the dish yellow', () {
+      // Arrange
+      final chicken = dish(
+        name: 'Grilled chicken',
+        options: const [
+          DishOption(
+            name: 'Choice of side',
+            values: ['Potato purée', 'Green salad'],
+          ),
+        ],
+      );
+      // Act
+      final result = ClassificationRules.matchDish(chicken);
+      // Assert
+      expect(result.isNonKeto, isFalse);
+      expect(result.instructions, contains(carbModifiersEn['puree']));
+    });
+
+    test('an option group named after a red base does not redden the dish', () {
+      // Arrange: a burger with a "nuggets meal" upgrade option.
+      final burger = dish(
+        name: 'המבורגר',
+        options: const [
+          DishOption(name: 'ארוחת נאגטס', values: ['נאגטס - 6 יחידות']),
+        ],
+      );
+      // Act
+      final result = ClassificationRules.matchDish(burger);
+      // Assert: yellow for the bun, never red for an optional upgrade.
+      expect(result.isNonKeto, isFalse);
+      expect(result.instructions, equals([carbModifiersHe['לחמנייה']]));
+    });
+
+    test('a red base in the description still reddens the dish', () {
+      // Act
+      final result = ClassificationRules.matchDish(
+        dish(name: 'Special of the day', description: 'Spaghetti bolognese'),
+      );
+      // Assert
+      expect(result.isNonKeto, isTrue);
+      expect(result.baseLabel, 'spaghetti');
+    });
+
+    test('matchDish and match agree for a dish with no options', () {
+      // Arrange
+      final steak = dish(name: 'Entrecôte', description: 'with potato purée');
+      // Act
+      final byDish = ClassificationRules.matchDish(steak);
+      final byText = ClassificationRules.match('Entrecôte with potato purée');
+      // Assert
+      expect(byDish, equals(byText));
+    });
+  });
+
+  group('ClassificationRules.match — pastry vocabulary (issue #190)', () {
+    const pastries = <String>[
+      'דניש קינמון',
+      'שמרים גבינה',
+      'מאפה גבינה',
+      'רוגלך שוקולד',
+      'Cinnamon danish',
+      'Cheese pastry',
+      'Blueberry muffin',
+      'Plain scone',
+    ];
+    for (final name in pastries) {
+      test('"$name" is red', () {
+        // Act
+        final result = ClassificationRules.match(name);
+        // Assert
+        expect(result.isNonKeto, isTrue, reason: name);
+      });
+    }
+
+    test('"Danish blue cheese" is not red (guarded)', () {
+      // Act
+      final result = ClassificationRules.match('Steak with danish blue');
+      // Assert
+      expect(result.isNonKeto, isFalse);
+    });
+
+    test('a bare burger is yellow with the bun sentence, in both '
+        'languages', () {
+      // Act
+      final en = ClassificationRules.match('Burger');
+      final he = ClassificationRules.match('המבורגר');
+      final cheese = ClassificationRules.match("צ'יזבורגר המוסד");
+      // Assert
+      expect(en.instructions, equals([carbModifiersEn['burger']]));
+      expect(he.instructions, equals([carbModifiersHe['המבורגר']]));
+      expect(cheese.instructions, equals([carbModifiersHe["צ'יזבורגר"]]));
+    });
+
+    test('a lettuce burger is not yellow (guarded)', () {
+      // Act
+      final result = ClassificationRules.match('Lettuce burger with bacon');
+      // Assert
+      expect(result.instructions, isEmpty);
+    });
+
+    test('the construct form לחמניית carries the bun sentence', () {
+      // Act
+      final result = ClassificationRules.match('המבורגר בלחמניית מחמצת');
+      // Assert
+      expect(result.isNonKeto, isFalse);
+      expect(result.instructions, contains(carbModifiersHe['לחמנייה']));
+    });
   });
 }

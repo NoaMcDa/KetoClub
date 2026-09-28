@@ -14,6 +14,7 @@
 library;
 
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/utils/constants.dart';
 
 /// Bidi control characters Wolt and 10bis Hebrew payloads carry around
 /// mixed-script runs (vocabulary spec, normaliser step 1): LRM, RLM, LRE,
@@ -218,6 +219,53 @@ abstract final class TextNormaliser {
       }
     }
     return parts.where((part) => part.isNotEmpty).join(' ');
+  }
+
+  /// The dish's own text — [dish]'s name and description, normalised and
+  /// joined with a space — with no option text at all (issue #192). This
+  /// is what a non-keto base is matched against: an option group named
+  /// after a red base ("ארוחת נאגטס", a meal upgrade on a burger) is a
+  /// thing the dish *can* become, not what it is, so it may never redden
+  /// the dish on its own.
+  static String dishCoreText(Dish dish) {
+    final parts = <String>[normalise(dish.name), normalise(dish.description)];
+    return parts.where((part) => part.isNotEmpty).join(' ');
+  }
+
+  /// The text the rule engine reads for one dish (issues #191, #192):
+  /// [dishCoreText] plus every option group's name and each of its value
+  /// labels **except removal values** — a value whose first word is one
+  /// of [optionRemovalWordsEn]/[optionRemovalWordsHe] ("No onions",
+  /// "ללא אלף האיים") names something the dish can be ordered *without*,
+  /// and reading it as an ingredient produced "olive oil instead of the
+  /// thousand island" on a burger whose only mention of it was the option
+  /// to leave it off. A "choice of side" value ("Potato purée") is still
+  /// read, as architecture.md §6.1 requires.
+  ///
+  /// Distinct from [dishSearchText], which keeps every value and stays
+  /// the input to [menuFingerprint] and the share text, so this change
+  /// invalidates no cached analysis.
+  static String dishRulesText(Dish dish) {
+    final parts = <String>[dishCoreText(dish)];
+    for (final option in dish.options) {
+      parts.add(normalise(option.name));
+      for (final value in option.values) {
+        if (isRemovalOptionValue(value)) continue;
+        parts.add(normalise(value));
+      }
+    }
+    return parts.where((part) => part.isNotEmpty).join(' ');
+  }
+
+  /// Whether the option value [raw] is a removal — its first normalised
+  /// word is one of [optionRemovalWordsEn] or [optionRemovalWordsHe]
+  /// (issue #192). A blank value is not a removal.
+  static bool isRemovalOptionValue(String raw) {
+    final normalised = normalise(raw);
+    if (normalised.isEmpty) return false;
+    final first = normalised.split(' ').first;
+    return optionRemovalWordsEn.contains(first) ||
+        optionRemovalWordsHe.contains(first);
   }
 
   /// A stable hash of [menu]'s dish text, for the cache-staleness
