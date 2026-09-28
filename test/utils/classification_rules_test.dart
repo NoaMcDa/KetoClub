@@ -3,13 +3,13 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/utils/classification_rules.dart';
 import 'package:ketoclub/utils/constants.dart';
 
-/// The one Hebrew trigger whose pattern deliberately disables the
+/// The Hebrew triggers whose pattern deliberately disables the
 /// permissive prefix (see `classification_rules.dart`'s
 /// `_noPrefixHebrewTriggers`): folded `חלה` also spells a common verb
 /// form, and its prefixed form (`החלה`) is itself an ordinary word
-/// ("commencement"), so it is excluded from the prefix half of the
-/// generated Hebrew trigger tests below.
-const String _noPrefixTrigger = 'חלה';
+/// ("commencement"); `משמרים` is "preservatives". Both are excluded from
+/// the prefix half of the generated Hebrew trigger tests below.
+const Set<String> _noPrefixTriggers = <String>{'חלה', 'שמרים'};
 
 /// A neutral English wrapper containing no guard vocabulary, so every
 /// `carbModifiersEn`/`nonKetoBasesEn` trigger can be dropped in as-is.
@@ -266,7 +266,7 @@ void main() {
         expect(bare.isNonKeto, isFalse);
         expect(bare.instructions, contains(entry.value));
 
-        if (trigger != _noPrefixTrigger) {
+        if (!_noPrefixTriggers.contains(trigger)) {
           // Act
           final prefixed = ClassificationRules.match(_heText('ה$trigger'));
           // Assert
@@ -286,7 +286,7 @@ void main() {
         expect(bare.isNonKeto, isTrue);
         expect(bare.baseLabel, isNotNull);
 
-        if (trigger != _noPrefixTrigger) {
+        if (!_noPrefixTriggers.contains(trigger)) {
           // Act
           final prefixed = ClassificationRules.match(_heText('ה$trigger'));
           // Assert
@@ -553,14 +553,24 @@ void main() {
     const carbOnlyNames = <String, String>{
       'פיתה רגילה': 'פיתה',
       'לחמניה ללא גלוטן': 'לחמניה',
-      'לחמניית מחמצת': 'לחמניית',
+      // The construct form is labelled by the readable form.
+      'לחמניית מחמצת': 'לחמנייה',
       "מגש צ'יפס": "צ'יפס",
       "שקית צ'יפס": "צ'יפס",
       'מנת אורז': 'אורז',
+      // A leading ה on a leftover word is stripped before the lookup.
+      'לחם הבית': 'לחם',
+      'הפיתה הרגילה': 'פיתה',
+      // At a tie on start, the longer trigger names the dish.
+      'פירה תפוחי אדמה': 'פירה תפוחי אדמה',
+      'אורז מלא': 'אורז מלא',
       'Plain pita': 'pita',
       'Sourdough bun': 'bun',
       'Portion of fries': 'fries',
+      'French fries': 'fries',
+      'Steamed jasmine rice': 'rice',
       'Large bag of chips': 'chips',
+      'Sweet potato fries': 'sweet potato',
       'Fries': 'fries',
     };
     for (final MapEntry(key: name, value: label) in carbOnlyNames.entries) {
@@ -573,7 +583,6 @@ void main() {
     }
 
     const notCarbOnly = <String>[
-      'המבורגר',
       'שווארמה בפיתה',
       'סלט טונה עם לחם',
       'Chicken salad with pita on the side',
@@ -583,6 +592,15 @@ void main() {
       'כריך',
       'Toast',
       'Grilled sea bream',
+      // Not a starch or a bread: a sauce or a vegetable alone is not
+      // "built on" itself.
+      'Carrots',
+      'Honey',
+      'Vinaigrette',
+      'גזר',
+      'דבש',
+      // Only qualifier words, no trigger at all.
+      'Large portion',
       '',
       '   ',
     ];
@@ -691,9 +709,78 @@ void main() {
       );
       // Act
       final result = ClassificationRules.matchDish(burger);
-      // Assert: yellow for the bun, never red for an optional upgrade.
+      // Assert: yellow, never red for an optional upgrade — the ask to
+      // skip that option comes first, then the bun sentence.
       expect(result.isNonKeto, isFalse);
-      expect(result.instructions, equals([carbModifiersHe['לחמנייה']]));
+      expect(
+        result.instructions,
+        equals([
+          optionBaseModificationHe.replaceAll('{base}', 'נאגטס'),
+          carbModifiersHe['לחמנייה'],
+        ]),
+      );
+    });
+
+    test('a bread-named dish whose description names a filling is a D-V3 '
+        'yellow, not red', () {
+      // Arrange
+      final laffa = dish(name: 'לאפה', description: 'שווארמה, חומוס, סלט');
+      final pita = dish(
+        name: 'Pita',
+        options: const [
+          DishOption(name: 'Choose your filling', values: ['Chicken', 'Beef']),
+        ],
+      );
+      // Act
+      final laffaResult = ClassificationRules.matchDish(laffa);
+      final pitaResult = ClassificationRules.matchDish(pita);
+      // Assert
+      expect(laffaResult.isNonKeto, isFalse);
+      expect(laffaResult.instructions, contains(carbModifiersHe['לאפה']));
+      expect(pitaResult.isNonKeto, isFalse);
+      expect(pitaResult.instructions, equals([carbModifiersEn['pita']]));
+    });
+
+    test('a bread-named dish whose description names only the bread is '
+        'still red', () {
+      // Act
+      final result = ClassificationRules.matchDish(
+        dish(name: 'לחמניית מחמצת', description: 'לחמנייה מקמח מלא, אפויה'),
+      );
+      // Assert
+      expect(result.isNonKeto, isTrue);
+      expect(result.baseLabel, 'לחמנייה');
+    });
+
+    test('a red base offered only as an option is a yellow asking for the '
+        'other option', () {
+      // Arrange
+      final chicken = dish(
+        name: 'Grilled chicken',
+        options: const [
+          DishOption(name: 'Choice of side', values: ['Pasta', 'Green salad']),
+        ],
+      );
+      final heChicken = dish(
+        name: 'חזה עוף',
+        options: const [
+          DishOption(name: 'תוספת לבחירה', values: ['פסטה', 'סלט ירוק']),
+        ],
+      );
+      // Act
+      final en = ClassificationRules.matchDish(chicken);
+      final he = ClassificationRules.matchDish(heChicken);
+      // Assert
+      expect(en.isNonKeto, isFalse);
+      expect(
+        en.instructions,
+        equals([optionBaseModificationEn.replaceAll('{base}', 'pasta')]),
+      );
+      expect(he.isNonKeto, isFalse);
+      expect(
+        he.instructions,
+        equals([optionBaseModificationHe.replaceAll('{base}', 'פסטה')]),
+      );
     });
 
     test('a red base in the description still reddens the dish', () {
@@ -737,11 +824,57 @@ void main() {
       });
     }
 
-    test('"Danish blue cheese" is not red (guarded)', () {
-      // Act
-      final result = ClassificationRules.match('Steak with danish blue');
-      // Assert
-      expect(result.isNonKeto, isFalse);
+    test('"danish blue" and "danish meatballs" are not red (guarded), '
+        '"danish cheese" is', () {
+      // Act & Assert
+      expect(
+        ClassificationRules.match('Steak with danish blue').isNonKeto,
+        isFalse,
+      );
+      expect(
+        ClassificationRules.match('Danish meatballs in gravy').isNonKeto,
+        isFalse,
+      );
+      expect(ClassificationRules.match('Danish cheese').isNonKeto, isTrue);
+    });
+
+    test('an egg muffin or keto muffin is not red (guarded)', () {
+      // Act & Assert
+      expect(
+        ClassificationRules.match('Egg muffins with spinach').isNonKeto,
+        isFalse,
+      );
+      expect(ClassificationRules.match('Keto muffin').isNonKeto, isFalse);
+      expect(ClassificationRules.match('Blueberry muffin').isNonKeto, isTrue);
+    });
+
+    test('שמרים never matches inside משמרים ("preservatives") and is guarded '
+        'for nutritional yeast', () {
+      // Act & Assert
+      expect(
+        ClassificationRules.match('לחם ביתי ללא חומרים משמרים').isNonKeto,
+        isFalse,
+      );
+      expect(
+        ClassificationRules.match('סלט עם שמרים תזונתיים').isNonKeto,
+        isFalse,
+      );
+      expect(ClassificationRules.match('שמרים גבינה').isNonKeto, isTrue);
+      expect(ClassificationRules.match('עוגת שמרים').isNonKeto, isTrue);
+    });
+
+    test('a Hebrew burger wrapped in lettuce or keto is not yellow '
+        '(guarded)', () {
+      // Act & Assert
+      expect(
+        ClassificationRules.match('המבורגר עטוף בחסה').instructions,
+        isEmpty,
+      );
+      expect(ClassificationRules.match('המבורגר קטו').instructions, isEmpty);
+      expect(
+        ClassificationRules.match('Keto cheeseburger').instructions,
+        isEmpty,
+      );
     });
 
     test('a bare burger is yellow with the bun sentence, in both '

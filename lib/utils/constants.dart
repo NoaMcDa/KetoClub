@@ -683,6 +683,9 @@ const List<String> nonKetoBasesHe = <String>[
   // the only sense it has on a menu; `מאפה`/`מאפים` is the generic
   // pastry word Israeli bakeries name every counter item with.
   'דניש', // danish
+  // Compiled with no permissive prefix (classification_rules.dart): the
+  // prefixed form would match inside `משמרים` ("preservatives"), as in
+  // "ללא חומרים משמרים" on a bread's description.
   'שמרים', // yeast pastry
   'מאפה', 'מאפים', // pastry / pastries
   'רוגלך', // rugelach
@@ -737,39 +740,152 @@ const List<String> carbOnlyQualifiersEn = <String>[
   'wholewheat',
   'crispy',
   'hot',
+  'french',
+  'steamed',
+  'jasmine',
+  'basmati',
+  'curly',
+  'thick',
+  'thin',
+  'cut',
+  'seasoned',
+  'salted',
+  'baked',
+  'roasted',
+  'boiled',
+  'fried',
+  'style',
+  'classic',
+  'original',
 ];
 
-/// Carb-modifier triggers the carb-only rule never fires on (issue #191):
-/// dishes a bread *carries*, whose filling exists even when the name
-/// does not spell it out. "Burger" or "כריך" alone is D-V3's yellow
-/// ("without the bun, wrapped in lettuce"), never "the carb itself";
-/// "Plain pita" or "מגש צ'יפס" is. Both languages, matched against the
-/// trigger's own dictionary key.
-const Set<String> carbOnlyExemptTriggers = <String>{
-  'burger',
-  'burgers',
-  'hamburger',
-  'cheeseburger',
-  'sandwich',
-  'sandwiches',
-  'wrap',
-  'toast',
-  'toasts',
-  'המבורגר',
-  'בורגר',
-  "צ'יזבורגר",
-  'כריך',
-  'כריכים',
-  "סנדוויץ'",
-  "סנדוויצ'ים",
-  'סנדביץ',
-  'ראפ',
-  'טוסט',
-  'טוסטים',
+/// The carb-modifier triggers the carb-only rule (issue #191) may fire on:
+/// the starches and the breads — things that *are* the carb when nothing
+/// else is on the plate. Every other modifier (a sauce, a root vegetable,
+/// a dressing) is left out on purpose: "Carrots" or "Honey" as a dish name
+/// is odd, but calling it "built on carrots, which cannot be made keto" is
+/// wrong. The bread-*carried* dishes (burger, sandwich, wrap, toast) are
+/// left out for the opposite reason: their filling exists even when the
+/// name does not spell it out, and D-V3's yellow is the right answer.
+/// Every entry must be a key of [carbModifiersEn] or [carbModifiersHe]; a
+/// test asserts it.
+const Set<String> carbOnlyEligibleTriggers = <String>{
+  // Starches.
+  'fries', 'chips', 'potato', 'potatoes', 'puree', 'mash', 'mashed potato',
+  'mashed potatoes', 'potato mash', 'sweet potato', 'sweet potatoes',
+  'rice', 'bulgur', 'quinoa', 'hummus',
+  // Breads.
+  'bread', 'pita', 'laffa', 'bun', 'buns', 'burger bun', 'baguette',
+  'tortilla',
+  // Hebrew starches.
+  'פירה', 'מחית תפוחי אדמה', 'מחית תפו"א', 'פירה תפוחי אדמה', 'פירה תפו"א',
+  "צ'יפס", 'תפוחי אדמה מטוגנים', 'קריספס', 'אורז', 'אורז יסמין',
+  'אורז מלא', 'בטטה', 'בטטות', 'תפוח אדמה מתוק', 'תפוח אדמה',
+  'תפוחי אדמה', 'תפו"א', 'תפוד', 'תפודים', 'בורגול', 'קינואה', 'חומוס',
+  // Hebrew breads.
+  'לחם', 'פיתה', 'לאפה', 'לחמנייה', 'לחמניה', 'לחמניות', 'לחמניית',
+  'לחמנית', 'באגט', 'טורטייה', 'טורטיה',
 };
 
+/// Display labels for a carb-only red's `{base}` (issue #191), for the
+/// triggers whose dictionary key is not a form that reads well on its own
+/// — a construct form ("לחמניית" needs a following word) or a shorthand.
+/// Every other trigger is its own label.
+const Map<String, String> carbOnlyBaseLabels = <String, String>{
+  'לחמניית': 'לחמנייה',
+  'לחמנית': 'לחמנייה',
+  'תפו"א': 'תפוחי אדמה',
+  'תפוד': 'תפוח אדמה',
+  'תפודים': 'תפוחי אדמה',
+  'מחית תפו"א': 'מחית תפוחי אדמה',
+  'פירה תפו"א': 'פירה תפוחי אדמה',
+  'buns': 'bun',
+  'burger bun': 'bun',
+};
+
+/// Protein and filling words, English, that mark a bread-named dish as
+/// filled (issue #191): "Laffa" described as "shawarma, hummus, salad" is
+/// a D-V3 yellow, not the carb itself. Read together with the plant and
+/// dairy vocabularies (issue #56), which already name the salad half of
+/// a filling. Compared after normalisation.
+const List<String> fillingProteinTriggersEn = <String>[
+  'chicken',
+  'beef',
+  'lamb',
+  'steak',
+  'meat',
+  'meatballs',
+  'shawarma',
+  'kebab',
+  'kebabs',
+  'falafel',
+  'sabich',
+  'egg',
+  'eggs',
+  'omelette',
+  'omelet',
+  'tuna',
+  'fish',
+  'salmon',
+  'turkey',
+  'sausage',
+  'pastrami',
+  'bacon',
+  'liver',
+  'schnitzel',
+  'burger',
+  'patty',
+];
+
+/// Hebrew mirror of [fillingProteinTriggersEn] (issue #191).
+const List<String> fillingProteinTriggersHe = <String>[
+  'עוף',
+  'בקר',
+  'טלה',
+  'סטייק',
+  'בשר',
+  'קציצה',
+  'קציצות',
+  'שווארמה',
+  'שוארמה',
+  'שווארמת',
+  'קבב',
+  'פלאפל',
+  'סביח',
+  'ביצה',
+  'ביצים',
+  'חביתה',
+  'טונה',
+  'דג',
+  'דגים',
+  'סלמון',
+  'הודו',
+  'נקניק',
+  'נקניקיה',
+  'פסטרמה',
+  'בייקון',
+  'כבד',
+  'שניצל',
+  'המבורגר',
+  'קציצת',
+];
+
+/// The waiter sentence for a non-keto base that appears only among a
+/// dish's options — a "choice of side" that offers pasta beside a salad
+/// (issue #192). The dish itself is fine, so it is yellow, not red, and
+/// the ask is to pick the other option. `{base}` is the base's label.
+const String optionBaseModificationEn =
+    'Among the options, skip the {base} and choose a salad or vegetables '
+    'instead.';
+
+/// Hebrew mirror of [optionBaseModificationEn] (issue #192).
+const String optionBaseModificationHe =
+    'מבין האפשרויות, בלי {base} — בחרו סלט או ירקות במקום.';
+
 /// Hebrew mirror of [carbOnlyQualifiersEn] (issue #191): "פיתה רגילה",
-/// "לחמניה ללא גלוטן", "מגש צ'יפס", "שקית צ'יפס", "לחמניית מחמצת".
+/// "לחמניה ללא גלוטן", "מגש צ'יפס", "שקית צ'יפס", "לחמניית מחמצת". A
+/// leftover word is looked up with a leading ה or ו stripped as well, so
+/// "לחם הבית" and "הפיתה הרגילה" qualify through `בית` and `רגילה`.
 const List<String> carbOnlyQualifiersHe = <String>[
   'מנת',
   'מנה',
@@ -809,7 +925,22 @@ const List<String> carbOnlyQualifiersHe = <String>[
   'פריך',
   'פריכה',
   'עם',
-  'ו',
+  'מתובל',
+  'מתובלים',
+  'אפוי',
+  'אפויים',
+  'אפויות',
+  'צלוי',
+  'צלויים',
+  'מבושל',
+  'קלוי',
+  'קלאסי',
+  'קלאסית',
+  'מטוגן',
+  'מטוגנים',
+  'מטוגנות',
+  'דק',
+  'עבה',
 ];
 
 /// First words that mark an option value as a *removal* rather than an
@@ -920,13 +1051,26 @@ const Map<String, GuardWords> ketoQualifierGuardsEn = <String, GuardWords>{
   'pancake': (before: ['keto', 'almond', 'coconut'], after: []),
   'waffle': (before: ['keto', 'chaffle', 'almond'], after: []),
   'bread': (before: ['keto', 'cloud', 'almond'], after: []),
-  // `danish blue` and `danish cheese` are cheeses, not pastries (issue
-  // #190) — the one `after`-side guard besides `spaghetti squash`.
-  'danish': (before: [], after: ['blue', 'cheese']),
+  // `danish blue` is a cheese and `danish meatballs` a cuisine; `danish
+  // cheese` stays red — it is how דניש גבינה, a cheese pastry, is printed.
+  'danish': (before: [], after: ['blue', 'meatballs', 'rye', 'style']),
+  // An egg muffin or a keto muffin is a breakfast, not a pastry.
+  'muffin': (before: ['egg', 'keto', 'almond', 'coconut'], after: []),
+  'muffins': (before: ['egg', 'keto', 'almond', 'coconut'], after: []),
   // A lettuce-wrapped or keto burger already has no bun (issue #190).
-  'burger': (before: ['lettuce', 'keto', 'bunless', 'naked'], after: []),
-  'burgers': (before: ['lettuce', 'keto', 'bunless', 'naked'], after: []),
+  'burger': (before: _bunlessBurgerWords, after: []),
+  'burgers': (before: _bunlessBurgerWords, after: []),
+  'hamburger': (before: _bunlessBurgerWords, after: []),
+  'cheeseburger': (before: _bunlessBurgerWords, after: []),
 };
+
+/// Words before a burger word that mean it already comes without a bun.
+const List<String> _bunlessBurgerWords = <String>[
+  'lettuce',
+  'keto',
+  'bunless',
+  'naked',
+];
 
 /// Builds a Hebrew guard's [GuardWords] from one word list, applied on
 /// **both** sides. Unlike the English table, no Hebrew guard is
@@ -989,6 +1133,14 @@ final GuardWords _heBreadGuard = _heGuard(const [
 /// See [ketoQualifierGuardsHe] — `טוסט`.
 final GuardWords _heToastGuard = _heGuard(const ['קטו', 'ענן', 'שקדים']);
 
+/// See [ketoQualifierGuardsHe] — the burger words (issue #190): wrapped
+/// in lettuce, or keto, and it already has no bun.
+final GuardWords _heBurgerGuard = _heGuard(const ['חסה', 'בחסה', 'קטו']);
+
+/// See [ketoQualifierGuardsHe] — `שמרים`: nutritional yeast is a keto
+/// seasoning, not a pastry.
+final GuardWords _heYeastGuard = _heGuard(const ['תזונתיים', 'תזונתי']);
+
 /// Keto-substitute guards, Hebrew (`vocabulary_spec.md` "Guards
 /// (D-V1)"). See [_heGuard] for why every entry is bidirectional here,
 /// unlike [ketoQualifierGuardsEn].
@@ -1004,6 +1156,10 @@ final Map<String, GuardWords> ketoQualifierGuardsHe = <String, GuardWords>{
   'לחמנית': _heBreadGuard,
   'לחם': _heBreadGuard,
   'טוסט': _heToastGuard,
+  'המבורגר': _heBurgerGuard,
+  'בורגר': _heBurgerGuard,
+  "צ'יזבורגר": _heBurgerGuard,
+  'שמרים': _heYeastGuard,
 };
 
 // ---------------------------------------------------------------------------

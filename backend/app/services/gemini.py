@@ -6,11 +6,13 @@ it cannot surface in an access log or an httpx log line.
 
 Every failure is a ``BackendError`` whose ``reason`` is one of
 ``CHAT_FAILURE_REASONS``. Nothing here logs the key, prompt text or an
-upstream body: only upstream status codes.
+upstream body: only upstream status codes and, on an error, Google's short
+``error.status`` enum (#187).
 """
 
 import copy
 import logging
+import re
 from typing import Final
 
 import httpx
@@ -35,6 +37,11 @@ CHAT_FAILURE_REASONS: Final[tuple[str, ...]] = (
 UPSTREAM_TIMEOUT: Final = httpx.Timeout(connect=5.0, read=110.0, write=30.0, pool=5.0)
 
 _INVALID_KEY_MARKER: Final = "API_KEY_INVALID"
+
+# What Google's ``error.status`` looks like (``NOT_FOUND``,
+# ``RESOURCE_EXHAUSTED``). Anything else — a proxy at ``GEMINI_BASE_URL``
+# echoing free text — is not logged, so a log line can never carry a body.
+_ERROR_STATUS_SHAPE: Final = re.compile(r"^[A-Z_]{1,64}$")
 
 logger = logging.getLogger("ketoclub.chat")
 logger.setLevel(logging.INFO)
@@ -178,7 +185,7 @@ def _log_upstream_error(response: httpx.Response) -> None:
     bare status code that the app rendered as "AI error".
     """
     status = _upstream_error_status(response)
-    if status is not None:
+    if status is not None and _ERROR_STATUS_SHAPE.fullmatch(status):
         logger.info("gemini upstream error_status=%s", status)
     if response.status_code == 404:
         logger.warning(

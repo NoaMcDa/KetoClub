@@ -535,9 +535,13 @@ issues #191, #192), in this order:
    portion/qualifier words (`carbOnlyQualifiers{En,He}` — portion, bag, tray,
    plain, regular, large, sourdough, gluten free, מנת, מגש, שקית, רגילה, ללא
    גלוטן, מחמצת…) is red, labelled with the trigger itself: "Portion of
-   fries", "פיתה רגילה". Triggers in `carbOnlyExemptTriggers` — the burger,
-   sandwich, wrap and toast families in both languages, bread that carries an
-   unnamed filling — never fire this rule and stay a D-V3 yellow instead.
+   fries", "פיתה רגילה". Only the starches and breads in
+   `carbOnlyEligibleTriggers` can fire it — never a sauce or root vegetable
+   ("Carrots" is not "built on carrots"), and never the bread-carried
+   families (burger, sandwich, wrap, toast), which stay a D-V3 yellow. And
+   never when the description or a non-removal option names a filling
+   (`describesFilling`: a protein, a plant or dairy word): "לאפה" described
+   as "שווארמה, חומוס, סלט" is the dish D-V3 means, not the carb itself.
 2. Otherwise, `NON_KETO_BASES` is matched against
    `TextNormaliser.dishCoreText` — the dish's name and description only,
    never its options — so an option group named after a red base (an "ארוחת
@@ -1504,14 +1508,18 @@ was not possible — the fix needs to know which part of the dish a word came
 from — so `ClassificationRules.matchDish(Dish)` replaces `match` as the
 heuristic's entry point and runs three steps in order: (1) a dish **name**
 made only of unguarded carb-modifier triggers plus portion/qualifier words
-(`carbOnlyQualifiers{En,He}`) is red, labelled with the trigger, unless the
-trigger is in `carbOnlyExemptTriggers` (the burger, sandwich, wrap and toast
-families — bread that carries an unnamed filling, D-V3's yellow); (2) a
+(`carbOnlyQualifiers{En,He}`) is red, labelled with the trigger, when the
+trigger is a starch or bread in `carbOnlyEligibleTriggers` (never a sauce or
+vegetable, never the bread-carried burger, sandwich, wrap and toast families
+— D-V3's yellow) and nothing in the description or options names a filling
+(`describesFilling`); (2) a
 non-keto base is matched on `TextNormaliser.dishCoreText` — name and
 description, never options; (3) a carb modifier is matched on
 `TextNormaliser.dishRulesText` — the core text plus option group names and
 values, with a removal value (first word `no`/`without`/`skip`/`ללא`/`בלי`)
-dropped. `match(String)` is kept for callers with only a string. The same
+dropped, and a red base found only among the options ("Choice of side:
+pasta / salad") is a yellow asking for the other option, never a red.
+`match(String)` is kept for callers with only a string. The same
 pass also filled two vocabulary gaps the same real menus exposed: the pastry
 counter (danish, pastry, muffin, scone, מאפה, שמרים, דניש, …) as a red base,
 and the burger word families (`burger`, `hamburger`, `בורגר`, …) as bun

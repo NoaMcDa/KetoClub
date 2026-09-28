@@ -430,7 +430,7 @@ Built, but not confirmed end to end, and not to be reported as done:
    recordings and phone run in "What is NOT verified yet" above. What's next
    is Phase 3's remaining milestone (community database, reviews, submissions;
    `backend_plan.md` §5 milestone C, issues #105–#108). §14 has the decisions
-   log D1–D13, §17 the open questions with the default the code follows.
+   log D1–D14, §17 the open questions with the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing

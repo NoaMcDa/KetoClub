@@ -246,7 +246,16 @@ abstract final class TextNormaliser {
   /// the input to [menuFingerprint] and the share text, so this change
   /// invalidates no cached analysis.
   static String dishRulesText(Dish dish) {
-    final parts = <String>[dishCoreText(dish)];
+    final parts = <String>[dishCoreText(dish), dishOptionRulesText(dish)];
+    return parts.where((part) => part.isNotEmpty).join(' ');
+  }
+
+  /// The option half of [dishRulesText] on its own: every option group's
+  /// name and each non-removal value, normalised and joined (issue #192).
+  /// Matched separately so a non-keto base found only here can be told
+  /// apart from one in the dish's own text.
+  static String dishOptionRulesText(Dish dish) {
+    final parts = <String>[];
     for (final option in dish.options) {
       parts.add(normalise(option.name));
       for (final value in option.values) {
