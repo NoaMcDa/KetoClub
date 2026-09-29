@@ -894,7 +894,7 @@ Screens:
 | `MenuScreen` | `/venue/:source/:id` | Classified menu with filters and engine chip; `/venue/scan/{id}` opens a pasted menu (D18) |
 | `WaiterCardSheet` | modal | Large-type script with copy |
 | `SettingsScreen` | `/settings` | Key entry, disclosure text, cache clear, language |
-| `ScanScreen` | `/scan` | A field to paste a menu's text into, and Analyse (D18); photographing a physical menu is still Phase 4 |
+| `ScanScreen` | `/scan` | Collects menu pages from the camera, the photo library or a PDF, or a menu's text pasted into a field (D18). Analyse hands the pages to `ScannedMenuClassifier` in one call (D15), or the parsed paste to `MenuRepository.store`, and opens `/venue/scan/{id}` (#82, #83) |
 | `SavedScreen` | `/saved` | Placeholder — saving a venue is not built (Phase 3 territory) |
 
 **The bottom-navigation shell** *(issue #11, Phase 1)*, not in this document when
@@ -2097,6 +2097,11 @@ and what is still owed (fixture recordings, a phone run).
 10. ✅ **Platform setup** (#130) — permissions, icons, splash, bundle ids for
    iOS, Android and web. Still owed: a test on a physical iOS and Android
    device with a real Wolt venue (`docs/RELEASE.md`'s device matrix).
+
+**Phase 4 steps (menu scanning).** Steps 11 to 16 are done; 17 is open.
+Each has its own issue in the GitHub milestone "Phase 4: Menu Scanning"; D15,
+D18 and D19 (§14) are the record of the decisions.
+
 11. ✅ **Image parts** (#170, D15) — `LlmChatClient.complete` takes `images`;
     `/v1/chat` accepts them with the `VISION_MAX_*` bounds and both chat clients
     forward them as `inline_data`. A text-only call is byte-for-byte unchanged.
@@ -2116,6 +2121,10 @@ and what is still owed (fixture recordings, a phone run).
     Still owed: a real restaurant site fetched, on the web build and a phone.
 17. ☐ **QR codes** (#182) — a menu reached from a scanned QR code.
 
+The person-run vision smoke test (#88, `backend/tools/vision_smoke.py`) is a
+verification step for 11 to 14, not a build step: no real image request has been
+sent yet (§17.1).
+
 Extension points already designed in:
 
 | Future feature | Where it plugs in | What must not change |
@@ -2123,9 +2132,9 @@ Extension points already designed in:
 | Tabit, Ontopo | a new `PlatformMenuAdapter` | `Menu` model, classifier |
 | A restaurant's own website | **Shipped (D19, issue #181).** `WebsiteMenuAdapter` over a `WebsiteFetcher` (the backend's `/v1/website/fetch` on web, direct on phones); page text through `TextMenuSource`, a PDF through `ScannedMenuClassifier` | `Menu` model, the text classifiers, the vision prompt |
 | Pasted text | **Shipped (D18, issue #83).** `TextMenuSource.parse` yields a `Menu` from lines of text under `MenuSource.scan`; `MenuRepository.store` puts it in the cache | the prompt and parser (unchanged, as predicted) |
-| Photographed or PDF menus (Phase 4) | **Built behind fakes (D15, #89).** The pages are read and classified by Gemini's own vision in one request — no OCR stage — through `ScannedMenuClassifier` (`VisionMenuClassifier` behind `RoutingScannedMenuClassifier`); the transcription is stored under `MenuSource.scan` like a paste (D18) | the text prompt (the vision preamble sits in front of it), the response schema, `MenuClassifier` |
+| Photographed or PDF menus (Phase 4) | **Built (D15, #89, #82); the real model has not yet been called with images (#88).** The pages are read and classified by Gemini's own vision in one request — no OCR stage — through `ScannedMenuClassifier` (`VisionMenuClassifier` behind `RoutingScannedMenuClassifier`); the transcription is stored under `MenuSource.scan` like a paste (D18) | the text prompt (the vision preamble sits in front of it), the response schema, `MenuClassifier` |
 | Vision-model classification | **Built (#89)** as the sibling `ScannedMenuClassifier`, not a second `MenuClassifier`; its own router applies consent and connectivity, with no rules fallback | the UI's menu screen, which shows a scan like any other menu |
-| Custom dietary rules (Tier C) | `ClassificationOptions` → appended to the system prompt and to the rules table | schema |
+| Custom dietary rules (Tier C) | **Shipped (#56, #143).** `ClassificationOptions` → appended to the system prompt and to the rules table | schema |
 | Community ratings, venue directory (Phase 3) | a backend with its own client under `services/community/`; `Venue` gains the README's rating fields | everything above stays client-only |
 | CORS proxy for web | **Shipped (D11).** `backend/`'s `/v1/proxy/wolt/…` route; `WoltMenuAdapter` took a configurable `proxyBase`, exactly as this row predicted | adapter logic (unchanged, as predicted) |
 | Shared analysis cache (Tier D) | **Shipped (D12, issue #103).** The backend's own `chat_cache`, keyed by a hash of the request — not a remote tier of the device's `MenuCache`, which stays exactly as before; each device still caches its own `Menu` and `MenuAnalysis` locally | parser, models (unchanged — the cache sits below `LlmChatClient`, invisible to both) |

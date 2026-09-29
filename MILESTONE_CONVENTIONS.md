@@ -61,7 +61,8 @@ Phase N: [Feature Group Name]
 ### Phase 2: Mobile Interface & Discovery
 
 **Goal**: Complete the user-facing mobile app with geolocation, the 10bis adapter,
-and filtering. **Status**: next; not started.
+and filtering. **Status**: built, apart from fixture recordings and a physical-device
+run — see `CLAUDE.md`'s status banner and `HANDOFF.md`.
 
 **Milestones (as created on GitHub):**
 1. `Phase 2: Geolocation & Venue Search` — device location + venue discovery.
@@ -115,28 +116,44 @@ for the backend's design and its own issue range (#94–#109).
 - Verified keto-friendly badges visible to users — not built
 - Support for user submissions of new venues — not built
 
-### Phase 4: Advanced Features
+### Phase 4: Menu Scanning
 
-**Goal**: Add OCR vision processing and advanced dietary customization.
-**Status**: planned.
+**Goal**: Let a user get the same color-coded breakdown for a menu no delivery
+platform serves: text they paste, photographs of a physical menu, or a PDF.
+**Status**: core built and merged; see `architecture.md` §16's Phase 4 steps.
 
-**Milestones (as created on GitHub):**
-1. `Phase 4: OCR Menu Scanning` — snap a photo of a physical menu, extract text
-   (`m16_menu_scanner_research.md`)
-2. `Phase 4: Dietary Customization` — carnivore, pesco-keto, seed-oil avoidance
-   modes (Tier C in `feature_prioratization`)
-3. `Phase 4: Vision Classifier` — a vision-model `MenuClassifier` for OCR'd text,
-   behind the same interface as the two Phase 1 engines (`architecture.md` §16's
-   extension-points table)
+**Milestone (as created on GitHub):**
+1. `Phase 4: Menu Scanning` — the only Phase 4 milestone. It absorbed the
+   separate "Vision Classifier" milestone an earlier draft listed, because the
+   vision engine is the scan path itself and not a second engine behind
+   `MenuClassifier` (`architecture.md` D15 — Gemini reads the pages, so there is
+   no on-device OCR and the old "OCR Menu Scanning" milestone name no longer
+   describes anything). Shipped: paste-a-menu (#83, D18), image parts on the chat
+   clients (#170), `VisionMenuClassifier` behind a sibling `ScannedMenuClassifier`
+   (#89), the Scan tab's photo, image and PDF pickers (#82), the scan flow tests
+   (#84) and website menus (#181, D19). Open: #88 (a person-run Gemini vision
+   smoke test) and #182 (QR codes).
+
+Dietary customisation (carnivore, dairy-free, seed-oil-free toggles; Tier C in
+`feature_prioratization`) is **shipped** and lives under
+`Phase 2: Settings & Preferences` (#56, #143); there is no Phase 4 milestone for
+it, and a pesco-keto mode was never built.
 
 **There is no Phase 4 "Meal Logging" milestone.** `architecture.md` D8 rules meal
 logging and macro tracking out of scope for KetoClub entirely — that design in
 `m15_meal_entry_research.md` belongs to a different application.
 
 **Success Criteria:**
-- OCR extracts 95%+ of readable text from menu photos
-- Users can switch between dietary rulesets
-- A vision-model classifier handles menus with no extractable text
+- ✅ A pasted menu is classified like a fetched one
+- ✅ Photographed or PDF pages are read and classified by a vision model in one
+  request, with a way to check the transcription against the pages ("View
+  pages") — no on-device OCR, so the old "95%+ of readable text" criterion is
+  gone; its replacement is a transcription check on real menus, which is #88
+- ✅ Users can switch between dietary rulesets (shipped under Phase 2)
+- ⏳ A real Gemini request carrying images has been observed working (#88); flow
+  tests cover each scan path (#84)
+- ✅ Menus from a restaurant's own website (#181, D19); a QR code — not built
+  (#182)
 
 ## Milestone Properties
 

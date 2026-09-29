@@ -369,9 +369,24 @@ Roadmap & Milestone Tracking
     * [ ] Verified directory of keto-dedicated and keto-accessible restaurants.
     * [ ] User review feedback loop ("Did the restaurant accommodate your substitution?").
     * [ ] User submissions for unlisted restaurants and manual review tagging.
-* [ ] Phase 4: Advanced Nutritional Intelligence
-    * [ ] Computer Vision & OCR: Snap a photo of a physical printed paper menu to receive the same color-coded breakdown.
-    * [ ] Configurable dietary rules: Support for carnivore, pesco-keto, and strict seed-oil avoidance modes.
+* [ ] Phase 4: Menu Scanning (core built; four issues open)
+    * [x] Paste a menu: text pasted into the Scan tab is parsed and classified like
+      any fetched menu (issue #83, `architecture.md` D18).
+    * [x] Menu scanning through Gemini vision (D15, replacing the on-device OCR this
+      line once planned; issue #81 was closed as not planned): snap photographs,
+      pick images from the gallery or pick a PDF, and the model reads and
+      classifies every page in one request for the same color-coded breakdown
+      (issues #170, #89, #82). There is no rules fallback for a photo, and no page
+      is ever cached or stored server-side.
+    * [ ] Flow tests for the scan paths (#84), and a person-run smoke test of a real
+      Gemini request carrying images (#88); until #88, the vision path is proven
+      against fakes only.
+    * [x] Menus from a restaurant's own website (#181, D19): paste any restaurant
+      URL; its JSON-LD menu, menu page or PDF is found and classified.
+    * [ ] Menus from a QR code (#182).
+    * [x] Configurable dietary rules: strict seed-oil free, dairy-free keto and
+      carnivore-only toggles in Settings (issue #56). Shipped earlier, under
+      Phase 2; a pesco-keto mode was not built.
 Development Setup & Installation
 
 **This section describes the actual repository layout, corrected from an
