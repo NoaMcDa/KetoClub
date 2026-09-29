@@ -412,9 +412,8 @@ this is the short list.
 
 ## Where the reasoning lives
 
-- `architecture.md` §14 — the decisions log, now D1 to D17 (D15 not yet
-  recorded), each recording what
-  was decided, why, and what it supersedes. The `(Phase 1)` markers throughout
+- `architecture.md` §14 — the decisions log, now D1 to D17, each
+  recording what was decided, why, and what it supersedes. The `(Phase 1)` markers throughout
   were added across both waves of that work. D10 was rewritten in place, not
   appended to: it first recorded that a connectivity pre-check was deliberately
   cut, then — in the second wave — that decision was reversed and the old
