@@ -120,6 +120,30 @@ class ChatRequest(BaseModel):
         return None
 
 
+class WebsiteFetchRequest(BaseModel):
+    """Request body for ``POST /v1/website/fetch`` (D19, #181).
+
+    The URL travels in the body, not the query string, so the per-request
+    log line (which records the route path) never carries it.
+    """
+
+    url: str = Field(..., min_length=1, max_length=2048)
+
+
+class WebsiteFetchResponse(BaseModel):
+    """A successful ``POST /v1/website/fetch``: one HTML page or PDF.
+
+    ``body`` is the decoded page text for ``html`` and standard base64 for
+    ``pdf``. ``final_url`` is the URL after redirects, so the app resolves
+    the page's relative links against the right base.
+    """
+
+    kind: Literal["html", "pdf"]
+    content_type: str
+    body: str
+    final_url: str
+
+
 class ChatResponse(BaseModel):
     """Response body for a successful ``POST /v1/chat``."""
 
