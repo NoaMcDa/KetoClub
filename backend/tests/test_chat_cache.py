@@ -27,7 +27,7 @@ _KEY = "test-gemini-key-for-chat-cache-that-must-never-be-logged"
 _INSTALL_ID = "0123456789abcdef0123456789abcdef"
 _URL = (
     "https://generativelanguage.googleapis.com"
-    "/v1beta/models/gemini-2.5-flash:generateContent"
+    "/v1beta/models/gemini-3.5-flash:generateContent"
 )
 _SYSTEM = "You are the keto-diet menu analyst for KetoClub. CACHE-SYSTEM-MARKER"
 _USER = "1 | Mains | Entrecote | 300g steak with fries CACHE-USER-MARKER"
