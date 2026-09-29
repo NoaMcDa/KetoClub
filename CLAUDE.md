@@ -454,8 +454,8 @@ Built, but not confirmed end to end, and not to be reported as done:
   menu are all unobserved. `backend/tools/vision_smoke.py` is the person-run check.
 - **The Scan tab's pickers and permissions are evidenced by fakes only.**
   `DevicePagePicker` (over `image_picker` and `file_picker`) and the iOS camera and
-  photo-library permission strings have never run on a phone or a simulator; the
-  strings are English-only, like the location one below.
+  photo-library permission strings (English and Hebrew `InfoPlist.strings`) have
+  never run on a phone or a simulator.
 - **The Wolt menu fixture is real** (`wolt_hamosad_menu.json`, recorded
   2026-09-25 from the consumer-assortment endpoint the app now calls; issues
   #22, #168), but only one venue was recorded and only from a laptop — this

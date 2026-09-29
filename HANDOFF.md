@@ -260,8 +260,8 @@ on GitHub — tooling exists for several of them, it did not close any of them.
    (`docs/RELEASE.md`'s device matrix has the row). The Scan tab's pickers are
    in the same position: the camera and photo-library permission prompts, the
    gallery and PDF pickers and a real photograph's size and orientation are
-   evidenced only by fakes until a phone runs them. The iOS permission strings
-   are also English-only — see "Known limitations" below.
+   evidenced only by fakes until a phone runs them. The iOS location string is
+   also English-only — see "Known limitations" below.
 7. **The performance budget is unmeasured on a real device** (issue #65).
    `tool/perf_menu.dart` and its 16 ms-per-frame budget table (`tool/README.md`)
    exist; the 60-dish-fixture, real-phone, real-4G measurement itself does not.
