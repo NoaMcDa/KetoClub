@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart'
     show MaterialApp, NavigationBar, TextDirection, ThemeMode;
 import 'package:flutter/widgets.dart';
@@ -5,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/app.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
+import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/scan_screen.dart';
 import 'package:ketoclub/screens/settings_screen.dart';
@@ -269,7 +272,8 @@ void main() {
     });
 
     testWidgets('the scan route hands ScanController the scanned-menu '
-        'classifier from the dependencies (issue #89)', (tester) async {
+        'classifier and the pages registry from the dependencies '
+        '(issue #89)', (tester) async {
       // Arrange
       final fakes = FakeAppDependencies();
       await tester.pumpWidget(KetoClubApp(dependencies: fakes.dependencies));
@@ -287,6 +291,19 @@ void main() {
         listen: false,
       );
       expect(controller.classifier, same(fakes.scannedMenuClassifier));
+      // The registry is private; a read proves it is the dependencies' one,
+      // which the menu screen reads for "View pages".
+      final page = ScannedPage(
+        mimeType: ScannedPage.jpeg,
+        bytes: Uint8List.fromList(<int>[1, 2, 3]),
+      );
+      controller.addPages(<ScannedPage>[page]);
+      final ref = await controller.analysePages();
+      expect(ref, isNotNull);
+      expect(
+        fakes.scannedPages.get(ref!),
+        ScannedMenu(pages: <ScannedPage>[page]),
+      );
     });
 
     test('returns null for an unknown path rather than a blank screen', () {

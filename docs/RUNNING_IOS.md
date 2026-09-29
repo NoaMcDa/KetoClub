@@ -107,10 +107,32 @@ An iOS build needs no `--dart-define`: `KETOCLUB_BACKEND_URL` is read only by
 the web build (D17). The Gemini key is never compiled in; each user pastes
 their own in Settings.
 
+## Camera and photo-library permissions (Scan tab)
+
+The Scan tab's **Take a photo** and **Choose photos** use `image_picker`
+(issue #82), so `ios/Runner/Info.plist` carries two usage strings, both
+required by App Store policy:
+
+- `NSCameraUsageDescription` — shown the first time you tap **Take a photo**.
+- `NSPhotoLibraryUsageDescription` — for **Choose photos**. The plugin uses the
+  system photo picker, so iOS 14+ normally shows the picker without a prompt;
+  the string must still be present.
+
+**Choose a PDF** uses the document picker and needs no permission string.
+Neither prompt appears on launch. To see the denied path, tap **Don't Allow**
+on the camera prompt: **Take a photo** then adds nothing (the picker answers as
+if cancelled), and Settings → KetoClub → Camera turns it back on. The camera
+does not exist in the iOS simulator, so **Take a photo** needs a real iPhone;
+**Choose photos** and **Choose a PDF** work in the simulator (HEIC pictures do
+not, an Apple issue the plugin's README describes; use JPEG or PNG there).
+
+Scanning also needs a saved Gemini key (§3): the pages go straight from the
+phone to Google.
+
 ## iOS Hebrew permission string
 
-`ios/Runner/{en,he}.lproj/InfoPlist.strings` translate the location
-permission prompt (issue #169). The files exist on disk, but the
+`ios/Runner/{en,he}.lproj/InfoPlist.strings` translate the location, camera
+and photo-library permission prompts (issues #169, #82). The files exist on disk, but the
 Runner Xcode project needs them added to its resources for iOS to
 discover them at runtime — pbxproj edits from outside Xcode risk
 corrupting the project file. Once, on your Mac:

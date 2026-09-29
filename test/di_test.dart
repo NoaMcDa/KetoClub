@@ -12,9 +12,9 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
+import 'package:ketoclub/services/platform/device_page_picker.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
-import 'package:ketoclub/services/platform/page_picker.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
@@ -67,9 +67,8 @@ void main() {
         isA<RoutingScannedMenuClassifier>(),
       );
       expect(dependencies.scannedPages, isA<ScannedPagesRegistry>());
-      // The scan seams' placeholder, until issue #82 wires the device page
-      // picker.
-      expect(dependencies.pagePicker, isA<NoPagePicker>());
+      // The device page picker (issue #82).
+      expect(dependencies.pagePicker, isA<DevicePagePicker>());
     });
 
     test('performs no plugin I/O while building the graph', () {
