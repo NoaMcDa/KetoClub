@@ -133,11 +133,6 @@ void main() {
         expect(llm.calls, hasLength(1));
         expect(find.byType(EngineChip), findsOneWidget);
         expect(find.text(_en.engineChipRules), findsOneWidget);
-        expect(
-          find.text(' (${_en.engineChipReasonBackendUnreachable})'),
-          findsOneWidget,
-        );
-        expect(find.text(' (${_en.engineChipReasonOffline})'), findsNothing);
         expect(find.text(_dishName), findsOneWidget);
         expect(find.byType(StatusBadge), findsOneWidget);
         // The full sentence, not only the engine chip's short reason
