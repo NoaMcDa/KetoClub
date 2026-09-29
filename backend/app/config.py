@@ -78,6 +78,27 @@ class Settings(BaseSettings):
     # client moves on.
     WOLT_CLIENT_VERSION: str = "1.16.125"
 
+    # --- Website menus (D19, #181) --------------------------------------------
+    # The User-Agent every POST /v1/website/fetch request sends: it names the
+    # fetcher (robots.txt token ``ketoclubbot``) and a contact URL, so a site
+    # owner can see who read the page and how to opt out.
+    WEBSITE_USER_AGENT: str = (
+        "KetoClubBot/1.0 (+https://github.com/NoaMcDa/KetoClub; menu reader)"
+    )
+    # Size caps. A PDF goes on to Gemini as one inline part, so its cap is
+    # VISION_MAX_IMAGE_BYTES; a page over the HTML cap is not a menu page.
+    WEBSITE_MAX_HTML_BYTES: int = 2 * 1024 * 1024
+    WEBSITE_MAX_PDF_BYTES: int = 3 * 1024 * 1024
+    # robots.txt is read up to this many bytes (RFC 9309 asks for at least
+    # 500 KiB) and cached per host, in memory, for this long.
+    WEBSITE_MAX_ROBOTS_BYTES: int = 512 * 1024
+    WEBSITE_ROBOTS_TTL_SECONDS: int = 3600
+    # Fetches per site, across every install, in any 60 s: one paste costs at
+    # most two (the page and the menu page it links to).
+    WEBSITE_HOST_RATE_LIMIT_PER_MINUTE: int = 6
+    # Fetches per install in any 60 s, so the route is no open proxy.
+    WEBSITE_RATE_LIMIT_PER_MINUTE: int = 10
+
     # --- Database -------------------------------------------------------------
     DATABASE_URL: str = "sqlite:///./ketoclub.db"
 
