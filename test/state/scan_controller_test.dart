@@ -1,10 +1,23 @@
+import 'dart:async';
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/failures.dart';
+import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
+import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/scan_controller.dart';
+import 'package:ketoclub/state/scanned_pages_registry.dart';
+import 'package:ketoclub/utils/constants.dart';
 
 import '../fakes/fake_clock.dart';
 import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_scanned_menu_classifier.dart';
+import '../fakes/fake_settings_store.dart';
 
 final DateTime _epoch = DateTime.utc(2026, 9, 29, 12);
 
@@ -13,16 +26,19 @@ void main() {
     late FakeMenuRepository repository;
     late FakeClock clock;
     late FakeScannedMenuClassifier classifier;
+    late FakeSettingsStore settings;
     late ScanController controller;
 
     setUp(() {
       repository = FakeMenuRepository();
       clock = FakeClock(_epoch);
       classifier = FakeScannedMenuClassifier();
+      settings = FakeSettingsStore();
       controller = ScanController(
         classifier: classifier,
         repository: repository,
         clock: clock,
+        settingsStore: settings,
       );
     });
 
@@ -164,6 +180,7 @@ void main() {
         classifier: classifier,
         repository: repository,
         clock: clock,
+        settingsStore: settings,
       )..text = 'Steak';
 
       // Act: dispose while the store is still in flight.
@@ -171,6 +188,415 @@ void main() {
       slow.dispose();
 
       // Assert: completing must not throw "used after dispose".
+      expect(await pending, isNotNull);
+    });
+  });
+
+  group('ScanController pages', () {
+    late FakeMenuRepository repository;
+    late FakeScannedMenuClassifier classifier;
+    late FakeSettingsStore settings;
+    late ScanController controller;
+
+    ScannedPage page([int bytes = 4]) =>
+        ScannedPage(mimeType: ScannedPage.jpeg, bytes: Uint8List(bytes));
+
+    // [count] distinct pages, so equality does not collapse them.
+    List<ScannedPage> distinct(int count) => [
+      for (var i = 0; i < count; i++)
+        ScannedPage(
+          mimeType: ScannedPage.jpeg,
+          bytes: Uint8List.fromList([i, 1, 2]),
+        ),
+    ];
+
+    setUp(() {
+      repository = FakeMenuRepository();
+      classifier = FakeScannedMenuClassifier();
+      settings = FakeSettingsStore();
+      controller = ScanController(
+        classifier: classifier,
+        repository: repository,
+        clock: FakeClock(_epoch),
+        settingsStore: settings,
+      );
+    });
+
+    tearDown(() => controller.dispose());
+
+    test('starts with no pages and cannot analyse them', () {
+      expect(controller.pages, isEmpty);
+      expect(controller.atPageCap, isFalse);
+      expect(controller.canAnalysePages, isFalse);
+      expect(controller.analysing, isFalse);
+      expect(controller.lastFailure, isNull);
+    });
+
+    test('addPages keeps the order and notifies once', () {
+      // Arrange
+      var notified = 0;
+      controller.addListener(() => notified++);
+      final first = distinct(3);
+
+      // Act
+      final rejection = controller.addPages(first);
+
+      // Assert
+      expect(rejection, isNull);
+      expect(controller.pages, first);
+      expect(controller.canAnalysePages, isTrue);
+      expect(notified, 1);
+    });
+
+    test('the pages list cannot be modified from outside', () {
+      controller.addPages(distinct(1));
+
+      expect(() => controller.pages.add(page()), throwsUnsupportedError);
+    });
+
+    test('adding nothing does not notify', () {
+      var notified = 0;
+      controller
+        ..addListener(() => notified++)
+        ..addPages(const <ScannedPage>[]);
+
+      expect(notified, 0);
+    });
+
+    test('a page of exactly maxScanPageBytes is accepted', () {
+      final rejection = controller.addPages([page(maxScanPageBytes)]);
+
+      expect(rejection, isNull);
+      expect(controller.pages, hasLength(1));
+    });
+
+    test('a page over maxScanPageBytes is rejected with its own reason', () {
+      // Act
+      final rejection = controller.addPages([page(maxScanPageBytes + 1)]);
+
+      // Assert
+      expect(rejection, ScanPageRejection.pageTooLarge);
+      expect(controller.pages, isEmpty);
+    });
+
+    test('an oversize page keeps the pages before it and drops the rest', () {
+      // Arrange
+      final ok = distinct(2);
+
+      // Act
+      final rejection = controller.addPages([
+        ...ok,
+        page(maxScanPageBytes + 1),
+        ...distinct(1),
+      ]);
+
+      // Assert
+      expect(rejection, ScanPageRejection.pageTooLarge);
+      expect(controller.pages, ok);
+    });
+
+    test('maxScanPages pages fill the cap, one more is rejected', () {
+      // Arrange
+      final full = distinct(maxScanPages);
+
+      // Act
+      final fits = controller.addPages(full);
+      final overflow = controller.addPages([page(9)]);
+
+      // Assert
+      expect(fits, isNull);
+      expect(controller.atPageCap, isTrue);
+      expect(overflow, ScanPageRejection.tooManyPages);
+      expect(controller.pages, full);
+    });
+
+    test('a batch that crosses the cap keeps what fits', () {
+      // Arrange
+      controller.addPages(distinct(maxScanPages - 1));
+
+      // Act
+      final rejection = controller.addPages(distinct(3));
+
+      // Assert
+      expect(rejection, ScanPageRejection.tooManyPages);
+      expect(controller.pages, hasLength(maxScanPages));
+    });
+
+    test('removePageAt removes that page and frees the cap', () {
+      // Arrange
+      final full = distinct(maxScanPages);
+      controller
+        ..addPages(full)
+        // Act
+        ..removePageAt(0);
+
+      // Assert
+      expect(controller.pages, full.sublist(1));
+      expect(controller.atPageCap, isFalse);
+    });
+
+    test('removePageAt ignores an index out of range', () {
+      var notified = 0;
+      controller
+        ..addPages(distinct(1))
+        ..addListener(() => notified++)
+        ..removePageAt(-1)
+        ..removePageAt(1);
+
+      expect(controller.pages, hasLength(1));
+      expect(notified, 0);
+    });
+
+    test('analysePages with no pages does nothing', () async {
+      expect(await controller.analysePages(), isNull);
+      expect(classifier.calls, isEmpty);
+    });
+
+    test('analysePages classifies all pages in one call, stores the menu '
+        'and its analysis and returns the ref', () async {
+      // Arrange
+      final scanned = distinct(3);
+      controller.addPages(scanned);
+
+      // Act
+      final ref = await controller.analysePages();
+
+      // Assert
+      expect(classifier.calls, hasLength(1));
+      expect(classifier.calls.single.$1.pages, scanned);
+      final stored = repository.storedMenus.single;
+      expect(ref, stored.venueRef);
+      expect(ref!.source, MenuSource.scan);
+      expect(repository.savedAnalyses.single.ref, ref);
+      expect(repository.savedAnalyses.single.analysis, isA<MenuAnalysed>());
+      expect(controller.lastFailure, isNull);
+      expect(controller.analysing, isFalse);
+    });
+
+    test('the pages survive a successful analysis', () async {
+      controller.addPages(distinct(2));
+
+      await controller.analysePages();
+
+      expect(controller.pages, hasLength(2));
+    });
+
+    test('the options come from the settings', () async {
+      // Arrange
+      await settings.write(
+        const AppSettings(
+          estimationConsentGiven: false,
+          netCarbLimitGrams: 12,
+          dairyFree: true,
+        ),
+      );
+      controller.addPages(distinct(1));
+
+      // Act
+      await controller.analysePages();
+
+      // Assert
+      final options = classifier.calls.single.$2;
+      expect(options.estimationConsentGiven, isFalse);
+      expect(options.netCarbLimitGrams, 12);
+      expect(
+        options.dietaryConstraints,
+        ClassificationOptions.dietaryConstraintsFor(
+          seedOilFree: false,
+          dairyFree: true,
+          carnivoreOnly: false,
+        ),
+      );
+    });
+
+    test('analysing is true while the classifier is reading', () async {
+      // Arrange
+      final gate = Completer<void>();
+      classifier.gate = gate.future;
+      controller.addPages(distinct(1));
+
+      // Act
+      final pending = controller.analysePages();
+      await pumpEventQueue();
+
+      // Assert: mid-flight the pages are locked and a second call is a no-op.
+      expect(controller.analysing, isTrue);
+      expect(controller.canAnalysePages, isFalse);
+      expect(controller.addPages(distinct(1)), isNull);
+      expect(controller.pages, hasLength(1));
+      controller.removePageAt(0);
+      expect(controller.pages, hasLength(1));
+      expect(await controller.analysePages(), isNull);
+      gate.complete();
+      expect(await pending, isNotNull);
+      expect(controller.analysing, isFalse);
+      expect(classifier.calls, hasLength(1));
+    });
+
+    test(
+      'a failure sets lastFailure, stores nothing and keeps the pages',
+      () async {
+        // Arrange
+        classifier.respondWith(
+          const ScannedMenuFailed(reason: MenuAnalysisFailureReason.timeout),
+        );
+        final scanned = distinct(2);
+        controller.addPages(scanned);
+
+        // Act
+        final ref = await controller.analysePages();
+
+        // Assert
+        expect(ref, isNull);
+        expect(controller.lastFailure, MenuAnalysisFailureReason.timeout);
+        expect(controller.pages, scanned);
+        expect(repository.storedMenus, isEmpty);
+        expect(repository.savedAnalyses, isEmpty);
+        expect(controller.canAnalysePages, isTrue);
+      },
+    );
+
+    group('with a pages registry', () {
+      late ScannedPagesRegistry registry;
+      late ScanController registered;
+
+      setUp(() {
+        registry = ScannedPagesRegistry();
+        registered = ScanController(
+          classifier: classifier,
+          repository: repository,
+          clock: FakeClock(_epoch),
+          settingsStore: settings,
+          pagesRegistry: registry,
+        );
+      });
+
+      tearDown(() => registered.dispose());
+
+      test('a successful read puts the pages under the returned ref', () async {
+        // Arrange
+        final scanned = distinct(3);
+        registered.addPages(scanned);
+
+        // Act
+        final ref = await registered.analysePages();
+
+        // Assert: exactly the pages the classifier read, so the menu
+        // screen's "View pages" shows what the model saw.
+        expect(ref, isNotNull);
+        expect(registry.get(ref!), ScannedMenu(pages: scanned));
+        expect(registry.get(ref), classifier.calls.single.$1);
+      });
+
+      test('editing the pages afterwards leaves the registered scan', () async {
+        // Arrange
+        final scanned = distinct(2);
+        registered.addPages(scanned);
+        final ref = await registered.analysePages();
+
+        // Act
+        registered
+          ..removePageAt(0)
+          ..addPages(distinct(4).sublist(3));
+
+        // Assert
+        expect(registry.get(ref!)!.pages, scanned);
+      });
+
+      test('a failure puts nothing in the registry', () async {
+        // Arrange
+        classifier.respondWith(
+          const ScannedMenuFailed(reason: MenuAnalysisFailureReason.offline),
+        );
+        registered.addPages(distinct(2));
+
+        // Act
+        final ref = await registered.analysePages();
+
+        // Assert: the ref the fake's first read would have used holds
+        // nothing.
+        expect(ref, isNull);
+        expect(
+          registry.get(
+            const VenueRef(source: MenuSource.scan, platformId: 'fake-scan-1'),
+          ),
+          isNull,
+        );
+      });
+    });
+
+    test('retry calls the classifier again with the same pages and clears '
+        'the failure on success', () async {
+      // Arrange
+      classifier.respondWith(
+        const ScannedMenuFailed(reason: MenuAnalysisFailureReason.offline),
+      );
+      controller.addPages(distinct(2));
+      await controller.analysePages();
+
+      // Act: the network is back.
+      classifier.respondWith(
+        ScannedMenuRead(
+          menu: Menu(
+            venueRef: const VenueRef(
+              source: MenuSource.scan,
+              platformId: 'retry',
+            ),
+            currency: 'ILS',
+            fetchedAt: _epoch,
+            categories: const <MenuCategory>[],
+          ),
+          analysis: MenuAnalysed(
+            dishes: const <AnalysedDish>[],
+            unclassified: const <String>[],
+            engine: const LlmEngine(model: 'fake/vision'),
+            analysedAt: _epoch,
+            options: const ClassificationOptions().snapshot,
+          ),
+        ),
+      );
+      final ref = await controller.analysePages();
+
+      // Assert
+      expect(classifier.calls, hasLength(2));
+      expect(classifier.calls.last.$1, classifier.calls.first.$1);
+      expect(ref?.platformId, 'retry');
+      expect(controller.lastFailure, isNull);
+    });
+
+    test('changing the pages clears a stale failure', () async {
+      // Arrange
+      classifier.respondWith(
+        const ScannedMenuFailed(reason: MenuAnalysisFailureReason.badResponse),
+      );
+      controller.addPages(distinct(2));
+      await controller.analysePages();
+
+      // Act
+      controller.removePageAt(0);
+
+      // Assert
+      expect(controller.lastFailure, isNull);
+    });
+
+    test('does not notify after dispose when analysis finishes late', () async {
+      // Arrange
+      final gate = Completer<void>();
+      classifier.gate = gate.future;
+      final slow = ScanController(
+        classifier: classifier,
+        repository: repository,
+        clock: FakeClock(_epoch),
+        settingsStore: settings,
+      )..addPages(distinct(1));
+
+      // Act
+      final pending = slow.analysePages();
+      await pumpEventQueue();
+      slow.dispose();
+      gate.complete();
+
+      // Assert
       expect(await pending, isNotNull);
     });
   });

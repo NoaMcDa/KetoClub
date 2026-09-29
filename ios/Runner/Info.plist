@@ -39,6 +39,17 @@
 		     inline value is only the last-resort default. See
 		     docs/RUNNING_IOS.md's "iOS Hebrew permission string" note. -->
 		<string>KetoClub uses your location once to list nearby restaurants. It is sent only to the restaurant platform as a search parameter and is never stored.</string>
+		<key>NSCameraUsageDescription</key>
+		<!-- The Scan tab's "Take a photo" (architecture.md D15, issue #82):
+		     the camera is opened only when the user taps it, and the photo
+		     is read once and kept in memory only. English inline as the
+		     default; he.lproj/InfoPlist.strings carries the Hebrew, see
+		     the location key above. -->
+		<string>KetoClub uses the camera to photograph a menu page. The photo is sent to Google's Gemini API to read the dishes and is not saved on this device.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<!-- The Scan tab's "Choose photos" (issue #82): only the pictures
+		     the user picks are read. -->
+		<string>KetoClub reads the menu photos you choose. They are sent to Google's Gemini API to read the dishes and are not saved on this device.</string>
 		<key>LSApplicationQueriesSchemes</key>
 		<array>
 			<!-- Lets url_launcher open a venue's own page on Wolt or 10bis

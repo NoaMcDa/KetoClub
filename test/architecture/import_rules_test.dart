@@ -257,6 +257,15 @@ const _boundaries = <_Boundary>[
   // user's own key (architecture.md D17). Web goes through /v1/chat.
   _Boundary('googleapis.com', {'services/llm/gemini_chat_client.dart'}),
   _Boundary('x-goog-api-key', {'services/llm/gemini_chat_client.dart'}),
+  // The Scan tab's camera, photo-library and PDF plugins (issue #82); one
+  // file touches each, so a page never reaches the widget tree by another
+  // route than the PagePicker seam.
+  _Boundary('package:image_picker/', {
+    'services/platform/device_page_picker.dart',
+  }),
+  _Boundary('package:file_picker/', {
+    'services/platform/device_page_picker.dart',
+  }),
   // The secure storage plugin guards that key; one file touches it.
   _Boundary('package:flutter_secure_storage/', {
     'services/storage/api_key_store.dart',

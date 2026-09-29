@@ -352,6 +352,53 @@
   },
   "scannedMenuPdfPage": "PDF document",
   "scannedMenuPagesClose": "Close",
+  "scanScreenIntro": "Photograph the pages of a menu, choose photos from your library, or choose a PDF. KetoClub reads the dishes off the pages and analyses them.",
+  "scanScreenActionTakePhoto": "Take a photo",
+  "scanScreenActionChoosePhotos": "Choose photos",
+  "scanScreenActionChoosePdf": "Choose a PDF",
+  "scanScreenPagesHeading": "Pages",
+  "scanScreenPageCount": "{count} of {max} pages",
+  "@scanScreenPageCount": {
+    "placeholders": { "count": { "type": "int" }, "max": { "type": "int" } }
+  },
+  "scanScreenCapReached": "That is the most pages one scan can hold. Remove a page to add another.",
+  "scanScreenPageLabel": "Page {number}",
+  "@scanScreenPageLabel": {
+    "placeholders": { "number": { "type": "int" } }
+  },
+  "scanScreenPdfLabel": "PDF document",
+  "scanScreenPageSizeKb": "{kb} KB",
+  "@scanScreenPageSizeKb": {
+    "placeholders": { "kb": { "type": "int" } }
+  },
+  "scanScreenRemovePage": "Remove page {number}",
+  "@scanScreenRemovePage": {
+    "placeholders": { "number": { "type": "int" } }
+  },
+  "scanScreenTooManyPages": "One scan holds at most {max} pages. The pages over the limit were not added.",
+  "@scanScreenTooManyPages": {
+    "placeholders": { "max": { "type": "int" } }
+  },
+  "scanScreenPageTooLarge": "That page is larger than {mb} MB, so it was not added. Try a smaller photo or a smaller PDF.",
+  "@scanScreenPageTooLarge": {
+    "placeholders": { "mb": { "type": "int" } }
+  },
+  "scanScreenAnalysePages": "Analyse pages",
+  "scanScreenPasteHeading": "Or paste the text",
+  "scanScreenDisclosureWeb": "The pages are sent to KetoClub's server, which forwards them to Google's Gemini API to be read.",
+  "scanScreenDisclosureDirect": "The pages are sent straight from this device to Google's Gemini API, using your own API key.",
+  "scanScreenSettingsLink": "Settings",
+  "scanScreenFailureNotConfigured": "Scanning is not available on this build.",
+  "scanScreenFailureNeedsServer": "Scanning needs KetoClub's server, and this build is not connected to one. Pasting the menu text still works.",
+  "scanScreenFailureOffline": "You look offline. Your pages are kept; reconnect and try again.",
+  "scanScreenFailureTimeout": "The AI model was too slow. Your pages are kept; try again.",
+  "scanScreenFailureRateLimited": "The daily AI limit is used up. Your pages are kept; try again later.",
+  "scanScreenFailureBadResponse": "The AI model gave an unusable answer. Your pages are kept; try again.",
+  "scanScreenFailureNoDishesFound": "No dishes could be read from these pages. Check that the photos are sharp and well lit, or paste the text instead.",
+  "scanScreenFailureBackendUnreachable": "KetoClub's server could not be reached. Your pages are kept; try again.",
+  "scanScreenFailureConsentWithheld": "Scanning sends the pages to Google's Gemini API to be read. Allow AI analysis in Settings to scan a menu.",
+  "scanScreenFailureApiKeyMissing": "Add your Gemini API key in Settings to scan a menu.",
+  "scanScreenFailureApiKeyRejected": "Gemini rejected your API key. Check it in Settings, then try again.",
 
   "websiteMenuNotFound": "KetoClub could not find a menu it can read on {site}.",
   "@websiteMenuNotFound": {

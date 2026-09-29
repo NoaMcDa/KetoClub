@@ -21,6 +21,9 @@
 // where a browser cannot start. `flutter build web --target=…` does NOT catch
 // it: that resolves imports from the package root instead.
 
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/app.dart';
@@ -31,7 +34,10 @@ import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/classifier/scanned_classifier_router.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
+import 'package:ketoclub/services/classifier/vision_menu_classifier.dart';
+import 'package:ketoclub/services/llm/llm_chat_client.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
@@ -646,4 +652,120 @@ final class FlowFakePagePicker implements PagePicker {
     calls.add('pickPdf');
     return pdf;
   }
+}
+
+/// One [LlmChatClient.complete] call, as [FlowFakeLlmChatClient] recorded it.
+typedef FlowLlmCall = ({
+  String systemPrompt,
+  String userPrompt,
+  Map<String, Object?>? responseSchema,
+  String? schemaName,
+  List<ChatImagePart> images,
+});
+
+/// An [LlmChatClient] that answers from a queue of scripted results and
+/// records every call — the seam the scan flows fake instead of the network
+/// (issue #84), so the real vision classifier and its router run over it.
+///
+/// Answers the results queued with [enqueue] in order, one per call. With
+/// the queue empty it answers [ChatFailureReason.badResponse], so a call a
+/// flow did not expect reads as a failure rather than a hang.
+final class FlowFakeLlmChatClient implements LlmChatClient {
+  final List<ChatResult> _queue = <ChatResult>[];
+
+  /// Every call [complete] received, in call order.
+  final List<FlowLlmCall> calls = <FlowLlmCall>[];
+
+  /// Queues [result] as the answer to the next call not yet answered.
+  void enqueue(ChatResult result) => _queue.add(result);
+
+  /// Queues a successful reply carrying [content], from a placeholder model.
+  void enqueueReply(String content) =>
+      enqueue(ChatCompleted(content: content, model: 'flow-test-model'));
+
+  @override
+  Future<ChatResult> complete({
+    required String systemPrompt,
+    required String userPrompt,
+    Map<String, Object?>? responseSchema,
+    String? schemaName,
+    List<ChatImagePart> images = const <ChatImagePart>[],
+  }) async {
+    calls.add((
+      systemPrompt: systemPrompt,
+      userPrompt: userPrompt,
+      responseSchema: responseSchema,
+      schemaName: schemaName,
+      images: images,
+    ));
+    if (_queue.isEmpty) {
+      return const ChatFailed(reason: ChatFailureReason.badResponse);
+    }
+    return _queue.removeAt(0);
+  }
+}
+
+/// The real scan path over a faked chat client: a
+/// `RoutingScannedMenuClassifier` in front of a `VisionMenuClassifier`,
+/// sharing [fakes]' clock, and its connectivity unless [connectivity] is
+/// given, for [FakeAppDependencies.scannedClassifierOverride].
+ScannedMenuClassifier realScannedClassifier(
+  FakeAppDependencies fakes,
+  LlmChatClient client, {
+  Connectivity? connectivity,
+}) => RoutingScannedMenuClassifier(
+  vision: VisionMenuClassifier(client: client, clock: fakes.clock),
+  connectivity: connectivity ?? fakes.connectivity,
+);
+
+/// A valid 1×1 white PNG, for a page a flow "photographs".
+final Uint8List whitePngBytes = base64Decode(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4//8/AAX+Av4N'
+  '70a4AAAAAElFTkSuQmCC',
+);
+
+/// A valid 1×1 black PNG, so two pages differ and their order is checkable.
+final Uint8List blackPngBytes = base64Decode(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGNgYGAAAAAEAAH2'
+  'FzhVAAAAAElFTkSuQmCC',
+);
+
+/// A few bytes that open with the `%PDF-` magic, standing in for a document.
+final Uint8List pdfBytes = Uint8List.fromList(utf8.encode('%PDF-1.4\n%%EOF\n'));
+
+/// The dish names [validScannedReply] transcribes, in reading order.
+const List<String> scannedReplyDishNames = <String>[
+  'Grilled Salmon',
+  'Ribeye Steak with Fries',
+  'Spaghetti Carbonara',
+  'Lamb Chops',
+];
+
+/// A vision reply the response parser accepts, transcribing the first [n]
+/// of [scannedReplyDishNames] (1 to 4): ids `v1..vN`, a green, a yellow with
+/// its waiter instruction, a red and a green.
+String validScannedReply(int n) {
+  assert(n >= 1 && n <= scannedReplyDishNames.length, 'n out of range');
+  const verdicts = <String>['orderAsIs', 'modifiable', 'nonKeto', 'orderAsIs'];
+  const reasons = <String>[
+    'Grilled fish with lemon butter, nothing starchy.',
+    'Great protein, but it comes with fries.',
+    'Built on wheat pasta, which cannot be made keto.',
+    'Plain grilled lamb.',
+  ];
+  return jsonEncode(<String, Object?>{
+    'dishes': <Map<String, Object?>>[
+      for (var i = 0; i < n; i++)
+        <String, Object?>{
+          'id': 'v${i + 1}',
+          'name': scannedReplyDishNames[i],
+          'verdict': verdicts[i],
+          'why': reasons[i],
+          'modification': verdicts[i] == 'modifiable'
+              ? 'Replace the fries with a green salad.'
+              : null,
+          'net_carbs_estimate': null,
+        },
+    ],
+  });
 }

@@ -26,10 +26,10 @@ The backend is for the web build only (`architecture.md` D11, D17). iOS and
 Android never call it, even when it is configured: they call Wolt and
 Google's Gemini API themselves. What each platform can reach with no backend:
 
-| Platform | Menus (Wolt, 10bis) | Nearby / by-name search | AI analysis |
-|---|---|---|---|
-| iOS, Android | direct calls to the platform | direct calls to Wolt | **yes, with your own Gemini key** — see below; without one, rules engine only (labelled "rules") |
-| Web (Chrome) | **blocked by CORS** — paste-a-link shows the "open in the phone app" message | blocked by CORS | no |
+| Platform | Menus (Wolt, 10bis) | Nearby / by-name search | AI analysis | Scan tab (camera, photos, PDF) |
+|---|---|---|---|---|
+| iOS, Android | direct calls to the platform | direct calls to Wolt | **yes, with your own Gemini key** — see below; without one, rules engine only (labelled "rules") | camera and photo library through the OS pickers (the camera and photo-library permission prompts appear on first use), PDFs through the file picker; pages go straight to Gemini with your key, so **needs the key** ("Add your Gemini API key in Settings") |
+| Web (Chrome) | **blocked by CORS** — paste-a-link shows the "open in the phone app" message | blocked by CORS | no | the browser's file chooser (a phone browser offers its camera); pages go through the backend, so **needs the backend** (§2, §3) — without it the screen says scanning needs the server, and pasting text still works |
 
 **AI analysis on a phone (D17).** Create a free API key in
 [Google AI Studio](https://aistudio.google.com/apikey), then in the app open
@@ -151,6 +151,8 @@ for issue #38, and `backend/README.md` the 10bis curl for issue #44.
 | Phone: "Gemini rejected your API key" | the saved key is wrong, revoked, or not enabled for the Gemini API | paste a fresh key from Google AI Studio |
 | "Showing rule-based results" after a wait | web: backend unreachable or Gemini timed out; phone: Gemini timed out | web: `curl /v1/health` |
 | Nearby search says "blocked by browser" | web without a backend | §3 |
+| Scan tab (web): "Scanning needs KetoClub's server" | no backend URL compiled in | §2 and §3; pasting the menu text works without it |
+| Scan tab (phone): "Add your Gemini API key in Settings" | no key saved; pages go straight to Gemini | §1, "AI analysis on a phone" |
 | `flutter analyze` fails on an info | intended — CI runs `--fatal-infos` | fix the lint |
 | Location button does nothing on web | browser Geolocation needs `https://` or `localhost` | use `localhost`, not a LAN IP, for the web build |
 | Backend terminal shows `gemini upstream_status=404` | `GEMINI_MODEL` is not served for this key or API version (#179) | list what the key can use: `curl -sS https://generativelanguage.googleapis.com/v1beta/models -H "x-goog-api-key: $GEMINI_API_KEY"`, then set `GEMINI_MODEL` in `backend/.env` |
