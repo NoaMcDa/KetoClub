@@ -89,7 +89,7 @@ backend/
 | Variable | Default | Meaning |
 |---|---|---|
 | `GEMINI_API_KEY` | unset | The server's key, sent only as `x-goog-api-key`. Unset means `/v1/chat` answers `notConfigured` (superseded `OPENROUTER_API_KEY`, D12) |
-| `GEMINI_MODEL` | `gemini-2.5-flash` | Model requested at `generateContent` (superseded `OPENROUTER_MODEL`) |
+| `GEMINI_MODEL` | `gemini-3.5-flash` | Model requested at `generateContent` (superseded `OPENROUTER_MODEL`; superseded: see architecture.md D12 note for the default) |
 | `GEMINI_BASE_URL` | `https://generativelanguage.googleapis.com` | Upstream host; never taken from a request |
 | `GEMINI_MAX_OUTPUT_TOKENS` | `8192` | `generationConfig.maxOutputTokens` |
 | `GEMINI_THINKING_BUDGET` | `0` | Thinking tokens count against the output budget, and this is a classification task |

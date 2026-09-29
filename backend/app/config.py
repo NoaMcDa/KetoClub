@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     # Sent upstream only as the ``x-goog-api-key`` header, never in a URL.
     GEMINI_API_KEY: str = ""
     # Model id in the generateContent path (#100).
-    GEMINI_MODEL: str = "gemini-2.5-flash"
+    GEMINI_MODEL: str = "gemini-3.5-flash"
     # Upstream Gemini host.  Never taken from a request, for the same reason
     # as WOLT_BASE_URL; tests point respx at the default.
     GEMINI_BASE_URL: str = "https://generativelanguage.googleapis.com"
@@ -38,8 +38,8 @@ class Settings(BaseSettings):
     # and is badResponse, so this must exceed what a full menu's verdicts
     # take: a 118-dish Hebrew menu (why + modification per dish, Hebrew at
     # roughly a token per character) needs well over the 8192 this once was
-    # (#188). 65536 is the Gemini 2.5 Flash family's documented ceiling; a
-    # successor with a lower one answers 400 and this must come down with it.
+    # (#188). 65536 is the ceiling of the Flash family this backend targets;
+    # a successor with a lower one answers 400 and this must come down with it.
     GEMINI_MAX_OUTPUT_TOKENS: int = 65536
     # generationConfig.thinkingConfig.thinkingBudget.  Thinking tokens count
     # against the output budget above, and this is a classification task

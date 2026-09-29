@@ -251,7 +251,7 @@ Manual steps only the user can run:
 | Record the 10bis fixture (#44) | After B1 | The curl in B1's README section |
 | Capture the venue-search requests (#38) | Now | Browser DevTools on wolt.com, redact, paste into `menu_api_research` |
 | Gemini smoke test | Before the Phase 2 release | `GEMINI_API_KEY` in `backend/.env`, then the `/v1/chat` curl in `backend/README.md` |
-| Web end to end | After each wave | `flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000`, paste a Wolt link, see the "AI · gemini-2.5-flash" chip |
+| Web end to end | After each wave | `flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000`, paste a Wolt link, see the "AI · gemini-3.5-flash" chip |
 | Phone end to end | After #66 | `flutter run -d <device> --dart-define=KETOCLUB_BACKEND_URL=http://<lan-ip>:8000`. Needs #99 or the define, since the chat client uses the base URL on every platform |
 | Performance numbers (#65) | Wave 4 | On a real phone on 4G, 60-dish fixture |
 | Permission prompts (#37, #66) | Wave 2 | One iOS and one Android device |
