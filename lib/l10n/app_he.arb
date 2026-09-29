@@ -339,5 +339,53 @@
   "scanAnalyse": "נתחו",
   "scanEmptyPaste": "קטוקלאב לא מצא מנות בטקסט הזה. הדביקו את התפריט עם מנה אחת בכל שורה.",
   "sourceScanned": "תפריט שהודבק",
-  "fetchFailedScanNotSaved": "התפריט שהודבק כבר לא שמור במכשיר הזה. הדביקו אותו שוב כדי לנתח אותו."
+  "fetchFailedScanNotSaved": "התפריט שהודבק כבר לא שמור במכשיר הזה. הדביקו אותו שוב כדי לנתח אותו.",
+
+  "scanScreenIntro": "צלמו את דפי התפריט, בחרו תמונות מהגלריה או בחרו קובץ PDF. קטוקלאב קורא את המנות מהדפים ומנתח אותן.",
+  "scanScreenActionTakePhoto": "צילום",
+  "scanScreenActionChoosePhotos": "בחירת תמונות",
+  "scanScreenActionChoosePdf": "בחירת PDF",
+  "scanScreenPagesHeading": "דפים",
+  "scanScreenPageCount": "{count} מתוך {max} דפים",
+  "@scanScreenPageCount": {
+    "placeholders": { "count": { "type": "int" }, "max": { "type": "int" } }
+  },
+  "scanScreenCapReached": "זה המספר המרבי של דפים בסריקה אחת. הסירו דף כדי להוסיף אחר.",
+  "scanScreenPageLabel": "דף {number}",
+  "@scanScreenPageLabel": {
+    "placeholders": { "number": { "type": "int" } }
+  },
+  "scanScreenPdfLabel": "מסמך PDF",
+  "scanScreenPageSizeKb": "{kb} KB",
+  "@scanScreenPageSizeKb": {
+    "placeholders": { "kb": { "type": "int" } }
+  },
+  "scanScreenRemovePage": "הסרת דף {number}",
+  "@scanScreenRemovePage": {
+    "placeholders": { "number": { "type": "int" } }
+  },
+  "scanScreenTooManyPages": "סריקה אחת כוללת עד {max} דפים. הדפים שמעבר למגבלה לא נוספו.",
+  "@scanScreenTooManyPages": {
+    "placeholders": { "max": { "type": "int" } }
+  },
+  "scanScreenPageTooLarge": "הדף גדול מ-{mb} MB ולכן לא נוסף. נסו תמונה קטנה יותר או PDF קטן יותר.",
+  "@scanScreenPageTooLarge": {
+    "placeholders": { "mb": { "type": "int" } }
+  },
+  "scanScreenAnalysePages": "נתחו את הדפים",
+  "scanScreenPasteHeading": "או הדביקו את הטקסט",
+  "scanScreenDisclosureWeb": "הדפים נשלחים לשרת של קטוקלאב, שמעביר אותם ל-Gemini API של גוגל לקריאה.",
+  "scanScreenDisclosureDirect": "הדפים נשלחים ישירות מהמכשיר הזה ל-Gemini API של גוגל, באמצעות מפתח ה-API שלכם.",
+  "scanScreenSettingsLink": "הגדרות",
+  "scanScreenFailureNotConfigured": "סריקה אינה זמינה בגרסה הזאת.",
+  "scanScreenFailureNeedsServer": "סריקה דורשת את השרת של קטוקלאב, והגרסה הזאת לא מחוברת לשרת. הדבקת טקסט התפריט עדיין עובדת.",
+  "scanScreenFailureOffline": "נראה שאין חיבור לאינטרנט. הדפים נשמרו; התחברו ונסו שוב.",
+  "scanScreenFailureTimeout": "מודל ה-AI היה איטי מדי. הדפים נשמרו; נסו שוב.",
+  "scanScreenFailureRateLimited": "מכסת ה-AI היומית נוצלה. הדפים נשמרו; נסו שוב מאוחר יותר.",
+  "scanScreenFailureBadResponse": "מודל ה-AI החזיר תשובה שאי אפשר להשתמש בה. הדפים נשמרו; נסו שוב.",
+  "scanScreenFailureNoDishesFound": "לא ניתן היה לקרוא מנות מהדפים האלה. ודאו שהתמונות חדות ומוארות היטב, או הדביקו את הטקסט במקום.",
+  "scanScreenFailureBackendUnreachable": "לא ניתן להגיע לשרת של קטוקלאב. הדפים נשמרו; נסו שוב.",
+  "scanScreenFailureConsentWithheld": "סריקה שולחת את הדפים ל-Gemini API של גוגל לקריאה. אפשרו ניתוח AI בהגדרות כדי לסרוק תפריט.",
+  "scanScreenFailureApiKeyMissing": "הוסיפו את מפתח ה-API של Gemini בהגדרות כדי לסרוק תפריט.",
+  "scanScreenFailureApiKeyRejected": "Gemini דחה את מפתח ה-API שלכם. בדקו אותו בהגדרות ונסו שוב."
 }

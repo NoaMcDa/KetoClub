@@ -800,4 +800,118 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get fetchFailedScanNotSaved =>
       'This pasted menu is no longer saved on this device. Paste it again to analyse it.';
+
+  @override
+  String get scanScreenIntro =>
+      'Photograph the pages of a menu, choose photos from your library, or choose a PDF. KetoClub reads the dishes off the pages and analyses them.';
+
+  @override
+  String get scanScreenActionTakePhoto => 'Take a photo';
+
+  @override
+  String get scanScreenActionChoosePhotos => 'Choose photos';
+
+  @override
+  String get scanScreenActionChoosePdf => 'Choose a PDF';
+
+  @override
+  String get scanScreenPagesHeading => 'Pages';
+
+  @override
+  String scanScreenPageCount(int count, int max) {
+    return '$count of $max pages';
+  }
+
+  @override
+  String get scanScreenCapReached =>
+      'That is the most pages one scan can hold. Remove a page to add another.';
+
+  @override
+  String scanScreenPageLabel(int number) {
+    return 'Page $number';
+  }
+
+  @override
+  String get scanScreenPdfLabel => 'PDF document';
+
+  @override
+  String scanScreenPageSizeKb(int kb) {
+    return '$kb KB';
+  }
+
+  @override
+  String scanScreenRemovePage(int number) {
+    return 'Remove page $number';
+  }
+
+  @override
+  String scanScreenTooManyPages(int max) {
+    return 'One scan holds at most $max pages. The pages over the limit were not added.';
+  }
+
+  @override
+  String scanScreenPageTooLarge(int mb) {
+    return 'That page is larger than $mb MB, so it was not added. Try a smaller photo or a smaller PDF.';
+  }
+
+  @override
+  String get scanScreenAnalysePages => 'Analyse pages';
+
+  @override
+  String get scanScreenPasteHeading => 'Or paste the text';
+
+  @override
+  String get scanScreenDisclosureWeb =>
+      'The pages are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API to be read.';
+
+  @override
+  String get scanScreenDisclosureDirect =>
+      'The pages are sent straight from this device to Google\'s Gemini API, using your own API key.';
+
+  @override
+  String get scanScreenSettingsLink => 'Settings';
+
+  @override
+  String get scanScreenFailureNotConfigured =>
+      'Scanning is not available on this build.';
+
+  @override
+  String get scanScreenFailureNeedsServer =>
+      'Scanning needs KetoClub\'s server, and this build is not connected to one. Pasting the menu text still works.';
+
+  @override
+  String get scanScreenFailureOffline =>
+      'You look offline. Your pages are kept; reconnect and try again.';
+
+  @override
+  String get scanScreenFailureTimeout =>
+      'The AI model was too slow. Your pages are kept; try again.';
+
+  @override
+  String get scanScreenFailureRateLimited =>
+      'The daily AI limit is used up. Your pages are kept; try again later.';
+
+  @override
+  String get scanScreenFailureBadResponse =>
+      'The AI model gave an unusable answer. Your pages are kept; try again.';
+
+  @override
+  String get scanScreenFailureNoDishesFound =>
+      'No dishes could be read from these pages. Check that the photos are sharp and well lit, or paste the text instead.';
+
+  @override
+  String get scanScreenFailureBackendUnreachable =>
+      'KetoClub\'s server could not be reached. Your pages are kept; try again.';
+
+  @override
+  String get scanScreenFailureConsentWithheld =>
+      'Scanning sends the pages to Google\'s Gemini API to be read. Allow AI analysis in Settings to scan a menu.';
+
+  @override
+  String get scanScreenFailureApiKeyMissing =>
+      'Add your Gemini API key in Settings to scan a menu.';
+
+  @override
+  String get scanScreenFailureApiKeyRejected =>
+      'Gemini rejected your API key. Check it in Settings, then try again.';
 }

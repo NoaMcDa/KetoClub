@@ -183,8 +183,12 @@ Route<void>? generateRoute(
             classifier: dependencies.scannedMenuClassifier,
             repository: dependencies.menuRepository,
             clock: dependencies.clock,
+            settingsStore: dependencies.settingsStore,
           ),
-          child: const ScanScreen(),
+          child: ScanScreen(
+            pagePicker: dependencies.pagePicker,
+            directToGoogle: dependencies.apiKeyStore != null,
+          ),
         ),
       ),
     );

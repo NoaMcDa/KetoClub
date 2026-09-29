@@ -1351,6 +1351,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This pasted menu is no longer saved on this device. Paste it again to analyse it.'**
   String get fetchFailedScanNotSaved;
+
+  /// No description provided for @scanScreenIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Photograph the pages of a menu, choose photos from your library, or choose a PDF. KetoClub reads the dishes off the pages and analyses them.'**
+  String get scanScreenIntro;
+
+  /// No description provided for @scanScreenActionTakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo'**
+  String get scanScreenActionTakePhoto;
+
+  /// No description provided for @scanScreenActionChoosePhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose photos'**
+  String get scanScreenActionChoosePhotos;
+
+  /// No description provided for @scanScreenActionChoosePdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a PDF'**
+  String get scanScreenActionChoosePdf;
+
+  /// No description provided for @scanScreenPagesHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Pages'**
+  String get scanScreenPagesHeading;
+
+  /// No description provided for @scanScreenPageCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of {max} pages'**
+  String scanScreenPageCount(int count, int max);
+
+  /// No description provided for @scanScreenCapReached.
+  ///
+  /// In en, this message translates to:
+  /// **'That is the most pages one scan can hold. Remove a page to add another.'**
+  String get scanScreenCapReached;
+
+  /// No description provided for @scanScreenPageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {number}'**
+  String scanScreenPageLabel(int number);
+
+  /// No description provided for @scanScreenPdfLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF document'**
+  String get scanScreenPdfLabel;
+
+  /// No description provided for @scanScreenPageSizeKb.
+  ///
+  /// In en, this message translates to:
+  /// **'{kb} KB'**
+  String scanScreenPageSizeKb(int kb);
+
+  /// No description provided for @scanScreenRemovePage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove page {number}'**
+  String scanScreenRemovePage(int number);
+
+  /// No description provided for @scanScreenTooManyPages.
+  ///
+  /// In en, this message translates to:
+  /// **'One scan holds at most {max} pages. The pages over the limit were not added.'**
+  String scanScreenTooManyPages(int max);
+
+  /// No description provided for @scanScreenPageTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'That page is larger than {mb} MB, so it was not added. Try a smaller photo or a smaller PDF.'**
+  String scanScreenPageTooLarge(int mb);
+
+  /// No description provided for @scanScreenAnalysePages.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyse pages'**
+  String get scanScreenAnalysePages;
+
+  /// No description provided for @scanScreenPasteHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Or paste the text'**
+  String get scanScreenPasteHeading;
+
+  /// No description provided for @scanScreenDisclosureWeb.
+  ///
+  /// In en, this message translates to:
+  /// **'The pages are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API to be read.'**
+  String get scanScreenDisclosureWeb;
+
+  /// No description provided for @scanScreenDisclosureDirect.
+  ///
+  /// In en, this message translates to:
+  /// **'The pages are sent straight from this device to Google\'s Gemini API, using your own API key.'**
+  String get scanScreenDisclosureDirect;
+
+  /// No description provided for @scanScreenSettingsLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get scanScreenSettingsLink;
+
+  /// No description provided for @scanScreenFailureNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning is not available on this build.'**
+  String get scanScreenFailureNotConfigured;
+
+  /// No description provided for @scanScreenFailureNeedsServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning needs KetoClub\'s server, and this build is not connected to one. Pasting the menu text still works.'**
+  String get scanScreenFailureNeedsServer;
+
+  /// No description provided for @scanScreenFailureOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'You look offline. Your pages are kept; reconnect and try again.'**
+  String get scanScreenFailureOffline;
+
+  /// No description provided for @scanScreenFailureTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI model was too slow. Your pages are kept; try again.'**
+  String get scanScreenFailureTimeout;
+
+  /// No description provided for @scanScreenFailureRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'The daily AI limit is used up. Your pages are kept; try again later.'**
+  String get scanScreenFailureRateLimited;
+
+  /// No description provided for @scanScreenFailureBadResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI model gave an unusable answer. Your pages are kept; try again.'**
+  String get scanScreenFailureBadResponse;
+
+  /// No description provided for @scanScreenFailureNoDishesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No dishes could be read from these pages. Check that the photos are sharp and well lit, or paste the text instead.'**
+  String get scanScreenFailureNoDishesFound;
+
+  /// No description provided for @scanScreenFailureBackendUnreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub\'s server could not be reached. Your pages are kept; try again.'**
+  String get scanScreenFailureBackendUnreachable;
+
+  /// No description provided for @scanScreenFailureConsentWithheld.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning sends the pages to Google\'s Gemini API to be read. Allow AI analysis in Settings to scan a menu.'**
+  String get scanScreenFailureConsentWithheld;
+
+  /// No description provided for @scanScreenFailureApiKeyMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your Gemini API key in Settings to scan a menu.'**
+  String get scanScreenFailureApiKeyMissing;
+
+  /// No description provided for @scanScreenFailureApiKeyRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini rejected your API key. Check it in Settings, then try again.'**
+  String get scanScreenFailureApiKeyRejected;
 }
 
 class _AppLocalizationsDelegate

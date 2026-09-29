@@ -15,6 +15,9 @@ dependencies:
   # that fails anyway still maps to `offline`.
   connectivity_plus: ^7.3.1
   cupertino_icons: ^1.0.8
+  # The Scan tab's "Choose a PDF" (architecture.md D15, issue #82). Only
+  # services/platform/device_page_picker.dart imports it.
+  file_picker: ^13.1.0
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -29,6 +32,10 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   http: ^1.1.0
+  # The Scan tab's camera and photo library (issue #82); the plugin
+  # downsizes, so no image library is needed. Only device_page_picker.dart
+  # imports it.
+  image_picker: ^1.2.3
   intl: ^0.20.3
   provider: ^6.0.0
   # Raises screen brightness while the Waiter Card is open so a waiter can read

@@ -11,9 +11,9 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
+import 'package:ketoclub/services/platform/device_page_picker.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
-import 'package:ketoclub/services/platform/page_picker.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
@@ -58,13 +58,13 @@ void main() {
       // The test VM is not web, so the phone path: a key store for the
       // user's own Gemini key (architecture.md D17).
       expect(dependencies.apiKeyStore, isA<SecureApiKeyStore>());
-      // The scan seams' placeholders, until issue #89 wires the vision
-      // classifier and issue #82 the device page picker.
+      // The vision classifier is still the placeholder until issue #89;
+      // the page picker is the device one (issue #82).
       expect(
         dependencies.scannedMenuClassifier,
         isA<UnavailableScannedMenuClassifier>(),
       );
-      expect(dependencies.pagePicker, isA<NoPagePicker>());
+      expect(dependencies.pagePicker, isA<DevicePagePicker>());
     });
 
     test('performs no plugin I/O while building the graph', () {
