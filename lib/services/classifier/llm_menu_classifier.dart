@@ -19,12 +19,14 @@ import 'package:ketoclub/services/platform/clock.dart';
 
 /// The [ChatFailureReason] a [ChatFailed] carried, mapped 1:1 by name to
 /// the [MenuAnalysisFailureReason] this classifier reports for it
-/// (architecture.md §10).
+/// (architecture.md §10). Shared by [LlmMenuClassifier] and the scan
+/// path's `VisionMenuClassifier` (issue #89), so a chat failure reads the
+/// same whether a menu or a photograph was being classified.
 ///
 /// An exhaustive switch with no `default`, so a new [ChatFailureReason]
 /// value fails to compile here rather than silently reporting the wrong
 /// reason to the user.
-MenuAnalysisFailureReason _failureReasonFor(ChatFailureReason reason) {
+MenuAnalysisFailureReason menuFailureReasonFor(ChatFailureReason reason) {
   switch (reason) {
     case ChatFailureReason.notConfigured:
       return MenuAnalysisFailureReason.notConfigured;
@@ -103,7 +105,7 @@ final class LlmMenuClassifier implements MenuClassifier {
           final MenuAnalysisFailed failed => failed,
         };
       case ChatFailed(:final reason):
-        return MenuAnalysisFailed(reason: _failureReasonFor(reason));
+        return MenuAnalysisFailed(reason: menuFailureReasonFor(reason));
     }
   }
 }

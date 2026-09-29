@@ -9,6 +9,7 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
@@ -17,6 +18,7 @@ import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/menu_controller.dart';
+import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
@@ -31,6 +33,7 @@ import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
+import 'package:ketoclub/widgets/scanned_pages_sheet.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
@@ -108,6 +111,7 @@ class MenuScreen extends StatefulWidget {
     required this.externalLinkOpener,
     required this.menuSharer,
     this.venueNameHint,
+    this.scannedPages,
     super.key,
   });
 
@@ -135,6 +139,13 @@ class MenuScreen extends StatefulWidget {
   /// Shares [MenuShareText.build]'s summary of the green and yellow
   /// dishes when the app bar's share action is tapped (issue #54).
   final MenuSharer menuSharer;
+
+  /// The pages recent scans were read from, in memory only (issue #89).
+  /// When it holds pages for a [MenuSource.scan] [ref], the header names
+  /// the menu as read by AI from those pages and offers "View pages";
+  /// otherwise — a pasted menu, a scan from an earlier run, or null — the
+  /// header reads as a pasted menu, as it did before scanning existed.
+  final ScannedPagesRegistry? scannedPages;
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -497,10 +508,30 @@ class _MenuScreenState extends State<MenuScreen> {
   /// pasted menu, whose reference is a hash and reads as "Pasted menu".
   String _displayName(MenuController controller, AppLocalizations l10n) {
     final fallback = widget.ref.source == MenuSource.scan
-        ? l10n.sourceScanned
+        ? _scanSourceName(l10n)
         : widget.ref.platformId;
     return controller.venueName ?? widget.venueNameHint ?? fallback;
   }
+
+  /// The pages this menu was read from, when it is a scan whose pages are
+  /// still held in memory (issue #89); null for every other menu.
+  ScannedMenu? get _scannedPages => widget.ref.source == MenuSource.scan
+      ? widget.scannedPages?.get(widget.ref)
+      : null;
+
+  /// What a [MenuSource.scan] menu is called: "Scanned menu" while its
+  /// pages are held (issue #89), else "Pasted menu" — a scan from an
+  /// earlier run reads as a paste, since nothing but the pages tells the
+  /// two apart.
+  String _scanSourceName(AppLocalizations l10n) =>
+      _scannedPages != null ? l10n.scannedMenuTitle : l10n.sourceScanned;
+
+  /// The name the source line gives this menu's source: the platform's
+  /// brand, or for a scan [_scanSourceName].
+  String _sourceName(AppLocalizations l10n) =>
+      widget.ref.source == MenuSource.scan
+      ? _scanSourceName(l10n)
+      : _platformName(widget.ref.source, l10n);
 
   /// The venue name and keto score (issue #29's header row,
   /// `.design/Main.dc.html`).
@@ -517,7 +548,7 @@ class _MenuScreenState extends State<MenuScreen> {
   ) {
     final name = _displayName(controller, l10n);
     final theme = Theme.of(context);
-    return Row(
+    final titleRow = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
@@ -531,6 +562,51 @@ class _MenuScreenState extends State<MenuScreen> {
         ),
         KetoScoreBadge(score: controller.ketoScoreOutOfTen),
       ],
+    );
+    final pages = _scannedPages;
+    if (pages == null) return titleRow;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [titleRow, _scannedSourceRow(context, l10n, pages)],
+    );
+  }
+
+  /// The scanned menu's honest source line (issue #89): the dishes were
+  /// read by AI from the user's own pages, with "View pages" beside it so
+  /// the transcription can be checked against them.
+  Widget _scannedSourceRow(
+    BuildContext context,
+    AppLocalizations l10n,
+    ScannedMenu pages,
+  ) {
+    final theme = Theme.of(context);
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 4,
+      children: [
+        Icon(
+          Icons.auto_awesome_outlined,
+          size: 14,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        Text(l10n.scannedMenuReadByAi, style: theme.textTheme.bodySmall),
+        TextButton.icon(
+          icon: const Icon(Icons.photo_library_outlined, size: 16),
+          label: Text(l10n.scannedMenuViewPages),
+          style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
+          onPressed: () => unawaited(_openScannedPages(pages)),
+        ),
+      ],
+    );
+  }
+
+  /// Opens [ScannedPagesSheet] over [pages] as a dismissible modal.
+  Future<void> _openScannedPages(ScannedMenu pages) {
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) => ScannedPagesSheet(scan: pages),
     );
   }
 
@@ -565,7 +641,7 @@ class _MenuScreenState extends State<MenuScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          l10n.menuSourceLine(_platformName(widget.ref.source, l10n), age),
+          l10n.menuSourceLine(_sourceName(l10n), age),
           style: Theme.of(context).textTheme.bodySmall,
         ),
         // A pasted menu has no platform to ask again, so a refresh would

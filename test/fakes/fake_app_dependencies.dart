@@ -1,4 +1,5 @@
 import 'package:ketoclub/state/app_dependencies.dart';
+import 'package:ketoclub/state/scanned_pages_registry.dart';
 
 import 'fake_app_logger.dart';
 import 'fake_clock.dart';
@@ -36,7 +37,8 @@ final class FakeAppDependencies {
       locationService = FakeLocationService(),
       venueSearchService = FakeVenueSearchService(),
       scannedMenuClassifier = FakeScannedMenuClassifier(),
-      pagePicker = FakePagePicker();
+      pagePicker = FakePagePicker(),
+      scannedPages = ScannedPagesRegistry();
 
   /// The faked menu repository.
   final FakeMenuRepository repository;
@@ -88,6 +90,11 @@ final class FakeAppDependencies {
   /// with [FakePagePicker.queueTakePhoto] and friends.
   final FakePagePicker pagePicker;
 
+  /// The in-memory scanned-pages registry (issue #89) — the real one, as
+  /// it does no I/O; put a scan here to drive the menu header's "View
+  /// pages".
+  final ScannedPagesRegistry scannedPages;
+
   /// The dependency set to hand to the app widget.
   AppDependencies get dependencies => AppDependencies(
     menuRepository: repository,
@@ -104,5 +111,6 @@ final class FakeAppDependencies {
     venueSearchService: venueSearchService,
     scannedMenuClassifier: scannedMenuClassifier,
     pagePicker: pagePicker,
+    scannedPages: scannedPages,
   );
 }

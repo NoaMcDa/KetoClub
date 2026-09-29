@@ -1,0 +1,37 @@
+{
+  "_fixture_note": "synthetic fixture: the same dish read three times — as on two overlapping photographs — with names that differ only in case, spacing and punctuation, so they normalise alike (architecture.md §9.4 scanned variant: duplicate normalised names keep the first; issue #89). The first copy is the one kept, verdict and all; the later copies' different verdicts are dropped with them.",
+  "dishes": [
+    {
+      "id": "v1",
+      "name": "Caesar Salad",
+      "verdict": "modifiable",
+      "why": "Romaine and parmesan, but it comes with croutons.",
+      "modification": "No croutons, please.",
+      "net_carbs_estimate": 4
+    },
+    {
+      "id": "v2",
+      "name": "Grilled Salmon",
+      "verdict": "orderAsIs",
+      "why": "Grilled fish, nothing starchy.",
+      "modification": null,
+      "net_carbs_estimate": 1
+    },
+    {
+      "id": "v3",
+      "name": "  caesar   salad ",
+      "verdict": "orderAsIs",
+      "why": "A second read of the same salad.",
+      "modification": null,
+      "net_carbs_estimate": 2
+    },
+    {
+      "id": "v4",
+      "name": "CAESAR SALAD!",
+      "verdict": "nonKeto",
+      "why": "A third read of the same salad.",
+      "modification": null,
+      "net_carbs_estimate": null
+    }
+  ]
+}
