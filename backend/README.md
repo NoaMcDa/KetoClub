@@ -35,14 +35,76 @@ Community routes are later issues (`backend_plan.md` §5).
 
 ### `POST /v1/chat`
 
-Body `{system_prompt, user_prompt, response_schema?, schema_name?}`, the
-Dart `LlmChatClient.complete` parameters one to one; `200` answers
+Body `{system_prompt, user_prompt, response_schema?, schema_name?, images?}`,
+the Dart `LlmChatClient.complete` parameters one to one; `200` answers
 `{content, model}`. Every request needs `X-KetoClub-Install-Id` (32 lowercase
 hex characters) and must **not** carry `Authorization`: the server holds the
 key. `response_schema` is a strict JSON schema; the backend converts it to
 Gemini's `responseSchema` subset (no `additionalProperties`, `nullable`
 instead of `["T", "null"]`). A 400 on a schema-carrying request is re-sent
 once without the schema, unless it is an invalid key.
+
+#### Menu pages: `images` (D15, #170)
+
+`images` is an optional list of `{mime_type, data}`: menu photographs or a
+PDF for Gemini to read with its own vision (`architecture.md` D15). `data` is
+standard, padded base64; `mime_type` is one of `image/jpeg`, `image/png`,
+`image/webp` or `application/pdf`. Each part is forwarded to Gemini as an
+`inline_data` part after the user prompt's text part, in the order sent, and
+the schema retry re-sends them unchanged. Omitted or empty, the request is
+exactly the text-only one it always was.
+
+- **Bounds**: at most `VISION_MAX_IMAGES` parts (default 6), each at most
+  `VISION_MAX_IMAGE_BYTES` once decoded (default 3 MiB). Over either, a
+  malformed base64 string or any other `mime_type` (`image/gif`,
+  `image/heic`) is FastAPI's 422 before any upstream call and before the
+  rate limiter; the app reads 422 as `badResponse`.
+- **Never cached**: a request with images neither reads nor writes the
+  shared completion cache below, and answers `X-KetoClub-Cache: bypass`.
+  Images never enter the cache key.
+- **Never stored or logged**: pages are forwarded and dropped. The log line
+  carries `images=<count>` and nothing else about them: never bytes, a mime
+  type or base64.
+- **Same gates**: the install id is still required, `Authorization` is still
+  rejected, and the per-install limiter counts an image request exactly like
+  a text one.
+
+Phones do not use this route (`architecture.md` D17): `GeminiChatClient`
+sends the same `inline_data` parts straight to Google.
+
+A one-pixel PNG, for trying the route by hand:
+
+```bash
+curl -sS -i localhost:8000/v1/chat \
+  -H 'Content-Type: application/json' \
+  -H 'X-KetoClub-Install-Id: 0123456789abcdef0123456789abcdef' \
+  -d '{
+    "system_prompt": "Describe the image in one word, as JSON {\"word\": ...}.",
+    "user_prompt": "What is in this image?",
+    "images": [{
+      "mime_type": "image/png",
+      "data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+    }]
+  }'
+# HTTP/1.1 200 OK ... x-ketoclub-cache: bypass
+```
+
+For real menu pages, `tools/vision_smoke.py` (issue #88) base64-encodes the
+files, posts one request and prints the status, latency, `X-KetoClub-Cache`
+and the reply. It makes a real call, so it is not a test and not in the
+coverage measurement:
+
+```bash
+uv run python tools/vision_smoke.py \
+  --backend http://localhost:8000 \
+  --install-id 0123456789abcdef0123456789abcdef \
+  --schema-file tests/fixtures/menu_analysis_schema.json \
+  page1.jpg page2.jpg menu.pdf
+```
+
+Its default prompts are short placeholders; pass `--system-prompt-file` and
+`--user-prompt-file` with the app's own `MenuAnalysisPrompt` text to test the
+real thing.
 
 Every error the route originates is `{reason, status_code}`:
 
@@ -55,8 +117,8 @@ Every error the route originates is `{reason, status_code}`:
 | 503 | `notConfigured` | No `GEMINI_API_KEY`, or Gemini rejected it (400 `API_KEY_INVALID`, 401, 403) |
 | 504 | `timeout` | Gemini did not answer within 110 s |
 
-A body that fails validation (empty prompt, prompt over its bound) is
-FastAPI's own 422. The `user_prompt` bound is 400,000 characters (#188) — an
+A body that fails validation (empty prompt, prompt over its bound, an
+image out of bounds) is FastAPI's own 422. The `user_prompt` bound is 400,000 characters (#188) — an
 abuse guard, not a model limit, and not a promise: a menu that large is bound
 first by `GEMINI_MAX_OUTPUT_TOKENS` and the 110 s read timeout, so past a
 couple of hundred dishes the honest answer is #188's batching, not this cap.
@@ -71,8 +133,8 @@ curl -sS https://generativelanguage.googleapis.com/v1beta/models \
   -H "x-goog-api-key: $GEMINI_API_KEY" | grep '"name"'
 ```
 
-Logs carry the install id's first 8 characters, the `cache=hit|miss`
-outcome, upstream status codes and, on an error, Google's `error.status`
+Logs carry the install id's first 8 characters, an image count, the
+`cache=hit|miss|bypass` outcome, upstream status codes and, on an error, Google's `error.status`
 enum only: never the key, prompt text or an upstream body.
 
 #### The shared completion cache (#103)
@@ -98,8 +160,11 @@ router) goes much further this way.
   reason) is never cached. The stored row holds no install id and no
   install-identifying data at all; the cache serves every install
   identically once warm.
-- **Header**: every `/v1/chat` response carries `X-KetoClub-Cache: hit` or
-  `miss`, exposed to browser JS via CORS `expose_headers`.
+- **Header**: every successful `/v1/chat` response carries
+  `X-KetoClub-Cache: hit`, `miss` or, for a request with images (#170),
+  `bypass`, exposed to browser JS via CORS `expose_headers`.
+- **Images**: a request carrying any is never looked up and never stored;
+  see "Menu pages" above.
 
 ## The Wolt menu proxy
 
@@ -258,6 +323,8 @@ that need them (`/v1/chat`, and `/v1/admin/*` in a later issue). See
 | `GEMINI_BASE_URL` | `https://generativelanguage.googleapis.com` | Upstream host; never taken from a request |
 | `GEMINI_MAX_OUTPUT_TOKENS` | `65536` | `generationConfig.maxOutputTokens`; must exceed a full menu's verdicts (#188) |
 | `GEMINI_THINKING_BUDGET` | `0` | Thinking tokens count against the output budget, and this is a classification task |
+| `VISION_MAX_IMAGES` | `6` | Most `images` parts one `/v1/chat` request may carry (#170) |
+| `VISION_MAX_IMAGE_BYTES` | `3145728` | Largest `images` part once decoded, in bytes (3 MiB) |
 | `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_PER_DAY` | `5`, `40` | Per install id on `/v1/chat`, in memory |
 | `WOLT_BASE_URL` | `https://restaurant-api.wolt.com` | Upstream host for the by-name discovery route (the menu proxy left it in #168); never taken from a request |
 | `TENBIS_BASE_URL` | `https://www.10bis.co.il` | Upstream host for the 10bis proxy; never taken from a request |

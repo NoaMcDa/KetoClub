@@ -1067,7 +1067,8 @@ suspect for that outage. The `verdict` enum in the shipped schema is derived fro
 
 **This entire section now describes the backend's behaviour, not the Dart
 client's** (D12). `BackendChatClient` does one thing: `POST {baseUrl}/v1/chat`
-with `{system_prompt, user_prompt, response_schema, schema_name}`, a
+with `{system_prompt, user_prompt, response_schema, schema_name}` — plus
+`images` when the call carries menu pages (D15) — a
 `X-KetoClub-Install-Id` header, no `Authorization` header ever, and a client-side
 timeout (`llmRequestTimeout`, 120 s, unchanged) that simply gives up and reports
 `timeout` if the backend never answers. Everything below is what the backend
@@ -1080,6 +1081,20 @@ contract this section always described, only moved server-side:
   `temperature: 0` and `thinkingConfig.thinkingBudget: 0` — this is a
   classification task with a strict schema, not a reasoning one, and thinking
   tokens would otherwise compete with the answer for `maxOutputTokens`.
+- **Menu pages (D15, issue #170).** `LlmChatClient.complete` takes an optional
+  `images` list of `ChatImagePart {mimeType, bytes}` — `image/jpeg`,
+  `image/png`, `image/webp` or `application/pdf`. Each becomes an
+  `inline_data` part (`{mime_type, data}`, base64) after the user prompt's
+  text part, in order: `BackendChatClient` sends them as the body's `images`
+  and the backend forwards them; `GeminiChatClient` (phones, D17) puts them in
+  its own request to Google. With no images, neither client sends anything
+  new — the text-only body, and so the backend's cache key for it, is byte for
+  byte what it was. The backend bounds them (`VISION_MAX_IMAGES`, default 6;
+  `VISION_MAX_IMAGE_BYTES`, default 3 MiB decoded) and answers 422 — read by
+  the app as `badResponse` — to more parts, a bigger part, malformed base64 or
+  any other type, before any upstream call. A request with images never reads
+  or writes the completion cache (#103) and answers `X-KetoClub-Cache:
+  bypass`; the per-install limiter counts it like any other.
 - On an upstream 400 whose error body is **not** `API_KEY_INVALID`, the backend
   re-sends the **same** request exactly once with `responseMimeType` only and no
   schema. 401, 403, 429 and 5xx are never retried — they are answers about the
@@ -1217,6 +1232,14 @@ should not reach a log or a widget, even with no bearer token left to leak.
     stores it alongside the cached content, `backend_plan.md` §3.5. A phone
     sends no install id anywhere for analysis. No location, no venue name, no
     user identity, ever.
+  - Menu pages, when the user scans one (D15): the photographs or PDF go to
+    Google Gemini as `inline_data` parts, the same two routes as dish text —
+    straight from a phone with the user's key (D17), or on web through the
+    backend's `/v1/chat`. The backend forwards them and drops them: a page is
+    never stored server-side, never enters the completion cache or its key,
+    and never reaches a log line — the chat log carries an image count, never
+    bytes, a media type or base64. A photograph can hold more than the menu
+    (a hand, a face, a receipt); what is in the frame is sent as taken.
   - Nowhere else. There is no telemetry.
 - **Consent (D16, issue #167).** AI analysis is **on by default** on a
   fresh install: `AppSettings.estimationConsentGiven` defaults to `true`.
@@ -1581,6 +1604,41 @@ needs the whole dish object, not just its joined text. **What it does not
 touch:** `TextNormaliser.dishSearchText` and `menuFingerprint` (§6.4) are
 unchanged and still hash every option value regardless of removal wording,
 so no cached analysis is invalidated by this decision.
+
+**D15 — Menu scanning goes through Gemini's own vision, not on-device
+OCR.** *(Decided 2026-09-24, recorded 2026-09-29; answers issue #81, closed
+as not planned, and #170. Amends D5 for the Phase 4 scan path and §16's
+"Photographed or PDF menus" row, which both assumed OCR text.)* The default
+model, `gemini-3.5-flash`, reads photographs and PDFs natively, so a separate
+OCR stage (the M16 research's on-device text recognition, then text into the
+existing prompt) would add a second engine whose errors the model can no
+longer see past: a misread price column or a dish name split across two
+lines is lost before classification starts. Instead a menu page travels as an
+image part of the same one-request-per-menu chat call (D6): `LlmChatClient.
+complete` gained `images` (`ChatImagePart {mimeType, bytes}`), and both
+clients carry them as `inline_data` parts after the user prompt (§9.3).
+
+- **Web** posts them to `/v1/chat` as `images: [{mime_type, data}]`, bounded
+  by `VISION_MAX_IMAGES` (6) and `VISION_MAX_IMAGE_BYTES` (3 MiB decoded); the
+  install id, the `Authorization` rejection, the limiter and the error
+  vocabulary are the route's own, not a second copy.
+- **Phones** (D17) send them straight to Google in `GeminiChatClient`'s own
+  request, with the user's key.
+- **Never kept.** Pages are forwarded and dropped: never stored server-side,
+  never cached — a request with images bypasses the completion cache (#103)
+  both ways and images never enter its key — and never logged beyond a count
+  (§11).
+- **A text-only call is unchanged.** Both clients send nothing new when
+  `images` is empty, so no server cache key moves and no existing prompt is
+  touched.
+
+**What it costs:** the scan path depends on a network and a model, with no
+offline OCR fallback to degrade to — the rules engine needs text a photo does
+not have. A page costs more tokens than its text would, and no two scans ever
+share a cached answer. The default model has not yet been confirmed to accept
+image and `application/pdf` parts with the real prompt (#179), and the Scan
+screen that produces pages (#89) and the person-run smoke check
+(`backend/tools/vision_smoke.py`, #88) come after this transport change.
 
 **D16 — AI analysis is on by default.** *(2026-09-28; answers issue #167;
 amends §11.)* D2 makes the language model the primary classifier, but

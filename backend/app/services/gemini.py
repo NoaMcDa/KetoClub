@@ -140,9 +140,16 @@ def _body(
     }
     if schema is not None:
         generation_config["responseSchema"] = schema
+    # Menu pages (D15, #170) follow the prompt as inline_data parts; with
+    # none, the parts list is exactly the text-only one it always was.
+    user_parts: list[dict[str, object]] = [{"text": request.user_prompt}]
+    user_parts.extend(
+        {"inline_data": {"mime_type": image.mime_type, "data": image.data}}
+        for image in request.images
+    )
     return {
         "system_instruction": {"parts": [{"text": request.system_prompt}]},
-        "contents": [{"role": "user", "parts": [{"text": request.user_prompt}]}],
+        "contents": [{"role": "user", "parts": user_parts}],
         "generationConfig": generation_config,
     }
 

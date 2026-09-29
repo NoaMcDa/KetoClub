@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
 
@@ -58,6 +59,24 @@ void runLlmChatClientContract(String name, LlmChatClient Function() build) {
           schemaName: 'menu_analysis',
         ),
         completes,
+      );
+    });
+
+    test('complete with one image never throws', () async {
+      final client = build();
+
+      await expectLater(
+        client.complete(
+          systemPrompt: 'system',
+          userPrompt: 'user',
+          images: <ChatImagePart>[
+            ChatImagePart(
+              mimeType: ChatImagePart.png,
+              bytes: Uint8List.fromList(<int>[0x89, 0x50, 0x4E, 0x47]),
+            ),
+          ],
+        ),
+        completion(isA<ChatResult>()),
       );
     });
 

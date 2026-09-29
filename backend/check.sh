@@ -13,7 +13,7 @@ echo "== ruff format --check"
 uv run ruff format --check .
 
 echo "== mypy"
-uv run mypy app
+uv run mypy app tools
 
 echo "== pytest (coverage floor 80%)"
 uv run pytest --cov=app --cov-fail-under=80
