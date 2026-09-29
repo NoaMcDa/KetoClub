@@ -1,15 +1,22 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/utils/constants.dart';
 
+import '../services/classifier/scanned_menu_classifier_contract.dart';
 import '../services/llm/llm_chat_client_contract.dart';
+import '../services/platform/page_picker_contract.dart';
 import '../services/storage/api_key_store_contract.dart';
 import '../services/storage/install_id_store_contract.dart';
 import '../services/storage/menu_cache_contract.dart';
@@ -22,6 +29,8 @@ import 'fake_install_id_store.dart';
 import 'fake_llm_chat_client.dart';
 import 'fake_menu_cache.dart';
 import 'fake_notes_store.dart';
+import 'fake_page_picker.dart';
+import 'fake_scanned_menu_classifier.dart';
 import 'fake_settings_store.dart';
 
 void main() {
@@ -815,6 +824,144 @@ void main() {
   runInstallIdStoreContract('FakeInstallIdStore', FakeInstallIdStore.new);
   runNotesStoreContract('FakeNotesStore', FakeNotesStore.new);
   runApiKeyStoreContract('FakeApiKeyStore', FakeApiKeyStore.new);
+  runScannedMenuClassifierContract(
+    'FakeScannedMenuClassifier',
+    FakeScannedMenuClassifier.new,
+    recordedOptions: (fake) => [for (final call in fake.calls) call.$2],
+  );
+  runPagePickerContract('FakePagePicker', FakePagePicker.new);
+
+  group('FakeScannedMenuClassifier', () {
+    test('reads one dish per page under a scan reference by default', () async {
+      // Arrange
+      final fake = FakeScannedMenuClassifier();
+
+      // Act
+      final result = await fake.classify(
+        _scanOf(2),
+        options: const ClassificationOptions(),
+      );
+
+      // Assert
+      final read = result as ScannedMenuRead;
+      expect(read.menu.venueRef.source, equals(MenuSource.scan));
+      expect(
+        read.menu.allDishes.map((dish) => dish.name),
+        equals(<String>['Scanned dish 1', 'Scanned dish 2']),
+      );
+      expect(read.analysis.engine, equals(fake.derivedEngine));
+      expect(
+        read.analysis.dishes.map((dish) => dish.why).toSet(),
+        equals(<String>{FakeScannedMenuClassifier.defaultWhy}),
+      );
+    });
+
+    test('answers noDishesFound for a scan with no pages', () async {
+      final result = await FakeScannedMenuClassifier().classify(
+        _scanOf(0),
+        options: const ClassificationOptions(),
+      );
+
+      expect(
+        result,
+        equals(
+          const ScannedMenuFailed(
+            reason: MenuAnalysisFailureReason.noDishesFound,
+          ),
+        ),
+      );
+    });
+
+    test('respondWith scripts every later call', () async {
+      // Arrange
+      const scripted = ScannedMenuFailed(
+        reason: MenuAnalysisFailureReason.offline,
+      );
+      final fake = FakeScannedMenuClassifier()..respondWith(scripted);
+
+      // Act
+      final first = await fake.classify(
+        _scanOf(1),
+        options: const ClassificationOptions(),
+      );
+      final second = await fake.classify(
+        _scanOf(3),
+        options: const ClassificationOptions(),
+      );
+
+      // Assert
+      expect(first, equals(scripted));
+      expect(second, equals(scripted));
+      expect(fake.calls.map((call) => call.$1.pages.length), equals([1, 3]));
+    });
+
+    test('announces its engines and waits for its gate', () async {
+      // Arrange
+      final heard = <ClassifyingEngine>[];
+      final gate = Completer<void>();
+      final fake = FakeScannedMenuClassifier()
+        ..announces = const <ClassifyingEngine>[ClassifyingEngine.llm]
+        ..gate = gate.future;
+      var done = false;
+
+      // Act
+      final pending = fake
+          .classify(
+            _scanOf(1),
+            options: ClassificationOptions(onEngineStarted: heard.add),
+          )
+          .then((_) => done = true);
+      await Future<void>.delayed(Duration.zero);
+
+      // Assert: announced, still held open, then released.
+      expect(heard, equals(<ClassifyingEngine>[ClassifyingEngine.llm]));
+      expect(done, isFalse);
+      gate.complete();
+      await pending;
+      expect(done, isTrue);
+    });
+  });
+
+  group('FakePagePicker', () {
+    test('answers each method from its own queue, then as cancelled', () async {
+      // Arrange
+      final photo = _pageOf(1);
+      final image = _pageOf(2);
+      final pdf = ScannedPage(
+        mimeType: ScannedPage.pdf,
+        bytes: Uint8List.fromList(<int>[3]),
+      );
+      final picker = FakePagePicker()
+        ..queueTakePhoto(<ScannedPage>[photo])
+        ..queuePickImages(<ScannedPage>[image, photo])
+        ..queuePickPdf(<ScannedPage>[pdf]);
+
+      // Act / Assert
+      expect(await picker.takePhoto(), equals(<ScannedPage>[photo]));
+      expect(await picker.pickImages(), equals(<ScannedPage>[image, photo]));
+      expect(await picker.pickPdf(), equals(<ScannedPage>[pdf]));
+      expect(await picker.takePhoto(), isEmpty);
+      expect(await picker.pickImages(), isEmpty);
+      expect(await picker.pickPdf(), isEmpty);
+    });
+
+    test('records every call in order', () async {
+      final picker = FakePagePicker();
+
+      await picker.pickPdf();
+      await picker.takePhoto();
+      await picker.pickImages();
+
+      expect(
+        picker.calls,
+        equals(<PagePickerCall>[
+          PagePickerCall.pickPdf,
+          PagePickerCall.takePhoto,
+          PagePickerCall.pickImages,
+        ]),
+      );
+    });
+  });
 
   group('FakeMenuCache degradation switches', () {
     test('failOnRead makes every read miss without throwing', () async {
@@ -837,6 +984,17 @@ void main() {
     });
   });
 }
+
+/// A one-byte JPEG page holding [seed], for the scan fakes' tests.
+ScannedPage _pageOf(int seed) => ScannedPage(
+  mimeType: ScannedPage.jpeg,
+  bytes: Uint8List.fromList(<int>[seed]),
+);
+
+/// A scan of [count] distinct pages, for the scan fakes' tests.
+ScannedMenu _scanOf(int count) => ScannedMenu(
+  pages: <ScannedPage>[for (var i = 0; i < count; i++) _pageOf(i)],
+);
 
 /// A venue ref shared by this file's `CachedMenu` value-object tests.
 const VenueRef _woltRef = VenueRef(source: MenuSource.wolt, platformId: 'x');

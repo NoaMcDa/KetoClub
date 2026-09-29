@@ -38,9 +38,13 @@ inferred from them and from the rest of the directory, not aspirational.
    parameter per scenario. The common shapes are:
    - a **queue**, drained in order and then sticking on its last entry or a
      `fallback` (`FakePlatformMenuAdapter.queueResult`/`queueFetched`/
-     `queueFailed`, `FakeLlmChatClient.enqueue`);
+     `queueFailed`, `FakeLlmChatClient.enqueue`), or one queue per method
+     falling back to the interface's own "nothing" answer
+     (`FakePagePicker.queueTakePhoto`/`queuePickImages`/`queuePickPdf`,
+     each answering an empty list — a cancelled picker — once drained);
    - a **scripted single value**, set once and returned from then on
-     (`FakeMenuClassifier.respondWith`, `stub`/`stubAll` on
+     (`FakeMenuClassifier.respondWith`,
+     `FakeScannedMenuClassifier.respondWith`, `stub`/`stubAll` on
      `FakeMenuRepository`);
    - a **degradation switch**, a plain `bool` field a test flips to make an
      otherwise-working fake start failing without ever throwing
@@ -113,6 +117,12 @@ runSettingsStoreContract('PrefsSettingsStore', _buildStore);
 // test/services/classifier/menu_classifier_contract_test.dart
 runMenuClassifierContract('FakeMenuClassifier', FakeMenuClassifier.new);
 ```
+
+A contract that can only check what an implementation *records* when it
+records anything takes an optional reader for it:
+`runScannedMenuClassifierContract` accepts `recordedOptions`, which
+`fakes_test.dart` passes for `FakeScannedMenuClassifier` and
+`UnavailableScannedMenuClassifier` (which records nothing) omits.
 
 `build` is passed as a tear-off (`FakeMenuRepository.new`) when the no-arg
 constructor is enough, or as a closure (`() => CachedMenuRepository(...)`)

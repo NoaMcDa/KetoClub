@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:ketoclub/di.dart';
 import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
+import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/llm/backend_chat_client.dart';
 import 'package:ketoclub/services/llm/gemini_chat_client.dart';
 import 'package:ketoclub/services/location/geolocator_location_service.dart';
@@ -12,6 +13,7 @@ import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
+import 'package:ketoclub/services/platform/page_picker.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
@@ -56,6 +58,13 @@ void main() {
       // The test VM is not web, so the phone path: a key store for the
       // user's own Gemini key (architecture.md D17).
       expect(dependencies.apiKeyStore, isA<SecureApiKeyStore>());
+      // The scan seams' placeholders, until issue #89 wires the vision
+      // classifier and issue #82 the device page picker.
+      expect(
+        dependencies.scannedMenuClassifier,
+        isA<UnavailableScannedMenuClassifier>(),
+      );
+      expect(dependencies.pagePicker, isA<NoPagePicker>());
     });
 
     test('performs no plugin I/O while building the graph', () {

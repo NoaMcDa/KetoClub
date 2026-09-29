@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../fakes/fake_clock.dart';
 import '../fakes/fake_menu_repository.dart';
+import '../fakes/fake_scanned_menu_classifier.dart';
 
 /// The English strings a test can read expected copy from.
 final AppLocalizations _en = AppLocalizationsEn();
@@ -47,6 +48,7 @@ Future<void> _pump(
 }
 
 ScanController _controller(FakeMenuRepository repository) => ScanController(
+  classifier: FakeScannedMenuClassifier(),
   repository: repository,
   clock: FakeClock(DateTime.utc(2026, 9, 29)),
 );

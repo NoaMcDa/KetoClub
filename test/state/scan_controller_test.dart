@@ -4,6 +4,7 @@ import 'package:ketoclub/state/scan_controller.dart';
 
 import '../fakes/fake_clock.dart';
 import '../fakes/fake_menu_repository.dart';
+import '../fakes/fake_scanned_menu_classifier.dart';
 
 final DateTime _epoch = DateTime.utc(2026, 9, 29, 12);
 
@@ -11,15 +12,36 @@ void main() {
   group('ScanController', () {
     late FakeMenuRepository repository;
     late FakeClock clock;
+    late FakeScannedMenuClassifier classifier;
     late ScanController controller;
 
     setUp(() {
       repository = FakeMenuRepository();
       clock = FakeClock(_epoch);
-      controller = ScanController(repository: repository, clock: clock);
+      classifier = FakeScannedMenuClassifier();
+      controller = ScanController(
+        classifier: classifier,
+        repository: repository,
+        clock: clock,
+      );
     });
 
     tearDown(() => controller.dispose());
+
+    test('exposes the scanned-menu classifier it was built with', () {
+      expect(controller.classifier, same(classifier));
+    });
+
+    test('the paste flow never calls the scanned-menu classifier', () async {
+      // Arrange
+      controller.text = 'Steak';
+
+      // Act
+      await controller.submitPaste();
+
+      // Assert
+      expect(classifier.calls, isEmpty);
+    });
 
     test('starts empty and cannot analyse', () {
       expect(controller.text, isEmpty);
@@ -138,8 +160,11 @@ void main() {
 
     test('does not notify after dispose when a store finishes late', () async {
       // Arrange
-      final slow = ScanController(repository: repository, clock: clock)
-        ..text = 'Steak';
+      final slow = ScanController(
+        classifier: classifier,
+        repository: repository,
+        clock: clock,
+      )..text = 'Steak';
 
       // Act: dispose while the store is still in flight.
       final pending = slow.submitPaste();

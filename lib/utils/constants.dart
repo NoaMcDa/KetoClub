@@ -1559,3 +1559,22 @@ final RegExp pastedPriceSuffix = RegExp(
 /// The most words a line may have and still be read as a section header
 /// when it is followed by a blank line (`TextMenuSource`).
 const int pastedHeaderMaxWords = 4;
+
+// ---------------------------------------------------------------------------
+// Scanned menus (architecture.md D15; issues #82, #89)
+// ---------------------------------------------------------------------------
+
+/// The most pages one scan may hold, all sent in one vision request (D6).
+///
+/// The image picker's own `limit` is unreliable on Android, so the Scan
+/// controller enforces this in Dart (issue #82). KetoClub's backend
+/// enforces the same bound as `VISION_MAX_IMAGES` (issue #170); keep the
+/// two equal, or a scan the app accepts is refused by the server.
+const int maxScanPages = 6;
+
+/// The most bytes one scanned page may hold: 3 MiB.
+///
+/// Enforced by the Scan controller (issue #82), and by KetoClub's backend
+/// as `VISION_MAX_IMAGE_BYTES`, measured on the decoded bytes (issue
+/// #170); keep the two equal.
+const int maxScanPageBytes = 3 * 1024 * 1024;

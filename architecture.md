@@ -665,6 +665,33 @@ where the concrete engines and the connectivity check are built and handed to it
 (constraint 4, §18.1). Consent arrives per call in `ClassificationOptions`, not
 as a dependency.
 
+**`ScannedMenuClassifier`** — the scan path's sibling interface (D15; issue
+#89), in `scanned_menu_classifier.dart`:
+
+```dart
+abstract interface class ScannedMenuClassifier {
+  /// Never throws. One call per scan: all pages in one request (D6).
+  Future<ScannedMenuResult> classify(
+    ScannedMenu scan, {
+    required ClassificationOptions options,
+  });
+}
+// ScannedMenuResult = ScannedMenuRead(menu, analysis) | ScannedMenuFailed(reason)
+```
+
+It is not a `MenuClassifier` because a photograph has no `Menu` until it is
+read, and putting page bytes on `Menu` or `VenueRef` would push them into the
+Hive JSON cache. A `ScannedMenu` (`lib/models/scanned_menu.dart`, pages of
+`{mimeType, bytes}`) has no `toJson` and lives only in memory; the `Menu` a
+`ScannedMenuRead` returns is `MenuSource.scan`-sourced and carries no byte of
+it, so it is stored and cached like a pasted menu. Until #89 lands the vision
+engine, `di.dart` wires `UnavailableScannedMenuClassifier`, which answers
+`notConfigured` without I/O; the Scan tab's pages come from a `PagePicker`
+(`services/platform/page_picker.dart`, #82) wired the same way to
+`NoPagePicker`. The bounds `maxScanPages` (6) and `maxScanPageBytes` (3 MiB)
+in `constants.dart` match the backend's `VISION_MAX_IMAGES` and
+`VISION_MAX_IMAGE_BYTES`.
+
 Dish-level output is the same from either engine:
 
 ```dart
