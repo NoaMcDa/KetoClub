@@ -454,8 +454,8 @@ Built, but not confirmed end to end, and not to be reported as done:
   menu are all unobserved. `backend/tools/vision_smoke.py` is the person-run check.
 - **The Scan tab's pickers and permissions are evidenced by fakes only.**
   `DevicePagePicker` (over `image_picker` and `file_picker`) and the iOS camera and
-  photo-library permission strings (English and Hebrew `InfoPlist.strings`) have
-  never run on a phone or a simulator.
+  photo-library permission strings (English and Hebrew `InfoPlist.strings`, not
+  yet registered in Xcode, see below) have never run on a phone or a simulator.
 - **The Wolt menu fixture is real** (`wolt_hamosad_menu.json`, recorded
   2026-09-25 from the consumer-assortment endpoint the app now calls; issues
   #22, #168), but only one venue was recorded and only from a laptop — this
@@ -474,10 +474,12 @@ Built, but not confirmed end to end, and not to be reported as done:
 - **No physical iOS or Android device has ever run this app.** Screen-brightness
   raising for the Waiter Card in particular is evidenced only by a mocked method
   channel and a fake, and the location-permission prompt (approximate/precise on
-  Android 12+, the "Never" path on iOS) is evidenced only by fakes. The iOS
-  `NSLocationWhenInUseUsageDescription` string is English-only — there is no
-  `InfoPlist.strings` variant group set up for Hebrew (`ios/Runner/Info.plist`'s
-  own comment explains why editing the pbxproj by hand was skipped).
+  Android 12+, the "Never" path on iOS) is evidenced only by fakes. The Hebrew
+  iOS permission strings (location, camera, photo library) exist on disk in
+  `ios/Runner/{en,he}.lproj/InfoPlist.strings` (#169, #196, #205), but the
+  one-time Xcode step that registers them with the Runner target
+  (`docs/RUNNING_IOS.md`, "iOS Hebrew permission string") has not been done or
+  checked, so until it is a Hebrew phone may still see the English prompt.
 - **The performance budget numbers are unmeasured on a real device** (issue
   #65). `tool/perf_menu.dart` and its 16 ms-per-frame budget table
   (`tool/README.md`) exist, but the measurement itself needs a real phone on

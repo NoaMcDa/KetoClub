@@ -122,11 +122,12 @@ out the Discovery chain that first run had deferred:
   `wolt_pages_search.json`) are synthetic, same reason and same tracking
   issue (#38) as the Wolt menu fixture below.
 - **Step 10, platform setup** (#130): icons, splash, bundle ids and
-  permissions for iOS, Android and web. The iOS location-permission string
-  (`NSLocationWhenInUseUsageDescription`) is English-only — the project has
-  no `InfoPlist.strings` variant group for Hebrew, and `ios/Runner/Info.plist`
-  says why wiring one by hand-editing the pbxproj was skipped rather than
-  risked. Still owed: an actual run on a physical iOS or Android device (see
+  permissions for iOS, Android and web. The iOS permission strings have Hebrew
+  translations on disk (`ios/Runner/{en,he}.lproj/InfoPlist.strings`, #169,
+  #196; the camera and photo-library ones arrived with the Scan tab), but the
+  Runner target registers them only after a one-time Xcode step
+  (`docs/RUNNING_IOS.md`), because hand-editing the pbxproj risked corrupting
+  it. Still owed: an actual run on a physical iOS or Android device (see
   "Outstanding before release" below).
 
 The same run also built a real Saved tab (#132, issue #48: cached menus,
@@ -260,8 +261,8 @@ on GitHub — tooling exists for several of them, it did not close any of them.
    (`docs/RELEASE.md`'s device matrix has the row). The Scan tab's pickers are
    in the same position: the camera and photo-library permission prompts, the
    gallery and PDF pickers and a real photograph's size and orientation are
-   evidenced only by fakes until a phone runs them. The iOS location string is
-   also English-only — see "Known limitations" below.
+   evidenced only by fakes until a phone runs them. The iOS Hebrew permission
+   strings still need their Xcode registration — see "Known limitations" below.
 7. **The performance budget is unmeasured on a real device** (issue #65).
    `tool/perf_menu.dart` and its 16 ms-per-frame budget table (`tool/README.md`)
    exist; the 60-dish-fixture, real-phone, real-4G measurement itself does not.
@@ -330,13 +331,14 @@ spacing values) is enforced by a test; pixel fidelity by no test at all.
   transcription is cached, and the registry keeps the pages of at most the last
   four scans, so "View pages" disappears once the app is closed (or the scan is
   evicted) and the menu then reads like a pasted one.
-- **The iOS location-permission string is English-only.** The project has no
-  `InfoPlist.strings` variant group registered in `Runner.xcodeproj` (only
-  "en" and "Base" are known regions), and wiring one by hand-editing the
-  `pbxproj` without Xcode risked corrupting a project file nothing here can
-  build-test — `ios/Runner/Info.plist`'s own comment on
-  `NSLocationWhenInUseUsageDescription` explains the trade. A Hebrew-speaking
-  user sees the English prompt.
+- **The iOS Hebrew permission strings are unregistered until someone runs one
+  Xcode step.** `ios/Runner/{en,he}.lproj/InfoPlist.strings` hold the location,
+  camera and photo-library prompts in both languages (#169, #196, #205), but
+  `Runner.xcodeproj` was not edited by hand — nothing here can build-test a
+  project file — so iOS cannot discover them until the "Add Files to Runner"
+  step in `docs/RUNNING_IOS.md` ("iOS Hebrew permission string") is done on a
+  Mac. Until then, and until a Hebrew phone has shown the result, a
+  Hebrew-speaking user may still see the English prompt.
 - **Wolt's discovery endpoints are unofficial and origin-locked**, and Wolt's
   ToS forbid "systematic retrieval" by a bot. The Discovery screen fetches a
   menu only when the user opens a venue — nothing pre-scores a whole list of

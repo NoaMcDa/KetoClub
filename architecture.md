@@ -891,7 +891,7 @@ Screens:
 | `MenuScreen` | `/venue/:source/:id` | Classified menu with filters and engine chip; `/venue/scan/{id}` opens a pasted menu (D18) |
 | `WaiterCardSheet` | modal | Large-type script with copy |
 | `SettingsScreen` | `/settings` | Key entry, disclosure text, cache clear, language |
-| `ScanScreen` | `/scan` | A field to paste a menu's text into, and Analyse (D18); photographing a physical menu is still Phase 4 |
+| `ScanScreen` | `/scan` | Collects menu pages from the camera, the photo library or a PDF, or a menu's text pasted into a field (D18). Analyse hands the pages to `ScannedMenuClassifier` in one call (D15), or the parsed paste to `MenuRepository.store`, and opens `/venue/scan/{id}` (#82, #83) |
 | `SavedScreen` | `/saved` | Placeholder — saving a venue is not built (Phase 3 territory) |
 
 **The bottom-navigation shell** *(issue #11, Phase 1)*, not in this document when
