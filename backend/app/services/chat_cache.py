@@ -29,6 +29,9 @@ def cache_key(model: str, request: ChatRequest) -> str:
     key is stable across dict key order — including inside a nested
     ``response_schema`` — and changes whenever the model, either prompt, the
     schema or its name changes.
+
+    ``request.images`` never enters the key (#170): a request carrying any
+    is never cached, and the route does not call this for one.
     """
     payload = {
         "model": model,

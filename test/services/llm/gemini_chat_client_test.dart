@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:fake_async/fake_async.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -91,6 +92,34 @@ final String _badRequestBody = jsonEncode(<String, Object?>{
     'status': 'INVALID_ARGUMENT',
   },
 });
+
+/// A two-page menu: a WebP photograph and a PDF, in that order.
+final List<ChatImagePart> _pages = <ChatImagePart>[
+  ChatImagePart(
+    mimeType: ChatImagePart.webp,
+    bytes: Uint8List.fromList(utf8.encode('RIFF page one')),
+  ),
+  ChatImagePart(
+    mimeType: ChatImagePart.pdf,
+    bytes: Uint8List.fromList(utf8.encode('%PDF-1.4 menu')),
+  ),
+];
+
+/// [_pages] as the `inline_data` parts Gemini should receive.
+const List<Object?> _inlinePages = <Object?>[
+  <String, Object?>{
+    'inline_data': <String, Object?>{
+      'mime_type': 'image/webp',
+      'data': 'UklGRiBwYWdlIG9uZQ==',
+    },
+  },
+  <String, Object?>{
+    'inline_data': <String, Object?>{
+      'mime_type': 'application/pdf',
+      'data': 'JVBERi0xLjQgbWVudQ==',
+    },
+  },
+];
 
 /// Builds a client over [transport], with [key] saved unless it is null.
 GeminiChatClient _build(
@@ -361,6 +390,73 @@ void main() {
 
       // Assert
       expect(_configOf(sent).containsKey('responseSchema'), isFalse);
+    });
+
+    test('sends each image as an inline_data part after the text part, in '
+        'order', () async {
+      // Arrange
+      late http.Request sent;
+      final client = _build(
+        MockClient((request) async {
+          sent = request;
+          return http.Response(_successBody(), 200);
+        }),
+      );
+
+      // Act
+      final result = await client.complete(
+        systemPrompt: 's',
+        userPrompt: 'menu',
+        images: _pages,
+      );
+
+      // Assert
+      expect(result, isA<ChatCompleted>());
+      expect(
+        _bodyOf(sent)['contents'],
+        equals(<Object?>[
+          <String, Object?>{
+            'role': 'user',
+            'parts': <Object?>[
+              <String, Object?>{'text': 'menu'},
+              ..._inlinePages,
+            ],
+          },
+        ]),
+      );
+      expect(sent.headers[GeminiChatClient.apiKeyHeader], equals(_key));
+    });
+
+    test('a text-only body is byte for byte the pre-image body', () async {
+      // Arrange
+      final bodies = <String>[];
+      final client = _build(
+        MockClient((request) async {
+          bodies.add(request.body);
+          return http.Response(_successBody(), 200);
+        }),
+      );
+
+      // Act
+      await client.complete(systemPrompt: 's', userPrompt: 'u');
+      await client.complete(
+        systemPrompt: 's',
+        userPrompt: 'u',
+        // Passing the default explicitly is this test's point: an empty
+        // list must send exactly what omitting it sends.
+        // ignore: avoid_redundant_argument_values
+        images: const <ChatImagePart>[],
+      );
+
+      // Assert
+      final expected = <String>[
+        '{"system_instruction":{"parts":[{"text":"s"}]},',
+        '"contents":[{"role":"user","parts":[{"text":"u"}]}],',
+        '"generationConfig":{"responseMimeType":"application/json",',
+        '"maxOutputTokens":8192,"temperature":0,',
+        '"thinkingConfig":{"thinkingBudget":0}}}',
+      ].join();
+      expect(bodies, equals(<String>[expected, expected]));
     });
   });
 
@@ -648,6 +744,40 @@ void main() {
       expect(_configOf(sent[0]).containsKey('responseSchema'), isTrue);
       expect(_configOf(sent[1]).containsKey('responseSchema'), isFalse);
       expect(_configOf(sent[1])['responseMimeType'], 'application/json');
+    });
+
+    test('the retry re-sends the images unchanged', () async {
+      // Arrange
+      final sent = <http.Request>[];
+      final client = _build(
+        MockClient((request) async {
+          sent.add(request);
+          return sent.length == 1
+              ? http.Response(_badRequestBody, 400)
+              : http.Response(_successBody(), 200);
+        }),
+      );
+
+      // Act
+      final result = await client.complete(
+        systemPrompt: 's',
+        userPrompt: 'u',
+        responseSchema: _schema,
+        images: _pages,
+      );
+
+      // Assert
+      expect(result, isA<ChatCompleted>());
+      expect(sent, hasLength(2));
+      expect(_configOf(sent[1]).containsKey('responseSchema'), isFalse);
+      expect(
+        _bodyOf(sent[1])['contents'],
+        equals(_bodyOf(sent[0])['contents']),
+      );
+      final parts =
+          (_bodyOf(sent[1])['contents']! as List<Object?>).single!
+              as Map<String, Object?>;
+      expect(parts['parts'], hasLength(3));
     });
 
     test('a second 400 is not re-sent again', () async {

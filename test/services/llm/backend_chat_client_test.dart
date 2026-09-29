@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:fake_async/fake_async.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -24,6 +25,18 @@ const Map<String, Object?> _schema = <String, Object?>{
   'type': 'object',
   'additionalProperties': false,
 };
+
+/// A two-page menu: a JPEG photograph and a PDF, in that order.
+final List<ChatImagePart> _pages = <ChatImagePart>[
+  ChatImagePart(
+    mimeType: ChatImagePart.jpeg,
+    bytes: Uint8List.fromList(<int>[0xFF, 0xD8, 0xFF, 0xE0, 0x00]),
+  ),
+  ChatImagePart(
+    mimeType: ChatImagePart.pdf,
+    bytes: Uint8List.fromList(utf8.encode('%PDF-1.4 menu')),
+  ),
+];
 
 /// A backend success body carrying [content] from [model].
 String _successBody({String content = 'ok', String model = 'served-model'}) =>
@@ -258,6 +271,132 @@ void main() {
           'system_prompt': 'the system',
           'user_prompt': 'u',
         }),
+      );
+    });
+
+    test('sends each image as mime_type and base64 data, in order', () async {
+      // Arrange
+      Object? capturedBody;
+      final client = _build(
+        MockClient((request) async {
+          capturedBody = jsonDecode(request.body);
+          return http.Response(_successBody(), 200);
+        }),
+      );
+
+      // Act
+      final result = await client.complete(
+        systemPrompt: 'the system',
+        userPrompt: 'u',
+        responseSchema: _schema,
+        schemaName: 'menu_analysis',
+        images: _pages,
+      );
+
+      // Assert
+      expect(result, isA<ChatCompleted>());
+      expect(
+        capturedBody,
+        equals(<String, Object?>{
+          'system_prompt': 'the system',
+          'user_prompt': 'u',
+          'response_schema': _schema,
+          'schema_name': 'menu_analysis',
+          'images': <Object?>[
+            <String, Object?>{'mime_type': 'image/jpeg', 'data': '/9j/4AA='},
+            <String, Object?>{
+              'mime_type': 'application/pdf',
+              'data': 'JVBERi0xLjQgbWVudQ==',
+            },
+          ],
+        }),
+      );
+    });
+
+    test('a text-only body is byte for byte the pre-image body, so the '
+        "server's cache key does not move", () async {
+      // Arrange
+      final bodies = <String>[];
+      final client = _build(
+        MockClient((request) async {
+          bodies.add(request.body);
+          return http.Response(_successBody(), 200);
+        }),
+      );
+
+      // Act
+      await client.complete(
+        systemPrompt: 'the system',
+        userPrompt: 'the user',
+        responseSchema: _schema,
+        schemaName: 'menu_analysis',
+      );
+      await client.complete(
+        systemPrompt: 'the system',
+        userPrompt: 'the user',
+        responseSchema: _schema,
+        schemaName: 'menu_analysis',
+        // Passing the default explicitly is this test's point: an empty
+        // list must send exactly what omitting it sends.
+        // ignore: avoid_redundant_argument_values
+        images: const <ChatImagePart>[],
+      );
+
+      // Assert
+      final expected = <String>[
+        '{"system_prompt":"the system","user_prompt":"the user",',
+        '"response_schema":{"type":"object","additionalProperties":false},',
+        '"schema_name":"menu_analysis"}',
+      ].join();
+      expect(bodies, equals(<String>[expected, expected]));
+    });
+
+    test('never sends an Authorization header with images either', () async {
+      // Arrange
+      Map<String, String>? capturedHeaders;
+      final client = _build(
+        MockClient((request) async {
+          capturedHeaders = request.headers;
+          return http.Response(_successBody(), 200);
+        }),
+      );
+
+      // Act
+      await client.complete(systemPrompt: 's', userPrompt: 'u', images: _pages);
+
+      // Assert
+      final names = capturedHeaders!.keys.map((k) => k.toLowerCase());
+      expect(names, isNot(contains('authorization')));
+      expect(capturedHeaders![BackendChatClient.installIdHeader], _installId);
+    });
+
+    test('a 422 for an out-of-bounds image is badResponse', () async {
+      // Arrange
+      final client = _answering(
+        jsonEncode(<String, Object?>{
+          'detail': <Object?>[
+            <String, Object?>{'msg': 'at most 6 images per request'},
+          ],
+        }),
+        422,
+      );
+
+      // Act
+      final result = await client.complete(
+        systemPrompt: 's',
+        userPrompt: 'u',
+        images: _pages,
+      );
+
+      // Assert
+      expect(
+        result,
+        equals(
+          const ChatFailed(
+            reason: ChatFailureReason.badResponse,
+            statusCode: 422,
+          ),
+        ),
       );
     });
 

@@ -46,6 +46,16 @@ class Settings(BaseSettings):
     # with a strict schema, so the default spends none on thinking.
     GEMINI_THINKING_BUDGET: int = 0
 
+    # --- Vision (D15, #170) ---------------------------------------------------
+    # Bounds on the optional ``images`` of POST /v1/chat: menu pages sent to
+    # Gemini as inline_data parts.  Over either → 422 with no upstream call.
+    # A phone-compressed menu photo is well under 3 MiB; six covers a
+    # multi-page menu.  Gemini bounds the whole inline request too, so a
+    # worst-case 6 x 3 MiB body can still be refused upstream (a 400, which
+    # this route answers as badResponse).
+    VISION_MAX_IMAGES: int = 6
+    VISION_MAX_IMAGE_BYTES: int = 3 * 1024 * 1024
+
     # --- Proxy ----------------------------------------------------------------
     # Wolt host of the by-name venue search POST (#123). The menu proxy
     # (#95) called this host too until #168 moved it to the assortment

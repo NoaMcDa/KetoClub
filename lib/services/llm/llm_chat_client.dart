@@ -112,6 +112,44 @@ final class ChatFailed extends ChatResult {
   String toString() => 'ChatFailed($reason)';
 }
 
+/// One menu page sent with a chat completion, for the model to read with
+/// its own vision (architecture.md D15, issue #170).
+///
+/// [mimeType] is one of [jpeg], [png], [webp] or [pdf]: the four types
+/// Gemini reads natively and KetoClub's backend accepts. The backend
+/// answers 422 (read as [ChatFailureReason.badResponse]) to any other, and
+/// to a part over its size bound.
+///
+/// Pages are forwarded and dropped: no client logs, caches or stores
+/// them, and [toString] names only the type and size, never the bytes.
+@immutable
+final class ChatImagePart {
+  /// Creates a page of [mimeType] holding [bytes].
+  const new({required this.mimeType, required this.bytes});
+
+  /// `image/jpeg`.
+  static const String jpeg = 'image/jpeg';
+
+  /// `image/png`.
+  static const String png = 'image/png';
+
+  /// `image/webp`.
+  static const String webp = 'image/webp';
+
+  /// `application/pdf`: a whole menu document rather than a photograph.
+  static const String pdf = 'application/pdf';
+
+  /// The page's media type; see [jpeg], [png], [webp] and [pdf].
+  final String mimeType;
+
+  /// The page's raw, un-encoded bytes. Each client encodes them for its
+  /// own wire format.
+  final Uint8List bytes;
+
+  @override
+  String toString() => 'ChatImagePart($mimeType, ${bytes.length} bytes)';
+}
+
 /// A single chat completion call to a hosted language model
 /// (architecture.md §9). Implementations never let a response body reach
 /// a [ChatFailed] or a log.
@@ -120,6 +158,10 @@ abstract interface class LlmChatClient {
   /// requesting structured output shaped by [responseSchema] under
   /// [schemaName] when both are given.
   ///
+  /// [images] are menu pages the model reads after [userPrompt], in order
+  /// (architecture.md D15). Empty — the default — the request is exactly
+  /// the text-only one it was before images existed.
+  ///
   /// Always resolves to a [ChatResult], whether or not a schema was
   /// requested. Never throws.
   Future<ChatResult> complete({
@@ -127,5 +169,6 @@ abstract interface class LlmChatClient {
     required String userPrompt,
     Map<String, Object?>? responseSchema,
     String? schemaName,
+    List<ChatImagePart> images = const <ChatImagePart>[],
   });
 }

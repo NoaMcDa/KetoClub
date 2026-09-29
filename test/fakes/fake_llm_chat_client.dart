@@ -9,6 +9,7 @@ final class RecordedChatRequest {
     required this.userPrompt,
     required this.responseSchema,
     required this.schemaName,
+    this.images = const <ChatImagePart>[],
   });
 
   /// The system prompt the call was made with.
@@ -24,6 +25,10 @@ final class RecordedChatRequest {
   /// The schema name the call was made with, or null when none was
   /// requested.
   final String? schemaName;
+
+  /// The menu pages the call was made with, in order; empty when none
+  /// were sent (architecture.md D15).
+  final List<ChatImagePart> images;
 }
 
 /// An [LlmChatClient] that returns scripted [ChatResult]s from a queue
@@ -51,6 +56,7 @@ final class FakeLlmChatClient implements LlmChatClient {
     required String userPrompt,
     Map<String, Object?>? responseSchema,
     String? schemaName,
+    List<ChatImagePart> images = const <ChatImagePart>[],
   }) async {
     requests.add(
       RecordedChatRequest(
@@ -58,6 +64,7 @@ final class FakeLlmChatClient implements LlmChatClient {
         userPrompt: userPrompt,
         responseSchema: responseSchema,
         schemaName: schemaName,
+        images: List<ChatImagePart>.unmodifiable(images),
       ),
     );
     if (_queue.isEmpty) return fallback;
