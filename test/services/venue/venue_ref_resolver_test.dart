@@ -123,6 +123,13 @@ const _rejected = <_Rejected>[
     'a lookalike 10bis host with 10bis.co.il as a prefix, not the domain',
     'https://10bis.co.il.evil.com/Restaurants/Menu/123456',
   ),
+  // Issue #169: a bare English word without a hyphen used to resolve as
+  // a Wolt slug and be offered "Show the keto menu"; it now reads as
+  // unrecognised so the user has to paste a real link or a hyphenated
+  // slug.
+  _Rejected('a bare English word (no hyphen)', 'pizza'),
+  _Rejected('a bare Hebrew-looking word (no hyphen)', 'vitrina'),
+  _Rejected('a two-character bare token', 'ab'),
 ];
 
 void main() {

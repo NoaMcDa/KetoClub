@@ -1,0 +1,7 @@
+/* NSLocationWhenInUseUsageDescription — English translation.
+
+   Kept in sync with Info.plist's inline default. Once this variant
+   group is added to the pbxproj (open ios/Runner.xcworkspace in Xcode
+   once — see docs/RUNNING_IOS.md), Info.plist's inline value stops
+   being read and the localised strings here take over per locale. */
+"NSLocationWhenInUseUsageDescription" = "KetoClub uses your location once to list nearby restaurants. It is sent only to the restaurant platform as a search parameter and is never stored.";

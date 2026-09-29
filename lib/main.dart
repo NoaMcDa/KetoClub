@@ -28,6 +28,7 @@ Stream<LicenseEntry> _fontLicenses() async* {
   for (final asset in const [
     'assets/fonts/OFL-PublicSans.txt',
     'assets/fonts/OFL-InstrumentSerif.txt',
+    'assets/fonts/OFL-Rubik.txt',
   ]) {
     final text = await rootBundle.loadString(asset);
     yield LicenseEntryWithLineBreaks(const ['ketoclub'], text);

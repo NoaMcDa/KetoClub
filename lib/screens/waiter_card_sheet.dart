@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
@@ -10,10 +9,10 @@ import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/widgets/content_direction.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
 
-/// The full-screen waiter card: a tab per modifiable dish, each one's
-/// script shown as numbered lines large enough and with enough contrast
-/// to hand the phone across a table (architecture.md §6.3), with the
-/// screen brightness raised for as long as the card is open.
+/// The full-screen waiter card for a single [DishRow]: the dish name plus
+/// its script rendered as numbered lines large enough and with enough
+/// contrast to hand the phone across a table (architecture.md §6.3),
+/// with the screen brightness raised for as long as the card is open.
 ///
 /// The dish name and script are rendered exactly as printed, in the
 /// menu's own language, matching [WaiterScriptWidget.script]'s convention
@@ -24,53 +23,22 @@ import 'package:ketoclub/widgets/waiter_script_widget.dart';
 /// shown only when [AnalysedDish.netCarbsEstimate] is present, per issue
 /// #30's decision on estimated net carbs (architecture.md §17.4).
 ///
-/// **Two constructors, one screen.** [WaiterCardSheet.new] takes a single
-/// [DishRow], the shape `menu_screen.dart`'s dish-card affordance already
-/// calls this with; it keeps compiling unchanged and defaults
-/// [screenBrightness] to [NoOpScreenBrightness] since that call site has
-/// no [ScreenBrightness] of its own to pass yet (issue #31's follow-up:
-/// thread `AppDependencies.screenBrightness` down to it, then pass it
-/// through here, for the brightness raise to actually happen from that
-/// path). [WaiterCardSheet.forRows] is the shape a sticky bar offering
-/// every modifiable dish needs — a list plus which one to open on —
-/// and always takes its [ScreenBrightness] explicitly, since every new
-/// call site can supply one from the start.
+/// Issue #169 deleted the earlier `.forRows` multi-tab constructor: the
+/// floating "Waiter card · N dishes" pill it powered was never built (the
+/// menu screen opens the card per-dish from a dish card's own action), so
+/// the tab row, its clamping and its RTL layout were dead code.
 class WaiterCardSheet extends StatefulWidget {
-  /// Creates a card for a single dish [row] — see this class's own doc
-  /// comment for why [screenBrightness] defaults to a no-op here and not
-  /// on [WaiterCardSheet.forRows].
-  new({required DishRow row, ScreenBrightness? screenBrightness, Key? key})
-    : this.forRows(
-        rows: [row],
-        screenBrightness: screenBrightness ?? const NoOpScreenBrightness(),
-        key: key,
-      );
-
-  /// Creates a card over [rows] — every modifiable dish worth offering a
-  /// tab for — opening on [initialIndex] (clamped into range, default the
-  /// first). A pill tab per row is shown across the top whenever there is
-  /// more than one.
-  ///
-  // This lint wants this constructor's own name written without repeating
-  // the class ("WaiterCardSheet.forRows" -> just ".forRows"), but Dart's
-  // constructor grammar accepts the type-name-elision shorthand only for
-  // the unnamed constructor (as `new`, used above); a named constructor
-  // still requires its enclosing class name (see VerdictTone.lerp in
-  // verdict_colors.dart for the same finding). Suppressed rather than
-  // worked around with an invalid syntax.
-  // ignore: unnecessary_type_name_in_constructor
-  const WaiterCardSheet.forRows({
-    required this.rows,
-    required this.screenBrightness,
-    this.initialIndex = 0,
+  /// Creates a card for [row]. [screenBrightness] defaults to
+  /// [NoOpScreenBrightness] for callers that have no [ScreenBrightness]
+  /// of their own to pass yet.
+  const new({
+    required this.row,
+    this.screenBrightness = const NoOpScreenBrightness(),
     super.key,
-  }) : assert(rows.length > 0, 'WaiterCardSheet needs at least one row');
+  });
 
-  /// The dishes shown as tabs, in display order. Never empty.
-  final List<DishRow> rows;
-
-  /// Which of [rows] is shown when the card first opens.
-  final int initialIndex;
+  /// The dish this card shows.
+  final DishRow row;
 
   /// Raised for as long as this card is on screen, restored once it
   /// closes (architecture.md §6.3). A no-op on platforms with no
@@ -82,16 +50,9 @@ class WaiterCardSheet extends StatefulWidget {
 }
 
 class _WaiterCardSheetState extends State<WaiterCardSheet> {
-  /// The active tab: an index into `widget.rows`, clamped so a caller
-  /// passing an out-of-range [WaiterCardSheet.initialIndex] cannot crash
-  /// this screen — the same "show what it already has" rule as the
-  /// missing-script and missing-estimate cases this screen also handles.
-  late int _index;
-
   @override
   void initState() {
     super.initState();
-    _index = math.max(0, math.min(widget.initialIndex, widget.rows.length - 1));
     // Fire-and-forget: raising brightness must never block or fail this
     // screen's build (ScreenBrightness's own contract never throws).
     unawaited(widget.screenBrightness.raise());
@@ -103,21 +64,13 @@ class _WaiterCardSheetState extends State<WaiterCardSheet> {
     super.dispose();
   }
 
-  void _selectTab(int index) => setState(() => _index = index);
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final row = widget.rows[_index];
+    final row = widget.row;
     final script = row.analysis?.modification;
     final netCarbsEstimate = row.analysis?.netCarbsEstimate;
-    // Laid out as `.design/WaiterCard.dc.html`: a small muted title with
-    // a close button at its end, then — scrolling beneath them — the
-    // dish tabs, the dish name as a large serif heading, and the script
-    // in a card at the full-screen size. The Column fills the modal
-    // sheet's full height, so the card reads as a screen of its own
-    // rather than a strip along the bottom.
     return SafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -150,14 +103,6 @@ class _WaiterCardSheetState extends State<WaiterCardSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (widget.rows.length > 1) ...[
-                    _TabRow(
-                      rows: widget.rows,
-                      activeIndex: _index,
-                      onSelect: _selectTab,
-                    ),
-                    const SizedBox(height: 18),
-                  ],
                   Text(
                     row.dish.name,
                     textDirection: contentDirection(
@@ -194,56 +139,6 @@ class _WaiterCardSheetState extends State<WaiterCardSheet> {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-/// A pill row across the modifiable dishes; tapping one switches
-/// [_WaiterCardSheetState]'s active tab.
-///
-/// Scrolls horizontally so a menu with many modifiable dishes never
-/// overflows a phone-width screen, per this repo's responsive rule.
-class _TabRow extends StatelessWidget {
-  const new({
-    required this.rows,
-    required this.activeIndex,
-    required this.onSelect,
-  });
-
-  /// The dishes to show one pill per, in display order.
-  final List<DishRow> rows;
-
-  /// Which pill is currently selected.
-  final int activeIndex;
-
-  /// Called with the tapped pill's index.
-  final ValueChanged<int> onSelect;
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          for (var i = 0; i < rows.length; i++)
-            Padding(
-              padding: EdgeInsetsDirectional.only(
-                end: i == rows.length - 1 ? 0 : 8,
-              ),
-              child: ChoiceChip(
-                label: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 140),
-                  child: Text(
-                    rows[i].dish.name,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                selected: i == activeIndex,
-                onSelected: (_) => onSelect(i),
-              ),
-            ),
         ],
       ),
     );

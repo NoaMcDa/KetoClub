@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
-import 'package:ketoclub/models/failures.dart';
 
 /// Which engine produced a menu analysis: the AI model, or the on-device
 /// rules fallback (architecture.md §6.2, §6.6).
 ///
-/// The AI variant names the model that answered ("AI · {model}"); the
-/// rules variant always carries the reason the LLM was not used
-/// ("Rules ({reason})"), both in the chip itself and — since the rules
-/// variant also always carries the "not AI-verified" meaning, that its
-/// greens have not been checked by the LLM — as a [Tooltip] so that
-/// meaning is available without depending on colour.
+/// The AI variant names the model that answered ("AI · {model}"). The
+/// rules variant reads just "Rules": the reason the LLM was not used
+/// lives beside this chip in the rules-reason banner, so restating it
+/// here used to read as the same thing twice on one screen (issue
+/// #169). The
+/// [Tooltip] still explains "not AI-verified" so a user hovering the
+/// chip understands the difference between the two engines. A screen
+/// reader hears "Rules engine, not AI-verified" as one announcement, so
+/// the reason phrase is not lost from accessibility either — it moves to
+/// the banner, which is where the sighted user sees it.
 ///
 /// Each label is built from two sibling [Text] widgets rather than one
 /// interpolated string, so a caller can still find the bare "AI" or
@@ -45,18 +48,19 @@ class EngineChip extends StatelessWidget {
           labelParts: [l10n.engineChipAi, ' · $model'],
         ),
       ),
-      RulesEngine(:final reason) => Semantics(
-        label: l10n.engineChipRulesSemanticLabel(_reasonLabel(reason, l10n)),
+      RulesEngine() => Semantics(
+        // The semantic label deliberately no longer names the reason
+        // (issue #169). The rules banner beside this chip already
+        // announces the reason as a full sentence; a screen reader
+        // hearing both would hear the same reason twice.
+        label: l10n.rulesNotVerifiedHint,
         excludeSemantics: true,
         child: Tooltip(
           message: l10n.rulesNotVerifiedHint,
           child: _chip(
             icon: Icons.rule,
             color: colorScheme.onSurfaceVariant,
-            labelParts: [
-              l10n.engineChipRules,
-              ' (${_reasonLabel(reason, l10n)})',
-            ],
+            labelParts: [l10n.engineChipRules],
           ),
         ),
       ),
@@ -92,28 +96,3 @@ class EngineChip extends StatelessWidget {
     );
   }
 }
-
-/// A short, chip-sized phrase naming why the router fell back to the rules
-/// engine for [reason], read from [l10n].
-///
-/// An exhaustive switch with no `default`: adding a
-/// [MenuAnalysisFailureReason] value without updating this function is a
-/// compile error (architecture.md §10). [MenuAnalysisFailureReason
-/// .noDishesFound] never reaches [RulesEngine] in practice — the router
-/// never falls back for it (architecture.md §6.2) — but the switch still
-/// covers it so this stays exhaustive if that ever changes.
-String _reasonLabel(
-  MenuAnalysisFailureReason reason,
-  AppLocalizations l10n,
-) => switch (reason) {
-  MenuAnalysisFailureReason.notConfigured => l10n.engineChipReasonNotConfigured,
-  MenuAnalysisFailureReason.offline => l10n.engineChipReasonOffline,
-  MenuAnalysisFailureReason.timeout => l10n.engineChipReasonTimeout,
-  MenuAnalysisFailureReason.rateLimited => l10n.engineChipReasonRateLimited,
-  MenuAnalysisFailureReason.badResponse => l10n.engineChipReasonBadResponse,
-  MenuAnalysisFailureReason.noDishesFound => l10n.engineChipReasonNoDishesFound,
-  MenuAnalysisFailureReason.backendUnreachable =>
-    l10n.engineChipReasonBackendUnreachable,
-  MenuAnalysisFailureReason.consentWithheld =>
-    l10n.engineChipReasonConsentWithheld,
-};

@@ -8,7 +8,9 @@ void main() {
       final result = formatPrice(64, localeTag: 'en');
       // Assert
       expect(result, startsWith('₪'));
-      expect(result, contains('64.00'));
+      expect(result, contains('64'));
+      // Issue #169: whole-shekel amounts render without .00.
+      expect(result, isNot(contains('.00')));
     });
 
     test('formatPrice for he places the shekel symbol after the amount', () {
@@ -16,14 +18,15 @@ void main() {
       final result = formatPrice(64, localeTag: 'he');
       // Assert
       expect(result, endsWith('₪'));
-      expect(result, contains('64.00'));
+      expect(result, contains('64'));
+      expect(result, isNot(contains('.00')));
     });
 
-    test('formatPrice formats zero with two decimal places', () {
+    test('formatPrice omits decimals for a zero amount (whole)', () {
       // Act
       final result = formatPrice(0, localeTag: 'en');
-      // Assert
-      expect(result, equals('₪0.00'));
+      // Assert: issue #169 — no bare .00 on a whole-shekel price.
+      expect(result, equals('₪0'));
     });
 
     test('formatPrice formats a fractional amount to two decimals', () {
@@ -31,6 +34,30 @@ void main() {
       final result = formatPrice(12.5, localeTag: 'en');
       // Assert
       expect(result, equals('₪12.50'));
+    });
+
+    test('formatPrice omits decimals for a whole en amount', () {
+      // Act
+      final result = formatPrice(38, localeTag: 'en');
+      // Assert
+      expect(result, equals('₪38'));
+    });
+
+    test('formatPrice omits decimals for a whole he amount', () {
+      // Act
+      final result = formatPrice(38, localeTag: 'he');
+      // Assert: order of glyphs varies in RTL, but the ₪ and 38 must be
+      // present without any `.00`.
+      expect(result, contains('38'));
+      expect(result, contains('₪'));
+      expect(result, isNot(contains('.00')));
+    });
+
+    test('formatPrice keeps decimals for a fractional he amount', () {
+      // Act
+      final result = formatPrice(12.5, localeTag: 'he');
+      // Assert
+      expect(result, contains('12.50'));
     });
 
     test('formatPrice defaults to ILS when currency is omitted', () {
@@ -53,7 +80,20 @@ void main() {
       final result = formatPrice(64, localeTag: 'en', currency: 'USD');
       // Assert
       expect(result, contains(r'$'));
-      expect(result, contains('64.00'));
+      expect(result, contains('64'));
+      // Whole-number amounts omit decimals for USD too (issue #169).
+      expect(result, isNot(contains('.00')));
     });
+
+    test(
+      'formatPrice keeps decimals for a fractional non-default currency',
+      () {
+        // Act
+        final result = formatPrice(12.5, localeTag: 'en', currency: 'USD');
+        // Assert
+        expect(result, contains(r'$'));
+        expect(result, contains('12.50'));
+      },
+    );
   });
 }
