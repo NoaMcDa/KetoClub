@@ -24,9 +24,10 @@ Routes shipped so far:
 | `POST /v1/chat` | #100 | **yes** | **yes** (`RATE_LIMIT_*`) | Hosted classification for the web build: forwards one completion to Gemini `generateContent` with the server's key |
 | `GET /v1/proxy/wolt/pages/restaurants` | #123 | **yes** | **yes** (`DISCOVERY_RATE_LIMIT_PER_MINUTE`) | Nearby-venue search for the web build, see below |
 | `POST /v1/proxy/wolt/pages/search` | #123 | **yes** | **yes** (`DISCOVERY_RATE_LIMIT_PER_MINUTE`) | By-name venue search for the web build, see below |
+| `POST /v1/website/fetch` | #181 | **yes** | **yes** (`WEBSITE_RATE_LIMIT_PER_MINUTE`, and per host) | One restaurant page or PDF for the web build, fetched politely (D19), see below |
 
 Menu proxies are one fetch per user action and have no per-install
-identity; `/v1/chat` and the two discovery routes require
+identity; `/v1/chat`, the two discovery routes and the website route require
 `X-KetoClub-Install-Id` and enforce a per-install limit. A missing or
 malformed install id is answered `400 {"reason":"badResponse"}` — a
 client that misses the header sees the same shape as a bad prompt.
@@ -290,6 +291,72 @@ curl -sS localhost:8000/v1/proxy/wolt/pages/search \
   -d '{"q": "vitrina", "lat": 32.07, "lon": 34.77, "lang": "en"}'
 ```
 
+## The website fetch route
+
+`POST /v1/website/fetch` (#181, `architecture.md` D19) fetches **one**
+restaurant page or PDF for the web build, which cannot read another site
+itself (no CORS). Finding the menu on the page — JSON-LD, a `/menu` /
+`תפריט` / `.pdf` link, or the page's own text — is the app's job, on every
+platform (`lib/services/menu/website/`); this route only fetches, politely.
+Phones fetch sites directly under the same rules (D17), so the two must be
+kept in step.
+
+- **Request:** `{"url": "https://…"}` (at most 2048 characters) with the
+  `X-KetoClub-Install-Id` header. The URL travels in the body so the request
+  log, which records the route path, never holds it.
+- **Success:** `200 {"kind": "html" | "pdf", "content_type", "body",
+  "final_url"}` — `body` is the decoded page for `html` (by its `charset`,
+  UTF-8 by default) and standard base64 for `pdf`; `final_url` is the URL
+  after redirects, the base the app resolves relative links against.
+- **Failures,** each `{"reason", "status_code"}` with its own reason, which
+  the app maps one to one (`BackendWebsiteFetcher.reasonFor`):
+
+  | Status | `reason` | When |
+  |---|---|---|
+  | 400 | `invalidUrl` | not `http`/`https`, user info in the URL, a port other than 80/443, or a host that resolves to a non-public address (checked again on every redirect) |
+  | 400 | `badResponse` | missing or malformed install id |
+  | 403 | `disallowedByRobots` | the site's `robots.txt` disallows `ketoclubbot` (or `*`) for the path |
+  | 403 | `aiReserved` | `X-Robots-Tag: noai`, `tdm-reservation: 1`, or their `<meta>` forms |
+  | 404 | `notFound` | the site answered 404 or 410 |
+  | 413 | `tooLarge` | over `WEBSITE_MAX_HTML_BYTES` or `WEBSITE_MAX_PDF_BYTES` (declared or streamed) |
+  | 415 | `unsupportedContent` | neither HTML nor a PDF |
+  | 422 | `jsOnlyPage` | a page that renders only with JavaScript: almost no text beside an executable script, or a `<noscript>` asking for JavaScript (a page carrying JSON-LD is left to the app) |
+  | 429 | `rateLimited` | the per-host or per-install limit |
+  | 502 | `offline` | the site (or its `robots.txt`) could not be reached, answered 5xx on `robots.txt`, or its host did not resolve |
+  | 502 | `upstreamStatus` | any other non-2xx from the site, or more than five redirects |
+  | 504 | `timeout` | the site did not answer in time |
+
+**Crawl hygiene** (the research's §4.4 and §6 posture):
+
+- **Logged out and named.** Nothing of the inbound request is forwarded —
+  no cookie, no credential, no install id. Every request sends
+  `WEBSITE_USER_AGENT`, which names the fetcher and a contact URL, plus
+  `Accept` and `Accept-Language: he,en`.
+- **Public hosts only.** The host must resolve only to globally routable
+  addresses; loopback, private, link-local, multicast and reserved addresses
+  are refused before any request, on the first URL and on every redirect.
+- **`robots.txt` first,** per scheme and host, cached in memory for
+  `WEBSITE_ROBOTS_TTL_SECONDS`: the groups naming `ketoclubbot`, else `*`;
+  longest match wins, a tie goes to `Allow` (RFC 9309). A 4xx (or a 3xx,
+  which is not followed) means no rules; a 5xx or no answer means the site is
+  not fetched at all.
+- **AI opt-outs are honoured** as refusals, not warnings.
+- **Rate limits,** in memory: `WEBSITE_HOST_RATE_LIMIT_PER_MINUTE` fetches per
+  site across every install (a paste costs at most two), and
+  `WEBSITE_RATE_LIMIT_PER_MINUTE` per install, so the route is no open proxy.
+- **Size caps** before and while reading the body.
+- **Nothing is kept or republished.** No page is cached server-side; the one
+  log line per fetch (logger `ketoclub.website`) carries the host and the
+  outcome only — never the path, the query or the body.
+- **No Wix `_api` calls** and no headless browser (#180 decides the first).
+
+```bash
+curl -sS localhost:8000/v1/website/fetch \
+  -H 'Content-Type: application/json' \
+  -H 'X-KetoClub-Install-Id: 0123456789abcdef0123456789abcdef' \
+  -d '{"url": "https://example.com/"}'
+```
+
 ## Running locally
 
 ```bash
@@ -332,6 +399,11 @@ that need them (`/v1/chat`, and `/v1/admin/*` in a later issue). See
 | `WOLT_CLIENT_VERSION` | `1.16.125` | Wolt web-client version sent on menu and discovery requests |
 | `DISCOVERY_CACHE_TTL_SECONDS` | `300` | Discovery response cache TTL |
 | `DISCOVERY_RATE_LIMIT_PER_MINUTE` | `20` | Per install id, across both discovery routes; no daily cap |
+| `WEBSITE_USER_AGENT` | `KetoClubBot/1.0 (+https://github.com/NoaMcDa/KetoClub; menu reader)` | Sent on every website fetch; names the fetcher and a contact URL (D19) |
+| `WEBSITE_MAX_HTML_BYTES`, `WEBSITE_MAX_PDF_BYTES` | `2097152`, `3145728` | Size caps for a fetched page and PDF; the PDF cap matches `VISION_MAX_IMAGE_BYTES` |
+| `WEBSITE_MAX_ROBOTS_BYTES`, `WEBSITE_ROBOTS_TTL_SECONDS` | `524288`, `3600` | How much of `robots.txt` is read, and how long it is cached per host |
+| `WEBSITE_HOST_RATE_LIMIT_PER_MINUTE` | `6` | Website fetches per site across every install |
+| `WEBSITE_RATE_LIMIT_PER_MINUTE` | `10` | Website fetches per install id |
 
 ## Smoke test against the real API
 

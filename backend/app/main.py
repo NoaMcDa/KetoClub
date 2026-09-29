@@ -7,6 +7,9 @@ environment variables, so tests never share state through the process-wide
 ``get_settings`` cache.
 """
 
+import asyncio
+import socket
+import time
 import uuid
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
@@ -20,13 +23,23 @@ from app.config import Settings, get_settings
 from app.db import build_engine
 from app.errors import BackendError, handle_backend_error
 from app.models import Base
-from app.routers import chat, discovery, health, proxy
+from app.routers import chat, discovery, health, proxy, website
 from app.services.rate_limit import RateLimiter
 from app.services.request_logging import RequestLoggingMiddleware
 
 # "No daily cap" (#123) expressed as a bound no real install could reach in
 # a day, so the discovery limiter's day window never binds.
 _DISCOVERY_NO_DAILY_CAP = 10**9
+
+
+async def resolve_host_addresses(host: str) -> list[str]:
+    """Every IP address ``host`` resolves to, for the website route's
+    public-address check (D19). Tests replace ``app.state.resolve_host``.
+    """
+    infos = await asyncio.get_running_loop().getaddrinfo(
+        host, None, type=socket.SOCK_STREAM
+    )
+    return [str(info[4][0]) for info in infos]
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -76,6 +89,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         per_minute=resolved_settings.DISCOVERY_RATE_LIMIT_PER_MINUTE,
         per_day=_DISCOVERY_NO_DAILY_CAP,
     )
+    # The website route's limits (D19): per site across every install, so
+    # KetoClub never hammers one restaurant, and per install, so the route
+    # is no open proxy. Minute windows only.
+    app.state.website_host_limiter = RateLimiter(
+        per_minute=resolved_settings.WEBSITE_HOST_RATE_LIMIT_PER_MINUTE,
+        per_day=_DISCOVERY_NO_DAILY_CAP,
+    )
+    app.state.website_install_limiter = RateLimiter(
+        per_minute=resolved_settings.WEBSITE_RATE_LIMIT_PER_MINUTE,
+        per_day=_DISCOVERY_NO_DAILY_CAP,
+    )
+    app.state.robots_cache = {}
+    app.state.website_clock = time.monotonic
+    app.state.resolve_host = resolve_host_addresses
     app.add_exception_handler(BackendError, handle_backend_error)
 
     app.add_middleware(RequestLoggingMiddleware)
@@ -95,6 +122,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(chat.router, prefix="/v1")
     app.include_router(proxy.router, prefix="/v1")
     app.include_router(discovery.router, prefix="/v1")
+    app.include_router(website.router, prefix="/v1")
 
     return app
 
