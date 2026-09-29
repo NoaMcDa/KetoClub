@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/location/location_service.dart';
@@ -9,6 +9,7 @@ import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/page_picker.dart';
+import 'package:ketoclub/services/platform/qr_scanner.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
@@ -38,6 +39,11 @@ class AppDependencies {
   /// [UnavailableScannedMenuClassifier] answers `notConfigured` and
   /// [NoPagePicker] answers as if cancelled. `di.dart` passes the real
   /// ones (issues #89 and #82).
+  ///
+  /// [qrScanner] and [navigatorKey] default the same way: [NoQrScanner]
+  /// answers null with no plugin I/O and is unavailable, so the Scan tab
+  /// hides its QR action, and a null key leaves the root navigator to
+  /// `MaterialApp` (issue #182).
   const new({
     required this.menuRepository,
     required this.menuClassifier,
@@ -56,6 +62,8 @@ class AppDependencies {
     this.apiKeyStore,
     this.scannedMenuClassifier = const UnavailableScannedMenuClassifier(),
     this.pagePicker = const NoPagePicker(),
+    this.qrScanner = const NoQrScanner(),
+    this.navigatorKey,
   });
 
   /// Loads a venue's menu, cache first (architecture.md §6.1).
@@ -130,6 +138,17 @@ class AppDependencies {
   /// Collects menu pages from the camera, the photo library or a PDF for
   /// the Scan tab (issue #82).
   final PagePicker pagePicker;
+
+  /// Reads a table's QR code with the camera for the Scan tab's "Scan QR
+  /// code" action (issue #182). Unavailable on web, where pasting the URL
+  /// already works.
+  final QrScanner qrScanner;
+
+  /// The app's root navigator, when a service has to push a page of its own
+  /// (the QR camera, issue #182). `MaterialApp` uses it as its
+  /// `navigatorKey`, so the same key `di.dart` gave the scanner reaches the
+  /// navigator the screens are on. Null when nothing needs it.
+  final GlobalKey<NavigatorState>? navigatorKey;
 
   /// The pages of recent scans, in memory only, so the menu screen can
   /// show a scanned menu's pages beside its transcription (issue #89).

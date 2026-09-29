@@ -37,6 +37,9 @@ dependencies:
   # imports it.
   image_picker: ^1.2.3
   intl: ^0.20.3
+  # The Scan tab's "Scan QR code" (issue #182): the camera view that reads a
+  # table's QR code. Only widgets/mobile_qr_scanner.dart imports it.
+  mobile_scanner: ^7.4.2
   provider: ^6.0.0
   # Raises screen brightness while the Waiter Card is open so a waiter can read
   # it across a table; restored on close, and a no-op on web.

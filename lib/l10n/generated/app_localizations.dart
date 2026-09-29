@@ -1615,6 +1615,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The menu on {site} is a PDF, which only AI analysis can read, and it could not be read now. Check AI analysis in Settings, then try again.'**
   String websitePdfUnread(String site);
+
+  /// No description provided for @scanQrAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR code'**
+  String get scanQrAction;
+
+  /// No description provided for @scanQrTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR code'**
+  String get scanQrTitle;
+
+  /// No description provided for @scanQrInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Point the camera at the QR code on the table.'**
+  String get scanQrInstruction;
+
+  /// No description provided for @scanQrCameraDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub cannot use the camera. Allow camera access in your device settings, or paste the menu link instead.'**
+  String get scanQrCameraDenied;
+
+  /// No description provided for @scanQrCameraUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The camera could not start. Close this screen and paste the menu link instead.'**
+  String get scanQrCameraUnavailable;
+
+  /// No description provided for @scanQrUnsupportedSource.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} menus are not supported yet. Photograph the menu instead.'**
+  String scanQrUnsupportedSource(String name);
+
+  /// No description provided for @scanQrPhotographInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'This QR code does not lead to a menu KetoClub can read. Photograph the menu instead.'**
+  String get scanQrPhotographInstead;
 }
 
 class _AppLocalizationsDelegate

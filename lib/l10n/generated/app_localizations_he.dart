@@ -980,4 +980,30 @@ class AppLocalizationsHe extends AppLocalizations {
   String websitePdfUnread(String site) {
     return 'התפריט ב־$site הוא קובץ PDF, שרק ניתוח AI יכול לקרוא, והוא לא נקרא כרגע. בדקו את ניתוח ה-AI בהגדרות ונסו שוב.';
   }
+
+  @override
+  String get scanQrAction => 'סריקת קוד QR';
+
+  @override
+  String get scanQrTitle => 'סריקת קוד QR';
+
+  @override
+  String get scanQrInstruction => 'כוונו את המצלמה אל קוד ה-QR שעל השולחן.';
+
+  @override
+  String get scanQrCameraDenied =>
+      'קטוקלאב לא יכולה להשתמש במצלמה. אפשרו גישה למצלמה בהגדרות המכשיר, או הדביקו את קישור התפריט.';
+
+  @override
+  String get scanQrCameraUnavailable =>
+      'לא ניתן היה להפעיל את המצלמה. סגרו את המסך והדביקו את קישור התפריט.';
+
+  @override
+  String scanQrUnsupportedSource(String name) {
+    return 'תפריטי $name עדיין לא נתמכים. צלמו את התפריט במקום.';
+  }
+
+  @override
+  String get scanQrPhotographInstead =>
+      'קוד ה-QR הזה לא מוביל לתפריט שקטוקלאב יכולה לקרוא. צלמו את התפריט במקום.';
 }

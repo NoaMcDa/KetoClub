@@ -5,6 +5,7 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/platform/page_picker.dart';
+import 'package:ketoclub/services/venue/qr_payload_router.dart';
 import 'package:ketoclub/state/menu_controller.dart' show LoadPhase;
 import 'package:ketoclub/state/scan_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
@@ -16,6 +17,10 @@ import 'package:provider/provider.dart';
 /// The Scan tab (architecture.md §6.6, D15, D18; issues #11, #82, #83):
 /// take a photo, choose photos or choose a PDF, list and remove the pages
 /// collected, and analyse them in one go, or paste a menu's text instead.
+/// Where the build has a camera scanner (not web), "Scan QR code" reads a
+/// table's QR code (issue #182): a menu link opens the menu exactly as a
+/// pasted one does, and a code that leads nowhere KetoClub can read says
+/// why and suggests photographing the menu.
 ///
 /// Pages are read by a vision model, so one line above Analyse says where
 /// they go (D17): through KetoClub's server on web, straight to Google on
@@ -91,6 +96,12 @@ class _ScanScreenState extends State<ScanScreen> {
     _open(ref);
   }
 
+  Future<void> _scanQr() async {
+    final venue = await context.read<ScanController>().scanQr();
+    if (venue == null || !mounted) return;
+    _open(venue.ref);
+  }
+
   void _open(VenueRef? ref) {
     if (ref == null || !mounted) return;
     Navigator.pushNamed(context, venueRoutePath(ref));
@@ -103,6 +114,8 @@ class _ScanScreenState extends State<ScanScreen> {
     final theme = Theme.of(context);
     final pages = controller.pages;
     final canAdd = !controller.atPageCap && !controller.analysing && !_picking;
+    final canScanQr = !controller.qrScanning && !controller.analysing;
+    final qrNotice = controller.qrNotice;
     final failure = controller.lastFailure;
 
     return Scaffold(
@@ -137,8 +150,26 @@ class _ScanScreenState extends State<ScanScreen> {
                 icon: const Icon(Icons.picture_as_pdf_outlined),
                 label: Text(l10n.scanScreenActionChoosePdf),
               ),
+              if (controller.qrAvailable)
+                OutlinedButton.icon(
+                  onPressed: canScanQr ? () => unawaited(_scanQr()) : null,
+                  icon: const Icon(Icons.qr_code_scanner),
+                  label: Text(l10n.scanQrAction),
+                ),
             ],
           ),
+          if (qrNotice != null) ...[
+            const SizedBox(height: 12),
+            Semantics(
+              liveRegion: true,
+              child: Text(switch (qrNotice) {
+                QrUnsupportedSource(:final name) =>
+                  l10n.scanQrUnsupportedSource(name),
+                QrVenue() ||
+                QrPhotographInstead() => l10n.scanQrPhotographInstead,
+              }, style: theme.textTheme.bodyMedium),
+            ),
+          ],
           if (_rejection != null) ...[
             const SizedBox(height: 12),
             Semantics(

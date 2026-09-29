@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart' as plus;
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/widgets.dart' show GlobalKey, NavigatorState;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:ketoclub/services/classifier/classifier_router.dart';
@@ -25,6 +26,7 @@ import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/device_page_picker.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
+import 'package:ketoclub/services/platform/qr_scanner.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/install_id_store.dart';
@@ -34,6 +36,7 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/venue/wolt/wolt_venue_search_service.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
+import 'package:ketoclub/widgets/mobile_qr_scanner.dart';
 import 'package:screen_brightness/screen_brightness.dart' as plugin;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -144,6 +147,23 @@ LlmChatClient chatClientFor({
         installIdStore: installIdStore,
       );
 
+/// The QR scanner behind the Scan tab's "Scan QR code" action (issue #182),
+/// or one that says it is unavailable when this build has no camera scanner.
+///
+/// In a browser the answer is [NoQrScanner]: pasting the URL already works
+/// there, and the Scan tab hides the action. Everywhere else it is a
+/// [MobileQrScanner] that shows its camera page on the navigator behind
+/// [navigatorKey], which the app also gives `MaterialApp`. Constructing
+/// either performs no plugin I/O; the camera opens only when a scan runs.
+///
+/// A pure, top-level function so `di_test.dart` can cover both branches.
+QrScanner qrScannerFor({
+  required bool runsInBrowser,
+  required GlobalKey<NavigatorState> navigatorKey,
+}) => runsInBrowser
+    ? const NoQrScanner()
+    : MobileQrScanner(navigatorKey: navigatorKey);
+
 /// Composition root (architecture.md §18.1).
 ///
 /// This is the only file under lib/ that may construct a concrete service,
@@ -207,6 +227,15 @@ AppDependencies buildDependencies() {
   final screenBrightness = kIsWeb
       ? const NoOpScreenBrightness()
       : DeviceScreenBrightness(plugin.ScreenBrightness());
+
+  // The QR camera pushes a page on the app's own navigator, so the scanner
+  // and `MaterialApp` share this key (issue #182). Web has no camera
+  // scanner: pasting the URL already works there.
+  final navigatorKey = GlobalKey<NavigatorState>();
+  final qrScanner = qrScannerFor(
+    runsInBrowser: kIsWeb,
+    navigatorKey: navigatorKey,
+  );
 
   return AppDependencies(
     menuRepository: CachedMenuRepository(
@@ -286,5 +315,8 @@ AppDependencies buildDependencies() {
     // The device picker builds no plugin state until a page is picked
     // (issue #82), so this stays free of plugin I/O at start-up.
     pagePicker: DevicePagePicker(),
+    // Opens no camera until a scan is asked for (issue #182).
+    qrScanner: qrScanner,
+    navigatorKey: navigatorKey,
   );
 }

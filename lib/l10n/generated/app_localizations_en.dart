@@ -976,4 +976,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String websitePdfUnread(String site) {
     return 'The menu on $site is a PDF, which only AI analysis can read, and it could not be read now. Check AI analysis in Settings, then try again.';
   }
+
+  @override
+  String get scanQrAction => 'Scan QR code';
+
+  @override
+  String get scanQrTitle => 'Scan QR code';
+
+  @override
+  String get scanQrInstruction =>
+      'Point the camera at the QR code on the table.';
+
+  @override
+  String get scanQrCameraDenied =>
+      'KetoClub cannot use the camera. Allow camera access in your device settings, or paste the menu link instead.';
+
+  @override
+  String get scanQrCameraUnavailable =>
+      'The camera could not start. Close this screen and paste the menu link instead.';
+
+  @override
+  String scanQrUnsupportedSource(String name) {
+    return '$name menus are not supported yet. Photograph the menu instead.';
+  }
+
+  @override
+  String get scanQrPhotographInstead =>
+      'This QR code does not lead to a menu KetoClub can read. Photograph the menu instead.';
 }

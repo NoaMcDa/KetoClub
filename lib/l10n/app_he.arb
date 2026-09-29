@@ -427,5 +427,15 @@
   "websitePdfUnread": "התפריט ב־{site} הוא קובץ PDF, שרק ניתוח AI יכול לקרוא, והוא לא נקרא כרגע. בדקו את ניתוח ה-AI בהגדרות ונסו שוב.",
   "@websitePdfUnread": {
     "placeholders": { "site": { "type": "String" } }
-  }
+  },
+  "scanQrAction": "סריקת קוד QR",
+  "scanQrTitle": "סריקת קוד QR",
+  "scanQrInstruction": "כוונו את המצלמה אל קוד ה-QR שעל השולחן.",
+  "scanQrCameraDenied": "קטוקלאב לא יכולה להשתמש במצלמה. אפשרו גישה למצלמה בהגדרות המכשיר, או הדביקו את קישור התפריט.",
+  "scanQrCameraUnavailable": "לא ניתן היה להפעיל את המצלמה. סגרו את המסך והדביקו את קישור התפריט.",
+  "scanQrUnsupportedSource": "תפריטי {name} עדיין לא נתמכים. צלמו את התפריט במקום.",
+  "@scanQrUnsupportedSource": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "scanQrPhotographInstead": "קוד ה-QR הזה לא מוביל לתפריט שקטוקלאב יכולה לקרוא. צלמו את התפריט במקום."
 }

@@ -93,6 +93,17 @@ abstract final class VenueRefResolver {
     return null;
   }
 
+  /// [input] read as an absolute URL, or null when it is not one: a bare
+  /// slug or id, plain text, or anything with no host. A scheme-less
+  /// `domain/path` gets `https://` first, the same reading [resolve] gives
+  /// it. Public so a caller that must tell "a URL that names no venue"
+  /// from "not a URL at all" (the QR router, issue #182) uses the one
+  /// parser rather than its own.
+  static Uri? parseUrl(String input) {
+    final trimmed = input.trim();
+    return trimmed.isEmpty ? null : _asUri(trimmed);
+  }
+
   /// Parses [trimmed] as an absolute URI.
   ///
   /// A scheme-qualified string (`https://wolt.com/...`) parses directly.
