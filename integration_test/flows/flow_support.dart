@@ -38,6 +38,7 @@ import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
+import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -145,6 +146,18 @@ final class FakeAppDependencies {
   /// `backend_unreachable_analysis_flow_test.dart`).
   MenuClassifier? classifierOverride;
 
+  /// When set, [dependencies] wires this in place of [repository] — for a
+  /// flow that must run the real `CachedMenuRepository` over a real
+  /// platform adapter and a scripted HTTP client (see
+  /// `direct_gemini_analysis_flow_test.dart`), rather than a repository
+  /// scripted with the finished menu.
+  MenuRepository? repositoryOverride;
+
+  /// The user's own Gemini API key store, as `di.dart` provides it on iOS
+  /// and Android (architecture.md D17). Null by default — the web build's
+  /// value — so Settings shows no key section unless a flow sets one.
+  ApiKeyStore? apiKeyStore;
+
   /// The engine behind "Estimate this list" (issue #42, D13): the real
   /// on-device rule engine over the same fixed time as [clock], exactly
   /// as `di.dart` wires it, so a flow sees real rules verdicts while
@@ -153,7 +166,7 @@ final class FakeAppDependencies {
 
   /// The dependency set to hand to the app widget.
   AppDependencies get dependencies => AppDependencies(
-    menuRepository: repository,
+    menuRepository: repositoryOverride ?? repository,
     menuClassifier: classifierOverride ?? classifier,
     estimateClassifier: estimateClassifier,
     settingsStore: settingsStore,
@@ -165,7 +178,55 @@ final class FakeAppDependencies {
     menuSharer: menuSharer,
     locationService: locationService,
     venueSearchService: venueSearchService,
+    apiKeyStore: apiKeyStore,
   );
+}
+
+/// An [ApiKeyStore] backed by an in-memory field — mirrors `test/fakes`'
+/// `FakeApiKeyStore`, duplicated here for the reason this file's own top
+/// doc comment gives.
+final class FlowFakeApiKeyStore implements ApiKeyStore {
+  /// Creates a store holding [seed], or empty when omitted.
+  new({String? seed}) : _key = seed;
+
+  String? _key;
+
+  @override
+  Future<String?> read() async => _key;
+
+  @override
+  Future<void> write(String key) async => _key = key;
+
+  @override
+  Future<void> delete() async => _key = null;
+
+  @override
+  Future<bool> hasKey() async => _key != null;
+}
+
+/// A [MenuCache] that remembers nothing, so a real `CachedMenuRepository`
+/// built over it goes to its adapter on every open.
+final class FlowForgetfulMenuCache implements MenuCache {
+  @override
+  Future<CachedMenu?> read(VenueRef ref) async => null;
+
+  @override
+  Future<void> write(CachedMenu entry) async {}
+
+  @override
+  Future<void> clear() async {}
+
+  @override
+  Future<int> size() async => 0;
+
+  @override
+  Future<List<CachedMenuEntry>> entries() async => const <CachedMenuEntry>[];
+
+  @override
+  Future<int> count() async => 0;
+
+  @override
+  Future<void> remove(VenueRef ref) async {}
 }
 
 /// A [MenuRepository] that answers from a scripted map.

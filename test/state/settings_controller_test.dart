@@ -6,6 +6,7 @@ import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 
+import '../fakes/fake_api_key_store.dart';
 import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_settings_store.dart';
 
@@ -538,6 +539,125 @@ void main() {
 
       // Assert
       expect(states, [true, false, true, false, true, false]);
+    });
+  });
+
+  group('SettingsController Gemini API key (architecture.md D17)', () {
+    late FakeSettingsStore settings;
+    late FakeMenuRepository repository;
+    late FakeApiKeyStore keys;
+
+    setUp(() {
+      settings = FakeSettingsStore();
+      repository = FakeMenuRepository();
+      keys = FakeApiKeyStore();
+    });
+
+    test('with no key store (web) the key is unsupported and absent', () async {
+      // Arrange
+      final controller = SettingsController(settings, repository);
+
+      // Act
+      await controller.load();
+      await controller.saveApiKey('AIza-key');
+      await controller.deleteApiKey();
+
+      // Assert: every key call is a silent no-op.
+      expect(controller.supportsApiKey, isFalse);
+      expect(controller.hasApiKey, isFalse);
+    });
+
+    test('with a key store (phone) the key is supported', () {
+      // Arrange & Act
+      final controller = SettingsController(settings, repository, keys);
+
+      // Assert
+      expect(controller.supportsApiKey, isTrue);
+      expect(controller.hasApiKey, isFalse);
+    });
+
+    test('load reads whether a key is already saved', () async {
+      // Arrange
+      final controller = SettingsController(
+        settings,
+        repository,
+        FakeApiKeyStore(seed: 'AIza-saved'),
+      );
+
+      // Act
+      await controller.load();
+
+      // Assert
+      expect(controller.hasApiKey, isTrue);
+    });
+
+    test('saveApiKey writes the trimmed key and reports it saved', () async {
+      // Arrange
+      final controller = SettingsController(settings, repository, keys);
+
+      // Act
+      await controller.saveApiKey('  AIza-new  ');
+
+      // Assert
+      expect(await keys.read(), 'AIza-new');
+      expect(controller.hasApiKey, isTrue);
+    });
+
+    test('saveApiKey ignores a blank key and writes nothing', () async {
+      // Arrange
+      final controller = SettingsController(settings, repository, keys);
+
+      // Act
+      await controller.saveApiKey('   ');
+
+      // Assert
+      expect(keys.writeCallCount, 0);
+      expect(controller.hasApiKey, isFalse);
+    });
+
+    test('saveApiKey toggles isBusy true then false', () async {
+      // Arrange
+      final controller = SettingsController(settings, repository, keys);
+      final states = <bool>[];
+      controller.addListener(() => states.add(controller.isBusy));
+
+      // Act
+      await controller.saveApiKey('AIza-new');
+
+      // Assert
+      expect(states, [true, false]);
+    });
+
+    test('deleteApiKey removes the key and reports it absent', () async {
+      // Arrange
+      final keys = FakeApiKeyStore(seed: 'AIza-saved');
+      final controller = SettingsController(settings, repository, keys);
+      await controller.load();
+
+      // Act
+      await controller.deleteApiKey();
+
+      // Assert
+      expect(await keys.read(), isNull);
+      expect(keys.deleteCallCount, 1);
+      expect(controller.hasApiKey, isFalse);
+    });
+
+    test('no getter ever returns the key itself', () async {
+      // Arrange
+      const secret = 'AIza-secret-value';
+      final controller = SettingsController(
+        settings,
+        repository,
+        FakeApiKeyStore(seed: secret),
+      );
+
+      // Act
+      await controller.load();
+
+      // Assert: presence only.
+      expect(controller.hasApiKey, isTrue);
+      expect(controller.toString(), isNot(contains(secret)));
     });
   });
 }

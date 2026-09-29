@@ -283,6 +283,10 @@ void main() {
               MenuAnalysisFailureReason.badResponse,
             ChatFailureReason.backendUnreachable =>
               MenuAnalysisFailureReason.backendUnreachable,
+            ChatFailureReason.apiKeyMissing =>
+              MenuAnalysisFailureReason.apiKeyMissing,
+            ChatFailureReason.apiKeyRejected =>
+              MenuAnalysisFailureReason.apiKeyRejected,
           };
           expect(result, equals(MenuAnalysisFailed(reason: expectedReason)));
         });

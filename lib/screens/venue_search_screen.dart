@@ -68,6 +68,7 @@ class VenueSearchScreen extends StatefulWidget {
     required this.connectivity,
     required this.locationService,
     required this.settingsStore,
+    this.directToGoogle = false,
     super.key,
   });
 
@@ -87,6 +88,11 @@ class VenueSearchScreen extends StatefulWidget {
   /// other service on this screen — `SettingsController` is not
   /// provided here.
   final SettingsStore settingsStore;
+
+  /// Whether AI analysis sends dish text straight to Google from this
+  /// device (iOS and Android, D17), so the disclosure banner says so
+  /// rather than naming KetoClub's server (web, D12).
+  final bool directToGoogle;
 
   @override
   State<VenueSearchScreen> createState() => _VenueSearchScreenState();
@@ -182,7 +188,10 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               OfflineBanner(connectivity: widget.connectivity),
-              ConsentDisclosureBanner(settingsStore: widget.settingsStore),
+              ConsentDisclosureBanner(
+                settingsStore: widget.settingsStore,
+                directToGoogle: widget.directToGoogle,
+              ),
               _header(context, l10n, controller),
               const SizedBox(height: 12),
               Text(appName, style: textTheme.labelSmall),

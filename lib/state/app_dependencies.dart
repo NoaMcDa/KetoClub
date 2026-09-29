@@ -8,6 +8,7 @@ import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
+import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
@@ -25,7 +26,8 @@ class AppDependencies {
   /// being required: it was added after every existing call site — every
   /// flow test's fake dependency set among them — was already written, and
   /// a caller with nothing to say about brightness should not have to say
-  /// so.
+  /// so. [apiKeyStore] defaults to null for the same reason, and because
+  /// null is also the web build's real value.
   const new({
     required this.menuRepository,
     required this.menuClassifier,
@@ -40,6 +42,7 @@ class AppDependencies {
     required this.locationService,
     required this.venueSearchService,
     this.screenBrightness = const NoOpScreenBrightness(),
+    this.apiKeyStore,
   });
 
   /// Loads a venue's menu, cache first (architecture.md §6.1).
@@ -98,4 +101,11 @@ class AppDependencies {
   /// `phase2_discovery_research.md` §5). One call per user action; never
   /// fanned out over venues.
   final VenueSearchService venueSearchService;
+
+  /// The user's own Gemini API key, on iOS and Android only
+  /// (architecture.md D17): there the app calls Gemini directly, and
+  /// Settings shows a key field over this store. Null on web, which
+  /// reaches Gemini through KetoClub's backend (D12) and so has no key and
+  /// no key field. The classifier's chat client holds the same instance.
+  final ApiKeyStore? apiKeyStore;
 }

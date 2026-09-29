@@ -6,9 +6,10 @@ is a checklist, not a design document; see `architecture.md` for the design
 and `HANDOFF.md` for what is still unfinished.
 
 The model check used to be `tool/measure_model_latency.dart` against
-OpenRouter. That tool and OpenRouter are both gone (#102, #116). The model
-check today is the Gemini smoke curl in `backend/README.md`, against
-KetoClub's own backend.
+OpenRouter. That tool and OpenRouter are both gone (#102, #116). There are
+two model checks today, one per path (D17): the Gemini smoke curl in
+`backend/README.md` for the web build, and a phone with its own key for iOS
+and Android (below).
 
 ## 1. Pre-release checklist
 
@@ -30,11 +31,23 @@ KetoClub's own backend.
       `backend/`, not the repository root).
 - [ ] Run the `/v1/chat` smoke curl in `backend/README.md`'s "Smoke test
       against the real API" section. A real completion comes back as
-      `{"content":"{\"dishes\": [...]}","model":"gemini-2.5-flash"}` (or
+      `{"content":"{\"dishes\": [...]}","model":"gemini-3.5-flash"}` (or
       whatever `GEMINI_MODEL` names). This needs a real network path to
       `generativelanguage.googleapis.com`, which CI and this repository's
       own build environment do not have.
 - [ ] `backend/check.sh` passes locally (mirrors the `backend` CI job).
+
+### Phones call Gemini directly (D17)
+
+- [ ] On a real iPhone and a real Android phone, with no
+      `KETOCLUB_BACKEND_URL` define: paste a real Gemini key in Settings,
+      leave AI analysis on (the D16 default), open a Wolt menu, and see the engine chip read
+      "AI". This is the first time the direct client meets Google with a
+      valid key, and whether Google accepts `toGeminiSchema`'s output for
+      the real prompt's schema is only observed here.
+- [ ] Remove the key and reopen the menu: rules verdicts with "Add your
+      Gemini API key in Settings" and an Open Settings shortcut.
+- [ ] Save a deliberately wrong key: "Gemini rejected your API key".
 
 ### Fixtures (#22, #44)
 

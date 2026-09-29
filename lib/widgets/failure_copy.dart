@@ -64,6 +64,8 @@ String analysisFailureMessage(
   MenuAnalysisFailureReason.backendUnreachable =>
     l10n.analysisBackendUnreachable,
   MenuAnalysisFailureReason.consentWithheld => l10n.analysisConsentWithheld,
+  MenuAnalysisFailureReason.apiKeyMissing => l10n.analysisApiKeyMissing,
+  MenuAnalysisFailureReason.apiKeyRejected => l10n.analysisApiKeyRejected,
 };
 
 /// The message for a venue-search failure (`phase2_discovery_research.md`

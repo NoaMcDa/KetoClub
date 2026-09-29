@@ -1,7 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
 import 'package:ketoclub/di.dart';
 import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
+import 'package:ketoclub/services/llm/backend_chat_client.dart';
+import 'package:ketoclub/services/llm/gemini_chat_client.dart';
 import 'package:ketoclub/services/location/geolocator_location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
@@ -10,10 +13,14 @@ import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
+import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/venue/wolt/wolt_venue_search_service.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
+
+import 'fakes/fake_api_key_store.dart';
+import 'fakes/fake_install_id_store.dart';
 
 void main() {
   group('buildDependencies', () {
@@ -46,6 +53,9 @@ void main() {
       expect(dependencies.menuSharer, isA<SharePlusMenuSharer>());
       expect(dependencies.locationService, isA<GeolocatorLocationService>());
       expect(dependencies.venueSearchService, isA<WoltVenueSearchService>());
+      // The test VM is not web, so the phone path: a key store for the
+      // user's own Gemini key (architecture.md D17).
+      expect(dependencies.apiKeyStore, isA<SecureApiKeyStore>());
     });
 
     test('performs no plugin I/O while building the graph', () {
@@ -67,6 +77,71 @@ void main() {
       // Assert
       expect(service.proxyBase, isNull);
       expect(service.runsInBrowser, isFalse);
+    });
+  });
+
+  group('apiKeyStoreFor (architecture.md D17)', () {
+    test('returns a secure store outside a browser', () {
+      // Act
+      final store = apiKeyStoreFor(runsInBrowser: false);
+
+      // Assert
+      expect(store, isA<SecureApiKeyStore>());
+    });
+
+    test('returns null in a browser: the backend holds the key', () {
+      // Act
+      final store = apiKeyStoreFor(runsInBrowser: true);
+
+      // Assert
+      expect(store, isNull);
+    });
+  });
+
+  group('chatClientFor (architecture.md D17)', () {
+    test('with a key store calls Gemini directly, ignoring a configured '
+        'backend', () {
+      // Act
+      final client = chatClientFor(
+        client: http.Client(),
+        apiKeyStore: FakeApiKeyStore(),
+        backendBase: Uri.parse('http://localhost:8000'),
+        installIdStore: FakeInstallIdStore(),
+      );
+
+      // Assert
+      expect(client, isA<GeminiChatClient>());
+    });
+
+    test('with no key store goes through the backend', () {
+      // Arrange
+      final base = Uri.parse('http://localhost:8000');
+
+      // Act
+      final client = chatClientFor(
+        client: http.Client(),
+        apiKeyStore: null,
+        backendBase: base,
+        installIdStore: FakeInstallIdStore(),
+      );
+
+      // Assert
+      expect(client, isA<BackendChatClient>());
+      expect((client as BackendChatClient).baseUrl, base);
+    });
+
+    test('with no key store and no backend is a backend client that '
+        'answers notConfigured', () {
+      // Act
+      final client = chatClientFor(
+        client: http.Client(),
+        apiKeyStore: null,
+        backendBase: null,
+        installIdStore: FakeInstallIdStore(),
+      );
+
+      // Assert
+      expect((client as BackendChatClient).baseUrl, isNull);
     });
   });
 

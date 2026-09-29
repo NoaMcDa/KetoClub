@@ -41,7 +41,8 @@ MenuAnalysis _toRulesResult(
 ///    [_connectivity] nor [_llm] is consulted: no dish text leaves the
 ///    device.
 /// 2. **The `Connectivity` pre-check (architecture.md §14 D10).** Before
-///    ever sending a request to KetoClub's server, [classify] asks
+///    ever sending a request to the model — straight to Gemini on iOS and
+///    Android (D17), through KetoClub's server on web (D12) — [classify] asks
 ///    [_connectivity] whether the device appears to have a route at all;
 ///    a `false` reading skips the LLM call entirely, falling straight to
 ///    the heuristic stamped [MenuAnalysisFailureReason.offline].
@@ -51,8 +52,11 @@ MenuAnalysis _toRulesResult(
 /// 3. **The LLM.** Every failure except
 ///    [MenuAnalysisFailureReason.noDishesFound] falls back to the
 ///    heuristic with the reason carried, so the UI can say why it is
-///    showing rule-based results. Nothing pre-checks whether the server
-///    is up: the call is the probe.
+///    showing rule-based results. That includes the direct client's
+///    [MenuAnalysisFailureReason.apiKeyMissing] and
+///    [MenuAnalysisFailureReason.apiKeyRejected]: the user fixes those in
+///    Settings, and meanwhile sees rule-based verdicts. Nothing pre-checks
+///    whether the server or Google is up: the call is the probe.
 ///
 /// The router announces nothing through
 /// [ClassificationOptions.onEngineStarted] itself: it passes `options`
@@ -82,7 +86,7 @@ final class RoutingMenuClassifier implements MenuClassifier {
   }) async {
     if (!options.estimationConsentGiven) {
       // Rule 1 (architecture.md §6.2, §11): the user has not allowed dish
-      // text to leave the device, so the server is never asked.
+      // text to leave the device, so no model is ever asked.
       return _toRulesResult(
         await _heuristic.classify(menu, options: options),
         MenuAnalysisFailureReason.consentWithheld,
@@ -129,6 +133,8 @@ final class RoutingMenuClassifier implements MenuClassifier {
       case MenuAnalysisFailureReason.badResponse:
       case MenuAnalysisFailureReason.backendUnreachable:
       case MenuAnalysisFailureReason.consentWithheld:
+      case MenuAnalysisFailureReason.apiKeyMissing:
+      case MenuAnalysisFailureReason.apiKeyRejected:
         // The reason is surfaced on the rules result so the UI can say
         // why it is showing rule-based results (architecture.md §10).
         // §6.2 says a bad response is "not silently papered over"; it is

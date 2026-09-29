@@ -38,6 +38,10 @@ MenuAnalysisFailureReason _failureReasonFor(ChatFailureReason reason) {
       return MenuAnalysisFailureReason.badResponse;
     case ChatFailureReason.backendUnreachable:
       return MenuAnalysisFailureReason.backendUnreachable;
+    case ChatFailureReason.apiKeyMissing:
+      return MenuAnalysisFailureReason.apiKeyMissing;
+    case ChatFailureReason.apiKeyRejected:
+      return MenuAnalysisFailureReason.apiKeyRejected;
   }
 }
 
@@ -81,7 +85,7 @@ final class LlmMenuClassifier implements MenuClassifier {
     );
     switch (result) {
       case ChatCompleted(:final content, :final model):
-        // The model the server reports as having served the reply:
+        // The model the provider reports as having served the reply:
         // the app never names a model itself (architecture.md §9.3).
         final parsed = MenuResponseParser.parse(
           content,

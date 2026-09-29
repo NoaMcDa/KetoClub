@@ -23,12 +23,25 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 /// store on init and after every write, so the banner reflects the
 /// stored value whether it was written from Settings, from this widget,
 /// or on a previous launch.
+///
+/// [directToGoogle] picks the disclosure text: on iOS and Android dish
+/// text goes straight to Google with the user's own key (D17), on web
+/// through KetoClub's server (D12) — the same choice the Settings
+/// consent section makes from `SettingsController.supportsApiKey`.
 class ConsentDisclosureBanner extends StatefulWidget {
   /// Creates a banner over [settingsStore].
-  const new({required this.settingsStore, super.key});
+  const new({
+    required this.settingsStore,
+    this.directToGoogle = false,
+    super.key,
+  });
 
   /// The persistent settings this banner reads and writes.
   final SettingsStore settingsStore;
+
+  /// Whether dish text goes straight from this device to Google (iOS and
+  /// Android, D17) rather than through KetoClub's server (web, D12).
+  final bool directToGoogle;
 
   @override
   State<ConsentDisclosureBanner> createState() =>
@@ -118,7 +131,9 @@ class _ConsentDisclosureBannerState extends State<ConsentDisclosureBanner> {
               ),
               const SizedBox(height: 6),
               Text(
-                l10n.settingsConsentBody,
+                widget.directToGoogle
+                    ? l10n.settingsConsentBodyDirect
+                    : l10n.settingsConsentBody,
                 style: TextStyle(color: colorScheme.onSurfaceVariant),
               ),
               const SizedBox(height: 8),

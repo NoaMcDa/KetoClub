@@ -17,10 +17,12 @@ import 'package:ketoclub/widgets/failure_copy.dart';
 ///
 /// Renders nothing for [LlmEngine] — an AI result needs no explanation —
 /// so a caller can pass `MenuController.engine` straight through without
-/// its own null or type check. [MenuAnalysisFailureReason.consentWithheld]
-/// is the one reason the user can fix from this very screen, so its
-/// banner alone offers a shortcut to Settings, reusing the app bar
-/// action's own `/settings` route name rather than a new one — this
+/// its own null or type check. [MenuAnalysisFailureReason.consentWithheld],
+/// [MenuAnalysisFailureReason.apiKeyMissing] and
+/// [MenuAnalysisFailureReason.apiKeyRejected] are the reasons the user can
+/// fix from Settings, so their banners alone offer a shortcut there,
+/// reusing the app bar action's own `/settings` route name rather than a
+/// new one — this
 /// widget's layer (architecture.md §5) sits below `app.dart`, which owns
 /// that constant, so the route name is written out here exactly as
 /// `menu_screen.dart`'s own Settings action already does.
@@ -85,7 +87,7 @@ class RulesReasonBanner extends StatelessWidget {
                   style: TextStyle(color: colorScheme.onSurfaceVariant),
                 ),
               ),
-              if (rules.reason == MenuAnalysisFailureReason.consentWithheld)
+              if (_isFixableInSettings(rules.reason))
                 _settingsAction(context, l10n, colorScheme),
               if (retryCallback != null && _isRetryable(rules.reason))
                 _retryAction(l10n, colorScheme, retryCallback),
@@ -109,12 +111,33 @@ class RulesReasonBanner extends StatelessWidget {
         MenuAnalysisFailureReason.backendUnreachable => true,
         MenuAnalysisFailureReason.notConfigured => false,
         MenuAnalysisFailureReason.consentWithheld => false,
+        MenuAnalysisFailureReason.apiKeyMissing => false,
+        MenuAnalysisFailureReason.apiKeyRejected => false,
         MenuAnalysisFailureReason.noDishesFound => false,
       };
 
-  /// The "Open Settings" action shown only for
-  /// [MenuAnalysisFailureReason.consentWithheld] — the one reason the user
-  /// can fix from Settings, which is why no other reason gets an action.
+  /// Whether [reason] is one the user fixes in Settings, and so offers the
+  /// "Open Settings" action: consent withheld, or the Gemini key used on
+  /// iOS and Android missing or refused (architecture.md D17). Retrying
+  /// cannot help any of them, which is why none of them is retryable.
+  /// An exhaustive switch with no `default`, like [_isRetryable].
+  static bool _isFixableInSettings(MenuAnalysisFailureReason reason) =>
+      switch (reason) {
+        MenuAnalysisFailureReason.consentWithheld => true,
+        MenuAnalysisFailureReason.apiKeyMissing => true,
+        MenuAnalysisFailureReason.apiKeyRejected => true,
+        MenuAnalysisFailureReason.offline => false,
+        MenuAnalysisFailureReason.timeout => false,
+        MenuAnalysisFailureReason.rateLimited => false,
+        MenuAnalysisFailureReason.badResponse => false,
+        MenuAnalysisFailureReason.backendUnreachable => false,
+        MenuAnalysisFailureReason.notConfigured => false,
+        MenuAnalysisFailureReason.noDishesFound => false,
+      };
+
+  /// The "Open Settings" action shown only for the reasons
+  /// [_isFixableInSettings] approves — the ones the user can fix from
+  /// Settings, which is why no other reason gets this action.
   Widget _settingsAction(
     BuildContext context,
     AppLocalizations l10n,
