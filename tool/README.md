@@ -79,7 +79,7 @@ server-side, so there is no client-side model call left to measure this way —
 The equivalent check now lives in `backend/README.md`'s "Manual end-to-end
 check" section: with `GEMINI_API_KEY` set and the backend running, a `curl`
 against `/v1/chat` is the one-command way to see a real completion from the
-pinned model (`GEMINI_MODEL`, default `gemini-2.5-flash`) — see that file for
-the exact command. `generativelanguage.googleapis.com` is unreachable from this
-build environment the same way `openrouter.ai` was, so nobody has run it from
-here yet (`architecture.md` §17 open question 1, `HANDOFF.md`).
+pinned model (`GEMINI_MODEL`, default `gemini-3.5-flash`) — see that file for
+the exact command. The model has been called once this way (smoke test
+2026-09-28, #165; redacted responses in `test/fixtures/llm/smoke_*.json`);
+phone latency is still unmeasured (`architecture.md` §17.1, `HANDOFF.md`).

@@ -145,22 +145,23 @@ Several things are genuinely unfinished. None is a surprise; each is unfinished
 for a stated reason, and issues #16, #38, #44 and #65 are still **open**
 on GitHub — tooling exists for several of them, it did not close any of them.
 
-1. **The pinned Gemini model has never been called from this environment**
-   (§9.3, §17 open question 1 — closed as posed by D12, but the verification it
-   always asked for is still owed, now against a different provider).
-   `GEMINI_MODEL` defaults to `gemini-2.5-flash`, a backend environment
-   variable, not a Dart constant — swapping it is a redeploy, not a code
-   change. `generativelanguage.googleapis.com` is blocked from the build
-   environment the same way `openrouter.ai` was (the egress proxy answers 403
-   to the `CONNECT`), so the real system prompt has never been run against it
-   from here. **The one-command check now lives in `backend/README.md`**, in
-   its "Manual end-to-end check" section: with `GEMINI_API_KEY` set and the
-   server running, a `curl` against `/v1/chat` with a two-dish prompt is the
-   whole command, for anyone with a network path to Google. Nobody has run it
-   yet. `tool/measure_model_latency.dart`, the OpenRouter-specific version of
-   this check, was deleted along with `OpenRouterClient` (#102, D12) — there is
-   no client-side model to measure any more, since the app never calls a model
-   provider directly.
+1. **The pinned Gemini model has been called once, by a smoke test, not on a
+   phone** (§9.3, §17.1, #165). `GEMINI_MODEL` defaults to `gemini-3.5-flash`,
+   a backend environment variable, not a Dart constant — swapping it is a
+   redeploy, not a code change. The smoke test ran 2026-09-28 through the
+   local backend against the real prompt: `gemini-2.5-flash` answers 404 for
+   new API keys (which is why the default moved, #179), `gemini-3.8-flash` and
+   `gemini-flash-latest` answer 503 for structured output, and
+   `gemini-flash-lite-latest` rejects `thinkingConfig`. Redacted responses are
+   under `test/fixtures/llm/smoke_*.json`. Still unverified: phone latency
+   (#65) and a real 60-dish-or-bigger menu (Gemini returned 503 for the
+   56-dish attempt). **The one-command check lives in `backend/README.md`**,
+   in its "Manual end-to-end check" section: with `GEMINI_API_KEY` set and
+   the server running, a `curl` against `/v1/chat` with a two-dish prompt is
+   the whole command. `tool/measure_model_latency.dart`, the
+   OpenRouter-specific version of this check, was deleted along with
+   `OpenRouterClient` (#102, D12) — there is no client-side model to measure
+   any more, since the app never calls a model provider directly.
 2. **The Wolt menu fixture is real now; the endpoint moved** (issues #22,
    #168, both closed by the port). Wolt's `/v4/venues/slug/{slug}/menu/data`
    answers every anonymous caller with `200` and a zero-byte body — measured
@@ -336,8 +337,9 @@ work "Outstanding before release" lists.
   80-column limit and `public_member_api_docs` apply to `test/` and
   `integration_test/` too.
 - **The egress proxy blocks `restaurant-api.wolt.com`, `consumer-api.wolt.com`,
-  `wolt.com`, `www.10bis.co.il` and `generativelanguage.googleapis.com`** (the
-  last one since D12; it blocked `openrouter.ai` before that). Nothing can be
+  `wolt.com` and `www.10bis.co.il`.** `generativelanguage.googleapis.com` was
+  blocked too until the 2026-09-28 smoke test (#165) found it reachable; it is
+  the one live service that has been verified from here. Nothing else can be
   verified against a live service from CI or from a Claude Code session —
   including Phase 2's discovery endpoints, which is why
   `phase2_discovery_research.md` is confidence-rated third-party evidence
@@ -396,7 +398,7 @@ this is the short list.
 
 ## Where the reasoning lives
 
-- `architecture.md` §14 — the decisions log, now D1 to D13, each recording what
+- `architecture.md` §14 — the decisions log, now D1 to D16, each recording what
   was decided, why, and what it supersedes. The `(Phase 1)` markers throughout
   were added across both waves of that work. D10 was rewritten in place, not
   appended to: it first recorded that a connectivity pre-check was deliberately

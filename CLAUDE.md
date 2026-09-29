@@ -361,9 +361,10 @@ for what Phase 3's remaining milestone (#105–#108) and Phase 4 pick up next.
 - Backend hosting beyond `localhost` (issue #109, `architecture.md` §17.6). The
   backend is designed to be run locally by whoever has the repository checked
   out; nothing yet says where it runs for anyone else.
-- The pinned Gemini model has never been called against the real prompt from this
-  environment: `generativelanguage.googleapis.com` is unreachable through the
-  egress proxy here. See "What is NOT verified yet" below.
+- A phone-latency measurement and a 60-dish-or-bigger menu run against the
+  pinned Gemini model. The model itself has been called (smoke test
+  2026-09-28, #165); see the "Gemini smoke test" bullet under "What is NOT
+  verified yet" below for what that did and did not establish.
 
 Nothing above is stubbed — the files simply do not exist, which keeps them out of
 the coverage denominator.
@@ -433,7 +434,7 @@ Built, but not confirmed end to end, and not to be reported as done:
    recordings and phone run in "What is NOT verified yet" above. What's next
    is Phase 3's remaining milestone (community database, reviews, submissions;
    `backend_plan.md` §5 milestone C, issues #105–#108). §14 has the decisions
-   log D1–D14, §17 the open questions with the default the code follows.
+   log D1–D16, §17 the open questions with the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing

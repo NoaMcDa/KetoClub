@@ -30,7 +30,7 @@ KetoClub's own backend.
       `backend/`, not the repository root).
 - [ ] Run the `/v1/chat` smoke curl in `backend/README.md`'s "Smoke test
       against the real API" section. A real completion comes back as
-      `{"content":"{\"dishes\": [...]}","model":"gemini-2.5-flash"}` (or
+      `{"content":"{\"dishes\": [...]}","model":"gemini-3.5-flash"}` (or
       whatever `GEMINI_MODEL` names). This needs a real network path to
       `generativelanguage.googleapis.com`, which CI and this repository's
       own build environment do not have.

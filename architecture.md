@@ -934,7 +934,9 @@ to gate the rows above that do.
 ## 9. LLM integration contract
 
 **Since D12, the model behind this contract is Google Gemini** (`GEMINI_MODEL`,
-default `gemini-2.5-flash`, a backend config value — never hardcoded in `lib/`),
+default `gemini-3.5-flash` (moved from `gemini-2.5-flash` on 2026-09-28,
+#165/#179: Google answers 404 for new keys), a backend config value — never
+hardcoded in `lib/`),
 reached only through KetoClub's own backend. `MenuAnalysisPrompt` and
 `MenuResponseParser` are unchanged by that move: they build and read text, not
 HTTP, so the prompt (§9.1) and the schema (§9.2) are exactly what
@@ -1072,7 +1074,8 @@ contract this section always described, only moved server-side:
   client's 120 s outer bound, so the backend's own `timeout` reason reaches the
   UI before the client's timeout would fire on a healthy connection.
 - The model id is `GEMINI_MODEL` in the backend's config (default
-  `gemini-2.5-flash`), never a Dart constant — swapping it is an environment
+  `gemini-3.5-flash`, moved from `gemini-2.5-flash` on 2026-09-28, #165/#179:
+  Google answers 404 for new keys), never a Dart constant — swapping it is an environment
   variable, not a code change or a release. §17 open question 1's "verify the
   pinned model" check is still owed, against this id (see §17).
 - The reason vocabulary on the wire is exactly `notConfigured`, `offline`,
@@ -1412,7 +1415,8 @@ the controllers, the screens, the parser — knows the backend exists; `Menu` an
 removed.** *(Supersedes D3; closes §17 open question 1 as originally posed —
 "which OpenRouter model to pin" no longer applies.)* The backend holds a
 Gemini key server-side (`GEMINI_API_KEY`, model `GEMINI_MODEL`, default
-`gemini-2.5-flash`) and the app never holds a model key at all:
+`gemini-3.5-flash`, moved from `gemini-2.5-flash` on 2026-09-28, #165/#179:
+Google answers 404 for new keys) and the app never holds a model key at all:
 `flutter_secure_storage` and `KeyStore` are gone, and so is the Settings key
 section. `BackendChatClient` posts `{system_prompt, user_prompt,
 response_schema, schema_name}` to `/v1/chat` with an `X-KetoClub-Install-Id`
