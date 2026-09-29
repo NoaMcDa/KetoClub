@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
@@ -153,6 +154,27 @@ void main() {
       final recorded = client.requests.single;
       expect(recorded.responseSchema, isNull);
       expect(recorded.schemaName, isNull);
+      expect(recorded.images, isEmpty);
+    });
+
+    test('complete records the images it was sent, in order', () async {
+      final client = FakeLlmChatClient();
+      final page1 = ChatImagePart(
+        mimeType: ChatImagePart.jpeg,
+        bytes: Uint8List.fromList(<int>[1, 2, 3]),
+      );
+      final page2 = ChatImagePart(
+        mimeType: ChatImagePart.pdf,
+        bytes: Uint8List.fromList(<int>[4]),
+      );
+
+      await client.complete(
+        systemPrompt: 'system',
+        userPrompt: 'user',
+        images: <ChatImagePart>[page1, page2],
+      );
+
+      expect(client.requests.single.images, orderedEquals([page1, page2]));
     });
   });
 

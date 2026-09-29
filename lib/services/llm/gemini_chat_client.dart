@@ -88,6 +88,12 @@ Object? _copy(Object? value) => switch (value) {
 /// second 400. Nothing pre-checks whether Google is reachable: the call is
 /// the probe (architecture.md §14 D10).
 ///
+/// **Pages follow the prompt.** Each of [complete]'s images is an
+/// `inline_data` part (`{mime_type, data}`, base64) after the user
+/// prompt's text part, in order (architecture.md D15), straight to Google
+/// like the prompt itself; the schema retry re-sends them. With none, the
+/// body is exactly the text-only one it always was.
+///
 /// **Failure mapping.** No saved key is [ChatFailureReason.apiKeyMissing]
 /// with no I/O beyond the key read. A saved key holding a space, a control
 /// character or anything outside ASCII — a paste that picked up more than
@@ -159,6 +165,7 @@ final class GeminiChatClient implements LlmChatClient {
     required String userPrompt,
     Map<String, Object?>? responseSchema,
     String? schemaName,
+    List<ChatImagePart> images = const <ChatImagePart>[],
   }) async {
     // [schemaName] is accepted for the interface's sake: Gemini's
     // `responseSchema` has no name field, so there is nowhere to send it.
@@ -174,12 +181,23 @@ final class GeminiChatClient implements LlmChatClient {
         ? null
         : toGeminiSchema(responseSchema);
 
-    var outcome = await _post(key, _body(systemPrompt, userPrompt, schema));
+    final userParts = <Object?>[
+      <String, Object?>{'text': userPrompt},
+      for (final image in images)
+        <String, Object?>{
+          'inline_data': <String, Object?>{
+            'mime_type': image.mimeType,
+            'data': base64Encode(image.bytes),
+          },
+        },
+    ];
+
+    var outcome = await _post(key, _body(systemPrompt, userParts, schema));
     if (outcome case _Answered(:final response)
         when schema != null &&
             response.statusCode == 400 &&
             !_isInvalidKey(response)) {
-      outcome = await _post(key, _body(systemPrompt, userPrompt, null));
+      outcome = await _post(key, _body(systemPrompt, userParts, null));
     }
 
     return switch (outcome) {
@@ -190,7 +208,7 @@ final class GeminiChatClient implements LlmChatClient {
 
   Map<String, Object?> _body(
     String systemPrompt,
-    String userPrompt,
+    List<Object?> userParts,
     Map<String, Object?>? schema,
   ) => <String, Object?>{
     'system_instruction': <String, Object?>{
@@ -199,12 +217,7 @@ final class GeminiChatClient implements LlmChatClient {
       ],
     },
     'contents': <Object?>[
-      <String, Object?>{
-        'role': 'user',
-        'parts': <Object?>[
-          <String, Object?>{'text': userPrompt},
-        ],
-      },
+      <String, Object?>{'role': 'user', 'parts': userParts},
     ],
     'generationConfig': <String, Object?>{
       'responseMimeType': 'application/json',

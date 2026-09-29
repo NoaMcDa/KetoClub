@@ -38,6 +38,12 @@ const Set<ChatFailureReason> _wireReasons = <ChatFailureReason>{
 /// [ChatFailureReason.offline] — the server's own `offline` means *it*
 /// could not reach the model provider.
 ///
+/// **Pages ride along only when there are any.** A call with images
+/// adds an `images` list of `{mime_type, data}` (base64) to the body
+/// (architecture.md D15); a call without them sends no `images` key at
+/// all, so a text-only body — and the server's cache key for it — is
+/// byte-identical to the one sent before images existed.
+///
 /// **The body never escapes.** An error body's `reason` is read and
 /// mapped by name; nothing else from it reaches a [ChatFailed].
 final class BackendChatClient implements LlmChatClient {
@@ -87,6 +93,7 @@ final class BackendChatClient implements LlmChatClient {
     required String userPrompt,
     Map<String, Object?>? responseSchema,
     String? schemaName,
+    List<ChatImagePart> images = const <ChatImagePart>[],
   }) async {
     final baseUrl = this.baseUrl;
     if (baseUrl == null) {
@@ -99,6 +106,14 @@ final class BackendChatClient implements LlmChatClient {
       'user_prompt': userPrompt,
       'response_schema': ?responseSchema,
       'schema_name': ?schemaName,
+      if (images.isNotEmpty)
+        'images': <Object?>[
+          for (final image in images)
+            <String, Object?>{
+              'mime_type': image.mimeType,
+              'data': base64Encode(image.bytes),
+            },
+        ],
     };
 
     final http.Response response;
