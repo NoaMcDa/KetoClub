@@ -1,4 +1,4 @@
-# KetoClub — handoff after Phase 1, the Phase 3 backend, and Phase 2
+# KetoClub — handoff after Phase 1, the Phase 3 backend, Phase 2, and Phase 4's scan core
 
 Written at the end of the session that built Phase 1, updated at the close of
 issue #36 after a second wave of parallel work substantially extended it,
@@ -6,7 +6,8 @@ updated again at the close of issue #97 after the Phase 3 backend foundations
 and hosted-classification milestones landed (D11, D12), and updated once more
 now that Phase 2's run (10bis, location and nearby search, the Discovery
 screen, platform setup, and a run of features beyond those) has landed on top
-of both. It says what exists, what is deliberately unfinished, and which
+of both, and again for Phase 4's menu-scanning core (paste, photographs, PDF).
+It says what exists, what is deliberately unfinished, and which
 mistakes are already paid for so nobody pays for them twice.
 
 `architecture.md` is the authoritative design. Where it and `README.md` or
@@ -46,7 +47,7 @@ Card **raises screen brightness** while open and restores it on close
 (`services/platform/screen_brightness.dart`); a **bottom-navigation shell**
 (`AppShell`, issue #11) around four tabs — Explore, Scan, Saved, Settings — with
 Scan and Saved as localized placeholder screens at the time, not blank stubs
-(Saved became a real tab in Phase 2 — see below); and a light/dark
+(Saved became a real tab in Phase 2, Scan in Phase 4 — see below); and a light/dark
 **design-token theme** (`theme/`, issue #9) with two known WCAG AA contrast
 failures kept intentionally rather than silently drifting from the artboard (see
 "Known limitations" below).
@@ -143,8 +144,43 @@ offline banner, cached-menu fallback copy (#144). `docs/RELEASE.md` (#133)
 is the pre-release checklist and device-test matrix that names what a real
 device run still needs to confirm.
 
+**Phase 4, "Menu Scanning", has its core built** (the one GitHub milestone
+"Phase 4: Menu Scanning"; it absorbed the earlier Vision Classifier milestone).
+A menu no delivery platform serves now comes from the Scan tab, three ways, all
+stored under `MenuSource.scan` and opened at `/venue/scan/{id}` like any venue:
+
+- **Paste** (#83, D18): `TextMenuSource.parse` turns lines of text into a `Menu`
+  (prices stripped, no options, ids `p1..pN`); `MenuRepository.store` caches it
+  and the ordinary classifier router reads it. The ref is a hash of the dishes,
+  so pasting the same menu twice is one cache entry.
+- **Photographs, gallery images and a PDF** (#170, #89, #82; D15): pages travel
+  as image parts of the one chat request per menu (`LlmChatClient.complete`'s
+  `images`; `/v1/chat`'s `images` on web, straight to Google on phones), and
+  `VisionMenuClassifier` has Gemini transcribe *and* classify them in that one
+  call. It is a **sibling** of `MenuClassifier` (`ScannedMenuClassifier`),
+  fronted by `RoutingScannedMenuClassifier` (consent, then connectivity), with
+  **no rules fallback**: the rule engine needs text and a photo has none. The
+  reply goes through `MenuResponseParser.parseScanned`, which swaps "never
+  invent a dish" (there is no source menu to check against) for "drop a
+  nameless element, keep the first of duplicate names". The scan menu's header
+  says it was read by AI and offers **View pages** from `ScannedPagesRegistry`,
+  the in-memory page thumbnails, so the user can check the transcription
+  against the photograph. Page bytes are never cached (Hive would hold them
+  as JSON), never stored server-side and never logged beyond a count.
+  `DevicePagePicker` (over `image_picker` and `file_picker`) is the one place
+  that touches the camera, gallery or file system.
+- **No on-device OCR** (D15; #81 closed as not planned): Gemini reads the page
+  itself, so a misread column cannot be lost before classification starts.
+
+Still open in that milestone: **#84** flow tests for the three scan paths,
+**#88** the person-run Gemini vision smoke test (`backend/tools/
+vision_smoke.py`), **#181** menus read from a restaurant's website, and **#182**
+QR codes. Configurable dietary rules, which the roadmap once listed under
+Phase 4, had already shipped under Phase 2 (#56, #143).
+
 What is **not** built: Tabit and Ontopo adapters — Wolt and 10bis both ship
-now, with an adapter registered in `di.dart` for each; OCR; Phase 3's
+now, with an adapter registered in `di.dart` for each; website-menu and QR-code
+scanning (#181, #182); Phase 3's
 community database, user reviews and venue submissions (`backend_plan.md` §5
 milestone C, issues #105–#108); and hosting the backend anywhere beyond
 `localhost` (issue #109). None of it is stubbed — the files simply do not
@@ -155,7 +191,7 @@ exist, which keeps them out of the coverage denominator.
 ## Outstanding before release
 
 Several things are genuinely unfinished. None is a surprise; each is unfinished
-for a stated reason, and issues #16, #38, #44 and #65 are still **open**
+for a stated reason, and issues #16, #38, #44, #65 and #88 are still **open**
 on GitHub — tooling exists for several of them, it did not close any of them.
 
 1. **The pinned Gemini model has never answered a phone's request** (§9.3, §17
@@ -206,19 +242,30 @@ on GitHub — tooling exists for several of them, it did not close any of them.
    `www.10bis.co.il` is also blocked here. `test/fixtures/README.md` has the
    curl to run once a machine can reach it, and what to check
    (`TenBisMenuMapper`'s assumed field names) once it does.
-5. **iOS and every physical device are unexercised.** CI builds web and an Android
+5. **No real Gemini request has carried images** (#88, D15). Everything on the
+   vision path is proven against fakes: whether `gemini-3.5-flash` accepts
+   `image/*` and `application/pdf` parts with the real prompt and schema, how
+   long a multi-page scan takes (the text path took 33.5 s cold for 20 dishes),
+   and how faithfully it transcribes a real printed, photographed or Hebrew menu
+   are unobserved. Run `backend/tools/vision_smoke.py` against a backend that
+   holds a key (its docstring has the command), with real menu photos, and
+   record the outcome in `architecture.md` §17.
+6. **iOS and every physical device are unexercised.** CI builds web and an Android
    APK, and builds iOS without codesigning on pushes to `main`. Nothing has run on
    a real phone. Screen-brightness raising for the Waiter Card in particular is
    evidenced only by a mocked method channel and a fake — it has never been seen
    to actually happen — and the same is true of the location-permission prompt
    added in Phase 2 (the approximate/precise choice on Android 12+, the "Never"
    path on iOS): evidenced only by fakes until a phone runs it
-   (`docs/RELEASE.md`'s device matrix has the row). The iOS permission string
-   is also English-only — see "Known limitations" below.
-6. **The performance budget is unmeasured on a real device** (issue #65).
+   (`docs/RELEASE.md`'s device matrix has the row). The Scan tab's pickers are
+   in the same position: the camera and photo-library permission prompts, the
+   gallery and PDF pickers and a real photograph's size and orientation are
+   evidenced only by fakes until a phone runs them. The iOS permission strings
+   are also English-only — see "Known limitations" below.
+7. **The performance budget is unmeasured on a real device** (issue #65).
    `tool/perf_menu.dart` and its 16 ms-per-frame budget table (`tool/README.md`)
    exist; the 60-dish-fixture, real-phone, real-4G measurement itself does not.
-7. **No human has reviewed the code.** §18.6 wants a review by someone who did
+8. **No human has reviewed the code.** §18.6 wants a review by someone who did
    not write it; none of #90, #91, the second wave, or Phase 2's run, was
    merged with one.
 
@@ -260,7 +307,7 @@ spacing values) is enforced by a test; pixel fidelity by no test at all.
   proxy (§13, D9); D11 shipped one (`backend/`'s `/v1/proxy/wolt/…` route). With
   `KETOCLUB_BACKEND_URL` configured and the backend up, the web build fetches
   live Wolt menus like any other target; with neither, it is still a mobile
-  feature and paste-a-menu is the fallback. The web build's classifier has
+  feature and the Scan tab's paste-a-menu (D18) is the fallback. The web build's classifier has
   always worked regardless, because it always went through a backend that
   permits browser-origin calls — KetoClub's own since D12, OpenRouter before it.
 - **`net_carbs_estimate` is an LLM-only figure the user is told is an estimate**
@@ -276,6 +323,13 @@ spacing values) is enforced by a test; pixel fidelity by no test at all.
   `on`/surface pair — these three plus every other one `VerdictColors`
   produces — is pinned by `test/theme/contrast_test.dart` (issue #64's
   contrast half; semantics/RTL/large text are a later PR).
+- **A scan has no rules fallback and no offline path.** The rule engine needs
+  text, so with consent withheld, no network or a failed model call a photograph
+  or PDF produces an error and nothing else (D15). Pasted text does fall back to
+  rules, being an ordinary menu. Scan pages also never survive a restart: only the
+  transcription is cached, and the registry keeps the pages of at most the last
+  four scans, so "View pages" disappears once the app is closed (or the scan is
+  evicted) and the menu then reads like a pasted one.
 - **The iOS location-permission string is English-only.** The project has no
   `InfoPlist.strings` variant group registered in `Runner.xcodeproj` (only
   "en" and "Base" are known regions), and wiring one by hand-editing the
@@ -412,7 +466,7 @@ this is the short list.
 
 ## Where the reasoning lives
 
-- `architecture.md` §14 — the decisions log, now D1 to D17, each
+- `architecture.md` §14 — the decisions log, now D1 to D18, each
   recording what was decided, why, and what it supersedes. The `(Phase 1)` markers throughout
   were added across both waves of that work. D10 was rewritten in place, not
   appended to: it first recorded that a connectivity pre-check was deliberately

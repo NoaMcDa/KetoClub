@@ -2001,15 +2001,39 @@ and what is still owed (fixture recordings, a phone run).
    iOS, Android and web. Still owed: a test on a physical iOS and Android
    device with a real Wolt venue (`docs/RELEASE.md`'s device matrix).
 
+**Phase 4 steps (menu scanning).** Steps 11 to 14 are done; 15 to 17 are open.
+Each has its own issue in the GitHub milestone "Phase 4: Menu Scanning"; D15
+and D18 (§14) are the record of the decisions.
+
+11. ✅ **Image parts** (#170, D15) — `LlmChatClient.complete` takes `images`;
+    `/v1/chat` accepts them with the `VISION_MAX_*` bounds and both chat clients
+    forward them as `inline_data`. A text-only call is byte-for-byte unchanged.
+12. ✅ **Paste-a-menu** (#83, D18) — `MenuSource.scan`, the pure `TextMenuSource`,
+    `MenuRepository.store`, and the Scan tab's paste field.
+13. ✅ **Scan seams and the vision classifier** (#89) — `ScannedMenuClassifier`,
+    `VisionMenuClassifier`, `RoutingScannedMenuClassifier`,
+    `MenuResponseParser.parseScanned` and the in-memory `ScannedPagesRegistry`.
+14. ✅ **The Scan tab** (#82) — photograph pages, pick images or a PDF through
+    `DevicePagePicker` (`image_picker`, `file_picker`), the iOS camera and
+    photo-library permission strings, and the menu header's "View pages".
+15. ☐ **Flow tests for the scan paths** (#84) — paste, photograph and PDF driven
+    end to end with the chat client faked.
+16. ☐ **A website menu source** (#181) — a restaurant's own site as a scan input.
+17. ☐ **QR codes** (#182) — a menu reached from a scanned QR code.
+
+The person-run vision smoke test (#88, `backend/tools/vision_smoke.py`) is a
+verification step for 11 to 14, not a build step: no real image request has been
+sent yet (§17.1).
+
 Extension points already designed in:
 
 | Future feature | Where it plugs in | What must not change |
 |---|---|---|
 | Tabit, Ontopo | a new `PlatformMenuAdapter` | `Menu` model, classifier |
 | Pasted text | **Shipped (D18, issue #83).** `TextMenuSource.parse` yields a `Menu` from lines of text under `MenuSource.scan`; `MenuRepository.store` puts it in the cache | the prompt and parser (unchanged, as predicted) |
-| Photographed or PDF menus (Phase 4) | **Built behind fakes (D15, #89).** The pages are read and classified by Gemini's own vision in one request — no OCR stage — through `ScannedMenuClassifier` (`VisionMenuClassifier` behind `RoutingScannedMenuClassifier`); the transcription is stored under `MenuSource.scan` like a paste (D18) | the text prompt (the vision preamble sits in front of it), the response schema, `MenuClassifier` |
+| Photographed or PDF menus (Phase 4) | **Built (D15, #89, #82); the real model has not yet been called with images (#88).** The pages are read and classified by Gemini's own vision in one request — no OCR stage — through `ScannedMenuClassifier` (`VisionMenuClassifier` behind `RoutingScannedMenuClassifier`); the transcription is stored under `MenuSource.scan` like a paste (D18) | the text prompt (the vision preamble sits in front of it), the response schema, `MenuClassifier` |
 | Vision-model classification | **Built (#89)** as the sibling `ScannedMenuClassifier`, not a second `MenuClassifier`; its own router applies consent and connectivity, with no rules fallback | the UI's menu screen, which shows a scan like any other menu |
-| Custom dietary rules (Tier C) | `ClassificationOptions` → appended to the system prompt and to the rules table | schema |
+| Custom dietary rules (Tier C) | **Shipped (#56, #143).** `ClassificationOptions` → appended to the system prompt and to the rules table | schema |
 | Community ratings, venue directory (Phase 3) | a backend with its own client under `services/community/`; `Venue` gains the README's rating fields | everything above stays client-only |
 | CORS proxy for web | **Shipped (D11).** `backend/`'s `/v1/proxy/wolt/…` route; `WoltMenuAdapter` took a configurable `proxyBase`, exactly as this row predicted | adapter logic (unchanged, as predicted) |
 | Shared analysis cache (Tier D) | **Shipped (D12, issue #103).** The backend's own `chat_cache`, keyed by a hash of the request — not a remote tier of the device's `MenuCache`, which stays exactly as before; each device still caches its own `Menu` and `MenuAnalysis` locally | parser, models (unchanged — the cache sits below `LlmChatClient`, invisible to both) |
