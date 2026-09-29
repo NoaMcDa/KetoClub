@@ -7,7 +7,7 @@ def test_defaults_match_documented_values() -> None:
     settings = Settings(_env_file=None)  # type: ignore[call-arg]
 
     assert settings.GEMINI_API_KEY == ""
-    assert settings.GEMINI_MODEL == "gemini-2.5-flash"
+    assert settings.GEMINI_MODEL == "gemini-3.5-flash"
     assert settings.GEMINI_BASE_URL == "https://generativelanguage.googleapis.com"
     assert settings.GEMINI_MAX_OUTPUT_TOKENS == 65536
     assert settings.GEMINI_THINKING_BUDGET == 0

@@ -26,7 +26,7 @@ _KEY = "test-gemini-key-that-must-never-be-logged"
 _INSTALL_ID = "0123456789abcdef0123456789abcdef"
 _URL = (
     "https://generativelanguage.googleapis.com"
-    "/v1beta/models/gemini-2.5-flash:generateContent"
+    "/v1beta/models/gemini-3.5-flash:generateContent"
 )
 _SYSTEM = "You are the keto-diet menu analyst for KetoClub. SYSTEM-MARKER"
 _USER = "1 | Mains | Entrecote | 300g steak with fries USER-MARKER"
@@ -225,7 +225,7 @@ def test_model_falls_back_to_the_configured_one_without_model_version(
     response = _post(chat_client)
 
     assert response.status_code == 200
-    assert response.json()["model"] == "gemini-2.5-flash"
+    assert response.json()["model"] == "gemini-3.5-flash"
 
 
 def test_thought_parts_are_not_part_of_the_answer(
