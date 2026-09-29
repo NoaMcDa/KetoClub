@@ -9,14 +9,20 @@ import 'package:ketoclub/models/failures.dart';
 /// *why* the fetch failed; this widget is the *way out* — retrying the
 /// same fetch, or going back to paste a different link:
 ///
-/// - [MenuFetchFailureReason.offline] and
-///   [MenuFetchFailureReason.backendUnreachable]: retry. Both are
-///   connectivity problems that may already have cleared by the time the
-///   user taps the button.
+/// - [MenuFetchFailureReason.offline],
+///   [MenuFetchFailureReason.backendUnreachable] and the website reasons
+///   that pass ([MenuFetchFailureReason.websiteUnreachable],
+///   [MenuFetchFailureReason.websiteRateLimited],
+///   [MenuFetchFailureReason.websitePdfUnread]): retry. Each may already
+///   have cleared by the time the user taps the button.
 /// - [MenuFetchFailureReason.notFound],
 ///   [MenuFetchFailureReason.platformChanged],
-///   [MenuFetchFailureReason.unsupportedSource] and
-///   [MenuFetchFailureReason.scanNotSaved]: nothing about retrying
+///   [MenuFetchFailureReason.unsupportedSource],
+///   [MenuFetchFailureReason.scanNotSaved] and the website reasons that
+///   do not pass ([MenuFetchFailureReason.menuNotFound],
+///   [MenuFetchFailureReason.disallowedByRobots],
+///   [MenuFetchFailureReason.jsOnlyPage],
+///   [MenuFetchFailureReason.websiteTooLarge]): nothing about retrying
 ///   the identical request would help — the venue reference itself was
 ///   the problem, or (for a scan) there is nothing to fetch again — so
 ///   the action goes back to paste a different one.
@@ -56,14 +62,21 @@ class FetchFailureAction extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return switch (reason) {
       MenuFetchFailureReason.offline ||
-      MenuFetchFailureReason.backendUnreachable => ElevatedButton(
+      MenuFetchFailureReason.backendUnreachable ||
+      MenuFetchFailureReason.websiteUnreachable ||
+      MenuFetchFailureReason.websiteRateLimited ||
+      MenuFetchFailureReason.websitePdfUnread => ElevatedButton(
         onPressed: onRetry,
         child: Text(l10n.actionRetry),
       ),
       MenuFetchFailureReason.notFound ||
       MenuFetchFailureReason.platformChanged ||
       MenuFetchFailureReason.unsupportedSource ||
-      MenuFetchFailureReason.scanNotSaved => ElevatedButton(
+      MenuFetchFailureReason.scanNotSaved ||
+      MenuFetchFailureReason.menuNotFound ||
+      MenuFetchFailureReason.disallowedByRobots ||
+      MenuFetchFailureReason.jsOnlyPage ||
+      MenuFetchFailureReason.websiteTooLarge => ElevatedButton(
         onPressed: onBackToSearch,
         child: Text(l10n.actionBackToSearch),
       ),

@@ -9,6 +9,8 @@ import 'package:ketoclub/services/llm/backend_chat_client.dart';
 import 'package:ketoclub/services/llm/gemini_chat_client.dart';
 import 'package:ketoclub/services/location/geolocator_location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
+import 'package:ketoclub/services/menu/website/backend_website_fetcher.dart';
+import 'package:ketoclub/services/menu/website/direct_website_fetcher.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
@@ -105,6 +107,37 @@ void main() {
       // Assert
       expect(service.proxyBase, isNull);
       expect(service.runsInBrowser, isFalse);
+    });
+  });
+
+  group('websiteFetcherFor (architecture.md D19)', () {
+    test('goes through the backend when a proxy base is set', () {
+      // Act
+      final fetcher = websiteFetcherFor(
+        client: http.Client(),
+        proxyBase: Uri.parse('http://localhost:8000'),
+        installIdStore: FakeInstallIdStore(),
+      );
+
+      // Assert
+      expect(fetcher, isA<BackendWebsiteFetcher>());
+      expect(
+        (fetcher as BackendWebsiteFetcher).proxyBase,
+        Uri.parse('http://localhost:8000'),
+      );
+    });
+
+    test('fetches the site directly with no proxy base', () {
+      // Act
+      final fetcher = websiteFetcherFor(
+        client: http.Client(),
+        proxyBase: null,
+        installIdStore: FakeInstallIdStore(),
+      );
+
+      // Assert: the test VM is not a browser, so it names itself.
+      expect(fetcher, isA<DirectWebsiteFetcher>());
+      expect((fetcher as DirectWebsiteFetcher).runsInBrowser, isFalse);
     });
   });
 

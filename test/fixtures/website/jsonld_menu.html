@@ -1,0 +1,24 @@
+<!doctype html>
+<!-- Synthetic fixture (issue #181): a homepage carrying a schema.org menu in JSON-LD. -->
+<html lang="en"><head><title>Cafe Noir</title>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@graph": [
+  {"@type": "WebSite", "name": "Cafe Noir"},
+  {"@type": "Restaurant", "name": "Cafe Noir",
+   "hasMenu": {"@type": "Menu", "name": "Dinner",
+     "hasMenuSection": [
+       {"@type": "MenuSection", "name": "Starters",
+        "hasMenuItem": [
+          {"@type": "MenuItem", "name": "Caesar salad", "description": "Romaine, parmesan, croutons", "offers": {"@type": "Offer", "price": "52", "priceCurrency": "ILS"}},
+          {"@type": "MenuItem", "name": "  ", "description": "nameless, skipped"}
+        ]},
+       {"@type": "MenuSection", "name": "Mains",
+        "hasMenuItem": {"@type": "MenuItem", "name": "Entrecote steak", "description": "300 g, with fries"},
+        "hasMenuSection": {"@type": "MenuSection", "name": "Pasta",
+          "hasMenuItem": [{"@type": "MenuItem", "name": "Spaghetti carbonara"}]}}
+     ]}}
+]}
+</script>
+<script type="application/ld+json">{ not json </script>
+</head><body><h1>Cafe Noir</h1><p>Open daily 12:00 to 23:00.</p>
+<a href="/menu">Menu</a></body></html>

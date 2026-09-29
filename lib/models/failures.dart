@@ -38,6 +38,46 @@ enum MenuFetchFailureReason {
   /// platform to fetch from again (architecture.md D18). Shown as "This
   /// pasted menu is no longer saved on this device. Paste it again."
   scanNotSaved,
+
+  /// A restaurant website was read, but no menu KetoClub can read was found
+  /// on it: no JSON-LD menu, no menu page or PDF link, and no priced dish
+  /// list in the page's own text — or the only text there was reversed
+  /// Hebrew (architecture.md D19). Shown as "KetoClub could not find a menu
+  /// it can read on {site}."
+  menuNotFound,
+
+  /// The website asks automated readers not to read the page: its
+  /// `robots.txt` disallows KetoClub, or the page opts out of AI use
+  /// (`noai`, `tdm-reservation`). Nothing is fetched past the refusal
+  /// (D19). Shown as "{site} asks apps like KetoClub not to read its
+  /// pages, so KetoClub does not."
+  disallowedByRobots,
+
+  /// The website builds its page with JavaScript only, which KetoClub does
+  /// not run (D19). Shown as "{site} only shows its menu with JavaScript,
+  /// which KetoClub cannot read yet."
+  jsOnlyPage,
+
+  /// The website itself could not be reached, timed out or answered with
+  /// a server error, while KetoClub's own backend (web) was fine (D19).
+  /// Shown as "{site} did not answer. Try again later."
+  websiteUnreachable,
+
+  /// The page or PDF is larger than KetoClub reads (D19). Shown as "The
+  /// menu on {site} is too large for KetoClub to read."
+  websiteTooLarge,
+
+  /// KetoClub already read this site several times in the last minute,
+  /// and spaces its requests to any one site (D19). Shown as "KetoClub
+  /// read {site} a moment ago. Wait a minute, then try again."
+  websiteRateLimited,
+
+  /// The website's menu is a PDF, and only AI analysis can read a PDF: the
+  /// vision read failed, was not allowed, or found no dish (D19; D15).
+  /// Shown as "The menu on {site} is a PDF, which only AI analysis can
+  /// read, and it could not be read now. Check AI analysis in Settings,
+  /// then try again."
+  websitePdfUnread,
 }
 
 /// Why menu analysis could not be produced, or fell back to the rules

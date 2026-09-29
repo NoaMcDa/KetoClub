@@ -381,7 +381,9 @@ Roadmap & Milestone Tracking
     * [ ] Flow tests for the scan paths (#84), and a person-run smoke test of a real
       Gemini request carrying images (#88); until #88, the vision path is proven
       against fakes only.
-    * [ ] Menus from a restaurant's own website (#181) and from a QR code (#182).
+    * [x] Menus from a restaurant's own website (#181, D19): paste any restaurant
+      URL; its JSON-LD menu, menu page or PDF is found and classified.
+    * [ ] Menus from a QR code (#182).
     * [x] Configurable dietary rules: strict seed-oil free, dairy-free keto and
       carnivore-only toggles in Settings (issue #56). Shipped earlier, under
       Phase 2; a pesco-keto mode was not built.

@@ -13,6 +13,13 @@ void main() {
         'unsupportedSource',
         'backendUnreachable',
         'scanNotSaved',
+        'menuNotFound',
+        'disallowedByRobots',
+        'jsOnlyPage',
+        'websiteUnreachable',
+        'websiteTooLarge',
+        'websiteRateLimited',
+        'websitePdfUnread',
       ];
 
       // Act

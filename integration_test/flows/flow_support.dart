@@ -48,6 +48,7 @@ import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/page_picker.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
+import 'package:ketoclub/services/storage/install_id_store.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -239,6 +240,18 @@ final class FlowFakeApiKeyStore implements ApiKeyStore {
 
   @override
   Future<bool> hasKey() async => _key != null;
+}
+
+/// An [InstallIdStore] answering one fixed, well-formed id — mirrors
+/// `test/fakes`' `FakeInstallIdStore`, duplicated here for the reason this
+/// file's own top doc comment gives.
+final class FlowFakeInstallIdStore implements InstallIdStore {
+  /// The id every call answers: 32 lowercase hex characters, the shape
+  /// the backend accepts.
+  static const String fixedId = '0123456789abcdef0123456789abcdef';
+
+  @override
+  Future<String> id() async => fixedId;
 }
 
 /// A [MenuCache] that remembers nothing, so a real `CachedMenuRepository`

@@ -35,9 +35,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > Scan tab (`TextMenuSource`, D18), or from photographs or a PDF that Gemini
 > reads and classifies in one request (D15 — image parts on `/v1/chat` and on
 > both chat clients, `VisionMenuClassifier` behind `RoutingScannedMenuClassifier`,
-> the Scan tab's photo/gallery/PDF pickers). There is no on-device OCR. Website
-> menus (#181) and QR codes (#182) are not built, and no real Gemini request
-> carrying images has been sent yet (#88).
+> the Scan tab's photo/gallery/PDF pickers). There is no on-device OCR. A
+> restaurant's own website is a menu source too (#181, D19): paste any
+> restaurant URL and its menu page, JSON-LD or PDF is found and classified.
+> QR codes (#182) are not built, and no real Gemini request carrying images
+> has been sent yet (#88).
 >
 > **Read `architecture.md` first — it is authoritative.** This file and `README.md`
 > predate the code in places; where any of them disagrees with `architecture.md`,
@@ -185,8 +187,9 @@ lib/
 │   ├── venue/                 # venue_ref_resolver (paste-a-URL, pure), venue_search_service
 │   │                          # (interface), wolt/ (WoltVenueSearchService + mapper, issue #39)
 │   ├── menu/                  # platform_menu_adapter, menu_repository, wolt/ and tenbis/
-│   │                          # (each split HTTP-adapter + pure mapper, proxyBase, D11) and
-│   │                          # text/ (TextMenuSource: pasted text to a Menu, pure, D18)
+│   │                          # (each split HTTP-adapter + pure mapper, proxyBase, D11),
+│   │                          # text/ (TextMenuSource: pasted text to a Menu, pure, D18) and
+│   │                          # website/ (a restaurant's own site: locator, fetchers, D19)
 │   └── classifier/            # menu_classifier, heuristic, llm, router, prompt, parser, and
 │                              # the scan path's siblings: scanned_menu_classifier (interface),
 │                              # vision_menu_classifier, scanned_classifier_router (D15)
@@ -213,7 +216,7 @@ tool/                          # check.sh (the gate), coverage_gate.sh, gen_cove
                                 # record_wolt_fixture.sh (issue #22)
 
 backend/                       # optional local FastAPI service (D11, D12) — see backend/README.md
-├── app/                       # main.py, config.py, routers/ (health, proxy, chat), services/
+├── app/                       # main.py, config.py, routers/ (health, proxy, chat, website), services/
 ├── tools/                     # vision_smoke.py: the person-run image smoke check (#88)
 ├── tests/                     # respx-mocked; no real network call
 └── check.sh                   # mirrors tool/check.sh; its own required CI job
@@ -389,9 +392,9 @@ When reading research docs (m15/m16), note that prefixes indicate iteration/mile
   **Core built.** Paste-a-menu (#83, D18), image parts on `/v1/chat` and both chat
   clients (#170, D15), the `ScannedMenuClassifier` seam with `VisionMenuClassifier`
   and `RoutingScannedMenuClassifier` (#89), and the Scan tab's photo, image and PDF
-  pickers alongside paste (#82). Still open in the milestone: #84 (flow tests for the
-  scan paths), #88 (the person-run Gemini vision smoke test,
-  `backend/tools/vision_smoke.py`), #181 (website menus) and #182 (QR codes).
+  pickers alongside paste (#82), flow tests for the scan paths (#84), and website
+  menus (#181, D19). Still open in the milestone: #88 (the person-run Gemini
+  vision smoke test, `backend/tools/vision_smoke.py`) and #182 (QR codes).
   On-device OCR was dropped (D15; #81 closed as not planned). Configurable dietary
   rules are not Phase 4 work: they shipped earlier under Phase 2 (#56, #143).
 
@@ -405,11 +408,12 @@ up next.
   adapter registered for each (`di.dart`). The `PlatformMenuAdapter`
   interface and its shared contract suite already exist, so a new platform is
   a new adapter plus a registration in `di.dart`.
-- Menu scanning's remaining sources (Phase 4): menus read from a restaurant's own
-  website (#181) and from a QR code (#182). The Scan tab itself is real — paste,
-  photographs, gallery images and a PDF — and there is no on-device OCR by design
-  (D15). Also not built: community features — venue ratings, reviews, submissions
-  (Phase 3, `backend_plan.md` §5's milestone C).
+- Menus reached from a QR code (#182), the last of menu scanning's sources
+  (Phase 4). A restaurant's own website is built (#181, `architecture.md` D19):
+  paste any restaurant URL on Explore. The Scan tab itself is real — paste,
+  photographs, gallery images and a PDF — and there is no on-device OCR by
+  design (D15). Also not built: community features — venue ratings, reviews,
+  submissions (Phase 3, `backend_plan.md` §5's milestone C).
 - Backend hosting beyond `localhost` (issue #109, `architecture.md` §17.6). The
   backend is designed to be run locally by whoever has the repository checked
   out; nothing yet says where it runs for anyone else.
@@ -471,6 +475,12 @@ Built, but not confirmed end to end, and not to be reported as done:
 - **The 10bis fixture is synthetic** (`tenbis_synthetic_menu.json`; issue #44,
   tracked separately from #22). `www.10bis.co.il` is blocked the same way; see
   `test/fixtures/README.md` for the curl to run once a machine can reach it.
+- **Website menus (#181, D19) have never read a real restaurant site.** The
+  locator, page reader and both fetchers are tested against synthetic HTML
+  (`test/fixtures/website/`) and mocked HTTP only; no browser has run the web
+  path and no phone the direct one. How often real Israeli sites carry
+  JSON-LD menus, link a menu page or PDF, or render only with JavaScript is
+  unmeasured, and a website PDF has never been sent to Gemini.
 - **No physical iOS or Android device has ever run this app.** Screen-brightness
   raising for the Waiter Card in particular is evidenced only by a mocked method
   channel and a fake, and the location-permission prompt (approximate/precise on
@@ -507,8 +517,8 @@ Built, but not confirmed end to end, and not to be reported as done:
    recordings and phone run in "What is NOT verified yet" above. What's next
    is Phase 3's remaining milestone (community database, reviews, submissions;
    `backend_plan.md` §5 milestone C, issues #105–#108) and Phase 4's open
-   scan issues (#84, #88, #181, #182; §16's Phase 4 steps). §14 has the decisions
-   log D1–D18, §17 the open questions with the default the code follows.
+   scan issues (#88, #182; §16's Phase 4 steps). §14 has the decisions
+   log D1–D19, §17 the open questions with the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing

@@ -319,6 +319,8 @@ ketoclub/
 │   │   │   │   ├── wolt_adapter.dart     # HTTP only; delegates to the mapper
 │   │   │   │   └── wolt_menu_mapper.dart # pure: Wolt JSON → Menu (fixture-tested, no I/O)
 │   │   │   ├── tenbis/                   # same split: TenBisAdapter + TenBisMenuMapper (#126, #127, #134)
+│   │   │   ├── website/                  # D19 (#181): WebsiteMenuAdapter; pure locator, JSON-LD mapper,
+│   │   │   │                             # HTML reader, robots.txt; direct and backend fetchers
 │   │   │   ├── tabit/                    # not built; a future phase
 │   │   │   └── ontopo/                   # Phase 4 (PDF links only), not built
 │   │   └── classifier/                   # rank 1 — may import llm/ and platform/
@@ -478,6 +480,7 @@ The normalisation rules that matter:
 | 10bis | numeric `restaurantId` | decimal ILS as-is | `categoriesList[].dishList[]` | `dishOptionsList[]` |
 | Tabit | `siteId` | check on first real payload | POS kitchen groups → categories | forced questions and modifiers |
 | Ontopo | `venue_id` | n/a | returns `menu_pdf_url` / `external_menu_url`, not items | n/a |
+| Website (D19) | the normalised pasted URL | never read: `price: 0`, no price shown | JSON-LD `MenuSection`s; else page text or a PDF read by vision | none |
 
 Option labels ("Choice of side: potato purée / green salad") are part of the text the
 classifier sees, because a dish's yellow-ness often lives in the options, not the
@@ -934,11 +937,12 @@ computable".
 Plain Dart, immutable, no code generation.
 
 ```dart
-enum MenuSource { wolt, tenbis, tabit, ontopo, scan }   // scan: text the user supplied (D18)
+enum MenuSource { wolt, tenbis, tabit, ontopo, scan, website }
+// scan: text the user supplied (D18); website: a restaurant's own site (D19)
 
 class VenueRef {                       // how we address a venue on a platform
   final MenuSource source;
-  final String platformId;             // slug, restaurantId, siteId, venue_id
+  final String platformId;             // slug, restaurantId, siteId, venue_id, URL
 }
 
 class Venue {
@@ -1006,6 +1010,8 @@ fields and are not modelled until then.
 | **Tabit** | `GET https://tgp-api.tabit.cloud/menu/v2/{siteId}` (alt: `online.tabit.cloud/api/v1/ordering/menu?siteId=`) | session / anonymous token from the QR landing | Phase 2+ | Dine-in venues absent from delivery apps |
 | **Ontopo** | `POST https://ontopo.com/api/loginAnonymously` → `GET https://ontopo.com/api/venue/{venueId}` | anonymous bearer | Phase 4 | Returns PDF/image links, needs the OCR path |
 | **KetoClub backend — Wolt proxy** | `GET {KETOCLUB_BACKEND_URL}/v1/proxy/wolt/venues/slug/{slug}/assortment` | none | Phase 3 (D11), path moved in #168 | Allow-listed passthrough only — Wolt's status, body and `Content-Type` unchanged, 1 h server cache of non-empty `2xx` bodies; used only by the web build with a backend configured |
+| **Restaurant website** (D19) | `GET` the pasted URL, then at most one linked menu page or PDF, plus `/robots.txt` | none; logged out, `KetoClubBot/1.0 (+contact URL)` | Phase 4 (#181) | Phones fetch directly; web goes through the route below. `robots.txt`, `noai` and TDM reservations honoured; size-capped |
+| **KetoClub backend — website fetch** | `POST {KETOCLUB_BACKEND_URL}/v1/website/fetch` `{"url"}` | `X-KetoClub-Install-Id` | Phase 4 (D19) | Fetches one public page or PDF: `{kind, content_type, body, final_url}` or a distinct `{reason, status_code}`; public hosts only, per-host and per-install limits, nothing cached |
 | **KetoClub backend — chat** | `POST {KETOCLUB_BACKEND_URL}/v1/chat` | `X-KetoClub-Install-Id` (no model key from the client) | Phase 3 (D12) | Forwards one completion per menu to Google Gemini; see §9 |
 
 All restaurant endpoints are undocumented internal APIs discovered by network
@@ -1279,6 +1285,13 @@ languages. Collapsing reasons is a bug.
 | `MenuFetch.unsupportedSource` | repository | "KetoClub cannot read menus from this site yet." | paste text (Phase 4) |
 | `MenuFetch.backendUnreachable` | adapter, `ClientException` reaching the backend itself (D11) | "KetoClub's server could not be reached, so the menu could not be read." | retry, or unset the backend define |
 | `MenuFetch.scanNotSaved` | repository, a `MenuSource.scan` ref whose cache entry is gone (D18) | "This pasted menu is no longer saved on this device. Paste it again to analyse it." | back, paste again |
+| `MenuFetch.menuNotFound` | website adapter: no JSON-LD menu, no menu link or PDF, and fewer than three priced lines; or the text read as reversed Hebrew (D19) | "KetoClub could not find a menu it can read on {site}." | back, paste another link |
+| `MenuFetch.disallowedByRobots` | website fetch: `robots.txt` disallows KetoClub, or the page opts out of AI use (`noai`, `tdm-reservation`) (D19) | "{site} asks apps like KetoClub not to read its pages, so KetoClub does not." | back |
+| `MenuFetch.jsOnlyPage` | website fetch or adapter: the page renders only with JavaScript (D19) | "{site} only shows its menu with JavaScript, which KetoClub cannot read yet." | back, paste the menu text |
+| `MenuFetch.websiteUnreachable` | website fetch: the site timed out, failed or answered a non-404 error, or its `robots.txt` did (D19) | "{site} did not answer. Try again later." | retry |
+| `MenuFetch.websiteTooLarge` | website fetch: a page over 2 MiB or a PDF over 3 MiB (D19) | "The menu on {site} is too large for KetoClub to read." | back |
+| `MenuFetch.websiteRateLimited` | backend website route: the per-host or per-install limit (D19) | "KetoClub read {site} a moment ago. Wait a minute, then try again." | retry |
+| `MenuFetch.websitePdfUnread` | website adapter: a PDF menu the vision path could not read, was not allowed to, or found nothing in (D19, D15) | "The menu on {site} is a PDF, which only AI analysis can read, and it could not be read now. Check AI analysis in Settings, then try again." | retry, settings |
 | `Analysis.notConfigured` | web only: no backend URL compiled in, or the backend has no Gemini key (D12) | rules result + "AI analysis is not available on this build or server. Showing rule-based results." | none from the app |
 | `Analysis.consentWithheld` | router, consent toggle off (client-only, §11) | rules result + "Allow AI analysis in Settings to analyse this menu. Showing rule-based results." | settings |
 | `Analysis.apiKeyMissing` | phones only: `GeminiChatClient` found no key saved, so nothing was sent (D17) | rules result + "Add your Gemini API key in Settings to analyse this menu. Showing rule-based results." | settings |
@@ -1882,6 +1895,83 @@ fallback when a platform blocks the browser (§6, §13); this builds it.
   classifier already does, and no editing of a stored paste: to change one, paste
   it again. Pasted text is treated exactly as untrusted as a fetched menu.
 
+**D19 — Website menu source: a restaurant's own site, read politely.**
+*(Issue #181, 2026-09-29; follows `docs/menu_sources_research.md` §1, §3.2,
+§3.6 and §6, which found no licensed menu API for Israeli restaurants and the
+restaurant's own site or PDF the only source that covers them all.)* Wolt and
+10bis cover delivery; the dine-in restaurants a keto diner actually sits in
+often appear on neither.
+
+- **The source.** `MenuSource` gains `website`, wire value `website`.
+  `VenueRefResolver.resolve` returns it for any `http`/`https` URL on a dotted
+  host it does not otherwise recognise and with no user info; Wolt and 10bis
+  keep priority (a Wolt URL that is not a venue page is still null), and the
+  bare-word guard of #169 is unchanged. `platformId` is the URL normalised by
+  `normaliseWebsiteUrl` (lower-case scheme and host, no fragment, no default
+  port, no trailing `/`), and `platformUrl` returns it. The route path
+  percent-encodes it (`utils/venue_route.dart`) so a URL stays one segment.
+- **Finding the menu** (`services/menu/website/`, pure, every platform).
+  `WebsiteMenuLocator.locate` tries, in order: (1) JSON-LD `Menu` /
+  `MenuSection` / `MenuItem` with named items, mapped straight to categories by
+  `JsonLdMenuMapper`; (2) a link to the menu — JSON-LD `hasMenu` first, then a
+  page link whose address or text says `menu` or `תפריט`, or that ends in
+  `.pdf` (a menu-named PDF, then a menu-named page, then any PDF; a page link
+  must stay on the same site, a PDF may be on a file host); (3) the page's own
+  text. A link is followed **once**, never a second hop, and a linked page that
+  yields nothing falls back to the first page's own text.
+- **Reading it.** Page text becomes `TextMenuSource` input (D18) through
+  `WebsiteMenuLocator.menuText`, which reads only the stretch between the first
+  and last priced line (so navigation and footers never become dishes), needs at
+  least three priced lines to call a page a menu, and handles both "price on its
+  own line" and "price at the end of the line" layouts. A **PDF goes to the
+  vision path** (`ScannedMenuClassifier`, D15) as one `application/pdf` page —
+  **never through a text layer**, which reverses most Hebrew PDFs. The
+  transcription and its analysis come back from the same one request (D6); the
+  analysis rides on the new `MenuFetched.analysis`, the repository caches it
+  beside the menu, and the menu screen reuses it because both build their
+  options with `ClassificationOptions.fromSettings`. Any text that is read (page
+  text or JSON-LD) is rejected as `menuNotFound` when a Hebrew word in it starts
+  with a final-form letter (ך ם ן ף ץ) — `utils/hebrew_order.dart` — since that
+  is proof of reversed text.
+- **Fetching it (crawl hygiene).** Web goes through the backend's new
+  `POST /v1/website/fetch` (`{"url"}` in the body, so no URL reaches a request
+  log; answers `{kind: html|pdf, content_type, body, final_url}`, a PDF's body in
+  base64). Phones (D17) fetch the site themselves through
+  `DirectWebsiteFetcher` with the same rules; a web build with no backend meets
+  the site's cross-origin block and says so (`blockedByBrowser`). The rules,
+  both ways: logged out, no cookies; a named User-Agent with a contact URL
+  (`KetoClubBot/1.0 (+https://github.com/NoaMcDa/KetoClub; menu reader)`, where
+  the platform lets a request set one); `robots.txt` honoured for `ketoclubbot`,
+  else `*` (RFC 9309 longest match; a 4xx means no rules, a 5xx or no answer
+  means the site is not read); `X-Robots-Tag: noai`, `tdm-reservation: 1` and
+  their `<meta>` forms honoured; at most five redirects, each re-checked; 2 MiB
+  for a page and `maxScanPageBytes` (3 MiB) for a PDF. The backend adds a
+  public-address check on every hop (no private, loopback or link-local
+  address, so the route cannot reach its own network), only default ports, a
+  per-host limit (6 a minute across all installs), a per-install limit (10 a
+  minute) and an in-memory `robots.txt` cache (1 h); it keeps no page and logs
+  the host and outcome only. A page that renders only with JavaScript fails
+  with its own reason: no headless browser is in scope. **No Wix `_api` calls**
+  (#180 decides that route).
+- **Showing it.** Every dish has `price: 0` and `DishCard.showPrice` is false
+  for a website (M16: a scraped price is unverified); the source line, header
+  and Saved entry show the site's host. The menu is cached 24 hours like any
+  other and nothing is republished (research §4.4).
+- **Seven new fetch reasons** (§10), each with its own copy in both languages:
+  `menuNotFound`, `disallowedByRobots` (robots.txt or an AI opt-out: the user's
+  way out is the same), `jsOnlyPage`, `websiteUnreachable`, `websiteTooLarge`,
+  `websiteRateLimited` and `websitePdfUnread` (the vision read failed, was not
+  allowed, or found nothing — there is no rules fallback for a PDF).
+
+**What it costs:** a second, looser proxy on the backend — the upstream host
+comes from the request, which the Wolt and 10bis proxies never allow — fenced
+by the public-address check and the limits above; two fetchers applying the
+same hygiene rules, in Dart and in Python, that must be kept in step; and a
+text heuristic that will misread some page layouts (the model then sees a few
+wrong "dishes", or none). **What it does not do:** no headless browser, no
+sitemap crawl, no second hop, no Wix structured route, and no real site has
+been fetched yet — the fixtures under `test/fixtures/website/` are synthetic.
+
 ---
 
 ## 15. Testing strategy
@@ -1894,6 +1984,13 @@ This section lists what each part of the system must be tested for.
   option flattening. The mapper is pure, so it is tested with no HTTP at all; the
   adapter is tested with a fake `http.Client` for status handling only. Re-record
   the fixture when the platform changes; the test failing is the alarm.
+- **Website source (D19):** the locator, JSON-LD mapper and page-text reader
+  against synthetic HTML fixtures (`test/fixtures/website/`: JSON-LD, a
+  `/menu` link, a Hebrew `תפריט` link, a PDF link, none, and both price
+  layouts) with no HTTP; `robots.txt` matching; both fetchers over a fake
+  `http.Client`; the adapter over a scripted fetcher, including the PDF's
+  one vision call and the reversed-Hebrew guard. The backend route's hygiene
+  rules are Python tests (`backend/tests/test_website_*.py`).
 - **Heuristic classifier:** table-driven tests over the README examples plus Hebrew
   equivalents. Every entry in `CARB_MODIFIERS` and `NON_KETO_BASES` has at least one
   positive case and one word-boundary negative case (`rice` must not match `price`).
@@ -2001,9 +2098,9 @@ and what is still owed (fixture recordings, a phone run).
    iOS, Android and web. Still owed: a test on a physical iOS and Android
    device with a real Wolt venue (`docs/RELEASE.md`'s device matrix).
 
-**Phase 4 steps (menu scanning).** Steps 11 to 14 are done; 15 to 17 are open.
-Each has its own issue in the GitHub milestone "Phase 4: Menu Scanning"; D15
-and D18 (§14) are the record of the decisions.
+**Phase 4 steps (menu scanning).** Steps 11 to 16 are done; 17 is open.
+Each has its own issue in the GitHub milestone "Phase 4: Menu Scanning"; D15,
+D18 and D19 (§14) are the record of the decisions.
 
 11. ✅ **Image parts** (#170, D15) — `LlmChatClient.complete` takes `images`;
     `/v1/chat` accepts them with the `VISION_MAX_*` bounds and both chat clients
@@ -2016,9 +2113,12 @@ and D18 (§14) are the record of the decisions.
 14. ✅ **The Scan tab** (#82) — photograph pages, pick images or a PDF through
     `DevicePagePicker` (`image_picker`, `file_picker`), the iOS camera and
     photo-library permission strings, and the menu header's "View pages".
-15. ☐ **Flow tests for the scan paths** (#84) — paste, photograph and PDF driven
+15. ✅ **Flow tests for the scan paths** (#84) — paste, photograph and PDF driven
     end to end with the chat client faked.
-16. ☐ **A website menu source** (#181) — a restaurant's own site as a scan input.
+16. ✅ **A website menu source** (#181, D19) — `MenuSource.website`, the pure
+    locator and page reader, `WebsiteMenuAdapter` over a direct or backend
+    fetcher, `POST /v1/website/fetch`, and a PDF read by the vision path.
+    Still owed: a real restaurant site fetched, on the web build and a phone.
 17. ☐ **QR codes** (#182) — a menu reached from a scanned QR code.
 
 The person-run vision smoke test (#88, `backend/tools/vision_smoke.py`) is a
@@ -2030,6 +2130,7 @@ Extension points already designed in:
 | Future feature | Where it plugs in | What must not change |
 |---|---|---|
 | Tabit, Ontopo | a new `PlatformMenuAdapter` | `Menu` model, classifier |
+| A restaurant's own website | **Shipped (D19, issue #181).** `WebsiteMenuAdapter` over a `WebsiteFetcher` (the backend's `/v1/website/fetch` on web, direct on phones); page text through `TextMenuSource`, a PDF through `ScannedMenuClassifier` | `Menu` model, the text classifiers, the vision prompt |
 | Pasted text | **Shipped (D18, issue #83).** `TextMenuSource.parse` yields a `Menu` from lines of text under `MenuSource.scan`; `MenuRepository.store` puts it in the cache | the prompt and parser (unchanged, as predicted) |
 | Photographed or PDF menus (Phase 4) | **Built (D15, #89, #82); the real model has not yet been called with images (#88).** The pages are read and classified by Gemini's own vision in one request — no OCR stage — through `ScannedMenuClassifier` (`VisionMenuClassifier` behind `RoutingScannedMenuClassifier`); the transcription is stored under `MenuSource.scan` like a paste (D18) | the text prompt (the vision preamble sits in front of it), the response schema, `MenuClassifier` |
 | Vision-model classification | **Built (#89)** as the sibling `ScannedMenuClassifier`, not a second `MenuClassifier`; its own router applies consent and connectivity, with no rules fallback | the UI's menu screen, which shows a scan like any other menu |

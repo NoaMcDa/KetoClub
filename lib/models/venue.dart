@@ -18,7 +18,13 @@ enum MenuSource {
   /// page), addressed by the hex of its dish-text fingerprint. It has no
   /// platform to fetch from: the cache is its only home (architecture.md
   /// D18).
-  scan;
+  scan,
+
+  /// A restaurant's own website, addressed by the normalised URL the user
+  /// pasted (architecture.md D19; issue #181). Its menu is found on the
+  /// site itself: a JSON-LD menu, a linked menu page or PDF, or the page's
+  /// own text.
+  website;
 
   /// The source whose [name] equals [wire], or null when none does.
   ///

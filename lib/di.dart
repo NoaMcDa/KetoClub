@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/llm_menu_classifier.dart';
+import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/scanned_classifier_router.dart';
 import 'package:ketoclub/services/classifier/vision_menu_classifier.dart';
 import 'package:ketoclub/services/llm/backend_chat_client.dart';
@@ -13,6 +14,10 @@ import 'package:ketoclub/services/llm/llm_chat_client.dart';
 import 'package:ketoclub/services/location/geolocator_location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/tenbis/tenbis_adapter.dart';
+import 'package:ketoclub/services/menu/website/backend_website_fetcher.dart';
+import 'package:ketoclub/services/menu/website/direct_website_fetcher.dart';
+import 'package:ketoclub/services/menu/website/website_adapter.dart';
+import 'package:ketoclub/services/menu/website/website_fetcher.dart';
 import 'package:ketoclub/services/menu/wolt/wolt_adapter.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
@@ -81,6 +86,26 @@ Uri? backendBaseUrl(String configured) {
 /// own.
 Uri? menuProxyBase({required bool runsInBrowser, required String configured}) =>
     runsInBrowser ? backendBaseUrl(configured) : null;
+
+/// How a restaurant's own website is fetched (architecture.md D19): through
+/// KetoClub's backend when [proxyBase] is set — the web build with a
+/// backend, see [menuProxyBase] — and straight from the site otherwise.
+/// On a phone that is the rule (D17); in a browser with no backend the
+/// direct fetch meets the site's cross-origin block and says so
+/// (`blockedByBrowser`). Constructing either performs no I/O.
+///
+/// A pure, top-level function so `di_test.dart` can cover both branches.
+WebsiteFetcher websiteFetcherFor({
+  required http.Client client,
+  required Uri? proxyBase,
+  required InstallIdStore installIdStore,
+}) => proxyBase != null
+    ? BackendWebsiteFetcher(
+        client: client,
+        proxyBase: proxyBase,
+        installIdStore: installIdStore,
+      )
+    : DirectWebsiteFetcher(client: client);
 
 /// Where the user's own Gemini API key is kept, or null when this build
 /// has none (architecture.md D17).
@@ -162,6 +187,20 @@ AppDependencies buildDependencies() {
     installIdStore: installIdStore,
   );
   final llm = LlmMenuClassifier(chatClient, clock);
+  final settingsStore = PrefsSettingsStore(load: SharedPreferences.getInstance);
+  // The scan path (issue #89, D15): consent and the connectivity
+  // pre-check in front of the vision engine, which sends the pages over
+  // the same chat client as the text classifier. No rules fallback: a
+  // photograph has no text for the rule engine. Constructing either does
+  // no I/O. A website's PDF menu is read through it too (D19).
+  final scannedMenuClassifier = RoutingScannedMenuClassifier(
+    vision: VisionMenuClassifier(client: chatClient, clock: clock),
+    connectivity: connectivity,
+  );
+  final proxyBase = menuProxyBase(
+    runsInBrowser: kIsWeb,
+    configured: _configuredBackendUrl,
+  );
   // `screen_brightness` has no web implementation; the no-op is a
   // deliberate composition choice for that platform, not a fallback from a
   // caught failure (screen_brightness.dart's own doc comment).
@@ -186,6 +225,20 @@ AppDependencies buildDependencies() {
             configured: _configuredBackendUrl,
           ),
         ),
+        // Any other restaurant URL (D19). A PDF menu is read by the vision
+        // path under the options the menu screen would build, so the
+        // analysis it caches is the one the screen reuses.
+        WebsiteMenuAdapter(
+          fetcher: websiteFetcherFor(
+            client: client,
+            proxyBase: proxyBase,
+            installIdStore: installIdStore,
+          ),
+          scannedClassifier: scannedMenuClassifier,
+          readOptions: () async =>
+              ClassificationOptions.fromSettings(await settingsStore.read()),
+          clock: clock,
+        ),
       ],
       cache: HiveMenuCache(
         openBox: () async {
@@ -199,7 +252,7 @@ AppDependencies buildDependencies() {
     // The rule engine on its own, for "Estimate this list" (issue #42,
     // D13): the explicit action must never reach the language model.
     estimateClassifier: heuristic,
-    settingsStore: PrefsSettingsStore(load: SharedPreferences.getInstance),
+    settingsStore: settingsStore,
     notesStore: PrefsNotesStore(load: SharedPreferences.getInstance),
     clock: clock,
     logger: const DeveloperLogAppLogger(),
@@ -227,15 +280,7 @@ AppDependencies buildDependencies() {
       ),
     ),
     apiKeyStore: apiKeyStore,
-    // The scan path (issue #89, D15): consent and the connectivity
-    // pre-check in front of the vision engine, which sends the pages over
-    // the same chat client as the text classifier. No rules fallback: a
-    // photograph has no text for the rule engine. Constructing either
-    // does no I/O.
-    scannedMenuClassifier: RoutingScannedMenuClassifier(
-      vision: VisionMenuClassifier(client: chatClient, clock: clock),
-      connectivity: connectivity,
-    ),
+    scannedMenuClassifier: scannedMenuClassifier,
     // In memory only; the pages never reach Hive (issue #89).
     scannedPages: ScannedPagesRegistry(),
     // The device picker builds no plugin state until a page is picked

@@ -255,7 +255,8 @@ void main() {
       // Act
       await tester.enterText(
         find.byType(TextField),
-        'https://example.com/nope',
+        // Not a Wolt venue page; Wolt keeps priority over websites (D19).
+        'https://wolt.com/en/discovery',
       );
       await tester.pump();
 

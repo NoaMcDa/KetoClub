@@ -226,6 +226,18 @@ const _boundaries = <_Boundary>[
     'services/venue/venue_ref_resolver.dart',
   }),
   _Boundary('/v1/chat', {'services/llm/backend_chat_client.dart'}),
+  // A restaurant's own website (architecture.md D19): the web build asks
+  // the backend's fetch route, a phone fetches directly with the named
+  // User-Agent. Each lives in exactly one file.
+  _Boundary('/v1/website/fetch', {
+    'services/menu/website/backend_website_fetcher.dart',
+  }),
+  _Boundary('KetoClubBot/', {
+    'services/menu/website/direct_website_fetcher.dart',
+  }),
+  _Boundary('github.com/NoaMcDa', {
+    'services/menu/website/direct_website_fetcher.dart',
+  }),
   _Boundary('KETOCLUB_BACKEND_URL', {'di.dart'}),
   _Boundary('package:geolocator/geolocator.dart', {
     'services/location/geolocator_location_service.dart',

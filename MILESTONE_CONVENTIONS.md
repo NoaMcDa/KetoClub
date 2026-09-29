@@ -130,9 +130,9 @@ platform serves: text they paste, photographs of a physical menu, or a PDF.
    no on-device OCR and the old "OCR Menu Scanning" milestone name no longer
    describes anything). Shipped: paste-a-menu (#83, D18), image parts on the chat
    clients (#170), `VisionMenuClassifier` behind a sibling `ScannedMenuClassifier`
-   (#89) and the Scan tab's photo, image and PDF pickers (#82). Open: #84 (flow
-   tests), #88 (a person-run Gemini vision smoke test), #181 (website menus) and
-   #182 (QR codes).
+   (#89), the Scan tab's photo, image and PDF pickers (#82), the scan flow tests
+   (#84) and website menus (#181, D19). Open: #88 (a person-run Gemini vision
+   smoke test) and #182 (QR codes).
 
 Dietary customisation (carnivore, dairy-free, seed-oil-free toggles; Tier C in
 `feature_prioratization`) is **shipped** and lives under
@@ -152,7 +152,8 @@ logging and macro tracking out of scope for KetoClub entirely — that design in
 - ✅ Users can switch between dietary rulesets (shipped under Phase 2)
 - ⏳ A real Gemini request carrying images has been observed working (#88); flow
   tests cover each scan path (#84)
-- Menus from a website or a QR code — not built (#181, #182)
+- ✅ Menus from a restaurant's own website (#181, D19); a QR code — not built
+  (#182)
 
 ## Milestone Properties
 

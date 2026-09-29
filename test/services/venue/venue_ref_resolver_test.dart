@@ -90,15 +90,71 @@ const _accepted = <_Accepted>[
     'https://www.10bis.co.il/Restaurants/Menu/123456/',
     VenueRef(source: MenuSource.tenbis, platformId: '123456'),
   ),
+  // Issue #181 (D19): any other http(s) URL is a restaurant's own site.
+  _Accepted(
+    'a restaurant homepage URL, as a website',
+    'https://cafe-noir.co.il/',
+    VenueRef(source: MenuSource.website, platformId: 'https://cafe-noir.co.il'),
+  ),
+  _Accepted(
+    'a URL on an unrelated host, as a website with its path kept',
+    'https://example.com/restaurant/vitrina-lilinblum',
+    VenueRef(
+      source: MenuSource.website,
+      platformId: 'https://example.com/restaurant/vitrina-lilinblum',
+    ),
+  ),
+  _Accepted(
+    'a website URL with upper case, a fragment and a query, normalised',
+    'HTTPS://Cafe-Noir.CO.IL/Menu/?lang=he#dinner',
+    VenueRef(
+      source: MenuSource.website,
+      platformId: 'https://cafe-noir.co.il/Menu?lang=he',
+    ),
+  ),
+  _Accepted(
+    'a scheme-less website URL with a path',
+    'cafe-noir.co.il/menu',
+    VenueRef(
+      source: MenuSource.website,
+      platformId: 'https://cafe-noir.co.il/menu',
+    ),
+  ),
+  _Accepted(
+    'a plain http website keeps its scheme and a non-default port',
+    'http://cafe-noir.co.il:8080/menu',
+    VenueRef(
+      source: MenuSource.website,
+      platformId: 'http://cafe-noir.co.il:8080/menu',
+    ),
+  ),
+  _Accepted(
+    "a lookalike wolt host, which is someone else's website",
+    'https://wolt.com.evil.com/en/isr/tel-aviv/restaurant/vitrina-lilinblum',
+    VenueRef(
+      source: MenuSource.website,
+      platformId:
+          'https://wolt.com.evil.com/en/isr/tel-aviv/restaurant/'
+          'vitrina-lilinblum',
+    ),
+  ),
+  _Accepted(
+    "a lookalike 10bis host, which is someone else's website",
+    'https://10bis.co.il.evil.com/Restaurants/Menu/123456',
+    VenueRef(
+      source: MenuSource.website,
+      platformId: 'https://10bis.co.il.evil.com/Restaurants/Menu/123456',
+    ),
+  ),
 ];
 
 const _rejected = <_Rejected>[
   _Rejected('empty input', ''),
   _Rejected('whitespace-only input', '   '),
-  _Rejected(
-    'a URL on an unrelated host',
-    'https://example.com/restaurant/vitrina-lilinblum',
-  ),
+  _Rejected('an ftp URL', 'ftp://cafe-noir.co.il/menu.pdf'),
+  _Rejected('a URL whose host has no dot', 'http://localhost/menu'),
+  _Rejected('a URL carrying user info', 'https://me:pw@cafe-noir.co.il/'),
+  _Rejected('a mailto link', 'mailto:owner@cafe-noir.co.il'),
   _Rejected(
     'a wolt.com URL with no restaurant segment',
     'https://wolt.com/en/isr/tel-aviv',
@@ -108,20 +164,12 @@ const _rejected = <_Rejected>[
     'https://wolt.com/en/isr/tel-aviv/restaurant/',
   ),
   _Rejected(
-    'a lookalike wolt host with wolt.com as a prefix, not the domain',
-    'https://wolt.com.evil.com/en/isr/tel-aviv/restaurant/vitrina-lilinblum',
-  ),
-  _Rejected(
     'a 10bis URL with no numeric id anywhere in the path',
     'https://www.10bis.co.il/Restaurants/Menu/',
   ),
   _Rejected(
     'a 10bis URL whose id segment is non-numeric',
     'https://www.10bis.co.il/Restaurants/Menu/abc123',
-  ),
-  _Rejected(
-    'a lookalike 10bis host with 10bis.co.il as a prefix, not the domain',
-    'https://10bis.co.il.evil.com/Restaurants/Menu/123456',
   ),
   // Issue #169: a bare English word without a hyphen used to resolve as
   // a Wolt slug and be offered "Show the keto menu"; it now reads as
@@ -219,6 +267,21 @@ void main() {
       );
     });
 
+    test("returns a website ref's own URL, which round-trips", () {
+      // Arrange
+      final ref = VenueRefResolver.resolve(
+        'https://cafe-noir.co.il/%D7%AA%D7%A4%D7%A8%D7%99%D7%98?x=1',
+      );
+
+      // Act
+      final url = VenueRefResolver.platformUrl(ref!);
+
+      // Assert
+      expect(ref.source, MenuSource.website);
+      expect(url.toString(), ref.platformId);
+      expect(VenueRefResolver.resolve(url.toString()), equals(ref));
+    });
+
     test('returns null for Tabit, Ontopo and a scan, which have no known '
         'URL form', () {
       for (final source in [
@@ -263,6 +326,55 @@ void main() {
 
       // Assert
       expect(roundTripped, equals(ref));
+    });
+  });
+
+  group('VenueRefResolver.websiteHost (D19)', () {
+    test('is the host of a website ref', () {
+      const ref = VenueRef(
+        source: MenuSource.website,
+        platformId: 'https://cafe-noir.co.il/menu',
+      );
+      expect(VenueRefResolver.websiteHost(ref), 'cafe-noir.co.il');
+    });
+
+    test('is null for any other source, or an id with no host', () {
+      expect(
+        VenueRefResolver.websiteHost(
+          const VenueRef(source: MenuSource.wolt, platformId: 'a-b'),
+        ),
+        isNull,
+      );
+      expect(
+        VenueRefResolver.websiteHost(
+          const VenueRef(source: MenuSource.website, platformId: 'nothing'),
+        ),
+        isNull,
+      );
+    });
+  });
+
+  group('VenueRefResolver.normaliseWebsiteUrl (D19)', () {
+    test('rejects a host that starts or ends with a dot', () {
+      expect(
+        VenueRefResolver.normaliseWebsiteUrl(Uri.parse('https://.co.il/')),
+        isNull,
+      );
+      expect(
+        VenueRefResolver.normaliseWebsiteUrl(Uri.parse('https://cafe.il./')),
+        isNull,
+      );
+    });
+
+    test('the same page pasted twice normalises the same', () {
+      expect(
+        VenueRefResolver.normaliseWebsiteUrl(
+          Uri.parse('https://cafe.co.il:443/menu/'),
+        ),
+        VenueRefResolver.normaliseWebsiteUrl(
+          Uri.parse('https://CAFE.co.il/menu#top'),
+        ),
+      );
     });
   });
 }

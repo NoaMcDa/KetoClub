@@ -8,6 +8,7 @@ import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/consent_disclosure_banner.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
@@ -126,11 +127,7 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
   /// arguments so the menu header can show it: no documented menu payload
   /// names the venue, so without it the header falls back to the slug.
   void _openVenue(VenueRef ref, {String? name}) {
-    Navigator.pushNamed(
-      context,
-      '/venue/${ref.source.name}/${ref.platformId}',
-      arguments: name,
-    );
+    Navigator.pushNamed(context, venueRoutePath(ref), arguments: name);
   }
 
   void _locate() {

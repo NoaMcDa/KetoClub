@@ -622,4 +622,40 @@ void main() {
       expect(await cache.read(_tenbisRef), isNotNull);
     });
   });
+
+  group('CachedMenuRepository adapter-made analysis (issue #181)', () {
+    test('caches the analysis an adapter read with the menu, replacing '
+        'an older one', () async {
+      // Arrange: a website PDF read by vision carries its own verdicts.
+      const websiteRef = VenueRef(
+        source: MenuSource.website,
+        platformId: 'https://cafe.example',
+      );
+      final adapter = FakePlatformMenuAdapter(source: MenuSource.website);
+      final cache = FakeMenuCache();
+      final repository = CachedMenuRepository(
+        adapters: [adapter],
+        cache: cache,
+        clock: FakeClock(_epoch),
+      );
+      final menu = _menuWith(websiteRef, _epoch);
+      await cache.write(CachedMenu(menu: menu, analysis: _someAnalysis));
+      final analysis = MenuAnalysed(
+        dishes: const <AnalysedDish>[],
+        unclassified: const <String>['A'],
+        engine: const LlmEngine(model: 'vision'),
+        analysedAt: _epoch,
+      );
+      adapter.queueResult(MenuFetched(menu: menu, analysis: analysis));
+
+      // Act
+      final result = await repository.load(websiteRef, forceRefresh: true);
+
+      // Assert: the caller gets the menu; the cache holds both.
+      expect(result, MenuFetched(menu: menu));
+      final cached = await cache.read(websiteRef);
+      expect(cached?.menu, menu);
+      expect(cached?.analysis, analysis);
+    });
+  });
 }

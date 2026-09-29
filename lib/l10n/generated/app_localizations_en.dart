@@ -941,4 +941,39 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get scanScreenFailureApiKeyRejected =>
       'Gemini rejected your API key. Check it in Settings, then try again.';
+
+  @override
+  String websiteMenuNotFound(String site) {
+    return 'KetoClub could not find a menu it can read on $site.';
+  }
+
+  @override
+  String websiteDisallowedByRobots(String site) {
+    return '$site asks apps like KetoClub not to read its pages, so KetoClub does not.';
+  }
+
+  @override
+  String websiteJsOnlyPage(String site) {
+    return '$site only shows its menu with JavaScript, which KetoClub cannot read yet.';
+  }
+
+  @override
+  String websiteUnreachable(String site) {
+    return '$site did not answer. Try again later.';
+  }
+
+  @override
+  String websiteTooLarge(String site) {
+    return 'The menu on $site is too large for KetoClub to read.';
+  }
+
+  @override
+  String websiteRateLimited(String site) {
+    return 'KetoClub read $site a moment ago. Wait a minute, then try again.';
+  }
+
+  @override
+  String websitePdfUnread(String site) {
+    return 'The menu on $site is a PDF, which only AI analysis can read, and it could not be read now. Check AI analysis in Settings, then try again.';
+  }
 }

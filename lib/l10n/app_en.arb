@@ -398,5 +398,34 @@
   "scanScreenFailureBackendUnreachable": "KetoClub's server could not be reached. Your pages are kept; try again.",
   "scanScreenFailureConsentWithheld": "Scanning sends the pages to Google's Gemini API to be read. Allow AI analysis in Settings to scan a menu.",
   "scanScreenFailureApiKeyMissing": "Add your Gemini API key in Settings to scan a menu.",
-  "scanScreenFailureApiKeyRejected": "Gemini rejected your API key. Check it in Settings, then try again."
+  "scanScreenFailureApiKeyRejected": "Gemini rejected your API key. Check it in Settings, then try again.",
+
+  "websiteMenuNotFound": "KetoClub could not find a menu it can read on {site}.",
+  "@websiteMenuNotFound": {
+    "placeholders": { "site": { "type": "String" } }
+  },
+  "websiteDisallowedByRobots": "{site} asks apps like KetoClub not to read its pages, so KetoClub does not.",
+  "@websiteDisallowedByRobots": {
+    "placeholders": { "site": { "type": "String" } }
+  },
+  "websiteJsOnlyPage": "{site} only shows its menu with JavaScript, which KetoClub cannot read yet.",
+  "@websiteJsOnlyPage": {
+    "placeholders": { "site": { "type": "String" } }
+  },
+  "websiteUnreachable": "{site} did not answer. Try again later.",
+  "@websiteUnreachable": {
+    "placeholders": { "site": { "type": "String" } }
+  },
+  "websiteTooLarge": "The menu on {site} is too large for KetoClub to read.",
+  "@websiteTooLarge": {
+    "placeholders": { "site": { "type": "String" } }
+  },
+  "websiteRateLimited": "KetoClub read {site} a moment ago. Wait a minute, then try again.",
+  "@websiteRateLimited": {
+    "placeholders": { "site": { "type": "String" } }
+  },
+  "websitePdfUnread": "The menu on {site} is a PDF, which only AI analysis can read, and it could not be read now. Check AI analysis in Settings, then try again.",
+  "@websitePdfUnread": {
+    "placeholders": { "site": { "type": "String" } }
+  }
 }

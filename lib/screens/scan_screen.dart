@@ -8,6 +8,7 @@ import 'package:ketoclub/services/platform/page_picker.dart';
 import 'package:ketoclub/state/menu_controller.dart' show LoadPhase;
 import 'package:ketoclub/state/scan_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/scan_failure_copy.dart';
 import 'package:provider/provider.dart';
@@ -92,7 +93,7 @@ class _ScanScreenState extends State<ScanScreen> {
 
   void _open(VenueRef? ref) {
     if (ref == null || !mounted) return;
-    Navigator.pushNamed(context, '/venue/${ref.source.name}/${ref.platformId}');
+    Navigator.pushNamed(context, venueRoutePath(ref));
   }
 
   @override

@@ -140,3 +140,18 @@ the first"; one fixture per replaced rule (`nameless_element`,
 §9.4 rule is proven by running the text path's own `llm_*.json` fixtures above
 through `parseScanned` unchanged, so the two parsers are held to the same
 files. No vision reply has been recorded yet (#88).
+
+## Restaurant websites (`website/*.html`)
+
+**Synthetic**, hand-written for issue #181 (`architecture.md` D19); each says so
+in a leading HTML comment. No real restaurant site has been recorded: they pin
+the locator's cases, not any real site's markup. `jsonld_menu.html` carries a
+schema.org `Menu` (sections, a nested section, a nameless item, a malformed
+block); `menu_link.html` links its menu page from the nav (and a Wolt link that
+must not be followed); `hebrew_menu_link.html` says `תפריט` only in a link's
+text; `pdf_link.html` links a menu PDF on a file host beside a wine-list PDF;
+`no_menu.html` has none of these; `menu_page_separate_prices.html` (Hebrew) and
+`menu_page_inline_prices.html` (English) are the two price layouts
+`WebsiteMenuLocator.menuText` reads. Replace or supplement them with real,
+redacted pages once a machine can fetch some, and record which sites they came
+from.

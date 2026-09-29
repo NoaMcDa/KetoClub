@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
@@ -18,8 +19,14 @@ sealed class MenuFetchResult {
 final class MenuFetched extends MenuFetchResult {
   /// Creates a fetched result carrying [menu]. [fromCache] marks a cached
   /// menu served instead of a fresh fetch; [staleReason] must be null
-  /// unless [fromCache] is true.
-  const new({required this.menu, this.fromCache = false, this.staleReason});
+  /// unless [fromCache] is true. [analysis] is set only by an adapter that
+  /// classified the menu in the same request that read it.
+  const new({
+    required this.menu,
+    this.fromCache = false,
+    this.staleReason,
+    this.analysis,
+  });
 
   /// The menu, fresh or cached.
   final Menu menu;
@@ -33,15 +40,23 @@ final class MenuFetched extends MenuFetchResult {
   /// Non-null only when [fromCache] is true (architecture.md §10, row 1).
   final MenuFetchFailureReason? staleReason;
 
+  /// The verdicts for [menu], when the adapter produced them while reading
+  /// it: a website's PDF menu, transcribed and classified by the vision
+  /// path in one request (architecture.md D6, D19). The repository caches
+  /// it beside [menu], so the menu screen reuses it rather than spending a
+  /// second model call. Null for every other fetch.
+  final MenuAnalysed? analysis;
+
   @override
   bool operator ==(Object other) =>
       other is MenuFetched &&
       other.menu == menu &&
       other.fromCache == fromCache &&
-      other.staleReason == staleReason;
+      other.staleReason == staleReason &&
+      other.analysis == analysis;
 
   @override
-  int get hashCode => Object.hash(menu, fromCache, staleReason);
+  int get hashCode => Object.hash(menu, fromCache, staleReason, analysis);
 
   @override
   String toString() =>

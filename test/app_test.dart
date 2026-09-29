@@ -14,6 +14,7 @@ import 'package:ketoclub/screens/settings_screen.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/scan_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/app_shell.dart';
 import 'package:provider/provider.dart';
 
@@ -238,6 +239,27 @@ void main() {
         MenuSource.tenbis,
       );
       expect(venueRefFromPath('/venue/0/12345'), isNull);
+    });
+
+    test('reads back a website ref, whose URL is one encoded segment', () {
+      // Arrange
+      const ref = VenueRef(
+        source: MenuSource.website,
+        platformId: 'https://cafe-noir.co.il/menu?lang=he',
+      );
+
+      // Act
+      final path = venueRoutePath(ref);
+
+      // Assert
+      expect(path, startsWith('/venue/website/https%3A%2F%2F'));
+      expect(venueRefFromPath(path), ref);
+      expect(
+        venueRoutePath(
+          const VenueRef(source: MenuSource.wolt, platformId: 'a-b'),
+        ),
+        '/venue/wolt/a-b',
+      );
     });
 
     test('rejects a path that is not a venue route', () {

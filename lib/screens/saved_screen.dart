@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
+import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/saved_controller.dart';
+import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:provider/provider.dart';
 
-/// The brand name shown for [source] (architecture.md §10) — the same
+/// The brand name shown for [ref]'s source (architecture.md §10) — the same
 /// literal names `menu_screen.dart`'s own `_platformName` uses. Kept as
 /// this file's own copy rather than a shared import: not an l10n key
 /// either, for the same reason as there — a platform's brand name does
@@ -17,23 +19,28 @@ import 'package:provider/provider.dart';
 /// self-contained").
 ///
 /// A pasted menu has no brand, so it reads [AppLocalizations.sourceScanned].
-String _platformName(MenuSource source, AppLocalizations l10n) =>
-    switch (source) {
+///
+/// A website reads its own host (architecture.md D19).
+String _platformName(VenueRef ref, AppLocalizations l10n) =>
+    switch (ref.source) {
       MenuSource.wolt => 'Wolt',
       MenuSource.tenbis => '10bis',
       MenuSource.tabit => 'Tabit',
       MenuSource.ontopo => 'Ontopo',
       MenuSource.scan => l10n.sourceScanned,
+      MenuSource.website => VenueRefResolver.websiteHost(ref) ?? ref.platformId,
     };
 
 /// The title a saved entry shows: its venue name, else its reference —
 /// except for a pasted menu, whose reference is a hash and reads as
-/// [AppLocalizations.sourceScanned].
+/// [AppLocalizations.sourceScanned], and a website, which reads as its
+/// host.
 String _entryTitle(CachedMenuEntry entry, AppLocalizations l10n) =>
     entry.venueName ??
-    (entry.ref.source == MenuSource.scan
-        ? l10n.sourceScanned
-        : entry.ref.platformId);
+    switch (entry.ref.source) {
+      MenuSource.scan || MenuSource.website => _platformName(entry.ref, l10n),
+      _ => entry.ref.platformId,
+    };
 
 /// The bucketed "time ago" phrase for [fetchedAt] relative to [now] — this
 /// file's own copy of `menu_screen.dart`'s `_ageLabel`, kept local for the
@@ -166,7 +173,7 @@ class _SavedScreenState extends State<SavedScreen> {
           entry: entry,
           onTap: () => Navigator.pushNamed(
             context,
-            '/venue/${entry.ref.source.name}/${entry.ref.platformId}',
+            venueRoutePath(entry.ref),
             // Issue #169: pass the cached venue name through the route
             // as arguments, so the menu header shows the venue's real
             // name rather than the raw slug when the cache has one
@@ -276,9 +283,7 @@ class _SavedEntryTile extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 4),
-              Text(
-                l10n.menuSourceLine(_platformName(entry.ref.source, l10n), age),
-              ),
+              Text(l10n.menuSourceLine(_platformName(entry.ref, l10n), age)),
               const SizedBox(height: 4),
               Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
