@@ -9,10 +9,12 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 import '../services/llm/llm_chat_client_contract.dart';
+import '../services/storage/api_key_store_contract.dart';
 import '../services/storage/install_id_store_contract.dart';
 import '../services/storage/menu_cache_contract.dart';
 import '../services/storage/notes_store_contract.dart';
 import '../services/storage/settings_store_contract.dart';
+import 'fake_api_key_store.dart';
 import 'fake_app_logger.dart';
 import 'fake_clock.dart';
 import 'fake_install_id_store.dart';
@@ -790,6 +792,7 @@ void main() {
   runLlmChatClientContract('FakeLlmChatClient', FakeLlmChatClient.new);
   runInstallIdStoreContract('FakeInstallIdStore', FakeInstallIdStore.new);
   runNotesStoreContract('FakeNotesStore', FakeNotesStore.new);
+  runApiKeyStoreContract('FakeApiKeyStore', FakeApiKeyStore.new);
 
   group('FakeMenuCache degradation switches', () {
     test('failOnRead makes every read miss without throwing', () async {

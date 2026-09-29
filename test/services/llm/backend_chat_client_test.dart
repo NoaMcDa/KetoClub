@@ -441,9 +441,44 @@ void main() {
       // Act
       final clientOnly = ChatFailureReason.values.toSet().difference(covered);
 
-      // Assert: only backendUnreachable is not a wire reason.
-      expect(clientOnly, equals({ChatFailureReason.backendUnreachable}));
+      // Assert: backendUnreachable is the client failing to reach the
+      // server; the two key reasons belong to the direct Gemini client
+      // alone (architecture.md D17). None of them is a wire reason.
+      expect(
+        clientOnly,
+        equals({
+          ChatFailureReason.backendUnreachable,
+          ChatFailureReason.apiKeyMissing,
+          ChatFailureReason.apiKeyRejected,
+        }),
+      );
     });
+
+    for (final name in const ['apiKeyMissing', 'apiKeyRejected']) {
+      test('the direct-client-only "$name" from the wire is '
+          'badResponse', () async {
+        // Arrange: the backend holds its own key (D12), so a body blaming
+        // the user's key is not one this client trusts.
+        final client = _answering(_errorBody(name, 401), 401);
+
+        // Act
+        final result = await client.complete(
+          systemPrompt: 's',
+          userPrompt: 'u',
+        );
+
+        // Assert
+        expect(
+          result,
+          equals(
+            const ChatFailed(
+              reason: ChatFailureReason.badResponse,
+              statusCode: 401,
+            ),
+          ),
+        );
+      });
+    }
 
     test('an unknown reason is badResponse with the status', () async {
       // Arrange

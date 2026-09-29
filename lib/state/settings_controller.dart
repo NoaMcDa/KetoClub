@@ -1,44 +1,67 @@
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
+import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 /// Screen state for the Settings screen (architecture.md §6.6).
 ///
 /// Reads and writes the user's preferences — including whether dish text
-/// may be sent to KetoClub's server for AI analysis — through a
-/// [SettingsStore], and delegates cache clearing to a [MenuRepository].
-/// There is no credential here: the model key lives on the server.
+/// may be sent for AI analysis — through a [SettingsStore], and delegates
+/// cache clearing to a [MenuRepository].
+///
+/// On iOS and Android it also saves and removes the user's own Gemini API
+/// key through an [ApiKeyStore] (architecture.md D17); on web there is no
+/// store, [supportsApiKey] is false, and the model key lives on the
+/// server (D12). **Never exposes the key itself** — only [hasApiKey], a
+/// presence flag — because the key is read solely by `GeminiChatClient`
+/// and is never logged, never in a failure value and never in the cache
+/// (§11); a getter that returned it, or a field that outlived
+/// [saveApiKey], would be a way around that rule.
 ///
 /// Never throws — every service behind it already returns values instead
 /// of throwing, or promises not to (architecture.md §18.1).
 final class SettingsController extends ChangeNotifier {
-  /// Creates a controller over a [SettingsStore] and a [MenuRepository].
+  /// Creates a controller over a [SettingsStore], a [MenuRepository] and,
+  /// on iOS and Android, an [ApiKeyStore].
   ///
-  /// The two services are positional and private, matching
+  /// The services are positional and private, matching
   /// `MenuController`: private because a widget reaches a service only
   /// through a controller's own API (architecture.md §5) and a public
   /// field would hand it a way around this class; positional, because a
   /// private field cannot be a named initializing formal in Dart and the
   /// alternative was suppressing a lint on every field. The distinct
   /// types mean a misordered call does not compile.
-  new(this._settings, this._repository);
+  /// The key store is optional because the web build has none.
+  new(this._settings, this._repository, [this._apiKeyStore]);
 
   final SettingsStore _settings;
   final MenuRepository _repository;
+  final ApiKeyStore? _apiKeyStore;
 
   bool _isBusy = false;
   AppSettings _appSettings = const AppSettings();
   int _cachedMenuCount = 0;
+  bool _hasApiKey = false;
 
   /// Whether an operation is currently reading from or writing to a
   /// store.
   bool get isBusy => _isBusy;
 
-  /// Whether the user has allowed AI analysis: dish text sent to
-  /// KetoClub's server, which forwards it to the model provider.
+  /// Whether the user has allowed AI analysis: dish text sent to the
+  /// model provider — straight to Google on iOS and Android (D17), through
+  /// KetoClub's server on web (D12).
   bool get consentGiven => _appSettings.estimationConsentGiven;
+
+  /// Whether this build takes the user's own Gemini API key: true on iOS
+  /// and Android, false on web (architecture.md D17). Settings shows the
+  /// key field, and the direct-to-Google disclosure, only when it is.
+  bool get supportsApiKey => _apiKeyStore != null;
+
+  /// Whether a Gemini API key is currently saved. Always false when
+  /// [supportsApiKey] is. Never the key itself — see the class doc.
+  bool get hasApiKey => _hasApiKey;
 
   /// The UI language, as a BCP-47 tag, or null to follow the device
   /// locale.
@@ -83,14 +106,56 @@ final class SettingsController extends ChangeNotifier {
 
     _appSettings = await _settings.read();
     _cachedMenuCount = await _repository.cachedMenuCount();
+    _hasApiKey = await _apiKeyStore?.hasKey() ?? false;
+
+    _isBusy = false;
+    notifyListeners();
+  }
+
+  /// Saves [key], trimmed, as the user's Gemini API key (architecture.md
+  /// D17).
+  ///
+  /// A key that is empty or only whitespace is **not written**: Gemini
+  /// would reject it regardless, so storing it would only replace "no
+  /// key" with a value guaranteed to fail. Also a no-op when
+  /// [supportsApiKey] is false. [hasApiKey] is re-read from the store
+  /// afterwards rather than assumed, so a write the platform dropped
+  /// shows as "no key".
+  Future<void> saveApiKey(String key) async {
+    final store = _apiKeyStore;
+    final trimmed = key.trim();
+    if (store == null || trimmed.isEmpty) return;
+
+    _isBusy = true;
+    notifyListeners();
+
+    await store.write(trimmed);
+    _hasApiKey = await store.hasKey();
+
+    _isBusy = false;
+    notifyListeners();
+  }
+
+  /// Removes the saved Gemini API key, if any; the next menu opened falls
+  /// back to the rules engine, saying why. A no-op when [supportsApiKey]
+  /// is false.
+  Future<void> deleteApiKey() async {
+    final store = _apiKeyStore;
+    if (store == null) return;
+
+    _isBusy = true;
+    notifyListeners();
+
+    await store.delete();
+    _hasApiKey = await store.hasKey();
 
     _isBusy = false;
     notifyListeners();
   }
 
   /// Records whether the user agrees to the disclosure in Settings that dish
-  /// text is sent to KetoClub's server, which forwards it to the model
-  /// provider for analysis (architecture.md §11).
+  /// text is sent to the model provider for analysis — directly on iOS and
+  /// Android, through KetoClub's server on web (architecture.md §11).
   ///
   /// Named rather than positional so a call site reads as a sentence, which
   /// also avoids suppressing `avoid_positional_boolean_parameters`.

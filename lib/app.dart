@@ -165,6 +165,7 @@ Route<void>? generateRoute(
             connectivity: dependencies.connectivity,
             locationService: dependencies.locationService,
             settingsStore: dependencies.settingsStore,
+            directToGoogle: dependencies.apiKeyStore != null,
           ),
         ),
       ),
@@ -201,6 +202,7 @@ Route<void>? generateRoute(
           create: (_) => SettingsController(
             dependencies.settingsStore,
             dependencies.menuRepository,
+            dependencies.apiKeyStore,
           ),
           child: const SettingsScreen(),
         ),

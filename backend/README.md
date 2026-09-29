@@ -8,6 +8,12 @@ request before it leaves; this service forwards it (`backend_plan.md` §1).
 configured, the app behaves exactly as it does without one, including the
 web build's paste-a-link path.
 
+**It serves the web build only** (`architecture.md` D17, issue #194). iOS and
+Android call Wolt and Google's Gemini API themselves, with a key the user
+pastes into the app's Settings, and never call this service even when
+`KETOCLUB_BACKEND_URL` is compiled into a phone build. `/v1/chat` is the web
+build's only path to a model.
+
 Routes shipped so far:
 
 | Route | Issue | Install id? | Limiter? | What it does |
@@ -15,7 +21,7 @@ Routes shipped so far:
 | `GET /v1/health` | #94 | no | no | `{status, version, llm_configured}` |
 | `GET /v1/proxy/wolt/venues/slug/{slug}/assortment` | #95, #168 | no | no | The Wolt menu proxy for the web build, see below |
 | `GET /v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu` | #122 | no | no | The 10bis menu proxy for the web build, see below |
-| `POST /v1/chat` | #100 | **yes** | **yes** (`RATE_LIMIT_*`) | Hosted classification: forwards one completion to Gemini `generateContent` with the server's key |
+| `POST /v1/chat` | #100 | **yes** | **yes** (`RATE_LIMIT_*`) | Hosted classification for the web build: forwards one completion to Gemini `generateContent` with the server's key |
 | `GET /v1/proxy/wolt/pages/restaurants` | #123 | **yes** | **yes** (`DISCOVERY_RATE_LIMIT_PER_MINUTE`) | Nearby-venue search for the web build, see below |
 | `POST /v1/proxy/wolt/pages/search` | #123 | **yes** | **yes** (`DISCOVERY_RATE_LIMIT_PER_MINUTE`) | By-name venue search for the web build, see below |
 
@@ -235,15 +241,8 @@ Point the Flutter web build at it:
 flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
 ```
 
-From an **Android emulator**, `localhost` on the host machine is not
-reachable from the guest; use the emulator's host alias instead:
-
-```bash
-flutter run --dart-define=KETOCLUB_BACKEND_URL=http://10.0.2.2:8000
-```
-
-iOS simulators and physical devices are unaffected — see `backend_plan.md`
-§4 for the client-side wiring once the proxy route lands.
+An iOS or Android build ignores the define (D17): phones reach Wolt and
+Gemini directly, so there is no reason to point one at this service.
 
 ## Configuration
 

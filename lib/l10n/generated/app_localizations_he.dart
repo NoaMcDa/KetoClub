@@ -145,6 +145,33 @@ class AppLocalizationsHe extends AppLocalizations {
   String get consentDisclosureTurnOff => 'כבה';
 
   @override
+  String get settingsConsentBodyDirect =>
+      'ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים תפריט, שמות המנות, התיאורים ושמות התוספות נשלחים ישירות מהמכשיר הזה ל‑Gemini API של Google, עם מפתח ה‑API שלכם. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.';
+
+  @override
+  String get settingsKeySection => 'מפתח Gemini API';
+
+  @override
+  String get settingsKeyBody =>
+      'בטלפון הזה, ניתוח בינה מלאכותית פונה ישירות ל‑Gemini API של Google עם המפתח שלכם. אפשר ליצור מפתח בחינם ב‑Google AI Studio. המפתח נשמר באחסון המאובטח של המכשיר ונשלח רק ל‑Google.';
+
+  @override
+  String get settingsKeyHint => 'הדביקו את מפתח ה‑Gemini API שלכם';
+
+  @override
+  String get settingsKeySave => 'שמור מפתח';
+
+  @override
+  String get settingsKeyPresent => 'מפתח שמור במכשיר הזה.';
+
+  @override
+  String get settingsKeyAbsent =>
+      'אין מפתח שמור. קטוקלאב ישתמש בכללים שעל המכשיר.';
+
+  @override
+  String get settingsKeyDelete => 'הסר מפתח';
+
+  @override
   String get settingsLanguage => 'שפה';
 
   @override
@@ -331,6 +358,14 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get analysisConsentWithheld =>
       'אשרו ניתוח בינה מלאכותית בהגדרות כדי לנתח את התפריט הזה. מוצגות תוצאות על בסיס כללים.';
+
+  @override
+  String get analysisApiKeyMissing =>
+      'הוסיפו את מפתח ה‑Gemini API שלכם בהגדרות כדי לנתח את התפריט הזה. מוצגות תוצאות על בסיס כללים.';
+
+  @override
+  String get analysisApiKeyRejected =>
+      'Gemini דחתה את מפתח ה‑API שלכם. בדקו אותו בהגדרות. מוצגות תוצאות על בסיס כללים.';
 
   @override
   String pillSemanticLabel(String verdict) {

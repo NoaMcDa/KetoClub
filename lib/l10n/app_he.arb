@@ -59,6 +59,14 @@
   "settingsConsentAccept": "אפשר ניתוח בינה מלאכותית",
   "consentDisclosureOk": "אישור",
   "consentDisclosureTurnOff": "כבה",
+  "settingsConsentBodyDirect": "ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים תפריט, שמות המנות, התיאורים ושמות התוספות נשלחים ישירות מהמכשיר הזה ל‑Gemini API של Google, עם מפתח ה‑API שלכם. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.",
+  "settingsKeySection": "מפתח Gemini API",
+  "settingsKeyBody": "בטלפון הזה, ניתוח בינה מלאכותית פונה ישירות ל‑Gemini API של Google עם המפתח שלכם. אפשר ליצור מפתח בחינם ב‑Google AI Studio. המפתח נשמר באחסון המאובטח של המכשיר ונשלח רק ל‑Google.",
+  "settingsKeyHint": "הדביקו את מפתח ה‑Gemini API שלכם",
+  "settingsKeySave": "שמור מפתח",
+  "settingsKeyPresent": "מפתח שמור במכשיר הזה.",
+  "settingsKeyAbsent": "אין מפתח שמור. קטוקלאב ישתמש בכללים שעל המכשיר.",
+  "settingsKeyDelete": "הסר מפתח",
   "settingsLanguage": "שפה",
   "settingsLanguageSystem": "לפי המכשיר",
   "settingsLanguageEnglish": "אנגלית",
@@ -132,6 +140,8 @@
   "analysisNoDishesFound": "הבינה המלאכותית לא הצליחה לזהות מנות בתפריט הזה.",
   "analysisBackendUnreachable": "לא ניתן היה להתחבר לשרת של קטוקלאב. מוצגות תוצאות על בסיס כללים.",
   "analysisConsentWithheld": "אשרו ניתוח בינה מלאכותית בהגדרות כדי לנתח את התפריט הזה. מוצגות תוצאות על בסיס כללים.",
+  "analysisApiKeyMissing": "הוסיפו את מפתח ה‑Gemini API שלכם בהגדרות כדי לנתח את התפריט הזה. מוצגות תוצאות על בסיס כללים.",
+  "analysisApiKeyRejected": "Gemini דחתה את מפתח ה‑API שלכם. בדקו אותו בהגדרות. מוצגות תוצאות על בסיס כללים.",
 
   "pillSemanticLabel": "פסיקה: {verdict}",
   "@pillSemanticLabel": {

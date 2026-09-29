@@ -17,13 +17,19 @@ final AppLocalizations _en = AppLocalizationsEn();
 Future<FakeSettingsStore> _pump(
   WidgetTester tester, {
   FakeSettingsStore? store,
+  bool directToGoogle = false,
 }) async {
   final backing = store ?? FakeSettingsStore();
   await tester.pumpWidget(
     MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: Scaffold(body: ConsentDisclosureBanner(settingsStore: backing)),
+      home: Scaffold(
+        body: ConsentDisclosureBanner(
+          settingsStore: backing,
+          directToGoogle: directToGoogle,
+        ),
+      ),
     ),
   );
   return backing;
@@ -44,6 +50,20 @@ void main() {
       expect(find.text(_en.consentDisclosureOk), findsOneWidget);
       expect(find.text(_en.consentDisclosureTurnOff), findsOneWidget);
     });
+
+    testWidgets(
+      'says dish text goes straight to Google when directToGoogle is set '
+      "(iOS and Android, D17), not through KetoClub's server",
+      (tester) async {
+        // Act
+        await _pump(tester, directToGoogle: true);
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_en.settingsConsentBodyDirect), findsOneWidget);
+        expect(find.text(_en.settingsConsentBody), findsNothing);
+      },
+    );
 
     testWidgets(
       'renders nothing once disclosureSeen is true — never shown twice on '

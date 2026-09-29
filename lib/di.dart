@@ -6,6 +6,8 @@ import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/llm_menu_classifier.dart';
 import 'package:ketoclub/services/llm/backend_chat_client.dart';
+import 'package:ketoclub/services/llm/gemini_chat_client.dart';
+import 'package:ketoclub/services/llm/llm_chat_client.dart';
 import 'package:ketoclub/services/location/geolocator_location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/tenbis/tenbis_adapter.dart';
@@ -16,6 +18,7 @@ import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
+import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/install_id_store.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
@@ -30,10 +33,11 @@ const String _menuCacheBoxName = 'menu_cache';
 
 /// KetoClub's own backend, read at build time (`backend_plan.md` §4.1).
 /// Empty when the app was built with no `--dart-define=KETOCLUB_BACKEND_URL=…`,
-/// which is every build until issue #99 adds a Settings override. The chat
-/// client needs it on every platform — AI analysis goes through the backend,
-/// which holds the model key — while the menu proxy uses it only in a
-/// browser (see [menuProxyBase]).
+/// which is every build until issue #99 adds a Settings override. Only the
+/// web build reads it: there AI analysis goes through the backend, which
+/// holds the model key, and so do menus (see [menuProxyBase]). iOS and
+/// Android call Wolt and Gemini directly and ignore it (architecture.md
+/// D17, see [chatClientFor]).
 const String _configuredBackendUrl = String.fromEnvironment(
   'KETOCLUB_BACKEND_URL',
 );
@@ -74,6 +78,43 @@ Uri? backendBaseUrl(String configured) {
 Uri? menuProxyBase({required bool runsInBrowser, required String configured}) =>
     runsInBrowser ? backendBaseUrl(configured) : null;
 
+/// Where the user's own Gemini API key is kept, or null when this build
+/// has none (architecture.md D17).
+///
+/// Off the web — iOS and Android — the app calls Gemini directly with a
+/// key the user pastes into Settings, kept in the platform's secure
+/// storage. In a browser the backend holds the key (D12), so there is no
+/// store, and so no key field in Settings. Constructing the store touches
+/// no platform channel.
+///
+/// A pure, top-level function rather than a private helper so
+/// `di_test.dart` can cover both branches, as with [menuProxyBase].
+ApiKeyStore? apiKeyStoreFor({required bool runsInBrowser}) =>
+    runsInBrowser ? null : const SecureApiKeyStore();
+
+/// The chat client the LLM classifier sends its one request per menu
+/// through (architecture.md §9, D12, D17).
+///
+/// With an [apiKeyStore] — iOS and Android, see [apiKeyStoreFor] — it is
+/// a [GeminiChatClient] calling Google directly with the user's key, and
+/// [backendBase] is ignored even when set. Without one — the web build —
+/// it is a [BackendChatClient] posting to [backendBase], which answers
+/// `notConfigured` without I/O when that is null. Keying the choice on
+/// the store, not on the platform again, is what keeps "the key field
+/// Settings shows" and "the client that reads the key" from disagreeing.
+LlmChatClient chatClientFor({
+  required http.Client client,
+  required ApiKeyStore? apiKeyStore,
+  required Uri? backendBase,
+  required InstallIdStore installIdStore,
+}) => apiKeyStore != null
+    ? GeminiChatClient(client: client, apiKeyStore: apiKeyStore)
+    : BackendChatClient(
+        client: client,
+        baseUrl: backendBase,
+        installIdStore: installIdStore,
+      );
+
 /// Composition root (architecture.md §18.1).
 ///
 /// This is the only file under lib/ that may construct a concrete service,
@@ -96,16 +137,22 @@ AppDependencies buildDependencies() {
   // Passed to the chat client and the venue search: the install id is
   // sent nowhere but the `X-KetoClub-Install-Id` header on a request to
   // KetoClub's own backend (`backend_plan.md` §3.4), which rate-limits
-  // both the chat route and the discovery routes by it.
+  // both the chat route and the discovery routes by it. Only the web build
+  // makes such requests; on a phone the id is never read.
   final installIdStore = PrefsInstallIdStore(
     load: SharedPreferences.getInstance,
   );
 
+  // iOS and Android: the user's own Gemini key, read by the direct
+  // client and written by Settings (architecture.md D17). Web: null.
+  final apiKeyStore = apiKeyStoreFor(runsInBrowser: kIsWeb);
+
   const heuristic = HeuristicMenuClassifier(clock: clock);
   final llm = LlmMenuClassifier(
-    BackendChatClient(
+    chatClientFor(
       client: client,
-      baseUrl: backendBaseUrl(_configuredBackendUrl),
+      apiKeyStore: apiKeyStore,
+      backendBase: backendBaseUrl(_configuredBackendUrl),
       installIdStore: installIdStore,
     ),
     clock,
@@ -174,5 +221,6 @@ AppDependencies buildDependencies() {
         configured: _configuredBackendUrl,
       ),
     ),
+    apiKeyStore: apiKeyStore,
   );
 }

@@ -241,7 +241,14 @@ const _boundaries = <_Boundary>[
     'or-',
     <String>{},
   ),
-  _Boundary('googleapis.com', <String>{}),
+  // Google's Gemini API, called directly from iOS and Android with the
+  // user's own key (architecture.md D17). Web goes through /v1/chat.
+  _Boundary('googleapis.com', {'services/llm/gemini_chat_client.dart'}),
+  _Boundary('x-goog-api-key', {'services/llm/gemini_chat_client.dart'}),
+  // The secure storage plugin guards that key; one file touches it.
+  _Boundary('package:flutter_secure_storage/', {
+    'services/storage/api_key_store.dart',
+  }),
 ];
 
 /// Every authored .dart file under lib/, as lib-relative path to source.

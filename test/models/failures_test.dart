@@ -34,6 +34,8 @@ void main() {
         'noDishesFound',
         'backendUnreachable',
         'consentWithheld',
+        'apiKeyMissing',
+        'apiKeyRejected',
       ];
 
       // Act

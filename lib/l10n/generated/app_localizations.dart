@@ -344,6 +344,54 @@ abstract class AppLocalizations {
   /// **'Turn off'**
   String get consentDisclosureTurnOff;
 
+  /// No description provided for @settingsConsentBodyDirect.
+  ///
+  /// In en, this message translates to:
+  /// **'AI analysis is on by default: when you open a menu, dish names, descriptions and option labels are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.'**
+  String get settingsConsentBodyDirect;
+
+  /// No description provided for @settingsKeySection.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini API key'**
+  String get settingsKeySection;
+
+  /// No description provided for @settingsKeyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'On this phone, AI analysis calls Google\'s Gemini API directly with your own key. You can create one for free in Google AI Studio. It is kept in this device\'s secure storage and sent only to Google.'**
+  String get settingsKeyBody;
+
+  /// No description provided for @settingsKeyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste your Gemini API key'**
+  String get settingsKeyHint;
+
+  /// No description provided for @settingsKeySave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save key'**
+  String get settingsKeySave;
+
+  /// No description provided for @settingsKeyPresent.
+  ///
+  /// In en, this message translates to:
+  /// **'A key is saved on this device.'**
+  String get settingsKeyPresent;
+
+  /// No description provided for @settingsKeyAbsent.
+  ///
+  /// In en, this message translates to:
+  /// **'No key saved. KetoClub will use on-device rules.'**
+  String get settingsKeyAbsent;
+
+  /// No description provided for @settingsKeyDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove key'**
+  String get settingsKeyDelete;
+
   /// No description provided for @settingsLanguage.
   ///
   /// In en, this message translates to:
@@ -637,6 +685,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Allow AI analysis in Settings to analyse this menu. Showing rule-based results.'**
   String get analysisConsentWithheld;
+
+  /// No description provided for @analysisApiKeyMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your Gemini API key in Settings to analyse this menu. Showing rule-based results.'**
+  String get analysisApiKeyMissing;
+
+  /// No description provided for @analysisApiKeyRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini rejected your API key. Check it in Settings. Showing rule-based results.'**
+  String get analysisApiKeyRejected;
 
   /// No description provided for @pillSemanticLabel.
   ///
