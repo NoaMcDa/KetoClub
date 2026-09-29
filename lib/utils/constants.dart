@@ -1603,3 +1603,29 @@ const String scannedDishIdPrefix = 'v';
 /// not read (every transcribed dish has price 0 and none is shown), and
 /// KetoClub only serves Israeli venues, so this is only ever stored.
 const String scannedMenuCurrency = 'ILS';
+
+// ---------------------------------------------------------------------------
+// Website menus (architecture.md D19; issue #181)
+// ---------------------------------------------------------------------------
+
+/// The largest HTML page a website fetch reads: 2 MiB. A PDF is capped at
+/// [maxScanPageBytes] instead, since it goes on to the vision path as one
+/// page. The backend's `WEBSITE_MAX_HTML_BYTES` is the same number.
+const int websiteMaxHtmlBytes = 2 * 1024 * 1024;
+
+/// How long one request to a restaurant's site may take, direct or
+/// through the backend's own per-hop budget.
+const Duration websiteFetchTimeout = Duration(seconds: 15);
+
+/// How long the web build waits for the backend's website route, which may
+/// follow redirects and read `robots.txt` before answering.
+const Duration websiteBackendTimeout = Duration(seconds: 60);
+
+/// The name of the category a website menu read from page text is filed
+/// under before its first header: `TextMenuSource.parse`'s
+/// `uncategorisedName`, in the menu's language like
+/// [scannedCategoryNameEn].
+const String websiteCategoryNameEn = 'Menu';
+
+/// [websiteCategoryNameEn] for a menu with any Hebrew dish name.
+const String websiteCategoryNameHe = 'תפריט';

@@ -46,6 +46,11 @@ final RegExp _hyphenatedSlug = RegExp(r'^[a-z0-9][a-z0-9-]*-[a-z0-9-]*$');
 ///   inferred from the documented API path rather than a recorded page;
 ///   re-verify against a real 10bis restaurant URL before release.
 /// - A bare 10bis restaurant id, e.g. `123456`.
+/// - Any other `http`/`https` URL, on a host with a dot in it and no
+///   user info: a restaurant's own website (architecture.md D19; issue
+///   #181). Its [VenueRef.platformId] is the URL normalised by
+///   [normaliseWebsiteUrl]. Wolt and 10bis keep priority: a URL on either
+///   host that is not a venue page is still null, never a website.
 ///
 /// A bare token (anything that is not itself a recognisable URL) is told
 /// apart by shape, not by an explicit platform prefix: a 10bis id is
@@ -66,11 +71,12 @@ final RegExp _hyphenatedSlug = RegExp(r'^[a-z0-9][a-z0-9-]*-[a-z0-9-]*$');
 /// into a URL (Tabit, Ontopo).
 abstract final class VenueRefResolver {
   /// Returns null when [input] is not something KetoClub can read:
-  /// empty or whitespace-only input, a URL on a host this class does
-  /// not recognise, a recognised host with no landmark path segment (or
-  /// a `10bis.co.il` URL with no numeric id after it), anything that
-  /// would otherwise resolve to an empty [VenueRef.platformId], or a
-  /// bare token that carries no hyphen (issue #169: not slug-shaped).
+  /// empty or whitespace-only input, a URL that is not `http`/`https`,
+  /// has no dotted host or carries user info, a Wolt or 10bis host
+  /// with no landmark path segment (or a `10bis.co.il` URL with no
+  /// numeric id after it), anything that would otherwise resolve to an
+  /// empty [VenueRef.platformId], or a bare token that carries no hyphen
+  /// (issue #169: not slug-shaped).
   static VenueRef? resolve(String input) {
     final trimmed = input.trim();
     if (trimmed.isEmpty) return null;
@@ -108,9 +114,9 @@ abstract final class VenueRefResolver {
 
   /// Resolves an already-parsed [uri] by host: `wolt.com` (or a
   /// subdomain) goes to [_fromWoltUri], `10bis.co.il` (or a subdomain)
-  /// to [_fromTenBisUri], and anything else — including a lookalike
-  /// host such as `wolt.com.evil.com` or `10bis.co.il.evil.com`, which
-  /// is neither host nor a true subdomain of it — is null.
+  /// to [_fromTenBisUri], and any other host to [_fromWebsiteUri] — a
+  /// lookalike such as `wolt.com.evil.com` is neither host nor a true
+  /// subdomain of it, so it is read as the website it is.
   static VenueRef? _fromUri(Uri uri) {
     final host = uri.host.toLowerCase();
     if (host == 'wolt.com' || host.endsWith('.wolt.com')) {
@@ -119,7 +125,50 @@ abstract final class VenueRefResolver {
     if (host == '10bis.co.il' || host.endsWith('.10bis.co.il')) {
       return _fromTenBisUri(uri);
     }
-    return null;
+    return _fromWebsiteUri(uri);
+  }
+
+  /// Resolves a restaurant website [uri] (D19): null unless
+  /// [normaliseWebsiteUrl] accepts it.
+  static VenueRef? _fromWebsiteUri(Uri uri) {
+    final normalised = normaliseWebsiteUrl(uri);
+    if (normalised == null) return null;
+    return VenueRef(source: MenuSource.website, platformId: normalised);
+  }
+
+  /// The form a website URL is stored in (D19), or null when [uri] is not
+  /// one: not `http`/`https`, a host with no dot (`localhost`), or user
+  /// info in the URL.
+  ///
+  /// Lower-cases the scheme and host, drops the fragment, a default port
+  /// and one trailing `/`, and keeps the path and query as given, so the
+  /// same page pasted twice is the same cache entry.
+  static String? normaliseWebsiteUrl(Uri uri) {
+    final scheme = uri.scheme.toLowerCase();
+    if (scheme != 'http' && scheme != 'https') return null;
+    final host = uri.host.toLowerCase();
+    if (!host.contains('.') || host.startsWith('.') || host.endsWith('.')) {
+      return null;
+    }
+    if (uri.userInfo.isNotEmpty) return null;
+    final path = uri.path.endsWith('/')
+        ? uri.path.substring(0, uri.path.length - 1)
+        : uri.path;
+    return Uri(
+      scheme: scheme,
+      host: host,
+      port: uri.hasPort ? uri.port : null,
+      path: path,
+      query: uri.hasQuery ? uri.query : null,
+    ).toString();
+  }
+
+  /// The host of a website [ref] (`cafe.co.il`), which the screens show in
+  /// place of a platform's brand (D19), or null for any other source.
+  static String? websiteHost(VenueRef ref) {
+    if (ref.source != MenuSource.website) return null;
+    final host = Uri.tryParse(ref.platformId)?.host ?? '';
+    return host.isEmpty ? null : host;
   }
 
   /// Resolves a `wolt.com` [uri]: null unless its path holds a
@@ -195,6 +244,8 @@ abstract final class VenueRefResolver {
   static Uri? platformUrl(VenueRef ref) => switch (ref.source) {
     MenuSource.wolt => _woltUrl(ref.platformId),
     MenuSource.tenbis => _tenBisUrl(ref.platformId),
+    // A website's own page is the URL it was pasted as (D19).
+    MenuSource.website => Uri.tryParse(ref.platformId),
     MenuSource.tabit || MenuSource.ontopo || MenuSource.scan => null,
   };
 }

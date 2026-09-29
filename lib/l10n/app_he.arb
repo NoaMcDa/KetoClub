@@ -351,5 +351,34 @@
     "placeholders": { "number": { "type": "int" } }
   },
   "scannedMenuPdfPage": "מסמך PDF",
-  "scannedMenuPagesClose": "סגירה"
+  "scannedMenuPagesClose": "סגירה",
+
+  "websiteMenuNotFound": "קטוקלאב לא מצאה ב־{site} תפריט שאפשר לקרוא.",
+  "@websiteMenuNotFound": {
+    "placeholders": { "site": { "type": "String" } }
+  },
+  "websiteDisallowedByRobots": "{site} מבקש מאפליקציות כמו קטוקלאב לא לקרוא את הדפים שלו, ולכן קטוקלאב לא קוראת אותו.",
+  "@websiteDisallowedByRobots": {
+    "placeholders": { "site": { "type": "String" } }
+  },
+  "websiteJsOnlyPage": "{site} מציג את התפריט רק באמצעות JavaScript, שקטוקלאב עדיין לא יודעת לקרוא.",
+  "@websiteJsOnlyPage": {
+    "placeholders": { "site": { "type": "String" } }
+  },
+  "websiteUnreachable": "{site} לא ענה. נסו שוב מאוחר יותר.",
+  "@websiteUnreachable": {
+    "placeholders": { "site": { "type": "String" } }
+  },
+  "websiteTooLarge": "התפריט ב־{site} גדול מדי בשביל קטוקלאב.",
+  "@websiteTooLarge": {
+    "placeholders": { "site": { "type": "String" } }
+  },
+  "websiteRateLimited": "קטוקלאב קראה את {site} לפני רגע. חכו דקה ונסו שוב.",
+  "@websiteRateLimited": {
+    "placeholders": { "site": { "type": "String" } }
+  },
+  "websitePdfUnread": "התפריט ב־{site} הוא קובץ PDF, שרק ניתוח AI יכול לקרוא, והוא לא נקרא כרגע. בדקו את ניתוח ה-AI בהגדרות ונסו שוב.",
+  "@websitePdfUnread": {
+    "placeholders": { "site": { "type": "String" } }
+  }
 }

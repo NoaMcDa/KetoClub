@@ -660,14 +660,15 @@ final class VenueSearchController extends ChangeNotifier {
   }
 
   /// The display name for [ref]: the cached menu's
-  /// `CachedMenuEntry.venueName` when [ref] is saved, else
-  /// [VenueRef.platformId].
+  /// `CachedMenuEntry.venueName` when [ref] is saved, else its website's
+  /// host (D19), else [VenueRef.platformId].
   Future<String> _nameFor(VenueRef ref) async {
+    final fallback = VenueRefResolver.websiteHost(ref) ?? ref.platformId;
     final saved = await _repository.savedMenus();
     for (final entry in saved) {
-      if (entry.ref == ref) return entry.venueName ?? ref.platformId;
+      if (entry.ref == ref) return entry.venueName ?? fallback;
     }
-    return ref.platformId;
+    return fallback;
   }
 }
 

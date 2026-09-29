@@ -834,12 +834,19 @@ void main() {
         const retryable = <MenuFetchFailureReason>{
           MenuFetchFailureReason.offline,
           MenuFetchFailureReason.backendUnreachable,
+          MenuFetchFailureReason.websiteUnreachable,
+          MenuFetchFailureReason.websiteRateLimited,
+          MenuFetchFailureReason.websitePdfUnread,
         };
         const backToSearch = <MenuFetchFailureReason>{
           MenuFetchFailureReason.notFound,
           MenuFetchFailureReason.platformChanged,
           MenuFetchFailureReason.unsupportedSource,
           MenuFetchFailureReason.scanNotSaved,
+          MenuFetchFailureReason.menuNotFound,
+          MenuFetchFailureReason.disallowedByRobots,
+          MenuFetchFailureReason.jsOnlyPage,
+          MenuFetchFailureReason.websiteTooLarge,
         };
 
         for (final reason in MenuFetchFailureReason.values) {
@@ -1044,6 +1051,39 @@ void main() {
       expect(find.byTooltip(_en.actionRefreshMenu), findsNothing);
     });
 
+    testWidgets('a website menu shows its host, no price and a link back '
+        'to the site (issue #181)', (tester) async {
+      // Arrange: even a priced dish shows no price — a site's is
+      // unverified (D19).
+      const siteRef = VenueRef(
+        source: MenuSource.website,
+        platformId: 'https://cafe-noir.co.il/menu',
+      );
+      final repository = FakeMenuRepository()
+        ..stub(
+          siteRef,
+          MenuFetched(menu: _menuOf([_dish('Grilled salmon')], ref: siteRef)),
+        );
+      final controller = _controllerFor(repository: repository);
+      final opener = FakeExternalLinkOpener();
+
+      // Act
+      await _pump(tester, controller, ref: siteRef, externalLinkOpener: opener);
+      await tester.pumpAndSettle();
+
+      // Assert: the header and the source line read the host, not the URL.
+      expect(find.text('Grilled salmon'), findsOneWidget);
+      expect(find.textContaining('₪'), findsNothing);
+      expect(find.text('cafe-noir.co.il'), findsOneWidget);
+      expect(find.textContaining('cafe-noir.co.il ·'), findsOneWidget);
+      expect(find.text('https://cafe-noir.co.il/menu'), findsNothing);
+      expect(find.byTooltip(_en.actionRefreshMenu), findsOneWidget);
+      await tester.tap(
+        find.byTooltip(_en.menuOpenOnPlatform('cafe-noir.co.il')),
+      );
+      expect(opener.openCalls, [Uri.parse('https://cafe-noir.co.il/menu')]);
+    });
+
     testWidgets('build names the platform matching ref.source in the '
         'failure message', (tester) async {
       // Arrange
@@ -1064,6 +1104,14 @@ void main() {
         (
           ref: VenueRef(source: MenuSource.scan, platformId: 'e'),
           name: 'Pasted menu',
+        ),
+        // A website names its own host (D19).
+        (
+          ref: VenueRef(
+            source: MenuSource.website,
+            platformId: 'https://cafe-noir.co.il/menu',
+          ),
+          name: 'cafe-noir.co.il',
         ),
       ];
 

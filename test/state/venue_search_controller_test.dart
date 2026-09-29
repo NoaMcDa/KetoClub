@@ -168,7 +168,9 @@ void main() {
 
       test('setInput with nonsense sets isInvalid true', () {
         // Arrange
-        const nonsense = 'https://example.com/not/a/venue';
+        // A Wolt page that is not a venue: Wolt keeps priority over the
+        // website source (D19), so this is unreadable, not a website.
+        const nonsense = 'https://wolt.com/en/discovery';
 
         // Act
         controller.setInput(nonsense);

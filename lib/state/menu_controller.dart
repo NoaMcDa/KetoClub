@@ -581,14 +581,8 @@ final class MenuController extends ChangeNotifier {
   /// "Your keto rules" toggles switch on (issue #56), in the fixed order
   /// [ClassificationOptions.dietaryConstraintsFor] gives them.
   ClassificationOptions _optionsFrom(AppSettings settings) =>
-      ClassificationOptions(
-        estimationConsentGiven: settings.estimationConsentGiven,
-        netCarbLimitGrams: settings.netCarbLimitGrams,
-        dietaryConstraints: ClassificationOptions.dietaryConstraintsFor(
-          seedOilFree: settings.seedOilFree,
-          dairyFree: settings.dairyFree,
-          carnivoreOnly: settings.carnivoreOnly,
-        ),
+      ClassificationOptions.fromSettings(
+        settings,
         // The engine that picks up these options reports itself here, so
         // [phase] can name it (issue #65). An observer only: it takes no
         // part in [ClassificationOptions.matches] or equality.

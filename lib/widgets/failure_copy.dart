@@ -7,7 +7,9 @@ import 'package:ketoclub/services/venue/venue_search_service.dart';
 /// [platform] names the source platform (e.g. "Wolt") and is required by
 /// [MenuFetchFailureReason.notFound],
 /// [MenuFetchFailureReason.blockedByBrowser] and
-/// [MenuFetchFailureReason.platformChanged]; [statusCode] is required by
+/// [MenuFetchFailureReason.platformChanged], and — as the site's host —
+/// by every website reason (architecture.md D19); [statusCode] is required
+/// by
 /// [MenuFetchFailureReason.platformChanged].
 /// A caller that omits one where it is expected gets an empty
 /// placeholder rather than a thrown error, since a failure screen must
@@ -35,6 +37,25 @@ String fetchFailureMessage(
   MenuFetchFailureReason.backendUnreachable =>
     l10n.fetchFailedBackendUnreachable,
   MenuFetchFailureReason.scanNotSaved => l10n.fetchFailedScanNotSaved,
+  MenuFetchFailureReason.menuNotFound => l10n.websiteMenuNotFound(
+    platform ?? '',
+  ),
+  MenuFetchFailureReason.disallowedByRobots => l10n.websiteDisallowedByRobots(
+    platform ?? '',
+  ),
+  MenuFetchFailureReason.jsOnlyPage => l10n.websiteJsOnlyPage(platform ?? ''),
+  MenuFetchFailureReason.websiteUnreachable => l10n.websiteUnreachable(
+    platform ?? '',
+  ),
+  MenuFetchFailureReason.websiteTooLarge => l10n.websiteTooLarge(
+    platform ?? '',
+  ),
+  MenuFetchFailureReason.websiteRateLimited => l10n.websiteRateLimited(
+    platform ?? '',
+  ),
+  MenuFetchFailureReason.websitePdfUnread => l10n.websitePdfUnread(
+    platform ?? '',
+  ),
 };
 
 /// The message for a menu-analysis failure (architecture.md §10).

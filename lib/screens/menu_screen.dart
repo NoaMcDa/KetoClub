@@ -38,7 +38,7 @@ import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
 
-/// The brand name shown for [source] inside failure copy (architecture.md
+/// The brand name shown for [ref]'s source inside failure copy (architecture.md
 /// §10), e.g. "Wolt" in "Venue not found on Wolt. Check the link."
 ///
 /// Not an l10n key: a platform's brand name is identical in every UI
@@ -48,13 +48,17 @@ import 'package:provider/provider.dart';
 ///
 /// The one exception is a pasted menu, which has no brand and so reads
 /// [AppLocalizations.sourceScanned] ("Pasted menu").
-String _platformName(MenuSource source, AppLocalizations l10n) =>
-    switch (source) {
+///
+/// A website has no brand either: it reads its own host (`cafe.co.il`,
+/// architecture.md D19), the source chip the research asks for.
+String _platformName(VenueRef ref, AppLocalizations l10n) =>
+    switch (ref.source) {
       MenuSource.wolt => 'Wolt',
       MenuSource.tenbis => '10bis',
       MenuSource.tabit => 'Tabit',
       MenuSource.ontopo => 'Ontopo',
       MenuSource.scan => l10n.sourceScanned,
+      MenuSource.website => VenueRefResolver.websiteHost(ref) ?? ref.platformId,
     };
 
 /// The bucketed "time ago" phrase for [fetchedAt] relative to [now]
@@ -311,7 +315,7 @@ class _MenuScreenState extends State<MenuScreen> {
     final message = fetchFailureMessage(
       failure,
       l10n,
-      platform: _platformName(widget.ref.source, l10n),
+      platform: _platformName(widget.ref, l10n),
       statusCode: controller.fetchStatusCode,
     );
     return Center(
@@ -505,11 +509,14 @@ class _MenuScreenState extends State<MenuScreen> {
 
   /// The name the header and the shared text give the venue: the menu's
   /// own, the hint a venue card passed, else the reference — except for a
-  /// pasted menu, whose reference is a hash and reads as "Pasted menu".
+  /// pasted menu, whose reference is a hash and reads as "Pasted menu",
+  /// and a website, whose reference is a URL and reads as its host.
   String _displayName(MenuController controller, AppLocalizations l10n) {
-    final fallback = widget.ref.source == MenuSource.scan
-        ? _scanSourceName(l10n)
-        : widget.ref.platformId;
+    final fallback = switch (widget.ref.source) {
+      MenuSource.scan => _scanSourceName(l10n),
+      MenuSource.website => _platformName(widget.ref, l10n),
+      _ => widget.ref.platformId,
+    };
     return controller.venueName ?? widget.venueNameHint ?? fallback;
   }
 
@@ -531,7 +538,7 @@ class _MenuScreenState extends State<MenuScreen> {
   String _sourceName(AppLocalizations l10n) =>
       widget.ref.source == MenuSource.scan
       ? _scanSourceName(l10n)
-      : _platformName(widget.ref.source, l10n);
+      : _platformName(widget.ref, l10n);
 
   /// The venue name and keto score (issue #29's header row,
   /// `.design/Main.dc.html`).
@@ -640,9 +647,16 @@ class _MenuScreenState extends State<MenuScreen> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          l10n.menuSourceLine(_sourceName(l10n), age),
-          style: Theme.of(context).textTheme.bodySmall,
+        // Bounded, because a website's source is its host (D19), which
+        // can be far longer than a platform's brand.
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 180),
+          child: Text(
+            l10n.menuSourceLine(_sourceName(l10n), age),
+            style: Theme.of(context).textTheme.bodySmall,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
         // A pasted menu has no platform to ask again, so a refresh would
         // only re-serve the same cache entry.
@@ -675,9 +689,7 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget? _openOnPlatformAction(AppLocalizations l10n) {
     final url = VenueRefResolver.platformUrl(widget.ref);
     if (url == null) return null;
-    final label = l10n.menuOpenOnPlatform(
-      _platformName(widget.ref.source, l10n),
-    );
+    final label = l10n.menuOpenOnPlatform(_platformName(widget.ref, l10n));
     return IconButton(
       icon: const Icon(Icons.open_in_new, size: 18),
       tooltip: label,
@@ -859,7 +871,7 @@ class _MenuScreenState extends State<MenuScreen> {
         fetchFailureMessage(
           staleReason,
           l10n,
-          platform: _platformName(widget.ref.source, l10n),
+          platform: _platformName(widget.ref, l10n),
         ),
       );
     }
@@ -901,7 +913,11 @@ class _MenuScreenState extends State<MenuScreen> {
             onShowScript: (shown) => unawaited(_openWaiterCard(shown)),
             note: controller.noteFor(row.dish.id),
             onEditNote: (edited) => unawaited(_openNoteEditor(edited)),
-            showPrice: widget.ref.source != MenuSource.scan,
+            // A pasted menu has no prices, and a website's are unverified
+            // (D18, D19): neither shows one.
+            showPrice:
+                widget.ref.source != MenuSource.scan &&
+                widget.ref.source != MenuSource.website,
           ),
         ),
       );

@@ -135,8 +135,15 @@ final class CachedMenuRepository implements MenuRepository {
 
     final result = await adapter.fetch(ref);
     switch (result) {
-      case MenuFetched(menu: final fetched):
-        await cache.write(_merge(previous: cached, fetched: fetched));
+      case MenuFetched(menu: final fetched, :final analysis):
+        // An analysis the adapter made while reading the menu (a website
+        // PDF, D19) is the freshest there is; otherwise the cached one is
+        // kept only if the dish text did not change.
+        await cache.write(
+          analysis != null
+              ? CachedMenu(menu: fetched, analysis: analysis)
+              : _merge(previous: cached, fetched: fetched),
+        );
         return MenuFetched(menu: fetched);
       case MenuFetchFailed(:final reason):
         if (cached != null) {

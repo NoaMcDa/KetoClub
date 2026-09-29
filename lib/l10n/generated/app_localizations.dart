@@ -1399,6 +1399,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close'**
   String get scannedMenuPagesClose;
+
+  /// No description provided for @websiteMenuNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub could not find a menu it can read on {site}.'**
+  String websiteMenuNotFound(String site);
+
+  /// No description provided for @websiteDisallowedByRobots.
+  ///
+  /// In en, this message translates to:
+  /// **'{site} asks apps like KetoClub not to read its pages, so KetoClub does not.'**
+  String websiteDisallowedByRobots(String site);
+
+  /// No description provided for @websiteJsOnlyPage.
+  ///
+  /// In en, this message translates to:
+  /// **'{site} only shows its menu with JavaScript, which KetoClub cannot read yet.'**
+  String websiteJsOnlyPage(String site);
+
+  /// No description provided for @websiteUnreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'{site} did not answer. Try again later.'**
+  String websiteUnreachable(String site);
+
+  /// No description provided for @websiteTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'The menu on {site} is too large for KetoClub to read.'**
+  String websiteTooLarge(String site);
+
+  /// No description provided for @websiteRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub read {site} a moment ago. Wait a minute, then try again.'**
+  String websiteRateLimited(String site);
+
+  /// No description provided for @websitePdfUnread.
+  ///
+  /// In en, this message translates to:
+  /// **'The menu on {site} is a PDF, which only AI analysis can read, and it could not be read now. Check AI analysis in Settings, then try again.'**
+  String websitePdfUnread(String site);
 }
 
 class _AppLocalizationsDelegate

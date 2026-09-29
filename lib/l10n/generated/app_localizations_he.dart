@@ -832,4 +832,39 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get scannedMenuPagesClose => 'סגירה';
+
+  @override
+  String websiteMenuNotFound(String site) {
+    return 'קטוקלאב לא מצאה ב־$site תפריט שאפשר לקרוא.';
+  }
+
+  @override
+  String websiteDisallowedByRobots(String site) {
+    return '$site מבקש מאפליקציות כמו קטוקלאב לא לקרוא את הדפים שלו, ולכן קטוקלאב לא קוראת אותו.';
+  }
+
+  @override
+  String websiteJsOnlyPage(String site) {
+    return '$site מציג את התפריט רק באמצעות JavaScript, שקטוקלאב עדיין לא יודעת לקרוא.';
+  }
+
+  @override
+  String websiteUnreachable(String site) {
+    return '$site לא ענה. נסו שוב מאוחר יותר.';
+  }
+
+  @override
+  String websiteTooLarge(String site) {
+    return 'התפריט ב־$site גדול מדי בשביל קטוקלאב.';
+  }
+
+  @override
+  String websiteRateLimited(String site) {
+    return 'קטוקלאב קראה את $site לפני רגע. חכו דקה ונסו שוב.';
+  }
+
+  @override
+  String websitePdfUnread(String site) {
+    return 'התפריט ב־$site הוא קובץ PDF, שרק ניתוח AI יכול לקרוא, והוא לא נקרא כרגע. בדקו את ניתוח ה-AI בהגדרות ונסו שוב.';
+  }
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/state/scan_controller.dart';
+import 'package:ketoclub/utils/venue_route.dart';
 import 'package:provider/provider.dart';
 
 /// The Scan tab (architecture.md §6.6, D18; issues #11, #83): a field to
@@ -39,7 +40,7 @@ class _ScanScreenState extends State<ScanScreen> {
       uncategorisedName: AppLocalizations.of(context)!.sourceScanned,
     );
     if (ref == null || !mounted) return;
-    Navigator.pushNamed(context, '/venue/${ref.source.name}/${ref.platformId}');
+    Navigator.pushNamed(context, venueRoutePath(ref));
   }
 
   @override

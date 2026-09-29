@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 /// Element-wise list equality, used by the equality operator on
@@ -51,6 +52,27 @@ final class ClassificationOptions {
     this.netCarbLimitGrams = defaultNetCarbLimitGrams,
     this.onEngineStarted,
   });
+
+  /// The options [settings] ask for: consent, the net-carb limit (issue
+  /// #57) and the dietary constraints of the three "Your keto rules"
+  /// toggles (issue #56), with [onEngineStarted] as given.
+  ///
+  /// The menu screen and the website adapter's PDF read (D19) both build
+  /// their options here, so an analysis one of them caches is one the
+  /// other's [matches] accepts.
+  factory fromSettings(
+    AppSettings settings, {
+    void Function(ClassifyingEngine engine)? onEngineStarted,
+  }) => ClassificationOptions(
+    estimationConsentGiven: settings.estimationConsentGiven,
+    netCarbLimitGrams: settings.netCarbLimitGrams,
+    dietaryConstraints: dietaryConstraintsFor(
+      seedOilFree: settings.seedOilFree,
+      dairyFree: settings.dairyFree,
+      carnivoreOnly: settings.carnivoreOnly,
+    ),
+    onEngineStarted: onEngineStarted,
+  );
 
   /// Whether the user has consented to sending menu text to a
   /// third-party LLM for a net-carb estimate (architecture.md §11).

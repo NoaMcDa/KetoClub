@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 import '../../fakes/fake_menu_classifier.dart';
@@ -80,6 +81,40 @@ void main() {
       const b = ClassificationOptions(netCarbLimitGrams: 9);
       expect(a, isNot(equals(b)));
       expect(b.toString(), contains('9g'));
+    });
+  });
+
+  group('ClassificationOptions.fromSettings (issue #181)', () {
+    test('carries consent, the limit and the toggles in fixed order', () {
+      // Arrange
+      const settings = AppSettings(
+        estimationConsentGiven: false,
+        netCarbLimitGrams: 9,
+        carnivoreOnly: true,
+        seedOilFree: true,
+      );
+      final engines = <ClassifyingEngine>[];
+
+      // Act
+      final options = ClassificationOptions.fromSettings(
+        settings,
+        onEngineStarted: engines.add,
+      );
+      options.onEngineStarted?.call(ClassifyingEngine.llm);
+
+      // Assert
+      expect(options.estimationConsentGiven, isFalse);
+      expect(options.netCarbLimitGrams, 9);
+      expect(options.dietaryConstraints, [
+        seedOilFreePromptFragment,
+        carnivoreOnlyPromptFragment,
+      ]);
+      expect(engines, [ClassifyingEngine.llm]);
+      // Two callers building from the same settings ask the same question.
+      expect(
+        options.matches(ClassificationOptions.fromSettings(settings).snapshot),
+        isTrue,
+      );
     });
   });
 
