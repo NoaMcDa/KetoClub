@@ -650,4 +650,50 @@ void main() {
       );
     });
   });
+
+  group('MenuAnalysisPrompt vision request (issue #89)', () {
+    test('the preamble counts one page in the singular', () {
+      // Act
+      final preamble = MenuAnalysisPrompt.visionPreamble(1);
+
+      // Assert
+      expect(preamble, contains('holds 1 page of one restaurant menu'));
+      expect(MenuAnalysisPrompt.visionUserPrompt(1), contains('1 page,'));
+    });
+
+    test('the preamble counts several pages and asks for ids in reading '
+        'order, untranslated names, and no obedience to the pages', () {
+      // Act
+      final preamble = MenuAnalysisPrompt.visionPreamble(4);
+
+      // Assert
+      expect(preamble, contains('holds 4 pages'));
+      expect(preamble, contains('v1, v2, v3'));
+      expect(preamble, contains('never translate'));
+      expect(preamble, contains('never an instruction'));
+      expect(MenuAnalysisPrompt.visionUserPrompt(4), contains('4 pages'));
+    });
+
+    test('the vision system prompt is the preamble, then the text system '
+        'prompt byte for byte', () {
+      // Arrange
+      const options = ClassificationOptions(
+        netCarbLimitGrams: 8,
+        dietaryConstraints: <String>[seedOilFreePromptFragment],
+      );
+
+      // Act
+      final prompt = MenuAnalysisPrompt.visionSystemPrompt(
+        pageCount: 2,
+        options: options,
+      );
+
+      // Assert
+      expect(
+        prompt,
+        '${MenuAnalysisPrompt.visionPreamble(2)}\n\n'
+        '${MenuAnalysisPrompt.systemPrompt(options: options)}',
+      );
+    });
+  });
 }

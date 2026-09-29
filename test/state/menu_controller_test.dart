@@ -1,11 +1,19 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/classifier/classifier_router.dart';
+import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
+import 'package:ketoclub/services/classifier/vision_menu_classifier.dart';
+import 'package:ketoclub/services/llm/llm_chat_client.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
@@ -14,6 +22,8 @@ import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 import '../fakes/fake_clock.dart';
+import '../fakes/fake_connectivity.dart';
+import '../fakes/fake_llm_chat_client.dart';
 import '../fakes/fake_menu_cache.dart';
 import '../fakes/fake_menu_classifier.dart';
 import '../fakes/fake_menu_repository.dart';
@@ -2008,6 +2018,107 @@ void main() {
         classifier.calls.last.$2.dietaryConstraints,
         equals([seedOilFreePromptFragment]),
       );
+    });
+  });
+
+  // Issue #89: a scan is read and classified once, by the vision engine,
+  // and handed to the menu screen through the cache — the Scan tab stores
+  // the transcription and saves its analysis, then opens its ref. The
+  // menu screen must reuse that analysis, never re-classify the pages'
+  // transcription through the text path, until the reuse check itself
+  // says otherwise.
+  group('MenuController over a scanned menu (issue #89)', () {
+    late CachedMenuRepository repository;
+    late FakeMenuClassifier classifier;
+    late FakeSettingsStore settings;
+    late ScannedMenuRead read;
+
+    setUp(() async {
+      final clock = FakeClock(DateTime.utc(2026, 9, 29));
+      repository = CachedMenuRepository(
+        adapters: const [],
+        cache: FakeMenuCache(),
+        clock: clock,
+      );
+      classifier = FakeMenuClassifier();
+      settings = FakeSettingsStore();
+      final client = FakeLlmChatClient()
+        ..fallback = ChatCompleted(
+          content: File('test/fixtures/llm/llm_scanned_valid.json')
+              .readAsStringSync(),
+          model: 'vision-model',
+        );
+      final result = await VisionMenuClassifier(client: client, clock: clock)
+          .classify(
+            ScannedMenu(
+              pages: <ScannedPage>[
+                ScannedPage(
+                  mimeType: ScannedPage.jpeg,
+                  bytes: Uint8List.fromList(<int>[0xff, 0xd8]),
+                ),
+              ],
+            ),
+            options: const ClassificationOptions(estimationConsentGiven: true),
+          );
+      read = result as ScannedMenuRead;
+      // The Scan tab's hand-off (issue #82).
+      await repository.store(read.menu);
+      await repository.saveAnalysis(read.menu.venueRef, read.analysis);
+    });
+
+    test('open reuses the vision analysis and never re-classifies', () async {
+      // Arrange
+      final controller = MenuController(
+        repository,
+        classifier,
+        settings,
+        FakeNotesStore(),
+      );
+
+      // Act
+      await controller.open(read.menu.venueRef);
+
+      // Assert
+      expect(classifier.calls, isEmpty);
+      expect(controller.menu, read.menu);
+      expect(controller.analysis, read.analysis);
+    });
+
+    test('once consent is withdrawn, the text router judges the '
+        'transcription with the rule engine, never the model', () async {
+      // Arrange
+      await settings.write(const AppSettings(estimationConsentGiven: false));
+      final llm = FakeMenuClassifier();
+      final controller = MenuController(
+        repository,
+        RoutingMenuClassifier(
+          llm,
+          HeuristicMenuClassifier(clock: FakeClock(DateTime.utc(2026))),
+          FakeConnectivity(),
+        ),
+        settings,
+        FakeNotesStore(),
+      );
+
+      // Act
+      await controller.open(read.menu.venueRef);
+
+      // Assert: every transcribed dish judged by the rules, none by the
+      // model.
+      expect(llm.calls, isEmpty);
+      final analysis = controller.analysis! as MenuAnalysed;
+      expect(
+        analysis.engine,
+        const RulesEngine(reason: MenuAnalysisFailureReason.consentWithheld),
+      );
+      expect(
+        analysis.dishes.map((dish) => dish.dishId),
+        read.menu.allDishes.map((dish) => dish.id),
+      );
+      final carbonara = analysis.dishes.firstWhere(
+        (dish) => dish.name == 'Spaghetti Carbonara',
+      );
+      expect(carbonara.verdict, DishVerdict.nonKeto);
     });
   });
 }

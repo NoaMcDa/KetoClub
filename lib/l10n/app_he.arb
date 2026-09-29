@@ -339,5 +339,17 @@
   "scanAnalyse": "נתחו",
   "scanEmptyPaste": "קטוקלאב לא מצא מנות בטקסט הזה. הדביקו את התפריט עם מנה אחת בכל שורה.",
   "sourceScanned": "תפריט שהודבק",
-  "fetchFailedScanNotSaved": "התפריט שהודבק כבר לא שמור במכשיר הזה. הדביקו אותו שוב כדי לנתח אותו."
+  "fetchFailedScanNotSaved": "התפריט שהודבק כבר לא שמור במכשיר הזה. הדביקו אותו שוב כדי לנתח אותו.",
+
+  "scannedMenuTitle": "תפריט סרוק",
+  "scannedMenuReadByAi": "נקרא בידי AI מהעמודים שלכם",
+  "scannedMenuViewPages": "הצגת העמודים",
+  "scannedMenuPagesTitle": "העמודים שלכם",
+  "scannedMenuPagesNote": "השוו את שמות המנות לעמודים שלכם: ה-AI עלול לקרוא מילה לא נכון.",
+  "scannedMenuPageLabel": "עמוד {number}",
+  "@scannedMenuPageLabel": {
+    "placeholders": { "number": { "type": "int" } }
+  },
+  "scannedMenuPdfPage": "מסמך PDF",
+  "scannedMenuPagesClose": "סגירה"
 }

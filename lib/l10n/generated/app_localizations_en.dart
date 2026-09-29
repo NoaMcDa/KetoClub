@@ -800,4 +800,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get fetchFailedScanNotSaved =>
       'This pasted menu is no longer saved on this device. Paste it again to analyse it.';
+
+  @override
+  String get scannedMenuTitle => 'Scanned menu';
+
+  @override
+  String get scannedMenuReadByAi => 'Read by AI from your pages';
+
+  @override
+  String get scannedMenuViewPages => 'View pages';
+
+  @override
+  String get scannedMenuPagesTitle => 'Your pages';
+
+  @override
+  String get scannedMenuPagesNote =>
+      'Check the dish names against your pages: the AI may misread a word.';
+
+  @override
+  String scannedMenuPageLabel(int number) {
+    return 'Page $number';
+  }
+
+  @override
+  String get scannedMenuPdfPage => 'PDF document';
+
+  @override
+  String get scannedMenuPagesClose => 'Close';
 }

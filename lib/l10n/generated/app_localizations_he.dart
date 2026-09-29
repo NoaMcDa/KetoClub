@@ -805,4 +805,31 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get fetchFailedScanNotSaved =>
       'התפריט שהודבק כבר לא שמור במכשיר הזה. הדביקו אותו שוב כדי לנתח אותו.';
+
+  @override
+  String get scannedMenuTitle => 'תפריט סרוק';
+
+  @override
+  String get scannedMenuReadByAi => 'נקרא בידי AI מהעמודים שלכם';
+
+  @override
+  String get scannedMenuViewPages => 'הצגת העמודים';
+
+  @override
+  String get scannedMenuPagesTitle => 'העמודים שלכם';
+
+  @override
+  String get scannedMenuPagesNote =>
+      'השוו את שמות המנות לעמודים שלכם: ה-AI עלול לקרוא מילה לא נכון.';
+
+  @override
+  String scannedMenuPageLabel(int number) {
+    return 'עמוד $number';
+  }
+
+  @override
+  String get scannedMenuPdfPage => 'מסמך PDF';
+
+  @override
+  String get scannedMenuPagesClose => 'סגירה';
 }

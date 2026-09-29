@@ -339,5 +339,17 @@
   "scanAnalyse": "Analyse",
   "scanEmptyPaste": "KetoClub found no dishes in that text. Paste the menu with one dish per line.",
   "sourceScanned": "Pasted menu",
-  "fetchFailedScanNotSaved": "This pasted menu is no longer saved on this device. Paste it again to analyse it."
+  "fetchFailedScanNotSaved": "This pasted menu is no longer saved on this device. Paste it again to analyse it.",
+
+  "scannedMenuTitle": "Scanned menu",
+  "scannedMenuReadByAi": "Read by AI from your pages",
+  "scannedMenuViewPages": "View pages",
+  "scannedMenuPagesTitle": "Your pages",
+  "scannedMenuPagesNote": "Check the dish names against your pages: the AI may misread a word.",
+  "scannedMenuPageLabel": "Page {number}",
+  "@scannedMenuPageLabel": {
+    "placeholders": { "number": { "type": "int" } }
+  },
+  "scannedMenuPdfPage": "PDF document",
+  "scannedMenuPagesClose": "Close"
 }

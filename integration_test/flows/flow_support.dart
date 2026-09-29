@@ -47,6 +47,7 @@ import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
+import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 
 /// Pumps the whole app over [fakes] and settles it.
@@ -98,7 +99,8 @@ final class FakeAppDependencies {
       locationService = FlowFakeLocationService(),
       venueSearchService = FlowFakeVenueSearchService(),
       scannedClassifier = FlowFakeScannedMenuClassifier(),
-      pagePicker = FlowFakePagePicker();
+      pagePicker = FlowFakePagePicker(),
+      scannedPages = ScannedPagesRegistry();
 
   /// The faked menu repository; script it with [FlowFakeMenuRepository.stub].
   final FlowFakeMenuRepository repository;
@@ -145,6 +147,10 @@ final class FakeAppDependencies {
   /// The faked page picker behind the Scan tab (issue #82); script it
   /// with [FlowFakePagePicker.photos] and friends.
   final FlowFakePagePicker pagePicker;
+
+  /// The in-memory scanned-pages registry (issue #89) — the real one, as
+  /// it does no I/O, shared by the Scan tab and the menu screen.
+  final ScannedPagesRegistry scannedPages;
 
   /// When set, [dependencies] wires this in place of [classifier].
   ///
@@ -203,6 +209,7 @@ final class FakeAppDependencies {
     apiKeyStore: apiKeyStore,
     scannedMenuClassifier: scannedClassifierOverride ?? scannedClassifier,
     pagePicker: pagePickerOverride ?? pagePicker,
+    scannedPages: scannedPages,
   );
 }
 

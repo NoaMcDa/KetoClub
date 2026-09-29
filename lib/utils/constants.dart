@@ -1578,3 +1578,28 @@ const int maxScanPages = 6;
 /// as `VISION_MAX_IMAGE_BYTES`, measured on the decoded bytes (issue
 /// #170); keep the two equal.
 const int maxScanPageBytes = 3 * 1024 * 1024;
+
+/// The id of the one category a scanned menu's transcription holds
+/// (`MenuResponseParser.parseScanned`; issue #89). The reply schema asks
+/// for no structure beyond a dish list, so every dish is filed under it.
+const String scannedCategoryId = 'scanned';
+
+/// The name of [scannedCategoryId]'s category when the transcription is
+/// not Hebrew. Like the waiter-script templates it is in the menu's
+/// language, not the UI's (architecture.md §12): it heads the dishes as
+/// the menu printed them, the way a platform's own category name does.
+const String scannedCategoryNameEn = 'Scanned menu';
+
+/// The name of [scannedCategoryId]'s category when any transcribed dish
+/// name is Hebrew; see [scannedCategoryNameEn].
+const String scannedCategoryNameHe = 'תפריט סרוק';
+
+/// The prefix of a transcribed dish's id: the first dish is `v1`, then
+/// `v2`, …, in the reply's order — the ids the vision preamble asks the
+/// model for, assigned by the parser rather than trusted from it.
+const String scannedDishIdPrefix = 'v';
+
+/// The currency a scanned menu is stored with. A photograph's prices are
+/// not read (every transcribed dish has price 0 and none is shown), and
+/// KetoClub only serves Israeli venues, so this is only ever stored.
+const String scannedMenuCurrency = 'ILS';

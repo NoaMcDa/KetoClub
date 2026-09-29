@@ -13,6 +13,8 @@ import 'dart:convert';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 
@@ -125,6 +127,124 @@ abstract final class MenuResponseParser {
     );
   }
 
+  /// Parses [body] — the raw reply to a vision request that transcribed
+  /// and classified photographed or PDF pages in one call — into the
+  /// transcribed [Menu] addressed to [ref] and its analysis, stamped
+  /// [analysedAt] with [engine] (architecture.md §9.4, scanned variant;
+  /// D15, issue #89).
+  ///
+  /// There is no source menu to check a reply against: the pages are the
+  /// source, and the user checks the transcription against them ("View
+  /// pages"). So §9.4 rule 3 (provenance) and rule 7 (skipped source
+  /// dishes) are replaced by:
+  ///
+  /// - an element with no non-empty `name` (after trimming) is dropped —
+  ///   it names no dish, so there is nothing to transcribe or show; and
+  /// - of several elements whose names normalise alike
+  ///   ([TextNormaliser.normalise]), the first is kept and the rest are
+  ///   dropped, so one dish printed twice, or read twice across two
+  ///   overlapping photographs, is one dish.
+  ///
+  /// Every kept element becomes a [Dish] of the transcription, in reply
+  /// order, with the id `v1`, `v2`, … assigned here rather than trusted
+  /// from the model, the trimmed name exactly as the model read it, an
+  /// empty description, `price: 0` (a scan has no trustworthy price) and
+  /// no options. Every other rule applies verbatim to each kept element:
+  /// rules 1-2 and the [maxAnalysedDishes] cap fail the whole reply as
+  /// [MenuAnalysisFailureReason.badResponse]; rules 4-6 and issue #57's
+  /// net-carb post-rule place the dish or demote it to
+  /// [MenuAnalysed.unclassified]. A demoted dish stays in the
+  /// transcription, so the menu still lists it and the rules engine can
+  /// judge it later. Rule 8: a reply with no kept element is
+  /// [MenuAnalysisFailureReason.noDishesFound].
+  ///
+  /// The transcription's single category is [scannedCategoryId], named in
+  /// the menu's own language ([scannedCategoryNameHe] when any dish name
+  /// is Hebrew, else [scannedCategoryNameEn]) — the same rule the waiter
+  /// script follows (architecture.md §12). Its [Menu.fetchedAt] is
+  /// [analysedAt] and it has no [Menu.venueName].
+  ///
+  /// Static, pure, and never throws, like [parse].
+  static ScannedMenuResult parseScanned(
+    String body, {
+    required VenueRef ref,
+    required DateTime analysedAt,
+    required AnalysisEngine engine,
+    int netCarbLimitGrams = defaultNetCarbLimitGrams,
+  }) {
+    final decoded = _decode(body);
+    if (decoded == null) return _scannedBadResponse();
+
+    final rawDishes = decoded['dishes'];
+    if (rawDishes is! List<Object?>) return _scannedBadResponse();
+    if (rawDishes.length > maxAnalysedDishes) return _scannedBadResponse();
+
+    final seenNames = <String>{};
+    final transcribed = <Dish>[];
+    final dishes = <AnalysedDish>[];
+    final unclassified = <String>[];
+
+    for (final rawDish in rawDishes) {
+      if (rawDish is! Map<String, Object?>) continue;
+      final rawName = rawDish['name'];
+      final name = rawName is String ? rawName.trim() : '';
+      if (name.isEmpty) continue;
+      final normalised = TextNormaliser.normalise(name);
+      // A name with no letter or digit normalises to nothing; its trimmed
+      // text is then its own key, so two such names still dedupe exactly.
+      if (!seenNames.add(normalised.isEmpty ? name : normalised)) continue;
+
+      final dish = Dish(
+        id: '$scannedDishIdPrefix${transcribed.length + 1}',
+        name: name,
+        description: '',
+        price: 0,
+        options: const <DishOption>[],
+      );
+      transcribed.add(dish);
+      _judge(
+        rawDish,
+        dish,
+        netCarbLimitGrams: netCarbLimitGrams,
+        dishes: dishes,
+        unclassified: unclassified,
+      );
+    }
+
+    if (transcribed.isEmpty) {
+      return const ScannedMenuFailed(
+        reason: MenuAnalysisFailureReason.noDishesFound,
+      );
+    }
+    final isHebrew = transcribed.any(
+      (dish) => TextNormaliser.containsHebrew(dish.name),
+    );
+    final menu = Menu(
+      venueRef: ref,
+      currency: scannedMenuCurrency,
+      fetchedAt: analysedAt,
+      categories: <MenuCategory>[
+        MenuCategory(
+          id: scannedCategoryId,
+          name: isHebrew ? scannedCategoryNameHe : scannedCategoryNameEn,
+          dishes: transcribed,
+        ),
+      ],
+    );
+    return ScannedMenuRead(
+      menu: menu,
+      analysis: MenuAnalysed(
+        dishes: dishes,
+        unclassified: unclassified,
+        engine: engine,
+        analysedAt: analysedAt,
+      ),
+    );
+  }
+
+  static ScannedMenuFailed _scannedBadResponse() =>
+      const ScannedMenuFailed(reason: MenuAnalysisFailureReason.badResponse);
+
   /// Strips a markdown fence if present and `jsonDecode`s [body].
   ///
   /// Returns null when [jsonDecode] throws or the decoded root is not a
@@ -183,7 +303,27 @@ abstract final class MenuResponseParser {
       return;
     }
     placedSourceIds.add(matched.id);
+    _judge(
+      rawDish,
+      matched,
+      netCarbLimitGrams: netCarbLimitGrams,
+      dishes: dishes,
+      unclassified: unclassified,
+    );
+  }
 
+  /// Applies §9.4 rules 4-6 and issue #57's post-rule to [rawDish], a
+  /// reply element already resolved to [matched]: places it onto [dishes]
+  /// under [matched]'s own id and name, or demotes [matched]'s name onto
+  /// [unclassified]. Shared verbatim by [parse] and [parseScanned] — only
+  /// how an element finds its dish differs between the two.
+  static void _judge(
+    Map<String, Object?> rawDish,
+    Dish matched, {
+    required int netCarbLimitGrams,
+    required List<AnalysedDish> dishes,
+    required List<String> unclassified,
+  }) {
     final rawVerdict = rawDish['verdict'];
     // Matched by string, never by ordinal (DishVerdict.tryParse), so a
     // reordering of the enum can never silently re-map a live reply.
