@@ -7,6 +7,12 @@ this route originates is a ``BackendError`` rendered as
 A completion cached by request hash (#103) is served before the rate
 limiter is ever consulted: a cache hit costs no upstream quota, so it must
 not spend the install's either.
+
+A request carrying ``images`` (menu pages, D15, #170) never touches that
+cache: it is neither read nor written, the answer says
+``X-KetoClub-Cache: bypass``, and it spends the limiter like any miss. Pages
+are forwarded to Gemini and dropped; nothing here stores or logs them beyond
+their count.
 """
 
 import logging
@@ -14,6 +20,7 @@ from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, Request, Response
+from fastapi.exceptions import RequestValidationError
 from starlette.concurrency import run_in_threadpool
 
 from app.errors import BackendError
@@ -61,25 +68,48 @@ async def chat(
     """Forward one completion to Gemini, within the install's rate limit.
 
     A cache hit (#103) answers directly, before the rate limiter and before
-    the no-key check, and never touches the install's quota.
+    the no-key check, and never touches the install's quota. A request with
+    images skips the cache both ways (#170).
     """
-    logger.info("chat install_id=%s", log_safe(install_id))
-
     settings = request.app.state.settings
     engine = request.app.state.engine
-    key = chat_cache.cache_key(settings.GEMINI_MODEL, body)
+    image_count = len(body.images)
+    if image_count:
+        # The count only: never a part's bytes, mime type or base64.
+        logger.info("chat install_id=%s images=%d", log_safe(install_id), image_count)
+    else:
+        logger.info("chat install_id=%s", log_safe(install_id))
 
-    cached = await run_in_threadpool(
-        chat_cache.read_cached,
-        engine,
-        key,
-        settings.CHAT_CACHE_TTL_SECONDS,
-        datetime.now(UTC),
+    violation = body.image_bound_violation(
+        settings.VISION_MAX_IMAGES, settings.VISION_MAX_IMAGE_BYTES
     )
-    if cached is not None:
-        logger.info("chat install_id=%s cache=hit", log_safe(install_id))
-        response.headers["X-KetoClub-Cache"] = "hit"
-        return cached
+    if violation is not None:
+        # FastAPI's own 422 shape, as for any other malformed body.
+        raise RequestValidationError(
+            [
+                {
+                    "type": "value_error",
+                    "loc": ("body", "images"),
+                    "msg": violation,
+                    "input": None,
+                }
+            ]
+        )
+
+    key = None if image_count else chat_cache.cache_key(settings.GEMINI_MODEL, body)
+
+    if key is not None:
+        cached = await run_in_threadpool(
+            chat_cache.read_cached,
+            engine,
+            key,
+            settings.CHAT_CACHE_TTL_SECONDS,
+            datetime.now(UTC),
+        )
+        if cached is not None:
+            logger.info("chat install_id=%s cache=hit", log_safe(install_id))
+            response.headers["X-KetoClub-Cache"] = "hit"
+            return cached
 
     limiter: RateLimiter = request.app.state.rate_limiter
     if not limiter.allow(install_id):
@@ -87,6 +117,11 @@ async def chat(
         raise BackendError(429, "rateLimited")
 
     result = await gemini.complete(request.app.state.http_client, settings, body)
+
+    if key is None:
+        logger.info("chat install_id=%s cache=bypass", log_safe(install_id))
+        response.headers["X-KetoClub-Cache"] = "bypass"
+        return result
 
     await run_in_threadpool(
         chat_cache.write_cached, engine, key, result, datetime.now(UTC)

@@ -7,6 +7,7 @@ autouse network block from ``conftest``: a request it does not match still
 fails there instead of leaving the sandbox.
 """
 
+import base64
 import json
 import logging
 from collections.abc import Iterator
@@ -20,6 +21,7 @@ from fastapi.testclient import TestClient
 
 from app.config import Settings
 from app.main import create_app
+from app.schemas import ImagePart
 from app.services.gemini import CHAT_FAILURE_REASONS, to_gemini_schema
 
 _KEY = "test-gemini-key-that-must-never-be-logged"
@@ -33,6 +35,13 @@ _USER = "1 | Mains | Entrecote | 300g steak with fries USER-MARKER"
 _SCHEMA_FILE = Path(__file__).parent / "fixtures" / "menu_analysis_schema.json"
 _SCHEMA: dict[str, object] = json.loads(_SCHEMA_FILE.read_text(encoding="utf-8"))
 _ANSWER = '{"dishes": []}'
+
+# A real 1x1 transparent PNG: what a phone would never send, but a valid page.
+_PNG_B64 = (
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAC"
+    "hwGA60e6kgAAAABJRU5ErkJggg=="
+)
+_PDF_B64 = base64.b64encode(b"%PDF-1.4 a one-page menu").decode("ascii")
 
 
 def _settings(api_key: str = _KEY, per_minute: int = 100) -> Settings:
@@ -579,14 +588,21 @@ def test_logs_never_carry_the_key_prompts_upstream_body_or_full_install_id(
             httpx.Response(400, json=_GENERIC_400_BODY),
             httpx.Response(200, json=_reply()),
             httpx.Response(500, json=_GENERIC_400_BODY),
+            httpx.Response(200, json=_reply()),
         ]
     )
 
+    image_b64 = base64.b64encode(b"IMAGE-BYTES-MARKER " * 8).decode("ascii")
     with caplog.at_level(logging.DEBUG):
         # A distinct prompt on the second call: the same body would be a
         # #103 cache hit and never reach the third mocked (500) response.
         assert _post(chat_client).status_code == 200
         assert _post(chat_client, body=_prompt_variant("second")).status_code == 502
+        # A page (#170): only its count may reach a log line.
+        assert (
+            _post(chat_client, body=_image_body(("image/webp", image_b64))).status_code
+            == 200
+        )
 
     text = caplog.text
     assert _KEY not in text
@@ -594,11 +610,227 @@ def test_logs_never_carry_the_key_prompts_upstream_body_or_full_install_id(
     assert "USER-MARKER" not in text
     assert "UPSTREAM-BODY-MARKER" not in text
     assert _INSTALL_ID not in text
+    assert image_b64 not in text
+    assert image_b64[:16] not in text
+    assert "IMAGE-BYTES-MARKER" not in text
+    assert "image/webp" not in text
 
     chat_lines = [r.getMessage() for r in caplog.records if r.name == "ketoclub.chat"]
     assert f"chat install_id={_INSTALL_ID[:8]}" in chat_lines
+    assert f"chat install_id={_INSTALL_ID[:8]} images=1" in chat_lines
+    assert f"chat install_id={_INSTALL_ID[:8]} cache=bypass" in chat_lines
     assert "gemini upstream_status=400 retrying without responseSchema" in chat_lines
     assert "gemini upstream_status=500" in chat_lines
+
+
+# --- images (D15, #170) ---------------------------------------------------------
+
+
+def _image_body(
+    *images: tuple[str, str], base: dict[str, object] | None = None
+) -> dict[str, object]:
+    """``_request_body()`` (or ``base``) carrying ``images`` as (mime, base64)."""
+    body = dict(_request_body() if base is None else base)
+    body["images"] = [{"mime_type": mime, "data": data} for mime, data in images]
+    return body
+
+
+def test_images_follow_the_prompt_as_inline_data_parts_in_order(
+    chat_client: TestClient, gemini: respx.MockRouter
+) -> None:
+    route = gemini.post(_URL).mock(return_value=httpx.Response(200, json=_reply()))
+
+    response = _post(
+        chat_client,
+        body=_image_body(("image/png", _PNG_B64), ("application/pdf", _PDF_B64)),
+    )
+
+    assert response.status_code == 200
+    assert response.json()["content"] == _ANSWER
+    body = _sent_body(route.calls.last)
+    assert body["contents"] == [
+        {
+            "role": "user",
+            "parts": [
+                {"text": _USER},
+                {"inline_data": {"mime_type": "image/png", "data": _PNG_B64}},
+                {"inline_data": {"mime_type": "application/pdf", "data": _PDF_B64}},
+            ],
+        }
+    ]
+    # The system prompt and generation config are what a text request sends.
+    assert body["system_instruction"] == {"parts": [{"text": _SYSTEM}]}
+    assert _generation_config(route.calls.last)["responseSchema"] == (
+        to_gemini_schema(_SCHEMA)
+    )
+
+
+def test_the_schema_retry_resends_the_images(
+    chat_client: TestClient, gemini: respx.MockRouter
+) -> None:
+    route = gemini.post(_URL).mock(
+        side_effect=[
+            httpx.Response(400, json=_GENERIC_400_BODY),
+            httpx.Response(200, json=_reply()),
+        ]
+    )
+
+    response = _post(chat_client, body=_image_body(("image/png", _PNG_B64)))
+
+    assert response.status_code == 200
+    assert route.call_count == 2
+    retried = _sent_body(route.calls.last)
+    assert "responseSchema" not in _generation_config(route.calls.last)
+    assert retried["contents"] == _sent_body(route.calls[0])["contents"]
+
+
+def test_a_request_with_images_bypasses_the_completion_cache(
+    chat_client: TestClient, gemini: respx.MockRouter
+) -> None:
+    route = gemini.post(_URL).mock(return_value=httpx.Response(200, json=_reply()))
+    with_image = _image_body(("image/png", _PNG_B64))
+
+    first = _post(chat_client, body=with_image)
+    second = _post(chat_client, body=with_image)
+    # Same prompts, no images: the image calls wrote no row it could hit.
+    text_only = _post(chat_client)
+    # And a cached text answer is never served to an image request.
+    text_again = _post(chat_client)
+    image_after_text = _post(chat_client, body=with_image)
+
+    assert [r.status_code for r in (first, second, text_only)] == [200, 200, 200]
+    assert first.headers["X-KetoClub-Cache"] == "bypass"
+    assert second.headers["X-KetoClub-Cache"] == "bypass"
+    assert text_only.headers["X-KetoClub-Cache"] == "miss"
+    assert text_again.headers["X-KetoClub-Cache"] == "hit"
+    assert image_after_text.headers["X-KetoClub-Cache"] == "bypass"
+    assert route.call_count == 4
+
+
+@pytest.mark.parametrize(
+    "images",
+    [
+        [{"mime_type": "image/png", "data": _PNG_B64}] * 7,
+        [
+            {
+                "mime_type": "image/jpeg",
+                "data": base64.b64encode(b"\xff" * (4 * 1024 * 1024)).decode(),
+            }
+        ],
+        [{"mime_type": "image/png", "data": "not base64!"}],
+        [{"mime_type": "image/png", "data": _PNG_B64.rstrip("=")}],
+        [{"mime_type": "image/png", "data": ""}],
+        [{"mime_type": "image/gif", "data": _PNG_B64}],
+        [{"data": _PNG_B64}],
+        [{"mime_type": "image/png"}],
+    ],
+    ids=[
+        "seven-images",
+        "four-mib-part",
+        "bad-base64",
+        "unpadded-base64",
+        "empty-data",
+        "gif",
+        "no-mime-type",
+        "no-data",
+    ],
+)
+def test_out_of_bounds_images_are_422_without_an_upstream_call(
+    chat_client: TestClient,
+    gemini: respx.MockRouter,
+    images: list[dict[str, str]],
+) -> None:
+    route = gemini.post(_URL).mock(return_value=httpx.Response(200, json=_reply()))
+    body = _request_body()
+    body["images"] = images
+
+    response = _post(chat_client, body=body)
+
+    assert response.status_code == 422
+    assert not route.called
+
+
+def test_image_bounds_come_from_settings(gemini: respx.MockRouter) -> None:
+    route = gemini.post(_URL).mock(return_value=httpx.Response(200, json=_reply()))
+    settings = Settings(
+        DATABASE_URL="sqlite:///:memory:",
+        GEMINI_API_KEY=_KEY,
+        VISION_MAX_IMAGES=1,
+        VISION_MAX_IMAGE_BYTES=70,
+    )
+
+    with _client(settings) as client:
+        at_bound = _post(client, body=_image_body(("image/png", _PNG_B64)))
+        two = _post(
+            client,
+            body=_image_body(("image/png", _PNG_B64), ("image/png", _PNG_B64)),
+        )
+        too_big = _post(
+            client,
+            body=_image_body(("image/png", base64.b64encode(b"x" * 71).decode())),
+        )
+
+    assert at_bound.status_code == 200
+    assert two.status_code == 422
+    assert too_big.status_code == 422
+    assert route.call_count == 1
+
+
+def test_a_request_with_images_still_requires_the_install_id(
+    chat_client: TestClient, gemini: respx.MockRouter
+) -> None:
+    route = gemini.post(_URL).mock(return_value=httpx.Response(200, json=_reply()))
+
+    response = _post(chat_client, body=_image_body(("image/png", _PNG_B64)), headers={})
+
+    assert response.status_code == 400
+    assert response.json() == _error(400, "badResponse")
+    assert not route.called
+
+
+def test_a_request_with_images_still_rejects_authorization(
+    chat_client: TestClient, gemini: respx.MockRouter
+) -> None:
+    route = gemini.post(_URL).mock(return_value=httpx.Response(200, json=_reply()))
+
+    response = _post(
+        chat_client,
+        body=_image_body(("image/png", _PNG_B64)),
+        headers={
+            "Authorization": "Bearer sk-user",
+            "X-KetoClub-Install-Id": _INSTALL_ID,
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json() == _error(400, "badResponse")
+    assert not route.called
+
+
+def test_a_request_with_images_spends_the_per_install_limit(
+    gemini: respx.MockRouter,
+) -> None:
+    route = gemini.post(_URL).mock(return_value=httpx.Response(200, json=_reply()))
+
+    with _client(_settings(per_minute=1)) as client:
+        with_image = _post(client, body=_image_body(("image/png", _PNG_B64)))
+        text_after = _post(client, body=_prompt_variant("after-image"))
+        image_after = _post(client, body=_image_body(("image/png", _PNG_B64)))
+
+    assert with_image.status_code == 200
+    assert text_after.status_code == 429
+    assert image_after.status_code == 429
+    assert image_after.json() == _error(429, "rateLimited")
+    assert route.call_count == 1
+
+
+def test_image_decoded_size_is_exact_for_every_padding() -> None:
+    for raw in (b"", b"a", b"ab", b"abc", b"abcd", b"\x00" * 1000):
+        encoded = base64.b64encode(raw).decode("ascii")
+        if not encoded:
+            continue
+        part = ImagePart(mime_type="image/png", data=encoded)
+        assert part.decoded_size == len(raw)
 
 
 # --- upstream error diagnostics (#187) ----------------------------------------
