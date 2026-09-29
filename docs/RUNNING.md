@@ -26,10 +26,10 @@ The backend is for the web build only (`architecture.md` D11, D17). iOS and
 Android never call it, even when it is configured: they call Wolt and
 Google's Gemini API themselves. What each platform can reach with no backend:
 
-| Platform | Menus (Wolt, 10bis) | Nearby / by-name search | AI analysis | Scan tab (camera, photos, PDF) |
+| Platform | Menus (Wolt, 10bis) | Nearby / by-name search | AI analysis | Scan tab (camera, photos, PDF, QR codes) |
 |---|---|---|---|---|
-| iOS, Android | direct calls to the platform | direct calls to Wolt | **yes, with your own Gemini key** — see below; without one, rules engine only (labelled "rules") | camera and photo library through the OS pickers (the camera and photo-library permission prompts appear on first use), PDFs through the file picker; pages go straight to Gemini with your key, so **needs the key** ("Add your Gemini API key in Settings") |
-| Web (Chrome) | **blocked by CORS** — paste-a-link shows the "open in the phone app" message | blocked by CORS | no | the browser's file chooser (a phone browser offers its camera); pages go through the backend, so **needs the backend** (§2, §3) — without it the screen says scanning needs the server, and pasting text still works |
+| iOS, Android | direct calls to the platform | direct calls to Wolt | **yes, with your own Gemini key** — see below; without one, rules engine only (labelled "rules") | camera and photo library through the OS pickers (the camera and photo-library permission prompts appear on first use), PDFs through the file picker; pages go straight to Gemini with your key, so **needs the key** ("Add your Gemini API key in Settings"). "Scan QR code" uses the same camera permission to read a table's QR code: a Wolt, 10bis or restaurant-site link opens that menu (a site or PDF menu is read as in §1 of the website notes), a Tabit code says it is not supported yet, and an Instagram, Linktree or non-link code suggests photographing the menu |
+| Web (Chrome) | **blocked by CORS** — paste-a-link shows the "open in the phone app" message | blocked by CORS | no | the browser's file chooser (a phone browser offers its camera); pages go through the backend, so **needs the backend** (§2, §3) — without it the screen says scanning needs the server, and pasting text still works. No "Scan QR code" button on web: paste the link on Explore instead |
 
 **AI analysis on a phone (D17).** Create a free API key in
 [Google AI Studio](https://aistudio.google.com/apikey), then in the app open

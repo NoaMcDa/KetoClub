@@ -266,6 +266,10 @@ const _boundaries = <_Boundary>[
   _Boundary('package:file_picker/', {
     'services/platform/device_page_picker.dart',
   }),
+  // The Scan tab's QR camera (issue #182). It sits in widgets/, not
+  // services/platform/, because it owns a full-screen page; one file
+  // touches the plugin either way.
+  _Boundary('package:mobile_scanner/', {'widgets/mobile_qr_scanner.dart'}),
   // The secure storage plugin guards that key; one file touches it.
   _Boundary('package:flutter_secure_storage/', {
     'services/storage/api_key_store.dart',

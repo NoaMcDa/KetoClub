@@ -354,6 +354,33 @@ void main() {
     });
   });
 
+  group('VenueRefResolver.parseUrl (issue #182)', () {
+    test('reads a scheme-qualified URL', () {
+      expect(
+        VenueRefResolver.parseUrl('https://cafe.co.il/menu')?.host,
+        'cafe.co.il',
+      );
+    });
+
+    test('reads a scheme-less domain and path as https', () {
+      expect(VenueRefResolver.parseUrl('cafe.co.il/menu')?.scheme, 'https');
+    });
+
+    test('trims surrounding whitespace', () {
+      expect(
+        VenueRefResolver.parseUrl('  https://cafe.co.il/menu\n')?.host,
+        'cafe.co.il',
+      );
+    });
+
+    test('is null for a bare token, plain text and blank input', () {
+      for (final input in <String>['', '   ', 'vitrina-lilinblum', '123456']) {
+        expect(VenueRefResolver.parseUrl(input), isNull, reason: input);
+      }
+      expect(VenueRefResolver.parseUrl('Table 12'), isNull);
+    });
+  });
+
   group('VenueRefResolver.normaliseWebsiteUrl (D19)', () {
     test('rejects a host that starts or ends with a dot', () {
       expect(

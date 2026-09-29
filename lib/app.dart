@@ -96,6 +96,7 @@ class _KetoClubAppState extends State<KetoClubApp> {
       child: AnimatedBuilder(
         animation: Listenable.merge([_localeController, _themeModeController]),
         builder: (context, _) => MaterialApp(
+          navigatorKey: widget.dependencies.navigatorKey,
           title: appName,
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
@@ -185,6 +186,7 @@ Route<void>? generateRoute(
             clock: dependencies.clock,
             settingsStore: dependencies.settingsStore,
             pagesRegistry: dependencies.scannedPages,
+            qrScanner: dependencies.qrScanner,
           ),
           child: ScanScreen(
             pagePicker: dependencies.pagePicker,

@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart' show GlobalKey, NavigatorState;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:ketoclub/di.dart';
@@ -17,6 +18,7 @@ import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/device_page_picker.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
+import 'package:ketoclub/services/platform/qr_scanner.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
@@ -24,6 +26,7 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/venue/wolt/wolt_venue_search_service.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
+import 'package:ketoclub/widgets/mobile_qr_scanner.dart';
 
 import 'fakes/fake_api_key_store.dart';
 import 'fakes/fake_install_id_store.dart';
@@ -71,6 +74,9 @@ void main() {
       expect(dependencies.scannedPages, isA<ScannedPagesRegistry>());
       // The device page picker (issue #82).
       expect(dependencies.pagePicker, isA<DevicePagePicker>());
+      // The QR camera scanner, off the web (issue #182).
+      expect(dependencies.qrScanner, isA<MobileQrScanner>());
+      expect(dependencies.qrScanner.isAvailable, isTrue);
     });
 
     test('performs no plugin I/O while building the graph', () {
@@ -95,6 +101,46 @@ void main() {
         first.get(const VenueRef(source: MenuSource.scan, platformId: 'a')),
         isNull,
       );
+    });
+  });
+
+  group('QR scanner wiring (issue #182)', () {
+    test('a browser gets the unavailable scanner, so the action is hidden', () {
+      // Act
+      final scanner = qrScannerFor(
+        runsInBrowser: true,
+        navigatorKey: GlobalKey<NavigatorState>(),
+      );
+
+      // Assert
+      expect(scanner, isA<NoQrScanner>());
+      expect(scanner.isAvailable, isFalse);
+    });
+
+    test('a phone gets the camera scanner', () {
+      // Act
+      final scanner = qrScannerFor(
+        runsInBrowser: false,
+        navigatorKey: GlobalKey<NavigatorState>(),
+      );
+
+      // Assert
+      expect(scanner, isA<MobileQrScanner>());
+      expect(scanner.isAvailable, isTrue);
+    });
+
+    test('hands the app the navigator key the scanner shows its page on', () {
+      // Arrange: a GlobalKey reads the widgets binding.
+      TestWidgetsFlutterBinding.ensureInitialized();
+
+      // Act
+      final dependencies = buildDependencies();
+
+      // Assert: a key for MaterialApp, and a scanner whose page would land
+      // on that navigator; scanning with nothing mounted is a null, not a
+      // throw.
+      expect(dependencies.navigatorKey, isNotNull);
+      expect(dependencies.qrScanner.scan(), completion(isNull));
     });
   });
 

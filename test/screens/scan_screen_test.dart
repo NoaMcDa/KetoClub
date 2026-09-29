@@ -11,6 +11,7 @@ import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/screens/scan_screen.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
+import 'package:ketoclub/services/platform/qr_scanner.dart';
 import 'package:ketoclub/state/scan_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/scan_failure_copy.dart';
@@ -19,6 +20,7 @@ import 'package:provider/provider.dart';
 import '../fakes/fake_clock.dart';
 import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_page_picker.dart';
+import '../fakes/fake_qr_scanner.dart';
 import '../fakes/fake_scanned_menu_classifier.dart';
 import '../fakes/fake_settings_store.dart';
 
@@ -805,4 +807,207 @@ void main() {
       expect(find.text(_he.scanScreenPageTooLarge(3)), findsOneWidget);
     });
   });
+
+  group('ScanScreen QR action (issue #182)', () {
+    late FakeQrScanner scanner;
+    late ScanController controller;
+
+    ScanController build(QrScanner qrScanner) => ScanController(
+      classifier: FakeScannedMenuClassifier(),
+      repository: FakeMenuRepository(),
+      clock: FakeClock(DateTime.utc(2026, 9, 29)),
+      settingsStore: FakeSettingsStore(),
+      qrScanner: qrScanner,
+    );
+
+    setUp(() {
+      scanner = FakeQrScanner();
+      controller = build(scanner);
+    });
+
+    tearDown(() => controller.dispose());
+
+    testWidgets('shows the action when the build can scan', (tester) async {
+      // Arrange & Act
+      await _pump(tester, controller);
+
+      // Assert
+      expect(_action(_en.scanQrAction), findsOneWidget);
+      expect(_enabled(tester, _action(_en.scanQrAction)), isTrue);
+    });
+
+    testWidgets('hides the action when the build cannot scan (web)', (
+      tester,
+    ) async {
+      // Arrange
+      final web = build(FakeQrScanner(available: false));
+      addTearDown(web.dispose);
+
+      // Act
+      await _pump(tester, web);
+
+      // Assert
+      expect(find.text(_en.scanQrAction), findsNothing);
+      expect(find.text(_en.scanScreenActionTakePhoto), findsOneWidget);
+    });
+
+    testWidgets('a Wolt code opens that venue exactly as a paste does', (
+      tester,
+    ) async {
+      // Arrange
+      scanner.queuePayload(
+        'https://wolt.com/en/isr/tel-aviv/restaurant/vitrina-lilinblum',
+      );
+      final pushed = <String>[];
+      await _pump(tester, controller, pushed: pushed);
+
+      // Act
+      await tester.tap(_action(_en.scanQrAction));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(pushed, ['/venue/wolt/vitrina-lilinblum']);
+    });
+
+    testWidgets('a website code opens the website venue', (tester) async {
+      // Arrange
+      scanner.queuePayload('https://cafe.co.il/menu');
+      final pushed = <String>[];
+      await _pump(tester, controller, pushed: pushed);
+
+      // Act
+      await tester.tap(_action(_en.scanQrAction));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(pushed, [
+        '/venue/website/${Uri.encodeComponent('https://cafe.co.il/menu')}',
+      ]);
+    });
+
+    testWidgets('a cancelled scan opens nothing and says nothing', (
+      tester,
+    ) async {
+      // Arrange
+      final pushed = <String>[];
+      await _pump(tester, controller, pushed: pushed);
+
+      // Act
+      await tester.tap(_action(_en.scanQrAction));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(pushed, isEmpty);
+      expect(find.text(_en.scanQrPhotographInstead), findsNothing);
+      expect(find.text(_en.scanQrUnsupportedSource('Tabit')), findsNothing);
+      expect(_enabled(tester, _action(_en.scanQrAction)), isTrue);
+    });
+
+    testWidgets('a Tabit code says Tabit is not supported yet', (tester) async {
+      // Arrange
+      scanner.queuePayload('https://tabitisrael.co.il/tabit-order?siteName=x');
+      final pushed = <String>[];
+      await _pump(tester, controller, pushed: pushed);
+
+      // Act
+      await tester.tap(_action(_en.scanQrAction));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.scanQrUnsupportedSource('Tabit')), findsOneWidget);
+      expect(pushed, isEmpty);
+    });
+
+    testWidgets('an Instagram code suggests photographing the menu', (
+      tester,
+    ) async {
+      // Arrange
+      scanner.queuePayload('https://www.instagram.com/cafe.noa');
+      final pushed = <String>[];
+      await _pump(tester, controller, pushed: pushed);
+
+      // Act
+      await tester.tap(_action(_en.scanQrAction));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.scanQrPhotographInstead), findsOneWidget);
+      expect(pushed, isEmpty);
+    });
+
+    testWidgets('a code that is not a URL suggests photographing too', (
+      tester,
+    ) async {
+      // Arrange
+      scanner.queuePayload('Table 12');
+      await _pump(tester, controller);
+
+      // Act
+      await tester.tap(_action(_en.scanQrAction));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.scanQrPhotographInstead), findsOneWidget);
+    });
+
+    testWidgets('the action is disabled while the camera is open', (
+      tester,
+    ) async {
+      // Arrange
+      final gate = Completer<String?>();
+      final slow = build(_GatedScanner(gate.future));
+      addTearDown(slow.dispose);
+      await _pump(tester, slow);
+
+      // Act
+      await tester.tap(_action(_en.scanQrAction));
+      await tester.pump();
+
+      // Assert
+      expect(_enabled(tester, _action(_en.scanQrAction)), isFalse);
+
+      gate.complete(null);
+      await tester.pumpAndSettle();
+      expect(_enabled(tester, _action(_en.scanQrAction)), isTrue);
+    });
+
+    testWidgets('Hebrew renders the action and each notice, right to left', (
+      tester,
+    ) async {
+      // Arrange
+      scanner
+        ..queuePayload('https://tabitisrael.co.il/tabit-order?siteName=x')
+        ..queuePayload('https://www.instagram.com/cafe.noa');
+      await _pump(tester, controller, locale: const Locale('he'));
+
+      // Act & Assert
+      expect(find.text(_he.scanQrAction), findsOneWidget);
+      expect(
+        Directionality.of(tester.element(find.text(_he.scanQrAction))),
+        TextDirection.rtl,
+      );
+
+      await tester.tap(_action(_he.scanQrAction));
+      await tester.pumpAndSettle();
+      expect(find.text(_he.scanQrUnsupportedSource('Tabit')), findsOneWidget);
+
+      await tester.tap(_action(_he.scanQrAction));
+      await tester.pumpAndSettle();
+      expect(find.text(_he.scanQrPhotographInstead), findsOneWidget);
+      expect(find.text(_he.scanQrUnsupportedSource('Tabit')), findsNothing);
+    });
+  });
+}
+
+/// A [QrScanner] that answers when its [gate] completes.
+final class _GatedScanner implements QrScanner {
+  new(this.gate);
+
+  final Future<String?> gate;
+
+  @override
+  bool get isAvailable => true;
+
+  @override
+  Future<String?> scan() => gate;
 }

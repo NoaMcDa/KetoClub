@@ -427,5 +427,15 @@
   "websitePdfUnread": "The menu on {site} is a PDF, which only AI analysis can read, and it could not be read now. Check AI analysis in Settings, then try again.",
   "@websitePdfUnread": {
     "placeholders": { "site": { "type": "String" } }
-  }
+  },
+  "scanQrAction": "Scan QR code",
+  "scanQrTitle": "Scan QR code",
+  "scanQrInstruction": "Point the camera at the QR code on the table.",
+  "scanQrCameraDenied": "KetoClub cannot use the camera. Allow camera access in your device settings, or paste the menu link instead.",
+  "scanQrCameraUnavailable": "The camera could not start. Close this screen and paste the menu link instead.",
+  "scanQrUnsupportedSource": "{name} menus are not supported yet. Photograph the menu instead.",
+  "@scanQrUnsupportedSource": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "scanQrPhotographInstead": "This QR code does not lead to a menu KetoClub can read. Photograph the menu instead."
 }

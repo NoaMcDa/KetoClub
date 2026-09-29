@@ -275,7 +275,9 @@ ketoclub/
 │   │   ├── analysis_progress_row.dart    # names the engine while a menu is analysed (#137)
 │   │   ├── menu_search_field.dart        # search within a loaded menu (#140)
 │   │   ├── note_editor_sheet.dart        # personal, local-only notes on a dish (#131)
-│   │   └── rules_reason_banner.dart      # why a menu fell back to the rule engine (#125)
+│   │   ├── rules_reason_banner.dart      # why a menu fell back to the rule engine (#125)
+│   │   └── mobile_qr_scanner.dart        # MobileQrScanner + its camera page; the ONLY file importing
+│   │                                     # package:mobile_scanner (#182); here, not in services/, since it owns a page
 │   │
 │   ├── state/                            # ChangeNotifiers; constructor-injected with interfaces
 │   │   ├── app_dependencies.dart         # immutable holder of service interfaces; filled by di.dart
@@ -292,7 +294,8 @@ ketoclub/
 │   │   │   ├── clock.dart                # abstract Clock { DateTime now(); }  (cache freshness, tests)
 │   │   │   ├── app_logger.dart           # abstract AppLogger; never sees the key or an upstream body
 │   │   │   ├── connectivity.dart         # abstract Connectivity { Future<bool> isOnline(); } — a hint, never a verdict (§14 D10)
-│   │   │   └── screen_brightness.dart    # raises brightness for the Waiter Card, restores it on close
+│   │   │   ├── screen_brightness.dart    # raises brightness for the Waiter Card, restores it on close
+│   │   │   └── qr_scanner.dart           # interface QrScanner { scan() → String? } + NoQrScanner (#182)
 │   │   ├── storage/                      # rank 0
 │   │   │   ├── api_key_store.dart        # interface + SecureApiKeyStore: the user's Gemini key, phones only (D17)
 │   │   │   ├── install_id_store.dart     # interface + PrefsInstallIdStore; replaces key_store.dart (D12)
@@ -308,6 +311,7 @@ ketoclub/
 │   │   │   └── geolocator_location_service.dart # GeolocatorLocationService; the ONLY file importing package:geolocator
 │   │   ├── venue/                        # rank 0
 │   │   │   ├── venue_ref_resolver.dart   # pure: pasted URL / slug / ID → VenueRef
+│   │   │   ├── qr_payload_router.dart    # pure: a scanned QR payload → QrVenue / QrUnsupportedSource / QrPhotographInstead (#182)
 │   │   │   ├── venue_search_service.dart # interface only (issue #39)
 │   │   │   └── wolt/
 │   │   │       ├── wolt_venue_search_service.dart # HTTP only; delegates to the mapper
@@ -894,7 +898,7 @@ Screens:
 | `MenuScreen` | `/venue/:source/:id` | Classified menu with filters and engine chip; `/venue/scan/{id}` opens a pasted menu (D18) |
 | `WaiterCardSheet` | modal | Large-type script with copy |
 | `SettingsScreen` | `/settings` | Key entry, disclosure text, cache clear, language |
-| `ScanScreen` | `/scan` | Collects menu pages from the camera, the photo library or a PDF, or a menu's text pasted into a field (D18). Analyse hands the pages to `ScannedMenuClassifier` in one call (D15), or the parsed paste to `MenuRepository.store`, and opens `/venue/scan/{id}` (#82, #83) |
+| `ScanScreen` | `/scan` | Collects menu pages from the camera, the photo library or a PDF, or a menu's text pasted into a field (D18). Analyse hands the pages to `ScannedMenuClassifier` in one call (D15), or the parsed paste to `MenuRepository.store`, and opens `/venue/scan/{id}` (#82, #83). "Scan QR code" (not on web) reads a table's QR code through `QrScanner`; `QrPayloadRouter` sends a Wolt, 10bis, website or PDF link to that venue's `/venue/{source}/{id}` route, and answers a Tabit code ("not supported yet") or an Instagram, Linktree or non-URL code ("photograph the menu instead") with copy on the Scan tab (#182) |
 | `SavedScreen` | `/saved` | Placeholder — saving a venue is not built (Phase 3 territory) |
 
 **The bottom-navigation shell** *(issue #11, Phase 1)*, not in this document when
@@ -2098,7 +2102,7 @@ and what is still owed (fixture recordings, a phone run).
    iOS, Android and web. Still owed: a test on a physical iOS and Android
    device with a real Wolt venue (`docs/RELEASE.md`'s device matrix).
 
-**Phase 4 steps (menu scanning).** Steps 11 to 16 are done; 17 is open.
+**Phase 4 steps (menu scanning).** Steps 11 to 17 are done.
 Each has its own issue in the GitHub milestone "Phase 4: Menu Scanning"; D15,
 D18 and D19 (§14) are the record of the decisions.
 
@@ -2119,7 +2123,15 @@ D18 and D19 (§14) are the record of the decisions.
     locator and page reader, `WebsiteMenuAdapter` over a direct or backend
     fetcher, `POST /v1/website/fetch`, and a PDF read by the vision path.
     Still owed: a real restaurant site fetched, on the web build and a phone.
-17. ☐ **QR codes** (#182) — a menu reached from a scanned QR code.
+17. ✅ **QR codes** (#182) — a menu reached from a scanned QR code. The Scan
+    tab's "Scan QR code" action reads one code through `QrScanner`
+    (`MobileQrScanner` over `mobile_scanner`, off the web; `NoQrScanner` on
+    web, where the action is hidden). The pure `QrPayloadRouter` classifies the
+    payload: Wolt, 10bis, website and PDF links become a `VenueRef` and open
+    the menu screen exactly as a pasted link does; a Tabit code answers "not
+    supported yet" (#176 is the adapter); Instagram, Linktree and any non-URL
+    payload suggest photographing the menu. Still owed: a physical phone with
+    a real QR code (the camera is evidenced by a fake only).
 
 The person-run vision smoke test (#88, `backend/tools/vision_smoke.py`) is a
 verification step for 11 to 14, not a build step: no real image request has been

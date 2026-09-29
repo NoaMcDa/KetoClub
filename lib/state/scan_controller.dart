@@ -7,7 +7,9 @@ import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/text/text_menu_source.dart';
 import 'package:ketoclub/services/platform/clock.dart';
+import 'package:ketoclub/services/platform/qr_scanner.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/venue/qr_payload_router.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/utils/constants.dart';
 
@@ -40,8 +42,14 @@ enum ScanPageRejection {
 /// failure, so Retry is calling [analysePages] again; they live in memory
 /// only and are never written to the cache.
 ///
-/// Never throws — the repository and classifier do not, and
-/// [TextMenuSource.parse] is pure.
+/// **QR codes.** [scanQr] reads a table's QR code through the [QrScanner]
+/// and classifies it with [QrPayloadRouter]; a venue is handed to the
+/// caller to open, and the two outcomes with no menu behind them (a
+/// platform not supported yet, a code that is not a menu link) are kept as
+/// [qrNotice] for the screen to explain (issue #182).
+///
+/// Never throws — the repository, classifier and scanner do not, and
+/// [TextMenuSource.parse] and [QrPayloadRouter.classify] are pure.
 final class ScanController extends ChangeNotifier {
   /// Creates a controller that stores pasted and scanned menus in
   /// `repository` and stamps pasted ones with the time `clock` reports.
@@ -56,11 +64,17 @@ final class ScanController extends ChangeNotifier {
     required this._clock,
     required this._settingsStore,
     this._pagesRegistry,
+    this.qrScanner = const NoQrScanner(),
   });
 
   /// Reads and classifies scanned pages in one request (architecture.md
   /// D15). Used by [analysePages]; the paste flow does not call it.
   final ScannedMenuClassifier classifier;
+
+  /// Reads a table's QR code (issue #182). Used by [scanQr]; defaults to
+  /// [NoQrScanner], which is unavailable, so a controller built without a
+  /// scanner shows no QR action.
+  final QrScanner qrScanner;
 
   final MenuRepository _repository;
   final Clock _clock;
@@ -75,6 +89,8 @@ final class ScanController extends ChangeNotifier {
   bool _emptyPaste = false;
   bool _isSubmitting = false;
   bool _disposed = false;
+  bool _qrScanning = false;
+  QrTarget? _qrNotice;
 
   /// The text currently in the paste field.
   String get text => _text;
@@ -85,6 +101,7 @@ final class ScanController extends ChangeNotifier {
     if (value == _text) return;
     _text = value;
     _emptyPaste = false;
+    _qrNotice = null;
     notifyListeners();
   }
 
@@ -123,6 +140,47 @@ final class ScanController extends ChangeNotifier {
     _emptyPaste = false;
     _notify();
     return menu.venueRef;
+  }
+
+  /// Whether this build can scan a QR code, so the screen offers the
+  /// action. False on web, where pasting the link already works.
+  bool get qrAvailable => qrScanner.isAvailable;
+
+  /// Whether [scanQr] is waiting on the camera.
+  bool get qrScanning => _qrScanning;
+
+  /// What the last [scanQr] found when it was not a venue: a
+  /// [QrUnsupportedSource] (a platform KetoClub cannot read yet) or a
+  /// [QrPhotographInstead] (a code with no menu link in it). Null before a
+  /// scan, after a cancelled or venue scan, and once the user edits the
+  /// pages or the paste.
+  QrTarget? get qrNotice => _qrNotice;
+
+  /// Opens the camera, reads one QR code and classifies it, returning the
+  /// [QrVenue] to open, or null when there is nothing to open.
+  ///
+  /// Null covers a cancelled or denied camera (nothing else changes) and the
+  /// two outcomes that carry a message, which are left in [qrNotice]. Clears
+  /// the previous [qrNotice] first. A no-op while a scan is already open.
+  Future<QrVenue?> scanQr() async {
+    if (_qrScanning) return null;
+    _qrScanning = true;
+    _qrNotice = null;
+    notifyListeners();
+
+    final payload = await qrScanner.scan();
+    QrVenue? venue;
+    if (payload != null) {
+      switch (QrPayloadRouter.classify(payload)) {
+        case final QrVenue target:
+          venue = target;
+        case final QrTarget notice:
+          _qrNotice = notice;
+      }
+    }
+    _qrScanning = false;
+    _notify();
+    return venue;
   }
 
   /// The pages collected so far, in the order added. Unmodifiable.
@@ -171,6 +229,7 @@ final class ScanController extends ChangeNotifier {
     }
     if (added) {
       _lastFailure = null;
+      _qrNotice = null;
       notifyListeners();
     }
     return rejection;

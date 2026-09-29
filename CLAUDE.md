@@ -38,7 +38,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > the Scan tab's photo/gallery/PDF pickers). There is no on-device OCR. A
 > restaurant's own website is a menu source too (#181, D19): paste any
 > restaurant URL and its menu page, JSON-LD or PDF is found and classified.
-> QR codes (#182) are not built, and no real Gemini request carrying images
+> A table's QR code is a menu source too (#182): the Scan tab's "Scan QR code"
+> action (phones, not web) reads it with the camera and routes a Wolt, 10bis,
+> website or PDF link to that menu. No real Gemini request carrying images
 > has been sent yet (#88).
 >
 > **Read `architecture.md` first — it is authoritative.** This file and `README.md`
@@ -178,13 +180,16 @@ lib/
 │   ├── platform/              # clock, app_logger, connectivity (D10), screen_brightness,
 │   │                          # page_picker (interface + a null picker) and
 │   │                          # device_page_picker (camera, gallery and PDF over
-│   │                          # image_picker and file_picker, #82)
+│   │                          # image_picker and file_picker, #82) and qr_scanner
+│   │                          # (interface + a null scanner, #182)
 │   ├── storage/               # install_id_store, menu_cache, settings_store, notes_store,
 │   │                          # api_key_store (the user's Gemini key, phones only, D17)
 │   ├── llm/                   # llm_chat_client, backend_chat_client (web, D12),
 │   │                          # gemini_chat_client (phones, direct to Google, D17)
 │   ├── location/              # location_service, geolocator_location_service (issue #37)
-│   ├── venue/                 # venue_ref_resolver (paste-a-URL, pure), venue_search_service
+│   ├── venue/                 # venue_ref_resolver (paste-a-URL, pure), qr_payload_router
+│   │                          # (a scanned QR payload → venue / unsupported / photograph, pure, #182),
+│   │                          # venue_search_service
 │   │                          # (interface), wolt/ (WoltVenueSearchService + mapper, issue #39)
 │   ├── menu/                  # platform_menu_adapter, menu_repository, wolt/ and tenbis/
 │   │                          # (each split HTTP-adapter + pure mapper, proxyBase, D11),
@@ -203,7 +208,8 @@ lib/
 │                              # venue_card, category_chips, photo_tile, offline_banner,
 │                              # fetch_failure_action, analysis_progress_row, menu_search_field,
 │                              # note_editor_sheet, rules_reason_banner, scanned_pages_sheet,
-│                              # scan_failure_copy
+│                              # scan_failure_copy, mobile_qr_scanner (the QR camera page and
+│                              # its QrScanner, the one file over mobile_scanner, #182)
 └── screens/                   # venue_search (the Discovery screen, D13), menu,
                                # waiter_card_sheet, settings (a Gemini key section on
                                # phones only, D17), saved (a real
@@ -393,8 +399,8 @@ When reading research docs (m15/m16), note that prefixes indicate iteration/mile
   clients (#170, D15), the `ScannedMenuClassifier` seam with `VisionMenuClassifier`
   and `RoutingScannedMenuClassifier` (#89), and the Scan tab's photo, image and PDF
   pickers alongside paste (#82), flow tests for the scan paths (#84), and website
-  menus (#181, D19). Still open in the milestone: #88 (the person-run Gemini
-  vision smoke test, `backend/tools/vision_smoke.py`) and #182 (QR codes).
+  menus (#181, D19), and table QR codes (#182). Still open in the milestone: #88
+  (the person-run Gemini vision smoke test, `backend/tools/vision_smoke.py`).
   On-device OCR was dropped (D15; #81 closed as not planned). Configurable dietary
   rules are not Phase 4 work: they shipped earlier under Phase 2 (#56, #143).
 
@@ -408,18 +414,15 @@ up next.
   adapter registered for each (`di.dart`). The `PlatformMenuAdapter`
   interface and its shared contract suite already exist, so a new platform is
   a new adapter plus a registration in `di.dart`.
-- Menus reached from a QR code (#182), the last of menu scanning's sources
-  (Phase 4). A restaurant's own website is built (#181, `architecture.md` D19):
-  paste any restaurant URL on Explore. The Scan tab itself is real — paste,
-  photographs, gallery images and a PDF — and there is no on-device OCR by
-  design (D15). Also not built: community features — venue ratings, reviews,
-  submissions (Phase 3, `backend_plan.md` §5's milestone C).
+- Menu scanning's sources are all built: paste, photographs, gallery images, a
+  PDF, a restaurant's own website (#181, `architecture.md` D19) and a table's
+  QR code (#182). There is no on-device OCR by design (D15), and a Tabit QR
+  code answers "not supported yet" until the Tabit adapter exists (#176).
+  Also not built: community features — venue ratings, reviews, submissions
+  (Phase 3, `backend_plan.md` §5's milestone C).
 - Backend hosting beyond `localhost` (issue #109, `architecture.md` §17.6). The
   backend is designed to be run locally by whoever has the repository checked
   out; nothing yet says where it runs for anyone else.
-- Flow tests for the scan paths (#84): the scan controller, classifier and screen
-  are unit- and widget-tested, but no flow test drives paste, photo or PDF
-  end to end.
 - The pinned Gemini model has answered the real prompt only through the
   backend, from a laptop (the #165 smoke test); the phones' direct client has
   never been run with a real key. See "What is NOT verified yet" below.
@@ -456,6 +459,12 @@ Built, but not confirmed end to end, and not to be reported as done:
   `application/pdf` parts with the real prompt and schema, how long a multi-page
   scan takes, and how accurate the transcription is on a real printed or Hebrew
   menu are all unobserved. `backend/tools/vision_smoke.py` is the person-run check.
+- **QR scanning is evidenced by a fake scanner only; no device has run the
+  camera.** `MobileQrScanner` (over `mobile_scanner`, in
+  `lib/widgets/mobile_qr_scanner.dart`) is tested with a stand-in camera view,
+  and `QrPayloadRouter` against a table of URL kinds; whether the plugin builds
+  for Android and iOS is known only from CI, and how it decodes a real table QR
+  code, in Hebrew or a small print, is unobserved.
 - **The Scan tab's pickers and permissions are evidenced by fakes only.**
   `DevicePagePicker` (over `image_picker` and `file_picker`) and the iOS camera and
   photo-library permission strings (English and Hebrew `InfoPlist.strings`, not
@@ -517,7 +526,7 @@ Built, but not confirmed end to end, and not to be reported as done:
    recordings and phone run in "What is NOT verified yet" above. What's next
    is Phase 3's remaining milestone (community database, reviews, submissions;
    `backend_plan.md` §5 milestone C, issues #105–#108) and Phase 4's open
-   scan issues (#88, #182; §16's Phase 4 steps). §14 has the decisions
+   scan issue (#88; §16's Phase 4 steps). §14 has the decisions
    log D1–D19, §17 the open questions with the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.

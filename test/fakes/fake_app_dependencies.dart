@@ -11,6 +11,7 @@ import 'fake_menu_repository.dart';
 import 'fake_menu_sharer.dart';
 import 'fake_notes_store.dart';
 import 'fake_page_picker.dart';
+import 'fake_qr_scanner.dart';
 import 'fake_scanned_menu_classifier.dart';
 import 'fake_settings_store.dart';
 import 'fake_venue_search_service.dart';
@@ -38,6 +39,7 @@ final class FakeAppDependencies {
       venueSearchService = FakeVenueSearchService(),
       scannedMenuClassifier = FakeScannedMenuClassifier(),
       pagePicker = FakePagePicker(),
+      qrScanner = FakeQrScanner(),
       scannedPages = ScannedPagesRegistry();
 
   /// The faked menu repository.
@@ -90,6 +92,10 @@ final class FakeAppDependencies {
   /// with [FakePagePicker.queueTakePhoto] and friends.
   final FakePagePicker pagePicker;
 
+  /// The faked QR scanner behind the Scan tab's "Scan QR code" action
+  /// (issue #182); script it with [FakeQrScanner.queuePayload].
+  final FakeQrScanner qrScanner;
+
   /// The in-memory scanned-pages registry (issue #89) — the real one, as
   /// it does no I/O; put a scan here to drive the menu header's "View
   /// pages".
@@ -111,6 +117,7 @@ final class FakeAppDependencies {
     venueSearchService: venueSearchService,
     scannedMenuClassifier: scannedMenuClassifier,
     pagePicker: pagePicker,
+    qrScanner: qrScanner,
     scannedPages: scannedPages,
   );
 }
