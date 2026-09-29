@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/llm_menu_classifier.dart';
+import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/llm/backend_chat_client.dart';
 import 'package:ketoclub/services/llm/gemini_chat_client.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
@@ -17,6 +18,7 @@ import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
+import 'package:ketoclub/services/platform/page_picker.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/install_id_store.dart';
@@ -222,5 +224,15 @@ AppDependencies buildDependencies() {
       ),
     ),
     apiKeyStore: apiKeyStore,
+    // The scan seams' placeholders, passed explicitly so the next two
+    // changes each replace one line: issue #89 wires the vision
+    // classifier here, issue #82 the device page picker. Neither
+    // placeholder performs any I/O. They equal AppDependencies' defaults,
+    // hence the lint suppressions: the explicit line is the point.
+    // ignore: avoid_redundant_argument_values
+    scannedMenuClassifier: const UnavailableScannedMenuClassifier(),
+    // Explicit for the same reason as the line above.
+    // ignore: avoid_redundant_argument_values
+    pagePicker: const NoPagePicker(),
   );
 }

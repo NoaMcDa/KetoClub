@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/text/text_menu_source.dart';
 import 'package:ketoclub/services/platform/clock.dart';
@@ -18,8 +19,18 @@ import 'package:ketoclub/services/platform/clock.dart';
 /// pure.
 final class ScanController extends ChangeNotifier {
   /// Creates a controller that stores pasted menus in `repository` and
-  /// stamps them with the time `clock` reports.
-  new({required this._repository, required this._clock});
+  /// stamps them with the time `clock` reports. [classifier] reads
+  /// scanned pages (issue #89); the paste flow never calls it.
+  new({
+    required this.classifier,
+    required this._repository,
+    required this._clock,
+  });
+
+  /// Reads and classifies scanned pages in one request (architecture.md
+  /// D15). Held for the scan flow (issues #82, #89); the paste flow does
+  /// not use it.
+  final ScannedMenuClassifier classifier;
 
   final MenuRepository _repository;
   final Clock _clock;

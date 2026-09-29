@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
@@ -7,6 +8,7 @@ import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
+import 'package:ketoclub/services/platform/page_picker.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
@@ -28,6 +30,13 @@ class AppDependencies {
   /// a caller with nothing to say about brightness should not have to say
   /// so. [apiKeyStore] defaults to null for the same reason, and because
   /// null is also the web build's real value.
+  ///
+  /// [scannedMenuClassifier] and [pagePicker] default for the same reason:
+  /// they were added after those call sites, and a test that never scans
+  /// should not have to build either. Their defaults do no I/O —
+  /// [UnavailableScannedMenuClassifier] answers `notConfigured` and
+  /// [NoPagePicker] answers as if cancelled — until issues #89 and #82
+  /// wire the real ones in `di.dart`.
   const new({
     required this.menuRepository,
     required this.menuClassifier,
@@ -43,6 +52,8 @@ class AppDependencies {
     required this.venueSearchService,
     this.screenBrightness = const NoOpScreenBrightness(),
     this.apiKeyStore,
+    this.scannedMenuClassifier = const UnavailableScannedMenuClassifier(),
+    this.pagePicker = const NoPagePicker(),
   });
 
   /// Loads a venue's menu, cache first (architecture.md §6.1).
@@ -108,4 +119,13 @@ class AppDependencies {
   /// reaches Gemini through KetoClub's backend (D12) and so has no key and
   /// no key field. The classifier's chat client holds the same instance.
   final ApiKeyStore? apiKeyStore;
+
+  /// Reads photographed or PDF menu pages and classifies them in one
+  /// request (architecture.md §6.2, D15; issue #89). A sibling of
+  /// [menuClassifier], because a scan has no `Menu` until it is read.
+  final ScannedMenuClassifier scannedMenuClassifier;
+
+  /// Collects menu pages from the camera, the photo library or a PDF for
+  /// the Scan tab (issue #82).
+  final PagePicker pagePicker;
 }

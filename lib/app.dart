@@ -180,6 +180,7 @@ Route<void>? generateRoute(
         currentIndex: AppShell.scanIndex,
         child: ChangeNotifierProvider<ScanController>(
           create: (_) => ScanController(
+            classifier: dependencies.scannedMenuClassifier,
             repository: dependencies.menuRepository,
             clock: dependencies.clock,
           ),

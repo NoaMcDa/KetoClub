@@ -9,6 +9,8 @@ import 'fake_menu_classifier.dart';
 import 'fake_menu_repository.dart';
 import 'fake_menu_sharer.dart';
 import 'fake_notes_store.dart';
+import 'fake_page_picker.dart';
+import 'fake_scanned_menu_classifier.dart';
 import 'fake_settings_store.dart';
 import 'fake_venue_search_service.dart';
 
@@ -32,7 +34,9 @@ final class FakeAppDependencies {
       externalLinkOpener = FakeExternalLinkOpener(),
       menuSharer = FakeMenuSharer(),
       locationService = FakeLocationService(),
-      venueSearchService = FakeVenueSearchService();
+      venueSearchService = FakeVenueSearchService(),
+      scannedMenuClassifier = FakeScannedMenuClassifier(),
+      pagePicker = FakePagePicker();
 
   /// The faked menu repository.
   final FakeMenuRepository repository;
@@ -76,6 +80,14 @@ final class FakeAppDependencies {
   /// [FakeVenueSearchService.queueFound] and friends.
   final FakeVenueSearchService venueSearchService;
 
+  /// The faked vision classifier behind the Scan tab (issue #89); script
+  /// it with [FakeScannedMenuClassifier.respondWith].
+  final FakeScannedMenuClassifier scannedMenuClassifier;
+
+  /// The faked page picker behind the Scan tab (issue #82); script it
+  /// with [FakePagePicker.queueTakePhoto] and friends.
+  final FakePagePicker pagePicker;
+
   /// The dependency set to hand to the app widget.
   AppDependencies get dependencies => AppDependencies(
     menuRepository: repository,
@@ -90,5 +102,7 @@ final class FakeAppDependencies {
     menuSharer: menuSharer,
     locationService: locationService,
     venueSearchService: venueSearchService,
+    scannedMenuClassifier: scannedMenuClassifier,
+    pagePicker: pagePicker,
   );
 }

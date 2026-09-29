@@ -27,9 +27,11 @@ import 'package:ketoclub/app.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
@@ -38,6 +40,7 @@ import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
+import 'package:ketoclub/services/platform/page_picker.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
@@ -93,7 +96,9 @@ final class FakeAppDependencies {
       externalLinkOpener = FlowFakeExternalLinkOpener(),
       menuSharer = FlowFakeMenuSharer(),
       locationService = FlowFakeLocationService(),
-      venueSearchService = FlowFakeVenueSearchService();
+      venueSearchService = FlowFakeVenueSearchService(),
+      scannedClassifier = FlowFakeScannedMenuClassifier(),
+      pagePicker = FlowFakePagePicker();
 
   /// The faked menu repository; script it with [FlowFakeMenuRepository.stub].
   final FlowFakeMenuRepository repository;
@@ -133,6 +138,14 @@ final class FakeAppDependencies {
   /// [FlowFakeVenueSearchService.result].
   final FlowFakeVenueSearchService venueSearchService;
 
+  /// The faked vision classifier behind the Scan tab (issue #89); script
+  /// it with [FlowFakeScannedMenuClassifier.result].
+  final FlowFakeScannedMenuClassifier scannedClassifier;
+
+  /// The faked page picker behind the Scan tab (issue #82); script it
+  /// with [FlowFakePagePicker.photos] and friends.
+  final FlowFakePagePicker pagePicker;
+
   /// When set, [dependencies] wires this in place of [classifier].
   ///
   /// Every flow test that only needs to script "what the top-level
@@ -152,6 +165,15 @@ final class FakeAppDependencies {
   /// `direct_gemini_analysis_flow_test.dart`), rather than a repository
   /// scripted with the finished menu.
   MenuRepository? repositoryOverride;
+
+  /// When set, [dependencies] wires this in place of [scannedClassifier]
+  /// — for a scan flow that must run the real vision classifier or its
+  /// router over a faked chat client (issue #84), the same way
+  /// [classifierOverride] does for the text path.
+  ScannedMenuClassifier? scannedClassifierOverride;
+
+  /// When set, [dependencies] wires this in place of [pagePicker].
+  PagePicker? pagePickerOverride;
 
   /// The user's own Gemini API key store, as `di.dart` provides it on iOS
   /// and Android (architecture.md D17). Null by default — the web build's
@@ -179,6 +201,8 @@ final class FakeAppDependencies {
     locationService: locationService,
     venueSearchService: venueSearchService,
     apiKeyStore: apiKeyStore,
+    scannedMenuClassifier: scannedClassifierOverride ?? scannedClassifier,
+    pagePicker: pagePickerOverride ?? pagePicker,
   );
 }
 
@@ -538,5 +562,68 @@ final class FlowFakeVenueSearchService implements VenueSearchService {
     byNameCalls.add(query);
     if (query.trim().isEmpty) return const VenuesFound(<Venue>[]);
     return result;
+  }
+}
+
+/// A [ScannedMenuClassifier] answering one settable [result] and recording
+/// every call — mirrors `test/fakes`' `FakeScannedMenuClassifier`,
+/// duplicated here for the reason this file's own top doc comment gives.
+final class FlowFakeScannedMenuClassifier implements ScannedMenuClassifier {
+  /// What every call answers; `notConfigured` — the shipped placeholder's
+  /// answer — until a flow sets it.
+  ScannedMenuResult result = const ScannedMenuFailed(
+    reason: MenuAnalysisFailureReason.notConfigured,
+  );
+
+  /// Every scan this classifier was asked about, in order.
+  final List<ScannedMenu> calls = <ScannedMenu>[];
+
+  /// The options each call in [calls] carried, in the same order.
+  final List<ClassificationOptions> optionCalls = <ClassificationOptions>[];
+
+  @override
+  Future<ScannedMenuResult> classify(
+    ScannedMenu scan, {
+    required ClassificationOptions options,
+  }) async {
+    calls.add(scan);
+    optionCalls.add(options);
+    return result;
+  }
+}
+
+/// A [PagePicker] answering settable lists and counting calls — mirrors
+/// `test/fakes`' `FakePagePicker`, duplicated here for the reason this
+/// file's own top doc comment gives. Every list starts empty, which reads
+/// as a cancelled picker.
+final class FlowFakePagePicker implements PagePicker {
+  /// What every [takePhoto] answers.
+  List<ScannedPage> photos = const <ScannedPage>[];
+
+  /// What every [pickImages] answers.
+  List<ScannedPage> images = const <ScannedPage>[];
+
+  /// What every [pickPdf] answers.
+  List<ScannedPage> pdf = const <ScannedPage>[];
+
+  /// The name of every method called, in call order.
+  final List<String> calls = <String>[];
+
+  @override
+  Future<List<ScannedPage>> takePhoto() async {
+    calls.add('takePhoto');
+    return photos;
+  }
+
+  @override
+  Future<List<ScannedPage>> pickImages() async {
+    calls.add('pickImages');
+    return images;
+  }
+
+  @override
+  Future<List<ScannedPage>> pickPdf() async {
+    calls.add('pickPdf');
+    return pdf;
   }
 }

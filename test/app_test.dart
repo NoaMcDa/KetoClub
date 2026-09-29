@@ -6,10 +6,13 @@ import 'package:ketoclub/app.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/scan_screen.dart';
 import 'package:ketoclub/screens/settings_screen.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/state/scan_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/app_shell.dart';
+import 'package:provider/provider.dart';
 
 import 'fakes/fake_app_dependencies.dart';
 
@@ -263,6 +266,27 @@ void main() {
           reason: 'no route for $path',
         );
       }
+    });
+
+    testWidgets('the scan route hands ScanController the scanned-menu '
+        'classifier from the dependencies (issue #89)', (tester) async {
+      // Arrange
+      final fakes = FakeAppDependencies();
+      await tester.pumpWidget(KetoClubApp(dependencies: fakes.dependencies));
+      await tester.pumpAndSettle();
+
+      // Act
+      tester
+          .state<NavigatorState>(find.byType(Navigator).first)
+          .pushNamed(scanRoutePath);
+      await tester.pumpAndSettle();
+
+      // Assert
+      final controller = Provider.of<ScanController>(
+        tester.element(find.byType(ScanScreen)),
+        listen: false,
+      );
+      expect(controller.classifier, same(fakes.scannedMenuClassifier));
     });
 
     test('returns null for an unknown path rather than a blank screen', () {
