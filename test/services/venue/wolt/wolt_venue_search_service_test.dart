@@ -683,6 +683,40 @@ void main() {
       );
     });
 
+    test('maps a passed-through 430 to platformChanged', () async {
+      await _expectBoth(
+        _proxied(_answering(430)),
+        const VenueSearchFailed(
+          VenueSearchFailureReason.platformChanged,
+          statusCode: 430,
+        ),
+      );
+    });
+
+    test('maps a backend 400 to backendUnreachable, not platformChanged '
+        '(the install id was missing — #155)', () async {
+      await _expectBoth(
+        _proxied(_answering(400, '{"reason":"badResponse"}')),
+        const VenueSearchFailed(
+          VenueSearchFailureReason.backendUnreachable,
+          statusCode: 400,
+        ),
+      );
+    });
+
+    test(
+      'maps a backend 500 to backendUnreachable, not platformChanged',
+      () async {
+        await _expectBoth(
+          _proxied(_answering(500)),
+          const VenueSearchFailed(
+            VenueSearchFailureReason.backendUnreachable,
+            statusCode: 500,
+          ),
+        );
+      },
+    );
+
     test('maps a 2xx body of the wrong shape to platformChanged', () async {
       await _expectBoth(
         _proxied(_answering(200, '{"detail":"nope"}')),

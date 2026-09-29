@@ -10,14 +10,20 @@ web build's paste-a-link path.
 
 Routes shipped so far:
 
-| Route | Issue | What it does |
-|---|---|---|
-| `GET /v1/health` | #94 | `{status, version, llm_configured}` |
-| `GET /v1/proxy/wolt/venues/slug/{slug}/assortment` | #95, #168 | The Wolt menu proxy for the web build, see below |
-| `GET /v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu` | #122 | The 10bis menu proxy for the web build, see below |
-| `POST /v1/chat` | #100 | Hosted classification: forwards one completion to Gemini `generateContent` with the server's key |
-| `GET /v1/proxy/wolt/pages/restaurants` | #123 | Nearby-venue search for the web build, see below |
-| `POST /v1/proxy/wolt/pages/search` | #123 | By-name venue search for the web build, see below |
+| Route | Issue | Install id? | Limiter? | What it does |
+|---|---|---|---|---|
+| `GET /v1/health` | #94 | no | no | `{status, version, llm_configured}` |
+| `GET /v1/proxy/wolt/venues/slug/{slug}/assortment` | #95, #168 | no | no | The Wolt menu proxy for the web build, see below |
+| `GET /v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu` | #122 | no | no | The 10bis menu proxy for the web build, see below |
+| `POST /v1/chat` | #100 | **yes** | **yes** (`RATE_LIMIT_*`) | Hosted classification: forwards one completion to Gemini `generateContent` with the server's key |
+| `GET /v1/proxy/wolt/pages/restaurants` | #123 | **yes** | **yes** (`DISCOVERY_RATE_LIMIT_PER_MINUTE`) | Nearby-venue search for the web build, see below |
+| `POST /v1/proxy/wolt/pages/search` | #123 | **yes** | **yes** (`DISCOVERY_RATE_LIMIT_PER_MINUTE`) | By-name venue search for the web build, see below |
+
+Menu proxies are one fetch per user action and have no per-install
+identity; `/v1/chat` and the two discovery routes require
+`X-KetoClub-Install-Id` and enforce a per-install limit. A missing or
+malformed install id is answered `400 {"reason":"badResponse"}` — a
+client that misses the header sees the same shape as a bad prompt.
 
 Community routes are later issues (`backend_plan.md` §5).
 
