@@ -17,6 +17,7 @@ import 'package:ketoclub/utils/constants.dart';
 import '../services/classifier/scanned_menu_classifier_contract.dart';
 import '../services/llm/llm_chat_client_contract.dart';
 import '../services/platform/page_picker_contract.dart';
+import '../services/platform/qr_scanner_contract.dart';
 import '../services/storage/api_key_store_contract.dart';
 import '../services/storage/install_id_store_contract.dart';
 import '../services/storage/menu_cache_contract.dart';
@@ -30,6 +31,7 @@ import 'fake_llm_chat_client.dart';
 import 'fake_menu_cache.dart';
 import 'fake_notes_store.dart';
 import 'fake_page_picker.dart';
+import 'fake_qr_scanner.dart';
 import 'fake_scanned_menu_classifier.dart';
 import 'fake_settings_store.dart';
 
@@ -830,6 +832,7 @@ void main() {
     recordedOptions: (fake) => [for (final call in fake.calls) call.$2],
   );
   runPagePickerContract('FakePagePicker', FakePagePicker.new);
+  runQrScannerContract('FakeQrScanner', FakeQrScanner.new);
 
   group('FakeScannedMenuClassifier', () {
     test('reads one dish per page under a scan reference by default', () async {
@@ -960,6 +963,29 @@ void main() {
           PagePickerCall.pickImages,
         ]),
       );
+    });
+  });
+
+  group('FakeQrScanner', () {
+    test('answers queued payloads in order, then null, and counts', () async {
+      // Arrange
+      final scanner = FakeQrScanner()
+        ..queuePayload('https://a.example/menu')
+        ..queuePayload(null)
+        ..queuePayload('second');
+
+      // Act / Assert
+      expect(await scanner.scan(), 'https://a.example/menu');
+      expect(await scanner.scan(), isNull);
+      expect(await scanner.scan(), 'second');
+      expect(await scanner.scan(), isNull);
+      expect(scanner.scanCallCount, 4);
+    });
+
+    test('reports the availability it was given', () {
+      expect(FakeQrScanner().isAvailable, isTrue);
+      expect(FakeQrScanner(available: false).isAvailable, isFalse);
+      expect((FakeQrScanner()..available = false).isAvailable, isFalse);
     });
   });
 

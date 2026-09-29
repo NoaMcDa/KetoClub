@@ -9,13 +9,16 @@ import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
+import 'package:ketoclub/services/platform/qr_scanner.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/venue/qr_payload_router.dart';
 import 'package:ketoclub/state/scan_controller.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 import '../fakes/fake_clock.dart';
 import '../fakes/fake_menu_repository.dart';
+import '../fakes/fake_qr_scanner.dart';
 import '../fakes/fake_scanned_menu_classifier.dart';
 import '../fakes/fake_settings_store.dart';
 
@@ -600,4 +603,221 @@ void main() {
       expect(await pending, isNotNull);
     });
   });
+
+  group('ScanController QR codes (issue #182)', () {
+    late FakeQrScanner scanner;
+    late ScanController controller;
+
+    ScanController build(QrScanner qrScanner) => ScanController(
+      classifier: FakeScannedMenuClassifier(),
+      repository: FakeMenuRepository(),
+      clock: FakeClock(_epoch),
+      settingsStore: FakeSettingsStore(),
+      qrScanner: qrScanner,
+    );
+
+    setUp(() {
+      scanner = FakeQrScanner();
+      controller = build(scanner);
+    });
+
+    tearDown(() => controller.dispose());
+
+    test('is unavailable, and scans nothing, without a scanner', () async {
+      // Arrange
+      final bare = ScanController(
+        classifier: FakeScannedMenuClassifier(),
+        repository: FakeMenuRepository(),
+        clock: FakeClock(_epoch),
+        settingsStore: FakeSettingsStore(),
+      );
+      addTearDown(bare.dispose);
+
+      // Assert
+      expect(bare.qrAvailable, isFalse);
+      expect(await bare.scanQr(), isNull);
+      expect(bare.qrNotice, isNull);
+    });
+
+    test('reports the scanner availability', () {
+      expect(controller.qrAvailable, isTrue);
+      expect(build(FakeQrScanner(available: false)).qrAvailable, isFalse);
+    });
+
+    test('a cancelled scan answers null and leaves no notice', () async {
+      // Arrange: nothing queued, so the scanner answers null.
+
+      // Act
+      final venue = await controller.scanQr();
+
+      // Assert
+      expect(venue, isNull);
+      expect(controller.qrNotice, isNull);
+      expect(controller.qrScanning, isFalse);
+      expect(scanner.scanCallCount, 1);
+    });
+
+    test('a Wolt code answers the venue to open', () async {
+      // Arrange
+      scanner.queuePayload(
+        'https://wolt.com/en/isr/tel-aviv/restaurant/vitrina-lilinblum',
+      );
+
+      // Act
+      final venue = await controller.scanQr();
+
+      // Assert
+      expect(
+        venue?.ref,
+        const VenueRef(
+          source: MenuSource.wolt,
+          platformId: 'vitrina-lilinblum',
+        ),
+      );
+      expect(controller.qrNotice, isNull);
+    });
+
+    test('a website or PDF code answers a website venue', () async {
+      // Arrange
+      scanner.queuePayload('https://static.rest.co.il/1/29092026/menu.pdf');
+
+      // Act
+      final venue = await controller.scanQr();
+
+      // Assert
+      expect(venue?.ref.source, MenuSource.website);
+    });
+
+    test(
+      'a Tabit code answers null and keeps the unsupported notice',
+      () async {
+        // Arrange
+        scanner.queuePayload(
+          'https://tabitisrael.co.il/tabit-order?siteName=x',
+        );
+
+        // Act
+        final venue = await controller.scanQr();
+
+        // Assert
+        expect(venue, isNull);
+        expect(controller.qrNotice, const QrUnsupportedSource('Tabit'));
+      },
+    );
+
+    test('an Instagram code answers null and asks for a photograph', () async {
+      // Arrange
+      scanner.queuePayload('https://www.instagram.com/cafe.noa');
+
+      // Act
+      final venue = await controller.scanQr();
+
+      // Assert
+      expect(venue, isNull);
+      expect(controller.qrNotice, const QrPhotographInstead());
+    });
+
+    test('a payload that is not a URL asks for a photograph', () async {
+      // Arrange
+      scanner.queuePayload('Table 12');
+
+      // Act
+      await controller.scanQr();
+
+      // Assert
+      expect(controller.qrNotice, const QrPhotographInstead());
+    });
+
+    test('the next scan clears the previous notice', () async {
+      // Arrange
+      scanner
+        ..queuePayload('Table 12')
+        ..queuePayload(null);
+      await controller.scanQr();
+      expect(controller.qrNotice, isNotNull);
+
+      // Act
+      await controller.scanQr();
+
+      // Assert
+      expect(controller.qrNotice, isNull);
+    });
+
+    test('editing the paste or adding pages clears the notice', () async {
+      // Arrange
+      scanner
+        ..queuePayload('Table 12')
+        ..queuePayload('Table 13');
+      await controller.scanQr();
+
+      // Act & Assert
+      controller.text = 'Steak';
+      expect(controller.qrNotice, isNull);
+
+      await controller.scanQr();
+      expect(controller.qrNotice, isNotNull);
+      controller.addPages(<ScannedPage>[
+        ScannedPage(
+          mimeType: ScannedPage.jpeg,
+          bytes: Uint8List.fromList(<int>[1, 2, 3]),
+        ),
+      ]);
+      expect(controller.qrNotice, isNull);
+    });
+
+    test(
+      'is scanning while the camera is open, and ignores a second',
+      () async {
+        // Arrange
+        final gate = Completer<String?>();
+        final slow = _GatedQrScanner(gate.future);
+        final gated = build(slow);
+        addTearDown(gated.dispose);
+
+        // Act
+        final first = gated.scanQr();
+        final second = await gated.scanQr();
+
+        // Assert
+        expect(gated.qrScanning, isTrue);
+        expect(second, isNull);
+        expect(slow.scanCallCount, 1);
+
+        gate.complete('https://wolt.com/en/isr/tel-aviv/restaurant/a-b');
+        expect(await first, isNotNull);
+        expect(gated.qrScanning, isFalse);
+      },
+    );
+
+    test('does not notify after dispose when the camera closes late', () async {
+      // Arrange
+      final gate = Completer<String?>();
+      final slow = build(_GatedQrScanner(gate.future));
+
+      // Act
+      final pending = slow.scanQr();
+      slow.dispose();
+      gate.complete(null);
+
+      // Assert
+      expect(await pending, isNull);
+    });
+  });
+}
+
+/// A [QrScanner] that answers when its [gate] completes.
+final class _GatedQrScanner implements QrScanner {
+  new(this.gate);
+
+  final Future<String?> gate;
+  int scanCallCount = 0;
+
+  @override
+  bool get isAvailable => true;
+
+  @override
+  Future<String?> scan() {
+    scanCallCount++;
+    return gate;
+  }
 }

@@ -47,6 +47,7 @@ import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/page_picker.dart';
+import 'package:ketoclub/services/platform/qr_scanner.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/install_id_store.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
@@ -107,6 +108,7 @@ final class FakeAppDependencies {
       venueSearchService = FlowFakeVenueSearchService(),
       scannedClassifier = FlowFakeScannedMenuClassifier(),
       pagePicker = FlowFakePagePicker(),
+      qrScanner = FlowFakeQrScanner(),
       scannedPages = ScannedPagesRegistry();
 
   /// The faked menu repository; script it with [FlowFakeMenuRepository.stub].
@@ -154,6 +156,10 @@ final class FakeAppDependencies {
   /// The faked page picker behind the Scan tab (issue #82); script it
   /// with [FlowFakePagePicker.photos] and friends.
   final FlowFakePagePicker pagePicker;
+
+  /// The faked QR scanner behind the Scan tab's "Scan QR code" action
+  /// (issue #182); set [FlowFakeQrScanner.payload] to what a code decodes to.
+  final FlowFakeQrScanner qrScanner;
 
   /// The in-memory scanned-pages registry (issue #89) — the real one, as
   /// it does no I/O, shared by the Scan tab and the menu screen.
@@ -216,6 +222,7 @@ final class FakeAppDependencies {
     apiKeyStore: apiKeyStore,
     scannedMenuClassifier: scannedClassifierOverride ?? scannedClassifier,
     pagePicker: pagePickerOverride ?? pagePicker,
+    qrScanner: qrScanner,
     scannedPages: scannedPages,
   );
 }
@@ -651,6 +658,30 @@ final class FlowFakePagePicker implements PagePicker {
   Future<List<ScannedPage>> pickPdf() async {
     calls.add('pickPdf');
     return pdf;
+  }
+}
+
+/// A [QrScanner] answering one settable payload and counting calls —
+/// mirrors `test/fakes`' `FakeQrScanner`, duplicated here for the reason
+/// this file's own top doc comment gives. [payload] starts null, which
+/// reads as a cancelled camera.
+final class FlowFakeQrScanner implements QrScanner {
+  /// What every [scan] answers; null is a cancelled or denied camera.
+  String? payload;
+
+  /// Whether [isAvailable] answers true, so the Scan tab shows its action.
+  bool available = true;
+
+  /// How many times [scan] was called.
+  int scanCallCount = 0;
+
+  @override
+  bool get isAvailable => available;
+
+  @override
+  Future<String?> scan() async {
+    scanCallCount++;
+    return payload;
   }
 }
 

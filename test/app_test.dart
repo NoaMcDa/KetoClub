@@ -12,6 +12,7 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/scan_screen.dart';
 import 'package:ketoclub/screens/settings_screen.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:ketoclub/state/scan_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/venue_route.dart';
@@ -325,6 +326,64 @@ void main() {
       expect(
         fakes.scannedPages.get(ref!),
         ScannedMenu(pages: <ScannedPage>[page]),
+      );
+    });
+
+    testWidgets('the scan route hands ScanController the QR scanner '
+        '(issue #182)', (tester) async {
+      // Arrange
+      final fakes = FakeAppDependencies();
+      fakes.qrScanner.queuePayload('Table 12');
+      await tester.pumpWidget(KetoClubApp(dependencies: fakes.dependencies));
+      await tester.pumpAndSettle();
+
+      // Act
+      tester
+          .state<NavigatorState>(find.byType(Navigator).first)
+          .pushNamed(scanRoutePath);
+      await tester.pumpAndSettle();
+      final controller = Provider.of<ScanController>(
+        tester.element(find.byType(ScanScreen)),
+        listen: false,
+      );
+      await controller.scanQr();
+
+      // Assert
+      expect(controller.qrScanner, same(fakes.qrScanner));
+      expect(fakes.qrScanner.scanCallCount, 1);
+    });
+
+    testWidgets('MaterialApp uses the navigator key from the dependencies '
+        '(issue #182)', (tester) async {
+      // Arrange
+      final key = GlobalKey<NavigatorState>();
+      final base = FakeAppDependencies().dependencies;
+      final dependencies = AppDependencies(
+        menuRepository: base.menuRepository,
+        menuClassifier: base.menuClassifier,
+        estimateClassifier: base.estimateClassifier,
+        settingsStore: base.settingsStore,
+        notesStore: base.notesStore,
+        clock: base.clock,
+        logger: base.logger,
+        connectivity: base.connectivity,
+        externalLinkOpener: base.externalLinkOpener,
+        menuSharer: base.menuSharer,
+        locationService: base.locationService,
+        venueSearchService: base.venueSearchService,
+        scannedPages: base.scannedPages,
+        navigatorKey: key,
+      );
+
+      // Act
+      await tester.pumpWidget(KetoClubApp(dependencies: dependencies));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(key.currentState, isNotNull);
+      expect(
+        key.currentState,
+        same(tester.state<NavigatorState>(find.byType(Navigator).first)),
       );
     });
 
