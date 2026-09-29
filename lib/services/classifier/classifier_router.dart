@@ -42,7 +42,7 @@ MenuAnalysis _toRulesResult(
 ///    device.
 /// 2. **The `Connectivity` pre-check (architecture.md §14 D10).** Before
 ///    ever sending a request to the model — straight to Gemini on iOS and
-///    Android (D14), through KetoClub's server on web (D12) — [classify] asks
+///    Android (D17), through KetoClub's server on web (D12) — [classify] asks
 ///    [_connectivity] whether the device appears to have a route at all;
 ///    a `false` reading skips the LLM call entirely, falling straight to
 ///    the heuristic stamped [MenuAnalysisFailureReason.offline].

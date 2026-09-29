@@ -84,7 +84,7 @@ const List<MenuAnalysisFailureReason> _fallbackReasons =
       MenuAnalysisFailureReason.badResponse,
       MenuAnalysisFailureReason.backendUnreachable,
       MenuAnalysisFailureReason.notConfigured,
-      // The direct Gemini client's own reasons (architecture.md D14): the
+      // The direct Gemini client's own reasons (architecture.md D17): the
       // user fixes them in Settings, and meanwhile the rules engine
       // answers, saying why.
       MenuAnalysisFailureReason.apiKeyMissing,

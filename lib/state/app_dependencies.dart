@@ -103,7 +103,7 @@ class AppDependencies {
   final VenueSearchService venueSearchService;
 
   /// The user's own Gemini API key, on iOS and Android only
-  /// (architecture.md D14): there the app calls Gemini directly, and
+  /// (architecture.md D17): there the app calls Gemini directly, and
   /// Settings shows a key field over this store. Null on web, which
   /// reaches Gemini through KetoClub's backend (D12) and so has no key and
   /// no key field. The classifier's chat client holds the same instance.

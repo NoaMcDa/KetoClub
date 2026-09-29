@@ -7,7 +7,7 @@ and `HANDOFF.md` for what is still unfinished.
 
 The model check used to be `tool/measure_model_latency.dart` against
 OpenRouter. That tool and OpenRouter are both gone (#102, #116). There are
-two model checks today, one per path (D14): the Gemini smoke curl in
+two model checks today, one per path (D17): the Gemini smoke curl in
 `backend/README.md` for the web build, and a phone with its own key for iOS
 and Android (below).
 
@@ -31,17 +31,17 @@ and Android (below).
       `backend/`, not the repository root).
 - [ ] Run the `/v1/chat` smoke curl in `backend/README.md`'s "Smoke test
       against the real API" section. A real completion comes back as
-      `{"content":"{\"dishes\": [...]}","model":"gemini-2.5-flash"}` (or
+      `{"content":"{\"dishes\": [...]}","model":"gemini-3.5-flash"}` (or
       whatever `GEMINI_MODEL` names). This needs a real network path to
       `generativelanguage.googleapis.com`, which CI and this repository's
       own build environment do not have.
 - [ ] `backend/check.sh` passes locally (mirrors the `backend` CI job).
 
-### Phones call Gemini directly (D14)
+### Phones call Gemini directly (D17)
 
 - [ ] On a real iPhone and a real Android phone, with no
       `KETOCLUB_BACKEND_URL` define: paste a real Gemini key in Settings,
-      allow AI analysis, open a Wolt menu, and see the engine chip read
+      leave AI analysis on (the D16 default), open a Wolt menu, and see the engine chip read
       "AI". This is the first time the direct client meets Google with a
       valid key, and whether Google accepts `toGeminiSchema`'s output for
       the real prompt's schema is only observed here.
@@ -239,12 +239,19 @@ Time from the tap that opens the menu to the frame where verdicts appear
 
 | Target | Cold fetch | Proxy-cached fetch | Hive-cached open | AI analysis cold | AI analysis server-cached |
 |---|---|---|---|---|---|
-| Web via local backend | | | | | |
+| Web via local backend | | | | 20-dish: 33.5 s (E) / 10-dish: 8.8 s (H) | 4 ms |
 | iOS | | n/a unless via backend | | | |
 | Android | | n/a unless via backend | | | |
 
 iOS and Android fetch Wolt directly unless the build routes them through
 the backend, so the proxy-cached column only applies to them in that case.
+
+AI-analysis numbers above are from the 2026-09-28 Gemini smoke test
+(#165) running the backend on a laptop against `gemini-3.5-flash` — not a
+phone on 4G, not a 60-dish menu, and not the app on device. They record
+that the path works end-to-end and that the server-side completion cache
+answers a duplicate request in low single-digit milliseconds. Fill the
+phone rows in during #166.
 
 ### Main-thread steps on a phone
 

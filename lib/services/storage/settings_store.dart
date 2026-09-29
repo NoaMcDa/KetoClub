@@ -50,16 +50,25 @@ enum AppThemeMode {
 /// The user's on-device preferences (architecture.md §6.4): UI language,
 /// filter default, AI-estimation consent, the last venue opened, the
 /// appearance (issue #58), the net-carb limit (issue #57), the
-/// last-used filter (issue #55) and the three "Your keto rules"
-/// toggles (issue #56).
+/// last-used filter (issue #55), the three "Your keto rules"
+/// toggles (issue #56), and whether the first-launch AI disclosure
+/// banner has been seen (D16, issue #167).
 @immutable
 final class AppSettings {
   /// Creates settings. Every field defaults to the "nothing set yet"
   /// value a virgin store should read back.
+  ///
+  /// [estimationConsentGiven] defaults to true (D16, issue #167): AI
+  /// analysis is on by default on a fresh install, and the
+  /// consent-disclosure banner (`lib/widgets/consent_disclosure_banner`)
+  /// shown once on Explore is what the user sees to acknowledge it. A
+  /// stored `false` still stays `false` —
+  /// [tryFrom]'s round-trip pins that migration behaviour so an install
+  /// that already refused before D16 keeps its refusal.
   const new({
     this.languageTag,
     this.filter = MenuFilter.all,
-    this.estimationConsentGiven = false,
+    this.estimationConsentGiven = true,
     this.lastVenue,
     this.themeMode = AppThemeMode.system,
     this.netCarbLimitGrams = defaultNetCarbLimitGrams,
@@ -67,6 +76,7 @@ final class AppSettings {
     this.dairyFree = false,
     this.carnivoreOnly = false,
     this.lastFilter,
+    this.disclosureSeen = false,
   });
 
   /// Reads settings written by [toJson].
@@ -102,8 +112,14 @@ final class AppSettings {
     if (rawFilter is! String) return null;
     final filter = MenuFilter.tryParse(rawFilter);
     if (filter == null) return null;
+    // D16 (issue #167) flipped the default to true. A stored value —
+    // written by any install that reached [toJson] before or since —
+    // wins over the default, so an install that already refused keeps
+    // its refusal; a missing key on an install that predates
+    // estimationConsentGiven at all reads as the new default rather than
+    // invalidating the record.
     final rawConsent = json['estimationConsentGiven'];
-    if (rawConsent is! bool) return null;
+    if (rawConsent != null && rawConsent is! bool) return null;
     final rawLastVenue = json['lastVenue'];
     VenueRef? lastVenue;
     if (rawLastVenue != null) {
@@ -126,7 +142,10 @@ final class AppSettings {
     return AppSettings(
       languageTag: rawLanguageTag is String ? rawLanguageTag : null,
       filter: filter,
-      estimationConsentGiven: rawConsent,
+      // Missing key → D16 default of true (issue #167); a stored bool
+      // wins. The earlier guard rejects any non-null non-bool, so by
+      // here rawConsent is null, true, or false.
+      estimationConsentGiven: rawConsent != false,
       lastVenue: lastVenue,
       themeMode: themeMode,
       netCarbLimitGrams: netCarbLimitGrams,
@@ -134,6 +153,7 @@ final class AppSettings {
       dairyFree: json['dairyFree'] == true,
       carnivoreOnly: json['carnivoreOnly'] == true,
       lastFilter: lastFilter,
+      disclosureSeen: json['disclosureSeen'] == true,
     );
   }
 
@@ -175,6 +195,22 @@ final class AppSettings {
   /// falling back to [filter] otherwise.
   final MenuFilter? lastFilter;
 
+  /// Whether the first-launch AI-analysis disclosure banner (D16, issue
+  /// #167) has already been shown and acknowledged.
+  ///
+  /// The banner appears on Explore only while this is false; either
+  /// button on the banner sets it to true, and the setting persists so
+  /// the banner is never shown twice on the same install. Independent
+  /// of [estimationConsentGiven]: dismissing the banner with "OK"
+  /// leaves consent as-is; dismissing it with "Turn off" also sets
+  /// consent to false. Missing or non-boolean values decode to false —
+  /// the "not seen yet" state — following the same "added later" rule
+  /// as [themeMode] and the dietary toggles.
+  ///
+  /// The banner itself lives in
+  /// `lib/widgets/consent_disclosure_banner.dart`.
+  final bool disclosureSeen;
+
   /// Returns a copy with the given fields replaced.
   ///
   /// Omitting [languageTag], [lastVenue] or [lastFilter] leaves the
@@ -196,6 +232,7 @@ final class AppSettings {
     bool? dairyFree,
     bool? carnivoreOnly,
     Object? lastFilter = _unset,
+    bool? disclosureSeen,
   }) => AppSettings(
     languageTag: identical(languageTag, _unset)
         ? this.languageTag
@@ -214,6 +251,7 @@ final class AppSettings {
     lastFilter: identical(lastFilter, _unset)
         ? this.lastFilter
         : lastFilter as MenuFilter?,
+    disclosureSeen: disclosureSeen ?? this.disclosureSeen,
   );
 
   /// Writes a form [tryFrom] can read back.
@@ -228,6 +266,7 @@ final class AppSettings {
     'dairyFree': dairyFree,
     'carnivoreOnly': carnivoreOnly,
     'lastFilter': lastFilter?.name,
+    'disclosureSeen': disclosureSeen,
   };
 
   @override
@@ -242,7 +281,8 @@ final class AppSettings {
       other.seedOilFree == seedOilFree &&
       other.dairyFree == dairyFree &&
       other.carnivoreOnly == carnivoreOnly &&
-      other.lastFilter == lastFilter;
+      other.lastFilter == lastFilter &&
+      other.disclosureSeen == disclosureSeen;
 
   @override
   int get hashCode => Object.hash(
@@ -256,6 +296,7 @@ final class AppSettings {
     dairyFree,
     carnivoreOnly,
     lastFilter,
+    disclosureSeen,
   );
 
   @override
@@ -264,7 +305,8 @@ final class AppSettings {
       'consent: $estimationConsentGiven, themeMode: $themeMode, '
       'netCarbLimit: ${netCarbLimitGrams}g, lastFilter: $lastFilter, '
       'seedOilFree: $seedOilFree, dairyFree: $dairyFree, '
-      'carnivoreOnly: $carnivoreOnly)';
+      'carnivoreOnly: $carnivoreOnly, '
+      'disclosureSeen: $disclosureSeen)';
 }
 
 /// On-device storage for [AppSettings] (architecture.md §6.4). Backed by

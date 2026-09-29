@@ -1,6 +1,6 @@
 /// Whether the device currently appears to have a network route, used as a
 /// pre-flight hint before `RoutingMenuClassifier` spends a model request —
-/// to Gemini directly on iOS and Android (D14), to KetoClub's server on web
+/// to Gemini directly on iOS and Android (D17), to KetoClub's server on web
 /// (architecture.md §6.2, §14 D10 — reinstated in Phase 1).
 library;
 

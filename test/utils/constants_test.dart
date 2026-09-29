@@ -31,9 +31,9 @@ void main() {
       expect(llmRequestTimeout, equals(const Duration(seconds: 120)));
     });
 
-    test('maxAnalysedDishes is 150', () {
+    test('maxAnalysedDishes is 1000', () {
       // Assert
-      expect(maxAnalysedDishes, equals(150));
+      expect(maxAnalysedDishes, equals(1000));
     });
 
     test('maxWhyLength is 300', () {
@@ -159,9 +159,9 @@ void main() {
   });
 
   group('carbModifiersEn', () {
-    test('has 58 triggers', () {
+    test('has 62 triggers', () {
       // Assert
-      expect(carbModifiersEn, hasLength(58));
+      expect(carbModifiersEn, hasLength(62));
     });
 
     test('every trigger maps to a non-empty sentence', () {
@@ -188,9 +188,9 @@ void main() {
   });
 
   group('carbModifiersHe', () {
-    test('has 75 triggers', () {
+    test('has 80 triggers', () {
       // Assert
-      expect(carbModifiersHe, hasLength(75));
+      expect(carbModifiersHe, hasLength(80));
     });
 
     test('every trigger maps to a non-empty sentence', () {
@@ -221,9 +221,9 @@ void main() {
   });
 
   group('nonKetoBasesEn', () {
-    test('has 92 triggers', () {
+    test('has 100 triggers', () {
       // Assert
-      expect(nonKetoBasesEn, hasLength(92));
+      expect(nonKetoBasesEn, hasLength(100));
     });
 
     test('carries the battered-fish phrases D-V2 alone would miss', () {
@@ -260,9 +260,9 @@ void main() {
   });
 
   group('nonKetoBasesHe', () {
-    test('has 107 triggers', () {
+    test('has 116 triggers', () {
       // Assert
-      expect(nonKetoBasesHe, hasLength(107));
+      expect(nonKetoBasesHe, hasLength(116));
     });
 
     test('has no duplicate triggers', () {
@@ -572,6 +572,54 @@ void main() {
       // Assert
       expect(dairyTriggersEn, containsAll(dairyGuardsEn.keys));
       expect(dairyTriggersHe, containsAll(dairyGuardsHe.keys));
+    });
+  });
+
+  group('carb-only and option vocabularies (issues #191, #192)', () {
+    test('every carbOnlyEligibleTriggers entry is a carb-modifier key', () {
+      // Assert
+      for (final key in carbOnlyEligibleTriggers) {
+        expect(
+          carbModifiersEn.containsKey(key) || carbModifiersHe.containsKey(key),
+          isTrue,
+          reason: '"$key" is not a carbModifiers key',
+        );
+      }
+    });
+
+    test('every carbOnlyBaseLabels key is an eligible trigger', () {
+      // Assert
+      for (final key in carbOnlyBaseLabels.keys) {
+        expect(carbOnlyEligibleTriggers, contains(key));
+      }
+    });
+
+    test('qualifier, removal and filling lists are unique, trimmed and '
+        'non-empty', () {
+      // Arrange
+      final lists = <String, List<String>>{
+        'carbOnlyQualifiersEn': carbOnlyQualifiersEn,
+        'carbOnlyQualifiersHe': carbOnlyQualifiersHe,
+        'optionRemovalWordsEn': optionRemovalWordsEn,
+        'optionRemovalWordsHe': optionRemovalWordsHe,
+        'fillingProteinTriggersEn': fillingProteinTriggersEn,
+        'fillingProteinTriggersHe': fillingProteinTriggersHe,
+      };
+      // Assert
+      for (final MapEntry(key: name, value: words) in lists.entries) {
+        expect(words, isNotEmpty, reason: name);
+        expect(words.toSet(), hasLength(words.length), reason: name);
+        for (final word in words) {
+          expect(word, equals(word.toLowerCase().trim()), reason: name);
+          expect(word, isNotEmpty, reason: name);
+        }
+      }
+    });
+
+    test('the option-base sentences carry the {base} placeholder', () {
+      // Assert
+      expect(optionBaseModificationEn, contains('{base}'));
+      expect(optionBaseModificationHe, contains('{base}'));
     });
   });
 }

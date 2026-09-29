@@ -10,7 +10,7 @@ library;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Where the user's own Gemini API key lives on an iOS or Android device
-/// (architecture.md D14, §11).
+/// (architecture.md D17, §11).
 ///
 /// Interface only: `di.dart` is the only file that constructs a concrete
 /// implementation, and it builds one only off the web — the web build

@@ -154,7 +154,7 @@ final class FakeAppDependencies {
   MenuRepository? repositoryOverride;
 
   /// The user's own Gemini API key store, as `di.dart` provides it on iOS
-  /// and Android (architecture.md D14). Null by default — the web build's
+  /// and Android (architecture.md D17). Null by default — the web build's
   /// value — so Settings shows no key section unless a flow sets one.
   ApiKeyStore? apiKeyStore;
 

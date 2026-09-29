@@ -10,7 +10,7 @@ import 'package:flutter/foundation.dart';
 /// reports when it could not reach the backend at all. [apiKeyMissing]
 /// and [apiKeyRejected] never come from the backend either: only the
 /// direct Gemini client used on iOS and Android reports them, because
-/// only there does the user supply the key (architecture.md D14).
+/// only there does the user supply the key (architecture.md D17).
 enum ChatFailureReason {
   /// No model is available: this build has no backend URL, or the
   /// backend has no model credentials configured (it answers 503).
@@ -34,12 +34,12 @@ enum ChatFailureReason {
   backendUnreachable,
 
   /// No Gemini API key is saved on this device, so the direct client
-  /// sent nothing (architecture.md D14). The user can fix it in
+  /// sent nothing (architecture.md D17). The user can fix it in
   /// Settings.
   apiKeyMissing,
 
   /// Gemini refused the key saved on this device: 401, 403, or a 400
-  /// naming an invalid key (architecture.md D14). The user can fix it in
+  /// naming an invalid key (architecture.md D17). The user can fix it in
   /// Settings.
   apiKeyRejected,
 }

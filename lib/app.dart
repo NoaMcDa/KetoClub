@@ -164,6 +164,8 @@ Route<void>? generateRoute(
           child: VenueSearchScreen(
             connectivity: dependencies.connectivity,
             locationService: dependencies.locationService,
+            settingsStore: dependencies.settingsStore,
+            directToGoogle: dependencies.apiKeyStore != null,
           ),
         ),
       ),

@@ -22,7 +22,7 @@ backend) are in `docs/RUNNING_IOS.md`.
 
 ## 1. The app on its own (no backend)
 
-The backend is for the web build only (`architecture.md` D11, D14). iOS and
+The backend is for the web build only (`architecture.md` D11, D17). iOS and
 Android never call it, even when it is configured: they call Wolt and
 Google's Gemini API themselves. What each platform can reach with no backend:
 
@@ -31,10 +31,10 @@ Google's Gemini API themselves. What each platform can reach with no backend:
 | iOS, Android | direct calls to the platform | direct calls to Wolt | **yes, with your own Gemini key** — see below; without one, rules engine only (labelled "rules") |
 | Web (Chrome) | **blocked by CORS** — paste-a-link shows the "open in the phone app" message | blocked by CORS | no |
 
-**AI analysis on a phone (D14).** Create a free API key in
+**AI analysis on a phone (D17).** Create a free API key in
 [Google AI Studio](https://aistudio.google.com/apikey), then in the app open
-**Settings**, paste it under **Gemini API key**, tap **Save key**, and tick
-**allow AI analysis**. The key is kept in the Keychain (iOS) or Keystore
+**Settings**, paste it under **Gemini API key** and tap **Save key**; AI
+analysis itself is on by default (D16), so nothing else needs ticking. The key is kept in the Keychain (iOS) or Keystore
 (Android) and sent only to Google, as the `x-goog-api-key` header. Without a
 key, a menu shows rule-based verdicts with "Add your Gemini API key in
 Settings" and a shortcut there.
@@ -54,7 +54,7 @@ flutter run -d <device-id>  # phone or simulator; `flutter devices` lists ids
 The backend gives the web build live menus and search (it forwards the
 requests Wolt and 10bis refuse from a browser) and AI analysis, because it
 holds the Gemini key server-side, so the browser never holds one (D12). Phones
-do not use it (D14).
+do not use it (D17).
 
 ```bash
 cd backend
@@ -75,17 +75,25 @@ error and cache.
 ## 3. The web app talking to the backend
 
 The backend URL is compiled in with a `--dart-define`; there is no in-app
-setting for it. Only the web build reads it: a phone build ignores it (D14).
+setting for it. Only the web build reads it: a phone build ignores it (D17).
 
 ```bash
 # web, backend on the same machine
 flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
 ```
 
-Then in the app: open **Settings → allow AI analysis** (consent is off by
-default and is the only thing gating the AI path once a backend is configured),
-paste a Wolt link on the Discovery tab or tap the location button to search
-nearby. The web Settings screen has no key field: the key is the backend's.
+Then in the app: **AI analysis is on by default** on a fresh install (D16,
+issue #167). On first launch a one-off disclosure banner on the Discovery
+tab tells you what leaves the device (dish text to KetoClub's backend, on
+to Google Gemini) with two buttons: **OK** acknowledges without changing
+anything, **Turn off** switches AI analysis off in the same tap. Either
+button dismisses the banner permanently. You can flip the toggle any time
+in **Settings → What leaves this device**; a stored refusal always wins
+over the default, so an install that has already turned it off keeps it
+off. The web Settings screen has no key field: the key is the backend's.
+
+Paste a Wolt link on the Discovery tab or tap the location button to
+search nearby.
 
 ### Builds
 
@@ -145,3 +153,5 @@ for issue #38, and `backend/README.md` the 10bis curl for issue #44.
 | Nearby search says "blocked by browser" | web without a backend | §3 |
 | `flutter analyze` fails on an info | intended — CI runs `--fatal-infos` | fix the lint |
 | Location button does nothing on web | browser Geolocation needs `https://` or `localhost` | use `localhost`, not a LAN IP, for the web build |
+| Backend terminal shows `gemini upstream_status=404` | `GEMINI_MODEL` is not served for this key or API version (#179) | list what the key can use: `curl -sS https://generativelanguage.googleapis.com/v1beta/models -H "x-goog-api-key: $GEMINI_API_KEY"`, then set `GEMINI_MODEL` in `backend/.env` |
+| "AI analysis failed" on a very large menu | the `user_prompt` cap was 60,000 characters, raised to 400,000 (#188) | update to a build with the raised cap; a menu still past 400,000 characters needs #188's batching |

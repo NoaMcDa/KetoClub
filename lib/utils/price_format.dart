@@ -16,13 +16,23 @@ import 'package:intl/intl.dart';
 /// Architectural Comparison table) prices in Israeli shekels. Symbol
 /// placement and decimal grouping follow [localeTag] via `package:intl`
 /// (`NumberFormat.simpleCurrency`), so `formatPrice(64, localeTag: 'en')`
-/// reads `"₪64.00"` and `formatPrice(64, localeTag: 'he')` reads
-/// `"64.00 ₪"` (with the locale's own bidi marks around each token).
+/// reads `"₪64"` and `formatPrice(64, localeTag: 'he')` reads `"64 ₪"`
+/// (with the locale's own bidi marks around each token). Whole-shekel
+/// prices render without decimals (issue #169): every menu platform
+/// today prices most dishes in whole shekels, so `.00` on every card
+/// only added visual noise. A fractional amount still renders to two
+/// decimals, e.g. `formatPrice(12.5, localeTag: 'en')` → `"₪12.50"`.
 String formatPrice(
   double amount, {
   required String localeTag,
   String currency = 'ILS',
 }) {
+  final isWhole = amount == amount.truncateToDouble();
   final format = NumberFormat.simpleCurrency(locale: localeTag, name: currency);
+  if (isWhole) {
+    format
+      ..minimumFractionDigits = 0
+      ..maximumFractionDigits = 0;
+  }
   return format.format(amount);
 }

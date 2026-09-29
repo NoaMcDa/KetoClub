@@ -38,9 +38,11 @@ String fetchFailureMessage(
 
 /// The message for a menu-analysis failure (architecture.md §10).
 ///
-/// [detail] is required by [MenuAnalysisFailureReason.badResponse]; a
-/// caller that omits it gets an empty placeholder rather than a thrown
-/// error, since a failure screen must never itself fail.
+/// [detail] is read only by [MenuAnalysisFailureReason.badResponse]; a
+/// caller that omits it, or passes a blank one, gets the detail-free
+/// sentence rather than "AI analysis failed ()" — which is what every
+/// rules-fallback banner rendered, since a `RulesEngine` carries no
+/// detail to pass (issue #189).
 ///
 /// An exhaustive switch with no `default`: adding a reason without adding
 /// its copy here is a compile error, never a silently collapsed message
@@ -54,9 +56,10 @@ String analysisFailureMessage(
   MenuAnalysisFailureReason.offline => l10n.analysisOffline,
   MenuAnalysisFailureReason.timeout => l10n.analysisTimeout,
   MenuAnalysisFailureReason.rateLimited => l10n.analysisRateLimited,
-  MenuAnalysisFailureReason.badResponse => l10n.analysisBadResponse(
-    detail ?? '',
-  ),
+  MenuAnalysisFailureReason.badResponse =>
+    detail == null || detail.trim().isEmpty
+        ? l10n.analysisBadResponseNoDetail
+        : l10n.analysisBadResponse(detail),
   MenuAnalysisFailureReason.noDishesFound => l10n.analysisNoDishesFound,
   MenuAnalysisFailureReason.backendUnreachable =>
     l10n.analysisBackendUnreachable,

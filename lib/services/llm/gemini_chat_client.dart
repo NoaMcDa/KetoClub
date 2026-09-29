@@ -71,7 +71,7 @@ Object? _copy(Object? value) => switch (value) {
 
 /// [LlmChatClient] that calls Google's Gemini API straight from the
 /// device, with the user's own key — the iOS and Android path
-/// (architecture.md D14). The web build uses `BackendChatClient` instead,
+/// (architecture.md D17). The web build uses `BackendChatClient` instead,
 /// because a browser cannot hold the key safely and D12's backend already
 /// holds one.
 ///
@@ -123,9 +123,11 @@ final class GeminiChatClient implements LlmChatClient {
        // ignore: prefer_initializing_formals
        _apiKeyStore = apiKeyStore;
 
-  /// The model the phone calls unless told otherwise: the backend's own
-  /// default (`GEMINI_MODEL`, D12), so web and phones classify alike.
-  static const String defaultModel = 'gemini-2.5-flash';
+  /// The model the phone calls unless told otherwise: the one
+  /// `backend/.env.example` sets as `GEMINI_MODEL` (D12), so web and
+  /// phones classify alike. The retiring `gemini-2.5-flash` answers 404
+  /// to new keys (issue #165), which is why this is not that one.
+  static const String defaultModel = 'gemini-3.5-flash';
 
   /// The header Gemini reads the API key from.
   static const String apiKeyHeader = 'x-goog-api-key';

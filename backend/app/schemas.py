@@ -30,10 +30,17 @@ class ChatRequest(BaseModel):
     upstream call. ``schema_name`` is accepted for parity with the Dart
     contract (and as part of the #103 cache key); Gemini's
     ``responseSchema`` has no name, so it is not forwarded.
+
+    ``user_prompt``'s bound is an abuse guard, not a model limit: the Dart
+    prompt runs about 430 characters per dish on a real Wolt menu, so the
+    old 60,000 rejected every venue over ~139 dishes with a 422 the app could
+    only render as "AI error" (#188). Gemini's input window is over a
+    million tokens; 400,000 characters is roughly 900 dishes, past any
+    restaurant and most supermarkets, while still refusing a runaway body.
     """
 
     system_prompt: str = Field(..., min_length=1, max_length=20000)
-    user_prompt: str = Field(..., min_length=1, max_length=60000)
+    user_prompt: str = Field(..., min_length=1, max_length=400000)
     response_schema: dict[str, object] | None = None
     schema_name: str | None = Field(default=None, max_length=64)
 

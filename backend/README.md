@@ -8,7 +8,7 @@ request before it leaves; this service forwards it (`backend_plan.md` §1).
 configured, the app behaves exactly as it does without one, including the
 web build's paste-a-link path.
 
-**It serves the web build only** (`architecture.md` D14, issue #194). iOS and
+**It serves the web build only** (`architecture.md` D17, issue #194). iOS and
 Android call Wolt and Google's Gemini API themselves, with a key the user
 pastes into the app's Settings, and never call this service even when
 `KETOCLUB_BACKEND_URL` is compiled into a phone build. `/v1/chat` is the web
@@ -16,14 +16,20 @@ build's only path to a model.
 
 Routes shipped so far:
 
-| Route | Issue | What it does |
-|---|---|---|
-| `GET /v1/health` | #94 | `{status, version, llm_configured}` |
-| `GET /v1/proxy/wolt/venues/slug/{slug}/assortment` | #95, #168 | The Wolt menu proxy for the web build, see below |
-| `GET /v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu` | #122 | The 10bis menu proxy for the web build, see below |
-| `POST /v1/chat` | #100 | Hosted classification for the web build: forwards one completion to Gemini `generateContent` with the server's key |
-| `GET /v1/proxy/wolt/pages/restaurants` | #123 | Nearby-venue search for the web build, see below |
-| `POST /v1/proxy/wolt/pages/search` | #123 | By-name venue search for the web build, see below |
+| Route | Issue | Install id? | Limiter? | What it does |
+|---|---|---|---|---|
+| `GET /v1/health` | #94 | no | no | `{status, version, llm_configured}` |
+| `GET /v1/proxy/wolt/venues/slug/{slug}/assortment` | #95, #168 | no | no | The Wolt menu proxy for the web build, see below |
+| `GET /v1/proxy/tenbis/api/v1.0/Restaurants/{restaurantId}/Menu` | #122 | no | no | The 10bis menu proxy for the web build, see below |
+| `POST /v1/chat` | #100 | **yes** | **yes** (`RATE_LIMIT_*`) | Hosted classification for the web build: forwards one completion to Gemini `generateContent` with the server's key |
+| `GET /v1/proxy/wolt/pages/restaurants` | #123 | **yes** | **yes** (`DISCOVERY_RATE_LIMIT_PER_MINUTE`) | Nearby-venue search for the web build, see below |
+| `POST /v1/proxy/wolt/pages/search` | #123 | **yes** | **yes** (`DISCOVERY_RATE_LIMIT_PER_MINUTE`) | By-name venue search for the web build, see below |
+
+Menu proxies are one fetch per user action and have no per-install
+identity; `/v1/chat` and the two discovery routes require
+`X-KetoClub-Install-Id` and enforce a per-install limit. A missing or
+malformed install id is answered `400 {"reason":"badResponse"}` — a
+client that misses the header sees the same shape as a bad prompt.
 
 Community routes are later issues (`backend_plan.md` §5).
 
@@ -50,9 +56,24 @@ Every error the route originates is `{reason, status_code}`:
 | 504 | `timeout` | Gemini did not answer within 110 s |
 
 A body that fails validation (empty prompt, prompt over its bound) is
-FastAPI's own 422. Logs carry the install id's first 8 characters, the
-`cache=hit|miss` outcome and upstream status codes only: never the key,
-prompt text or an upstream body.
+FastAPI's own 422. The `user_prompt` bound is 400,000 characters (#188) — an
+abuse guard, not a model limit, and not a promise: a menu that large is bound
+first by `GEMINI_MAX_OUTPUT_TOKENS` and the 110 s read timeout, so past a
+couple of hundred dishes the honest answer is #188's batching, not this cap.
+
+When the terminal shows `gemini upstream_status=404`, the configured
+`GEMINI_MODEL` is not served for this key or API version (a retired id, see
+#179): the log also prints `error_status=NOT_FOUND` and a one-line hint. List
+what the key can use and set `GEMINI_MODEL` in `.env`:
+
+```bash
+curl -sS https://generativelanguage.googleapis.com/v1beta/models \
+  -H "x-goog-api-key: $GEMINI_API_KEY" | grep '"name"'
+```
+
+Logs carry the install id's first 8 characters, the `cache=hit|miss`
+outcome, upstream status codes and, on an error, Google's `error.status`
+enum only: never the key, prompt text or an upstream body.
 
 #### The shared completion cache (#103)
 
@@ -220,7 +241,7 @@ Point the Flutter web build at it:
 flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
 ```
 
-An iOS or Android build ignores the define (D14): phones reach Wolt and
+An iOS or Android build ignores the define (D17): phones reach Wolt and
 Gemini directly, so there is no reason to point one at this service.
 
 ## Configuration
@@ -233,9 +254,9 @@ that need them (`/v1/chat`, and `/v1/admin/*` in a later issue). See
 | Variable | Default | Meaning |
 |---|---|---|
 | `GEMINI_API_KEY` | unset | The server's key, sent only as `x-goog-api-key`. Unset → `/v1/chat` answers `notConfigured` |
-| `GEMINI_MODEL` | `gemini-2.5-flash` | Model in the `generateContent` path |
+| `GEMINI_MODEL` | `gemini-3.5-flash` | Model in the `generateContent` path. `gemini-2.5-flash` was retired for new users September 2026 (404 NOT_FOUND); see `.env.example` for why 3.5-flash was picked over `gemini-flash-latest` / `-lite-latest` / `-3.8-flash`. |
 | `GEMINI_BASE_URL` | `https://generativelanguage.googleapis.com` | Upstream host; never taken from a request |
-| `GEMINI_MAX_OUTPUT_TOKENS` | `8192` | `generationConfig.maxOutputTokens` |
+| `GEMINI_MAX_OUTPUT_TOKENS` | `65536` | `generationConfig.maxOutputTokens`; must exceed a full menu's verdicts (#188) |
 | `GEMINI_THINKING_BUDGET` | `0` | Thinking tokens count against the output budget, and this is a classification task |
 | `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_PER_DAY` | `5`, `40` | Per install id on `/v1/chat`, in memory |
 | `WOLT_BASE_URL` | `https://restaurant-api.wolt.com` | Upstream host for the by-name discovery route (the menu proxy left it in #168); never taken from a request |
@@ -280,7 +301,7 @@ curl -sS localhost:8000/v1/chat \
     },
     "schema_name": "menu_analysis"
   }'
-# {"content":"{\"dishes\": [...]}","model":"gemini-2.5-flash"}
+# {"content":"{\"dishes\": [...]}","model":"gemini-3.5-flash"}
 ```
 
 The default limit is 5 requests a minute per install id; change the id to
@@ -339,7 +360,7 @@ once.
    Run it again: the second response carries `x-ketoclub-cache: hit`.
 5. **Chat smoke test.** Use the curl in "Smoke test against the real API"
    above. A real completion comes back as `{"content":"{\"dishes\": [...]}",
-   "model":"gemini-2.5-flash"}` (or whatever `GEMINI_MODEL` names).
+   "model":"gemini-3.5-flash"}` (or whatever `GEMINI_MODEL` names).
 5a. **Search for a venue on the web build**, against real Wolt discovery
    endpoints: use the two curls in "The Wolt venue-discovery proxies" above,
    or run the Flutter app and search by name or "near me" once #40 lands.

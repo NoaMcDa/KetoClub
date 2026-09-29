@@ -1,4 +1,4 @@
-// Flow test (FLOW_TEST_CONVENTIONS.md, architecture.md §18.4, D14; issue
+// Flow test (FLOW_TEST_CONVENTIONS.md, architecture.md §18.4, D17; issue
 // #194): on iOS and Android the app talks to Wolt and to Google's Gemini
 // API itself — never through KetoClub's backend, even when a backend URL
 // is compiled in.
@@ -95,7 +95,7 @@ final String _geminiBody = jsonEncode(<String, Object?>{
       },
     },
   ],
-  'modelVersion': 'gemini-2.5-flash',
+  'modelVersion': 'gemini-3.5-flash',
 });
 
 /// Wires [fakes] the way `di.dart` wires a phone build, over [network]'s
@@ -166,15 +166,16 @@ final class _Network {
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  group('Direct Wolt and Gemini flow on a phone (D14)', () {
+  group('Direct Wolt and Gemini flow on a phone (D17)', () {
     testWidgets(
       'with a key saved, the menu comes from Wolt and the verdicts from '
       "Gemini, and KetoClub's backend is never called",
       (tester) async {
-        // Setup: phone build, consent given, key saved, backend compiled in.
+        // Setup: phone build, consent on (the D16 default) with the
+        // disclosure already seen, key saved, backend compiled in.
         final fakes = FakeAppDependencies();
         await fakes.settingsStore.write(
-          const AppSettings(estimationConsentGiven: true),
+          const AppSettings(disclosureSeen: true),
         );
         final network = _Network();
         _wirePhoneBuild(fakes, network, FlowFakeApiKeyStore(seed: _key));
@@ -209,10 +210,11 @@ void main() {
       'with no key saved, Gemini is never called, the rules result says to '
       'add a key, and Settings takes one',
       (tester) async {
-        // Setup: phone build, consent given, no key yet.
+        // Setup: phone build, consent on (the D16 default) with the
+        // disclosure already seen, no key yet.
         final fakes = FakeAppDependencies();
         await fakes.settingsStore.write(
-          const AppSettings(estimationConsentGiven: true),
+          const AppSettings(disclosureSeen: true),
         );
         final network = _Network();
         final keys = FlowFakeApiKeyStore();
@@ -227,10 +229,6 @@ void main() {
         expect(network.hosts, ['consumer-api.wolt.com']);
         expect(find.text(_dishName), findsOneWidget);
         expect(find.text(_en.engineChipRules), findsOneWidget);
-        expect(
-          find.text(' (${_en.engineChipReasonApiKeyMissing})'),
-          findsOneWidget,
-        );
         expect(find.text(_en.analysisApiKeyMissing), findsOneWidget);
 
         // Act: follow the banner to Settings and save a key there.

@@ -333,22 +333,25 @@ void main() {
   });
 
   group('AppSettings', () {
-    test('defaults are all, no consent, no venue, no language, system '
-        'appearance', () {
+    test('defaults are all filter, consent on (D16, issue #167), no '
+        'venue, no language, system appearance, disclosure unseen', () {
       const settings = AppSettings();
 
       expect(settings.languageTag, isNull);
       expect(settings.filter, equals(MenuFilter.all));
-      expect(settings.estimationConsentGiven, isFalse);
+      expect(settings.estimationConsentGiven, isTrue);
+      expect(settings.disclosureSeen, isFalse);
       expect(settings.lastVenue, isNull);
       expect(settings.themeMode, equals(AppThemeMode.system));
     });
 
     test('tryFrom(x.toJson()) round-trips settings with every field set', () {
+      // D16 (issue #167) flipped estimationConsentGiven's default to
+      // true; this round-trip exercises the non-default (false).
       const settings = AppSettings(
         languageTag: 'he',
         filter: MenuFilter.greenOnly,
-        estimationConsentGiven: true,
+        estimationConsentGiven: false,
         lastVenue: VenueRef(source: MenuSource.tenbis, platformId: '9'),
         themeMode: AppThemeMode.dark,
       );
@@ -446,15 +449,17 @@ void main() {
     });
 
     test('copyWith replaces filter and consent', () {
+      // D16 (issue #167): defaults are all filter and consent on.
+      // Exercise replacing them both with the non-defaults.
       const settings = AppSettings();
 
       final result = settings.copyWith(
         filter: MenuFilter.greenOnly,
-        estimationConsentGiven: true,
+        estimationConsentGiven: false,
       );
 
       expect(result.filter, equals(MenuFilter.greenOnly));
-      expect(result.estimationConsentGiven, isTrue);
+      expect(result.estimationConsentGiven, isFalse);
     });
 
     test('copyWith omitting languageTag leaves it unchanged', () {

@@ -9,7 +9,7 @@ def test_defaults_match_documented_values() -> None:
     assert settings.GEMINI_API_KEY == ""
     assert settings.GEMINI_MODEL == "gemini-2.5-flash"
     assert settings.GEMINI_BASE_URL == "https://generativelanguage.googleapis.com"
-    assert settings.GEMINI_MAX_OUTPUT_TOKENS == 8192
+    assert settings.GEMINI_MAX_OUTPUT_TOKENS == 65536
     assert settings.GEMINI_THINKING_BUDGET == 0
     assert settings.WOLT_BASE_URL == "https://restaurant-api.wolt.com"
     assert settings.TENBIS_BASE_URL == "https://www.10bis.co.il"

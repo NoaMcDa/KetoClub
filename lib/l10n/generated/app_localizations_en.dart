@@ -132,14 +132,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsConsentBody =>
-      'When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics.';
+      'AI analysis is on by default: when you open a menu, dish names, descriptions and option labels are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.';
 
   @override
-  String get settingsConsentAccept => 'I understand';
+  String get settingsConsentAccept => 'Allow AI analysis';
+
+  @override
+  String get consentDisclosureOk => 'OK';
+
+  @override
+  String get consentDisclosureTurnOff => 'Turn off';
 
   @override
   String get settingsConsentBodyDirect =>
-      'When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics.';
+      'AI analysis is on by default: when you open a menu, dish names, descriptions and option labels are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.';
 
   @override
   String get settingsKeySection => 'Gemini API key';
@@ -336,6 +342,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get analysisBadResponseNoDetail =>
+      'The AI model gave an unusable answer. Showing rule-based results.';
+
+  @override
   String get analysisNoDishesFound =>
       'The AI could not identify any dishes on this menu.';
 
@@ -413,12 +423,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get engineChipReasonConsentWithheld => 'AI not allowed';
-
-  @override
-  String get engineChipReasonApiKeyMissing => 'no key';
-
-  @override
-  String get engineChipReasonApiKeyRejected => 'key rejected';
 
   @override
   String get navExplore => 'Explore';

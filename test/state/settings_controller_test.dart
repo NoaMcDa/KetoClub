@@ -25,15 +25,25 @@ void main() {
     test('initial state before load has the defaults', () async {
       // Arrange: settings seeded before load() is ever called.
       await settings.write(
-        const AppSettings(languageTag: 'he', estimationConsentGiven: true),
+        const AppSettings(languageTag: 'he', estimationConsentGiven: false),
       );
       final freshController = SettingsController(settings, repository);
 
-      // Act / Assert: nothing has been read yet.
-      expect(freshController.consentGiven, isFalse);
+      // Act / Assert: nothing has been read yet. consentGiven starts at
+      // the D16 default (true, issue #167), languageTag/filter at
+      // AppSettings defaults.
+      expect(freshController.consentGiven, isTrue);
       expect(freshController.languageTag, isNull);
       expect(freshController.filter, MenuFilter.all);
       expect(freshController.isBusy, isFalse);
+    });
+
+    test('a fresh install (defaults) has consent on and the disclosure '
+        'unseen (D16, issue #167)', () {
+      // Act / Assert: no seeded settings, no load() — just the
+      // controller's initial state.
+      expect(controller.consentGiven, isTrue);
+      expect(controller.disclosureSeen, isFalse);
     });
 
     test('load populates consentGiven languageTag and filter', () async {
@@ -42,15 +52,16 @@ void main() {
         const AppSettings(
           languageTag: 'he',
           filter: MenuFilter.greenOnly,
-          estimationConsentGiven: true,
+          estimationConsentGiven: false,
         ),
       );
 
       // Act
       await controller.load();
 
-      // Assert
-      expect(controller.consentGiven, isTrue);
+      // Assert: the seeded refusal wins over the D16 default (issue
+      // #167).
+      expect(controller.consentGiven, isFalse);
       expect(controller.languageTag, 'he');
       expect(controller.filter, MenuFilter.greenOnly);
     });
@@ -340,6 +351,82 @@ void main() {
       // Assert
       expect(count, 2);
     });
+
+    group('acknowledgeDisclosure / declineDisclosure (D16, issue #167)', () {
+      test('acknowledgeDisclosure persists disclosureSeen as true without '
+          'changing consentGiven', () async {
+        // Arrange: consent is at the D16 default of true.
+        expect(controller.consentGiven, isTrue);
+        expect(controller.disclosureSeen, isFalse);
+
+        // Act
+        await controller.acknowledgeDisclosure();
+
+        // Assert
+        expect(controller.disclosureSeen, isTrue);
+        expect(controller.consentGiven, isTrue);
+        final stored = await settings.read();
+        expect(stored.disclosureSeen, isTrue);
+        expect(stored.estimationConsentGiven, isTrue);
+      });
+
+      test(
+        'acknowledgeDisclosure leaves a previously-set false consent '
+        'as false — the banner is an acknowledgement, not a re-consent',
+        () async {
+          // Arrange
+          await controller.setConsent(given: false);
+
+          // Act
+          await controller.acknowledgeDisclosure();
+
+          // Assert
+          expect(controller.consentGiven, isFalse);
+          expect(controller.disclosureSeen, isTrue);
+        },
+      );
+
+      test('declineDisclosure sets consent to false AND disclosureSeen to '
+          'true in one write', () async {
+        // Arrange
+        expect(controller.consentGiven, isTrue);
+
+        // Act
+        await controller.declineDisclosure();
+
+        // Assert
+        expect(controller.consentGiven, isFalse);
+        expect(controller.disclosureSeen, isTrue);
+        final stored = await settings.read();
+        expect(stored.estimationConsentGiven, isFalse);
+        expect(stored.disclosureSeen, isTrue);
+        expect(settings.writeCallCount, equals(1));
+      });
+
+      test('acknowledgeDisclosure toggles isBusy true then false', () async {
+        // Arrange
+        final states = <bool>[];
+        controller.addListener(() => states.add(controller.isBusy));
+
+        // Act
+        await controller.acknowledgeDisclosure();
+
+        // Assert
+        expect(states, [true, false]);
+      });
+
+      test('declineDisclosure toggles isBusy true then false', () async {
+        // Arrange
+        final states = <bool>[];
+        controller.addListener(() => states.add(controller.isBusy));
+
+        // Act
+        await controller.declineDisclosure();
+
+        // Assert
+        expect(states, [true, false]);
+      });
+    });
   });
 
   group('SettingsController dietary toggles (issue #56)', () {
@@ -455,7 +542,7 @@ void main() {
     });
   });
 
-  group('SettingsController Gemini API key (architecture.md D14)', () {
+  group('SettingsController Gemini API key (architecture.md D17)', () {
     late FakeSettingsStore settings;
     late FakeMenuRepository repository;
     late FakeApiKeyStore keys;

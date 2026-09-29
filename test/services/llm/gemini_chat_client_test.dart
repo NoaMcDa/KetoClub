@@ -41,7 +41,7 @@ const Map<String, Object?> _schema = <String, Object?>{
 String _successBody({
   String text = '{"dishes":[]}',
   String finishReason = 'STOP',
-  String? modelVersion = 'gemini-2.5-flash-001',
+  String? modelVersion = 'gemini-3.5-flash-001',
 }) => jsonEncode(<String, Object?>{
   'candidates': <Object?>[
     <String, Object?>{
@@ -215,7 +215,7 @@ void main() {
         sent.url,
         Uri.parse(
           'https://generativelanguage.googleapis.com/v1beta/models/'
-          'gemini-2.5-flash:generateContent',
+          'gemini-3.5-flash:generateContent',
         ),
       );
     });
@@ -378,7 +378,7 @@ void main() {
         equals(
           const ChatCompleted(
             content: '{"a":1}',
-            model: 'gemini-2.5-flash-001',
+            model: 'gemini-3.5-flash-001',
           ),
         ),
       );
@@ -392,7 +392,7 @@ void main() {
       final result = await client.complete(systemPrompt: 's', userPrompt: 'u');
 
       // Assert
-      expect((result as ChatCompleted).model, 'gemini-2.5-flash');
+      expect((result as ChatCompleted).model, 'gemini-3.5-flash');
     });
 
     test('decodes a Hebrew reply as UTF-8 even with no content type', () async {
@@ -837,7 +837,7 @@ void main() {
       final client = _answering(_successBody(), 200);
 
       // Act & Assert
-      expect(client.toString(), contains('gemini-2.5-flash'));
+      expect(client.toString(), contains('gemini-3.5-flash'));
       expect(client.toString(), isNot(contains(_key)));
     });
   });

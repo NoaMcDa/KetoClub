@@ -54,7 +54,7 @@ void main() {
       expect(dependencies.locationService, isA<GeolocatorLocationService>());
       expect(dependencies.venueSearchService, isA<WoltVenueSearchService>());
       // The test VM is not web, so the phone path: a key store for the
-      // user's own Gemini key (architecture.md D14).
+      // user's own Gemini key (architecture.md D17).
       expect(dependencies.apiKeyStore, isA<SecureApiKeyStore>());
     });
 
@@ -80,7 +80,7 @@ void main() {
     });
   });
 
-  group('apiKeyStoreFor (architecture.md D14)', () {
+  group('apiKeyStoreFor (architecture.md D17)', () {
     test('returns a secure store outside a browser', () {
       // Act
       final store = apiKeyStoreFor(runsInBrowser: false);
@@ -98,7 +98,7 @@ void main() {
     });
   });
 
-  group('chatClientFor (architecture.md D14)', () {
+  group('chatClientFor (architecture.md D17)', () {
     test('with a key store calls Gemini directly, ignoring a configured '
         'backend', () {
       // Act

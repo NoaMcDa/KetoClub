@@ -78,7 +78,7 @@ client-only version did. `architecture.md` D11 and D12 (§14) are the
 authoritative record of what shipped; `backend_plan.md`'s own status banner may
 lag behind them.
 
-**Since D14 (issue #194) the backend serves the web build only.** iOS and
+**Since D17 (issue #194) the backend serves the web build only.** iOS and
 Android call Wolt and Google's Gemini API themselves and ignore
 `KETOCLUB_BACKEND_URL`. The Wolt half was already true (`menuProxyBase` is null
 off the web). The Gemini half is new: `GeminiChatClient`
@@ -88,7 +88,7 @@ a phone-only Settings section, kept in the Keychain/Keystore by
 `SecureApiKeyStore` (`flutter_secure_storage`, reinstated). `di.dart`'s
 `apiKeyStoreFor`/`chatClientFor` pick the phone or web path. Two failure
 reasons exist only on phones, `apiKeyMissing` and `apiKeyRejected`; both fall
-back to rules and offer "Open Settings". `architecture.md` D14 is the record.
+back to rules and offer "Open Settings". `architecture.md` D17 is the record.
 
 **Phase 2 — build-order steps 8 to 10, plus a run of features neither step
 names — has since landed too.** It shipped as a run of PRs (#124–#154) after
@@ -158,20 +158,23 @@ Several things are genuinely unfinished. None is a surprise; each is unfinished
 for a stated reason, and issues #16, #38, #44 and #65 are still **open**
 on GitHub — tooling exists for several of them, it did not close any of them.
 
-1. **The pinned Gemini model has never answered a real request** (§9.3, §17
+1. **The pinned Gemini model has never answered a phone's request** (§9.3, §17
    open question 1 — closed as posed by D12, but the verification it always
-   asked for is still owed). The model is `gemini-2.5-flash` on both paths:
-   the backend's `GEMINI_MODEL` default on web, and
-   `GeminiChatClient.defaultModel` on phones (D14) — a Dart constant there, so
-   swapping the phones' model is a release, not a redeploy. As of 2026-09-28
-   `generativelanguage.googleapis.com` **is** reachable from the build
-   environment (it was blocked before), and Google's real invalid-key 400 was
-   recorded into `gemini_chat_client_test.dart`, but no valid key has been
-   available, so no successful completion has been seen from either path. For
-   the web path, the one-command check is in `backend/README.md`'s "Manual
-   end-to-end check" section. For a phone, run the app on a device, paste a
-   key in Settings, allow AI analysis and open a Wolt menu; the engine chip
-   should read "AI".
+   asked for is still owed for phones). The model is `gemini-3.5-flash` on
+   both paths: the backend's `GEMINI_MODEL` default on web, and
+   `GeminiChatClient.defaultModel` on phones (D17) — a Dart constant there, so
+   swapping the phones' model is a release, not a redeploy. The retiring
+   `gemini-2.5-flash` answers 404 to new keys, which is why both moved. As of
+   2026-09-28 `generativelanguage.googleapis.com` **is** reachable from the
+   build environment (it was blocked before): Google's real invalid-key 400
+   was recorded into `gemini_chat_client_test.dart`, and the Gemini smoke test
+   (#165, `architecture.md` §17.1) saw real completions through the local
+   backend from a laptop. **No completion has been seen from the phone path
+   (`GeminiChatClient`) with a valid key.** For the web path, the one-command
+   check is in `backend/README.md`'s "Manual end-to-end check" section. For a
+   phone, run the app on a device, paste a key in Settings, leave AI analysis
+   on (the D16 default) and open a Wolt menu; the engine chip should read
+   "AI".
 2. **The Wolt menu fixture is real now; the endpoint moved** (issues #22,
    #168, both closed by the port). Wolt's `/v4/venues/slug/{slug}/menu/data`
    answers every anonymous caller with `200` and a zero-byte body — measured
@@ -243,6 +246,15 @@ spacing values) is enforced by a test; pixel fidelity by no test at all.
   cauliflower"` produces a needless yellow ("omit the rice" on a dish with no rice).
   That fails in the safe direction — a pointless modification request, not the wrong
   green architecture.md constraint 5 names as the failure that matters.
+- **The carb-only-dish rule (#191) fires on the dish name only**, and
+  stands down when the description or an option names a filling from a
+  fixed protein/plant/dairy vocabulary. A bread named "לאפה" and described
+  with a filling word the vocabulary lacks is still red, and a dish named
+  plainly but described as "just a basket of fries" still gets the D-V3
+  yellow. **The option-removal rule (#192) keys on a value's first word
+  only**, so "Bun, no sesame" — a removal that is not the first word — is
+  still read as an ingredient, not dropped. **`מאפה` is red** even for a
+  crustless "מאפה חצילים", accepted as the rarer reading.
 - **The web build cannot fetch menus only without the backend running.** The
   restaurant APIs send no CORS headers, so live fetching needed a CORS-forwarding
   proxy (§13, D9); D11 shipped one (`backend/`'s `/v1/proxy/wolt/…` route). With
@@ -400,7 +412,8 @@ this is the short list.
 
 ## Where the reasoning lives
 
-- `architecture.md` §14 — the decisions log, now D1 to D13, each recording what
+- `architecture.md` §14 — the decisions log, now D1 to D17 (D15 not yet
+  recorded), each recording what
   was decided, why, and what it supersedes. The `(Phase 1)` markers throughout
   were added across both waves of that work. D10 was rewritten in place, not
   appended to: it first recorded that a connectivity pre-check was deliberately

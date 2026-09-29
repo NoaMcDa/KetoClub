@@ -231,16 +231,32 @@ void main() {
         });
       });
 
-      test('a bare word is searched by name and still resolves as a slug', () {
+      test('a bare word is searched by name, no longer resolved as a slug '
+          '(issue #169)', () {
         fakeAsync((async) {
           // Act
           controller.search('vitrina', language: 'en');
           async.elapse(venueSearchDebounce);
 
-          // Assert
+          // Assert: a bare word no longer resolves as a Wolt slug — a
+          // hyphenated shape is required now, so `VenueRefResolver` no
+          // longer offers "Show the keto menu" for it. The by-name
+          // search still fires regardless.
           expect(controller.isPaste, isFalse);
-          expect(controller.resolved?.platformId, 'vitrina');
+          expect(controller.resolved, isNull);
           expect(search.byNameCalls.single.query, 'vitrina');
+        });
+      });
+
+      test('a hyphenated slug still resolves as a Wolt slug', () {
+        fakeAsync((async) {
+          // Act
+          controller.search('vitrina-lilinblum', language: 'en');
+          async.elapse(venueSearchDebounce);
+
+          // Assert
+          expect(controller.resolved?.platformId, 'vitrina-lilinblum');
+          expect(controller.resolved?.source, MenuSource.wolt);
         });
       });
     });

@@ -242,7 +242,7 @@ const _boundaries = <_Boundary>[
     <String>{},
   ),
   // Google's Gemini API, called directly from iOS and Android with the
-  // user's own key (architecture.md D14). Web goes through /v1/chat.
+  // user's own key (architecture.md D17). Web goes through /v1/chat.
   _Boundary('googleapis.com', {'services/llm/gemini_chat_client.dart'}),
   _Boundary('x-goog-api-key', {'services/llm/gemini_chat_client.dart'}),
   // The secure storage plugin guards that key; one file touches it.

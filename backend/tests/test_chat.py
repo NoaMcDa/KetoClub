@@ -194,7 +194,7 @@ def test_request_body_carries_prompts_converted_schema_and_config(
     assert body["generationConfig"] == {
         "responseMimeType": "application/json",
         "responseSchema": to_gemini_schema(_SCHEMA),
-        "maxOutputTokens": 8192,
+        "maxOutputTokens": 65536,
         "temperature": 0,
         "thinkingConfig": {"thinkingBudget": 0},
     }
@@ -506,7 +506,7 @@ def test_missing_or_malformed_install_id_is_bad_response(
         {"system_prompt": _SYSTEM, "user_prompt": ""},
         {"user_prompt": _USER},
         {"system_prompt": "x" * 20001, "user_prompt": _USER},
-        {"system_prompt": _SYSTEM, "user_prompt": "x" * 60001},
+        {"system_prompt": _SYSTEM, "user_prompt": "x" * 400001},
         {"system_prompt": _SYSTEM, "user_prompt": _USER, "schema_name": "x" * 65},
     ],
     ids=[
@@ -599,3 +599,71 @@ def test_logs_never_carry_the_key_prompts_upstream_body_or_full_install_id(
     assert f"chat install_id={_INSTALL_ID[:8]}" in chat_lines
     assert "gemini upstream_status=400 retrying without responseSchema" in chat_lines
     assert "gemini upstream_status=500" in chat_lines
+
+
+# --- upstream error diagnostics (#187) ----------------------------------------
+
+
+def test_a_404_names_the_error_status_and_the_model_hint_without_the_body(
+    chat_client: TestClient,
+    gemini: respx.MockRouter,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    gemini.post(_URL).mock(
+        return_value=httpx.Response(
+            404,
+            json={
+                "error": {
+                    "code": 404,
+                    "message": (
+                        "models/gemini-2.5-flash is not found for API version "
+                        "v1beta UPSTREAM-BODY-MARKER"
+                    ),
+                    "status": "NOT_FOUND",
+                }
+            },
+        )
+    )
+
+    with caplog.at_level(logging.INFO):
+        response = _post(chat_client)
+
+    # The wire contract is unchanged: still a generic badResponse to the app.
+    assert response.status_code == 502
+    assert response.json() == _error(502, "badResponse")
+
+    chat_lines = [r.getMessage() for r in caplog.records if r.name == "ketoclub.chat"]
+    assert "gemini upstream_status=404" in chat_lines
+    assert "gemini upstream error_status=NOT_FOUND" in chat_lines
+    hints = [line for line in chat_lines if "GEMINI_MODEL" in line]
+    assert len(hints) == 1
+    assert "404" in hints[0]
+    # Google's message quotes the request, so it is never logged (§3.5).
+    assert "UPSTREAM-BODY-MARKER" not in caplog.text
+    assert _KEY not in caplog.text
+
+
+@pytest.mark.parametrize(
+    "upstream_body",
+    [{"error": {"code": 500}}, {"error": "boom"}, "not json at all"],
+    ids=["no-status", "error-not-a-dict", "not-json"],
+)
+def test_a_non_404_error_without_a_status_logs_only_the_status_code(
+    chat_client: TestClient,
+    gemini: respx.MockRouter,
+    caplog: pytest.LogCaptureFixture,
+    upstream_body: object,
+) -> None:
+    if isinstance(upstream_body, str):
+        mocked = httpx.Response(500, text=upstream_body)
+    else:
+        mocked = httpx.Response(500, json=upstream_body)
+    gemini.post(_URL).mock(return_value=mocked)
+
+    with caplog.at_level(logging.INFO):
+        assert _post(chat_client).status_code == 502
+
+    chat_lines = [r.getMessage() for r in caplog.records if r.name == "ketoclub.chat"]
+    assert "gemini upstream_status=500" in chat_lines
+    assert not any("error_status" in line for line in chat_lines)
+    assert not any("GEMINI_MODEL" in line for line in chat_lines)

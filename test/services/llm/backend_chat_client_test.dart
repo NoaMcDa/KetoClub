@@ -443,7 +443,7 @@ void main() {
 
       // Assert: backendUnreachable is the client failing to reach the
       // server; the two key reasons belong to the direct Gemini client
-      // alone (architecture.md D14). None of them is a wire reason.
+      // alone (architecture.md D17). None of them is a wire reason.
       expect(
         clientOnly,
         equals({

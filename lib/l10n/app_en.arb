@@ -55,9 +55,11 @@
   "waiterCardTitle": "Say this to the waiter",
 
   "settingsConsentTitle": "What leaves this device",
-  "settingsConsentBody": "When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent to KetoClub's server, which forwards them to Google's Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics.",
-  "settingsConsentAccept": "I understand",
-  "settingsConsentBodyDirect": "When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent straight from this device to Google's Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics.",
+  "settingsConsentBody": "AI analysis is on by default: when you open a menu, dish names, descriptions and option labels are sent to KetoClub's server, which forwards them to Google's Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.",
+  "settingsConsentAccept": "Allow AI analysis",
+  "consentDisclosureOk": "OK",
+  "consentDisclosureTurnOff": "Turn off",
+  "settingsConsentBodyDirect": "AI analysis is on by default: when you open a menu, dish names, descriptions and option labels are sent straight from this device to Google's Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.",
   "settingsKeySection": "Gemini API key",
   "settingsKeyBody": "On this phone, AI analysis calls Google's Gemini API directly with your own key. You can create one for free in Google AI Studio. It is kept in this device's secure storage and sent only to Google.",
   "settingsKeyHint": "Paste your Gemini API key",
@@ -134,6 +136,7 @@
   "@analysisBadResponse": {
     "placeholders": { "detail": { "type": "String" } }
   },
+  "analysisBadResponseNoDetail": "The AI model gave an unusable answer. Showing rule-based results.",
   "analysisNoDishesFound": "The AI could not identify any dishes on this menu.",
   "analysisBackendUnreachable": "KetoClub's server could not be reached. Showing rule-based results.",
   "analysisConsentWithheld": "Allow AI analysis in Settings to analyse this menu. Showing rule-based results.",
@@ -174,8 +177,6 @@
   "engineChipReasonNoDishesFound": "no dishes found",
   "engineChipReasonBackendUnreachable": "server unreachable",
   "engineChipReasonConsentWithheld": "AI not allowed",
-  "engineChipReasonApiKeyMissing": "no key",
-  "engineChipReasonApiKeyRejected": "key rejected",
   "navExplore": "Explore",
   "navScan": "Scan",
   "navSaved": "Saved",

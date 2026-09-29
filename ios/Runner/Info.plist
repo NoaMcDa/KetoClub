@@ -28,12 +28,16 @@
 		<!-- Device position for nearby search (architecture.md §6.5, issue
 		     #37): read once, used only to list nearby restaurants and sent
 		     only to the restaurant platform as a search parameter, never
-		     stored. English only: this project has no Info.plist string
-		     localisation set up (no InfoPlist.strings variant group in
-		     Runner.xcodeproj — only "en" and "Base" are registered
-		     `knownRegions`), and wiring one by hand-editing the pbxproj
-		     without Xcode risks corrupting a project file nothing here can
-		     build-test; see the PR description. -->
+		     stored.
+
+		     English is inline here as the default, so the prompt reads in
+		     English on any device whose pbxproj has not yet been updated
+		     to include ios/Runner/{en,he}.lproj/InfoPlist.strings (issue
+		     #169). Once those files are added to the Runner target in
+		     Xcode (Editor → Add File to Project…), iOS reads the localised
+		     string from the matching `.lproj/InfoPlist.strings` and this
+		     inline value is only the last-resort default. See
+		     docs/RUNNING_IOS.md's "iOS Hebrew permission string" note. -->
 		<string>KetoClub uses your location once to list nearby restaurants. It is sent only to the restaurant platform as a search parameter and is never stored.</string>
 		<key>LSApplicationQueriesSchemes</key>
 		<array>

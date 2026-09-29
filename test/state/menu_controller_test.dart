@@ -624,9 +624,7 @@ void main() {
     test('open passes estimationConsentGiven from SettingsStore into '
         'ClassificationOptions', () async {
       // Arrange
-      settings = FakeSettingsStore(
-        initial: const AppSettings(estimationConsentGiven: true),
-      );
+      settings = FakeSettingsStore();
       controller = MenuController(repository, classifier, settings, notes);
       repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
 
@@ -1643,9 +1641,7 @@ void main() {
       );
       classifier = FakeMenuClassifier()
         ..derivedEngine = const LlmEngine(model: 'served-model');
-      settings = FakeSettingsStore(
-        initial: const AppSettings(estimationConsentGiven: true),
-      );
+      settings = FakeSettingsStore();
       controller = MenuController(
         repository,
         classifier,
@@ -1656,9 +1652,7 @@ void main() {
 
     test('open passes the stored limit to the classifier', () async {
       // Arrange
-      await settings.write(
-        const AppSettings(estimationConsentGiven: true, netCarbLimitGrams: 9),
-      );
+      await settings.write(const AppSettings(netCarbLimitGrams: 9));
 
       // Act
       await controller.open(_ref);
@@ -1696,9 +1690,7 @@ void main() {
         'limit, and caches the new result with it', () async {
       // Arrange
       await controller.open(_ref);
-      await settings.write(
-        const AppSettings(estimationConsentGiven: true, netCarbLimitGrams: 9),
-      );
+      await settings.write(const AppSettings(netCarbLimitGrams: 9));
 
       // Act
       final reopened = MenuController(
@@ -1723,11 +1715,9 @@ void main() {
     test('changing the limit back reuses nothing stale: the 9 g result is '
         'replaced when the user returns to 6 g', () async {
       // Arrange
-      await settings.write(
-        const AppSettings(estimationConsentGiven: true, netCarbLimitGrams: 9),
-      );
+      await settings.write(const AppSettings(netCarbLimitGrams: 9));
       await controller.open(_ref);
-      await settings.write(const AppSettings(estimationConsentGiven: true));
+      await settings.write(const AppSettings());
 
       // Act
       await controller.open(_ref);
@@ -1760,7 +1750,9 @@ void main() {
       () async {
         // Arrange
         await controller.open(_ref);
-        await settings.write(const AppSettings());
+        // D16 (issue #167) flipped AppSettings's default to true; state
+        // the withdrawal explicitly rather than relying on the default.
+        await settings.write(const AppSettings(estimationConsentGiven: false));
 
         // Act
         await controller.open(_ref);
@@ -1801,9 +1793,7 @@ void main() {
       repository = FakeMenuRepository()
         ..stub(_ref, MenuFetched(menu: menu, fromCache: true));
       classifier = FakeMenuClassifier();
-      settings = FakeSettingsStore(
-        initial: const AppSettings(estimationConsentGiven: true),
-      );
+      settings = FakeSettingsStore();
       controller = MenuController(
         repository,
         classifier,
@@ -1831,9 +1821,7 @@ void main() {
         'user has chosen another limit', () async {
       // Arrange
       repository.seedCache(CachedMenu(menu: menu, analysis: llmAnalysis()));
-      await settings.write(
-        const AppSettings(estimationConsentGiven: true, netCarbLimitGrams: 4),
-      );
+      await settings.write(const AppSettings(netCarbLimitGrams: 4));
 
       // Act
       await controller.open(_ref);
@@ -1906,9 +1894,7 @@ void main() {
       );
       classifier = FakeMenuClassifier()
         ..derivedEngine = const LlmEngine(model: 'served-model');
-      settings = FakeSettingsStore(
-        initial: const AppSettings(estimationConsentGiven: true),
-      );
+      settings = FakeSettingsStore();
     });
 
     /// A fresh controller over the shared repository, as a new visit to
@@ -1921,7 +1907,6 @@ void main() {
       // Arrange
       await settings.write(
         const AppSettings(
-          estimationConsentGiven: true,
           carnivoreOnly: true,
           seedOilFree: true,
           dairyFree: true,
@@ -1953,9 +1938,7 @@ void main() {
     test('unchanged toggles reuse the cached analysis on the next open, '
         'spending no classifier call', () async {
       // Arrange
-      await settings.write(
-        const AppSettings(estimationConsentGiven: true, dairyFree: true),
-      );
+      await settings.write(const AppSettings(dairyFree: true));
       final first = newController();
       await first.open(_ref);
 
@@ -1969,18 +1952,9 @@ void main() {
     });
 
     for (final (name, turnedOn) in <(String, AppSettings)>[
-      (
-        'seed-oil free',
-        const AppSettings(estimationConsentGiven: true, seedOilFree: true),
-      ),
-      (
-        'dairy-free',
-        const AppSettings(estimationConsentGiven: true, dairyFree: true),
-      ),
-      (
-        'carnivore only',
-        const AppSettings(estimationConsentGiven: true, carnivoreOnly: true),
-      ),
+      ('seed-oil free', const AppSettings(seedOilFree: true)),
+      ('dairy-free', const AppSettings(dairyFree: true)),
+      ('carnivore only', const AppSettings(carnivoreOnly: true)),
     ]) {
       test('turning $name on re-analyses on the next open, and caches the '
           'new result with the toggle recorded', () async {
@@ -2006,11 +1980,9 @@ void main() {
     test('turning a toggle back off re-analyses rather than reusing the '
         'result made with it on', () async {
       // Arrange
-      await settings.write(
-        const AppSettings(estimationConsentGiven: true, carnivoreOnly: true),
-      );
+      await settings.write(const AppSettings(carnivoreOnly: true));
       await newController().open(_ref);
-      await settings.write(const AppSettings(estimationConsentGiven: true));
+      await settings.write(const AppSettings());
 
       // Act
       await newController().open(_ref);
@@ -2025,9 +1997,7 @@ void main() {
       // Arrange
       final controller = newController();
       await controller.open(_ref);
-      await settings.write(
-        const AppSettings(estimationConsentGiven: true, seedOilFree: true),
-      );
+      await settings.write(const AppSettings(seedOilFree: true));
 
       // Act
       await controller.refresh();

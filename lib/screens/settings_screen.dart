@@ -41,7 +41,7 @@ const Key dairyFreeSwitchKey = Key('settingsDairyFreeSwitch');
 /// The "Carnivore only" switch (issue #56).
 const Key carnivoreOnlySwitchKey = Key('settingsCarnivoreOnlySwitch');
 
-/// The Gemini API key field (architecture.md D14), shown on iOS and
+/// The Gemini API key field (architecture.md D17), shown on iOS and
 /// Android only.
 const Key apiKeyFieldKey = Key('settingsApiKeyField');
 
@@ -54,7 +54,7 @@ const Key apiKeyDeleteKey = Key('settingsApiKeyDelete');
 /// The Settings screen: the AI-analysis consent disclosure, the user's
 /// Gemini API key on iOS and Android, the UI language, the appearance, the
 /// net-carb limit, the "Your keto rules" dietary toggles, the default menu
-/// filter, and cache clearing (architecture.md §6.6, §11, §12, §13, D14).
+/// filter, and cache clearing (architecture.md §6.6, §11, §12, §13, D17).
 ///
 /// Reads its [SettingsController] from `provider` and calls
 /// [SettingsController.load] once, after the first frame, the same way
@@ -147,11 +147,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  /// The consent disclosure: what leaves the device, and the
-  /// acknowledgement checkbox wired to [SettingsController.setConsent]
-  /// (architecture.md §11). Where dish text goes depends on the build:
-  /// straight to Google with the user's key on iOS and Android (D14),
-  /// through KetoClub's server on web (D12) — so the disclosure follows
+  /// The consent disclosure (architecture.md §11, D16 issue #167): the
+  /// same body text the consent-disclosure banner (`ConsentDisclosureBanner`)
+  /// shows once on Explore, with a checkbox that starts ticked on a
+  /// fresh install — AI analysis is on by default (D16). Unticking it
+  /// here sets consent to false and stops any dish text from leaving
+  /// the device. Where dish text goes depends on the build: straight to
+  /// Google with the user's key on iOS and Android (D17), through
+  /// KetoClub's server on web (D12) — so the disclosure follows
   /// [SettingsController.supportsApiKey].
   Widget _consentSection(
     BuildContext context,
@@ -186,7 +189,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   /// The Gemini API key field, its save and remove actions and the
-  /// saved/not-saved status line (architecture.md D14, §11). Built only
+  /// saved/not-saved status line (architecture.md D17, §11). Built only
   /// when [SettingsController.supportsApiKey] is true.
   ///
   /// The field is [TextField.obscureText] and never prefilled — see

@@ -118,7 +118,7 @@ class RulesReasonBanner extends StatelessWidget {
 
   /// Whether [reason] is one the user fixes in Settings, and so offers the
   /// "Open Settings" action: consent withheld, or the Gemini key used on
-  /// iOS and Android missing or refused (architecture.md D14). Retrying
+  /// iOS and Android missing or refused (architecture.md D17). Retrying
   /// cannot help any of them, which is why none of them is retryable.
   /// An exhaustive switch with no `default`, like [_isRetryable].
   static bool _isFixableInSettings(MenuAnalysisFailureReason reason) =>

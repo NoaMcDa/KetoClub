@@ -232,4 +232,61 @@ void main() {
       });
     }
   });
+
+  group('analysisFailureMessage without a detail (issue #189)', () {
+    for (final locale in _locales) {
+      test('badResponse with no detail has no empty parentheses in '
+          '${locale.languageCode}', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+
+        // Act
+        final absent = analysisFailureMessage(
+          MenuAnalysisFailureReason.badResponse,
+          l10n,
+        );
+        final blank = analysisFailureMessage(
+          MenuAnalysisFailureReason.badResponse,
+          l10n,
+          detail: '   ',
+        );
+
+        // Assert
+        expect(absent, isNotEmpty);
+        expect(absent, isNot(contains('()')));
+        expect(absent, isNot(contains('( )')));
+        expect(blank, equals(absent));
+      });
+
+      test('the detail-free copy is still distinct from every other reason '
+          'in ${locale.languageCode}', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+
+        // Act
+        final messages = [
+          for (final reason in MenuAnalysisFailureReason.values)
+            analysisFailureMessage(reason, l10n),
+        ];
+
+        // Assert: collapsing reasons is a bug (architecture.md §10).
+        expect(messages.toSet(), hasLength(messages.length));
+      });
+
+      test('a real detail is still rendered in ${locale.languageCode}', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+
+        // Act
+        final message = analysisFailureMessage(
+          MenuAnalysisFailureReason.badResponse,
+          l10n,
+          detail: 'unexpected shape',
+        );
+
+        // Assert
+        expect(message, contains('(unexpected shape)'));
+      });
+    }
+  });
 }

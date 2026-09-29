@@ -133,9 +133,7 @@ void main() {
         // Consent must be given before the router ever consults
         // connectivity: rule 1 in `classifier_router.dart` routes "no
         // consent" straight to the heuristic under `consentWithheld`.
-        await fakes.settingsStore.write(
-          const AppSettings(estimationConsentGiven: true),
-        );
+        await fakes.settingsStore.write(const AppSettings());
         final llm = _FakeLlmClassifier();
         final connectivity = _FixedConnectivity(online: false);
         fakes.classifierOverride = RoutingMenuClassifier(
@@ -156,7 +154,7 @@ void main() {
         expect(llm.calls, isEmpty);
         expect(find.byType(EngineChip), findsOneWidget);
         expect(find.text(_en.engineChipRules), findsOneWidget);
-        expect(find.text(' (${_en.engineChipReasonOffline})'), findsOneWidget);
+        expect(find.text(_en.analysisOffline), findsOneWidget);
         expect(find.text(_dishName), findsOneWidget);
         expect(find.byType(StatusBadge), findsOneWidget);
       },
@@ -180,9 +178,7 @@ void main() {
         // Consent must be given before the router ever consults
         // connectivity: rule 1 in `classifier_router.dart` routes "no
         // consent" straight to the heuristic under `consentWithheld`.
-        await fakes.settingsStore.write(
-          const AppSettings(estimationConsentGiven: true),
-        );
+        await fakes.settingsStore.write(const AppSettings());
         final llm = _FakeLlmClassifier()
           ..scriptedFailure = const MenuAnalysisFailed(
             reason: MenuAnalysisFailureReason.offline,
@@ -206,7 +202,7 @@ void main() {
         expect(llm.calls, hasLength(1));
         expect(find.byType(EngineChip), findsOneWidget);
         expect(find.text(_en.engineChipRules), findsOneWidget);
-        expect(find.text(' (${_en.engineChipReasonOffline})'), findsOneWidget);
+        expect(find.text(_en.analysisOffline), findsOneWidget);
         expect(find.text(_dishName), findsOneWidget);
         expect(find.byType(StatusBadge), findsOneWidget);
       },

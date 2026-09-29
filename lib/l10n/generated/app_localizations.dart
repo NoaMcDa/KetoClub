@@ -323,19 +323,31 @@ abstract class AppLocalizations {
   /// No description provided for @settingsConsentBody.
   ///
   /// In en, this message translates to:
-  /// **'When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics.'**
+  /// **'AI analysis is on by default: when you open a menu, dish names, descriptions and option labels are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.'**
   String get settingsConsentBody;
 
   /// No description provided for @settingsConsentAccept.
   ///
   /// In en, this message translates to:
-  /// **'I understand'**
+  /// **'Allow AI analysis'**
   String get settingsConsentAccept;
+
+  /// No description provided for @consentDisclosureOk.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get consentDisclosureOk;
+
+  /// No description provided for @consentDisclosureTurnOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off'**
+  String get consentDisclosureTurnOff;
 
   /// No description provided for @settingsConsentBodyDirect.
   ///
   /// In en, this message translates to:
-  /// **'When you allow AI analysis, dish names, descriptions and option labels from the menu you open are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics.'**
+  /// **'AI analysis is on by default: when you open a menu, dish names, descriptions and option labels are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.'**
   String get settingsConsentBodyDirect;
 
   /// No description provided for @settingsKeySection.
@@ -650,6 +662,12 @@ abstract class AppLocalizations {
   /// **'AI analysis failed ({detail}). Showing rule-based results.'**
   String analysisBadResponse(String detail);
 
+  /// No description provided for @analysisBadResponseNoDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI model gave an unusable answer. Showing rule-based results.'**
+  String get analysisBadResponseNoDetail;
+
   /// No description provided for @analysisNoDishesFound.
   ///
   /// In en, this message translates to:
@@ -775,18 +793,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'AI not allowed'**
   String get engineChipReasonConsentWithheld;
-
-  /// No description provided for @engineChipReasonApiKeyMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'no key'**
-  String get engineChipReasonApiKeyMissing;
-
-  /// No description provided for @engineChipReasonApiKeyRejected.
-  ///
-  /// In en, this message translates to:
-  /// **'key rejected'**
-  String get engineChipReasonApiKeyRejected;
 
   /// No description provided for @navExplore.
   ///

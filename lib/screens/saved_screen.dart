@@ -154,6 +154,13 @@ class _SavedScreenState extends State<SavedScreen> {
           onTap: () => Navigator.pushNamed(
             context,
             '/venue/${entry.ref.source.name}/${entry.ref.platformId}',
+            // Issue #169: pass the cached venue name through the route
+            // as arguments, so the menu header shows the venue's real
+            // name rather than the raw slug when the cache has one
+            // (`_generateRoute` in app.dart reads a String argument as
+            // `venueNameHint`). Null-safe: an entry with no cached name
+            // falls back to the slug, unchanged.
+            arguments: entry.venueName,
           ),
           onRemove: () => _removeWithUndo(context, controller, entry),
         );

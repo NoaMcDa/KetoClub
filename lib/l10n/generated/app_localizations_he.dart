@@ -133,14 +133,20 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settingsConsentBody =>
-      'כשאתם מאשרים ניתוח בינה מלאכותית, שמות המנות, התיאורים ושמות התוספות מהתפריט שאתם פותחים נשלחים לשרת של קטוקלאב, שמעביר אותם לניתוח ב‑Gemini API של Google. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים.';
+      'ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים תפריט, שמות המנות, התיאורים ושמות התוספות נשלחים לשרת של קטוקלאב, שמעביר אותם לניתוח ב‑Gemini API של Google. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.';
 
   @override
-  String get settingsConsentAccept => 'הבנתי';
+  String get settingsConsentAccept => 'אפשר ניתוח בינה מלאכותית';
+
+  @override
+  String get consentDisclosureOk => 'אישור';
+
+  @override
+  String get consentDisclosureTurnOff => 'כבה';
 
   @override
   String get settingsConsentBodyDirect =>
-      'כשאתם מאשרים ניתוח בינה מלאכותית, שמות המנות, התיאורים ושמות התוספות מהתפריט שאתם פותחים נשלחים ישירות מהמכשיר הזה ל‑Gemini API של Google, עם מפתח ה‑API שלכם. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים.';
+      'ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים תפריט, שמות המנות, התיאורים ושמות התוספות נשלחים ישירות מהמכשיר הזה ל‑Gemini API של Google, עם מפתח ה‑API שלכם. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.';
 
   @override
   String get settingsKeySection => 'מפתח Gemini API';
@@ -338,6 +344,10 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get analysisBadResponseNoDetail =>
+      'מודל הבינה המלאכותית החזיר תשובה לא שמישה. מוצגות תוצאות על בסיס כללים.';
+
+  @override
   String get analysisNoDishesFound =>
       'הבינה המלאכותית לא הצליחה לזהות מנות בתפריט הזה.';
 
@@ -415,12 +425,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get engineChipReasonConsentWithheld => 'בינה מלאכותית לא אושרה';
-
-  @override
-  String get engineChipReasonApiKeyMissing => 'אין מפתח';
-
-  @override
-  String get engineChipReasonApiKeyRejected => 'המפתח נדחה';
 
   @override
   String get navExplore => 'גילוי';

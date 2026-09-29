@@ -12,7 +12,7 @@ import 'package:ketoclub/utils/constants.dart';
 /// cache clearing to a [MenuRepository].
 ///
 /// On iOS and Android it also saves and removes the user's own Gemini API
-/// key through an [ApiKeyStore] (architecture.md D14); on web there is no
+/// key through an [ApiKeyStore] (architecture.md D17); on web there is no
 /// store, [supportsApiKey] is false, and the model key lives on the
 /// server (D12). **Never exposes the key itself** — only [hasApiKey], a
 /// presence flag — because the key is read solely by `GeminiChatClient`
@@ -50,12 +50,12 @@ final class SettingsController extends ChangeNotifier {
   bool get isBusy => _isBusy;
 
   /// Whether the user has allowed AI analysis: dish text sent to the
-  /// model provider — straight to Google on iOS and Android (D14), through
+  /// model provider — straight to Google on iOS and Android (D17), through
   /// KetoClub's server on web (D12).
   bool get consentGiven => _appSettings.estimationConsentGiven;
 
   /// Whether this build takes the user's own Gemini API key: true on iOS
-  /// and Android, false on web (architecture.md D14). Settings shows the
+  /// and Android, false on web (architecture.md D17). Settings shows the
   /// key field, and the direct-to-Google disclosure, only when it is.
   bool get supportsApiKey => _apiKeyStore != null;
 
@@ -85,6 +85,14 @@ final class SettingsController extends ChangeNotifier {
   /// Whether the "Carnivore only" rule is on (issue #56).
   bool get carnivoreOnly => _appSettings.carnivoreOnly;
 
+  /// Whether the first-launch AI-disclosure banner has already been
+  /// shown on this install (D16, issue #167). Persisted on
+  /// [AppSettings.disclosureSeen]; the banner itself reads the store
+  /// directly rather than through this controller, so this getter is a
+  /// convenience for tests and any future caller in a scope that
+  /// already holds a controller.
+  bool get disclosureSeen => _appSettings.disclosureSeen;
+
   /// How many menus are currently cached (issue #61's Settings section). A
   /// count of entries, never a byte figure —
   /// [MenuRepository.cachedMenuCount]'s own doc comment explains why.
@@ -105,7 +113,7 @@ final class SettingsController extends ChangeNotifier {
   }
 
   /// Saves [key], trimmed, as the user's Gemini API key (architecture.md
-  /// D14).
+  /// D17).
   ///
   /// A key that is empty or only whitespace is **not written**: Gemini
   /// would reject it regardless, so storing it would only replace "no
@@ -242,6 +250,23 @@ final class SettingsController extends ChangeNotifier {
   /// [setSeedOilFree].
   Future<void> setCarnivoreOnly({required bool enabled}) =>
       _update(_appSettings.copyWith(carnivoreOnly: enabled));
+
+  /// Records that the first-launch AI-disclosure banner has been
+  /// dismissed with "OK" (D16, issue #167). Leaves
+  /// [consentGiven] unchanged — the user acknowledged the disclosure
+  /// but did not refuse — and persists [disclosureSeen] as true so the
+  /// banner is never shown twice on the same install.
+  Future<void> acknowledgeDisclosure() =>
+      _update(_appSettings.copyWith(disclosureSeen: true));
+
+  /// Records that the first-launch AI-disclosure banner has been
+  /// dismissed with "Turn off" (D16, issue #167): consent is set to
+  /// false in the same write as [disclosureSeen] is set to true, so the
+  /// router stops sending dish text and the banner is never shown
+  /// twice.
+  Future<void> declineDisclosure() => _update(
+    _appSettings.copyWith(estimationConsentGiven: false, disclosureSeen: true),
+  );
 
   /// Replaces the held settings with [next] and persists them, marking
   /// [isBusy] around the write exactly as every other setter here does.

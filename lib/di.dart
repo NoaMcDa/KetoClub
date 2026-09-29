@@ -37,7 +37,7 @@ const String _menuCacheBoxName = 'menu_cache';
 /// web build reads it: there AI analysis goes through the backend, which
 /// holds the model key, and so do menus (see [menuProxyBase]). iOS and
 /// Android call Wolt and Gemini directly and ignore it (architecture.md
-/// D14, see [chatClientFor]).
+/// D17, see [chatClientFor]).
 const String _configuredBackendUrl = String.fromEnvironment(
   'KETOCLUB_BACKEND_URL',
 );
@@ -79,7 +79,7 @@ Uri? menuProxyBase({required bool runsInBrowser, required String configured}) =>
     runsInBrowser ? backendBaseUrl(configured) : null;
 
 /// Where the user's own Gemini API key is kept, or null when this build
-/// has none (architecture.md D14).
+/// has none (architecture.md D17).
 ///
 /// Off the web — iOS and Android — the app calls Gemini directly with a
 /// key the user pastes into Settings, kept in the platform's secure
@@ -93,7 +93,7 @@ ApiKeyStore? apiKeyStoreFor({required bool runsInBrowser}) =>
     runsInBrowser ? null : const SecureApiKeyStore();
 
 /// The chat client the LLM classifier sends its one request per menu
-/// through (architecture.md §9, D12, D14).
+/// through (architecture.md §9, D12, D17).
 ///
 /// With an [apiKeyStore] — iOS and Android, see [apiKeyStoreFor] — it is
 /// a [GeminiChatClient] calling Google directly with the user's key, and
@@ -144,7 +144,7 @@ AppDependencies buildDependencies() {
   );
 
   // iOS and Android: the user's own Gemini key, read by the direct
-  // client and written by Settings (architecture.md D14). Web: null.
+  // client and written by Settings (architecture.md D17). Web: null.
   final apiKeyStore = apiKeyStoreFor(runsInBrowser: kIsWeb);
 
   const heuristic = HeuristicMenuClassifier(clock: clock);

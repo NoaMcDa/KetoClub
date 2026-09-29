@@ -48,7 +48,8 @@ void main() {
     });
 
     testWidgets(
-      'build shows engineChipRules and the rulesNotVerifiedHint tooltip',
+      'build shows engineChipRules and the rulesNotVerifiedHint tooltip, '
+      'no reason phrase (issue #169)',
       (tester) async {
         // Arrange
         await _pump(
@@ -63,91 +64,44 @@ void main() {
         // Act
         final tooltip = tester.widget<Tooltip>(find.byType(Tooltip));
 
-        // Assert: the reason ("not configured" for notConfigured) is
-        // shown right on the chip, not only in the tooltip — issue #30.
+        // Assert: the chip carries only "Rules" plus the tooltip. The
+        // reason lives beside this chip in `RulesReasonBanner` now; the
+        // chip and the banner used to say the same thing twice.
         expect(find.text('Rules'), findsOneWidget);
-        expect(find.text(' (not configured)'), findsOneWidget);
+        expect(find.textContaining('not configured'), findsNothing);
         expect(find.byType(Icon), findsOneWidget);
         expect(tooltip.message, 'Rule-based result, not AI-verified.');
         expect(
-          find.bySemanticsLabel(
-            'Rules engine, not AI-verified: not configured',
-          ),
+          find.bySemanticsLabel('Rule-based result, not AI-verified.'),
           findsOneWidget,
         );
       },
     );
 
     testWidgets(
-      'build shows the offline reason on the chip for the offline reason',
+      'the chip carries no reason phrase regardless of the RulesEngine reason',
       (tester) async {
-        // Arrange
-        await _pump(
-          tester,
-          const EngineChip(
-            engine: RulesEngine(reason: MenuAnalysisFailureReason.offline),
-          ),
-        );
+        for (final reason in MenuAnalysisFailureReason.values) {
+          await _pump(tester, EngineChip(engine: RulesEngine(reason: reason)));
 
-        // Act & Assert
-        expect(find.text(' (offline)'), findsOneWidget);
+          // Assert: no `(reason)` phrase in either language on any reason
+          // — the banner owns that copy now (issue #169).
+          final withParens = tester
+              .widgetList<Text>(find.byType(Text))
+              .map((t) => t.data ?? '')
+              .where((d) => d.startsWith(' ('));
+          expect(
+            withParens,
+            isEmpty,
+            reason:
+                'RulesEngine reason $reason must not restate the reason '
+                'on the chip',
+          );
+        }
       },
     );
 
-    testWidgets(
-      'build shows the server-unreachable reason for backendUnreachable',
-      (tester) async {
-        // Arrange
-        await _pump(
-          tester,
-          const EngineChip(
-            engine: RulesEngine(
-              reason: MenuAnalysisFailureReason.backendUnreachable,
-            ),
-          ),
-        );
-
-        // Act & Assert
-        expect(find.text(' (server unreachable)'), findsOneWidget);
-      },
-    );
-
-    testWidgets('build shows the AI-not-allowed reason for consentWithheld', (
-      tester,
-    ) async {
-      // Arrange
-      await _pump(
-        tester,
-        const EngineChip(
-          engine: RulesEngine(
-            reason: MenuAnalysisFailureReason.consentWithheld,
-          ),
-        ),
-      );
-
-      // Act & Assert
-      expect(find.text(' (AI not allowed)'), findsOneWidget);
-    });
-
-    testWidgets('every reason gets its own chip label', (tester) async {
-      // Arrange
-      final labels = <String>{};
-
-      // Act
-      for (final reason in MenuAnalysisFailureReason.values) {
-        await _pump(tester, EngineChip(engine: RulesEngine(reason: reason)));
-        final texts = tester
-            .widgetList<Text>(find.byType(Text))
-            .map((t) => t.data ?? '')
-            .where((d) => d.startsWith(' ('));
-        labels.addAll(texts);
-      }
-
-      // Assert: collapsing reasons is a bug (architecture.md §10).
-      expect(labels, hasLength(MenuAnalysisFailureReason.values.length));
-    });
-
-    testWidgets('build shows the Hebrew labels in the he locale', (
+    testWidgets('build shows the Hebrew "Rules" label in the he locale', (
       tester,
     ) async {
       // Arrange
@@ -159,9 +113,9 @@ void main() {
         locale: const Locale('he'),
       );
 
-      // Act & Assert
+      // Act & Assert: no `(reason)` phrase; only the engine name.
       expect(find.text('כללים'), findsOneWidget);
-      expect(find.text(' (לא מקוון)'), findsOneWidget);
+      expect(find.textContaining(' ('), findsNothing);
     });
   });
 }

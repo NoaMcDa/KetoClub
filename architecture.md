@@ -6,12 +6,12 @@ ingestion with a Hive cache, the classified menu screen and Waiter Card, and the
 LLM client with its router and Settings. **Phase 3 backend foundations and hosted
 classification landed next** (D11, D12): a local FastAPI backend (`backend/`)
 proxies Wolt for the web build and forwards one chat completion per menu to
-Google Gemini. **Since D14, iOS and Android call Wolt and Gemini themselves**:
+Google Gemini. **Since D17, iOS and Android call Wolt and Gemini themselves**:
 the backend's proxy and chat routes serve the web build only, and a phone calls
 Gemini directly with an API key the user pastes into Settings. Phase 2 (10bis,
 nearby search) is still to come. When code and this document disagree, fix one of
 them in the same pull request; the entries marked *(Phase 1)* below record where
-that already happened, D11/D12 in §14 record the backend addition, and D14 records
+that already happened, D11/D12 in §14 record the backend addition, and D17 records
 where the phones stopped using it.
 
 **Audience:** anyone about to write the first line of Dart for KetoClub, and anyone
@@ -67,7 +67,7 @@ pulls that venue's live menu straight from a delivery or POS platform (Wolt firs
 then 10bis, later Tabit and Ontopo), classifies every dish as 🟢 order-as-is,
 🟡 order-with-a-change, or 🔴 not keto, and for every yellow dish produces an exact
 sentence to say to the waiter. Classification is done by Google's Gemini model:
-on iOS and Android the app calls it directly with the user's own API key (D14);
+on iOS and Android the app calls it directly with the user's own API key (D17);
 on web it goes through KetoClub's own backend, which holds a key the browser
 never sees (D12). When there is no key or backend, no consent, or no network,
 an on-device rule engine gives a coarser answer. A small local FastAPI backend
@@ -96,11 +96,11 @@ about any individual user — see §11.
 │  │        ▼                                                                    │ │
 │  │  MenuClassifier ── RoutingMenuClassifier ┬── LlmMenuClassifier ── LlmChatClient│ │
 │  │                                       │     (GeminiChatClient on a phone,   │ │
-│  │                                       │      BackendChatClient on web, D14) │ │
+│  │                                       │      BackendChatClient on web, D17) │ │
 │  │                                       └── HeuristicMenuClassifier           │ │
 │  │                                                                             │ │
 │  │  LocationService   VenueSearchService   MenuCache   InstallIdStore          │ │
-│  │  ApiKeyStore (phones only, D14)                                             │ │
+│  │  ApiKeyStore (phones only, D17)                                             │ │
 │  └───────────────┬──────────────────┬────────────────┬──────────────┬──────────┘ │
 │                  │                  │                │              │             │
 │           geolocator           http client      Hive (cache)  shared_preferences │
@@ -109,7 +109,7 @@ about any individual user — see §11.
         OS location services   ┌──────┴──────────────────────────────────────────┐
                                │ consumer-api.wolt.com*    www.10bis.co.il        │
                                │ tgp-api.tabit.cloud       ontopo.com             │
-                               │ generativelanguage.googleapis.com  (phones, D14) │
+                               │ generativelanguage.googleapis.com  (phones, D17) │
                                │ {KETOCLUB_BACKEND_URL}/v1/chat, /v1/proxy/wolt/… │
                                │   (web only; backend holds its key, D11/D12)    │
                                └─────────────────────────────────────────────────┘
@@ -117,7 +117,7 @@ about any individual user — see §11.
 
 \* direct from iOS/Android; the web build reaches Wolt through the backend proxy
 when `KETOCLUB_BACKEND_URL` is configured (D11, §13). iOS and Android never call
-the backend at all, even when the define is set (D14).
+the backend at all, even when the define is set (D17).
 
 Three layers, one direction of dependency: **presentation → state → services**.
 Services never import Flutter widgets. Models are plain Dart and are shared by all
@@ -138,7 +138,7 @@ issues and reviews can cite them.
    completion cache (§6.4, `backend_plan.md`), never a per-user record.
 2. **One codebase, three targets.** Web, iOS and Android share all business logic.
    Platform differences are confined to permissions, HTTP transport and layout.
-3. **The key belongs to whoever makes the call (D12, D14).** On web the language
+3. **The key belongs to whoever makes the call (D12, D17).** On web the language
    model is reached through KetoClub's backend, which holds a Google Gemini key
    server-side, and the browser holds no key at all. On iOS and Android the app
    calls Gemini itself with a key the user pastes into Settings, kept in the
@@ -293,7 +293,7 @@ ketoclub/
 │   │   │   ├── connectivity.dart         # abstract Connectivity { Future<bool> isOnline(); } — a hint, never a verdict (§14 D10)
 │   │   │   └── screen_brightness.dart    # raises brightness for the Waiter Card, restores it on close
 │   │   ├── storage/                      # rank 0
-│   │   │   ├── api_key_store.dart        # interface + SecureApiKeyStore: the user's Gemini key, phones only (D14)
+│   │   │   ├── api_key_store.dart        # interface + SecureApiKeyStore: the user's Gemini key, phones only (D17)
 │   │   │   ├── install_id_store.dart     # interface + PrefsInstallIdStore; replaces key_store.dart (D12)
 │   │   │   ├── menu_cache.dart           # interface + HiveMenuCache
 │   │   │   ├── notes_store.dart          # interface + PrefsNotesStore: personal, local-only dish notes (#131)
@@ -301,7 +301,7 @@ ketoclub/
 │   │   ├── llm/                          # rank 0
 │   │   │   ├── llm_chat_client.dart      # interface, ChatResult, ChatFailureReason
 │   │   │   ├── backend_chat_client.dart  # the ONLY file naming `/v1/chat`; the web build's client (D12)
-│   │   │   └── gemini_chat_client.dart   # the ONLY file naming Google's host; the phones' client (D14)
+│   │   │   └── gemini_chat_client.dart   # the ONLY file naming Google's host; the phones' client (D17)
 │   │   ├── location/                     # rank 0
 │   │   │   ├── location_service.dart     # interface + sealed LocationResult (issue #37)
 │   │   │   └── geolocator_location_service.dart # GeolocatorLocationService; the ONLY file importing package:geolocator
@@ -419,7 +419,7 @@ literal.
   the retired `menu/data` path nowhere at all (#168); `/v1/chat` only in
   `services/llm/backend_chat_client.dart`; `KETOCLUB_BACKEND_URL` only in
   `di.dart`; `googleapis.com` and the `x-goog-api-key` header only in
-  `services/llm/gemini_chat_client.dart`, the phones' direct client (D14);
+  `services/llm/gemini_chat_client.dart`, the phones' direct client (D17);
   `package:flutter_secure_storage/` only in `services/storage/api_key_store.dart`;
   and `openrouter` and `sk-or-` appear nowhere under `lib/` at all. Concrete
   service classes are constructed in exactly one file: `di.dart`.
@@ -428,12 +428,12 @@ literal.
 
 | Package | Why |
 |---|---|
-| `http` | Restaurant APIs; on web, since D11/D12, KetoClub's own backend (`/v1/proxy/wolt/…`, `/v1/chat`); on phones, since D14, Google's Gemini API. Small, works on all three targets. |
+| `http` | Restaurant APIs; on web, since D11/D12, KetoClub's own backend (`/v1/proxy/wolt/…`, `/v1/chat`); on phones, since D17, Google's Gemini API. Small, works on all three targets. |
 | `provider` | State management. `ChangeNotifier` per screen is enough at this size. |
 | `geolocator` | Device location on web, iOS, Android. |
 | `hive` + `hive_flutter` | Menu and analysis cache. |
 | `shared_preferences` | Non-secret settings (filters, language, last venue) and, since D12, the anonymous install id the web build sends to the backend. |
-| `flutter_secure_storage` | The user's own Gemini API key on iOS and Android (D14): Keychain on iOS, Keystore-backed on Android. Dropped by D12, reinstated by D14; never used on web. |
+| `flutter_secure_storage` | The user's own Gemini API key on iOS and Android (D17): Keychain on iOS, Keystore-backed on Android. Dropped by D12, reinstated by D17; never used on web. |
 | `flutter_localizations` + `intl` | Hebrew and English UI, RTL, number formatting. |
 | `url_launcher` | Open the venue on the source platform. |
 | `connectivity_plus` | Backs `Connectivity`, the pre-flight hint `RoutingMenuClassifier` consults before spending a backend chat request (§6.2, §8, §14 D10 — reinstated in Phase 1, extended to the backend by D11). |
@@ -477,7 +477,11 @@ The normalisation rules that matter:
 
 Option labels ("Choice of side: potato purée / green salad") are part of the text the
 classifier sees, because a dish's yellow-ness often lives in the options, not the
-description.
+description — refined by D14 (§14): a non-keto **base** is never matched inside
+option text, only within the dish's own name and description, and an option
+**value** that names a removal ("No onions", "ללא אלף האיים") is dropped
+entirely rather than read as an ingredient the dish arrives with. §6.2 has the
+exact rule order the heuristic engine runs.
 
 *(Phase 1)* Two normalisation rules the Wolt payload forced, both in
 `wolt_menu_mapper.dart`: an `item_id` a category lists but `items[]` does not
@@ -534,18 +538,45 @@ Three implementations, one router:
 **`LlmMenuClassifier`** — the primary engine. Builds one prompt from the whole
 menu (§9.1), sends it through `LlmChatClient`, and hands the reply to
 `MenuResponseParser`. It never touches `http` directly and never sees a model
-key. `di.dart` hands it one of two `LlmChatClient`s (D14): on iOS and Android a
+key. `di.dart` hands it one of two `LlmChatClient`s (D17): on iOS and Android a
 `GeminiChatClient` that calls Google directly with the key in `ApiKeyStore`; on
 web a `BackendChatClient` that posts to KetoClub's own backend, which holds the
 Gemini key server-side (D12).
 
 **`HeuristicMenuClassifier`** — the fallback. A Dart port of the README's
-`analyze_dish`: word-boundary regex over `NON_KETO_BASES` → red; over
-`CARB_MODIFIERS` → yellow with the mapped template sentences; else green. It runs
-on-device, offline, in milliseconds, and its result is labelled as "rules" in the UI
-(`engine_chip.dart`) with its greens carrying a "not AI-verified" hint. Hebrew
-triggers live next to the English ones in `constants.dart` (פירה, צ'יפס, אורז,
-תפוח אדמה, פסטה, פיצה, לחמנייה, …).
+`analyze_dish`, run per dish through `ClassificationRules.matchDish` (D14, §14;
+issues #191, #192), in this order:
+
+1. A dish **name** that is nothing but an unguarded carb-modifier trigger plus
+   portion/qualifier words (`carbOnlyQualifiers{En,He}` — portion, bag, tray,
+   plain, regular, large, sourdough, gluten free, מנת, מגש, שקית, רגילה, ללא
+   גלוטן, מחמצת…) is red, labelled with the trigger itself: "Portion of
+   fries", "פיתה רגילה". Only the starches and breads in
+   `carbOnlyEligibleTriggers` can fire it — never a sauce or root vegetable
+   ("Carrots" is not "built on carrots"), and never the bread-carried
+   families (burger, sandwich, wrap, toast), which stay a D-V3 yellow. And
+   never when the description or a non-removal option names a filling
+   (`describesFilling`: a protein, a plant or dairy word): "לאפה" described
+   as "שווארמה, חומוס, סלט" is the dish D-V3 means, not the carb itself.
+2. Otherwise, `NON_KETO_BASES` is matched against
+   `TextNormaliser.dishCoreText` — the dish's name and description only,
+   never its options — so an option group named after a red base (an "ארוחת
+   נאגטס" meal upgrade on a burger) can never redden the dish on its own.
+3. Otherwise, `CARB_MODIFIERS` is matched against
+   `TextNormaliser.dishRulesText`: the core text plus every option group's
+   name and non-removal values (a "choice of side" value still counts, per
+   §6.1) but with every removal value dropped — one whose first word is
+   `no`/`without`/`skip`/`ללא`/`בלי` (`optionRemovalWordsEn/He`) — giving a
+   yellow with the mapped template sentence. Otherwise the dish is green.
+
+None of this changes `TextNormaliser.dishSearchText` or `menuFingerprint`
+(§6.4), which still hash the dish's full text including every option value
+regardless of removal wording, so no cached analysis is invalidated by D14.
+
+It runs on-device, offline, in milliseconds, and its result is labelled as "rules"
+in the UI (`engine_chip.dart`) with its greens carrying a "not AI-verified" hint.
+Hebrew triggers live next to the English ones in `constants.dart` (פירה, צ'יפס,
+אורז, תפוח אדמה, פסטה, פיצה, לחמנייה, …).
 
 *(Phase 1)* The vocabulary is no longer "deliberately small", and it needed three
 relations this section did not anticipate, all in `constants.dart`:
@@ -587,7 +618,7 @@ The table in §9.1 lists each toggle's prompt fragment, rule and hint copy side 
 side.
 
 **`RoutingMenuClassifier`** — decides, per call, in this order (revised by D12
-and D14; the router itself checks only consent and connectivity — whether a key
+and D17; the router itself checks only consent and connectivity — whether a key
 is saved is the phone's chat client's answer, not a router rule):
 
 1. Estimation consent not given → heuristic, with
@@ -609,7 +640,7 @@ is saved is the phone's chat client's answer, not a router rule):
    `ClientException` posting to `/v1/chat` is simply `backendUnreachable`,
    handled by rule 4 like any other LLM-path failure.
 3. Otherwise → the LLM path, via `GeminiChatClient` on a phone or
-   `BackendChatClient` on web (D14).
+   `BackendChatClient` on web (D17).
 4. If the call fails with `offline`, `timeout`, `rateLimited`, `badResponse`,
    `backendUnreachable` or `notConfigured` (web: no backend URL compiled in, or
    the server has no Gemini key), or — on a phone — `apiKeyMissing` (no key
@@ -623,7 +654,7 @@ is saved is the phone's chat client's answer, not a router rule):
    described) — a web build with no `KETOCLUB_BACKEND_URL` define answers
    `notConfigured` and falls back the same way. A phone with no key saved
    answers `apiKeyMissing` the same way, which is how a fresh install reads
-   until the user pastes a key (D14).
+   until the user pastes a key (D17).
 5. `noDishesFound` is returned as a failure rather than swapped for rules — §10
    gives that row "try rules" as a way out the user takes, not as an automatic
    degradation.
@@ -923,8 +954,10 @@ to gate the rows above that do.
 ## 9. LLM integration contract
 
 **Since D12, the model behind this contract is Google Gemini** (`GEMINI_MODEL`,
-default `gemini-2.5-flash`, a backend config value — never hardcoded in `lib/`),
-reached only through KetoClub's own backend. `MenuAnalysisPrompt` and
+default `gemini-3.5-flash`, a backend config value on web), reached on web
+through KetoClub's own backend and, since D17, directly from iOS and Android
+by `GeminiChatClient`, whose `defaultModel` is the one Dart constant naming the
+same id. `MenuAnalysisPrompt` and
 `MenuResponseParser` are unchanged by that move: they build and read text, not
 HTTP, so the prompt (§9.1) and the schema (§9.2) are exactly what
 `BackendChatClient` sends the backend, which is exactly what the backend forwards
@@ -1052,15 +1085,18 @@ contract this section always described, only moved server-side:
   schema. 401, 403, 429 and 5xx are never retried — they are answers about the
   key, the quota and the provider, and are surfaced as such. Never a second
   retry.
-- `maxOutputTokens` is `GEMINI_MAX_OUTPUT_TOKENS` (default 8192); a reply that
-  hits it ends with `finishReason: MAX_TOKENS`, which is `badResponse` — a
-  truncated dish array is unrecoverable the same way it always was.
+- `maxOutputTokens` is `GEMINI_MAX_OUTPUT_TOKENS` (default 65536, the 2.5
+  Flash family's ceiling — it was 8192, which a 118-dish Hebrew menu's
+  verdicts overran, #188); a reply that hits it ends with `finishReason:
+  MAX_TOKENS`, which is `badResponse` — a truncated dish array is
+  unrecoverable the same way it always was.
 - Backend-side upstream timeout: connect 5 s, read 110 s — inside the Dart
   client's 120 s outer bound, so the backend's own `timeout` reason reaches the
   UI before the client's timeout would fire on a healthy connection.
-- The model id is `GEMINI_MODEL` in the backend's config (default
-  `gemini-2.5-flash`), never a Dart constant — swapping it is an environment
-  variable, not a code change or a release. §17 open question 1's "verify the
+- On web the model id is `GEMINI_MODEL` in the backend's config (default
+  `gemini-3.5-flash`), never a Dart constant — swapping it is an environment
+  variable, not a code change or a release. On phones (D17) it is
+  `GeminiChatClient.defaultModel`, so swapping it there is a release. §17 open question 1's "verify the
   pinned model" check is still owed, against this id (see §17).
 - The reason vocabulary on the wire is exactly `notConfigured`, `offline`,
   `timeout`, `rateLimited`, `badResponse` — §10's table gives the mapping. There
@@ -1090,8 +1126,10 @@ tests free of a real clock.)* In order:
 5. `verdict == modifiable` with a null, blank, or over-length `modification` →
    `unclassified` (constraint 7). A green or red carrying a `modification` keeps the
    verdict and drops the field.
-6. Caps: more than 150 dishes → `badResponse`; `why` truncated at 300 characters,
-   never rejected for length alone.
+6. Caps: more than `maxAnalysedDishes` (1000; a sanity bound against a
+   runaway reply, not a menu size — raised from 150, which real Israeli Wolt
+   venues exceed, #188) dishes → `badResponse`; `why` truncated at 300
+   characters, never rejected for length alone.
 
    *(Phase 1)* Rules 5 and 6 read as contradicting each other on an over-length
    `modification`: rule 5 demotes the dish, rule 6 says to truncate rather than
@@ -1127,8 +1165,8 @@ languages. Collapsing reasons is a bug.
 | `MenuFetch.backendUnreachable` | adapter, `ClientException` reaching the backend itself (D11) | "KetoClub's server could not be reached, so the menu could not be read." | retry, or unset the backend define |
 | `Analysis.notConfigured` | web only: no backend URL compiled in, or the backend has no Gemini key (D12) | rules result + "AI analysis is not available on this build or server. Showing rule-based results." | none from the app |
 | `Analysis.consentWithheld` | router, consent toggle off (client-only, §11) | rules result + "Allow AI analysis in Settings to analyse this menu. Showing rule-based results." | settings |
-| `Analysis.apiKeyMissing` | phones only: `GeminiChatClient` found no key saved, so nothing was sent (D14) | rules result + "Add your Gemini API key in Settings to analyse this menu. Showing rule-based results." | settings |
-| `Analysis.apiKeyRejected` | phones only: Google answered 401, 403, or a 400 naming an invalid key (D14) | rules result + "Gemini rejected your API key. Check it in Settings. Showing rule-based results." | settings |
+| `Analysis.apiKeyMissing` | phones only: `GeminiChatClient` found no key saved, so nothing was sent (D17) | rules result + "Add your Gemini API key in Settings to analyse this menu. Showing rule-based results." | settings |
+| `Analysis.apiKeyRejected` | phones only: Google answered 401, 403, or a 400 naming an invalid key (D17) | rules result + "Gemini rejected your API key. Check it in Settings. Showing rule-based results." | settings |
 | `Analysis.offline` | router / client, no route: a phone's `ClientException` calling Google, or on web the backend's own 502 (Gemini unreachable) | rules result + "Offline. Showing rule-based results." | retry |
 | `Analysis.timeout` | client, > 120 s, or the backend's 504 (Gemini did not answer within its own budget) | rules result + "The AI model was too slow. Showing rule-based results." | retry |
 | `Analysis.rateLimited` | client, 429 — on a phone, the user's own key's Gemini quota; on web, Gemini's limit or the backend's per-install limiter | rules result + "Daily AI limit reached." | wait |
@@ -1157,7 +1195,7 @@ should not reach a log or a widget, even with no bearer token left to leak.
 
 ## 11. Security and privacy
 
-- **Whose key, and where it lives (D12, D14).** On web there is no key in the
+- **Whose key, and where it lives (D12, D17).** On web there is no key in the
   browser: the Gemini key lives only in the backend's `GEMINI_API_KEY`
   environment variable. On iOS and Android the user pastes their own Gemini key
   into Settings; `SecureApiKeyStore` keeps it in the Keychain or Keystore, and
@@ -1170,7 +1208,7 @@ should not reach a log or a widget, even with no bearer token left to leak.
   - To the restaurant platform: the venue identifier (or, with a backend
     configured on web, to KetoClub's backend instead, which then talks to the
     platform — see D11).
-  - To Google Gemini — directly from a phone with the user's key (D14), or on
+  - To Google Gemini — directly from a phone with the user's key (D17), or on
     web through KetoClub's backend (D12): dish names, descriptions, option
     labels, and the optional dietary constraints from Settings. On web the
     anonymous install id also goes to the backend, for rate limiting only — it
@@ -1179,12 +1217,26 @@ should not reach a log or a widget, even with no bearer token left to leak.
     sends no install id anywhere for analysis. No location, no venue name, no
     user identity, ever.
   - Nowhere else. There is no telemetry.
-- **Consent.** Settings shows one disclosure stating the above in plain
-  language — on a phone, that dish text goes straight to Google's Gemini API
-  with the user's own key; on web, that it goes to KetoClub's server, which
-  forwards it to Google — and that nothing about the user is sent, and the user
-  confirms once. The router treats withheld consent as its own
-  reason, `consentWithheld` (§10), distinct from a server-side `notConfigured`.
+- **Consent (D16, issue #167).** AI analysis is **on by default** on a
+  fresh install: `AppSettings.estimationConsentGiven` defaults to `true`.
+  A one-off `ConsentDisclosureBanner` shown on Explore states in plain
+  language what leaves the device — dish text to KetoClub's server, which
+  forwards it to Google's Gemini API, and nothing else about the user —
+  and offers two buttons: **OK** acknowledges without changing consent;
+  **Turn off** sets consent to `false`. Either button persists
+  `AppSettings.disclosureSeen: true`, so the banner never appears twice
+  on the same install. The Settings toggle mirrors the same choice at
+  any later point. A stored `false` from before D16 (or one written by
+  "Turn off") always wins over the new default: an install that already
+  refused keeps its refusal. The router treats withheld consent as its
+  own reason, `consentWithheld` (§10), distinct from a server-side
+  `notConfigured`. `ClassificationOptions.estimationConsentGiven` keeps
+  its `false` default so a caller that forgets to pass consent still
+  never sends text — only the *settings-level* default flipped.
+  Where the text goes depends on the build (D17): on iOS and Android it
+  goes straight from the phone to Google's Gemini API with the user's own
+  key, and both the banner and the Settings disclosure say so; on web it
+  goes through KetoClub's server as above.
 - **The model's output is data.** It is parsed by rules and rendered as text. No
   field is ever executed, used as a URL, or used to choose code paths beyond the
   three-valued verdict.
@@ -1394,7 +1446,7 @@ the controllers, the screens, the parser — knows the backend exists; `Menu` an
 **D12 — The backend serves Google Gemini; the bring-your-own-key path is
 removed.** *(Supersedes D3; closes §17 open question 1 as originally posed —
 "which OpenRouter model to pin" no longer applies. **Superseded on iOS and
-Android by D14**, which puts a user-supplied key back on phones; D12 still
+Android by D17**, which puts a user-supplied key back on phones; D12 still
 describes the web build exactly.)* The backend holds a
 Gemini key server-side (`GEMINI_API_KEY`, model `GEMINI_MODEL`, default
 `gemini-2.5-flash`) and the app never holds a model key at all:
@@ -1491,7 +1543,64 @@ honoured only as far as the device (and, after B, the backend) has actually
 analysed. That gap is the point: a number on a card is a claim about food
 someone is about to order, and D13 only makes claims it can back.
 
-**D14 — iOS and Android call Wolt and Gemini themselves; the backend is for
+**D14 — The heuristic engine judges a whole dish, not one flat string.**
+*(Amends §6.1's "option labels are part of the text the classifier sees" and
+D-V3's bread-carrier rule; answers issues #190, #191, #192.)* Two real-menu
+misreads showed `ClassificationRules.match(String)` was too blunt: an
+"ארוחת נאגטס" (nuggets meal) option group on a burger reddened the whole
+dish from its option text alone, and a plain "פיתה רגילה" or "Portion of
+fries" with no other words came out yellow with "serve it without the pita"
+— an instruction that cannot be followed — because nothing told the engine
+a dish could *be* the carb rather than merely contain one. Fixing both from one flat string
+was not possible — the fix needs to know which part of the dish a word came
+from — so `ClassificationRules.matchDish(Dish)` replaces `match` as the
+heuristic's entry point and runs three steps in order: (1) a dish **name**
+made only of unguarded carb-modifier triggers plus portion/qualifier words
+(`carbOnlyQualifiers{En,He}`) is red, labelled with the trigger, when the
+trigger is a starch or bread in `carbOnlyEligibleTriggers` (never a sauce or
+vegetable, never the bread-carried burger, sandwich, wrap and toast families
+— D-V3's yellow) and nothing in the description or options names a filling
+(`describesFilling`); (2) a
+non-keto base is matched on `TextNormaliser.dishCoreText` — name and
+description, never options; (3) a carb modifier is matched on
+`TextNormaliser.dishRulesText` — the core text plus option group names and
+values, with a removal value (first word `no`/`without`/`skip`/`ללא`/`בלי`)
+dropped, and a red base found only among the options ("Choice of side:
+pasta / salad") is a yellow asking for the other option, never a red.
+`match(String)` is kept for callers with only a string. The same
+pass also filled two vocabulary gaps the same real menus exposed: the pastry
+counter (danish, pastry, muffin, scone, מאפה, שמרים, דניש, …) as a red base,
+and the burger word families (`burger`, `hamburger`, `בורגר`, …) as bun
+carriers, so a bare "Cheeseburger" gets the bun sentence instead of reading
+green for want of the literal word "bun".
+
+**What it costs:** three ordered rules instead of one flat regex pass, and a
+`Dish` parameter where a `String` used to do — every heuristic call site now
+needs the whole dish object, not just its joined text. **What it does not
+touch:** `TextNormaliser.dishSearchText` and `menuFingerprint` (§6.4) are
+unchanged and still hash every option value regardless of removal wording,
+so no cached analysis is invalidated by this decision.
+
+**D16 — AI analysis is on by default.** *(2026-09-28; answers issue #167;
+amends §11.)* D2 makes the language model the primary classifier, but
+`AppSettings.estimationConsentGiven` defaulted to `false`, so a fresh
+install always saw rules-engine verdicts and the "why not AI" banner until
+the user hunted for the Settings switch. That defeated the point of D2 for
+every new user and turned the model into an opt-in feature the app is not
+scoped around. The flip: on a fresh install `estimationConsentGiven`
+defaults to `true`, and a one-off `ConsentDisclosureBanner` on Explore
+tells the user in plain language what leaves the device (dish text to
+KetoClub's backend, on to Google Gemini) with two buttons — **OK**
+acknowledges, **Turn off** sets consent to `false`. Either dismisses the
+banner permanently through a new `AppSettings.disclosureSeen: true`. A
+stored `false` from before D16 (or one written by "Turn off") always wins
+over the new default; the Settings toggle mirrors the same choice at any
+later point. `ClassificationOptions.estimationConsentGiven` keeps its
+`false` default: a caller that forgets to pass consent still never sends
+text — only the *settings-level* default flipped, not the classifier's
+own contract.
+
+**D17 — iOS and Android call Wolt and Gemini themselves; the backend is for
 the web build only.** *(Issue #194. Supersedes D12 on iOS and Android; D12
 still describes the web build. Leaves D11 unchanged: the menu proxy was
 already web-only.)* D11 promised that the backend is "an accelerator, never a
@@ -1504,13 +1613,14 @@ and `KETOCLUB_BACKEND_URL` has no effect there even when it is set.
 
 - **Wolt and 10bis.** Already true before this decision: `menuProxyBase`
   answers null whenever `runsInBrowser` is false, and `di.dart` passes that to
-  both menu adapters and to `WoltVenueSearchService`. D14 only records it as a
+  both menu adapters and to `WoltVenueSearchService`. D17 only records it as a
   rule, pinned by `di_test.dart` and the phone flow test.
 - **Gemini.** `di.dart`'s `chatClientFor` builds a `GeminiChatClient` whenever
   it is given an `ApiKeyStore`, and `apiKeyStoreFor` gives one only off the
   web. The client is a Dart port of the backend's `services/gemini.py`: the
   same `generateContent` body, the same strict-schema-to-`responseSchema`
-  conversion (`toGeminiSchema`), the same model default (`gemini-2.5-flash`),
+  conversion (`toGeminiSchema`), the same model default (`gemini-3.5-flash`, the
+  `GEMINI_MODEL` that `backend/.env.example` sets since #165),
   output budget and zero thinking budget, the same single retry without the
   schema on a non-key 400, and the same `finishReason == STOP` and
   thought-part rules for reading the reply. Keying the choice on the store,
@@ -1533,8 +1643,8 @@ and `KETOCLUB_BACKEND_URL` has no effect there even when it is set.
   `offline`, not `backendUnreachable`, because there is no KetoClub server in
   between. The backend client never trusts either new reason from the wire.
 - **Privacy.** Dish text now goes from a phone straight to Google, with no
-  install id; Settings' disclosure says so on phones and keeps the
-  via-server wording on web.
+  install id; Settings' disclosure and D16's first-launch banner say so on
+  phones and keep the via-server wording on web.
 
 **What it costs:** a phone user must now get a Gemini key before AI analysis
 works, where D12's plan was that nobody would ever have to — though D12's plan
@@ -1570,7 +1680,7 @@ This section lists what each part of the system must be tested for.
   `json_schema`/`responseSchema` fallback and the Gemini retry rule are backend
   (Python) tests, not Dart ones — see `backend/tests/test_chat.py`,
   `test_gemini_schema.py`.
-- **`GeminiChatClient` (D14):** a fake `http.Client` asserting the endpoint,
+- **`GeminiChatClient` (D17):** a fake `http.Client` asserting the endpoint,
   the key only in `x-goog-api-key` (trimmed, never in the URL or body, no
   install id), the `generateContent` body and generation config, the schema
   conversion (`toGeminiSchema`, pinned rule by rule with no HTTP), the single
@@ -1592,7 +1702,7 @@ This section lists what each part of the system must be tested for.
   in Settings (there is no key to enter) and see the engine chip switch to AI;
   toggle consent off and see rules with the `consentWithheld` message; with a
   backend URL configured and the LLM classifier faked as `backendUnreachable`,
-  see that copy; on a phone build (D14), with a backend URL compiled in, see
+  see that copy; on a phone build (D17), with a backend URL compiled in, see
   the menu fetched from Wolt and the verdicts from Gemini with nothing sent to
   the backend, and with no key saved see the `apiKeyMissing` copy, follow it to
   Settings and save a key (`direct_gemini_analysis_flow_test.dart`).
@@ -1682,19 +1792,24 @@ Extension points already designed in:
 Things this document could not settle from the available material. Each has a
 default the implementation follows until answered.
 
-1. **Which OpenRouter model to pin.** *(Closed by D12: the question no longer
-   applies as posed — there is no OpenRouter model to pin, no free-tier id to
-   rotate, and no per-user quota. D12 pins `GEMINI_MODEL` (default
-   `gemini-2.5-flash`) as a backend environment variable instead of a Dart
-   constant, so changing it is a redeploy, not a release. **The pre-release
-   verification this question originally asked for is still outstanding, now
-   against Gemini**: `generativelanguage.googleapis.com` is unreachable from the
-   build environment (same as `openrouter.ai` was), so the real system prompt
-   has never been run against the pinned model from here. `backend/README.md`'s
-   manual end-to-end check is the one-command way to do that for anyone with a
-   network path to Google; the `m15_openrouter_models_fix.md`-derived latency
-   figures this question used to cite no longer apply to a different provider
-   and are not carried over as a guess.)*
+1. **Which OpenRouter model to pin.** *(Closed by D12 and then verified on
+   2026-09-28: the question no longer applies as posed — there is no
+   OpenRouter model to pin, no free-tier id to rotate, and no per-user quota.
+   D12 pins `GEMINI_MODEL` (default now `gemini-3.5-flash`) as a backend
+   environment variable instead of a Dart constant, so changing it is a
+   redeploy, not a release. The smoke test #165 ran on 2026-09-28 against
+   the real prompt: `gemini-2.5-flash` (the D12 default) is 404 for new
+   users — Google's API recommends `gemini-3.8-flash` as the successor, but
+   both `-3.8-flash` and `gemini-flash-latest` currently answer 503
+   UNAVAILABLE for structured-output requests, and `gemini-flash-lite-latest`
+   answers 400 INVALID_ARGUMENT for `generationConfig.thinkingConfig`. The
+   default was moved to `gemini-3.5-flash` on the same day. Round-trip
+   latencies from a laptop through the local backend: 33.5 s cold for a
+   20-dish English menu, 8.8 s for a 10-dish Hebrew menu, 4 ms for a cache
+   hit; the responses (redacted) are under `test/fixtures/llm/smoke_*.json`
+   and Hebrew `why`/`modification` came back in Hebrew. Phone numbers are
+   still #65, and the successor picking under #179 has not chosen a
+   permanent home yet.)*
 2. **Exact Wolt venue-search endpoint** for nearby search. `menu_api_research` covers
    menus only. Default: ship paste-a-URL first (Tier A) and discover the search
    endpoint with the reverse-engineering protocol in `README.md` when building
