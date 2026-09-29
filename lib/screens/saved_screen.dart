@@ -15,12 +15,25 @@ import 'package:provider/provider.dart';
 /// either, for the same reason as there — a platform's brand name does
 /// not translate (architecture.md §18.2's "each file stays
 /// self-contained").
-String _platformName(MenuSource source) => switch (source) {
-  MenuSource.wolt => 'Wolt',
-  MenuSource.tenbis => '10bis',
-  MenuSource.tabit => 'Tabit',
-  MenuSource.ontopo => 'Ontopo',
-};
+///
+/// A pasted menu has no brand, so it reads [AppLocalizations.sourceScanned].
+String _platformName(MenuSource source, AppLocalizations l10n) =>
+    switch (source) {
+      MenuSource.wolt => 'Wolt',
+      MenuSource.tenbis => '10bis',
+      MenuSource.tabit => 'Tabit',
+      MenuSource.ontopo => 'Ontopo',
+      MenuSource.scan => l10n.sourceScanned,
+    };
+
+/// The title a saved entry shows: its venue name, else its reference —
+/// except for a pasted menu, whose reference is a hash and reads as
+/// [AppLocalizations.sourceScanned].
+String _entryTitle(CachedMenuEntry entry, AppLocalizations l10n) =>
+    entry.venueName ??
+    (entry.ref.source == MenuSource.scan
+        ? l10n.sourceScanned
+        : entry.ref.platformId);
 
 /// The bucketed "time ago" phrase for [fetchedAt] relative to [now] — this
 /// file's own copy of `menu_screen.dart`'s `_ageLabel`, kept local for the
@@ -181,7 +194,7 @@ class _SavedScreenState extends State<SavedScreen> {
     final removed = controller.hide(entry.ref);
     if (removed == null) return;
     final l10n = AppLocalizations.of(context)!;
-    final title = removed.venueName ?? removed.ref.platformId;
+    final title = _entryTitle(removed, l10n);
     var undone = false;
 
     unawaited(
@@ -229,7 +242,7 @@ class _SavedEntryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final title = entry.venueName ?? entry.ref.platformId;
+    final title = _entryTitle(entry, l10n);
     final age = _ageLabel(entry.fetchedAt, DateTime.now(), l10n);
     final engine = entry.engine;
 
@@ -263,7 +276,9 @@ class _SavedEntryTile extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 4),
-              Text(l10n.menuSourceLine(_platformName(entry.ref.source), age)),
+              Text(
+                l10n.menuSourceLine(_platformName(entry.ref.source, l10n), age),
+              ),
               const SizedBox(height: 4),
               Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,

@@ -14,10 +14,12 @@ import 'package:ketoclub/models/failures.dart';
 ///   connectivity problems that may already have cleared by the time the
 ///   user taps the button.
 /// - [MenuFetchFailureReason.notFound],
-///   [MenuFetchFailureReason.platformChanged] and
-///   [MenuFetchFailureReason.unsupportedSource]: nothing about retrying
+///   [MenuFetchFailureReason.platformChanged],
+///   [MenuFetchFailureReason.unsupportedSource] and
+///   [MenuFetchFailureReason.scanNotSaved]: nothing about retrying
 ///   the identical request would help — the venue reference itself was
-///   the problem — so the action goes back to paste a different one.
+///   the problem, or (for a scan) there is nothing to fetch again — so
+///   the action goes back to paste a different one.
 /// - [MenuFetchFailureReason.blockedByBrowser]: neither. No retry on this
 ///   platform will ever succeed, and `fetchFailureMessage`'s own copy
 ///   already names the way out (the phone app), so this widget renders
@@ -60,7 +62,8 @@ class FetchFailureAction extends StatelessWidget {
       ),
       MenuFetchFailureReason.notFound ||
       MenuFetchFailureReason.platformChanged ||
-      MenuFetchFailureReason.unsupportedSource => ElevatedButton(
+      MenuFetchFailureReason.unsupportedSource ||
+      MenuFetchFailureReason.scanNotSaved => ElevatedButton(
         onPressed: onBackToSearch,
         child: Text(l10n.actionBackToSearch),
       ),

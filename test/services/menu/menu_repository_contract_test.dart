@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
+import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
@@ -98,6 +99,33 @@ void main() {
       // Assert
       expect(count, 1);
     });
+
+    test(
+      'store records the menu and keeps an analysis already cached',
+      () async {
+        // Arrange
+        final repository = FakeMenuRepository();
+        const ref = VenueRef(source: MenuSource.scan, platformId: 'cafe0001');
+        final menu = Menu(
+          venueRef: ref,
+          currency: 'ILS',
+          fetchedAt: DateTime.utc(2026),
+          categories: const <MenuCategory>[],
+        );
+        const analysis = MenuAnalysisFailed(
+          reason: MenuAnalysisFailureReason.timeout,
+        );
+        await repository.store(menu);
+        await repository.saveAnalysis(ref, analysis);
+
+        // Act
+        await repository.store(menu);
+
+        // Assert
+        expect(repository.storedMenus, [menu, menu]);
+        expect((await repository.cached(ref))?.analysis, analysis);
+      },
+    );
 
     test('remove records the ref and drops it from the cache', () async {
       // Arrange

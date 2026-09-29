@@ -29,13 +29,23 @@ abstract interface class MenuRepository {
   /// may be out of date, which two separate results could not express.
   ///
   /// Returns [MenuFetchFailed] with `unsupportedSource` when no registered
-  /// adapter handles [ref]. Never throws.
+  /// adapter handles [ref]. A `MenuSource.scan` ref has no adapter: it is
+  /// answered from the cache alone, `fromCache: true` and never stale, or
+  /// with `scanNotSaved` on a miss, and [forceRefresh] changes nothing for
+  /// it. Never throws.
   Future<MenuFetchResult> load(VenueRef ref, {bool forceRefresh = false});
 
   /// The cached menu and analysis for [ref], fresh or stale, or null on a miss.
   ///
   /// Reads only; never fetches. Never throws — a corrupt entry is a miss.
   Future<CachedMenu?> cached(VenueRef ref);
+
+  /// Stores [menu], a menu the user supplied as text (`MenuSource.scan`),
+  /// under its own `venueRef` so a later [load] serves it. An analysis
+  /// already cached for the same reference is kept, since a scan's
+  /// reference is a fingerprint of its dish text and so names the same
+  /// dishes. Never throws.
+  Future<void> store(Menu menu);
 
   /// Stores [analysis] against the menu already cached for [ref].
   ///
@@ -110,6 +120,7 @@ final class CachedMenuRepository implements MenuRepository {
     VenueRef ref, {
     bool forceRefresh = false,
   }) async {
+    if (ref.source == MenuSource.scan) return await _loadScan(ref);
     final adapter = _adapterFor(ref);
     if (adapter == null) {
       return const MenuFetchFailed(
@@ -137,6 +148,22 @@ final class CachedMenuRepository implements MenuRepository {
         }
         return result;
     }
+  }
+
+  @override
+  Future<void> store(Menu menu) async {
+    final previous = await cache.read(menu.venueRef);
+    await cache.write(_merge(previous: previous, fetched: menu));
+  }
+
+  /// A scan has no platform to ask again, so the cache is its only
+  /// source: served as it is, however old, or a miss the UI can name.
+  Future<MenuFetchResult> _loadScan(VenueRef ref) async {
+    final cached = await cache.read(ref);
+    if (cached == null) {
+      return const MenuFetchFailed(reason: MenuFetchFailureReason.scanNotSaved);
+    }
+    return MenuFetched(menu: cached.menu, fromCache: true);
   }
 
   @override

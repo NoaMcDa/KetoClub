@@ -133,7 +133,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settingsConsentBody =>
-      'ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים תפריט, שמות המנות, התיאורים ושמות התוספות נשלחים לשרת של קטוקלאב, שמעביר אותם לניתוח ב‑Gemini API של Google. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.';
+      'ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות נשלחים לשרת של קטוקלאב, שמעביר אותם לניתוח ב‑Gemini API של Google. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.';
 
   @override
   String get settingsConsentAccept => 'אפשר ניתוח בינה מלאכותית';
@@ -146,7 +146,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settingsConsentBodyDirect =>
-      'ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים תפריט, שמות המנות, התיאורים ושמות התוספות נשלחים ישירות מהמכשיר הזה ל‑Gemini API של Google, עם מפתח ה‑API שלכם. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.';
+      'ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות נשלחים ישירות מהמכשיר הזה ל‑Gemini API של Google, עם מפתח ה‑API שלכם. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.';
 
   @override
   String get settingsKeySection => 'מפתח Gemini API';
@@ -437,13 +437,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get navSettings => 'הגדרות';
-
-  @override
-  String get scanPlaceholderTitle => 'סריקת תפריט';
-
-  @override
-  String get scanPlaceholderBody =>
-      'צילום תפריט פיזי יתאפשר בעדכון עתידי. בינתיים, הדביקו קישור למשלוח במסך גילוי.';
 
   @override
   String get savedPlaceholderTitle => 'מסעדות שמורות';
@@ -784,4 +777,32 @@ class AppLocalizationsHe extends AppLocalizations {
   String categoryChipSemanticLabel(String category) {
     return 'עברו אל $category';
   }
+
+  @override
+  String get scanTitle => 'סריקת תפריט';
+
+  @override
+  String get scanPasteIntro =>
+      'הדביקו תפריט מכל מקור, מנה בכל שורה. קטוקלאב קורא אותו בדיוק כמו תפריט משלוחים.';
+
+  @override
+  String get scanPasteLabel => 'טקסט התפריט';
+
+  @override
+  String get scanPasteHint =>
+      'סלמון על הגריל\nסלט קיסר, בלי קרוטונים\nפסטה קרבונרה';
+
+  @override
+  String get scanAnalyse => 'נתחו';
+
+  @override
+  String get scanEmptyPaste =>
+      'קטוקלאב לא מצא מנות בטקסט הזה. הדביקו את התפריט עם מנה אחת בכל שורה.';
+
+  @override
+  String get sourceScanned => 'תפריט שהודבק';
+
+  @override
+  String get fetchFailedScanNotSaved =>
+      'התפריט שהודבק כבר לא שמור במכשיר הזה. הדביקו אותו שוב כדי לנתח אותו.';
 }

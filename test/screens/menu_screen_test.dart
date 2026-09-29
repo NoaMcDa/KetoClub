@@ -796,6 +796,7 @@ void main() {
           MenuFetchFailureReason.notFound,
           MenuFetchFailureReason.platformChanged,
           MenuFetchFailureReason.unsupportedSource,
+          MenuFetchFailureReason.scanNotSaved,
         };
 
         for (final reason in MenuFetchFailureReason.values) {
@@ -974,6 +975,32 @@ void main() {
       },
     );
 
+    testWidgets('a scan menu shows no price, no refresh action and a '
+        'Pasted menu header instead of its hash (issue #83)', (tester) async {
+      // Arrange
+      const scanRef = VenueRef(source: MenuSource.scan, platformId: '0badf00d');
+      final repository = FakeMenuRepository()
+        ..stub(
+          scanRef,
+          MenuFetched(
+            menu: _menuOf([_dish('Grilled salmon')], ref: scanRef),
+            fromCache: true,
+          ),
+        );
+      final controller = _controllerFor(repository: repository);
+
+      // Act
+      await _pump(tester, controller, ref: scanRef);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Grilled salmon'), findsOneWidget);
+      expect(find.textContaining('₪'), findsNothing);
+      expect(find.text(_en.sourceScanned), findsOneWidget);
+      expect(find.text('0badf00d'), findsNothing);
+      expect(find.byTooltip(_en.actionRefreshMenu), findsNothing);
+    });
+
     testWidgets('build names the platform matching ref.source in the '
         'failure message', (tester) async {
       // Arrange
@@ -990,6 +1017,10 @@ void main() {
         (
           ref: VenueRef(source: MenuSource.ontopo, platformId: 'd'),
           name: 'Ontopo',
+        ),
+        (
+          ref: VenueRef(source: MenuSource.scan, platformId: 'e'),
+          name: 'Pasted menu',
         ),
       ];
 

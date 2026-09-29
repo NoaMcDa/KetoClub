@@ -110,6 +110,26 @@ final class _ReplaceRecordingObserver extends NavigatorObserver {
 
 void main() {
   group('SavedScreen', () {
+    testWidgets('a pasted menu is titled and labelled Pasted menu, never by '
+        'its hash (issue #83)', (tester) async {
+      // Arrange
+      const scanRef = VenueRef(source: MenuSource.scan, platformId: '0badf00d');
+      final repository = FakeMenuRepository()
+        ..seedCache(
+          CachedMenu(menu: _menuWith(scanRef, DateTime.now().toUtc())),
+        );
+      final controller = SavedController(repository);
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert: the title, and the "{platform} · {age}" line.
+      expect(find.text(_en.sourceScanned), findsOneWidget);
+      expect(find.textContaining('${_en.sourceScanned} · '), findsOneWidget);
+      expect(find.text('0badf00d'), findsNothing);
+    });
+
     for (final entry in {
       'light': AppTheme.light(),
       'dark': AppTheme.dark(),

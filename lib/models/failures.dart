@@ -32,6 +32,12 @@ enum MenuFetchFailureReason {
   /// when a proxy base is configured. Shown as "KetoClub's server could not
   /// be reached, so the menu could not be read."
   backendUnreachable,
+
+  /// The repository was asked for a menu the user supplied as text
+  /// (`MenuSource.scan`) and its cache no longer holds it — a scan has no
+  /// platform to fetch from again (architecture.md D18). Shown as "This
+  /// pasted menu is no longer saved on this device. Paste it again."
+  scanNotSaved,
 }
 
 /// Why menu analysis could not be produced, or fell back to the rules

@@ -46,6 +46,9 @@ final class FakeMenuRepository implements MenuRepository {
   /// How many times [clearCache] has been called.
   int clearCacheCallCount = 0;
 
+  /// Every menu passed to [store], in order.
+  final List<Menu> storedMenus = <Menu>[];
+
   /// Every [VenueRef] passed to [remove], in order.
   final List<VenueRef> removedRefs = <VenueRef>[];
 
@@ -82,6 +85,11 @@ final class FakeMenuRepository implements MenuRepository {
     }
     final stubbed = _stubs[ref.cacheKey] ?? stubAll;
     if (stubbed != null) return stubbed;
+    // Like the real repository, a scan is answered from what was stored.
+    final scanned = _cached[ref.cacheKey];
+    if (ref.source == MenuSource.scan && scanned != null) {
+      return MenuFetched(menu: scanned.menu, fromCache: true);
+    }
     return MenuFetched(
       menu: Menu(
         venueRef: ref,
@@ -89,6 +97,15 @@ final class FakeMenuRepository implements MenuRepository {
         fetchedAt: DateTime.utc(2026),
         categories: const <MenuCategory>[],
       ),
+    );
+  }
+
+  @override
+  Future<void> store(Menu menu) async {
+    storedMenus.add(menu);
+    _cached[menu.venueRef.cacheKey] = CachedMenu(
+      menu: menu,
+      analysis: _cached[menu.venueRef.cacheKey]?.analysis,
     );
   }
 

@@ -595,9 +595,12 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     AppLocalizations l10n,
     VenueRef lastVenue,
   ) {
+    // A pasted menu's id is a hash, not something to show a person.
     final name =
         context.read<VenueSearchController>().lastVenueName ??
-        lastVenue.platformId;
+        (lastVenue.source == MenuSource.scan
+            ? l10n.sourceScanned
+            : lastVenue.platformId);
     return Card(
       margin: EdgeInsets.zero,
       child: ListTile(

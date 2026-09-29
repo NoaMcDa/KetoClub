@@ -12,7 +12,13 @@ enum MenuSource {
   tabit,
 
   /// Ontopo reservations, addressed by venue id. Phase 4.
-  ontopo;
+  ontopo,
+
+  /// A menu the user supplied as text (a paste, later a photographed
+  /// page), addressed by the hex of its dish-text fingerprint. It has no
+  /// platform to fetch from: the cache is its only home (architecture.md
+  /// D18).
+  scan;
 
   /// The source whose [name] equals [wire], or null when none does.
   ///

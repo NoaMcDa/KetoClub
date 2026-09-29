@@ -812,10 +812,10 @@ Screens:
 | Screen | Route | Purpose |
 |---|---|---|
 | `VenueSearchScreen` | `/` | Locate, search, or paste; opens a venue |
-| `MenuScreen` | `/venue/:source/:id` | Classified menu with filters and engine chip |
+| `MenuScreen` | `/venue/:source/:id` | Classified menu with filters and engine chip; `/venue/scan/{id}` opens a pasted menu (D18) |
 | `WaiterCardSheet` | modal | Large-type script with copy |
 | `SettingsScreen` | `/settings` | Key entry, disclosure text, cache clear, language |
-| `ScanScreen` | `/scan` | Placeholder — physical-menu scanning is Phase 4 |
+| `ScanScreen` | `/scan` | A field to paste a menu's text into, and Analyse (D18); photographing a physical menu is still Phase 4 |
 | `SavedScreen` | `/saved` | Placeholder — saving a venue is not built (Phase 3 territory) |
 
 **The bottom-navigation shell** *(issue #11, Phase 1)*, not in this document when
@@ -858,7 +858,7 @@ computable".
 Plain Dart, immutable, no code generation.
 
 ```dart
-enum MenuSource { wolt, tenbis, tabit, ontopo }
+enum MenuSource { wolt, tenbis, tabit, ontopo, scan }   // scan: text the user supplied (D18)
 
 class VenueRef {                       // how we address a venue on a platform
   final MenuSource source;
@@ -1178,6 +1178,7 @@ languages. Collapsing reasons is a bug.
 | `MenuFetch.platformChanged` | adapter, non-JSON / unexpected shape | "{platform} changed its menu format. Please report this." | report |
 | `MenuFetch.unsupportedSource` | repository | "KetoClub cannot read menus from this site yet." | paste text (Phase 4) |
 | `MenuFetch.backendUnreachable` | adapter, `ClientException` reaching the backend itself (D11) | "KetoClub's server could not be reached, so the menu could not be read." | retry, or unset the backend define |
+| `MenuFetch.scanNotSaved` | repository, a `MenuSource.scan` ref whose cache entry is gone (D18) | "This pasted menu is no longer saved on this device. Paste it again to analyse it." | back, paste again |
 | `Analysis.notConfigured` | web only: no backend URL compiled in, or the backend has no Gemini key (D12) | rules result + "AI analysis is not available on this build or server. Showing rule-based results." | none from the app |
 | `Analysis.consentWithheld` | router, consent toggle off (client-only, §11) | rules result + "Allow AI analysis in Settings to analyse this menu. Showing rule-based results." | settings |
 | `Analysis.apiKeyMissing` | phones only: `GeminiChatClient` found no key saved, so nothing was sent (D17) | rules result + "Add your Gemini API key in Settings to analyse this menu. Showing rule-based results." | settings |
@@ -1712,6 +1713,58 @@ their own key's quota rather than the backend's per-install limiter (5/minute,
 cache (#103), so the same menu opened on two phones is two model calls. The
 backend's `/v1/chat` remains the web build's only path to a model, unchanged.
 
+**D18 — Paste-a-menu: a menu can come from text the user supplies, stored
+under `MenuSource.scan`.** *(Issue #83; the first Phase 4 item and the only one
+with no blocker: no OCR, no new dependency, no backend change.)* Text is the one
+classifier input (D5), so a pasted menu needs no engine of its own, only a
+way to become dishes. Three documents already named paste-a-menu as the web
+fallback when a platform blocks the browser (§6, §13); this builds it.
+
+- **The source.** `MenuSource` gains `scan`, the wire value `scan`. A new pure
+  `TextMenuSource.parse(text, {required now})` in `services/menu/text/` turns
+  lines into a `Menu`: lines are trimmed and blank ones dropped; a trailing price
+  (`₪`, `NIS`, `ILS`, or a bare trailing number, one regex in `constants.dart`) is
+  stripped before anything else reads the line, so no price reaches a dish, a
+  prompt or a cache entry; a line ending in `:` is a section header; a line that
+  starts with `-`, `(` or a lowercase letter straight after a dish is that dish's
+  description continued; every other line is a dish with `price: 0`, no options and
+  an id `p1..pN` in line order. At most `maxAnalysedDishes` dishes are kept, and
+  the result is null when none survived. The one refinement of the issue's "a short
+  line before a blank line is a header" is that the line must also stand alone (a
+  blank line, or the start of the text, above it): the last dish of every group is
+  also followed by a blank line, and without this it would read as a header. A paste
+  where every line is separated by a blank one switches the rule off, since every
+  dish would otherwise be a header.
+- **The reference.** A paste's `VenueRef` is `scan/<hex of
+  TextNormaliser.menuFingerprint(menu)>`, eight digits, so the same dishes pasted
+  again are the same cache entry (the price does not enter the fingerprint) and
+  the same prompt, and the backend's `chat_cache` (D12) answers the second one.
+  The fingerprint is 32 bits, so two different pastes could in principle collide
+  and share an entry; at a person's own paste volume that is accepted, and a
+  collision would show as the other paste's dishes, never as an invented dish.
+  `venueName` is null, and the screens read "Pasted menu" (`sourceScanned`)
+  instead of the hash.
+- **The repository.** `MenuRepository` gains `store(Menu)`, which writes the menu
+  under its own ref and keeps an analysis already cached for the same dish text.
+  `CachedMenuRepository.load` answers a `scan` ref from the cache alone, served
+  `fromCache: true` and never stale: there is no platform to ask again, so
+  freshness is meaningless, and `refresh` re-serves the entry. A miss is a new
+  `MenuFetchFailureReason.scanNotSaved` with its own copy in both languages and
+  a back-to-search action rather than Retry, because retrying finds nothing
+  either. Nothing evicts a cache entry by age, so a scan stays until the user
+  removes it from Saved or clears the cache; only then is it `scanNotSaved`.
+- **No price for a scan.** `DishCard` gains `showPrice` (default true), and the
+  menu screen passes `false` for a scan. The share text already carries no price,
+  and the classifier prompt omits it (§9).
+- **The entry point.** The Scan tab's body is a multi-line paste field and an
+  Analyse button (`ScanController`), which stores the parsed menu and pushes
+  `/venue/scan/{id}`; from there the menu is loaded, classified by the router and
+  cached like any other venue. Consent (D16) is unchanged, and Settings' disclosure
+  now says "open or paste". Photo actions around the field arrive with #82.
+- **What it does not do.** No OCR, no language detection beyond what the
+  classifier already does, and no editing of a stored paste: to change one, paste
+  it again. Pasted text is treated exactly as untrusted as a fetched menu.
+
 ---
 
 ## 15. Testing strategy
@@ -1836,7 +1889,8 @@ Extension points already designed in:
 | Future feature | Where it plugs in | What must not change |
 |---|---|---|
 | Tabit, Ontopo | a new `PlatformMenuAdapter` | `Menu` model, classifier |
-| Photographed or PDF menus (Phase 4) | a new source that yields `Menu` from OCR text; the M16 research is the reference | the prompt and parser |
+| Pasted text | **Shipped (D18, issue #83).** `TextMenuSource.parse` yields a `Menu` from lines of text under `MenuSource.scan`; `MenuRepository.store` puts it in the cache | the prompt and parser (unchanged, as predicted) |
+| Photographed or PDF menus (Phase 4) | a new source that yields `Menu` from OCR text, stored the same way under `MenuSource.scan` (D18); the M16 research is the reference | the prompt and parser |
 | Vision-model classification | a second `MenuClassifier`; router chooses | the UI |
 | Custom dietary rules (Tier C) | `ClassificationOptions` → appended to the system prompt and to the rules table | schema |
 | Community ratings, venue directory (Phase 3) | a backend with its own client under `services/community/`; `Venue` gains the README's rating fields | everything above stays client-only |

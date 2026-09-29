@@ -7,9 +7,32 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
+import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
+
+/// A pasted menu (`MenuSource.scan`) for the `store` tests.
+final Menu _scanMenu = Menu(
+  venueRef: const VenueRef(source: MenuSource.scan, platformId: '0badf00d'),
+  currency: 'ILS',
+  fetchedAt: DateTime.utc(2026, 9, 29),
+  categories: const <MenuCategory>[
+    MenuCategory(
+      id: 'pasted',
+      name: 'Pasted menu',
+      dishes: <Dish>[
+        Dish(
+          id: 'p1',
+          name: 'Grilled salmon',
+          description: '',
+          price: 0,
+          options: <DishOption>[],
+        ),
+      ],
+    ),
+  ],
+);
 
 /// Asserts the [MenuRepository] contract against what [build] returns.
 ///
@@ -108,6 +131,42 @@ void runMenuRepositoryContract(
       // Assert: no single-shot state.
       await expectLater(repository.load(refItHandles), completes);
       await expectLater(repository.load(refItHandles), completes);
+    });
+
+    test('store completes and never throws', () async {
+      await expectLater(repository.store(_scanMenu), completes);
+    });
+
+    test('store makes the menu readable through cached', () async {
+      // Act
+      await repository.store(_scanMenu);
+
+      // Assert
+      final entry = await repository.cached(_scanMenu.venueRef);
+      expect(entry?.menu, _scanMenu);
+    });
+
+    test('store makes the menu appear in savedMenus and the count', () async {
+      // Act
+      await repository.store(_scanMenu);
+
+      // Assert
+      final saved = await repository.savedMenus();
+      expect(saved.map((entry) => entry.ref), [_scanMenu.venueRef]);
+      expect(await repository.cachedMenuCount(), 1);
+    });
+
+    test('a stored scan menu is loaded from the cache', () async {
+      // Arrange
+      await repository.store(_scanMenu);
+
+      // Act
+      final result = await repository.load(_scanMenu.venueRef);
+
+      // Assert
+      expect(result, isA<MenuFetched>());
+      expect((result as MenuFetched).menu, _scanMenu);
+      expect(result.fromCache, isTrue);
     });
 
     test('savedMenus resolves without throwing', () async {

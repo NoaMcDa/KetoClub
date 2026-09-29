@@ -14,6 +14,23 @@ void main() {
       expect(result, equals(MenuSource.wolt));
     });
 
+    test('tryParse reads the scan source from its wire value', () {
+      // Assert: a pasted menu's cache key and route both spell it `scan`.
+      expect(MenuSource.tryParse('scan'), MenuSource.scan);
+    });
+
+    test('a scan VenueRef round-trips through its JSON form', () {
+      // Arrange
+      const ref = VenueRef(source: MenuSource.scan, platformId: '0badf00d');
+
+      // Act
+      final decoded = VenueRef.tryFrom(ref.toJson());
+
+      // Assert
+      expect(decoded, ref);
+      expect(ref.cacheKey, 'scan/0badf00d');
+    });
+
     test('tryParse returns null for an unknown string', () {
       // Arrange
       const wire = 'doordash';

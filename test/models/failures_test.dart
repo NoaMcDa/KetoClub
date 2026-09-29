@@ -12,6 +12,7 @@ void main() {
         'platformChanged',
         'unsupportedSource',
         'backendUnreachable',
+        'scanNotSaved',
       ];
 
       // Act

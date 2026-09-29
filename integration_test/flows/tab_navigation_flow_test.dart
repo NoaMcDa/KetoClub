@@ -40,7 +40,7 @@ void main() {
         await tapAndSettle(tester, navDestination(_en.navScan));
 
         // Assert
-        expect(find.text(_en.scanPlaceholderTitle), findsOneWidget);
+        expect(find.text(_en.scanTitle), findsOneWidget);
 
         // Act: Saved.
         await tapAndSettle(tester, navDestination(_en.navSaved));
