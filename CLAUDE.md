@@ -171,7 +171,8 @@ lib/
 │   ├── venue/                 # venue_ref_resolver (paste-a-URL, pure), venue_search_service
 │   │                          # (interface), wolt/ (WoltVenueSearchService + mapper, issue #39)
 │   ├── menu/                  # platform_menu_adapter, menu_repository, wolt/ and tenbis/
-│   │                          # (each split HTTP-adapter + pure mapper, proxyBase, D11)
+│   │                          # (each split HTTP-adapter + pure mapper, proxyBase, D11),
+│   │                          # text/ (paste, D18), website/ (a restaurant's own site, D19)
 │   └── classifier/            # menu_classifier, heuristic, llm, router, prompt, parser
 ├── theme/                     # app_tokens, verdict_colors, app_typography, app_theme
 ├── state/                     # app_dependencies, locale_controller + one ChangeNotifier per
@@ -193,7 +194,7 @@ tool/                          # check.sh (the gate), coverage_gate.sh, gen_cove
                                 # record_wolt_fixture.sh (issue #22)
 
 backend/                       # optional local FastAPI service (D11, D12) — see backend/README.md
-├── app/                       # main.py, config.py, routers/ (health, proxy, chat), services/
+├── app/                       # main.py, config.py, routers/ (health, proxy, chat, website), services/
 ├── tests/                     # respx-mocked; no real network call
 └── check.sh                   # mirrors tool/check.sh; its own required CI job
 ```
@@ -366,11 +367,11 @@ for what Phase 3's remaining milestone (#105–#108) and Phase 4 pick up next.
   adapter registered for each (`di.dart`). The `PlatformMenuAdapter`
   interface and its shared contract suite already exist, so a new platform is
   a new adapter plus a registration in `di.dart`.
-- OCR and the photographed-menu path (Phase 4), and community features — venue
-  ratings, reviews, submissions (Phase 3, `backend_plan.md` §5's milestone C).
-  The Scan bottom-nav tab is still only a localized placeholder screen (issue
-  #11) explaining that — Saved is no longer a placeholder alongside it; it
-  became a real cached-menus tab in Phase 2 (issue #48; `saved_screen.dart`).
+- Menus reached from a QR code (#182), the last of menu scanning's sources
+  (Phase 4). A restaurant's own website is built (#181, `architecture.md` D19):
+  paste any restaurant URL on Explore. There is no on-device OCR by design
+  (D15). Also not built: community features — venue ratings, reviews,
+  submissions (Phase 3, `backend_plan.md` §5's milestone C).
 - Backend hosting beyond `localhost` (issue #109, `architecture.md` §17.6). The
   backend is designed to be run locally by whoever has the repository checked
   out; nothing yet says where it runs for anyone else.
@@ -419,6 +420,12 @@ Built, but not confirmed end to end, and not to be reported as done:
 - **The 10bis fixture is synthetic** (`tenbis_synthetic_menu.json`; issue #44,
   tracked separately from #22). `www.10bis.co.il` is blocked the same way; see
   `test/fixtures/README.md` for the curl to run once a machine can reach it.
+- **Website menus (#181, D19) have never read a real restaurant site.** The
+  locator, page reader and both fetchers are tested against synthetic HTML
+  (`test/fixtures/website/`) and mocked HTTP only; no browser has run the web
+  path and no phone the direct one. How often real Israeli sites carry
+  JSON-LD menus, link a menu page or PDF, or render only with JavaScript is
+  unmeasured, and a website PDF has never been sent to Gemini.
 - **No physical iOS or Android device has ever run this app.** Screen-brightness
   raising for the Waiter Card in particular is evidenced only by a mocked method
   channel and a fake, and the location-permission prompt (approximate/precise on
@@ -453,7 +460,7 @@ Built, but not confirmed end to end, and not to be reported as done:
    recordings and phone run in "What is NOT verified yet" above. What's next
    is Phase 3's remaining milestone (community database, reviews, submissions;
    `backend_plan.md` §5 milestone C, issues #105–#108). §14 has the decisions
-   log D1–D17, §17 the open questions with the default the code follows.
+   log D1–D19, §17 the open questions with the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing
