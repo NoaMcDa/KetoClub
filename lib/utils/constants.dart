@@ -1535,3 +1535,27 @@ const String dietaryRuleWhyEn =
 const String dietaryRuleWhyHe =
     'המנה מתאימה לקטו, אבל לא לאחד הכללים שהפעלתם '
     'בהגדרות. בקשו את השינוי שמופיע כאן.';
+
+// ---------------------------------------------------------------------------
+// Pasted menus (architecture.md D18; issue #83)
+// ---------------------------------------------------------------------------
+
+/// A price a pasted line ends with, for `TextMenuSource` to strip: an
+/// optional separator (`-`, an en or em dash, `:`), an optional leading
+/// `₪`, the number (`45`, `45.90`, `45,90`) and an optional trailing `₪`,
+/// `NIS` or `ILS`, anchored at the end of the line.
+///
+/// A bare trailing number counts as a price, so `Steak 300` loses its
+/// `300`; that is the deliberate trade for never letting a price into the
+/// text the classifier reads. The token must follow whitespace, a
+/// separator or the start of the line, so a digit inside a word (`B12`)
+/// is left alone. Matched case-insensitively.
+final RegExp pastedPriceSuffix = RegExp(
+  r'(?:^|\s+|\s*[-–—:]\s*)(?:₪\s*)?\d+(?:[.,]\d{1,2})?'
+  r'(?:\s*(?:₪|NIS|ILS))?\s*$',
+  caseSensitive: false,
+);
+
+/// The most words a line may have and still be read as a section header
+/// when it is followed by a blank line (`TextMenuSource`).
+const int pastedHeaderMaxWords = 4;

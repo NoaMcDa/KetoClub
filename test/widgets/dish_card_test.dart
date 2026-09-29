@@ -58,6 +58,29 @@ void main() {
       expect(find.text(formatPrice(64, localeTag: 'en')), findsOneWidget);
     });
 
+    testWidgets('build hides the price when showPrice is false', (
+      tester,
+    ) async {
+      // Arrange
+      final row = DishRow(dish: _dish(), category: 'Pasted menu');
+
+      // Act
+      await _pump(
+        tester,
+        DishCard(
+          row: row,
+          localeTag: 'en',
+          onShowScript: (_) {},
+          showPrice: false,
+        ),
+      );
+
+      // Assert: a pasted menu's price is not real, so none is drawn.
+      expect(find.text(formatPrice(64, localeTag: 'en')), findsNothing);
+      expect(find.textContaining('₪'), findsNothing);
+      expect(find.text('Grilled Salmon'), findsOneWidget);
+    });
+
     testWidgets(
       'build starts a modifiable row collapsed, with the full-sheet button '
       'visible either way',

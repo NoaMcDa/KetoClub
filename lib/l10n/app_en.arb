@@ -55,11 +55,11 @@
   "waiterCardTitle": "Say this to the waiter",
 
   "settingsConsentTitle": "What leaves this device",
-  "settingsConsentBody": "AI analysis is on by default: when you open a menu, dish names, descriptions and option labels are sent to KetoClub's server, which forwards them to Google's Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.",
+  "settingsConsentBody": "AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels are sent to KetoClub's server, which forwards them to Google's Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.",
   "settingsConsentAccept": "Allow AI analysis",
   "consentDisclosureOk": "OK",
   "consentDisclosureTurnOff": "Turn off",
-  "settingsConsentBodyDirect": "AI analysis is on by default: when you open a menu, dish names, descriptions and option labels are sent straight from this device to Google's Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.",
+  "settingsConsentBodyDirect": "AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels are sent straight from this device to Google's Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.",
   "settingsKeySection": "Gemini API key",
   "settingsKeyBody": "On this phone, AI analysis calls Google's Gemini API directly with your own key. You can create one for free in Google AI Studio. It is kept in this device's secure storage and sent only to Google.",
   "settingsKeyHint": "Paste your Gemini API key",
@@ -181,8 +181,6 @@
   "navScan": "Scan",
   "navSaved": "Saved",
   "navSettings": "Settings",
-  "scanPlaceholderTitle": "Scan a menu",
-  "scanPlaceholderBody": "Photographing a physical menu is coming in a later update. For now, paste a delivery link on Explore.",
   "savedPlaceholderTitle": "Saved venues",
   "savedPlaceholderBody": "Open a venue's menu and it appears here automatically, available for a day — even offline.",
   "savedLoading": "Loading your saved menus…",
@@ -332,5 +330,14 @@
   "categoryChipSemanticLabel": "Jump to {category}",
   "@categoryChipSemanticLabel": {
     "placeholders": { "category": { "type": "String" } }
-  }
+  },
+
+  "scanTitle": "Scan a menu",
+  "scanPasteIntro": "Paste a menu from anywhere, one dish per line. KetoClub reads it the same way it reads a delivery menu.",
+  "scanPasteLabel": "Menu text",
+  "scanPasteHint": "Grilled salmon\nCaesar salad, no croutons\nPasta carbonara",
+  "scanAnalyse": "Analyse",
+  "scanEmptyPaste": "KetoClub found no dishes in that text. Paste the menu with one dish per line.",
+  "sourceScanned": "Pasted menu",
+  "fetchFailedScanNotSaved": "This pasted menu is no longer saved on this device. Paste it again to analyse it."
 }

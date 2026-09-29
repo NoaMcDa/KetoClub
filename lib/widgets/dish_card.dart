@@ -30,6 +30,7 @@ class DishCard extends StatefulWidget {
     required this.onShowScript,
     this.note,
     this.onEditNote,
+    this.showPrice = true,
     super.key,
   });
 
@@ -54,6 +55,11 @@ class DishCard extends StatefulWidget {
   /// hides the note affordance entirely, so every existing call site that
   /// predates this field renders exactly as it did before.
   final ValueChanged<DishRow>? onEditNote;
+
+  /// Whether the dish's price is drawn. False for a pasted menu, whose
+  /// prices were stripped before classification and are not real (issue
+  /// #83, architecture.md D18); true everywhere else.
+  final bool showPrice;
 
   @override
   State<DishCard> createState() => _DishCardState();
@@ -140,13 +146,14 @@ class _DishCardState extends State<DishCard> {
           runSpacing: 4,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            Text(
-              formatPrice(dish.price, localeTag: widget.localeTag),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w700,
+            if (widget.showPrice)
+              Text(
+                formatPrice(dish.price, localeTag: widget.localeTag),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
             if (netCarbs != null && tone != null && verdict != null)
               _NetCarbsChip(
                 estimate: netCarbs,

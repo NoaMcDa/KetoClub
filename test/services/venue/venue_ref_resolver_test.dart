@@ -219,9 +219,13 @@ void main() {
       );
     });
 
-    test('returns null for Tabit and Ontopo, which have no known URL form '
-        'yet', () {
-      for (final source in [MenuSource.tabit, MenuSource.ontopo]) {
+    test('returns null for Tabit, Ontopo and a scan, which have no known '
+        'URL form', () {
+      for (final source in [
+        MenuSource.tabit,
+        MenuSource.ontopo,
+        MenuSource.scan,
+      ]) {
         // Act
         final url = VenueRefResolver.platformUrl(
           VenueRef(source: source, platformId: 'anything'),

@@ -250,6 +250,14 @@ final class FlowFakeMenuRepository implements MenuRepository {
     VenueRef ref, {
     bool forceRefresh = false,
   }) async {
+    // A pasted menu is answered from the cache alone, as the real
+    // repository does (architecture.md D18).
+    if (ref.source == MenuSource.scan) {
+      final scanned = _cached[ref.cacheKey];
+      return scanned == null
+          ? const MenuFetchFailed(reason: MenuFetchFailureReason.scanNotSaved)
+          : MenuFetched(menu: scanned.menu, fromCache: true);
+    }
     final stubbed = _stubs[ref.cacheKey];
     if (stubbed == null) {
       return const MenuFetchFailed(
@@ -277,6 +285,14 @@ final class FlowFakeMenuRepository implements MenuRepository {
       );
     }
     return stubbed;
+  }
+
+  @override
+  Future<void> store(Menu menu) async {
+    _cached[menu.venueRef.cacheKey] = CachedMenu(
+      menu: menu,
+      analysis: _cached[menu.venueRef.cacheKey]?.analysis,
+    );
   }
 
   @override

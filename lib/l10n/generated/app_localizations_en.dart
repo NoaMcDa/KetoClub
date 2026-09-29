@@ -132,7 +132,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsConsentBody =>
-      'AI analysis is on by default: when you open a menu, dish names, descriptions and option labels are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.';
+      'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.';
 
   @override
   String get settingsConsentAccept => 'Allow AI analysis';
@@ -145,7 +145,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsConsentBodyDirect =>
-      'AI analysis is on by default: when you open a menu, dish names, descriptions and option labels are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.';
+      'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.';
 
   @override
   String get settingsKeySection => 'Gemini API key';
@@ -435,13 +435,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get navSettings => 'Settings';
-
-  @override
-  String get scanPlaceholderTitle => 'Scan a menu';
-
-  @override
-  String get scanPlaceholderBody =>
-      'Photographing a physical menu is coming in a later update. For now, paste a delivery link on Explore.';
 
   @override
   String get savedPlaceholderTitle => 'Saved venues';
@@ -779,4 +772,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String categoryChipSemanticLabel(String category) {
     return 'Jump to $category';
   }
+
+  @override
+  String get scanTitle => 'Scan a menu';
+
+  @override
+  String get scanPasteIntro =>
+      'Paste a menu from anywhere, one dish per line. KetoClub reads it the same way it reads a delivery menu.';
+
+  @override
+  String get scanPasteLabel => 'Menu text';
+
+  @override
+  String get scanPasteHint =>
+      'Grilled salmon\nCaesar salad, no croutons\nPasta carbonara';
+
+  @override
+  String get scanAnalyse => 'Analyse';
+
+  @override
+  String get scanEmptyPaste =>
+      'KetoClub found no dishes in that text. Paste the menu with one dish per line.';
+
+  @override
+  String get sourceScanned => 'Pasted menu';
+
+  @override
+  String get fetchFailedScanNotSaved =>
+      'This pasted menu is no longer saved on this device. Paste it again to analyse it.';
 }

@@ -34,6 +34,7 @@ String fetchFailureMessage(
   MenuFetchFailureReason.unsupportedSource => l10n.fetchFailedUnsupportedSource,
   MenuFetchFailureReason.backendUnreachable =>
     l10n.fetchFailedBackendUnreachable,
+  MenuFetchFailureReason.scanNotSaved => l10n.fetchFailedScanNotSaved,
 };
 
 /// The message for a menu-analysis failure (architecture.md §10).

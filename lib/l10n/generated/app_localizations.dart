@@ -323,7 +323,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsConsentBody.
   ///
   /// In en, this message translates to:
-  /// **'AI analysis is on by default: when you open a menu, dish names, descriptions and option labels are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.'**
+  /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.'**
   String get settingsConsentBody;
 
   /// No description provided for @settingsConsentAccept.
@@ -347,7 +347,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsConsentBodyDirect.
   ///
   /// In en, this message translates to:
-  /// **'AI analysis is on by default: when you open a menu, dish names, descriptions and option labels are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.'**
+  /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.'**
   String get settingsConsentBodyDirect;
 
   /// No description provided for @settingsKeySection.
@@ -817,18 +817,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settings'**
   String get navSettings;
-
-  /// No description provided for @scanPlaceholderTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan a menu'**
-  String get scanPlaceholderTitle;
-
-  /// No description provided for @scanPlaceholderBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Photographing a physical menu is coming in a later update. For now, paste a delivery link on Explore.'**
-  String get scanPlaceholderBody;
 
   /// No description provided for @savedPlaceholderTitle.
   ///
@@ -1315,6 +1303,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Jump to {category}'**
   String categoryChipSemanticLabel(String category);
+
+  /// No description provided for @scanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan a menu'**
+  String get scanTitle;
+
+  /// No description provided for @scanPasteIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste a menu from anywhere, one dish per line. KetoClub reads it the same way it reads a delivery menu.'**
+  String get scanPasteIntro;
+
+  /// No description provided for @scanPasteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu text'**
+  String get scanPasteLabel;
+
+  /// No description provided for @scanPasteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Grilled salmon\nCaesar salad, no croutons\nPasta carbonara'**
+  String get scanPasteHint;
+
+  /// No description provided for @scanAnalyse.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyse'**
+  String get scanAnalyse;
+
+  /// No description provided for @scanEmptyPaste.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub found no dishes in that text. Paste the menu with one dish per line.'**
+  String get scanEmptyPaste;
+
+  /// No description provided for @sourceScanned.
+  ///
+  /// In en, this message translates to:
+  /// **'Pasted menu'**
+  String get sourceScanned;
+
+  /// No description provided for @fetchFailedScanNotSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'This pasted menu is no longer saved on this device. Paste it again to analyse it.'**
+  String get fetchFailedScanNotSaved;
 }
 
 class _AppLocalizationsDelegate

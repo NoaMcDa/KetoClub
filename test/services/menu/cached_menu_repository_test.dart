@@ -67,6 +67,137 @@ void main() {
     refItRejects: _tenbisRef,
   );
 
+  group('CachedMenuRepository scan menus (issue #83)', () {
+    const scanRef = VenueRef(source: MenuSource.scan, platformId: 'cafe0001');
+    late FakePlatformMenuAdapter adapter;
+    late FakeMenuCache cache;
+    late FakeClock clock;
+    late CachedMenuRepository repository;
+
+    setUp(() {
+      adapter = FakePlatformMenuAdapter();
+      cache = FakeMenuCache();
+      clock = FakeClock(_epoch);
+      repository = CachedMenuRepository(
+        adapters: [adapter],
+        cache: cache,
+        clock: clock,
+        freshFor: _freshFor,
+      );
+    });
+
+    test('store writes the menu under its own ref', () async {
+      // Arrange
+      final menu = _menuWith(scanRef, clock.now());
+
+      // Act
+      await repository.store(menu);
+
+      // Assert
+      expect((await cache.read(scanRef))?.menu, menu);
+    });
+
+    test('load serves a stored scan menu from the cache', () async {
+      // Arrange
+      final menu = _menuWith(scanRef, clock.now());
+      await repository.store(menu);
+
+      // Act
+      final result = await repository.load(scanRef);
+
+      // Assert
+      expect(result, equals(MenuFetched(menu: menu, fromCache: true)));
+      expect(adapter.fetchCalls, isEmpty);
+    });
+
+    test('load never marks a scan menu stale, however old', () async {
+      // Arrange
+      final menu = _menuWith(scanRef, clock.now());
+      await repository.store(menu);
+      clock.advance(_freshFor * 100);
+
+      // Act
+      final result = await repository.load(scanRef);
+
+      // Assert
+      expect(result, equals(MenuFetched(menu: menu, fromCache: true)));
+      expect((result as MenuFetched).staleReason, isNull);
+      expect(adapter.fetchCalls, isEmpty);
+    });
+
+    test('load of a scan menu that was never stored is scanNotSaved', () async {
+      // Act
+      final result = await repository.load(scanRef);
+
+      // Assert
+      expect(
+        result,
+        const MenuFetchFailed(reason: MenuFetchFailureReason.scanNotSaved),
+      );
+      expect(adapter.fetchCalls, isEmpty);
+    });
+
+    test('a scan menu removed from the cache is scanNotSaved again', () async {
+      // Arrange
+      await repository.store(_menuWith(scanRef, clock.now()));
+      await repository.remove(scanRef);
+
+      // Act
+      final result = await repository.load(scanRef);
+
+      // Assert
+      expect(result, isA<MenuFetchFailed>());
+    });
+
+    test(
+      'load with forceRefresh re-serves the cache for a scan menu',
+      () async {
+        // Arrange
+        final menu = _menuWith(scanRef, clock.now());
+        await repository.store(menu);
+
+        // Act: the refresh button and pull-to-refresh both come here.
+        final result = await repository.load(scanRef, forceRefresh: true);
+
+        // Assert
+        expect(result, equals(MenuFetched(menu: menu, fromCache: true)));
+        expect(adapter.fetchCalls, isEmpty);
+      },
+    );
+
+    test('storing the same paste again keeps its analysis', () async {
+      // Arrange
+      await repository.store(_menuWith(scanRef, clock.now()));
+      await repository.saveAnalysis(scanRef, _someAnalysis);
+      clock.advance(const Duration(days: 3));
+      final again = _menuWith(scanRef, clock.now());
+
+      // Act
+      await repository.store(again);
+
+      // Assert: same dish text, same fingerprint, so same analysis; only
+      // the stamp moves.
+      final entry = await cache.read(scanRef);
+      expect(entry?.menu.fetchedAt, again.fetchedAt);
+      expect(entry?.analysis, _someAnalysis);
+    });
+
+    test(
+      'storing different dishes under a ref drops the old analysis',
+      () async {
+        // Arrange
+        await repository.store(_menuWith(scanRef, clock.now()));
+        await repository.saveAnalysis(scanRef, _someAnalysis);
+
+        // Act
+        await repository.store(_menuWith(scanRef, clock.now(), dishText: 'B'));
+
+        // Assert
+        expect((await cache.read(scanRef))?.analysis, isNull);
+      },
+    );
+  });
+
   group('CachedMenuRepository', () {
     late FakePlatformMenuAdapter adapter;
     late FakeMenuCache cache;

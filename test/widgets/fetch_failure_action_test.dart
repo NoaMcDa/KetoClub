@@ -56,6 +56,7 @@ void main() {
       MenuFetchFailureReason.notFound,
       MenuFetchFailureReason.platformChanged,
       MenuFetchFailureReason.unsupportedSource,
+      MenuFetchFailureReason.scanNotSaved,
     ]) {
       testWidgets(
         'renders a Back to search button that calls onBackToSearch for '

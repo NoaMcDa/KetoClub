@@ -183,7 +183,8 @@ abstract final class VenueRefResolver {
 
   /// The venue's own page on the platform [ref] names, for an "open on
   /// {platform}" action in the menu header (issue #53) — or null when
-  /// [VenueRef.source] has no known URL form yet (Tabit, Ontopo).
+  /// [VenueRef.source] has no known URL form (Tabit, Ontopo, and a scan,
+  /// which has no platform page at all).
   ///
   /// Pure, like [resolve]: no I/O, so a caller can decide whether to show
   /// the button the instant a menu loads. Round-trips through [resolve]
@@ -194,6 +195,6 @@ abstract final class VenueRefResolver {
   static Uri? platformUrl(VenueRef ref) => switch (ref.source) {
     MenuSource.wolt => _woltUrl(ref.platformId),
     MenuSource.tenbis => _tenBisUrl(ref.platformId),
-    MenuSource.tabit || MenuSource.ontopo => null,
+    MenuSource.tabit || MenuSource.ontopo || MenuSource.scan => null,
   };
 }

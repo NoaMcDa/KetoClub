@@ -42,12 +42,17 @@ import 'package:provider/provider.dart';
 /// language KetoClub supports, so it is not translatable prose — the ARB
 /// files already embed the same names verbatim (e.g. `venueSearchHint`'s
 /// "Wolt") rather than parameterising them.
-String _platformName(MenuSource source) => switch (source) {
-  MenuSource.wolt => 'Wolt',
-  MenuSource.tenbis => '10bis',
-  MenuSource.tabit => 'Tabit',
-  MenuSource.ontopo => 'Ontopo',
-};
+///
+/// The one exception is a pasted menu, which has no brand and so reads
+/// [AppLocalizations.sourceScanned] ("Pasted menu").
+String _platformName(MenuSource source, AppLocalizations l10n) =>
+    switch (source) {
+      MenuSource.wolt => 'Wolt',
+      MenuSource.tenbis => '10bis',
+      MenuSource.tabit => 'Tabit',
+      MenuSource.ontopo => 'Ontopo',
+      MenuSource.scan => l10n.sourceScanned,
+    };
 
 /// The bucketed "time ago" phrase for [fetchedAt] relative to [now]
 /// (issue #29's persistent source line): "just now" under a minute, then
@@ -234,8 +239,7 @@ class _MenuScreenState extends State<MenuScreen> {
     final analysis = controller.analysis;
     if (menu == null || analysis is! MenuAnalysed) return;
     final text = MenuShareText.build(
-      venueName:
-          controller.venueName ?? widget.venueNameHint ?? widget.ref.platformId,
+      venueName: _displayName(controller, AppLocalizations.of(context)!),
       menu: menu,
       analysis: analysis,
     );
@@ -296,7 +300,7 @@ class _MenuScreenState extends State<MenuScreen> {
     final message = fetchFailureMessage(
       failure,
       l10n,
-      platform: _platformName(widget.ref.source),
+      platform: _platformName(widget.ref.source, l10n),
       statusCode: controller.fetchStatusCode,
     );
     return Center(
@@ -488,6 +492,16 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
+  /// The name the header and the shared text give the venue: the menu's
+  /// own, the hint a venue card passed, else the reference — except for a
+  /// pasted menu, whose reference is a hash and reads as "Pasted menu".
+  String _displayName(MenuController controller, AppLocalizations l10n) {
+    final fallback = widget.ref.source == MenuSource.scan
+        ? l10n.sourceScanned
+        : widget.ref.platformId;
+    return controller.venueName ?? widget.venueNameHint ?? fallback;
+  }
+
   /// The venue name and keto score (issue #29's header row,
   /// `.design/Main.dc.html`).
   ///
@@ -501,8 +515,7 @@ class _MenuScreenState extends State<MenuScreen> {
     AppLocalizations l10n,
     MenuController controller,
   ) {
-    final name =
-        controller.venueName ?? widget.venueNameHint ?? widget.ref.platformId;
+    final name = _displayName(controller, l10n);
     final theme = Theme.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -552,17 +565,20 @@ class _MenuScreenState extends State<MenuScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          l10n.menuSourceLine(_platformName(widget.ref.source), age),
+          l10n.menuSourceLine(_platformName(widget.ref.source, l10n), age),
           style: Theme.of(context).textTheme.bodySmall,
         ),
-        IconButton(
-          icon: const Icon(Icons.refresh, size: 16),
-          tooltip: l10n.actionRefreshMenu,
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-          visualDensity: VisualDensity.compact,
-          onPressed: () => _retry(controller.refresh),
-        ),
+        // A pasted menu has no platform to ask again, so a refresh would
+        // only re-serve the same cache entry.
+        if (widget.ref.source != MenuSource.scan)
+          IconButton(
+            icon: const Icon(Icons.refresh, size: 16),
+            tooltip: l10n.actionRefreshMenu,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            visualDensity: VisualDensity.compact,
+            onPressed: () => _retry(controller.refresh),
+          ),
         ?_openOnPlatformAction(l10n),
       ],
     );
@@ -583,7 +599,9 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget? _openOnPlatformAction(AppLocalizations l10n) {
     final url = VenueRefResolver.platformUrl(widget.ref);
     if (url == null) return null;
-    final label = l10n.menuOpenOnPlatform(_platformName(widget.ref.source));
+    final label = l10n.menuOpenOnPlatform(
+      _platformName(widget.ref.source, l10n),
+    );
     return IconButton(
       icon: const Icon(Icons.open_in_new, size: 18),
       tooltip: label,
@@ -765,7 +783,7 @@ class _MenuScreenState extends State<MenuScreen> {
         fetchFailureMessage(
           staleReason,
           l10n,
-          platform: _platformName(widget.ref.source),
+          platform: _platformName(widget.ref.source, l10n),
         ),
       );
     }
@@ -807,6 +825,7 @@ class _MenuScreenState extends State<MenuScreen> {
             onShowScript: (shown) => unawaited(_openWaiterCard(shown)),
             note: controller.noteFor(row.dish.id),
             onEditNote: (edited) => unawaited(_openNoteEditor(edited)),
+            showPrice: widget.ref.source != MenuSource.scan,
           ),
         ),
       );
