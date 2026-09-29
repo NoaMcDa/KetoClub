@@ -383,7 +383,9 @@ Roadmap & Milestone Tracking
       against fakes only.
     * [x] Menus from a restaurant's own website (#181, D19): paste any restaurant
       URL; its JSON-LD menu, menu page or PDF is found and classified.
-    * [ ] Menus from a QR code (#182).
+    * [x] Menus from a QR code (#182): the Scan tab's "Scan QR code" reads a table's
+      code and opens a Wolt, 10bis, website or PDF menu; Tabit says it is not
+      supported yet.
     * [x] Configurable dietary rules: strict seed-oil free, dairy-free keto and
       carnivore-only toggles in Settings (issue #56). Shipped earlier, under
       Phase 2; a pesco-keto mode was not built.

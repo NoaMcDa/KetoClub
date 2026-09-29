@@ -173,17 +173,21 @@ stored under `MenuSource.scan` and opened at `/venue/scan/{id}` like any venue:
 - **No on-device OCR** (D15; #81 closed as not planned): Gemini reads the page
   itself, so a misread column cannot be lost before classification starts.
 
-Also shipped: flow tests for the three scan paths (**#84**) and menus read
+Also shipped: flow tests for the three scan paths (**#84**), menus read
 from a restaurant's own website (**#181**, D19: paste any restaurant URL; the
 backend's `POST /v1/website/fetch` on web, a direct fetch on phones, a PDF
-read by the vision path). Still open in that milestone: **#88** the
-person-run Gemini vision smoke test (`backend/tools/vision_smoke.py`) and
-**#182** QR codes. Configurable dietary rules, which the roadmap once listed under
+read by the vision path), and a table's QR code (**#182**: the Scan tab's
+"Scan QR code" reads it with the camera through `MobileQrScanner`, and the
+pure `QrPayloadRouter` sends a Wolt, 10bis, website or PDF link to that menu,
+says Tabit is not supported yet, and suggests photographing the menu for
+Instagram, Linktree or a non-link code). Still open in that milestone: **#88**
+the person-run Gemini vision smoke test (`backend/tools/vision_smoke.py`).
+Configurable dietary rules, which the roadmap once listed under
 Phase 4, had already shipped under Phase 2 (#56, #143).
 
 What is **not** built: Tabit and Ontopo adapters — Wolt and 10bis both ship
 now, with an adapter registered in `di.dart` for each, and so does a
-restaurant's own website (D19); QR-code scanning (#182); Phase 3's
+restaurant's own website (D19) and a scanned QR code (#182); Phase 3's
 community database, user reviews and venue submissions (`backend_plan.md` §5
 milestone C, issues #105–#108); and hosting the backend anywhere beyond
 `localhost` (issue #109). None of it is stubbed — the files simply do not
