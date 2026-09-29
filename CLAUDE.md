@@ -6,8 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **KetoClub** is a restaurant menu analysis platform designed to help keto dieters find safe dining options. The app ingests live menus from restaurant delivery platforms, classifies dishes by keto-compatibility, and generates automatic waiter instructions for modifications.
 
-> **Status: Phase 1 and Phase 2 are built and merged, and Phase 3 backend
-> foundations and hosted classification have landed underneath both.**
+> **Status: Phase 1 and Phase 2 are built and merged, Phase 3 backend
+> foundations and hosted classification have landed underneath both, and
+> Phase 4 ("Menu Scanning") has its core built.**
 > Build-order steps 1–7 of `architecture.md` §16 (models and service
 > contracts, the bilingual heuristic engine, Wolt ingestion with a Hive
 > cache, the classified menu screen and Waiter Card, the LLM client with its
@@ -29,7 +30,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > `flutter_secure_storage`, and the backend serves the web build only. Three earlier decisions were reversed in the Phase 1 close-out pass
 > (`architecture.md`): D10 reinstates `Connectivity`, §17.4 now renders
 > `net_carbs_estimate` as a labelled chip, and §6.6's collapsed red-dish group
-> is gone — the verdict counter tiles are the filter now.
+> is gone — the verdict counter tiles are the filter now. Phase 4's core has
+> shipped on top: a menu no platform serves can come from text pasted into the
+> Scan tab (`TextMenuSource`, D18), or from photographs or a PDF that Gemini
+> reads and classifies in one request (D15 — image parts on `/v1/chat` and on
+> both chat clients, `VisionMenuClassifier` behind `RoutingScannedMenuClassifier`,
+> the Scan tab's photo/gallery/PDF pickers). There is no on-device OCR. Website
+> menus (#181) and QR codes (#182) are not built, and no real Gemini request
+> carrying images has been sent yet (#88).
 >
 > **Read `architecture.md` first — it is authoritative.** This file and `README.md`
 > predate the code in places; where any of them disagrees with `architecture.md`,
@@ -138,15 +146,17 @@ Three core entities:
   in the UI as a labelled "estimate" chip, never a bare number — see
   `architecture.md` §17.4, reversed in this pass from "never rendered"
 
-Future additions: user ratings, review feedback loop, OCR/vision processing for physical menus.
+Future additions: user ratings and a review feedback loop. A scanned or pasted
+menu is stored under `MenuSource.scan` (D18) and is otherwise an ordinary `Menu`
+(no venue, no prices).
 
 ## Development Workflow
 
 ### Current status
 
-Phase 1 and Phase 2 are built and merged, and Phase 3 backend foundations and
-hosted classification have landed underneath both (see the banner at the
-top). The repository holds a working Flutter app, an optional local FastAPI
+Phase 1 and Phase 2 are built and merged, Phase 3 backend foundations and
+hosted classification have landed underneath both, and Phase 4's menu-scanning
+core is built (see the banner at the top). The repository holds a working Flutter app, an optional local FastAPI
 backend (`backend/`), plus the planning documents all three were built from.
 
 ### Actual project structure
@@ -157,12 +167,16 @@ lib/
 ├── di.dart                    # composition root: the ONLY file constructing concrete services
 ├── app.dart                   # MaterialApp, localisation delegates, generateRoute
 ├── l10n/                      # app_en.arb, app_he.arb + committed generated/ output
-├── models/                    # venue, menu, analysis, failures — plain immutable Dart
+├── models/                    # venue, menu, analysis, failures, scanned_menu (the pages of
+│                              # one scan, in memory only) — plain immutable Dart
 ├── utils/                     # constants (the keto vocabulary), text_normaliser,
 │                              # classification_rules, price_format, keto_score,
 │                              # wolt_headers (the web-client header set, #168)
 ├── services/
-│   ├── platform/              # clock, app_logger, connectivity (D10), screen_brightness
+│   ├── platform/              # clock, app_logger, connectivity (D10), screen_brightness,
+│   │                          # page_picker (interface + a null picker) and
+│   │                          # device_page_picker (camera, gallery and PDF over
+│   │                          # image_picker and file_picker, #82)
 │   ├── storage/               # install_id_store, menu_cache, settings_store, notes_store,
 │   │                          # api_key_store (the user's Gemini key, phones only, D17)
 │   ├── llm/                   # llm_chat_client, backend_chat_client (web, D12),
@@ -171,21 +185,27 @@ lib/
 │   ├── venue/                 # venue_ref_resolver (paste-a-URL, pure), venue_search_service
 │   │                          # (interface), wolt/ (WoltVenueSearchService + mapper, issue #39)
 │   ├── menu/                  # platform_menu_adapter, menu_repository, wolt/ and tenbis/
-│   │                          # (each split HTTP-adapter + pure mapper, proxyBase, D11)
-│   └── classifier/            # menu_classifier, heuristic, llm, router, prompt, parser
+│   │                          # (each split HTTP-adapter + pure mapper, proxyBase, D11) and
+│   │                          # text/ (TextMenuSource: pasted text to a Menu, pure, D18)
+│   └── classifier/            # menu_classifier, heuristic, llm, router, prompt, parser, and
+│                              # the scan path's siblings: scanned_menu_classifier (interface),
+│                              # vision_menu_classifier, scanned_classifier_router (D15)
 ├── theme/                     # app_tokens, verdict_colors, app_typography, app_theme
 ├── state/                     # app_dependencies, locale_controller + one ChangeNotifier per
-│                              # screen, including venue_search_controller and saved_controller
+│                              # screen, including venue_search_controller and saved_controller,
+│                              # scan_controller and scanned_pages_registry (the in-memory
+│                              # page thumbnails behind "View pages")
 ├── widgets/                   # dish_card, status_badge, engine_chip, waiter_script,
 │                              # verdict_counter_tiles, keto_score_badge, app_shell, failure_copy,
 │                              # venue_card, category_chips, photo_tile, offline_banner,
 │                              # fetch_failure_action, analysis_progress_row, menu_search_field,
-│                              # note_editor_sheet, rules_reason_banner
+│                              # note_editor_sheet, rules_reason_banner, scanned_pages_sheet,
+│                              # scan_failure_copy
 └── screens/                   # venue_search (the Discovery screen, D13), menu,
                                # waiter_card_sheet, settings (a Gemini key section on
                                # phones only, D17), saved (a real
-                               # cached-menus tab, issue #48) and scan (still a placeholder,
-                               # issue #11)
+                               # cached-menus tab, issue #48) and scan (real now: photograph
+                               # pages, pick images, pick a PDF, or paste; #82, #83)
 
 test/                          # mirrors lib/, plus architecture/, fakes/, fixtures/, l10n/
 integration_test/flows/        # flow tests + flow_support.dart (same-directory helper)
@@ -194,6 +214,7 @@ tool/                          # check.sh (the gate), coverage_gate.sh, gen_cove
 
 backend/                       # optional local FastAPI service (D11, D12) — see backend/README.md
 ├── app/                       # main.py, config.py, routers/ (health, proxy, chat), services/
+├── tools/                     # vision_smoke.py: the person-run image smoke check (#88)
 ├── tests/                     # respx-mocked; no real network call
 └── check.sh                   # mirrors tool/check.sh; its own required CI job
 ```
@@ -275,7 +296,14 @@ The section this replaces described a heuristic-first design that predates the c
    `apiKeyRejected` with that reason carried through so the UI can say why.
    `apiKeyMissing` (no key saved; nothing sent) and `apiKeyRejected` (Google
    refused it) exist only on phones and point the user to Settings; a web
-   server-side key problem still reads as `notConfigured`.
+   server-side key problem still reads as `notConfigured`. A **sibling interface,
+   `ScannedMenuClassifier`**, serves the Scan tab's photographs and PDFs (D15):
+   `VisionMenuClassifier` sends all pages plus one prompt in a single request and
+   `RoutingScannedMenuClassifier` applies consent and connectivity, but there is
+   **no rules fallback** — the rule engine needs text a photo does not have — and
+   the page bytes live only in memory (`ScannedPagesRegistry`), never in the Hive
+   cache. Pasted text needs no sibling: it becomes an ordinary `Menu` through
+   `TextMenuSource` (D18).
 2. **The model's reply is untrusted input.** `MenuResponseParser` is static, pure and
    never throws, and implements §9.4's eight rules: a dish the menu does not contain
    is an invention and is never given a verdict; a yellow whose instruction is
@@ -331,7 +359,9 @@ The section this replaces described a heuristic-first design that predates the c
   banner may lag behind them.
 
 **Research & Analysis:**
-- `m16_menu_scanner_research.md`: Computer vision and OCR strategy for physical menu scanning (Phase 4)
+- `m16_menu_scanner_research.md`: Computer vision and OCR strategy for physical menu scanning
+  (Phase 4). Its on-device OCR conclusion was **not** adopted: D15 has Gemini read the
+  pages itself, so read it for the menu-photo failure modes, not the architecture
 - `m15_meal_entry_research.md`: User flow design for meal logging and macro tracking
 - `m15_openrouter_models_fix.md` / `m16_structured_output_fix.md`: LLM model evaluation and structured output schemas (if integrating AI for edge cases)
 - `menu_api_research`: Platform API comparison and reverse-engineering notes
@@ -355,10 +385,19 @@ When reading research docs (m15/m16), note that prefixes indicate iteration/mile
   classification landed** (D11, D12: the Wolt CORS proxy and Gemini-backed
   chat). Community database, user reviews, restaurant submissions and hosting
   beyond `localhost` → **Planned**
-- **Phase 4**: OCR/vision, configurable dietary rules → **Planned**
+- **Phase 4**: Menu Scanning (one GitHub milestone, "Phase 4: Menu Scanning") →
+  **Core built.** Paste-a-menu (#83, D18), image parts on `/v1/chat` and both chat
+  clients (#170, D15), the `ScannedMenuClassifier` seam with `VisionMenuClassifier`
+  and `RoutingScannedMenuClassifier` (#89), and the Scan tab's photo, image and PDF
+  pickers alongside paste (#82). Still open in the milestone: #84 (flow tests for the
+  scan paths), #88 (the person-run Gemini vision smoke test,
+  `backend/tools/vision_smoke.py`), #181 (website menus) and #182 (QR codes).
+  On-device OCR was dropped (D15; #81 closed as not planned). Configurable dietary
+  rules are not Phase 4 work: they shipped earlier under Phase 2 (#56, #143).
 
 Phase 1 and Phase 2 are built; `feature_prioratization` has the tier breakdown
-for what Phase 3's remaining milestone (#105–#108) and Phase 4 pick up next.
+for what Phase 3's remaining milestone (#105–#108) and Phase 4's open issues pick
+up next.
 
 ## What is NOT built yet
 
@@ -366,14 +405,17 @@ for what Phase 3's remaining milestone (#105–#108) and Phase 4 pick up next.
   adapter registered for each (`di.dart`). The `PlatformMenuAdapter`
   interface and its shared contract suite already exist, so a new platform is
   a new adapter plus a registration in `di.dart`.
-- OCR and the photographed-menu path (Phase 4), and community features — venue
-  ratings, reviews, submissions (Phase 3, `backend_plan.md` §5's milestone C).
-  The Scan bottom-nav tab is still only a localized placeholder screen (issue
-  #11) explaining that — Saved is no longer a placeholder alongside it; it
-  became a real cached-menus tab in Phase 2 (issue #48; `saved_screen.dart`).
+- Menu scanning's remaining sources (Phase 4): menus read from a restaurant's own
+  website (#181) and from a QR code (#182). The Scan tab itself is real — paste,
+  photographs, gallery images and a PDF — and there is no on-device OCR by design
+  (D15). Also not built: community features — venue ratings, reviews, submissions
+  (Phase 3, `backend_plan.md` §5's milestone C).
 - Backend hosting beyond `localhost` (issue #109, `architecture.md` §17.6). The
   backend is designed to be run locally by whoever has the repository checked
   out; nothing yet says where it runs for anyone else.
+- Flow tests for the scan paths (#84): the scan controller, classifier and screen
+  are unit- and widget-tested, but no flow test drives paste, photo or PDF
+  end to end.
 - The pinned Gemini model has answered the real prompt only through the
   backend, from a laptop (the #165 smoke test); the phones' direct client has
   never been run with a real key. See "What is NOT verified yet" below.
@@ -404,6 +446,16 @@ Built, but not confirmed end to end, and not to be reported as done:
   `GeminiChatClient`: the smoke test above went through the backend only.
   Whether Google accepts `toGeminiSchema`'s output for the real prompt's
   schema, and the direct path's latency on a phone, are unobserved.
+- **No real Gemini request carrying images has been sent** (#88). The vision
+  path (D15, `VisionMenuClassifier`) is proven against fakes and recorded-shape
+  fixtures only: whether `gemini-3.5-flash` accepts `image/*` and
+  `application/pdf` parts with the real prompt and schema, how long a multi-page
+  scan takes, and how accurate the transcription is on a real printed or Hebrew
+  menu are all unobserved. `backend/tools/vision_smoke.py` is the person-run check.
+- **The Scan tab's pickers and permissions are evidenced by fakes only.**
+  `DevicePagePicker` (over `image_picker` and `file_picker`) and the iOS camera and
+  photo-library permission strings (English and Hebrew `InfoPlist.strings`, not
+  yet registered in Xcode, see below) have never run on a phone or a simulator.
 - **The Wolt menu fixture is real** (`wolt_hamosad_menu.json`, recorded
   2026-09-25 from the consumer-assortment endpoint the app now calls; issues
   #22, #168), but only one venue was recorded and only from a laptop — this
@@ -422,10 +474,12 @@ Built, but not confirmed end to end, and not to be reported as done:
 - **No physical iOS or Android device has ever run this app.** Screen-brightness
   raising for the Waiter Card in particular is evidenced only by a mocked method
   channel and a fake, and the location-permission prompt (approximate/precise on
-  Android 12+, the "Never" path on iOS) is evidenced only by fakes. The iOS
-  `NSLocationWhenInUseUsageDescription` string is English-only — there is no
-  `InfoPlist.strings` variant group set up for Hebrew (`ios/Runner/Info.plist`'s
-  own comment explains why editing the pbxproj by hand was skipped).
+  Android 12+, the "Never" path on iOS) is evidenced only by fakes. The Hebrew
+  iOS permission strings (location, camera, photo library) exist on disk in
+  `ios/Runner/{en,he}.lproj/InfoPlist.strings` (#169, #196, #205), but the
+  one-time Xcode step that registers them with the Runner target
+  (`docs/RUNNING_IOS.md`, "iOS Hebrew permission string") has not been done or
+  checked, so until it is a Hebrew phone may still see the English prompt.
 - **The performance budget numbers are unmeasured on a real device** (issue
   #65). `tool/perf_menu.dart` and its 16 ms-per-frame budget table
   (`tool/README.md`) exist, but the measurement itself needs a real phone on
@@ -452,8 +506,9 @@ Built, but not confirmed end to end, and not to be reported as done:
    nearby search, platform setup) are now done too, modulo the fixture
    recordings and phone run in "What is NOT verified yet" above. What's next
    is Phase 3's remaining milestone (community database, reviews, submissions;
-   `backend_plan.md` §5 milestone C, issues #105–#108). §14 has the decisions
-   log D1–D17, §17 the open questions with the default the code follows.
+   `backend_plan.md` §5 milestone C, issues #105–#108) and Phase 4's open
+   scan issues (#84, #88, #181, #182; §16's Phase 4 steps). §14 has the decisions
+   log D1–D18, §17 the open questions with the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing
