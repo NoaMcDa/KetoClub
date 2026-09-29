@@ -1,15 +1,26 @@
+import 'dart:async';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_he.dart';
+import 'package:ketoclub/models/failures.dart';
+import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/screens/scan_screen.dart';
+import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/state/scan_controller.dart';
+import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/widgets/scan_failure_copy.dart';
 import 'package:provider/provider.dart';
 
 import '../fakes/fake_clock.dart';
 import '../fakes/fake_menu_repository.dart';
+import '../fakes/fake_page_picker.dart';
 import '../fakes/fake_scanned_menu_classifier.dart';
+import '../fakes/fake_settings_store.dart';
 
 /// The English strings a test can read expected copy from.
 final AppLocalizations _en = AppLocalizationsEn();
@@ -24,8 +35,16 @@ Future<void> _pump(
   ScanController controller, {
   Locale locale = const Locale('en'),
   List<String>? pushed,
-}) {
-  return tester.pumpWidget(
+  FakePagePicker? picker,
+  bool directToGoogle = false,
+}) async {
+  // Tall enough that the whole screen is built: a ListView builds lazily,
+  // so anything below the fold would be absent from the tree.
+  tester.view
+    ..physicalSize = const Size(800, 3200)
+    ..devicePixelRatio = 1;
+  addTearDown(tester.view.reset);
+  await tester.pumpWidget(
     MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
@@ -36,7 +55,10 @@ Future<void> _pump(
           if (settings.name == '/') {
             return ChangeNotifierProvider<ScanController>.value(
               value: controller,
-              child: const ScanScreen(),
+              child: ScanScreen(
+                pagePicker: picker ?? FakePagePicker(),
+                directToGoogle: directToGoogle,
+              ),
             );
           }
           pushed?.add(settings.name!);
@@ -47,11 +69,42 @@ Future<void> _pump(
   );
 }
 
-ScanController _controller(FakeMenuRepository repository) => ScanController(
-  classifier: FakeScannedMenuClassifier(),
+ScanController _controller(
+  FakeMenuRepository repository, {
+  FakeScannedMenuClassifier? classifier,
+}) => ScanController(
+  classifier: classifier ?? FakeScannedMenuClassifier(),
   repository: repository,
   clock: FakeClock(DateTime.utc(2026, 9, 29)),
+  settingsStore: FakeSettingsStore(),
 );
+
+/// A distinct JPEG page, so several in one scan do not compare equal.
+ScannedPage _jpeg(int seed, {int bytes = 3}) => ScannedPage(
+  mimeType: ScannedPage.jpeg,
+  bytes: Uint8List.fromList([seed, ...List<int>.filled(bytes - 1, 1)]),
+);
+
+/// A PDF page of [bytes] bytes.
+ScannedPage _pdf({int bytes = 2048}) =>
+    ScannedPage(mimeType: ScannedPage.pdf, bytes: Uint8List(bytes));
+
+/// The button that analyses the collected pages.
+Finder _analysePages(AppLocalizations l10n) =>
+    find.widgetWithText(ElevatedButton, l10n.scanScreenAnalysePages);
+
+/// An action button, found by its label.
+///
+/// `OutlinedButton.icon` builds a private subclass, which `byType` would
+/// not match, hence `bySubtype`.
+Finder _action(String label) => find.ancestor(
+  of: find.text(label),
+  matching: find.bySubtype<OutlinedButton>(),
+);
+
+/// Whether [finder]'s button is enabled.
+bool _enabled(WidgetTester tester, Finder finder) =>
+    tester.widget<ButtonStyleButton>(finder).onPressed != null;
 
 /// The Analyse button, found by its label.
 Finder _analyse(AppLocalizations l10n) =>
@@ -210,6 +263,546 @@ void main() {
 
       // Assert
       expect(find.text(_he.scanEmptyPaste), findsOneWidget);
+    });
+  });
+
+  group('ScanScreen pages', () {
+    late FakeMenuRepository repository;
+    late FakeScannedMenuClassifier classifier;
+    late FakePagePicker picker;
+    late ScanController controller;
+
+    setUp(() {
+      repository = FakeMenuRepository();
+      classifier = FakeScannedMenuClassifier();
+      picker = FakePagePicker();
+      controller = _controller(repository, classifier: classifier);
+    });
+
+    tearDown(() => controller.dispose());
+
+    testWidgets('shows the three actions and no page list at first', (
+      tester,
+    ) async {
+      // Act
+      await _pump(tester, controller, picker: picker);
+
+      // Assert
+      expect(find.text(_en.scanScreenIntro), findsOneWidget);
+      expect(_action(_en.scanScreenActionTakePhoto), findsOneWidget);
+      expect(_action(_en.scanScreenActionChoosePhotos), findsOneWidget);
+      expect(_action(_en.scanScreenActionChoosePdf), findsOneWidget);
+      expect(find.text(_en.scanScreenPagesHeading), findsNothing);
+    });
+
+    testWidgets('each action calls its picker method and lists the pages', (
+      tester,
+    ) async {
+      // Arrange
+      picker
+        ..queueTakePhoto([_jpeg(1)])
+        ..queuePickImages([_jpeg(2), _jpeg(3)])
+        ..queuePickPdf([_pdf()]);
+      await _pump(tester, controller, picker: picker);
+
+      // Act
+      await tester.tap(_action(_en.scanScreenActionTakePhoto));
+      await tester.pumpAndSettle();
+      await tester.tap(_action(_en.scanScreenActionChoosePhotos));
+      await tester.pumpAndSettle();
+      await tester.tap(_action(_en.scanScreenActionChoosePdf));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(picker.calls, [
+        PagePickerCall.takePhoto,
+        PagePickerCall.pickImages,
+        PagePickerCall.pickPdf,
+      ]);
+      expect(controller.pages, hasLength(4));
+      expect(
+        find.text(_en.scanScreenPageCount(4, maxScanPages)),
+        findsOneWidget,
+      );
+      expect(find.text(_en.scanScreenPageLabel(1)), findsOneWidget);
+      expect(find.text(_en.scanScreenPageLabel(3)), findsOneWidget);
+      expect(find.text(_en.scanScreenPdfLabel), findsOneWidget);
+      expect(find.byIcon(Icons.picture_as_pdf_outlined), findsWidgets);
+      expect(find.byType(Image), findsNWidgets(3));
+    });
+
+    testWidgets('a PDF row shows its size in KB', (tester) async {
+      // Arrange
+      picker.queuePickPdf([_pdf()]);
+      await _pump(tester, controller, picker: picker);
+
+      // Act
+      await tester.tap(_action(_en.scanScreenActionChoosePdf));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.scanScreenPageSizeKb(2)), findsOneWidget);
+    });
+
+    testWidgets('a cancelled picker adds nothing', (tester) async {
+      // Arrange
+      await _pump(tester, controller, picker: picker);
+
+      // Act
+      await tester.tap(_action(_en.scanScreenActionTakePhoto));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(picker.calls, [PagePickerCall.takePhoto]);
+      expect(controller.pages, isEmpty);
+      expect(find.text(_en.scanScreenPagesHeading), findsNothing);
+    });
+
+    testWidgets('the remove button drops that page', (tester) async {
+      // Arrange
+      picker.queuePickImages([_jpeg(1), _jpeg(2)]);
+      await _pump(tester, controller, picker: picker);
+      await tester.tap(_action(_en.scanScreenActionChoosePhotos));
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(find.byTooltip(_en.scanScreenRemovePage(1)));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(controller.pages, [_jpeg(2)]);
+      expect(
+        find.text(_en.scanScreenPageCount(1, maxScanPages)),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('at the cap the add actions are disabled and the cap copy '
+        'shows; removing a page frees them', (tester) async {
+      // Arrange
+      picker.queuePickImages([for (var i = 0; i < maxScanPages; i++) _jpeg(i)]);
+      await _pump(tester, controller, picker: picker);
+
+      // Act
+      await tester.tap(_action(_en.scanScreenActionChoosePhotos));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(
+        find.text(_en.scanScreenPageCount(maxScanPages, maxScanPages)),
+        findsOneWidget,
+      );
+      expect(find.text(_en.scanScreenCapReached), findsOneWidget);
+      for (final label in [
+        _en.scanScreenActionTakePhoto,
+        _en.scanScreenActionChoosePhotos,
+        _en.scanScreenActionChoosePdf,
+      ]) {
+        expect(_enabled(tester, _action(label)), isFalse, reason: label);
+      }
+
+      // Act: remove one.
+      await tester.tap(find.byTooltip(_en.scanScreenRemovePage(1)));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.scanScreenCapReached), findsNothing);
+      expect(_enabled(tester, _action(_en.scanScreenActionTakePhoto)), isTrue);
+    });
+
+    testWidgets('more pages than fit report the too-many copy', (tester) async {
+      // Arrange
+      picker.queuePickImages([
+        for (var i = 0; i < maxScanPages + 2; i++) _jpeg(i),
+      ]);
+      await _pump(tester, controller, picker: picker);
+
+      // Act
+      await tester.tap(_action(_en.scanScreenActionChoosePhotos));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(
+        find.text(_en.scanScreenTooManyPages(maxScanPages)),
+        findsOneWidget,
+      );
+      expect(controller.pages, hasLength(maxScanPages));
+    });
+
+    testWidgets('an oversize page reports its own copy and is not added', (
+      tester,
+    ) async {
+      // Arrange
+      picker.queuePickPdf([_pdf(bytes: maxScanPageBytes + 1)]);
+      await _pump(tester, controller, picker: picker);
+
+      // Act
+      await tester.tap(_action(_en.scanScreenActionChoosePdf));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.scanScreenPageTooLarge(3)), findsOneWidget);
+      expect(find.text(_en.scanScreenTooManyPages(maxScanPages)), findsNothing);
+      expect(controller.pages, isEmpty);
+    });
+
+    testWidgets('the next pick clears the rejection copy', (tester) async {
+      // Arrange
+      picker
+        ..queuePickPdf([_pdf(bytes: maxScanPageBytes + 1)])
+        ..queueTakePhoto([_jpeg(1)]);
+      await _pump(tester, controller, picker: picker);
+      await tester.tap(_action(_en.scanScreenActionChoosePdf));
+      await tester.pumpAndSettle();
+      expect(find.text(_en.scanScreenPageTooLarge(3)), findsOneWidget);
+
+      // Act
+      await tester.tap(_action(_en.scanScreenActionTakePhoto));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.scanScreenPageTooLarge(3)), findsNothing);
+    });
+
+    testWidgets('removing a page clears the rejection copy', (tester) async {
+      // Arrange
+      picker.queuePickImages([_jpeg(1), _jpeg(2)]);
+      await _pump(tester, controller, picker: picker);
+      await tester.tap(_action(_en.scanScreenActionChoosePhotos));
+      await tester.pumpAndSettle();
+      picker.queuePickPdf([_pdf(bytes: maxScanPageBytes + 1)]);
+      await tester.tap(_action(_en.scanScreenActionChoosePdf));
+      await tester.pumpAndSettle();
+      expect(find.text(_en.scanScreenPageTooLarge(3)), findsOneWidget);
+
+      // Act
+      await tester.tap(find.byTooltip(_en.scanScreenRemovePage(1)));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.scanScreenPageTooLarge(3)), findsNothing);
+    });
+
+    testWidgets('Analyse pages is disabled with no pages, enabled with one', (
+      tester,
+    ) async {
+      // Arrange
+      picker.queueTakePhoto([_jpeg(1)]);
+      await _pump(tester, controller, picker: picker);
+      expect(_enabled(tester, _analysePages(_en)), isFalse);
+
+      // Act
+      await tester.tap(_action(_en.scanScreenActionTakePhoto));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(_enabled(tester, _analysePages(_en)), isTrue);
+    });
+
+    testWidgets('Analyse pages hands every page to the classifier in one '
+        'call and opens the stored scan', (tester) async {
+      // Arrange
+      final pushed = <String>[];
+      picker
+        ..queuePickImages([_jpeg(1), _jpeg(2)])
+        ..queuePickPdf([_pdf()]);
+      await _pump(tester, controller, picker: picker, pushed: pushed);
+      await tester.tap(_action(_en.scanScreenActionChoosePhotos));
+      await tester.pumpAndSettle();
+      await tester.tap(_action(_en.scanScreenActionChoosePdf));
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(_analysePages(_en));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(classifier.calls, hasLength(1));
+      expect(classifier.calls.single.$1.pages, hasLength(3));
+      final stored = repository.storedMenus.single;
+      expect(pushed, ['/venue/scan/${stored.venueRef.platformId}']);
+      expect(repository.savedAnalyses, hasLength(1));
+    });
+
+    testWidgets('shows the progress row while the classifier is reading', (
+      tester,
+    ) async {
+      // Arrange
+      final gate = Completer<void>();
+      classifier.gate = gate.future;
+      picker.queueTakePhoto([_jpeg(1)]);
+      await _pump(tester, controller, picker: picker);
+      await tester.tap(_action(_en.scanScreenActionTakePhoto));
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(_analysePages(_en));
+      await tester.pump();
+
+      // Assert: the row is up and nothing can change under the request.
+      expect(find.text(_en.menuProgressAnalysing), findsOneWidget);
+      expect(_enabled(tester, _analysePages(_en)), isFalse);
+      expect(_enabled(tester, _action(_en.scanScreenActionTakePhoto)), isFalse);
+      expect(
+        tester
+            .widget<IconButton>(find.widgetWithIcon(IconButton, Icons.close))
+            .onPressed,
+        isNull,
+      );
+
+      // Act: it finishes.
+      gate.complete();
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.menuProgressAnalysing), findsNothing);
+    });
+
+    testWidgets('a failure shows its copy, keeps the pages and Retry '
+        'calls the classifier again', (tester) async {
+      // Arrange
+      classifier.respondWith(
+        const ScannedMenuFailed(reason: MenuAnalysisFailureReason.timeout),
+      );
+      final pushed = <String>[];
+      picker.queueTakePhoto([_jpeg(1)]);
+      await _pump(tester, controller, picker: picker, pushed: pushed);
+      await tester.tap(_action(_en.scanScreenActionTakePhoto));
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(_analysePages(_en));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.scanScreenFailureTimeout), findsOneWidget);
+      expect(find.text(_en.scanScreenPageLabel(1)), findsOneWidget);
+      expect(pushed, isEmpty);
+      expect(repository.storedMenus, isEmpty);
+
+      // Act: retry; the classifier now fails for another reason.
+      classifier.respondWith(
+        const ScannedMenuFailed(reason: MenuAnalysisFailureReason.offline),
+      );
+      await tester.tap(find.widgetWithText(OutlinedButton, _en.actionRetry));
+      await tester.pumpAndSettle();
+
+      // Assert: called again with the same pages, copy replaced.
+      expect(classifier.calls, hasLength(2));
+      expect(classifier.calls.last.$1, classifier.calls.first.$1);
+      expect(find.text(_en.scanScreenFailureTimeout), findsNothing);
+      expect(find.text(_en.scanScreenFailureOffline), findsOneWidget);
+    });
+
+    testWidgets('Retry that succeeds opens the scan', (tester) async {
+      // Arrange
+      classifier.respondWith(
+        const ScannedMenuFailed(reason: MenuAnalysisFailureReason.offline),
+      );
+      final pushed = <String>[];
+      picker.queueTakePhoto([_jpeg(1)]);
+      await _pump(tester, controller, picker: picker, pushed: pushed);
+      await tester.tap(_action(_en.scanScreenActionTakePhoto));
+      await tester.pumpAndSettle();
+      await tester.tap(_analysePages(_en));
+      await tester.pumpAndSettle();
+      final working = FakeScannedMenuClassifier();
+      final read = await working.classify(
+        ScannedMenu(pages: [_jpeg(1)]),
+        options: const ClassificationOptions(),
+      );
+      classifier.respondWith(read);
+
+      // Act
+      await tester.tap(find.widgetWithText(OutlinedButton, _en.actionRetry));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(pushed, hasLength(1));
+      expect(find.text(_en.scanScreenFailureOffline), findsNothing);
+    });
+
+    testWidgets('every failure reason has its own copy on screen', (
+      tester,
+    ) async {
+      // Arrange
+      picker.queueTakePhoto([_jpeg(1)]);
+      await _pump(tester, controller, picker: picker);
+      await tester.tap(_action(_en.scanScreenActionTakePhoto));
+      await tester.pumpAndSettle();
+
+      // Act & Assert
+      for (final reason in MenuAnalysisFailureReason.values) {
+        classifier.respondWith(ScannedMenuFailed(reason: reason));
+        await tester.tap(_analysePages(_en));
+        await tester.pumpAndSettle();
+        expect(
+          find.text(scanFailureMessage(reason, _en, directToGoogle: false)),
+          findsOneWidget,
+          reason: '$reason',
+        );
+      }
+    });
+
+    testWidgets('on web notConfigured says scanning needs the server', (
+      tester,
+    ) async {
+      // Arrange
+      classifier.respondWith(
+        const ScannedMenuFailed(
+          reason: MenuAnalysisFailureReason.notConfigured,
+        ),
+      );
+      picker.queueTakePhoto([_jpeg(1)]);
+      await _pump(tester, controller, picker: picker);
+      await tester.tap(_action(_en.scanScreenActionTakePhoto));
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(_analysePages(_en));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.scanScreenFailureNeedsServer), findsOneWidget);
+    });
+
+    testWidgets('on phones notConfigured says scanning is unavailable', (
+      tester,
+    ) async {
+      // Arrange
+      classifier.respondWith(
+        const ScannedMenuFailed(
+          reason: MenuAnalysisFailureReason.notConfigured,
+        ),
+      );
+      picker.queueTakePhoto([_jpeg(1)]);
+      await _pump(tester, controller, picker: picker, directToGoogle: true);
+      await tester.tap(_action(_en.scanScreenActionTakePhoto));
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(_analysePages(_en));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.scanScreenFailureNotConfigured), findsOneWidget);
+      expect(find.text(_en.scanScreenFailureNeedsServer), findsNothing);
+    });
+
+    testWidgets('consent withheld says to allow AI analysis in Settings', (
+      tester,
+    ) async {
+      // Arrange
+      classifier.respondWith(
+        const ScannedMenuFailed(
+          reason: MenuAnalysisFailureReason.consentWithheld,
+        ),
+      );
+      picker.queueTakePhoto([_jpeg(1)]);
+      await _pump(tester, controller, picker: picker);
+      await tester.tap(_action(_en.scanScreenActionTakePhoto));
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(_analysePages(_en));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.scanScreenFailureConsentWithheld), findsOneWidget);
+    });
+
+    testWidgets("the disclosure line names KetoClub's server on web", (
+      tester,
+    ) async {
+      // Act
+      await _pump(tester, controller, picker: picker);
+
+      // Assert
+      expect(find.text(_en.scanScreenDisclosureWeb), findsOneWidget);
+      expect(find.text(_en.scanScreenDisclosureDirect), findsNothing);
+      expect(_en.scanScreenDisclosureWeb, contains("KetoClub's server"));
+      expect(_en.scanScreenDisclosureWeb, contains('Gemini API'));
+    });
+
+    testWidgets('the disclosure line says straight to Google on phones', (
+      tester,
+    ) async {
+      // Act
+      await _pump(tester, controller, picker: picker, directToGoogle: true);
+
+      // Assert
+      expect(find.text(_en.scanScreenDisclosureDirect), findsOneWidget);
+      expect(find.text(_en.scanScreenDisclosureWeb), findsNothing);
+      expect(_en.scanScreenDisclosureDirect, contains('straight'));
+      expect(_en.scanScreenDisclosureDirect, contains('Gemini API'));
+    });
+
+    testWidgets('the Settings link opens /settings', (tester) async {
+      // Arrange
+      final pushed = <String>[];
+      await _pump(tester, controller, picker: picker, pushed: pushed);
+
+      // Act
+      await tester.tap(
+        find.widgetWithText(TextButton, _en.scanScreenSettingsLink),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(pushed, ['/settings']);
+    });
+
+    testWidgets('Hebrew renders the page copy right to left', (tester) async {
+      // Arrange
+      picker.queueTakePhoto([_jpeg(1)]);
+      classifier.respondWith(
+        const ScannedMenuFailed(reason: MenuAnalysisFailureReason.offline),
+      );
+      await _pump(
+        tester,
+        controller,
+        picker: picker,
+        locale: const Locale('he'),
+      );
+
+      // Act
+      await tester.tap(_action(_he.scanScreenActionTakePhoto));
+      await tester.pumpAndSettle();
+      await tester.tap(_analysePages(_he));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_he.scanScreenIntro), findsOneWidget);
+      expect(
+        find.text(_he.scanScreenPageCount(1, maxScanPages)),
+        findsOneWidget,
+      );
+      expect(find.text(_he.scanScreenDisclosureWeb), findsOneWidget);
+      expect(find.text(_he.scanScreenFailureOffline), findsOneWidget);
+      expect(
+        Directionality.of(tester.element(find.text(_he.scanScreenIntro))),
+        TextDirection.rtl,
+      );
+    });
+
+    testWidgets('the Hebrew oversize copy is shown under Locale(he)', (
+      tester,
+    ) async {
+      // Arrange
+      picker.queuePickPdf([_pdf(bytes: maxScanPageBytes + 1)]);
+      await _pump(
+        tester,
+        controller,
+        picker: picker,
+        locale: const Locale('he'),
+      );
+
+      // Act
+      await tester.tap(_action(_he.scanScreenActionChoosePdf));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_he.scanScreenPageTooLarge(3)), findsOneWidget);
     });
   });
 }

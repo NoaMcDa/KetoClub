@@ -832,4 +832,117 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get scannedMenuPagesClose => 'סגירה';
+
+  @override
+  String get scanScreenIntro =>
+      'צלמו את דפי התפריט, בחרו תמונות מהגלריה או בחרו קובץ PDF. קטוקלאב קורא את המנות מהדפים ומנתח אותן.';
+
+  @override
+  String get scanScreenActionTakePhoto => 'צילום';
+
+  @override
+  String get scanScreenActionChoosePhotos => 'בחירת תמונות';
+
+  @override
+  String get scanScreenActionChoosePdf => 'בחירת PDF';
+
+  @override
+  String get scanScreenPagesHeading => 'דפים';
+
+  @override
+  String scanScreenPageCount(int count, int max) {
+    return '$count מתוך $max דפים';
+  }
+
+  @override
+  String get scanScreenCapReached =>
+      'זה המספר המרבי של דפים בסריקה אחת. הסירו דף כדי להוסיף אחר.';
+
+  @override
+  String scanScreenPageLabel(int number) {
+    return 'דף $number';
+  }
+
+  @override
+  String get scanScreenPdfLabel => 'מסמך PDF';
+
+  @override
+  String scanScreenPageSizeKb(int kb) {
+    return '$kb KB';
+  }
+
+  @override
+  String scanScreenRemovePage(int number) {
+    return 'הסרת דף $number';
+  }
+
+  @override
+  String scanScreenTooManyPages(int max) {
+    return 'סריקה אחת כוללת עד $max דפים. הדפים שמעבר למגבלה לא נוספו.';
+  }
+
+  @override
+  String scanScreenPageTooLarge(int mb) {
+    return 'הדף גדול מ-$mb MB ולכן לא נוסף. נסו תמונה קטנה יותר או PDF קטן יותר.';
+  }
+
+  @override
+  String get scanScreenAnalysePages => 'נתחו את הדפים';
+
+  @override
+  String get scanScreenPasteHeading => 'או הדביקו את הטקסט';
+
+  @override
+  String get scanScreenDisclosureWeb =>
+      'הדפים נשלחים לשרת של קטוקלאב, שמעביר אותם ל-Gemini API של גוגל לקריאה.';
+
+  @override
+  String get scanScreenDisclosureDirect =>
+      'הדפים נשלחים ישירות מהמכשיר הזה ל-Gemini API של גוגל, באמצעות מפתח ה-API שלכם.';
+
+  @override
+  String get scanScreenSettingsLink => 'הגדרות';
+
+  @override
+  String get scanScreenFailureNotConfigured => 'סריקה אינה זמינה בגרסה הזאת.';
+
+  @override
+  String get scanScreenFailureNeedsServer =>
+      'סריקה דורשת את השרת של קטוקלאב, והגרסה הזאת לא מחוברת לשרת. הדבקת טקסט התפריט עדיין עובדת.';
+
+  @override
+  String get scanScreenFailureOffline =>
+      'נראה שאין חיבור לאינטרנט. הדפים נשמרו; התחברו ונסו שוב.';
+
+  @override
+  String get scanScreenFailureTimeout =>
+      'מודל ה-AI היה איטי מדי. הדפים נשמרו; נסו שוב.';
+
+  @override
+  String get scanScreenFailureRateLimited =>
+      'מכסת ה-AI היומית נוצלה. הדפים נשמרו; נסו שוב מאוחר יותר.';
+
+  @override
+  String get scanScreenFailureBadResponse =>
+      'מודל ה-AI החזיר תשובה שאי אפשר להשתמש בה. הדפים נשמרו; נסו שוב.';
+
+  @override
+  String get scanScreenFailureNoDishesFound =>
+      'לא ניתן היה לקרוא מנות מהדפים האלה. ודאו שהתמונות חדות ומוארות היטב, או הדביקו את הטקסט במקום.';
+
+  @override
+  String get scanScreenFailureBackendUnreachable =>
+      'לא ניתן להגיע לשרת של קטוקלאב. הדפים נשמרו; נסו שוב.';
+
+  @override
+  String get scanScreenFailureConsentWithheld =>
+      'סריקה שולחת את הדפים ל-Gemini API של גוגל לקריאה. אפשרו ניתוח AI בהגדרות כדי לסרוק תפריט.';
+
+  @override
+  String get scanScreenFailureApiKeyMissing =>
+      'הוסיפו את מפתח ה-API של Gemini בהגדרות כדי לסרוק תפריט.';
+
+  @override
+  String get scanScreenFailureApiKeyRejected =>
+      'Gemini דחה את מפתח ה-API שלכם. בדקו אותו בהגדרות ונסו שוב.';
 }

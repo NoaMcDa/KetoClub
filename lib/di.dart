@@ -17,9 +17,9 @@ import 'package:ketoclub/services/menu/wolt/wolt_adapter.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
+import 'package:ketoclub/services/platform/device_page_picker.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
-import 'package:ketoclub/services/platform/page_picker.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/install_id_store.dart';
@@ -238,11 +238,8 @@ AppDependencies buildDependencies() {
     ),
     // In memory only; the pages never reach Hive (issue #89).
     scannedPages: ScannedPagesRegistry(),
-    // The scan seams' placeholder, passed explicitly so issue #82 replaces
-    // one line with the device page picker. It performs no I/O. It equals
-    // AppDependencies' default, hence the lint suppression: the explicit
-    // line is the point.
-    // ignore: avoid_redundant_argument_values
-    pagePicker: const NoPagePicker(),
+    // The device picker builds no plugin state until a page is picked
+    // (issue #82), so this stays free of plugin I/O at start-up.
+    pagePicker: DevicePagePicker(),
   );
 }

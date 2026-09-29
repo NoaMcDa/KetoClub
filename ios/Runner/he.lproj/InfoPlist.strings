@@ -6,3 +6,5 @@
    Info.plist's inline English value is what iOS shows on a phone in
    any locale — see docs/RUNNING_IOS.md. */
 "NSLocationWhenInUseUsageDescription" = "‏KetoClub משתמש במיקום שלך פעם אחת כדי להציג מסעדות קרובות. הוא נשלח רק לפלטפורמת המשלוחים כפרמטר חיפוש ואינו נשמר.";
+"NSCameraUsageDescription" = "‏KetoClub משתמש במצלמה כדי לצלם דף מתפריט. התמונה נשלחת ל-Gemini API של גוגל כדי לקרוא את המנות ואינה נשמרת במכשיר.";
+"NSPhotoLibraryUsageDescription" = "‏KetoClub קורא את תמונות התפריט שבחרתם. הן נשלחות ל-Gemini API של גוגל כדי לקרוא את המנות ואינן נשמרות במכשיר.";
