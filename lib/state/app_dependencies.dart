@@ -36,8 +36,8 @@ class AppDependencies {
   /// they were added after those call sites, and a test that never scans
   /// should not have to build either. Their defaults do no I/O —
   /// [UnavailableScannedMenuClassifier] answers `notConfigured` and
-  /// [NoPagePicker] answers as if cancelled — until issues #89 and #82
-  /// wire the real ones in `di.dart`.
+  /// [NoPagePicker] answers as if cancelled. `di.dart` passes the real
+  /// ones (issues #89 and #82).
   const new({
     required this.menuRepository,
     required this.menuClassifier,

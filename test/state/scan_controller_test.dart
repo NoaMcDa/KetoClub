@@ -11,6 +11,7 @@ import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/scan_controller.dart';
+import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 import '../fakes/fake_clock.dart';
@@ -454,6 +455,75 @@ void main() {
         expect(controller.canAnalysePages, isTrue);
       },
     );
+
+    group('with a pages registry', () {
+      late ScannedPagesRegistry registry;
+      late ScanController registered;
+
+      setUp(() {
+        registry = ScannedPagesRegistry();
+        registered = ScanController(
+          classifier: classifier,
+          repository: repository,
+          clock: FakeClock(_epoch),
+          settingsStore: settings,
+          pagesRegistry: registry,
+        );
+      });
+
+      tearDown(() => registered.dispose());
+
+      test('a successful read puts the pages under the returned ref', () async {
+        // Arrange
+        final scanned = distinct(3);
+        registered.addPages(scanned);
+
+        // Act
+        final ref = await registered.analysePages();
+
+        // Assert: exactly the pages the classifier read, so the menu
+        // screen's "View pages" shows what the model saw.
+        expect(ref, isNotNull);
+        expect(registry.get(ref!), ScannedMenu(pages: scanned));
+        expect(registry.get(ref), classifier.calls.single.$1);
+      });
+
+      test('editing the pages afterwards leaves the registered scan', () async {
+        // Arrange
+        final scanned = distinct(2);
+        registered.addPages(scanned);
+        final ref = await registered.analysePages();
+
+        // Act
+        registered
+          ..removePageAt(0)
+          ..addPages(distinct(4).sublist(3));
+
+        // Assert
+        expect(registry.get(ref!)!.pages, scanned);
+      });
+
+      test('a failure puts nothing in the registry', () async {
+        // Arrange
+        classifier.respondWith(
+          const ScannedMenuFailed(reason: MenuAnalysisFailureReason.offline),
+        );
+        registered.addPages(distinct(2));
+
+        // Act
+        final ref = await registered.analysePages();
+
+        // Assert: the ref the fake's first read would have used holds
+        // nothing.
+        expect(ref, isNull);
+        expect(
+          registry.get(
+            const VenueRef(source: MenuSource.scan, platformId: 'fake-scan-1'),
+          ),
+          isNull,
+        );
+      });
+    });
 
     test('retry calls the classifier again with the same pages and clears '
         'the failure on success', () async {

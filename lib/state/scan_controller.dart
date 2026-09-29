@@ -8,6 +8,7 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/text/text_menu_source.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 /// Why [ScanController.addPages] refused pages (issue #82).
@@ -33,9 +34,11 @@ enum ScanPageRejection {
 /// `maxScanPageBytes` each — the bounds are enforced here, not by the
 /// pickers, so the screen can say which one a page broke. [analysePages]
 /// hands every page to the [ScannedMenuClassifier] in one call, stores the
-/// menu and its analysis, and returns the [VenueRef] to open. The pages
-/// are never discarded by a failure, so Retry is calling [analysePages]
-/// again; they live in memory only and are never written to the cache.
+/// menu and its analysis, puts the pages in the [ScannedPagesRegistry]
+/// under that menu's reference (so the menu screen offers "View pages"),
+/// and returns the [VenueRef] to open. The pages are never discarded by a
+/// failure, so Retry is calling [analysePages] again; they live in memory
+/// only and are never written to the cache.
 ///
 /// Never throws — the repository and classifier do not, and
 /// [TextMenuSource.parse] is pure.
@@ -44,12 +47,15 @@ final class ScanController extends ChangeNotifier {
   /// `repository` and stamps pasted ones with the time `clock` reports.
   /// [classifier] reads scanned pages (issue #89) under the options
   /// `settingsStore` gives: consent, the net-carb limit and the dietary
-  /// toggles, the same ones the menu screen classifies with.
+  /// toggles, the same ones the menu screen classifies with. The pages of
+  /// a successful read are put in `pagesRegistry` (issue #89), when one is
+  /// given, so the menu screen can show them.
   new({
     required this.classifier,
     required this._repository,
     required this._clock,
     required this._settingsStore,
+    this._pagesRegistry,
   });
 
   /// Reads and classifies scanned pages in one request (architecture.md
@@ -59,6 +65,7 @@ final class ScanController extends ChangeNotifier {
   final MenuRepository _repository;
   final Clock _clock;
   final SettingsStore _settingsStore;
+  final ScannedPagesRegistry? _pagesRegistry;
 
   final List<ScannedPage> _pages = <ScannedPage>[];
   bool _analysing = false;
@@ -180,7 +187,9 @@ final class ScanController extends ChangeNotifier {
 
   /// Reads every page in one [classifier] call, stores the resulting menu
   /// and its analysis and returns the [VenueRef] to open, so the menu
-  /// screen reuses the analysis instead of classifying again.
+  /// screen reuses the analysis instead of classifying again. The pages
+  /// that were read go into the pages registry under that reference, so
+  /// the menu screen can offer them for checking; a failure puts nothing.
   ///
   /// Returns null, and sets [lastFailure], when the classifier could not
   /// read the pages; the pages are kept, so calling this again is Retry.
@@ -192,8 +201,11 @@ final class ScanController extends ChangeNotifier {
     notifyListeners();
 
     final settings = await _settingsStore.read();
+    // An unmodifiable copy: the registry keeps exactly the pages that were
+    // read, even if the user edits the list afterwards.
+    final scan = ScannedMenu(pages: _pages);
     final result = await classifier.classify(
-      ScannedMenu(pages: _pages),
+      scan,
       options: ClassificationOptions(
         estimationConsentGiven: settings.estimationConsentGiven,
         netCarbLimitGrams: settings.netCarbLimitGrams,
@@ -211,8 +223,7 @@ final class ScanController extends ChangeNotifier {
         ref = menu.venueRef;
         await _repository.store(menu);
         await _repository.saveAnalysis(ref, analysis);
-      // TODO(NoaMcDa): #89 dependencies.scannedPages.put(ref, scan) once
-      // the registry lands.
+        _pagesRegistry?.put(ref, scan);
       case ScannedMenuFailed(:final reason):
         _lastFailure = reason;
     }

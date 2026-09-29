@@ -184,6 +184,7 @@ Route<void>? generateRoute(
             repository: dependencies.menuRepository,
             clock: dependencies.clock,
             settingsStore: dependencies.settingsStore,
+            pagesRegistry: dependencies.scannedPages,
           ),
           child: ScanScreen(
             pagePicker: dependencies.pagePicker,
