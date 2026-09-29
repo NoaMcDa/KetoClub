@@ -29,13 +29,14 @@ void runSettingsStoreContract(String name, SettingsStore Function() build) {
       const settings = AppSettings(
         languageTag: 'he',
         filter: MenuFilter.greenOnly,
-        estimationConsentGiven: true,
+        estimationConsentGiven: false,
         lastVenue: VenueRef(source: MenuSource.wolt, platformId: 'v1'),
         themeMode: AppThemeMode.dark,
         netCarbLimitGrams: 14,
         seedOilFree: true,
         dairyFree: true,
         lastFilter: MenuFilter.yellowOnly,
+        disclosureSeen: true,
       );
 
       await store.write(settings);

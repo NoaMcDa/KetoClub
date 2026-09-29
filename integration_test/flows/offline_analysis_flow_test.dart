@@ -133,9 +133,7 @@ void main() {
         // Consent must be given before the router ever consults
         // connectivity: rule 1 in `classifier_router.dart` routes "no
         // consent" straight to the heuristic under `consentWithheld`.
-        await fakes.settingsStore.write(
-          const AppSettings(estimationConsentGiven: true),
-        );
+        await fakes.settingsStore.write(const AppSettings());
         final llm = _FakeLlmClassifier();
         final connectivity = _FixedConnectivity(online: false);
         fakes.classifierOverride = RoutingMenuClassifier(
@@ -180,9 +178,7 @@ void main() {
         // Consent must be given before the router ever consults
         // connectivity: rule 1 in `classifier_router.dart` routes "no
         // consent" straight to the heuristic under `consentWithheld`.
-        await fakes.settingsStore.write(
-          const AppSettings(estimationConsentGiven: true),
-        );
+        await fakes.settingsStore.write(const AppSettings());
         final llm = _FakeLlmClassifier()
           ..scriptedFailure = const MenuAnalysisFailed(
             reason: MenuAnalysisFailureReason.offline,

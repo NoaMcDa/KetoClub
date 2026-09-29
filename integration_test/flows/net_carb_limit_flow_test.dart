@@ -74,9 +74,7 @@ final MenuAnalysed _cachedAt6g = MenuAnalysed(
 /// already cached beside it.
 Future<FakeAppDependencies> _fakes() async {
   final fakes = FakeAppDependencies();
-  await fakes.settingsStore.write(
-    const AppSettings(estimationConsentGiven: true),
-  );
+  await fakes.settingsStore.write(const AppSettings());
   fakes.repository
     ..stub(_ref, MenuFetched(menu: _menu))
     ..seedCache(CachedMenu(menu: _menu, analysis: _cachedAt6g));

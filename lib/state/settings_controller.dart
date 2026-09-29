@@ -62,6 +62,14 @@ final class SettingsController extends ChangeNotifier {
   /// Whether the "Carnivore only" rule is on (issue #56).
   bool get carnivoreOnly => _appSettings.carnivoreOnly;
 
+  /// Whether the first-launch AI-disclosure banner has already been
+  /// shown on this install (D16, issue #167). Persisted on
+  /// [AppSettings.disclosureSeen]; the banner itself reads the store
+  /// directly rather than through this controller, so this getter is a
+  /// convenience for tests and any future caller in a scope that
+  /// already holds a controller.
+  bool get disclosureSeen => _appSettings.disclosureSeen;
+
   /// How many menus are currently cached (issue #61's Settings section). A
   /// count of entries, never a byte figure —
   /// [MenuRepository.cachedMenuCount]'s own doc comment explains why.
@@ -177,6 +185,23 @@ final class SettingsController extends ChangeNotifier {
   /// [setSeedOilFree].
   Future<void> setCarnivoreOnly({required bool enabled}) =>
       _update(_appSettings.copyWith(carnivoreOnly: enabled));
+
+  /// Records that the first-launch AI-disclosure banner has been
+  /// dismissed with "OK" (D16, issue #167). Leaves
+  /// [consentGiven] unchanged — the user acknowledged the disclosure
+  /// but did not refuse — and persists [disclosureSeen] as true so the
+  /// banner is never shown twice on the same install.
+  Future<void> acknowledgeDisclosure() =>
+      _update(_appSettings.copyWith(disclosureSeen: true));
+
+  /// Records that the first-launch AI-disclosure banner has been
+  /// dismissed with "Turn off" (D16, issue #167): consent is set to
+  /// false in the same write as [disclosureSeen] is set to true, so the
+  /// router stops sending dish text and the banner is never shown
+  /// twice.
+  Future<void> declineDisclosure() => _update(
+    _appSettings.copyWith(estimationConsentGiven: false, disclosureSeen: true),
+  );
 
   /// Replaces the held settings with [next] and persists them, marking
   /// [isBusy] around the write exactly as every other setter here does.

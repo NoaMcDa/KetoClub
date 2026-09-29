@@ -135,26 +135,48 @@ void main() {
       expect(find.byType(TextField), findsNothing);
     });
 
-    testWidgets('the consent checkbox calls setConsent and the flag persists', (
-      tester,
-    ) async {
-      // Arrange
-      final settingsStore = FakeSettingsStore();
-      final controller = _controllerFor(settingsStore: settingsStore);
-      await _pump(tester, controller);
-      await tester.pumpAndSettle();
+    testWidgets(
+      'the consent checkbox starts checked on a fresh install (D16, issue '
+      '#167) and unticking it persists false',
+      (tester) async {
+        // Arrange: a virgin store — the D16 default of true kicks in.
+        final settingsStore = FakeSettingsStore();
+        final controller = _controllerFor(settingsStore: settingsStore);
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+        expect(controller.consentGiven, isTrue);
 
-      // Act
-      final accept = find.text(_en.settingsConsentAccept);
-      await tester.ensureVisible(accept);
-      await tester.tap(accept);
-      await tester.pumpAndSettle();
+        // Act: untick the checkbox.
+        final accept = find.text(_en.settingsConsentAccept);
+        await tester.ensureVisible(accept);
+        await tester.tap(accept);
+        await tester.pumpAndSettle();
 
-      // Assert
-      expect(controller.consentGiven, isTrue);
-      final stored = await settingsStore.read();
-      expect(stored.estimationConsentGiven, isTrue);
-    });
+        // Assert
+        expect(controller.consentGiven, isFalse);
+        final stored = await settingsStore.read();
+        expect(stored.estimationConsentGiven, isFalse);
+      },
+    );
+
+    testWidgets(
+      'an install that persisted a refusal keeps its refusal, and the '
+      'checkbox is unticked (D16, issue #167)',
+      (tester) async {
+        // Arrange
+        final settingsStore = FakeSettingsStore(
+          initial: const AppSettings(estimationConsentGiven: false),
+        );
+        final controller = _controllerFor(settingsStore: settingsStore);
+
+        // Act
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(controller.consentGiven, isFalse);
+      },
+    );
 
     testWidgets('choosing English sets the language tag to en', (tester) async {
       // Arrange

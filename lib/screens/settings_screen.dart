@@ -121,9 +121,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  /// The consent disclosure: what leaves the device, and the
-  /// acknowledgement checkbox wired to [SettingsController.setConsent]
-  /// (architecture.md §11).
+  /// The consent disclosure (architecture.md §11, D16 issue #167): the
+  /// same body text the consent-disclosure banner (`ConsentDisclosureBanner`)
+  /// shows once on Explore, with a checkbox that starts ticked on a
+  /// fresh install — AI analysis is on by default (D16). Unticking it
+  /// here sets consent to false and stops any dish text from leaving
+  /// the device.
   Widget _consentSection(
     BuildContext context,
     AppLocalizations l10n,
