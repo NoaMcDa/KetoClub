@@ -14,6 +14,7 @@ import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
+import 'package:ketoclub/state/scanned_pages_registry.dart';
 
 /// The set of service interfaces the app is built on (architecture.md §18.1).
 ///
@@ -50,6 +51,7 @@ class AppDependencies {
     required this.menuSharer,
     required this.locationService,
     required this.venueSearchService,
+    required this.scannedPages,
     this.screenBrightness = const NoOpScreenBrightness(),
     this.apiKeyStore,
     this.scannedMenuClassifier = const UnavailableScannedMenuClassifier(),
@@ -128,4 +130,11 @@ class AppDependencies {
   /// Collects menu pages from the camera, the photo library or a PDF for
   /// the Scan tab (issue #82).
   final PagePicker pagePicker;
+
+  /// The pages of recent scans, in memory only, so the menu screen can
+  /// show a scanned menu's pages beside its transcription (issue #89).
+  /// The Scan tab puts them; the menu screen reads them. One instance for
+  /// the app's lifetime, so it is required rather than defaulted: a
+  /// default would be a different registry for each caller.
+  final ScannedPagesRegistry scannedPages;
 }

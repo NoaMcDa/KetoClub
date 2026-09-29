@@ -282,6 +282,7 @@ ketoclub/
 │   │   ├── venue_search_controller.dart  # the Discovery screen (issue #40, D13)
 │   │   ├── menu_controller.dart
 │   │   ├── saved_controller.dart         # the Saved tab (issue #48)
+│   │   ├── scanned_pages_registry.dart   # a scan's pages, in memory only, for "View pages" (#89)
 │   │   ├── settings_controller.dart
 │   │   ├── theme_mode_controller.dart    # Light/Dark/System appearance setting (#129)
 │   │   └── locale_controller.dart        # the app-wide language switch (not tied to one screen)
@@ -325,8 +326,11 @@ ketoclub/
 │   │       ├── classifier_router.dart    # RoutingMenuClassifier: picks LLM or rules per call
 │   │       ├── llm_menu_classifier.dart
 │   │       ├── menu_analysis_prompt.dart # system prompt, user prompt builder, JSON schema
-│   │       ├── menu_response_parser.dart # §9.4 — pure, static, never throws
-│   │       └── heuristic_menu_classifier.dart
+│   │       ├── menu_response_parser.dart # §9.4 — pure, static, never throws; parse + parseScanned
+│   │       ├── heuristic_menu_classifier.dart
+│   │       ├── scanned_menu_classifier.dart   # the scan path's sibling interface (D15)
+│   │       ├── vision_menu_classifier.dart    # pages → one vision request → Menu + analysis (#89)
+│   │       └── scanned_classifier_router.dart # consent + connectivity, no rules fallback (#89)
 │   │
 │   ├── models/                           # plain Dart, immutable, no Flutter beyond foundation
 │   │   ├── venue.dart
@@ -684,13 +688,58 @@ read, and putting page bytes on `Menu` or `VenueRef` would push them into the
 Hive JSON cache. A `ScannedMenu` (`lib/models/scanned_menu.dart`, pages of
 `{mimeType, bytes}`) has no `toJson` and lives only in memory; the `Menu` a
 `ScannedMenuRead` returns is `MenuSource.scan`-sourced and carries no byte of
-it, so it is stored and cached like a pasted menu. Until #89 lands the vision
-engine, `di.dart` wires `UnavailableScannedMenuClassifier`, which answers
-`notConfigured` without I/O; the Scan tab's pages come from a `PagePicker`
-(`services/platform/page_picker.dart`, #82) wired the same way to
-`NoPagePicker`. The bounds `maxScanPages` (6) and `maxScanPageBytes` (3 MiB)
-in `constants.dart` match the backend's `VISION_MAX_IMAGES` and
-`VISION_MAX_IMAGE_BYTES`.
+it, so it is stored and cached like a pasted menu. The Scan tab's pages come
+from a `PagePicker` (`services/platform/page_picker.dart`, #82). The bounds
+`maxScanPages` (6) and `maxScanPageBytes` (3 MiB) in `constants.dart` match
+the backend's `VISION_MAX_IMAGES` and `VISION_MAX_IMAGE_BYTES`.
+
+Two implementations (#89), wired in `di.dart` as
+`RoutingScannedMenuClassifier(vision: VisionMenuClassifier(client, clock),
+connectivity)`, over the **same** `LlmChatClient` instance the text
+`LlmMenuClassifier` holds:
+
+**`VisionMenuClassifier`** sends one request per scan (D6), all pages in it as
+`images` in reading order. The system prompt is
+`MenuAnalysisPrompt.visionSystemPrompt`: a vision preamble ("the user message
+holds N pages of one menu; transcribe every dish name exactly as printed, in
+the menu's language, ids `v1..vN` in reading order, then classify each"),
+then the text path's `systemPrompt` byte for byte. The user prompt is one
+short line; the response schema and `schemaName` are the text path's,
+unchanged, so the backend's schema conversion is untouched. The reply goes to
+`MenuResponseParser.parseScanned` (§9.4), which returns the transcribed `Menu`
+and its `MenuAnalysed` together: `VenueRef(scan, <hex of the clock's
+millisecond stamp>)`, one category `scanned` (named "Scanned menu" /
+"תפריט סרוק" in the menu's own language, §12), every dish `price: 0` with no
+description or options, and no `venueName`. The analysis is stamped
+`LlmEngine(model)` with the model the provider reported and records the
+options snapshot, exactly as the text path does. Chat failures map one to one
+through the same `menuFailureReasonFor` the text classifier uses. An empty
+scan sends nothing and is `noDishesFound`. A two-request design (transcribe,
+then the text path) was rejected: checking provenance against a transcript
+the model wrote checks the model against itself, and spends two of the day's
+calls.
+
+**`RoutingScannedMenuClassifier`** applies the text router's first two rules
+and nothing else: consent withheld → `consentWithheld` with the chat client
+never called (no page leaves the device); `Connectivity.isOnline()` false →
+`offline`; otherwise the vision result as it is. **There is no rules
+fallback for a photograph** — the heuristic needs dish text the pages do not
+have — so every failure reaches the Scan tab as a `ScannedMenuFailed`, whose
+copy `failure_copy.dart` already carries.
+
+**Hand-off and "View pages".** The Scan controller (#82) calls the router,
+then `repository.store(menu)` and `saveAnalysis(ref, analysis)`, puts the
+pages in `ScannedPagesRegistry` (`state/`, on `AppDependencies.scannedPages`)
+and opens `/venue/scan/{id}`. `MenuController.open` reuses that analysis
+through the existing fingerprint-and-options check and never re-classifies a
+scan; if consent is later withdrawn the reuse check fails and the text router
+runs the heuristic over the transcription, which is correct by construction.
+The registry holds the last few scans' pages in memory only — never Hive,
+never JSON, never a log — so while it has a scan's pages the menu header
+says "Read by AI from your pages" and offers "View pages" (a bottom sheet of
+thumbnails; a PDF shows as a labelled tile), letting the user check the
+transcription against the photograph. After a restart the pages are gone and
+the menu reads as a pasted one.
 
 Dish-level output is the same from either engine:
 
@@ -1189,6 +1238,30 @@ tests free of a real clock.)* In order:
 
 All caps and verdict names live in `constants.dart`.
 
+**The scanned variant (D15, #89).** `MenuResponseParser.parseScanned(String
+body, {required VenueRef ref, required DateTime analysedAt, required
+AnalysisEngine engine, int netCarbLimitGrams})` returns a `ScannedMenuResult`
+— the transcribed `Menu` and its `MenuAnalysed` together, or a failure. It
+shares `_decode`, the `badResponse` path and the per-element verdict rules
+with `parse`; only how an element finds its dish differs. A scan has no source
+menu to check against — the pages are the source, and "View pages" is the
+honest substitute — so:
+
+- **Rule 3 is replaced.** An element with no non-empty `name` (after
+  trimming, or not a string, or not an object) is dropped. Of several
+  elements whose names normalise alike (`TextNormaliser.normalise`), the
+  first is kept and the rest dropped, verdict and all. Every kept element
+  becomes a transcribed `Dish` with the id `v1`, `v2`, … assigned by the
+  parser in reply order — the model's own ids are not trusted.
+- **Rule 7 does not apply**: there is no source dish the model could have
+  skipped. A dish demoted by rules 4–5 stays in the transcription, so the
+  menu still lists it and the rule engine can judge it later.
+- **Rules 1, 2, 4, 5, 6, the #57 net-carb post-rule and rule 8 apply
+  verbatim**: the text path's own `llm_*.json` fixtures are run through
+  `parseScanned` to prove it, alongside `llm/llm_scanned_{valid,
+  duplicate_names,nameless_element,over_cap,empty}.json` for the replaced
+  rules. Rule 8 reads as: no kept element → `noDishesFound`.
+
 ---
 
 ## 10. Failure handling
@@ -1405,8 +1478,10 @@ model with the real prompt before release, the parser discipline in §9.4.
 
 **D5 — Text is the one classifier input.**
 Every source, including future OCR, is normalised to dish text before
-classification. One prompt, one parser, one fake. A vision-model path is a second
-`MenuClassifier`, not a change to this one.
+classification. One prompt, one parser, one fake. A vision-model path is a sibling
+interface, `ScannedMenuClassifier`, not a second `MenuClassifier` and not a change
+to this one: a photograph has no `Menu` to pass in until the model reads it
+(D15, §6.2).
 
 **D6 — One request per menu.**
 Per-dish requests would burn the free quota on a single restaurant and cost the
@@ -1667,6 +1742,21 @@ image and `application/pdf` parts with the real prompt (#179), and the Scan
 screen that produces pages (#89) and the person-run smoke check
 (`backend/tools/vision_smoke.py`, #88) come after this transport change.
 
+**The classifier on top (#89, 2026-09-29).** The pages are read and
+classified by `VisionMenuClassifier` behind `RoutingScannedMenuClassifier`
+(§6.2), a sibling of `MenuClassifier` rather than one of its implementations,
+in **one** request: the text path's system prompt behind a vision preamble,
+the pages as image parts, and the unchanged response schema. The reply is
+parsed by `MenuResponseParser.parseScanned` (§9.4), which replaces "never
+invent a dish" — there is no source menu to check against — with "drop a
+nameless element; keep the first of duplicate names", and applies every other
+rule verbatim. The honest substitute for provenance is the page itself: the
+menu header says "Read by AI from your pages" and offers "View pages" from an
+in-memory `ScannedPagesRegistry`, so the user can check the transcription
+against the photograph. Consent withheld means no page is sent; offline means
+no request is spent; and there is no rules fallback. No real image request
+has yet been sent with this prompt (#88).
+
 **D16 — AI analysis is on by default.** *(2026-09-28; answers issue #167;
 amends §11.)* D2 makes the language model the primary classifier, but
 `AppSettings.estimationConsentGiven` defaulted to `false`, so a fresh
@@ -1917,8 +2007,8 @@ Extension points already designed in:
 |---|---|---|
 | Tabit, Ontopo | a new `PlatformMenuAdapter` | `Menu` model, classifier |
 | Pasted text | **Shipped (D18, issue #83).** `TextMenuSource.parse` yields a `Menu` from lines of text under `MenuSource.scan`; `MenuRepository.store` puts it in the cache | the prompt and parser (unchanged, as predicted) |
-| Photographed or PDF menus (Phase 4) | a new source that yields `Menu` from OCR text, stored the same way under `MenuSource.scan` (D18); the M16 research is the reference | the prompt and parser |
-| Vision-model classification | a second `MenuClassifier`; router chooses | the UI |
+| Photographed or PDF menus (Phase 4) | **Built behind fakes (D15, #89).** The pages are read and classified by Gemini's own vision in one request — no OCR stage — through `ScannedMenuClassifier` (`VisionMenuClassifier` behind `RoutingScannedMenuClassifier`); the transcription is stored under `MenuSource.scan` like a paste (D18) | the text prompt (the vision preamble sits in front of it), the response schema, `MenuClassifier` |
+| Vision-model classification | **Built (#89)** as the sibling `ScannedMenuClassifier`, not a second `MenuClassifier`; its own router applies consent and connectivity, with no rules fallback | the UI's menu screen, which shows a scan like any other menu |
 | Custom dietary rules (Tier C) | `ClassificationOptions` → appended to the system prompt and to the rules table | schema |
 | Community ratings, venue directory (Phase 3) | a backend with its own client under `services/community/`; `Venue` gains the README's rating fields | everything above stays client-only |
 | CORS proxy for web | **Shipped (D11).** `backend/`'s `/v1/proxy/wolt/…` route; `WoltMenuAdapter` took a configurable `proxyBase`, exactly as this row predicted | adapter logic (unchanged, as predicted) |

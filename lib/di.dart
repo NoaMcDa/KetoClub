@@ -5,7 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/llm_menu_classifier.dart';
-import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
+import 'package:ketoclub/services/classifier/scanned_classifier_router.dart';
+import 'package:ketoclub/services/classifier/vision_menu_classifier.dart';
 import 'package:ketoclub/services/llm/backend_chat_client.dart';
 import 'package:ketoclub/services/llm/gemini_chat_client.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
@@ -27,6 +28,7 @@ import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/venue/wolt/wolt_venue_search_service.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
+import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:screen_brightness/screen_brightness.dart' as plugin;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -150,15 +152,16 @@ AppDependencies buildDependencies() {
   final apiKeyStore = apiKeyStoreFor(runsInBrowser: kIsWeb);
 
   const heuristic = HeuristicMenuClassifier(clock: clock);
-  final llm = LlmMenuClassifier(
-    chatClientFor(
-      client: client,
-      apiKeyStore: apiKeyStore,
-      backendBase: backendBaseUrl(_configuredBackendUrl),
-      installIdStore: installIdStore,
-    ),
-    clock,
+  // One chat client for both engines that reach the model: the text
+  // classifier and the scan path's vision classifier (issue #89). Either
+  // way one request per menu or per scan (D6), against one quota.
+  final chatClient = chatClientFor(
+    client: client,
+    apiKeyStore: apiKeyStore,
+    backendBase: backendBaseUrl(_configuredBackendUrl),
+    installIdStore: installIdStore,
   );
+  final llm = LlmMenuClassifier(chatClient, clock);
   // `screen_brightness` has no web implementation; the no-op is a
   // deliberate composition choice for that platform, not a fallback from a
   // caught failure (screen_brightness.dart's own doc comment).
@@ -224,13 +227,17 @@ AppDependencies buildDependencies() {
       ),
     ),
     apiKeyStore: apiKeyStore,
-    // The scan seams' placeholders, passed explicitly so the next two
-    // changes each replace one line: issue #89 wires the vision
-    // classifier here, issue #82 the device page picker. Neither
-    // placeholder performs any I/O. They equal AppDependencies' defaults,
-    // hence the lint suppressions: the explicit line is the point.
-    // ignore: avoid_redundant_argument_values
-    scannedMenuClassifier: const UnavailableScannedMenuClassifier(),
+    // The scan path (issue #89, D15): consent and the connectivity
+    // pre-check in front of the vision engine, which sends the pages over
+    // the same chat client as the text classifier. No rules fallback: a
+    // photograph has no text for the rule engine. Constructing either
+    // does no I/O.
+    scannedMenuClassifier: RoutingScannedMenuClassifier(
+      vision: VisionMenuClassifier(client: chatClient, clock: clock),
+      connectivity: connectivity,
+    ),
+    // In memory only; the pages never reach Hive (issue #89).
+    scannedPages: ScannedPagesRegistry(),
     // The device picker builds no plugin state until a page is picked
     // (issue #82), so this stays free of plugin I/O at start-up.
     pagePicker: DevicePagePicker(),

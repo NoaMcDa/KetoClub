@@ -1,9 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:ketoclub/di.dart';
+import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
-import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
+import 'package:ketoclub/services/classifier/scanned_classifier_router.dart';
 import 'package:ketoclub/services/llm/backend_chat_client.dart';
 import 'package:ketoclub/services/llm/gemini_chat_client.dart';
 import 'package:ketoclub/services/location/geolocator_location_service.dart';
@@ -20,6 +21,7 @@ import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/venue/wolt/wolt_venue_search_service.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
+import 'package:ketoclub/state/scanned_pages_registry.dart';
 
 import 'fakes/fake_api_key_store.dart';
 import 'fakes/fake_install_id_store.dart';
@@ -58,12 +60,14 @@ void main() {
       // The test VM is not web, so the phone path: a key store for the
       // user's own Gemini key (architecture.md D17).
       expect(dependencies.apiKeyStore, isA<SecureApiKeyStore>());
-      // The vision classifier is still the placeholder until issue #89;
-      // the page picker is the device one (issue #82).
+      // The scan path (issue #89): consent and connectivity in front of
+      // the vision engine, and the in-memory pages registry.
       expect(
         dependencies.scannedMenuClassifier,
-        isA<UnavailableScannedMenuClassifier>(),
+        isA<RoutingScannedMenuClassifier>(),
       );
+      expect(dependencies.scannedPages, isA<ScannedPagesRegistry>());
+      // The device page picker (issue #82).
       expect(dependencies.pagePicker, isA<DevicePagePicker>());
     });
 
@@ -74,6 +78,21 @@ void main() {
       // belongs in a closure invoked on first use, not in a constructor.
       // main_test.dart and the launch flow test depend on this too.
       expect(buildDependencies, returnsNormally);
+    });
+  });
+
+  group('buildDependencies scan wiring (issue #89)', () {
+    test('gives each dependency graph its own empty pages registry', () {
+      // Act
+      final first = buildDependencies().scannedPages;
+      final second = buildDependencies().scannedPages;
+
+      // Assert: nothing is carried over, and nothing is shared.
+      expect(identical(first, second), isFalse);
+      expect(
+        first.get(const VenueRef(source: MenuSource.scan, platformId: 'a')),
+        isNull,
+      );
     });
   });
 

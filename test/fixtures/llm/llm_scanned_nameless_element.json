@@ -1,0 +1,53 @@
+{
+  "_fixture_note": "synthetic fixture: elements that name no dish — an empty name, a whitespace-only name, a null name, a missing name, a numeric name and an element that is not an object at all — around one named dish (architecture.md §9.4 scanned variant: an element with no non-empty name is dropped; issue #89). Only 'Greek Salad' survives, numbered v1.",
+  "dishes": [
+    {
+      "id": "v1",
+      "name": "",
+      "verdict": "orderAsIs",
+      "why": "An element with an empty name.",
+      "modification": null,
+      "net_carbs_estimate": 1
+    },
+    {
+      "id": "v2",
+      "name": "   ",
+      "verdict": "orderAsIs",
+      "why": "An element with a whitespace-only name.",
+      "modification": null,
+      "net_carbs_estimate": 1
+    },
+    {
+      "id": "v3",
+      "name": null,
+      "verdict": "orderAsIs",
+      "why": "An element with a null name.",
+      "modification": null,
+      "net_carbs_estimate": 1
+    },
+    {
+      "id": "v4",
+      "verdict": "orderAsIs",
+      "why": "An element with no name key at all.",
+      "modification": null,
+      "net_carbs_estimate": 1
+    },
+    {
+      "id": "v5",
+      "name": 42,
+      "verdict": "orderAsIs",
+      "why": "An element whose name is a number.",
+      "modification": null,
+      "net_carbs_estimate": 1
+    },
+    "not an object",
+    {
+      "id": "v7",
+      "name": "Greek Salad",
+      "verdict": "orderAsIs",
+      "why": "Tomato, cucumber, olives and feta.",
+      "modification": null,
+      "net_carbs_estimate": 5
+    }
+  ]
+}

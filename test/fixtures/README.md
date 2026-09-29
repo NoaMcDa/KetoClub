@@ -128,3 +128,15 @@ suite weaker rather than stronger.
 
 `llm_unknown_keys.json` doubles as the parser's unknown-key tolerance test: it
 carries a `_fixture_note` key that the parser must ignore.
+
+### Scanned-menu replies (`llm/llm_scanned_*.json`)
+
+Also synthetic by design, for `MenuResponseParser.parseScanned` (the vision
+path, issue #89). A scan has no source menu, so §9.4's provenance rule is
+replaced by "a nameless element is dropped; duplicate normalised names keep
+the first"; one fixture per replaced rule (`nameless_element`,
+`duplicate_names`), plus a valid reply, an empty one (`noDishesFound`) and
+`over_cap` — 1001 generated dishes, one past `maxAnalysedDishes`. Every other
+§9.4 rule is proven by running the text path's own `llm_*.json` fixtures above
+through `parseScanned` unchanged, so the two parsers are held to the same
+files. No vision reply has been recorded yet (#88).

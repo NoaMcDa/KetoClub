@@ -246,6 +246,7 @@ Route<void>? generateRoute(
           connectivity: dependencies.connectivity,
           externalLinkOpener: dependencies.externalLinkOpener,
           menuSharer: dependencies.menuSharer,
+          scannedPages: dependencies.scannedPages,
         ),
       ),
     );

@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
 // `intl` (imported below for `DateFormat`) also declares its own
 // `TextDirection` class (`LTR`/`RTL`/`UNKNOWN`), which otherwise wins over
 // `dart:ui`'s `TextDirection` (lowercase `ltr`/`rtl`, the type
@@ -16,6 +18,7 @@ import 'package:ketoclub/l10n/generated/app_localizations_he.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/menu_screen.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
@@ -25,6 +28,7 @@ import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/menu_controller.dart';
+import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
@@ -35,6 +39,7 @@ import 'package:ketoclub/widgets/keto_score_badge.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
+import 'package:ketoclub/widgets/scanned_pages_sheet.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
@@ -120,6 +125,42 @@ void _useTallSurface(WidgetTester tester) {
   addTearDown(tester.view.resetDevicePixelRatio);
 }
 
+/// A 1×1 transparent PNG, so a page thumbnail decodes like a real one.
+final Uint8List _pngBytes = base64Decode(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChw'
+  'GA60e6kgAAAABJRU5ErkJggg==',
+);
+
+/// The reference a scanned menu in the "View pages" tests is read into.
+const VenueRef _scanRef = VenueRef(
+  source: MenuSource.scan,
+  platformId: '19a3c0ffee0',
+);
+
+/// Two photographed pages and a PDF, the pages a scan was read from.
+ScannedMenu _threePages() => ScannedMenu(
+  pages: <ScannedPage>[
+    ScannedPage(mimeType: ScannedPage.png, bytes: _pngBytes),
+    ScannedPage(mimeType: ScannedPage.png, bytes: _pngBytes),
+    ScannedPage(
+      mimeType: ScannedPage.pdf,
+      bytes: Uint8List.fromList(utf8.encode('%PDF-1.7')),
+    ),
+  ],
+);
+
+/// A controller whose repository serves a one-dish menu at [_scanRef].
+MenuController _scanController() => _controllerFor(
+  repository: FakeMenuRepository()
+    ..stub(
+      _scanRef,
+      MenuFetched(
+        menu: _menuOf([_dish('Grilled salmon')], ref: _scanRef),
+        fromCache: true,
+      ),
+    ),
+);
+
 /// Pumps a [MenuScreen] for [ref] over [controller], inside a localised
 /// [MaterialApp] with [controller] provided through `provider` — the
 /// shape every test in this file uses.
@@ -134,6 +175,7 @@ Future<void> _pump(
   FakeMenuSharer? menuSharer,
   ThemeData? theme,
   String? venueNameHint,
+  ScannedPagesRegistry? scannedPages,
 }) {
   _useTallSurface(tester);
   return tester.pumpWidget(
@@ -156,6 +198,7 @@ Future<void> _pump(
           externalLinkOpener: externalLinkOpener ?? FakeExternalLinkOpener(),
           menuSharer: menuSharer ?? FakeMenuSharer(),
           venueNameHint: venueNameHint,
+          scannedPages: scannedPages,
         ),
       ),
     ),
@@ -2410,6 +2453,149 @@ void main() {
           expect(screen.overlaps(headerRect), isTrue);
         },
       );
+    });
+
+    group('scanned pages (issue #89)', () {
+      testWidgets('a scan whose pages are held reads as read by AI and '
+          'offers View pages, with no price', (tester) async {
+        // Arrange
+        final registry = ScannedPagesRegistry()..put(_scanRef, _threePages());
+
+        // Act
+        await _pump(
+          tester,
+          _scanController(),
+          ref: _scanRef,
+          scannedPages: registry,
+        );
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_en.scannedMenuTitle), findsOneWidget);
+        expect(find.text(_en.scannedMenuReadByAi), findsOneWidget);
+        expect(find.text(_en.scannedMenuViewPages), findsOneWidget);
+        expect(find.text(_en.sourceScanned), findsNothing);
+        expect(
+          find.textContaining(_en.menuSourceLine(_en.scannedMenuTitle, '')),
+          findsOneWidget,
+        );
+        expect(find.text('19a3c0ffee0'), findsNothing);
+        expect(find.textContaining('₪'), findsNothing);
+      });
+
+      testWidgets('View pages opens a dismissible sheet with a thumbnail '
+          'per page and a PDF tile', (tester) async {
+        // Arrange
+        final registry = ScannedPagesRegistry()..put(_scanRef, _threePages());
+        await _pump(
+          tester,
+          _scanController(),
+          ref: _scanRef,
+          scannedPages: registry,
+        );
+        await tester.pumpAndSettle();
+
+        // Act
+        await tester.tap(find.text(_en.scannedMenuViewPages));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(ScannedPagesSheet), findsOneWidget);
+        expect(find.text(_en.scannedMenuPagesTitle), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byType(ScannedPagesSheet),
+            matching: find.byType(Image),
+          ),
+          findsNWidgets(2),
+        );
+        expect(find.text(_en.scannedMenuPdfPage), findsOneWidget);
+
+        // Act: dismiss it.
+        await tester.tap(find.byTooltip(_en.scannedMenuPagesClose));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(ScannedPagesSheet), findsNothing);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('a scan with no pages held keeps the Pasted menu header', (
+        tester,
+      ) async {
+        // Arrange: pages held for another scan only.
+        final registry = ScannedPagesRegistry()
+          ..put(
+            const VenueRef(source: MenuSource.scan, platformId: 'other'),
+            _threePages(),
+          );
+
+        // Act
+        await _pump(
+          tester,
+          _scanController(),
+          ref: _scanRef,
+          scannedPages: registry,
+        );
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_en.sourceScanned), findsOneWidget);
+        expect(find.text(_en.scannedMenuReadByAi), findsNothing);
+        expect(find.text(_en.scannedMenuViewPages), findsNothing);
+      });
+
+      testWidgets('a non-scan menu never offers pages', (tester) async {
+        // Arrange: a registry that, oddly, holds pages for a Wolt ref.
+        final registry = ScannedPagesRegistry()..put(_ref, _threePages());
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+
+        // Act
+        await _pump(
+          tester,
+          _controllerFor(repository: repository),
+          scannedPages: registry,
+        );
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_en.scannedMenuReadByAi), findsNothing);
+        expect(find.text(_en.scannedMenuViewPages), findsNothing);
+      });
+
+      testWidgets('under Locale(he) the scanned header is Hebrew and '
+          'right-to-left', (tester) async {
+        // Arrange
+        final registry = ScannedPagesRegistry()..put(_scanRef, _threePages());
+
+        // Act
+        await _pump(
+          tester,
+          _scanController(),
+          ref: _scanRef,
+          locale: const Locale('he'),
+          scannedPages: registry,
+        );
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_he.scannedMenuTitle), findsOneWidget);
+        expect(find.text(_he.scannedMenuReadByAi), findsOneWidget);
+        final context = tester.element(find.text(_he.scannedMenuReadByAi));
+        expect(Directionality.of(context), ui.TextDirection.rtl);
+        final title = tester.getCenter(find.text(_he.scannedMenuTitle));
+        final score = tester.getCenter(find.byType(KetoScoreBadge));
+        expect(score.dx, lessThan(title.dx));
+
+        // Act: the sheet is Hebrew too.
+        await tester.tap(find.text(_he.scannedMenuViewPages));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_he.scannedMenuPagesTitle), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
     });
 
     group('right-to-left (architecture.md §8.3)', () {

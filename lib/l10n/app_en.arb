@@ -341,6 +341,17 @@
   "sourceScanned": "Pasted menu",
   "fetchFailedScanNotSaved": "This pasted menu is no longer saved on this device. Paste it again to analyse it.",
 
+  "scannedMenuTitle": "Scanned menu",
+  "scannedMenuReadByAi": "Read by AI from your pages",
+  "scannedMenuViewPages": "View pages",
+  "scannedMenuPagesTitle": "Your pages",
+  "scannedMenuPagesNote": "Check the dish names against your pages: the AI may misread a word.",
+  "scannedMenuPageLabel": "Page {number}",
+  "@scannedMenuPageLabel": {
+    "placeholders": { "number": { "type": "int" } }
+  },
+  "scannedMenuPdfPage": "PDF document",
+  "scannedMenuPagesClose": "Close",
   "scanScreenIntro": "Photograph the pages of a menu, choose photos from your library, or choose a PDF. KetoClub reads the dishes off the pages and analyses them.",
   "scanScreenActionTakePhoto": "Take a photo",
   "scanScreenActionChoosePhotos": "Choose photos",

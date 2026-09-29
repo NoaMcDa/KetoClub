@@ -341,6 +341,17 @@
   "sourceScanned": "תפריט שהודבק",
   "fetchFailedScanNotSaved": "התפריט שהודבק כבר לא שמור במכשיר הזה. הדביקו אותו שוב כדי לנתח אותו.",
 
+  "scannedMenuTitle": "תפריט סרוק",
+  "scannedMenuReadByAi": "נקרא בידי AI מהעמודים שלכם",
+  "scannedMenuViewPages": "הצגת העמודים",
+  "scannedMenuPagesTitle": "העמודים שלכם",
+  "scannedMenuPagesNote": "השוו את שמות המנות לעמודים שלכם: ה-AI עלול לקרוא מילה לא נכון.",
+  "scannedMenuPageLabel": "עמוד {number}",
+  "@scannedMenuPageLabel": {
+    "placeholders": { "number": { "type": "int" } }
+  },
+  "scannedMenuPdfPage": "מסמך PDF",
+  "scannedMenuPagesClose": "סגירה",
   "scanScreenIntro": "צלמו את דפי התפריט, בחרו תמונות מהגלריה או בחרו קובץ PDF. קטוקלאב קורא את המנות מהדפים ומנתח אותן.",
   "scanScreenActionTakePhoto": "צילום",
   "scanScreenActionChoosePhotos": "בחירת תמונות",

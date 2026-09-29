@@ -1352,6 +1352,54 @@ abstract class AppLocalizations {
   /// **'This pasted menu is no longer saved on this device. Paste it again to analyse it.'**
   String get fetchFailedScanNotSaved;
 
+  /// No description provided for @scannedMenuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanned menu'**
+  String get scannedMenuTitle;
+
+  /// No description provided for @scannedMenuReadByAi.
+  ///
+  /// In en, this message translates to:
+  /// **'Read by AI from your pages'**
+  String get scannedMenuReadByAi;
+
+  /// No description provided for @scannedMenuViewPages.
+  ///
+  /// In en, this message translates to:
+  /// **'View pages'**
+  String get scannedMenuViewPages;
+
+  /// No description provided for @scannedMenuPagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your pages'**
+  String get scannedMenuPagesTitle;
+
+  /// No description provided for @scannedMenuPagesNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the dish names against your pages: the AI may misread a word.'**
+  String get scannedMenuPagesNote;
+
+  /// No description provided for @scannedMenuPageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {number}'**
+  String scannedMenuPageLabel(int number);
+
+  /// No description provided for @scannedMenuPdfPage.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF document'**
+  String get scannedMenuPdfPage;
+
+  /// No description provided for @scannedMenuPagesClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get scannedMenuPagesClose;
+
   /// No description provided for @scanScreenIntro.
   ///
   /// In en, this message translates to:

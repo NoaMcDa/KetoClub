@@ -1,0 +1,37 @@
+{
+  "_fixture_note": "synthetic fixture: a vision reply transcribing and classifying one photographed menu (architecture.md §9.4 scanned variant, positive case; issue #89). Ids are the model's own and are not trusted: the parser numbers the dishes v1..vN itself, which is why the fourth element's id 'v9' is ignored. The fourth dish is a green whose own net-carb estimate is over the default 6 g limit and carries an instruction, so issue #57's post-rule makes it yellow.",
+  "dishes": [
+    {
+      "id": "v1",
+      "name": "Grilled Salmon",
+      "verdict": "orderAsIs",
+      "why": "Grilled fish with lemon butter, nothing starchy.",
+      "modification": null,
+      "net_carbs_estimate": 1
+    },
+    {
+      "id": "v2",
+      "name": "Ribeye Steak with Fries",
+      "verdict": "modifiable",
+      "why": "Great protein, but it comes with fries.",
+      "modification": "Replace the fries with a green salad.",
+      "net_carbs_estimate": 3
+    },
+    {
+      "id": "v3",
+      "name": "Spaghetti Carbonara",
+      "verdict": "nonKeto",
+      "why": "Built on wheat pasta, which cannot be made keto.",
+      "modification": null,
+      "net_carbs_estimate": null
+    },
+    {
+      "id": "v9",
+      "name": "Chicken Skewers",
+      "verdict": "orderAsIs",
+      "why": "Grilled chicken, glazed with honey.",
+      "modification": "Ask for the skewers without the honey glaze.",
+      "net_carbs_estimate": 9
+    }
+  ]
+}
