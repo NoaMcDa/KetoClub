@@ -16,6 +16,7 @@ import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
@@ -850,6 +851,46 @@ void main() {
         expect(pushedNames, contains('/venue/wolt/vitrina'));
       },
     );
+
+    group('content width on a wide window (issue #221)', () {
+      /// Pumps the screen, locates, and lays the two-venue list out at
+      /// [width] logical pixels.
+      Future<void> listAt(WidgetTester tester, double width) async {
+        search.queueFound([_venue('ember-vine'), _venue('salt-stone')]);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await locate(tester);
+        tester.view.physicalSize = Size(width, 2400);
+        await tester.pumpAndSettle();
+      }
+
+      testWidgets('at 1440px a venue card is no wider than the cap and sits '
+          'centred in the window', (tester) async {
+        // Arrange + Act
+        await listAt(tester, 1440);
+
+        // Assert
+        final cards = find.byType(VenueCard);
+        expect(cards, findsNWidgets(2));
+        final rect = tester.getRect(cards.first);
+        expect(rect.width, lessThanOrEqualTo(contentMaxWidth));
+        expect(rect.center.dx, closeTo(720, 0.01));
+        final field = tester.getRect(find.byType(TextField));
+        expect(field.width, lessThanOrEqualTo(contentMaxWidth));
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('at 390px a venue card spans the phone width inside the '
+          '20px gutters, as before the cap', (tester) async {
+        // Arrange + Act
+        await listAt(tester, 390);
+
+        // Assert
+        final rect = tester.getRect(find.byType(VenueCard).first);
+        expect(rect.left, 20);
+        expect(rect.width, 350);
+        expect(tester.takeException(), isNull);
+      });
+    });
 
     group('Estimate this list (issue #42)', () {
       /// Scripts [venues] to load a one-dish menu each.

@@ -6,6 +6,7 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_he.dart';
 import 'package:ketoclub/screens/drinks_guide_screen.dart';
+import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
 
 /// English strings for the tests.
@@ -79,6 +80,31 @@ void main() {
         expect(find.byType(WaiterScriptWidget), findsWidgets);
       },
     );
+
+    testWidgets('at 1440px the guide reads in a centred column no wider '
+        'than the cap (issue #221)', (tester) async {
+      // Arrange
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      // Act
+      await _pump(tester);
+      await tester.pumpAndSettle();
+
+      // Assert
+      final column = tester.getRect(
+        find
+            .descendant(
+              of: find.byType(ContentWidth),
+              matching: find.byType(SingleChildScrollView),
+            )
+            .first,
+      );
+      expect(column.width, contentMaxWidth);
+      expect(column.center.dx, 720);
+    });
 
     // -------------------------------------------------------------------------
     // Hebrew / RTL

@@ -10,6 +10,7 @@ import 'package:ketoclub/state/settings_controller.dart';
 import 'package:ketoclub/state/theme_mode_controller.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/widgets/content_width.dart';
 import 'package:provider/provider.dart';
 
 /// Scopes a test's finder to the language section's radio group, so a
@@ -120,31 +121,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
       // every section must exist in the tree up front so a test (or a
       // screen reader) can find a control without first scrolling it
       // into the sliver viewport's cache extent.
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _consentSection(context, l10n, controller),
-            const SizedBox(height: 20),
-            if (controller.supportsApiKey) ...[
-              _apiKeySection(context, l10n, controller),
+      body: ContentWidth(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _consentSection(context, l10n, controller),
               const SizedBox(height: 20),
+              if (controller.supportsApiKey) ...[
+                _apiKeySection(context, l10n, controller),
+                const SizedBox(height: 20),
+              ],
+              _languageSection(context, l10n, controller),
+              const SizedBox(height: 20),
+              _appearanceSection(context, l10n, controller),
+              const SizedBox(height: 20),
+              _netCarbLimitSection(context, l10n, controller),
+              const SizedBox(height: 20),
+              _ketoRulesSection(context, l10n, controller),
+              const SizedBox(height: 20),
+              _filterSection(context, l10n, controller),
+              const SizedBox(height: 20),
+              _cacheSection(context, l10n, controller),
+              const SizedBox(height: 20),
+              _drinksGuideSection(context, l10n),
             ],
-            _languageSection(context, l10n, controller),
-            const SizedBox(height: 20),
-            _appearanceSection(context, l10n, controller),
-            const SizedBox(height: 20),
-            _netCarbLimitSection(context, l10n, controller),
-            const SizedBox(height: 20),
-            _ketoRulesSection(context, l10n, controller),
-            const SizedBox(height: 20),
-            _filterSection(context, l10n, controller),
-            const SizedBox(height: 20),
-            _cacheSection(context, l10n, controller),
-            const SizedBox(height: 20),
-            _drinksGuideSection(context, l10n),
-          ],
+          ),
         ),
       ),
     );

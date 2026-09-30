@@ -27,6 +27,7 @@ import 'package:ketoclub/utils/menu_share_text.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/carb_budget_field.dart';
 import 'package:ketoclub/widgets/category_chips.dart';
+import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
@@ -242,14 +243,16 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          OfflineBanner(
-            connectivity: widget.connectivity,
-            recheckToken: _recheckToken,
-          ),
-          Expanded(child: _body(context, l10n, controller)),
-        ],
+      body: ContentWidth(
+        child: Column(
+          children: [
+            OfflineBanner(
+              connectivity: widget.connectivity,
+              recheckToken: _recheckToken,
+            ),
+            Expanded(child: _body(context, l10n, controller)),
+          ],
+        ),
       ),
     );
   }
