@@ -24,7 +24,8 @@ const int pickedImageQuality = 80;
 /// Bytes are read through `XFile.readAsBytes()` and
 /// `PlatformFile.readAsBytes()`, never `dart:io`, so this file builds for
 /// the web. Every method never throws: a denied camera permission, a
-/// plugin error or a cancelled picker all answer an empty list. A picked
+/// plugin error (an `Exception` or an `Error`) or a cancelled picker all
+/// answer an empty list. A picked
 /// file whose type is not one KetoClub sends on (JPEG, PNG, WebP, or a
 /// PDF for [pickPdf]) is dropped rather than passed to the model.
 ///
@@ -56,7 +57,7 @@ final class DevicePagePicker implements PagePicker {
       );
       if (photo == null) return const <ScannedPage>[];
       return await _pagesFrom(<XFile>[photo]);
-    } on Exception {
+    } on Object {
       return const <ScannedPage>[];
     }
   }
@@ -69,7 +70,7 @@ final class DevicePagePicker implements PagePicker {
         imageQuality: pickedImageQuality,
       );
       return await _pagesFrom(photos);
-    } on Exception {
+    } on Object {
       return const <ScannedPage>[];
     }
   }
@@ -87,7 +88,7 @@ final class DevicePagePicker implements PagePicker {
       return <ScannedPage>[
         ScannedPage(mimeType: ScannedPage.pdf, bytes: bytes),
       ];
-    } on Exception {
+    } on Object {
       return const <ScannedPage>[];
     }
   }
@@ -102,7 +103,7 @@ final class DevicePagePicker implements PagePicker {
         final mimeType = _imageMimeType(file, bytes);
         if (mimeType == null || bytes.isEmpty) continue;
         pages.add(ScannedPage(mimeType: mimeType, bytes: bytes));
-      } on Exception {
+      } on Object {
         continue;
       }
     }

@@ -23,6 +23,19 @@ void main() {
       expect(rules.allows(_u('/robots.txt')), isTrue);
     });
 
+    test('CR-only and CRLF line endings are lines too', () {
+      for (final text in [
+        'User-agent: *\rDisallow: /\r',
+        'User-agent: *\r\nDisallow: /\r\n',
+      ]) {
+        expect(
+          RobotsRules.parse(text).allows(_u('/menu')),
+          isFalse,
+          reason: text,
+        );
+      }
+    });
+
     test('a group naming KetoClubBot replaces the * group', () {
       final rules = RobotsRules.parse(
         'User-agent: *\nDisallow: /\n\n'

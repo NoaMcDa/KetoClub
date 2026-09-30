@@ -12,11 +12,15 @@ import 'page_picker_contract.dart';
 /// A camera and library that answer what a test queued, and record the
 /// downsizing arguments they were called with.
 final class _FakeImagePicker extends ImagePicker {
-  new({this.photo, this.library = const <XFile>[], this.error});
+  new({this.photo, this.library = const <XFile>[], this.error, this.fault});
 
   final XFile? photo;
   final List<XFile> library;
   final Exception? error;
+
+  /// An `Error` (not an `Exception`) the plugin throws instead of
+  /// answering.
+  final Error? fault;
 
   ImageSource? lastSource;
   double? lastMaxWidth;
@@ -35,6 +39,7 @@ final class _FakeImagePicker extends ImagePicker {
     lastMaxWidth = maxWidth;
     lastQuality = imageQuality;
     if (error != null) throw error!;
+    if (fault != null) throw fault!;
     return photo;
   }
 
@@ -49,6 +54,7 @@ final class _FakeImagePicker extends ImagePicker {
     lastMaxWidth = maxWidth;
     lastQuality = imageQuality;
     if (error != null) throw error!;
+    if (fault != null) throw fault!;
     return library;
   }
 }
@@ -325,5 +331,47 @@ void main() {
         expect(await picker.pickPdf(), isEmpty);
       });
     });
+
+    group('an Error thrown by a plugin', () {
+      test('answers empty from every method, never throws', () async {
+        // Arrange
+        final picker = DevicePagePicker(
+          imagePicker: _FakeImagePicker(fault: StateError('plugin')),
+          pdfPick: () async => throw ArgumentError('plugin'),
+        );
+
+        // Act & Assert
+        expect(await picker.takePhoto(), isEmpty);
+        expect(await picker.pickImages(), isEmpty);
+        expect(await picker.pickPdf(), isEmpty);
+      });
+
+      test('an Error reading one file skips it, not the others', () async {
+        // Arrange
+        final picker = DevicePagePicker(
+          imagePicker: _FakeImagePicker(
+            library: [
+              _ThrowingXFile(),
+              _xfile(_jpegBytes, name: 'ok.jpg'),
+            ],
+          ),
+        );
+
+        // Act
+        final pages = await picker.pickImages();
+
+        // Assert
+        expect(pages.single.mimeType, ScannedPage.jpeg);
+      });
+    });
   });
+}
+
+/// A picked image whose bytes cannot be read: the plugin throws an
+/// `Error`, not an `Exception`.
+final class _ThrowingXFile extends XFile {
+  new() : super('broken.jpg');
+
+  @override
+  Future<Uint8List> readAsBytes() async => throw StateError('read');
 }

@@ -28,7 +28,9 @@ final class RobotsRules {
     var inRules = false;
     var namesUs = false;
     var foundUs = false;
-    for (final raw in text.split('\n')) {
+    // Any line ending, as Python's `splitlines()` in the backend's twin:
+    // a CR-only file is not one line with no rules.
+    for (final raw in text.split(_lineBreak)) {
       final line = raw.split('#').first.trim();
       final colon = line.indexOf(':');
       if (colon < 0) continue;
@@ -58,6 +60,8 @@ final class RobotsRules {
   }
 
   final List<(bool, String)> _rules;
+
+  static final RegExp _lineBreak = RegExp(r'\r\n|\r|\n');
 
   /// Whether [url]'s path and query may be fetched: the longest matching
   /// pattern wins, a tie goes to `Allow`, and `/robots.txt` is always

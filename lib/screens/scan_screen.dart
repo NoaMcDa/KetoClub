@@ -70,13 +70,21 @@ class _ScanScreenState extends State<ScanScreen> {
       _picking = true;
       _rejection = null;
     });
-    final picked = await source();
-    if (!mounted) return;
-    final rejection = controller.addPages(picked);
-    setState(() {
-      _picking = false;
-      _rejection = rejection;
-    });
+    ScanPageRejection? rejection;
+    try {
+      final picked = await source();
+      if (!mounted) return;
+      rejection = controller.addPages(picked);
+    } finally {
+      // Reset even if a picker ever throws, so the buttons never stay
+      // disabled for good.
+      if (mounted) {
+        setState(() {
+          _picking = false;
+          _rejection = rejection;
+        });
+      }
+    }
   }
 
   void _remove(int index) {

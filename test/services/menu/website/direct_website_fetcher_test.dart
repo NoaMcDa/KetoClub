@@ -328,6 +328,200 @@ void main() {
       });
     });
 
+    group('never throws', () {
+      for (final (name, fail) in <(String, Never Function())>[
+        (
+          'an Exception package:http does not wrap',
+          () => throw Exception('handshake'),
+        ),
+        ('an Error', () => throw StateError('plugin')),
+      ]) {
+        test('$name on robots.txt or the page is unreachable', () async {
+          for (final onRobots in [true, false]) {
+            // Arrange: a TLS HandshakeException reaches the caller as is.
+            final client = MockClient((request) async {
+              if (request.url.path == '/robots.txt' && !onRobots) {
+                return http.Response('', 404);
+              }
+              fail();
+            });
+
+            // Act
+            final result = await _fetch(client);
+
+            // Assert
+            expect(
+              _reason(result),
+              MenuFetchFailureReason.websiteUnreachable,
+              reason: 'onRobots: $onRobots',
+            );
+          }
+        });
+      }
+
+      test('an Error while reading the body is unreachable', () async {
+        final client = MockClient.streaming((request, _) async {
+          if (request.url.path == '/robots.txt') {
+            return http.StreamedResponse(const Stream.empty(), 404);
+          }
+          return http.StreamedResponse(
+            Stream<List<int>>.error(StateError('stream')),
+            200,
+            headers: {'content-type': 'text/html'},
+          );
+        });
+        expect(
+          _reason(await _fetch(client)),
+          MenuFetchFailureReason.websiteUnreachable,
+        );
+      });
+
+      test('a malformed Location header is unreachable', () async {
+        final result = await _fetch(
+          _site({
+            '/': () =>
+                http.Response('', 302, headers: {'location': 'http://[bad'}),
+          }),
+        );
+        expect(_reason(result), MenuFetchFailureReason.websiteUnreachable);
+      });
+    });
+
+    group("the backend's public-address check", () {
+      for (final url in [
+        'http://127.0.0.1/',
+        'http://10.0.0.8/menu',
+        'http://192.168.1.1/',
+        'http://172.16.4.2/',
+        'http://169.254.169.254/latest/meta-data/',
+        'http://100.64.0.1/',
+        'http://0.0.0.0/',
+        'http://224.0.0.1/',
+        'http://2130706433/',
+        'http://0x7f.1/',
+        'http://127.1/',
+        'http://[::1]/',
+        'http://[fc00::1]/',
+        'http://[fd12:3456::1]/',
+        'http://[fe80::1]/',
+        'http://[::ffff:127.0.0.1]/',
+        'http://localhost/',
+        'http://router/',
+        'http://printer.local/menu',
+        'http://app.localhost/',
+        'https://cafe.example:8443/',
+        'http://cafe.example:8080/',
+        'https://user:pw@cafe.example/',
+      ]) {
+        test('refuses $url before any request', () async {
+          final seen = <http.BaseRequest>[];
+          final result = await _fetch(
+            _site({'/': () => _html(_page)}, seen: seen),
+            url: Uri.parse(url),
+          );
+          expect(_reason(result), MenuFetchFailureReason.unsupportedSource);
+          expect(seen, isEmpty);
+        });
+      }
+
+      test('a public IP address and the default ports are fetched', () async {
+        for (final url in [
+          'http://93.184.215.14/',
+          'https://cafe.example:443/',
+          'http://cafe.example:80/',
+        ]) {
+          final result = await _fetch(
+            _site({'/': () => _html(_page)}),
+            url: Uri.parse(url),
+          );
+          expect(result, isA<WebsitePage>(), reason: url);
+        }
+      });
+
+      test(
+        'a redirect to a private address is refused, not followed',
+        () async {
+          // Arrange
+          final seen = <http.BaseRequest>[];
+          final client = _site({
+            '/': () => http.Response(
+              '',
+              302,
+              headers: {'location': 'http://192.168.1.1/admin'},
+            ),
+          }, seen: seen);
+
+          // Act
+          final result = await _fetch(client);
+
+          // Assert
+          expect(_reason(result), MenuFetchFailureReason.unsupportedSource);
+          expect(seen.map((r) => r.url.host), everyElement('cafe.example'));
+        },
+      );
+    });
+
+    group('robots.txt parity with the backend', () {
+      test('only the first websiteMaxRobotsBytes are parsed', () async {
+        // Arrange: an Allow past the cap would tie with the Disallow and
+        // win; cut off, it is never read.
+        final robots =
+            'User-agent: *\nDisallow: /\n'
+            '#${'x' * websiteMaxRobotsBytes}\n'
+            'Allow: /\n';
+
+        // Act
+        final result = await _fetch(
+          _site({
+            '/': () => _html(_page),
+          }, robots: () => http.Response(robots, 200)),
+        );
+
+        // Assert
+        expect(_reason(result), MenuFetchFailureReason.disallowedByRobots);
+      });
+
+      test('a huge robots.txt is not read to its end', () async {
+        // Arrange: 4 MiB, eight times the cap.
+        var pulled = 0;
+        const chunkBytes = 64 * 1024;
+        Iterable<List<int>> huge() sync* {
+          yield utf8.encode('User-agent: *\nAllow: /\n');
+          for (var i = 0; i < 64; i++) {
+            pulled += 1;
+            yield List<int>.filled(chunkBytes, 0x23);
+          }
+        }
+
+        final client = MockClient.streaming((request, _) async {
+          if (request.url.path == '/robots.txt') {
+            return http.StreamedResponse(Stream.fromIterable(huge()), 200);
+          }
+          return http.StreamedResponse(
+            Stream.value(utf8.encode(_page)),
+            200,
+            headers: {'content-type': 'text/html'},
+          );
+        });
+
+        // Act
+        final result = await _fetch(client);
+
+        // Assert
+        expect(result, isA<WebsitePage>());
+        expect(pulled, lessThanOrEqualTo(websiteMaxRobotsBytes ~/ chunkBytes));
+      });
+
+      test('a CR-only robots.txt still refuses', () async {
+        final result = await _fetch(
+          _site({
+            '/': () => _html(_page),
+          }, robots: () => http.Response('User-agent: *\rDisallow: /\r', 200)),
+        );
+        expect(_reason(result), MenuFetchFailureReason.disallowedByRobots);
+      });
+    });
+
     test('decodePage reads the legacy Hebrew code pages', () {
       // "סלט" and a shekel sign in windows-1255, then plain UTF-8.
       final legacy = Uint8List.fromList([0xF1, 0xEC, 0xE8, 0x20, 0xA4]);

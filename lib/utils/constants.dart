@@ -1613,6 +1613,11 @@ const String scannedMenuCurrency = 'ILS';
 /// page. The backend's `WEBSITE_MAX_HTML_BYTES` is the same number.
 const int websiteMaxHtmlBytes = 2 * 1024 * 1024;
 
+/// The most of a site's `robots.txt` a phone reads: 512 KiB, the backend's
+/// `WEBSITE_MAX_ROBOTS_BYTES`. A longer file is not refused: its first
+/// 512 KiB are parsed, as the backend parses them (RFC 9309 §2.5).
+const int websiteMaxRobotsBytes = 512 * 1024;
+
 /// How long one request to a restaurant's site may take, direct or
 /// through the backend's own per-hop budget.
 const Duration websiteFetchTimeout = Duration(seconds: 15);
