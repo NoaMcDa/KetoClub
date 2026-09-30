@@ -246,14 +246,14 @@ class _MenuScreenState extends State<MenuScreen> {
       ),
       body: ContentWidth(
         child: Column(
-        children: [
-          OfflineBanner(
-            connectivity: widget.connectivity,
-            recheckToken: _recheckToken,
-          ),
-          Expanded(child: _body(context, l10n, controller)),
-        ],
-      ),
+          children: [
+            OfflineBanner(
+              connectivity: widget.connectivity,
+              recheckToken: _recheckToken,
+            ),
+            Expanded(child: _body(context, l10n, controller)),
+          ],
+        ),
       ),
     );
   }

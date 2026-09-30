@@ -131,194 +131,194 @@ class _ScanScreenState extends State<ScanScreen> {
       appBar: AppBar(title: Text(l10n.scanTitle)),
       body: ContentWidth(
         child: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          Text(l10n.scanScreenIntro, style: theme.textTheme.bodyMedium),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              OutlinedButton.icon(
-                onPressed: canAdd
-                    ? () => unawaited(_pick(widget.pagePicker.takePhoto))
-                    : null,
-                icon: const Icon(Icons.photo_camera_outlined),
-                label: Text(l10n.scanScreenActionTakePhoto),
-              ),
-              OutlinedButton.icon(
-                onPressed: canAdd
-                    ? () => unawaited(_pick(widget.pagePicker.pickImages))
-                    : null,
-                icon: const Icon(Icons.photo_library_outlined),
-                label: Text(l10n.scanScreenActionChoosePhotos),
-              ),
-              OutlinedButton.icon(
-                onPressed: canAdd
-                    ? () => unawaited(_pick(widget.pagePicker.pickPdf))
-                    : null,
-                icon: const Icon(Icons.picture_as_pdf_outlined),
-                label: Text(l10n.scanScreenActionChoosePdf),
-              ),
-              if (controller.qrAvailable)
+          padding: const EdgeInsets.all(20),
+          children: [
+            Text(l10n.scanScreenIntro, style: theme.textTheme.bodyMedium),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
                 OutlinedButton.icon(
-                  onPressed: canScanQr ? () => unawaited(_scanQr()) : null,
-                  icon: const Icon(Icons.qr_code_scanner),
-                  label: Text(l10n.scanQrAction),
+                  onPressed: canAdd
+                      ? () => unawaited(_pick(widget.pagePicker.takePhoto))
+                      : null,
+                  icon: const Icon(Icons.photo_camera_outlined),
+                  label: Text(l10n.scanScreenActionTakePhoto),
                 ),
-            ],
-          ),
-          if (qrNotice != null) ...[
-            const SizedBox(height: 12),
-            Semantics(
-              liveRegion: true,
-              child: Text(switch (qrNotice) {
-                QrUnsupportedSource(:final name) =>
-                  l10n.scanQrUnsupportedSource(name),
-                QrVenue() ||
-                QrPhotographInstead() => l10n.scanQrPhotographInstead,
-              }, style: theme.textTheme.bodyMedium),
+                OutlinedButton.icon(
+                  onPressed: canAdd
+                      ? () => unawaited(_pick(widget.pagePicker.pickImages))
+                      : null,
+                  icon: const Icon(Icons.photo_library_outlined),
+                  label: Text(l10n.scanScreenActionChoosePhotos),
+                ),
+                OutlinedButton.icon(
+                  onPressed: canAdd
+                      ? () => unawaited(_pick(widget.pagePicker.pickPdf))
+                      : null,
+                  icon: const Icon(Icons.picture_as_pdf_outlined),
+                  label: Text(l10n.scanScreenActionChoosePdf),
+                ),
+                if (controller.qrAvailable)
+                  OutlinedButton.icon(
+                    onPressed: canScanQr ? () => unawaited(_scanQr()) : null,
+                    icon: const Icon(Icons.qr_code_scanner),
+                    label: Text(l10n.scanQrAction),
+                  ),
+              ],
             ),
-          ],
-          if (_rejection != null) ...[
-            const SizedBox(height: 12),
-            Semantics(
-              liveRegion: true,
-              child: Text(
-                switch (_rejection!) {
+            if (qrNotice != null) ...[
+              const SizedBox(height: 12),
+              Semantics(
+                liveRegion: true,
+                child: Text(switch (qrNotice) {
+                  QrUnsupportedSource(:final name) =>
+                    l10n.scanQrUnsupportedSource(name),
+                  QrVenue() ||
+                  QrPhotographInstead() => l10n.scanQrPhotographInstead,
+                }, style: theme.textTheme.bodyMedium),
+              ),
+            ],
+            if (_rejection != null) ...[
+              const SizedBox(height: 12),
+              Semantics(
+                liveRegion: true,
+                child: Text(
+                  switch (_rejection!) {
                     ScanPageRejection.tooManyPages =>
                       l10n.scanScreenTooManyPages(maxScanPages),
                     ScanPageRejection.pageTooLarge =>
                       l10n.scanScreenPageTooLarge(
-                    maxScanPageBytes ~/ (1024 * 1024),
+                        maxScanPageBytes ~/ (1024 * 1024),
+                      ),
+                  },
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.error,
                   ),
-                },
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.error,
                 ),
               ),
-            ),
-          ],
-          if (pages.isNotEmpty) ...[
-            const SizedBox(height: 20),
-            Text(
-              l10n.scanScreenPagesHeading,
-              style: theme.textTheme.titleSmall,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              l10n.scanScreenPageCount(pages.length, maxScanPages),
-              style: theme.textTheme.bodySmall,
-            ),
-            if (controller.atPageCap)
+            ],
+            if (pages.isNotEmpty) ...[
+              const SizedBox(height: 20),
+              Text(
+                l10n.scanScreenPagesHeading,
+                style: theme.textTheme.titleSmall,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                l10n.scanScreenPageCount(pages.length, maxScanPages),
+                style: theme.textTheme.bodySmall,
+              ),
+              if (controller.atPageCap)
                 Text(
                   l10n.scanScreenCapReached,
                   style: theme.textTheme.bodySmall,
                 ),
-            const SizedBox(height: 8),
-            for (var i = 0; i < pages.length; i++)
-              _PageRow(
-                page: pages[i],
-                number: i + 1,
-                onRemove: controller.analysing ? null : () => _remove(i),
-              ),
-          ],
-          const SizedBox(height: 12),
-          Text(
-            widget.directToGoogle
-                ? l10n.scanScreenDisclosureDirect
-                : l10n.scanScreenDisclosureWeb,
-            style: theme.textTheme.bodySmall,
-          ),
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: TextButton(
-              onPressed: () => Navigator.pushNamed(context, '/settings'),
-              child: Text(l10n.scanScreenSettingsLink),
-            ),
-          ),
-          if (controller.analysing)
-            const AnalysisProgressRow(phase: LoadPhase.classifying),
-          if (failure != null && !controller.analysing) ...[
-            Semantics(
-              liveRegion: true,
-              child: Text(
-                scanFailureMessage(
-                  failure,
-                  l10n,
-                  directToGoogle: widget.directToGoogle,
+              const SizedBox(height: 8),
+              for (var i = 0; i < pages.length; i++)
+                _PageRow(
+                  page: pages[i],
+                  number: i + 1,
+                  onRemove: controller.analysing ? null : () => _remove(i),
                 ),
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.error,
-                ),
-              ),
+            ],
+            const SizedBox(height: 12),
+            Text(
+              widget.directToGoogle
+                  ? l10n.scanScreenDisclosureDirect
+                  : l10n.scanScreenDisclosureWeb,
+              style: theme.textTheme.bodySmall,
             ),
-            const SizedBox(height: 8),
             Align(
               alignment: AlignmentDirectional.centerStart,
-              child: OutlinedButton(
+              child: TextButton(
+                onPressed: () => Navigator.pushNamed(context, '/settings'),
+                child: Text(l10n.scanScreenSettingsLink),
+              ),
+            ),
+            if (controller.analysing)
+              const AnalysisProgressRow(phase: LoadPhase.classifying),
+            if (failure != null && !controller.analysing) ...[
+              Semantics(
+                liveRegion: true,
+                child: Text(
+                  scanFailureMessage(
+                    failure,
+                    l10n,
+                    directToGoogle: widget.directToGoogle,
+                  ),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.error,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: OutlinedButton(
+                  onPressed: controller.canAnalysePages
+                      ? () => unawaited(_analysePages())
+                      : null,
+                  child: Text(l10n.actionRetry),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
                 onPressed: controller.canAnalysePages
                     ? () => unawaited(_analysePages())
                     : null,
-                child: Text(l10n.actionRetry),
+                child: Text(l10n.scanScreenAnalysePages),
               ),
             ),
-            const SizedBox(height: 8),
-          ],
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: controller.canAnalysePages
-                  ? () => unawaited(_analysePages())
-                  : null,
-              child: Text(l10n.scanScreenAnalysePages),
-            ),
-          ),
-          const SizedBox(height: 28),
+            const SizedBox(height: 28),
             Text(
               l10n.scanScreenPasteHeading,
               style: theme.textTheme.titleSmall,
             ),
-          const SizedBox(height: 8),
-          Text(l10n.scanPasteIntro, style: theme.textTheme.bodyMedium),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _field,
-            onChanged: (value) => controller.text = value,
-            keyboardType: TextInputType.multiline,
-            textInputAction: TextInputAction.newline,
-            minLines: 8,
-            maxLines: 14,
-            decoration: InputDecoration(
-              labelText: l10n.scanPasteLabel,
-              hintText: l10n.scanPasteHint,
-              alignLabelWithHint: true,
+            const SizedBox(height: 8),
+            Text(l10n.scanPasteIntro, style: theme.textTheme.bodyMedium),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _field,
+              onChanged: (value) => controller.text = value,
+              keyboardType: TextInputType.multiline,
+              textInputAction: TextInputAction.newline,
+              minLines: 8,
+              maxLines: 14,
+              decoration: InputDecoration(
+                labelText: l10n.scanPasteLabel,
+                hintText: l10n.scanPasteHint,
+                alignLabelWithHint: true,
+              ),
             ),
-          ),
-          if (controller.emptyPaste) ...[
-            const SizedBox(height: 12),
-            Semantics(
-              liveRegion: true,
-              child: Text(
-                l10n.scanEmptyPaste,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.error,
+            if (controller.emptyPaste) ...[
+              const SizedBox(height: 12),
+              Semantics(
+                liveRegion: true,
+                child: Text(
+                  l10n.scanEmptyPaste,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.error,
+                  ),
                 ),
+              ),
+            ],
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: controller.canAnalyse
+                    ? () => unawaited(_analysePaste())
+                    : null,
+                child: Text(l10n.scanAnalyse),
               ),
             ),
           ],
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: controller.canAnalyse
-                  ? () => unawaited(_analysePaste())
-                  : null,
-              child: Text(l10n.scanAnalyse),
-            ),
-          ),
-        ],
-      ),
+        ),
       ),
     );
   }
