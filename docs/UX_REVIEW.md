@@ -351,13 +351,23 @@ the source line and the keto-score badge. On a 1440px window this means:
 
 ## 4. Suggested order of work
 
-1. Content-width constraint + sheet `maxWidth` (an afternoon, no logic
-   touched, fixes most of "wide and weird").
-2. Discovery grid + card surface + "Closed" tag + distance.
-3. `NavigationRail` at ≥840px.
-4. Menu screen top-of-list diet (budget notice, chip/banner duplicate,
-   note row, second waiter button) and app-bar title.
-5. Rename Saved → Recent and enrich its rows.
-6. Settings reorder and segmented controls.
-7. Web shell: splash, manifest colours, path URLs, per-route titles.
-8. Hebrew font bundle (product decision on size).
+Every remark above is filed as its own issue under the GitHub milestone
+**Phase 8: UI Polish & Desktop Web** (#221–#264, label `Phase 8`).
+
+1. Content-width constraint (#221) + sheet `maxWidth` (#224) — an
+   afternoon, no logic touched, fixes most of "wide and weird".
+2. Discovery grid + card surface (#222), "Closed" tag (#227), distance
+   (#230).
+3. `NavigationRail` at ≥840px (#223).
+4. Menu screen top-of-list diet (#234; budget notice #235, chip/banner
+   duplicate #236, note row #240, second waiter button #239) and the
+   app-bar title (#237).
+5. Rename Saved → Recent (#251) and enrich its rows (#252, #253).
+6. Settings reorder (#255) and segmented controls (#256).
+7. Web shell: splash, manifest colours, path URLs, per-route titles (#226).
+8. Hebrew font bundle (#261; product decision on size).
+
+The rest, by section: Explore #228, #229, #231, #232, #233; Menu #238,
+#241, #242, #243, #244, #245; Waiter Card #246; Scan #247, #248, #249,
+#250; Saved #254; Settings #257, #258; Drinks #259; cross-cutting #260,
+#262, #263, #264; desktop two-pane menu #225.
