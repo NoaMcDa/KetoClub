@@ -31,8 +31,37 @@
 
   <title>KetoClub</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- Browser chrome follows the same --bg as the splash and the manifest
+       (AppTokens.lightBg / darkBg; test/web_shell_test.dart pins them). -->
+  <meta name="theme-color" content="#FAF7F0" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#14120E" media="(prefers-color-scheme: dark)">
+  <style>
+    /* The loading splash (issue #226): without it a first visit is a blank
+       page until CanvasKit arrives. Removed on Flutter's first frame. */
+    html, body { margin: 0; height: 100%; background: #FAF7F0; }
+    #splash {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: #FAF7F0; color: #3C7847;
+      font: 600 28px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif;
+      letter-spacing: 0.01em;
+    }
+    @media (prefers-color-scheme: dark) {
+      html, body, #splash { background: #14120E; }
+      #splash { color: #6DC17B; }
+    }
+  </style>
 </head>
 <body>
+  <div id="splash" role="status" aria-live="polite">KetoClub</div>
+  <script>
+    // Flutter dispatches `flutter-first-frame` on window once it has painted.
+    window.addEventListener('flutter-first-frame', function () {
+      var splash = document.getElementById('splash');
+      if (splash) splash.remove();
+    });
+  </script>
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader

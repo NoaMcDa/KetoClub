@@ -106,6 +106,40 @@ flutter build ios --no-codesign  # needs Xcode
 Add the same `--dart-define=KETOCLUB_BACKEND_URL=…` to a build that should
 talk to a backend.
 
+### Web shell: path URLs, splash and tab titles (issue #226)
+
+The web build uses **path URLs**: a shared link reads
+`/venue/wolt/hamosad`, not `/#/venue/wolt/hamosad` (`usePathUrlStrategy()` in
+`main.dart`, web only). That works only if the host answers **every unknown
+path with `index.html`** (a single-page-app fallback); otherwise a reload or a
+pasted deep link is a 404.
+
+- `flutter run -d chrome` and `flutter drive` already do this.
+- A static server must be told: `npx serve -s build/web` (the `-s` flag),
+  `python3 -m http.server` does **not** (it 404s on `/venue/...`), nginx wants
+  `try_files $uri /index.html;`, Firebase Hosting a `rewrites` entry to
+  `/index.html`, Netlify/Cloudflare Pages a `/* /index.html 200` rule. The
+  `<base href>` must match the path the app is served from
+  (`--base-href /sub/` for a sub-path). Hosting itself is issue #109.
+
+Two more web-only touches, checked by hand because no test drives a browser:
+
+- **Loading splash.** `web/index.html` paints the app name on the `--bg`
+  cream (dark `--bg` under a dark system theme) straight away and removes it
+  on Flutter's `flutter-first-frame` event. Manual check: open DevTools
+  Network, throttle to "Slow 3G", hard-reload; the name shows while
+  `canvaskit` downloads, then the app replaces it and
+  `document.getElementById('splash')` is `null`.
+- **Tab titles.** The tab reads "Explore · KetoClub", "Settings · KetoClub",
+  "<venue name> · KetoClub" and so on (`documentTitle`, `RouteTitle`);
+  the venue's name appears once its menu has loaded. Manual check: open two
+  tabs on different screens and confirm they are distinguishable, and that
+  Back restores the earlier title.
+
+`web/manifest.json`'s `background_color` and `theme_color` are the light
+`--bg` (`#FAF7F0`), pinned against `AppTokens.lightBg` by
+`test/web_shell_test.dart`; it no longer locks the orientation.
+
 ## 4. Tests and the gate
 
 ```bash

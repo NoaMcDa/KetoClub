@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/widgets/route_title.dart';
 
 /// The bottom-navigation shell around the four tab-root routes: Explore,
 /// Scan, Saved and Settings (architecture.md §6.6; issue #11).
@@ -26,7 +27,12 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 /// visit to `/` — see `generateRoute`'s doc comment in `app.dart`.
 class AppShell extends StatelessWidget {
   /// Creates the shell around [child], with tab [currentIndex] highlighted.
-  const new({required this.currentIndex, required this.child, super.key});
+  const new({
+    required this.currentIndex,
+    required this.child,
+    this.pageTitle,
+    super.key,
+  });
 
   /// The Explore tab's index — `/`, wrapping `VenueSearchScreen`.
   static const int exploreIndex = 0;
@@ -62,10 +68,26 @@ class AppShell extends StatelessWidget {
   /// The tab-root screen this shell wraps.
   final Widget child;
 
+  /// The browser-tab title's page name, when it should not be the active
+  /// tab's label (the drinks guide, which lives under Settings; issue #226).
+  final String? pageTitle;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final tabLabels = <String>[
+      l10n.navExplore,
+      l10n.navScan,
+      l10n.navSaved,
+      l10n.navSettings,
+    ];
+    return RouteTitle(
+      page: pageTitle ?? tabLabels[currentIndex],
+      child: _scaffold(context, l10n),
+    );
+  }
 
+  Widget _scaffold(BuildContext context, AppLocalizations l10n) {
     return Scaffold(
       body: child,
       bottomNavigationBar: NavigationBar(
