@@ -907,6 +907,9 @@ void main() {
 
       // Act
       await tester.enterText(find.byKey(apiKeyFieldKey), '  AIza-typed  ');
+      // Below the fold on the default 800×600 surface once the content
+      // column is capped (issue #221).
+      await tester.ensureVisible(find.byKey(apiKeySaveKey));
       await tester.tap(find.byKey(apiKeySaveKey));
       await tester.pumpAndSettle();
 
@@ -927,6 +930,7 @@ void main() {
 
       // Act
       await tester.enterText(find.byKey(apiKeyFieldKey), '   ');
+      await tester.ensureVisible(find.byKey(apiKeySaveKey));
       await tester.tap(find.byKey(apiKeySaveKey));
       await tester.pumpAndSettle();
 
@@ -943,6 +947,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Act
+      await tester.ensureVisible(find.byKey(apiKeyDeleteKey));
       await tester.tap(find.byKey(apiKeyDeleteKey));
       await tester.pumpAndSettle();
 

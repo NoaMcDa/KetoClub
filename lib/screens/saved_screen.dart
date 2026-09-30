@@ -7,6 +7,7 @@ import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/saved_controller.dart';
 import 'package:ketoclub/utils/venue_route.dart';
+import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:provider/provider.dart';
@@ -96,11 +97,13 @@ class _SavedScreenState extends State<SavedScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.savedPlaceholderTitle)),
-      body: controller.isLoading
-          ? _loadingList(l10n)
-          : controller.entries.isEmpty
-          ? _emptyState(context, l10n)
-          : _list(context, l10n, controller),
+      body: ContentWidth(
+        child: controller.isLoading
+            ? _loadingList(l10n)
+            : controller.entries.isEmpty
+            ? _emptyState(context, l10n)
+            : _list(context, l10n, controller),
+      ),
     );
   }
 

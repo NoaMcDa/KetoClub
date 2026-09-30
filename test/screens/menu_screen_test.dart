@@ -34,6 +34,7 @@ import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
+import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
@@ -2679,6 +2680,116 @@ void main() {
         // Assert
         expect(find.text(_he.scannedMenuPagesTitle), findsOneWidget);
         expect(tester.takeException(), isNull);
+      });
+    });
+
+    group('content width on a wide window (issue #221)', () {
+      /// A loaded menu with one green and one yellow dish, analysed, so
+      /// the verdict tiles and two dish cards are on screen.
+      MenuController analysedController() {
+        final green = _dish('Steak', id: 'green');
+        final yellow = _dish('Fries', id: 'yellow');
+        return _controllerFor(
+          repository: FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([green, yellow]))),
+          classifier: FakeMenuClassifier()
+            ..respondWith(
+              MenuAnalysed(
+                dishes: [
+                  _verdictFor(green, DishVerdict.orderAsIs),
+                  _verdictFor(
+                    yellow,
+                    DishVerdict.modifiable,
+                    modification: 'Ask for a salad instead of fries.',
+                  ),
+                ],
+                unclassified: const <String>[],
+                engine: const LlmEngine(model: 'test-model'),
+                analysedAt: DateTime.utc(2026),
+              ),
+            ),
+        );
+      }
+
+      /// Resizes the surface [_pump] set up to [width] logical pixels,
+      /// keeping its height, and lays the screen out again.
+      Future<void> resizeTo(WidgetTester tester, double width) async {
+        tester.view.physicalSize = Size(width, 1600);
+        await tester.pumpAndSettle();
+      }
+
+      testWidgets('at 1440px the dish cards and the verdict tiles are no '
+          'wider than the cap and sit centred in the window', (tester) async {
+        // Arrange
+        await _pump(tester, analysedController());
+        await tester.pumpAndSettle();
+
+        // Act
+        await resizeTo(tester, 1440);
+
+        // Assert
+        final tiles = tester.getRect(find.byType(VerdictCounterTiles));
+        expect(tiles.width, lessThanOrEqualTo(contentMaxWidth));
+        expect(tiles.center.dx, closeTo(720, 0.01));
+        final cards = find.byType(DishCard);
+        expect(cards, findsNWidgets(2));
+        for (final card in cards.evaluate()) {
+          final rect = tester.getRect(find.byWidget(card.widget));
+          expect(rect.width, lessThanOrEqualTo(contentMaxWidth));
+          expect(rect.center.dx, closeTo(720, 0.01));
+        }
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('at 390px a dish card and the verdict tiles span the '
+          'phone width inside the 20px gutters, as before the cap', (
+        tester,
+      ) async {
+        // Arrange
+        await _pump(tester, analysedController());
+        await tester.pumpAndSettle();
+
+        // Act
+        await resizeTo(tester, 390);
+
+        // Assert
+        final tiles = tester.getRect(find.byType(VerdictCounterTiles));
+        expect(tiles.left, 20);
+        expect(tiles.width, 350);
+        final card = tester.getRect(find.byType(DishCard).first);
+        expect(card.left, 20);
+        expect(card.width, 350);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('at 1440px a failed fetch reads inside the capped '
+          'column', (tester) async {
+        // Arrange
+        final controller = _controllerFor(
+          repository: FakeMenuRepository()
+            ..stub(
+              _ref,
+              const MenuFetchFailed(
+                reason: MenuFetchFailureReason.blockedByBrowser,
+              ),
+            ),
+        );
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Act
+        await resizeTo(tester, 1440);
+
+        // Assert
+        final message = fetchFailureMessage(
+          MenuFetchFailureReason.blockedByBrowser,
+          _en,
+          platform: 'Wolt',
+        );
+        final rect = tester.getRect(find.text(message));
+        const gutter = (1440 - contentMaxWidth) / 2;
+        expect(rect.left, greaterThanOrEqualTo(gutter));
+        expect(rect.right, lessThanOrEqualTo(1440 - gutter));
       });
     });
 

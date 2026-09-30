@@ -931,6 +931,19 @@ and `SavedScreen` are stateless placeholders with localized copy explaining what
 is missing, not stubs left silently blank; `MenuScreen` (reached from a search
 result, not a tab) and `WaiterCardSheet` (a modal) sit outside the shell.
 
+**Content is capped at 680px on a wide window** *(issue #221, Phase 8)*. Every
+screen was drawn on a 390px artboard, and on a desktop browser a full-width
+column turned the venue photo into a letterbox strip and stretched every button
+across the monitor. `ContentWidth` (`widgets/content_width.dart`) centres a
+screen's body and caps it at `contentMaxWidth` (680 logical pixels); it sits
+just inside each `Scaffold` — Discovery, the menu route (its loading,
+fetch-failure and empty states included), Scan, Saved, Settings and the drinks
+guide — so the `Scaffold` background and app bar stay full-bleed and only the
+content column is capped. At or below the cap it passes its child through
+unchanged, so nothing moves on a phone. The body is pinned to the top, not
+centred vertically. A screen may pass a wider cap (Discovery's venue grid,
+#222); none does yet.
+
 Visual rules: a verdict is always icon **and** colour, never colour alone
 (accessibility). Unclassified dishes are listed under their own neutral heading.
 The engine chip is always visible on a classified menu.

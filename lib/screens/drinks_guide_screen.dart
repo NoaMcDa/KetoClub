@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/utils/drinks_guide_data.dart';
+import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
 
 /// The route path for the offline drinks guide (issue #216).
@@ -36,25 +37,27 @@ class DrinksGuideScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.drinksGuideTitle)),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _Disclaimer(l10n.drinksGuideDisclaimer),
-            const SizedBox(height: 20),
-            _SectionHeader(l10n.drinksGuideSectionOrderAsIs),
-            const SizedBox(height: 8),
-            _DrinkGroup(entries: orderAsIs, showScript: false),
-            const SizedBox(height: 20),
-            _SectionHeader(l10n.drinksGuideSectionSwap),
-            const SizedBox(height: 8),
-            _DrinkGroup(entries: askForSwap, showScript: true),
-            const SizedBox(height: 20),
-            _SectionHeader(l10n.drinksGuideSectionSkip),
-            const SizedBox(height: 8),
-            _DrinkGroup(entries: skip, showScript: false),
-          ],
+      body: ContentWidth(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _Disclaimer(l10n.drinksGuideDisclaimer),
+              const SizedBox(height: 20),
+              _SectionHeader(l10n.drinksGuideSectionOrderAsIs),
+              const SizedBox(height: 8),
+              _DrinkGroup(entries: orderAsIs, showScript: false),
+              const SizedBox(height: 20),
+              _SectionHeader(l10n.drinksGuideSectionSwap),
+              const SizedBox(height: 8),
+              _DrinkGroup(entries: askForSwap, showScript: true),
+              const SizedBox(height: 20),
+              _SectionHeader(l10n.drinksGuideSectionSkip),
+              const SizedBox(height: 8),
+              _DrinkGroup(entries: skip, showScript: false),
+            ],
+          ),
         ),
       ),
     );

@@ -10,6 +10,7 @@ import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/consent_disclosure_banner.dart';
+import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
@@ -178,69 +179,71 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              OfflineBanner(connectivity: widget.connectivity),
-              ConsentDisclosureBanner(
-                settingsStore: widget.settingsStore,
-                directToGoogle: widget.directToGoogle,
-              ),
-              _header(context, l10n, controller),
-              const SizedBox(height: 12),
-              Text(appName, style: textTheme.labelSmall),
-              const SizedBox(height: 4),
-              // The artboard's 34px serif heading.
-              Text(
-                l10n.discoveryTitle,
-                style: textTheme.displaySmall?.copyWith(
-                  fontSize: 34,
-                  height: 1.08,
+      body: ContentWidth(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                OfflineBanner(connectivity: widget.connectivity),
+                ConsentDisclosureBanner(
+                  settingsStore: widget.settingsStore,
+                  directToGoogle: widget.directToGoogle,
                 ),
-              ),
-              if (lastVenue != null) ...[
+                _header(context, l10n, controller),
+                const SizedBox(height: 12),
+                Text(appName, style: textTheme.labelSmall),
+                const SizedBox(height: 4),
+                // The artboard's 34px serif heading.
+                Text(
+                  l10n.discoveryTitle,
+                  style: textTheme.displaySmall?.copyWith(
+                    fontSize: 34,
+                    height: 1.08,
+                  ),
+                ),
+                if (lastVenue != null) ...[
+                  const SizedBox(height: 16),
+                  _continueRow(context, l10n, lastVenue),
+                ],
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _field,
+                  focusNode: _fieldFocus,
+                  textInputAction: TextInputAction.search,
+                  onChanged: (value) =>
+                      controller.search(value, language: _language),
+                  onSubmitted: _onSubmitted,
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.search),
+                    labelText: l10n.venueSearchLabel,
+                    hintText: l10n.venueSearchHint,
+                    errorText: controller.isInvalid
+                        ? l10n.venueSearchInvalid
+                        : null,
+                  ),
+                ),
                 const SizedBox(height: 16),
-                _continueRow(context, l10n, lastVenue),
-              ],
-              const SizedBox(height: 20),
-              TextField(
-                controller: _field,
-                focusNode: _fieldFocus,
-                textInputAction: TextInputAction.search,
-                onChanged: (value) =>
-                    controller.search(value, language: _language),
-                onSubmitted: _onSubmitted,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search),
-                  labelText: l10n.venueSearchLabel,
-                  hintText: l10n.venueSearchHint,
-                  errorText: controller.isInvalid
-                      ? l10n.venueSearchInvalid
-                      : null,
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: FilledButton(
+                    onPressed: resolved == null
+                        ? null
+                        : () => _openVenue(resolved),
+                    child: Text(l10n.venueSearchOpen),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: FilledButton(
-                  onPressed: resolved == null
-                      ? null
-                      : () => _openVenue(resolved),
-                  child: Text(l10n.venueSearchOpen),
-                ),
-              ),
-              const SizedBox(height: 24),
-              if (controller.phase == DiscoveryPhase.idle &&
-                  controller.failure == null &&
-                  controller.results.isNotEmpty) ...[
-                _chips(l10n, controller),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
+                if (controller.phase == DiscoveryPhase.idle &&
+                    controller.failure == null &&
+                    controller.results.isNotEmpty) ...[
+                  _chips(l10n, controller),
+                  const SizedBox(height: 16),
+                ],
+                _body(context, l10n, controller),
               ],
-              _body(context, l10n, controller),
-            ],
+            ),
           ),
         ),
       ),

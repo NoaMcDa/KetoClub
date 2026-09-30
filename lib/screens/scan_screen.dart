@@ -11,6 +11,7 @@ import 'package:ketoclub/state/scan_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
+import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/scan_failure_copy.dart';
 import 'package:provider/provider.dart';
 
@@ -128,7 +129,8 @@ class _ScanScreenState extends State<ScanScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.scanTitle)),
-      body: ListView(
+      body: ContentWidth(
+        child: ListView(
         padding: const EdgeInsets.all(20),
         children: [
           Text(l10n.scanScreenIntro, style: theme.textTheme.bodyMedium),
@@ -184,10 +186,10 @@ class _ScanScreenState extends State<ScanScreen> {
               liveRegion: true,
               child: Text(
                 switch (_rejection!) {
-                  ScanPageRejection.tooManyPages => l10n.scanScreenTooManyPages(
-                    maxScanPages,
-                  ),
-                  ScanPageRejection.pageTooLarge => l10n.scanScreenPageTooLarge(
+                    ScanPageRejection.tooManyPages =>
+                      l10n.scanScreenTooManyPages(maxScanPages),
+                    ScanPageRejection.pageTooLarge =>
+                      l10n.scanScreenPageTooLarge(
                     maxScanPageBytes ~/ (1024 * 1024),
                   ),
                 },
@@ -209,7 +211,10 @@ class _ScanScreenState extends State<ScanScreen> {
               style: theme.textTheme.bodySmall,
             ),
             if (controller.atPageCap)
-              Text(l10n.scanScreenCapReached, style: theme.textTheme.bodySmall),
+                Text(
+                  l10n.scanScreenCapReached,
+                  style: theme.textTheme.bodySmall,
+                ),
             const SizedBox(height: 8),
             for (var i = 0; i < pages.length; i++)
               _PageRow(
@@ -270,7 +275,10 @@ class _ScanScreenState extends State<ScanScreen> {
             ),
           ),
           const SizedBox(height: 28),
-          Text(l10n.scanScreenPasteHeading, style: theme.textTheme.titleSmall),
+            Text(
+              l10n.scanScreenPasteHeading,
+              style: theme.textTheme.titleSmall,
+            ),
           const SizedBox(height: 8),
           Text(l10n.scanPasteIntro, style: theme.textTheme.bodyMedium),
           const SizedBox(height: 16),
@@ -310,6 +318,7 @@ class _ScanScreenState extends State<ScanScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }
