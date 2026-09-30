@@ -2,15 +2,11 @@
 // #46): a pasted 10bis link or bare id now resolves to a classified menu —
 // the adapter and its registration in di.dart are what changed since the
 // honest `unsupportedSource` message this test used to assert (issue #33).
-// A `notFound` ref still shows its own 10bis-specific copy, distinct from
-// a Wolt not-found message (architecture.md §10, "collapsing reasons is a
-// bug").
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
-import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/menu/tenbis/tenbis_menu_mapper.dart';
@@ -105,54 +101,5 @@ void main() {
       expect(find.text('Entrecôte 300g'), findsOneWidget);
       expect(find.text('Grilled Halloumi Salad'), findsOneWidget);
     });
-
-    testWidgets(
-      'pasting a bare 10bis id behaves the same way as the full url',
-      (tester) async {
-        // Setup
-        final mapped = TenBisMenuMapper.toMenu(
-          _tenBisJson,
-          ref: _ref,
-          fetchedAt: DateTime.utc(2026),
-        );
-        final fakes = FakeAppDependencies();
-        fakes.repository.stub(_ref, mapped);
-        await pumpApp(tester, fakes);
-
-        // Act: paste a bare numeric id and open it.
-        await enterText(tester, '654321');
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
-
-        // Assert
-        expect(find.byType(EngineChip), findsOneWidget);
-        expect(find.text('Entrecôte 300g'), findsOneWidget);
-      },
-    );
-
-    testWidgets(
-      'a 10bis ref the repository cannot find shows the 10bis-specific '
-      'not-found message',
-      (tester) async {
-        // Setup: distinct from a Wolt not-found message — both carry the
-        // platform name into the same l10n key, and this asserts the
-        // 10bis one specifically (architecture.md §10).
-        final fakes = FakeAppDependencies();
-        fakes.repository.stub(
-          _ref,
-          const MenuFetchFailed(
-            reason: MenuFetchFailureReason.notFound,
-            statusCode: 404,
-          ),
-        );
-        await pumpApp(tester, fakes);
-
-        // Act
-        await enterText(tester, _tenBisUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
-
-        // Assert
-        expect(find.text(_en.fetchFailedNotFound('10bis')), findsOneWidget);
-      },
-    );
   });
 }

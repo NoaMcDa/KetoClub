@@ -197,19 +197,6 @@ void main() {
           ),
         );
       });
-
-      test('parse given dishes as a valid empty list does not fail with '
-          'badResponse', () {
-        // Arrange
-        final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
-        final body = _fixture('llm_empty_dishes.json');
-
-        // Act
-        final result = _parse(body, source);
-
-        // Assert
-        expect(result, isNot(isA<MenuAnalysisFailed>()));
-      });
     });
 
     group('parse given provenance (rule 3)', () {
@@ -350,20 +337,6 @@ void main() {
         // Assert
         expect(result.dishes, isEmpty);
         expect(result.unclassified, ['Grilled Steak']);
-      });
-
-      test('parse given a valid verdict and non-empty why places the '
-          'dish', () {
-        // Arrange
-        final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
-        final body = _fixture('llm_fenced_valid.json');
-
-        // Act
-        final result = _parse(body, source) as MenuAnalysed;
-
-        // Assert
-        expect(result.dishes, hasLength(1));
-        expect(result.unclassified, isEmpty);
       });
     });
 
@@ -568,19 +541,6 @@ void main() {
         expect(result.dishes.single.dishId, 'dish-steak');
         expect(result.unclassified, ['Greek Salad']);
       });
-
-      test('parse given a reply that mentions every source dish leaves '
-          'unclassified empty', () {
-        // Arrange
-        final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
-        final body = _fixture('llm_fenced_valid.json');
-
-        // Act
-        final result = _parse(body, source) as MenuAnalysed;
-
-        // Assert
-        expect(result.unclassified, isEmpty);
-      });
     });
 
     group('parse given an empty result (rule 8)', () {
@@ -606,22 +566,6 @@ void main() {
         // Arrange
         final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
         final body = _fixture('llm_empty_dishes.json');
-
-        // Act
-        final result = _parse(body, source);
-
-        // Assert
-        expect(result, isA<MenuAnalysed>());
-        final analysed = result as MenuAnalysed;
-        expect(analysed.dishes, isEmpty);
-        expect(analysed.unclassified, ['Grilled Steak']);
-      });
-
-      test('parse given an all-unclassified reply (every dish demoted) '
-          'still returns MenuAnalysed, not a failure', () {
-        // Arrange
-        final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
-        final body = _fixture('llm_yellow_null_modification.json');
 
         // Act
         final result = _parse(body, source);

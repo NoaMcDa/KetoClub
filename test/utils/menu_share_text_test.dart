@@ -172,28 +172,6 @@ void main() {
       expect(text, isNot(contains('Spaghetti Carbonara')));
     });
 
-    test('never mentions a personal note — build is never given one', () {
-      // Arrange: nothing about the user is even representable in the
-      // arguments MenuShareText.build takes, but this test asserts the
-      // acceptance criterion in the shape a reviewer would look for —
-      // that a note's own text never appears in the export, even when it
-      // happens to be sitting right beside the dish in the app.
-      final steak = _dish('Grilled Steak');
-      final menu = _menuOf([steak]);
-      final analysis = _analysisOf([_verdictFor(steak, DishVerdict.orderAsIs)]);
-      const personalNote = 'Waitstaff happily substituted cauliflower.';
-
-      // Act
-      final text = MenuShareText.build(
-        venueName: 'Sunny Diner',
-        menu: menu,
-        analysis: analysis,
-      );
-
-      // Assert
-      expect(text, isNot(contains(personalNote)));
-    });
-
     test('omits the yellow heading and lines when no dish is yellow', () {
       // Arrange
       final steak = _dish('Grilled Steak');

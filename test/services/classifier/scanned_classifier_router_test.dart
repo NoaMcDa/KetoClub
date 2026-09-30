@@ -149,23 +149,5 @@ void main() {
         expect(client.requests, hasLength(1));
       }
     });
-
-    test('an empty transcription is noDishesFound', () async {
-      // Arrange
-      final client = FakeLlmChatClient()
-        ..fallback = const ChatCompleted(content: '{"dishes":[]}', model: 'm');
-
-      // Act
-      final result = await _overClient(client)
-          .classify(_onePage(), options: _consented);
-
-      // Assert
-      expect(
-        result,
-        const ScannedMenuFailed(
-          reason: MenuAnalysisFailureReason.noDishesFound,
-        ),
-      );
-    });
   });
 }

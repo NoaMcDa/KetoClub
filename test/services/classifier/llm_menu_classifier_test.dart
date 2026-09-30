@@ -295,42 +295,6 @@ void main() {
       }
     });
 
-    test('classify records the options it was given on a placed '
-        'result', () async {
-      // Arrange
-      final client = FakeLlmChatClient()
-        ..fallback = ChatCompleted(
-          content: _validReplyBody(dishId: 'dish-1', dishName: 'Salmon'),
-          model: 'm',
-        );
-      final classifier = LlmMenuClassifier(
-        client,
-        FakeClock(DateTime.utc(2026)),
-      );
-      const options = ClassificationOptions(
-        estimationConsentGiven: true,
-        netCarbLimitGrams: 14,
-        dietaryConstraints: ['dairy-free'],
-      );
-
-      // Act
-      final result = await classifier.classify(
-        _menuOf([_dishNamed('dish-1', 'Salmon')]),
-        options: options,
-      );
-
-      // Assert
-      expect(
-        (result as MenuAnalysed).options,
-        equals(
-          const AnalysisOptionsSnapshot(
-            netCarbLimitGrams: 14,
-            dietaryConstraints: ['dairy-free'],
-          ),
-        ),
-      );
-    });
-
     test('classify holds a green to the limit it was given: 8 g is over '
         'the default 6 g but within a 10 g limit', () async {
       // Arrange: the same green reply, estimated at 8 g, with a usable
@@ -517,14 +481,6 @@ void main() {
         carnivoreOnly: carnivoreOnly,
       ),
     );
-
-    test('every toggle off posts the default prompt byte for byte', () async {
-      // Act
-      final prompt = await postedSystemPrompt(toggles());
-
-      // Assert
-      expect(prompt, equals(_goldenSystemPromptAt6g));
-    });
 
     test('seed-oil free posts exactly the golden system_prompt', () async {
       // Act

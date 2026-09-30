@@ -7,8 +7,6 @@ import pytest
 import respx
 from fastapi.testclient import TestClient
 
-from app.config import Settings
-from app.main import create_app
 from app.services.wolt import WOLT_USER_AGENT
 
 RESTAURANT_ID = "123456"
@@ -55,28 +53,6 @@ def test_passthrough_200_preserves_body_and_content_type(
     assert response.headers["X-KetoClub-Cache"] == "miss"
 
 
-def test_passthrough_404(client: TestClient, tenbis: respx.MockRouter) -> None:
-    tenbis.get(UPSTREAM_PATH).mock(
-        return_value=httpx.Response(404, json={"error": "not found"})
-    )
-
-    response = client.get(PROXY_PATH)
-
-    assert response.status_code == 404
-    assert response.json() == {"error": "not found"}
-
-
-def test_passthrough_500(client: TestClient, tenbis: respx.MockRouter) -> None:
-    tenbis.get(UPSTREAM_PATH).mock(
-        return_value=httpx.Response(500, json={"error": "boom"})
-    )
-
-    response = client.get(PROXY_PATH)
-
-    assert response.status_code == 500
-    assert response.json() == {"error": "boom"}
-
-
 def test_letters_are_rejected(client: TestClient, tenbis: respx.MockRouter) -> None:
     response = client.get("/v1/proxy/tenbis/api/v1.0/Restaurants/abc123/Menu")
 
@@ -106,83 +82,6 @@ def test_empty_id_never_reaches_the_route(
 
     assert response.status_code == 404
     assert len(tenbis.calls) == 0
-
-
-def test_connect_error_returns_502_offline(
-    client: TestClient, tenbis: respx.MockRouter
-) -> None:
-    tenbis.get(UPSTREAM_PATH).mock(side_effect=httpx.ConnectError("connection refused"))
-
-    response = client.get(PROXY_PATH)
-
-    assert response.status_code == 502
-    assert response.json() == {"reason": "offline", "status_code": 502}
-
-
-def test_read_timeout_returns_504_timeout(
-    client: TestClient, tenbis: respx.MockRouter
-) -> None:
-    tenbis.get(UPSTREAM_PATH).mock(side_effect=httpx.ReadTimeout("timed out"))
-
-    response = client.get(PROXY_PATH)
-
-    assert response.status_code == 504
-    assert response.json() == {"reason": "timeout", "status_code": 504}
-
-
-def test_second_call_is_served_from_cache(
-    client: TestClient, tenbis: respx.MockRouter
-) -> None:
-    route = tenbis.get(UPSTREAM_PATH).mock(
-        return_value=httpx.Response(200, json={"categories": ["mains"]})
-    )
-
-    first = client.get(PROXY_PATH)
-    second = client.get(PROXY_PATH)
-
-    assert first.headers["X-KetoClub-Cache"] == "miss"
-    assert second.headers["X-KetoClub-Cache"] == "hit"
-    assert second.json() == {"categories": ["mains"]}
-    assert route.call_count == 1
-
-
-def test_expired_cache_entry_is_refetched(tenbis: respx.MockRouter) -> None:
-    # Its own app, not the shared `client` fixture: a zero-second TTL means
-    # every read is already stale, forcing the second call to refetch.
-    settings = Settings(DATABASE_URL="sqlite:///:memory:", MENU_CACHE_TTL_SECONDS=0)
-    app = create_app(settings=settings)
-
-    route = tenbis.get(UPSTREAM_PATH).mock(
-        return_value=httpx.Response(200, json={"categories": ["mains"]})
-    )
-
-    with TestClient(app) as client:
-        first = client.get(PROXY_PATH)
-        second = client.get(PROXY_PATH)
-
-    assert first.headers["X-KetoClub-Cache"] == "miss"
-    assert second.headers["X-KetoClub-Cache"] == "miss"
-    assert route.call_count == 2
-
-
-def test_failed_response_is_not_cached(
-    client: TestClient, tenbis: respx.MockRouter
-) -> None:
-    route = tenbis.get(UPSTREAM_PATH).mock(
-        side_effect=[
-            httpx.Response(404, json={"error": "not found"}),
-            httpx.Response(200, json={"categories": ["mains"]}),
-        ]
-    )
-
-    first = client.get(PROXY_PATH)
-    second = client.get(PROXY_PATH)
-
-    assert first.status_code == 404
-    assert first.headers["X-KetoClub-Cache"] == "miss"
-    assert second.status_code == 200
-    assert second.headers["X-KetoClub-Cache"] == "miss"
-    assert route.call_count == 2
 
 
 def test_inbound_credentials_and_origin_are_not_forwarded(

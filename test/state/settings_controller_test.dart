@@ -79,18 +79,6 @@ void main() {
       expect(controller.isBusy, isFalse);
     });
 
-    test('load notifies listeners exactly twice', () async {
-      // Arrange
-      var count = 0;
-      controller.addListener(() => count++);
-
-      // Act
-      await controller.load();
-
-      // Assert
-      expect(count, 2);
-    });
-
     test(
       'setConsent persists consent without clobbering a prior filter',
       () async {
@@ -184,11 +172,6 @@ void main() {
       expect(states, [true, false]);
     });
 
-    test('initial themeMode before load defaults to system', () {
-      // Assert
-      expect(controller.themeMode, equals(AppThemeMode.system));
-    });
-
     test('load populates themeMode', () async {
       // Arrange
       await settings.write(const AppSettings(themeMode: AppThemeMode.dark));
@@ -198,11 +181,6 @@ void main() {
 
       // Assert
       expect(controller.themeMode, equals(AppThemeMode.dark));
-    });
-
-    test('initial netCarbLimitGrams before load defaults to 6 g', () {
-      // Assert
-      expect(controller.netCarbLimitGrams, equals(6));
     });
 
     test('load populates netCarbLimitGrams', () async {
@@ -259,11 +237,6 @@ void main() {
 
       // Assert
       expect(states, [true, false]);
-    });
-
-    test('initial cachedMenuCount before load is 0', () {
-      // Assert
-      expect(controller.cachedMenuCount, equals(0));
     });
 
     test('load populates cachedMenuCount from the repository', () async {

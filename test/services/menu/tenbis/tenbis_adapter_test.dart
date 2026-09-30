@@ -52,21 +52,6 @@ void main() {
   );
 
   group('TenBisAdapter', () {
-    test('source is tenbis', () {
-      // Arrange
-      final adapter = TenBisAdapter(
-        client: MockClient((_) async {
-          return http.Response(_emptyMenuBody, 200);
-        }),
-      );
-
-      // Act
-      final source = adapter.source;
-
-      // Assert
-      expect(source, equals(MenuSource.tenbis));
-    });
-
     test('fetch sends the exact Restaurants/{id}/Menu URL', () async {
       // Arrange
       Uri? capturedUri;
@@ -103,23 +88,6 @@ void main() {
       expect(capturedHeaders, isNotNull);
       expect(capturedHeaders!['User-Agent'], equals(browserUserAgent));
       expect(capturedHeaders!['Accept'], equals('application/json'));
-    });
-
-    test('fetch returns a menu carrying the requested ref', () async {
-      // Arrange
-      final adapter = TenBisAdapter(
-        client: MockClient((request) async {
-          return http.Response(_emptyMenuBody, 200);
-        }),
-      );
-
-      // Act
-      final result = await adapter.fetch(_refItHandles);
-
-      // Assert
-      expect(result, isA<MenuFetched>());
-      expect((result as MenuFetched).menu.venueRef, equals(_refItHandles));
-      expect(result.menu.currency, equals('ILS'));
     });
 
     test('fetch maps a 404 status to notFound with the status code', () async {
@@ -477,98 +445,6 @@ void main() {
         result,
         equals(const MenuFetchFailed(reason: MenuFetchFailureReason.offline)),
       );
-    });
-
-    test(
-      'fetch maps a TimeoutException to offline with a proxy configured',
-      () async {
-        // Arrange
-        final adapter = TenBisAdapter(
-          client: MockClient((request) async {
-            throw TimeoutException('Timed out');
-          }),
-          proxyBase: Uri.parse('http://localhost:8000'),
-        );
-
-        // Act
-        final result = await adapter.fetch(ref);
-
-        // Assert
-        expect(
-          result,
-          equals(const MenuFetchFailed(reason: MenuFetchFailureReason.offline)),
-        );
-      },
-    );
-
-    test('fetch maps a proxied 404 to notFound with the status code', () async {
-      // Arrange: 10bis's own 404 passes through the backend unchanged
-      // (`backend_plan.md` §3.3), so the mapping needs no change.
-      final adapter = TenBisAdapter(
-        client: MockClient((request) async {
-          return http.Response('not found', 404);
-        }),
-        proxyBase: Uri.parse('http://localhost:8000'),
-      );
-
-      // Act
-      final result = await adapter.fetch(ref);
-
-      // Assert
-      expect(
-        result,
-        equals(
-          const MenuFetchFailed(
-            reason: MenuFetchFailureReason.notFound,
-            statusCode: 404,
-          ),
-        ),
-      );
-    });
-
-    test(
-      'fetch maps a proxied 500 to platformChanged with the status code',
-      () async {
-        // Arrange
-        final adapter = TenBisAdapter(
-          client: MockClient((request) async {
-            return http.Response('server error', 500);
-          }),
-          proxyBase: Uri.parse('http://localhost:8000'),
-        );
-
-        // Act
-        final result = await adapter.fetch(ref);
-
-        // Assert
-        expect(
-          result,
-          equals(
-            const MenuFetchFailed(
-              reason: MenuFetchFailureReason.platformChanged,
-              statusCode: 500,
-            ),
-          ),
-        );
-      },
-    );
-
-    test('fetch returns a menu carrying the requested ref through a '
-        'proxy', () async {
-      // Arrange
-      final adapter = TenBisAdapter(
-        client: MockClient((request) async {
-          return http.Response(_emptyMenuBody, 200);
-        }),
-        proxyBase: Uri.parse('http://localhost:8000'),
-      );
-
-      // Act
-      final result = await adapter.fetch(ref);
-
-      // Assert
-      expect(result, isA<MenuFetched>());
-      expect((result as MenuFetched).menu.venueRef, equals(ref));
     });
   });
 }

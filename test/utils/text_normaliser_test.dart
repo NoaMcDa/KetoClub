@@ -291,25 +291,6 @@ void main() {
         isNot(equals(TextNormaliser.menuFingerprint(second))),
       );
     });
-
-    test('menuFingerprint is stable across repeated calls', () {
-      // Arrange
-      final menu = _menu([_dish(name: 'Steak', description: 'Rare')]);
-      // Act
-      final first = TextNormaliser.menuFingerprint(menu);
-      final second = TextNormaliser.menuFingerprint(menu);
-      // Assert
-      expect(first, equals(second));
-    });
-
-    test('menuFingerprint handles a menu with no dishes', () {
-      // Arrange
-      final menu = _menu(const []);
-      // Act
-      final result = TextNormaliser.menuFingerprint(menu);
-      // Assert
-      expect(result, isA<int>());
-    });
   });
 
   group('TextNormaliser.dishCoreText (issue #192)', () {

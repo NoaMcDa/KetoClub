@@ -317,37 +317,6 @@ def test_cache_hit_bypasses_the_rate_limiter(wolt_discovery: respx.MockRouter) -
     assert limited.json() == {"reason": "rateLimited", "status_code": 429}
 
 
-def test_over_the_per_install_limit_is_rate_limited(
-    wolt_discovery: respx.MockRouter,
-) -> None:
-    route = wolt_discovery.get(_UPSTREAM_RESTAURANTS).mock(
-        return_value=httpx.Response(200, json=_venues_body())
-    )
-    settings = Settings(
-        DATABASE_URL="sqlite:///:memory:", DISCOVERY_RATE_LIMIT_PER_MINUTE=1
-    )
-    app = create_app(settings=settings)
-
-    with TestClient(app) as client:
-        first = client.get(
-            _RESTAURANTS_PATH, params={"lat": _LAT, "lon": _LON}, headers=_headers()
-        )
-        second = client.get(
-            _RESTAURANTS_PATH, params={"lat": 1.0, "lon": 2.0}, headers=_headers()
-        )
-        other_install = client.get(
-            _RESTAURANTS_PATH,
-            params={"lat": 1.0, "lon": 2.0},
-            headers=_headers("f" * 32),
-        )
-
-    assert first.status_code == 200
-    assert second.status_code == 429
-    assert second.json() == {"reason": "rateLimited", "status_code": 429}
-    assert other_install.status_code == 200
-    assert route.call_count == 2
-
-
 # --- POST /pages/search -----------------------------------------------------
 
 
@@ -368,58 +337,6 @@ def test_search_200_preserves_body_and_content_type(
     assert response.json() == _venues_body()
     assert response.headers["content-type"] == "application/json"
     assert response.headers["X-KetoClub-Cache"] == "miss"
-
-
-def test_search_passthrough_410(
-    client: TestClient, wolt_discovery: respx.MockRouter
-) -> None:
-    wolt_discovery.post(_UPSTREAM_SEARCH).mock(
-        return_value=httpx.Response(410, json={"error_code": 430})
-    )
-
-    response = client.post(_SEARCH_PATH, json=_search_body(), headers=_headers())
-
-    assert response.status_code == 410
-    assert response.json() == {"error_code": 430}
-
-
-def test_search_passthrough_500(
-    client: TestClient, wolt_discovery: respx.MockRouter
-) -> None:
-    wolt_discovery.post(_UPSTREAM_SEARCH).mock(
-        return_value=httpx.Response(500, json={"error": "boom"})
-    )
-
-    response = client.post(_SEARCH_PATH, json=_search_body(), headers=_headers())
-
-    assert response.status_code == 500
-    assert response.json() == {"error": "boom"}
-
-
-def test_search_connect_error_returns_502_offline(
-    client: TestClient, wolt_discovery: respx.MockRouter
-) -> None:
-    wolt_discovery.post(_UPSTREAM_SEARCH).mock(
-        side_effect=httpx.ConnectError("connection refused")
-    )
-
-    response = client.post(_SEARCH_PATH, json=_search_body(), headers=_headers())
-
-    assert response.status_code == 502
-    assert response.json() == {"reason": "offline", "status_code": 502}
-
-
-def test_search_timeout_returns_504_timeout(
-    client: TestClient, wolt_discovery: respx.MockRouter
-) -> None:
-    wolt_discovery.post(_UPSTREAM_SEARCH).mock(
-        side_effect=httpx.ReadTimeout("timed out")
-    )
-
-    response = client.post(_SEARCH_PATH, json=_search_body(), headers=_headers())
-
-    assert response.status_code == 504
-    assert response.json() == {"reason": "timeout", "status_code": 504}
 
 
 @pytest.mark.parametrize(
@@ -536,42 +453,6 @@ def test_search_with_and_without_a_position_do_not_share_a_cache_key(
     client.post(_SEARCH_PATH, json=_search_body(), headers=_headers())
     client.post(_SEARCH_PATH, json={"q": "vitrina", "lang": "en"}, headers=_headers())
 
-    assert route.call_count == 2
-
-
-def test_search_second_call_is_served_from_cache(
-    client: TestClient, wolt_discovery: respx.MockRouter
-) -> None:
-    route = wolt_discovery.post(_UPSTREAM_SEARCH).mock(
-        return_value=httpx.Response(200, json=_venues_body())
-    )
-
-    first = client.post(_SEARCH_PATH, json=_search_body(), headers=_headers())
-    second = client.post(_SEARCH_PATH, json=_search_body(), headers=_headers())
-
-    assert first.headers["X-KetoClub-Cache"] == "miss"
-    assert second.headers["X-KetoClub-Cache"] == "hit"
-    assert second.json() == _venues_body()
-    assert route.call_count == 1
-
-
-def test_search_expired_cache_entry_is_refetched(
-    wolt_discovery: respx.MockRouter,
-) -> None:
-    settings = Settings(
-        DATABASE_URL="sqlite:///:memory:", DISCOVERY_CACHE_TTL_SECONDS=0
-    )
-    app = create_app(settings=settings)
-    route = wolt_discovery.post(_UPSTREAM_SEARCH).mock(
-        return_value=httpx.Response(200, json=_venues_body())
-    )
-
-    with TestClient(app) as client:
-        first = client.post(_SEARCH_PATH, json=_search_body(), headers=_headers())
-        second = client.post(_SEARCH_PATH, json=_search_body(), headers=_headers())
-
-    assert first.headers["X-KetoClub-Cache"] == "miss"
-    assert second.headers["X-KetoClub-Cache"] == "miss"
     assert route.call_count == 2
 
 

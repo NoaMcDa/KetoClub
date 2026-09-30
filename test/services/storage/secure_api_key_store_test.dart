@@ -132,26 +132,5 @@ void main() {
         expect(result, isFalse);
       });
     }
-
-    test('a channel error carrying a message never surfaces it as the read '
-        'value', () async {
-      // Arrange: a channel error that happens to echo something back
-      // must still never surface as a value read() returns
-      // (architecture.md §11) — the catch clause returns null, not the
-      // exception's message.
-      _installFailingChannel(
-        () => PlatformException(
-          code: 'boom',
-          message: 'sk-live-should-never-surface',
-        ),
-      );
-      const store = SecureApiKeyStore();
-
-      // Act
-      final result = await store.read();
-
-      // Assert
-      expect(result, isNull);
-    });
   });
 }

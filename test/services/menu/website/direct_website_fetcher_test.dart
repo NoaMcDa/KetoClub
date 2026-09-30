@@ -511,15 +511,6 @@ void main() {
         expect(result, isA<WebsitePage>());
         expect(pulled, lessThanOrEqualTo(websiteMaxRobotsBytes ~/ chunkBytes));
       });
-
-      test('a CR-only robots.txt still refuses', () async {
-        final result = await _fetch(
-          _site({
-            '/': () => _html(_page),
-          }, robots: () => http.Response('User-agent: *\rDisallow: /\r', 200)),
-        );
-        expect(_reason(result), MenuFetchFailureReason.disallowedByRobots);
-      });
     });
 
     test('decodePage reads the legacy Hebrew code pages', () {

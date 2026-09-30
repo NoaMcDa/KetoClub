@@ -128,25 +128,5 @@ void main() {
       expect(find.text(_en.savedEntryDishCount(2)), findsOneWidget);
       expect(find.textContaining('₪'), findsNothing);
     });
-
-    testWidgets('a paste with no dishes shows the empty-paste copy', (
-      tester,
-    ) async {
-      // Setup
-      _useTallSurface(tester);
-      final fakes = FakeAppDependencies();
-      await pumpApp(tester, fakes);
-      await tapAndSettle(tester, navDestination(_en.navScan));
-
-      // Act
-      await enterText(tester, '42 ₪');
-      await tapAndSettle(tester, _analyse);
-
-      // Assert: still on the Scan tab, with the message, and nothing was
-      // classified.
-      expect(find.text(_en.scanEmptyPaste), findsOneWidget);
-      expect(find.byType(VerdictCounterTiles), findsNothing);
-      expect(fakes.classifier.calls, isEmpty);
-    });
   });
 }

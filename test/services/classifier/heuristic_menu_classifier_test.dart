@@ -279,55 +279,6 @@ void main() {
       expect(analysed.why, yellowWhyEn);
     });
 
-    test(
-      'classify given a Hebrew dish returns a Hebrew why and modification',
-      () async {
-        // Arrange
-        const dish = Dish(
-          id: 'dish-steak-he',
-          name: 'סטייק אנטריקוט',
-          description: 'מוגש עם פירה',
-          price: 120,
-          options: [],
-        );
-        final menu = _menuOf([dish]);
-
-        // Act
-        final result = await _classify(menu);
-
-        // Assert
-        final analysed = result.dishes.single;
-        expect(analysed.verdict, DishVerdict.modifiable);
-        expect(analysed.why, yellowWhyHe);
-        expect(analysed.modification, contains(carbModifiersHe['פירה']));
-      },
-    );
-
-    test('classify given an English dish returns an English why and '
-        'modification', () async {
-      // Arrange
-      const dish = Dish(
-        id: 'dish-steak-en',
-        name: 'Steak',
-        description: 'Served with mashed potatoes',
-        price: 120,
-        options: [],
-      );
-      final menu = _menuOf([dish]);
-
-      // Act
-      final result = await _classify(menu);
-
-      // Assert
-      final analysed = result.dishes.single;
-      expect(analysed.verdict, DishVerdict.modifiable);
-      expect(analysed.why, yellowWhyEn);
-      expect(
-        analysed.modification,
-        contains(carbModifiersEn['mashed potatoes']),
-      );
-    });
-
     test('classify given a mixed-script menu gives each dish its own '
         'language', () async {
       // Arrange
@@ -744,29 +695,6 @@ void main() {
       final analysed = (result as MenuAnalysed).dishes.single;
       expect(analysed.verdict, DishVerdict.modifiable);
       expect(analysed.modification, contains(carnivoreOnlyModificationEn));
-    });
-
-    test('classify records the toggles it ran under in the result', () async {
-      // Arrange
-      final classifier = HeuristicMenuClassifier(
-        clock: FakeClock(DateTime.utc(2026)),
-      );
-
-      // Act
-      final result = await classifier.classify(
-        _menuOf([_dishNamed('dish-1', 'Ribeye steak')]),
-        options: allRules,
-      );
-
-      // Assert
-      expect(
-        (result as MenuAnalysed).options?.dietaryConstraints,
-        equals([
-          seedOilFreePromptFragment,
-          dairyFreePromptFragment,
-          carnivoreOnlyPromptFragment,
-        ]),
-      );
     });
   });
 

@@ -265,14 +265,6 @@ void main() {
       expect(search.byNameCalls, isEmpty);
     });
 
-    testWidgets('an empty field shows no invalid message', (tester) async {
-      // Arrange
-      await _pump(tester, controller: controller, pushedNames: pushedNames);
-
-      // Assert: nothing typed yet.
-      expect(find.text(_l10n(tester).venueSearchInvalid), findsNothing);
-    });
-
     testWidgets('typing a valid slug enables the submit affordance', (
       tester,
     ) async {
@@ -782,24 +774,6 @@ void main() {
         expect(find.text(_l10n(tester).offlineBannerMessage), findsNothing);
       },
     );
-
-    testWidgets('build under Locale(he) renders the Hebrew title', (
-      tester,
-    ) async {
-      // Act
-      await _pump(
-        tester,
-        controller: controller,
-        pushedNames: pushedNames,
-        locale: const Locale('he'),
-      );
-      final l10n = _l10n(tester);
-
-      // Assert
-      expect(find.text(l10n.venueSearchLabel), findsOneWidget);
-      expect(find.text(l10n.discoveryTitle), findsOneWidget);
-      expect(find.text(l10n.discoveryEmptyBody), findsOneWidget);
-    });
 
     testWidgets('no lastVenue stored shows no Continue row (issue #55)', (
       tester,

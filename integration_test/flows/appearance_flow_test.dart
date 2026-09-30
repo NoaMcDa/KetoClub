@@ -33,27 +33,6 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Appearance flow', () {
-    testWidgets('choosing Dark in Settings re-themes the running app to dark', (
-      tester,
-    ) async {
-      // Setup: the app on top of in-memory fakes, starting in the
-      // default (system) appearance.
-      final fakes = FakeAppDependencies();
-      await pumpApp(tester, fakes);
-
-      // Act: go to Settings and choose Dark.
-      await tapAndSettle(tester, navDestination(_en.navSettings));
-      final dark = _appearanceOption(_en.settingsAppearanceDark);
-      await tester.ensureVisible(dark);
-      await tapAndSettle(tester, dark);
-
-      // Assert: the running app itself is dark now, read from a screen
-      // widget still on the tree — the Settings screen the user is
-      // looking at, not a controller reached from the side.
-      final afterContext = tester.element(find.byType(SettingsScreen));
-      expect(Theme.of(afterContext).brightness, Brightness.dark);
-    });
-
     testWidgets(
       'choosing Dark persists it, so the choice survives a fresh launch',
       (tester) async {

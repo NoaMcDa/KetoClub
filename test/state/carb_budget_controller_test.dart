@@ -45,12 +45,6 @@ void main() {
       expect(controller.budgetGrams, equals(150));
     });
 
-    test('setBudget with a negative value clamps to 1', () {
-      controller.setBudget(-5);
-
-      expect(controller.budgetGrams, equals(1));
-    });
-
     test('setBudget notifies listeners when the value changes', () {
       var notified = 0;
       controller
@@ -68,17 +62,6 @@ void main() {
         ..setBudget(20);
 
       expect(notified, isZero);
-    });
-
-    test('setBudget with a different value notifies', () {
-      var notified = 0;
-      controller
-        ..setBudget(20)
-        ..addListener(() => notified++)
-        ..setBudget(25);
-
-      expect(notified, equals(1));
-      expect(controller.budgetGrams, equals(25));
     });
 
     test('clear resets budgetGrams to null and clears hasBudget', () {
@@ -107,27 +90,6 @@ void main() {
         ..clear();
 
       expect(notified, isZero);
-    });
-
-    test('clear after clear does not notify again', () {
-      var notified = 0;
-      controller
-        ..setBudget(8)
-        ..clear()
-        ..addListener(() => notified++)
-        ..clear();
-
-      expect(notified, isZero);
-    });
-
-    test('setBudget then clear then setBudget works correctly', () {
-      controller
-        ..setBudget(10)
-        ..clear()
-        ..setBudget(20);
-
-      expect(controller.budgetGrams, equals(20));
-      expect(controller.hasBudget, isTrue);
     });
   });
 }

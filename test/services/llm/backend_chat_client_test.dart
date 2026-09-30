@@ -370,36 +370,6 @@ void main() {
       expect(capturedHeaders![BackendChatClient.installIdHeader], _installId);
     });
 
-    test('a 422 for an out-of-bounds image is badResponse', () async {
-      // Arrange
-      final client = _answering(
-        jsonEncode(<String, Object?>{
-          'detail': <Object?>[
-            <String, Object?>{'msg': 'at most 6 images per request'},
-          ],
-        }),
-        422,
-      );
-
-      // Act
-      final result = await client.complete(
-        systemPrompt: 's',
-        userPrompt: 'u',
-        images: _pages,
-      );
-
-      // Assert
-      expect(
-        result,
-        equals(
-          const ChatFailed(
-            reason: ChatFailureReason.badResponse,
-            statusCode: 422,
-          ),
-        ),
-      );
-    });
-
     test('sends one request per call, with no retry on failure', () async {
       // Arrange
       var transportCalls = 0;

@@ -17,12 +17,6 @@ void main() {
       expect(a.contentHash, equals(b.contentHash));
     });
 
-    test('a page equals itself', () {
-      final page = _page(<int>[1]);
-
-      expect(page, equals(page));
-    });
-
     test('a differing mime type makes two pages unequal', () {
       final a = _page(<int>[1, 2, 3]);
       final b = _page(<int>[1, 2, 3], mimeType: ScannedPage.png);

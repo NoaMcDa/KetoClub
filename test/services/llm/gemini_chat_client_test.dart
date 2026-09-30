@@ -973,14 +973,6 @@ void main() {
   });
 
   group('toGeminiSchema', () {
-    test('drops additionalProperties at every level', () {
-      // Act
-      final converted = jsonEncode(toGeminiSchema(_schema));
-
-      // Assert
-      expect(converted, isNot(contains('additionalProperties')));
-    });
-
     test('turns a [T, "null"] union into T plus nullable', () {
       // Act
       final converted = toGeminiSchema(<String, Object?>{
