@@ -69,6 +69,7 @@ Classification	Meaning	Nutritional Criteria	Customer Action
 🟢 Green	Safe As-Is	Net carbohydrates ≤6g, healthy fat/protein foundation, zero starchy sides, no sweet marinades or flours.	Order directly off the menu without special requests.
 🟡 Yellow	Safe with Modifications	The core protein or salad is keto-compliant, but accompanied by a starchy side (fries, purée), root vegetable (carrots, beets), or sugary dressing.	Order using the generated waiter script to substitute or remove carb components.
 🔴 Excluded / Red	Not Keto-Compatible	Dishes built on high-carbohydrate fundamentals that cannot be customized (e.g., wheat pasta, pizza crust, grain bowls, breaded proteins).	Filtered out of view or flagged as non-keto.
+Drinks: The rule engine and the LLM prompt both classify drinks. Regular cola, sprite, juice, lemonade, beer, sweet wine, and liqueur are red. Iced coffee, latte, cappuccino, and tonic are yellow — the app shows a swap script (ask for black coffee, unsweetened almond milk, or soda water instead). Zero-sugar and diet variants are rescued by a guard and come back green. An offline bilingual bar-and-coffee reference (/drinks screen) is accessible from the menu app bar and Settings.
 Waiter Instruction Generator
 For every dish flagged as 🟡 Yellow, KetoClub automatically generates actionable, polite, and precise requests you can read or show to your server:
 * Starchy Sides: "Please replace the potato purée with a green salad, sautéed mushrooms, or extra steamed greens." 

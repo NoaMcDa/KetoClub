@@ -853,5 +853,67 @@ void main() {
       final analysed = (result as MenuAnalysed).dishes.single;
       expect(analysed.verdict, DishVerdict.orderAsIs);
     });
+
+    // §3 wrong-green fix (#216): the Wolt-מוסד fixture contains
+    // קוקה קולה, קוקה קולה זירו, and בירה שחורה — with the new drink
+    // vocabulary the first and third must be nonKeto and the second must
+    // remain green (the זירו guard rescues it).
+    test(
+      'Wolt fixture drinks: קוקה קולה is nonKeto (§3 wrong-green fix)',
+      () async {
+        // Arrange — dish name as it appears in wolt_hamosad_menu.json
+        final menu = _menuOf([
+          _dishNamed('61ecfdac853cef6ba4d5e3f3', 'קוקה קולה'),
+        ]);
+
+        // Act
+        final result = await _classify(menu);
+
+        // Assert
+        expect(
+          result.dishes.single.verdict,
+          DishVerdict.nonKeto,
+          reason: 'קוקה קולה must be red — it contains the קולה base trigger',
+        );
+      },
+    );
+
+    test('Wolt fixture drinks: קוקה קולה זירו is orderAsIs '
+        '(זירו guard rescues it)', () async {
+      // Arrange — dish name as it appears in wolt_hamosad_menu.json
+      final menu = _menuOf([
+        _dishNamed('61ecfdac853cef6ba4d5e3fb', 'קוקה קולה זירו'),
+      ]);
+
+      // Act
+      final result = await _classify(menu);
+
+      // Assert — זירו guard fires; dish is green
+      expect(
+        result.dishes.single.verdict,
+        DishVerdict.orderAsIs,
+        reason: 'קוקה קולה זירו must be green — the זירו guard rescues קולה',
+      );
+    });
+
+    test(
+      'Wolt fixture drinks: בירה שחורה is nonKeto (dark beer is red)',
+      () async {
+        // Arrange — dish name as it appears in wolt_hamosad_menu.json
+        final menu = _menuOf([
+          _dishNamed('61ecfdac853cef6ba4d5e3f1', 'בירה שחורה'),
+        ]);
+
+        // Act
+        final result = await _classify(menu);
+
+        // Assert
+        expect(
+          result.dishes.single.verdict,
+          DishVerdict.nonKeto,
+          reason: 'בירה שחורה must be red — it contains the בירה base trigger',
+        );
+      },
+    );
   });
 }

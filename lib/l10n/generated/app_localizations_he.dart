@@ -40,6 +40,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get actionShareMenu => 'שתף תפריט';
 
   @override
+  String get actionOpenDrinksGuide => 'מדריך שתייה';
+
+  @override
   String get actionCancel => 'ביטול';
 
   @override
@@ -1033,4 +1036,26 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get hiddenCarbsCertaintyLikely => 'סביר';
+
+  @override
+  String get drinksGuideTitle => 'מדריך שתייה';
+
+  @override
+  String get drinksGuideDisclaimer =>
+      'טווחי פחמימות נטו טיפוסיים למנה סטנדרטית. כל הנתונים הם הערכות — הערכים האמיתיים משתנים לפי מותג, גודל ומתכון.';
+
+  @override
+  String get drinksGuideSectionOrderAsIs => 'להזמין כמו שזה';
+
+  @override
+  String get drinksGuideSectionSwap => 'לבקש החלפה';
+
+  @override
+  String get drinksGuideSectionSkip => 'לדלג';
+
+  @override
+  String get settingsDrinksGuideTitle => 'מדריך שתייה';
+
+  @override
+  String get settingsDrinksGuideSubtitle => 'מדריך בר וקפה';
 }

@@ -628,6 +628,25 @@ a green dish yellow with their own bilingual sentence and never touch a red one.
 The table in §9.1 lists each toggle's prompt fragment, rule and hint copy side by
 side.
 
+*(Issue #216)* Drinks vocabulary added to both language sets. Sugary drinks are
+red (`nonKetoBases{En,He}`): cola, coke, pepsi, sprite, fanta, juice, lemonade,
+beer, lager, stout, ale, smoothie, liqueur, sweet wine, moscato, port wine, and
+their Hebrew counterparts (קולה, קוקה קולה, ספרייט, פאנטה, פריגת, מיץ, לימונדה,
+בירה, בירה שחורה, שיכר, ליקר, סמוטי, יין מתוק). Coffee drinks and tonic are yellow
+(`carbModifiers{En,He}`): latte, iced latte, cappuccino, iced coffee, frappe, tonic,
+tonic water, syrup, and Hebrew twins (הפוך, הפוך קר, לאטה, קפוצ'ינו, קפה קר, סירופ,
+טוניק). Zero/diet/sugar-free labels rescue a red base via `ketoQualifierGuards{En,He}`:
+"Coca-Cola Zero" and "קוקה קולה זירו" are green, not red. `הפוך` ("hafuch",
+the Israeli upside-down latte) is compiled without a permissive prefix — its
+prefixed forms mean "to flip/reverse" in Hebrew, and `_noPrefixHebrewTriggers`
+already excluded `חלה` and `שמרים` for the same idiom-collision reason. The
+`מיץ` bare trigger is intentionally included; if it produces a false positive
+on a fixture dish, drop it and keep only the compound forms `מיץ תפוזים` /
+`מיץ ענבים`. An offline bilingual reference screen (`/drinks`,
+`DrinksGuideScreen`) is reachable from the menu screen's app bar and from
+Settings. Its content lives in `drinks_guide_data.dart` as Dart literals
+(the §6.3 exception), never in ARB.
+
 **`RoutingMenuClassifier`** — decides, per call, in this order (revised by D12
 and D17; the router itself checks only consent and connectivity — whether a key
 is saved is the phone's chat client's answer, not a router rule):
@@ -1063,7 +1082,11 @@ One request per menu. The **system** prompt (in `menu_analysis_prompt.dart`) sta
   otherwise to unclassified); starchy sides, root vegetables,
   sugary sauces and glazes, breading and buns make a dish yellow when the core is
   compliant; pasta, pizza, rice bowls, noodles, breaded proteins, pastry, sandwiches
-  on bread are red.
+  on bread are red. *(Issue #216)* A drinks line is also in `promptKetoRulesTemplate`:
+  sugary drinks (cola, sprite, juice, lemonade, beer, sweet wine, liqueur) are red;
+  iced coffee, latte, cappuccino, and tonic are yellow (ask for black coffee,
+  unsweetened almond milk, or soda water); zero/diet and water/plain coffee/dry
+  wine/spirits are green.
 - Output rules: return only dishes present in the input; use the dish `id` and the
   exact printed `name`; every `modifiable` dish must carry a `modification`; write
   `why` and `modification` in the language the menu is written in; keep each under

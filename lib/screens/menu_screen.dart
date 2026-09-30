@@ -11,6 +11,7 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/drinks_guide_screen.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
@@ -216,6 +217,11 @@ class _MenuScreenState extends State<MenuScreen> {
     return Scaffold(
       appBar: AppBar(
         actions: [
+          IconButton(
+            icon: const Icon(Icons.local_bar),
+            tooltip: l10n.actionOpenDrinksGuide,
+            onPressed: () => Navigator.pushNamed(context, drinksRoutePath),
+          ),
           if (canShare)
             IconButton(
               icon: const Icon(Icons.share),

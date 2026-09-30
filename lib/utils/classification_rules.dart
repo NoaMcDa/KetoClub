@@ -35,10 +35,12 @@ const String _hePrefixes = 'בהוכלמש';
 
 /// The entries where the permissive prefix lookbehind is unsafe: folded
 /// `חלה` also spells "began" (a common verb form), and `שמרים` with a מ
-/// prefix is `משמרים` ("preservatives", as in "ללא חומרים משמרים"), so
-/// both are compiled with no permissive prefix — see
-/// [_hebrewTriggerPattern]'s `allowPrefix`.
-const Set<String> _noPrefixHebrewTriggers = <String>{'חלה', 'שמרים'};
+/// prefix is `משמרים` ("preservatives", as in "ללא חומרים משמרים"), and
+/// `הפוך` collides with "to flip/reverse" (e.g. `להפוך`), so all three
+/// are compiled with no permissive prefix — see
+/// [_hebrewTriggerPattern]'s `allowPrefix`. Applied to both
+/// [_compileBasesHe] and [_compileCarbHe].
+const Set<String> _noPrefixHebrewTriggers = <String>{'חלה', 'שמרים', 'הפוך'};
 
 /// Builds a Hebrew trigger pattern. Permissive on the left when
 /// [allowPrefix] is true (ב/ה/ו/כ/ל/מ/ש are grammatical particles, so
@@ -114,12 +116,16 @@ List<_CompiledModifier> _compileCarbEn() => carbModifiersEn.entries
     )
     .toList(growable: false);
 
-/// Compiles [carbModifiersHe], same rule as [_compileBasesEn].
+/// Compiles [carbModifiersHe], same rule as [_compileBasesHe]: entries
+/// in [_noPrefixHebrewTriggers] disable the permissive prefix.
 List<_CompiledModifier> _compileCarbHe() => carbModifiersHe.entries
     .map(
       (entry) => (
         key: entry.key,
-        pattern: _hebrewTriggerPattern(TextNormaliser.normalise(entry.key)),
+        pattern: _hebrewTriggerPattern(
+          TextNormaliser.normalise(entry.key),
+          allowPrefix: !_noPrefixHebrewTriggers.contains(entry.key),
+        ),
         sentence: entry.value,
       ),
     )

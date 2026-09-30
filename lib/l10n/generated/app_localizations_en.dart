@@ -40,6 +40,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionShareMenu => 'Share menu';
 
   @override
+  String get actionOpenDrinksGuide => 'Drinks guide';
+
+  @override
   String get actionCancel => 'Cancel';
 
   @override
@@ -1030,4 +1033,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hiddenCarbsCertaintyLikely => 'Likely';
+
+  @override
+  String get drinksGuideTitle => 'Drinks guide';
+
+  @override
+  String get drinksGuideDisclaimer =>
+      'Typical net-carb ranges per standard serving. All figures are estimates — actual values vary by brand, size, and recipe.';
+
+  @override
+  String get drinksGuideSectionOrderAsIs => 'ORDER AS-IS';
+
+  @override
+  String get drinksGuideSectionSwap => 'ASK FOR A SWAP';
+
+  @override
+  String get drinksGuideSectionSkip => 'SKIP';
+
+  @override
+  String get settingsDrinksGuideTitle => 'DRINKS GUIDE';
+
+  @override
+  String get settingsDrinksGuideSubtitle => 'Bar and coffee reference';
 }
