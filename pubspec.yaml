@@ -26,6 +26,10 @@ dependencies:
   # the Keychain on iOS, Keystore-backed storage on Android. Never used on
   # web, which reaches Gemini through KetoClub's backend instead (D12).
   flutter_secure_storage: ^11.1.1
+  # usePathUrlStrategy() for clean web deep links (issue #226); main.dart
+  # only, and only on web.
+  flutter_web_plugins:
+    sdk: flutter
   geolocator: ^14.0.0
   # Menu and analysis cache (architecture.md §6.4). Pure Dart; only di.dart
   # touches hive_flutter, so the cache is testable without a binding.

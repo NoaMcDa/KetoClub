@@ -1,7 +1,6 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart'
     show MaterialApp, NavigationBar, TextDirection, ThemeMode;
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/app.dart';
@@ -9,6 +8,7 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/drinks_guide_screen.dart' show drinksRoutePath;
 import 'package:ketoclub/screens/scan_screen.dart';
 import 'package:ketoclub/screens/settings_screen.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -17,6 +17,7 @@ import 'package:ketoclub/state/scan_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/app_shell.dart';
+import 'package:ketoclub/widgets/route_title.dart';
 import 'package:provider/provider.dart';
 
 import 'fakes/fake_app_dependencies.dart';
@@ -215,6 +216,57 @@ void main() {
       expect(find.byType(AppShell), findsOneWidget);
       final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
       expect(bar.selectedIndex, equals(AppShell.settingsIndex));
+    });
+  });
+
+  group('browser tab title (issue #226)', () {
+    testWidgets('follows the route: tab label, drinks guide, then back', (
+      tester,
+    ) async {
+      // Arrange: record what the app tells the platform the title is.
+      final titles = <String>[];
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+            if (call.method ==
+                'SystemChrome.setApplicationSwitcherDescription') {
+              final args = call.arguments as Map<Object?, Object?>;
+              titles.add(args['label']! as String);
+            }
+            return null;
+          });
+      addTearDown(
+        () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(SystemChannels.platform, null),
+      );
+      await tester.pumpWidget(
+        KetoClubApp(dependencies: FakeAppDependencies().dependencies),
+      );
+      await tester.pumpAndSettle();
+      final navigator = tester.state<NavigatorState>(
+        find.byType(Navigator).first,
+      );
+
+      // Assert: the Explore tab names itself.
+      expect(titles.last, documentTitle(_en.navExplore));
+
+      // Act / Assert: a pushed tab root, then the drinks guide.
+      navigator.pushReplacementNamed(settingsRoutePath);
+      await tester.pumpAndSettle();
+      expect(titles.last, documentTitle(_en.navSettings));
+      navigator.pushNamed(drinksRoutePath);
+      await tester.pumpAndSettle();
+      expect(titles.last, documentTitle(_en.drinksGuideTitle));
+      navigator.pop();
+      await tester.pumpAndSettle();
+      expect(titles.last, documentTitle(_en.navSettings));
+
+      // Act / Assert: a venue route is titled with the name the card passed.
+      navigator.pushNamed('/venue/wolt/hamosad', arguments: 'Hamosad');
+      await tester.pumpAndSettle();
+      expect(titles.last, documentTitle('Hamosad'));
+      navigator.pop();
+      await tester.pumpAndSettle();
+      expect(titles.last, documentTitle(_en.navSettings));
     });
   });
 

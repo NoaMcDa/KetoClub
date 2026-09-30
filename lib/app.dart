@@ -25,6 +25,7 @@ import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/app_shell.dart';
+import 'package:ketoclub/widgets/route_title.dart';
 import 'package:provider/provider.dart';
 
 /// The root widget: MaterialApp, theme, routes, localisation
@@ -104,6 +105,7 @@ class _KetoClubAppState extends State<KetoClubApp> {
         builder: (context, _) => MaterialApp(
           navigatorKey: widget.dependencies.navigatorKey,
           title: appName,
+          onGenerateTitle: (_) => documentTitle(null),
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
           themeMode: _themeModeController.themeMode,
@@ -236,9 +238,10 @@ Route<void>? generateRoute(
   if (name == drinksRoutePath) {
     return MaterialPageRoute<void>(
       settings: settings,
-      builder: (_) => const AppShell(
+      builder: (context) => AppShell(
         currentIndex: AppShell.settingsIndex,
-        child: DrinksGuideScreen(),
+        pageTitle: AppLocalizations.of(context)!.drinksGuideTitle,
+        child: const DrinksGuideScreen(),
       ),
     );
   }
@@ -256,18 +259,23 @@ Route<void>? generateRoute(
           context.read<CarbBudgetController>(),
           dependencies.menuQuestionAnswerer,
         ),
-        child: MenuScreen(
-          ref: ref,
-          // A venue card passes the name it already shows (see
-          // VenueSearchScreen._openVenue); a deep link carries none.
-          venueNameHint: settings.arguments is String
+        child: _VenueTitle(
+          fallback: settings.arguments is String
               ? settings.arguments! as String
               : null,
-          screenBrightness: dependencies.screenBrightness,
-          connectivity: dependencies.connectivity,
-          externalLinkOpener: dependencies.externalLinkOpener,
-          menuSharer: dependencies.menuSharer,
-          scannedPages: dependencies.scannedPages,
+          child: MenuScreen(
+            ref: ref,
+            // A venue card passes the name it already shows (see
+            // VenueSearchScreen._openVenue); a deep link carries none.
+            venueNameHint: settings.arguments is String
+                ? settings.arguments! as String
+                : null,
+            screenBrightness: dependencies.screenBrightness,
+            connectivity: dependencies.connectivity,
+            externalLinkOpener: dependencies.externalLinkOpener,
+            menuSharer: dependencies.menuSharer,
+            scannedPages: dependencies.scannedPages,
+          ),
         ),
       ),
     );
@@ -296,4 +304,19 @@ VenueRef? venueRefFromPath(String path) {
   final source = MenuSource.tryParse(segments[1]);
   if (source == null || segments[2].isEmpty) return null;
   return VenueRef(source: source, platformId: segments[2]);
+}
+
+/// Titles the venue route after the venue: the loaded menu's own name, else
+/// the name a venue card passed, else just the app name (issue #226).
+class _VenueTitle extends StatelessWidget {
+  const new({required this.fallback, required this.child});
+
+  final String? fallback;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = context.select<MenuController, String?>((c) => c.venueName);
+    return RouteTitle(page: name ?? fallback, child: child);
+  }
 }
