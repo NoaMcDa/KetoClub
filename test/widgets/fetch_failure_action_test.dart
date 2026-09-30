@@ -98,7 +98,7 @@ void main() {
       // Assert
       expect(find.text(_en.actionRetry), findsNothing);
       expect(find.text(_en.actionBackToSearch), findsNothing);
-      expect(find.byType(ElevatedButton), findsNothing);
+      expect(find.byType(FilledButton), findsNothing);
     });
   });
 }

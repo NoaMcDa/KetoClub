@@ -95,10 +95,7 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
               autofocus: true,
               maxLines: 4,
               minLines: 2,
-              decoration: InputDecoration(
-                hintText: l10n.noteEditorHint,
-                border: const OutlineInputBorder(),
-              ),
+              decoration: InputDecoration(hintText: l10n.noteEditorHint),
             ),
             const SizedBox(height: 16),
             Row(
@@ -109,7 +106,7 @@ class _NoteEditorSheetState extends State<NoteEditorSheet> {
                     child: Text(l10n.noteEditorClear),
                   ),
                 const Spacer(),
-                ElevatedButton(
+                FilledButton(
                   onPressed: _save,
                   child: Text(l10n.noteEditorSave),
                 ),

@@ -65,7 +65,7 @@ class FetchFailureAction extends StatelessWidget {
       MenuFetchFailureReason.backendUnreachable ||
       MenuFetchFailureReason.websiteUnreachable ||
       MenuFetchFailureReason.websiteRateLimited ||
-      MenuFetchFailureReason.websitePdfUnread => ElevatedButton(
+      MenuFetchFailureReason.websitePdfUnread => FilledButton(
         onPressed: onRetry,
         child: Text(l10n.actionRetry),
       ),
@@ -76,7 +76,7 @@ class FetchFailureAction extends StatelessWidget {
       MenuFetchFailureReason.menuNotFound ||
       MenuFetchFailureReason.disallowedByRobots ||
       MenuFetchFailureReason.jsOnlyPage ||
-      MenuFetchFailureReason.websiteTooLarge => ElevatedButton(
+      MenuFetchFailureReason.websiteTooLarge => FilledButton(
         onPressed: onBackToSearch,
         child: Text(l10n.actionBackToSearch),
       ),

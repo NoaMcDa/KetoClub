@@ -26,7 +26,7 @@ final AppLocalizations _en = AppLocalizationsEn();
 
 /// The Analyse-pages button on the Scan tab.
 Finder get _analysePages =>
-    find.widgetWithText(ElevatedButton, _en.scanScreenAnalysePages);
+    find.widgetWithText(FilledButton, _en.scanScreenAnalysePages);
 
 /// The Retry button the failure copy offers.
 Finder get _retry => find.widgetWithText(OutlinedButton, _en.actionRetry);

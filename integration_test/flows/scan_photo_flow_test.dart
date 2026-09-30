@@ -27,7 +27,7 @@ final AppLocalizations _en = AppLocalizationsEn();
 
 /// The Analyse-pages button on the Scan tab.
 Finder get _analysePages =>
-    find.widgetWithText(ElevatedButton, _en.scanScreenAnalysePages);
+    find.widgetWithText(FilledButton, _en.scanScreenAnalysePages);
 
 /// Gives the surface a phone-tall viewport, so a lazy `ListView` builds
 /// every card (CLAUDE.md's traps); reset when the test ends.
@@ -60,7 +60,7 @@ void main() {
 
         // Act: open the Scan tab and choose the photos.
         await tapAndSettle(tester, navDestination(_en.navScan));
-        expect(tester.widget<ElevatedButton>(_analysePages).onPressed, isNull);
+        expect(tester.widget<FilledButton>(_analysePages).onPressed, isNull);
         await tapAndSettle(tester, find.text(_en.scanScreenActionChoosePhotos));
 
         // Assert: both pages are listed and Analyse is now enabled.
@@ -68,10 +68,7 @@ void main() {
         expect(find.text(_en.scanScreenPageCount(2, 6)), findsOneWidget);
         expect(find.text(_en.scanScreenPageLabel(1)), findsOneWidget);
         expect(find.text(_en.scanScreenPageLabel(2)), findsOneWidget);
-        expect(
-          tester.widget<ElevatedButton>(_analysePages).onPressed,
-          isNotNull,
-        );
+        expect(tester.widget<FilledButton>(_analysePages).onPressed, isNotNull);
 
         // Act: analyse the pages.
         await tapAndSettle(tester, _analysePages);

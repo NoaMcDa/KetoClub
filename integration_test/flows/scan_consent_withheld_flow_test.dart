@@ -26,7 +26,7 @@ final AppLocalizations _en = AppLocalizationsEn();
 
 /// The Analyse-pages button on the Scan tab.
 Finder get _analysePages =>
-    find.widgetWithText(ElevatedButton, _en.scanScreenAnalysePages);
+    find.widgetWithText(FilledButton, _en.scanScreenAnalysePages);
 
 /// The Scan tab's link to Settings, scoped to the button so it does not
 /// match the bottom-navigation label or the Settings title.

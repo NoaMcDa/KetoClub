@@ -94,7 +94,7 @@ ScannedPage _pdf({int bytes = 2048}) =>
 
 /// The button that analyses the collected pages.
 Finder _analysePages(AppLocalizations l10n) =>
-    find.widgetWithText(ElevatedButton, l10n.scanScreenAnalysePages);
+    find.widgetWithText(FilledButton, l10n.scanScreenAnalysePages);
 
 /// An action button, found by its label.
 ///
@@ -111,7 +111,7 @@ bool _enabled(WidgetTester tester, Finder finder) =>
 
 /// The Analyse button, found by its label.
 Finder _analyse(AppLocalizations l10n) =>
-    find.widgetWithText(ElevatedButton, l10n.scanAnalyse);
+    find.widgetWithText(FilledButton, l10n.scanAnalyse);
 
 void main() {
   group('ScanScreen', () {
@@ -163,7 +163,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(tester.widget<ElevatedButton>(_analyse(_en)).onPressed, isNull);
+      expect(tester.widget<FilledButton>(_analyse(_en)).onPressed, isNull);
     });
 
     testWidgets('Analyse stays disabled for whitespace only', (tester) async {
@@ -175,7 +175,7 @@ void main() {
       await tester.pump();
 
       // Assert
-      expect(tester.widget<ElevatedButton>(_analyse(_en)).onPressed, isNull);
+      expect(tester.widget<FilledButton>(_analyse(_en)).onPressed, isNull);
     });
 
     testWidgets('typing enables Analyse', (tester) async {
@@ -187,7 +187,7 @@ void main() {
       await tester.pump();
 
       // Assert
-      expect(tester.widget<ElevatedButton>(_analyse(_en)).onPressed, isNotNull);
+      expect(tester.widget<FilledButton>(_analyse(_en)).onPressed, isNotNull);
     });
 
     testWidgets('Analyse stores the menu and opens /venue/scan/{id}', (

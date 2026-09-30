@@ -944,6 +944,15 @@ cannot also be the result of a filter that selects it, so the group went and
 `MenuController.redRows` went with it. The count survives where it now belongs: on
 the Skip counter tile.
 
+**One button hierarchy and one field style** *(issue #248, Phase 8)*. Each screen
+has one `FilledButton` for its primary action, `OutlinedButton` for a secondary
+one, and `TextButton` for an inline link; `ElevatedButton` is not used anywhere.
+A text field takes its look (the 14px `--line` border, the accent focus border,
+the error borders) from `inputDecorationTheme` in `lib/theme/app_theme.dart` and
+passes no `border` of its own. `test/architecture/import_rules_test.dart` asserts
+both: `ElevatedButton` appears nowhere under `lib/`, and `OutlineInputBorder(`
+only in `theme/app_theme.dart`.
+
 **The menu header shows a keto score out of 10** *(issue #29, Phase 1)*, computed
 by `utils/keto_score.dart` from the analysis's verdict counts (green counts full,
 yellow at half weight, red at none) and rendered by `KetoScoreBadge`. It is a
