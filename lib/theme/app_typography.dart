@@ -12,12 +12,15 @@ import 'package:flutter/material.dart';
 /// **Neither Public Sans nor Instrument Serif has Hebrew glyphs**, and the
 /// app is bilingual (architecture.md D7), so every [TextStyle] here sets
 /// [TextStyle.fontFamilyFallback] to a chain that reaches a Hebrew-capable
-/// face. Rubik is bundled with the app (issue #169) and comes first so a
-/// Hebrew string always renders, even on a web build whose
-/// `fonts.gstatic.com` is unreachable — a system face like `Noto Sans
-/// Hebrew` may exist on native platforms but the web build cannot rely on
-/// it. `Arial Hebrew`, `David` and `Arial` follow as native-platform
-/// safety nets in case the bundled asset is somehow unavailable.
+/// face. Noto Sans Hebrew (issue #261) and Rubik (issue #169) are both
+/// bundled with the app, Noto Sans Hebrew first, so a Hebrew string always
+/// renders, even on a web build whose `fonts.gstatic.com` is unreachable —
+/// a system face may exist on native platforms but the web build cannot
+/// rely on it. `Arial Hebrew`, `David` and `Arial` follow as
+/// native-platform safety nets in case a bundled asset is unavailable.
+///
+/// Only weights 400 and 700 of Noto Sans Hebrew are bundled; Flutter picks
+/// the nearest, so the 500 to 800 UI weights use 400 or 700 for Hebrew.
 abstract final class AppTypography {
   /// The UI face's family name, as declared in `pubspec.yaml`.
   static const String uiFamily = 'Public Sans';
@@ -25,20 +28,25 @@ abstract final class AppTypography {
   /// The display face's family name, as declared in `pubspec.yaml`.
   static const String displayFamily = 'Instrument Serif';
 
+  /// The bundled Hebrew face's family name, as declared in `pubspec.yaml`.
+  static const String hebrewFamily = 'Noto Sans Hebrew';
+
   /// Fallback chain for [uiFamily] so Hebrew text reaches a real face.
   static const List<String> uiFallback = [
+    hebrewFamily,
     'Rubik',
-    'Noto Sans Hebrew',
     'Arial Hebrew',
     'Arial',
   ];
 
   /// Fallback chain for [displayFamily] so Hebrew display text (the keto
-  /// score, serif headings) reaches a real face. Rubik is not a serif, but
-  /// it covers Hebrew — a legible Hebrew rendering matters more than the
-  /// face's serif category when the artboard's Latin face has no Hebrew
-  /// glyphs at all.
+  /// score, serif headings) reaches a real face. The bundled Noto Sans
+  /// Hebrew is not a serif, but it covers Hebrew — a legible Hebrew
+  /// rendering matters more than the face's serif category when the
+  /// artboard's Latin face has no Hebrew glyphs at all. `Noto Serif Hebrew`
+  /// and `David` follow for platforms that have them, then Rubik.
   static const List<String> displayFallback = [
+    hebrewFamily,
     'Noto Serif Hebrew',
     'David',
     'Rubik',
