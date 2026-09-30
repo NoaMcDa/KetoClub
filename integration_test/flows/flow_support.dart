@@ -30,10 +30,12 @@ import 'package:ketoclub/app.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/menu_question.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/classifier/menu_question_answerer.dart';
 import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 import 'package:ketoclub/services/classifier/scanned_classifier_router.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
@@ -99,6 +101,7 @@ final class FakeAppDependencies {
       classifier = FlowFakeMenuClassifier(),
       estimateClassifier = HeuristicMenuClassifier(clock: FlowFakeClock()),
       settingsStore = FlowFakeSettingsStore(),
+      questionAnswerer = FlowFakeMenuQuestionAnswerer(),
       notesStore = FlowFakeNotesStore(),
       clock = FlowFakeClock(),
       logger = FlowFakeAppLogger(),
@@ -161,6 +164,10 @@ final class FakeAppDependencies {
   /// The faked QR scanner behind the Scan tab's "Scan QR code" action
   /// (issue #182); set [FlowFakeQrScanner.payload] to what a code decodes to.
   final FlowFakeQrScanner qrScanner;
+
+  /// The faked question answerer (issue #214); script it with
+  /// [FlowFakeMenuQuestionAnswerer.enqueue] and friends.
+  final FlowFakeMenuQuestionAnswerer questionAnswerer;
 
   /// The in-memory scanned-pages registry (issue #89) — the real one, as
   /// it does no I/O, shared by the Scan tab and the menu screen.
@@ -225,6 +232,7 @@ final class FakeAppDependencies {
     pagePicker: pagePickerOverride ?? pagePicker,
     qrScanner: qrScanner,
     scannedPages: scannedPages,
+    menuQuestionAnswerer: questionAnswerer,
   );
 }
 
@@ -756,6 +764,45 @@ final Uint8List whitePngBytes = base64Decode(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4//8/AAX+Av4N'
   '70a4AAAAAElFTkSuQmCC',
 );
+
+/// A [MenuQuestionAnswerer] that answers from a queue of scripted results and
+/// records every call — the seam the question flows fake instead of the
+/// network (issue #214).
+///
+/// Answers the results queued with [enqueue] in order, one per call. With the
+/// queue empty it answers [MenuAnalysisFailureReason.badResponse].
+final class FlowFakeMenuQuestionAnswerer implements MenuQuestionAnswerer {
+  final List<MenuQuestionResult> _queue = <MenuQuestionResult>[];
+
+  /// Every call [ask] received, in call order.
+  final List<({Menu menu, MenuAnalysed analysis, String question})> calls =
+      <({Menu menu, MenuAnalysed analysis, String question})>[];
+
+  /// Queues [result] as the answer to the next call not yet answered.
+  void enqueue(MenuQuestionResult result) => _queue.add(result);
+
+  /// Queues a successful [answer] referring to optional [dishIds].
+  void enqueueAnswer(
+    String answer, {
+    List<String> dishIds = const <String>[],
+  }) =>
+      enqueue(MenuQuestionAnswered(answer: answer, referencedDishIds: dishIds));
+
+  @override
+  Future<MenuQuestionResult> ask(
+    Menu menu,
+    MenuAnalysed analysis,
+    String question,
+  ) async {
+    calls.add((menu: menu, analysis: analysis, question: question));
+    if (_queue.isEmpty) {
+      return const MenuQuestionFailed(
+        reason: MenuQuestionFailureReason.badResponse,
+      );
+    }
+    return _queue.removeAt(0);
+  }
+}
 
 /// A valid 1×1 black PNG, so two pages differ and their order is checkable.
 final Uint8List blackPngBytes = base64Decode(

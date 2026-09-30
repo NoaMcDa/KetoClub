@@ -2,8 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/menu_question.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/classifier/menu_question_answerer.dart';
+import 'package:ketoclub/services/classifier/menu_question_prompt.dart';
 import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
@@ -14,6 +17,25 @@ import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/keto_score.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
+
+/// The state of a user-initiated menu question (architecture.md §9.5;
+/// issue #214).
+///
+/// Transitions: idle → loading → answered or failed; dismissed (any
+/// terminal state) → idle via [MenuController.dismissQuestion].
+enum QuestionState {
+  /// No question has been asked, or the last one was dismissed.
+  idle,
+
+  /// A question is in flight; the sheet shows a spinner.
+  loading,
+
+  /// The model answered; the sheet shows the answer text and dish chips.
+  answered,
+
+  /// The model or transport failed; the sheet shows distinct failure copy.
+  failed,
+}
 
 /// Which step of loading a menu [MenuController] is in (issue #65), so the
 /// menu screen can say what it is waiting for rather than show a bare
@@ -82,12 +104,17 @@ final class MenuController extends ChangeNotifier {
   /// [open], and reads and writes the open venue's personal dish notes
   /// through a [NotesStore] (issue #52).
   ///
-  /// The four services are positional and private. Private, because a widget
+  /// The five services are positional and private. Private, because a widget
   /// reaches a service only through a controller's own API (architecture.md
   /// §5) and public fields would hand it a way around this class; positional,
   /// because a private field cannot be a named initializing formal in Dart and
   /// the alternative was suppressing a lint on every field. The types are
   /// distinct, so a misordered call does not compile.
+  ///
+  /// The optional [MenuQuestionAnswerer] defaults to null: callers that never
+  /// use the question feature — tests and the scan path — need not construct
+  /// one. When null, [isQuestionAvailable] returns false and [askQuestion]
+  /// is a no-op.
   ///
   /// No `Clock` is injected. Every timestamp this controller exposes comes
   /// from the result it was read from — [cachedAt] and [fetchedAt] from
@@ -99,8 +126,9 @@ final class MenuController extends ChangeNotifier {
     this._classifier,
     this._settings,
     this._notes,
-    this._carbBudget,
-  ) {
+    this._carbBudget, [
+    this._answerer,
+  ]) {
     _carbBudget.addListener(_onBudgetChange);
   }
 
@@ -109,6 +137,7 @@ final class MenuController extends ChangeNotifier {
   final SettingsStore _settings;
   final NotesStore _notes;
   final CarbBudgetController _carbBudget;
+  final MenuQuestionAnswerer? _answerer;
 
   @override
   void dispose() {
@@ -131,6 +160,36 @@ final class MenuController extends ChangeNotifier {
   String _query = '';
   VenueRef? _openRef;
   Map<String, String> _dishNotes = const <String, String>{};
+
+  // Question state (architecture.md §9.5; issue #214). None of these fields
+  // is ever persisted, logged, or sent to the cache — see D8.
+  QuestionState _questionState = QuestionState.idle;
+  MenuQuestionAnswered? _questionAnswer;
+  MenuQuestionFailureReason? _questionFailure;
+
+  /// Whether a question is currently in flight.
+  bool get isQuestionLoading => _questionState == QuestionState.loading;
+
+  /// The current question state.
+  QuestionState get questionState => _questionState;
+
+  /// The last successful answer, or null when [questionState] is not
+  /// [QuestionState.answered].
+  MenuQuestionAnswered? get questionAnswer => _questionAnswer;
+
+  /// The reason the last question failed, or null when [questionState] is not
+  /// [QuestionState.failed].
+  MenuQuestionFailureReason? get questionFailure => _questionFailure;
+
+  /// Whether the app-bar action that opens the question sheet is available.
+  ///
+  /// True only when an LLM analysis succeeded, the question answerer is
+  /// wired in, and the analysis did not itself fail — mirrors the condition
+  /// under which [askQuestion] can do real work.
+  bool get isQuestionAvailable {
+    final a = _analysis;
+    return _answerer != null && a is MenuAnalysed && a.engine is LlmEngine;
+  }
 
   /// The venue [open] most recently loaded, or null before the first
   /// call — [refresh] has nothing to refetch until then.
@@ -659,6 +718,58 @@ final class MenuController extends ChangeNotifier {
       return null;
     }
     return analysis;
+  }
+
+  /// Sends [question] to the LLM, grounded in the current [analysis].
+  ///
+  /// Guards: no-ops when [_answerer] is null, when [analysis] is not a
+  /// [MenuAnalysed] with an [LlmEngine], when [question] is blank after
+  /// trimming, or when a question is already in flight. The question is
+  /// never persisted, never logged, and never stored in the Hive cache or
+  /// [SettingsStore] (architecture.md D8; issue #214).
+  ///
+  /// Transitions [questionState]: idle/answered/failed → loading → answered
+  /// or failed.
+  Future<void> askQuestion(String question) async {
+    final answerer = _answerer;
+    if (answerer == null) return;
+    final menu = _menu;
+    final analysis = _analysis;
+    if (menu == null || analysis is! MenuAnalysed) return;
+    if (analysis.engine is! LlmEngine) return;
+    if (_questionState == QuestionState.loading) return;
+    final trimmed = question.trim();
+    if (trimmed.isEmpty) return;
+    if (trimmed.length > menuQuestionMaxLength) return;
+
+    _questionState = QuestionState.loading;
+    _questionAnswer = null;
+    _questionFailure = null;
+    notifyListeners();
+
+    // The question is in the user prompt only, never logged or persisted.
+    final result = await answerer.ask(menu, analysis, trimmed);
+    switch (result) {
+      case MenuQuestionAnswered():
+        _questionState = QuestionState.answered;
+        _questionAnswer = result;
+        _questionFailure = null;
+      case MenuQuestionFailed():
+        _questionState = QuestionState.failed;
+        _questionAnswer = null;
+        _questionFailure = result.reason;
+    }
+    notifyListeners();
+  }
+
+  /// Resets the question sheet to idle, discarding any previous answer or
+  /// failure. A no-op when already idle.
+  void dismissQuestion() {
+    if (_questionState == QuestionState.idle) return;
+    _questionState = QuestionState.idle;
+    _questionAnswer = null;
+    _questionFailure = null;
+    notifyListeners();
   }
 
   /// Changes [filter], persists it as [AppSettings.lastFilter] (issue

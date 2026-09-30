@@ -248,12 +248,13 @@ Route<void>? generateRoute(
     return MaterialPageRoute<void>(
       settings: settings,
       builder: (context) => ChangeNotifierProvider<MenuController>(
-        create: (_) => MenuController(
+        create: (context) => MenuController(
           dependencies.menuRepository,
           dependencies.menuClassifier,
           dependencies.settingsStore,
           dependencies.notesStore,
           context.read<CarbBudgetController>(),
+          dependencies.menuQuestionAnswerer,
         ),
         child: MenuScreen(
           ref: ref,

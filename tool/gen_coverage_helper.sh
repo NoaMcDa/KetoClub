@@ -20,7 +20,7 @@ mkdir -p test
   echo
   find lib -name '*.dart' \
     ! -name '*.g.dart' ! -name '*.freezed.dart' ! -path 'lib/l10n/generated/*' \
-    | sort \
+    | LC_ALL=C sort \
     | sed -e "s|^lib/|import 'package:${package}/|" -e "s|\$|';|"
   echo
   echo "void main() {}"
