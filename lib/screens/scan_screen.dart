@@ -262,7 +262,7 @@ class _ScanScreenState extends State<ScanScreen> {
           ],
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
+            child: FilledButton(
               onPressed: controller.canAnalysePages
                   ? () => unawaited(_analysePages())
                   : null,
@@ -285,7 +285,6 @@ class _ScanScreenState extends State<ScanScreen> {
               labelText: l10n.scanPasteLabel,
               hintText: l10n.scanPasteHint,
               alignLabelWithHint: true,
-              border: const OutlineInputBorder(),
             ),
           ),
           if (controller.emptyPaste) ...[
@@ -303,7 +302,7 @@ class _ScanScreenState extends State<ScanScreen> {
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
+            child: FilledButton(
               onPressed: controller.canAnalyse
                   ? () => unawaited(_analysePaste())
                   : null,

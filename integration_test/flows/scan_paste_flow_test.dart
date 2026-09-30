@@ -26,7 +26,7 @@ const String _pasted =
     'Sirloin with fries 45 NIS';
 
 /// The Analyse button on the Scan tab.
-Finder get _analyse => find.widgetWithText(ElevatedButton, _en.scanAnalyse);
+Finder get _analyse => find.widgetWithText(FilledButton, _en.scanAnalyse);
 
 /// The verdicts the faked classifier answers with, keyed by the dish ids
 /// `TextMenuSource` assigns (`p1`, `p2`).
@@ -76,7 +76,7 @@ void main() {
 
         // Act: open the Scan tab, paste, and analyse.
         await tapAndSettle(tester, navDestination(_en.navScan));
-        expect(tester.widget<ElevatedButton>(_analyse).onPressed, isNull);
+        expect(tester.widget<FilledButton>(_analyse).onPressed, isNull);
         await enterText(tester, _pasted);
         await tapAndSettle(tester, _analyse);
 

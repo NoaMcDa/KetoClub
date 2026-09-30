@@ -133,15 +133,12 @@ class _MenuQuestionSheetState extends State<MenuQuestionSheet> {
           maxLines: 3,
           minLines: 2,
           maxLength: menuQuestionMaxLength,
-          decoration: InputDecoration(
-            hintText: l10n.menuQuestionSheetHint,
-            border: const OutlineInputBorder(),
-          ),
+          decoration: InputDecoration(hintText: l10n.menuQuestionSheetHint),
         ),
         const SizedBox(height: 16),
         Align(
           alignment: AlignmentDirectional.centerEnd,
-          child: ElevatedButton(
+          child: FilledButton(
             onPressed: _submit,
             child: Text(l10n.menuQuestionSheetAsk),
           ),

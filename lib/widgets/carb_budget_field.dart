@@ -128,7 +128,6 @@ class _CarbBudgetFieldState extends State<CarbBudgetField> {
                   )
                 : null,
             isDense: true,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       },
