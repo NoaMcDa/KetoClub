@@ -34,6 +34,7 @@ import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 import 'package:ketoclub/services/classifier/scanned_classifier_router.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/vision_menu_classifier.dart';
@@ -433,6 +434,7 @@ final class FlowFakeMenuClassifier implements MenuClassifier {
       ),
       analysedAt: DateTime.utc(2026),
       options: options.snapshot,
+      schemaVersion: MenuResponseParser.schemaVersion,
     );
   }
 }

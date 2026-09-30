@@ -14,6 +14,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/settings_screen.dart';
+import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -68,6 +69,7 @@ final MenuAnalysed _cachedAt6g = MenuAnalysed(
   engine: const LlmEngine(model: 'served-model'),
   analysedAt: DateTime.utc(2026),
   options: const AnalysisOptionsSnapshot(netCarbLimitGrams: 6),
+  schemaVersion: MenuResponseParser.schemaVersion,
 );
 
 /// Fakes with consent given, [_menu] served for [_ref], and [_cachedAt6g]
