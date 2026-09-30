@@ -110,6 +110,46 @@ def test_html_page_is_returned_with_its_final_url(
     assert "x-ketoclub-install-id" not in sent.headers
 
 
+def test_an_unknown_charset_still_answers_200_with_the_decoded_page(
+    site_client: TestClient, web: respx.MockRouter
+) -> None:
+    _no_robots(web)
+    web.get(_HOME).mock(
+        return_value=httpx.Response(
+            200,
+            content=_MENU_PAGE.encode(),
+            headers={"content-type": "text/html; charset=x-bogus-charset"},
+        )
+    )
+
+    response = _post(site_client)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["kind"] == "html"
+    assert "Dish 3" in body["body"]
+
+
+def test_bytes_that_do_not_match_the_declared_charset_never_500(
+    site_client: TestClient, web: respx.MockRouter
+) -> None:
+    _no_robots(web)
+    page = _MENU_PAGE.replace("Menu", "תפריט", 1).encode("windows-1255")
+    web.get(_HOME).mock(
+        return_value=httpx.Response(
+            200,
+            content=page,
+            headers={"content-type": "text/html; charset=utf-8"},
+        )
+    )
+
+    response = _post(site_client)
+
+    assert response.status_code == 200
+    assert response.json()["kind"] == "html"
+    assert "Dish 3" in response.json()["body"]
+
+
 def test_pdf_is_returned_as_base64(
     site_client: TestClient, web: respx.MockRouter
 ) -> None:

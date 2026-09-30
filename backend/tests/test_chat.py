@@ -750,6 +750,30 @@ def test_out_of_bounds_images_are_422_without_an_upstream_call(
     assert not route.called
 
 
+def test_a_422_never_echoes_the_submitted_image(
+    chat_client: TestClient,
+    gemini: respx.MockRouter,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    route = gemini.post(_URL).mock(return_value=httpx.Response(200, json=_reply()))
+    submitted = "NOT-BASE64-MARKER!" * 600  # about 10 KiB
+    body = _image_body(("image/png", submitted))
+
+    with caplog.at_level(logging.DEBUG):
+        response = _post(chat_client, body=body)
+
+    assert response.status_code == 422
+    assert submitted not in response.text
+    assert "NOT-BASE64-MARKER" not in response.text
+    assert "NOT-BASE64-MARKER" not in caplog.text
+    detail = response.json()["detail"]
+    assert isinstance(detail, list)
+    assert detail[0]["loc"][-1] == "data"
+    assert detail[0]["msg"]
+    assert set(detail[0]) == {"type", "loc", "msg"}
+    assert not route.called
+
+
 def test_image_bounds_come_from_settings(gemini: respx.MockRouter) -> None:
     route = gemini.post(_URL).mock(return_value=httpx.Response(200, json=_reply()))
     settings = Settings(

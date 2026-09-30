@@ -248,3 +248,16 @@ def charset_of(content_type: str) -> str:
         if key.strip().lower() == "charset" and value.strip():
             return value.strip().strip('"').lower()
     return "utf-8"
+
+
+def decode_page(content: bytes, content_type: str) -> str:
+    """``content`` decoded by its declared charset, never raising.
+
+    A charset Python does not know (``LookupError``) or one that cannot decode
+    the bytes (``ValueError``, which covers ``UnicodeDecodeError``) falls back
+    to UTF-8 with replacement characters, so a mislabelled page still reads.
+    """
+    try:
+        return content.decode(charset_of(content_type), errors="replace")
+    except (LookupError, ValueError):
+        return content.decode("utf-8", errors="replace")

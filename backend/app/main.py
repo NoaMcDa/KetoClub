@@ -16,12 +16,13 @@ from contextlib import asynccontextmanager
 
 import httpx
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
 from app.config import Settings, get_settings
 from app.db import build_engine
-from app.errors import BackendError, handle_backend_error
+from app.errors import BackendError, handle_backend_error, handle_validation_error
 from app.models import Base
 from app.routers import chat, discovery, health, proxy, website
 from app.services.rate_limit import RateLimiter
@@ -104,6 +105,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.website_clock = time.monotonic
     app.state.resolve_host = resolve_host_addresses
     app.add_exception_handler(BackendError, handle_backend_error)
+    app.add_exception_handler(RequestValidationError, handle_validation_error)
 
     app.add_middleware(RequestLoggingMiddleware)
     app.add_middleware(
