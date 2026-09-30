@@ -114,8 +114,16 @@ void main() {
       await tapAndSettle(tester, find.text(_en.menuQuestionSheetAsk));
 
       // Assert: the answer is shown, including a chip for the referenced dish.
+      // The dish name also appears in the DishCard behind the sheet, so
+      // scope the chip lookup to the sheet.
       expect(find.text('The steak is perfect for keto.'), findsOneWidget);
-      expect(find.text(fixture.steak.name), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(MenuQuestionSheet),
+          matching: find.text(fixture.steak.name),
+        ),
+        findsOneWidget,
+      );
 
       // Verify the question answerer received the question.
       expect(fakes.questionAnswerer.calls, hasLength(1));
