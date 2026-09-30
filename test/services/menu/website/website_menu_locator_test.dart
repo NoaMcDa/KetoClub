@@ -101,6 +101,32 @@ void main() {
       );
     });
 
+    test('a link percent-encoded in windows-1255 is found, not thrown', () {
+      // Act: `%FA%F4%F8%E9%E8` is not UTF-8, so a strict decode throws.
+      final location = WebsiteMenuLocator.locate(
+        _fixture('legacy_encoded_menu_link.html'),
+        _home,
+      );
+
+      // Assert
+      expect(
+        (location as MenuLinkFound).uri,
+        Uri.parse('https://cafe-noir.example/%FA%F4%F8%E9%E8.html'),
+      );
+    });
+
+    test('a malformed escape beside a menu word still locates the link', () {
+      final location = WebsiteMenuLocator.locate(
+        '<a href="/about%FF.html">About</a><a href="/menu%FF">Food</a>',
+        _home,
+      );
+
+      expect(
+        (location as MenuLinkFound).uri,
+        Uri.parse('https://cafe-noir.example/menu%FF'),
+      );
+    });
+
     test('step 3: a page with no menu link finds nothing', () {
       expect(
         WebsiteMenuLocator.locate(_fixture('no_menu.html'), _home),

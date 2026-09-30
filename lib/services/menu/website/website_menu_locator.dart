@@ -240,12 +240,31 @@ abstract final class WebsiteMenuLocator {
       line.replaceFirst(_bullet, '').replaceAll(_whitespace, ' ').trim();
 
   static bool _namesMenu(PageLink link) {
-    final address = Uri.decodeFull(link.uri.path).toLowerCase();
+    final address = _decodePath(link.uri.path).toLowerCase();
     final text = link.text.toLowerCase();
     return menuWords.any(
       (word) => address.contains(word) || text.contains(word),
     );
   }
+
+  /// [path] percent-decoded as UTF-8, else byte by byte as `windows-1255`
+  /// (older Hebrew sites encode `תפריט` as `%FA%F4%F8%E9%E8`). Never
+  /// throws: [Uri.decodeFull] throws on bytes that are not UTF-8.
+  static String _decodePath(String path) {
+    try {
+      return Uri.decodeFull(path);
+    } on FormatException {
+      return path.replaceAllMapped(_escape, (match) {
+        final byte = int.parse(match.group(1)!, radix: 16);
+        // The Hebrew letters of windows-1255 sit at 0xE0–0xFA.
+        return String.fromCharCode(
+          byte >= 0xE0 && byte <= 0xFA ? 0x05D0 + byte - 0xE0 : byte,
+        );
+      });
+    }
+  }
+
+  static final RegExp _escape = RegExp('%([0-9A-Fa-f]{2})');
 
   static bool _sameSite(Uri a, Uri b) => _bareHost(a) == _bareHost(b);
 

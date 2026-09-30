@@ -149,7 +149,9 @@ the locator's cases, not any real site's markup. `jsonld_menu.html` carries a
 schema.org `Menu` (sections, a nested section, a nameless item, a malformed
 block); `menu_link.html` links its menu page from the nav (and a Wolt link that
 must not be followed); `hebrew_menu_link.html` says `תפריט` only in a link's
-text; `pdf_link.html` links a menu PDF on a file host beside a wine-list PDF;
+text; `legacy_encoded_menu_link.html` links it only as `תפריט`
+percent-encoded in `windows-1255` (`%FA%F4%F8%E9%E8`), which is not UTF-8;
+`pdf_link.html` links a menu PDF on a file host beside a wine-list PDF;
 `no_menu.html` has none of these; `menu_page_separate_prices.html` (Hebrew) and
 `menu_page_inline_prices.html` (English) are the two price layouts
 `WebsiteMenuLocator.menuText` reads. Replace or supplement them with real,

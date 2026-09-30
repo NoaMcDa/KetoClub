@@ -194,6 +194,22 @@ void main() {
       ]);
     });
 
+    test('a link encoded in windows-1255 is followed, never thrown', () async {
+      // Arrange
+      final menuPage = Uri.parse('$_homeUrl/%FA%F4%F8%E9%E8.html');
+      final fetcher = _ScriptedFetcher()
+        ..page(_home, _fixture('legacy_encoded_menu_link.html'))
+        ..page(menuPage, _fixture('menu_page_inline_prices.html'));
+
+      // Act
+      final result = await _adapter(fetcher).fetch(_ref);
+
+      // Assert
+      expect(result, isA<MenuFetchResult>());
+      expect(_dishNames(result), hasLength(4));
+      expect(fetcher.calls, [_home, menuPage]);
+    });
+
     test('a linked page with JSON-LD is mapped', () async {
       final menuPage = Uri.parse('$_homeUrl/food/menu/');
       final fetcher = _ScriptedFetcher()
