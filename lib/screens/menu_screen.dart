@@ -25,6 +25,7 @@ import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
+import 'package:ketoclub/widgets/app_sheet.dart';
 import 'package:ketoclub/widgets/carb_budget_field.dart';
 import 'package:ketoclub/widgets/category_chips.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
@@ -626,9 +627,8 @@ class _MenuScreenState extends State<MenuScreen> {
 
   /// Opens [ScannedPagesSheet] over [pages] as a dismissible modal.
   Future<void> _openScannedPages(ScannedMenu pages) {
-    return showModalBottomSheet<void>(
+    return showKetoClubSheet<void>(
       context: context,
-      isScrollControlled: true,
       showDragHandle: true,
       builder: (_) => ScannedPagesSheet(scan: pages),
     );
@@ -1034,9 +1034,9 @@ class _MenuScreenState extends State<MenuScreen> {
 
   /// Opens the full-screen [WaiterCardSheet] for [row] as a modal.
   Future<void> _openWaiterCard(DishRow row) {
-    return showModalBottomSheet<void>(
+    return showKetoClubSheet<void>(
       context: context,
-      isScrollControlled: true,
+      showDragHandle: true,
       builder: (_) =>
           WaiterCardSheet(row: row, screenBrightness: widget.screenBrightness),
     );
@@ -1050,9 +1050,8 @@ class _MenuScreenState extends State<MenuScreen> {
   /// the callbacks below close over the controller instance directly.
   Future<void> _openNoteEditor(DishRow row) {
     final controller = context.read<MenuController>();
-    return showModalBottomSheet<void>(
+    return showKetoClubSheet<void>(
       context: context,
-      isScrollControlled: true,
       builder: (_) => NoteEditorSheet(
         dishName: row.dish.name,
         initialNote: controller.noteFor(row.dish.id),
@@ -1073,9 +1072,8 @@ class _MenuScreenState extends State<MenuScreen> {
     final menu = controller.menu;
     if (menu == null) return;
     unawaited(
-      showModalBottomSheet<void>(
+      showKetoClubSheet<void>(
         context: context,
-        isScrollControlled: true,
         builder: (_) => AnimatedBuilder(
           animation: controller,
           builder: (_, child) => MenuQuestionSheet(
