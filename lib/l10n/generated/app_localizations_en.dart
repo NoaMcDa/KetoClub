@@ -1021,4 +1021,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String netCarbsChipLeavesSuffix(int grams) {
     return ' · leaves ${grams}g';
   }
+
+  @override
+  String get hiddenCarbsSectionLabel => 'Possible hidden carbs';
+
+  @override
+  String get hiddenCarbsCertaintySuspected => 'Suspected';
+
+  @override
+  String get hiddenCarbsCertaintyLikely => 'Likely';
 }

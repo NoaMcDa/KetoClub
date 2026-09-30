@@ -270,4 +270,56 @@ void main() {
       expect(find.byType(WaiterCardSheet), findsOneWidget);
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // Hidden-carbs panel (issue #213)
+  // ---------------------------------------------------------------------------
+
+  group('_HiddenCarbsPanel', () {
+    DishRow rowWithFlags(List<HiddenCarb> flags) => DishRow(
+      dish: _dish('Grilled Salmon'),
+      category: 'Mains',
+      analysis: AnalysedDish(
+        dishId: 'Grilled Salmon',
+        name: 'Grilled Salmon',
+        verdict: DishVerdict.modifiable,
+        why: 'Suspicious glaze',
+        modification: 'Ask for the glaze on the side',
+        hiddenCarbs: flags,
+      ),
+    );
+
+    testWidgets('panel is visible when the dish has hidden-carb flags', (
+      tester,
+    ) async {
+      // Arrange
+      const flag = HiddenCarb(
+        source: 'house glaze',
+        certainty: HiddenCarbCertainty.likely,
+        waiterQuestion: 'Is the glaze sugar-free?',
+      );
+      final row = rowWithFlags([flag]);
+
+      // Act
+      await _pump(tester, WaiterCardSheet(row: row));
+
+      // Assert
+      expect(find.text('Possible hidden carbs'), findsOneWidget);
+      expect(find.text('house glaze'), findsOneWidget);
+      expect(find.text('Is the glaze sugar-free?'), findsOneWidget);
+    });
+
+    testWidgets('panel is not shown when the dish has no flags', (
+      tester,
+    ) async {
+      // Arrange — yellow dish with no hidden-carb flags
+      final row = _row('Grilled Salmon', modification: 'No fries please.');
+
+      // Act
+      await _pump(tester, WaiterCardSheet(row: row));
+
+      // Assert
+      expect(find.text('Possible hidden carbs'), findsNothing);
+    });
+  });
 }

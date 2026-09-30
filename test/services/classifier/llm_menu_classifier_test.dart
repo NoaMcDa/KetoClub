@@ -75,6 +75,7 @@ Net carbs of 9g or less per dish make it green (orderAsIs).
 Starchy sides, root vegetables, sugary sauces and glazes, breading, and bread that only carries the dish (a bun, pita, toast) make an otherwise-compliant dish yellow (modifiable): name the exact component to remove and the exact substitute to ask for.
 Pasta, pizza, rice bowls, noodles, breaded or battered proteins, and pastry make a dish red (nonKeto), even with modifications, and get no modification text.
 Write "why" and "modification" in the language the menu is written in, each under 300 characters. Return only dishes present in the input, using their given id and exact printed name.
+Hidden carbs: breading crumbs, sweet marinades, house dressings, thickeners and glazes often contain sugar, honey, flour or cornstarch even when the dish name reads clean. For each dish, list any such suspected or confirmed hidden carb under "hidden_carbs" as {source, certainty ("suspected" or "likely"), waiter_question} — the question to ask the waiter, in the menu's language, under 300 characters. Use an empty array when none apply.
 
 Every "modifiable" dish must carry a non-empty "modification" naming the exact component to remove and the exact substitute to ask for. A dish with no compliant path is "nonKeto" and must not carry a "modification".
 Respond with JSON matching the supplied schema and nothing else: no markdown fence, no heading, no commentary before or after the JSON object.''';

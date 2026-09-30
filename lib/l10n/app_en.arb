@@ -446,5 +446,8 @@
   "netCarbsChipLeavesSuffix": " · leaves {grams}g",
   "@netCarbsChipLeavesSuffix": {
     "placeholders": { "grams": { "type": "int" } }
-  }
+  },
+  "hiddenCarbsSectionLabel": "Possible hidden carbs",
+  "hiddenCarbsCertaintySuspected": "Suspected",
+  "hiddenCarbsCertaintyLikely": "Likely"
 }

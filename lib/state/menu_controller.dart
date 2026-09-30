@@ -4,6 +4,7 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
@@ -199,7 +200,8 @@ final class MenuController extends ChangeNotifier {
   /// number in its place; a null here means "not computable", not zero.
   double? get ketoScoreOutOfTen => ketoScore(
     greenCount: greenCount,
-    yellowCount: yellowCount,
+    hiddenCarbYellowCount: hiddenCarbYellowCount,
+    otherYellowCount: yellowCount - hiddenCarbYellowCount,
     redCount: redCount,
   );
 
@@ -210,6 +212,20 @@ final class MenuController extends ChangeNotifier {
   /// How many dishes in [analysis] were classified [DishVerdict.modifiable]
   /// (yellow); 0 when there is no [MenuAnalysed] result.
   int get yellowCount => _countOf(DishVerdict.modifiable);
+
+  /// How many [DishVerdict.modifiable] dishes in [analysis] were demoted
+  /// from green because of a hidden-carb flag (issue #213); 0 when there
+  /// is no [MenuAnalysed] result. A subset of [yellowCount].
+  int get hiddenCarbYellowCount {
+    final currentAnalysis = _analysis;
+    if (currentAnalysis is! MenuAnalysed) return 0;
+    return currentAnalysis.dishes
+        .where(
+          (d) =>
+              d.verdict == DishVerdict.modifiable && d.hiddenCarbs.isNotEmpty,
+        )
+        .length;
+  }
 
   /// How many dishes in [analysis] were classified [DishVerdict.nonKeto]
   /// (red); 0 when there is no [MenuAnalysed] result.
@@ -636,6 +652,12 @@ final class MenuController extends ChangeNotifier {
       return null;
     }
     if (!options.matches(analysis.options)) return null;
+    // Issue #213: a cached result from a previous schema version may have
+    // stale green verdicts that the new parser would demote. Re-analyse
+    // rather than show a potentially wrong green.
+    if (analysis.schemaVersion != MenuResponseParser.schemaVersion) {
+      return null;
+    }
     return analysis;
   }
 

@@ -965,4 +965,278 @@ void main() {
       expect(kind, equals('llm'));
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // HiddenCarb (issue #213)
+  // ---------------------------------------------------------------------------
+
+  group('HiddenCarbCertainty', () {
+    test('tryParse returns suspected for the wire value "suspected"', () {
+      expect(
+        HiddenCarbCertainty.tryParse('suspected'),
+        equals(HiddenCarbCertainty.suspected),
+      );
+    });
+
+    test('tryParse returns likely for the wire value "likely"', () {
+      expect(
+        HiddenCarbCertainty.tryParse('likely'),
+        equals(HiddenCarbCertainty.likely),
+      );
+    });
+
+    test('tryParse returns null for an unknown string', () {
+      expect(HiddenCarbCertainty.tryParse('unknown'), isNull);
+    });
+  });
+
+  group('HiddenCarb', () {
+    const validJson = <String, Object?>{
+      'source': 'house dressing',
+      'certainty': 'suspected',
+      'waiterQuestion': 'Is the dressing sugar-free?',
+    };
+
+    test('tryFrom returns a HiddenCarb for a valid map', () {
+      // Act
+      final result = HiddenCarb.tryFrom(validJson);
+
+      // Assert
+      expect(result, isNotNull);
+      expect(result!.source, equals('house dressing'));
+      expect(result.certainty, equals(HiddenCarbCertainty.suspected));
+      expect(result.waiterQuestion, equals('Is the dressing sugar-free?'));
+    });
+
+    test('tryFrom(x.toJson()) round-trips to an equal HiddenCarb', () {
+      // Arrange
+      const flag = HiddenCarb(
+        source: 'teriyaki glaze',
+        certainty: HiddenCarbCertainty.likely,
+        waiterQuestion: 'Is the glaze without honey?',
+      );
+
+      // Act
+      final result = HiddenCarb.tryFrom(flag.toJson());
+
+      // Assert
+      expect(result, equals(flag));
+    });
+
+    test('tryFrom returns null when source is blank', () {
+      final json = <String, Object?>{...validJson, 'source': '  '};
+      expect(HiddenCarb.tryFrom(json), isNull);
+    });
+
+    test('tryFrom returns null when certainty is unknown', () {
+      final json = <String, Object?>{...validJson, 'certainty': 'maybe'};
+      expect(HiddenCarb.tryFrom(json), isNull);
+    });
+
+    test('tryFrom returns null when waiterQuestion is blank', () {
+      final json = <String, Object?>{...validJson, 'waiterQuestion': ''};
+      expect(HiddenCarb.tryFrom(json), isNull);
+    });
+
+    test('tryFrom returns null when source is missing', () {
+      final json = <String, Object?>{...validJson}..remove('source');
+      expect(HiddenCarb.tryFrom(json), isNull);
+    });
+
+    test('== and hashCode compare all three fields', () {
+      const a = HiddenCarb(
+        source: 'house dressing',
+        certainty: HiddenCarbCertainty.suspected,
+        waiterQuestion: 'Is the dressing sugar-free?',
+      );
+      const b = HiddenCarb(
+        source: 'house dressing',
+        certainty: HiddenCarbCertainty.suspected,
+        waiterQuestion: 'Is the dressing sugar-free?',
+      );
+      const c = HiddenCarb(
+        source: 'teriyaki glaze',
+        certainty: HiddenCarbCertainty.likely,
+        waiterQuestion: 'Glaze without honey?',
+      );
+      expect(a, equals(b));
+      expect(a.hashCode, equals(b.hashCode));
+      expect(a, isNot(equals(c)));
+    });
+  });
+
+  group('AnalysedDish with hiddenCarbs (issue #213)', () {
+    const dishWithFlagJson = <String, Object?>{
+      'dishId': 'd10',
+      'name': 'Grilled salmon',
+      'verdict': 'modifiable',
+      'why': 'House glaze',
+      'modification': 'Ask for the glaze on the side',
+      'netCarbsEstimate': null,
+      'hiddenCarbs': [
+        <String, Object?>{
+          'source': 'house glaze',
+          'certainty': 'likely',
+          'waiterQuestion': 'Is the glaze without sugar?',
+        },
+      ],
+    };
+
+    test('tryFrom reads hiddenCarbs when present', () {
+      // Act
+      final result = AnalysedDish.tryFrom(dishWithFlagJson);
+
+      // Assert
+      expect(result?.hiddenCarbs, hasLength(1));
+      expect(result?.hiddenCarbs.first.source, equals('house glaze'));
+    });
+
+    test('tryFrom reads absent hiddenCarbs as empty list', () {
+      // Arrange — no hiddenCarbs key (pre-issue-#213 cache entry)
+      const json = <String, Object?>{
+        'dishId': 'd2',
+        'name': 'Grilled chicken',
+        'verdict': 'orderAsIs',
+        'why': 'Plain protein',
+        'modification': null,
+        'netCarbsEstimate': null,
+      };
+
+      // Act
+      final result = AnalysedDish.tryFrom(json);
+
+      // Assert
+      expect(result, isNotNull);
+      expect(result!.hiddenCarbs, isEmpty);
+    });
+
+    test('tryFrom drops a malformed entry in hiddenCarbs silently', () {
+      // Arrange — one valid entry and one missing the source
+      final json = <String, Object?>{
+        ...dishWithFlagJson,
+        'hiddenCarbs': <Object?>[
+          <String, Object?>{
+            'certainty': 'likely',
+            'waiterQuestion': 'Sugar-free?',
+          },
+          <String, Object?>{
+            'source': 'house glaze',
+            'certainty': 'likely',
+            'waiterQuestion': 'Is the glaze without sugar?',
+          },
+        ],
+      };
+
+      // Act
+      final result = AnalysedDish.tryFrom(json);
+
+      // Assert — only the valid entry survives
+      expect(result, isNotNull);
+      expect(result!.hiddenCarbs, hasLength(1));
+      expect(result.hiddenCarbs.first.source, equals('house glaze'));
+    });
+
+    test('tryFrom(x.toJson()) round-trips a dish with hidden carbs', () {
+      // Arrange
+      final dish = AnalysedDish.tryFrom(dishWithFlagJson)!;
+
+      // Act
+      final result = AnalysedDish.tryFrom(dish.toJson());
+
+      // Assert
+      expect(result, equals(dish));
+      expect(result!.hiddenCarbs, equals(dish.hiddenCarbs));
+    });
+
+    test('== accounts for hiddenCarbs list', () {
+      final a = AnalysedDish.tryFrom(dishWithFlagJson)!;
+      final b = AnalysedDish.tryFrom(dishWithFlagJson)!;
+      const noFlags = AnalysedDish(
+        dishId: 'd10',
+        name: 'Grilled salmon',
+        verdict: DishVerdict.modifiable,
+        why: 'House glaze',
+        modification: 'Ask for the glaze on the side',
+      );
+
+      expect(a, equals(b));
+      expect(a.hashCode, equals(b.hashCode));
+      expect(a, isNot(equals(noFlags)));
+    });
+  });
+
+  group('MenuAnalysed schemaVersion (issue #213)', () {
+    const llmEngineJson = <String, Object?>{'kind': 'llm', 'model': 'gpt-x'};
+    const baseJson = <String, Object?>{
+      'dishes': <Object?>[],
+      'unclassified': <Object?>[],
+      'engine': llmEngineJson,
+      'analysedAt': '2024-01-01T00:00:00.000Z',
+    };
+
+    test('tryFrom reads an absent schemaVersion as 0', () {
+      // Act
+      final result = MenuAnalysed.tryFrom(baseJson);
+
+      // Assert
+      expect(result, isNotNull);
+      expect(result!.schemaVersion, equals(0));
+    });
+
+    test('tryFrom reads an explicit schemaVersion of 1', () {
+      // Arrange
+      final json = <String, Object?>{...baseJson, 'schemaVersion': 1};
+
+      // Act
+      final result = MenuAnalysed.tryFrom(json);
+
+      // Assert
+      expect(result?.schemaVersion, equals(1));
+    });
+
+    test('toJson always emits schemaVersion', () {
+      // Arrange
+      final json = <String, Object?>{...baseJson, 'schemaVersion': 1};
+      final analysed = MenuAnalysed.tryFrom(json)!;
+
+      // Act
+      final serialised = analysed.toJson();
+
+      // Assert
+      expect(serialised.containsKey('schemaVersion'), isTrue);
+      expect(serialised['schemaVersion'], equals(1));
+    });
+
+    test('toJson emits schemaVersion 0 when default', () {
+      // Act
+      final analysed = MenuAnalysed.tryFrom(baseJson)!;
+      final serialised = analysed.toJson();
+
+      // Assert
+      expect(serialised.containsKey('schemaVersion'), isTrue);
+      expect(serialised['schemaVersion'], equals(0));
+    });
+
+    test('tryFrom(x.toJson()) round-trips schemaVersion', () {
+      // Arrange
+      final json = <String, Object?>{...baseJson, 'schemaVersion': 1};
+      final analysed = MenuAnalysed.tryFrom(json)!;
+
+      // Act
+      final result = MenuAnalysed.tryFrom(analysed.toJson());
+
+      // Assert
+      expect(result?.schemaVersion, equals(1));
+    });
+
+    test('== accounts for schemaVersion', () {
+      final a = MenuAnalysed.tryFrom(baseJson)!; // schemaVersion = 0
+      final b = MenuAnalysed.tryFrom(<String, Object?>{
+        ...baseJson,
+        'schemaVersion': 1,
+      })!;
+
+      expect(a, isNot(equals(b)));
+    });
+  });
 }

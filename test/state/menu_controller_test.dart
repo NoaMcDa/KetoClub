@@ -11,6 +11,7 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/vision_menu_classifier.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
@@ -1818,15 +1819,20 @@ void main() {
     final menu = _menuOf([steak]);
 
     /// An LLM analysis of [menu] recording [options], as a cache would
-    /// hold it.
-    MenuAnalysed llmAnalysis({AnalysisOptionsSnapshot? options}) =>
-        MenuAnalysed(
-          dishes: [_verdictFor(steak, DishVerdict.orderAsIs)],
-          unclassified: const <String>[],
-          engine: const LlmEngine(model: 'served-model'),
-          analysedAt: DateTime.utc(2026),
-          options: options,
-        );
+    /// hold it. Defaults to the current [MenuResponseParser.schemaVersion]
+    /// so tests that assert cache reuse read as intended (the reuse gate
+    /// checks the version too since issue #213).
+    MenuAnalysed llmAnalysis({
+      AnalysisOptionsSnapshot? options,
+      int schemaVersion = MenuResponseParser.schemaVersion,
+    }) => MenuAnalysed(
+      dishes: [_verdictFor(steak, DishVerdict.orderAsIs)],
+      unclassified: const <String>[],
+      engine: const LlmEngine(model: 'served-model'),
+      analysedAt: DateTime.utc(2026),
+      options: options,
+      schemaVersion: schemaVersion,
+    );
 
     late FakeMenuRepository repository;
     late FakeMenuClassifier classifier;
@@ -2210,6 +2216,7 @@ void main() {
       engine: const LlmEngine(model: 'test-model'),
       analysedAt: DateTime.utc(2026),
       options: const AnalysisOptionsSnapshot(netCarbLimitGrams: 6),
+      schemaVersion: MenuResponseParser.schemaVersion,
     );
 
     late FakeMenuRepository repository;
@@ -2295,6 +2302,7 @@ void main() {
           engine: const LlmEngine(model: 'test-model'),
           analysedAt: DateTime.utc(2026),
           options: const AnalysisOptionsSnapshot(netCarbLimitGrams: 6),
+          schemaVersion: MenuResponseParser.schemaVersion,
         );
         final r = FakeMenuRepository()
           ..stub(
@@ -2398,6 +2406,7 @@ void main() {
         engine: const LlmEngine(model: 'test-model'),
         analysedAt: DateTime.utc(2026),
         options: const AnalysisOptionsSnapshot(netCarbLimitGrams: 6),
+        schemaVersion: MenuResponseParser.schemaVersion,
       );
       final r = FakeMenuRepository()
         ..stub(_ref, MenuFetched(menu: mixedMenu))

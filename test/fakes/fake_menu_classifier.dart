@@ -2,6 +2,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 
 /// A scripted [MenuClassifier] for tests.
 ///
@@ -86,6 +87,7 @@ class FakeMenuClassifier implements MenuClassifier {
       engine: derivedEngine,
       analysedAt: DateTime.utc(2026),
       options: options.snapshot,
+      schemaVersion: MenuResponseParser.schemaVersion,
     );
   }
 }

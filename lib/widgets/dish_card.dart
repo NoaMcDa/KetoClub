@@ -198,6 +198,10 @@ class _DishCardState extends State<DishCard> {
             if (_scriptExpanded) ...[
               const SizedBox(height: 8),
               WaiterScriptWidget(script: scriptText!),
+              if (analysis!.hiddenCarbs.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                _HiddenCarbsRow(hiddenCarbs: analysis.hiddenCarbs, tone: tone),
+              ],
             ],
             Align(
               alignment: AlignmentDirectional.centerEnd,
@@ -421,6 +425,87 @@ class _ScriptDisclosure extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// One or more hidden-carb flags shown inside [_ScriptDisclosure] when a
+/// dish was demoted to yellow by the parser (issue #213).
+///
+/// Each flag shows a small warning icon, the [HiddenCarb.source] (the
+/// suspected ingredient), and the [HiddenCarb.waiterQuestion] in the
+/// menu's own language. The label ("Possible hidden carbs") comes from
+/// ARB; the question text is rendered as-is, in the menu's own language
+/// per architecture.md §12, with a [Directionality] wrapper.
+class _HiddenCarbsRow extends StatelessWidget {
+  /// Creates a row for one or more [hiddenCarbs] on a [DishVerdict.modifiable]
+  /// dish, styled with [tone].
+  const new({required this.hiddenCarbs, required this.tone});
+
+  /// The non-empty list of hidden-carb flags from [AnalysedDish.hiddenCarbs].
+  final List<HiddenCarb> hiddenCarbs;
+
+  /// The amber tone of the enclosing [DishCard].
+  final VerdictTone tone;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final ambient = Directionality.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: Text(
+            l10n.hiddenCarbsSectionLabel,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: tone.ink,
+              letterSpacing: 0.4,
+            ),
+          ),
+        ),
+        ...hiddenCarbs.map(
+          (flag) => Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.warning_amber_rounded, size: 14, color: tone.ink),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        flag.source,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: tone.ink,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        flag.waiterQuestion,
+                        textDirection: contentDirection(
+                          flag.waiterQuestion,
+                          ambient,
+                        ),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: tone.ink,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
