@@ -164,7 +164,7 @@ abstract final class MenuAnalysisPrompt {
 
   /// The strict JSON schema for the reply (architecture.md §9.2).
   ///
-  /// Every one of the six dish properties is listed in `required`, and
+  /// Every one of the seven dish properties is listed in `required`, and
   /// both the outer object and the dish object carry
   /// `additionalProperties: false` — OpenAI-style strict mode demands
   /// both, and `m16_structured_output_fix.md` documents the outage a
@@ -173,6 +173,12 @@ abstract final class MenuAnalysisPrompt {
   /// `["string"/"number", "null"]` rather than omitted, because strict
   /// mode has no way to say "optional": the model is required to send
   /// `null` where `MenuResponseParser` treats it as absent.
+  ///
+  /// `hidden_carbs` is an array (empty when none) of strict objects with
+  /// three required properties: `source`, `certainty` (an enum), and
+  /// `waiter_question`. The nested object also carries
+  /// `additionalProperties: false`. `to_gemini_schema` already recurses
+  /// into `properties`/`items`, so no backend change is needed (D13).
   ///
   /// Deliberately absent: a `description` property.
   /// `m16_structured_output_fix.md` describes a *different* project's
@@ -202,6 +208,7 @@ abstract final class MenuAnalysisPrompt {
             'why',
             'modification',
             'net_carbs_estimate',
+            'hidden_carbs',
           ],
           'properties': <String, Object?>{
             'id': const <String, Object?>{'type': 'string'},
@@ -218,6 +225,28 @@ abstract final class MenuAnalysisPrompt {
             },
             'net_carbs_estimate': const <String, Object?>{
               'type': <String>['number', 'null'],
+            },
+            'hidden_carbs': <String, Object?>{
+              'type': 'array',
+              'items': <String, Object?>{
+                'type': 'object',
+                'additionalProperties': false,
+                'required': const <String>[
+                  'source',
+                  'certainty',
+                  'waiter_question',
+                ],
+                'properties': <String, Object?>{
+                  'source': const <String, Object?>{'type': 'string'},
+                  'certainty': <String, Object?>{
+                    'type': 'string',
+                    'enum': HiddenCarbCertainty.values
+                        .map((c) => c.name)
+                        .toList(),
+                  },
+                  'waiter_question': const <String, Object?>{'type': 'string'},
+                },
+              },
             },
           },
         },

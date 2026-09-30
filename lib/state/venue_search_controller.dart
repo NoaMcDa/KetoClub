@@ -562,9 +562,16 @@ final class VenueSearchController extends ChangeNotifier {
     if (analysis is! MenuAnalysed) return null;
     final green = _count(analysis, DishVerdict.orderAsIs);
     final yellow = _count(analysis, DishVerdict.modifiable);
+    final hiddenCarbYellow = analysis.dishes
+        .where(
+          (d) =>
+              d.verdict == DishVerdict.modifiable && d.hiddenCarbs.isNotEmpty,
+        )
+        .length;
     final score = ketoScore(
       greenCount: green,
-      yellowCount: yellow,
+      hiddenCarbYellowCount: hiddenCarbYellow,
+      otherYellowCount: yellow - hiddenCarbYellow,
       redCount: _count(analysis, DishVerdict.nonKeto),
     );
     if (score == null) return null;

@@ -4,8 +4,8 @@
 /// produces.
 library;
 
-/// How much a modifiable (yellow) dish counts toward [ketoScore], relative
-/// to a green dish's full weight of 1.0.
+/// How much a modifiable (yellow) dish with no hidden-carb flag counts
+/// toward [ketoScore], relative to a green dish's full weight of 1.0.
 ///
 /// This lives here, not in `lib/utils/constants.dart`, because this file
 /// does not own that file (see the pull request that added this one); a
@@ -13,15 +13,27 @@ library;
 /// regardless.
 const double _yellowWeight = 0.5;
 
+/// How much a hidden-carb-demoted yellow dish counts toward [ketoScore],
+/// relative to a green dish's full weight of 1.0 (issue #213).
+///
+/// Lower than [_yellowWeight] (0.5) because the dish was only demoted
+/// because a hidden ingredient is *suspected* — the waiter may confirm
+/// the dish is actually safe, so it is not quite as penalising as a
+/// definitively-modified yellow. Decision D13 (architecture.md §14)
+/// states the formula is a UI ranking heuristic with no nutrition basis.
+const double _hiddenCarbYellowWeight = 0.25;
+
 /// Scores a menu's overall keto-friendliness out of 10, from how many of
 /// its dishes the classifier placed in each verdict.
 ///
-/// `score = 10 * (green + 0.5 * yellow) / (green + yellow + red)`, rounded
-/// to one decimal place. A green dish counts in full, a yellow one at
-/// [_yellowWeight] because it needs a swap before it is safe to order, and
-/// a red dish counts for nothing but still enlarges the denominator, so a
-/// menu that leans non-keto scores lower even though no red dish adds to
-/// the numerator.
+/// `score = 10 * (green + 0.5 * otherYellow + 0.25 * hiddenYellow)`
+/// `/  (green + otherYellow + hiddenYellow + red)`, rounded to one
+/// decimal place. A green dish counts in full; a yellow with modifications
+/// (but no hidden-carb flag) counts at [_yellowWeight] (0.5); a
+/// hidden-carb-demoted yellow counts at [_hiddenCarbYellowWeight] (0.25)
+/// — lower because the demotion may be a false alarm the waiter can clear
+/// up on the spot; a red dish counts for nothing but enlarges the
+/// denominator (issue #213, architecture.md D13).
 ///
 /// **Unclassified dishes play no part in this formula at all** — there is
 /// no `unclassifiedCount` parameter, and dishes the classifier could not
@@ -31,36 +43,36 @@ const double _yellowWeight = 0.5;
 /// let the engine's own gaps drag a menu's score down for something that
 /// was never actually checked.
 ///
-/// Returns null when [greenCount] + [yellowCount] + [redCount] is 0 —
-/// no dish was placed at all, whether because the menu is empty or
-/// because the analysis found nothing to classify — rather than a
-/// spurious `0.0`. **Callers must not show a score at all unless the menu
-/// has a `MenuAnalysed` result** (`MenuController.ketoScoreOutOfTen`
-/// already enforces this): a `MenuAnalysisFailed` result has no verdict
-/// counts to compute from, and rendering null there as `0.0` would tell
-/// the user "this menu is zero keto-friendly", a materially different and
-/// false claim from "we could not read this menu".
+/// Returns null when the total is 0 — no dish was placed at all, whether
+/// because the menu is empty or because the analysis found nothing to
+/// classify — rather than a spurious `0.0`. **Callers must not show a
+/// score at all unless the menu has a `MenuAnalysed` result**
+/// (`MenuController.ketoScoreOutOfTen` already enforces this): a
+/// `MenuAnalysisFailed` result has no verdict counts to compute from,
+/// and rendering null there as `0.0` would tell the user "this menu is
+/// zero keto-friendly", a materially different and false claim from "we
+/// could not read this menu".
 ///
-/// This formula, and the 0.5 yellow weight in particular, is invented
-/// product logic with no nutrition research behind it — there is no
-/// source for "a dish that needs one swap is worth exactly half a safe
-/// one" beyond it sounding reasonable. It renders as a single, confident
-/// decimal next to food a person is about to order and eat, which claims
-/// more precision and authority than the formula actually has. Decision
-/// D13 (architecture.md §14, issue #41) looked for a basis, found none,
-/// and kept the formula unchanged with that status stated plainly: a UI
-/// ranking heuristic with no nutrition basis, never a health claim. The
-/// venue cards reuse this function rather than a second formula, show it
-/// only from an analysis already cached, and mark rules-only numbers as
-/// an estimate through the engine label.
+/// This formula is invented product logic with no nutrition research
+/// behind it. Decision D13 (architecture.md §14, issue #41) looked for
+/// a basis, found none, and kept the formula with that status stated
+/// plainly: a UI ranking heuristic, never a health claim. The venue
+/// cards reuse this function rather than a second formula, show it only
+/// from an analysis already cached, and mark rules-only numbers as an
+/// estimate through the engine label.
 double? ketoScore({
   required int greenCount,
-  required int yellowCount,
+  required int hiddenCarbYellowCount,
+  required int otherYellowCount,
   required int redCount,
 }) {
+  final yellowCount = hiddenCarbYellowCount + otherYellowCount;
   final total = greenCount + yellowCount + redCount;
   if (total == 0) return null;
-  final weighted = greenCount + _yellowWeight * yellowCount;
+  final weighted =
+      greenCount +
+      _yellowWeight * otherYellowCount +
+      _hiddenCarbYellowWeight * hiddenCarbYellowCount;
   final score = 10 * weighted / total;
   return double.parse(score.toStringAsFixed(1));
 }

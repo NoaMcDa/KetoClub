@@ -446,5 +446,8 @@
   "netCarbsChipLeavesSuffix": " · נשאר {grams} גרם",
   "@netCarbsChipLeavesSuffix": {
     "placeholders": { "grams": { "type": "int" } }
-  }
+  },
+  "hiddenCarbsSectionLabel": "פחמימות נסתרות אפשריות",
+  "hiddenCarbsCertaintySuspected": "חשד",
+  "hiddenCarbsCertaintyLikely": "סביר"
 }

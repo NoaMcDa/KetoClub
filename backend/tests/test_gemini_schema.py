@@ -90,6 +90,7 @@ def test_whole_menu_analysis_schema_converts_exactly() -> None:
                         "why",
                         "modification",
                         "net_carbs_estimate",
+                        "hidden_carbs",
                     ],
                     "properties": {
                         "id": {"type": "string"},
@@ -101,11 +102,52 @@ def test_whole_menu_analysis_schema_converts_exactly() -> None:
                         "why": {"type": "string"},
                         "modification": {"type": "string", "nullable": True},
                         "net_carbs_estimate": {"type": "number", "nullable": True},
+                        "hidden_carbs": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "required": [
+                                    "source",
+                                    "certainty",
+                                    "waiter_question",
+                                ],
+                                "properties": {
+                                    "source": {"type": "string"},
+                                    "certainty": {
+                                        "type": "string",
+                                        "enum": ["suspected", "likely"],
+                                    },
+                                    "waiter_question": {"type": "string"},
+                                },
+                            },
+                        },
                     },
                 },
             }
         },
     }
+
+
+def test_hidden_carbs_nested_object_passes_through_recursive_converter() -> None:
+    """The nested hidden_carbs object and its items are recursed into by
+    to_gemini_schema (L79-87 of gemini.py), so additionalProperties is stripped
+    from both levels and the enum survives unchanged."""
+    converted = to_gemini_schema(_menu_analysis_schema())
+    dish = _dish_properties(converted)
+    hidden_carbs = dish["hidden_carbs"]
+    assert isinstance(hidden_carbs, dict)
+    assert hidden_carbs["type"] == "array"
+    item = hidden_carbs["items"]
+    assert isinstance(item, dict)
+    assert "additionalProperties" not in item
+    item_props = item["properties"]
+    assert isinstance(item_props, dict)
+    assert item_props["certainty"] == {
+        "type": "string",
+        "enum": ["suspected", "likely"],
+    }
+    assert item_props["source"] == {"type": "string"}
+    assert item_props["waiter_question"] == {"type": "string"}
 
 
 def test_null_first_union_is_handled() -> None:

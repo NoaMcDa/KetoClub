@@ -71,6 +71,7 @@ class _WaiterCardSheetState extends State<WaiterCardSheet> {
     final row = widget.row;
     final script = row.analysis?.modification;
     final netCarbsEstimate = row.analysis?.netCarbsEstimate;
+    final hiddenCarbs = row.analysis?.hiddenCarbs ?? const [];
     return SafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -131,6 +132,10 @@ class _WaiterCardSheetState extends State<WaiterCardSheet> {
                       ),
                     ),
                   ],
+                  if (hiddenCarbs.isNotEmpty) ...[
+                    const SizedBox(height: 18),
+                    _HiddenCarbsPanel(hiddenCarbs: hiddenCarbs),
+                  ],
                   if (netCarbsEstimate != null) ...[
                     const SizedBox(height: 18),
                     _AfterText(estimate: netCarbsEstimate),
@@ -140,6 +145,86 @@ class _WaiterCardSheetState extends State<WaiterCardSheet> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// The hidden-carb flags panel shown below the script when a dish was
+/// demoted from green by the parser (issue #213, architecture.md §6.2).
+///
+/// Each flag shows the suspected ingredient and the waiter question in
+/// the menu's own language (architecture.md §12). Styled to mirror
+/// [_AfterText]'s warning-amber tone.
+class _HiddenCarbsPanel extends StatelessWidget {
+  /// Creates a panel for the non-empty [hiddenCarbs] list.
+  const new({required this.hiddenCarbs});
+
+  /// The flags to display. Must not be empty.
+  final List<HiddenCarb> hiddenCarbs;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final tone = VerdictColors.of(context).forVerdict(DishVerdict.modifiable);
+    final ambient = Directionality.of(context);
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: tone.tint,
+        border: Border.all(color: tone.rail),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.warning_amber_rounded, color: tone.ink, size: 16),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l10n.hiddenCarbsSectionLabel,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: tone.ink,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            ...hiddenCarbs.map(
+              (flag) => Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      flag.source,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: tone.ink,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      flag.waiterQuestion,
+                      textDirection: contentDirection(
+                        flag.waiterQuestion,
+                        ambient,
+                      ),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: tone.ink,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

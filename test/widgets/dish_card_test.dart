@@ -754,5 +754,133 @@ void main() {
         },
       );
     });
+
+    // -------------------------------------------------------------------------
+    // Hidden-carb row (issue #213)
+    // -------------------------------------------------------------------------
+
+    group('_HiddenCarbsRow', () {
+      const flag = HiddenCarb(
+        source: 'house dressing',
+        certainty: HiddenCarbCertainty.suspected,
+        waiterQuestion: 'Is the dressing sugar-free?',
+      );
+
+      DishRow yellowWithFlag(List<HiddenCarb> flags) => DishRow(
+        dish: _dish(),
+        category: 'Mains',
+        analysis: AnalysedDish(
+          dishId: 'dish_1',
+          name: 'Grilled Salmon',
+          verdict: DishVerdict.modifiable,
+          why: 'Has a suspicious glaze',
+          modification: 'Ask for the sauce on the side',
+          hiddenCarbs: flags,
+        ),
+      );
+
+      testWidgets('hidden-carb rows are shown when the dish has flags and the '
+          'disclosure is expanded — English', (tester) async {
+        // Arrange
+        final row = yellowWithFlag([flag]);
+
+        await _pump(
+          tester,
+          DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+        );
+
+        // Expand the script disclosure
+        await tester.tap(find.text('Ask your waiter'));
+        await tester.pump();
+
+        // Assert
+        expect(find.text('Possible hidden carbs'), findsOneWidget);
+        expect(find.text('house dressing'), findsOneWidget);
+        expect(find.text('Is the dressing sugar-free?'), findsOneWidget);
+      });
+
+      testWidgets('hidden-carb rows are shown when the dish has flags and the '
+          'disclosure is expanded — Hebrew', (tester) async {
+        // Arrange
+        final row = yellowWithFlag([flag]);
+
+        await _pump(
+          tester,
+          DishCard(row: row, localeTag: 'he', onShowScript: (_) {}),
+          locale: const Locale('he'),
+        );
+
+        // Expand the script disclosure (Hebrew label)
+        await tester.tap(find.text('שאלו את המלצר'));
+        await tester.pump();
+
+        // Assert — the Hebrew section label
+        expect(find.text('פחמימות נסתרות אפשריות'), findsOneWidget);
+      });
+
+      testWidgets(
+        'hidden-carb section is not shown when the disclosure is collapsed',
+        (tester) async {
+          // Arrange — flag present but disclosure not expanded
+          final row = yellowWithFlag([flag]);
+
+          await _pump(
+            tester,
+            DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+          );
+
+          // Disclosure not tapped — section hidden
+          expect(find.text('Possible hidden carbs'), findsNothing);
+        },
+      );
+
+      testWidgets('hidden-carb section is not shown for a green dish', (
+        tester,
+      ) async {
+        // Arrange — green has no modification, no flag (parser rule)
+        final row = DishRow(
+          dish: _dish(),
+          category: 'Mains',
+          analysis: const AnalysedDish(
+            dishId: 'dish_1',
+            name: 'Grilled Salmon',
+            verdict: DishVerdict.orderAsIs,
+            why: 'Clean protein',
+          ),
+        );
+
+        await _pump(
+          tester,
+          DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+        );
+
+        // Assert
+        expect(find.text('Possible hidden carbs'), findsNothing);
+      });
+
+      testWidgets('hidden-carb section is not shown for a red dish', (
+        tester,
+      ) async {
+        // Arrange
+        final row = DishRow(
+          dish: _dish(),
+          category: 'Mains',
+          analysis: const AnalysedDish(
+            dishId: 'dish_1',
+            name: 'Grilled Salmon',
+            verdict: DishVerdict.nonKeto,
+            why: 'Pasta base',
+          ),
+        );
+
+        await _pump(
+          tester,
+          DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+        );
+
+        // Assert
+        expect(find.text('Possible hidden carbs'), findsNothing);
+      });
+    });
   });
 }

@@ -1687,6 +1687,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **' · leaves {grams}g'**
   String netCarbsChipLeavesSuffix(int grams);
+
+  /// No description provided for @hiddenCarbsSectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Possible hidden carbs'**
+  String get hiddenCarbsSectionLabel;
+
+  /// No description provided for @hiddenCarbsCertaintySuspected.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspected'**
+  String get hiddenCarbsCertaintySuspected;
+
+  /// No description provided for @hiddenCarbsCertaintyLikely.
+  ///
+  /// In en, this message translates to:
+  /// **'Likely'**
+  String get hiddenCarbsCertaintyLikely;
 }
 
 class _AppLocalizationsDelegate

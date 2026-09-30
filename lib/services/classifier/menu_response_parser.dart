@@ -33,6 +33,13 @@ final RegExp _fencedJson = RegExp(
 /// reply as [MenuAnalysisFailed] — there is no fourth outcome and no
 /// exception crosses this class's boundary.
 abstract final class MenuResponseParser {
+  /// The schema version stamped on every [MenuAnalysed] this parser
+  /// produces (issue #213). `MenuController._reusableAnalysis` rejects a
+  /// cached result whose [MenuAnalysed.schemaVersion] does not equal this,
+  /// so upgrading the schema forces a re-analysis rather than reusing a
+  /// stale result.
+  static const int schemaVersion = 1;
+
   /// Parses [body] — the raw LLM reply — against [source], the [Menu] it
   /// was computed from, stamping the result [analysedAt] with [engine].
   ///
@@ -124,6 +131,7 @@ abstract final class MenuResponseParser {
       unclassified: unclassified,
       engine: engine,
       analysedAt: analysedAt,
+      schemaVersion: schemaVersion,
     );
   }
 
@@ -238,6 +246,7 @@ abstract final class MenuResponseParser {
         unclassified: unclassified,
         engine: engine,
         analysedAt: analysedAt,
+        schemaVersion: schemaVersion,
       ),
     );
   }
@@ -312,11 +321,12 @@ abstract final class MenuResponseParser {
     );
   }
 
-  /// Applies §9.4 rules 4-6 and issue #57's post-rule to [rawDish], a
-  /// reply element already resolved to [matched]: places it onto [dishes]
-  /// under [matched]'s own id and name, or demotes [matched]'s name onto
-  /// [unclassified]. Shared verbatim by [parse] and [parseScanned] — only
-  /// how an element finds its dish differs between the two.
+  /// Applies §9.4 rules 4-6, issue #57's post-rule, and issue #213's
+  /// hidden-carb rule (rule 5a) to [rawDish], a reply element already
+  /// resolved to [matched]: places it onto [dishes] under [matched]'s own
+  /// id and name, or demotes [matched]'s name onto [unclassified]. Shared
+  /// verbatim by [parse] and [parseScanned] — only how an element finds
+  /// its dish differs between the two.
   static void _judge(
     Map<String, Object?> rawDish,
     Dish matched, {
@@ -367,9 +377,29 @@ abstract final class MenuResponseParser {
       finalVerdict = DishVerdict.modifiable;
     }
 
+    // Issue #213 rule 5a: a green with a valid hidden-carb flag is a
+    // wrong green (architecture.md §3 constraint 5). Parse flags first;
+    // a red drops them (red has no modification), a pre-existing yellow
+    // is left alone (it already has an instruction).
+    final hiddenCarbs = verdict == DishVerdict.nonKeto
+        ? const <HiddenCarb>[]
+        : _parseHiddenCarbs(rawDish['hidden_carbs']);
+
+    if (finalVerdict == DishVerdict.orderAsIs && hiddenCarbs.isNotEmpty) {
+      // Demote green → yellow. The instruction is the model's own
+      // modification if usable; otherwise the first flag's waiter
+      // question (guaranteed non-empty by _parseHiddenCarbs).
+      finalVerdict = DishVerdict.modifiable;
+    }
+
     String? finalModification;
     if (finalVerdict == DishVerdict.modifiable) {
-      if (!hasUsableModification) {
+      if (hasUsableModification) {
+        finalModification = modification;
+      } else if (hiddenCarbs.isNotEmpty) {
+        // The only instruction we have is from the hidden-carb flag.
+        finalModification = hiddenCarbs.first.waiterQuestion;
+      } else {
         // Constraint 7: a yellow without an instruction does not exist.
         // An over-length instruction is demoted, not truncated: cutting
         // a waiter script off mid-sentence could leave a shorter
@@ -379,7 +409,6 @@ abstract final class MenuResponseParser {
         unclassified.add(matched.name);
         return;
       }
-      finalModification = modification;
     }
     // Any other verdict keeps it and drops the field: a green or red
     // carrying a `modification` is not demoted for it.
@@ -392,8 +421,46 @@ abstract final class MenuResponseParser {
         why: _truncated(why, maxWhyLength),
         modification: finalModification,
         netCarbsEstimate: netCarbsEstimate,
+        hiddenCarbs: finalVerdict == DishVerdict.nonKeto
+            ? const <HiddenCarb>[]
+            : hiddenCarbs,
       ),
     );
+  }
+
+  /// Parses the raw `hidden_carbs` array from a reply element (issue
+  /// #213, architecture.md §9.4 rule 5a).
+  ///
+  /// Silently drops any entry that is malformed, missing required fields,
+  /// has an unknown certainty, carries a blank source or waiter question,
+  /// or whose source or waiter_question exceeds [maxWhyLength] characters
+  /// (same budget as `why` — 300 chars). Never throws (constraint 7).
+  /// Caps the result at 3 entries per issue #213.
+  static List<HiddenCarb> _parseHiddenCarbs(Object? raw) {
+    if (raw is! List<Object?>) return const <HiddenCarb>[];
+    final result = <HiddenCarb>[];
+    for (final entry in raw) {
+      if (result.length >= 3) break;
+      if (entry is! Map<String, Object?>) continue;
+      final rawSource = entry['source'];
+      final rawCertainty = entry['certainty'];
+      final rawQuestion = entry['waiter_question'];
+      if (rawSource is! String || rawSource.trim().isEmpty) continue;
+      if (rawSource.length > maxWhyLength) continue;
+      if (rawCertainty is! String) continue;
+      final certainty = HiddenCarbCertainty.tryParse(rawCertainty);
+      if (certainty == null) continue;
+      if (rawQuestion is! String || rawQuestion.trim().isEmpty) continue;
+      if (rawQuestion.length > maxWhyLength) continue;
+      result.add(
+        HiddenCarb(
+          source: rawSource.trim(),
+          certainty: certainty,
+          waiterQuestion: rawQuestion.trim(),
+        ),
+      );
+    }
+    return result;
   }
 
   /// Finds the dish in [source] a reply element with this [id] and
