@@ -1533,6 +1533,7 @@ void main() {
           findsOneWidget,
         );
         expect(find.text(_en.legendNote), findsOneWidget);
+        expect(find.text(_en.legendEngines), findsOneWidget);
 
         // Act: collapse again.
         await tester.tap(find.text(_en.legendHide));
@@ -1547,6 +1548,7 @@ void main() {
           ),
           findsNothing,
         );
+        expect(find.text(_en.legendEngines), findsNothing);
       },
     );
 
