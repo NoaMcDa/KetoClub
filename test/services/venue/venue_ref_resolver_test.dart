@@ -154,6 +154,10 @@ const _rejected = <_Rejected>[
   _Rejected('an ftp URL', 'ftp://cafe-noir.co.il/menu.pdf'),
   _Rejected('a URL whose host has no dot', 'http://localhost/menu'),
   _Rejected('a URL carrying user info', 'https://me:pw@cafe-noir.co.il/'),
+  _Rejected('a loopback IP address', 'http://127.0.0.1/menu'),
+  _Rejected('a private IP address', 'http://192.168.1.1/menu'),
+  _Rejected('a scheme-less private IP address', '10.0.0.8/menu'),
+  _Rejected('a .local name', 'http://printer.local/menu'),
   _Rejected('a mailto link', 'mailto:owner@cafe-noir.co.il'),
   _Rejected(
     'a wolt.com URL with no restaurant segment',

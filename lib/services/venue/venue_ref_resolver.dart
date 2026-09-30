@@ -1,4 +1,5 @@
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/utils/public_web_address.dart';
 
 /// Bare tokens made only of ASCII digits: how a pasted 10bis restaurant
 /// id is told apart from a pasted Wolt slug (see [VenueRefResolver]).
@@ -148,8 +149,9 @@ abstract final class VenueRefResolver {
   }
 
   /// The form a website URL is stored in (D19), or null when [uri] is not
-  /// one: not `http`/`https`, a host with no dot (`localhost`), or user
-  /// info in the URL.
+  /// one: not `http`/`https`, a host with no dot (`localhost`), a host
+  /// [isPublicHost] refuses (a private or loopback IP address, `*.local`),
+  /// or user info in the URL.
   ///
   /// Lower-cases the scheme and host, drops the fragment, a default port
   /// and one trailing `/`, and keeps the path and query as given, so the
@@ -161,6 +163,7 @@ abstract final class VenueRefResolver {
     if (!host.contains('.') || host.startsWith('.') || host.endsWith('.')) {
       return null;
     }
+    if (!isPublicHost(host)) return null;
     if (uri.userInfo.isNotEmpty) return null;
     final path = uri.path.endsWith('/')
         ? uri.path.substring(0, uri.path.length - 1)

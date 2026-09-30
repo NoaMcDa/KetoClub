@@ -8,6 +8,7 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/services/menu/website/robots_txt.dart';
 import 'package:ketoclub/services/menu/website/website_fetcher.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/public_web_address.dart';
 
 /// The User-Agent a phone sends to a restaurant's site: it names the
 /// fetcher (the `robots.txt` token [robotsToken]) and a contact URL, the
@@ -22,13 +23,17 @@ const String websiteUserAgent =
 ///
 /// The rules the backend route applies, applied here: logged out (the
 /// client carries no cookie), [websiteUserAgent] where the platform lets a
-/// request set it, `robots.txt` read once per site per session and
-/// honoured (a 4xx means no rules; a 5xx or no answer means the page is
-/// not fetched), `X-Robots-Tag: noai` and `tdm-reservation: 1` honoured,
-/// at most [maxRedirects] redirects each checked against the new site's
-/// `robots.txt`, and [websiteMaxHtmlBytes] / [maxScanPageBytes] caps. One
-/// paste reads at most two pages, so no per-site spacing is kept here; the
-/// backend, which serves many installs, keeps one.
+/// request set it, public hosts on the default port only ([isPublicWebUrl],
+/// checked on every hop), `robots.txt` read once per site per session (up
+/// to [websiteMaxRobotsBytes]) and honoured (a 4xx means no rules; a 5xx
+/// or no answer means the page is not fetched), `X-Robots-Tag: noai` and
+/// `tdm-reservation: 1` honoured, at most [maxRedirects] redirects each
+/// checked against the new site's `robots.txt`, and [websiteMaxHtmlBytes] /
+/// [maxScanPageBytes] caps. One paste reads at most two pages, so no
+/// per-site spacing is kept here; the backend, which serves many installs,
+/// keeps one. Never throws: an error `package:http` does not wrap in a
+/// `ClientException` (a TLS failure) is
+/// [MenuFetchFailureReason.websiteUnreachable].
 final class DirectWebsiteFetcher implements WebsiteFetcher {
   /// Creates a fetcher over [client]. [runsInBrowser] exists so a test can
   /// exercise the browser mapping of a failed request on any platform.
@@ -50,9 +55,22 @@ final class DirectWebsiteFetcher implements WebsiteFetcher {
 
   @override
   Future<WebsiteFetchResult> fetch(Uri url) async {
+    try {
+      return await _fetch(url);
+    } on Object {
+      // The contract is "never throws"; whatever slipped past the
+      // per-request catches below is the site's failure, not a crash.
+      return _unreachable;
+    }
+  }
+
+  Future<WebsiteFetchResult> _fetch(Uri url) async {
     var current = url;
     for (var hop = 0; hop <= maxRedirects; hop++) {
-      if (current.scheme != 'http' && current.scheme != 'https') {
+      // The backend's `invalidUrl`, which the web build also reads as
+      // unsupportedSource: not http(s), user info, another port, or a
+      // host on a private network.
+      if (!isPublicWebUrl(current)) {
         return const WebsiteFetchFailed(
           reason: MenuFetchFailureReason.unsupportedSource,
         );
@@ -72,8 +90,9 @@ final class DirectWebsiteFetcher implements WebsiteFetcher {
             .timeout(websiteFetchTimeout);
       } on http.ClientException {
         return _clientFailure();
-      } on TimeoutException {
-        return _timedOut;
+      } on Object {
+        // A timeout, or a TLS failure `package:http` does not wrap.
+        return _unreachable;
       }
 
       final location = response.headers['location'];
@@ -81,14 +100,16 @@ final class DirectWebsiteFetcher implements WebsiteFetcher {
           response.statusCode < 400 &&
           location != null) {
         unawaited(response.stream.drain<void>().catchError((Object _) {}));
-        current = current.resolve(location);
+        try {
+          current = current.resolve(location);
+        } on FormatException {
+          return _unreachable;
+        }
         continue;
       }
       return await _read(response, current);
     }
-    return const WebsiteFetchFailed(
-      reason: MenuFetchFailureReason.websiteUnreachable,
-    );
+    return _unreachable;
   }
 
   static const String _accept =
@@ -109,19 +130,22 @@ final class DirectWebsiteFetcher implements WebsiteFetcher {
     final origin = '${url.scheme}://${url.authority}';
     final cached = _robots[origin];
     if (cached != null) return cached;
-    final http.Response response;
+    final http.StreamedResponse response;
+    final Uint8List body;
     try {
-      response = await http.Response.fromStream(
-        await _client
-            .send(
-              _request(Uri.parse('$origin/robots.txt'), accept: 'text/plain'),
-            )
-            .timeout(websiteFetchTimeout),
+      response = await _client
+          .send(_request(Uri.parse('$origin/robots.txt'), accept: 'text/plain'))
+          .timeout(websiteFetchTimeout);
+      // Only the first websiteMaxRobotsBytes are read and parsed, as the
+      // backend does: an endless robots.txt cannot exhaust the phone.
+      body = await _readPrefix(
+        response.stream,
+        websiteMaxRobotsBytes,
       ).timeout(websiteFetchTimeout);
     } on http.ClientException {
       return _clientFailure();
-    } on TimeoutException {
-      return _timedOut;
+    } on Object {
+      return _unreachable;
     }
     if (response.statusCode >= 500) {
       return WebsiteFetchFailed(
@@ -130,15 +154,13 @@ final class DirectWebsiteFetcher implements WebsiteFetcher {
       );
     }
     final rules = response.statusCode >= 200 && response.statusCode < 300
-        ? RobotsRules.parse(
-            utf8.decode(response.bodyBytes, allowMalformed: true),
-          )
+        ? RobotsRules.parse(utf8.decode(body, allowMalformed: true))
         : const RobotsRules();
     _robots[origin] = rules;
     return rules;
   }
 
-  static const WebsiteFetchFailed _timedOut = WebsiteFetchFailed(
+  static const WebsiteFetchFailed _unreachable = WebsiteFetchFailed(
     reason: MenuFetchFailureReason.websiteUnreachable,
   );
 
@@ -197,8 +219,8 @@ final class DirectWebsiteFetcher implements WebsiteFetcher {
       bytes = read;
     } on http.ClientException {
       return _clientFailure();
-    } on TimeoutException {
-      return _timedOut;
+    } on Object {
+      return _unreachable;
     }
 
     final contentType = (headers['content-type'] ?? '').toLowerCase();
@@ -231,6 +253,23 @@ final class DirectWebsiteFetcher implements WebsiteFetcher {
     final builder = BytesBuilder(copy: false);
     await for (final chunk in stream) {
       if (builder.length + chunk.length > cap) return null;
+      builder.add(chunk);
+    }
+    return builder.takeBytes();
+  }
+
+  /// At most the first [cap] bytes of [stream]; the rest is never read.
+  static Future<Uint8List> _readPrefix(
+    Stream<List<int>> stream,
+    int cap,
+  ) async {
+    final builder = BytesBuilder(copy: false);
+    await for (final chunk in stream) {
+      final room = cap - builder.length;
+      if (chunk.length >= room) {
+        builder.add(chunk.sublist(0, room));
+        break;
+      }
       builder.add(chunk);
     }
     return builder.takeBytes();
