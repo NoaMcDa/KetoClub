@@ -100,13 +100,17 @@ void main() {
       // Assert: the sheet is open and showing the idle state.
       expect(find.byType(MenuQuestionSheet), findsOneWidget);
       expect(find.text(_en.menuQuestionSheetTitle), findsOneWidget);
-      expect(find.byType(TextField), findsOneWidget);
+      // Scope the field lookup to the sheet — the menu screen itself has a
+      // search field and a carb-budget field, so a bare `TextField` finder
+      // is ambiguous.
+      final sheetField = find.descendant(
+        of: find.byType(MenuQuestionSheet),
+        matching: find.byType(TextField),
+      );
+      expect(sheetField, findsOneWidget);
 
       // Act: type a question and tap Ask.
-      await tester.enterText(
-        find.byType(TextField),
-        'Is the steak keto-friendly?',
-      );
+      await tester.enterText(sheetField, 'Is the steak keto-friendly?');
       await tapAndSettle(tester, find.text(_en.menuQuestionSheetAsk));
 
       // Assert: the answer is shown, including a chip for the referenced dish.
@@ -124,7 +128,7 @@ void main() {
       await tapAndSettle(tester, find.text(_en.menuQuestionSheetAskAnother));
 
       // Assert: the sheet is back to idle.
-      expect(find.byType(TextField), findsOneWidget);
+      expect(sheetField, findsOneWidget);
       expect(find.text('The steak is perfect for keto.'), findsNothing);
     });
 
@@ -145,7 +149,13 @@ void main() {
       await enterText(tester, _woltUrl);
       await tapAndSettle(tester, find.text(_en.venueSearchOpen));
       await tapAndSettle(tester, find.byIcon(Icons.question_answer));
-      await tester.enterText(find.byType(TextField), 'What can I eat?');
+      await tester.enterText(
+        find.descendant(
+          of: find.byType(MenuQuestionSheet),
+          matching: find.byType(TextField),
+        ),
+        'What can I eat?',
+      );
       await tapAndSettle(tester, find.text(_en.menuQuestionSheetAsk));
 
       // Assert: the offline failure message is shown.
