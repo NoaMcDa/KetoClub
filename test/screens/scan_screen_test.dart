@@ -11,6 +11,7 @@ import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/screens/scan_screen.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
+import 'package:ketoclub/services/platform/page_picker.dart';
 import 'package:ketoclub/services/platform/qr_scanner.dart';
 import 'package:ketoclub/state/scan_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
@@ -37,7 +38,7 @@ Future<void> _pump(
   ScanController controller, {
   Locale locale = const Locale('en'),
   List<String>? pushed,
-  FakePagePicker? picker,
+  PagePicker? picker,
   bool directToGoogle = false,
 }) async {
   // Tall enough that the whole screen is built: a ListView builds lazily,
@@ -344,6 +345,27 @@ void main() {
 
       // Assert
       expect(find.text(_en.scanScreenPageSizeKb(2)), findsOneWidget);
+    });
+
+    testWidgets('a picker that throws leaves the actions enabled', (
+      tester,
+    ) async {
+      // Arrange
+      await _pump(tester, controller, picker: _ThrowingPagePicker());
+
+      final errors = <Object>[];
+
+      // Act: the tap's unawaited pick fails in this zone, not the test's.
+      await runZonedGuarded(
+        () => tester.tap(_action(_en.scanScreenActionTakePhoto)),
+        (error, _) => errors.add(error),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(errors.single, isA<StateError>());
+      expect(_enabled(tester, _action(_en.scanScreenActionTakePhoto)), isTrue);
+      expect(controller.pages, isEmpty);
     });
 
     testWidgets('a cancelled picker adds nothing', (tester) async {
@@ -1010,4 +1032,17 @@ final class _GatedScanner implements QrScanner {
 
   @override
   Future<String?> scan() => gate;
+}
+
+/// A [PagePicker] whose every method throws an `Error`, which the real
+/// picker's contract forbids: the screen must still not stay wedged.
+final class _ThrowingPagePicker implements PagePicker {
+  @override
+  Future<List<ScannedPage>> takePhoto() async => throw StateError('camera');
+
+  @override
+  Future<List<ScannedPage>> pickImages() async => throw StateError('images');
+
+  @override
+  Future<List<ScannedPage>> pickPdf() async => throw StateError('pdf');
 }
