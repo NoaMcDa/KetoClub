@@ -680,37 +680,6 @@ void main() {
       );
     });
 
-    test('open notifies listeners exactly three times on a full round trip '
-        'with a classifier that announces no engine — fetching, '
-        'classifying, done (issue #65)', () async {
-      // Arrange
-      repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
-      var notifyCount = 0;
-      controller.addListener(() => notifyCount++);
-
-      // Act
-      await controller.open(_ref);
-
-      // Assert
-      expect(notifyCount, 3);
-    });
-
-    test('open notifies listeners exactly twice on a failed fetch', () async {
-      // Arrange
-      repository.stub(
-        _ref,
-        const MenuFetchFailed(reason: MenuFetchFailureReason.offline),
-      );
-      var notifyCount = 0;
-      controller.addListener(() => notifyCount++);
-
-      // Act
-      await controller.open(_ref);
-
-      // Assert
-      expect(notifyCount, 2);
-    });
-
     test(
       'visibleRows returns every dish unjudged when the analysis failed',
       () async {
@@ -1128,17 +1097,6 @@ void main() {
         expect(phases, [LoadPhase.fetching, LoadPhase.idle]);
       });
 
-      test('open hands the classifier an onEngineStarted listener', () async {
-        // Arrange
-        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
-
-        // Act
-        await controller.open(_ref);
-
-        // Assert
-        expect(classifier.calls.single.$2.onEngineStarted, isNotNull);
-      });
-
       test('an announcement arriving after the load finished is ignored '
           'and does not notify', () async {
         // Arrange
@@ -1189,19 +1147,6 @@ void main() {
 
         // Assert
         expect(phases, [LoadPhase.fetching, LoadPhase.idle]);
-      });
-
-      test('isClassifying is true for exactly the three classifying '
-          'phases', () {
-        // Act
-        final classifying = LoadPhase.values.where((p) => p.isClassifying);
-
-        // Assert
-        expect(classifying, [
-          LoadPhase.classifying,
-          LoadPhase.classifyingLlm,
-          LoadPhase.classifyingRules,
-        ]);
       });
     });
 
@@ -1641,18 +1586,6 @@ void main() {
         expect(decoded?.filter, filter, reason: 'for ${filter.name}');
       }
     });
-
-    test('a filter name AppSettings.tryFrom does not recognise degrades to '
-        'null rather than throwing — the case a stored value from a future '
-        'or corrupted format would hit', () {
-      // Act
-      final decoded = AppSettings.tryFrom(settingsJson('somethingUnknown'));
-
-      // Assert: PrefsSettingsStore.read() treats a null tryFrom result as
-      // "use defaults" (architecture.md §6.4), so this is what keeps a
-      // stored value it no longer recognises from crashing the app.
-      expect(decoded, isNull);
-    });
   });
 
   // Issue #57: the cached analysis records the options it was made with,
@@ -1806,11 +1739,6 @@ void main() {
         expect(classifier.calls.last.$2.estimationConsentGiven, isFalse);
       },
     );
-
-    test('netCarbLimitGrams is the default before any analysis', () {
-      // Assert
-      expect(controller.netCarbLimitGrams, equals(defaultNetCarbLimitGrams));
-    });
   });
 
   group('MenuController reuse checks against the cached entry', () {

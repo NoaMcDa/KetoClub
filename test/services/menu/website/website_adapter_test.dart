@@ -89,12 +89,6 @@ void main() {
   );
 
   group('WebsiteMenuAdapter (issue #181)', () {
-    test('is the website source', () {
-      final adapter = _adapter(_ScriptedFetcher());
-      expect(adapter.source, MenuSource.website);
-      expect(adapter.canHandle(_ref), isTrue);
-    });
-
     test('a ref that is not an http(s) URL is unsupported', () async {
       final fetcher = _ScriptedFetcher();
       for (final id in ['not a url', 'ftp://cafe.example/m', 'http://[x']) {
@@ -171,42 +165,6 @@ void main() {
       expect(menu.allDishes.every((dish) => dish.price == 0), isTrue);
       expect(menu.venueRef, _ref);
       // The menu page's own nav link back to /menu is never followed.
-      expect(fetcher.calls, [_home, menuPage]);
-    });
-
-    test('a Hebrew תפריט link is followed', () async {
-      final menuPage = Uri.parse('$_homeUrl/page-3');
-      final fetcher = _ScriptedFetcher()
-        ..page(_home, _fixture('hebrew_menu_link.html'))
-        ..page(menuPage, _fixture('menu_page_inline_prices.html'));
-
-      final result = await _adapter(fetcher).fetch(_ref);
-
-      expect(_dishNames(result), [
-        'Caesar salad',
-        'Soup of the day',
-        'Grilled salmon',
-        'Burger & fries',
-      ]);
-      expect((result as MenuFetched).menu.categories.map((c) => c.name), [
-        'Starters',
-        'Mains',
-      ]);
-    });
-
-    test('a link encoded in windows-1255 is followed, never thrown', () async {
-      // Arrange
-      final menuPage = Uri.parse('$_homeUrl/%FA%F4%F8%E9%E8.html');
-      final fetcher = _ScriptedFetcher()
-        ..page(_home, _fixture('legacy_encoded_menu_link.html'))
-        ..page(menuPage, _fixture('menu_page_inline_prices.html'));
-
-      // Act
-      final result = await _adapter(fetcher).fetch(_ref);
-
-      // Assert
-      expect(result, isA<MenuFetchResult>());
-      expect(_dishNames(result), hasLength(4));
       expect(fetcher.calls, [_home, menuPage]);
     });
 

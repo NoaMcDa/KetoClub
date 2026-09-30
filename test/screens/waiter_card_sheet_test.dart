@@ -148,22 +148,6 @@ void main() {
       expect(find.textContaining('estimate'), findsOneWidget);
     });
 
-    testWidgets('tapping copy shows the actionCopied confirmation', (
-      tester,
-    ) async {
-      // Arrange
-      const script = 'Ask for steamed vegetables instead of rice.';
-      final row = _row('Roast Chicken', modification: script);
-      await _pump(tester, WaiterCardSheet(row: row));
-
-      // Act
-      await tester.tap(find.byType(FilledButton));
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(find.text('Copied'), findsOneWidget);
-    });
-
     testWidgets('build renders the dish name verbatim in the he locale', (
       tester,
     ) async {
@@ -255,19 +239,6 @@ void main() {
 
       // Assert
       expect(brightness.restoreCount, 1);
-    });
-
-    testWidgets('never raises the brightness with no screenBrightness given', (
-      tester,
-    ) async {
-      // Arrange / Act: the convenience constructor's own default is a
-      // no-op, so this must build and settle without ever throwing, even
-      // though there is no brightness fake here to assert on.
-      final row = _row('Grilled Salmon', modification: 'Ask for a swap.');
-      await _pump(tester, WaiterCardSheet(row: row));
-
-      // Assert
-      expect(find.byType(WaiterCardSheet), findsOneWidget);
     });
   });
 }

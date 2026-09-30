@@ -2,23 +2,38 @@
 
 from pathlib import Path
 
-from sqlalchemy import text
+import pytest
+from sqlalchemy import Engine, text
+from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
 
 from app.config import Settings
 from app.db import build_engine, get_session
 
 
-def test_sqlite_engine_enables_wal_journal_mode() -> None:
-    engine = build_engine(Settings(DATABASE_URL="sqlite:///:memory:"))
+def _file_engine(tmp_path: Path) -> Engine:
+    return build_engine(Settings(DATABASE_URL=f"sqlite:///{tmp_path / 'test.db'}"))
+
+
+def _create_table(engine: Engine) -> None:
+    with engine.begin() as conn:
+        conn.execute(text("CREATE TABLE rows (id INTEGER PRIMARY KEY, v TEXT)"))
+
+
+def _row_count(engine: Engine) -> int:
+    with Session(engine) as session:
+        return session.execute(text("SELECT COUNT(*) FROM rows")).scalar_one()
+
+
+def test_sqlite_engine_enables_wal_journal_mode(tmp_path: Path) -> None:
+    # A file-backed database is the only kind that can actually report "wal":
+    # an in-memory one answers "memory" whether or not the listener ran.
+    engine = _file_engine(tmp_path)
 
     with engine.connect() as conn:
         mode = conn.execute(text("PRAGMA journal_mode")).scalar()
 
-    # An in-memory database reports "memory", not "wal": WAL needs a file to
-    # back the write-ahead log. The pragma still runs without error, which is
-    # what a file-backed database needs.
-    assert mode in {"wal", "memory"}
+    assert mode == "wal"
 
 
 def test_in_memory_url_uses_a_shared_static_pool() -> None:
@@ -28,37 +43,34 @@ def test_in_memory_url_uses_a_shared_static_pool() -> None:
 
 
 def test_file_backed_url_does_not_use_static_pool(tmp_path: Path) -> None:
-    db_path = tmp_path / "test.db"
-    engine = build_engine(Settings(DATABASE_URL=f"sqlite:///{db_path}"))
+    engine = _file_engine(tmp_path)
 
     assert not isinstance(engine.pool, StaticPool)
 
 
-def test_get_session_commits_on_success() -> None:
-    engine = build_engine(Settings(DATABASE_URL="sqlite:///:memory:"))
+def test_get_session_commits_on_success(tmp_path: Path) -> None:
+    engine = _file_engine(tmp_path)
+    _create_table(engine)
 
     generator = get_session(engine)
     session = next(generator)
-    session.execute(text("SELECT 1"))
-
-    # Exhausting the generator runs the commit path with no exception raised.
-    with_exception = False
-    try:
+    session.execute(text("INSERT INTO rows (v) VALUES ('kept')"))
+    with pytest.raises(StopIteration):
         next(generator)
-    except StopIteration:
-        with_exception = True
-    assert with_exception
+
+    # A fresh session on a fresh connection sees the row only if it was
+    # committed, not merely written inside the request's own transaction.
+    assert _row_count(engine) == 1
 
 
-def test_get_session_rolls_back_on_error() -> None:
-    engine = build_engine(Settings(DATABASE_URL="sqlite:///:memory:"))
+def test_get_session_rolls_back_on_error(tmp_path: Path) -> None:
+    engine = _file_engine(tmp_path)
+    _create_table(engine)
 
     generator = get_session(engine)
-    next(generator)
-
-    with_exception = False
-    try:
+    session = next(generator)
+    session.execute(text("INSERT INTO rows (v) VALUES ('lost')"))
+    with pytest.raises(RuntimeError, match="boom"):
         generator.throw(RuntimeError("boom"))
-    except RuntimeError:
-        with_exception = True
-    assert with_exception
+
+    assert _row_count(engine) == 0

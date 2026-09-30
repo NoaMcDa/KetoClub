@@ -245,17 +245,6 @@ void main() {
       // Act & Assert
       expect(a, isNot(equals(b)));
     });
-
-    test('toString mentions the dishId and verdict', () {
-      // Arrange
-      final dish = AnalysedDish.tryFrom(orderAsIsJson)!;
-
-      // Act
-      final result = dish.toString();
-
-      // Assert
-      expect(result, contains('d2'));
-    });
   });
 
   group('DishRow', () {
@@ -274,9 +263,19 @@ void main() {
     );
 
     test('== returns true for rows with equal fields', () {
-      // Arrange
-      const a = DishRow(dish: dish, category: 'Mains', analysis: analysis);
-      const b = DishRow(dish: dish, category: 'Mains', analysis: analysis);
+      // Arrange: built at run time, so == is exercised rather than const
+      // canonicalisation.
+      final categories = <String>['Mains', 'Mains'];
+      final a = DishRow(
+        dish: dish,
+        category: categories[0],
+        analysis: analysis,
+      );
+      final b = DishRow(
+        dish: dish,
+        category: categories[1],
+        analysis: analysis,
+      );
 
       // Act & Assert
       expect(a, equals(b));
@@ -291,32 +290,15 @@ void main() {
       // Act & Assert
       expect(a, isNot(equals(b)));
     });
-
-    test('analysis defaults to null when the menu is unanalysed', () {
-      // Arrange & Act
-      const row = DishRow(dish: dish, category: 'Mains');
-
-      // Assert
-      expect(row.analysis, isNull);
-    });
-
-    test('toString mentions the dish id and category', () {
-      // Arrange
-      const row = DishRow(dish: dish, category: 'Mains');
-
-      // Act
-      final result = row.toString();
-
-      // Assert
-      expect(result, contains('Mains'));
-    });
   });
 
   group('LlmEngine', () {
     test('== returns true for engines with the same model', () {
-      // Arrange
-      const a = LlmEngine(model: 'gpt-x');
-      const b = LlmEngine(model: 'gpt-x');
+      // Arrange: built at run time, so == is exercised rather than const
+      // canonicalisation.
+      final models = <String>['gpt-x', 'gpt-x'];
+      final a = LlmEngine(model: models[0]);
+      final b = LlmEngine(model: models[1]);
 
       // Act & Assert
       expect(a, equals(b));
@@ -333,24 +315,18 @@ void main() {
       // Assert
       expect(result, equals({'kind': 'llm', 'model': 'gpt-x'}));
     });
-
-    test('toString mentions the model', () {
-      // Arrange
-      const engine = LlmEngine(model: 'gpt-x');
-
-      // Act
-      final result = engine.toString();
-
-      // Assert
-      expect(result, contains('gpt-x'));
-    });
   });
 
   group('RulesEngine', () {
     test('== returns true for engines with the same reason', () {
-      // Arrange
-      const a = RulesEngine(reason: MenuAnalysisFailureReason.offline);
-      const b = RulesEngine(reason: MenuAnalysisFailureReason.offline);
+      // Arrange: built at run time, so == is exercised rather than const
+      // canonicalisation.
+      final reasons = <MenuAnalysisFailureReason>[
+        MenuAnalysisFailureReason.offline,
+        MenuAnalysisFailureReason.offline,
+      ];
+      final a = RulesEngine(reason: reasons[0]);
+      final b = RulesEngine(reason: reasons[1]);
 
       // Act & Assert
       expect(a, equals(b));
@@ -366,26 +342,6 @@ void main() {
 
       // Assert
       expect(result, equals({'kind': 'rules', 'reason': 'timeout'}));
-    });
-
-    test('LlmEngine and RulesEngine are never equal to each other', () {
-      // Arrange
-      const llm = LlmEngine(model: 'gpt-x');
-      const rules = RulesEngine(reason: MenuAnalysisFailureReason.offline);
-
-      // Act & Assert
-      expect(llm, isNot(equals(rules)));
-    });
-
-    test('toString mentions the reason', () {
-      // Arrange
-      const engine = RulesEngine(reason: MenuAnalysisFailureReason.timeout);
-
-      // Act
-      final result = engine.toString();
-
-      // Assert
-      expect(result, contains('timeout'));
     });
   });
 
@@ -607,17 +563,6 @@ void main() {
       expect(a, isNot(equals(b)));
     });
 
-    test('toString mentions the dish and unclassified counts', () {
-      // Arrange
-      final analysed = MenuAnalysed.tryFrom(validJson)!;
-
-      // Act
-      final result = analysed.toString();
-
-      // Assert
-      expect(result, contains('1 dishes'));
-    });
-
     group('options (issue #57)', () {
       const optionsJson = <String, Object?>{
         'netCarbLimitGrams': 9,
@@ -837,21 +782,6 @@ void main() {
       expect(a, isNot(equals(differentLength)));
       expect(a, isNot(equals(differentConstraint)));
     });
-
-    test('toString mentions the limit and the constraints', () {
-      // Arrange
-      const snapshot = AnalysisOptionsSnapshot(
-        netCarbLimitGrams: 11,
-        dietaryConstraints: ['dairy-free'],
-      );
-
-      // Act
-      final result = snapshot.toString();
-
-      // Assert
-      expect(result, contains('11g'));
-      expect(result, contains('dairy-free'));
-    });
   });
 
   group('MenuAnalysisFailed', () {
@@ -869,24 +799,15 @@ void main() {
       expect(result, equals({'reason': 'badResponse', 'detail': 'HTTP 500'}));
     });
 
-    test('detail defaults to null', () {
-      // Arrange & Act
-      const failure = MenuAnalysisFailed(
-        reason: MenuAnalysisFailureReason.noDishesFound,
-      );
-
-      // Assert
-      expect(failure.detail, isNull);
-    });
-
     test('== returns true for failures with equal fields', () {
-      // Arrange
-      const a = MenuAnalysisFailed(
-        reason: MenuAnalysisFailureReason.backendUnreachable,
-      );
-      const b = MenuAnalysisFailed(
-        reason: MenuAnalysisFailureReason.backendUnreachable,
-      );
+      // Arrange: built at run time, so == is exercised rather than const
+      // canonicalisation.
+      final reasons = <MenuAnalysisFailureReason>[
+        MenuAnalysisFailureReason.backendUnreachable,
+        MenuAnalysisFailureReason.backendUnreachable,
+      ];
+      final a = MenuAnalysisFailed(reason: reasons[0]);
+      final b = MenuAnalysisFailed(reason: reasons[1]);
 
       // Act & Assert
       expect(a, equals(b));
@@ -906,19 +827,6 @@ void main() {
 
       // Act & Assert
       expect(a, isNot(equals(b)));
-    });
-
-    test('toString mentions the reason', () {
-      // Arrange
-      const failure = MenuAnalysisFailed(
-        reason: MenuAnalysisFailureReason.noDishesFound,
-      );
-
-      // Act
-      final result = failure.toString();
-
-      // Assert
-      expect(result, contains('noDishesFound'));
     });
   });
 

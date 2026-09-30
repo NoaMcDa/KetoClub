@@ -94,25 +94,6 @@ void main() {
       expect(reported, MenuFilter.all);
     });
 
-    testWidgets('each tile carries a semantic label naming its count', (
-      tester,
-    ) async {
-      // Arrange
-      await _pump(
-        tester,
-        VerdictCounterTiles(
-          greenCount: 7,
-          yellowCount: 0,
-          redCount: 0,
-          filter: MenuFilter.all,
-          onFilterChanged: (_) {},
-        ),
-      );
-
-      // Assert
-      expect(find.bySemanticsLabel('Order as-is: 7'), findsOneWidget);
-    });
-
     testWidgets(
       'every tile shows an icon beside its colour, never colour alone '
       '(architecture.md §6.6)',

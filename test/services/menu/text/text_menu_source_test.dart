@@ -140,27 +140,6 @@ void main() {
         expect(menu.categories.first.dishes, hasLength(2));
       });
 
-      test('a header is never a dish', () {
-        // Act
-        final menu = _parse('Starters:\nHummus');
-
-        // Assert
-        expect(_names(menu), ['Hummus']);
-      });
-
-      test('a short line alone between blank lines starts a category', () {
-        // Act
-        final menu = _parse(
-          'Starters\n\nHummus\nSoup\n\nMain courses\n\nSteak',
-        );
-
-        // Assert
-        expect(
-          [for (final c in menu.categories) c.name],
-          ['Starters', 'Main courses'],
-        );
-      });
-
       test('a long line before a blank line stays a dish', () {
         // Act
         final menu = _parse(

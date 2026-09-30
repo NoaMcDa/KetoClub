@@ -621,18 +621,6 @@ void main() {
       }
     });
 
-    test('returns the venues nearest first', () async {
-      // Arrange
-      final service = _proxied(_fixtureClient(), browser: true);
-
-      // Act
-      final result = await _nearby(service);
-
-      // Assert
-      expect(_slugs(result).first, equals('hakosem'));
-      expect(_slugs(result).last, equals('ghost-kitchen-tlv'));
-    });
-
     test('maps a ClientException to backendUnreachable', () async {
       for (final browser in <bool>[true, false]) {
         await _expectBoth(

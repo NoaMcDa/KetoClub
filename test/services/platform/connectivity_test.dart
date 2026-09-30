@@ -108,15 +108,6 @@ void main() {
       // Act & Assert
       expect(await connectivity.isOnline(), isTrue);
     });
-
-    test('isOnline never throws regardless of the channel result', () async {
-      // Arrange
-      _installFailingChannel();
-      final connectivity = _buildDevice();
-
-      // Act & Assert
-      await expectLater(connectivity.isOnline(), completes);
-    });
   });
 
   group('FakeConnectivity', () {

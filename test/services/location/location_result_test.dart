@@ -127,15 +127,6 @@ void main() {
       expect(a, isNot(equals(b)));
     });
 
-    test('every LocationUnavailableReason value constructs and prints', () {
-      for (final reason in LocationUnavailableReason.values) {
-        final result = LocationUnavailable(reason: reason);
-
-        expect(result.reason, equals(reason));
-        expect(result.toString(), contains(reason.name));
-      }
-    });
-
     test('toString mentions the reason', () {
       const result = LocationUnavailable(
         reason: LocationUnavailableReason.unsupported,

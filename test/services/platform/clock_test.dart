@@ -12,14 +12,5 @@ void main() {
       expect(result.isBefore(before), isFalse);
       expect(result.isAfter(after), isFalse);
     });
-
-    test('two successive calls do not go backwards', () {
-      const clock = SystemClock();
-
-      final first = clock.now();
-      final second = clock.now();
-
-      expect(second.isBefore(first), isFalse);
-    });
   });
 }

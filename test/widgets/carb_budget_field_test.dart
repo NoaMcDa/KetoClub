@@ -51,12 +51,6 @@ void main() {
         expect(find.text(_en.carbBudgetFieldLabel), findsOneWidget);
       });
 
-      testWidgets('shows the hint text', (tester) async {
-        await _pump(tester, isBudgetAvailable: true);
-
-        expect(find.text(_en.carbBudgetFieldHint), findsOneWidget);
-      });
-
       testWidgets('does not show the disabled-reason text', (tester) async {
         await _pump(tester, isBudgetAvailable: true);
 

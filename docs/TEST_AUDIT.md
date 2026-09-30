@@ -21,7 +21,13 @@ pins, one RTL test per screen, "no plugin I/O in constructors" tests, enum
 exhaustiveness guards, "never leaks the key/body" tests and golden-prompt tests.
 
 Totals: **249 flagged** (A 100, B 25, C 4, D 105, E 15) and about 180 borderline.
-The borderline items are listed at the end; act on the flagged ones first.
+
+**Status: every item in section 2 has been applied** in the same change that
+added this document. Deleted tests are gone; the const-canonicalised equality
+tests were kept and made non-const; the assertion-weak launch flow and the
+three backend `test_db.py` tests were strengthened instead of deleted. Line
+numbers in section 2 refer to the tree *before* that change. Section 3
+(borderline) is untouched and remains open for judgement.
 
 ---
 

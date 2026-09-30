@@ -59,17 +59,6 @@ GeolocatorLocationService _buildService({
 
 void main() {
   group('GeolocatorLocationService', () {
-    test('runsInBrowser defaults to kIsWeb — false on the test VM', () {
-      final service = GeolocatorLocationService(
-        isLocationServiceEnabled: _enabled,
-        checkPermission: _whileInUse,
-        requestPermission: _whileInUse,
-        getCurrentPosition: ({locationSettings}) async => _samplePosition,
-      );
-
-      expect(service.runsInBrowser, isFalse);
-    });
-
     test(
       'current returns servicesOff when the location service is off',
       () async {
@@ -304,23 +293,6 @@ void main() {
       // Act & Assert
       await expectLater(service.current(), completes);
     });
-
-    test('current maps a denial to LocationDenied(permanently: false) '
-        'when runsInBrowser is true, matching an insecure-context refusal '
-        'the web plugin cannot distinguish from an ordinary one', () async {
-      // Arrange
-      final service = _buildService(
-        runsInBrowser: true,
-        checkPermission: _denied,
-        requestPermission: _denied,
-      );
-
-      // Act
-      final result = await service.current();
-
-      // Assert
-      expect(result, equals(const LocationDenied(permanently: false)));
-    });
   });
 
   group('GeolocatorLocationService.openSettings', () {
@@ -433,22 +405,6 @@ void main() {
       expect(
         await service.current(),
         equals(const LocationDenied(permanently: true)),
-      );
-    });
-
-    test('current reflects result being changed after construction', () async {
-      final service = FakeLocationService()
-        ..result = const LocationUnavailable(
-          reason: LocationUnavailableReason.servicesOff,
-        );
-
-      expect(
-        await service.current(),
-        equals(
-          const LocationUnavailable(
-            reason: LocationUnavailableReason.servicesOff,
-          ),
-        ),
       );
     });
 

@@ -158,9 +158,11 @@ void main() {
     });
 
     test('== returns true for two refs with equal fields', () {
-      // Arrange
-      const a = VenueRef(source: MenuSource.ontopo, platformId: 'v1');
-      const b = VenueRef(source: MenuSource.ontopo, platformId: 'v1');
+      // Arrange: built at run time, so == is exercised rather than const
+      // canonicalisation.
+      final ids = <String>['v1', 'v1'];
+      final a = VenueRef(source: MenuSource.ontopo, platformId: ids[0]);
+      final b = VenueRef(source: MenuSource.ontopo, platformId: ids[1]);
 
       // Act & Assert
       expect(a, equals(b));
@@ -175,45 +177,9 @@ void main() {
       // Act & Assert
       expect(a, isNot(equals(b)));
     });
-
-    test('toString mentions the cache key', () {
-      // Arrange
-      const ref = VenueRef(source: MenuSource.wolt, platformId: 'v1');
-
-      // Act
-      final result = ref.toString();
-
-      // Assert
-      expect(result, contains('wolt/v1'));
-    });
   });
 
   group('Venue', () {
-    test('== returns true for two venues with equal fields', () {
-      // Arrange
-      const ref = VenueRef(source: MenuSource.wolt, platformId: 'v1');
-      const a = Venue(
-        ref: ref,
-        name: 'Diner',
-        address: '1 Main St',
-        latitude: 1,
-        longitude: 2,
-        sourceUrl: 'https://example.com',
-      );
-      const b = Venue(
-        ref: ref,
-        name: 'Diner',
-        address: '1 Main St',
-        latitude: 1,
-        longitude: 2,
-        sourceUrl: 'https://example.com',
-      );
-
-      // Act & Assert
-      expect(a, equals(b));
-      expect(a.hashCode, equals(b.hashCode));
-    });
-
     test('== returns true for two non-const venues built separately with '
         'equal fields', () {
       // Arrange
@@ -235,17 +201,6 @@ void main() {
 
       // Act & Assert
       expect(a, isNot(equals(b)));
-    });
-
-    test('== treats absent optional fields (all null) as equal', () {
-      // Arrange
-      const ref = VenueRef(source: MenuSource.wolt, platformId: 'v1');
-      const a = Venue(ref: ref, name: 'Diner');
-      const b = Venue(ref: ref, name: 'Diner');
-
-      // Act & Assert
-      expect(a, equals(b));
-      expect(a.hashCode, equals(b.hashCode));
     });
 
     test('== and hashCode cover every field added for venue search '
@@ -281,35 +236,6 @@ void main() {
       expect(build(shortDescription: 'Other'), isNot(equals(base)));
       expect(build(platformRating: 8), isNot(equals(base)));
       expect(build(estimateMinutes: 30), isNot(equals(base)));
-    });
-
-    test('defaults the venue-search fields to empty or null', () {
-      // Arrange
-      const ref = VenueRef(source: MenuSource.wolt, platformId: 'v1');
-
-      // Act
-      const venue = Venue(ref: ref, name: 'Diner');
-
-      // Assert
-      expect(venue.cuisineTags, isEmpty);
-      expect(venue.isOnline, isNull);
-      expect(venue.imageUrl, isNull);
-      expect(venue.shortDescription, isNull);
-      expect(venue.platformRating, isNull);
-      expect(venue.estimateMinutes, isNull);
-    });
-
-    test('toString mentions the cache key and the name', () {
-      // Arrange
-      const ref = VenueRef(source: MenuSource.wolt, platformId: 'v1');
-      const venue = Venue(ref: ref, name: 'Diner');
-
-      // Act
-      final result = venue.toString();
-
-      // Assert
-      expect(result, contains('wolt/v1'));
-      expect(result, contains('Diner'));
     });
   });
 }

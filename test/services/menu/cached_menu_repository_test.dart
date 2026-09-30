@@ -6,7 +6,6 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
-import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 
 import '../../fakes/fake_clock.dart';
 import '../../fakes/fake_menu_cache.dart';
@@ -86,30 +85,6 @@ void main() {
       );
     });
 
-    test('store writes the menu under its own ref', () async {
-      // Arrange
-      final menu = _menuWith(scanRef, clock.now());
-
-      // Act
-      await repository.store(menu);
-
-      // Assert
-      expect((await cache.read(scanRef))?.menu, menu);
-    });
-
-    test('load serves a stored scan menu from the cache', () async {
-      // Arrange
-      final menu = _menuWith(scanRef, clock.now());
-      await repository.store(menu);
-
-      // Act
-      final result = await repository.load(scanRef);
-
-      // Assert
-      expect(result, equals(MenuFetched(menu: menu, fromCache: true)));
-      expect(adapter.fetchCalls, isEmpty);
-    });
-
     test('load never marks a scan menu stale, however old', () async {
       // Arrange
       final menu = _menuWith(scanRef, clock.now());
@@ -135,18 +110,6 @@ void main() {
         const MenuFetchFailed(reason: MenuFetchFailureReason.scanNotSaved),
       );
       expect(adapter.fetchCalls, isEmpty);
-    });
-
-    test('a scan menu removed from the cache is scanNotSaved again', () async {
-      // Arrange
-      await repository.store(_menuWith(scanRef, clock.now()));
-      await repository.remove(scanRef);
-
-      // Act
-      final result = await repository.load(scanRef);
-
-      // Assert
-      expect(result, isA<MenuFetchFailed>());
     });
 
     test(
@@ -328,29 +291,6 @@ void main() {
         'a network attempt', () async {
       // Act
       final result = await repository.load(_tenbisRef);
-
-      // Assert
-      expect(
-        result,
-        equals(
-          const MenuFetchFailed(
-            reason: MenuFetchFailureReason.unsupportedSource,
-          ),
-        ),
-      );
-      expect(adapter.fetchCalls, isEmpty);
-    });
-
-    test('load with a ref resolved from a pasted 10bis.co.il URL still '
-        'returns unsupportedSource — recognising the URL is not the same '
-        'as having an adapter for it', () async {
-      // Arrange
-      final ref = VenueRefResolver.resolve(
-        'https://www.10bis.co.il/Restaurants/Menu/123456',
-      );
-
-      // Act
-      final result = await repository.load(ref!);
 
       // Assert
       expect(

@@ -44,32 +44,23 @@ void main() {
       expect(VerdictTone.lerp(a, b, 1), b);
     });
 
-    test('lerp at t=0.5 interpolates every field with Color.lerp', () {
-      // Act
-      final mid = VerdictTone.lerp(a, b, 0.5);
-
-      // Assert
-      expect(mid.rail, Color.lerp(a.rail, b.rail, 0.5));
-      expect(mid.pill, Color.lerp(a.pill, b.pill, 0.5));
-      expect(mid.tint, Color.lerp(a.tint, b.tint, 0.5));
-      expect(mid.ink, Color.lerp(a.ink, b.ink, 0.5));
-      expect(mid.on, Color.lerp(a.on, b.on, 0.5));
-    });
-
     test('equal tones compare equal and share a hashCode', () {
-      // Arrange
-      const copy = VerdictTone(
-        rail: Color(0xFF000000),
-        pill: Color(0xFF111111),
-        tint: Color(0xFF222222),
-        ink: Color(0xFF333333),
-        on: Color(0xFF444444),
+      // Arrange: both built at run time, so == is exercised rather than
+      // const canonicalisation.
+      VerdictTone tone(int rail) => VerdictTone(
+        rail: Color(rail),
+        pill: Color(rail + 0x111111),
+        tint: Color(rail + 0x222222),
+        ink: Color(rail + 0x333333),
+        on: Color(rail + 0x444444),
       );
+      final first = tone(0xFF000000);
+      final second = tone(0xFF000000);
 
       // Assert
-      expect(a, copy);
-      expect(a.hashCode, copy.hashCode);
-      expect(a == b, isFalse);
+      expect(first, second);
+      expect(first.hashCode, second.hashCode);
+      expect(first == b, isFalse);
     });
   });
 

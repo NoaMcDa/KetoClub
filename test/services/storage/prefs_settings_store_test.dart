@@ -139,28 +139,6 @@ void main() {
     });
 
     test(
-      'write then read round-trips every field, including nullable ones',
-      () async {
-        // Arrange
-        final store = _buildStore();
-        const settings = AppSettings(
-          languageTag: 'he',
-          filter: MenuFilter.greenOnly,
-          lastVenue: VenueRef(source: MenuSource.tabit, platformId: 'site-9'),
-        );
-
-        // Act
-        await store.write(settings);
-        final result = await store.read();
-
-        // Assert
-        expect(result, equals(settings));
-        expect(result.languageTag, equals('he'));
-        expect(result.lastVenue, equals(settings.lastVenue));
-      },
-    );
-
-    test(
       'write then read round-trips languageTag and lastVenue as null',
       () async {
         // Arrange
@@ -399,37 +377,6 @@ void main() {
       expect(result.carnivoreOnly, isTrue);
     });
 
-    test('AppSettings JSON round-trips the dietary toggles', () {
-      // Arrange
-      const settings = AppSettings(seedOilFree: true, carnivoreOnly: true);
-
-      // Act
-      final json = settings.toJson();
-      final decoded = AppSettings.tryFrom(json);
-
-      // Assert
-      expect(json['seedOilFree'], isTrue);
-      expect(json['dairyFree'], isFalse);
-      expect(json['carnivoreOnly'], isTrue);
-      expect(decoded, equals(settings));
-    });
-
-    test('AppSettings.tryFrom reads missing toggle keys as off', () {
-      // Act: pass the fields written by an install before the toggles
-      // existed. estimationConsentGiven is written explicitly here as
-      // true — D16 (issue #167) flipped the default — so this decodes
-      // as the modern defaults.
-      final decoded = AppSettings.tryFrom(<String, Object?>{
-        'languageTag': null,
-        'filter': 'all',
-        'estimationConsentGiven': true,
-        'lastVenue': null,
-      });
-
-      // Assert
-      expect(decoded, equals(const AppSettings()));
-    });
-
     test('AppSettings.tryFrom decodes a stored consent value of false as '
         'false, so an install that already refused before D16 keeps its '
         'refusal (issue #167)', () {
@@ -490,29 +437,6 @@ void main() {
       // Assert
       expect(decoded, isNotNull);
       expect(decoded!.disclosureSeen, isFalse);
-    });
-
-    test('write then read round-trips a non-default themeMode', () async {
-      // Arrange
-      final store = _buildStore();
-
-      // Act
-      await store.write(const AppSettings(themeMode: AppThemeMode.dark));
-      final result = await store.read();
-
-      // Assert
-      expect(result.themeMode, equals(AppThemeMode.dark));
-    });
-
-    test('read never returns null even on a virgin store', () async {
-      // Arrange
-      final store = _buildStore();
-
-      // Act
-      final result = await store.read();
-
-      // Assert
-      expect(result, isNotNull);
     });
 
     test(

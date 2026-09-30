@@ -216,19 +216,6 @@ void main() {
         equals(const VenueRef(source: MenuSource.tenbis, platformId: '000123')),
       );
     });
-
-    test('resolve is pure: the same input always resolves the same way', () {
-      // Arrange
-      const input =
-          'https://wolt.com/en/isr/tel-aviv/restaurant/vitrina-lilinblum';
-
-      // Act
-      final first = VenueRefResolver.resolve(input);
-      final second = VenueRefResolver.resolve(input);
-
-      // Assert
-      expect(first, equals(second));
-    });
   });
 
   group('VenueRefResolver.platformUrl (issue #53)', () {

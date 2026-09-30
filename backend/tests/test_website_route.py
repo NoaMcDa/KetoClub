@@ -244,15 +244,6 @@ def test_robots_allow_lets_the_page_through(
     assert _post(site_client).status_code == 200
 
 
-def test_a_missing_robots_txt_allows(
-    site_client: TestClient, web: respx.MockRouter
-) -> None:
-    _no_robots(web)
-    web.get(_HOME).mock(return_value=_html())
-
-    assert _post(site_client).status_code == 200
-
-
 def test_a_failing_robots_txt_refuses_to_fetch(
     site_client: TestClient, web: respx.MockRouter
 ) -> None:

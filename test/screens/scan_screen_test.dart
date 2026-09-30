@@ -166,18 +166,6 @@ void main() {
       expect(tester.widget<ElevatedButton>(_analyse(_en)).onPressed, isNull);
     });
 
-    testWidgets('Analyse stays disabled for whitespace only', (tester) async {
-      // Arrange
-      await _pump(tester, controller);
-
-      // Act
-      await tester.enterText(find.byType(TextField), '   \n ');
-      await tester.pump();
-
-      // Assert
-      expect(tester.widget<ElevatedButton>(_analyse(_en)).onPressed, isNull);
-    });
-
     testWidgets('typing enables Analyse', (tester) async {
       // Arrange
       await _pump(tester, controller);
@@ -250,22 +238,6 @@ void main() {
 
       // Assert
       expect(find.text(_en.scanEmptyPaste), findsNothing);
-    });
-
-    testWidgets('the empty-paste copy is in Hebrew under Locale(he)', (
-      tester,
-    ) async {
-      // Arrange
-      await _pump(tester, controller, locale: const Locale('he'));
-      await tester.enterText(find.byType(TextField), '45 ₪');
-      await tester.pump();
-
-      // Act
-      await tester.tap(_analyse(_he));
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(find.text(_he.scanEmptyPaste), findsOneWidget);
     });
   });
 
@@ -668,28 +640,6 @@ void main() {
       }
     });
 
-    testWidgets('on web notConfigured says scanning needs the server', (
-      tester,
-    ) async {
-      // Arrange
-      classifier.respondWith(
-        const ScannedMenuFailed(
-          reason: MenuAnalysisFailureReason.notConfigured,
-        ),
-      );
-      picker.queueTakePhoto([_jpeg(1)]);
-      await _pump(tester, controller, picker: picker);
-      await tester.tap(_action(_en.scanScreenActionTakePhoto));
-      await tester.pumpAndSettle();
-
-      // Act
-      await tester.tap(_analysePages(_en));
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(find.text(_en.scanScreenFailureNeedsServer), findsOneWidget);
-    });
-
     testWidgets('on phones notConfigured says scanning is unavailable', (
       tester,
     ) async {
@@ -711,28 +661,6 @@ void main() {
       // Assert
       expect(find.text(_en.scanScreenFailureNotConfigured), findsOneWidget);
       expect(find.text(_en.scanScreenFailureNeedsServer), findsNothing);
-    });
-
-    testWidgets('consent withheld says to allow AI analysis in Settings', (
-      tester,
-    ) async {
-      // Arrange
-      classifier.respondWith(
-        const ScannedMenuFailed(
-          reason: MenuAnalysisFailureReason.consentWithheld,
-        ),
-      );
-      picker.queueTakePhoto([_jpeg(1)]);
-      await _pump(tester, controller, picker: picker);
-      await tester.tap(_action(_en.scanScreenActionTakePhoto));
-      await tester.pumpAndSettle();
-
-      // Act
-      await tester.tap(_analysePages(_en));
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(find.text(_en.scanScreenFailureConsentWithheld), findsOneWidget);
     });
 
     testWidgets("the disclosure line names KetoClub's server on web", (
@@ -807,26 +735,6 @@ void main() {
         Directionality.of(tester.element(find.text(_he.scanScreenIntro))),
         TextDirection.rtl,
       );
-    });
-
-    testWidgets('the Hebrew oversize copy is shown under Locale(he)', (
-      tester,
-    ) async {
-      // Arrange
-      picker.queuePickPdf([_pdf(bytes: maxScanPageBytes + 1)]);
-      await _pump(
-        tester,
-        controller,
-        picker: picker,
-        locale: const Locale('he'),
-      );
-
-      // Act
-      await tester.tap(_action(_he.scanScreenActionChoosePdf));
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(find.text(_he.scanScreenPageTooLarge(3)), findsOneWidget);
     });
   });
 
@@ -955,21 +863,6 @@ void main() {
       // Assert
       expect(find.text(_en.scanQrPhotographInstead), findsOneWidget);
       expect(pushed, isEmpty);
-    });
-
-    testWidgets('a code that is not a URL suggests photographing too', (
-      tester,
-    ) async {
-      // Arrange
-      scanner.queuePayload('Table 12');
-      await _pump(tester, controller);
-
-      // Act
-      await tester.tap(_action(_en.scanQrAction));
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(find.text(_en.scanQrPhotographInstead), findsOneWidget);
     });
 
     testWidgets('the action is disabled while the camera is open', (

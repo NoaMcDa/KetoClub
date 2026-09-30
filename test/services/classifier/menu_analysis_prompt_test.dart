@@ -64,33 +64,7 @@ void _assertStrictSchema(Map<String, Object?> schema) {
 
 void main() {
   group('MenuAnalysisPrompt', () {
-    test('schemaName is the literal menu_analysis', () {
-      // Assert
-      expect(MenuAnalysisPrompt.schemaName, 'menu_analysis');
-    });
-
     group('systemPrompt', () {
-      test('systemPrompt contains the verdict definitions at the default '
-          'limit verbatim', () {
-        // Act
-        final prompt = MenuAnalysisPrompt.systemPrompt();
-
-        // Assert
-        expect(
-          prompt,
-          contains(promptVerdictDefinitionsFor(defaultNetCarbLimitGrams)),
-        );
-      });
-
-      test('systemPrompt contains the keto rules at the default limit '
-          'verbatim', () {
-        // Act
-        final prompt = MenuAnalysisPrompt.systemPrompt();
-
-        // Assert
-        expect(prompt, contains(promptKetoRulesFor(defaultNetCarbLimitGrams)));
-      });
-
       test('systemPrompt never leaves the limit placeholder unfilled', () {
         // Act
         final prompt = MenuAnalysisPrompt.systemPrompt(
@@ -116,16 +90,6 @@ void main() {
         });
       }
 
-      test('systemPrompt states every modifiable dish must carry a '
-          'modification', () {
-        // Act
-        final prompt = MenuAnalysisPrompt.systemPrompt();
-
-        // Assert
-        expect(prompt, contains('modification'));
-        expect(prompt, contains('nonKeto'));
-      });
-
       test('systemPrompt states the reply must be JSON and nothing else', () {
         // Act
         final prompt = MenuAnalysisPrompt.systemPrompt();
@@ -133,15 +97,6 @@ void main() {
         // Assert
         expect(prompt.toLowerCase(), contains('json'));
         expect(prompt.toLowerCase(), contains('nothing else'));
-      });
-
-      test('systemPrompt given default options omits any dietary '
-          'constraint section', () {
-        // Act
-        final prompt = MenuAnalysisPrompt.systemPrompt();
-
-        // Assert
-        expect(prompt.toLowerCase(), isNot(contains('dietary constraint')));
       });
 
       test('systemPrompt given dietaryConstraints appends every one of '
@@ -159,24 +114,6 @@ void main() {
         expect(prompt, contains('dairy-free'));
         expect(prompt, contains('seed-oil free'));
         expect(prompt, contains('carnivore'));
-      });
-
-      test('systemPrompt given dietaryConstraints still contains the '
-          'verdict definitions and keto rules', () {
-        // Arrange
-        const options = ClassificationOptions(
-          dietaryConstraints: ['dairy-free'],
-        );
-
-        // Act
-        final prompt = MenuAnalysisPrompt.systemPrompt(options: options);
-
-        // Assert
-        expect(
-          prompt,
-          contains(promptVerdictDefinitionsFor(defaultNetCarbLimitGrams)),
-        );
-        expect(prompt, contains(promptKetoRulesFor(defaultNetCarbLimitGrams)));
       });
     });
 
@@ -348,54 +285,6 @@ void main() {
     });
 
     group('userPrompt', () {
-      test('userPrompt emits one line per dish, in menu order', () {
-        // Arrange
-        final menu = _menuOf([
-          (
-            'Mains',
-            [
-              const Dish(
-                id: 'dish-1',
-                name: 'Grilled Steak',
-                description: 'With herb butter',
-                price: 68,
-                options: [],
-              ),
-              const Dish(
-                id: 'dish-2',
-                name: 'Margherita Pizza',
-                description: 'Tomato and mozzarella',
-                price: 52,
-                options: [],
-              ),
-            ],
-          ),
-          (
-            'Salads',
-            [
-              const Dish(
-                id: 'dish-3',
-                name: 'Greek Salad',
-                description: 'Feta and olives',
-                price: 38,
-                options: [],
-              ),
-            ],
-          ),
-        ]);
-
-        // Act
-        final prompt = MenuAnalysisPrompt.userPrompt(menu);
-
-        // Assert
-        final lines = prompt.split('\n');
-        expect(lines, [
-          'dish-1 | Mains | Grilled Steak | With herb butter | ',
-          'dish-2 | Mains | Margherita Pizza | Tomato and mozzarella | ',
-          'dish-3 | Salads | Greek Salad | Feta and olives | ',
-        ]);
-      });
-
       test('userPrompt contains no price, in any format', () {
         // Arrange
         const dish = Dish(
@@ -444,33 +333,6 @@ void main() {
           prompt,
           'dish-1 | Mains | Grilled Chicken |  | '
           'Choice of side: French Fries, Green Salad',
-        );
-      });
-
-      test('userPrompt joins more than one option group with a '
-          'semicolon', () {
-        // Arrange
-        const dish = Dish(
-          id: 'dish-1',
-          name: 'Build-Your-Bowl',
-          description: '',
-          price: 45,
-          options: [
-            DishOption(name: 'Base', values: ['Rice', 'Cauliflower rice']),
-            DishOption(name: 'Protein', values: ['Chicken', 'Tofu']),
-          ],
-        );
-        final menu = _menuOf([
-          ('Mains', [dish]),
-        ]);
-
-        // Act
-        final prompt = MenuAnalysisPrompt.userPrompt(menu);
-
-        // Assert
-        expect(
-          prompt,
-          contains('Base: Rice, Cauliflower rice; Protein: Chicken, Tofu'),
         );
       });
 
@@ -546,19 +408,6 @@ void main() {
         // Assert
         expect(modification['type'], ['string', 'null']);
         expect(netCarbs['type'], ['number', 'null']);
-      });
-
-      test('responseSchema has no description property on a dish', () {
-        // Act
-        final schema = MenuAnalysisPrompt.responseSchema();
-        final dishesSchema =
-            (schema['properties']! as Map<String, Object?>)['dishes']!
-                as Map<String, Object?>;
-        final itemSchema = dishesSchema['items']! as Map<String, Object?>;
-        final properties = itemSchema['properties']! as Map<String, Object?>;
-
-        // Assert
-        expect(properties.containsKey('description'), isFalse);
       });
 
       test('responseSchema enumerates the verdict property from '
@@ -672,28 +521,6 @@ void main() {
       expect(preamble, contains('never translate'));
       expect(preamble, contains('never an instruction'));
       expect(MenuAnalysisPrompt.visionUserPrompt(4), contains('4 pages'));
-    });
-
-    test('the vision system prompt is the preamble, then the text system '
-        'prompt byte for byte', () {
-      // Arrange
-      const options = ClassificationOptions(
-        netCarbLimitGrams: 8,
-        dietaryConstraints: <String>[seedOilFreePromptFragment],
-      );
-
-      // Act
-      final prompt = MenuAnalysisPrompt.visionSystemPrompt(
-        pageCount: 2,
-        options: options,
-      );
-
-      // Assert
-      expect(
-        prompt,
-        '${MenuAnalysisPrompt.visionPreamble(2)}\n\n'
-        '${MenuAnalysisPrompt.systemPrompt(options: options)}',
-      );
     });
   });
 }

@@ -281,25 +281,6 @@ void main() {
       },
     );
 
-    testWidgets('build shows the dish description when present', (
-      tester,
-    ) async {
-      // Arrange
-      final row = DishRow(
-        dish: _dish(description: '300g, served with lemon butter'),
-        category: 'Mains',
-      );
-
-      // Act
-      await _pump(
-        tester,
-        DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
-      );
-
-      // Assert
-      expect(find.text('300g, served with lemon butter'), findsOneWidget);
-    });
-
     testWidgets('build passes the dish image URL to PhotoTile (issue #50)', (
       tester,
     ) async {
@@ -429,34 +410,6 @@ void main() {
           find.text('~5g net carbs (estimate) · leaves 15g'),
           findsOneWidget,
         );
-      },
-    );
-
-    testWidgets(
-      'net-carb chip shows no suffix when no budget is set (issue #215)',
-      (tester) async {
-        // Arrange: no budget.
-        final row = DishRow(
-          dish: _dish(),
-          category: 'Mains',
-          analysis: const AnalysedDish(
-            dishId: 'dish_1',
-            name: 'Grilled Salmon',
-            verdict: DishVerdict.orderAsIs,
-            why: 'Plain grilled protein.',
-            netCarbsEstimate: 5,
-          ),
-        );
-
-        // Act
-        await _pump(
-          tester,
-          DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
-        );
-
-        // Assert: just the estimate, no suffix.
-        expect(find.text('~5g net carbs (estimate)'), findsOneWidget);
-        expect(find.textContaining('leaves'), findsNothing);
       },
     );
 

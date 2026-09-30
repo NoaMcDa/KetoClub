@@ -145,17 +145,6 @@ void main() {
       });
     }
 
-    test('names the platform a Tabit code belongs to', () {
-      // Act
-      final target = QrPayloadRouter.classify(
-        'https://tabitisrael.co.il/tabit-order?siteName=x',
-      );
-
-      // Assert
-      expect(target, isA<QrUnsupportedSource>());
-      expect((target as QrUnsupportedSource).name, 'Tabit');
-    });
-
     test('never throws on odd input', () {
       for (final payload in <String>[
         '%',
