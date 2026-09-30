@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/classifier/menu_question_answerer.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
@@ -44,6 +45,10 @@ class AppDependencies {
   /// answers null with no plugin I/O and is unavailable, so the Scan tab
   /// hides its QR action, and a null key leaves the root navigator to
   /// `MaterialApp` (issue #182).
+  ///
+  /// [menuQuestionAnswerer] defaults to null: a caller that never uses the
+  /// question feature need not construct one, and `MenuController` hides the
+  /// action when it is absent.
   const new({
     required this.menuRepository,
     required this.menuClassifier,
@@ -64,6 +69,7 @@ class AppDependencies {
     this.pagePicker = const NoPagePicker(),
     this.qrScanner = const NoQrScanner(),
     this.navigatorKey,
+    this.menuQuestionAnswerer,
   });
 
   /// Loads a venue's menu, cache first (architecture.md §6.1).
@@ -156,4 +162,9 @@ class AppDependencies {
   /// the app's lifetime, so it is required rather than defaulted: a
   /// default would be a different registry for each caller.
   final ScannedPagesRegistry scannedPages;
+
+  /// Answers one free-text question about a menu that has already been
+  /// analysed (architecture.md §9.5; issue #214). Null when the question
+  /// feature is not wired — `MenuController` hides the action in that case.
+  final MenuQuestionAnswerer? menuQuestionAnswerer;
 }

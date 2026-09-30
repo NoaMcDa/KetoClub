@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/failures.dart';
+import 'package:ketoclub/models/menu_question.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 
@@ -288,5 +289,102 @@ void main() {
         expect(message, contains('(unexpected shape)'));
       });
     }
+  });
+
+  group('menuQuestionFailureMessage (architecture.md §9.5; issue #214)', () {
+    for (final locale in _locales) {
+      test('returns a non-empty message for every reason in $locale', () {
+        // Arrange
+        final l10n = lookupAppLocalizations(locale);
+
+        // Act & Assert
+        for (final reason in MenuQuestionFailureReason.values) {
+          expect(
+            menuQuestionFailureMessage(reason, l10n),
+            isNotEmpty,
+            reason: '$reason should have copy in ${locale.languageCode}',
+          );
+        }
+      });
+
+      test('9 of 10 question reasons have distinct copy in '
+          '${locale.languageCode} (badResponse and noDishesFound share)', () {
+        // Arrange: these two map to the same key by design — the "bad AI
+        // response" message covers both "model gave an unusable answer" and
+        // "no dishes found", which are indistinguishable from the user's
+        // perspective in the question context.
+        const sharedPair = {
+          MenuQuestionFailureReason.badResponse,
+          MenuQuestionFailureReason.noDishesFound,
+        };
+
+        final l10n = lookupAppLocalizations(locale);
+
+        // Act
+        final reasonsOutsidePair = MenuQuestionFailureReason.values
+            .where((r) => !sharedPair.contains(r))
+            .toList();
+        final messages = [
+          for (final r in reasonsOutsidePair)
+            menuQuestionFailureMessage(r, l10n),
+        ];
+
+        // Assert: the 8 outside-pair reasons all have distinct copy.
+        expect(
+          messages.toSet(),
+          hasLength(messages.length),
+          reason: 'every reason outside the shared pair must have its own copy',
+        );
+      });
+
+      test('badResponse and noDishesFound share a message in '
+          '${locale.languageCode} — this is intentional', () {
+        final l10n = lookupAppLocalizations(locale);
+
+        expect(
+          menuQuestionFailureMessage(
+            MenuQuestionFailureReason.badResponse,
+            l10n,
+          ),
+          equals(
+            menuQuestionFailureMessage(
+              MenuQuestionFailureReason.noDishesFound,
+              l10n,
+            ),
+          ),
+        );
+      });
+    }
+
+    group('question copy never duplicates analysis copy', () {
+      for (final locale in _locales) {
+        test('in ${locale.languageCode}: menuQuestion messages are distinct '
+            'from analysisFailureMessage messages', () {
+          // Arrange
+          final l10n = lookupAppLocalizations(locale);
+
+          final analysisMessages = {
+            for (final r in MenuAnalysisFailureReason.values)
+              analysisFailureMessage(r, l10n),
+          };
+          final questionMessages = [
+            for (final r in MenuQuestionFailureReason.values)
+              menuQuestionFailureMessage(r, l10n),
+          ];
+
+          // Assert: no question message appears in the analysis message set.
+          // (Architecture §10 — collapsing two message families is a bug.)
+          for (final msg in questionMessages) {
+            expect(
+              analysisMessages,
+              isNot(contains(msg)),
+              reason:
+                  '"$msg" must not appear in the analysis failure messages; '
+                  'each surface has its own copy',
+            );
+          }
+        });
+      }
+    });
   });
 }

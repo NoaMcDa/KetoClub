@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/llm_menu_classifier.dart';
+import 'package:ketoclub/services/classifier/llm_menu_question_answerer.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/scanned_classifier_router.dart';
 import 'package:ketoclub/services/classifier/vision_menu_classifier.dart';
@@ -198,8 +199,9 @@ AppDependencies buildDependencies() {
 
   const heuristic = HeuristicMenuClassifier(clock: clock);
   // One chat client for both engines that reach the model: the text
-  // classifier and the scan path's vision classifier (issue #89). Either
-  // way one request per menu or per scan (D6), against one quota.
+  // classifier, the scan path's vision classifier (issue #89), and the
+  // menu question answerer (issue #214). Each is one request per call,
+  // against the same quota (D6).
   final chatClient = chatClientFor(
     client: client,
     apiKeyStore: apiKeyStore,
@@ -207,6 +209,9 @@ AppDependencies buildDependencies() {
     installIdStore: installIdStore,
   );
   final llm = LlmMenuClassifier(chatClient, clock);
+  // The question answerer shares the same chat client (architecture.md D6,
+  // §9.5). One request per explicit user question, never automatic.
+  final menuQuestionAnswerer = LlmMenuQuestionAnswerer(chatClient);
   final settingsStore = PrefsSettingsStore(load: SharedPreferences.getInstance);
   // The scan path (issue #89, D15): consent and the connectivity
   // pre-check in front of the vision engine, which sends the pages over
@@ -281,6 +286,7 @@ AppDependencies buildDependencies() {
     // The rule engine on its own, for "Estimate this list" (issue #42,
     // D13): the explicit action must never reach the language model.
     estimateClassifier: heuristic,
+    menuQuestionAnswerer: menuQuestionAnswerer,
     settingsStore: settingsStore,
     notesStore: PrefsNotesStore(load: SharedPreferences.getInstance),
     clock: clock,

@@ -329,7 +329,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsConsentBody.
   ///
   /// In en, this message translates to:
-  /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.'**
+  /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.'**
   String get settingsConsentBody;
 
   /// No description provided for @settingsConsentAccept.
@@ -353,7 +353,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsConsentBodyDirect.
   ///
   /// In en, this message translates to:
-  /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.'**
+  /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.'**
   String get settingsConsentBodyDirect;
 
   /// No description provided for @settingsKeySection.
@@ -1753,6 +1753,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bar and coffee reference'**
   String get settingsDrinksGuideSubtitle;
+
+  /// No description provided for @actionAskAboutMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about this menu'**
+  String get actionAskAboutMenu;
+
+  /// No description provided for @menuQuestionSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about this menu'**
+  String get menuQuestionSheetTitle;
+
+  /// No description provided for @menuQuestionSheetHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Which dishes are dairy-free?'**
+  String get menuQuestionSheetHint;
+
+  /// No description provided for @menuQuestionSheetAsk.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask'**
+  String get menuQuestionSheetAsk;
+
+  /// No description provided for @menuQuestionSheetLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Asking…'**
+  String get menuQuestionSheetLoading;
+
+  /// No description provided for @menuQuestionSheetAskAnother.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask another question'**
+  String get menuQuestionSheetAskAnother;
+
+  /// No description provided for @menuQuestionFailedNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'AI is not available on this build, so the question could not be answered.'**
+  String get menuQuestionFailedNotConfigured;
+
+  /// No description provided for @menuQuestionFailedOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'You look offline. Reconnect and try asking again.'**
+  String get menuQuestionFailedOffline;
+
+  /// No description provided for @menuQuestionFailedTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI model was too slow. Try asking again.'**
+  String get menuQuestionFailedTimeout;
+
+  /// No description provided for @menuQuestionFailedRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'The daily AI limit is used up. Try again later.'**
+  String get menuQuestionFailedRateLimited;
+
+  /// No description provided for @menuQuestionFailedBadResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI gave an unusable answer. Try asking in a different way.'**
+  String get menuQuestionFailedBadResponse;
+
+  /// No description provided for @menuQuestionFailedBackendUnreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'KetoClub\'s server could not be reached. Try asking again.'**
+  String get menuQuestionFailedBackendUnreachable;
+
+  /// No description provided for @menuQuestionFailedConsentWithheld.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow AI analysis in Settings to ask questions about a menu.'**
+  String get menuQuestionFailedConsentWithheld;
+
+  /// No description provided for @menuQuestionFailedApiKeyMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your Gemini API key in Settings to ask questions about a menu.'**
+  String get menuQuestionFailedApiKeyMissing;
+
+  /// No description provided for @menuQuestionFailedApiKeyRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini rejected your API key. Check it in Settings, then try asking again.'**
+  String get menuQuestionFailedApiKeyRejected;
 }
 
 class _AppLocalizationsDelegate

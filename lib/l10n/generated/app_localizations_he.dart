@@ -136,7 +136,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settingsConsentBody =>
-      'ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות נשלחים לשרת של קטוקלאב, שמעביר אותם לניתוח ב‑Gemini API של Google. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.';
+      'ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות — וכל שאלה שאתם כותבים על תפריט — נשלחים לשרת של קטוקלאב, שמעביר אותם לניתוח ב‑Gemini API של Google. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.';
 
   @override
   String get settingsConsentAccept => 'אפשר ניתוח בינה מלאכותית';
@@ -149,7 +149,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settingsConsentBodyDirect =>
-      'ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות נשלחים ישירות מהמכשיר הזה ל‑Gemini API של Google, עם מפתח ה‑API שלכם. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.';
+      'ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות — וכל שאלה שאתם כותבים על תפריט — נשלחים ישירות מהמכשיר הזה ל‑Gemini API של Google, עם מפתח ה‑API שלכם. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.';
 
   @override
   String get settingsKeySection => 'מפתח Gemini API';
@@ -1058,4 +1058,58 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settingsDrinksGuideSubtitle => 'מדריך בר וקפה';
+
+  @override
+  String get actionAskAboutMenu => 'שאלו על התפריט הזה';
+
+  @override
+  String get menuQuestionSheetTitle => 'שאלו על התפריט הזה';
+
+  @override
+  String get menuQuestionSheetHint => 'לדוגמה: אילו מנות הן ללא מוצרי חלב?';
+
+  @override
+  String get menuQuestionSheetAsk => 'שאל';
+
+  @override
+  String get menuQuestionSheetLoading => 'שואל…';
+
+  @override
+  String get menuQuestionSheetAskAnother => 'שאלו שאלה נוספת';
+
+  @override
+  String get menuQuestionFailedNotConfigured =>
+      'בינה מלאכותית אינה זמינה בגרסה הזו, ולכן לא ניתן היה לענות על השאלה.';
+
+  @override
+  String get menuQuestionFailedOffline =>
+      'נראה שאינכם מחוברים. התחברו מחדש ונסו לשאול שוב.';
+
+  @override
+  String get menuQuestionFailedTimeout =>
+      'מודל הבינה המלאכותית היה איטי מדי. נסו לשאול שוב.';
+
+  @override
+  String get menuQuestionFailedRateLimited =>
+      'המגבלה היומית של הבינה המלאכותית נוצלה. נסו שוב מאוחר יותר.';
+
+  @override
+  String get menuQuestionFailedBadResponse =>
+      'הבינה המלאכותית החזירה תשובה לא שמישה. נסו לנסח את השאלה אחרת.';
+
+  @override
+  String get menuQuestionFailedBackendUnreachable =>
+      'לא ניתן היה להתחבר לשרת של קטוקלאב. נסו לשאול שוב.';
+
+  @override
+  String get menuQuestionFailedConsentWithheld =>
+      'אשרו ניתוח בינה מלאכותית בהגדרות כדי לשאול שאלות על תפריט.';
+
+  @override
+  String get menuQuestionFailedApiKeyMissing =>
+      'הוסיפו את מפתח ה‑Gemini API שלכם בהגדרות כדי לשאול שאלות על תפריט.';
+
+  @override
+  String get menuQuestionFailedApiKeyRejected =>
+      'Gemini דחתה את מפתח ה‑API שלכם. בדקו אותו בהגדרות ונסו לשאול שוב.';
 }
