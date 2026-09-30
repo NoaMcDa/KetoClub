@@ -11,6 +11,7 @@
   "actionBackToSearch": "חזרה לחיפוש",
   "offlineBannerMessage": "אין חיבור לאינטרנט.",
   "actionShareMenu": "שתף תפריט",
+  "actionOpenDrinksGuide": "מדריך שתייה",
   "actionCancel": "ביטול",
 
   "venueSearchLabel": "חיפוש מסעדה",
@@ -449,5 +450,12 @@
   },
   "hiddenCarbsSectionLabel": "פחמימות נסתרות אפשריות",
   "hiddenCarbsCertaintySuspected": "חשד",
-  "hiddenCarbsCertaintyLikely": "סביר"
+  "hiddenCarbsCertaintyLikely": "סביר",
+  "drinksGuideTitle": "מדריך שתייה",
+  "drinksGuideDisclaimer": "טווחי פחמימות נטו טיפוסיים למנה סטנדרטית. כל הנתונים הם הערכות — הערכים האמיתיים משתנים לפי מותג, גודל ומתכון.",
+  "drinksGuideSectionOrderAsIs": "להזמין כמו שזה",
+  "drinksGuideSectionSwap": "לבקש החלפה",
+  "drinksGuideSectionSkip": "לדלג",
+  "settingsDrinksGuideTitle": "מדריך שתייה",
+  "settingsDrinksGuideSubtitle": "מדריך בר וקפה"
 }

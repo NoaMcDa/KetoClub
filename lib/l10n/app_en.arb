@@ -11,6 +11,7 @@
   "actionBackToSearch": "Back to search",
   "offlineBannerMessage": "No internet connection.",
   "actionShareMenu": "Share menu",
+  "actionOpenDrinksGuide": "Drinks guide",
   "actionCancel": "Cancel",
 
   "venueSearchLabel": "Find a restaurant",
@@ -449,5 +450,12 @@
   },
   "hiddenCarbsSectionLabel": "Possible hidden carbs",
   "hiddenCarbsCertaintySuspected": "Suspected",
-  "hiddenCarbsCertaintyLikely": "Likely"
+  "hiddenCarbsCertaintyLikely": "Likely",
+  "drinksGuideTitle": "Drinks guide",
+  "drinksGuideDisclaimer": "Typical net-carb ranges per standard serving. All figures are estimates — actual values vary by brand, size, and recipe.",
+  "drinksGuideSectionOrderAsIs": "ORDER AS-IS",
+  "drinksGuideSectionSwap": "ASK FOR A SWAP",
+  "drinksGuideSectionSkip": "SKIP",
+  "settingsDrinksGuideTitle": "DRINKS GUIDE",
+  "settingsDrinksGuideSubtitle": "Bar and coffee reference"
 }

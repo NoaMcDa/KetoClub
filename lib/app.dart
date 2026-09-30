@@ -7,6 +7,7 @@ import 'package:flutter/material.dart' hide MenuController;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/drinks_guide_screen.dart';
 import 'package:ketoclub/screens/menu_screen.dart';
 import 'package:ketoclub/screens/saved_screen.dart';
 import 'package:ketoclub/screens/scan_screen.dart';
@@ -228,6 +229,16 @@ Route<void>? generateRoute(
           ),
           child: const SettingsScreen(),
         ),
+      ),
+    );
+  }
+
+  if (name == drinksRoutePath) {
+    return MaterialPageRoute<void>(
+      settings: settings,
+      builder: (_) => const AppShell(
+        currentIndex: AppShell.settingsIndex,
+        child: DrinksGuideScreen(),
       ),
     );
   }

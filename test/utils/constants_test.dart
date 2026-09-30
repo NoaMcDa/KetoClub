@@ -159,9 +159,9 @@ void main() {
   });
 
   group('carbModifiersEn', () {
-    test('has 62 triggers', () {
+    test('has 71 triggers', () {
       // Assert
-      expect(carbModifiersEn, hasLength(62));
+      expect(carbModifiersEn, hasLength(71));
     });
 
     test('every trigger maps to a non-empty sentence', () {
@@ -188,9 +188,9 @@ void main() {
   });
 
   group('carbModifiersHe', () {
-    test('has 80 triggers', () {
+    test('has 87 triggers', () {
       // Assert
-      expect(carbModifiersHe, hasLength(80));
+      expect(carbModifiersHe, hasLength(87));
     });
 
     test('every trigger maps to a non-empty sentence', () {
@@ -221,9 +221,9 @@ void main() {
   });
 
   group('nonKetoBasesEn', () {
-    test('has 100 triggers', () {
+    test('has 118 triggers', () {
       // Assert
-      expect(nonKetoBasesEn, hasLength(100));
+      expect(nonKetoBasesEn, hasLength(118));
     });
 
     test('carries the battered-fish phrases D-V2 alone would miss', () {
@@ -260,9 +260,9 @@ void main() {
   });
 
   group('nonKetoBasesHe', () {
-    test('has 116 triggers', () {
+    test('has 131 triggers', () {
       // Assert
-      expect(nonKetoBasesHe, hasLength(116));
+      expect(nonKetoBasesHe, hasLength(131));
     });
 
     test('has no duplicate triggers', () {

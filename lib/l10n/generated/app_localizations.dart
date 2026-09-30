@@ -158,6 +158,12 @@ abstract class AppLocalizations {
   /// **'Share menu'**
   String get actionShareMenu;
 
+  /// No description provided for @actionOpenDrinksGuide.
+  ///
+  /// In en, this message translates to:
+  /// **'Drinks guide'**
+  String get actionOpenDrinksGuide;
+
   /// No description provided for @actionCancel.
   ///
   /// In en, this message translates to:
@@ -1705,6 +1711,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Likely'**
   String get hiddenCarbsCertaintyLikely;
+
+  /// No description provided for @drinksGuideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Drinks guide'**
+  String get drinksGuideTitle;
+
+  /// No description provided for @drinksGuideDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Typical net-carb ranges per standard serving. All figures are estimates — actual values vary by brand, size, and recipe.'**
+  String get drinksGuideDisclaimer;
+
+  /// No description provided for @drinksGuideSectionOrderAsIs.
+  ///
+  /// In en, this message translates to:
+  /// **'ORDER AS-IS'**
+  String get drinksGuideSectionOrderAsIs;
+
+  /// No description provided for @drinksGuideSectionSwap.
+  ///
+  /// In en, this message translates to:
+  /// **'ASK FOR A SWAP'**
+  String get drinksGuideSectionSwap;
+
+  /// No description provided for @drinksGuideSectionSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'SKIP'**
+  String get drinksGuideSectionSkip;
+
+  /// No description provided for @settingsDrinksGuideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'DRINKS GUIDE'**
+  String get settingsDrinksGuideTitle;
+
+  /// No description provided for @settingsDrinksGuideSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bar and coffee reference'**
+  String get settingsDrinksGuideSubtitle;
 }
 
 class _AppLocalizationsDelegate
