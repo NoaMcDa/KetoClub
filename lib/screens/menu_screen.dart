@@ -17,12 +17,14 @@ import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
+import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
+import 'package:ketoclub/widgets/carb_budget_field.dart';
 import 'package:ketoclub/widgets/category_chips.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
@@ -428,6 +430,8 @@ class _MenuScreenState extends State<MenuScreen> {
           const SizedBox(height: 4),
           MenuSearchField(onChanged: controller.setQuery),
           const SizedBox(height: 8),
+          CarbBudgetField(isBudgetAvailable: controller.isBudgetAvailable),
+          const SizedBox(height: 8),
           if (analysed) ...[
             const SizedBox(height: 8),
             VerdictCounterTiles(
@@ -712,6 +716,7 @@ class _MenuScreenState extends State<MenuScreen> {
   /// next to the control it undoes.
   Widget _noVisibleRows(AppLocalizations l10n, MenuController controller) {
     final canClearFilter = controller.filter != MenuFilter.all;
+    final hasBudget = context.read<CarbBudgetController>().hasBudget;
     return Center(
       child: Padding(
         padding: const EdgeInsets.only(top: 12),
@@ -719,11 +724,13 @@ class _MenuScreenState extends State<MenuScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(l10n.menuNoResults, textAlign: TextAlign.center),
-            if (canClearFilter) ...[
+            if (canClearFilter || hasBudget) ...[
               const SizedBox(height: 12),
               OutlinedButton(
-                onPressed: () =>
-                    unawaited(controller.setFilter(MenuFilter.all)),
+                onPressed: () {
+                  unawaited(controller.setFilter(MenuFilter.all));
+                  context.read<CarbBudgetController>().clear();
+                },
                 child: Text(l10n.menuClearFilter),
               ),
             ],

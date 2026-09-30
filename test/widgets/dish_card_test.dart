@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/price_format.dart';
@@ -10,23 +11,29 @@ import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
+import 'package:provider/provider.dart';
 
 /// Pumps [child] inside a localised [MaterialApp] and a [Scaffold], the
 /// shape every widget test in `test/widgets/` uses. [theme] defaults to
 /// null, the bare-[MaterialApp] shape most of this file's tests use.
+/// [carbBudget] defaults to a fresh controller with no budget set.
 Future<void> _pump(
   WidgetTester tester,
   Widget child, {
   Locale locale = const Locale('en'),
   ThemeData? theme,
+  CarbBudgetController? carbBudget,
 }) {
   return tester.pumpWidget(
-    MaterialApp(
-      theme: theme,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      locale: locale,
-      home: Scaffold(body: child),
+    ChangeNotifierProvider<CarbBudgetController>.value(
+      value: carbBudget ?? CarbBudgetController(),
+      child: MaterialApp(
+        theme: theme,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: locale,
+        home: Scaffold(body: child),
+      ),
     ),
   );
 }
@@ -391,6 +398,68 @@ void main() {
       },
     );
 
+    testWidgets(
+      'net-carb chip shows the "leaves N g" suffix when a budget is set '
+      '(issue #215)',
+      (tester) async {
+        // Arrange: a 5 g dish with a 20 g budget → leaves 15 g.
+        final budget = CarbBudgetController()..setBudget(20);
+        addTearDown(budget.dispose);
+        final row = DishRow(
+          dish: _dish(),
+          category: 'Mains',
+          analysis: const AnalysedDish(
+            dishId: 'dish_1',
+            name: 'Grilled Salmon',
+            verdict: DishVerdict.orderAsIs,
+            why: 'Plain grilled protein.',
+            netCarbsEstimate: 5,
+          ),
+        );
+
+        // Act
+        await _pump(
+          tester,
+          DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+          carbBudget: budget,
+        );
+
+        // Assert: the chip text includes both the estimate and the suffix.
+        expect(
+          find.text('~5g net carbs (estimate) · leaves 15g'),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'net-carb chip shows no suffix when no budget is set (issue #215)',
+      (tester) async {
+        // Arrange: no budget.
+        final row = DishRow(
+          dish: _dish(),
+          category: 'Mains',
+          analysis: const AnalysedDish(
+            dishId: 'dish_1',
+            name: 'Grilled Salmon',
+            verdict: DishVerdict.orderAsIs,
+            why: 'Plain grilled protein.',
+            netCarbsEstimate: 5,
+          ),
+        );
+
+        // Act
+        await _pump(
+          tester,
+          DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+        );
+
+        // Assert: just the estimate, no suffix.
+        expect(find.text('~5g net carbs (estimate)'), findsOneWidget);
+        expect(find.textContaining('leaves'), findsNothing);
+      },
+    );
+
     testWidgets('build paints a green row on VerdictColors.green.tint, per the '
         'artboard verdictStyles table', (tester) async {
       // Arrange
@@ -500,20 +569,23 @@ void main() {
 
         // Act
         await tester.pumpWidget(
-          MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(
-              body: Builder(
-                builder: (context) => MediaQuery(
-                  data: MediaQuery.of(context)
-                      .copyWith(textScaler: const TextScaler.linear(2)),
-                  child: SingleChildScrollView(
-                    child: DishCard(
-                      row: row,
-                      localeTag: 'en',
-                      onShowScript: (_) {},
-                      onEditNote: (_) {},
+          ChangeNotifierProvider<CarbBudgetController>.value(
+            value: CarbBudgetController(),
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: Builder(
+                  builder: (context) => MediaQuery(
+                    data: MediaQuery.of(context)
+                        .copyWith(textScaler: const TextScaler.linear(2)),
+                    child: SingleChildScrollView(
+                      child: DishCard(
+                        row: row,
+                        localeTag: 'en',
+                        onShowScript: (_) {},
+                        onEditNote: (_) {},
+                      ),
                     ),
                   ),
                 ),

@@ -13,6 +13,7 @@ import 'package:ketoclub/screens/scan_screen.dart';
 import 'package:ketoclub/screens/settings_screen.dart';
 import 'package:ketoclub/screens/venue_search_screen.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
+import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/state/saved_controller.dart';
@@ -53,6 +54,7 @@ class KetoClubApp extends StatefulWidget {
 class _KetoClubAppState extends State<KetoClubApp> {
   late final LocaleController _localeController;
   late final ThemeModeController _themeModeController;
+  late final CarbBudgetController _carbBudget;
 
   @override
   void initState() {
@@ -61,6 +63,7 @@ class _KetoClubAppState extends State<KetoClubApp> {
     _themeModeController = ThemeModeController(
       widget.dependencies.settingsStore,
     );
+    _carbBudget = CarbBudgetController();
     // Fire-and-forget: the first frame renders in the device locale (and,
     // for appearance, ThemeMode.system) and flips once each resolves
     // (LocaleController's and ThemeModeController's class docs, issue #8,
@@ -73,6 +76,7 @@ class _KetoClubAppState extends State<KetoClubApp> {
   void dispose() {
     _localeController.dispose();
     _themeModeController.dispose();
+    _carbBudget.dispose();
     super.dispose();
   }
 
@@ -92,6 +96,7 @@ class _KetoClubAppState extends State<KetoClubApp> {
         ChangeNotifierProvider<ThemeModeController>.value(
           value: _themeModeController,
         ),
+        ChangeNotifierProvider<CarbBudgetController>.value(value: _carbBudget),
       ],
       child: AnimatedBuilder(
         animation: Listenable.merge([_localeController, _themeModeController]),
@@ -231,12 +236,13 @@ Route<void>? generateRoute(
   if (ref != null) {
     return MaterialPageRoute<void>(
       settings: settings,
-      builder: (_) => ChangeNotifierProvider<MenuController>(
+      builder: (context) => ChangeNotifierProvider<MenuController>(
         create: (_) => MenuController(
           dependencies.menuRepository,
           dependencies.menuClassifier,
           dependencies.settingsStore,
           dependencies.notesStore,
+          context.read<CarbBudgetController>(),
         ),
         child: MenuScreen(
           ref: ref,

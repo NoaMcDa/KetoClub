@@ -437,5 +437,14 @@
   "@scanQrUnsupportedSource": {
     "placeholders": { "name": { "type": "String" } }
   },
-  "scanQrPhotographInstead": "This QR code does not lead to a menu KetoClub can read. Photograph the menu instead."
+  "scanQrPhotographInstead": "This QR code does not lead to a menu KetoClub can read. Photograph the menu instead.",
+
+  "carbBudgetFieldLabel": "Budget for tonight (g)",
+  "carbBudgetFieldHint": "e.g. 20",
+  "carbBudgetFieldClear": "Clear budget",
+  "carbBudgetDisabledReason": "Set a budget after AI analysis — rule-based results have no carb estimates.",
+  "netCarbsChipLeavesSuffix": " · leaves {grams}g",
+  "@netCarbsChipLeavesSuffix": {
+    "placeholders": { "grams": { "type": "int" } }
+  }
 }

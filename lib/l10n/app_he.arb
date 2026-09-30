@@ -437,5 +437,14 @@
   "@scanQrUnsupportedSource": {
     "placeholders": { "name": { "type": "String" } }
   },
-  "scanQrPhotographInstead": "קוד ה-QR הזה לא מוביל לתפריט שקטוקלאב יכולה לקרוא. צלמו את התפריט במקום."
+  "scanQrPhotographInstead": "קוד ה-QR הזה לא מוביל לתפריט שקטוקלאב יכולה לקרוא. צלמו את התפריט במקום.",
+
+  "carbBudgetFieldLabel": "תקציב הפחמימות הלילה (גרם)",
+  "carbBudgetFieldHint": "לדוגמה: 20",
+  "carbBudgetFieldClear": "נקה תקציב",
+  "carbBudgetDisabledReason": "קבעו תקציב לאחר ניתוח בינה מלאכותית — לתוצאות על בסיס כללים אין הערכת פחמימות.",
+  "netCarbsChipLeavesSuffix": " · נשאר {grams} גרם",
+  "@netCarbsChipLeavesSuffix": {
+    "placeholders": { "grams": { "type": "int" } }
+  }
 }

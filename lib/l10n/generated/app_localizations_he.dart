@@ -1006,4 +1006,22 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get scanQrPhotographInstead =>
       'קוד ה-QR הזה לא מוביל לתפריט שקטוקלאב יכולה לקרוא. צלמו את התפריט במקום.';
+
+  @override
+  String get carbBudgetFieldLabel => 'תקציב הפחמימות הלילה (גרם)';
+
+  @override
+  String get carbBudgetFieldHint => 'לדוגמה: 20';
+
+  @override
+  String get carbBudgetFieldClear => 'נקה תקציב';
+
+  @override
+  String get carbBudgetDisabledReason =>
+      'קבעו תקציב לאחר ניתוח בינה מלאכותית — לתוצאות על בסיס כללים אין הערכת פחמימות.';
+
+  @override
+  String netCarbsChipLeavesSuffix(int grams) {
+    return ' · נשאר $grams גרם';
+  }
 }

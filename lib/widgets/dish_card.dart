@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/price_format.dart';
@@ -8,6 +9,7 @@ import 'package:ketoclub/widgets/content_direction.dart';
 import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
+import 'package:provider/provider.dart';
 
 /// One menu row: the dish, its price, and its verdict once analysed
 /// (architecture.md §6.6), styled per verdict from the artboard's
@@ -95,6 +97,10 @@ class _DishCardState extends State<DishCard> {
         ? (_nonBlank(analysis?.modification) ?? l10n.dishCardScriptFallback)
         : null;
     final netCarbs = analysis?.netCarbsEstimate;
+    final budget = context.watch<CarbBudgetController>().budgetGrams;
+    final leavesGrams = (budget != null && netCarbs != null)
+        ? budget - netCarbs.round()
+        : null;
     final neutralSurfaces = NeutralSurfaces.of(context);
     final ambient = Directionality.of(context);
 
@@ -159,6 +165,7 @@ class _DishCardState extends State<DishCard> {
                 estimate: netCarbs,
                 tone: tone,
                 background: _carbChipBackground(theme, verdict, tone),
+                leavesGrams: leavesGrams,
               ),
           ],
         ),
@@ -300,6 +307,7 @@ class _NetCarbsChip extends StatelessWidget {
     required this.estimate,
     required this.tone,
     required this.background,
+    this.leavesGrams,
   });
 
   /// The raw estimate in grams, from the LLM engine only
@@ -313,10 +321,20 @@ class _NetCarbsChip extends StatelessWidget {
   /// This chip's background, from [_carbChipBackground].
   final Color background;
 
+  /// How many grams remain in the budget after this dish, when a budget is
+  /// set. Shown as a suffix inside the chip: "~3g net carbs · leaves 5g".
+  /// Null when no budget is active.
+  final int? leavesGrams;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final grams = estimate.round().toString();
+    final leaves = leavesGrams;
+    final label = leaves != null
+        ? '${l10n.netCarbsChipLabel(grams)}'
+              '${l10n.netCarbsChipLeavesSuffix(leaves)}'
+        : l10n.netCarbsChipLabel(grams);
     return Semantics(
       label: l10n.netCarbsChipSemanticLabel(grams),
       excludeSemantics: true,
@@ -328,7 +346,7 @@ class _NetCarbsChip extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
           child: Text(
-            l10n.netCarbsChipLabel(grams),
+            label,
             style: TextStyle(
               fontSize: 11.5,
               fontWeight: FontWeight.w700,
