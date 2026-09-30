@@ -18,6 +18,7 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 
@@ -84,7 +85,13 @@ void main() {
       settings = FakeSettingsStore();
       notes = FakeNotesStore();
       clock = FakeClock(DateTime.utc(2026));
-      controller = MenuController(repository, classifier, settings, notes);
+      controller = MenuController(
+        repository,
+        classifier,
+        settings,
+        notes,
+        CarbBudgetController(),
+      );
     });
 
     test(
@@ -543,7 +550,13 @@ void main() {
       settings = FakeSettingsStore(
         initial: const AppSettings(filter: MenuFilter.greenOnly),
       );
-      controller = MenuController(repository, classifier, settings, notes);
+      controller = MenuController(
+        repository,
+        classifier,
+        settings,
+        notes,
+        CarbBudgetController(),
+      );
       repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
 
       // Act
@@ -562,7 +575,13 @@ void main() {
           lastFilter: MenuFilter.redOnly,
         ),
       );
-      controller = MenuController(repository, classifier, settings, notes);
+      controller = MenuController(
+        repository,
+        classifier,
+        settings,
+        notes,
+        CarbBudgetController(),
+      );
       repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
 
       // Act
@@ -579,7 +598,13 @@ void main() {
         settings = FakeSettingsStore(
           initial: const AppSettings(filter: MenuFilter.yellowOnly),
         );
-        controller = MenuController(repository, classifier, settings, notes);
+        controller = MenuController(
+          repository,
+          classifier,
+          settings,
+          notes,
+          CarbBudgetController(),
+        );
         repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
 
         // Act
@@ -635,7 +660,13 @@ void main() {
         'ClassificationOptions', () async {
       // Arrange
       settings = FakeSettingsStore();
-      controller = MenuController(repository, classifier, settings, notes);
+      controller = MenuController(
+        repository,
+        classifier,
+        settings,
+        notes,
+        CarbBudgetController(),
+      );
       repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
 
       // Act
@@ -1657,6 +1688,7 @@ void main() {
         classifier,
         settings,
         FakeNotesStore(),
+        CarbBudgetController(),
       );
     });
 
@@ -1684,6 +1716,7 @@ void main() {
         classifier,
         settings,
         FakeNotesStore(),
+        CarbBudgetController(),
       );
       await reopened.open(_ref);
 
@@ -1708,6 +1741,7 @@ void main() {
         classifier,
         settings,
         FakeNotesStore(),
+        CarbBudgetController(),
       );
       await reopened.open(_ref);
 
@@ -1809,6 +1843,7 @@ void main() {
         classifier,
         settings,
         FakeNotesStore(),
+        CarbBudgetController(),
       );
     });
 
@@ -1909,8 +1944,13 @@ void main() {
 
     /// A fresh controller over the shared repository, as a new visit to
     /// the menu screen would build.
-    MenuController newController() =>
-        MenuController(repository, classifier, settings, FakeNotesStore());
+    MenuController newController() => MenuController(
+      repository,
+      classifier,
+      settings,
+      FakeNotesStore(),
+      CarbBudgetController(),
+    );
 
     test('open passes every toggle on as its prompt fragment, in the fixed '
         'order', () async {
@@ -2073,6 +2113,7 @@ void main() {
         classifier,
         settings,
         FakeNotesStore(),
+        CarbBudgetController(),
       );
 
       // Act
@@ -2098,6 +2139,7 @@ void main() {
         ),
         settings,
         FakeNotesStore(),
+        CarbBudgetController(),
       );
 
       // Act
@@ -2119,6 +2161,279 @@ void main() {
         (dish) => dish.name == 'Spaghetti Carbonara',
       );
       expect(carbonara.verdict, DishVerdict.nonKeto);
+    });
+  });
+
+  // ── Carb budget (issue #215) ────────────────────────────────────────────
+
+  group('MenuController carb budget (issue #215)', () {
+    const steak = Dish(
+      id: 'steak',
+      name: 'Herb Butter Steak',
+      description: '',
+      price: 42,
+      options: <DishOption>[],
+    );
+    const salad = Dish(
+      id: 'salad',
+      name: 'Caesar Salad',
+      description: '',
+      price: 28,
+      options: <DishOption>[],
+    );
+    final menu = Menu(
+      venueRef: _ref,
+      currency: 'ILS',
+      fetchedAt: DateTime.utc(2026),
+      categories: const <MenuCategory>[
+        MenuCategory(id: 'c1', name: 'Mains', dishes: [steak, salad]),
+      ],
+    );
+    final analysisWithEstimates = MenuAnalysed(
+      dishes: const [
+        AnalysedDish(
+          dishId: 'steak',
+          name: 'Herb Butter Steak',
+          verdict: DishVerdict.orderAsIs,
+          why: 'Protein and fat.',
+          netCarbsEstimate: 2,
+        ),
+        AnalysedDish(
+          dishId: 'salad',
+          name: 'Caesar Salad',
+          verdict: DishVerdict.orderAsIs,
+          why: 'Mostly greens.',
+          netCarbsEstimate: 8,
+        ),
+      ],
+      unclassified: const <String>[],
+      engine: const LlmEngine(model: 'test-model'),
+      analysedAt: DateTime.utc(2026),
+      options: const AnalysisOptionsSnapshot(netCarbLimitGrams: 6),
+    );
+
+    late FakeMenuRepository repository;
+    late FakeMenuClassifier classifier;
+    late FakeSettingsStore settings;
+    late CarbBudgetController budget;
+    late MenuController controller;
+
+    setUp(() {
+      repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: menu))
+        ..seedCache(CachedMenu(menu: menu, analysis: analysisWithEstimates));
+      classifier = FakeMenuClassifier()
+        ..derivedEngine = const LlmEngine(model: 'test-model');
+      settings = FakeSettingsStore();
+      budget = CarbBudgetController();
+      controller = MenuController(
+        repository,
+        classifier,
+        settings,
+        FakeNotesStore(),
+        budget,
+      );
+    });
+
+    tearDown(() {
+      budget.dispose();
+      controller.dispose();
+    });
+
+    test('isBudgetAvailable is false before any analysis', () {
+      expect(controller.isBudgetAvailable, isFalse);
+    });
+
+    test('isBudgetAvailable is true after an LLM analysis and false after a '
+        'rules analysis', () async {
+      await controller.open(_ref);
+      // The cache holds an LLM analysis so isBudgetAvailable is true.
+      expect(controller.isBudgetAvailable, isTrue);
+
+      // Disable consent so the rules engine answers on the next open.
+      await settings.write(const AppSettings(estimationConsentGiven: false));
+      final rulesController = MenuController(
+        FakeMenuRepository()..stub(_ref, MenuFetched(menu: menu)),
+        FakeMenuClassifier(),
+        settings,
+        FakeNotesStore(),
+        CarbBudgetController(),
+      );
+      addTearDown(rulesController.dispose);
+      await rulesController.open(_ref);
+      expect(rulesController.isBudgetAvailable, isFalse);
+    });
+
+    test(
+      'setting a budget filters out dishes whose estimate exceeds it',
+      () async {
+        await controller.open(_ref);
+        // Both dishes visible with no budget.
+        expect(controller.visibleRows, hasLength(2));
+
+        // Set a 5 g budget: only steak (2 g) survives; salad (8 g) is hidden.
+        budget.setBudget(5);
+        expect(controller.visibleRows, hasLength(1));
+        expect(controller.visibleRows.single.dish.id, equals('steak'));
+      },
+    );
+
+    test(
+      'a dish without a netCarbsEstimate is never filtered out by the budget',
+      () async {
+        // Replace the analysis with one that has no estimate on the steak.
+        final analysisNoEstimate = MenuAnalysed(
+          dishes: const [
+            AnalysedDish(
+              dishId: 'steak',
+              name: 'Herb Butter Steak',
+              verdict: DishVerdict.orderAsIs,
+              why: 'Protein.',
+            ),
+          ],
+          unclassified: const <String>[],
+          engine: const LlmEngine(model: 'test-model'),
+          analysedAt: DateTime.utc(2026),
+          options: const AnalysisOptionsSnapshot(netCarbLimitGrams: 6),
+        );
+        final r = FakeMenuRepository()
+          ..stub(
+            _ref,
+            MenuFetched(
+              menu: Menu(
+                venueRef: _ref,
+                currency: 'ILS',
+                fetchedAt: DateTime.utc(2026),
+                categories: const [
+                  MenuCategory(id: 'c1', name: 'Mains', dishes: [steak]),
+                ],
+              ),
+            ),
+          )
+          ..seedCache(
+            CachedMenu(
+              menu: Menu(
+                venueRef: _ref,
+                currency: 'ILS',
+                fetchedAt: DateTime.utc(2026),
+                categories: const [
+                  MenuCategory(id: 'c1', name: 'Mains', dishes: [steak]),
+                ],
+              ),
+              analysis: analysisNoEstimate,
+            ),
+          );
+        final c = MenuController(
+          r,
+          FakeMenuClassifier(),
+          FakeSettingsStore(),
+          FakeNotesStore(),
+          budget,
+        );
+        addTearDown(c.dispose);
+        await c.open(_ref);
+
+        budget.setBudget(1); // Budget of 1g — would filter steak if estimated.
+        expect(c.visibleRows, hasLength(1)); // Steak has no estimate → passes.
+      },
+    );
+
+    test(
+      'changing the budget notifies without calling the classifier',
+      () async {
+        await controller.open(_ref);
+        final callsBefore = classifier.calls.length;
+        var notified = 0;
+        controller.addListener(() => notified++);
+
+        budget.setBudget(10);
+
+        expect(notified, equals(1));
+        expect(classifier.calls, hasLength(callsBefore)); // No new call.
+      },
+    );
+
+    test('budget composes with the verdict filter: both must match', () async {
+      // Add a yellow dish with a high carb estimate.
+      const pasta = Dish(
+        id: 'pasta',
+        name: 'Pasta',
+        description: '',
+        price: 35,
+        options: <DishOption>[],
+      );
+      final mixedMenu = Menu(
+        venueRef: _ref,
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: const [
+          MenuCategory(id: 'c1', name: 'Mains', dishes: [steak, salad, pasta]),
+        ],
+      );
+      final mixedAnalysis = MenuAnalysed(
+        dishes: const [
+          AnalysedDish(
+            dishId: 'steak',
+            name: 'Herb Butter Steak',
+            verdict: DishVerdict.orderAsIs,
+            why: 'Protein.',
+            netCarbsEstimate: 2,
+          ),
+          AnalysedDish(
+            dishId: 'salad',
+            name: 'Caesar Salad',
+            verdict: DishVerdict.modifiable,
+            why: 'Mostly greens.',
+            modification: 'No croutons.',
+            netCarbsEstimate: 8,
+          ),
+          AnalysedDish(
+            dishId: 'pasta',
+            name: 'Pasta',
+            verdict: DishVerdict.nonKeto,
+            why: 'Pasta.',
+          ),
+        ],
+        unclassified: const <String>[],
+        engine: const LlmEngine(model: 'test-model'),
+        analysedAt: DateTime.utc(2026),
+        options: const AnalysisOptionsSnapshot(netCarbLimitGrams: 6),
+      );
+      final r = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: mixedMenu))
+        ..seedCache(CachedMenu(menu: mixedMenu, analysis: mixedAnalysis));
+      final c = MenuController(
+        r,
+        FakeMenuClassifier(),
+        FakeSettingsStore(),
+        FakeNotesStore(),
+        budget,
+      );
+      addTearDown(c.dispose);
+      await c.open(_ref);
+
+      // Filter to green-only AND set a 5 g budget.
+      await c.setFilter(MenuFilter.greenOnly);
+      budget.setBudget(5);
+
+      // Only steak matches both: green and ≤ 5 g.
+      expect(c.visibleRows, hasLength(1));
+      expect(c.visibleRows.single.dish.id, equals('steak'));
+    });
+
+    test('setting the budget never triggers a new classifier call '
+        '(no-persistence contract, issue #215)', () async {
+      await controller.open(_ref);
+      // Record the write count after open (open does one settings write
+      // to persist lastVenue).
+      final writesAfterOpen = settings.writeCallCount;
+
+      budget.setBudget(42);
+
+      // No new classifier call.
+      expect(classifier.calls, isEmpty);
+      // No new settings write — the budget is not persisted.
+      expect(settings.writeCallCount, equals(writesAfterOpen));
     });
   });
 }

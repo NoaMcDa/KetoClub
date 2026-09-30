@@ -27,6 +27,7 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
+import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/theme/app_theme.dart';
@@ -104,11 +105,13 @@ MenuController _controllerFor({
   FakeMenuClassifier? classifier,
   FakeSettingsStore? settings,
   FakeNotesStore? notes,
+  CarbBudgetController? carbBudget,
 }) => MenuController(
   repository,
   classifier ?? FakeMenuClassifier(),
   settings ?? FakeSettingsStore(),
   notes ?? FakeNotesStore(),
+  carbBudget ?? CarbBudgetController(),
 );
 
 /// Gives the test surface a phone-tall viewport for the rest of the test.
@@ -176,29 +179,38 @@ Future<void> _pump(
   ThemeData? theme,
   String? venueNameHint,
   ScannedPagesRegistry? scannedPages,
+  CarbBudgetController? carbBudget,
 }) {
   _useTallSurface(tester);
+  final budgetController = carbBudget ?? CarbBudgetController();
   return tester.pumpWidget(
-    MaterialApp(
-      theme: theme,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      locale: locale,
-      home: ChangeNotifierProvider<MenuController>.value(
-        value: controller,
-        // Keyed by ref so that a test pumping a second ref onto the same
-        // tree slot (the platform-name loop test) mounts a fresh
-        // MenuScreen — and so runs initState's open() again — rather than
-        // Flutter updating the previous element in place.
-        child: MenuScreen(
-          key: ValueKey(ref.cacheKey),
-          ref: ref,
-          screenBrightness: screenBrightness ?? FakeScreenBrightness(),
-          connectivity: connectivity ?? FakeConnectivity(),
-          externalLinkOpener: externalLinkOpener ?? FakeExternalLinkOpener(),
-          menuSharer: menuSharer ?? FakeMenuSharer(),
-          venueNameHint: venueNameHint,
-          scannedPages: scannedPages,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<CarbBudgetController>.value(
+          value: budgetController,
+        ),
+      ],
+      child: MaterialApp(
+        theme: theme,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: locale,
+        home: ChangeNotifierProvider<MenuController>.value(
+          value: controller,
+          // Keyed by ref so that a test pumping a second ref onto the same
+          // tree slot (the platform-name loop test) mounts a fresh
+          // MenuScreen — and so runs initState's open() again — rather
+          // than Flutter updating the previous element in place.
+          child: MenuScreen(
+            key: ValueKey(ref.cacheKey),
+            ref: ref,
+            screenBrightness: screenBrightness ?? FakeScreenBrightness(),
+            connectivity: connectivity ?? FakeConnectivity(),
+            externalLinkOpener: externalLinkOpener ?? FakeExternalLinkOpener(),
+            menuSharer: menuSharer ?? FakeMenuSharer(),
+            venueNameHint: venueNameHint,
+            scannedPages: scannedPages,
+          ),
         ),
       ),
     ),
@@ -218,26 +230,33 @@ Future<void> _pumpWithRoutes(
 }) {
   _useTallSurface(tester);
   return tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: ChangeNotifierProvider<MenuController>.value(
-        value: controller,
-        child: MenuScreen(
-          ref: _ref,
-          screenBrightness: FakeScreenBrightness(),
-          connectivity: connectivity ?? FakeConnectivity(),
-          externalLinkOpener: FakeExternalLinkOpener(),
-          menuSharer: menuSharer ?? FakeMenuSharer(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<CarbBudgetController>.value(
+          value: CarbBudgetController(),
         ),
+      ],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: ChangeNotifierProvider<MenuController>.value(
+          value: controller,
+          child: MenuScreen(
+            ref: _ref,
+            screenBrightness: FakeScreenBrightness(),
+            connectivity: connectivity ?? FakeConnectivity(),
+            externalLinkOpener: FakeExternalLinkOpener(),
+            menuSharer: menuSharer ?? FakeMenuSharer(),
+          ),
+        ),
+        onGenerateRoute: (settings) {
+          pushedNames.add(settings.name ?? '');
+          return MaterialPageRoute<void>(
+            builder: (_) => const SizedBox.shrink(),
+            settings: settings,
+          );
+        },
       ),
-      onGenerateRoute: (settings) {
-        pushedNames.add(settings.name ?? '');
-        return MaterialPageRoute<void>(
-          builder: (_) => const SizedBox.shrink(),
-          settings: settings,
-        );
-      },
     ),
   );
 }
@@ -943,14 +962,21 @@ void main() {
         );
         rootKey.currentState!.push(
           MaterialPageRoute<void>(
-            builder: (_) => ChangeNotifierProvider<MenuController>.value(
-              value: controller,
-              child: MenuScreen(
-                ref: _ref,
-                screenBrightness: FakeScreenBrightness(),
-                connectivity: FakeConnectivity(),
-                externalLinkOpener: FakeExternalLinkOpener(),
-                menuSharer: FakeMenuSharer(),
+            builder: (_) => MultiProvider(
+              providers: [
+                ChangeNotifierProvider<CarbBudgetController>(
+                  create: (_) => CarbBudgetController(),
+                ),
+              ],
+              child: ChangeNotifierProvider<MenuController>.value(
+                value: controller,
+                child: MenuScreen(
+                  ref: _ref,
+                  screenBrightness: FakeScreenBrightness(),
+                  connectivity: FakeConnectivity(),
+                  externalLinkOpener: FakeExternalLinkOpener(),
+                  menuSharer: FakeMenuSharer(),
+                ),
               ),
             ),
           ),
@@ -986,30 +1012,37 @@ void main() {
         // onGenerateInitialRoutes makes MenuScreen the only route on the
         // stack, so there is nothing for Back to search to pop back to.
         await tester.pumpWidget(
-          MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            onGenerateInitialRoutes: (_) => [
-              MaterialPageRoute<void>(
-                builder: (_) => ChangeNotifierProvider<MenuController>.value(
-                  value: controller,
-                  child: MenuScreen(
-                    ref: _ref,
-                    screenBrightness: FakeScreenBrightness(),
-                    connectivity: FakeConnectivity(),
-                    externalLinkOpener: FakeExternalLinkOpener(),
-                    menuSharer: FakeMenuSharer(),
-                  ),
-                ),
+          MultiProvider(
+            providers: [
+              ChangeNotifierProvider<CarbBudgetController>(
+                create: (_) => CarbBudgetController(),
               ),
             ],
-            onGenerateRoute: (settings) {
-              pushedNames.add(settings.name ?? '');
-              return MaterialPageRoute<void>(
-                builder: (_) => const Text('root'),
-                settings: settings,
-              );
-            },
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              onGenerateInitialRoutes: (_) => [
+                MaterialPageRoute<void>(
+                  builder: (_) => ChangeNotifierProvider<MenuController>.value(
+                    value: controller,
+                    child: MenuScreen(
+                      ref: _ref,
+                      screenBrightness: FakeScreenBrightness(),
+                      connectivity: FakeConnectivity(),
+                      externalLinkOpener: FakeExternalLinkOpener(),
+                      menuSharer: FakeMenuSharer(),
+                    ),
+                  ),
+                ),
+              ],
+              onGenerateRoute: (settings) {
+                pushedNames.add(settings.name ?? '');
+                return MaterialPageRoute<void>(
+                  builder: (_) => const Text('root'),
+                  settings: settings,
+                );
+              },
+            ),
           ),
         );
         await tester.pumpAndSettle();

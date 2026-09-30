@@ -9,6 +9,7 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/keto_score.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
@@ -92,12 +93,31 @@ final class MenuController extends ChangeNotifier {
   /// `Menu.fetchedAt`, `analysedAt` from the classifier — so a clock here
   /// would be a dependency nothing reads. Rendering "4 min ago" from
   /// [fetchedAt] is left to whoever displays it, against its own clock.
-  new(this._repository, this._classifier, this._settings, this._notes);
+  new(
+    this._repository,
+    this._classifier,
+    this._settings,
+    this._notes,
+    this._carbBudget,
+  ) {
+    _carbBudget.addListener(_onBudgetChange);
+  }
 
   final MenuRepository _repository;
   final MenuClassifier _classifier;
   final SettingsStore _settings;
   final NotesStore _notes;
+  final CarbBudgetController _carbBudget;
+
+  @override
+  void dispose() {
+    _carbBudget.removeListener(_onBudgetChange);
+    super.dispose();
+  }
+
+  /// Called when the budget changes; re-filters the visible rows by
+  /// notifying listeners. Never re-classifies.
+  void _onBudgetChange() => notifyListeners();
 
   LoadPhase _phase = LoadPhase.idle;
   Menu? _menu;
@@ -247,6 +267,14 @@ final class MenuController extends ChangeNotifier {
     return currentAnalysis is MenuAnalysed ? currentAnalysis.engine : null;
   }
 
+  /// Whether the carb budget can meaningfully filter the current analysis.
+  ///
+  /// True only when [analysis] is a [MenuAnalysed] produced by the LLM
+  /// engine — the rule engine never sets [AnalysedDish.netCarbsEstimate],
+  /// so a budget would silently pass every dish and mislead the user.
+  bool get isBudgetAvailable =>
+      _analysis is MenuAnalysed && engine is LlmEngine;
+
   /// Which verdicts [visibleRows] keeps.
   MenuFilter get filter => _filter;
 
@@ -300,6 +328,7 @@ final class MenuController extends ChangeNotifier {
         final verdict = analysedById[dish.id];
         if (!_matchesFilter(verdict)) continue;
         if (!_matchesQuery(dish, normalisedQuery)) continue;
+        if (!_matchesBudget(verdict)) continue;
         rows.add(
           DishRow(dish: dish, category: category.name, analysis: verdict),
         );
@@ -670,6 +699,24 @@ final class MenuController extends ChangeNotifier {
       return const <String, AnalysedDish>{};
     }
     return {for (final dish in currentAnalysis.dishes) dish.dishId: dish};
+  }
+
+  /// Whether [verdict] passes the current carb budget, if one is set.
+  ///
+  /// Null budget → always true (no budget active).
+  /// Null verdict → always true (no analysis yet, so never hide).
+  /// Null [AnalysedDish.netCarbsEstimate] → always true (estimate-less
+  /// dishes are never filtered out: the budget only trims dishes the LLM
+  /// estimated, and silently hiding estimate-less dishes would misrepresent
+  /// the menu).
+  /// Otherwise passes when the estimate is ≤ the budget (inclusive).
+  bool _matchesBudget(AnalysedDish? verdict) {
+    final budget = _carbBudget.budgetGrams;
+    if (budget == null) return true;
+    if (verdict == null) return true;
+    final estimate = verdict.netCarbsEstimate;
+    if (estimate == null) return true;
+    return estimate <= budget;
   }
 
   /// Whether [verdict] belongs in [visibleRows] under the current

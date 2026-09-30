@@ -1657,6 +1657,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This QR code does not lead to a menu KetoClub can read. Photograph the menu instead.'**
   String get scanQrPhotographInstead;
+
+  /// No description provided for @carbBudgetFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget for tonight (g)'**
+  String get carbBudgetFieldLabel;
+
+  /// No description provided for @carbBudgetFieldHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 20'**
+  String get carbBudgetFieldHint;
+
+  /// No description provided for @carbBudgetFieldClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear budget'**
+  String get carbBudgetFieldClear;
+
+  /// No description provided for @carbBudgetDisabledReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a budget after AI analysis — rule-based results have no carb estimates.'**
+  String get carbBudgetDisabledReason;
+
+  /// No description provided for @netCarbsChipLeavesSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **' · leaves {grams}g'**
+  String netCarbsChipLeavesSuffix(int grams);
 }
 
 class _AppLocalizationsDelegate

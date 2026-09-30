@@ -1003,4 +1003,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get scanQrPhotographInstead =>
       'This QR code does not lead to a menu KetoClub can read. Photograph the menu instead.';
+
+  @override
+  String get carbBudgetFieldLabel => 'Budget for tonight (g)';
+
+  @override
+  String get carbBudgetFieldHint => 'e.g. 20';
+
+  @override
+  String get carbBudgetFieldClear => 'Clear budget';
+
+  @override
+  String get carbBudgetDisabledReason =>
+      'Set a budget after AI analysis — rule-based results have no carb estimates.';
+
+  @override
+  String netCarbsChipLeavesSuffix(int grams) {
+    return ' · leaves ${grams}g';
+  }
 }
