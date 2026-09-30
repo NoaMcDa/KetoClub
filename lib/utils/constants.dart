@@ -147,7 +147,9 @@ const String promptKetoRulesTemplate = '''
 Net carbs of {limit}g or less per dish make it green (orderAsIs).
 Starchy sides, root vegetables, sugary sauces and glazes, breading, and bread that only carries the dish (a bun, pita, toast) make an otherwise-compliant dish yellow (modifiable): name the exact component to remove and the exact substitute to ask for.
 Pasta, pizza, rice bowls, noodles, breaded or battered proteins, and pastry make a dish red (nonKeto), even with modifications, and get no modification text.
-Write "why" and "modification" in the language the menu is written in, each under 300 characters. Return only dishes present in the input, using their given id and exact printed name.''';
+Drinks: cola, sprite, juice, lemonade, beer, sweet wine, and liqueur are red; iced coffee, latte, cappuccino, and tonic are yellow (ask for black coffee, unsweetened almond milk, or soda water instead); zero-sugar or diet versions of soda or beer, plain water, black coffee, espresso, tea, dry wine, and spirits are green.
+Write "why" and "modification" in the language the menu is written in, each under 300 characters. Return only dishes present in the input, using their given id and exact printed name.
+Hidden carbs: breading crumbs, sweet marinades, house dressings, thickeners and glazes often contain sugar, honey, flour or cornstarch even when the dish name reads clean. For each dish, list any such suspected or confirmed hidden carb under "hidden_carbs" as {source, certainty ("suspected" or "likely"), waiter_question} — the question to ask the waiter, in the menu's language, under 300 characters. Use an empty array when none apply.''';
 
 /// [promptVerdictDefinitionsTemplate] with [netCarbLimitGrams] in place of
 /// [netCarbLimitPlaceholder] — the text both the system prompt and the
@@ -405,6 +407,35 @@ const Map<String, String> carbModifiersEn = <String, String>{
       'Please leave out the crispy onions — they are coated in flour.',
   'tamarind': 'Please leave out the tamarind sauce; it contains sugar.',
   'hoisin': 'Please leave out the hoisin sauce; it contains sugar.',
+
+  // Drink triggers — yellow with a swap script (#216). Latte/cappuccino:
+  // the dairy rule (dairyTriggersEn `milk`/`cream`) fires separately when
+  // dairy-free is on, so the swap sentence here names non-dairy options only.
+  // Tonic water: the drink is high in sugar; ask for plain soda water.
+  // Syrup: any flavoured syrup in a drink or dessert — ask to skip it.
+  'latte':
+      'Please make it with black coffee or unsweetened almond milk, no '
+      'added sugar.',
+  'iced latte':
+      'Please make it with black coffee or unsweetened almond milk, '
+      'no added sugar.',
+  'cappuccino':
+      'Please make it with black coffee or unsweetened almond milk, '
+      'no added sugar.',
+  'iced coffee':
+      'Please make it without sugar or flavoured syrup; just '
+      'espresso and ice.',
+  'frappe':
+      'Please skip the sugar and any flavoured syrup; just espresso, '
+      'ice, and water or unsweetened almond milk.',
+  'tonic':
+      'Please substitute soda water for the tonic; tonic is high in '
+      'sugar.',
+  'tonic water':
+      'Please substitute soda water for the tonic; tonic is high '
+      'in sugar.',
+  'syrup': 'Please leave out the flavoured syrup.',
+  'flavoured syrup': 'Please leave out the flavoured syrup.',
 };
 
 // ---------------------------------------------------------------------------
@@ -552,6 +583,25 @@ const Map<String, String> carbModifiersHe = <String, String>{
   // carries the filling and is removable, same as `tortilla`/`טורטייה`
   // above). Moved here to match D-V3 and the English vocabulary.
   'ראפ': 'אפשר בבקשה לקבל את המילוי בקערה, בלי הראפ?',
+
+  // Drink triggers — yellow with a swap script (#216). `הפוך` ("hafuch",
+  // Israeli upside-down latte) is registered without a permissive prefix
+  // (see classification_rules.dart `_noPrefixHebrewTriggers`) so the
+  // grammatical particle ב/ה ("בהפוך") or ל ("להפוך" — "to flip") does
+  // not false-yellow an unrelated phrase.
+  'הפוך':
+      'אפשר בבקשה קפה הפוך עם חלב שקדים ללא סוכר, בלי '
+      'תוספת סירופ?',
+  'הפוך קר':
+      'אפשר בבקשה קפה הפוך קר עם חלב שקדים ללא סוכר, בלי '
+      'תוספת סירופ?',
+  'לאטה':
+      'אפשר בבקשה להכין את הלאטה עם חלב שקדים ללא סוכר, בלי '
+      'תוספת סירופ?',
+  "קפוצ'ינו": "אפשר בבקשה להכין את הקפוצ'ינו עם חלב שקדים ללא סוכר?",
+  'קפה קר': 'אפשר בבקשה קפה קר בלי סוכר ובלי סירופ?',
+  'סירופ': 'אפשר בבקשה בלי הסירופ?',
+  'טוניק': 'אפשר בבקשה לשים סודה במקום הטוניק? הטוניק עתיר סוכר.',
 };
 
 // ---------------------------------------------------------------------------
@@ -613,6 +663,22 @@ const List<String> nonKetoBasesEn = <String>[
   // `pastry base`, both of which are red anyway.
   'danish', 'pastry', 'pastries', 'rugelach', 'muffin', 'muffins',
   'scone', 'scones',
+
+  // Drink bases — red (#216). Sugary drinks that cannot be made keto.
+  // Guards below rescue zero/diet variants. `beer batter` is already
+  // above (D-V2 breading), so a bare `beer` entry here is safe — the
+  // longer trigger takes priority when both match the same text.
+  // `juice` is the generic form; compound forms `orange juice` and
+  // `apple juice` are included too for display-label precision.
+  // `smoothie` was already in the list above (milkshake cluster); kept
+  // consistent by NOT duplicating it here — only `milkshake` was there.
+  'cola', 'coke', 'pepsi', 'sprite', 'fanta',
+  'lemonade',
+  'juice', 'orange juice', 'apple juice',
+  'beer', 'lager', 'stout', 'ale',
+  'liqueur',
+  'smoothie',
+  'sweet wine', 'moscato', 'port wine',
 
   // See the doc comment above: required by D-V3's decision record and by
   // nonKetoBaseLabelsEn, missing from the spec's own enumeration.
@@ -692,6 +758,28 @@ const List<String> nonKetoBasesHe = <String>[
   'עוגיה', // cookie (singular; עוגיות is above)
   'מאפין', 'מאפינס', // muffin / muffins
   'סקון', // scone
+  // Drink bases — red (#216). Guards below rescue zero/diet variants.
+  // `בירה` has a guard for `בירה לבנה` (white beer — still red, no
+  // guard needed) but `בירה שחורה` is also red, and the bare `בירה`
+  // trigger catches both. `מיץ` is a bare trigger; the compound forms
+  // `מיץ תפוזים` / `מיץ ענבים` are added for label precision too.
+  // Note: if bare `מיץ` false-reds a dish name that is a proper name
+  // (e.g. "מיצי"), drop it and keep only the compound forms.
+  'קולה', // cola
+  'קוקה קולה', // Coca-Cola (compound first — suppresses bare `קולה` match)
+  'ספרייט', // sprite
+  'פאנטה', // fanta
+  'פריגת', // Prigat (Israeli juice brand)
+  'מיץ', // juice (bare; see note above)
+  'מיץ תפוזים', // orange juice
+  'מיץ ענבים', // grape juice
+  'לימונדה', // lemonade
+  'בירה', // beer
+  'בירה שחורה', // stout / dark beer
+  'שיכר', // alcoholic malt drink
+  'ליקר', // liqueur
+  'סמוטי', // smoothie
+  'יין מתוק', // sweet wine
 ];
 
 // ---------------------------------------------------------------------------
@@ -1062,6 +1150,23 @@ const Map<String, GuardWords> ketoQualifierGuardsEn = <String, GuardWords>{
   'burgers': (before: _bunlessBurgerWords, after: []),
   'hamburger': (before: _bunlessBurgerWords, after: []),
   'cheeseburger': (before: _bunlessBurgerWords, after: []),
+
+  // Drink guards (#216): zero, diet, and sugar-free rescue cola/sprite/
+  // beer/tonic so "Coca-Cola Zero" and "Diet Beer" are not marked red.
+  // `after`-only: the qualifier follows the drink name in English ("Cola
+  // Zero", "Sprite Zero") more often than it precedes it.
+  'cola': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'coke': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'pepsi': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'sprite': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'fanta': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'beer': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'lager': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'ale': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'tonic': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'tonic water': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'juice': (before: _sugarFreeWords, after: _sugarFreeWords),
+  'lemonade': (before: _sugarFreeWords, after: _sugarFreeWords),
 };
 
 /// Words before a burger word that mean it already comes without a bun.
@@ -1070,6 +1175,21 @@ const List<String> _bunlessBurgerWords = <String>[
   'keto',
   'bunless',
   'naked',
+];
+
+/// Guard words that rescue a sugary drink base (#216): zero, diet, and
+/// explicit "no sugar" / "sugar free" labels — "Coca-Cola Zero",
+/// "Diet Sprite", "sugar-free tonic". Checked on **both** sides so
+/// "Zero Cola" and "Cola Zero" are both rescued.
+const List<String> _sugarFreeWords = <String>[
+  'zero',
+  'diet',
+  'sugar-free',
+  'sugar free',
+  'no sugar',
+  'zero sugar',
+  'unsweetened',
+  'light',
 ];
 
 /// Builds a Hebrew guard's [GuardWords] from one word list, applied on
@@ -1141,6 +1261,16 @@ final GuardWords _heBurgerGuard = _heGuard(const ['חסה', 'בחסה', 'קטו'
 /// seasoning, not a pastry.
 final GuardWords _heYeastGuard = _heGuard(const ['תזונתיים', 'תזונתי']);
 
+/// Guard words that rescue a sugary Hebrew drink base (#216): זירו,
+/// דיאט, and explicit "no sugar" labels. Bidirectional per [_heGuard]
+/// so "קוקה קולה זירו" and "זירו קוקה קולה" are both rescued.
+final GuardWords _heDrinkGuard = _heGuard(const [
+  'זירו',
+  'דיאט',
+  'ללא סוכר',
+  'ללא סוכרים',
+]);
+
 /// Keto-substitute guards, Hebrew (`vocabulary_spec.md` "Guards
 /// (D-V1)"). See [_heGuard] for why every entry is bidirectional here,
 /// unlike [ketoQualifierGuardsEn].
@@ -1160,6 +1290,18 @@ final Map<String, GuardWords> ketoQualifierGuardsHe = <String, GuardWords>{
   'בורגר': _heBurgerGuard,
   "צ'יזבורגר": _heBurgerGuard,
   'שמרים': _heYeastGuard,
+
+  // Drink guards (#216): זירו/דיאט/ללא סוכר rescue the drink bases.
+  'קולה': _heDrinkGuard,
+  'קוקה קולה': _heDrinkGuard,
+  'ספרייט': _heDrinkGuard,
+  'פאנטה': _heDrinkGuard,
+  'פריגת': _heDrinkGuard,
+  'מיץ': _heDrinkGuard,
+  'בירה': _heDrinkGuard,
+  'בירה שחורה': _heDrinkGuard,
+  'טוניק': _heDrinkGuard,
+  'לימונדה': _heDrinkGuard,
 };
 
 // ---------------------------------------------------------------------------

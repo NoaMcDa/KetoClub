@@ -11,6 +11,7 @@
   "actionBackToSearch": "חזרה לחיפוש",
   "offlineBannerMessage": "אין חיבור לאינטרנט.",
   "actionShareMenu": "שתף תפריט",
+  "actionOpenDrinksGuide": "מדריך שתייה",
   "actionCancel": "ביטול",
 
   "venueSearchLabel": "חיפוש מסעדה",
@@ -55,11 +56,11 @@
   "waiterCardTitle": "זה מה שאומרים למלצר",
 
   "settingsConsentTitle": "מה יוצא מהמכשיר הזה",
-  "settingsConsentBody": "ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות נשלחים לשרת של קטוקלאב, שמעביר אותם לניתוח ב‑Gemini API של Google. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.",
+  "settingsConsentBody": "ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות — וכל שאלה שאתם כותבים על תפריט — נשלחים לשרת של קטוקלאב, שמעביר אותם לניתוח ב‑Gemini API של Google. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.",
   "settingsConsentAccept": "אפשר ניתוח בינה מלאכותית",
   "consentDisclosureOk": "אישור",
   "consentDisclosureTurnOff": "כבה",
-  "settingsConsentBodyDirect": "ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות נשלחים ישירות מהמכשיר הזה ל‑Gemini API של Google, עם מפתח ה‑API שלכם. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.",
+  "settingsConsentBodyDirect": "ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות — וכל שאלה שאתם כותבים על תפריט — נשלחים ישירות מהמכשיר הזה ל‑Gemini API של Google, עם מפתח ה‑API שלכם. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.",
   "settingsKeySection": "מפתח Gemini API",
   "settingsKeyBody": "בטלפון הזה, ניתוח בינה מלאכותית פונה ישירות ל‑Gemini API של Google עם המפתח שלכם. אפשר ליצור מפתח בחינם ב‑Google AI Studio. המפתח נשמר באחסון המאובטח של המכשיר ונשלח רק ל‑Google.",
   "settingsKeyHint": "הדביקו את מפתח ה‑Gemini API שלכם",
@@ -446,5 +447,31 @@
   "netCarbsChipLeavesSuffix": " · נשאר {grams} גרם",
   "@netCarbsChipLeavesSuffix": {
     "placeholders": { "grams": { "type": "int" } }
-  }
+  },
+  "hiddenCarbsSectionLabel": "פחמימות נסתרות אפשריות",
+  "hiddenCarbsCertaintySuspected": "חשד",
+  "hiddenCarbsCertaintyLikely": "סביר",
+  "drinksGuideTitle": "מדריך שתייה",
+  "drinksGuideDisclaimer": "טווחי פחמימות נטו טיפוסיים למנה סטנדרטית. כל הנתונים הם הערכות — הערכים האמיתיים משתנים לפי מותג, גודל ומתכון.",
+  "drinksGuideSectionOrderAsIs": "להזמין כמו שזה",
+  "drinksGuideSectionSwap": "לבקש החלפה",
+  "drinksGuideSectionSkip": "לדלג",
+  "settingsDrinksGuideTitle": "מדריך שתייה",
+  "settingsDrinksGuideSubtitle": "מדריך בר וקפה",
+  "actionAskAboutMenu": "שאלו על התפריט הזה",
+  "menuQuestionSheetTitle": "שאלו על התפריט הזה",
+  "menuQuestionSheetHint": "לדוגמה: אילו מנות הן ללא מוצרי חלב?",
+  "menuQuestionSheetAsk": "שאל",
+  "menuQuestionSheetLoading": "שואל…",
+  "menuQuestionSheetAskAnother": "שאלו שאלה נוספת",
+
+  "menuQuestionFailedNotConfigured": "בינה מלאכותית אינה זמינה בגרסה הזו, ולכן לא ניתן היה לענות על השאלה.",
+  "menuQuestionFailedOffline": "נראה שאינכם מחוברים. התחברו מחדש ונסו לשאול שוב.",
+  "menuQuestionFailedTimeout": "מודל הבינה המלאכותית היה איטי מדי. נסו לשאול שוב.",
+  "menuQuestionFailedRateLimited": "המגבלה היומית של הבינה המלאכותית נוצלה. נסו שוב מאוחר יותר.",
+  "menuQuestionFailedBadResponse": "הבינה המלאכותית החזירה תשובה לא שמישה. נסו לנסח את השאלה אחרת.",
+  "menuQuestionFailedBackendUnreachable": "לא ניתן היה להתחבר לשרת של קטוקלאב. נסו לשאול שוב.",
+  "menuQuestionFailedConsentWithheld": "אשרו ניתוח בינה מלאכותית בהגדרות כדי לשאול שאלות על תפריט.",
+  "menuQuestionFailedApiKeyMissing": "הוסיפו את מפתח ה‑Gemini API שלכם בהגדרות כדי לשאול שאלות על תפריט.",
+  "menuQuestionFailedApiKeyRejected": "Gemini דחתה את מפתח ה‑API שלכם. בדקו אותו בהגדרות ונסו לשאול שוב."
 }

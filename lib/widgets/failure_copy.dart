@@ -90,6 +90,37 @@ String analysisFailureMessage(
   MenuAnalysisFailureReason.apiKeyRejected => l10n.analysisApiKeyRejected,
 };
 
+/// The message for a menu question failure (architecture.md §9.5; issue #214).
+///
+/// Distinct copy per reason with no rules-fallback path: unlike menu
+/// analysis, a free-text question has no on-device equivalent, so every
+/// message says the question could not be answered rather than offering
+/// an alternative.
+///
+/// An exhaustive switch with no `default`: adding a reason without adding
+/// its copy here is a compile error, never a silently collapsed message
+/// (architecture.md §10, "collapsing reasons is a bug").
+String menuQuestionFailureMessage(
+  MenuAnalysisFailureReason reason,
+  AppLocalizations l10n,
+) => switch (reason) {
+  MenuAnalysisFailureReason.notConfigured =>
+    l10n.menuQuestionFailedNotConfigured,
+  MenuAnalysisFailureReason.offline => l10n.menuQuestionFailedOffline,
+  MenuAnalysisFailureReason.timeout => l10n.menuQuestionFailedTimeout,
+  MenuAnalysisFailureReason.rateLimited => l10n.menuQuestionFailedRateLimited,
+  MenuAnalysisFailureReason.badResponse => l10n.menuQuestionFailedBadResponse,
+  MenuAnalysisFailureReason.noDishesFound => l10n.menuQuestionFailedBadResponse,
+  MenuAnalysisFailureReason.backendUnreachable =>
+    l10n.menuQuestionFailedBackendUnreachable,
+  MenuAnalysisFailureReason.consentWithheld =>
+    l10n.menuQuestionFailedConsentWithheld,
+  MenuAnalysisFailureReason.apiKeyMissing =>
+    l10n.menuQuestionFailedApiKeyMissing,
+  MenuAnalysisFailureReason.apiKeyRejected =>
+    l10n.menuQuestionFailedApiKeyRejected,
+};
+
 /// The message for a venue-search failure (`phase2_discovery_research.md`
 /// §5, issue #39).
 ///

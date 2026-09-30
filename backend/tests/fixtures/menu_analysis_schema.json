@@ -14,7 +14,8 @@
           "verdict",
           "why",
           "modification",
-          "net_carbs_estimate"
+          "net_carbs_estimate",
+          "hidden_carbs"
         ],
         "properties": {
           "id": {"type": "string"},
@@ -25,7 +26,23 @@
           },
           "why": {"type": "string"},
           "modification": {"type": ["string", "null"]},
-          "net_carbs_estimate": {"type": ["number", "null"]}
+          "net_carbs_estimate": {"type": ["number", "null"]},
+          "hidden_carbs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["source", "certainty", "waiter_question"],
+              "properties": {
+                "source": {"type": "string"},
+                "certainty": {
+                  "type": "string",
+                  "enum": ["suspected", "likely"]
+                },
+                "waiter_question": {"type": "string"}
+              }
+            }
+          }
         }
       }
     }

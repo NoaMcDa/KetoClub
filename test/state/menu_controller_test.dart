@@ -6,11 +6,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/menu_question.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/classifier/menu_question_answerer.dart';
+import 'package:ketoclub/services/classifier/menu_question_prompt.dart';
+import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/vision_menu_classifier.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
@@ -27,6 +31,7 @@ import '../fakes/fake_connectivity.dart';
 import '../fakes/fake_llm_chat_client.dart';
 import '../fakes/fake_menu_cache.dart';
 import '../fakes/fake_menu_classifier.dart';
+import '../fakes/fake_menu_question_answerer.dart';
 import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_notes_store.dart';
 import '../fakes/fake_platform_menu_adapter.dart';
@@ -1746,15 +1751,20 @@ void main() {
     final menu = _menuOf([steak]);
 
     /// An LLM analysis of [menu] recording [options], as a cache would
-    /// hold it.
-    MenuAnalysed llmAnalysis({AnalysisOptionsSnapshot? options}) =>
-        MenuAnalysed(
-          dishes: [_verdictFor(steak, DishVerdict.orderAsIs)],
-          unclassified: const <String>[],
-          engine: const LlmEngine(model: 'served-model'),
-          analysedAt: DateTime.utc(2026),
-          options: options,
-        );
+    /// hold it. Defaults to the current [MenuResponseParser.schemaVersion]
+    /// so tests that assert cache reuse read as intended (the reuse gate
+    /// checks the version too since issue #213).
+    MenuAnalysed llmAnalysis({
+      AnalysisOptionsSnapshot? options,
+      int schemaVersion = MenuResponseParser.schemaVersion,
+    }) => MenuAnalysed(
+      dishes: [_verdictFor(steak, DishVerdict.orderAsIs)],
+      unclassified: const <String>[],
+      engine: const LlmEngine(model: 'served-model'),
+      analysedAt: DateTime.utc(2026),
+      options: options,
+      schemaVersion: schemaVersion,
+    );
 
     late FakeMenuRepository repository;
     late FakeMenuClassifier classifier;
@@ -2138,6 +2148,7 @@ void main() {
       engine: const LlmEngine(model: 'test-model'),
       analysedAt: DateTime.utc(2026),
       options: const AnalysisOptionsSnapshot(netCarbLimitGrams: 6),
+      schemaVersion: MenuResponseParser.schemaVersion,
     );
 
     late FakeMenuRepository repository;
@@ -2223,6 +2234,7 @@ void main() {
           engine: const LlmEngine(model: 'test-model'),
           analysedAt: DateTime.utc(2026),
           options: const AnalysisOptionsSnapshot(netCarbLimitGrams: 6),
+          schemaVersion: MenuResponseParser.schemaVersion,
         );
         final r = FakeMenuRepository()
           ..stub(
@@ -2326,6 +2338,7 @@ void main() {
         engine: const LlmEngine(model: 'test-model'),
         analysedAt: DateTime.utc(2026),
         options: const AnalysisOptionsSnapshot(netCarbLimitGrams: 6),
+        schemaVersion: MenuResponseParser.schemaVersion,
       );
       final r = FakeMenuRepository()
         ..stub(_ref, MenuFetched(menu: mixedMenu))
@@ -2364,4 +2377,363 @@ void main() {
       expect(settings.writeCallCount, equals(writesAfterOpen));
     });
   });
+
+  group('askQuestion (architecture.md §9.5; issue #214)', () {
+    late FakeMenuRepository repository;
+    late FakeMenuClassifier classifier;
+    late FakeSettingsStore settings;
+    late FakeNotesStore notes;
+    late FakeMenuQuestionAnswerer answerer;
+    late MenuController controller;
+
+    /// Opens a menu via [controller] that yields a [MenuAnalysed] with an
+    /// [LlmEngine], so [controller.isQuestionAvailable] is true.
+    Future<void> openWithLlmAnalysis({List<Dish>? dishes}) async {
+      final menuDishes = dishes ?? [_dish('steak', id: 'steak')];
+      final menu = _menuOf(menuDishes);
+      repository.stub(_ref, MenuFetched(menu: menu));
+      classifier
+        ..respondWith(
+          MenuAnalysed(
+            dishes: [
+              for (final d in menuDishes) _verdictFor(d, DishVerdict.orderAsIs),
+            ],
+            unclassified: const <String>[],
+            engine: const LlmEngine(model: 'test-model'),
+            analysedAt: DateTime.utc(2026),
+          ),
+        )
+        ..derivedEngine = const LlmEngine(model: 'test-model');
+      await controller.open(_ref);
+    }
+
+    setUp(() {
+      repository = FakeMenuRepository();
+      classifier = FakeMenuClassifier();
+      settings = FakeSettingsStore();
+      notes = FakeNotesStore();
+      answerer = FakeMenuQuestionAnswerer();
+      controller = MenuController(
+        repository,
+        classifier,
+        settings,
+        notes,
+        CarbBudgetController(),
+        answerer,
+      );
+    });
+
+    test('isQuestionAvailable is false before any open', () {
+      expect(controller.isQuestionAvailable, isFalse);
+    });
+
+    test('isQuestionAvailable is true after an LLM analysis', () async {
+      await openWithLlmAnalysis();
+
+      expect(controller.isQuestionAvailable, isTrue);
+    });
+
+    test(
+      'isQuestionAvailable is false when analysis used RulesEngine',
+      () async {
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        classifier.derivedEngine = const RulesEngine(
+          reason: MenuAnalysisFailureReason.notConfigured,
+        );
+        await controller.open(_ref);
+
+        expect(controller.isQuestionAvailable, isFalse);
+      },
+    );
+
+    test('isQuestionAvailable is false when analysis failed', () async {
+      repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+      classifier.respondWith(
+        const MenuAnalysisFailed(reason: MenuAnalysisFailureReason.timeout),
+      );
+      await controller.open(_ref);
+
+      expect(controller.isQuestionAvailable, isFalse);
+    });
+
+    test('isQuestionAvailable is false when no answerer is wired', () async {
+      // A controller with no answerer (the optional 6th argument omitted).
+      final bare = MenuController(
+        repository,
+        classifier,
+        settings,
+        notes,
+        CarbBudgetController(),
+      );
+      repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+      classifier.respondWith(
+        MenuAnalysed(
+          dishes: [_verdictFor(_dish('Steak'), DishVerdict.orderAsIs)],
+          unclassified: const <String>[],
+          engine: const LlmEngine(model: 'test-model'),
+          analysedAt: DateTime.utc(2026),
+        ),
+      );
+      await bare.open(_ref);
+
+      expect(bare.isQuestionAvailable, isFalse);
+    });
+
+    test('questionState starts at idle', () {
+      expect(controller.questionState, QuestionState.idle);
+    });
+
+    test(
+      'askQuestion transitions loading → answered on a successful reply',
+      () async {
+        await openWithLlmAnalysis();
+        answerer.enqueueAnswer('The steak is keto-friendly.');
+
+        final states = <QuestionState>[];
+        controller.addListener(() => states.add(controller.questionState));
+
+        await controller.askQuestion('Which dish should I order?');
+
+        expect(states, [QuestionState.loading, QuestionState.answered]);
+        expect(controller.questionState, QuestionState.answered);
+      },
+    );
+
+    test('askQuestion sets questionAnswer on success', () async {
+      await openWithLlmAnalysis();
+      answerer.enqueueAnswer('Steak is great.', dishIds: ['steak']);
+
+      await controller.askQuestion('Best keto dish?');
+
+      expect(controller.questionAnswer, isNotNull);
+      expect(controller.questionAnswer!.answer, 'Steak is great.');
+      expect(controller.questionAnswer!.referencedDishIds, ['steak']);
+    });
+
+    test(
+      'askQuestion transitions loading → failed on a failure reply',
+      () async {
+        await openWithLlmAnalysis();
+        answerer.enqueue(
+          const MenuQuestionFailed(reason: MenuQuestionFailureReason.offline),
+        );
+
+        final states = <QuestionState>[];
+        controller.addListener(() => states.add(controller.questionState));
+
+        await controller.askQuestion('Is there a dairy-free option?');
+
+        expect(states, [QuestionState.loading, QuestionState.failed]);
+        expect(controller.questionState, QuestionState.failed);
+        expect(controller.questionFailure, MenuQuestionFailureReason.offline);
+      },
+    );
+
+    test('askQuestion clears questionAnswer on failure', () async {
+      // First ask succeeds.
+      await openWithLlmAnalysis();
+      answerer.enqueueAnswer('Steak is fine.');
+      await controller.askQuestion('First question?');
+      expect(controller.questionAnswer, isNotNull);
+
+      // Second ask fails.
+      answerer.enqueue(
+        const MenuQuestionFailed(reason: MenuQuestionFailureReason.timeout),
+      );
+      await controller.askQuestion('Second question?');
+
+      expect(controller.questionAnswer, isNull);
+      expect(controller.questionState, QuestionState.failed);
+    });
+
+    test('dismissQuestion resets to idle from answered', () async {
+      await openWithLlmAnalysis();
+      answerer.enqueueAnswer('Good choice.');
+      await controller.askQuestion('Is this keto?');
+      expect(controller.questionState, QuestionState.answered);
+
+      controller.dismissQuestion();
+
+      expect(controller.questionState, QuestionState.idle);
+      expect(controller.questionAnswer, isNull);
+    });
+
+    test('dismissQuestion resets to idle from failed', () async {
+      await openWithLlmAnalysis();
+      answerer.enqueue(
+        const MenuQuestionFailed(reason: MenuQuestionFailureReason.badResponse),
+      );
+      await controller.askQuestion('Can I eat this?');
+      expect(controller.questionState, QuestionState.failed);
+
+      controller.dismissQuestion();
+
+      expect(controller.questionState, QuestionState.idle);
+      expect(controller.questionFailure, isNull);
+    });
+
+    test('dismissQuestion when already idle is a no-op (no notification)', () {
+      var notifyCount = 0;
+      controller
+        ..addListener(() => notifyCount++)
+        ..dismissQuestion();
+
+      expect(notifyCount, 0);
+      expect(controller.questionState, QuestionState.idle);
+    });
+
+    test('askQuestion is a no-op when no menu is open', () async {
+      // No controller.open() call, so _menu is null.
+      await controller.askQuestion('What can I eat?');
+
+      expect(answerer.calls, isEmpty);
+      expect(controller.questionState, QuestionState.idle);
+    });
+
+    test(
+      'askQuestion is a no-op when analysis is not a MenuAnalysed',
+      () async {
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        classifier.respondWith(
+          const MenuAnalysisFailed(reason: MenuAnalysisFailureReason.timeout),
+        );
+        await controller.open(_ref);
+
+        await controller.askQuestion('What can I eat?');
+
+        expect(answerer.calls, isEmpty);
+        expect(controller.questionState, QuestionState.idle);
+      },
+    );
+
+    test(
+      'askQuestion is a no-op when analysis engine is RulesEngine',
+      () async {
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        classifier.derivedEngine = const RulesEngine(
+          reason: MenuAnalysisFailureReason.notConfigured,
+        );
+        await controller.open(_ref);
+
+        await controller.askQuestion('What can I eat?');
+
+        expect(answerer.calls, isEmpty);
+      },
+    );
+
+    test('askQuestion is a no-op when question is blank', () async {
+      await openWithLlmAnalysis();
+
+      await controller.askQuestion('   ');
+
+      expect(answerer.calls, isEmpty);
+      expect(controller.questionState, QuestionState.idle);
+    });
+
+    test(
+      'askQuestion is a no-op when question exceeds menuQuestionMaxLength',
+      () async {
+        await openWithLlmAnalysis();
+
+        await controller.askQuestion('x' * (menuQuestionMaxLength + 1));
+
+        expect(answerer.calls, isEmpty);
+        expect(controller.questionState, QuestionState.idle);
+      },
+    );
+
+    test(
+      'askQuestion accepts a question exactly at menuQuestionMaxLength',
+      () async {
+        await openWithLlmAnalysis();
+        answerer.enqueueAnswer('Within limit.');
+
+        await controller.askQuestion('a' * menuQuestionMaxLength);
+
+        expect(answerer.calls, hasLength(1));
+      },
+    );
+
+    test(
+      'askQuestion is a no-op when a question is already in flight',
+      () async {
+        await openWithLlmAnalysis();
+        // Do not enqueue a result so the first ask blocks.
+        // The fake returns synchronously, so we test the guard directly.
+        final gate = Completer<void>();
+        // Use a slow answerer.
+        late final MenuQuestionAnswerer slowAnswerer;
+        slowAnswerer = _SlowQuestionAnswerer(gate.future);
+        final ctrlr = MenuController(
+          repository,
+          classifier,
+          settings,
+          notes,
+          CarbBudgetController(),
+          slowAnswerer,
+        );
+        await ctrlr.open(_ref);
+
+        // Start a question (not yet answered).
+        final first = ctrlr.askQuestion('First?');
+        await pumpEventQueue();
+        expect(ctrlr.questionState, QuestionState.loading);
+
+        // A second ask while loading is a no-op.
+        await ctrlr.askQuestion('Second?');
+
+        // Let the first question complete.
+        gate.complete();
+        await first;
+
+        // Only one real ask happened.
+        expect(ctrlr.questionState, QuestionState.failed);
+      },
+    );
+
+    group('D8 — question never persisted or logged (architecture.md D8)', () {
+      test('askQuestion does not write to SettingsStore', () async {
+        await openWithLlmAnalysis();
+        answerer.enqueueAnswer('Steak is fine.');
+        final settingsBefore = await settings.read();
+
+        await controller.askQuestion('Is steak keto?');
+
+        expect(await settings.read(), equals(settingsBefore));
+      });
+
+      test('askQuestion does not write to the notes store', () async {
+        await openWithLlmAnalysis();
+        answerer.enqueueAnswer('Steak is fine.');
+
+        await controller.askQuestion('Is steak keto?');
+
+        // FakeNotesStore records writes; the question must not trigger one.
+        expect(notes.writeCalls, isEmpty);
+      });
+    });
+  });
+}
+
+/// A [MenuQuestionAnswerer] that blocks until a gate completes, then returns
+/// [MenuQuestionFailed] with [MenuQuestionFailureReason.badResponse].
+///
+/// Used to hold a question in flight so the "no concurrent questions" guard
+/// can be exercised.
+final class _SlowQuestionAnswerer implements MenuQuestionAnswerer {
+  /// Creates a slow answerer that waits for the given gate before responding.
+  const new(this._gate);
+  final Future<void> _gate;
+
+  @override
+  Future<MenuQuestionResult> ask(
+    Menu menu,
+    MenuAnalysed analysis,
+    String question,
+  ) async {
+    await _gate;
+    return const MenuQuestionFailed(
+      reason: MenuQuestionFailureReason.badResponse,
+    );
+  }
 }

@@ -20,6 +20,7 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/drinks_guide_screen.dart';
 import 'package:ketoclub/screens/menu_screen.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
@@ -2509,6 +2510,43 @@ void main() {
           expect(tester.takeException(), isNull);
         },
       );
+    });
+
+    group('drinks guide app-bar action (#216)', () {
+      testWidgets(
+        'the drinks-guide icon button is visible on the loaded menu',
+        (tester) async {
+          // Arrange
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+          final controller = _controllerFor(repository: repository);
+          final pushedNames = <String>[];
+          await _pumpWithRoutes(tester, controller, pushedNames);
+          await tester.pumpAndSettle();
+
+          // Assert — the icon is rendered unconditionally
+          expect(find.byIcon(Icons.local_bar), findsOneWidget);
+        },
+      );
+
+      testWidgets('tapping the drinks-guide icon pushes the /drinks route', (
+        tester,
+      ) async {
+        // Arrange
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        final controller = _controllerFor(repository: repository);
+        final pushedNames = <String>[];
+        await _pumpWithRoutes(tester, controller, pushedNames);
+        await tester.pumpAndSettle();
+
+        // Act
+        await tester.tap(find.byIcon(Icons.local_bar));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(pushedNames, contains(drinksRoutePath));
+      });
     });
   });
 }

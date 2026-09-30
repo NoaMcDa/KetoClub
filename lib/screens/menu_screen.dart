@@ -11,6 +11,7 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/drinks_guide_screen.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
@@ -31,6 +32,7 @@ import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/fetch_failure_action.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
+import 'package:ketoclub/widgets/menu_question_sheet.dart';
 import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
@@ -216,6 +218,17 @@ class _MenuScreenState extends State<MenuScreen> {
     return Scaffold(
       appBar: AppBar(
         actions: [
+          IconButton(
+            icon: const Icon(Icons.local_bar),
+            tooltip: l10n.actionOpenDrinksGuide,
+            onPressed: () => Navigator.pushNamed(context, drinksRoutePath),
+          ),
+          if (controller.isQuestionAvailable)
+            IconButton(
+              icon: const Icon(Icons.question_answer),
+              tooltip: l10n.actionAskAboutMenu,
+              onPressed: () => _openQuestionSheet(context, controller),
+            ),
           if (canShare)
             IconButton(
               icon: const Icon(Icons.share),
@@ -1045,6 +1058,35 @@ class _MenuScreenState extends State<MenuScreen> {
         initialNote: controller.noteFor(row.dish.id),
         onSave: (note) => unawaited(controller.setNote(row.dish.id, note)),
         onClear: () => unawaited(controller.clearNote(row.dish.id)),
+      ),
+    );
+  }
+
+  /// Opens [MenuQuestionSheet] as a modal bottom sheet, bound to the
+  /// current [MenuController] (architecture.md §9.5; issue #214).
+  ///
+  /// Reads the controller before opening — the same pattern [_openNoteEditor]
+  /// follows — and passes current state values in. The sheet rebuilds via
+  /// [StatefulBuilder] on every [ChangeNotifier] notification, so the spinner
+  /// and answer appear without closing and reopening the sheet.
+  void _openQuestionSheet(BuildContext context, MenuController controller) {
+    final menu = controller.menu;
+    if (menu == null) return;
+    unawaited(
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        builder: (_) => AnimatedBuilder(
+          animation: controller,
+          builder: (_, child) => MenuQuestionSheet(
+            questionState: controller.questionState,
+            answer: controller.questionAnswer,
+            failure: controller.questionFailure,
+            allDishes: menu.allDishes.toList(),
+            onAsk: (q) => unawaited(controller.askQuestion(q)),
+            onDismiss: controller.dismissQuestion,
+          ),
+        ),
       ),
     );
   }

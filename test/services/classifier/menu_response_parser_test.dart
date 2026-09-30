@@ -56,12 +56,13 @@ MenuAnalysis _parse(String body, Menu source) => MenuResponseParser.parse(
   engine: _engine,
 );
 
-/// A one-dish reply for `dish-steak` with [verdict], [modification] and
-/// [netCarbsEstimate], for the issue #57 net-carb limit post-rule.
+/// A one-dish reply for `dish-steak` with [verdict], [modification],
+/// [netCarbsEstimate], and an optional [hiddenCarbs] list.
 String _steakReply({
   String verdict = 'orderAsIs',
   String? modification,
   num? netCarbsEstimate,
+  List<Object?>? hiddenCarbs,
 }) => jsonEncode(<String, Object?>{
   'dishes': <Object?>[
     <String, Object?>{
@@ -71,6 +72,7 @@ String _steakReply({
       'why': 'Grilled protein, glaze on top.',
       'modification': modification,
       'net_carbs_estimate': netCarbsEstimate,
+      'hidden_carbs': hiddenCarbs ?? <Object?>[],
     },
   ],
 });
@@ -798,6 +800,245 @@ void main() {
         final analysed = result.dishes.single;
         expect(analysed.dishId, 'dish-steak');
         expect(analysed.verdict, DishVerdict.orderAsIs);
+      });
+    });
+
+    // -------------------------------------------------------------------------
+    // Hidden-carb radar (issue #213, architecture.md §9.4 rule 5a)
+    // -------------------------------------------------------------------------
+
+    group('hidden-carb demotion (issue #213)', () {
+      test('parse stamps schemaVersion 1 on every MenuAnalysed result', () {
+        // Arrange
+        final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
+        final body = _steakReply();
+
+        // Act
+        final result = _parse(body, source) as MenuAnalysed;
+
+        // Assert
+        expect(result.schemaVersion, equals(MenuResponseParser.schemaVersion));
+      });
+
+      test('green dish with a valid hidden-carb flag is demoted to yellow', () {
+        // Arrange
+        final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
+        final body = _steakReply(
+          hiddenCarbs: [
+            <String, Object?>{
+              'source': 'house glaze',
+              'certainty': 'likely',
+              'waiter_question': 'Is the glaze without honey?',
+            },
+          ],
+        );
+
+        // Act
+        final result = _parse(body, source) as MenuAnalysed;
+
+        // Assert
+        expect(result.dishes.single.verdict, DishVerdict.modifiable);
+        expect(result.dishes.single.hiddenCarbs, hasLength(1));
+        expect(
+          result.dishes.single.hiddenCarbs.first.source,
+          equals('house glaze'),
+        );
+      });
+
+      test('green with hidden-carb and no modification uses waiterQuestion as '
+          'instruction', () {
+        // Arrange
+        final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
+        final body = _steakReply(
+          hiddenCarbs: [
+            <String, Object?>{
+              'source': 'house glaze',
+              'certainty': 'suspected',
+              'waiter_question': 'Is the glaze sugar-free?',
+            },
+          ],
+        );
+
+        // Act
+        final result = _parse(body, source) as MenuAnalysed;
+
+        // Assert
+        final dish = result.dishes.single;
+        expect(dish.verdict, DishVerdict.modifiable);
+        expect(dish.modification, equals('Is the glaze sugar-free?'));
+      });
+
+      test('green with hidden-carb and a usable modification keeps the '
+          'modification as the instruction', () {
+        // Arrange
+        final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
+        final body = _steakReply(
+          modification: 'Ask for the glaze on the side',
+          hiddenCarbs: [
+            <String, Object?>{
+              'source': 'house glaze',
+              'certainty': 'likely',
+              'waiter_question': 'Is the glaze sugar-free?',
+            },
+          ],
+        );
+
+        // Act
+        final result = _parse(body, source) as MenuAnalysed;
+
+        // Assert
+        final dish = result.dishes.single;
+        expect(dish.verdict, DishVerdict.modifiable);
+        expect(dish.modification, equals('Ask for the glaze on the side'));
+        expect(dish.hiddenCarbs, hasLength(1));
+      });
+
+      test('red dish drops hidden_carbs even when present', () {
+        // Arrange
+        final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
+        final body = _steakReply(
+          verdict: 'nonKeto',
+          hiddenCarbs: [
+            <String, Object?>{
+              'source': 'breaded coating',
+              'certainty': 'likely',
+              'waiter_question': 'Is it breaded?',
+            },
+          ],
+        );
+
+        // Act
+        final result = _parse(body, source) as MenuAnalysed;
+
+        // Assert
+        expect(result.dishes.single.verdict, DishVerdict.nonKeto);
+        expect(result.dishes.single.hiddenCarbs, isEmpty);
+      });
+
+      test('absent hidden_carbs is treated as empty — no demotion', () {
+        // Arrange
+        final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
+        final body = jsonEncode(<String, Object?>{
+          'dishes': [
+            <String, Object?>{
+              'id': 'dish-steak',
+              'name': 'Grilled Steak',
+              'verdict': 'orderAsIs',
+              'why': 'Plain protein.',
+              'modification': null,
+              'net_carbs_estimate': null,
+              // no hidden_carbs key
+            },
+          ],
+        });
+
+        // Act
+        final result = _parse(body, source) as MenuAnalysed;
+
+        // Assert
+        expect(result.dishes.single.verdict, DishVerdict.orderAsIs);
+        expect(result.dishes.single.hiddenCarbs, isEmpty);
+      });
+
+      test('malformed hidden_carbs entries are silently dropped', () {
+        // Arrange
+        final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
+        final body = _steakReply(
+          hiddenCarbs: [
+            // Missing source — dropped
+            <String, Object?>{
+              'certainty': 'likely',
+              'waiter_question': 'Sugar-free?',
+            },
+            // Valid entry
+            <String, Object?>{
+              'source': 'house dressing',
+              'certainty': 'suspected',
+              'waiter_question': 'Is the dressing sugar-free?',
+            },
+          ],
+        );
+
+        // Act
+        final result = _parse(body, source) as MenuAnalysed;
+
+        // Assert — demoted with the one valid entry
+        expect(result.dishes.single.verdict, DishVerdict.modifiable);
+        expect(result.dishes.single.hiddenCarbs, hasLength(1));
+      });
+
+      test('over-length waiter_question is dropped', () {
+        // Arrange
+        final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
+        final longQuestion = 'x' * 301;
+        final body = _steakReply(
+          hiddenCarbs: [
+            <String, Object?>{
+              'source': 'house glaze',
+              'certainty': 'suspected',
+              'waiter_question': longQuestion,
+            },
+          ],
+        );
+
+        // Act
+        final result = _parse(body, source) as MenuAnalysed;
+
+        // Assert — entry dropped, so no demotion and empty list
+        expect(result.dishes.single.verdict, DishVerdict.orderAsIs);
+        expect(result.dishes.single.hiddenCarbs, isEmpty);
+      });
+
+      test('more than three hidden_carbs entries are truncated to three', () {
+        // Arrange
+        final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
+        final body = _steakReply(
+          hiddenCarbs: List.generate(
+            5,
+            (i) => <String, Object?>{
+              'source': 'source$i',
+              'certainty': 'suspected',
+              'waiter_question': 'Question $i?',
+            },
+          ),
+        );
+
+        // Act
+        final result = _parse(body, source) as MenuAnalysed;
+
+        // Assert — capped at 3
+        expect(result.dishes.single.hiddenCarbs, hasLength(3));
+        expect(
+          result.dishes.single.hiddenCarbs.first.source,
+          equals('source0'),
+        );
+      });
+
+      test('yellow dish with existing modification keeps its verdict and '
+          'modification unchanged', () {
+        // Arrange — model sent yellow with modification AND hidden_carbs;
+        // the flag list is preserved and the modification is kept.
+        final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
+        final body = _steakReply(
+          verdict: 'modifiable',
+          modification: 'No fries, green salad please',
+          hiddenCarbs: [
+            <String, Object?>{
+              'source': 'sauce',
+              'certainty': 'suspected',
+              'waiter_question': 'Sugar-free sauce?',
+            },
+          ],
+        );
+
+        // Act
+        final result = _parse(body, source) as MenuAnalysed;
+
+        // Assert
+        final dish = result.dishes.single;
+        expect(dish.verdict, DishVerdict.modifiable);
+        expect(dish.modification, equals('No fries, green salad please'));
+        expect(dish.hiddenCarbs, hasLength(1));
       });
     });
   });

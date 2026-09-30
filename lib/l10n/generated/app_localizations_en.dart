@@ -40,6 +40,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionShareMenu => 'Share menu';
 
   @override
+  String get actionOpenDrinksGuide => 'Drinks guide';
+
+  @override
   String get actionCancel => 'Cancel';
 
   @override
@@ -132,7 +135,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsConsentBody =>
-      'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.';
+      'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.';
 
   @override
   String get settingsConsentAccept => 'Allow AI analysis';
@@ -145,7 +148,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsConsentBodyDirect =>
-      'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.';
+      'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.';
 
   @override
   String get settingsKeySection => 'Gemini API key';
@@ -1021,4 +1024,89 @@ class AppLocalizationsEn extends AppLocalizations {
   String netCarbsChipLeavesSuffix(int grams) {
     return ' · leaves ${grams}g';
   }
+
+  @override
+  String get hiddenCarbsSectionLabel => 'Possible hidden carbs';
+
+  @override
+  String get hiddenCarbsCertaintySuspected => 'Suspected';
+
+  @override
+  String get hiddenCarbsCertaintyLikely => 'Likely';
+
+  @override
+  String get drinksGuideTitle => 'Drinks guide';
+
+  @override
+  String get drinksGuideDisclaimer =>
+      'Typical net-carb ranges per standard serving. All figures are estimates — actual values vary by brand, size, and recipe.';
+
+  @override
+  String get drinksGuideSectionOrderAsIs => 'ORDER AS-IS';
+
+  @override
+  String get drinksGuideSectionSwap => 'ASK FOR A SWAP';
+
+  @override
+  String get drinksGuideSectionSkip => 'SKIP';
+
+  @override
+  String get settingsDrinksGuideTitle => 'DRINKS GUIDE';
+
+  @override
+  String get settingsDrinksGuideSubtitle => 'Bar and coffee reference';
+
+  @override
+  String get actionAskAboutMenu => 'Ask about this menu';
+
+  @override
+  String get menuQuestionSheetTitle => 'Ask about this menu';
+
+  @override
+  String get menuQuestionSheetHint => 'e.g. Which dishes are dairy-free?';
+
+  @override
+  String get menuQuestionSheetAsk => 'Ask';
+
+  @override
+  String get menuQuestionSheetLoading => 'Asking…';
+
+  @override
+  String get menuQuestionSheetAskAnother => 'Ask another question';
+
+  @override
+  String get menuQuestionFailedNotConfigured =>
+      'AI is not available on this build, so the question could not be answered.';
+
+  @override
+  String get menuQuestionFailedOffline =>
+      'You look offline. Reconnect and try asking again.';
+
+  @override
+  String get menuQuestionFailedTimeout =>
+      'The AI model was too slow. Try asking again.';
+
+  @override
+  String get menuQuestionFailedRateLimited =>
+      'The daily AI limit is used up. Try again later.';
+
+  @override
+  String get menuQuestionFailedBadResponse =>
+      'The AI gave an unusable answer. Try asking in a different way.';
+
+  @override
+  String get menuQuestionFailedBackendUnreachable =>
+      'KetoClub\'s server could not be reached. Try asking again.';
+
+  @override
+  String get menuQuestionFailedConsentWithheld =>
+      'Allow AI analysis in Settings to ask questions about a menu.';
+
+  @override
+  String get menuQuestionFailedApiKeyMissing =>
+      'Add your Gemini API key in Settings to ask questions about a menu.';
+
+  @override
+  String get menuQuestionFailedApiKeyRejected =>
+      'Gemini rejected your API key. Check it in Settings, then try asking again.';
 }

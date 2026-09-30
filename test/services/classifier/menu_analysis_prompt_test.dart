@@ -370,8 +370,8 @@ void main() {
         _assertStrictSchema(schema);
       });
 
-      test('responseSchema declares exactly the six documented dish '
-          'properties', () {
+      test('responseSchema declares exactly the seven documented dish '
+          'properties (issue #213 adds hidden_carbs)', () {
         // Act
         final schema = MenuAnalysisPrompt.responseSchema();
         final dishesSchema =
@@ -388,7 +388,34 @@ void main() {
           'why',
           'modification',
           'net_carbs_estimate',
+          'hidden_carbs',
         });
+      });
+
+      test('responseSchema hidden_carbs nested object is strict with three '
+          'required properties', () {
+        // Act
+        final schema = MenuAnalysisPrompt.responseSchema();
+        final dishProperties =
+            ((schema['properties']! as Map<String, Object?>)['dishes']!
+                    as Map<String, Object?>)['items']!
+                as Map<String, Object?>;
+        final hiddenCarbs =
+            (dishProperties['properties']!
+                    as Map<String, Object?>)['hidden_carbs']!
+                as Map<String, Object?>;
+        final itemSchema = hiddenCarbs['items']! as Map<String, Object?>;
+
+        // Assert
+        expect(itemSchema['additionalProperties'], isFalse);
+        expect((itemSchema['required']! as List<Object?>).toSet(), {
+          'source',
+          'certainty',
+          'waiter_question',
+        });
+        final itemProps = itemSchema['properties']! as Map<String, Object?>;
+        final certainty = itemProps['certainty']! as Map<String, Object?>;
+        expect(certainty['enum'], containsAll(['suspected', 'likely']));
       });
 
       test('responseSchema types modification and net_carbs_estimate as '

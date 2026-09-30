@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/screens/drinks_guide_screen.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
@@ -141,6 +142,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _filterSection(context, l10n, controller),
             const SizedBox(height: 20),
             _cacheSection(context, l10n, controller),
+            const SizedBox(height: 20),
+            _drinksGuideSection(context, l10n),
           ],
         ),
       ),
@@ -678,6 +681,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await controller.clearCache();
     if (!mounted) return;
     setState(() => _cacheCleared = true);
+  }
+
+  /// A row linking to the offline drinks guide (/drinks, issue #216).
+  Widget _drinksGuideSection(BuildContext context, AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionLabel(l10n.settingsDrinksGuideTitle),
+        _SettingsGroup(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.local_bar),
+              title: Text(l10n.settingsDrinksGuideSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.pushNamed(context, drinksRoutePath),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }
 

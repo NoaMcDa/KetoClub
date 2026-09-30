@@ -7,6 +7,7 @@ import 'package:flutter/material.dart' hide MenuController;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/drinks_guide_screen.dart';
 import 'package:ketoclub/screens/menu_screen.dart';
 import 'package:ketoclub/screens/saved_screen.dart';
 import 'package:ketoclub/screens/scan_screen.dart';
@@ -232,17 +233,28 @@ Route<void>? generateRoute(
     );
   }
 
+  if (name == drinksRoutePath) {
+    return MaterialPageRoute<void>(
+      settings: settings,
+      builder: (_) => const AppShell(
+        currentIndex: AppShell.settingsIndex,
+        child: DrinksGuideScreen(),
+      ),
+    );
+  }
+
   final ref = venueRefFromPath(name);
   if (ref != null) {
     return MaterialPageRoute<void>(
       settings: settings,
       builder: (context) => ChangeNotifierProvider<MenuController>(
-        create: (_) => MenuController(
+        create: (context) => MenuController(
           dependencies.menuRepository,
           dependencies.menuClassifier,
           dependencies.settingsStore,
           dependencies.notesStore,
           context.read<CarbBudgetController>(),
+          dependencies.menuQuestionAnswerer,
         ),
         child: MenuScreen(
           ref: ref,

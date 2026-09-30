@@ -27,6 +27,97 @@ MenuAnalysisFailureReason? _tryParseFailureReason(String wire) {
   return null;
 }
 
+/// How certain the model is that a dish hides a non-keto ingredient.
+///
+/// Two levels only — matching the Dart enum names to the JSON enum values
+/// keeps the parser trivial (architecture.md §9.4). The third state,
+/// "none", is represented by an empty [AnalysedDish.hiddenCarbs] list.
+enum HiddenCarbCertainty {
+  /// The model suspects a hidden ingredient (e.g. a house dressing may
+  /// contain sugar), but it cannot confirm without more information.
+  suspected,
+
+  /// The model is confident a hidden ingredient is present (e.g. teriyaki
+  /// glaze almost always contains honey or mirin).
+  likely;
+
+  /// The certainty whose [name] equals [wire], or null when none does.
+  static HiddenCarbCertainty? tryParse(String wire) {
+    for (final c in HiddenCarbCertainty.values) {
+      if (c.name == wire) return c;
+    }
+    return null;
+  }
+}
+
+/// One hidden-carb flag on a dish: a suspected or confirmed non-keto
+/// ingredient the dish name does not reveal, with a waiter question to
+/// surface it (architecture.md §6.2, issue #213).
+///
+/// Immutable value type; round-trips through [toJson]/[tryFrom].
+@immutable
+final class HiddenCarb {
+  /// Creates a flag for [source], with [certainty] and a [waiterQuestion]
+  /// in the menu's language (architecture.md §12).
+  const new({
+    required this.source,
+    required this.certainty,
+    required this.waiterQuestion,
+  });
+
+  /// Reads a flag written by [toJson].
+  ///
+  /// Returns null for any shape mismatch and never throws: a missing or
+  /// blank [source]/[waiterQuestion], an unknown [certainty], or an
+  /// over-length value all produce null (architecture.md §9.4 rule 7).
+  static HiddenCarb? tryFrom(Map<String, Object?> json) {
+    final rawSource = json['source'];
+    final rawCertainty = json['certainty'];
+    final rawQuestion = json['waiterQuestion'];
+    if (rawSource is! String || rawSource.trim().isEmpty) return null;
+    if (rawCertainty is! String) return null;
+    final certainty = HiddenCarbCertainty.tryParse(rawCertainty);
+    if (certainty == null) return null;
+    if (rawQuestion is! String || rawQuestion.trim().isEmpty) return null;
+    return HiddenCarb(
+      source: rawSource,
+      certainty: certainty,
+      waiterQuestion: rawQuestion,
+    );
+  }
+
+  /// A short description of the suspected ingredient (e.g. "house
+  /// dressing", "teriyaki glaze"). Never empty.
+  final String source;
+
+  /// How confident the model is.
+  final HiddenCarbCertainty certainty;
+
+  /// A waiter-facing question in the menu's own language (architecture.md
+  /// §12): e.g. "Is the dressing sugar-free?" Never empty.
+  final String waiterQuestion;
+
+  /// Writes a form [tryFrom] can read back.
+  Map<String, Object?> toJson() => <String, Object?>{
+    'source': source,
+    'certainty': certainty.name,
+    'waiterQuestion': waiterQuestion,
+  };
+
+  @override
+  bool operator ==(Object other) =>
+      other is HiddenCarb &&
+      other.source == source &&
+      other.certainty == certainty &&
+      other.waiterQuestion == waiterQuestion;
+
+  @override
+  int get hashCode => Object.hash(source, certainty, waiterQuestion);
+
+  @override
+  String toString() => 'HiddenCarb($source, $certainty)';
+}
+
 /// How the classifier judged one dish (architecture.md §6.2).
 enum DishVerdict {
   /// Keto-safe as printed; order with no changes.
@@ -108,13 +199,17 @@ final class AnalysedDish {
     required this.why,
     this.modification,
     this.netCarbsEstimate,
+    this.hiddenCarbs = const <HiddenCarb>[],
   });
 
   /// Reads a verdict written by [toJson].
   ///
   /// Returns null for any shape mismatch — including a
   /// [DishVerdict.modifiable] verdict with no [modification], or a
-  /// non-modifiable verdict that carries one — and never throws.
+  /// non-modifiable verdict that carries one — and never throws. An
+  /// absent or null `hiddenCarbs` reads as empty (a dish cached before
+  /// issue #213 has none); a malformed entry in the list is dropped
+  /// silently (architecture.md §9.4).
   static AnalysedDish? tryFrom(Map<String, Object?> json) {
     final dishId = json['dishId'];
     final name = json['name'];
@@ -137,6 +232,16 @@ final class AnalysedDish {
     if (!isModifiable && modification != null) return null;
     if (rawNetCarbs != null && rawNetCarbs is! num) return null;
     final netCarbsEstimate = rawNetCarbs is num ? rawNetCarbs.toDouble() : null;
+    final rawHiddenCarbs = json['hiddenCarbs'];
+    final hiddenCarbs = <HiddenCarb>[];
+    if (rawHiddenCarbs is List<Object?>) {
+      for (final rawEntry in rawHiddenCarbs) {
+        if (rawEntry is Map<String, Object?>) {
+          final entry = HiddenCarb.tryFrom(rawEntry);
+          if (entry != null) hiddenCarbs.add(entry);
+        }
+      }
+    }
     return AnalysedDish(
       dishId: dishId,
       name: name,
@@ -144,6 +249,7 @@ final class AnalysedDish {
       why: why,
       modification: modification,
       netCarbsEstimate: netCarbsEstimate,
+      hiddenCarbs: hiddenCarbs,
     );
   }
 
@@ -171,6 +277,12 @@ final class AnalysedDish {
   /// it.
   final double? netCarbsEstimate;
 
+  /// Hidden-carb flags from the LLM engine (issue #213, architecture.md
+  /// §6.2). Empty when the engine found none, or when this is a
+  /// rules-engine result. A non-empty list on a green dish means the dish
+  /// was demoted to yellow by the parser.
+  final List<HiddenCarb> hiddenCarbs;
+
   /// Writes a form [tryFrom] can read back.
   Map<String, Object?> toJson() => <String, Object?>{
     'dishId': dishId,
@@ -179,6 +291,7 @@ final class AnalysedDish {
     'why': why,
     'modification': modification,
     'netCarbsEstimate': netCarbsEstimate,
+    'hiddenCarbs': hiddenCarbs.map((h) => h.toJson()).toList(),
   };
 
   @override
@@ -189,11 +302,19 @@ final class AnalysedDish {
       other.verdict == verdict &&
       other.why == why &&
       other.modification == modification &&
-      other.netCarbsEstimate == netCarbsEstimate;
+      other.netCarbsEstimate == netCarbsEstimate &&
+      _listEquals(other.hiddenCarbs, hiddenCarbs);
 
   @override
-  int get hashCode =>
-      Object.hash(dishId, name, verdict, why, modification, netCarbsEstimate);
+  int get hashCode => Object.hash(
+    dishId,
+    name,
+    verdict,
+    why,
+    modification,
+    netCarbsEstimate,
+    Object.hashAll(hiddenCarbs),
+  );
 
   @override
   String toString() => 'AnalysedDish($dishId: $verdict)';
@@ -406,13 +527,14 @@ sealed class MenuAnalysis {
 final class MenuAnalysed extends MenuAnalysis {
   /// Creates a result for [dishes], noting [unclassified] names and
   /// which [engine] produced it at [analysedAt], with the [options] it was
-  /// produced under when those are known.
+  /// produced under when those are known, at [schemaVersion].
   const new({
     required this.dishes,
     required this.unclassified,
     required this.engine,
     required this.analysedAt,
     this.options,
+    this.schemaVersion = 0,
   });
 
   /// Reads a result written by [toJson].
@@ -421,7 +543,8 @@ final class MenuAnalysed extends MenuAnalysis {
   /// verdict, engine tag or [options] snapshot, and never throws. An
   /// absent or null `options` reads as a null [options] rather than
   /// invalidating the record: every analysis cached before issue #57
-  /// has none, and each of those was made under the defaults.
+  /// has none, and each of those was made under the defaults. An absent
+  /// or null `schemaVersion` reads as 0 — the version before issue #213.
   static MenuAnalysed? tryFrom(Map<String, Object?> json) {
     final rawDishes = json['dishes'];
     final rawUnclassified = json['unclassified'];
@@ -454,12 +577,15 @@ final class MenuAnalysed extends MenuAnalysis {
       options = AnalysisOptionsSnapshot.tryFrom(rawOptions);
       if (options == null) return null;
     }
+    final rawSchemaVersion = json['schemaVersion'];
+    final schemaVersion = rawSchemaVersion is int ? rawSchemaVersion : 0;
     return MenuAnalysed(
       dishes: dishes,
       unclassified: unclassified,
       engine: engine,
       analysedAt: analysedAt,
       options: options,
+      schemaVersion: schemaVersion,
     );
   }
 
@@ -490,6 +616,15 @@ final class MenuAnalysed extends MenuAnalysis {
   /// user's current ones before reusing a cached analysis.
   final AnalysisOptionsSnapshot? options;
 
+  /// The schema version this result was produced under (issue #213).
+  ///
+  /// Absent in cached entries produced before issue #213 — [tryFrom]
+  /// reads those as 0. `MenuController._reusableAnalysis` rejects a
+  /// cached result whose version does not match the current parser's
+  /// schema version constant, so stale greens cannot survive a schema
+  /// upgrade.
+  final int schemaVersion;
+
   /// A copy of this result with [engine] replaced.
   ///
   /// Used by the router to re-stamp the fallback reason after the fact.
@@ -499,6 +634,7 @@ final class MenuAnalysed extends MenuAnalysis {
     engine: engine,
     analysedAt: analysedAt,
     options: options,
+    schemaVersion: schemaVersion,
   );
 
   /// A copy of this result recording [options] as the options it was
@@ -513,9 +649,12 @@ final class MenuAnalysed extends MenuAnalysis {
     engine: engine,
     analysedAt: analysedAt,
     options: options,
+    schemaVersion: schemaVersion,
   );
 
-  /// Writes a form [tryFrom] can read back.
+  /// Writes a form [tryFrom] can read back. [schemaVersion] is always
+  /// emitted — safer than omitting 0, which would prevent a future
+  /// `tryFrom` from knowing whether the field was absent or zero.
   Map<String, Object?> toJson() => <String, Object?>{
     'dishes': dishes.map((dish) => dish.toJson()).toList(),
     'unclassified': unclassified,
@@ -525,6 +664,7 @@ final class MenuAnalysed extends MenuAnalysis {
     },
     'analysedAt': analysedAt.toIso8601String(),
     'options': options?.toJson(),
+    'schemaVersion': schemaVersion,
   };
 
   @override
@@ -534,7 +674,8 @@ final class MenuAnalysed extends MenuAnalysis {
       _listEquals(other.unclassified, unclassified) &&
       other.engine == engine &&
       other.analysedAt == analysedAt &&
-      other.options == options;
+      other.options == options &&
+      other.schemaVersion == schemaVersion;
 
   @override
   int get hashCode => Object.hash(
@@ -543,6 +684,7 @@ final class MenuAnalysed extends MenuAnalysis {
     engine,
     analysedAt,
     options,
+    schemaVersion,
   );
 
   @override
