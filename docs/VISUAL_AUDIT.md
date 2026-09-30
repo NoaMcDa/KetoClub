@@ -78,10 +78,10 @@ headless Chromium ──▶ build/web (static, :8080) ──▶ backend (:8000) 
    OUTDIR=build/visual-audit python3 tool/visual_audit/render_artboards.py
    ```
 
-   Hebrew has no bundled face (see finding G7), so Flutter fetches Noto
-   Sans Hebrew from `fonts.gstatic.com` at runtime; the driver routes that
-   one host through Python's own HTTP client so the fetch uses the
-   machine's proxy and CA settings.
+   This audit ran before Hebrew had a bundled face (finding G7, since
+   fixed), so Flutter fetched Noto Sans Hebrew from `fonts.gstatic.com` at
+   runtime; the driver routes that one host through Python's own HTTP client
+   so the fetch uses the machine's proxy and CA settings.
 
 5. **The artboards** — the `.dc.html` files expect the design canvas's own
    `support.js`, which is not in `.design/`. `tool/visual_audit/support.js`
@@ -114,7 +114,7 @@ reason), or **Decision** — needs a product call before anyone changes it.
 | G4 | Search fields (Discovery, menu, note editor) | a `--surface` box, `--line` edge, 14px radius | an underlined Material field | **Fixed** — `inputDecorationTheme` |
 | G5 | Chips (filters, category jumps, waiter-card tabs) | `.chip`: a pill, 12.5px semibold, `--accent` fill when selected, no check mark | rounded rectangles, 14–15px labels, a check mark, a pale green selected fill | **Fixed** — `chipTheme` |
 | G6 | Small upper-case labels ("LOOKING AROUND", "KETO SCORE", tile labels) | `--ink3` | `--ink2` | **Fixed** — `labelSmall` is `--ink3` |
-| G7 | Hebrew text anywhere | — | rendered as empty boxes whenever `fonts.gstatic.com` is unreachable: no Hebrew face is bundled, and the fallback chain names system fonts a CanvasKit build cannot use, so web depends on Flutter's runtime font download | **Decision** — bundle a Hebrew face (e.g. Noto Sans Hebrew, OFL) for offline and blocked networks, at the cost of app size |
+| G7 | Hebrew text anywhere | — | rendered as empty boxes whenever `fonts.gstatic.com` is unreachable: no Hebrew face was bundled, and the fallback chain named system fonts a CanvasKit build cannot use, so web depended on Flutter's runtime font download | **Fixed** (#261) — Noto Sans Hebrew 400 and 700 (OFL, 46 KB each) bundled under `assets/fonts/` and first in both `AppTypography.uiFallback` and `displayFallback` |
 | G8 | Menu → ⚙ Settings → any tab | — | the tab replaced only the top route, leaving the menu underneath: every such round trip grew the navigation stack by a whole menu screen | **Fixed** — tab taps clear the stack (`pushNamedAndRemoveUntil`) |
 | G9 | Tab roots reached by deep link (`/#/settings`) | no back arrow | a back arrow (Flutter web pushes `/` under an initial deep link); tapping a tab never shows it | **Left** — web initial-route behaviour, not reachable by in-app navigation |
 

@@ -1,4 +1,8 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show FontLoader;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/theme/app_theme.dart';
@@ -225,6 +229,74 @@ void main() {
       final body = Theme.of(context).textTheme.bodyMedium!;
       expect(body.fontFamilyFallback, AppTypography.uiFallback);
       expect(find.text('theme probe'), findsOneWidget);
+    });
+
+    test('the bundled Hebrew face leads both fallback chains', () {
+      // Assert
+      expect(AppTypography.hebrewFamily, 'Noto Sans Hebrew');
+      expect(AppTypography.uiFallback.first, AppTypography.hebrewFamily);
+      expect(AppTypography.displayFallback.first, AppTypography.hebrewFamily);
+    });
+
+    testWidgets('Hebrew text measures with the bundled face, not boxes', (
+      tester,
+    ) async {
+      // Arrange: the same Hebrew string in the bundled family and in an
+      // unbundled one. A family that is not bundled falls back to the test
+      // font, whose every glyph is a full-em square.
+      const hebrew = 'שלום עולם';
+      // flutter_test renders every family in its Ahem stand-in unless the
+      // font is loaded, so load the bundled file the way the engine would.
+      final loader = FontLoader(AppTypography.hebrewFamily)
+        ..addFont(
+          Future.value(
+            ByteData.sublistView(
+              File('assets/fonts/NotoSansHebrew-400.ttf').readAsBytesSync(),
+            ),
+          ),
+        );
+      await loader.load();
+      Future<Size> measure(String family) async {
+        final key = GlobalKey();
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.rtl,
+            child: Center(
+              child: Text(
+                hebrew,
+                key: key,
+                style: TextStyle(fontFamily: family, fontSize: 20),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        return tester.getSize(find.byKey(key));
+      }
+
+      // Act
+      final bundled = await measure(AppTypography.hebrewFamily);
+      final unbundled = await measure('No Such Family');
+
+      // Assert: real glyphs, with proportional (non-square) advances.
+      expect(bundled.width, greaterThan(0));
+      expect(bundled.height, greaterThan(0));
+      expect(bundled.width, isNot(unbundled.width));
+    });
+
+    test('both weights and the licence are bundled and declared', () {
+      // Arrange
+      final pubspec = File('pubspec.yaml').readAsStringSync();
+
+      // Assert
+      for (final name in const [
+        'NotoSansHebrew-400.ttf',
+        'NotoSansHebrew-700.ttf',
+        'OFL-NotoSansHebrew.txt',
+      ]) {
+        expect(File('assets/fonts/$name').existsSync(), isTrue, reason: name);
+        expect(pubspec, contains('assets/fonts/$name'));
+      }
     });
 
     test('the display face also declares a Hebrew fallback', () {
