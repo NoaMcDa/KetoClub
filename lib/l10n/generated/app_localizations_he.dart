@@ -734,6 +734,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get legendNote => 'אותם הכללים שקטוקלאב שולחת למודל הבינה המלאכותית.';
 
   @override
+  String get legendEngines =>
+      'כללים: בדיקות מילות מפתח של קטוקלאב על טקסט המנה, בלי הערכת פחמימות. בינה מלאכותית: Gemini קורא את כל התפריט ומעריך פחמימות נטו.';
+
+  @override
   String get waiterCardCopyButton => 'העתק טקסט';
 
   @override

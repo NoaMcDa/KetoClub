@@ -851,6 +851,8 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
             ),
           Text(l10n.legendNote, style: bodyStyle),
+          const SizedBox(height: 6),
+          Text(l10n.legendEngines, style: bodyStyle),
         ],
       ),
     );

@@ -729,6 +729,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get legendNote => 'The same rules KetoClub sends to the AI model.';
 
   @override
+  String get legendEngines =>
+      'Rules: KetoClub\'s own keyword checks on the dish text, with no carb estimate. AI: Gemini reads the whole menu and estimates net carbs.';
+
+  @override
   String get waiterCardCopyButton => 'Copy text';
 
   @override

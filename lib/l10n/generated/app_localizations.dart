@@ -1226,6 +1226,12 @@ abstract class AppLocalizations {
   /// **'The same rules KetoClub sends to the AI model.'**
   String get legendNote;
 
+  /// No description provided for @legendEngines.
+  ///
+  /// In en, this message translates to:
+  /// **'Rules: KetoClub\'s own keyword checks on the dish text, with no carb estimate. AI: Gemini reads the whole menu and estimates net carbs.'**
+  String get legendEngines;
+
   /// No description provided for @waiterCardCopyButton.
   ///
   /// In en, this message translates to:

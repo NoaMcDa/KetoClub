@@ -307,6 +307,7 @@
   "legendToggle": "What do the colours mean?",
   "legendHide": "Hide the legend",
   "legendNote": "The same rules KetoClub sends to the AI model.",
+  "legendEngines": "Rules: KetoClub's own keyword checks on the dish text, with no carb estimate. AI: Gemini reads the whole menu and estimates net carbs.",
   "waiterCardCopyButton": "Copy text",
   "waiterCardAfterText": "With these changes, about {grams}g net carbs (estimate) — safe to order.",
   "@waiterCardAfterText": {
