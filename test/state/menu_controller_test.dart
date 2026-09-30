@@ -2216,6 +2216,7 @@ void main() {
       engine: const LlmEngine(model: 'test-model'),
       analysedAt: DateTime.utc(2026),
       options: const AnalysisOptionsSnapshot(netCarbLimitGrams: 6),
+      schemaVersion: MenuResponseParser.schemaVersion,
     );
 
     late FakeMenuRepository repository;
@@ -2301,6 +2302,7 @@ void main() {
           engine: const LlmEngine(model: 'test-model'),
           analysedAt: DateTime.utc(2026),
           options: const AnalysisOptionsSnapshot(netCarbLimitGrams: 6),
+          schemaVersion: MenuResponseParser.schemaVersion,
         );
         final r = FakeMenuRepository()
           ..stub(
@@ -2404,6 +2406,7 @@ void main() {
         engine: const LlmEngine(model: 'test-model'),
         analysedAt: DateTime.utc(2026),
         options: const AnalysisOptionsSnapshot(netCarbLimitGrams: 6),
+        schemaVersion: MenuResponseParser.schemaVersion,
       );
       final r = FakeMenuRepository()
         ..stub(_ref, MenuFetched(menu: mixedMenu))
