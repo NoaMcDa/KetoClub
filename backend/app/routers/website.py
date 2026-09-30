@@ -41,7 +41,7 @@ from app.services.install_id import require_install_id
 from app.services.rate_limit import RateLimiter
 from app.services.website import (
     RobotsRules,
-    charset_of,
+    decode_page,
     document_kind,
     header_reserves_ai,
     html_reserves_ai,
@@ -243,7 +243,7 @@ async def _read_document(
             final_url=url,
         )
 
-    page = content.decode(charset_of(content_type), errors="replace")
+    page = decode_page(content, content_type)
     if html_reserves_ai(page):
         raise BackendError(403, "aiReserved")
     if looks_javascript_only(page):

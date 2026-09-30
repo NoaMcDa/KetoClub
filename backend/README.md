@@ -306,7 +306,8 @@ kept in step.
   log, which records the route path, never holds it.
 - **Success:** `200 {"kind": "html" | "pdf", "content_type", "body",
   "final_url"}` — `body` is the decoded page for `html` (by its `charset`,
-  UTF-8 by default) and standard base64 for `pdf`; `final_url` is the URL
+  UTF-8 by default and whenever the declared one is unknown or wrong) and
+  standard base64 for `pdf`; `final_url` is the URL
   after redirects, the base the app resolves relative links against.
 - **Failures,** each `{"reason", "status_code"}` with its own reason, which
   the app maps one to one (`BackendWebsiteFetcher.reasonFor`):
