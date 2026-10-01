@@ -155,4 +155,29 @@ void main() {
       expect(decoration.color, isNot(tone.rail));
     });
   });
+
+  group('UnclassifiedBadge', () {
+    testWidgets('build shows an icon and the uppercased label', (tester) async {
+      // Arrange & Act
+      await _pump(tester, const UnclassifiedBadge());
+
+      // Assert
+      expect(find.byType(Icon), findsOneWidget);
+      expect(find.text('NOT CLASSIFIED'), findsOneWidget);
+    });
+
+    testWidgets('build shows the Hebrew label under the he locale', (
+      tester,
+    ) async {
+      // Arrange & Act
+      await _pump(
+        tester,
+        const UnclassifiedBadge(),
+        locale: const Locale('he'),
+      );
+
+      // Assert
+      expect(find.text('לא סווג'), findsOneWidget);
+    });
+  });
 }

@@ -33,6 +33,7 @@ class DishCard extends StatefulWidget {
     this.note,
     this.onEditNote,
     this.showPrice = true,
+    this.unclassified = false,
     super.key,
   });
 
@@ -62,6 +63,12 @@ class DishCard extends StatefulWidget {
   /// prices were stripped before classification and are not real (issue
   /// #83, architecture.md D18); true everywhere else.
   final bool showPrice;
+
+  /// Whether this is a dish the classifier could not place (issue #244):
+  /// a null-analysis row then carries the neutral [UnclassifiedBadge]
+  /// instead of no badge at all. False everywhere else, where a null
+  /// analysis means the menu has not been analysed yet.
+  final bool unclassified;
 
   @override
   State<DishCard> createState() => _DishCardState();
@@ -116,6 +123,9 @@ class _DishCardState extends State<DishCard> {
         // description at 1.45 line height, and a 13.5px bold price.
         if (analysis != null) ...[
           StatusBadge(verdict: analysis.verdict),
+          const SizedBox(height: 6),
+        ] else if (widget.unclassified) ...[
+          const UnclassifiedBadge(),
           const SizedBox(height: 6),
         ],
         // The name and description are menu content, laid out in the

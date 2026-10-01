@@ -266,6 +266,12 @@ abstract class AppLocalizations {
   /// **'KetoClub saw these dishes but could not place them. Read them yourself before ordering.'**
   String get unclassifiedExplain;
 
+  /// No description provided for @unclassifiedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Not classified'**
+  String get unclassifiedBadge;
+
   /// No description provided for @engineChipAi.
   ///
   /// In en, this message translates to:

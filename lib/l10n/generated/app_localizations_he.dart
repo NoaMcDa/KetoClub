@@ -102,6 +102,9 @@ class AppLocalizationsHe extends AppLocalizations {
       'קטוקלאב ראה את המנות האלה אבל לא הצליח לסווג אותן. קראו אותן בעצמכם לפני שאתם מזמינים.';
 
   @override
+  String get unclassifiedBadge => 'לא סווג';
+
+  @override
   String get engineChipAi => 'בינה מלאכותית';
 
   @override

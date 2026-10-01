@@ -102,6 +102,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'KetoClub saw these dishes but could not place them. Read them yourself before ordering.';
 
   @override
+  String get unclassifiedBadge => 'Not classified';
+
+  @override
   String get engineChipAi => 'AI';
 
   @override
