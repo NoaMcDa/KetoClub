@@ -40,9 +40,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionShareMenu => 'Share menu';
 
   @override
-  String get actionOpenDrinksGuide => 'Drinks guide';
-
-  @override
   String get actionMoreMenuOptions => 'More options';
 
   @override
@@ -557,6 +554,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get discoveryEmptyBody =>
       'Use your location to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.';
+
+  @override
+  String get discoveryDrinksGuideCard =>
+      'Ordering a drink? Bar and coffee guide';
 
   @override
   String get discoveryLookingAround => 'Looking around';
@@ -1181,12 +1182,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String drinksGuideCarbsSemanticLabel(String range) {
     return 'Estimated net carbs, not confirmed: $range';
   }
-
-  @override
-  String get settingsDrinksGuideTitle => 'DRINKS GUIDE';
-
-  @override
-  String get settingsDrinksGuideSubtitle => 'Bar and coffee reference';
 
   @override
   String get actionAskAboutMenu => 'Ask about this menu';

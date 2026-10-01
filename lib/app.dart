@@ -250,7 +250,7 @@ Route<void>? generateRoute(
     return MaterialPageRoute<void>(
       settings: settings,
       builder: (context) => AppShell(
-        currentIndex: AppShell.settingsIndex,
+        currentIndex: AppShell.exploreIndex,
         pageTitle: AppLocalizations.of(context)!.drinksGuideTitle,
         child: const DrinksGuideScreen(),
       ),

@@ -69,7 +69,8 @@ class AppShell extends StatelessWidget {
   final Widget child;
 
   /// The browser-tab title's page name, when it should not be the active
-  /// tab's label (the drinks guide, which lives under Settings; issue #226).
+  /// tab's label (the drinks guide, which lives under Explore; issues #226,
+  /// #257).
   final String? pageTitle;
 
   @override

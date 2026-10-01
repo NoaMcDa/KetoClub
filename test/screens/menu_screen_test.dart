@@ -20,7 +20,6 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
-import 'package:ketoclub/screens/drinks_guide_screen.dart';
 import 'package:ketoclub/screens/menu_screen.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
@@ -2362,11 +2361,10 @@ void main() {
         await tester.pumpAndSettle();
 
         // Assert: a failed analysis has no green or yellow dish to
-        // share, so the action is hidden.
-        await tester.tap(find.byTooltip(_en.actionMoreMenuOptions));
-        await tester.pumpAndSettle();
+        // share, and share is all the overflow holds (the drinks guide
+        // moved to Explore, issue #257), so the whole overflow is hidden.
+        expect(find.byTooltip(_en.actionMoreMenuOptions), findsNothing);
         expect(find.text(_en.actionShareMenu), findsNothing);
-        expect(find.text(_en.actionOpenDrinksGuide), findsOneWidget);
       });
 
       testWidgets('the share action appears once the analysis has at least one '
@@ -2839,50 +2837,6 @@ void main() {
           final score = tester.getCenter(find.byType(KetoScoreBadge));
           expect(score.dx, lessThan(name.dx));
           expect(tester.takeException(), isNull);
-        },
-      );
-    });
-
-    group('drinks guide app-bar action (#216)', () {
-      testWidgets(
-        'the overflow menu lists the drinks guide on the loaded menu',
-        (tester) async {
-          // Arrange
-          final repository = FakeMenuRepository()
-            ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
-          final controller = _controllerFor(repository: repository);
-          final pushedNames = <String>[];
-          await _pumpWithRoutes(tester, controller, pushedNames);
-          await tester.pumpAndSettle();
-
-          // Assert — the overflow is rendered unconditionally and holds
-          // the drinks guide as a text item, not a bar icon
-          expect(find.byIcon(Icons.local_bar), findsNothing);
-          await tester.tap(find.byTooltip(_en.actionMoreMenuOptions));
-          await tester.pumpAndSettle();
-          expect(find.text(_en.actionOpenDrinksGuide), findsOneWidget);
-        },
-      );
-
-      testWidgets(
-        'choosing the drinks guide in the overflow pushes the /drinks route',
-        (tester) async {
-          // Arrange
-          final repository = FakeMenuRepository()
-            ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
-          final controller = _controllerFor(repository: repository);
-          final pushedNames = <String>[];
-          await _pumpWithRoutes(tester, controller, pushedNames);
-          await tester.pumpAndSettle();
-
-          // Act
-          await tester.tap(find.byTooltip(_en.actionMoreMenuOptions));
-          await tester.pumpAndSettle();
-          await tester.tap(find.text(_en.actionOpenDrinksGuide));
-          await tester.pumpAndSettle();
-
-          // Assert
-          expect(pushedNames, contains(drinksRoutePath));
         },
       );
     });

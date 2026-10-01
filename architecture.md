@@ -643,8 +643,8 @@ already excluded `חלה` and `שמרים` for the same idiom-collision reason. 
 `מיץ` bare trigger is intentionally included; if it produces a false positive
 on a fixture dish, drop it and keep only the compound forms `מיץ תפוזים` /
 `מיץ ענבים`. An offline bilingual reference screen (`/drinks`,
-`DrinksGuideScreen`) is reachable from the menu screen's app bar and from
-Settings. Its content lives in `drinks_guide_data.dart` as Dart literals
+`DrinksGuideScreen`) is reachable from a card under the Explore search field
+(shown in the empty state and above results, hidden while loading; #257). Its content lives in `drinks_guide_data.dart` as Dart literals
 (the §6.3 exception), never in ARB.
 
 **`RoutingMenuClassifier`** — decides, per call, in this order (revised by D12
@@ -923,10 +923,10 @@ Screens:
 
 | Screen | Route | Purpose |
 |---|---|---|
-| `VenueSearchScreen` | `/` | Locate, search, or paste; opens a venue |
+| `VenueSearchScreen` | `/` | Locate, search, or paste; opens a venue; a card under the search field opens the drinks guide (#257) |
 | `MenuScreen` | `/venue/:source/:id` | Classified menu with filters and engine chip; `/venue/scan/{id}` opens a pasted menu (D18) |
 | `WaiterCardSheet` | modal | Large-type script with copy |
-| `SettingsScreen` | `/settings` | In this order (#255, `docs/UX_REVIEW.md` §2.6): Language, Appearance, Your keto rules, Net carb limit, Default filter; then "AI & privacy" — the consent text collapsed behind a "What leaves this device" disclosure with the "Allow AI analysis" checkbox always visible, and the Gemini key entry on iOS and Android (D17); then "Recent menus" (the cache count and clear, labelled after the tab, #251); then the drinks guide link |
+| `SettingsScreen` | `/settings` | In this order (#255, `docs/UX_REVIEW.md` §2.6): Language, Appearance, Your keto rules, Net carb limit, Default filter; then "AI & privacy" — the consent text collapsed behind a "What leaves this device" disclosure with the "Allow AI analysis" checkbox always visible, and the Gemini key entry on iOS and Android (D17); then "Recent menus" (the cache count and clear, labelled after the tab, #251); then nothing: the drinks guide moved to an Explore card (#257) |
 | `ScanScreen` | `/scan` | Collects menu pages from the camera, the photo library or a PDF, or a menu's text pasted into a field (D18). Analyse hands the pages to `ScannedMenuClassifier` in one call (D15), or the parsed paste to `MenuRepository.store`, and opens `/venue/scan/{id}` (#82, #83). "Scan QR code" (not on web) reads a table's QR code through `QrScanner`; `QrPayloadRouter` sends a Wolt, 10bis, website or PDF link to that venue's `/venue/{source}/{id}` route, and answers a Tabit code ("not supported yet") or an Instagram, Linktree or non-URL code ("photograph the menu instead") with copy on the Scan tab (#182) |
 | `SavedScreen` | `/saved` | The "Recent" tab: the automatic 24-hour cache of every menu opened, pasted, scanned or read from a website, with offline access and remove (#48). Titled "Recent menus" with a history (clock) icon, not "Saved": nothing is saved by the user (#251). The route path and class names stay `/saved` / `SavedScreen` |
 

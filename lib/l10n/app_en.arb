@@ -11,7 +11,6 @@
   "actionBackToSearch": "Back to search",
   "offlineBannerMessage": "No internet connection.",
   "actionShareMenu": "Share menu",
-  "actionOpenDrinksGuide": "Drinks guide",
   "actionMoreMenuOptions": "More options",
   "actionCancel": "Cancel",
 
@@ -239,6 +238,7 @@
   "discoveryTitle": "Where to eat",
   "discoveryEmptyTitle": "Find somewhere to eat",
   "discoveryEmptyBody": "Use your location to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.",
+  "discoveryDrinksGuideCard": "Ordering a drink? Bar and coffee guide",
   "discoveryLookingAround": "Looking around",
   "discoveryAroundYou": "Your location",
   "discoveryLocationInvite": "Tap to use your location",
@@ -523,8 +523,6 @@
   "@drinksGuideCarbsSemanticLabel": {
     "placeholders": { "range": { "type": "String" } }
   },
-  "settingsDrinksGuideTitle": "DRINKS GUIDE",
-  "settingsDrinksGuideSubtitle": "Bar and coffee reference",
   "actionAskAboutMenu": "Ask about this menu",
   "menuQuestionSheetTitle": "Ask about this menu",
   "menuQuestionSheetHint": "e.g. Which dishes are dairy-free?",

@@ -40,9 +40,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get actionShareMenu => 'שתף תפריט';
 
   @override
-  String get actionOpenDrinksGuide => 'מדריך שתייה';
-
-  @override
   String get actionMoreMenuOptions => 'אפשרויות נוספות';
 
   @override
@@ -563,6 +560,9 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get discoveryEmptyBody =>
       'השתמשו במיקום שלכם כדי לראות מסעדות בסביבה, חפשו לפי שם, או הדביקו למעלה קישור מוולט כדי לפתוח את התפריט המסווג לפי קטו.';
+
+  @override
+  String get discoveryDrinksGuideCard => 'מזמינים משקה? מדריך בר וקפה';
 
   @override
   String get discoveryLookingAround => 'מחפשים סביב';
@@ -1187,12 +1187,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String drinksGuideCarbsSemanticLabel(String range) {
     return 'הערכת פחמימות נטו, לא מאומתת: $range';
   }
-
-  @override
-  String get settingsDrinksGuideTitle => 'מדריך שתייה';
-
-  @override
-  String get settingsDrinksGuideSubtitle => 'מדריך בר וקפה';
 
   @override
   String get actionAskAboutMenu => 'שאלו על התפריט הזה';
