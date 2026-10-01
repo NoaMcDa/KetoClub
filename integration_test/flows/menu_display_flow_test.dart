@@ -258,7 +258,7 @@ void main() {
         fakes.classifier.respondWith(fixture.analysis);
         await pumpApp(tester, fakes);
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: the search field sits behind the collapsed Filters row,
         // and the first dish is already on screen above the fold.
