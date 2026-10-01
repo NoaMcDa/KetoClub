@@ -666,6 +666,9 @@ final class FlowFakePagePicker implements PagePicker {
   final List<String> calls = <String>[];
 
   @override
+  bool get canTakePhoto => true;
+
+  @override
   Future<List<ScannedPage>> takePhoto() async {
     calls.add('takePhoto');
     return photos;

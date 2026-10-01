@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/services/platform/page_picker.dart';
@@ -34,10 +35,18 @@ const int pickedImageQuality = 80;
 /// `di.dart` can build it at start-up (`di_test` asserts this).
 final class DevicePagePicker implements PagePicker {
   /// Creates a picker over [imagePicker] and [pdfPick]; each defaults to
-  /// the real plugin. Tests pass fakes.
-  new({ImagePicker? imagePicker, PdfFilePick? pdfPick})
-    : _images = imagePicker ?? ImagePicker(),
-      _pdfPick = pdfPick ?? _pickPdfFile;
+  /// the real plugin. Tests pass fakes. [runsInBrowser] defaults to
+  /// [kIsWeb]: `image_picker` has no camera capture on web, so
+  /// [canTakePhoto] is false there (issue #249).
+  new({
+    ImagePicker? imagePicker,
+    PdfFilePick? pdfPick,
+    this.runsInBrowser = kIsWeb,
+  }) : _images = imagePicker ?? ImagePicker(),
+       _pdfPick = pdfPick ?? _pickPdfFile;
+
+  /// Whether this instance runs in a browser (defaults to [kIsWeb]).
+  final bool runsInBrowser;
 
   final ImagePicker _images;
   final PdfFilePick _pdfPick;
@@ -46,6 +55,9 @@ final class DevicePagePicker implements PagePicker {
     type: FileType.custom,
     allowedExtensions: const <String>['pdf'],
   );
+
+  @override
+  bool get canTakePhoto => !runsInBrowser;
 
   @override
   Future<List<ScannedPage>> takePhoto() async {

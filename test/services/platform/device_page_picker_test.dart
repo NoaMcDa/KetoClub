@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
@@ -120,6 +121,20 @@ void main() {
     test('builds with no plugin I/O', () {
       // Act & Assert: the default plugins are only reached on a pick.
       expect(DevicePagePicker.new, returnsNormally);
+    });
+
+    group('canTakePhoto', () {
+      test('is true on a phone', () {
+        expect(DevicePagePicker(runsInBrowser: false).canTakePhoto, isTrue);
+      });
+
+      test('is false in a browser, which has no camera capture', () {
+        expect(DevicePagePicker(runsInBrowser: true).canTakePhoto, isFalse);
+      });
+
+      test('defaults to the build target: flutter test is not web', () {
+        expect(DevicePagePicker().canTakePhoto, !kIsWeb);
+      });
     });
 
     group('takePhoto', () {

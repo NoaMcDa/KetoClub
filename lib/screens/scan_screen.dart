@@ -190,13 +190,14 @@ class _ScanScreenState extends State<ScanScreen> {
         spacing: 8,
         runSpacing: 8,
         children: [
-          OutlinedButton.icon(
-            onPressed: canAdd
-                ? () => unawaited(_pick(widget.pagePicker.takePhoto))
-                : null,
-            icon: const Icon(Icons.photo_camera_outlined),
-            label: Text(l10n.scanScreenActionTakePhoto),
-          ),
+          if (widget.pagePicker.canTakePhoto)
+            OutlinedButton.icon(
+              onPressed: canAdd
+                  ? () => unawaited(_pick(widget.pagePicker.takePhoto))
+                  : null,
+              icon: const Icon(Icons.photo_camera_outlined),
+              label: Text(l10n.scanScreenActionTakePhoto),
+            ),
           OutlinedButton.icon(
             onPressed: canAdd
                 ? () => unawaited(_pick(widget.pagePicker.pickImages))
