@@ -132,17 +132,7 @@ final class FakeMenuRepository implements MenuRepository {
     final pending = savedMenusGate;
     if (pending != null) await pending;
     return [
-      for (final cached in _cached.values)
-        CachedMenuEntry(
-          ref: cached.menu.venueRef,
-          venueName: cached.menu.venueName,
-          fetchedAt: cached.menu.fetchedAt,
-          dishCount: cached.menu.allDishes.length,
-          engine: switch (cached.analysis) {
-            final MenuAnalysed analysed => analysed.engine,
-            _ => null,
-          },
-        ),
+      for (final cached in _cached.values) CachedMenuEntry.summarise(cached),
     ];
   }
 

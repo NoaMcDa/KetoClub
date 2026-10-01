@@ -377,17 +377,7 @@ final class FlowFakeMenuRepository implements MenuRepository {
 
   @override
   Future<List<CachedMenuEntry>> savedMenus() async => [
-    for (final entry in _cached.values)
-      CachedMenuEntry(
-        ref: entry.menu.venueRef,
-        venueName: entry.menu.venueName,
-        fetchedAt: entry.menu.fetchedAt,
-        dishCount: entry.menu.allDishes.length,
-        engine: switch (entry.analysis) {
-          final MenuAnalysed analysed => analysed.engine,
-          _ => null,
-        },
-      ),
+    for (final entry in _cached.values) CachedMenuEntry.summarise(entry),
   ];
 
   @override

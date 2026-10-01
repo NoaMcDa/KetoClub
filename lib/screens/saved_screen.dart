@@ -9,6 +9,7 @@ import 'package:ketoclub/state/saved_controller.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/keto_score_badge.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:provider/provider.dart';
 
@@ -233,9 +234,13 @@ class _SavedScreenState extends State<SavedScreen> {
   }
 }
 
-/// One row in the Saved list: venue name, platform and age, dish count,
-/// an [EngineChip] when the cached menu was analysed, and a way to remove
-/// it by swipe or by [onRemove]'s trailing button.
+/// One row in the Saved list: venue name with its keto score inline,
+/// platform and age, dish count, the green and yellow counts the Explore
+/// venue card shows, an [EngineChip] when the cached menu was analysed,
+/// and a way to remove it by swipe or by [onRemove]'s trailing button.
+///
+/// No photo: the cache holds no venue image (a `Menu` carries none, only
+/// dishes do), so there is nothing honest to show in its place (#252).
 class _SavedEntryTile extends StatelessWidget {
   const new({required this.entry, required this.onTap, required this.onRemove});
 
@@ -280,7 +285,15 @@ class _SavedEntryTile extends StatelessWidget {
         margin: EdgeInsets.zero,
         child: ListTile(
           onTap: onTap,
-          title: Text(title),
+          title: Row(
+            children: [
+              Expanded(child: Text(title)),
+              if (entry.score != null) ...[
+                const SizedBox(width: 10),
+                KetoScoreBadge(score: entry.score, inline: true),
+              ],
+            ],
+          ),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -294,6 +307,10 @@ class _SavedEntryTile extends StatelessWidget {
                 runSpacing: 4,
                 children: [
                   Text(l10n.savedEntryDishCount(entry.dishCount)),
+                  if (entry.score != null) ...[
+                    Text(l10n.venueCardGreenCount(entry.greenCount)),
+                    Text(l10n.venueCardYellowCount(entry.yellowCount)),
+                  ],
                   if (engine != null) EngineChip(engine: engine),
                 ],
               ),

@@ -6,6 +6,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/utils/keto_score.dart';
 
 /// The reason whose `name` equals [wire], or null when none does.
 ///
@@ -127,7 +128,56 @@ final class CachedMenuEntry {
     required this.fetchedAt,
     required this.dishCount,
     required this.engine,
+    this.score,
+    this.greenCount = 0,
+    this.yellowCount = 0,
   });
+
+  /// Summarises [cached] for the Saved list: its venue, fetch time, dish
+  /// count, engine, and — from a completed analysis that placed at least
+  /// one dish — the keto score and verdict counts the Explore venue card
+  /// shows for the same menu (`ketoScore`, architecture.md D13).
+  // A named constructor still needs its class name (see `VerdictTone.lerp`).
+  // ignore: unnecessary_type_name_in_constructor
+  factory CachedMenuEntry.summarise(CachedMenu cached) {
+    final analysis = cached.analysis;
+    final menu = cached.menu;
+    if (analysis is! MenuAnalysed) {
+      return CachedMenuEntry(
+        ref: menu.venueRef,
+        venueName: menu.venueName,
+        fetchedAt: menu.fetchedAt,
+        dishCount: menu.allDishes.length,
+        engine: null,
+      );
+    }
+    int count(DishVerdict verdict) =>
+        analysis.dishes.where((dish) => dish.verdict == verdict).length;
+    final green = count(DishVerdict.orderAsIs);
+    final yellow = count(DishVerdict.modifiable);
+    final hiddenCarbYellow = analysis.dishes
+        .where(
+          (d) =>
+              d.verdict == DishVerdict.modifiable && d.hiddenCarbs.isNotEmpty,
+        )
+        .length;
+    final score = ketoScore(
+      greenCount: green,
+      hiddenCarbYellowCount: hiddenCarbYellow,
+      otherYellowCount: yellow - hiddenCarbYellow,
+      redCount: count(DishVerdict.nonKeto),
+    );
+    return CachedMenuEntry(
+      ref: menu.venueRef,
+      venueName: menu.venueName,
+      fetchedAt: menu.fetchedAt,
+      dishCount: menu.allDishes.length,
+      engine: analysis.engine,
+      score: score,
+      greenCount: score == null ? 0 : green,
+      yellowCount: score == null ? 0 : yellow,
+    );
+  }
 
   /// Which venue, on which platform, this entry is for.
   final VenueRef ref;
@@ -147,6 +197,19 @@ final class CachedMenuEntry {
   /// has none, or has only a failed one.
   final AnalysisEngine? engine;
 
+  /// The keto score out of 10 for the cached analysis, or null when the
+  /// entry has no completed analysis or it placed no dish — never a
+  /// fabricated `0.0` (see `ketoScore`).
+  final double? score;
+
+  /// How many dishes the cached analysis placed green; 0 when [score] is
+  /// null.
+  final int greenCount;
+
+  /// How many dishes the cached analysis placed yellow; 0 when [score] is
+  /// null.
+  final int yellowCount;
+
   /// Whether the cached menu carries a completed ([MenuAnalysed]) analysis.
   bool get analysed => engine != null;
 
@@ -157,10 +220,22 @@ final class CachedMenuEntry {
       other.venueName == venueName &&
       other.fetchedAt == fetchedAt &&
       other.dishCount == dishCount &&
-      other.engine == engine;
+      other.engine == engine &&
+      other.score == score &&
+      other.greenCount == greenCount &&
+      other.yellowCount == yellowCount;
 
   @override
-  int get hashCode => Object.hash(ref, venueName, fetchedAt, dishCount, engine);
+  int get hashCode => Object.hash(
+    ref,
+    venueName,
+    fetchedAt,
+    dishCount,
+    engine,
+    score,
+    greenCount,
+    yellowCount,
+  );
 
   @override
   String toString() => 'CachedMenuEntry(${ref.cacheKey}, $dishCount dishes)';
@@ -393,18 +468,7 @@ final class HiveMenuCache implements MenuCache {
       if (decoded is! Map<String, Object?>) continue;
       final cached = CachedMenu.tryFrom(decoded);
       if (cached == null) continue;
-      result.add(
-        CachedMenuEntry(
-          ref: cached.menu.venueRef,
-          venueName: cached.menu.venueName,
-          fetchedAt: cached.menu.fetchedAt,
-          dishCount: cached.menu.allDishes.length,
-          engine: switch (cached.analysis) {
-            final MenuAnalysed analysed => analysed.engine,
-            _ => null,
-          },
-        ),
-      );
+      result.add(CachedMenuEntry.summarise(cached));
     }
     return result;
   }

@@ -12,6 +12,7 @@ import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/state/saved_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/keto_score_badge.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:provider/provider.dart';
 
@@ -53,6 +54,35 @@ Menu _menuWith(
       ],
     ),
   ],
+);
+
+/// A [MenuAnalysed] placing one green, one yellow and one red dish, which
+/// scores `(1 + 0.5) / 3 * 10 = 5.0`.
+MenuAnalysed _mixedAnalysis() => MenuAnalysed(
+  dishes: const <AnalysedDish>[
+    AnalysedDish(
+      dishId: 'd0',
+      name: 'Dish 0',
+      verdict: DishVerdict.orderAsIs,
+      why: 'No starch.',
+    ),
+    AnalysedDish(
+      dishId: 'd1',
+      name: 'Dish 1',
+      verdict: DishVerdict.modifiable,
+      why: 'Has a side.',
+      modification: 'Swap the side.',
+    ),
+    AnalysedDish(
+      dishId: 'd2',
+      name: 'Dish 2',
+      verdict: DishVerdict.nonKeto,
+      why: 'Pasta.',
+    ),
+  ],
+  unclassified: const <String>[],
+  engine: const LlmEngine(model: 'test/model'),
+  analysedAt: DateTime.utc(2026),
 );
 
 Future<void> _pump(
@@ -264,6 +294,49 @@ void main() {
 
       // Assert
       expect(find.byType(EngineChip), findsOneWidget);
+      // No dish was placed, so there is no score to claim (never 0.0).
+      expect(find.byType(KetoScoreBadge), findsNothing);
+      expect(find.text(_en.venueCardGreenCount(0)), findsNothing);
+    });
+
+    testWidgets('shows the keto score and the green and yellow counts of an '
+        'analysed entry', (tester) async {
+      // Arrange
+      final repository = FakeMenuRepository()
+        ..seedCache(
+          CachedMenu(
+            menu: _menuWith(_woltRef, DateTime.now(), dishes: 3),
+            analysis: _mixedAnalysis(),
+          ),
+        );
+      final controller = SavedController(repository);
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byType(KetoScoreBadge), findsOneWidget);
+      expect(find.text('5.0'), findsOneWidget);
+      expect(find.text(_en.venueCardGreenCount(1)), findsOneWidget);
+      expect(find.text(_en.venueCardYellowCount(1)), findsOneWidget);
+    });
+
+    testWidgets('shows no score for an entry that was never analysed', (
+      tester,
+    ) async {
+      // Arrange
+      final repository = FakeMenuRepository()
+        ..seedCache(CachedMenu(menu: _menuWith(_woltRef, DateTime.now())));
+      final controller = SavedController(repository);
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byType(KetoScoreBadge), findsNothing);
+      expect(find.text(_en.venueCardYellowCount(0)), findsNothing);
     });
 
     testWidgets('lists the newest-fetched menu first', (tester) async {

@@ -13,6 +13,7 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/keto_score_badge.dart';
 
 import 'flow_support.dart';
 
@@ -100,6 +101,13 @@ void main() {
         expect(find.text('Vitrina'), findsOneWidget);
         expect(find.text(_en.savedEntryDishCount(1)), findsOneWidget);
         expect(find.byType(EngineChip), findsOneWidget);
+
+        // Assert: the row carries the same score and counts the Explore
+        // card would (one green dish scores 10.0).
+        expect(find.byType(KetoScoreBadge), findsOneWidget);
+        expect(find.text('10.0'), findsOneWidget);
+        expect(find.text(_en.venueCardGreenCount(1)), findsOneWidget);
+        expect(find.text(_en.venueCardYellowCount(0)), findsOneWidget);
 
         // Act: tap it to reopen the same menu.
         await tapAndSettle(tester, find.text('Vitrina'));
