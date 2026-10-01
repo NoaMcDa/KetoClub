@@ -164,6 +164,15 @@ class MenuScreen extends StatefulWidget {
   State<MenuScreen> createState() => _MenuScreenState();
 }
 
+/// The entries of the menu app bar's overflow menu (issue #238).
+enum _MenuOverflowAction {
+  /// Opens the drinks guide.
+  drinksGuide,
+
+  /// Shares the menu's green and yellow dishes as text.
+  share,
+}
+
 class _MenuScreenState extends State<MenuScreen> {
   /// Whether the verdict legend (issue #17, §"WHAT TO BUILD" item 5) is
   /// expanded.
@@ -260,27 +269,37 @@ class _MenuScreenState extends State<MenuScreen> {
                     : const SizedBox.shrink(),
               ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.local_bar),
-            tooltip: l10n.actionOpenDrinksGuide,
-            onPressed: () => Navigator.pushNamed(context, drinksRoutePath),
-          ),
           if (controller.isQuestionAvailable)
             IconButton(
               icon: const Icon(Icons.question_answer),
               tooltip: l10n.actionAskAboutMenu,
               onPressed: () => _openQuestionSheet(context, controller),
             ),
-          if (canShare)
-            IconButton(
-              icon: const Icon(Icons.share),
-              tooltip: l10n.actionShareMenu,
-              onPressed: () => unawaited(_shareMenu(controller)),
-            ),
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: l10n.actionOpenSettings,
             onPressed: () => Navigator.pushNamed(context, '/settings'),
+          ),
+          PopupMenuButton<_MenuOverflowAction>(
+            tooltip: l10n.actionMoreMenuOptions,
+            onSelected: (action) => switch (action) {
+              _MenuOverflowAction.drinksGuide => Navigator.pushNamed(
+                context,
+                drinksRoutePath,
+              ),
+              _MenuOverflowAction.share => unawaited(_shareMenu(controller)),
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: _MenuOverflowAction.drinksGuide,
+                child: Text(l10n.actionOpenDrinksGuide),
+              ),
+              if (canShare)
+                PopupMenuItem(
+                  value: _MenuOverflowAction.share,
+                  child: Text(l10n.actionShareMenu),
+                ),
+            ],
           ),
         ],
       ),
