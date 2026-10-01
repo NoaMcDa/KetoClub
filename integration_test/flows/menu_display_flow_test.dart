@@ -113,9 +113,17 @@ _buildFixture() {
 
 /// The loaded menu's list. Named explicitly because the screen holds
 /// other scrollables too — the search field and the category chip row
-/// (issue #51) — and `scrollUntilVisible` needs exactly one.
+/// (issue #51), and on a wide window the side pane (issue #225), which
+/// `flutter drive`'s 1600px window shows — and `scrollUntilVisible` needs
+/// exactly one: the list under the RefreshIndicator.
 final Finder _menuList = find
-    .descendant(of: find.byType(ListView), matching: find.byType(Scrollable))
+    .descendant(
+      of: find.descendant(
+        of: find.byType(RefreshIndicator),
+        matching: find.byType(ListView),
+      ),
+      matching: find.byType(Scrollable),
+    )
     .first;
 
 /// The yellow counter tile, found inside the counter row: a yellow dish's

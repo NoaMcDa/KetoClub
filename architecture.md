@@ -972,6 +972,25 @@ height. Every venue card is drawn on a `Card`, taking the theme's
 `CardThemeData` shape and `--line` edge, with its ink well laid over the
 whole card so a hover or keyboard focus on the web lights up the photo too.
 
+**The menu splits into two panes on a wide window** *(issue #225, Phase 8)*.
+At `menuTwoPaneMinWidth` (1080px of window) and above, a loaded menu with at
+least one dish is laid out as two panes inside a wider cap,
+`menuTwoPaneMaxWidth` (1200px), which the menu route passes to `ContentWidth`
+in place of 680. The side pane, a fixed 380px (the artboard's column), holds
+what decides what the list shows: the header with the keto score, the verdict
+tiles, the "Showing" label and source line (with its refresh and open-on
+actions), the Filters row and the category chips, which wrap rather than
+scroll sideways there, since a mouse cannot drag a row. It scrolls on its own
+only when an open Filters row makes it taller than the window. Beside it, past
+a divider, the dish list scrolls alone: the progress row, the analysis and
+cache notices, the rules banner or engine chip, the dishes and the
+unclassified section. The dish list keeps the screen's one `ScrollController`
+and the pull-to-refresh, so a chip jump, a tile filter, a search, a refresh
+and the Waiter Card work as they do on a phone. The header never scrolls under
+the app bar there, so the bar shows no venue name (issue #237 applies below
+1080px only). Below 1080px, and for the loading, failed-fetch and empty-menu
+states at any width, the screen is the single capped column above, unchanged.
+
 Visual rules: a verdict is always icon **and** colour, never colour alone
 (accessibility). Unclassified dishes are listed under their own neutral heading.
 The engine chip is always visible on a classified menu.
