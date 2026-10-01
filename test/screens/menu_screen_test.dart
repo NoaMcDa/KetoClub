@@ -2356,7 +2356,10 @@ void main() {
 
         // Assert: a failed analysis has no green or yellow dish to
         // share, so the action is hidden.
-        expect(find.byIcon(Icons.share), findsNothing);
+        await tester.tap(find.byTooltip(_en.actionMoreMenuOptions));
+        await tester.pumpAndSettle();
+        expect(find.text(_en.actionShareMenu), findsNothing);
+        expect(find.text(_en.actionOpenDrinksGuide), findsOneWidget);
       });
 
       testWidgets('the share action appears once the analysis has at least one '
@@ -2385,9 +2388,11 @@ void main() {
         await _pump(tester, controller);
         await tester.pumpAndSettle();
 
-        // Assert
-        expect(find.byIcon(Icons.share), findsOneWidget);
-        expect(find.byTooltip(_en.actionShareMenu), findsOneWidget);
+        // Assert: no icon in the bar; the overflow carries a text item.
+        expect(find.byIcon(Icons.share), findsNothing);
+        await tester.tap(find.byTooltip(_en.actionMoreMenuOptions));
+        await tester.pumpAndSettle();
+        expect(find.text(_en.actionShareMenu), findsOneWidget);
       });
 
       testWidgets('tapping the share action hands the sharer the text '
@@ -2423,7 +2428,9 @@ void main() {
         await tester.pumpAndSettle();
 
         // Act
-        await tester.tap(find.byIcon(Icons.share));
+        await tester.tap(find.byTooltip(_en.actionMoreMenuOptions));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(_en.actionShareMenu));
         await tester.pumpAndSettle();
 
         // Assert: the exact text MenuShareText.build produces for the
@@ -2831,7 +2838,7 @@ void main() {
 
     group('drinks guide app-bar action (#216)', () {
       testWidgets(
-        'the drinks-guide icon button is visible on the loaded menu',
+        'the overflow menu lists the drinks guide on the loaded menu',
         (tester) async {
           // Arrange
           final repository = FakeMenuRepository()
@@ -2841,29 +2848,36 @@ void main() {
           await _pumpWithRoutes(tester, controller, pushedNames);
           await tester.pumpAndSettle();
 
-          // Assert — the icon is rendered unconditionally
-          expect(find.byIcon(Icons.local_bar), findsOneWidget);
+          // Assert — the overflow is rendered unconditionally and holds
+          // the drinks guide as a text item, not a bar icon
+          expect(find.byIcon(Icons.local_bar), findsNothing);
+          await tester.tap(find.byTooltip(_en.actionMoreMenuOptions));
+          await tester.pumpAndSettle();
+          expect(find.text(_en.actionOpenDrinksGuide), findsOneWidget);
         },
       );
 
-      testWidgets('tapping the drinks-guide icon pushes the /drinks route', (
-        tester,
-      ) async {
-        // Arrange
-        final repository = FakeMenuRepository()
-          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
-        final controller = _controllerFor(repository: repository);
-        final pushedNames = <String>[];
-        await _pumpWithRoutes(tester, controller, pushedNames);
-        await tester.pumpAndSettle();
+      testWidgets(
+        'choosing the drinks guide in the overflow pushes the /drinks route',
+        (tester) async {
+          // Arrange
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+          final controller = _controllerFor(repository: repository);
+          final pushedNames = <String>[];
+          await _pumpWithRoutes(tester, controller, pushedNames);
+          await tester.pumpAndSettle();
 
-        // Act
-        await tester.tap(find.byIcon(Icons.local_bar));
-        await tester.pumpAndSettle();
+          // Act
+          await tester.tap(find.byTooltip(_en.actionMoreMenuOptions));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text(_en.actionOpenDrinksGuide));
+          await tester.pumpAndSettle();
 
-        // Assert
-        expect(pushedNames, contains(drinksRoutePath));
-      });
+          // Assert
+          expect(pushedNames, contains(drinksRoutePath));
+        },
+      );
     });
 
     group('top of the list and the Filters row (issue #234)', () {

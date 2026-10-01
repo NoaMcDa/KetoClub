@@ -43,6 +43,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get actionOpenDrinksGuide => 'מדריך שתייה';
 
   @override
+  String get actionMoreMenuOptions => 'אפשרויות נוספות';
+
+  @override
   String get actionCancel => 'ביטול';
 
   @override

@@ -164,6 +164,12 @@ abstract class AppLocalizations {
   /// **'Drinks guide'**
   String get actionOpenDrinksGuide;
 
+  /// No description provided for @actionMoreMenuOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'More options'**
+  String get actionMoreMenuOptions;
+
   /// No description provided for @actionCancel.
   ///
   /// In en, this message translates to:
