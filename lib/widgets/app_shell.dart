@@ -17,14 +17,14 @@ import 'package:ketoclub/widgets/route_title.dart';
 /// then needs no route observer, since the index is simply passed in by
 /// whichever route built this shell.
 ///
-/// This is deliberately not an `IndexedStack`: every route in `generateRoute`
-/// already builds a fresh controller on purpose (so two visits to a screen
-/// start clean), Scan and Saved are stateless placeholders, and an
-/// `IndexedStack` would have to own `/settings` as one of its children,
-/// breaking the direct deep link `test/app_test.dart` asserts. The accepted
-/// trade-off is that switching tabs discards whatever was typed into the
-/// Explore text field, because `VenueSearchController` is rebuilt on every
-/// visit to `/` — see `generateRoute`'s doc comment in `app.dart`.
+/// This is deliberately not an `IndexedStack`: the other routes in
+/// `generateRoute` build a fresh controller on purpose (so two visits to a
+/// screen start clean), and an `IndexedStack` would have to own `/settings`
+/// as one of its children, breaking the direct deep link `test/app_test.dart`
+/// asserts. Explore keeps its query, results and chip across a tab switch
+/// anyway, because its `VenueSearchController` lives as long as the app
+/// rather than the route (issue #233) — see `generateRoute`'s doc comment in
+/// `app.dart`.
 class AppShell extends StatelessWidget {
   /// Creates the shell around [child], with tab [currentIndex] highlighted.
   const new({

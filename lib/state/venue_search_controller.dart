@@ -412,6 +412,11 @@ final class VenueSearchController extends ChangeNotifier {
 
   /// Reads [AppSettings.lastVenue] and, when set, the name to show for it
   /// (see the class doc). Notifies listeners once.
+  ///
+  /// Safe to call on every return to the Explore tab, which is when the
+  /// screen calls it now that this controller lives as long as the app
+  /// (issue #233): it touches only the "Continue with…" row, never the
+  /// query, the results or the chip, and starts no search.
   Future<void> load() async {
     final lastVenue = (await _settings.read()).lastVenue;
     _lastVenue = lastVenue;

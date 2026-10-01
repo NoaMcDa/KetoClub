@@ -34,9 +34,12 @@ import 'package:provider/provider.dart';
 /// Receives its services from the composition root so that tests can pump
 /// the whole app with fakes.
 ///
-/// A `StatefulWidget` for exactly one reason: it owns a [LocaleController]
-/// and a [ThemeModeController] for the lifetime of the app, both created
-/// once in `initState` rather than rebuilt on every `build`. A
+/// A `StatefulWidget` for exactly one reason: it owns a [LocaleController],
+/// a [ThemeModeController], a [CarbBudgetController] and the Explore tab's
+/// [VenueSearchController] for the lifetime of the app, each created once
+/// in `initState` rather than rebuilt on every `build`. The last one lives
+/// here, not in its route, so the typed query, the results and the chip
+/// survive a tab switch (issue #233). A
 /// `StatelessWidget` has no such hook — `provider`'s `create` runs once per
 /// *provider*, but there would be nothing to host that provider above
 /// without a place to call `dispose` — so this mirrors why `SettingsScreen`
@@ -57,6 +60,7 @@ class _KetoClubAppState extends State<KetoClubApp> {
   late final LocaleController _localeController;
   late final ThemeModeController _themeModeController;
   late final CarbBudgetController _carbBudget;
+  late final VenueSearchController _venueSearch;
 
   @override
   void initState() {
@@ -66,6 +70,14 @@ class _KetoClubAppState extends State<KetoClubApp> {
       widget.dependencies.settingsStore,
     );
     _carbBudget = CarbBudgetController();
+    final dependencies = widget.dependencies;
+    _venueSearch = VenueSearchController(
+      dependencies.settingsStore,
+      dependencies.menuRepository,
+      locationService: dependencies.locationService,
+      venueSearchService: dependencies.venueSearchService,
+      estimateClassifier: dependencies.estimateClassifier,
+    );
     // Fire-and-forget: the first frame renders in the device locale (and,
     // for appearance, ThemeMode.system) and flips once each resolves
     // (LocaleController's and ThemeModeController's class docs, issue #8,
@@ -79,6 +91,7 @@ class _KetoClubAppState extends State<KetoClubApp> {
     _localeController.dispose();
     _themeModeController.dispose();
     _carbBudget.dispose();
+    _venueSearch.dispose();
     super.dispose();
   }
 
@@ -99,6 +112,9 @@ class _KetoClubAppState extends State<KetoClubApp> {
           value: _themeModeController,
         ),
         ChangeNotifierProvider<CarbBudgetController>.value(value: _carbBudget),
+        ChangeNotifierProvider<VenueSearchController>.value(
+          value: _venueSearch,
+        ),
       ],
       child: AnimatedBuilder(
         animation: Listenable.merge([_localeController, _themeModeController]),
@@ -142,13 +158,15 @@ class _KetoClubAppState extends State<KetoClubApp> {
 /// carry the nav bar; `.design/MenuDark.dc.html` and
 /// `.design/WaiterCard.dc.html` do not.
 ///
-/// Each route creates its own controller, so screen state does not outlive the
-/// screen and two visits to a venue start clean. That also means switching
-/// tabs discards whatever was typed into the Explore text field, since
-/// `VenueSearchController` is rebuilt — an accepted trade-off (issue #11)
-/// rather than a reason to reach for a `Navigator` per tab, which would have
-/// to own `/settings` as one of its children and break the direct deep link
-/// `generateRoute`'s own tests assert.
+/// Every route but Explore creates its own controller, so screen state does
+/// not outlive the screen and two visits to a venue start clean. Explore is
+/// the one exception (issue #233): `/` reuses the single
+/// [VenueSearchController] that `KetoClubApp` owns and provides above the
+/// navigator, so switching tabs and coming back keeps the typed query, the
+/// results and the active chip. That is a longer controller lifetime, not a
+/// `Navigator` per tab, which would have to own `/settings` as one of its
+/// children and break the direct deep link `generateRoute`'s own tests
+/// assert.
 ///
 /// Public and separately tested, because a silently unmatched route would
 /// present as a blank screen.
@@ -163,20 +181,13 @@ Route<void>? generateRoute(
       settings: settings,
       builder: (_) => AppShell(
         currentIndex: AppShell.exploreIndex,
-        child: ChangeNotifierProvider<VenueSearchController>(
-          create: (_) => VenueSearchController(
-            dependencies.settingsStore,
-            dependencies.menuRepository,
-            locationService: dependencies.locationService,
-            venueSearchService: dependencies.venueSearchService,
-            estimateClassifier: dependencies.estimateClassifier,
-          ),
-          child: VenueSearchScreen(
-            connectivity: dependencies.connectivity,
-            locationService: dependencies.locationService,
-            settingsStore: dependencies.settingsStore,
-            directToGoogle: dependencies.apiKeyStore != null,
-          ),
+        // No provider here: the screen reads the app-lifetime
+        // VenueSearchController KetoClubApp provides (issue #233).
+        child: VenueSearchScreen(
+          connectivity: dependencies.connectivity,
+          locationService: dependencies.locationService,
+          settingsStore: dependencies.settingsStore,
+          directToGoogle: dependencies.apiKeyStore != null,
         ),
       ),
     );
