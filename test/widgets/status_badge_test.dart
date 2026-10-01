@@ -62,7 +62,7 @@ void main() {
         await _pump(tester, const StatusBadge(verdict: DishVerdict.modifiable));
 
         // Act & Assert
-        expect(find.text('ORDER WITH A CHANGE'), findsOneWidget);
+        expect(find.text('WITH CHANGES'), findsOneWidget);
       },
     );
 
@@ -73,7 +73,7 @@ void main() {
         await _pump(tester, const StatusBadge(verdict: DishVerdict.nonKeto));
 
         // Act & Assert
-        expect(find.text('NOT KETO'), findsOneWidget);
+        expect(find.text('SKIP'), findsOneWidget);
       },
     );
 
@@ -89,7 +89,7 @@ void main() {
 
       // Act & Assert: Hebrew has no letter case, so the ARB text is shown
       // verbatim.
-      expect(find.text('לא קטוגני'), findsOneWidget);
+      expect(find.text('לדלג'), findsOneWidget);
     });
 
     testWidgets('build carries a Semantics label naming the verdict for screen '
@@ -98,10 +98,7 @@ void main() {
       await _pump(tester, const StatusBadge(verdict: DishVerdict.modifiable));
 
       // Act & Assert
-      expect(
-        find.bySemanticsLabel('Verdict: Order with a change'),
-        findsOneWidget,
-      );
+      expect(find.bySemanticsLabel('Verdict: With changes'), findsOneWidget);
     });
 
     testWidgets(

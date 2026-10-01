@@ -31,7 +31,7 @@
   "filterGreenOnly": "רק מנות להזמנה כמו שהן",
   "filterGreenAndYellow": "כמו שהן ועם שינוי",
   "filterAll": "הכול",
-  "redGroupTitle": "לא קטוגני ({count})",
+  "redGroupTitle": "לדלג ({count})",
   "@redGroupTitle": {
     "placeholders": { "count": { "type": "int" } }
   },
@@ -49,9 +49,9 @@
     "placeholders": { "date": { "type": "String" } }
   },
 
-  "verdictOrderAsIs": "להזמין כמו שזה",
-  "verdictModifiable": "להזמין עם שינוי",
-  "verdictNonKeto": "לא קטוגני",
+  "verdictOrderAsIs": "להזמין כמו שהוא",
+  "verdictModifiable": "עם שינויים",
+  "verdictNonKeto": "לדלג",
 
   "dishCardFullScreen": "מסך מלא",
   "dishCardFullScreenSemanticLabel": "הצג כרטיס למלצר עבור {dish}",
@@ -296,8 +296,8 @@
   "menuShowingYellow": "מוצגות מנות שדורשות שינוי",
   "menuShowingRed": "מוצג מה כדאי לדלג עליו",
   "menuShowingGreenAndYellow": "מוצגות מנות שאפשר להזמין כמו שהן או עם שינוי",
-  "tileGreenLabel": "להזמין כמו שהן",
-  "tileYellowLabel": "עם שינוי",
+  "tileGreenLabel": "להזמין כמו שהוא",
+  "tileYellowLabel": "עם שינויים",
   "tileRedLabel": "לדלג",
   "tileSemanticLabel": "{label}: {count}",
   "@tileSemanticLabel": {

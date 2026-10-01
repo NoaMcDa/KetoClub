@@ -97,7 +97,7 @@ void main() {
       );
 
       // Assert
-      expect(text, contains('Order with changes:'));
+      expect(text, contains('With changes:'));
       final lines = text.split('\n');
       final nameIndex = lines.indexOf('- Burger with fries');
       expect(nameIndex, greaterThanOrEqualTo(0));
@@ -146,7 +146,7 @@ void main() {
       );
 
       // Assert
-      expect(text, contains('להזמין עם שינויים:'));
+      expect(text, contains('עם שינויים:'));
       expect(text, contains('בלי הצ׳יפס, בבקשה.'));
     });
 
@@ -186,7 +186,7 @@ void main() {
       );
 
       // Assert
-      expect(text, isNot(contains('Order with changes:')));
+      expect(text, isNot(contains('With changes:')));
     });
 
     test('omits the green heading and lines when no dish is green', () {
@@ -206,7 +206,7 @@ void main() {
 
       // Assert
       expect(text, isNot(contains('Order as-is:')));
-      expect(text, contains('Order with changes:'));
+      expect(text, contains('With changes:'));
     });
 
     test('is just the venue name when neither group has a dish', () {

@@ -251,7 +251,7 @@ abstract class AppLocalizations {
   /// No description provided for @redGroupTitle.
   ///
   /// In en, this message translates to:
-  /// **'Not keto ({count})'**
+  /// **'Skip ({count})'**
   String redGroupTitle(int count);
 
   /// No description provided for @unclassifiedTitle.
@@ -305,13 +305,13 @@ abstract class AppLocalizations {
   /// No description provided for @verdictModifiable.
   ///
   /// In en, this message translates to:
-  /// **'Order with a change'**
+  /// **'With changes'**
   String get verdictModifiable;
 
   /// No description provided for @verdictNonKeto.
   ///
   /// In en, this message translates to:
-  /// **'Not keto'**
+  /// **'Skip'**
   String get verdictNonKeto;
 
   /// No description provided for @dishCardFullScreen.

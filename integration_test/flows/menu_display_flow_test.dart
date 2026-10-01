@@ -118,6 +118,13 @@ final Finder _menuList = find
     .descendant(of: find.byType(ListView), matching: find.byType(Scrollable))
     .first;
 
+/// The yellow counter tile, found inside the counter row: a yellow dish's
+/// badge now carries the same words (issue #243).
+final Finder _yellowTile = find.descendant(
+  of: find.byType(VerdictCounterTiles),
+  matching: find.text(_en.tileYellowLabel.toUpperCase()),
+);
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -184,16 +191,12 @@ void main() {
       // with it depends on the viewport's height — it holds on web and
       // fails on the smaller flutter-tester surface. Scroll to the thing
       // about to be tapped.
-      await tester.scrollUntilVisible(
-        find.text(_en.tileYellowLabel.toUpperCase()),
-        -200,
-        scrollable: _menuList,
-      );
+      await tester.scrollUntilVisible(_yellowTile, -200, scrollable: _menuList);
       await tester.pumpAndSettle();
 
       // Act: tap the "With changes" tile to narrow to the modifiable dish
       // alone — the acceptance criterion's "filter to yellow".
-      await tapAndSettle(tester, find.text(_en.tileYellowLabel.toUpperCase()));
+      await tapAndSettle(tester, _yellowTile);
 
       // Assert: only the modifiable dish shows.
       expect(find.byType(DishCard), findsOneWidget);
@@ -202,7 +205,7 @@ void main() {
       expect(find.text(_en.menuShowingYellow), findsOneWidget);
 
       // Act: tap the now-active tile again to return to showing everything.
-      await tapAndSettle(tester, find.text(_en.tileYellowLabel.toUpperCase()));
+      await tapAndSettle(tester, _yellowTile);
 
       // Assert: every verdict is back, including the non-keto dish — issue
       // #29 shows red dishes inline under "all" rather than in a separate
@@ -291,15 +294,12 @@ void main() {
         // Act: close the row, then narrow to the modifiable tile.
         await tapAndSettle(tester, find.text(_en.menuFiltersActive(1)));
         await tester.scrollUntilVisible(
-          find.text(_en.tileYellowLabel.toUpperCase()),
+          _yellowTile,
           -200,
           scrollable: _menuList,
         );
         await tester.pumpAndSettle();
-        await tapAndSettle(
-          tester,
-          find.text(_en.tileYellowLabel.toUpperCase()),
-        );
+        await tapAndSettle(tester, _yellowTile);
 
         // Assert: the hidden search still applies with the tile — no
         // modifiable dish matches "steak" — and the row says a filter is
