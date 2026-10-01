@@ -205,7 +205,7 @@
   "discoveryEmptyBody": "Use your location to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.",
   "discoveryLookingAround": "Looking around",
   "discoveryAroundYou": "Your location",
-  "discoveryLocationNotSet": "Location not set",
+  "discoveryLocationInvite": "Tap to use your location",
   "discoveryUseLocation": "Use my location",
   "discoveryChipNearby": "Nearby",
   "discoveryChipKetoEightPlus": "Keto 8+",

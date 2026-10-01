@@ -232,21 +232,93 @@ void main() {
       expect(find.byIcon(Icons.settings), findsNothing);
     });
 
-    testWidgets('before anything is asked, the header says no location is '
-        'set and the empty state offers the three ways in', (tester) async {
+    testWidgets('before anything is asked, the header invites a tap and the '
+        'empty state offers the ways in without a second locate button', (
+      tester,
+    ) async {
       // Act
       await _pump(tester, controller: controller, pushedNames: pushedNames);
       await tester.pumpAndSettle();
       final l10n = _l10n(tester);
 
-      // Assert
-      expect(find.text(l10n.discoveryLocationNotSet), findsOneWidget);
+      // Assert: an invitation, not an error-looking "Location not set".
+      expect(find.text(l10n.discoveryLocationInvite), findsOneWidget);
+      expect(
+        find.text(l10n.discoveryLookingAround.toUpperCase()),
+        findsNothing,
+      );
       expect(find.text(l10n.discoveryEmptyTitle), findsOneWidget);
       expect(find.text(l10n.discoveryEmptyBody), findsOneWidget);
-      expect(find.text(l10n.discoveryUseLocation), findsOneWidget);
+      // Exactly one visible location action: the header's, not the body's.
+      expect(find.byIcon(Icons.my_location), findsOneWidget);
+      expect(find.byTooltip(l10n.discoveryUseLocation), findsOneWidget);
+      expect(find.text(l10n.discoveryUseLocation), findsNothing);
       // No location prompt on open: the user has to ask.
       expect(location.currentCallCount, 0);
       expect(find.byType(ChoiceChip), findsNothing);
+    });
+
+    testWidgets('tapping the invitation text asks for the location', (
+      tester,
+    ) async {
+      // Arrange
+      location.result = const LocationFound(
+        latitude: 32,
+        longitude: 34.7,
+        accuracyMetres: 10,
+      );
+      search.queueFound([_venue('ember-vine')]);
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+      // Act
+      await tester.tap(find.text(_l10n(tester).discoveryLocationInvite));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(location.currentCallCount, 1);
+      expect(find.byType(VenueCard), findsOneWidget);
+    });
+
+    testWidgets('after a position the header reads "Looking around {address}" '
+        'and keeps the one locate button', (tester) async {
+      // Arrange
+      location.result = const LocationFound(
+        latitude: 32,
+        longitude: 34.7,
+        accuracyMetres: 10,
+      );
+      search.queueFound([_venue('ember-vine', address: 'Rothschild 22')]);
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+      // Act
+      await locate(tester);
+      final l10n = _l10n(tester);
+
+      // Assert
+      expect(find.text(l10n.discoveryLocationInvite), findsNothing);
+      expect(
+        find.text(l10n.discoveryLookingAround.toUpperCase()),
+        findsOneWidget,
+      );
+      expect(find.text('Rothschild 22'), findsOneWidget);
+      expect(find.byTooltip(l10n.discoveryUseLocation), findsOneWidget);
+    });
+
+    testWidgets('a denied location hands the one action to the denied card '
+        'and hides the header invitation', (tester) async {
+      // Arrange
+      location.result = const LocationDenied(permanently: false);
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+      // Act
+      await locate(tester);
+      final l10n = _l10n(tester);
+
+      // Assert: the card's Retry is the only way to ask again.
+      expect(find.text(l10n.discoveryLocationDeniedTitle), findsOneWidget);
+      expect(find.text(l10n.discoveryLocationInvite), findsNothing);
+      expect(find.byTooltip(l10n.discoveryUseLocation), findsNothing);
+      expect(find.text(l10n.actionRetry), findsOneWidget);
     });
 
     testWidgets('typing nonsense shows the venueSearchInvalid message', (

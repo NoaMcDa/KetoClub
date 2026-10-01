@@ -493,7 +493,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoveryAroundYou => 'Your location';
 
   @override
-  String get discoveryLocationNotSet => 'Location not set';
+  String get discoveryLocationInvite => 'Tap to use your location';
 
   @override
   String get discoveryUseLocation => 'Use my location';

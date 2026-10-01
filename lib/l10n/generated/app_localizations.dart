@@ -902,11 +902,11 @@ abstract class AppLocalizations {
   /// **'Your location'**
   String get discoveryAroundYou;
 
-  /// No description provided for @discoveryLocationNotSet.
+  /// No description provided for @discoveryLocationInvite.
   ///
   /// In en, this message translates to:
-  /// **'Location not set'**
-  String get discoveryLocationNotSet;
+  /// **'Tap to use your location'**
+  String get discoveryLocationInvite;
 
   /// No description provided for @discoveryUseLocation.
   ///
