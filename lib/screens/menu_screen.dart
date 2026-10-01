@@ -11,7 +11,6 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
-import 'package:ketoclub/screens/drinks_guide_screen.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
@@ -167,9 +166,6 @@ class MenuScreen extends StatefulWidget {
 
 /// The entries of the menu app bar's overflow menu (issue #238).
 enum _MenuOverflowAction {
-  /// Opens the drinks guide.
-  drinksGuide,
-
   /// Shares the menu's green and yellow dishes as text.
   share,
 }
@@ -281,27 +277,22 @@ class _MenuScreenState extends State<MenuScreen> {
             tooltip: l10n.actionOpenSettings,
             onPressed: () => Navigator.pushNamed(context, '/settings'),
           ),
-          PopupMenuButton<_MenuOverflowAction>(
-            tooltip: l10n.actionMoreMenuOptions,
-            onSelected: (action) => switch (action) {
-              _MenuOverflowAction.drinksGuide => Navigator.pushNamed(
-                context,
-                drinksRoutePath,
-              ),
-              _MenuOverflowAction.share => unawaited(_shareMenu(controller)),
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: _MenuOverflowAction.drinksGuide,
-                child: Text(l10n.actionOpenDrinksGuide),
-              ),
-              if (canShare)
+          // The overflow holds only "Share" since the drinks guide moved
+          // to Explore (issue #257), so with nothing to share it is hidden
+          // rather than opening an empty menu.
+          if (canShare)
+            PopupMenuButton<_MenuOverflowAction>(
+              tooltip: l10n.actionMoreMenuOptions,
+              onSelected: (action) => switch (action) {
+                _MenuOverflowAction.share => unawaited(_shareMenu(controller)),
+              },
+              itemBuilder: (context) => [
                 PopupMenuItem(
                   value: _MenuOverflowAction.share,
                   child: Text(l10n.actionShareMenu),
                 ),
-            ],
-          ),
+              ],
+            ),
         ],
       ),
       body: ContentWidth(

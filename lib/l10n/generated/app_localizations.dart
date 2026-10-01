@@ -158,12 +158,6 @@ abstract class AppLocalizations {
   /// **'Share menu'**
   String get actionShareMenu;
 
-  /// No description provided for @actionOpenDrinksGuide.
-  ///
-  /// In en, this message translates to:
-  /// **'Drinks guide'**
-  String get actionOpenDrinksGuide;
-
   /// No description provided for @actionMoreMenuOptions.
   ///
   /// In en, this message translates to:
@@ -973,6 +967,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use your location to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.'**
   String get discoveryEmptyBody;
+
+  /// No description provided for @discoveryDrinksGuideCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Ordering a drink? Bar and coffee guide'**
+  String get discoveryDrinksGuideCard;
 
   /// No description provided for @discoveryLookingAround.
   ///
@@ -1903,18 +1903,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Estimated net carbs, not confirmed: {range}'**
   String drinksGuideCarbsSemanticLabel(String range);
-
-  /// No description provided for @settingsDrinksGuideTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'DRINKS GUIDE'**
-  String get settingsDrinksGuideTitle;
-
-  /// No description provided for @settingsDrinksGuideSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Bar and coffee reference'**
-  String get settingsDrinksGuideSubtitle;
 
   /// No description provided for @actionAskAboutMenu.
   ///

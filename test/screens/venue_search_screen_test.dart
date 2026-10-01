@@ -6,6 +6,7 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/drinks_guide_screen.dart';
 import 'package:ketoclub/screens/venue_search_screen.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
@@ -235,6 +236,73 @@ void main() {
       // Assert
       expect(find.byType(AppBar), findsNothing);
       expect(find.byIcon(Icons.settings), findsNothing);
+    });
+
+    testWidgets('the empty state shows the drinks guide card under the search '
+        'field, and tapping it pushes /drinks (issue #257)', (tester) async {
+      // Arrange
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      await tester.pumpAndSettle();
+      final l10n = _l10n(tester);
+
+      // Assert: the card sits below the field.
+      expect(find.byIcon(Icons.local_bar), findsOneWidget);
+      expect(find.text(l10n.discoveryDrinksGuideCard), findsOneWidget);
+      expect(
+        tester.getTopLeft(find.byType(Card)).dy,
+        greaterThan(tester.getBottomLeft(find.byType(TextField)).dy),
+      );
+
+      // Act
+      await tester.tap(find.text(l10n.discoveryDrinksGuideCard));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(pushedNames, contains(drinksRoutePath));
+    });
+
+    testWidgets('the drinks guide card stays above the results (issue #257)', (
+      tester,
+    ) async {
+      // Arrange
+      search.queueFound([_venue('ember-vine')]);
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+      // Act
+      await locate(tester);
+
+      // Assert
+      final card = find.text(_l10n(tester).discoveryDrinksGuideCard);
+      expect(card, findsOneWidget);
+      expect(
+        tester.getTopLeft(card).dy,
+        lessThan(tester.getTopLeft(find.byType(VenueCard)).dy),
+      );
+    });
+
+    testWidgets('the drinks guide card is hidden while locating or searching '
+        'and returns once the answer lands (issue #257)', (tester) async {
+      // Arrange: hold the locate call open.
+      final gate = Completer<void>();
+      location.gate = gate.future;
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      final l10n = _l10n(tester);
+      expect(find.text(l10n.discoveryDrinksGuideCard), findsOneWidget);
+
+      // Act
+      await tester.tap(find.byTooltip(l10n.discoveryUseLocation));
+      await tester.pump();
+
+      // Assert
+      expect(find.byType(VenueCardSkeleton), findsNWidgets(3));
+      expect(find.text(l10n.discoveryDrinksGuideCard), findsNothing);
+
+      // Act
+      gate.complete();
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(l10n.discoveryDrinksGuideCard), findsOneWidget);
     });
 
     testWidgets('before anything is asked, the header invites a tap and the '

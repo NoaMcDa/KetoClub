@@ -11,7 +11,6 @@
   "actionBackToSearch": "חזרה לחיפוש",
   "offlineBannerMessage": "אין חיבור לאינטרנט.",
   "actionShareMenu": "שתף תפריט",
-  "actionOpenDrinksGuide": "מדריך שתייה",
   "actionMoreMenuOptions": "אפשרויות נוספות",
   "actionCancel": "ביטול",
 
@@ -239,6 +238,7 @@
   "discoveryTitle": "איפה לאכול",
   "discoveryEmptyTitle": "מצאו איפה לאכול",
   "discoveryEmptyBody": "השתמשו במיקום שלכם כדי לראות מסעדות בסביבה, חפשו לפי שם, או הדביקו למעלה קישור מוולט כדי לפתוח את התפריט המסווג לפי קטו.",
+  "discoveryDrinksGuideCard": "מזמינים משקה? מדריך בר וקפה",
   "discoveryLookingAround": "מחפשים סביב",
   "discoveryAroundYou": "המיקום שלך",
   "discoveryLocationInvite": "הקש כדי להשתמש במיקום שלך",
@@ -523,8 +523,6 @@
   "@drinksGuideCarbsSemanticLabel": {
     "placeholders": { "range": { "type": "String" } }
   },
-  "settingsDrinksGuideTitle": "מדריך שתייה",
-  "settingsDrinksGuideSubtitle": "מדריך בר וקפה",
   "actionAskAboutMenu": "שאלו על התפריט הזה",
   "menuQuestionSheetTitle": "שאלו על התפריט הזה",
   "menuQuestionSheetHint": "לדוגמה: אילו מנות הן ללא מוצרי חלב?",

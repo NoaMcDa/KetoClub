@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart'
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/drinks_guide_screen.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -263,6 +264,13 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
                         : null,
                   ),
                 ),
+                // Found before a menu is open (issue #257); hidden while a
+                // locate or search is loading so it never sits between the
+                // field and the skeletons.
+                if (controller.phase == DiscoveryPhase.idle) ...[
+                  const SizedBox(height: 12),
+                  _drinksGuideCard(context, l10n),
+                ],
                 const SizedBox(height: 24),
                 if (controller.phase == DiscoveryPhase.idle &&
                     controller.failure == null &&
@@ -275,6 +283,20 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  /// A card under the search field linking to the offline drinks guide
+  /// (`/drinks`, issues #216, #257).
+  Widget _drinksGuideCard(BuildContext context, AppLocalizations l10n) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: ListTile(
+        leading: const Icon(Icons.local_bar),
+        title: Text(l10n.discoveryDrinksGuideCard),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => Navigator.pushNamed(context, drinksRoutePath),
       ),
     );
   }

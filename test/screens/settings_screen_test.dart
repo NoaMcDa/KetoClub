@@ -161,7 +161,7 @@ void main() {
 
     testWidgets(
       'sections run Language, Appearance, keto rules, net carb limit, '
-      'default filter, AI & privacy, Recent menus, drinks guide '
+      'default filter, AI & privacy, Recent menus '
       '(issue #255)',
       (tester) async {
         // Arrange
@@ -180,13 +180,26 @@ void main() {
           _en.settingsFilter,
           _en.settingsAiPrivacy,
           _en.settingsCacheSection,
-          _en.settingsDrinksGuideTitle,
         ].map((label) => _top(tester, find.text(label))).toList();
         for (var i = 1; i < tops.length; i++) {
           expect(tops[i], greaterThan(tops[i - 1]));
         }
       },
     );
+
+    testWidgets('the drinks guide moved to Explore: Settings has no drinks '
+        'row (issue #257)', (tester) async {
+      // Arrange
+      final controller = _controllerFor();
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byIcon(Icons.local_bar), findsNothing);
+      expect(find.text(_en.drinksGuideTitle.toUpperCase()), findsNothing);
+    });
 
     testWidgets('the cache group carries the "Recent menus" label above '
         'its count (issue #255)', (tester) async {
