@@ -545,6 +545,66 @@ void main() {
       expect(find.text(_ref.platformId), findsNothing);
     });
 
+    testWidgets('the app bar names the venue once the header scrolls under '
+        'it, and the score badge stays in the body (issue #237)', (
+      tester,
+    ) async {
+      // Arrange: a 40-dish menu, far taller than the phone-tall surface.
+      final menu = Menu(
+        venueRef: _ref,
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: [
+          MenuCategory(
+            id: 'c1',
+            name: 'Mains',
+            dishes: [for (var i = 0; i < 40; i++) _dish('Dish $i', id: 'd$i')],
+          ),
+        ],
+        venueName: 'Sunny Diner',
+      );
+      final repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: menu));
+      final controller = _controllerFor(repository: repository);
+      final inAppBar = find.descendant(
+        of: find.byType(AppBar),
+        matching: find.text('Sunny Diner'),
+      );
+      await _pump(tester, controller, theme: AppTheme.light());
+      await tester.pumpAndSettle();
+      expect(inAppBar, findsNothing);
+
+      // Act
+      await tester.drag(find.byType(ListView), const Offset(0, -600));
+      await tester.pumpAndSettle();
+
+      // Assert: the name is in the bar, the badge never moved there, and
+      // the bar stays flat over the list (audit G2).
+      expect(inAppBar, findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(AppBar),
+          matching: find.byType(KetoScoreBadge),
+        ),
+        findsNothing,
+      );
+      final barMaterial = tester.widget<Material>(
+        find
+            .descendant(
+              of: find.byType(AppBar),
+              matching: find.byType(Material),
+            )
+            .first,
+      );
+      expect(barMaterial.elevation, 0);
+
+      // Scrolled back to the top, the header names the venue alone again.
+      await tester.drag(find.byType(ListView), const Offset(0, 600));
+      await tester.pumpAndSettle();
+      expect(inAppBar, findsNothing);
+      expect(find.text('Sunny Diner'), findsOneWidget);
+    });
+
     testWidgets(
       'the source line names the platform and shows for a freshly fetched '
       'menu, not only a cached one',

@@ -192,6 +192,18 @@ class _MenuScreenState extends State<MenuScreen> {
   /// Scrolls the loaded-menu list for [_scrollToCategory] (issue #51).
   final ScrollController _scrollController = ScrollController();
 
+  /// The loaded-menu list's top padding, above [_header].
+  static const double _listTopPadding = 8;
+
+  /// Whether the loaded-menu list has scrolled the [_header] out from
+  /// under the app bar, so the bar shows the venue name as its title
+  /// (issue #237). A notifier rather than a [State] field, so crossing
+  /// that line rebuilds the title alone, not the whole dish list.
+  final ValueNotifier<bool> _headerScrolledPast = ValueNotifier<bool>(false);
+
+  /// Wraps [_header], so [_updateHeaderScrolledPast] can read its height.
+  final GlobalKey _headerKey = GlobalKey();
+
   /// The stable [GlobalKey] for each category header currently or
   /// previously shown, keyed by category name — see [_categoryKeyFor]
   /// (issue #51).
@@ -199,13 +211,17 @@ class _MenuScreenState extends State<MenuScreen> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _scrollController
+      ..removeListener(_updateHeaderScrolledPast)
+      ..dispose();
+    _headerScrolledPast.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_updateHeaderScrolledPast);
     // Deferred to after the first frame, so building this screen never
     // itself starts the fetch — a widget's build method must stay free of
     // side effects.
@@ -228,6 +244,21 @@ class _MenuScreenState extends State<MenuScreen> {
         (controller.greenCount > 0 || controller.yellowCount > 0);
     return Scaffold(
       appBar: AppBar(
+        // The venue name, once the body header has scrolled under the bar
+        // (issue #237); the theme's `scrolledUnderElevation: 0` still
+        // keeps the bar flat over the list (audit G2).
+        title: controller.menu == null
+            ? null
+            : ValueListenableBuilder<bool>(
+                valueListenable: _headerScrolledPast,
+                builder: (context, scrolledPast, _) => scrolledPast
+                    ? Text(
+                        _displayName(controller, l10n),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    : const SizedBox.shrink(),
+              ),
         actions: [
           IconButton(
             icon: const Icon(Icons.local_bar),
@@ -265,6 +296,21 @@ class _MenuScreenState extends State<MenuScreen> {
         ),
       ),
     );
+  }
+
+  /// Sets [_headerScrolledPast] from the list's offset: past once the
+  /// list's top padding and the whole [_header] are above the viewport.
+  ///
+  /// A [ListView] builds lazily, so a header scrolled far enough away has
+  /// no render box left to measure; any offset above zero then means it
+  /// is gone.
+  void _updateHeaderScrolledPast() {
+    if (!_scrollController.hasClients) return;
+    final offset = _scrollController.offset;
+    final box = _headerKey.currentContext?.findRenderObject();
+    _headerScrolledPast.value = box is RenderBox && box.hasSize
+        ? offset >= _listTopPadding + box.size.height
+        : offset > 0;
   }
 
   /// Builds [MenuShareText.build]'s summary of [controller]'s current
@@ -450,12 +496,12 @@ class _MenuScreenState extends State<MenuScreen> {
         // Always scrollable, so a menu shorter than the screen can still
         // be pulled down to refresh (RefreshIndicator's own requirement).
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        padding: const EdgeInsets.fromLTRB(20, _listTopPadding, 20, 24),
         // Header, tiles, category chips, then dishes (issue #234): the
         // search, the carb budget and the legend sit behind one collapsed
         // Filters row, so the first dish card fits on a phone screen.
         children: [
-          header,
+          KeyedSubtree(key: _headerKey, child: header),
           const SizedBox(height: 4),
           if (analysed) ...[
             const SizedBox(height: 8),
