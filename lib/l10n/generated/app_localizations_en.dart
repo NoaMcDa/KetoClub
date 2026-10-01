@@ -733,6 +733,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Rules: KetoClub\'s own keyword checks on the dish text, with no carb estimate. AI: Gemini reads the whole menu and estimates net carbs.';
 
   @override
+  String get legendBudget =>
+      'Carb budget: after an AI analysis, a Filters field lets you set a net-carb budget for the meal. Rule-based results have no carb estimates, so it is not offered.';
+
+  @override
   String get waiterCardCopyButton => 'Copy text';
 
   @override
@@ -1033,10 +1037,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get carbBudgetFieldClear => 'Clear budget';
-
-  @override
-  String get carbBudgetDisabledReason =>
-      'Set a budget after AI analysis — rule-based results have no carb estimates.';
 
   @override
   String netCarbsChipLeavesSuffix(int grams) {

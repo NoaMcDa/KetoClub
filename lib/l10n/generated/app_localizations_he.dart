@@ -738,6 +738,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'כללים: בדיקות מילות מפתח של קטוקלאב על טקסט המנה, בלי הערכת פחמימות. בינה מלאכותית: Gemini קורא את כל התפריט ומעריך פחמימות נטו.';
 
   @override
+  String get legendBudget =>
+      'תקציב פחמימות: לאחר ניתוח בינה מלאכותית, שדה בסינון מאפשר לקבוע תקציב פחמימות נטו לארוחה. לתוצאות על בסיס כללים אין הערכת פחמימות, ולכן הוא לא מוצע.';
+
+  @override
   String get waiterCardCopyButton => 'העתק טקסט';
 
   @override
@@ -1036,10 +1040,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get carbBudgetFieldClear => 'נקה תקציב';
-
-  @override
-  String get carbBudgetDisabledReason =>
-      'קבעו תקציב לאחר ניתוח בינה מלאכותית — לתוצאות על בסיס כללים אין הערכת פחמימות.';
 
   @override
   String netCarbsChipLeavesSuffix(int grams) {

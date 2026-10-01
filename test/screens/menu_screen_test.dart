@@ -1442,6 +1442,13 @@ void main() {
         );
         expect(find.text(_en.legendNote), findsOneWidget);
         expect(find.text(_en.legendEngines), findsOneWidget);
+        expect(find.text(_en.legendBudget), findsOneWidget);
+
+        // Assert: a rules result shows no budget field and no notice about
+        // it outside the legend (issue #235).
+        expect(find.byType(CarbBudgetField), findsOneWidget);
+        expect(find.byType(TextField), findsOneWidget);
+        expect(find.text(_en.carbBudgetFieldLabel), findsNothing);
 
         // Act: collapse again.
         await tester.tap(find.text(_en.legendHide));
@@ -1457,6 +1464,7 @@ void main() {
           findsNothing,
         );
         expect(find.text(_en.legendEngines), findsNothing);
+        expect(find.text(_en.legendBudget), findsNothing);
       },
     );
 

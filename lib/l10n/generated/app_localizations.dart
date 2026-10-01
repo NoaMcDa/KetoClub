@@ -1232,6 +1232,12 @@ abstract class AppLocalizations {
   /// **'Rules: KetoClub\'s own keyword checks on the dish text, with no carb estimate. AI: Gemini reads the whole menu and estimates net carbs.'**
   String get legendEngines;
 
+  /// No description provided for @legendBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Carb budget: after an AI analysis, a Filters field lets you set a net-carb budget for the meal. Rule-based results have no carb estimates, so it is not offered.'**
+  String get legendBudget;
+
   /// No description provided for @waiterCardCopyButton.
   ///
   /// In en, this message translates to:
@@ -1699,12 +1705,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear budget'**
   String get carbBudgetFieldClear;
-
-  /// No description provided for @carbBudgetDisabledReason.
-  ///
-  /// In en, this message translates to:
-  /// **'Set a budget after AI analysis — rule-based results have no carb estimates.'**
-  String get carbBudgetDisabledReason;
 
   /// No description provided for @netCarbsChipLeavesSuffix.
   ///
