@@ -47,46 +47,81 @@ class _SkeletonBlock extends StatelessWidget {
 }
 
 /// A static placeholder shaped like [VenueCard] (issue #63): the same
-/// fixed-height photo tile, a title bar with a score-badge-sized block
-/// beside it, and two shorter bars where the blurb and the meta line sit.
+/// card surface and photo tile, a title bar with a score-badge-sized
+/// block beside it, and two shorter bars where the blurb and the meta
+/// line sit.
 ///
 /// The Discovery screen shows three of these in place of its old
 /// spinner while `DiscoveryPhase.locating` or `.searching` is in flight
-/// (`phase2_discovery_research.md` §8.2). Purely decorative — this
+/// (`phase2_discovery_research.md` §8.2), laid out in the same grid as
+/// the cards they stand in for (issue #222). Purely decorative — this
 /// widget's own [ExcludeSemantics] keeps every block out of the
 /// semantics tree, because the screen that lists a run of three wraps
 /// the whole group in one `Semantics` label naming what is loading,
 /// rather than each card announcing itself.
 class VenueCardSkeleton extends StatelessWidget {
-  /// Creates one venue-card-shaped placeholder.
-  const new({super.key});
+  /// Creates one venue-card-shaped placeholder, its photo block
+  /// [photoAspectRatio] wide-to-tall when given, as [VenueCard]'s is.
+  const new({this.photoAspectRatio, super.key});
+
+  /// The photo block's width-to-height ratio, or null for
+  /// [VenueCard.photoHeight]: [VenueCard.photoAspectRatio]'s twin.
+  final double? photoAspectRatio;
 
   @override
   Widget build(BuildContext context) {
     final base = NeutralSurfaces.of(context).surface2;
     final bar = Theme.of(context).dividerColor;
+    final aspectRatio = photoAspectRatio;
     return ExcludeSemantics(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _SkeletonBlock(
-            color: base,
-            height: VenueCard.photoHeight,
-            radius: 16,
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(child: _SkeletonBlock(color: bar, height: 21)),
-              const SizedBox(width: 10),
-              _SkeletonBlock(color: bar, height: 21, width: 40, radius: 10),
-            ],
-          ),
-          const SizedBox(height: 8),
-          _SkeletonBlock(color: bar, height: 14, width: 200),
-          const SizedBox(height: 6),
-          _SkeletonBlock(color: bar, height: 14, width: 120),
-        ],
+      child: Card(
+        margin: EdgeInsets.zero,
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (aspectRatio == null)
+              _SkeletonBlock(
+                color: base,
+                height: VenueCard.photoHeight,
+                radius: 0,
+              )
+            else
+              AspectRatio(
+                aspectRatio: aspectRatio,
+                // An infinite height fills the ratio's own box.
+                child: _SkeletonBlock(
+                  color: base,
+                  height: double.infinity,
+                  radius: 0,
+                ),
+              ),
+            Padding(
+              padding: VenueCard.textPadding,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(child: _SkeletonBlock(color: bar, height: 21)),
+                      const SizedBox(width: 10),
+                      _SkeletonBlock(
+                        color: bar,
+                        height: 21,
+                        width: 40,
+                        radius: 10,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  _SkeletonBlock(color: bar, height: 14, width: 200),
+                  const SizedBox(height: 6),
+                  _SkeletonBlock(color: bar, height: 14, width: 120),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

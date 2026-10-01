@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/theme/app_theme.dart';
+import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
 
 /// Pumps [child] inside a localised [MaterialApp] and a [Scaffold], the
@@ -9,9 +11,11 @@ Future<void> _pump(
   WidgetTester tester,
   Widget child, {
   Locale locale = const Locale('en'),
+  ThemeData? theme,
 }) {
   return tester.pumpWidget(
     MaterialApp(
+      theme: theme,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: locale,
@@ -80,6 +84,85 @@ void main() {
       expect(label.top, lessThan(number.bottom));
       expect(
         find.bySemanticsLabel('Keto score: 9.1 out of 10'),
+        findsOneWidget,
+      );
+    });
+  });
+
+  group('scoreTone', () {
+    final colors = VerdictColors.light();
+    const muted = Color(0xFF123456);
+
+    Color tone(double score) =>
+        scoreTone(score, verdicts: colors, muted: muted);
+
+    /// The band table: score, expected tone.
+    final table = <(double, Color)>[
+      (10, colors.green.ink),
+      (9.1, colors.green.ink),
+      (7, colors.green.ink),
+      (6.96, colors.green.ink),
+      (6.94, colors.amber.ink),
+      (6.9, colors.amber.ink),
+      (5, colors.amber.ink),
+      (4, colors.amber.ink),
+      (3.96, colors.amber.ink),
+      (3.94, muted),
+      (3.2, muted),
+      (0, muted),
+    ];
+
+    for (final (score, expected) in table) {
+      test('$score is toned by its band', () {
+        expect(tone(score), expected);
+      });
+    }
+  });
+
+  group('KetoScoreBadge tone', () {
+    Color digitColor(WidgetTester tester, String text) =>
+        tester.widget<Text>(find.text(text)).style!.color!;
+
+    for (final (name, theme) in [
+      ('light', AppTheme.light()),
+      ('dark', AppTheme.dark()),
+    ]) {
+      testWidgets('build paints the digit by band in the $name theme', (
+        tester,
+      ) async {
+        // Arrange
+        final colors = theme.extension<VerdictColors>()!;
+        final bands = <(double, String, Color)>[
+          (9.1, '9.1', colors.green.ink),
+          (5, '5.0', colors.amber.ink),
+          (3.2, '3.2', theme.colorScheme.onSurfaceVariant),
+        ];
+
+        for (final (score, text, expected) in bands) {
+          // Act
+          await _pump(tester, KetoScoreBadge(score: score), theme: theme);
+
+          // Assert
+          expect(digitColor(tester, text), expected);
+        }
+      });
+    }
+
+    testWidgets('inline paints the same band tone as the header', (
+      tester,
+    ) async {
+      // Arrange & Act
+      final theme = AppTheme.light();
+      await _pump(
+        tester,
+        const KetoScoreBadge(score: 3.2, inline: true),
+        theme: theme,
+      );
+
+      // Assert
+      expect(digitColor(tester, '3.2'), theme.colorScheme.onSurfaceVariant);
+      expect(
+        find.bySemanticsLabel('Keto score: 3.2 out of 10'),
         findsOneWidget,
       );
     });

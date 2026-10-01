@@ -10,7 +10,7 @@ import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/menu/tenbis/tenbis_menu_mapper.dart';
-import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 
 import 'flow_support.dart';
@@ -91,11 +91,11 @@ void main() {
 
       // Act: paste the 10bis URL and open it.
       await enterText(tester, _tenBisUrl);
-      await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+      await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
       // Assert: a classified menu is shown, sourced from 10bis, with
       // both dishes from the mapped fixture visible.
-      expect(find.byType(EngineChip), findsOneWidget);
+      expect(find.byType(RulesReasonBanner), findsOneWidget);
       expect(find.byType(VerdictCounterTiles), findsOneWidget);
       expect(find.textContaining('10bis'), findsWidgets);
       expect(find.text('Entrecôte 300g'), findsOneWidget);

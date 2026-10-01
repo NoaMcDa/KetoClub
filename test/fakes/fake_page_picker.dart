@@ -22,7 +22,11 @@ enum PagePickerCall {
 /// [calls] in call order.
 final class FakePagePicker implements PagePicker {
   /// Creates a picker with nothing queued and nothing recorded yet.
-  new();
+  /// [canTakePhoto] defaults to true, a phone.
+  new({this.canTakePhoto = true});
+
+  @override
+  final bool canTakePhoto;
 
   final List<List<ScannedPage>> _photos = <List<ScannedPage>>[];
   final List<List<ScannedPage>> _images = <List<ScannedPage>>[];

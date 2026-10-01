@@ -3,23 +3,26 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
-import 'package:ketoclub/screens/drinks_guide_screen.dart';
+import 'package:ketoclub/services/platform/app_info.dart';
+import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 import 'package:ketoclub/state/theme_mode_controller.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/widgets/content_width.dart';
 import 'package:provider/provider.dart';
 
-/// Scopes a test's finder to the language section's radio group, so a
-/// label the language and appearance sections happen to share (both offer
+/// Scopes a test's finder to the language section's segmented control, so
+/// a label the language and appearance sections happen to share (both offer
 /// a "follow the device" choice) cannot make `find.text(...)` match two
 /// widgets. Public so tests can reach it without a brittle text lookup.
+/// The name predates the control, which was a radio list until issue #256.
 const Key languageRadioGroupKey = Key('settingsLanguageRadioGroup');
 
-/// Scopes a test's finder to the appearance section's radio group, for the
-/// same reason as [languageRadioGroupKey].
+/// Scopes a test's finder to the appearance section's segmented control,
+/// for the same reason as [languageRadioGroupKey].
 const Key appearanceRadioGroupKey = Key('settingsAppearanceRadioGroup');
 
 /// The net-carb limit stepper's minus button (issue #57), public so a test
@@ -42,6 +45,11 @@ const Key dairyFreeSwitchKey = Key('settingsDairyFreeSwitch');
 /// The "Carnivore only" switch (issue #56).
 const Key carnivoreOnlySwitchKey = Key('settingsCarnivoreOnlySwitch');
 
+/// The "What leaves this device" disclosure in the AI & privacy section
+/// (issue #255), collapsed by default; a test taps it to read the consent
+/// body text, which is not built while the disclosure is closed.
+const Key consentDisclosureKey = Key('settingsConsentDisclosure');
+
 /// The Gemini API key field (architecture.md D17), shown on iOS and
 /// Android only.
 const Key apiKeyFieldKey = Key('settingsApiKeyField');
@@ -52,10 +60,32 @@ const Key apiKeySaveKey = Key('settingsApiKeySave');
 /// The "Remove key" button, shown only while a key is saved.
 const Key apiKeyDeleteKey = Key('settingsApiKeyDelete');
 
-/// The Settings screen: the AI-analysis consent disclosure, the user's
-/// Gemini API key on iOS and Android, the UI language, the appearance, the
-/// net-carb limit, the "Your keto rules" dietary toggles, the default menu
-/// filter, and cache clearing (architecture.md §6.6, §11, §12, §13, D17).
+/// The About section's version row (issue #258), showing the version and
+/// build number once [AppInfo.load] answers.
+const Key aboutVersionKey = Key('settingsAboutVersion');
+
+/// The About section's "Open-source licences" row (issue #258).
+const Key aboutLicencesKey = Key('settingsAboutLicences');
+
+/// The About section's collapsed privacy disclosure (issue #258).
+const Key aboutPrivacyKey = Key('settingsAboutPrivacy');
+
+/// The About section's "Report a problem" row (issue #258).
+const Key aboutReportKey = Key('settingsAboutReport');
+
+/// Where "Report a problem" sends the user: the repository's issue tracker.
+final Uri reportProblemUri = Uri.parse(
+  'https://github.com/NoaMcDa/KetoClub/issues',
+);
+
+/// The Settings screen, top to bottom (issue #255): the UI language, the
+/// appearance, the "Your keto rules" dietary toggles, the net-carb limit,
+/// the default menu filter, "AI & privacy" (the AI-analysis consent
+/// checkbox under its collapsed disclosure, and the user's Gemini API key
+/// on iOS and Android), the recent-menus cache and its clearing
+/// (architecture.md §6.6, §11, §12, §13, D17), and last an "About" group
+/// (issue #258): the app version, the open-source licences, the privacy
+/// text and where to report a problem.
 ///
 /// Reads its [SettingsController] from `provider` and calls
 /// [SettingsController.load] once, after the first frame, the same way
@@ -70,8 +100,20 @@ const Key apiKeyDeleteKey = Key('settingsApiKeyDelete');
 /// the controller themselves — so a regression in this wiring fails a
 /// test here, not only in a flow test.
 class SettingsScreen extends StatefulWidget {
-  /// Creates the Settings screen.
-  const new({super.key});
+  /// Creates the Settings screen. [appInfo] supplies the About section's
+  /// version, read once after the first frame; [externalLinkOpener] opens
+  /// its "Report a problem" link outside the app.
+  const new({
+    required this.appInfo,
+    required this.externalLinkOpener,
+    super.key,
+  });
+
+  /// Reads the app's version and build number (issue #258).
+  final AppInfo appInfo;
+
+  /// Opens the issue tracker link outside KetoClub (issue #258).
+  final ExternalLinkOpener externalLinkOpener;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -90,6 +132,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// screen after it is stored.
   final TextEditingController _apiKeyField = TextEditingController();
 
+  /// The app version, null until [AppInfo.load] answers or when it cannot.
+  AppVersion? _version;
+
   @override
   void dispose() {
     _apiKeyField.dispose();
@@ -106,7 +151,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       unawaited(context.read<SettingsController>().load());
+      unawaited(_loadVersion());
     });
+  }
+
+  /// Reads the version after the first frame (issue #258), never from a
+  /// constructor, so building this screen performs no plugin I/O.
+  Future<void> _loadVersion() async {
+    final version = await widget.appInfo.load();
+    if (!mounted) return;
+    setState(() => _version = version);
   }
 
   @override
@@ -120,45 +174,130 @@ class _SettingsScreenState extends State<SettingsScreen> {
       // every section must exist in the tree up front so a test (or a
       // screen reader) can find a control without first scrolling it
       // into the sliver viewport's cache extent.
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _consentSection(context, l10n, controller),
-            const SizedBox(height: 20),
-            if (controller.supportsApiKey) ...[
-              _apiKeySection(context, l10n, controller),
+      body: ContentWidth(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            // The order of issue #255 (`docs/UX_REVIEW.md` §2.6): the
+            // settings most people open this screen for come first, the
+            // privacy text — once the first thing on the page — sits in
+            // its own "AI & privacy" section further down, collapsed.
+            children: [
+              _languageSection(context, l10n, controller),
               const SizedBox(height: 20),
+              _appearanceSection(context, l10n, controller),
+              const SizedBox(height: 20),
+              _ketoRulesSection(context, l10n, controller),
+              const SizedBox(height: 20),
+              _netCarbLimitSection(context, l10n, controller),
+              const SizedBox(height: 20),
+              _filterSection(context, l10n, controller),
+              const SizedBox(height: 20),
+              _consentSection(context, l10n, controller),
+              if (controller.supportsApiKey) ...[
+                const SizedBox(height: 12),
+                _apiKeySection(context, l10n, controller),
+              ],
+              const SizedBox(height: 20),
+              _cacheSection(context, l10n, controller),
+              const SizedBox(height: 20),
+              _aboutSection(context, l10n, controller),
             ],
-            _languageSection(context, l10n, controller),
-            const SizedBox(height: 20),
-            _appearanceSection(context, l10n, controller),
-            const SizedBox(height: 20),
-            _netCarbLimitSection(context, l10n, controller),
-            const SizedBox(height: 20),
-            _ketoRulesSection(context, l10n, controller),
-            const SizedBox(height: 20),
-            _filterSection(context, l10n, controller),
-            const SizedBox(height: 20),
-            _cacheSection(context, l10n, controller),
-            const SizedBox(height: 20),
-            _drinksGuideSection(context, l10n),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  /// The consent disclosure (architecture.md §11, D16 issue #167): the
-  /// same body text the consent-disclosure banner (`ConsentDisclosureBanner`)
-  /// shows once on Explore, with a checkbox that starts ticked on a
-  /// fresh install — AI analysis is on by default (D16). Unticking it
-  /// here sets consent to false and stops any dish text from leaving
-  /// the device. Where dish text goes depends on the build: straight to
-  /// Google with the user's key on iOS and Android (D17), through
-  /// KetoClub's server on web (D12) — so the disclosure follows
-  /// [SettingsController.supportsApiKey].
+  /// The "About" group (issue #258), last on the screen: the version and
+  /// build, the open-source licences (Flutter's own licence page, which
+  /// also lists the font licence `main.dart` registers), the privacy text
+  /// — the consent section's own copy, behind a collapsed disclosure — and
+  /// a link to the issue tracker.
+  Widget _aboutSection(
+    BuildContext context,
+    AppLocalizations l10n,
+    SettingsController controller,
+  ) {
+    final version = _version;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionLabel(l10n.settingsAboutSection),
+        _SettingsGroup(
+          children: [
+            ListTile(
+              key: aboutVersionKey,
+              leading: const Icon(Icons.info_outline),
+              title: Text(l10n.settingsAboutVersion),
+              subtitle: version == null
+                  ? null
+                  : Text(
+                      l10n.settingsAboutVersionValue(
+                        version.version,
+                        version.buildNumber,
+                      ),
+                    ),
+            ),
+            ListTile(
+              key: aboutLicencesKey,
+              leading: const Icon(Icons.description_outlined),
+              title: Text(l10n.settingsAboutLicences),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => showLicensePage(context: context),
+            ),
+            ExpansionTile(
+              key: aboutPrivacyKey,
+              shape: const Border(),
+              collapsedShape: const Border(),
+              leading: const Icon(Icons.privacy_tip_outlined),
+              title: Text(l10n.settingsAboutPrivacy),
+              children: [
+                _GroupNote(
+                  controller.supportsApiKey
+                      ? l10n.settingsConsentBodyDirect
+                      : l10n.settingsConsentBody,
+                ),
+              ],
+            ),
+            ListTile(
+              key: aboutReportKey,
+              leading: const Icon(Icons.bug_report_outlined),
+              title: Text(l10n.settingsAboutReport),
+              subtitle: Text(l10n.settingsAboutReportHint),
+              trailing: const Icon(Icons.open_in_new),
+              onTap: () => unawaited(_openReport(context, l10n)),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// Opens [reportProblemUri] outside the app; says so when the platform
+  /// had no handler for it.
+  Future<void> _openReport(BuildContext context, AppLocalizations l10n) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final opened = await widget.externalLinkOpener.open(reportProblemUri);
+    if (opened || !mounted) return;
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.settingsAboutLinkFailed)),
+    );
+  }
+
+  /// The "AI & privacy" section's consent group (architecture.md §11, D16
+  /// issue #167, issue #255): a "What leaves this device" disclosure,
+  /// collapsed by default, over the same body text the consent-disclosure
+  /// banner (`ConsentDisclosureBanner`) shows once on Explore, and below
+  /// it the "Allow AI analysis" checkbox, which is always visible —
+  /// collapsing the explanation never hides the choice. The checkbox
+  /// starts ticked on a fresh install — AI analysis is on by default
+  /// (D16). Unticking it here sets consent to false and stops any dish
+  /// text from leaving the device. Where dish text goes depends on the
+  /// build: straight to Google with the user's key on iOS and Android
+  /// (D17), through KetoClub's server on web (D12) — so the disclosure
+  /// follows [SettingsController.supportsApiKey].
   Widget _consentSection(
     BuildContext context,
     AppLocalizations l10n,
@@ -168,13 +307,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionLabel(l10n.settingsConsentTitle),
+        _SectionLabel(l10n.settingsAiPrivacy),
         _SettingsGroup(
           children: [
-            _GroupNote(
-              controller.supportsApiKey
-                  ? l10n.settingsConsentBodyDirect
-                  : l10n.settingsConsentBody,
+            // Inside a grouped card the expansion tile's default top and
+            // bottom divider lines would double the card's own edge.
+            ExpansionTile(
+              key: consentDisclosureKey,
+              shape: const Border(),
+              collapsedShape: const Border(),
+              title: Text(
+                l10n.settingsConsentTitle,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              children: [
+                _GroupNote(
+                  controller.supportsApiKey
+                      ? l10n.settingsConsentBodyDirect
+                      : l10n.settingsConsentBody,
+                ),
+              ],
             ),
             CheckboxListTile(
               controlAffinity: ListTileControlAffinity.leading,
@@ -192,8 +344,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   /// The Gemini API key field, its save and remove actions and the
-  /// saved/not-saved status line (architecture.md D17, §11). Built only
-  /// when [SettingsController.supportsApiKey] is true.
+  /// saved/not-saved status line (architecture.md D17, §11): the second
+  /// half of the "AI & privacy" section, under [_consentSection] (issue
+  /// #255). Built only when [SettingsController.supportsApiKey] is true.
   ///
   /// The field is [TextField.obscureText] and never prefilled — see
   /// [_apiKeyField].
@@ -286,33 +439,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _SectionLabel(l10n.settingsLanguage),
-        _SettingsGroup(
-          children: [
-            RadioGroup<String?>(
-              key: languageRadioGroupKey,
-              groupValue: controller.languageTag,
-              onChanged: (tag) =>
-                  unawaited(_setLanguage(context, controller, tag)),
-              child: Column(
-                children: [
-                  RadioListTile<String?>(
-                    title: Text(l10n.settingsLanguageSystem),
-                    value: null,
-                    enabled: !busy,
-                  ),
-                  RadioListTile<String?>(
-                    title: Text(l10n.settingsLanguageEnglish),
-                    value: 'en',
-                    enabled: !busy,
-                  ),
-                  RadioListTile<String?>(
-                    title: Text(l10n.settingsLanguageHebrew),
-                    value: 'he',
-                    enabled: !busy,
-                  ),
-                ],
-              ),
-            ),
+        _ThreeWayControl<String?>(
+          key: languageRadioGroupKey,
+          selected: controller.languageTag,
+          enabled: !busy,
+          onChanged: (tag) => unawaited(_setLanguage(context, controller, tag)),
+          options: [
+            (value: null, label: l10n.settingsLanguageSystem),
+            (value: 'en', label: l10n.settingsLanguageEnglish),
+            (value: 'he', label: l10n.settingsLanguageHebrew),
           ],
         ),
       ],
@@ -349,33 +484,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _SectionLabel(l10n.settingsAppearance),
-        _SettingsGroup(
-          children: [
-            RadioGroup<AppThemeMode>(
-              key: appearanceRadioGroupKey,
-              groupValue: controller.themeMode,
-              onChanged: (mode) =>
-                  unawaited(_setThemeMode(context, controller, mode)),
-              child: Column(
-                children: [
-                  RadioListTile<AppThemeMode>(
-                    title: Text(l10n.settingsAppearanceSystem),
-                    value: AppThemeMode.system,
-                    enabled: !busy,
-                  ),
-                  RadioListTile<AppThemeMode>(
-                    title: Text(l10n.settingsAppearanceLight),
-                    value: AppThemeMode.light,
-                    enabled: !busy,
-                  ),
-                  RadioListTile<AppThemeMode>(
-                    title: Text(l10n.settingsAppearanceDark),
-                    value: AppThemeMode.dark,
-                    enabled: !busy,
-                  ),
-                ],
-              ),
-            ),
+        _ThreeWayControl<AppThemeMode>(
+          key: appearanceRadioGroupKey,
+          selected: controller.themeMode,
+          enabled: !busy,
+          onChanged: (mode) =>
+              unawaited(_setThemeMode(context, controller, mode)),
+          options: [
+            (value: AppThemeMode.system, label: l10n.settingsAppearanceSystem),
+            (value: AppThemeMode.light, label: l10n.settingsAppearanceLight),
+            (value: AppThemeMode.dark, label: l10n.settingsAppearanceDark),
           ],
         ),
       ],
@@ -603,6 +721,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Named after the tab it manages ("Recent", issue #251), so the
+        // cache group is no longer the one group without a label (#255).
+        _SectionLabel(l10n.settingsCacheSection),
         _SettingsGroup(
           children: [
             Padding(
@@ -682,24 +803,66 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (!mounted) return;
     setState(() => _cacheCleared = true);
   }
+}
 
-  /// A row linking to the offline drinks guide (/drinks, issue #216).
-  Widget _drinksGuideSection(BuildContext context, AppLocalizations l10n) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _SectionLabel(l10n.settingsDrinksGuideTitle),
-        _SettingsGroup(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.local_bar),
-              title: Text(l10n.settingsDrinksGuideSubtitle),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.pushNamed(context, drinksRoutePath),
-            ),
-          ],
+/// One option of a [_ThreeWayControl]: the value it stands for and its label.
+typedef _ThreeWayOption<T> = ({T value, String label});
+
+/// A single-row segmented control for a short, mutually exclusive choice
+/// (issue #256, audit S6): the language and appearance sections, which were
+/// three-row radio lists. Styled like the Default filter's control
+/// (chip-sized labels, compact density) so the two read as one family, and
+/// wrapped in the same sideways scroll that is only the fallback for a
+/// narrower screen or a longer translation (the S3 lesson: forced into
+/// equal thirds, labels break mid-word).
+///
+/// [enabled] false (the screen is busy) removes [onChanged], which is how
+/// [SegmentedButton] disables itself. A `null` option value is a legitimate
+/// selection ("match my device"), so [selected] is passed through as is.
+class _ThreeWayControl<T> extends StatelessWidget {
+  const new({
+    required this.selected,
+    required this.options,
+    required this.enabled,
+    required this.onChanged,
+    super.key,
+  });
+
+  /// The currently chosen option's value.
+  final T selected;
+
+  /// The options, in display order.
+  final List<_ThreeWayOption<T>> options;
+
+  /// Whether a tap may change the choice.
+  final bool enabled;
+
+  /// Called with the newly chosen value.
+  final void Function(T value) onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: SegmentedButton<T>(
+        showSelectedIcon: false,
+        style: SegmentedButton.styleFrom(
+          visualDensity: VisualDensity.compact,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          textStyle: const TextStyle(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-      ],
+        segments: [
+          for (final option in options)
+            ButtonSegment<T>(value: option.value, label: Text(option.label)),
+        ],
+        selected: <T>{selected},
+        onSelectionChanged: enabled
+            ? (selection) => onChanged(selection.first)
+            : null,
+      ),
     );
   }
 }

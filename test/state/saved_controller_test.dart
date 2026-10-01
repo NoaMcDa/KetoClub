@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
@@ -55,6 +56,51 @@ void main() {
       // Assert
       expect(controller.entries, hasLength(1));
       expect(controller.entries.single.ref, _woltRef);
+    });
+
+    test('load exposes the score and counts of an analysed entry', () async {
+      // Arrange
+      repository.seedCache(
+        CachedMenu(
+          menu: _menuWith(_woltRef, DateTime.utc(2026)),
+          analysis: MenuAnalysed(
+            dishes: const <AnalysedDish>[
+              AnalysedDish(
+                dishId: 'd1',
+                name: 'Steak',
+                verdict: DishVerdict.orderAsIs,
+                why: 'No starch.',
+              ),
+            ],
+            unclassified: const <String>[],
+            engine: const LlmEngine(model: 'test/model'),
+            analysedAt: DateTime.utc(2026),
+          ),
+        ),
+      );
+
+      // Act
+      await controller.load();
+
+      // Assert
+      final entry = controller.entries.single;
+      expect(entry.score, 10.0);
+      expect(entry.greenCount, 1);
+      expect(entry.yellowCount, 0);
+    });
+
+    test('load leaves score null for an entry with no analysis', () async {
+      // Arrange
+      repository.seedCache(
+        CachedMenu(menu: _menuWith(_woltRef, DateTime.utc(2026))),
+      );
+
+      // Act
+      await controller.load();
+
+      // Assert
+      expect(controller.entries.single.score, isNull);
+      expect(controller.entries.single.greenCount, 0);
     });
 
     test('load sorts entries newest-fetched first', () async {
@@ -186,5 +232,46 @@ void main() {
         expect(await repository.cached(_woltRef), isNotNull);
       },
     );
+
+    test('setPinned flips the row at once and tells the repository', () async {
+      // Arrange
+      repository.seedCache(
+        CachedMenu(menu: _menuWith(_woltRef, DateTime.utc(2026))),
+      );
+      await controller.load();
+      expect(controller.entries.single.pinned, isFalse);
+
+      // Act
+      await controller.setPinned(_woltRef, pinned: true);
+
+      // Assert
+      expect(controller.entries.single.pinned, isTrue);
+      expect(repository.pinCalls.single, (ref: _woltRef, pinned: true));
+      await controller.load();
+      expect(controller.entries.single.pinned, isTrue);
+    });
+
+    test('setPinned false unpins', () async {
+      // Arrange
+      repository.seedCache(
+        CachedMenu(menu: _menuWith(_woltRef, DateTime.utc(2026))),
+      );
+      await controller.load();
+      await controller.setPinned(_woltRef, pinned: true);
+
+      // Act
+      await controller.setPinned(_woltRef, pinned: false);
+
+      // Assert
+      expect(controller.entries.single.pinned, isFalse);
+    });
+
+    test('setPinned on an unlisted ref changes nothing', () async {
+      // Act
+      await controller.setPinned(_tenbisRef, pinned: true);
+
+      // Assert
+      expect(repository.pinCalls, isEmpty);
+    });
   });
 }

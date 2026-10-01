@@ -531,6 +531,44 @@ void main() {
       expect(rows.single.analysis, isNull);
     });
 
+    test('unclassifiedRows resolves names to menu dishes, one each, and '
+        'keeps a name the menu lacks (issue #244)', () async {
+      // Arrange: two dishes share a name; the model also named a third.
+      final first = _dish('Mystery', id: 'first');
+      final second = _dish('Mystery', id: 'second');
+      repository.stub(_ref, MenuFetched(menu: _menuOf([first, second])));
+      classifier.respondWith(
+        MenuAnalysed(
+          dishes: const <AnalysedDish>[],
+          unclassified: const <String>['Mystery', 'Mystery', 'Invented'],
+          engine: const RulesEngine(
+            reason: MenuAnalysisFailureReason.notConfigured,
+          ),
+          analysedAt: clock.now(),
+        ),
+      );
+      await controller.open(_ref);
+
+      // Act
+      final rows = controller.unclassifiedRows;
+
+      // Assert
+      expect(rows.map((row) => row.dish.name), [
+        'Mystery',
+        'Mystery',
+        'Invented',
+      ]);
+      expect(rows[0].dish.id, 'first');
+      expect(rows[1].dish.id, 'second');
+      expect(rows[2].category, isEmpty);
+      expect(rows.every((row) => row.analysis == null), isTrue);
+    });
+
+    test('unclassifiedRows is empty before any analysis (issue #244)', () {
+      // Act & Assert
+      expect(controller.unclassifiedRows, isEmpty);
+    });
+
     test('setFilter notifies listeners and does not call the repository '
         'again', () async {
       // Arrange

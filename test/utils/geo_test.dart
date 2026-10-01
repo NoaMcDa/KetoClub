@@ -156,4 +156,40 @@ void main() {
       expect(venues, orderedEquals(before));
     });
   });
+
+  group('formatDistance', () {
+    /// Each row: kilometres in, then the expected unit and value in en.
+    final table = <(double, DistanceUnit, String)>[
+      (0.05, DistanceUnit.metres, '50'),
+      (0.35, DistanceUnit.metres, '350'),
+      (0.354, DistanceUnit.metres, '350'),
+      (0.0004, DistanceUnit.metres, '10'),
+      (0.9996, DistanceUnit.kilometres, '1.0'),
+      (1.0, DistanceUnit.kilometres, '1.0'),
+      (1.25, DistanceUnit.kilometres, '1.3'),
+      (12.4, DistanceUnit.kilometres, '12.4'),
+      (1234.5, DistanceUnit.kilometres, '1,234.5'),
+      (-3, DistanceUnit.metres, '10'),
+      (double.nan, DistanceUnit.metres, '10'),
+    ];
+
+    for (final (km, unit, value) in table) {
+      test('reads $km km as $value ($unit)', () {
+        // Act
+        final label = formatDistance(km, locale: 'en');
+
+        // Assert
+        expect(label.unit, unit);
+        expect(label.value, value);
+      });
+    }
+
+    test('uses the locale decimal separator', () {
+      // Act
+      final label = formatDistance(12.4, locale: 'de');
+
+      // Assert
+      expect(label.value, '12,4');
+    });
+  });
 }

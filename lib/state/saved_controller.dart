@@ -65,6 +65,19 @@ final class SavedController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Keeps or stops keeping [ref]'s cached menu past the cache window
+  /// ([MenuRepository.pin]). The row flips at once, then the repository
+  /// is told; does nothing when [ref] is not currently listed. Never
+  /// throws.
+  Future<void> setPinned(VenueRef ref, {required bool pinned}) async {
+    final index = _entries.indexWhere((entry) => entry.ref == ref);
+    if (index == -1) return;
+    _entries = List<CachedMenuEntry>.of(_entries)
+      ..[index] = _entries[index].withPinned(pinned: pinned);
+    notifyListeners();
+    await _repository.pin(ref, pinned: pinned);
+  }
+
   /// Deletes [ref]'s cached menu through the repository. Called once an
   /// undo window has passed with no [restore] for it. Never throws.
   Future<void> commitRemoval(VenueRef ref) => _repository.remove(ref);

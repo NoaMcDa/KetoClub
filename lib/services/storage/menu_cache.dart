@@ -6,6 +6,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/utils/keto_score.dart';
 
 /// The reason whose `name` equals [wire], or null when none does.
 ///
@@ -127,7 +128,63 @@ final class CachedMenuEntry {
     required this.fetchedAt,
     required this.dishCount,
     required this.engine,
+    this.score,
+    this.greenCount = 0,
+    this.yellowCount = 0,
+    this.pinned = false,
   });
+
+  /// Summarises [cached] for the Saved list: its venue, fetch time, dish
+  /// count, engine, and — from a completed analysis that placed at least
+  /// one dish — the keto score and verdict counts the Explore venue card
+  /// shows for the same menu (`ketoScore`, architecture.md D13).
+  ///
+  /// [pinned] is whether the user asked to keep the entry past the cache
+  /// window ([MenuCache.pin]); it is not part of [cached], which never
+  /// carries it.
+  // A named constructor still needs its class name (see `VerdictTone.lerp`).
+  // ignore: unnecessary_type_name_in_constructor
+  factory CachedMenuEntry.summarise(CachedMenu cached, {bool pinned = false}) {
+    final analysis = cached.analysis;
+    final menu = cached.menu;
+    if (analysis is! MenuAnalysed) {
+      return CachedMenuEntry(
+        ref: menu.venueRef,
+        venueName: menu.venueName,
+        fetchedAt: menu.fetchedAt,
+        dishCount: menu.allDishes.length,
+        engine: null,
+        pinned: pinned,
+      );
+    }
+    int count(DishVerdict verdict) =>
+        analysis.dishes.where((dish) => dish.verdict == verdict).length;
+    final green = count(DishVerdict.orderAsIs);
+    final yellow = count(DishVerdict.modifiable);
+    final hiddenCarbYellow = analysis.dishes
+        .where(
+          (d) =>
+              d.verdict == DishVerdict.modifiable && d.hiddenCarbs.isNotEmpty,
+        )
+        .length;
+    final score = ketoScore(
+      greenCount: green,
+      hiddenCarbYellowCount: hiddenCarbYellow,
+      otherYellowCount: yellow - hiddenCarbYellow,
+      redCount: count(DishVerdict.nonKeto),
+    );
+    return CachedMenuEntry(
+      ref: menu.venueRef,
+      venueName: menu.venueName,
+      fetchedAt: menu.fetchedAt,
+      dishCount: menu.allDishes.length,
+      engine: analysis.engine,
+      score: score,
+      greenCount: score == null ? 0 : green,
+      yellowCount: score == null ? 0 : yellow,
+      pinned: pinned,
+    );
+  }
 
   /// Which venue, on which platform, this entry is for.
   final VenueRef ref;
@@ -147,8 +204,38 @@ final class CachedMenuEntry {
   /// has none, or has only a failed one.
   final AnalysisEngine? engine;
 
+  /// The keto score out of 10 for the cached analysis, or null when the
+  /// entry has no completed analysis or it placed no dish — never a
+  /// fabricated `0.0` (see `ketoScore`).
+  final double? score;
+
+  /// How many dishes the cached analysis placed green; 0 when [score] is
+  /// null.
+  final int greenCount;
+
+  /// How many dishes the cached analysis placed yellow; 0 when [score] is
+  /// null.
+  final int yellowCount;
+
+  /// Whether the user asked to keep this entry past the cache window
+  /// ([MenuCache.pin]), exempting it from expiry.
+  final bool pinned;
+
   /// Whether the cached menu carries a completed ([MenuAnalysed]) analysis.
   bool get analysed => engine != null;
+
+  /// This entry with [pinned] replaced.
+  CachedMenuEntry withPinned({required bool pinned}) => CachedMenuEntry(
+    ref: ref,
+    venueName: venueName,
+    fetchedAt: fetchedAt,
+    dishCount: dishCount,
+    engine: engine,
+    score: score,
+    greenCount: greenCount,
+    yellowCount: yellowCount,
+    pinned: pinned,
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -157,10 +244,24 @@ final class CachedMenuEntry {
       other.venueName == venueName &&
       other.fetchedAt == fetchedAt &&
       other.dishCount == dishCount &&
-      other.engine == engine;
+      other.engine == engine &&
+      other.score == score &&
+      other.greenCount == greenCount &&
+      other.yellowCount == yellowCount &&
+      other.pinned == pinned;
 
   @override
-  int get hashCode => Object.hash(ref, venueName, fetchedAt, dishCount, engine);
+  int get hashCode => Object.hash(
+    ref,
+    venueName,
+    fetchedAt,
+    dishCount,
+    engine,
+    score,
+    greenCount,
+    yellowCount,
+    pinned,
+  );
 
   @override
   String toString() => 'CachedMenuEntry(${ref.cacheKey}, $dishCount dishes)';
@@ -228,6 +329,21 @@ abstract interface class MenuCache {
   ///
   /// Never throws.
   Future<void> remove(VenueRef ref);
+
+  /// Keeps ([pinned] true) or stops keeping ([pinned] false) the entry
+  /// cached for [ref] past the cache window: a pinned entry is exempt
+  /// from expiry, so the repository serves it without refetching until
+  /// the user asks for a refresh. A pin is a flag on a menu, never a user
+  /// record (architecture.md D8).
+  ///
+  /// A no-op when nothing is cached for [ref], so a pin never outlives its
+  /// menu. [remove] and [clear] drop the pin along with the entry. Never
+  /// throws.
+  Future<void> pin(VenueRef ref, {bool pinned = true});
+
+  /// Whether the entry cached for [ref] is pinned ([pin]). False for a
+  /// ref with no entry, and on a storage failure. Never throws.
+  Future<bool> isPinned(VenueRef ref);
 }
 
 /// A [MenuCache] in a Hive box of JSON strings.
@@ -237,13 +353,88 @@ abstract interface class MenuCache {
 /// dependency graph: `buildDependencies()` is called from `main()` and
 /// from tests that run without a plugin binding. The opener is invoked at
 /// most once; its result is cached and reused by every later call.
+///
+/// Pins ([pin]) live in a second, tiny box ([openPinBox]) of cache keys
+/// rather than inside the entries, so the entry JSON, and with it every
+/// box already on a device, is unchanged: no schema migration.
 final class HiveMenuCache implements MenuCache {
-  /// Creates a cache over the box [openBox] returns.
-  new({required this.openBox});
+  /// Creates a cache over the box [openBox] returns, keeping pins in the
+  /// box [openPinBox] returns.
+  ///
+  /// With no [openPinBox] pins are held in memory for this instance only;
+  /// `di.dart` always supplies one.
+  new({required this.openBox, this.openPinBox});
 
   /// Opens (or creates) the backing box. Invoked at most once; see
   /// [_box].
   final Future<Box<String>> Function() openBox;
+
+  /// Opens (or creates) the box of pinned cache keys, or null to keep pins
+  /// in memory only. Invoked at most once; see [_pinBox].
+  final Future<Box<String>> Function()? openPinBox;
+
+  /// The pinned cache keys when [openPinBox] is null.
+  final Set<String> _memoryPins = <String>{};
+
+  /// The pin box, once opened (the same lazy-once shape as [_box]).
+  Future<Box<String>>? _pinBox;
+
+  Future<Box<String>>? _openedPinBox() {
+    final open = openPinBox;
+    if (open == null) return null;
+    return _pinBox ??= open();
+  }
+
+  /// The pinned cache keys; empty on a storage failure.
+  Future<Set<String>> _pinnedKeys() async {
+    final opened = _openedPinBox();
+    if (opened == null) return Set<String>.of(_memoryPins);
+    try {
+      final box = await opened;
+      return box.keys.whereType<String>().toSet();
+      // A broken box reads as "nothing pinned", never a throw.
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      return <String>{};
+    }
+  }
+
+  /// Records or forgets the pin for [key]; a failed write is dropped.
+  Future<void> _setPinKey(String key, {required bool pinned}) async {
+    final opened = _openedPinBox();
+    if (opened == null) {
+      pinned ? _memoryPins.add(key) : _memoryPins.remove(key);
+      return;
+    }
+    try {
+      final box = await opened;
+      if (pinned) {
+        await box.put(key, 'pinned');
+      } else {
+        await box.delete(key);
+      }
+      // A pin that cannot be stored is dropped; the entry still expires.
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      // Nothing to do: the pin write above never landed.
+    }
+  }
+
+  /// Forgets every pin.
+  Future<void> _clearPins() async {
+    final opened = _openedPinBox();
+    if (opened == null) {
+      _memoryPins.clear();
+      return;
+    }
+    try {
+      await (await opened).clear();
+      // An unclearable pin box leaves harmless keys for absent entries.
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      // Nothing to do: the clear above never landed.
+    }
+  }
 
   /// The box, once opened. Holds the in-flight (or completed) future
   /// rather than a `Box` directly, so nothing here touches the box before
@@ -321,6 +512,8 @@ final class HiveMenuCache implements MenuCache {
     } on HiveError {
       // Nothing to do: the clear above never landed.
     }
+    // Settings' "Clear" clears everything, pinned entries included.
+    await _clearPins();
   }
 
   @override
@@ -340,7 +533,28 @@ final class HiveMenuCache implements MenuCache {
     } on HiveError {
       // Nothing to do: the delete above never landed.
     }
+    await _setPinKey(ref.cacheKey, pinned: false);
   }
+
+  @override
+  Future<void> pin(VenueRef ref, {bool pinned = true}) async {
+    if (pinned) {
+      final Box<String> box;
+      try {
+        box = await _openedBox();
+        if (!box.containsKey(ref.cacheKey)) return;
+        // A broken box cannot hold a pin for a menu it cannot read.
+        // ignore: avoid_catching_errors
+      } on HiveError {
+        return;
+      }
+    }
+    await _setPinKey(ref.cacheKey, pinned: pinned);
+  }
+
+  @override
+  Future<bool> isPinned(VenueRef ref) async =>
+      (await _pinnedKeys()).contains(ref.cacheKey);
 
   @override
   Future<int> size() async {
@@ -382,6 +596,7 @@ final class HiveMenuCache implements MenuCache {
     } on HiveError {
       return const <CachedMenuEntry>[];
     }
+    final pins = await _pinnedKeys();
     final result = <CachedMenuEntry>[];
     for (final value in raw) {
       final Object? decoded;
@@ -394,15 +609,9 @@ final class HiveMenuCache implements MenuCache {
       final cached = CachedMenu.tryFrom(decoded);
       if (cached == null) continue;
       result.add(
-        CachedMenuEntry(
-          ref: cached.menu.venueRef,
-          venueName: cached.menu.venueName,
-          fetchedAt: cached.menu.fetchedAt,
-          dishCount: cached.menu.allDishes.length,
-          engine: switch (cached.analysis) {
-            final MenuAnalysed analysed => analysed.engine,
-            _ => null,
-          },
+        CachedMenuEntry.summarise(
+          cached,
+          pinned: pins.contains(cached.menu.venueRef.cacheKey),
         ),
       );
     }

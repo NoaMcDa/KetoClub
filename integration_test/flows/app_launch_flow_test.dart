@@ -3,7 +3,6 @@
 // the real composition root (`di.dart`), so it asserts what that screen
 // shows, not only the app's name.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
@@ -28,15 +27,15 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert: the first screen is the venue search screen, with its
-      // paste field and open button built by the real dependencies.
-      expect(find.text(appName), findsOneWidget);
+      // paste field built by the real dependencies. There is no standing
+      // open button any more (#229): a pasted link shows a suffix icon.
+      final handle = tester.ensureSemantics();
+      expect(find.bySemanticsLabel(appName), findsOneWidget);
+      handle.dispose();
       expect(find.byType(VenueSearchScreen), findsOneWidget);
       expect(find.text(_en.venueSearchLabel), findsOneWidget);
       expect(find.text(_en.venueSearchHint), findsOneWidget);
-      expect(
-        find.widgetWithText(FilledButton, _en.venueSearchOpen),
-        findsOneWidget,
-      );
+      expect(find.byTooltip(_en.venueSearchOpenLink), findsNothing);
     });
   });
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/widgets/focus_ring.dart';
 
 /// The horizontal row of category chips above the dish list (issue #51):
 /// one chip per name in `MenuController.visibleCategories`, in menu order.
@@ -16,13 +17,23 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 class CategoryChips extends StatelessWidget {
   /// Creates a chip row for [categories], reporting a tap through
   /// [onSelected].
-  const new({required this.categories, required this.onSelected, super.key});
+  const new({
+    required this.categories,
+    required this.onSelected,
+    this.wrap = false,
+    super.key,
+  });
 
   /// The categories to show a chip for, in the order they should appear.
   final List<String> categories;
 
   /// Called with the tapped chip's category name.
   final ValueChanged<String> onSelected;
+
+  /// Whether the chips wrap onto further lines instead of scrolling
+  /// sideways: the two-pane menu's side pane (issue #225), where every
+  /// chip should be in reach of a mouse, which cannot drag a row.
+  final bool wrap;
 
   @override
   Widget build(BuildContext context) {
@@ -32,23 +43,31 @@ class CategoryChips extends StatelessWidget {
     // handful of categories, so building every chip up front costs
     // nothing, and it keeps the loaded menu's one ListView the only one
     // on the screen — a widget test can still find it by type alone.
+    final chips = [
+      for (final category in categories)
+        Semantics(
+          button: true,
+          label: l10n.categoryChipSemanticLabel(category),
+          excludeSemantics: true,
+          child: FocusRing(
+            borderRadius: BorderRadius.circular(8),
+            child: ActionChip(
+              label: Text(category),
+              onPressed: () => onSelected(category),
+            ),
+          ),
+        ),
+    ];
+    if (wrap) return Wrap(spacing: 8, runSpacing: 8, children: chips);
     return SizedBox(
       height: 36,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            for (var i = 0; i < categories.length; i++) ...[
+            for (var i = 0; i < chips.length; i++) ...[
               if (i > 0) const SizedBox(width: 8),
-              Semantics(
-                button: true,
-                label: l10n.categoryChipSemanticLabel(categories[i]),
-                excludeSemantics: true,
-                child: ActionChip(
-                  label: Text(categories[i]),
-                  onPressed: () => onSelected(categories[i]),
-                ),
-              ),
+              chips[i],
             ],
           ],
         ),

@@ -18,14 +18,17 @@ final Uint8List _pngBytes = base64Decode(
 );
 
 /// Pumps a sheet over [scan] as the body of a localised app.
-Future<void> _pump(WidgetTester tester, ScannedMenu scan) => tester.pumpWidget(
-  MaterialApp(
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
-    supportedLocales: AppLocalizations.supportedLocales,
-    locale: const Locale('en'),
-    home: Scaffold(body: ScannedPagesSheet(scan: scan)),
-  ),
-);
+Future<void> _pump(WidgetTester tester, ScannedMenu scan, {int? initialPage}) =>
+    tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: Scaffold(
+          body: ScannedPagesSheet(scan: scan, initialPage: initialPage),
+        ),
+      ),
+    );
 
 void main() {
   group('ScannedPagesSheet', () {
@@ -87,6 +90,60 @@ void main() {
       // Assert
       expect(find.byType(InteractiveViewer), findsNothing);
       expect(find.byType(ScannedPagesSheet), findsOneWidget);
+    });
+
+    testWidgets('initialPage opens that image page full screen', (
+      tester,
+    ) async {
+      // Arrange
+      final scan = ScannedMenu(
+        pages: <ScannedPage>[
+          ScannedPage(mimeType: ScannedPage.png, bytes: _pngBytes),
+          ScannedPage(mimeType: ScannedPage.png, bytes: _pngBytes),
+        ],
+      );
+
+      // Act
+      await _pump(tester, scan, initialPage: 1);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byType(InteractiveViewer), findsOneWidget);
+    });
+
+    testWidgets('initialPage on a PDF page opens no full-screen view', (
+      tester,
+    ) async {
+      // Arrange
+      final scan = ScannedMenu(
+        pages: <ScannedPage>[
+          ScannedPage(mimeType: ScannedPage.pdf, bytes: Uint8List(8)),
+        ],
+      );
+
+      // Act
+      await _pump(tester, scan, initialPage: 0);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byType(InteractiveViewer), findsNothing);
+      expect(find.text(_en.scannedMenuPdfPage), findsOneWidget);
+    });
+
+    testWidgets('an out-of-range initialPage is ignored', (tester) async {
+      // Arrange
+      final scan = ScannedMenu(
+        pages: <ScannedPage>[
+          ScannedPage(mimeType: ScannedPage.png, bytes: _pngBytes),
+        ],
+      );
+
+      // Act
+      await _pump(tester, scan, initialPage: 5);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byType(InteractiveViewer), findsNothing);
     });
 
     testWidgets('a page whose bytes do not decode shows a broken-image '

@@ -40,7 +40,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionShareMenu => 'Share menu';
 
   @override
-  String get actionOpenDrinksGuide => 'Drinks guide';
+  String get actionMoreMenuOptions => 'More options';
 
   @override
   String get actionCancel => 'Cancel';
@@ -56,7 +56,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'KetoClub cannot read a menu from that yet. Paste a Wolt restaurant link or its slug.';
 
   @override
-  String get venueSearchOpen => 'Show the keto menu';
+  String get venueSearchOpenLink => 'Open link';
 
   @override
   String venueSearchContinueWith(String venue) {
@@ -89,7 +89,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String redGroupTitle(int count) {
-    return 'Not keto ($count)';
+    return 'Skip ($count)';
   }
 
   @override
@@ -100,6 +100,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get unclassifiedExplain =>
       'KetoClub saw these dishes but could not place them. Read them yourself before ordering.';
+
+  @override
+  String get unclassifiedBadge => 'Not classified';
 
   @override
   String get engineChipAi => 'AI';
@@ -119,16 +122,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get verdictOrderAsIs => 'Order as-is';
 
   @override
-  String get verdictModifiable => 'Order with a change';
+  String get verdictModifiable => 'With changes';
 
   @override
-  String get verdictNonKeto => 'Not keto';
+  String get verdictNonKeto => 'Skip';
 
   @override
-  String get waiterCardOpen => 'Show the waiter card';
+  String get dishCardFullScreen => 'Full screen';
+
+  @override
+  String dishCardFullScreenSemanticLabel(String dish) {
+    return 'Show the waiter card for $dish';
+  }
 
   @override
   String get waiterCardTitle => 'Say this to the waiter';
+
+  @override
+  String get settingsAiPrivacy => 'AI & privacy';
 
   @override
   String get settingsConsentTitle => 'What leaves this device';
@@ -247,6 +258,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsFilter => 'Default filter';
 
   @override
+  String get settingsCacheSection => 'Recent menus';
+
+  @override
   String settingsCacheSummary(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -272,6 +286,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsCacheCleared => 'Saved menus cleared.';
+
+  @override
+  String get settingsAboutSection => 'About';
+
+  @override
+  String get settingsAboutVersion => 'Version';
+
+  @override
+  String settingsAboutVersionValue(String version, String build) {
+    return '$version (build $build)';
+  }
+
+  @override
+  String get settingsAboutLicences => 'Open-source licences';
+
+  @override
+  String get settingsAboutPrivacy => 'Privacy';
+
+  @override
+  String get settingsAboutReport => 'Report a problem';
+
+  @override
+  String get settingsAboutReportHint =>
+      'Opens KetoClub\'s issue tracker on GitHub';
+
+  @override
+  String get settingsAboutLinkFailed => 'Could not open the link.';
 
   @override
   String get fetchFailedOffline =>
@@ -434,20 +475,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navScan => 'Scan';
 
   @override
-  String get navSaved => 'Saved';
+  String get navSaved => 'Recent';
 
   @override
   String get navSettings => 'Settings';
 
   @override
-  String get savedPlaceholderTitle => 'Saved venues';
+  String get savedPlaceholderTitle => 'Recent menus';
 
   @override
   String get savedPlaceholderBody =>
       'Open a venue\'s menu and it appears here automatically, available for a day — even offline.';
 
   @override
-  String get savedLoading => 'Loading your saved menus…';
+  String get savedLoading => 'Loading your recent menus…';
 
   @override
   String savedEntryDishCount(num count) {
@@ -474,6 +515,61 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String savedExpiresMinutes(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Expires in $count minutes',
+      one: 'Expires in 1 minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String savedExpiresHours(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Expires in $count hours',
+      one: 'Expires in 1 hour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String savedExpiresDays(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Expires in $count days',
+      one: 'Expires in 1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get savedExpired => 'Expired, refreshes when opened';
+
+  @override
+  String get savedKept => 'Kept, no expiry';
+
+  @override
+  String get savedKeep => 'Keep';
+
+  @override
+  String savedKeepSemanticLabel(String venue) {
+    return 'Keep $venue past its expiry';
+  }
+
+  @override
+  String get savedUnkeep => 'Stop keeping';
+
+  @override
+  String savedUnkeepSemanticLabel(String venue) {
+    return 'Stop keeping $venue';
+  }
+
+  @override
   String get savedUndo => 'Undo';
 
   @override
@@ -487,22 +583,27 @@ class AppLocalizationsEn extends AppLocalizations {
       'Use your location to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.';
 
   @override
+  String get discoveryDrinksGuideCard =>
+      'Ordering a drink? Bar and coffee guide';
+
+  @override
   String get discoveryLookingAround => 'Looking around';
 
   @override
   String get discoveryAroundYou => 'Your location';
 
   @override
-  String get discoveryLocationNotSet => 'Location not set';
+  String get discoveryLocationInvite => 'Tap to use your location';
 
   @override
   String get discoveryUseLocation => 'Use my location';
 
   @override
-  String get discoveryChipNearby => 'Nearby';
+  String get discoveryChipKetoEightPlus => 'Keto 8+';
 
   @override
-  String get discoveryChipKetoEightPlus => 'Keto 8+';
+  String get discoveryChipKetoEightPlusHint =>
+      'Needs scores first: estimate this list, or open a restaurant.';
 
   @override
   String get discoveryChipOpenNow => 'Open now';
@@ -572,11 +673,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'No restaurant in this list matches that filter.';
 
   @override
-  String get discoveryEstimateList => 'Estimate this list';
+  String get discoveryEstimateList => 'Quick score (on-device rules)';
 
   @override
   String get discoveryEstimateHint =>
-      'Reads each menu on this list once and scores it with the on-device rules, not the AI. Open a restaurant for the full analysis.';
+      'Open a restaurant for the full AI analysis.';
 
   @override
   String discoveryEstimating(int done, int total) {
@@ -597,6 +698,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String venueCardWalkMinutes(int minutes) {
     return '$minutes min walk';
+  }
+
+  @override
+  String venueCardDistanceMetres(String distance) {
+    return '$distance m';
+  }
+
+  @override
+  String venueCardDistanceKm(String distance) {
+    return '$distance km';
   }
 
   @override
@@ -729,7 +840,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get legendNote => 'The same rules KetoClub sends to the AI model.';
 
   @override
+  String get legendEngines =>
+      'Rules: KetoClub\'s own keyword checks on the dish text, with no carb estimate. AI: Gemini reads the whole menu and estimates net carbs.';
+
+  @override
+  String get legendBudget =>
+      'Carb budget: after an AI analysis, a Filters field lets you set a net-carb budget for the meal. Rule-based results have no carb estimates, so it is not offered.';
+
+  @override
   String get waiterCardCopyButton => 'Copy text';
+
+  @override
+  String get waiterCardCopied => 'Copied ✓';
+
+  @override
+  String get waiterCardDone => 'Done';
 
   @override
   String waiterCardAfterText(String grams) {
@@ -755,6 +880,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noteEditorClear => 'Clear note';
+
+  @override
+  String get menuFilters => 'Filters';
+
+  @override
+  String menuFiltersActive(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Filters · $count active',
+      one: 'Filters · 1 active',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get menuSearchHint => 'Search dishes';
@@ -836,6 +975,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'Photograph the pages of a menu, choose photos from your library, or choose a PDF. KetoClub reads the dishes off the pages and analyses them.';
 
   @override
+  String get scanScreenModePages => 'Photos & PDF';
+
+  @override
+  String get scanScreenModePaste => 'Paste text';
+
+  @override
+  String get scanScreenModeQr => 'QR code';
+
+  @override
+  String get scanScreenQrIntro =>
+      'Scan the QR code on your table to open the restaurant\'s menu.';
+
+  @override
   String get scanScreenActionTakePhoto => 'Take a photo';
 
   @override
@@ -875,6 +1027,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String scanScreenReorderPage(int number) {
+    return 'Move page $number. Drag to reorder';
+  }
+
+  @override
+  String scanScreenPreviewPage(int number) {
+    return 'Preview page $number';
+  }
+
+  @override
   String scanScreenTooManyPages(int max) {
     return 'One scan holds at most $max pages. The pages over the limit were not added.';
   }
@@ -886,9 +1048,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scanScreenAnalysePages => 'Analyse pages';
-
-  @override
-  String get scanScreenPasteHeading => 'Or paste the text';
 
   @override
   String get scanScreenDisclosureWeb =>
@@ -1017,10 +1176,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get carbBudgetFieldClear => 'Clear budget';
 
   @override
-  String get carbBudgetDisabledReason =>
-      'Set a budget after AI analysis — rule-based results have no carb estimates.';
-
-  @override
   String netCarbsChipLeavesSuffix(int grams) {
     return ' · leaves ${grams}g';
   }
@@ -1051,10 +1206,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drinksGuideSectionSkip => 'SKIP';
 
   @override
-  String get settingsDrinksGuideTitle => 'DRINKS GUIDE';
-
-  @override
-  String get settingsDrinksGuideSubtitle => 'Bar and coffee reference';
+  String drinksGuideCarbsSemanticLabel(String range) {
+    return 'Estimated net carbs, not confirmed: $range';
+  }
 
   @override
   String get actionAskAboutMenu => 'Ask about this menu';

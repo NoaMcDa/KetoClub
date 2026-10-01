@@ -1,7 +1,6 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart'
-    show MaterialApp, NavigationBar, TextDirection, ThemeMode;
+    show MaterialApp, NavigationBar, TextDirection, TextField, ThemeMode;
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/app.dart';
@@ -9,14 +8,19 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/drinks_guide_screen.dart' show drinksRoutePath;
+import 'package:ketoclub/screens/menu_screen.dart';
 import 'package:ketoclub/screens/scan_screen.dart';
 import 'package:ketoclub/screens/settings_screen.dart';
+import 'package:ketoclub/screens/venue_search_screen.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:ketoclub/state/scan_controller.dart';
+import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/app_shell.dart';
+import 'package:ketoclub/widgets/route_title.dart';
 import 'package:provider/provider.dart';
 
 import 'fakes/fake_app_dependencies.dart';
@@ -26,13 +30,17 @@ final AppLocalizations _en = AppLocalizationsEn();
 
 void main() {
   group('KetoClubApp', () {
-    testWidgets('shows the app name on launch', (tester) async {
+    testWidgets('shows the logo mark, labelled with the app name, on launch', (
+      tester,
+    ) async {
       // Arrange: the real app on top of faked services.
       await tester.pumpWidget(
         KetoClubApp(dependencies: FakeAppDependencies().dependencies),
       );
-      // Assert
-      expect(find.text(appName), findsOneWidget);
+      // Assert: the logo mark (#232) carries the name as its label.
+      final handle = tester.ensureSemantics();
+      expect(find.bySemanticsLabel(appName), findsOneWidget);
+      handle.dispose();
     });
 
     testWidgets('the Explore tab is selected on launch', (tester) async {
@@ -61,9 +69,9 @@ void main() {
       await tester.pumpWidget(KetoClubApp(dependencies: fakes.dependencies));
       await tester.pumpAndSettle();
 
-      // Assert: appName is untranslated (CLAUDE.md), so it is still on
-      // screen and a stable anchor to read the ambient direction from.
-      final context = tester.element(find.text(appName));
+      // Assert: the navigation bar is a stable anchor to read the ambient
+      // direction from.
+      final context = tester.element(find.byType(NavigationBar));
       expect(Directionality.of(context), TextDirection.rtl);
     });
 
@@ -79,7 +87,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      final context = tester.element(find.text(appName));
+      final context = tester.element(find.byType(NavigationBar));
       expect(Directionality.of(context), TextDirection.ltr);
     });
 
@@ -133,7 +141,7 @@ void main() {
           .pushReplacementNamed(settingsRoutePath);
       await tester.pumpAndSettle();
 
-      // Act: scoped to the appearance radio group, so a label the
+      // Act: scoped to the appearance segmented control, so a label the
       // language and appearance sections happen to share can never make
       // this finder ambiguous (settings_screen.dart's
       // `appearanceRadioGroupKey`).
@@ -180,6 +188,49 @@ void main() {
       expect(fakes.classifier.calls, isEmpty);
     });
 
+    testWidgets('the Explore controller, query and results survive a tab '
+        'switch and the route rebuild it causes (issue #233)', (tester) async {
+      // Arrange: a name search answered on Explore.
+      final fakes = FakeAppDependencies();
+      fakes.venueSearchService.queueFound(const [
+        Venue(
+          ref: VenueRef(source: MenuSource.wolt, platformId: 'sushi-bar'),
+          name: 'Sushi Bar',
+        ),
+      ]);
+      await tester.pumpWidget(KetoClubApp(dependencies: fakes.dependencies));
+      await tester.pumpAndSettle();
+      VenueSearchController explore() => Provider.of<VenueSearchController>(
+        tester.element(find.byType(VenueSearchScreen)),
+        listen: false,
+      );
+      final before = explore();
+      await tester.enterText(find.byType(TextField), 'sushi');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+      expect(find.text('Sushi Bar'), findsOneWidget);
+
+      // Act: away to Saved, which disposes the Explore route, and back.
+      Finder tab(String label) => find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.text(label),
+      );
+      await tester.tap(tab(_en.navSaved));
+      await tester.pumpAndSettle();
+      expect(find.byType(VenueSearchScreen), findsNothing);
+      await tester.tap(tab(_en.navExplore));
+      await tester.pumpAndSettle();
+
+      // Assert: the same controller, its query in a new field, its list.
+      expect(explore(), same(before));
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller?.text,
+        'sushi',
+      );
+      expect(find.text('Sushi Bar'), findsOneWidget);
+      expect(fakes.venueSearchService.byNameCalls, hasLength(1));
+    });
+
     testWidgets('a direct route to /settings lands on the Settings tab', (
       tester,
     ) async {
@@ -202,6 +253,139 @@ void main() {
       expect(find.byType(AppShell), findsOneWidget);
       final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
       expect(bar.selectedIndex, equals(AppShell.settingsIndex));
+    });
+  });
+
+  group('route stack (issue #262, audit G8)', () {
+    /// The bottom-navigation destination labelled [label].
+    Finder tab(String label) => find.descendant(
+      of: find.byType(NavigationBar),
+      matching: find.text(label),
+    );
+
+    testWidgets('browser Back after switching to Saved lands on Explore', (
+      tester,
+    ) async {
+      // Arrange
+      await tester.pumpWidget(
+        KetoClubApp(dependencies: FakeAppDependencies().dependencies),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(tab(_en.navSaved));
+      await tester.pumpAndSettle();
+      expect(find.byType(VenueSearchScreen), findsNothing);
+
+      // Act: what the engine sends for the browser's Back button.
+      final handled = await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(handled, isTrue);
+      expect(find.byType(VenueSearchScreen), findsOneWidget);
+      final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
+      expect(bar.selectedIndex, equals(AppShell.exploreIndex));
+    });
+
+    testWidgets('menu, its Settings action, then Explore leaves no menu '
+        'under the stack (audit G8)', (tester) async {
+      // Arrange: a venue menu opened from Explore, then Settings from its
+      // app bar.
+      await tester.pumpWidget(
+        KetoClubApp(dependencies: FakeAppDependencies().dependencies),
+      );
+      await tester.pumpAndSettle();
+      final navigator = tester.state<NavigatorState>(
+        find.byType(Navigator).first,
+      )..pushNamed('/venue/wolt/hamosad', arguments: 'Hamosad');
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip(_en.actionOpenSettings));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsScreen), findsOneWidget);
+
+      // Act
+      await tester.tap(tab(_en.navExplore));
+      await tester.pumpAndSettle();
+
+      // Assert: Explore alone, with no menu kept beneath it.
+      expect(find.byType(VenueSearchScreen), findsOneWidget);
+      expect(find.byType(MenuScreen, skipOffstage: false), findsNothing);
+      expect(navigator.canPop(), isFalse);
+    });
+
+    testWidgets("Back from the menu's Settings returns to the menu", (
+      tester,
+    ) async {
+      // Arrange: the Settings tab pushed over a venue menu.
+      await tester.pumpWidget(
+        KetoClubApp(dependencies: FakeAppDependencies().dependencies),
+      );
+      await tester.pumpAndSettle();
+      tester
+          .state<NavigatorState>(find.byType(Navigator).first)
+          .pushNamed('/venue/wolt/hamosad', arguments: 'Hamosad');
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip(_en.actionOpenSettings));
+      await tester.pumpAndSettle();
+
+      // Act
+      final handled = await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(handled, isTrue);
+      expect(find.byType(MenuScreen), findsOneWidget);
+      expect(find.byType(SettingsScreen), findsNothing);
+    });
+  });
+
+  group('browser tab title (issue #226)', () {
+    testWidgets('follows the route: tab label, drinks guide, then back', (
+      tester,
+    ) async {
+      // Arrange: record what the app tells the platform the title is.
+      final titles = <String>[];
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+            if (call.method ==
+                'SystemChrome.setApplicationSwitcherDescription') {
+              final args = call.arguments as Map<Object?, Object?>;
+              titles.add(args['label']! as String);
+            }
+            return null;
+          });
+      addTearDown(
+        () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(SystemChannels.platform, null),
+      );
+      await tester.pumpWidget(
+        KetoClubApp(dependencies: FakeAppDependencies().dependencies),
+      );
+      await tester.pumpAndSettle();
+      final navigator = tester.state<NavigatorState>(
+        find.byType(Navigator).first,
+      );
+
+      // Assert: the Explore tab names itself.
+      expect(titles.last, documentTitle(_en.navExplore));
+
+      // Act / Assert: a pushed tab root, then the drinks guide.
+      navigator.pushReplacementNamed(settingsRoutePath);
+      await tester.pumpAndSettle();
+      expect(titles.last, documentTitle(_en.navSettings));
+      navigator.pushNamed(drinksRoutePath);
+      await tester.pumpAndSettle();
+      expect(titles.last, documentTitle(_en.drinksGuideTitle));
+      navigator.pop();
+      await tester.pumpAndSettle();
+      expect(titles.last, documentTitle(_en.navSettings));
+
+      // Act / Assert: a venue route is titled with the name the card passed.
+      navigator.pushNamed('/venue/wolt/hamosad', arguments: 'Hamosad');
+      await tester.pumpAndSettle();
+      expect(titles.last, documentTitle('Hamosad'));
+      navigator.pop();
+      await tester.pumpAndSettle();
+      expect(titles.last, documentTitle(_en.navSettings));
     });
   });
 

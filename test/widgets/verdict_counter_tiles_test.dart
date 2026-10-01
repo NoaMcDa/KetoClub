@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/widgets/focus_ring.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
+
+import '../fakes/focus_ring_probe.dart';
 
 /// Pumps [child] inside a localised [MaterialApp] and a [Scaffold], the
 /// shape every widget test in `test/widgets/` uses.
@@ -92,6 +96,82 @@ void main() {
 
       // Assert
       expect(reported, MenuFilter.all);
+    });
+
+    testWidgets('Tab reaches each tile and Enter activates the focused one '
+        '(issue #264)', (tester) async {
+      // Arrange
+      final reported = <MenuFilter>[];
+      await _pump(
+        tester,
+        VerdictCounterTiles(
+          greenCount: 1,
+          yellowCount: 2,
+          redCount: 3,
+          filter: MenuFilter.all,
+          onFilterChanged: reported.add,
+        ),
+      );
+
+      // Act: Tab twice reaches the yellow tile, Enter activates it.
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+
+      // Assert
+      expect(reported, <MenuFilter>[MenuFilter.yellowOnly]);
+    });
+
+    testWidgets('Space activates the focused tile (issue #264)', (
+      tester,
+    ) async {
+      // Arrange
+      final reported = <MenuFilter>[];
+      await _pump(
+        tester,
+        VerdictCounterTiles(
+          greenCount: 1,
+          yellowCount: 2,
+          redCount: 3,
+          filter: MenuFilter.all,
+          onFilterChanged: reported.add,
+        ),
+      );
+
+      // Act
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+
+      // Assert
+      expect(reported, <MenuFilter>[MenuFilter.greenOnly]);
+    });
+
+    testWidgets('a tile focused by keyboard shows a focus ring, and only '
+        'that tile (issue #264)', (tester) async {
+      // Arrange
+      await _pump(
+        tester,
+        VerdictCounterTiles(
+          greenCount: 1,
+          yellowCount: 2,
+          redCount: 3,
+          filter: MenuFilter.all,
+          onFilterChanged: (_) {},
+        ),
+      );
+      final tiles = find.byType(FocusRing);
+      expect(focusRingShown(tester, tiles), isFalse);
+
+      // Act
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      // Assert
+      expect(focusRingShown(tester, tiles.at(0)), isTrue);
+      expect(focusRingShown(tester, tiles.at(1)), isFalse);
+      expect(focusRingShown(tester, tiles.at(2)), isFalse);
     });
 
     testWidgets(

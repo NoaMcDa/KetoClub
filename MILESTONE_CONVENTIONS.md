@@ -155,6 +155,39 @@ logging and macro tracking out of scope for KetoClub entirely — that design in
 - ✅ Menus from a restaurant's own website (#181, D19); a QR code — not built
   (#182)
 
+### Phases 5–7
+
+`Phase 5: Hosted Service`, `Phase 6: More Platforms` and `Phase 7: Eating-Out
+Copilot` exist on GitHub with matching `Phase 5`–`Phase 7` labels; their
+scope is described on the milestones themselves.
+
+### Phase 8: UI Polish & Desktop Web
+
+**Goal**: Act on the UI/UX review in `docs/UX_REVIEW.md` (2026-09-30): make
+the web build read as a designed desktop app on a computer, and polish every
+screen's hierarchy, copy and visual consistency. **Status**: built on the
+`phase-8` branch and open as PR #266 to `main`; every remark was one issue
+(#221–#264, label `Phase 8`), one feature branch and one merge, in eight
+waves with the full gate green after each (architecture.md D20, §16 steps
+18–25).
+
+**Milestone (as created on GitHub):**
+1. `Phase 8: UI Polish & Desktop Web` — the only Phase 8 milestone. Two
+   threads: the desktop web layout (a content-width cap, a venue grid, a
+   navigation rail, dialog-width sheets, web-shell fixes) and per-screen
+   polish (Explore, Menu, Waiter Card, Scan, Saved, Settings, Drinks guide)
+   plus cross-cutting rules (button hierarchy, banner vocabulary, verdict
+   vocabulary, a bundled Hebrew face, browser Back behaviour).
+
+**Success Criteria:**
+- At 1440px no photo is letterboxed, no card or button spans the window,
+  navigation is a rail, and sheets open at dialog width
+- The first dish of a 20-dish menu is visible without scrolling at 390×844
+- One primary-button kind, one field style and one banner vocabulary across
+  `lib/`, enforced by the architecture test
+- Saved reads as the automatic history it is; Settings opens on Language and
+  Appearance
+
 ## Milestone Properties
 
 ### Due Date

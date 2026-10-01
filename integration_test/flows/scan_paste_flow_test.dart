@@ -10,7 +10,7 @@ import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
-import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 
@@ -26,7 +26,7 @@ const String _pasted =
     'Sirloin with fries 45 NIS';
 
 /// The Analyse button on the Scan tab.
-Finder get _analyse => find.widgetWithText(ElevatedButton, _en.scanAnalyse);
+Finder get _analyse => find.widgetWithText(FilledButton, _en.scanAnalyse);
 
 /// The verdicts the faked classifier answers with, keyed by the dish ids
 /// `TextMenuSource` assigns (`p1`, `p2`).
@@ -74,16 +74,17 @@ void main() {
         fakes.classifier.respondWith(_analysis());
         await pumpApp(tester, fakes);
 
-        // Act: open the Scan tab, paste, and analyse.
+        // Act: open the Scan tab, choose Paste text, paste, and analyse.
         await tapAndSettle(tester, navDestination(_en.navScan));
-        expect(tester.widget<ElevatedButton>(_analyse).onPressed, isNull);
+        await tapAndSettle(tester, find.text(_en.scanScreenModePaste));
+        expect(tester.widget<FilledButton>(_analyse).onPressed, isNull);
         await enterText(tester, _pasted);
         await tapAndSettle(tester, _analyse);
 
         // Assert: the classified menu is shown, one badge per dish and
-        // the engine chip only an analysis brings.
+        // the rules notice only an analysis brings.
         expect(find.byType(VerdictCounterTiles), findsOneWidget);
-        expect(find.byType(EngineChip), findsOneWidget);
+        expect(find.byType(RulesReasonBanner), findsOneWidget);
         expect(find.byType(DishCard), findsNWidgets(2));
         expect(find.byType(StatusBadge), findsWidgets);
         expect(find.text('Herb butter steak'), findsOneWidget);
@@ -112,6 +113,7 @@ void main() {
       fakes.classifier.respondWith(_analysis());
       await pumpApp(tester, fakes);
       await tapAndSettle(tester, navDestination(_en.navScan));
+      await tapAndSettle(tester, find.text(_en.scanScreenModePaste));
 
       // Act: paste and analyse, go back, paste and analyse once more.
       await enterText(tester, _pasted);

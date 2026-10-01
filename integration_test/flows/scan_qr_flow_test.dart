@@ -18,7 +18,7 @@ import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
-import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 
 import 'flow_support.dart';
@@ -55,23 +55,27 @@ MenuFetched _menu(VenueRef ref) => MenuFetched(
   ),
 );
 
-/// The "Scan QR code" action on the Scan tab.
+/// The "Scan QR code" action, the QR code mode's one primary button
+/// (issue #247). `FilledButton.icon` builds a private subclass, hence
+/// `bySubtype`.
 Finder get _scanQr => find.ancestor(
   of: find.text(_en.scanQrAction),
-  matching: find.bySubtype<OutlinedButton>(),
+  matching: find.bySubtype<FilledButton>(),
 );
 
-/// Opens the Scan tab over [fakes] and taps "Scan QR code".
+/// Opens the Scan tab over [fakes], chooses the QR code mode and taps
+/// "Scan QR code".
 Future<void> _scan(WidgetTester tester, FakeAppDependencies fakes) async {
   await pumpApp(tester, fakes);
   await tapAndSettle(tester, navDestination(_en.navScan));
+  await tapAndSettle(tester, find.text(_en.scanScreenModeQr));
   await tapAndSettle(tester, _scanQr);
 }
 
 /// What a menu screen for a scanned venue shows.
 void _expectMenuOpened(FakeAppDependencies fakes, VenueRef ref) {
   expect(find.byType(VerdictCounterTiles), findsOneWidget);
-  expect(find.byType(EngineChip), findsOneWidget);
+  expect(find.byType(RulesReasonBanner), findsOneWidget);
   expect(find.text(_dishName), findsOneWidget);
   expect(fakes.classifier.calls.single.venueRef, ref);
 }

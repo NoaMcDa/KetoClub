@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/drinks_guide_screen.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -10,11 +13,19 @@ import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/consent_disclosure_banner.dart';
+import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/venue_card.dart';
+import 'package:ketoclub/widgets/venue_grid.dart';
 import 'package:provider/provider.dart';
+
+/// The launcher icon the logo mark shows (declared in `pubspec.yaml`).
+const String _logoAsset = 'assets/icon/icon.png';
+
+/// The logo mark's side, in logical pixels.
+const double _logoSize = 28;
 
 /// The Discovery screen (issue #40; architecture.md §6.5, §6.6, D13;
 /// `phase2_discovery_research.md` §6; `.design/Discovery.dc.html`): a
@@ -44,8 +55,8 @@ import 'package:provider/provider.dart';
 /// (`phase2_discovery_research.md` §6) — deferred, not dropped.
 ///
 /// **Card numbers follow D13**: a score and counts only for venues whose
-/// analysis is already cached on the device, the *Keto 8+* chip only once
-/// some card has them, and no menu fetched on load or on scroll. Above
+/// analysis is already cached on the device, the *Keto 8+* chip enabled only
+/// once some card has them, and no menu fetched on load or on scroll. Above
 /// the cards, while any visible card lacks numbers, an "Estimate this
 /// list" button (issue #42) fetches those menus once, on the user's tap
 /// only, and scores them with the on-device rules; the numbers it adds
@@ -70,6 +81,7 @@ class VenueSearchScreen extends StatefulWidget {
     required this.locationService,
     required this.settingsStore,
     this.directToGoogle = false,
+    this.autofocusSearch,
     super.key,
   });
 
@@ -95,6 +107,14 @@ class VenueSearchScreen extends StatefulWidget {
   /// rather than naming KetoClub's server (web, D12).
   final bool directToGoogle;
 
+  /// Whether the search field takes focus as soon as the screen opens
+  /// (issue #264). Null, the default, means the web build on a desktop
+  /// platform: search is the main path in a browser, where location is
+  /// often unavailable, while a phone, native or in a mobile browser, must
+  /// not have its keyboard pop up unasked. A test passes an explicit value
+  /// to exercise either branch without `kIsWeb`.
+  final bool? autofocusSearch;
+
   @override
   State<VenueSearchScreen> createState() => _VenueSearchScreenState();
 }
@@ -106,6 +126,9 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
   @override
   void initState() {
     super.initState();
+    // The controller outlives this screen (issue #233), so a return to the
+    // Explore tab puts back what was typed when the user left it.
+    _field.text = context.read<VenueSearchController>().input;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       unawaited(context.read<VenueSearchController>().load());
@@ -118,6 +141,15 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     _fieldFocus.dispose();
     super.dispose();
   }
+
+  /// Whether the search field autofocuses: [VenueSearchScreen.autofocusSearch]
+  /// when given, else web on a desktop platform (issue #264).
+  bool get _autofocusSearch =>
+      widget.autofocusSearch ??
+      (kIsWeb &&
+          defaultTargetPlatform != TargetPlatform.android &&
+          defaultTargetPlatform != TargetPlatform.iOS &&
+          defaultTargetPlatform != TargetPlatform.fuchsia);
 
   /// The UI language code every search is made in.
   String get _language => Localizations.localeOf(context).languageCode;
@@ -178,76 +210,104 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              OfflineBanner(connectivity: widget.connectivity),
-              ConsentDisclosureBanner(
-                settingsStore: widget.settingsStore,
-                directToGoogle: widget.directToGoogle,
-              ),
-              _header(context, l10n, controller),
-              const SizedBox(height: 12),
-              Text(appName, style: textTheme.labelSmall),
-              const SizedBox(height: 4),
-              // The artboard's 34px serif heading.
-              Text(
-                l10n.discoveryTitle,
-                style: textTheme.displaySmall?.copyWith(
-                  fontSize: 34,
-                  height: 1.08,
+      body: ContentWidth(
+        maxWidth: discoveryMaxWidth,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                OfflineBanner(connectivity: widget.connectivity),
+                ConsentDisclosureBanner(
+                  settingsStore: widget.settingsStore,
+                  directToGoogle: widget.directToGoogle,
                 ),
-              ),
-              if (lastVenue != null) ...[
-                const SizedBox(height: 16),
-                _continueRow(context, l10n, lastVenue),
+                _header(context, l10n, controller),
+                const SizedBox(height: 12),
+                _logoMark(),
+                const SizedBox(height: 8),
+                // The artboard's 34px serif heading.
+                Text(
+                  l10n.discoveryTitle,
+                  style: textTheme.displaySmall?.copyWith(
+                    fontSize: 34,
+                    height: 1.08,
+                  ),
+                ),
+                if (lastVenue != null) ...[
+                  const SizedBox(height: 16),
+                  _continueRow(context, l10n, lastVenue),
+                ],
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _field,
+                  focusNode: _fieldFocus,
+                  autofocus: _autofocusSearch,
+                  textInputAction: TextInputAction.search,
+                  onChanged: (value) =>
+                      controller.search(value, language: _language),
+                  onSubmitted: _onSubmitted,
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.search),
+                    labelText: l10n.venueSearchLabel,
+                    hintText: l10n.venueSearchHint,
+                    errorText: controller.isInvalid
+                        ? l10n.venueSearchInvalid
+                        : null,
+                    suffixIcon: controller.isExplicitLink && resolved != null
+                        ? IconButton(
+                            icon: const Icon(Icons.arrow_forward),
+                            tooltip: l10n.venueSearchOpenLink,
+                            onPressed: () => _openVenue(resolved),
+                          )
+                        : null,
+                  ),
+                ),
+                // Found before a menu is open (issue #257); hidden while a
+                // locate or search is loading so it never sits between the
+                // field and the skeletons.
+                if (controller.phase == DiscoveryPhase.idle) ...[
+                  const SizedBox(height: 12),
+                  _drinksGuideCard(context, l10n),
+                ],
+                const SizedBox(height: 24),
+                if (controller.phase == DiscoveryPhase.idle &&
+                    controller.failure == null &&
+                    controller.results.isNotEmpty) ...[
+                  _chips(l10n, controller),
+                  const SizedBox(height: 16),
+                ],
+                _body(context, l10n, controller),
               ],
-              const SizedBox(height: 20),
-              TextField(
-                controller: _field,
-                focusNode: _fieldFocus,
-                textInputAction: TextInputAction.search,
-                onChanged: (value) =>
-                    controller.search(value, language: _language),
-                onSubmitted: _onSubmitted,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search),
-                  labelText: l10n.venueSearchLabel,
-                  hintText: l10n.venueSearchHint,
-                  errorText: controller.isInvalid
-                      ? l10n.venueSearchInvalid
-                      : null,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: FilledButton(
-                  onPressed: resolved == null
-                      ? null
-                      : () => _openVenue(resolved),
-                  child: Text(l10n.venueSearchOpen),
-                ),
-              ),
-              const SizedBox(height: 24),
-              if (controller.phase == DiscoveryPhase.idle &&
-                  controller.failure == null &&
-                  controller.results.isNotEmpty) ...[
-                _chips(l10n, controller),
-                const SizedBox(height: 16),
-              ],
-              _body(context, l10n, controller),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  /// "Looking around {place}" with the location button at its end.
+  /// A card under the search field linking to the offline drinks guide
+  /// (`/drinks`, issues #216, #257).
+  Widget _drinksGuideCard(BuildContext context, AppLocalizations l10n) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: ListTile(
+        leading: const Icon(Icons.local_bar),
+        title: Text(l10n.discoveryDrinksGuideCard),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => Navigator.pushNamed(context, drinksRoutePath),
+      ),
+    );
+  }
+
+  /// The header: "Looking around {place}" with the location button at its
+  /// end once a position exists; before one, an invitation to tap instead
+  /// of a "Location not set" that reads as an error (issue #228).
+  ///
+  /// The page carries one location action at a time. While the body shows
+  /// a denied or unavailable card, that card owns the retry (see
+  /// [_bodyOwnsLocate]), so the header steps aside rather than repeat it.
   Widget _header(
     BuildContext context,
     AppLocalizations l10n,
@@ -255,6 +315,38 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
   ) {
     final textTheme = Theme.of(context).textTheme;
     final locating = controller.phase == DiscoveryPhase.locating;
+    final invited = controller.position == null;
+    if (invited && _bodyOwnsLocate(controller)) return const SizedBox.shrink();
+    final button = IconButton.filled(
+      tooltip: l10n.discoveryUseLocation,
+      icon: const Icon(Icons.my_location),
+      onPressed: locating ? null : _locate,
+    );
+    if (invited) {
+      // The words are a second target for the same tap, hidden from
+      // assistive technology so the button is the one named action.
+      return Row(
+        children: [
+          Expanded(
+            child: ExcludeSemantics(
+              child: InkWell(
+                onTap: locating ? null : _locate,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Text(
+                    l10n.discoveryLocationInvite,
+                    style: textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          button,
+        ],
+      );
+    }
     return Row(
       children: [
         Expanded(
@@ -277,19 +369,26 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
             ],
           ),
         ),
-        IconButton.filled(
-          tooltip: l10n.discoveryUseLocation,
-          icon: const Icon(Icons.my_location),
-          onPressed: locating ? null : _locate,
-        ),
+        button,
       ],
     );
   }
 
-  /// The header's place: the nearest result's address, "Your location"
-  /// without one, or "Location not set" before any position was read.
+  /// Whether [_body] is showing a denied or unavailable card, which
+  /// carries its own retry or settings action.
+  bool _bodyOwnsLocate(VenueSearchController controller) {
+    if (controller.phase != DiscoveryPhase.idle ||
+        controller.failure != null ||
+        controller.hasSearched) {
+      return false;
+    }
+    final outcome = controller.locationOutcome;
+    return outcome is LocationDenied || outcome is LocationUnavailable;
+  }
+
+  /// The header's place once a position exists: the nearest result's
+  /// address, or "Your location" without one.
   String _place(AppLocalizations l10n, VenueSearchController controller) {
-    if (controller.position == null) return l10n.discoveryLocationNotSet;
     for (final venue in controller.results) {
       final address = venue.address;
       if (address != null && address.trim().isNotEmpty) return address;
@@ -297,35 +396,57 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     return l10n.discoveryAroundYou;
   }
 
-  /// The chip row: *Nearby*, *Keto 8+* (only once a card has numbers,
-  /// D13), *Open now* and the one most common cuisine, when there is one.
-  /// A horizontally scrollable [Row], as `CategoryChips` is.
+  /// The chip row: *Keto 8+* (always there, disabled with a tooltip until a
+  /// card has numbers, D13), *Open now* and the one most common cuisine,
+  /// when there is one. The chips combine (issue #231); "Nearby" is the
+  /// default order, so it is not one. A horizontally scrollable [Row], as
+  /// `CategoryChips` is.
   Widget _chips(AppLocalizations l10n, VenueSearchController controller) {
     final cuisine = controller.topCuisine;
-    final chips = <(DiscoveryChip, String)>[
-      (DiscoveryChip.nearby, l10n.discoveryChipNearby),
-      if (controller.hasAnyNumbers)
-        (DiscoveryChip.ketoEightPlus, l10n.discoveryChipKetoEightPlus),
-      (DiscoveryChip.openNow, l10n.discoveryChipOpenNow),
+    final active = controller.activeChips;
+    final chips = <(DiscoveryChip, String, bool)>[
+      (
+        DiscoveryChip.ketoEightPlus,
+        l10n.discoveryChipKetoEightPlus,
+        controller.hasAnyNumbers,
+      ),
+      (DiscoveryChip.openNow, l10n.discoveryChipOpenNow, true),
       if (cuisine != null)
-        (DiscoveryChip.cuisine, VenueCard.cuisineLabel(cuisine)),
+        (DiscoveryChip.cuisine, VenueCard.cuisineLabel(cuisine), true),
     ];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          for (final (chip, label) in chips)
+          for (final (chip, label, enabled) in chips)
             Padding(
               padding: const EdgeInsetsDirectional.only(end: 8),
-              child: ChoiceChip(
-                label: Text(label),
-                selected: controller.activeChip == chip,
-                onSelected: (_) => controller.selectChip(chip),
+              child: _chipWithHint(
+                l10n,
+                enabled: enabled,
+                chip: FilterChip(
+                  label: Text(label),
+                  selected: enabled && active.contains(chip),
+                  onSelected: enabled
+                      ? (_) => controller.toggleChip(chip)
+                      : null,
+                ),
               ),
             ),
         ],
       ),
     );
+  }
+
+  /// [chip] as it is when [enabled]; otherwise wrapped in the tooltip that
+  /// says why *Keto 8+* cannot be used yet (the only chip ever disabled).
+  Widget _chipWithHint(
+    AppLocalizations l10n, {
+    required bool enabled,
+    required Widget chip,
+  }) {
+    if (enabled) return chip;
+    return Tooltip(message: l10n.discoveryChipKetoEightPlusHint, child: chip);
   }
 
   /// Everything below the chips, by precedence: work in flight, a failed
@@ -371,13 +492,6 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
         icon: Icons.travel_explore,
         title: l10n.discoveryEmptyTitle,
         body: l10n.discoveryEmptyBody,
-        actions: [
-          OutlinedButton.icon(
-            onPressed: _locate,
-            icon: const Icon(Icons.my_location),
-            label: Text(l10n.discoveryUseLocation),
-          ),
-        ],
       );
     }
 
@@ -412,16 +526,36 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
           _estimateRow(context, l10n, controller),
           const SizedBox(height: 16),
         ],
-        for (var i = 0; i < visible.length; i++) ...[
-          if (i > 0) const SizedBox(height: 19),
-          VenueCard(
+        VenueGrid(
+          itemCount: visible.length,
+          itemBuilder: (context, i, photoAspectRatio) => VenueCard(
             venue: visible[i],
             numbers: controller.cardNumbers(visible[i]),
             distanceKm: controller.distanceKmTo(visible[i]),
+            photoAspectRatio: photoAspectRatio,
             onTap: () => _openVenue(visible[i].ref, name: visible[i].name),
           ),
-        ],
+        ),
       ],
+    );
+  }
+
+  /// The app's only branding (issue #232): the launcher icon at 28px, read
+  /// as [appName] by a screen reader. Decoded at four times its size, not at
+  /// the asset's 1024px.
+  Widget _logoMark() {
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(7),
+        child: Image.asset(
+          _logoAsset,
+          width: _logoSize,
+          height: _logoSize,
+          cacheWidth: (_logoSize * 4).round(),
+          semanticLabel: appName,
+        ),
+      ),
     );
   }
 
@@ -538,20 +672,16 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
   /// shaped like the ones about to load, rather than a bare progress
   /// ring. Wrapped in one live [Semantics] label naming what is loading,
   /// since the cards themselves exclude their own semantics — a screen
-  /// reader hears [label] once, not three times.
+  /// reader hears [label] once, not three times. Laid out in the cards'
+  /// own [VenueGrid] (issue #222), so a wide window shows a row of them.
   Widget _skeletons(String label) {
     return Semantics(
       liveRegion: true,
       label: label,
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          VenueCardSkeleton(),
-          SizedBox(height: 19),
-          VenueCardSkeleton(),
-          SizedBox(height: 19),
-          VenueCardSkeleton(),
-        ],
+      child: VenueGrid(
+        itemCount: 3,
+        itemBuilder: (context, i, photoAspectRatio) =>
+            VenueCardSkeleton(photoAspectRatio: photoAspectRatio),
       ),
     );
   }

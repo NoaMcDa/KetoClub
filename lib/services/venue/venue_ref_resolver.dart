@@ -94,6 +94,22 @@ abstract final class VenueRefResolver {
     return null;
   }
 
+  /// Whether [input] is an explicit link or platform id rather than a
+  /// name that merely parses: it [resolve]s to a [VenueRef] *and* holds a
+  /// `/` (a URL, with or without a scheme) or is all digits (a 10bis id).
+  ///
+  /// A bare word is never explicit, even a hyphenated one that [resolve]
+  /// reads as a Wolt slug (`vitrina-lilinblum`): it is far more likely a
+  /// restaurant's name, so it is searched by name and offers no "open
+  /// link" action (issue #229, audit D8).
+  static bool isExplicitLink(String input) {
+    final trimmed = input.trim();
+    if (!trimmed.contains('/') && !_digitsOnly.hasMatch(trimmed)) {
+      return false;
+    }
+    return resolve(trimmed) != null;
+  }
+
   /// [input] read as an absolute URL, or null when it is not one: a bare
   /// slug or id, plain text, or anything with no host. A scheme-less
   /// `domain/path` gets `https://` first, the same reading [resolve] gives

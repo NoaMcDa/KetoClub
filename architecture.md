@@ -250,7 +250,7 @@ ketoclub/
 │   │   ├── waiter_card_sheet.dart        # full-screen high-contrast script + copy button
 │   │   ├── settings_screen.dart          # consent text, net-carb limit, dietary toggles (#56) — no key section (D12)
 │   │   ├── scan_screen.dart              # Scan tab placeholder (Phase 4, issue #11)
-│   │   └── saved_screen.dart             # Saved tab: cached menus, offline access, remove (issue #48)
+│   │   └── saved_screen.dart             # Recent tab (was "Saved"): cached menus, offline access, remove (#48, #251)
 │   │
 │   ├── theme/                            # design tokens as the app theme (rank 4, see below)
 │   │   ├── app_tokens.dart               # raw sRGB constants converted from the artboard's oklch tokens
@@ -283,7 +283,7 @@ ketoclub/
 │   │   ├── app_dependencies.dart         # immutable holder of service interfaces; filled by di.dart
 │   │   ├── venue_search_controller.dart  # the Discovery screen (issue #40, D13)
 │   │   ├── menu_controller.dart
-│   │   ├── saved_controller.dart         # the Saved tab (issue #48)
+│   │   ├── saved_controller.dart         # the Recent tab (issue #48)
 │   │   ├── scanned_pages_registry.dart   # a scan's pages, in memory only, for "View pages" (#89)
 │   │   ├── settings_controller.dart
 │   │   ├── theme_mode_controller.dart    # Light/Dark/System appearance setting (#129)
@@ -643,8 +643,8 @@ already excluded `חלה` and `שמרים` for the same idiom-collision reason. 
 `מיץ` bare trigger is intentionally included; if it produces a false positive
 on a fixture dish, drop it and keep only the compound forms `מיץ תפוזים` /
 `מיץ ענבים`. An offline bilingual reference screen (`/drinks`,
-`DrinksGuideScreen`) is reachable from the menu screen's app bar and from
-Settings. Its content lives in `drinks_guide_data.dart` as Dart literals
+`DrinksGuideScreen`) is reachable from a card under the Explore search field
+(shown in the empty state and above results, hidden while loading; #257). Its content lives in `drinks_guide_data.dart` as Dart literals
 (the §6.3 exception), never in ARB.
 
 **`RoutingMenuClassifier`** — decides, per call, in this order (revised by D12
@@ -847,6 +847,16 @@ Cache rules:
   answer.
 - The cache never stores the raw platform JSON, only the normalised `Menu`.
 - The user can clear the cache from Settings.
+- A cached menu can be **pinned** (the Recent tab's "Keep" toggle, issue #253;
+  `MenuCache.pin`): a pinned entry is served from the cache without a refetch
+  however old it is, until the user asks for a refresh (`forceRefresh` still
+  refetches, and the pin survives it). The pin is a set of cache keys in a
+  second Hive box (`menu_cache_pins`), so the entries' stored shape is untouched
+  and no migration is needed; it flags a menu, never a user record (D8). Removing
+  an entry unpins it, and Settings' "Clear" clears pinned entries too. The
+  Recent tab shows each unpinned row's remaining time (`fetchedAt` plus
+  `menuCacheTtl`, bucketed like the age label) and "Expired, refreshes when
+  opened" once the window has passed.
 - `MenuCache.size()` reports how many menus are cached — a count of entries, one
   per distinct `VenueRef`, never a byte figure. Hive's `Box` exposes how many keys
   it holds, not the on-disk size of the box file, and on web the box lives in
@@ -913,23 +923,73 @@ Screens:
 
 | Screen | Route | Purpose |
 |---|---|---|
-| `VenueSearchScreen` | `/` | Locate, search, or paste; opens a venue |
+| `VenueSearchScreen` | `/` | Locate, search, or paste; opens a venue; a card under the search field opens the drinks guide (#257) |
 | `MenuScreen` | `/venue/:source/:id` | Classified menu with filters and engine chip; `/venue/scan/{id}` opens a pasted menu (D18) |
 | `WaiterCardSheet` | modal | Large-type script with copy |
-| `SettingsScreen` | `/settings` | Key entry, disclosure text, cache clear, language |
+| `SettingsScreen` | `/settings` | In this order (#255, `docs/UX_REVIEW.md` §2.6): Language, Appearance, Your keto rules, Net carb limit, Default filter; then "AI & privacy" — the consent text collapsed behind a "What leaves this device" disclosure with the "Allow AI analysis" checkbox always visible, and the Gemini key entry on iOS and Android (D17); then "Recent menus" (the cache count and clear, labelled after the tab, #251); then nothing: the drinks guide moved to an Explore card (#257) |
 | `ScanScreen` | `/scan` | Collects menu pages from the camera, the photo library or a PDF, or a menu's text pasted into a field (D18). Analyse hands the pages to `ScannedMenuClassifier` in one call (D15), or the parsed paste to `MenuRepository.store`, and opens `/venue/scan/{id}` (#82, #83). "Scan QR code" (not on web) reads a table's QR code through `QrScanner`; `QrPayloadRouter` sends a Wolt, 10bis, website or PDF link to that venue's `/venue/{source}/{id}` route, and answers a Tabit code ("not supported yet") or an Instagram, Linktree or non-URL code ("photograph the menu instead") with copy on the Scan tab (#182) |
-| `SavedScreen` | `/saved` | Placeholder — saving a venue is not built (Phase 3 territory) |
+| `SavedScreen` | `/saved` | The "Recent" tab: the automatic 24-hour cache of every menu opened, pasted, scanned or read from a website, with offline access and remove (#48). Titled "Recent menus" with a history (clock) icon, not "Saved": nothing is saved by the user (#251). The route path and class names stay `/saved` / `SavedScreen` |
+
+**The keto score badge's tone** *(issue #241)* follows the score's band, not a fixed green, so a low score never reads as a positive claim: 7 and above is `green.ink`, 4 up to 7 is `amber.ink`, below 4 is the muted `ink3` (`scoreTone`, judged on the score as printed to one decimal), in the menu header and on the venue card alike; `contrast_test.dart` pins each tone against the page background in both themes.
 
 **The bottom-navigation shell** *(issue #11, Phase 1)*, not in this document when
 the four screens above were written: `AppShell` wraps all four tab-root routes
-(Explore `/`, Scan `/scan`, Saved `/saved`, Settings `/settings`) with a
+(Explore `/`, Scan `/scan`, Recent `/saved`, Settings `/settings`) with a
 `NavigationBar`. It is purely presentational — it takes an already-built `child`
 and the `currentIndex` `app.dart`'s `generateRoute` supplies, and switches tabs
-with `Navigator.pushReplacementNamed` rather than an `IndexedStack`, so the stack
-never grows and each visit to a tab rebuilds its controller from scratch. `Scan`
+by replacing the whole stack with the new tab root
+(`pushNamedAndRemoveUntil`) rather than an `IndexedStack`, so the stack never
+grows — Settings pushed over a menu leaves no menu beneath the next tab (audit
+G8) — and each visit to a tab rebuilds its controller from scratch. Back from a
+lone tab root other than Explore — the browser's Back button, which a
+`Router`-less `Navigator` turns into a pop, or Android's — switches to Explore
+instead of leaving the app; Back from Explore leaves it (issue #262). `Scan`
 and `SavedScreen` are stateless placeholders with localized copy explaining what
 is missing, not stubs left silently blank; `MenuScreen` (reached from a search
 result, not a tab) and `WaiterCardSheet` (a modal) sit outside the shell.
+
+**Content is capped at 680px on a wide window** *(issue #221, Phase 8)*. Every
+screen was drawn on a 390px artboard, and on a desktop browser a full-width
+column turned the venue photo into a letterbox strip and stretched every button
+across the monitor. `ContentWidth` (`widgets/content_width.dart`) centres a
+screen's body and caps it at `contentMaxWidth` (680 logical pixels); it sits
+just inside each `Scaffold` — Discovery, the menu route (its loading,
+fetch-failure and empty states included), Scan, Saved, Settings and the drinks
+guide — so the `Scaffold` background and app bar stay full-bleed and only the
+content column is capped. At or below the cap it passes its child through
+unchanged, so nothing moves on a phone. The body is pinned to the top, not
+centred vertically. A screen may pass a wider cap: Discovery passes
+`discoveryMaxWidth` (1080) for its venue grid.
+
+**Discovery lays its venue cards out in a grid on a wide window** *(issue
+#222, Phase 8)*. `VenueGrid` (`widgets/venue_grid.dart`) shows one card per
+row below 680px of list, two from 680px (a 720px window less the 20px
+gutters) and three from 1000px, and the loading skeletons follow the same
+grid. In a single column the photo keeps the artboard's fixed 118px banner,
+so a phone looks as before; in two or three columns it is 3:2, so a card is a
+photo tile rather than a strip, and the cards in a row are stretched to one
+height. Every venue card is drawn on a `Card`, taking the theme's
+`CardThemeData` shape and `--line` edge, with its ink well laid over the
+whole card so a hover or keyboard focus on the web lights up the photo too.
+
+**The menu splits into two panes on a wide window** *(issue #225, Phase 8)*.
+At `menuTwoPaneMinWidth` (1080px of window) and above, a loaded menu with at
+least one dish is laid out as two panes inside a wider cap,
+`menuTwoPaneMaxWidth` (1200px), which the menu route passes to `ContentWidth`
+in place of 680. The side pane, a fixed 380px (the artboard's column), holds
+what decides what the list shows: the header with the keto score, the verdict
+tiles, the "Showing" label and source line (with its refresh and open-on
+actions), the Filters row and the category chips, which wrap rather than
+scroll sideways there, since a mouse cannot drag a row. It scrolls on its own
+only when an open Filters row makes it taller than the window. Beside it, past
+a divider, the dish list scrolls alone: the progress row, the analysis and
+cache notices, the rules banner or engine chip, the dishes and the
+unclassified section. The dish list keeps the screen's one `ScrollController`
+and the pull-to-refresh, so a chip jump, a tile filter, a search, a refresh
+and the Waiter Card work as they do on a phone. The header never scrolls under
+the app bar there, so the bar shows no venue name (issue #237 applies below
+1080px only). Below 1080px, and for the loading, failed-fetch and empty-menu
+states at any width, the screen is the single capped column above, unchanged.
 
 Visual rules: a verdict is always icon **and** colour, never colour alone
 (accessibility). Unclassified dishes are listed under their own neutral heading.
@@ -943,6 +1003,30 @@ rail, tint and pill every other verdict gets. A dish hidden inside a collapsed g
 cannot also be the result of a filter that selects it, so the group went and
 `MenuController.redRows` went with it. The count survives where it now belongs: on
 the Skip counter tile.
+
+**One name per verdict** *(issue #243)*. The tile, the badge, the Settings
+default-filter segment, the legend and the shared text all say the same noun
+phrase, so the filter and the pill on a card never disagree. "Ask your waiter"
+is the name of an action (the dish card's disclosure), not of a verdict.
+
+| Verdict | English | Hebrew | ARB keys | Shared text heading |
+| --- | --- | --- | --- | --- |
+| Green | Order as-is | להזמין כמו שהוא | `verdictOrderAsIs`, `tileGreenLabel` | `shareGreenHeading{En,He}` |
+| Yellow | With changes | עם שינויים | `verdictModifiable`, `tileYellowLabel` | `shareYellowHeading{En,He}` |
+| Red | Skip | לדלג | `verdictNonKeto`, `tileRedLabel`, `redGroupTitle` | none (red is not shared) |
+
+The keys of each row keep their separate names (a badge and a tile are different
+widgets) but must hold the same words; the shared-text headings are Dart
+constants because they follow the menu's language, not the UI locale.
+
+**One button hierarchy and one field style** *(issue #248, Phase 8)*. Each screen
+has one `FilledButton` for its primary action, `OutlinedButton` for a secondary
+one, and `TextButton` for an inline link; `ElevatedButton` is not used anywhere.
+A text field takes its look (the 14px `--line` border, the accent focus border,
+the error borders) from `inputDecorationTheme` in `lib/theme/app_theme.dart` and
+passes no `border` of its own. `test/architecture/import_rules_test.dart` asserts
+both: `ElevatedButton` appears nowhere under `lib/`, and `OutlineInputBorder(`
+only in `theme/app_theme.dart`.
 
 **The menu header shows a keto score out of 10** *(issue #29, Phase 1)*, computed
 by `utils/keto_score.dart` from the analysis's verdict counts (green counts full,
@@ -1696,8 +1780,11 @@ copy) rather than a new one — under C that happens whenever the cached
 analysis was rules-only, and under A it is always the case.
 
 **Consequences.** #40's *Keto 8+* chip filters on the card score, so it is
-hidden until at least one visible card has numbers, rather than offered as a
-filter that always returns an empty list. #42 is rescoped from "fetch menus
+disabled (with a tooltip saying why) until at least one visible card has
+numbers, rather than offered as a filter that always returns an empty list;
+it stays on screen so the chip row never changes shape (issue #231). The
+chips are multi-select and combine; "Nearby" is the default order, not a
+filter, so it has no chip. #42 is rescoped from "fetch menus
 for the visible venues in the background" to "read cached analyses for the
 visible venues, plus the explicit estimate action". The Discovery list's
 performance budget gains a hard rule: **no menu fetch on scroll or on load** —
@@ -1999,6 +2086,28 @@ wrong "dishes", or none). **What it does not do:** no headless browser, no
 sitemap crawl, no second hop, no Wix structured route, and no real site has
 been fetched yet — the fixtures under `test/fixtures/website/` are synthetic.
 
+### D20 — Phase 8: one content width, a responsive Discovery grid, a rail, and the rest of `docs/UX_REVIEW.md`
+
+*(Issues #221–#264, PR #266; `docs/UX_REVIEW.md` is the record of the review
+and `MILESTONE_CONVENTIONS.md` the milestone.)* The artboards are 390px phone
+frames and nothing constrained width, so the web build on a computer stretched
+every card and photo across the window. **Decision:** every screen body sits in
+`ContentWidth` (top-aligned, 680px; Discovery 1080px for its grid; the menu
+route wider for two panes), the venue list is a `VenueGrid` (1/2/3 columns by
+width, 3:2 photos only in the grid, a card surface), `AppShell` shows a
+`NavigationRail` at 840px and wider and handles Back with a `PopScope` (Back
+from a lone non-Explore tab goes to Explore), sheets open through
+`showKetoClubSheet` capped at 560px, and the web shell gets a splash, `--bg`
+manifest colours, path URLs and per-route titles. The per-screen decisions the
+review left open were taken as the issues recorded: the standing open button
+is gone (D8), prices are whole shekels (M12), the menu screen shows the rules
+banner and not the chip (M14), Language and Appearance are segmented (S6),
+Noto Sans Hebrew is bundled (G7), the yellow verdict has one name, the keto
+score is toned by band, and "Saved" is "Recent" with an expiry countdown and a
+Keep pin kept in a second Hive box. **What it costs:** more layout code paths
+(phone, rail, two-pane) that only widget tests at 390/1200/1440px and CI's
+1600px Chrome run exercise; no real browser or phone has shown any of it.
+
 ---
 
 ## 15. Testing strategy
@@ -2159,6 +2268,38 @@ D18 and D19 (§14) are the record of the decisions.
 The person-run vision smoke test (#88, `backend/tools/vision_smoke.py`) is a
 verification step for 11 to 14, not a build step: no real image request has been
 sent yet (§17.1).
+
+**Phase 8 steps (UI polish and the desktop web layout).** Steps 18 to 25 are
+done on the `phase-8` branch (PR #266); each issue in the GitHub milestone
+"Phase 8: UI Polish & Desktop Web" is one feature branch; D20 (§14) is the
+record of the decisions and `docs/UX_REVIEW.md` the review they came from.
+
+18. ✅ **Width and shell** (#221, #224, #226, #248, #261, #263, #242) —
+    `ContentWidth`, `showKetoClubSheet`, the web splash/manifest/path URLs/tab
+    titles, `FilledButton` only with themed fields (architecture test), the
+    bundled Hebrew face, the legend's engine line, whole-shekel prices.
+19. ✅ **Discovery** (#222, #227, #228, #229, #230, #231, #232, #233) —
+    `VenueGrid`, the "Closed" tag, the pre-location invitation, the link icon
+    instead of a standing button, distance, multi-select chips, the logo mark,
+    an app-lifetime `VenueSearchController`.
+20. ✅ **Menu** (#234, #235, #236, #237, #238, #239, #240, #241, #243, #244,
+    #245) — `MenuFiltersRow`, no budget notice for rules, banner not chip,
+    venue name in the bar once scrolled, overflow actions, one waiter action,
+    note row only with a note, score bands, one name per verdict, unclassified
+    cards with retry, a flexible source line.
+21. ✅ **Waiter Card, Scan, Recent** (#246, #247, #249, #250, #251, #252, #253,
+    #254) — Done bar and inline "Copied", three Scan modes, no camera button on
+    web, reorder and preview pages, "Recent" with score, counts, expiry and
+    Keep, red remove icon.
+22. ✅ **Settings and Drinks** (#255, #256, #257, #258, #259) — reorder with a
+    collapsed AI & privacy group, segmented Language/Appearance, the drinks
+    guide on Explore, an About group over `AppInfo`, verdict-toned drink
+    sections and a shared `NetCarbsChip`.
+23. ✅ **Cross-cutting** (#260, #262, #264) — `AppNotice`, Back to Explore via
+    `PopScope`, `FocusRing` and desktop autofocus.
+24. ✅ **Navigation rail** (#223) — `NavigationRail` at 840px and wider.
+25. ✅ **Two-pane menu** (#225) — header, tiles, Filters row and chips beside
+    the scrolling dish list at 1080px and wider.
 
 Extension points already designed in:
 

@@ -6,6 +6,7 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/drinks_guide_screen.dart';
 import 'package:ketoclub/screens/venue_search_screen.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
@@ -16,11 +17,14 @@ import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
+import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/venue_card.dart';
+import 'package:ketoclub/widgets/venue_grid.dart';
 import 'package:provider/provider.dart';
 
 import '../fakes/fake_connectivity.dart';
@@ -51,6 +55,7 @@ Future<void> _pump(
   ThemeData? theme,
   LocationService? locationService,
   SettingsStore? settingsStore,
+  bool? autofocusSearch,
 }) {
   _useTallSurface(tester);
   return tester.pumpWidget(
@@ -62,6 +67,7 @@ Future<void> _pump(
         supportedLocales: AppLocalizations.supportedLocales,
         locale: locale,
         home: VenueSearchScreen(
+          autofocusSearch: autofocusSearch,
           connectivity: connectivity ?? FakeConnectivity(),
           locationService: locationService ?? FakeLocationService(),
           // Fresh install (D16, issue #167) → the disclosure banner is
@@ -205,15 +211,18 @@ void main() {
       });
     }
 
-    testWidgets('build renders the brand, the title and the search field', (
+    testWidgets('build renders the logo mark, the title and the search field', (
       tester,
     ) async {
       // Act
       await _pump(tester, controller: controller, pushedNames: pushedNames);
       final l10n = _l10n(tester);
 
-      // Assert
-      expect(find.text(appName), findsOneWidget);
+      // Assert: the brand is a logo mark, not a text label (#232).
+      final handle = tester.ensureSemantics();
+      expect(find.bySemanticsLabel(appName), findsOneWidget);
+      expect(find.text(appName), findsNothing);
+      handle.dispose();
       expect(find.text(l10n.discoveryTitle), findsOneWidget);
       expect(find.byType(TextField), findsOneWidget);
       expect(find.text(l10n.venueSearchLabel), findsOneWidget);
@@ -229,21 +238,160 @@ void main() {
       expect(find.byIcon(Icons.settings), findsNothing);
     });
 
-    testWidgets('before anything is asked, the header says no location is '
-        'set and the empty state offers the three ways in', (tester) async {
+    testWidgets('the empty state shows the drinks guide card under the search '
+        'field, and tapping it pushes /drinks (issue #257)', (tester) async {
+      // Arrange
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      await tester.pumpAndSettle();
+      final l10n = _l10n(tester);
+
+      // Assert: the card sits below the field.
+      expect(find.byIcon(Icons.local_bar), findsOneWidget);
+      expect(find.text(l10n.discoveryDrinksGuideCard), findsOneWidget);
+      expect(
+        tester.getTopLeft(find.byType(Card)).dy,
+        greaterThan(tester.getBottomLeft(find.byType(TextField)).dy),
+      );
+
+      // Act
+      await tester.tap(find.text(l10n.discoveryDrinksGuideCard));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(pushedNames, contains(drinksRoutePath));
+    });
+
+    testWidgets('the drinks guide card stays above the results (issue #257)', (
+      tester,
+    ) async {
+      // Arrange
+      search.queueFound([_venue('ember-vine')]);
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+      // Act
+      await locate(tester);
+
+      // Assert
+      final card = find.text(_l10n(tester).discoveryDrinksGuideCard);
+      expect(card, findsOneWidget);
+      expect(
+        tester.getTopLeft(card).dy,
+        lessThan(tester.getTopLeft(find.byType(VenueCard)).dy),
+      );
+    });
+
+    testWidgets('the drinks guide card is hidden while locating or searching '
+        'and returns once the answer lands (issue #257)', (tester) async {
+      // Arrange: hold the locate call open.
+      final gate = Completer<void>();
+      location.gate = gate.future;
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      final l10n = _l10n(tester);
+      expect(find.text(l10n.discoveryDrinksGuideCard), findsOneWidget);
+
+      // Act
+      await tester.tap(find.byTooltip(l10n.discoveryUseLocation));
+      await tester.pump();
+
+      // Assert
+      expect(find.byType(VenueCardSkeleton), findsNWidgets(3));
+      expect(find.text(l10n.discoveryDrinksGuideCard), findsNothing);
+
+      // Act
+      gate.complete();
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(l10n.discoveryDrinksGuideCard), findsOneWidget);
+    });
+
+    testWidgets('before anything is asked, the header invites a tap and the '
+        'empty state offers the ways in without a second locate button', (
+      tester,
+    ) async {
       // Act
       await _pump(tester, controller: controller, pushedNames: pushedNames);
       await tester.pumpAndSettle();
       final l10n = _l10n(tester);
 
-      // Assert
-      expect(find.text(l10n.discoveryLocationNotSet), findsOneWidget);
+      // Assert: an invitation, not an error-looking "Location not set".
+      expect(find.text(l10n.discoveryLocationInvite), findsOneWidget);
+      expect(
+        find.text(l10n.discoveryLookingAround.toUpperCase()),
+        findsNothing,
+      );
       expect(find.text(l10n.discoveryEmptyTitle), findsOneWidget);
       expect(find.text(l10n.discoveryEmptyBody), findsOneWidget);
-      expect(find.text(l10n.discoveryUseLocation), findsOneWidget);
+      // Exactly one visible location action: the header's, not the body's.
+      expect(find.byIcon(Icons.my_location), findsOneWidget);
+      expect(find.byTooltip(l10n.discoveryUseLocation), findsOneWidget);
+      expect(find.text(l10n.discoveryUseLocation), findsNothing);
       // No location prompt on open: the user has to ask.
       expect(location.currentCallCount, 0);
-      expect(find.byType(ChoiceChip), findsNothing);
+      expect(find.byType(FilterChip), findsNothing);
+    });
+
+    testWidgets('tapping the invitation text asks for the location', (
+      tester,
+    ) async {
+      // Arrange
+      location.result = const LocationFound(
+        latitude: 32,
+        longitude: 34.7,
+        accuracyMetres: 10,
+      );
+      search.queueFound([_venue('ember-vine')]);
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+      // Act
+      await tester.tap(find.text(_l10n(tester).discoveryLocationInvite));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(location.currentCallCount, 1);
+      expect(find.byType(VenueCard), findsOneWidget);
+    });
+
+    testWidgets('after a position the header reads "Looking around {address}" '
+        'and keeps the one locate button', (tester) async {
+      // Arrange
+      location.result = const LocationFound(
+        latitude: 32,
+        longitude: 34.7,
+        accuracyMetres: 10,
+      );
+      search.queueFound([_venue('ember-vine', address: 'Rothschild 22')]);
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+      // Act
+      await locate(tester);
+      final l10n = _l10n(tester);
+
+      // Assert
+      expect(find.text(l10n.discoveryLocationInvite), findsNothing);
+      expect(
+        find.text(l10n.discoveryLookingAround.toUpperCase()),
+        findsOneWidget,
+      );
+      expect(find.text('Rothschild 22'), findsOneWidget);
+      expect(find.byTooltip(l10n.discoveryUseLocation), findsOneWidget);
+    });
+
+    testWidgets('a denied location hands the one action to the denied card '
+        'and hides the header invitation', (tester) async {
+      // Arrange
+      location.result = const LocationDenied(permanently: false);
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+      // Act
+      await locate(tester);
+      final l10n = _l10n(tester);
+
+      // Assert: the card's Retry is the only way to ask again.
+      expect(find.text(l10n.discoveryLocationDeniedTitle), findsOneWidget);
+      expect(find.text(l10n.discoveryLocationInvite), findsNothing);
+      expect(find.byTooltip(l10n.discoveryUseLocation), findsNothing);
+      expect(find.text(l10n.actionRetry), findsOneWidget);
     });
 
     testWidgets('typing nonsense shows the venueSearchInvalid message', (
@@ -265,38 +413,97 @@ void main() {
       expect(search.byNameCalls, isEmpty);
     });
 
-    testWidgets('typing a valid slug enables the submit affordance', (
+    testWidgets('an empty field shows no invalid message', (tester) async {
+      // Arrange
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+      // Assert: nothing typed yet.
+      expect(find.text(_l10n(tester).venueSearchInvalid), findsNothing);
+    });
+
+    testWidgets('a controller that already holds a query and results puts '
+        'them back in the field and the list (issue #233)', (tester) async {
+      // Arrange: the app-lifetime controller, searched before the screen
+      // was last left.
+      search.queueFound([_venue('sushi-bar')]);
+      controller.search('sushi', language: 'en', immediate: true);
+      await tester.pumpAndSettle();
+
+      // Act
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller?.text,
+        'sushi',
+      );
+      expect(find.text('Venue sushi-bar'), findsOneWidget);
+      expect(search.byNameCalls, hasLength(1));
+    });
+
+    testWidgets('there is no standing open button, and none for a plain name', (
       tester,
     ) async {
       // Arrange
       await _pump(tester, controller: controller, pushedNames: pushedNames);
 
-      // Assert: disabled before anything resolves.
-      expect(
-        tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
-        isNull,
-      );
+      // Assert: nothing typed yet.
+      expect(find.byType(FilledButton), findsNothing);
+      expect(find.byTooltip(_l10n(tester).venueSearchOpenLink), findsNothing);
+
+      // Act
+      await _type(tester, 'pizza');
+
+      // Assert: a bare word offers no open action either.
+      expect(find.byType(FilledButton), findsNothing);
+      expect(find.byTooltip(_l10n(tester).venueSearchOpenLink), findsNothing);
+    });
+
+    testWidgets('a hyphenated bare slug is a name: no open icon', (
+      tester,
+    ) async {
+      // Arrange
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
 
       // Act
       await _type(tester, 'vitrina-lilinblum');
 
       // Assert
-      expect(
-        tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
-        isNotNull,
-      );
+      expect(find.byTooltip(_l10n(tester).venueSearchOpenLink), findsNothing);
+    });
+
+    testWidgets('a pasted link shows the open icon, which goes away when '
+        'the text stops being a link', (tester) async {
+      // Arrange
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+      // Act
+      await _type(tester, 'wolt.com/en/isr/tel-aviv/restaurant/vitrina');
+
+      // Assert
+      final open = find.byTooltip(_l10n(tester).venueSearchOpenLink);
+      expect(open, findsOneWidget);
+
+      // Act
+      await _type(tester, 'vitrina');
+
+      // Assert
+      expect(open, findsNothing);
     });
 
     testWidgets(
-      'tapping the submit affordance pushes the venue route path for a '
-      'Wolt slug',
+      'tapping the open icon pushes the venue route path for a Wolt link',
       (tester) async {
         // Arrange
         await _pump(tester, controller: controller, pushedNames: pushedNames);
-        await _type(tester, 'vitrina-lilinblum');
+        await _type(
+          tester,
+          'https://wolt.com/en/isr/tel-aviv/restaurant/vitrina-lilinblum',
+        );
 
         // Act
-        await tester.tap(find.byType(FilledButton));
+        await tester.tap(find.byTooltip(_l10n(tester).venueSearchOpenLink));
         await tester.pumpAndSettle();
 
         // Assert
@@ -315,7 +522,7 @@ void main() {
         await tester.pump();
 
         // Act
-        await tester.tap(find.byType(FilledButton));
+        await tester.tap(find.byTooltip(_l10n(tester).venueSearchOpenLink));
         await tester.pumpAndSettle();
 
         // Assert
@@ -384,7 +591,7 @@ void main() {
       expect(find.text('Rothschild 22'), findsOneWidget);
 
       // Act
-      await tester.tap(find.text('Venue salt-stone'));
+      await tester.tap(find.widgetWithText(VenueCard, 'Venue salt-stone'));
       await tester.pumpAndSettle();
 
       // Assert
@@ -634,7 +841,7 @@ void main() {
 
       // Act
       await tester.tap(
-        find.widgetWithText(ChoiceChip, l10n.discoveryChipOpenNow),
+        find.widgetWithText(FilterChip, l10n.discoveryChipOpenNow),
       );
       await tester.pumpAndSettle();
 
@@ -644,7 +851,7 @@ void main() {
 
       // Act
       await tester.tap(
-        find.widgetWithText(ChoiceChip, l10n.discoveryChipOpenNow),
+        find.widgetWithText(FilterChip, l10n.discoveryChipOpenNow),
       );
       await tester.pumpAndSettle();
 
@@ -652,9 +859,8 @@ void main() {
       expect(find.text('Venue closed'), findsOneWidget);
     });
 
-    testWidgets('Keto 8+ is hidden while no card has numbers (D13)', (
-      tester,
-    ) async {
+    testWidgets('Keto 8+ is always there, disabled with a tooltip, while no '
+        'card has numbers (D13, issue #231)', (tester) async {
       // Arrange
       search.queueFound([_venue('a')]);
       await _pump(tester, controller: controller, pushedNames: pushedNames);
@@ -662,13 +868,96 @@ void main() {
       // Act
       await locate(tester);
 
-      // Assert
+      // Assert: no Nearby chip; Keto 8+ present but not tappable.
       final l10n = _l10n(tester);
-      expect(find.text(l10n.discoveryChipNearby), findsOneWidget);
-      expect(find.text(l10n.discoveryChipKetoEightPlus), findsNothing);
+      expect(find.text('Nearby'), findsNothing);
+      final keto = find.widgetWithText(
+        FilterChip,
+        l10n.discoveryChipKetoEightPlus,
+      );
+      expect(keto, findsOneWidget);
+      expect(tester.widget<FilterChip>(keto).onSelected, isNull);
+      expect(
+        find.byTooltip(l10n.discoveryChipKetoEightPlusHint),
+        findsOneWidget,
+      );
+      expect(
+        tester
+            .widget<FilterChip>(
+              find.widgetWithText(FilterChip, l10n.discoveryChipOpenNow),
+            )
+            .onSelected,
+        isNotNull,
+      );
     });
 
-    testWidgets('Keto 8+ appears once a cached analysis scores a card, and '
+    testWidgets('Open now and Keto 8+ combine, and each chip shows its own '
+        'selected state', (tester) async {
+      // Arrange: both venues are scored 10.0; only one is open.
+      final open = _venue('open', isOnline: true);
+      final closed = _venue('closed', isOnline: false);
+      for (final venue in [open, closed]) {
+        repository.seedCache(
+          CachedMenu(
+            menu: Menu(
+              venueRef: venue.ref,
+              currency: 'ILS',
+              fetchedAt: DateTime.utc(2026),
+              categories: const <MenuCategory>[],
+            ),
+            analysis: MenuAnalysed(
+              dishes: const <AnalysedDish>[
+                AnalysedDish(
+                  dishId: '1',
+                  name: 'Steak',
+                  verdict: DishVerdict.orderAsIs,
+                  why: 'why',
+                ),
+              ],
+              unclassified: const <String>[],
+              engine: const LlmEngine(model: 'test-model'),
+              analysedAt: DateTime.utc(2026),
+            ),
+          ),
+        );
+      }
+      search.queueFound([open, closed]);
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      await locate(tester);
+      final l10n = _l10n(tester);
+      final keto = find.widgetWithText(
+        FilterChip,
+        l10n.discoveryChipKetoEightPlus,
+      );
+      final openNow = find.widgetWithText(
+        FilterChip,
+        l10n.discoveryChipOpenNow,
+      );
+      expect(tester.widget<FilterChip>(keto).onSelected, isNotNull);
+      expect(find.byTooltip(l10n.discoveryChipKetoEightPlusHint), findsNothing);
+
+      // Act
+      await tester.tap(keto);
+      await tester.pumpAndSettle();
+      await tester.tap(openNow);
+      await tester.pumpAndSettle();
+
+      // Assert: both chips are selected at once, and both filters apply.
+      expect(tester.widget<FilterChip>(keto).selected, isTrue);
+      expect(tester.widget<FilterChip>(openNow).selected, isTrue);
+      expect(find.text('Venue open'), findsOneWidget);
+      expect(find.text('Venue closed'), findsNothing);
+
+      // Act: turn Keto 8+ off; Open now stays.
+      await tester.tap(keto);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(tester.widget<FilterChip>(keto).selected, isFalse);
+      expect(tester.widget<FilterChip>(openNow).selected, isTrue);
+    });
+
+    testWidgets('Keto 8+ turns on once a cached analysis scores a card, and '
         'keeps only the 8+ venues', (tester) async {
       // Arrange: 'high' is cached at 10.0; 'plain' has nothing cached.
       final high = _venue('high');
@@ -705,7 +994,7 @@ void main() {
 
       // Act
       await tester.tap(
-        find.widgetWithText(ChoiceChip, l10n.discoveryChipKetoEightPlus),
+        find.widgetWithText(FilterChip, l10n.discoveryChipKetoEightPlus),
       );
       await tester.pumpAndSettle();
 
@@ -733,7 +1022,7 @@ void main() {
       final context = tester.element(find.byType(VenueCard));
       expect(Directionality.of(context), TextDirection.rtl);
       expect(search.nearbyCalls.single.language, 'he');
-      expect(find.text(_l10n(tester).discoveryChipNearby), findsOneWidget);
+      expect(find.text(_l10n(tester).discoveryChipOpenNow), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -824,6 +1113,162 @@ void main() {
         expect(pushedNames, contains('/venue/wolt/vitrina'));
       },
     );
+
+    group('content width on a wide window (issue #221)', () {
+      /// Pumps the screen, locates, and lays the two-venue list out at
+      /// [width] logical pixels.
+      Future<void> listAt(WidgetTester tester, double width) async {
+        search.queueFound([_venue('ember-vine'), _venue('salt-stone')]);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await locate(tester);
+        tester.view.physicalSize = Size(width, 2400);
+        await tester.pumpAndSettle();
+      }
+
+      testWidgets('at 1440px the Discovery column is no wider than its own '
+          'grid cap and sits centred in the window (issue #222)', (
+        tester,
+      ) async {
+        // Arrange + Act
+        await listAt(tester, 1440);
+
+        // Assert: the column is capped at discoveryMaxWidth, not the
+        // reading screens' 680, and centred, with the 20px gutters
+        // inside it.
+        final field = tester.getRect(find.byType(TextField));
+        expect(field.width, discoveryMaxWidth - 40);
+        expect(field.width, greaterThan(contentMaxWidth));
+        expect(field.center.dx, closeTo(720, 0.01));
+        final cards = find.byType(VenueCard);
+        expect(cards, findsNWidgets(2));
+        expect(tester.getRect(cards.first).left, field.left);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('at 390px a venue card spans the phone width inside the '
+          '20px gutters, as before the cap', (tester) async {
+        // Arrange + Act
+        await listAt(tester, 390);
+
+        // Assert
+        final rect = tester.getRect(find.byType(VenueCard).first);
+        expect(rect.left, 20);
+        expect(rect.width, 350);
+        expect(tester.takeException(), isNull);
+      });
+    });
+
+    group('venue grid (issue #222)', () {
+      /// The cards laid out in the first row: every card whose top edge
+      /// is the first card's.
+      int firstRowCount(WidgetTester tester, Finder cards) {
+        final top = tester.getRect(cards.first).top;
+        return cards
+            .evaluate()
+            .where((e) => tester.getRect(find.byWidget(e.widget)).top == top)
+            .length;
+      }
+
+      /// Pumps the screen, locates, and lays a four-venue list out at
+      /// [width] logical pixels.
+      Future<void> fourAt(WidgetTester tester, double width) async {
+        search.queueFound([
+          _venue('ember-vine'),
+          _venue('salt-stone'),
+          _venue('olive-row'),
+          _venue('cedar-hall'),
+        ]);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await locate(tester);
+        tester.view.physicalSize = Size(width, 2400);
+        await tester.pumpAndSettle();
+      }
+
+      for (final (width, perRow) in [(390.0, 1), (800.0, 2), (1200.0, 3)]) {
+        testWidgets('at ${width.toInt()}px shows $perRow venue card(s) per '
+            'row', (tester) async {
+          // Arrange + Act
+          await fourAt(tester, width);
+
+          // Assert
+          final cards = find.byType(VenueCard);
+          expect(cards, findsNWidgets(4));
+          expect(firstRowCount(tester, cards), perRow);
+          expect(tester.takeException(), isNull);
+        });
+      }
+
+      testWidgets("at 390px the photo keeps the artboard's fixed-height "
+          'banner, and at 1200px it is 3:2', (tester) async {
+        // Arrange + Act
+        await fourAt(tester, 390);
+
+        // Assert
+        final phone = tester.getSize(find.byType(PhotoTile).first);
+        expect(phone, const Size(350, VenueCard.photoHeight));
+
+        // Act
+        tester.view.physicalSize = const Size(1200, 2400);
+        await tester.pumpAndSettle();
+
+        // Assert
+        final grid = tester.getSize(find.byType(PhotoTile).first);
+        expect(
+          grid.width / grid.height,
+          closeTo(VenueCard.gridPhotoAspectRatio, 0.01),
+        );
+      });
+
+      testWidgets('cards in one row share a height, so their surfaces line '
+          'up', (tester) async {
+        // Arrange: one venue with a blurb, so its card is taller.
+        search.queueFound([
+          const Venue(
+            ref: VenueRef(source: MenuSource.wolt, platformId: 'long'),
+            name: 'Venue long',
+            shortDescription: 'A long blurb that adds a line to this card.',
+          ),
+          _venue('short'),
+        ]);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await locate(tester);
+
+        // Act: 800px, two per row.
+        tester.view.physicalSize = const Size(800, 2400);
+        await tester.pumpAndSettle();
+
+        // Assert
+        final cards = find.byType(VenueCard);
+        expect(
+          tester.getSize(cards.at(0)).height,
+          tester.getSize(cards.at(1)).height,
+        );
+      });
+
+      testWidgets('the loading skeletons follow the same grid at 1200px', (
+        tester,
+      ) async {
+        // Arrange: hold the locate call open on the skeletons.
+        final gate = Completer<void>();
+        location.gate = gate.future;
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        tester.view.physicalSize = const Size(1200, 2400);
+        await tester.pumpAndSettle();
+
+        // Act
+        await tester.tap(find.byTooltip(_l10n(tester).discoveryUseLocation));
+        await tester.pump();
+
+        // Assert: three skeletons, side by side in one row.
+        final skeletons = find.byType(VenueCardSkeleton);
+        expect(skeletons, findsNWidgets(3));
+        expect(firstRowCount(tester, skeletons), 3);
+
+        // Cleanup
+        gate.complete();
+        await tester.pumpAndSettle();
+      });
+    });
 
     group('Estimate this list (issue #42)', () {
       /// Scripts [venues] to load a one-dish menu each.
@@ -969,6 +1414,54 @@ void main() {
         expect(l10n.localeName, 'he');
         expect(find.text(l10n.discoveryEstimateList), findsOneWidget);
         expect(find.text(l10n.discoveryEstimateHint), findsOneWidget);
+      });
+    });
+
+    group('search autofocus (issue #264)', () {
+      /// Whether the pumped screen's search field holds primary focus.
+      bool searchFocused(WidgetTester tester) => tester
+          .widget<TextField>(find.byType(TextField))
+          .focusNode!
+          .hasPrimaryFocus;
+
+      testWidgets('takes focus on open when autofocusSearch is on', (
+        tester,
+      ) async {
+        // Arrange & Act
+        await _pump(
+          tester,
+          controller: controller,
+          pushedNames: pushedNames,
+          autofocusSearch: true,
+        );
+        await tester.pump();
+
+        // Assert
+        expect(searchFocused(tester), isTrue);
+      });
+
+      testWidgets('leaves focus alone when autofocusSearch is off, so a '
+          'phone shows no keyboard', (tester) async {
+        // Arrange & Act
+        await _pump(
+          tester,
+          controller: controller,
+          pushedNames: pushedNames,
+          autofocusSearch: false,
+        );
+        await tester.pump();
+
+        // Assert
+        expect(searchFocused(tester), isFalse);
+      });
+
+      testWidgets('defaults to off outside the web build', (tester) async {
+        // Arrange & Act: the flutter_tester VM is not `kIsWeb`.
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await tester.pump();
+
+        // Assert
+        expect(searchFocused(tester), isFalse);
       });
     });
   });

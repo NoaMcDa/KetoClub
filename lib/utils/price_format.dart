@@ -20,14 +20,17 @@ import 'package:intl/intl.dart';
 /// (with the locale's own bidi marks around each token). Whole-shekel
 /// prices render without decimals (issue #169): every menu platform
 /// today prices most dishes in whole shekels, so `.00` on every card
-/// only added visual noise. A fractional amount still renders to two
-/// decimals, e.g. `formatPrice(12.5, localeTag: 'en')` → `"₪12.50"`.
+/// only added visual noise (audit M12). A fractional amount still renders
+/// to two decimals, e.g. `formatPrice(12.5, localeTag: 'en')` → `"₪12.50"`.
 String formatPrice(
   double amount, {
   required String localeTag,
   String currency = 'ILS',
 }) {
-  final isWhole = amount == amount.truncateToDouble();
+  // Judge "whole" after rounding to agorot, so 141.999 (which prints as
+  // 142.00) is shown as "₪142" rather than "₪142.00".
+  final cents = (amount * 100).round();
+  final isWhole = cents % 100 == 0;
   final format = NumberFormat.simpleCurrency(locale: localeTag, name: currency);
   if (isWhole) {
     format

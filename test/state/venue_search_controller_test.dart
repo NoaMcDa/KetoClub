@@ -249,6 +249,22 @@ void main() {
           expect(search.byNameCalls.single.query, 'vitrina');
         });
       });
+
+      test('isExplicitLink is true for a link or id, false for a word', () {
+        // Act and assert
+        controller.setInput('https://wolt.com/en/isr/tel-aviv/restaurant/v');
+        expect(controller.isExplicitLink, isTrue);
+        controller.setInput('123456');
+        expect(controller.isExplicitLink, isTrue);
+        controller.setInput('pizza');
+        expect(controller.isExplicitLink, isFalse);
+        controller.setInput('vitrina-lilinblum');
+        expect(controller.isExplicitLink, isFalse);
+        controller.setInput('a/b');
+        expect(controller.isExplicitLink, isFalse);
+        controller.setInput('');
+        expect(controller.isExplicitLink, isFalse);
+      });
     });
 
     group('lastVenue (issue #55)', () {
@@ -308,6 +324,25 @@ void main() {
 
         // Assert
         expect(notifyCount, 1);
+      });
+
+      test('load on a return to Explore keeps the query, results and chip, '
+          'and searches nothing (issue #233)', () async {
+        // Arrange: a search answered and a chip picked, as a user leaves
+        // the tab with them.
+        search.queueFound([_venue('sushi-bar', isOnline: true)]);
+        controller.search('sushi', language: 'en', immediate: true);
+        await pumpEventQueue();
+        controller.toggleChip(DiscoveryChip.openNow);
+
+        // Act: the screen's load on coming back.
+        await controller.load();
+
+        // Assert
+        expect(controller.input, 'sushi');
+        expect(controller.results.single.name, 'sushi-bar');
+        expect(controller.activeChips, {DiscoveryChip.openNow});
+        expect(search.byNameCalls, hasLength(1));
       });
     });
 
@@ -580,12 +615,12 @@ void main() {
         await controller.locate(language: 'en');
       }
 
-      test('nearby is the default and shows every result', () async {
+      test('no chip is active by default and every result shows', () async {
         // Act
         await list([grill, sushi, cafe]);
 
         // Assert
-        expect(controller.activeChip, DiscoveryChip.nearby);
+        expect(controller.activeChips, isEmpty);
         expect(controller.visibleResults, [grill, sushi, cafe]);
       });
 
@@ -594,7 +629,7 @@ void main() {
         await list([grill, sushi, cafe]);
 
         // Act
-        controller.selectChip(DiscoveryChip.openNow);
+        controller.toggleChip(DiscoveryChip.openNow);
 
         // Assert
         expect(controller.visibleResults, [grill]);
@@ -606,7 +641,7 @@ void main() {
         await list([grill, sushi, cafe]);
 
         // Act
-        controller.selectChip(DiscoveryChip.cuisine);
+        controller.toggleChip(DiscoveryChip.cuisine);
 
         // Assert
         expect(controller.topCuisine, 'grill');
@@ -621,18 +656,73 @@ void main() {
         expect(controller.topCuisine, isNull);
       });
 
-      test('tapping the active chip again goes back to nearby', () async {
+      test('tapping the active chip again clears it', () async {
         // Arrange
         await list([grill, sushi, cafe]);
 
         // Act: the same chip, twice.
         controller
-          ..selectChip(DiscoveryChip.openNow)
-          ..selectChip(DiscoveryChip.openNow);
+          ..toggleChip(DiscoveryChip.openNow)
+          ..toggleChip(DiscoveryChip.openNow);
 
         // Assert
-        expect(controller.activeChip, DiscoveryChip.nearby);
+        expect(controller.activeChips, isEmpty);
         expect(controller.visibleResults, hasLength(3));
+      });
+
+      test('chips combine: a venue must pass every active one', () async {
+        // Arrange: grill is online and 8.0, sushi is offline and 8.0, cafe
+        // is online with no numbers.
+        final openCafe = _venue('open-cafe', tags: ['cafe'], isOnline: true);
+        repository
+          ..seedCache(_analysed(grill.ref, green: 8, yellow: 0, red: 2))
+          ..seedCache(_analysed(sushi.ref, green: 8, yellow: 0, red: 2));
+        await list([grill, sushi, openCafe]);
+
+        // Act / Assert: each chip alone, then together.
+        controller.toggleChip(DiscoveryChip.ketoEightPlus);
+        expect(controller.visibleResults, [grill, sushi]);
+        controller.toggleChip(DiscoveryChip.openNow);
+        expect(controller.activeChips, {
+          DiscoveryChip.ketoEightPlus,
+          DiscoveryChip.openNow,
+        });
+        expect(controller.visibleResults, [grill]);
+        controller.toggleChip(DiscoveryChip.cuisine);
+        expect(controller.visibleResults, [grill]);
+
+        // Act: drop one; the others still filter.
+        controller.toggleChip(DiscoveryChip.ketoEightPlus);
+
+        // Assert
+        expect(controller.visibleResults, [grill]);
+        controller.toggleChip(DiscoveryChip.openNow);
+        expect(controller.visibleResults, [grill, sushi]);
+      });
+
+      test('the combination can match nothing', () async {
+        // Arrange: the only high score is an offline venue.
+        repository.seedCache(_analysed(sushi.ref, green: 8, yellow: 0, red: 2));
+        await list([grill, sushi]);
+
+        // Act
+        controller
+          ..toggleChip(DiscoveryChip.ketoEightPlus)
+          ..toggleChip(DiscoveryChip.openNow);
+
+        // Assert
+        expect(controller.visibleResults, isEmpty);
+      });
+
+      test('activeChips is a read-only view', () async {
+        // Act
+        await list([grill]);
+
+        // Assert
+        expect(
+          () => controller.activeChips.add(DiscoveryChip.openNow),
+          throwsUnsupportedError,
+        );
       });
 
       test('keto 8+ keeps scores of 8.0 and above only', () async {
@@ -643,7 +733,7 @@ void main() {
         await list([grill, sushi, cafe]);
 
         // Act
-        controller.selectChip(DiscoveryChip.ketoEightPlus);
+        controller.toggleChip(DiscoveryChip.ketoEightPlus);
 
         // Assert
         expect(controller.cardNumbers(grill)?.score, 8.0);
@@ -651,16 +741,18 @@ void main() {
         expect(controller.visibleResults, [grill]);
       });
 
-      test('a new result set resets the chip to nearby', () async {
+      test('a new result set clears every chip', () async {
         // Arrange
         await list([grill, sushi]);
-        controller.selectChip(DiscoveryChip.openNow);
+        controller
+          ..toggleChip(DiscoveryChip.openNow)
+          ..toggleChip(DiscoveryChip.cuisine);
 
         // Act
         await list([cafe]);
 
         // Assert
-        expect(controller.activeChip, DiscoveryChip.nearby);
+        expect(controller.activeChips, isEmpty);
       });
     });
 
@@ -761,8 +853,8 @@ void main() {
         // make the controller do.
         await controller.locate(language: 'en');
         controller
-          ..selectChip(DiscoveryChip.ketoEightPlus)
-          ..selectChip(DiscoveryChip.openNow)
+          ..toggleChip(DiscoveryChip.ketoEightPlus)
+          ..toggleChip(DiscoveryChip.openNow)
           ..search('vitrina', language: 'en', immediate: true);
         await pumpEventQueue();
         controller.clearSearch();
@@ -962,7 +1054,7 @@ void main() {
         await pumpEventQueue();
 
         // Act
-        controller.selectChip(DiscoveryChip.openNow);
+        controller.toggleChip(DiscoveryChip.openNow);
         gate.complete();
         await run;
 

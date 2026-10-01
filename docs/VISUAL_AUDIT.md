@@ -78,10 +78,10 @@ headless Chromium ──▶ build/web (static, :8080) ──▶ backend (:8000) 
    OUTDIR=build/visual-audit python3 tool/visual_audit/render_artboards.py
    ```
 
-   Hebrew has no bundled face (see finding G7), so Flutter fetches Noto
-   Sans Hebrew from `fonts.gstatic.com` at runtime; the driver routes that
-   one host through Python's own HTTP client so the fetch uses the
-   machine's proxy and CA settings.
+   This audit ran before Hebrew had a bundled face (finding G7, since
+   fixed), so Flutter fetched Noto Sans Hebrew from `fonts.gstatic.com` at
+   runtime; the driver routes that one host through Python's own HTTP client
+   so the fetch uses the machine's proxy and CA settings.
 
 5. **The artboards** — the `.dc.html` files expect the design canvas's own
    `support.js`, which is not in `.design/`. `tool/visual_audit/support.js`
@@ -114,7 +114,7 @@ reason), or **Decision** — needs a product call before anyone changes it.
 | G4 | Search fields (Discovery, menu, note editor) | a `--surface` box, `--line` edge, 14px radius | an underlined Material field | **Fixed** — `inputDecorationTheme` |
 | G5 | Chips (filters, category jumps, waiter-card tabs) | `.chip`: a pill, 12.5px semibold, `--accent` fill when selected, no check mark | rounded rectangles, 14–15px labels, a check mark, a pale green selected fill | **Fixed** — `chipTheme` |
 | G6 | Small upper-case labels ("LOOKING AROUND", "KETO SCORE", tile labels) | `--ink3` | `--ink2` | **Fixed** — `labelSmall` is `--ink3` |
-| G7 | Hebrew text anywhere | — | rendered as empty boxes whenever `fonts.gstatic.com` is unreachable: no Hebrew face is bundled, and the fallback chain names system fonts a CanvasKit build cannot use, so web depends on Flutter's runtime font download | **Decision** — bundle a Hebrew face (e.g. Noto Sans Hebrew, OFL) for offline and blocked networks, at the cost of app size |
+| G7 | Hebrew text anywhere | — | rendered as empty boxes whenever `fonts.gstatic.com` is unreachable: no Hebrew face was bundled, and the fallback chain named system fonts a CanvasKit build cannot use, so web depended on Flutter's runtime font download | **Fixed** (#261) — Noto Sans Hebrew 400 and 700 (OFL, 46 KB each) bundled under `assets/fonts/` and first in both `AppTypography.uiFallback` and `displayFallback` |
 | G8 | Menu → ⚙ Settings → any tab | — | the tab replaced only the top route, leaving the menu underneath: every such round trip grew the navigation stack by a whole menu screen | **Fixed** — tab taps clear the stack (`pushNamedAndRemoveUntil`) |
 | G9 | Tab roots reached by deep link (`/#/settings`) | no back arrow | a back arrow (Flutter web pushes `/` under an initial deep link); tapping a tab never shows it | **Left** — web initial-route behaviour, not reachable by in-app navigation |
 
@@ -129,7 +129,7 @@ reason), or **Decision** — needs a product call before anyone changes it.
 | D5 | score "9.1 KETO" on one baseline beside the name | the menu header's stacked 24px score + label | **Fixed** — `KetoScoreBadge(inline: true)` |
 | D6 | permanent denial, **web**: — | "Open Settings" did nothing at all — a browser has no settings page to open, and the service's `false` was ignored | **Fixed** — a snack bar says where to allow location instead (new `discoveryOpenSettingsUnavailable`, en + he) |
 | D7 | no app-name label | "KetoClub" above the heading | **Left** — `app_test`/`main_test` find `appName` on the launch screen |
-| D8 | no open button; the field is the only way in | "Show the keto menu" always shown (disabled grey until the text parses); typing a plain name such as `pizza` **enables** it, because a bare word parses as a Wolt slug, so it opens `/venue/wolt/pizza` | **Decision** — keep the paste button, hide it until a link is pasted, or require a URL for it |
+| D8 | no open button; the field is the only way in | "Show the keto menu" always shown (disabled grey until the text parses); typing a plain name such as `pizza` **enables** it, because a bare word parses as a Wolt slug, so it opens `/venue/wolt/pizza` | **Fixed** (#229) — the standing button is gone; a pasted link opens on keyboard submit or through an "Open link" suffix icon that shows only while the text is a URL or a numeric id (`VenueRefResolver.isExplicitLink`); a plain word, hyphenated or not, shows nothing and searches by name |
 | D9 | the user's street ("Rothschild 22") | the nearest venue's address, in the feed's language (a Hebrew street in the English UI) | **Left** — reverse geocoding is deferred (`venue_search_screen.dart`'s own doc) |
 | D10 | an avatar ("N") | the location button | **Left** — there are no accounts |
 | D11 | — | cuisine chip and meta show the feed's English tag ("Falafel") in the Hebrew UI | **Decision** — translate known tags or leave feed text verbatim |
@@ -149,9 +149,9 @@ reason), or **Decision** — needs a product call before anyone changes it.
 | M9 | a 158px venue photo band with round back and bookmark buttons | a plain app bar | **Decision** — the menu payload has no venue photo, and "bookmark" duplicates Saved, which is automatic |
 | M10 | a subtitle ("Charcoal grill · Herzl 8 · ₪₪₪") | none | **Left** — not in the menu payload |
 | M11 | a floating "Waiter card · 2 dishes" pill opening every modify dish as tabs | only a per-dish "Show the waiter card"; `WaiterCardSheet.forRows` exists but nothing calls it | **Decision** — a floating bar overlaps the list's last cards and needs its own design pass |
-| M12 | "₪142" | "₪142.00" | **Decision** — `price_format_test` pins two decimals |
+| M12 | "₪142" | "₪142.00" | **Fixed** (#242) — whole-shekel prices drop `.00` (`formatPrice`, #169); a fraction keeps two decimals ("₪12.50") |
 | M13 | pill label "Modify" | "Order with a change" | **Left** — copy |
-| M14 | nothing between the tiles and the dishes | a search field, the legend toggle, the rules banner, the engine chip and category chips — the banner and the chip say the same thing twice | **Decision** — keep one of the two rules notices |
+| M14 | nothing between the tiles and the dishes | a search field, the legend toggle, the rules banner, the engine chip and category chips — the banner and the chip say the same thing twice | **Fixed** (#236) — a rules result shows the banner only; an AI result keeps its chip (no banner covers it); Saved rows and venue cards keep theirs |
 
 ### Waiter Card (`WaiterCard.dc.html`)
 
@@ -173,7 +173,7 @@ reason), or **Decision** — needs a product call before anyone changes it.
 | S3 | — | "Default filter" forced its four segments into equal quarters and broke labels mid-word ("Ever / ythin / g") | **Fixed** — chip-sized labels fit at 390px in English; the longer Hebrew "Order as-is" still wraps onto two lines, at a word boundary rather than mid-word |
 | S4 | "Clear" as a quiet `--red-ink` text action | a large filled green button | **Fixed** |
 | S5 | an "Analysis" group with an API key and a model picker | the consent section | **Left** — the artboard predates D12 (there is no key on the device); the artboard is what should change |
-| S6 | Appearance as a three-way segmented control | a radio list, as is Language | **Decision** — tests address both through `RadioGroup` keys |
+| S6 | Appearance as a three-way segmented control | a radio list, as is Language | **Fixed** (#256) — Language and Appearance are one-row `SegmentedButton`s in the Default filter's style; the `languageRadioGroupKey`/`appearanceRadioGroupKey` keys are kept, and the controls are disabled while the screen is busy. Hebrew labels are not wrapped by construction (the control sizes to its content, with a sideways-scroll fallback); measured with a proxy font the longest group, "לפי ערכת הנושא של המכשיר" + two short labels, is under 300px against 350px available at 390px |
 | S7 | a compact `--surface2` stepper | outlined circular buttons | **Left** |
 
 ### Saved and Scan (no artboard)

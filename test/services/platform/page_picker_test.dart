@@ -7,6 +7,10 @@ void main() {
   runPagePickerContract('NoPagePicker', NoPagePicker.new);
 
   group('NoPagePicker', () {
+    test('has no camera', () {
+      expect(const NoPagePicker().canTakePhoto, isFalse);
+    });
+
     test('answers every method as cancelled', () async {
       const picker = NoPagePicker();
 

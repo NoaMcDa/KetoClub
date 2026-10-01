@@ -158,11 +158,11 @@ abstract class AppLocalizations {
   /// **'Share menu'**
   String get actionShareMenu;
 
-  /// No description provided for @actionOpenDrinksGuide.
+  /// No description provided for @actionMoreMenuOptions.
   ///
   /// In en, this message translates to:
-  /// **'Drinks guide'**
-  String get actionOpenDrinksGuide;
+  /// **'More options'**
+  String get actionMoreMenuOptions;
 
   /// No description provided for @actionCancel.
   ///
@@ -188,11 +188,11 @@ abstract class AppLocalizations {
   /// **'KetoClub cannot read a menu from that yet. Paste a Wolt restaurant link or its slug.'**
   String get venueSearchInvalid;
 
-  /// No description provided for @venueSearchOpen.
+  /// No description provided for @venueSearchOpenLink.
   ///
   /// In en, this message translates to:
-  /// **'Show the keto menu'**
-  String get venueSearchOpen;
+  /// **'Open link'**
+  String get venueSearchOpenLink;
 
   /// No description provided for @venueSearchContinueWith.
   ///
@@ -251,7 +251,7 @@ abstract class AppLocalizations {
   /// No description provided for @redGroupTitle.
   ///
   /// In en, this message translates to:
-  /// **'Not keto ({count})'**
+  /// **'Skip ({count})'**
   String redGroupTitle(int count);
 
   /// No description provided for @unclassifiedTitle.
@@ -265,6 +265,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'KetoClub saw these dishes but could not place them. Read them yourself before ordering.'**
   String get unclassifiedExplain;
+
+  /// No description provided for @unclassifiedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Not classified'**
+  String get unclassifiedBadge;
 
   /// No description provided for @engineChipAi.
   ///
@@ -299,26 +305,38 @@ abstract class AppLocalizations {
   /// No description provided for @verdictModifiable.
   ///
   /// In en, this message translates to:
-  /// **'Order with a change'**
+  /// **'With changes'**
   String get verdictModifiable;
 
   /// No description provided for @verdictNonKeto.
   ///
   /// In en, this message translates to:
-  /// **'Not keto'**
+  /// **'Skip'**
   String get verdictNonKeto;
 
-  /// No description provided for @waiterCardOpen.
+  /// No description provided for @dishCardFullScreen.
   ///
   /// In en, this message translates to:
-  /// **'Show the waiter card'**
-  String get waiterCardOpen;
+  /// **'Full screen'**
+  String get dishCardFullScreen;
+
+  /// No description provided for @dishCardFullScreenSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the waiter card for {dish}'**
+  String dishCardFullScreenSemanticLabel(String dish);
 
   /// No description provided for @waiterCardTitle.
   ///
   /// In en, this message translates to:
   /// **'Say this to the waiter'**
   String get waiterCardTitle;
+
+  /// No description provided for @settingsAiPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'AI & privacy'**
+  String get settingsAiPrivacy;
 
   /// No description provided for @settingsConsentTitle.
   ///
@@ -530,6 +548,12 @@ abstract class AppLocalizations {
   /// **'Default filter'**
   String get settingsFilter;
 
+  /// No description provided for @settingsCacheSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent menus'**
+  String get settingsCacheSection;
+
   /// No description provided for @settingsCacheSummary.
   ///
   /// In en, this message translates to:
@@ -565,6 +589,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Saved menus cleared.'**
   String get settingsCacheCleared;
+
+  /// No description provided for @settingsAboutSection.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get settingsAboutSection;
+
+  /// No description provided for @settingsAboutVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get settingsAboutVersion;
+
+  /// No description provided for @settingsAboutVersionValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{version} (build {build})'**
+  String settingsAboutVersionValue(String version, String build);
+
+  /// No description provided for @settingsAboutLicences.
+  ///
+  /// In en, this message translates to:
+  /// **'Open-source licences'**
+  String get settingsAboutLicences;
+
+  /// No description provided for @settingsAboutPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get settingsAboutPrivacy;
+
+  /// No description provided for @settingsAboutReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a problem'**
+  String get settingsAboutReport;
+
+  /// No description provided for @settingsAboutReportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens KetoClub\'s issue tracker on GitHub'**
+  String get settingsAboutReportHint;
+
+  /// No description provided for @settingsAboutLinkFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the link.'**
+  String get settingsAboutLinkFailed;
 
   /// No description provided for @fetchFailedOffline.
   ///
@@ -815,7 +887,7 @@ abstract class AppLocalizations {
   /// No description provided for @navSaved.
   ///
   /// In en, this message translates to:
-  /// **'Saved'**
+  /// **'Recent'**
   String get navSaved;
 
   /// No description provided for @navSettings.
@@ -827,7 +899,7 @@ abstract class AppLocalizations {
   /// No description provided for @savedPlaceholderTitle.
   ///
   /// In en, this message translates to:
-  /// **'Saved venues'**
+  /// **'Recent menus'**
   String get savedPlaceholderTitle;
 
   /// No description provided for @savedPlaceholderBody.
@@ -839,7 +911,7 @@ abstract class AppLocalizations {
   /// No description provided for @savedLoading.
   ///
   /// In en, this message translates to:
-  /// **'Loading your saved menus…'**
+  /// **'Loading your recent menus…'**
   String get savedLoading;
 
   /// No description provided for @savedEntryDishCount.
@@ -866,6 +938,60 @@ abstract class AppLocalizations {
   /// **'Removed {venue}.'**
   String savedRemovedMessage(String venue);
 
+  /// No description provided for @savedExpiresMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Expires in 1 minute} other{Expires in {count} minutes}}'**
+  String savedExpiresMinutes(num count);
+
+  /// No description provided for @savedExpiresHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Expires in 1 hour} other{Expires in {count} hours}}'**
+  String savedExpiresHours(num count);
+
+  /// No description provided for @savedExpiresDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Expires in 1 day} other{Expires in {count} days}}'**
+  String savedExpiresDays(num count);
+
+  /// No description provided for @savedExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired, refreshes when opened'**
+  String get savedExpired;
+
+  /// No description provided for @savedKept.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept, no expiry'**
+  String get savedKept;
+
+  /// No description provided for @savedKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep'**
+  String get savedKeep;
+
+  /// No description provided for @savedKeepSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep {venue} past its expiry'**
+  String savedKeepSemanticLabel(String venue);
+
+  /// No description provided for @savedUnkeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop keeping'**
+  String get savedUnkeep;
+
+  /// No description provided for @savedUnkeepSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop keeping {venue}'**
+  String savedUnkeepSemanticLabel(String venue);
+
   /// No description provided for @savedUndo.
   ///
   /// In en, this message translates to:
@@ -890,6 +1016,12 @@ abstract class AppLocalizations {
   /// **'Use your location to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.'**
   String get discoveryEmptyBody;
 
+  /// No description provided for @discoveryDrinksGuideCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Ordering a drink? Bar and coffee guide'**
+  String get discoveryDrinksGuideCard;
+
   /// No description provided for @discoveryLookingAround.
   ///
   /// In en, this message translates to:
@@ -902,11 +1034,11 @@ abstract class AppLocalizations {
   /// **'Your location'**
   String get discoveryAroundYou;
 
-  /// No description provided for @discoveryLocationNotSet.
+  /// No description provided for @discoveryLocationInvite.
   ///
   /// In en, this message translates to:
-  /// **'Location not set'**
-  String get discoveryLocationNotSet;
+  /// **'Tap to use your location'**
+  String get discoveryLocationInvite;
 
   /// No description provided for @discoveryUseLocation.
   ///
@@ -914,17 +1046,17 @@ abstract class AppLocalizations {
   /// **'Use my location'**
   String get discoveryUseLocation;
 
-  /// No description provided for @discoveryChipNearby.
-  ///
-  /// In en, this message translates to:
-  /// **'Nearby'**
-  String get discoveryChipNearby;
-
   /// No description provided for @discoveryChipKetoEightPlus.
   ///
   /// In en, this message translates to:
   /// **'Keto 8+'**
   String get discoveryChipKetoEightPlus;
+
+  /// No description provided for @discoveryChipKetoEightPlusHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs scores first: estimate this list, or open a restaurant.'**
+  String get discoveryChipKetoEightPlusHint;
 
   /// No description provided for @discoveryChipOpenNow.
   ///
@@ -1043,13 +1175,13 @@ abstract class AppLocalizations {
   /// No description provided for @discoveryEstimateList.
   ///
   /// In en, this message translates to:
-  /// **'Estimate this list'**
+  /// **'Quick score (on-device rules)'**
   String get discoveryEstimateList;
 
   /// No description provided for @discoveryEstimateHint.
   ///
   /// In en, this message translates to:
-  /// **'Reads each menu on this list once and scores it with the on-device rules, not the AI. Open a restaurant for the full analysis.'**
+  /// **'Open a restaurant for the full AI analysis.'**
   String get discoveryEstimateHint;
 
   /// No description provided for @discoveryEstimating.
@@ -1081,6 +1213,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{minutes} min walk'**
   String venueCardWalkMinutes(int minutes);
+
+  /// No description provided for @venueCardDistanceMetres.
+  ///
+  /// In en, this message translates to:
+  /// **'{distance} m'**
+  String venueCardDistanceMetres(String distance);
+
+  /// No description provided for @venueCardDistanceKm.
+  ///
+  /// In en, this message translates to:
+  /// **'{distance} km'**
+  String venueCardDistanceKm(String distance);
 
   /// No description provided for @venueCardGreenCount.
   ///
@@ -1226,11 +1370,35 @@ abstract class AppLocalizations {
   /// **'The same rules KetoClub sends to the AI model.'**
   String get legendNote;
 
+  /// No description provided for @legendEngines.
+  ///
+  /// In en, this message translates to:
+  /// **'Rules: KetoClub\'s own keyword checks on the dish text, with no carb estimate. AI: Gemini reads the whole menu and estimates net carbs.'**
+  String get legendEngines;
+
+  /// No description provided for @legendBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Carb budget: after an AI analysis, a Filters field lets you set a net-carb budget for the meal. Rule-based results have no carb estimates, so it is not offered.'**
+  String get legendBudget;
+
   /// No description provided for @waiterCardCopyButton.
   ///
   /// In en, this message translates to:
   /// **'Copy text'**
   String get waiterCardCopyButton;
+
+  /// No description provided for @waiterCardCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied ✓'**
+  String get waiterCardCopied;
+
+  /// No description provided for @waiterCardDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get waiterCardDone;
 
   /// No description provided for @waiterCardAfterText.
   ///
@@ -1273,6 +1441,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear note'**
   String get noteEditorClear;
+
+  /// No description provided for @menuFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get menuFilters;
+
+  /// No description provided for @menuFiltersActive.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Filters · 1 active} other{Filters · {count} active}}'**
+  String menuFiltersActive(num count);
 
   /// No description provided for @menuSearchHint.
   ///
@@ -1412,6 +1592,30 @@ abstract class AppLocalizations {
   /// **'Photograph the pages of a menu, choose photos from your library, or choose a PDF. KetoClub reads the dishes off the pages and analyses them.'**
   String get scanScreenIntro;
 
+  /// No description provided for @scanScreenModePages.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos & PDF'**
+  String get scanScreenModePages;
+
+  /// No description provided for @scanScreenModePaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste text'**
+  String get scanScreenModePaste;
+
+  /// No description provided for @scanScreenModeQr.
+  ///
+  /// In en, this message translates to:
+  /// **'QR code'**
+  String get scanScreenModeQr;
+
+  /// No description provided for @scanScreenQrIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan the QR code on your table to open the restaurant\'s menu.'**
+  String get scanScreenQrIntro;
+
   /// No description provided for @scanScreenActionTakePhoto.
   ///
   /// In en, this message translates to:
@@ -1472,6 +1676,18 @@ abstract class AppLocalizations {
   /// **'Remove page {number}'**
   String scanScreenRemovePage(int number);
 
+  /// No description provided for @scanScreenReorderPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Move page {number}. Drag to reorder'**
+  String scanScreenReorderPage(int number);
+
+  /// No description provided for @scanScreenPreviewPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview page {number}'**
+  String scanScreenPreviewPage(int number);
+
   /// No description provided for @scanScreenTooManyPages.
   ///
   /// In en, this message translates to:
@@ -1489,12 +1705,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Analyse pages'**
   String get scanScreenAnalysePages;
-
-  /// No description provided for @scanScreenPasteHeading.
-  ///
-  /// In en, this message translates to:
-  /// **'Or paste the text'**
-  String get scanScreenPasteHeading;
 
   /// No description provided for @scanScreenDisclosureWeb.
   ///
@@ -1682,12 +1892,6 @@ abstract class AppLocalizations {
   /// **'Clear budget'**
   String get carbBudgetFieldClear;
 
-  /// No description provided for @carbBudgetDisabledReason.
-  ///
-  /// In en, this message translates to:
-  /// **'Set a budget after AI analysis — rule-based results have no carb estimates.'**
-  String get carbBudgetDisabledReason;
-
   /// No description provided for @netCarbsChipLeavesSuffix.
   ///
   /// In en, this message translates to:
@@ -1742,17 +1946,11 @@ abstract class AppLocalizations {
   /// **'SKIP'**
   String get drinksGuideSectionSkip;
 
-  /// No description provided for @settingsDrinksGuideTitle.
+  /// No description provided for @drinksGuideCarbsSemanticLabel.
   ///
   /// In en, this message translates to:
-  /// **'DRINKS GUIDE'**
-  String get settingsDrinksGuideTitle;
-
-  /// No description provided for @settingsDrinksGuideSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Bar and coffee reference'**
-  String get settingsDrinksGuideSubtitle;
+  /// **'Estimated net carbs, not confirmed: {range}'**
+  String drinksGuideCarbsSemanticLabel(String range);
 
   /// No description provided for @actionAskAboutMenu.
   ///

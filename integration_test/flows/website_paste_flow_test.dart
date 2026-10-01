@@ -26,7 +26,7 @@ import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/website/website_adapter.dart';
-import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 
 import 'flow_support.dart';
@@ -123,13 +123,13 @@ void main() {
 
       // Act: paste the homepage and open it.
       await enterText(tester, _homepage);
-      await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+      await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
       // Assert: the homepage, then the page it links to, were read.
       expect(asked, [_home, _menuPage]);
       // A classified menu, labelled with the site's host, with every dish
       // and no price anywhere (a site's price is unverified, D19).
-      expect(find.byType(EngineChip), findsOneWidget);
+      expect(find.byType(RulesReasonBanner), findsOneWidget);
       expect(find.byType(VerdictCounterTiles), findsOneWidget);
       expect(find.textContaining('cafe-noir.example'), findsWidgets);
       expect(find.text('Grilled salmon'), findsOneWidget);

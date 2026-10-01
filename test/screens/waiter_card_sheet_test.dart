@@ -74,6 +74,63 @@ void main() {
   });
 
   group('WaiterCardSheet.new (single-row convenience)', () {
+    testWidgets('Done pops the sheet and the close button stays', (
+      tester,
+    ) async {
+      // Arrange: a route that pushes the sheet.
+      final row = _row('Grilled Salmon', modification: 'Ask for a swap.');
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => Scaffold(body: WaiterCardSheet(row: row)),
+                  ),
+                ),
+                child: const Text('open'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      // Assert: both controls are present.
+      expect(find.byIcon(Icons.close), findsOneWidget);
+      expect(find.widgetWithText(FilledButton, 'Done'), findsOneWidget);
+
+      // Act
+      await tester.tap(find.widgetWithText(FilledButton, 'Done'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byType(WaiterCardSheet), findsNothing);
+    });
+
+    testWidgets('Done stays on screen when the content is taller than the '
+        'viewport', (tester) async {
+      // Arrange
+      tester.view.physicalSize = const Size(400, 500);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final row = _row(
+        'Grilled Salmon',
+        modification: List.generate(12, (i) => 'Step number $i').join('\n'),
+      );
+
+      // Act
+      await _pump(tester, WaiterCardSheet(row: row));
+
+      // Assert: pinned, so visible without scrolling.
+      final done = tester.getRect(find.widgetWithText(FilledButton, 'Done'));
+      expect(done.bottom, lessThanOrEqualTo(500));
+    });
+
     testWidgets('build shows waiterCardTitle, the dish name and the script', (
       tester,
     ) async {

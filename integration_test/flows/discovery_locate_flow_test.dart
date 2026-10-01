@@ -109,17 +109,33 @@ void main() {
         );
         await pumpApp(tester, fakes);
 
+        // Assert: before locating, the header invites a tap and the page
+        // carries exactly one location action (issue #228).
+        expect(find.text(_en.discoveryLocationInvite), findsOneWidget);
+        expect(find.byTooltip(_en.discoveryUseLocation), findsOneWidget);
+        expect(find.text(_en.discoveryUseLocation), findsNothing);
+
         // Act: locate.
         await tapAndSettle(tester, find.byTooltip(_en.discoveryUseLocation));
+
+        // Assert: the header now names the place.
+        expect(find.text(_en.discoveryLocationInvite), findsNothing);
+        expect(find.text('Rothschild 22'), findsOneWidget);
 
         // Assert: a card per venue, in the order the search service gave
         // them, and the cached venue's card shows its score.
         expect(find.byType(VenueCard), findsNWidgets(3));
-        final offlineY = tester.getTopLeft(find.text(offline.name)).dy;
-        final scoredY = tester.getTopLeft(find.text(scored.name)).dy;
-        final plainY = tester.getTopLeft(find.text(plain.name)).dy;
-        expect(offlineY, lessThan(scoredY));
-        expect(scoredY, lessThan(plainY));
+        // Reading order: top to bottom on a phone, and row by row, left
+        // to right, once a wide window lays the cards out in a grid
+        // (issue #222).
+        bool readsBefore(String first, String second) {
+          final a = tester.getTopLeft(find.text(first));
+          final b = tester.getTopLeft(find.text(second));
+          return a.dy < b.dy || (a.dy == b.dy && a.dx < b.dx);
+        }
+
+        expect(readsBefore(offline.name, scored.name), isTrue);
+        expect(readsBefore(scored.name, plain.name), isTrue);
         expect(find.text('10.0'), findsOneWidget);
 
         // Act: open the plain venue's card. It is the third card, below the
@@ -128,7 +144,7 @@ void main() {
         // lands outside the viewport and never reaches the card.
         await tester.ensureVisible(find.text(plain.name));
         await tester.pumpAndSettle();
-        await tapAndSettle(tester, find.text(plain.name));
+        await tapAndSettle(tester, find.widgetWithText(VenueCard, plain.name));
 
         // Assert: its real menu, from the fake repository, is shown —
         // not a placeholder and not another venue's. The dish sits below

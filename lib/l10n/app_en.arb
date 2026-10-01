@@ -11,13 +11,13 @@
   "actionBackToSearch": "Back to search",
   "offlineBannerMessage": "No internet connection.",
   "actionShareMenu": "Share menu",
-  "actionOpenDrinksGuide": "Drinks guide",
+  "actionMoreMenuOptions": "More options",
   "actionCancel": "Cancel",
 
   "venueSearchLabel": "Find a restaurant",
   "venueSearchHint": "Search by name, or paste a Wolt link",
   "venueSearchInvalid": "KetoClub cannot read a menu from that yet. Paste a Wolt restaurant link or its slug.",
-  "venueSearchOpen": "Show the keto menu",
+  "venueSearchOpenLink": "Open link",
   "venueSearchContinueWith": "Continue with {venue}",
   "@venueSearchContinueWith": {
     "placeholders": { "venue": { "type": "String" } }
@@ -31,7 +31,7 @@
   "filterGreenOnly": "Order as-is only",
   "filterGreenAndYellow": "As-is and with changes",
   "filterAll": "Everything",
-  "redGroupTitle": "Not keto ({count})",
+  "redGroupTitle": "Skip ({count})",
   "@redGroupTitle": {
     "placeholders": { "count": { "type": "int" } }
   },
@@ -40,6 +40,7 @@
     "placeholders": { "count": { "type": "int" } }
   },
   "unclassifiedExplain": "KetoClub saw these dishes but could not place them. Read them yourself before ordering.",
+  "unclassifiedBadge": "Not classified",
   "engineChipAi": "AI",
   "engineChipRules": "Rules",
   "rulesNotVerifiedHint": "Rule-based result, not AI-verified.",
@@ -49,12 +50,21 @@
   },
 
   "verdictOrderAsIs": "Order as-is",
-  "verdictModifiable": "Order with a change",
-  "verdictNonKeto": "Not keto",
+  "verdictModifiable": "With changes",
+  "verdictNonKeto": "Skip",
 
-  "waiterCardOpen": "Show the waiter card",
+  "dishCardFullScreen": "Full screen",
+  "dishCardFullScreenSemanticLabel": "Show the waiter card for {dish}",
+  "@dishCardFullScreenSemanticLabel": {
+    "placeholders": {
+      "dish": {
+        "type": "String"
+      }
+    }
+  },
   "waiterCardTitle": "Say this to the waiter",
 
+  "settingsAiPrivacy": "AI & privacy",
   "settingsConsentTitle": "What leaves this device",
   "settingsConsentBody": "AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent to KetoClub's server, which forwards them to Google's Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.",
   "settingsConsentAccept": "Allow AI analysis",
@@ -93,6 +103,7 @@
   "settingsCarnivoreOnly": "Carnivore only",
   "settingsCarnivoreOnlyHint": "Greens only meat, fish, eggs — vegetables become yellow.",
   "settingsFilter": "Default filter",
+  "settingsCacheSection": "Recent menus",
   "settingsCacheSummary": "{count, plural, one{1 menu cached · works offline} other{{count} menus cached · works offline}}",
   "@settingsCacheSummary": {
     "placeholders": { "count": { "type": "num" } }
@@ -102,6 +113,17 @@
   "settingsClearCacheConfirmBody": "This removes every menu saved on this device, including any you can currently open offline. You can save a venue again by opening it once you have a connection.",
   "settingsClearCacheConfirmAction": "Clear",
   "settingsCacheCleared": "Saved menus cleared.",
+  "settingsAboutSection": "About",
+  "settingsAboutVersion": "Version",
+  "settingsAboutVersionValue": "{version} (build {build})",
+  "@settingsAboutVersionValue": {
+    "placeholders": { "version": { "type": "String" }, "build": { "type": "String" } }
+  },
+  "settingsAboutLicences": "Open-source licences",
+  "settingsAboutPrivacy": "Privacy",
+  "settingsAboutReport": "Report a problem",
+  "settingsAboutReportHint": "Opens KetoClub's issue tracker on GitHub",
+  "settingsAboutLinkFailed": "Could not open the link.",
 
   "fetchFailedOffline": "No connection, so the menu could not be read.",
   "fetchFailedBlockedByBrowser": "A web browser cannot read {platform} menus: {platform} blocks requests from other websites. Open this link in the KetoClub phone app instead.",
@@ -180,11 +202,11 @@
   "engineChipReasonConsentWithheld": "AI not allowed",
   "navExplore": "Explore",
   "navScan": "Scan",
-  "navSaved": "Saved",
+  "navSaved": "Recent",
   "navSettings": "Settings",
-  "savedPlaceholderTitle": "Saved venues",
+  "savedPlaceholderTitle": "Recent menus",
   "savedPlaceholderBody": "Open a venue's menu and it appears here automatically, available for a day — even offline.",
-  "savedLoading": "Loading your saved menus…",
+  "savedLoading": "Loading your recent menus…",
   "savedEntryDishCount": "{count, plural, one{1 dish} other{{count} dishes}}",
   "@savedEntryDishCount": {
     "placeholders": { "count": { "type": "num" } }
@@ -198,17 +220,42 @@
   "@savedRemovedMessage": {
     "placeholders": { "venue": { "type": "String" } }
   },
+  "savedExpiresMinutes": "{count, plural, one{Expires in 1 minute} other{Expires in {count} minutes}}",
+  "@savedExpiresMinutes": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "savedExpiresHours": "{count, plural, one{Expires in 1 hour} other{Expires in {count} hours}}",
+  "@savedExpiresHours": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "savedExpiresDays": "{count, plural, one{Expires in 1 day} other{Expires in {count} days}}",
+  "@savedExpiresDays": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "savedExpired": "Expired, refreshes when opened",
+  "savedKept": "Kept, no expiry",
+  "savedKeep": "Keep",
+  "savedKeepSemanticLabel": "Keep {venue} past its expiry",
+  "@savedKeepSemanticLabel": {
+    "placeholders": { "venue": { "type": "String" } }
+  },
+  "savedUnkeep": "Stop keeping",
+  "savedUnkeepSemanticLabel": "Stop keeping {venue}",
+  "@savedUnkeepSemanticLabel": {
+    "placeholders": { "venue": { "type": "String" } }
+  },
   "savedUndo": "Undo",
 
   "discoveryTitle": "Where to eat",
   "discoveryEmptyTitle": "Find somewhere to eat",
   "discoveryEmptyBody": "Use your location to see restaurants nearby, search by name, or paste a Wolt link above to open its keto-classified menu.",
+  "discoveryDrinksGuideCard": "Ordering a drink? Bar and coffee guide",
   "discoveryLookingAround": "Looking around",
   "discoveryAroundYou": "Your location",
-  "discoveryLocationNotSet": "Location not set",
+  "discoveryLocationInvite": "Tap to use your location",
   "discoveryUseLocation": "Use my location",
-  "discoveryChipNearby": "Nearby",
   "discoveryChipKetoEightPlus": "Keto 8+",
+  "discoveryChipKetoEightPlusHint": "Needs scores first: estimate this list, or open a restaurant.",
   "discoveryChipOpenNow": "Open now",
   "discoveryLocating": "Finding your location…",
   "discoverySearching": "Looking for restaurants…",
@@ -228,8 +275,8 @@
   "discoveryNoResultsBody": "Try a different name, or clear the search.",
   "discoveryClearSearch": "Clear search",
   "discoveryNoChipResults": "No restaurant in this list matches that filter.",
-  "discoveryEstimateList": "Estimate this list",
-  "discoveryEstimateHint": "Reads each menu on this list once and scores it with the on-device rules, not the AI. Open a restaurant for the full analysis.",
+  "discoveryEstimateList": "Quick score (on-device rules)",
+  "discoveryEstimateHint": "Open a restaurant for the full AI analysis.",
   "discoveryEstimating": "Estimating {done} of {total}…",
   "@discoveryEstimating": {
     "placeholders": {
@@ -246,6 +293,14 @@
   "venueCardWalkMinutes": "{minutes} min walk",
   "@venueCardWalkMinutes": {
     "placeholders": { "minutes": { "type": "int" } }
+  },
+  "venueCardDistanceMetres": "{distance} m",
+  "@venueCardDistanceMetres": {
+    "placeholders": { "distance": { "type": "String" } }
+  },
+  "venueCardDistanceKm": "{distance} km",
+  "@venueCardDistanceKm": {
+    "placeholders": { "distance": { "type": "String" } }
   },
   "venueCardGreenCount": "{count, plural, one{1 dish as-is} other{{count} dishes as-is}}",
   "@venueCardGreenCount": {
@@ -307,7 +362,11 @@
   "legendToggle": "What do the colours mean?",
   "legendHide": "Hide the legend",
   "legendNote": "The same rules KetoClub sends to the AI model.",
+  "legendEngines": "Rules: KetoClub's own keyword checks on the dish text, with no carb estimate. AI: Gemini reads the whole menu and estimates net carbs.",
+  "legendBudget": "Carb budget: after an AI analysis, a Filters field lets you set a net-carb budget for the meal. Rule-based results have no carb estimates, so it is not offered.",
   "waiterCardCopyButton": "Copy text",
+  "waiterCardCopied": "Copied ✓",
+  "waiterCardDone": "Done",
   "waiterCardAfterText": "With these changes, about {grams}g net carbs (estimate) — safe to order.",
   "@waiterCardAfterText": {
     "placeholders": { "grams": { "type": "String" } }
@@ -323,6 +382,11 @@
   "noteEditorSave": "Save",
   "noteEditorClear": "Clear note",
 
+  "menuFilters": "Filters",
+  "menuFiltersActive": "{count, plural, one{Filters · 1 active} other{Filters · {count} active}}",
+  "@menuFiltersActive": {
+    "placeholders": { "count": { "type": "num" } }
+  },
   "menuSearchHint": "Search dishes",
   "menuSearchSemanticLabel": "Search dishes by name or description",
   "menuSearchClear": "Clear search",
@@ -354,6 +418,10 @@
   "scannedMenuPdfPage": "PDF document",
   "scannedMenuPagesClose": "Close",
   "scanScreenIntro": "Photograph the pages of a menu, choose photos from your library, or choose a PDF. KetoClub reads the dishes off the pages and analyses them.",
+  "scanScreenModePages": "Photos & PDF",
+  "scanScreenModePaste": "Paste text",
+  "scanScreenModeQr": "QR code",
+  "scanScreenQrIntro": "Scan the QR code on your table to open the restaurant's menu.",
   "scanScreenActionTakePhoto": "Take a photo",
   "scanScreenActionChoosePhotos": "Choose photos",
   "scanScreenActionChoosePdf": "Choose a PDF",
@@ -376,6 +444,14 @@
   "@scanScreenRemovePage": {
     "placeholders": { "number": { "type": "int" } }
   },
+  "scanScreenReorderPage": "Move page {number}. Drag to reorder",
+  "@scanScreenReorderPage": {
+    "placeholders": { "number": { "type": "int" } }
+  },
+  "scanScreenPreviewPage": "Preview page {number}",
+  "@scanScreenPreviewPage": {
+    "placeholders": { "number": { "type": "int" } }
+  },
   "scanScreenTooManyPages": "One scan holds at most {max} pages. The pages over the limit were not added.",
   "@scanScreenTooManyPages": {
     "placeholders": { "max": { "type": "int" } }
@@ -385,7 +461,6 @@
     "placeholders": { "mb": { "type": "int" } }
   },
   "scanScreenAnalysePages": "Analyse pages",
-  "scanScreenPasteHeading": "Or paste the text",
   "scanScreenDisclosureWeb": "The pages are sent to KetoClub's server, which forwards them to Google's Gemini API to be read.",
   "scanScreenDisclosureDirect": "The pages are sent straight from this device to Google's Gemini API, using your own API key.",
   "scanScreenSettingsLink": "Settings",
@@ -443,7 +518,6 @@
   "carbBudgetFieldLabel": "Budget for tonight (g)",
   "carbBudgetFieldHint": "e.g. 20",
   "carbBudgetFieldClear": "Clear budget",
-  "carbBudgetDisabledReason": "Set a budget after AI analysis — rule-based results have no carb estimates.",
   "netCarbsChipLeavesSuffix": " · leaves {grams}g",
   "@netCarbsChipLeavesSuffix": {
     "placeholders": { "grams": { "type": "int" } }
@@ -456,8 +530,10 @@
   "drinksGuideSectionOrderAsIs": "ORDER AS-IS",
   "drinksGuideSectionSwap": "ASK FOR A SWAP",
   "drinksGuideSectionSkip": "SKIP",
-  "settingsDrinksGuideTitle": "DRINKS GUIDE",
-  "settingsDrinksGuideSubtitle": "Bar and coffee reference",
+  "drinksGuideCarbsSemanticLabel": "Estimated net carbs, not confirmed: {range}",
+  "@drinksGuideCarbsSemanticLabel": {
+    "placeholders": { "range": { "type": "String" } }
+  },
   "actionAskAboutMenu": "Ask about this menu",
   "menuQuestionSheetTitle": "Ask about this menu",
   "menuQuestionSheetHint": "e.g. Which dishes are dairy-free?",

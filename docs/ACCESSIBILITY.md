@@ -54,12 +54,13 @@ things:
 
 | Widget | Announces | Test |
 |---|---|---|
-| `StatusBadge` | The verdict word ("Order as-is" / "Order with a change" / "Not keto") — never the colour | `status_badge_test.dart` |
+| `StatusBadge` | The verdict word ("Order as-is" / "With changes" / "Skip") — never the colour | `status_badge_test.dart` |
 | `EngineChip` | "AI engine, model {model}" or "Rules engine, not AI-verified: {reason}" | `engine_chip_test.dart` |
 | `VerdictCounterTiles` | "{verdict}: {count}", `selected` when the tile is the active filter, and — added in this pass — a hint: "Double tap to filter" (inactive) or "Double tap to clear the filter" (active) | `verdict_counter_tiles_test.dart` |
 | `KetoScoreBadge` | "Keto score: {score} out of 10" | `keto_score_badge_test.dart` |
 | `_NetCarbsChip` (DishCard) | "Estimated net carbs, not confirmed: {grams} grams" | `dish_card_test.dart` |
 | `_ScriptDisclosure` / note row (DishCard) | The disclosure label with Flutter's own `expanded` flag; the note text or "Add a note" | `dish_card_test.dart` |
+| `MenuFiltersRow` (menu screen) | "Filters" or "Filters · {count} active", with Flutter's own `expanded` flag and its own tap action, since `excludeSemantics` would otherwise drop the InkWell's (issue #234) | `menu_filters_row_test.dart` |
 | `VenueCard` | Name, open/closed state, and the score and counts as one label (issue #40) | `venue_card_test.dart` |
 | `WaiterScriptWidget` (the waiter card's script) | The whole script's lines as one block — added in this pass, so a screen reader no longer reads each numbered circle and line as its own node | `waiter_script_widget_test.dart`: "announces the whole script as one block, not one node per numbered line" |
 
@@ -119,7 +120,50 @@ No other `EdgeInsets.only(left:`/`right:` or `Alignment.centerLeft`/
 purely decorative gradient (`VenueCard`'s and `PhotoTile`'s placeholder
 gradients, whose diagonal direction carries no reading-order meaning).
 
-## 6. What this audit did not touch
+## 6. Keyboard and focus (issue #264)
+
+On web and desktop every tappable must be reachable with Tab, show where
+focus is, and activate on Enter or Space. Every tappable is already an
+`InkWell` or a Material button, which supplies the Tab stop, the hover and
+click cursor and the Enter/Space activation (`ActivateIntent`) for free; two
+things were added on top of that.
+
+- **A visible ring.** `InkWell`'s own focus highlight is a faint tint, easy
+  to lose on a tinted verdict tile or over a photo. `FocusRing`
+  (`lib/widgets/focus_ring.dart`) draws a 2px outline around its child while
+  focus is inside it and Flutter's highlight mode is *traditional*, i.e. a
+  key has been pressed. A mouse or touch tap never leaves a ring behind. It
+  owns no focus node and takes no tab stop, so it changes neither the order
+  nor the activation.
+- **Semantics wrappers do not block focus.** Each `Semantics(excludeSemantics:
+  true)` wrapper sits *outside* the `InkWell`; it only prunes the semantics
+  tree, never the focus tree, and re-declares the tap action itself (section
+  3), so keyboard and screen-reader activation both work.
+
+| Tappable | Ring colour | Test |
+|---|---|---|
+| Verdict counter tiles | the tile's verdict rail | `verdict_counter_tiles_test.dart`: Tab, Enter, Space and the ring on the focused tile only |
+| Category chips | primary | `category_chips_test.dart` |
+| Filters row | primary | `menu_filters_row_test.dart`: Enter and Space both toggle it |
+| Amber "Ask your waiter" disclosure | amber rail | `dish_card_test.dart`: Enter expands, Space collapses |
+| Venue card (Explore) | primary | `venue_card_test.dart`: Enter and Space open the venue |
+
+**Tab order on the menu screen** follows reading order: the app bar actions,
+the three verdict tiles, the Filters row, the category chips, then each dish
+card (its note button, then the amber disclosure). Pinned by
+`menu_screen_test.dart`, group "keyboard navigation".
+
+**Explore search autofocus.** The Explore search field takes focus on open
+on the web build on a desktop platform, where search is the main path and
+location is often unavailable. It never autofocuses on iOS or Android, nor in
+a phone's browser, so no keyboard pops up unasked. `VenueSearchScreen
+.autofocusSearch` is null by default (that rule) and a test forces either
+branch; see `venue_search_screen_test.dart`, group "search autofocus".
+
+Not covered: a real browser's Tab key and focus ring have not been observed;
+the evidence is `flutter test` with `sendKeyEvent` only.
+
+## 7. What this audit did not touch
 
 - `venue_search_screen.dart` and `venue_search_controller.dart` beyond
   reading them — issue #40 already added Discovery's own RTL test and

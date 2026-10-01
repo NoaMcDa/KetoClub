@@ -89,7 +89,7 @@ void main() {
 
         // Act: paste the link and open the venue.
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: the first menu's dish is showing.
         expect(find.text(_firstDish.name), findsOneWidget);
@@ -104,7 +104,17 @@ void main() {
 
         // Act: pull the list down far and fast enough to cross
         // RefreshIndicator's own trigger threshold.
-        await tester.fling(find.byType(ListView), const Offset(0, 300), 1000);
+        // The list holding the dishes: on a wide window the header and
+        // tiles sit in a list of their own beside it (issue #225), and
+        // `flutter drive` opens a 1600px window.
+        await tester.fling(
+          find.ancestor(
+            of: find.byType(DishCard).first,
+            matching: find.byType(ListView),
+          ),
+          const Offset(0, 300),
+          1000,
+        );
         await tester.pump();
         await tester.pump(const Duration(seconds: 1));
         await tester.pumpAndSettle();

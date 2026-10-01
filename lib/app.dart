@@ -25,6 +25,7 @@ import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/app_shell.dart';
+import 'package:ketoclub/widgets/route_title.dart';
 import 'package:provider/provider.dart';
 
 /// The root widget: MaterialApp, theme, routes, localisation
@@ -33,9 +34,12 @@ import 'package:provider/provider.dart';
 /// Receives its services from the composition root so that tests can pump
 /// the whole app with fakes.
 ///
-/// A `StatefulWidget` for exactly one reason: it owns a [LocaleController]
-/// and a [ThemeModeController] for the lifetime of the app, both created
-/// once in `initState` rather than rebuilt on every `build`. A
+/// A `StatefulWidget` for exactly one reason: it owns a [LocaleController],
+/// a [ThemeModeController], a [CarbBudgetController] and the Explore tab's
+/// [VenueSearchController] for the lifetime of the app, each created once
+/// in `initState` rather than rebuilt on every `build`. The last one lives
+/// here, not in its route, so the typed query, the results and the chip
+/// survive a tab switch (issue #233). A
 /// `StatelessWidget` has no such hook — `provider`'s `create` runs once per
 /// *provider*, but there would be nothing to host that provider above
 /// without a place to call `dispose` — so this mirrors why `SettingsScreen`
@@ -56,6 +60,7 @@ class _KetoClubAppState extends State<KetoClubApp> {
   late final LocaleController _localeController;
   late final ThemeModeController _themeModeController;
   late final CarbBudgetController _carbBudget;
+  late final VenueSearchController _venueSearch;
 
   @override
   void initState() {
@@ -65,6 +70,14 @@ class _KetoClubAppState extends State<KetoClubApp> {
       widget.dependencies.settingsStore,
     );
     _carbBudget = CarbBudgetController();
+    final dependencies = widget.dependencies;
+    _venueSearch = VenueSearchController(
+      dependencies.settingsStore,
+      dependencies.menuRepository,
+      locationService: dependencies.locationService,
+      venueSearchService: dependencies.venueSearchService,
+      estimateClassifier: dependencies.estimateClassifier,
+    );
     // Fire-and-forget: the first frame renders in the device locale (and,
     // for appearance, ThemeMode.system) and flips once each resolves
     // (LocaleController's and ThemeModeController's class docs, issue #8,
@@ -78,6 +91,7 @@ class _KetoClubAppState extends State<KetoClubApp> {
     _localeController.dispose();
     _themeModeController.dispose();
     _carbBudget.dispose();
+    _venueSearch.dispose();
     super.dispose();
   }
 
@@ -98,12 +112,16 @@ class _KetoClubAppState extends State<KetoClubApp> {
           value: _themeModeController,
         ),
         ChangeNotifierProvider<CarbBudgetController>.value(value: _carbBudget),
+        ChangeNotifierProvider<VenueSearchController>.value(
+          value: _venueSearch,
+        ),
       ],
       child: AnimatedBuilder(
         animation: Listenable.merge([_localeController, _themeModeController]),
         builder: (context, _) => MaterialApp(
           navigatorKey: widget.dependencies.navigatorKey,
           title: appName,
+          onGenerateTitle: (_) => documentTitle(null),
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
           themeMode: _themeModeController.themeMode,
@@ -140,13 +158,15 @@ class _KetoClubAppState extends State<KetoClubApp> {
 /// carry the nav bar; `.design/MenuDark.dc.html` and
 /// `.design/WaiterCard.dc.html` do not.
 ///
-/// Each route creates its own controller, so screen state does not outlive the
-/// screen and two visits to a venue start clean. That also means switching
-/// tabs discards whatever was typed into the Explore text field, since
-/// `VenueSearchController` is rebuilt — an accepted trade-off (issue #11)
-/// rather than a reason to reach for a `Navigator` per tab, which would have
-/// to own `/settings` as one of its children and break the direct deep link
-/// `generateRoute`'s own tests assert.
+/// Every route but Explore creates its own controller, so screen state does
+/// not outlive the screen and two visits to a venue start clean. Explore is
+/// the one exception (issue #233): `/` reuses the single
+/// [VenueSearchController] that `KetoClubApp` owns and provides above the
+/// navigator, so switching tabs and coming back keeps the typed query, the
+/// results and the active chip. That is a longer controller lifetime, not a
+/// `Navigator` per tab, which would have to own `/settings` as one of its
+/// children and break the direct deep link `generateRoute`'s own tests
+/// assert.
 ///
 /// Public and separately tested, because a silently unmatched route would
 /// present as a blank screen.
@@ -161,20 +181,13 @@ Route<void>? generateRoute(
       settings: settings,
       builder: (_) => AppShell(
         currentIndex: AppShell.exploreIndex,
-        child: ChangeNotifierProvider<VenueSearchController>(
-          create: (_) => VenueSearchController(
-            dependencies.settingsStore,
-            dependencies.menuRepository,
-            locationService: dependencies.locationService,
-            venueSearchService: dependencies.venueSearchService,
-            estimateClassifier: dependencies.estimateClassifier,
-          ),
-          child: VenueSearchScreen(
-            connectivity: dependencies.connectivity,
-            locationService: dependencies.locationService,
-            settingsStore: dependencies.settingsStore,
-            directToGoogle: dependencies.apiKeyStore != null,
-          ),
+        // No provider here: the screen reads the app-lifetime
+        // VenueSearchController KetoClubApp provides (issue #233).
+        child: VenueSearchScreen(
+          connectivity: dependencies.connectivity,
+          locationService: dependencies.locationService,
+          settingsStore: dependencies.settingsStore,
+          directToGoogle: dependencies.apiKeyStore != null,
         ),
       ),
     );
@@ -227,7 +240,10 @@ Route<void>? generateRoute(
             dependencies.menuRepository,
             dependencies.apiKeyStore,
           ),
-          child: const SettingsScreen(),
+          child: SettingsScreen(
+            appInfo: dependencies.appInfo,
+            externalLinkOpener: dependencies.externalLinkOpener,
+          ),
         ),
       ),
     );
@@ -236,9 +252,10 @@ Route<void>? generateRoute(
   if (name == drinksRoutePath) {
     return MaterialPageRoute<void>(
       settings: settings,
-      builder: (_) => const AppShell(
-        currentIndex: AppShell.settingsIndex,
-        child: DrinksGuideScreen(),
+      builder: (context) => AppShell(
+        currentIndex: AppShell.exploreIndex,
+        pageTitle: AppLocalizations.of(context)!.drinksGuideTitle,
+        child: const DrinksGuideScreen(),
       ),
     );
   }
@@ -256,18 +273,23 @@ Route<void>? generateRoute(
           context.read<CarbBudgetController>(),
           dependencies.menuQuestionAnswerer,
         ),
-        child: MenuScreen(
-          ref: ref,
-          // A venue card passes the name it already shows (see
-          // VenueSearchScreen._openVenue); a deep link carries none.
-          venueNameHint: settings.arguments is String
+        child: _VenueTitle(
+          fallback: settings.arguments is String
               ? settings.arguments! as String
               : null,
-          screenBrightness: dependencies.screenBrightness,
-          connectivity: dependencies.connectivity,
-          externalLinkOpener: dependencies.externalLinkOpener,
-          menuSharer: dependencies.menuSharer,
-          scannedPages: dependencies.scannedPages,
+          child: MenuScreen(
+            ref: ref,
+            // A venue card passes the name it already shows (see
+            // VenueSearchScreen._openVenue); a deep link carries none.
+            venueNameHint: settings.arguments is String
+                ? settings.arguments! as String
+                : null,
+            screenBrightness: dependencies.screenBrightness,
+            connectivity: dependencies.connectivity,
+            externalLinkOpener: dependencies.externalLinkOpener,
+            menuSharer: dependencies.menuSharer,
+            scannedPages: dependencies.scannedPages,
+          ),
         ),
       ),
     );
@@ -296,4 +318,19 @@ VenueRef? venueRefFromPath(String path) {
   final source = MenuSource.tryParse(segments[1]);
   if (source == null || segments[2].isEmpty) return null;
   return VenueRef(source: source, platformId: segments[2]);
+}
+
+/// Titles the venue route after the venue: the loaded menu's own name, else
+/// the name a venue card passed, else just the app name (issue #226).
+class _VenueTitle extends StatelessWidget {
+  const new({required this.fallback, required this.child});
+
+  final String? fallback;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = context.select<MenuController, String?>((c) => c.venueName);
+    return RouteTitle(page: name ?? fallback, child: child);
+  }
 }

@@ -110,7 +110,7 @@ void main() {
 
         // Act: paste the link and open the venue.
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: the cached dish is shown, dated, with the offline
         // banner and the stale-fetch reason both on screen.

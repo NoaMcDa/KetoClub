@@ -457,6 +457,48 @@ final class MenuController extends ChangeNotifier {
         : const <String>[];
   }
 
+  /// [unclassifiedNames] resolved to rows, so the menu screen can draw each
+  /// one as a `DishCard` (issue #244) with its description, price and photo.
+  ///
+  /// Each name is matched, in menu order, to a dish of that name the list
+  /// has not already used, so two dishes sharing a name stay two rows. A
+  /// name the menu does not contain (the model can name a dish by what it
+  /// read) still gets a row, a bare one built from the name alone: an
+  /// unclassified dish is never dropped (architecture.md §6.6, constraint
+  /// 8). Every row has a null [DishRow.analysis].
+  List<DishRow> get unclassifiedRows {
+    final currentMenu = _menu;
+    final names = unclassifiedNames;
+    if (names.isEmpty) return const <DishRow>[];
+    final unused = <DishRow>[
+      if (currentMenu != null)
+        for (final category in currentMenu.categories)
+          for (final dish in category.dishes)
+            DishRow(dish: dish, category: category.name),
+    ];
+    final rows = <DishRow>[];
+    for (final name in names) {
+      final index = unused.indexWhere((row) => row.dish.name == name);
+      if (index >= 0) {
+        rows.add(unused.removeAt(index));
+      } else {
+        rows.add(
+          DishRow(
+            dish: Dish(
+              id: 'unclassified:${rows.length}:$name',
+              name: name,
+              description: '',
+              price: 0,
+              options: const <DishOption>[],
+            ),
+            category: '',
+          ),
+        );
+      }
+    }
+    return rows;
+  }
+
   /// The user's personal note for the dish [dishId], on the currently
   /// open venue, or null when none has been written (issue #52). Local
   /// only: see [NotesStore]'s own doc comment for the privacy boundary

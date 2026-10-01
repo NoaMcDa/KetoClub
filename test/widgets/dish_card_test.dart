@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
@@ -12,6 +13,8 @@ import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
 import 'package:provider/provider.dart';
+
+import '../fakes/focus_ring_probe.dart';
 
 /// Pumps [child] inside a localised [MaterialApp] and a [Scaffold], the
 /// shape every widget test in `test/widgets/` uses. [theme] defaults to
@@ -65,6 +68,34 @@ void main() {
       expect(find.text(formatPrice(64, localeTag: 'en')), findsOneWidget);
     });
 
+    testWidgets('build shows the neutral badge only for an unclassified '
+        'null-analysis row (issue #244)', (tester) async {
+      // Arrange
+      final row = DishRow(dish: _dish(), category: 'Mains');
+
+      // Act: a plain null-analysis row has no badge.
+      await _pump(
+        tester,
+        DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+      );
+      expect(find.byType(UnclassifiedBadge), findsNothing);
+
+      // Act: flagged unclassified, it carries the neutral badge.
+      await _pump(
+        tester,
+        DishCard(
+          row: row,
+          localeTag: 'en',
+          onShowScript: (_) {},
+          unclassified: true,
+        ),
+      );
+
+      // Assert
+      expect(find.byType(UnclassifiedBadge), findsOneWidget);
+      expect(find.text('NOT CLASSIFIED'), findsOneWidget);
+    });
+
     testWidgets('build hides the price when showPrice is false', (
       tester,
     ) async {
@@ -114,13 +145,13 @@ void main() {
 
         // Assert: collapsed by default (architecture.md §6.6, issue #30's
         // expandable script), so the script itself is not yet built, but
-        // the summary CTA, the badge and the always-visible full-sheet
-        // button are.
+        // the summary CTA and the badge are, and the full-screen action
+        // is not (issue #239: one waiter action while collapsed).
         expect(find.byType(WaiterScriptWidget), findsNothing);
         expect(find.text(script), findsNothing);
         expect(find.text('Ask your waiter'), findsOneWidget);
         expect(find.byType(StatusBadge), findsOneWidget);
-        expect(find.text('Show the waiter card'), findsOneWidget);
+        expect(find.text('Full screen'), findsNothing);
       },
     );
 
@@ -153,6 +184,7 @@ void main() {
       expect(find.byType(WaiterScriptWidget), findsOneWidget);
       expect(find.text(script), findsOneWidget);
       expect(find.text('Hide the waiter script'), findsOneWidget);
+      expect(find.text('Full screen'), findsOneWidget);
 
       // Act: collapse again
       await tester.tap(find.text('Hide the waiter script'));
@@ -161,8 +193,7 @@ void main() {
       // Assert
       expect(find.byType(WaiterScriptWidget), findsNothing);
       expect(find.text('Ask your waiter'), findsOneWidget);
-      // The full-sheet button never depends on the disclosure state.
-      expect(find.text('Show the waiter card'), findsOneWidget);
+      expect(find.text('Full screen'), findsNothing);
     });
 
     testWidgets(
@@ -227,13 +258,60 @@ void main() {
             onShowScript: (shownRow) => shown = shownRow,
           ),
         );
-        await tester.tap(find.text('Show the waiter card'));
+        await tester.tap(find.text('Ask your waiter'));
+        await tester.pump();
+        await tester.tap(find.text('Full screen'));
         await tester.pumpAndSettle();
 
         // Assert
         expect(shown, row);
       },
     );
+
+    testWidgets('the disclosure row and the full-screen action are announced '
+        'as buttons, the latter with the dish name (issue #239)', (
+      tester,
+    ) async {
+      // Arrange
+      final handle = tester.ensureSemantics();
+      final row = DishRow(
+        dish: _dish(),
+        category: 'Mains',
+        analysis: const AnalysedDish(
+          dishId: 'dish_1',
+          name: 'Grilled Salmon',
+          verdict: DishVerdict.modifiable,
+          why: 'Mostly protein, with a starchy side to swap.',
+          modification: 'Ask for a side salad instead of fries.',
+        ),
+      );
+      await _pump(
+        tester,
+        DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+      );
+
+      // Assert: the collapsed row exposes a tap action to a screen reader.
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Ask your waiter')),
+        matchesSemantics(
+          label: 'Ask your waiter',
+          isButton: true,
+          hasTapAction: true,
+          hasExpandedState: true,
+        ),
+      );
+
+      // Act
+      await tester.tap(find.text('Ask your waiter'));
+      await tester.pump();
+
+      // Assert: the full-screen action names the dish.
+      expect(
+        find.bySemanticsLabel('Show the waiter card for ${_dish().name}'),
+        findsOneWidget,
+      );
+      handle.dispose();
+    });
 
     testWidgets('build shows no waiter script for a non-keto row', (
       tester,
@@ -259,7 +337,7 @@ void main() {
       // Assert
       expect(find.byType(WaiterScriptWidget), findsNothing);
       expect(find.byType(StatusBadge), findsOneWidget);
-      expect(find.text('Show the waiter card'), findsNothing);
+      expect(find.text('Full screen'), findsNothing);
     });
 
     testWidgets(
@@ -554,7 +632,7 @@ void main() {
       },
     );
 
-    testWidgets('build renders the Hebrew waiter-card label in the he locale', (
+    testWidgets('build renders the Hebrew full-screen label in the he locale', (
       tester,
     ) async {
       // Arrange
@@ -577,8 +655,11 @@ void main() {
         locale: const Locale('he'),
       );
 
-      // Assert
-      expect(find.text('הצג כרטיס למלצר'), findsOneWidget);
+      await tester.tap(find.text('שאלו את המלצר'));
+      await tester.pump();
+
+      // Assert: the full-screen action is inside the expanded script.
+      expect(find.text('מסך מלא'), findsOneWidget);
     });
 
     group('personal notes (issue #52)', () {
@@ -596,12 +677,13 @@ void main() {
 
           // Assert: existing call sites that predate this field compile and
           // render unchanged.
-          expect(find.text('Add a note'), findsNothing);
+          expect(find.byTooltip('Add a note'), findsNothing);
         },
       );
 
       testWidgets(
-        'build shows "Add a note" when onEditNote is given but note is null',
+        'build shows only the add-note icon, no note row, when onEditNote is '
+        'given but note is null',
         (tester) async {
           // Arrange
           final row = DishRow(dish: _dish(), category: 'Mains');
@@ -617,8 +699,10 @@ void main() {
             ),
           );
 
-          // Assert
-          expect(find.text('Add a note'), findsOneWidget);
+          // Assert: an icon button with the tooltip, and no text row.
+          expect(find.byTooltip('Add a note'), findsOneWidget);
+          expect(find.text('Add a note'), findsNothing);
+          expect(find.byIcon(Icons.sticky_note_2_outlined), findsNothing);
         },
       );
 
@@ -645,10 +729,50 @@ void main() {
           find.text('Waitstaff happily substituted cauliflower.'),
           findsOneWidget,
         );
-        expect(find.text('Add a note'), findsNothing);
+        expect(find.byTooltip('Add a note'), findsNothing);
+        expect(find.byIcon(Icons.note_add_outlined), findsNothing);
       });
 
-      testWidgets('tapping the note row calls onEditNote with this row', (
+      testWidgets('build keeps the add and edit semantics labels', (
+        tester,
+      ) async {
+        // Arrange
+        final row = DishRow(dish: _dish(), category: 'Mains');
+
+        // Act: no note yet.
+        await _pump(
+          tester,
+          DishCard(
+            row: row,
+            localeTag: 'en',
+            onShowScript: (_) {},
+            onEditNote: (_) {},
+          ),
+        );
+
+        // Assert
+        expect(find.bySemanticsLabel('Add a note'), findsOneWidget);
+
+        // Act: a note exists.
+        await _pump(
+          tester,
+          DishCard(
+            row: row,
+            localeTag: 'en',
+            onShowScript: (_) {},
+            note: 'No cheese.',
+            onEditNote: (_) {},
+          ),
+        );
+
+        // Assert
+        expect(
+          find.bySemanticsLabel('Edit your note: No cheese.'),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('tapping the add-note icon calls onEditNote with this row', (
         tester,
       ) async {
         // Arrange
@@ -665,7 +789,7 @@ void main() {
             onEditNote: (edited) => tapped = edited,
           ),
         );
-        await tester.tap(find.text('Add a note'));
+        await tester.tap(find.byTooltip('Add a note'));
         await tester.pump();
 
         // Assert
@@ -834,6 +958,50 @@ void main() {
         // Assert
         expect(find.text('Possible hidden carbs'), findsNothing);
       });
+    });
+
+    testWidgets('the amber script disclosure takes a Tab stop with a ring '
+        'and Enter expands it (issue #264)', (tester) async {
+      // Arrange
+      const script = 'Replace the mashed potatoes with a green salad.';
+      final row = DishRow(
+        dish: _dish(),
+        category: 'Mains',
+        analysis: const AnalysedDish(
+          dishId: 'dish_1',
+          name: 'Grilled Salmon',
+          verdict: DishVerdict.modifiable,
+          why: 'Mostly protein, with a starchy side to swap.',
+          modification: script,
+        ),
+      );
+      await _pump(
+        tester,
+        DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+      );
+      expect(focusRingShown(tester, find.byType(DishCard)), isFalse);
+
+      // Act
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      // Assert
+      expect(focusRingShown(tester, find.byType(DishCard)), isTrue);
+      expect(find.text(script), findsNothing);
+
+      // Act
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(script), findsOneWidget);
+
+      // Act: Space collapses it again.
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(script), findsNothing);
     });
   });
 }

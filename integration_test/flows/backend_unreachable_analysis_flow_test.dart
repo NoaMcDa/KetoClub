@@ -125,18 +125,18 @@ void main() {
 
         // Act: paste the Wolt link and open it.
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: the LLM engine was tried once, and its failure was
         // re-stamped onto the real heuristic's result under the
         // server-unreachable reason — never the device-offline one.
         expect(llm.calls, hasLength(1));
-        expect(find.byType(EngineChip), findsOneWidget);
-        expect(find.text(_en.engineChipRules), findsOneWidget);
+        expect(find.byType(EngineChip), findsNothing);
+        expect(find.text(_en.engineChipRules), findsNothing);
         expect(find.text(_dishName), findsOneWidget);
         expect(find.byType(StatusBadge), findsOneWidget);
-        // The full sentence, not only the engine chip's short reason
-        // (issue #119).
+        // The full sentence stands alone: the "Rules" chip is dropped on
+        // the menu screen (issue #236).
         expect(find.byType(RulesReasonBanner), findsOneWidget);
         expect(find.text(_en.analysisBackendUnreachable), findsOneWidget);
       },

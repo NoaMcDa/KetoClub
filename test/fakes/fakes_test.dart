@@ -722,6 +722,11 @@ void main() {
   });
 
   group('FakePagePicker', () {
+    test('has a camera unless told otherwise', () {
+      expect(FakePagePicker().canTakePhoto, isTrue);
+      expect(FakePagePicker(canTakePhoto: false).canTakePhoto, isFalse);
+    });
+
     test('answers each method from its own queue, then as cancelled', () async {
       // Arrange
       final photo = _pageOf(1);

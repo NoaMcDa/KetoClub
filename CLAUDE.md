@@ -42,6 +42,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > action (phones, not web) reads it with the camera and routes a Wolt, 10bis,
 > website or PDF link to that menu. No real Gemini request carrying images
 > has been sent yet (#88).
+> **Phase 8 ("UI Polish & Desktop Web", issues #221–#264, `docs/UX_REVIEW.md`)
+> shipped on top of all of that, on the `phase-8` branch (PR #266):** every
+> screen body sits in a `ContentWidth` cap (680px; Discovery 1080px), Discovery
+> is a 1/2/3-column venue grid with a card surface, a `NavigationRail` replaces
+> the bottom bar at 840px and wider, modal sheets are capped at 560px, the menu
+> screen goes two-pane at 1080px, the web shell has a splash, cream manifest
+> colours, path URLs and per-route tab titles, and Noto Sans Hebrew is bundled.
+> Per screen: the menu puts header, tiles, chips and dishes first with search,
+> budget and legend in a collapsible Filters row, names the venue in the app
+> bar once scrolled, keeps Share in an overflow, shows one waiter action per
+> yellow dish and unclassified dishes as cards; Explore shows a "Closed" tag,
+> distance, multi-select filter chips, a drinks-guide card and keeps its search
+> across tabs; "Saved" is now "Recent" with score, counts, an expiry countdown
+> and a Keep pin; Scan has three modes and reorderable pages; Settings opens on
+> Language and Appearance (segmented), collapses the AI disclosure and ends
+> with an About group. Cross-cutting: `FilledButton` only, themed field
+> borders, one `AppNotice` banner vocabulary, one name per verdict, the keto
+> score toned by band, focus rings, and browser Back that returns to Explore.
 >
 > **Read `architecture.md` first — it is authoritative.** This file and `README.md`
 > predate the code in places; where any of them disagrees with `architecture.md`,
@@ -403,6 +421,13 @@ When reading research docs (m15/m16), note that prefixes indicate iteration/mile
   (the person-run Gemini vision smoke test, `backend/tools/vision_smoke.py`).
   On-device OCR was dropped (D15; #81 closed as not planned). Configurable dietary
   rules are not Phase 4 work: they shipped earlier under Phase 2 (#56, #143).
+
+- **Phase 8**: UI Polish & Desktop Web (one GitHub milestone, issues #221–#264,
+  from `docs/UX_REVIEW.md`) → **Built on the `phase-8` branch, PR #266.** The
+  desktop web layout (content-width cap, venue grid, navigation rail, sheet
+  width, two-pane menu, web shell) and the per-screen polish listed in the
+  status banner above. Phases 5–7 exist on GitHub as milestones; see
+  `MILESTONE_CONVENTIONS.md`.
 
 Phase 1 and Phase 2 are built; `feature_prioratization` has the tier breakdown
 for what Phase 3's remaining milestone (#105–#108) and Phase 4's open issues pick

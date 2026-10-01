@@ -1,11 +1,17 @@
 import 'package:flutter/foundation.dart'
-    show LicenseEntry, LicenseEntryWithLineBreaks, LicenseRegistry;
+    show LicenseEntry, LicenseEntryWithLineBreaks, LicenseRegistry, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:ketoclub/app.dart';
 import 'package:ketoclub/di.dart';
 
 void main() {
+  // Shared links read `/venue/wolt/slug`, not `/#/venue/wolt/slug` (issue
+  // #226). Web only: the call is a no-op elsewhere, but guarding it keeps
+  // the intent plain. It must run before `runApp`, and the host must fall
+  // back to `index.html` for unknown paths (docs/RUNNING.md).
+  if (kIsWeb) usePathUrlStrategy();
   _registerFontLicenses();
   runApp(KetoClubApp(dependencies: buildDependencies()));
 }
@@ -29,6 +35,7 @@ Stream<LicenseEntry> _fontLicenses() async* {
     'assets/fonts/OFL-PublicSans.txt',
     'assets/fonts/OFL-InstrumentSerif.txt',
     'assets/fonts/OFL-Rubik.txt',
+    'assets/fonts/OFL-NotoSansHebrew.txt',
   ]) {
     final text = await rootBundle.loadString(asset);
     yield LicenseEntryWithLineBreaks(const ['ketoclub'], text);

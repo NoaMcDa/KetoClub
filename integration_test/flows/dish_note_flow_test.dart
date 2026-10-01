@@ -89,15 +89,15 @@ void main() {
 
         // Act: paste the link and open the venue.
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: the dish shows with no note yet.
         expect(find.byType(DishCard), findsOneWidget);
-        expect(find.text(_en.dishCardAddNote), findsOneWidget);
+        expect(find.byTooltip(_en.dishCardAddNote), findsOneWidget);
         expect(find.text(_note), findsNothing);
 
         // Act: open the note editor and write a note.
-        await tapAndSettle(tester, find.text(_en.dishCardAddNote));
+        await tapAndSettle(tester, find.byTooltip(_en.dishCardAddNote));
         expect(find.byType(NoteEditorSheet), findsOneWidget);
         // Typed into the sheet's own field: the menu's search field
         // (issue #51) is the first text field on screen, under the sheet.
@@ -114,19 +114,19 @@ void main() {
         // Assert: the sheet closed and the card now shows the note.
         expect(find.byType(NoteEditorSheet), findsNothing);
         expect(find.text(_note), findsOneWidget);
-        expect(find.text(_en.dishCardAddNote), findsNothing);
+        expect(find.byTooltip(_en.dishCardAddNote), findsNothing);
 
         // Act: leave the menu screen and reopen the same venue — a fresh
         // MenuController the way generateRoute builds one per push
         // (app.dart), over the same fakes.notesStore instance.
         await tapAndSettle(tester, find.byTooltip('Back'));
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: the note survived the revisit.
         expect(find.byType(DishCard), findsOneWidget);
         expect(find.text(_note), findsOneWidget);
-        expect(find.text(_en.dishCardAddNote), findsNothing);
+        expect(find.byTooltip(_en.dishCardAddNote), findsNothing);
       },
     );
   });

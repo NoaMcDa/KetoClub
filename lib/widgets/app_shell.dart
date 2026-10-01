@@ -1,32 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/widgets/route_title.dart';
 
-/// The bottom-navigation shell around the four tab-root routes: Explore,
-/// Scan, Saved and Settings (architecture.md §6.6; issue #11).
+/// The navigation shell around the four tab-root routes: Explore, Scan,
+/// Saved and Settings (architecture.md §6.6; issue #11).
+///
+/// Below [railBreakpoint] logical pixels of width it is a bottom
+/// [NavigationBar]; at [railBreakpoint] and wider — Material 3's medium
+/// breakpoint — a [NavigationRail] on the leading edge (the right one in
+/// Hebrew) takes its place, so four icons are not spread across a desktop
+/// monitor and the wide layout is anchored to one side (issue #223). Both
+/// are built from the same `_tabs` and call the same `_selectTab`, so a tab
+/// behaves identically whichever surface shows it. Each screen already
+/// constrains its own body (`ContentWidth`), so beside a rail that content
+/// centres in the width the rail leaves.
 ///
 /// Purely presentational: it takes an already-built [child] screen and a
 /// `const` [currentIndex] the route builder supplies, and holds no state and
 /// reaches no service of its own — `app.dart`'s `generateRoute` is the only
 /// place that decides which index a route gets.
 ///
-/// A tab tap uses [Navigator.pushNamedAndRemoveUntil], clearing every route
-/// beneath it, so the stack never grows — even when the shell was reached
-/// as a pushed route, such as the menu screen's Settings action — and the
-/// web URL tracks the active tab; "active tab reflects the route"
-/// then needs no route observer, since the index is simply passed in by
-/// whichever route built this shell.
+/// A tab tap replaces the whole stack with the new tab root (`_selectTab`),
+/// so the stack never grows — even when the shell was reached as a pushed
+/// route, such as the menu screen's Settings action, which must not leave
+/// the menu beneath the next tab (audit G8) — and the web URL tracks the
+/// active tab; "active tab reflects the route" then needs no route
+/// observer, since the index is simply passed in by whichever route built
+/// this shell.
 ///
-/// This is deliberately not an `IndexedStack`: every route in `generateRoute`
-/// already builds a fresh controller on purpose (so two visits to a screen
-/// start clean), Scan and Saved are stateless placeholders, and an
-/// `IndexedStack` would have to own `/settings` as one of its children,
-/// breaking the direct deep link `test/app_test.dart` asserts. The accepted
-/// trade-off is that switching tabs discards whatever was typed into the
-/// Explore text field, because `VenueSearchController` is rebuilt on every
-/// visit to `/` — see `generateRoute`'s doc comment in `app.dart`.
+/// Back from a tab other than Explore — the browser's Back button, Android's
+/// system back — returns to Explore rather than leaving the app (issue
+/// #262). A `Navigator` without a `Router` tells Flutter web to keep a
+/// single browser-history entry, so the browser's Back is simply a pop of
+/// this navigator; a lone tab root has nothing beneath it to pop to, so
+/// the shell catches that pop (`_backToExplore`) and switches to Explore
+/// instead. Back from Explore still leaves the app. A shell pushed over
+/// another route (Settings over a menu) pops normally, back to that route.
+///
+/// This is deliberately not an `IndexedStack`: the other routes in
+/// `generateRoute` build a fresh controller on purpose (so two visits to a
+/// screen start clean), and an `IndexedStack` would have to own `/settings`
+/// as one of its children, breaking the direct deep link `test/app_test.dart`
+/// asserts. Explore keeps its query, results and chip across a tab switch
+/// anyway, because its `VenueSearchController` lives as long as the app
+/// rather than the route (issue #233) — see `generateRoute`'s doc comment in
+/// `app.dart`.
 class AppShell extends StatelessWidget {
   /// Creates the shell around [child], with tab [currentIndex] highlighted.
-  const new({required this.currentIndex, required this.child, super.key});
+  const new({
+    required this.currentIndex,
+    required this.child,
+    this.pageTitle,
+    super.key,
+  });
 
   /// The Explore tab's index — `/`, wrapping `VenueSearchScreen`.
   static const int exploreIndex = 0;
@@ -40,13 +66,18 @@ class AppShell extends StatelessWidget {
   /// The Settings tab's index — `/settings`, wrapping `SettingsScreen`.
   static const int settingsIndex = 3;
 
+  /// The narrowest window width, in logical pixels, that shows a
+  /// [NavigationRail] instead of the bottom [NavigationBar]: Material 3's
+  /// medium breakpoint (issue #223).
+  static const double railBreakpoint = 840;
+
   /// The route pushed for each tab index, in the same order as the
-  /// `NavigationDestination`s built in `build` below. Mirrors the route
-  /// path constants in `app.dart`
-  /// (`scanRoutePath`, `savedRoutePath`, `settingsRoutePath`); this widget
-  /// cannot import `app.dart` to reuse them directly — `widgets/` sits below
-  /// `app.dart` in the layer order (architecture.md §5) — so the four
-  /// literals are the one place this shell must be kept in step with them.
+  /// destinations `_tabs` lists. Mirrors the route path constants in
+  /// `app.dart` (`scanRoutePath`, `savedRoutePath`, `settingsRoutePath`);
+  /// this widget cannot import `app.dart` to reuse them directly —
+  /// `widgets/` sits below `app.dart` in the layer order (architecture.md
+  /// §5) — so the four literals are the one place this shell must be kept
+  /// in step with them.
   static const List<String> _routes = <String>[
     '/',
     '/scan',
@@ -62,47 +93,129 @@ class AppShell extends StatelessWidget {
   /// The tab-root screen this shell wraps.
   final Widget child;
 
+  /// The browser-tab title's page name, when it should not be the active
+  /// tab's label (the drinks guide, which lives under Explore; issues #226,
+  /// #257).
+  final String? pageTitle;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    return RouteTitle(
+      page: pageTitle ?? _tabs(l10n)[currentIndex].label,
+      child: _backToExplore(context, _scaffold(context, l10n)),
+    );
+  }
 
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: currentIndex,
-        onDestinationSelected: (index) {
-          if (index == currentIndex) return;
-          // Removes every route, not just this one: the shell is also
-          // reached as a pushed route (the menu screen's Settings
-          // action), and replacing only the top would leave the menu
-          // and everything under it stacked beneath the new tab — each
-          // such round trip grew the stack by a whole menu screen.
-          Navigator.of(context)
-              .pushNamedAndRemoveUntil(_routes[index], (_) => false);
-        },
-        destinations: [
+  /// The four destinations, in [_routes]' order: icon, selected icon and
+  /// label. The one list every navigation surface builds from, so a
+  /// `NavigationRail` on wide screens (issue #223) cannot drift from the
+  /// bottom bar.
+  static List<({IconData icon, IconData selectedIcon, String label})> _tabs(
+    AppLocalizations l10n,
+  ) => [
+    (
+      icon: Icons.explore_outlined,
+      selectedIcon: Icons.explore,
+      label: l10n.navExplore,
+    ),
+    (
+      icon: Icons.document_scanner_outlined,
+      selectedIcon: Icons.document_scanner,
+      label: l10n.navScan,
+    ),
+    (icon: Icons.history, selectedIcon: Icons.history, label: l10n.navSaved),
+    (icon: Icons.tune, selectedIcon: Icons.tune, label: l10n.navSettings),
+  ];
+
+  /// Switches to tab [index]: the one tap handler every navigation surface
+  /// calls (issue #223 reuses it for the rail).
+  ///
+  /// Removes every route, not just this one, and pushes the tab root, so
+  /// the new tab replaces the current one. When this shell is the only
+  /// route — every tab-to-tab switch — that is exactly a
+  /// `pushReplacementNamed`. When the shell was pushed over other routes —
+  /// Settings from a menu or from the Scan tab, the drinks guide from a
+  /// menu, a deep link Flutter web stacks over `/` — replacing only the top
+  /// would leave the menu and everything under it beneath the new tab, and
+  /// each such round trip grew the stack by a whole menu screen (audit G8).
+  /// Clearing them all handles every such source in this one place, while
+  /// the source itself can still push Settings over the menu so that Back
+  /// from Settings returns to it.
+  void _selectTab(BuildContext context, int index) {
+    if (index == currentIndex) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(_routes[index], (_) => false);
+  }
+
+  /// Wraps [scaffold] so that Back from a lone tab root other than Explore
+  /// switches to Explore instead of leaving the app (issue #262; see the
+  /// class doc). Explore itself, and any shell with a route beneath it to
+  /// pop back to, pop as usual — which also keeps the iOS back-swipe working
+  /// for Settings pushed over a menu.
+  Widget _backToExplore(BuildContext context, Widget scaffold) {
+    if (currentIndex == exploreIndex) return scaffold;
+    return PopScope<Object?>(
+      canPop: ModalRoute.canPopOf(context) ?? true,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _selectTab(context, exploreIndex);
+      },
+      child: scaffold,
+    );
+  }
+
+  /// The shell's scaffold: a [NavigationRail] beside [child] when the
+  /// shell is at least [railBreakpoint] wide, a bottom [NavigationBar]
+  /// under it otherwise.
+  Widget _scaffold(BuildContext context, AppLocalizations l10n) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= railBreakpoint) {
+          return Scaffold(
+            body: Row(
+              children: [
+                _rail(context, l10n),
+                Expanded(child: child),
+              ],
+            ),
+          );
+        }
+        return Scaffold(body: child, bottomNavigationBar: _bar(context, l10n));
+      },
+    );
+  }
+
+  /// The bottom bar shown below [railBreakpoint].
+  Widget _bar(BuildContext context, AppLocalizations l10n) {
+    return NavigationBar(
+      selectedIndex: currentIndex,
+      onDestinationSelected: (index) => _selectTab(context, index),
+      destinations: [
+        for (final tab in _tabs(l10n))
           NavigationDestination(
-            icon: const Icon(Icons.explore_outlined),
-            selectedIcon: const Icon(Icons.explore),
-            label: l10n.navExplore,
+            icon: Icon(tab.icon),
+            selectedIcon: Icon(tab.selectedIcon),
+            label: tab.label,
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.document_scanner_outlined),
-            selectedIcon: const Icon(Icons.document_scanner),
-            label: l10n.navScan,
+      ],
+    );
+  }
+
+  /// The leading-edge rail shown at [railBreakpoint] and wider: compact
+  /// (`extended: false`) with every label shown, coloured by the theme's
+  /// `navigationRailTheme` to match the bar.
+  Widget _rail(BuildContext context, AppLocalizations l10n) {
+    return NavigationRail(
+      selectedIndex: currentIndex,
+      onDestinationSelected: (index) => _selectTab(context, index),
+      labelType: NavigationRailLabelType.all,
+      destinations: [
+        for (final tab in _tabs(l10n))
+          NavigationRailDestination(
+            icon: Icon(tab.icon),
+            selectedIcon: Icon(tab.selectedIcon),
+            label: Text(tab.label),
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.bookmark_border),
-            selectedIcon: const Icon(Icons.bookmark),
-            label: l10n.navSaved,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.tune),
-            selectedIcon: const Icon(Icons.tune),
-            label: l10n.navSettings,
-          ),
-        ],
-      ),
+      ],
     );
   }
 }

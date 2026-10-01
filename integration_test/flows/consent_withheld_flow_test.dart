@@ -147,12 +147,12 @@ void _expectConsentWithheldRulesResult(
 ) {
   expect(llm.calls, isEmpty);
   expect(connectivity.callCount, equals(0));
-  expect(find.byType(EngineChip), findsOneWidget);
-  expect(find.text(_en.engineChipRules), findsOneWidget);
+  expect(find.byType(EngineChip), findsNothing);
+  expect(find.text(_en.engineChipRules), findsNothing);
   expect(find.text(_dishName), findsOneWidget);
   expect(find.byType(StatusBadge), findsOneWidget);
-  // The full sentence, not only the engine chip's short reason (issue
-  // #119).
+  // The full sentence stands alone: the "Rules" chip is dropped on the
+  // menu screen (issue #236).
   expect(find.byType(RulesReasonBanner), findsOneWidget);
   expect(find.text(_en.analysisConsentWithheld), findsOneWidget);
 }
@@ -173,7 +173,7 @@ void main() {
 
         // Act: paste the Wolt link and open it.
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert
         _expectConsentWithheldRulesResult(llm, connectivity);
@@ -216,7 +216,7 @@ void main() {
         // Act: back to Explore, paste the Wolt link and open it.
         await tapAndSettle(tester, navDestination(_en.navExplore));
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert
         _expectConsentWithheldRulesResult(llm, connectivity);
@@ -254,7 +254,7 @@ void main() {
 
         // Act: paste the Wolt link and open it.
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: the LLM classifier WAS called (consent stayed on), so
         // this flow is not withheld.

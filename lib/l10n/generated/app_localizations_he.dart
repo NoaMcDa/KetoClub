@@ -40,7 +40,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get actionShareMenu => 'שתף תפריט';
 
   @override
-  String get actionOpenDrinksGuide => 'מדריך שתייה';
+  String get actionMoreMenuOptions => 'אפשרויות נוספות';
 
   @override
   String get actionCancel => 'ביטול';
@@ -56,7 +56,7 @@ class AppLocalizationsHe extends AppLocalizations {
       'קטוקלאב לא יודע לקרוא תפריט משם עדיין. הדביקו קישור למסעדה בוולט או את המזהה שלה.';
 
   @override
-  String get venueSearchOpen => 'הצג תפריט קטוגני';
+  String get venueSearchOpenLink => 'פתח קישור';
 
   @override
   String venueSearchContinueWith(String venue) {
@@ -89,7 +89,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String redGroupTitle(int count) {
-    return 'לא קטוגני ($count)';
+    return 'לדלג ($count)';
   }
 
   @override
@@ -100,6 +100,9 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get unclassifiedExplain =>
       'קטוקלאב ראה את המנות האלה אבל לא הצליח לסווג אותן. קראו אותן בעצמכם לפני שאתם מזמינים.';
+
+  @override
+  String get unclassifiedBadge => 'לא סווג';
 
   @override
   String get engineChipAi => 'בינה מלאכותית';
@@ -117,19 +120,27 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get verdictOrderAsIs => 'להזמין כמו שזה';
+  String get verdictOrderAsIs => 'להזמין כמו שהוא';
 
   @override
-  String get verdictModifiable => 'להזמין עם שינוי';
+  String get verdictModifiable => 'עם שינויים';
 
   @override
-  String get verdictNonKeto => 'לא קטוגני';
+  String get verdictNonKeto => 'לדלג';
 
   @override
-  String get waiterCardOpen => 'הצג כרטיס למלצר';
+  String get dishCardFullScreen => 'מסך מלא';
+
+  @override
+  String dishCardFullScreenSemanticLabel(String dish) {
+    return 'הצג כרטיס למלצר עבור $dish';
+  }
 
   @override
   String get waiterCardTitle => 'זה מה שאומרים למלצר';
+
+  @override
+  String get settingsAiPrivacy => 'בינה מלאכותית ופרטיות';
 
   @override
   String get settingsConsentTitle => 'מה יוצא מהמכשיר הזה';
@@ -248,6 +259,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settingsFilter => 'סינון ברירת מחדל';
 
   @override
+  String get settingsCacheSection => 'תפריטים אחרונים';
+
+  @override
   String settingsCacheSummary(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -274,6 +288,33 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settingsCacheCleared => 'התפריטים השמורים נוקו.';
+
+  @override
+  String get settingsAboutSection => 'אודות';
+
+  @override
+  String get settingsAboutVersion => 'גרסה';
+
+  @override
+  String settingsAboutVersionValue(String version, String build) {
+    return '$version (בנייה $build)';
+  }
+
+  @override
+  String get settingsAboutLicences => 'רישיונות קוד פתוח';
+
+  @override
+  String get settingsAboutPrivacy => 'פרטיות';
+
+  @override
+  String get settingsAboutReport => 'דיווח על תקלה';
+
+  @override
+  String get settingsAboutReportHint =>
+      'פותח את מעקב התקלות של קטוקלאב ב-GitHub';
+
+  @override
+  String get settingsAboutLinkFailed => 'לא ניתן היה לפתוח את הקישור.';
 
   @override
   String get fetchFailedOffline =>
@@ -436,20 +477,20 @@ class AppLocalizationsHe extends AppLocalizations {
   String get navScan => 'סריקה';
 
   @override
-  String get navSaved => 'שמורים';
+  String get navSaved => 'אחרונים';
 
   @override
   String get navSettings => 'הגדרות';
 
   @override
-  String get savedPlaceholderTitle => 'מסעדות שמורות';
+  String get savedPlaceholderTitle => 'תפריטים אחרונים';
 
   @override
   String get savedPlaceholderBody =>
       'פתחו תפריט של מסעדה והוא יופיע כאן אוטומטית, זמין ליממה — גם ללא חיבור לאינטרנט.';
 
   @override
-  String get savedLoading => 'טוען את התפריטים השמורים שלך…';
+  String get savedLoading => 'טוען את התפריטים האחרונים שלך…';
 
   @override
   String savedEntryDishCount(num count) {
@@ -477,6 +518,64 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String savedExpiresMinutes(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'יפוג בעוד $count דקות',
+      two: 'יפוג בעוד דקתיים',
+      one: 'יפוג בעוד דקה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String savedExpiresHours(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'יפוג בעוד $count שעות',
+      two: 'יפוג בעוד שעתיים',
+      one: 'יפוג בעוד שעה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String savedExpiresDays(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'יפוג בעוד $count ימים',
+      two: 'יפוג בעוד יומיים',
+      one: 'יפוג בעוד יום',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get savedExpired => 'פג תוקף, יתרענן בפתיחה';
+
+  @override
+  String get savedKept => 'נשמר, ללא תפוגה';
+
+  @override
+  String get savedKeep => 'שמור';
+
+  @override
+  String savedKeepSemanticLabel(String venue) {
+    return 'שמור את $venue מעבר לתפוגה';
+  }
+
+  @override
+  String get savedUnkeep => 'הפסק לשמור';
+
+  @override
+  String savedUnkeepSemanticLabel(String venue) {
+    return 'הפסק לשמור את $venue';
+  }
+
+  @override
   String get savedUndo => 'בטל';
 
   @override
@@ -490,22 +589,26 @@ class AppLocalizationsHe extends AppLocalizations {
       'השתמשו במיקום שלכם כדי לראות מסעדות בסביבה, חפשו לפי שם, או הדביקו למעלה קישור מוולט כדי לפתוח את התפריט המסווג לפי קטו.';
 
   @override
+  String get discoveryDrinksGuideCard => 'מזמינים משקה? מדריך בר וקפה';
+
+  @override
   String get discoveryLookingAround => 'מחפשים סביב';
 
   @override
   String get discoveryAroundYou => 'המיקום שלך';
 
   @override
-  String get discoveryLocationNotSet => 'לא נקבע מיקום';
+  String get discoveryLocationInvite => 'הקש כדי להשתמש במיקום שלך';
 
   @override
   String get discoveryUseLocation => 'השתמש במיקום שלי';
 
   @override
-  String get discoveryChipNearby => 'בסביבה';
+  String get discoveryChipKetoEightPlus => 'קטו 8+';
 
   @override
-  String get discoveryChipKetoEightPlus => 'קטו 8+';
+  String get discoveryChipKetoEightPlusHint =>
+      'צריך ציונים קודם: אפשר להעריך את הרשימה או לפתוח מסעדה.';
 
   @override
   String get discoveryChipOpenNow => 'פתוח עכשיו';
@@ -573,11 +676,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get discoveryNoChipResults => 'אף מסעדה ברשימה לא מתאימה לסינון הזה.';
 
   @override
-  String get discoveryEstimateList => 'הערך את הרשימה';
+  String get discoveryEstimateList => 'דירוג מהיר (כללים במכשיר)';
 
   @override
   String get discoveryEstimateHint =>
-      'קורא פעם אחת את התפריט של כל מסעדה ברשימה ומדרג אותו לפי הכללים שבמכשיר, לא בבינה מלאכותית. לניתוח המלא, פתחו את המסעדה.';
+      'לניתוח מלא עם בינה מלאכותית, פתחו מסעדה.';
 
   @override
   String discoveryEstimating(int done, int total) {
@@ -598,6 +701,16 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String venueCardWalkMinutes(int minutes) {
     return '$minutes דק׳ הליכה';
+  }
+
+  @override
+  String venueCardDistanceMetres(String distance) {
+    return '$distance מ׳';
+  }
+
+  @override
+  String venueCardDistanceKm(String distance) {
+    return '$distance ק״מ';
   }
 
   @override
@@ -666,10 +779,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'מוצגות מנות שאפשר להזמין כמו שהן או עם שינוי';
 
   @override
-  String get tileGreenLabel => 'להזמין כמו שהן';
+  String get tileGreenLabel => 'להזמין כמו שהוא';
 
   @override
-  String get tileYellowLabel => 'עם שינוי';
+  String get tileYellowLabel => 'עם שינויים';
 
   @override
   String get tileRedLabel => 'לדלג';
@@ -734,7 +847,21 @@ class AppLocalizationsHe extends AppLocalizations {
   String get legendNote => 'אותם הכללים שקטוקלאב שולחת למודל הבינה המלאכותית.';
 
   @override
+  String get legendEngines =>
+      'כללים: בדיקות מילות מפתח של קטוקלאב על טקסט המנה, בלי הערכת פחמימות. בינה מלאכותית: Gemini קורא את כל התפריט ומעריך פחמימות נטו.';
+
+  @override
+  String get legendBudget =>
+      'תקציב פחמימות: לאחר ניתוח בינה מלאכותית, שדה בסינון מאפשר לקבוע תקציב פחמימות נטו לארוחה. לתוצאות על בסיס כללים אין הערכת פחמימות, ולכן הוא לא מוצע.';
+
+  @override
   String get waiterCardCopyButton => 'העתק טקסט';
+
+  @override
+  String get waiterCardCopied => 'הועתק ✓';
+
+  @override
+  String get waiterCardDone => 'סיום';
 
   @override
   String waiterCardAfterText(String grams) {
@@ -760,6 +887,20 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get noteEditorClear => 'מחק הערה';
+
+  @override
+  String get menuFilters => 'סינון';
+
+  @override
+  String menuFiltersActive(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'סינון · $count פעילים',
+      one: 'סינון · 1 פעיל',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get menuSearchHint => 'חפשו מנות';
@@ -841,6 +982,19 @@ class AppLocalizationsHe extends AppLocalizations {
       'צלמו את דפי התפריט, בחרו תמונות מהגלריה או בחרו קובץ PDF. קטוקלאב קורא את המנות מהדפים ומנתח אותן.';
 
   @override
+  String get scanScreenModePages => 'תמונות ו-PDF';
+
+  @override
+  String get scanScreenModePaste => 'הדבקת טקסט';
+
+  @override
+  String get scanScreenModeQr => 'קוד QR';
+
+  @override
+  String get scanScreenQrIntro =>
+      'סרקו את קוד ה-QR שעל השולחן כדי לפתוח את התפריט של המסעדה.';
+
+  @override
   String get scanScreenActionTakePhoto => 'צילום';
 
   @override
@@ -880,6 +1034,16 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String scanScreenReorderPage(int number) {
+    return 'הזזת דף $number. גררו כדי לסדר מחדש';
+  }
+
+  @override
+  String scanScreenPreviewPage(int number) {
+    return 'תצוגה מקדימה של דף $number';
+  }
+
+  @override
   String scanScreenTooManyPages(int max) {
     return 'סריקה אחת כוללת עד $max דפים. הדפים שמעבר למגבלה לא נוספו.';
   }
@@ -891,9 +1055,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get scanScreenAnalysePages => 'נתחו את הדפים';
-
-  @override
-  String get scanScreenPasteHeading => 'או הדביקו את הטקסט';
 
   @override
   String get scanScreenDisclosureWeb =>
@@ -1020,10 +1181,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get carbBudgetFieldClear => 'נקה תקציב';
 
   @override
-  String get carbBudgetDisabledReason =>
-      'קבעו תקציב לאחר ניתוח בינה מלאכותית — לתוצאות על בסיס כללים אין הערכת פחמימות.';
-
-  @override
   String netCarbsChipLeavesSuffix(int grams) {
     return ' · נשאר $grams גרם';
   }
@@ -1054,10 +1211,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get drinksGuideSectionSkip => 'לדלג';
 
   @override
-  String get settingsDrinksGuideTitle => 'מדריך שתייה';
-
-  @override
-  String get settingsDrinksGuideSubtitle => 'מדריך בר וקפה';
+  String drinksGuideCarbsSemanticLabel(String range) {
+    return 'הערכת פחמימות נטו, לא מאומתת: $range';
+  }
 
   @override
   String get actionAskAboutMenu => 'שאלו על התפריט הזה';

@@ -3,10 +3,9 @@
     "short_name": "KetoClub",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#3C7847",
-    "theme_color": "#3C7847",
+    "background_color": "#FAF7F0",
+    "theme_color": "#FAF7F0",
     "description": "Restaurant menu analyzer for keto dieters. Classify dishes by keto-compatibility and generate waiter instructions for modifications.",
-    "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
         {

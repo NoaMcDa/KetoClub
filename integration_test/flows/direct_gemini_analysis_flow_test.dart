@@ -183,7 +183,7 @@ void main() {
 
         // Act: paste the Wolt link and open it.
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: exactly two requests, straight to Wolt then to Google.
         expect(network.hosts, [
@@ -223,18 +223,25 @@ void main() {
 
         // Act: paste the Wolt link and open it.
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: the menu came from Wolt; nothing went to Google.
         expect(network.hosts, ['consumer-api.wolt.com']);
         expect(find.text(_dishName), findsOneWidget);
-        expect(find.text(_en.engineChipRules), findsOneWidget);
+        expect(find.text(_en.engineChipRules), findsNothing);
         expect(find.text(_en.analysisApiKeyMissing), findsOneWidget);
 
         // Act: follow the banner to Settings and save a key there.
         await tapAndSettle(tester, find.text(_en.actionOpenSettings));
         expect(find.text(_en.settingsKeySection), findsOneWidget);
+        // The consent body sits behind the collapsed "What leaves this
+        // device" disclosure (issue #255): open it to read the copy.
+        await tester.ensureVisible(find.byKey(consentDisclosureKey));
+        await tapAndSettle(tester, find.byKey(consentDisclosureKey));
         expect(find.text(_en.settingsConsentBodyDirect), findsOneWidget);
+        // Below Language, Appearance and the keto rules since issue #255.
+        await tester.ensureVisible(find.byKey(apiKeyFieldKey));
+        await tester.pumpAndSettle();
         await tester.enterText(find.byKey(apiKeyFieldKey), _key);
         // Scrolled into view first, as a user would: at the test window's
         // height the button sits under the bottom navigation bar.

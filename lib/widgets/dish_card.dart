@@ -6,6 +6,8 @@ import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/price_format.dart';
 import 'package:ketoclub/widgets/content_direction.dart';
+import 'package:ketoclub/widgets/focus_ring.dart';
+import 'package:ketoclub/widgets/net_carbs_chip.dart';
 import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
@@ -17,9 +19,11 @@ import 'package:provider/provider.dart';
 /// coloured left rail, a tinted card, and a net-carb chip that is always
 /// framed as an estimate.
 ///
-/// A [DishVerdict.modifiable] row shows a tappable amber summary that
-/// expands into its waiter script, plus a button to open the full-screen
-/// waiter card; a [DishVerdict.nonKeto] row shows neither; a row whose
+/// A [DishVerdict.modifiable] row shows one tappable amber summary that
+/// expands into its waiter script; the button to open the full-screen
+/// waiter card lives inside that expanded panel, beside Copy, not as a
+/// standing second action (issue #239). A [DishVerdict.nonKeto] row shows
+/// neither; a row whose
 /// [DishRow.analysis] is null shows no verdict claim and no script,
 /// because none has been made yet.
 class DishCard extends StatefulWidget {
@@ -33,6 +37,7 @@ class DishCard extends StatefulWidget {
     this.note,
     this.onEditNote,
     this.showPrice = true,
+    this.unclassified = false,
     super.key,
   });
 
@@ -62,6 +67,12 @@ class DishCard extends StatefulWidget {
   /// prices were stripped before classification and are not real (issue
   /// #83, architecture.md D18); true everywhere else.
   final bool showPrice;
+
+  /// Whether this is a dish the classifier could not place (issue #244):
+  /// a null-analysis row then carries the neutral [UnclassifiedBadge]
+  /// instead of no badge at all. False everywhere else, where a null
+  /// analysis means the menu has not been analysed yet.
+  final bool unclassified;
 
   @override
   State<DishCard> createState() => _DishCardState();
@@ -105,6 +116,11 @@ class _DishCardState extends State<DishCard> {
     final ambient = Directionality.of(context);
 
     final cardEdge = _cardEdge(theme, neutralSurfaces, verdict, tone);
+    final hasNote =
+        widget.onEditNote != null &&
+        widget.note != null &&
+        widget.note!.isNotEmpty;
+    final showAddNote = widget.onEditNote != null && !hasNote;
     // The badge/name/description/price block and the photo tile sit in one
     // row, per the artboard's dish row (`.design/Main.dc.html`); the note
     // and script-disclosure rows below stay full width, outside it.
@@ -114,8 +130,29 @@ class _DishCardState extends State<DishCard> {
         // Sizes and the 6px rhythm are the artboard's dish row
         // (`.design/Main.dc.html`): a 15px bold name, a 12.5px `--ink2`
         // description at 1.45 line height, and a 13.5px bold price.
-        if (analysis != null) ...[
-          StatusBadge(verdict: analysis.verdict),
+        // The "add a note" icon sits at the corner of this header, opposite
+        // the badge, only while there is no note (issue #240); once a note
+        // exists the full-width note row below replaces it.
+        if (analysis != null || showAddNote) ...[
+          // A Wrap, not a Row: at a large text scale the badge and the
+          // 36px icon can outgrow one line together.
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: analysis != null
+                  ? WrapAlignment.spaceBetween
+                  : WrapAlignment.end,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                if (analysis != null) StatusBadge(verdict: analysis.verdict),
+                if (showAddNote)
+                  _AddNoteButton(onPressed: () => widget.onEditNote!(row)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 6),
+        ] else if (widget.unclassified) ...[
+          const UnclassifiedBadge(),
           const SizedBox(height: 6),
         ],
         // The name and description are menu content, laid out in the
@@ -161,11 +198,13 @@ class _DishCardState extends State<DishCard> {
                 ),
               ),
             if (netCarbs != null && tone != null && verdict != null)
-              _NetCarbsChip(
-                estimate: netCarbs,
+              NetCarbsChip(
+                label: _netCarbsLabel(l10n, netCarbs, leavesGrams),
+                semanticLabel: l10n.netCarbsChipSemanticLabel(
+                  netCarbs.round().toString(),
+                ),
                 tone: tone,
-                background: _carbChipBackground(theme, verdict, tone),
-                leavesGrams: leavesGrams,
+                background: netCarbsChipBackground(theme, verdict, tone),
               ),
           ],
         ),
@@ -184,9 +223,9 @@ class _DishCardState extends State<DishCard> {
               PhotoTile(imageUrl: dish.imageUrl, size: 72),
             ],
           ),
-          if (widget.onEditNote != null) ...[
+          if (hasNote) ...[
             const SizedBox(height: 8),
-            _NoteRow(note: widget.note, onTap: () => widget.onEditNote!(row)),
+            _NoteRow(note: widget.note!, onTap: () => widget.onEditNote!(row)),
           ],
           if (isModifiable && tone != null) ...[
             const SizedBox(height: 8),
@@ -197,19 +236,18 @@ class _DishCardState extends State<DishCard> {
             ),
             if (_scriptExpanded) ...[
               const SizedBox(height: 8),
-              WaiterScriptWidget(script: scriptText!),
+              WaiterScriptWidget(
+                script: scriptText!,
+                trailingAction: _FullScreenAction(
+                  dishName: dish.name,
+                  onPressed: () => widget.onShowScript(row),
+                ),
+              ),
               if (analysis!.hiddenCarbs.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 _HiddenCarbsRow(hiddenCarbs: analysis.hiddenCarbs, tone: tone),
               ],
             ],
-            Align(
-              alignment: AlignmentDirectional.centerEnd,
-              child: TextButton(
-                onPressed: () => widget.onShowScript(row),
-                child: Text(l10n.waiterCardOpen),
-              ),
-            ),
           ],
         ],
       ),
@@ -291,76 +329,18 @@ Color _cardEdge(
   DishVerdict.nonKeto => neutralSurfaces.line2,
 };
 
-/// The net-carb chip background for [verdict]: the plain surface for
-/// green (the artboard's `--surface`), and [tone]'s own tint for amber and
-/// red (`--amber-tint` / `--red-tint`).
-Color _carbChipBackground(
-  ThemeData theme,
-  DishVerdict verdict,
-  VerdictTone tone,
-) => switch (verdict) {
-  DishVerdict.orderAsIs => theme.cardColor,
-  DishVerdict.modifiable || DishVerdict.nonKeto => tone.tint,
-};
-
-/// The net-carb chip (architecture.md §17.4, reversed by issue #30): a
-/// rough estimate, always framed as one — never rendered as a bare number
-/// — and never shown at all when there is nothing to show.
-class _NetCarbsChip extends StatelessWidget {
-  const new({
-    required this.estimate,
-    required this.tone,
-    required this.background,
-    this.leavesGrams,
-  });
-
-  /// The raw estimate in grams, from the LLM engine only
-  /// ([AnalysedDish.netCarbsEstimate]). Rounded for display; this widget
-  /// is never built when the estimate is null.
-  final double estimate;
-
-  /// This dish's verdict tone, for the chip's foreground colour.
-  final VerdictTone tone;
-
-  /// This chip's background, from [_carbChipBackground].
-  final Color background;
-
-  /// How many grams remain in the budget after this dish, when a budget is
-  /// set. Shown as a suffix inside the chip: "~3g net carbs · leaves 5g".
-  /// Null when no budget is active.
-  final int? leavesGrams;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final grams = estimate.round().toString();
-    final leaves = leavesGrams;
-    final label = leaves != null
-        ? '${l10n.netCarbsChipLabel(grams)}'
-              '${l10n.netCarbsChipLeavesSuffix(leaves)}'
-        : l10n.netCarbsChipLabel(grams);
-    return Semantics(
-      label: l10n.netCarbsChipSemanticLabel(grams),
-      excludeSemantics: true,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: background,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 11.5,
-              fontWeight: FontWeight.w700,
-              color: tone.ink,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+/// The net-carb chip's visible text: "~3g net carbs (estimate)", with a
+/// " · leaves 5g" suffix when a budget is active ([leavesGrams] non-null).
+String _netCarbsLabel(
+  AppLocalizations l10n,
+  double estimate,
+  int? leavesGrams,
+) {
+  final grams = estimate.round().toString();
+  final label = l10n.netCarbsChipLabel(grams);
+  return leavesGrams == null
+      ? label
+      : '$label${l10n.netCarbsChipLeavesSuffix(leavesGrams)}';
 }
 
 /// The tappable amber summary row that expands into the waiter script.
@@ -389,41 +369,80 @@ class _ScriptDisclosure extends StatelessWidget {
       button: true,
       expanded: expanded,
       label: label,
+      // excludeSemantics drops the InkWell's own tap action, so the
+      // action is declared here too; without it a screen reader could
+      // focus the row but never activate it.
+      onTap: onTap,
       excludeSemantics: true,
-      child: InkWell(
-        onTap: onTap,
+      child: FocusRing(
         borderRadius: BorderRadius.circular(11),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: tone.tint,
-            borderRadius: BorderRadius.circular(11),
-            border: Border.all(color: tone.rail),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            child: Row(
-              children: [
-                Icon(Icons.restaurant_menu, size: 16, color: tone.ink),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
-                      color: tone.ink,
+        color: tone.rail,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(11),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: tone.tint,
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(color: tone.rail),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Row(
+                children: [
+                  Icon(Icons.restaurant_menu, size: 16, color: tone.ink),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: tone.ink,
+                      ),
                     ),
                   ),
-                ),
-                AnimatedRotation(
-                  turns: expanded ? 0.5 : 0,
-                  duration: const Duration(milliseconds: 150),
-                  child: Icon(Icons.expand_more, size: 15, color: tone.ink),
-                ),
-              ],
+                  AnimatedRotation(
+                    turns: expanded ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 150),
+                    child: Icon(Icons.expand_more, size: 15, color: tone.ink),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The "Full screen" action shown beside Copy inside the expanded waiter
+/// script (issue #239): opens the full-screen waiter card for the dish.
+///
+/// Announced with the dish name, so a screen reader user hears which
+/// dish's card it opens rather than a bare "Full screen".
+class _FullScreenAction extends StatelessWidget {
+  const new({required this.dishName, required this.onPressed});
+
+  /// The dish's name, spoken as part of the semantic label.
+  final String dishName;
+
+  /// Called when the action is activated.
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Semantics(
+      button: true,
+      label: l10n.dishCardFullScreenSemanticLabel(dishName),
+      onTap: onPressed,
+      excludeSemantics: true,
+      child: OutlinedButton.icon(
+        onPressed: onPressed,
+        icon: const Icon(Icons.fullscreen),
+        label: Text(l10n.dishCardFullScreen),
       ),
     );
   }
@@ -510,17 +529,49 @@ class _HiddenCarbsRow extends StatelessWidget {
   }
 }
 
-/// The personal-note affordance (issue #52): a small tappable icon-and-text
-/// row, showing the note itself once one exists or an "add a note" prompt
-/// before that. Neutral for every verdict — a note is the user's own
-/// annotation, not a verdict colour — so it reads from the theme's own
-/// on-surface-variant colour rather than a [VerdictTone].
+/// The "add a note" affordance (issue #240): one small icon button, shown
+/// only while a dish has no note, so forty dishes do not each carry a muted
+/// text row. Its tooltip is visual; its icon carries the semantics label.
+class _AddNoteButton extends StatelessWidget {
+  const new({required this.onPressed});
+
+  /// Called when the icon is tapped, to open the note editor.
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    // The tooltip is visual only; the icon's own label is the one semantics
+    // announcement, so the two never read twice.
+    return Tooltip(
+      message: l10n.dishCardAddNote,
+      excludeFromSemantics: true,
+      child: IconButton(
+        onPressed: onPressed,
+        icon: Icon(
+          Icons.note_add_outlined,
+          semanticLabel: l10n.dishCardAddNote,
+        ),
+        iconSize: 18,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+      ),
+    );
+  }
+}
+
+/// The personal-note row (issue #52): a small tappable icon-and-text row
+/// showing the note itself. Rendered only once a note exists (issue #240);
+/// before that, [_AddNoteButton] is the affordance. Neutral for every
+/// verdict — a note is the user's own annotation, not a verdict colour — so
+/// it reads from the theme's own on-surface-variant colour rather than a
+/// [VerdictTone].
 class _NoteRow extends StatelessWidget {
   const new({required this.note, required this.onTap});
 
-  /// The note to show, or null/empty to show the "add a note" prompt
-  /// instead.
-  final String? note;
+  /// The (non-empty) note to show.
+  final String note;
 
   /// Called when the row is tapped, to open the note editor.
   final VoidCallback onTap;
@@ -529,14 +580,10 @@ class _NoteRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final hasNote = note != null && note!.isNotEmpty;
     final color = theme.colorScheme.onSurfaceVariant;
-    final label = hasNote ? note! : l10n.dishCardAddNote;
     return Semantics(
       button: true,
-      label: hasNote
-          ? l10n.dishCardEditNoteSemanticLabel(note!)
-          : l10n.dishCardAddNote,
+      label: l10n.dishCardEditNoteSemanticLabel(note),
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,
@@ -545,17 +592,11 @@ class _NoteRow extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Row(
             children: [
-              Icon(
-                hasNote
-                    ? Icons.sticky_note_2_outlined
-                    : Icons.note_add_outlined,
-                size: 15,
-                color: color,
-              ),
+              Icon(Icons.sticky_note_2_outlined, size: 15, color: color),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  label,
+                  note,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(color: color),

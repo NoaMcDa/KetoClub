@@ -8,10 +8,11 @@ import 'package:provider/provider.dart';
 /// budget (issue #215).
 ///
 /// When [isBudgetAvailable] is false (rules engine, or no analysis yet),
-/// the field is replaced by a disabled-state banner explaining why, styled
-/// like the field's own container. The field is always shown for an LLM
-/// result, even mid-load, so the user can type the budget before the menu
-/// finishes classifying.
+/// nothing is rendered (issue #235): a user who cannot use the feature is
+/// not shown a notice about it on every menu, and the menu legend mentions
+/// the budget once instead. The field is always shown for an LLM result,
+/// even mid-load, so the user can type the budget before the menu finishes
+/// classifying.
 ///
 /// Reads and writes [CarbBudgetController] from the [MultiProvider] above
 /// [MaterialApp].
@@ -71,39 +72,8 @@ class _CarbBudgetFieldState extends State<CarbBudgetField> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
-    if (!widget.isBudgetAvailable) {
-      return DecoratedBox(
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: colorScheme.outlineVariant),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          child: Row(
-            children: [
-              Icon(
-                Icons.nightlight_round,
-                size: 16,
-                color: colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  l10n.carbBudgetDisabledReason,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+    if (!widget.isBudgetAvailable) return const SizedBox.shrink();
 
     return ListenableBuilder(
       listenable: context.watch<CarbBudgetController>(),
@@ -128,7 +98,6 @@ class _CarbBudgetFieldState extends State<CarbBudgetField> {
                   )
                 : null,
             isDense: true,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       },

@@ -27,7 +27,7 @@ final AppLocalizations _en = AppLocalizationsEn();
 
 /// The Analyse-pages button on the Scan tab.
 Finder get _analysePages =>
-    find.widgetWithText(ElevatedButton, _en.scanScreenAnalysePages);
+    find.widgetWithText(FilledButton, _en.scanScreenAnalysePages);
 
 /// Gives the surface a phone-tall viewport, so a lazy `ListView` builds
 /// every card (CLAUDE.md's traps); reset when the test ends.
@@ -60,7 +60,8 @@ void main() {
 
         // Act: open the Scan tab and choose the photos.
         await tapAndSettle(tester, navDestination(_en.navScan));
-        expect(tester.widget<ElevatedButton>(_analysePages).onPressed, isNull);
+        await tapAndSettle(tester, find.text(_en.scanScreenModePages));
+        expect(tester.widget<FilledButton>(_analysePages).onPressed, isNull);
         await tapAndSettle(tester, find.text(_en.scanScreenActionChoosePhotos));
 
         // Assert: both pages are listed and Analyse is now enabled.
@@ -68,16 +69,53 @@ void main() {
         expect(find.text(_en.scanScreenPageCount(2, 6)), findsOneWidget);
         expect(find.text(_en.scanScreenPageLabel(1)), findsOneWidget);
         expect(find.text(_en.scanScreenPageLabel(2)), findsOneWidget);
-        expect(
-          tester.widget<ElevatedButton>(_analysePages).onPressed,
-          isNotNull,
+        expect(tester.widget<FilledButton>(_analysePages).onPressed, isNotNull);
+
+        // Act: tap the first thumbnail to preview it.
+        await tapAndSettle(
+          tester,
+          find
+              .descendant(
+                of: find.byType(ReorderableListView),
+                matching: find.byType(Image),
+              )
+              .first,
         );
+
+        // Assert: the pages sheet opens at that page, full screen.
+        expect(find.byType(ScannedPagesSheet), findsOneWidget);
+        expect(
+          tester
+              .widget<ScannedPagesSheet>(find.byType(ScannedPagesSheet))
+              .initialPage,
+          0,
+        );
+        expect(find.byType(InteractiveViewer), findsOneWidget);
+
+        // Act: close the full-screen view, then the sheet.
+        await tapAndSettle(
+          tester,
+          find.descendant(
+            of: find.byType(Dialog),
+            matching: find.byTooltip(_en.scannedMenuPagesClose),
+          ),
+        );
+        await tapAndSettle(tester, find.byTooltip(_en.scannedMenuPagesClose));
+        expect(find.byType(ScannedPagesSheet), findsNothing);
+
+        // Act: drag the first page below the second by its handle.
+        await tester.drag(
+          find.byTooltip(_en.scanScreenReorderPage(1)),
+          const Offset(0, 200),
+        );
+        await tester.pumpAndSettle();
 
         // Act: analyse the pages.
         await tapAndSettle(tester, _analysePages);
 
-        // Assert: exactly one request, carrying both pages in order, under
-        // the vision preamble and the text path's own schema name.
+        // Assert: exactly one request, carrying both pages in the order
+        // the user arranged (black first now), under the vision preamble
+        // and the text path's own schema name.
         expect(client.calls, hasLength(1));
         final call = client.calls.single;
         expect(call.images, hasLength(2));
@@ -85,8 +123,8 @@ void main() {
           ChatImagePart.png,
           ChatImagePart.png,
         ]);
-        expect(call.images[0].bytes, orderedEquals(whitePngBytes));
-        expect(call.images[1].bytes, orderedEquals(blackPngBytes));
+        expect(call.images[0].bytes, orderedEquals(blackPngBytes));
+        expect(call.images[1].bytes, orderedEquals(whitePngBytes));
         expect(
           call.systemPrompt,
           contains(MenuAnalysisPrompt.visionPreamble(2)),

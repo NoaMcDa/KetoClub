@@ -237,6 +237,8 @@ const _boundaries = <_Boundary>[
   }),
   _Boundary('github.com/NoaMcDa', {
     'services/menu/website/direct_website_fetcher.dart',
+    // The issue tracker "Report a problem" opens (issue #258).
+    'screens/settings_screen.dart',
   }),
   _Boundary('KETOCLUB_BACKEND_URL', {'di.dart'}),
   _Boundary('package:geolocator/geolocator.dart', {
@@ -270,6 +272,11 @@ const _boundaries = <_Boundary>[
   // services/platform/, because it owns a full-screen page; one file
   // touches the plugin either way.
   _Boundary('package:mobile_scanner/', {'widgets/mobile_qr_scanner.dart'}),
+  // One button hierarchy and one field style (issue #248,
+  // architecture.md §6.6): no ElevatedButton anywhere, and the field
+  // border is drawn once, by the theme's inputDecorationTheme.
+  _Boundary('ElevatedButton', <String>{}),
+  _Boundary('OutlineInputBorder(', {'theme/app_theme.dart'}),
   // The secure storage plugin guards that key; one file touches it.
   _Boundary('package:flutter_secure_storage/', {
     'services/storage/api_key_store.dart',

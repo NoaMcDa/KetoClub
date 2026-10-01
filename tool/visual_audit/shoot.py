@@ -45,13 +45,13 @@ CHROME = os.environ.get("CHROME")
 LABELS = {
     "en": {
         "ask": "Ask your waiter",
-        "card": "Show the waiter card",
+        "card": "Show the waiter card for",
         "estimate": "Estimate this list",
         "open_settings": "Open Settings",
     },
     "he": {
         "ask": "שאלו את המלצר",
-        "card": "הצג כרטיס למלצר",
+        "card": "הצג כרטיס למלצר עבור",
         "estimate": "הערך את הרשימה",
         "open_settings": "פתח הגדרות",
     },
@@ -203,18 +203,19 @@ def run(browser, scheme, lang):
         scroll(page, 450)
         shot(page, f"menu_scrolled_{tag}")
         for _ in range(4):
-            if find_label(page, labels["card"]):
+            if find_label(page, labels["ask"]):
                 break
             scroll(page, 150)
-        if click_label(page, labels["card"]):
-            page.wait_for_timeout(1500)
-            shot(page, f"waiter_card_{tag}")
-            page.keyboard.press("Escape")
-            page.wait_for_timeout(1500)
+        # The full-screen action lives inside the expanded script (#239).
         if click_label(page, labels["ask"]):
             shot(page, f"menu_script_open_{tag}")
             scroll(page, 300)
             shot(page, f"menu_script_open_scrolled_{tag}")
+            if click_label(page, labels["card"]):
+                page.wait_for_timeout(1500)
+                shot(page, f"waiter_card_{tag}")
+                page.keyboard.press("Escape")
+                page.wait_for_timeout(1500)
         scroll(page, -5000)
         tap(page, 70 if he else 320, 205)  # the Skip tile
         shot(page, f"menu_filter_skip_{tag}")

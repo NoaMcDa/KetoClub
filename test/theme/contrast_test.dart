@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/theme/app_tokens.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
+import 'package:ketoclub/widgets/keto_score_badge.dart';
 
 /// WCAG AA's minimum contrast ratio for normal-weight/small text — the
 /// bar every pair below must clear.
@@ -81,6 +82,47 @@ void _expectAllPass(List<_Pair> pairs) {
   }
 }
 
+/// The three tones `scoreTone` can return for [colors] and [muted] — one
+/// per band of `KetoScoreBadge` (issue #241) — against [background].
+List<_Pair> _scoreBandPairs(
+  VerdictColors colors,
+  Color muted,
+  Color background,
+) => [
+  for (final (band, score) in [('high', 9.0), ('mid', 5.0), ('low', 2.0)])
+    _Pair(
+      'keto score $band band/bg',
+      scoreTone(score, verdicts: colors, muted: muted),
+      background,
+    ),
+];
+
+/// The "Closed" tag over a venue photo (issue #227): the theme's `ink` on
+/// its `surface`, the pair `VenueCard`'s closed pill draws.
+List<_Pair> _closedTagPairs(Color ink, Color surface) => [
+  _Pair('closed tag ink/surface', ink, surface),
+];
+
+/// The Saved row's remove icon (issue #254): the red `ink` drawn on the
+/// card, which is the theme's `surface`.
+List<_Pair> _removeIconPairs(VerdictColors colors, Color surface) => [
+  _Pair('saved remove icon red ink/surface', colors.red.ink, surface),
+];
+
+/// The offline notice (issue #260): an `AppNotice.warning` draws its icon
+/// and text in the amber tone's `ink` on its `tint`.
+List<_Pair> _warningNoticePairs(VerdictColors colors) => [
+  _Pair('offline notice amber ink/tint', colors.amber.ink, colors.amber.tint),
+];
+
+/// The drinks guide's carb chips (issue #259): `ink` on the card surface
+/// for green and on the tint for amber and red, as `NetCarbsChip` draws.
+List<_Pair> _carbChipPairs(VerdictColors colors, Color surface) => [
+  _Pair('green carb chip ink/surface', colors.green.ink, surface),
+  _Pair('amber carb chip ink/tint', colors.amber.ink, colors.amber.tint),
+  _Pair('red carb chip ink/tint', colors.red.ink, colors.red.tint),
+];
+
 void main() {
   group('relative luminance and contrast ratio (self-test)', () {
     test('identical colours have a ratio of 1.0', () {
@@ -107,6 +149,11 @@ void main() {
     _expectAllPass([
       ..._statusBadgePairs(colors),
       ..._inkOnBackgroundPairs(colors, background),
+      ..._scoreBandPairs(colors, AppTokens.lightInk3, background),
+      ..._closedTagPairs(AppTokens.lightInk, AppTokens.lightSurface),
+      ..._removeIconPairs(colors, AppTokens.lightSurface),
+      ..._warningNoticePairs(colors),
+      ..._carbChipPairs(colors, AppTokens.lightSurface),
     ]);
 
     test('ink1, ink2 and ink3 all clear AA on the background', () {
@@ -140,6 +187,11 @@ void main() {
     _expectAllPass([
       ..._statusBadgePairs(colors),
       ..._inkOnBackgroundPairs(colors, background),
+      ..._scoreBandPairs(colors, AppTokens.darkInk3, background),
+      ..._closedTagPairs(AppTokens.darkInk, AppTokens.darkSurface),
+      ..._removeIconPairs(colors, AppTokens.darkSurface),
+      ..._warningNoticePairs(colors),
+      ..._carbChipPairs(colors, AppTokens.darkSurface),
     ]);
 
     test('ink1, ink2 and ink3 all clear AA on the background', () {

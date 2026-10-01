@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 // `intl` (imported below for `DateFormat`) also declares its own
 // `TextDirection` class (`LTR`/`RTL`/`UNKNOWN`), which otherwise wins over
 // `dart:ui`'s `TextDirection` (lowercase `ltr`/`rtl`, the type
@@ -10,6 +9,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart' hide MenuController;
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
@@ -20,7 +20,6 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
-import 'package:ketoclub/screens/drinks_guide_screen.dart';
 import 'package:ketoclub/screens/menu_screen.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
@@ -34,10 +33,15 @@ import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
+import 'package:ketoclub/widgets/carb_budget_field.dart';
+import 'package:ketoclub/widgets/category_chips.dart';
+import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
+import 'package:ketoclub/widgets/menu_filters_row.dart';
+import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
@@ -54,6 +58,7 @@ import '../fakes/fake_menu_sharer.dart';
 import '../fakes/fake_notes_store.dart';
 import '../fakes/fake_screen_brightness.dart';
 import '../fakes/fake_settings_store.dart';
+import '../fakes/focus_ring_probe.dart';
 
 /// The venue every test opens, unless a test builds its own.
 const VenueRef _ref = VenueRef(source: MenuSource.wolt, platformId: 'v1');
@@ -128,6 +133,20 @@ void _useTallSurface(WidgetTester tester) {
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
 }
+
+/// Opens the menu screen's collapsed Filters row (issue #234), behind
+/// which the search field, the carb budget and the legend sit.
+Future<void> _openFilters(WidgetTester tester) async {
+  await tester.tap(find.text(_en.menuFilters));
+  await tester.pumpAndSettle();
+}
+
+/// The search field's own [TextField], told apart from the carb-budget
+/// field that an AI-classified menu also shows behind the Filters row.
+final Finder _searchField = find.descendant(
+  of: find.byType(MenuSearchField),
+  matching: find.byType(TextField),
+);
 
 /// A 1×1 transparent PNG, so a page thumbnail decodes like a real one.
 final Uint8List _pngBytes = base64Decode(
@@ -439,7 +458,7 @@ void main() {
         // Assert
         expect(find.text(_en.menuProgressAskingAi), findsNothing);
         expect(find.byType(CircularProgressIndicator), findsNothing);
-        expect(find.byType(EngineChip), findsOneWidget);
+        expect(find.byType(RulesReasonBanner), findsOneWidget);
       });
 
       testWidgets('the progress copy is Hebrew under the he locale', (
@@ -525,6 +544,66 @@ void main() {
       // Assert
       expect(find.text('Sunny Diner'), findsOneWidget);
       expect(find.text(_ref.platformId), findsNothing);
+    });
+
+    testWidgets('the app bar names the venue once the header scrolls under '
+        'it, and the score badge stays in the body (issue #237)', (
+      tester,
+    ) async {
+      // Arrange: a 40-dish menu, far taller than the phone-tall surface.
+      final menu = Menu(
+        venueRef: _ref,
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: [
+          MenuCategory(
+            id: 'c1',
+            name: 'Mains',
+            dishes: [for (var i = 0; i < 40; i++) _dish('Dish $i', id: 'd$i')],
+          ),
+        ],
+        venueName: 'Sunny Diner',
+      );
+      final repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: menu));
+      final controller = _controllerFor(repository: repository);
+      final inAppBar = find.descendant(
+        of: find.byType(AppBar),
+        matching: find.text('Sunny Diner'),
+      );
+      await _pump(tester, controller, theme: AppTheme.light());
+      await tester.pumpAndSettle();
+      expect(inAppBar, findsNothing);
+
+      // Act
+      await tester.drag(find.byType(ListView), const Offset(0, -600));
+      await tester.pumpAndSettle();
+
+      // Assert: the name is in the bar, the badge never moved there, and
+      // the bar stays flat over the list (audit G2).
+      expect(inAppBar, findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(AppBar),
+          matching: find.byType(KetoScoreBadge),
+        ),
+        findsNothing,
+      );
+      final barMaterial = tester.widget<Material>(
+        find
+            .descendant(
+              of: find.byType(AppBar),
+              matching: find.byType(Material),
+            )
+            .first,
+      );
+      expect(barMaterial.elevation, 0);
+
+      // Scrolled back to the top, the header names the venue alone again.
+      await tester.drag(find.byType(ListView), const Offset(0, 600));
+      await tester.pumpAndSettle();
+      expect(inAppBar, findsNothing);
+      expect(find.text('Sunny Diner'), findsOneWidget);
     });
 
     testWidgets(
@@ -1044,6 +1123,48 @@ void main() {
       expect(opener.openCalls, [Uri.parse('https://cafe-noir.co.il/menu')]);
     });
 
+    for (final width in [390.0, 680.0]) {
+      testWidgets('a 30-character website host is shown in full beside the '
+          'refresh and open icons at ${width.toInt()}px (issue #245)', (
+        tester,
+      ) async {
+        // Arrange
+        const host = 'cafe-hashalom-tel-aviv-b.co.il';
+        const siteRef = VenueRef(
+          source: MenuSource.website,
+          platformId: 'https://$host/menu',
+        );
+        final repository = FakeMenuRepository()
+          ..stub(
+            siteRef,
+            MenuFetched(menu: _menuOf([_dish('Grilled salmon')], ref: siteRef)),
+          );
+        final controller = _controllerFor(repository: repository);
+
+        // Act
+        await _pump(tester, controller, ref: siteRef);
+        tester.view.physicalSize = Size(width, 1600);
+        await tester.pumpAndSettle();
+
+        // Assert: the text is not cut (on a phone it wraps to two lines, on
+        // a computer it is one line wider than the old 180px cap), and the
+        // icons sit beside it.
+        final source = find.textContaining('$host ·');
+        expect(source, findsOneWidget);
+        final text = tester.getRect(source);
+        final refresh = tester.getRect(find.byTooltip(_en.actionRefreshMenu));
+        final open = tester.getRect(
+          find.byTooltip(_en.menuOpenOnPlatform(host)),
+        );
+        expect(text.width, greaterThan(180));
+        expect(text.right, lessThanOrEqualTo(refresh.left + 0.01));
+        expect(refresh.right, lessThanOrEqualTo(open.left + 0.01));
+        expect(open.right, lessThanOrEqualTo(width));
+        expect(text.center.dy, closeTo(refresh.center.dy, 20));
+        expect(tester.takeException(), isNull);
+      });
+    }
+
     testWidgets('build names the platform matching ref.source in the '
         'failure message', (tester) async {
       // Arrange
@@ -1129,9 +1250,11 @@ void main() {
       await _pumpWithRoutes(tester, controller, pushedNames);
       await tester.pumpAndSettle();
 
-      // Assert: the full sentence renders, not only the engine chip's
-      // short reason.
+      // Assert: the full sentence renders and the "Rules" chip is gone, as
+      // the banner already says it (audit M14, issue #236).
       expect(find.byType(RulesReasonBanner), findsOneWidget);
+      expect(find.byType(EngineChip), findsNothing);
+      expect(find.text(_en.engineChipRules), findsNothing);
       expect(
         find.text(
           analysisFailureMessage(
@@ -1346,6 +1469,7 @@ void main() {
         );
         await _pump(tester, controller);
         await tester.pumpAndSettle();
+        await _openFilters(tester);
 
         // Act
         await tester.tap(find.text(_en.legendToggle));
@@ -1394,6 +1518,7 @@ void main() {
         );
         await _pump(tester, controller);
         await tester.pumpAndSettle();
+        await _openFilters(tester);
 
         // Assert: collapsed by default.
         expect(find.text(_en.legendToggle), findsOneWidget);
@@ -1421,6 +1546,14 @@ void main() {
           findsOneWidget,
         );
         expect(find.text(_en.legendNote), findsOneWidget);
+        expect(find.text(_en.legendEngines), findsOneWidget);
+        expect(find.text(_en.legendBudget), findsOneWidget);
+
+        // Assert: a rules result shows no budget field and no notice about
+        // it outside the legend (issue #235).
+        expect(find.byType(CarbBudgetField), findsOneWidget);
+        expect(find.byType(TextField), findsOneWidget);
+        expect(find.text(_en.carbBudgetFieldLabel), findsNothing);
 
         // Act: collapse again.
         await tester.tap(find.text(_en.legendHide));
@@ -1435,6 +1568,8 @@ void main() {
           ),
           findsNothing,
         );
+        expect(find.text(_en.legendEngines), findsNothing);
+        expect(find.text(_en.legendBudget), findsNothing);
       },
     );
 
@@ -1596,10 +1731,16 @@ void main() {
         // Assert: the default filter (all) shows every dish, red included.
         expect(find.text('Steak'), findsOneWidget);
         expect(find.text('Spaghetti Carbonara'), findsOneWidget);
-        expect(find.text(_en.tileRedLabel.toUpperCase()), findsOneWidget);
+        // The tile and the red dish's badge now share one name (#243), so
+        // the tile is found inside the counter row.
+        final skipTile = find.descendant(
+          of: find.byType(VerdictCounterTiles),
+          matching: find.text(_en.tileRedLabel.toUpperCase()),
+        );
+        expect(skipTile, findsOneWidget);
 
         // Act: tap the Skip tile.
-        await tester.tap(find.text(_en.tileRedLabel.toUpperCase()));
+        await tester.tap(skipTile);
         await tester.pumpAndSettle();
 
         // Assert: only the red dish shows, and the label says so.
@@ -1608,7 +1749,7 @@ void main() {
         expect(find.text(_en.menuShowingRed), findsOneWidget);
 
         // Act: tap the now-active Skip tile again.
-        await tester.tap(find.text(_en.tileRedLabel.toUpperCase()));
+        await tester.tap(skipTile);
         await tester.pumpAndSettle();
 
         // Assert: back to showing everything.
@@ -1618,7 +1759,65 @@ void main() {
       },
     );
 
-    testWidgets('the unclassified section renders its names', (tester) async {
+    testWidgets('the unclassified section renders each dish as a card with '
+        'the neutral badge and its description (issue #244)', (tester) async {
+      // Arrange: one dish the menu has, one name only the model gave.
+      final green = _dish('Steak', id: 'green');
+      const mystery = Dish(
+        id: 'mystery',
+        name: 'Mystery bowl',
+        description: 'Chef special of the day',
+        price: 42,
+        options: <DishOption>[],
+      );
+      final repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: _menuOf([green, mystery])));
+      final classifier = FakeMenuClassifier()
+        ..respondWith(
+          MenuAnalysed(
+            dishes: [_verdictFor(green, DishVerdict.orderAsIs)],
+            unclassified: const <String>['Mystery bowl', 'Invented plate'],
+            engine: const RulesEngine(
+              reason: MenuAnalysisFailureReason.notConfigured,
+            ),
+            analysedAt: DateTime.utc(2026),
+          ),
+        );
+      final controller = _controllerFor(
+        repository: repository,
+        classifier: classifier,
+      );
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+      // Order as-is only: the section still shows them (constraint 8).
+      await controller.setFilter(MenuFilter.greenOnly);
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Invented plate'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      // Assert: heading and explanation stay, each name is a DishCard.
+      expect(find.text(_en.unclassifiedTitle(2)), findsOneWidget);
+      expect(find.text(_en.unclassifiedExplain), findsOneWidget);
+      expect(find.text('Mystery bowl'), findsOneWidget);
+      expect(find.text('Chef special of the day'), findsOneWidget);
+      expect(find.text('Invented plate'), findsOneWidget);
+      expect(find.text(_en.unclassifiedBadge.toUpperCase()), findsNWidgets(2));
+      expect(
+        find.ancestor(
+          of: find.text('Mystery bowl'),
+          matching: find.byType(DishCard),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('the unclassified section Try again re-analyses without a '
+        'new fetch (issue #244)', (tester) async {
       // Arrange
       final green = _dish('Steak', id: 'green');
       final repository = FakeMenuRepository()
@@ -1638,15 +1837,23 @@ void main() {
         repository: repository,
         classifier: classifier,
       );
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text(_en.actionRetry),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      final loadCallsBefore = repository.loadCalls.length;
+      final classifyCallsBefore = classifier.calls.length;
 
       // Act
-      await _pump(tester, controller);
+      await tester.tap(find.text(_en.actionRetry));
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text(_en.unclassifiedTitle(1)), findsOneWidget);
-      expect(find.text(_en.unclassifiedExplain), findsOneWidget);
-      expect(find.text('Mystery bowl'), findsOneWidget);
+      expect(repository.loadCalls.length, equals(loadCallsBefore));
+      expect(classifier.calls.length, greaterThan(classifyCallsBefore));
     });
 
     testWidgets('switching the filter changes which cards are visible', (
@@ -1752,6 +1959,7 @@ void main() {
       final controller = _controllerFor(repository: repository);
       await _pump(tester, controller);
       await tester.pumpAndSettle();
+      await _openFilters(tester);
 
       // Act
       await tester.enterText(find.byType(TextField), 'sushi');
@@ -1796,7 +2004,9 @@ void main() {
         await tester.pumpAndSettle();
 
         // Act
-        await tester.tap(find.text(_en.waiterCardOpen));
+        await tester.tap(find.text(_en.dishCardAskWaiter));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(_en.dishCardFullScreen));
         await tester.pumpAndSettle();
 
         // Assert
@@ -1843,7 +2053,9 @@ void main() {
         expect(brightness.raiseCount, 0);
 
         // Act
-        await tester.tap(find.text(_en.waiterCardOpen));
+        await tester.tap(find.text(_en.dishCardAskWaiter));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(_en.dishCardFullScreen));
         await tester.pumpAndSettle();
 
         // Assert
@@ -1891,8 +2103,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text(_he.tileGreenLabel.toUpperCase()), findsOneWidget);
-      expect(find.text(_he.tileRedLabel.toUpperCase()), findsOneWidget);
+      // Each verdict name appears on its tile and on its dish's badge.
+      expect(find.text(_he.tileGreenLabel.toUpperCase()), findsNWidgets(2));
+      expect(find.text(_he.tileRedLabel.toUpperCase()), findsNWidgets(2));
       expect(find.text(_he.menuKetoScoreLabel.toUpperCase()), findsOneWidget);
     });
 
@@ -2018,7 +2231,7 @@ void main() {
 
           // Assert
           expect(find.text('Ask for no cheese.'), findsOneWidget);
-          expect(find.text(_en.dishCardAddNote), findsNothing);
+          expect(find.byTooltip(_en.dishCardAddNote), findsNothing);
         },
       );
 
@@ -2034,7 +2247,7 @@ void main() {
           await tester.pumpAndSettle();
 
           // Act: open the editor.
-          await tester.tap(find.text(_en.dishCardAddNote));
+          await tester.tap(find.byTooltip(_en.dishCardAddNote));
           await tester.pumpAndSettle();
 
           // Assert: the sheet is open.
@@ -2086,7 +2299,7 @@ void main() {
           // Assert
           expect(find.byType(NoteEditorSheet), findsNothing);
           expect(find.text('Ask for no cheese.'), findsNothing);
-          expect(find.text(_en.dishCardAddNote), findsOneWidget);
+          expect(find.byTooltip(_en.dishCardAddNote), findsOneWidget);
         },
       );
 
@@ -2150,8 +2363,10 @@ void main() {
         await tester.pumpAndSettle();
 
         // Assert: a failed analysis has no green or yellow dish to
-        // share, so the action is hidden.
-        expect(find.byIcon(Icons.share), findsNothing);
+        // share, and share is all the overflow holds (the drinks guide
+        // moved to Explore, issue #257), so the whole overflow is hidden.
+        expect(find.byTooltip(_en.actionMoreMenuOptions), findsNothing);
+        expect(find.text(_en.actionShareMenu), findsNothing);
       });
 
       testWidgets('the share action appears once the analysis has at least one '
@@ -2180,9 +2395,11 @@ void main() {
         await _pump(tester, controller);
         await tester.pumpAndSettle();
 
-        // Assert
-        expect(find.byIcon(Icons.share), findsOneWidget);
-        expect(find.byTooltip(_en.actionShareMenu), findsOneWidget);
+        // Assert: no icon in the bar; the overflow carries a text item.
+        expect(find.byIcon(Icons.share), findsNothing);
+        await tester.tap(find.byTooltip(_en.actionMoreMenuOptions));
+        await tester.pumpAndSettle();
+        expect(find.text(_en.actionShareMenu), findsOneWidget);
       });
 
       testWidgets('tapping the share action hands the sharer the text '
@@ -2218,7 +2435,9 @@ void main() {
         await tester.pumpAndSettle();
 
         // Act
-        await tester.tap(find.byIcon(Icons.share));
+        await tester.tap(find.byTooltip(_en.actionMoreMenuOptions));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(_en.actionShareMenu));
         await tester.pumpAndSettle();
 
         // Assert: the exact text MenuShareText.build produces for the
@@ -2247,6 +2466,7 @@ void main() {
         await _pump(tester, controller);
         await tester.pumpAndSettle();
         expect(find.byType(DishCard), findsNWidgets(2));
+        await _openFilters(tester);
 
         // Act
         await tester.enterText(find.byType(TextField), 'steak');
@@ -2270,6 +2490,7 @@ void main() {
           final controller = _controllerFor(repository: repository);
           await _pump(tester, controller);
           await tester.pumpAndSettle();
+          await _openFilters(tester);
           await tester.enterText(find.byType(TextField), 'steak');
           await tester.pumpAndSettle();
           expect(find.byType(DishCard), findsOneWidget);
@@ -2485,6 +2706,399 @@ void main() {
       });
     });
 
+    group('content width on a wide window (issue #221)', () {
+      /// A loaded menu with one green and one yellow dish, analysed, so
+      /// the verdict tiles and two dish cards are on screen.
+      MenuController analysedController() {
+        final green = _dish('Steak', id: 'green');
+        final yellow = _dish('Fries', id: 'yellow');
+        return _controllerFor(
+          repository: FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([green, yellow]))),
+          classifier: FakeMenuClassifier()
+            ..respondWith(
+              MenuAnalysed(
+                dishes: [
+                  _verdictFor(green, DishVerdict.orderAsIs),
+                  _verdictFor(
+                    yellow,
+                    DishVerdict.modifiable,
+                    modification: 'Ask for a salad instead of fries.',
+                  ),
+                ],
+                unclassified: const <String>[],
+                engine: const LlmEngine(model: 'test-model'),
+                analysedAt: DateTime.utc(2026),
+              ),
+            ),
+        );
+      }
+
+      /// Resizes the surface [_pump] set up to [width] logical pixels,
+      /// keeping its height, and lays the screen out again.
+      Future<void> resizeTo(WidgetTester tester, double width) async {
+        tester.view.physicalSize = Size(width, 1600);
+        await tester.pumpAndSettle();
+      }
+
+      testWidgets('at 1440px the dish cards and the verdict tiles sit '
+          'inside the two-pane cap, centred in the window (issue #225 '
+          'widened the cap past 1080px)', (tester) async {
+        // Arrange
+        await _pump(tester, analysedController());
+        await tester.pumpAndSettle();
+
+        // Act
+        await resizeTo(tester, 1440);
+
+        // Assert: the tiles (left pane) and the cards (right pane) sit
+        // 20px inside a capped column with equal margins either side.
+        const gutter = (1440 - menuTwoPaneMaxWidth) / 2;
+        final tiles = tester.getRect(find.byType(VerdictCounterTiles));
+        expect(tiles.width, lessThanOrEqualTo(contentMaxWidth));
+        expect(tiles.left, closeTo(gutter + 20, 0.01));
+        final cards = find.byType(DishCard);
+        expect(cards, findsNWidgets(2));
+        for (final card in cards.evaluate()) {
+          final rect = tester.getRect(find.byWidget(card.widget));
+          expect(rect.left, greaterThan(tiles.right));
+          expect(rect.right, closeTo(1440 - gutter - 20, 0.01));
+        }
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('at 390px a dish card and the verdict tiles span the '
+          'phone width inside the 20px gutters, as before the cap', (
+        tester,
+      ) async {
+        // Arrange
+        await _pump(tester, analysedController());
+        await tester.pumpAndSettle();
+
+        // Act
+        await resizeTo(tester, 390);
+
+        // Assert
+        final tiles = tester.getRect(find.byType(VerdictCounterTiles));
+        expect(tiles.left, 20);
+        expect(tiles.width, 350);
+        final card = tester.getRect(find.byType(DishCard).first);
+        expect(card.left, 20);
+        expect(card.width, 350);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('at 1440px a failed fetch reads inside the capped '
+          'column', (tester) async {
+        // Arrange
+        final controller = _controllerFor(
+          repository: FakeMenuRepository()
+            ..stub(
+              _ref,
+              const MenuFetchFailed(
+                reason: MenuFetchFailureReason.blockedByBrowser,
+              ),
+            ),
+        );
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Act
+        await resizeTo(tester, 1440);
+
+        // Assert
+        final message = fetchFailureMessage(
+          MenuFetchFailureReason.blockedByBrowser,
+          _en,
+          platform: 'Wolt',
+        );
+        final rect = tester.getRect(find.text(message));
+        const gutter = (1440 - contentMaxWidth) / 2;
+        expect(rect.left, greaterThanOrEqualTo(gutter));
+        expect(rect.right, lessThanOrEqualTo(1440 - gutter));
+      });
+    });
+
+    group('two panes on a wide window (issue #225)', () {
+      /// Eight categories of five dishes, the venue named "Sunny Diner",
+      /// analysed by the model: "Dish 0-0" is the one yellow dish, every
+      /// other dish is green.
+      Menu longMenu() => Menu(
+        venueRef: _ref,
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: [
+          for (var c = 0; c < 8; c++)
+            MenuCategory(
+              id: 'cat$c',
+              name: 'Category $c',
+              dishes: [
+                for (var d = 0; d < 5; d++) _dish('Dish $c-$d', id: 'd$c-$d'),
+              ],
+            ),
+        ],
+        venueName: 'Sunny Diner',
+      );
+
+      /// A controller serving [longMenu] from [repository], analysed.
+      MenuController longController(FakeMenuRepository repository) {
+        final menu = longMenu();
+        repository.stub(_ref, MenuFetched(menu: menu));
+        return _controllerFor(
+          repository: repository,
+          classifier: FakeMenuClassifier()
+            ..respondWith(
+              MenuAnalysed(
+                dishes: [
+                  for (final dish in menu.allDishes)
+                    if (dish.id == 'd0-0')
+                      _verdictFor(
+                        dish,
+                        DishVerdict.modifiable,
+                        modification: 'Swap the fries for a salad.',
+                      )
+                    else
+                      _verdictFor(dish, DishVerdict.orderAsIs),
+                ],
+                unclassified: const <String>[],
+                engine: const LlmEngine(model: 'test-model'),
+                analysedAt: DateTime.utc(2026),
+              ),
+            ),
+        );
+      }
+
+      /// Pumps [controller]'s menu and lays it out [width] logical pixels
+      /// wide and 900 tall.
+      Future<void> pumpAt(
+        WidgetTester tester,
+        MenuController controller,
+        double width,
+      ) async {
+        await _pump(tester, controller);
+        tester.view.physicalSize = Size(width, 900);
+        await tester.pumpAndSettle();
+      }
+
+      /// The dish list: the one [ListView] holding the screen's scroll
+      /// controller, in either layout.
+      final dishList = find.byWidgetPredicate(
+        (widget) => widget is ListView && widget.controller != null,
+        description: 'the dish list',
+      );
+
+      /// The two-pane layout's side pane.
+      final sidePane = find.byWidgetPredicate(
+        (widget) => widget is ListView && widget.primary == false,
+        description: 'the side pane',
+      );
+
+      /// The venue name inside the app bar, not the body header.
+      final nameInAppBar = find.descendant(
+        of: find.byType(AppBar),
+        matching: find.text('Sunny Diner'),
+      );
+
+      testWidgets('at 1200px the header, tiles, Filters row and chips stay '
+          'put beside a dish list that scrolls on its own, and the app bar '
+          'never names the venue; back at 390px it is one list again', (
+        tester,
+      ) async {
+        // Arrange
+        await pumpAt(tester, longController(FakeMenuRepository()), 1200);
+
+        // Assert: two panes, the controls in the side pane, wrapped chips.
+        expect(find.byType(ListView), findsNWidgets(2));
+        expect(find.byType(VerticalDivider), findsOneWidget);
+        for (final type in [
+          VerdictCounterTiles,
+          MenuFiltersRow,
+          CategoryChips,
+          KetoScoreBadge,
+        ]) {
+          expect(
+            find.descendant(of: sidePane, matching: find.byType(type)),
+            findsOneWidget,
+          );
+        }
+        expect(
+          find.descendant(
+            of: find.byType(CategoryChips),
+            matching: find.byType(SingleChildScrollView),
+          ),
+          findsNothing,
+        );
+        final tiles = tester.getRect(find.byType(VerdictCounterTiles));
+        final card = tester.getRect(find.byType(DishCard).first);
+        expect(tiles.right, lessThan(card.left));
+        final header = tester.getRect(find.text('Sunny Diner'));
+
+        // Act
+        await tester.drag(dishList, const Offset(0, -600));
+        await tester.pumpAndSettle();
+
+        // Assert: the dishes moved, the header did not, and the bar stays
+        // empty since the header never went under it.
+        expect(find.text('Dish 0-0'), findsNothing);
+        expect(tester.getRect(find.text('Sunny Diner')), header);
+        expect(nameInAppBar, findsNothing);
+
+        // Act: narrow the window to a phone.
+        tester.view.physicalSize = const Size(390, 900);
+        await tester.pumpAndSettle();
+
+        // Assert: one list from the top, so the bar is still empty, until
+        // the header scrolls under it as before (issue #237).
+        expect(find.byType(ListView), findsOneWidget);
+        expect(find.byType(VerticalDivider), findsNothing);
+        expect(nameInAppBar, findsNothing);
+        await tester.drag(dishList, const Offset(0, -600));
+        await tester.pumpAndSettle();
+        expect(nameInAppBar, findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('at 1200px a category chip jumps the dish list, a search '
+          'narrows it and a verdict tile filters it', (tester) async {
+        // Arrange
+        await pumpAt(tester, longController(FakeMenuRepository()), 1200);
+        final heading = find.byWidgetPredicate(
+          (widget) =>
+              widget is Text &&
+              widget.data == 'Category 7' &&
+              widget.style != null,
+          description: "the 'Category 7' heading",
+        );
+        expect(heading, findsNothing);
+
+        // Act: the chip is in reach without scrolling the chip row.
+        await tester.tap(find.text('Category 7'));
+        await tester.pumpAndSettle();
+
+        // Assert: the heading is on screen inside the dish list.
+        expect(heading, findsOneWidget);
+        final list = tester.getRect(dishList);
+        expect(list.overlaps(tester.getRect(heading)), isTrue);
+
+        // Act
+        await _openFilters(tester);
+        await tester.enterText(_searchField, 'Dish 7-3');
+        await tester.pumpAndSettle();
+
+        // Assert: the one card left is that dish (the field holds the
+        // same text, so the find is scoped to the cards).
+        expect(find.byType(DishCard), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byType(DishCard),
+            matching: find.text('Dish 7-3'),
+          ),
+          findsOneWidget,
+        );
+
+        // Act: clear the search, then filter to the one yellow dish.
+        await tester.tap(find.byIcon(Icons.clear));
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.descendant(
+            of: find.byType(VerdictCounterTiles),
+            matching: find.text(_en.tileYellowLabel.toUpperCase()),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(DishCard), findsOneWidget);
+        expect(find.text('Dish 0-0'), findsOneWidget);
+        expect(find.text(_en.menuShowingYellow), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('at 1200px the refresh action and a pull on the dish list '
+          'both refetch, and a dish still opens its Waiter Card', (
+        tester,
+      ) async {
+        // Arrange
+        final repository = FakeMenuRepository();
+        await pumpAt(tester, longController(repository), 1200);
+        final loadCallsBefore = repository.loadCalls.length;
+
+        // Act
+        await tester.tap(find.byTooltip(_en.actionRefreshMenu));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(repository.loadCalls.length, loadCallsBefore + 1);
+        expect(
+          repository.loadCalls.last,
+          equals((ref: _ref, forceRefresh: true)),
+        );
+
+        // Act: pull the dish list down past RefreshIndicator's threshold.
+        await tester.fling(dishList, const Offset(0, 600), 1000);
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(repository.loadCalls.length, loadCallsBefore + 2);
+        expect(
+          repository.loadCalls.last,
+          equals((ref: _ref, forceRefresh: true)),
+        );
+
+        // Act
+        await tester.tap(find.text(_en.dishCardAskWaiter));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(_en.dishCardFullScreen));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(WaiterCardSheet), findsOneWidget);
+      });
+
+      testWidgets('at 390px the menu is the one list it always was: tiles '
+          'above the first card, chips in a sideways row, no divider', (
+        tester,
+      ) async {
+        // Arrange & Act
+        await pumpAt(tester, longController(FakeMenuRepository()), 390);
+
+        // Assert
+        expect(find.byType(ListView), findsOneWidget);
+        expect(find.byType(VerticalDivider), findsNothing);
+        final tiles = tester.getRect(find.byType(VerdictCounterTiles));
+        final card = tester.getRect(find.byType(DishCard).first);
+        expect(tiles.bottom, lessThan(card.top));
+        expect(tiles.width, 350);
+        expect(
+          find.descendant(
+            of: find.byType(CategoryChips),
+            matching: find.byType(SingleChildScrollView),
+          ),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('at 1200px an empty menu keeps the single capped column', (
+        tester,
+      ) async {
+        // Arrange
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf(const <Dish>[])));
+
+        // Act
+        await pumpAt(tester, _controllerFor(repository: repository), 1200);
+
+        // Assert
+        expect(find.text(_en.menuEmpty), findsOneWidget);
+        expect(find.byType(VerticalDivider), findsNothing);
+        final rect = tester.getRect(find.text(_en.menuEmpty));
+        expect(rect.left, greaterThanOrEqualTo((1200 - contentMaxWidth) / 2));
+      });
+    });
+
     group('right-to-left (architecture.md §8.3)', () {
       testWidgets(
         'under Locale(he) the screen renders under RTL directionality and '
@@ -2512,41 +3126,310 @@ void main() {
       );
     });
 
-    group('drinks guide app-bar action (#216)', () {
+    group('top of the list and the Filters row (issue #234)', () {
       testWidgets(
-        'the drinks-guide icon button is visible on the loaded menu',
+        'at 390×844 the first dish card is on screen without scrolling for '
+        'a 20-dish menu with a rules banner',
         (tester) async {
-          // Arrange
+          // Arrange: twenty described dishes, alternating green and
+          // yellow, classified by the rules because no backend is
+          // configured — the web build's everyday case — so the rules
+          // banner shows above the list (the chip is dropped, #236).
+          final dishes = <Dish>[
+            for (var i = 0; i < 20; i++)
+              Dish(
+                id: 'd$i',
+                name: 'Grilled chicken plate $i',
+                description: 'Chicken thigh with a side of fries and salad',
+                price: 62,
+                options: const <DishOption>[],
+              ),
+          ];
           final repository = FakeMenuRepository()
-            ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
-          final controller = _controllerFor(repository: repository);
-          final pushedNames = <String>[];
-          await _pumpWithRoutes(tester, controller, pushedNames);
+            ..stub(_ref, MenuFetched(menu: _menuOf(dishes)));
+          final classifier = FakeMenuClassifier()
+            ..respondWith(
+              MenuAnalysed(
+                dishes: [
+                  for (final (i, dish) in dishes.indexed)
+                    _verdictFor(
+                      dish,
+                      i.isEven ? DishVerdict.orderAsIs : DishVerdict.modifiable,
+                      modification: i.isEven ? null : 'Swap the fries',
+                    ),
+                ],
+                unclassified: const <String>[],
+                engine: const RulesEngine(
+                  reason: MenuAnalysisFailureReason.notConfigured,
+                ),
+                analysedAt: DateTime.utc(2026),
+              ),
+            );
+          final controller = _controllerFor(
+            repository: repository,
+            classifier: classifier,
+          );
+          await _pump(tester, controller, theme: AppTheme.light());
+          tester.view.physicalSize = const Size(390, 844);
           await tester.pumpAndSettle();
+          expect(find.byType(RulesReasonBanner), findsOneWidget);
 
-          // Assert — the icon is rendered unconditionally
-          expect(find.byIcon(Icons.local_bar), findsOneWidget);
+          // Assert: the whole first card sits inside the screen.
+          final screen = tester.getRect(find.byType(MenuScreen));
+          final firstCard = tester.getRect(find.byType(DishCard).first);
+          expect(firstCard.top, greaterThanOrEqualTo(screen.top));
+          expect(firstCard.bottom, lessThanOrEqualTo(screen.bottom));
         },
       );
 
-      testWidgets('tapping the drinks-guide icon pushes the /drinks route', (
+      testWidgets(
+        'the Filters row starts collapsed, and opening it shows the search '
+        'field, the carb budget and the legend; closing it hides them again',
+        (tester) async {
+          // Arrange
+          final green = _dish('Steak', id: 'green');
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([green])));
+          final classifier = FakeMenuClassifier()
+            ..respondWith(
+              MenuAnalysed(
+                dishes: [_verdictFor(green, DishVerdict.orderAsIs)],
+                unclassified: const <String>[],
+                engine: const LlmEngine(model: 'served-model'),
+                analysedAt: DateTime.utc(2026),
+              ),
+            );
+          final controller = _controllerFor(
+            repository: repository,
+            classifier: classifier,
+          );
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+
+          // Assert: collapsed — only the row itself shows.
+          expect(find.text(_en.menuFilters), findsOneWidget);
+          expect(find.byType(MenuSearchField), findsNothing);
+          expect(find.byType(CarbBudgetField), findsNothing);
+          expect(find.text(_en.legendToggle), findsNothing);
+
+          // Act
+          await _openFilters(tester);
+
+          // Assert
+          expect(find.byType(MenuSearchField), findsOneWidget);
+          expect(find.byType(CarbBudgetField), findsOneWidget);
+          expect(find.text(_en.legendToggle), findsOneWidget);
+
+          // Act: close it again.
+          await _openFilters(tester);
+
+          // Assert
+          expect(find.byType(MenuSearchField), findsNothing);
+          expect(find.byType(CarbBudgetField), findsNothing);
+          expect(find.text(_en.legendToggle), findsNothing);
+        },
+      );
+
+      testWidgets(
+        'a search typed behind the Filters row keeps narrowing the list '
+        'and keeps its text while the row is closed, and the closed row '
+        'counts it as active',
+        (tester) async {
+          // Arrange
+          final steak = _dish('Grilled Steak', id: 'steak');
+          final salad = _dish('Greek Salad', id: 'salad');
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([steak, salad])));
+          final controller = _controllerFor(repository: repository);
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+          await _openFilters(tester);
+          await tester.enterText(find.byType(TextField), 'steak');
+          await tester.pumpAndSettle();
+
+          // Act: close the row.
+          await tester.tap(find.text(_en.menuFiltersActive(1)));
+          await tester.pumpAndSettle();
+
+          // Assert: still narrowed, and the row says why.
+          expect(find.byType(MenuSearchField), findsNothing);
+          expect(find.byType(DishCard), findsOneWidget);
+          expect(find.text(_en.menuFiltersActive(1)), findsOneWidget);
+
+          // Act: open it again.
+          await tester.tap(find.text(_en.menuFiltersActive(1)));
+          await tester.pumpAndSettle();
+
+          // Assert: the typed text survived.
+          final field = tester.widget<TextField>(find.byType(TextField));
+          expect(field.controller?.text, 'steak');
+        },
+      );
+
+      testWidgets(
+        'a verdict tile, a search behind the Filters row and a category '
+        'chip still combine',
+        (tester) async {
+          // Arrange: a green and a yellow dish in each of two categories.
+          final steak = _dish('Grilled Steak', id: 'steak');
+          final burger = _dish('Steak Burger', id: 'burger');
+          final salad = _dish('Greek Salad', id: 'salad');
+          final wings = _dish('Hot Wings', id: 'wings');
+          final menu = Menu(
+            venueRef: _ref,
+            currency: 'ILS',
+            fetchedAt: DateTime.utc(2026),
+            categories: [
+              MenuCategory(id: 'c1', name: 'Mains', dishes: [steak, burger]),
+              MenuCategory(id: 'c2', name: 'Starters', dishes: [salad, wings]),
+            ],
+          );
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: menu));
+          final classifier = FakeMenuClassifier()
+            ..respondWith(
+              MenuAnalysed(
+                dishes: [
+                  _verdictFor(steak, DishVerdict.orderAsIs),
+                  _verdictFor(
+                    burger,
+                    DishVerdict.modifiable,
+                    modification: 'No bun',
+                  ),
+                  _verdictFor(salad, DishVerdict.orderAsIs),
+                  _verdictFor(wings, DishVerdict.orderAsIs),
+                ],
+                unclassified: const <String>[],
+                engine: const LlmEngine(model: 'served-model'),
+                analysedAt: DateTime.utc(2026),
+              ),
+            );
+          final controller = _controllerFor(
+            repository: repository,
+            classifier: classifier,
+          );
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+
+          // Act: green only, then a search for "steak".
+          await tester.tap(
+            find.descendant(
+              of: find.byType(VerdictCounterTiles),
+              matching: find.text(_en.tileGreenLabel.toUpperCase()),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await _openFilters(tester);
+          await tester.enterText(_searchField, 'steak');
+          await tester.pumpAndSettle();
+
+          // Assert: only the green steak is left, under Mains.
+          expect(find.byType(DishCard), findsOneWidget);
+          expect(find.text('Grilled Steak'), findsOneWidget);
+          expect(find.text('Steak Burger'), findsNothing);
+
+          // Act: widen the search to the starters and jump to them.
+          await tester.enterText(_searchField, 'wings');
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.descendant(
+              of: find.byType(CategoryChips),
+              matching: find.text('Starters'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          // Assert
+          expect(find.byType(DishCard), findsOneWidget);
+          expect(find.text('Hot Wings'), findsOneWidget);
+        },
+      );
+    });
+  });
+
+  group('keyboard navigation (issue #264)', () {
+    /// Which region of the menu body the focused widget sits in, or null.
+    String? regionOfFocus() {
+      final context = FocusManager.instance.primaryFocus?.context;
+      if (context == null) return null;
+      if (context.findAncestorWidgetOfExactType<VerdictCounterTiles>() !=
+          null) {
+        return 'tiles';
+      }
+      if (context.findAncestorWidgetOfExactType<MenuFiltersRow>() != null) {
+        return 'filters';
+      }
+      if (context.findAncestorWidgetOfExactType<CategoryChips>() != null) {
+        return 'chips';
+      }
+      if (context.findAncestorWidgetOfExactType<DishCard>() != null) {
+        return 'dish';
+      }
+      return null;
+    }
+
+    testWidgets('Tab visits the tiles, then the Filters row, the category '
+        'chips and the first dish, in that order, and Enter opens the '
+        "dish's script", (tester) async {
+      // Arrange: one yellow dish, so its card has the amber disclosure.
+      final yellow = _dish('Fries', id: 'yellow');
+      final repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: _menuOf([yellow])));
+      final classifier = FakeMenuClassifier()
+        ..respondWith(
+          MenuAnalysed(
+            dishes: [
+              _verdictFor(
+                yellow,
+                DishVerdict.modifiable,
+                modification: 'Swap the fries for a salad.',
+              ),
+            ],
+            unclassified: const <String>[],
+            engine: const RulesEngine(
+              reason: MenuAnalysisFailureReason.notConfigured,
+            ),
+            analysedAt: DateTime.utc(2026),
+          ),
+        );
+      await _pump(
         tester,
-      ) async {
-        // Arrange
-        final repository = FakeMenuRepository()
-          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
-        final controller = _controllerFor(repository: repository);
-        final pushedNames = <String>[];
-        await _pumpWithRoutes(tester, controller, pushedNames);
-        await tester.pumpAndSettle();
+        _controllerFor(repository: repository, classifier: classifier),
+      );
+      await tester.pumpAndSettle();
 
-        // Act
-        await tester.tap(find.byIcon(Icons.local_bar));
-        await tester.pumpAndSettle();
+      // Act: Tab on, noting each region the first time focus enters it.
+      final visited = <String>[];
+      var tilesVisited = 0;
+      for (var i = 0; i < 40 && !visited.contains('dish'); i++) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pump();
+        final region = regionOfFocus();
+        if (region == 'tiles') tilesVisited++;
+        if (region != null && !visited.contains(region)) visited.add(region);
+      }
 
-        // Assert
-        expect(pushedNames, contains(drinksRoutePath));
-      });
+      // Assert: three tile stops, then the regions in reading order.
+      expect(tilesVisited, 3);
+      expect(visited, <String>['tiles', 'filters', 'chips', 'dish']);
+
+      // Act: the card's note button comes first; one more Tab reaches the
+      // amber disclosure, which shows the ring.
+      for (var i = 0; i < 3; i++) {
+        if (focusRingShown(tester, find.byType(DishCard))) break;
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pump();
+      }
+
+      // Assert
+      expect(focusRingShown(tester, find.byType(DishCard)), isTrue);
+
+      // Act
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Swap the fries for a salad.'), findsOneWidget);
     });
   });
 }

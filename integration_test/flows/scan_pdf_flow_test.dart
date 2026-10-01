@@ -23,7 +23,7 @@ final AppLocalizations _en = AppLocalizationsEn();
 
 /// The Analyse-pages button on the Scan tab.
 Finder get _analysePages =>
-    find.widgetWithText(ElevatedButton, _en.scanScreenAnalysePages);
+    find.widgetWithText(FilledButton, _en.scanScreenAnalysePages);
 
 /// Gives the surface a phone-tall viewport, so a lazy `ListView` builds
 /// every card (CLAUDE.md's traps); reset when the test ends.
@@ -54,6 +54,7 @@ void main() {
 
         // Act: open the Scan tab and choose the PDF.
         await tapAndSettle(tester, navDestination(_en.navScan));
+        await tapAndSettle(tester, find.text(_en.scanScreenModePages));
         await tapAndSettle(tester, find.text(_en.scanScreenActionChoosePdf));
 
         // Assert: one page is listed, labelled as a document.

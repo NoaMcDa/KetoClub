@@ -131,7 +131,7 @@ abstract final class AppTheme {
     );
     // The artboards' tab bar (`.design/Discovery.dc.html`): no indicator
     // pill and no tinted surface; the active tab is `--accent`, the rest
-    // `--ink3`, with 10px labels.
+    // `--ink3`, with 10px labels. The wide-screen rail shares it.
     TextStyle navLabel({required bool active}) => TextStyle(
       fontFamily: AppTypography.uiFamily,
       fontFamilyFallback: AppTypography.uiFallback,
@@ -183,6 +183,20 @@ abstract final class AppTheme {
           (states) =>
               IconThemeData(size: 22, color: selected(states) ? accent : ink3),
         ),
+      ),
+      // The wide-screen counterpart of the tab bar above (issue #223): the
+      // same `--bg` surface, `--accent`/`--ink3` icons and labels, and no
+      // indicator pill, with every label shown.
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: scaffoldBackground,
+        elevation: 0,
+        labelType: NavigationRailLabelType.all,
+        useIndicator: false,
+        indicatorColor: Colors.transparent,
+        selectedLabelTextStyle: navLabel(active: true),
+        unselectedLabelTextStyle: navLabel(active: false),
+        selectedIconTheme: IconThemeData(size: 22, color: accent),
+        unselectedIconTheme: IconThemeData(size: 22, color: ink3),
       ),
       chipTheme: ChipThemeData(
         shape: const StadiumBorder(),

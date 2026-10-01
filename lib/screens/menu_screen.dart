@@ -11,7 +11,6 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
-import 'package:ketoclub/screens/drinks_guide_screen.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
@@ -25,13 +24,17 @@ import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
+import 'package:ketoclub/widgets/app_notice.dart';
+import 'package:ketoclub/widgets/app_sheet.dart';
 import 'package:ketoclub/widgets/carb_budget_field.dart';
 import 'package:ketoclub/widgets/category_chips.dart';
+import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/fetch_failure_action.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
+import 'package:ketoclub/widgets/menu_filters_row.dart';
 import 'package:ketoclub/widgets/menu_question_sheet.dart';
 import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
@@ -41,6 +44,18 @@ import 'package:ketoclub/widgets/scanned_pages_sheet.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
+
+/// The narrowest window, in logical pixels, at which a loaded menu is laid
+/// out in two panes: the header, the tiles, the Filters row and the
+/// category chips pinned beside a dish list that scrolls on its own
+/// (issue #225, architecture.md §6.6). The same width Discovery's grid
+/// stops growing at (`discoveryMaxWidth`).
+const double menuTwoPaneMinWidth = 1080;
+
+/// The widest the two-pane menu grows (issue #225): the [ContentWidth] cap
+/// the menu route passes in place of [contentMaxWidth] at
+/// [menuTwoPaneMinWidth] and above.
+const double menuTwoPaneMaxWidth = 1200;
 
 /// The brand name shown for [ref]'s source inside failure copy (architecture.md
 /// §10), e.g. "Wolt" in "Venue not found on Wolt. Check the link."
@@ -96,8 +111,10 @@ String _definitionTextFrom(String line) {
 
 /// The classified menu screen: a header naming the venue and its keto
 /// score, the persistent "{platform} · {age}" source line, the three
-/// verdict counter tiles that double as the filter, the engine chip, dish
-/// cards, and the unclassified section (architecture.md §6.6, issue #29).
+/// verdict counter tiles that double as the filter, a collapsed Filters
+/// row over the search, the carb budget and the legend (issue #234), the
+/// engine chip, dish cards, and the unclassified section (architecture.md
+/// §6.6, issue #29).
 ///
 /// Reads its [MenuController] from `provider` and loads [ref] once, after
 /// the first frame, so the initial build never itself triggers I/O. A
@@ -159,6 +176,12 @@ class MenuScreen extends StatefulWidget {
   State<MenuScreen> createState() => _MenuScreenState();
 }
 
+/// The entries of the menu app bar's overflow menu (issue #238).
+enum _MenuOverflowAction {
+  /// Shares the menu's green and yellow dishes as text.
+  share,
+}
+
 class _MenuScreenState extends State<MenuScreen> {
   /// Whether the verdict legend (issue #17, §"WHAT TO BUILD" item 5) is
   /// expanded.
@@ -169,6 +192,12 @@ class _MenuScreenState extends State<MenuScreen> {
   /// group's expansion flag local before issue #29 replaced that group
   /// with [MenuFilter.redOnly].
   bool _legendExpanded = false;
+
+  /// Whether the Filters row (issue #234) — the search field, the carb
+  /// budget and the legend — is expanded. Local UI state for the same
+  /// reason as [_legendExpanded]; collapsed by default so the first dish
+  /// card is on screen when the menu opens.
+  bool _filtersExpanded = false;
 
   /// Bumped on every retry action on this screen — the failed-fetch
   /// retry, the [RulesReasonBanner] retry, and pull-to-refresh — so the
@@ -181,6 +210,27 @@ class _MenuScreenState extends State<MenuScreen> {
   /// Scrolls the loaded-menu list for [_scrollToCategory] (issue #51).
   final ScrollController _scrollController = ScrollController();
 
+  /// The loaded-menu list's top padding, above [_header].
+  static const double _listTopPadding = 8;
+
+  /// Whether the loaded-menu list has scrolled the [_header] out from
+  /// under the app bar, so the bar shows the venue name as its title
+  /// (issue #237). A notifier rather than a [State] field, so crossing
+  /// that line rebuilds the title alone, not the whole dish list.
+  final ValueNotifier<bool> _headerScrolledPast = ValueNotifier<bool>(false);
+
+  /// Wraps [_header], so [_updateHeaderScrolledPast] can read its height.
+  final GlobalKey _headerKey = GlobalKey();
+
+  /// Whether the last build laid the loaded menu out in two panes (issue
+  /// #225); kept so [_updateHeaderScrolledPast] can tell.
+  bool _twoPane = false;
+
+  /// The side pane's width in the two-pane layout (issue #225): the
+  /// 390px artboard's column, so the header, the tiles and the chips keep
+  /// the proportions they were drawn at.
+  static const double _sidePaneWidth = 380;
+
   /// The stable [GlobalKey] for each category header currently or
   /// previously shown, keyed by category name — see [_categoryKeyFor]
   /// (issue #51).
@@ -188,13 +238,17 @@ class _MenuScreenState extends State<MenuScreen> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _scrollController
+      ..removeListener(_updateHeaderScrolledPast)
+      ..dispose();
+    _headerScrolledPast.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_updateHeaderScrolledPast);
     // Deferred to after the first frame, so building this screen never
     // itself starts the fetch — a widget's build method must stay free of
     // side effects.
@@ -217,41 +271,109 @@ class _MenuScreenState extends State<MenuScreen> {
         (controller.greenCount > 0 || controller.yellowCount > 0);
     return Scaffold(
       appBar: AppBar(
+        // The venue name, once the body header has scrolled under the bar
+        // (issue #237); the theme's `scrolledUnderElevation: 0` still
+        // keeps the bar flat over the list (audit G2).
+        title: controller.menu == null
+            ? null
+            : ValueListenableBuilder<bool>(
+                valueListenable: _headerScrolledPast,
+                builder: (context, scrolledPast, _) => scrolledPast
+                    ? Text(
+                        _displayName(controller, l10n),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    : const SizedBox.shrink(),
+              ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.local_bar),
-            tooltip: l10n.actionOpenDrinksGuide,
-            onPressed: () => Navigator.pushNamed(context, drinksRoutePath),
-          ),
           if (controller.isQuestionAvailable)
             IconButton(
               icon: const Icon(Icons.question_answer),
               tooltip: l10n.actionAskAboutMenu,
               onPressed: () => _openQuestionSheet(context, controller),
             ),
-          if (canShare)
-            IconButton(
-              icon: const Icon(Icons.share),
-              tooltip: l10n.actionShareMenu,
-              onPressed: () => unawaited(_shareMenu(controller)),
-            ),
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: l10n.actionOpenSettings,
             onPressed: () => Navigator.pushNamed(context, '/settings'),
           ),
+          // The overflow holds only "Share" since the drinks guide moved
+          // to Explore (issue #257), so with nothing to share it is hidden
+          // rather than opening an empty menu.
+          if (canShare)
+            PopupMenuButton<_MenuOverflowAction>(
+              tooltip: l10n.actionMoreMenuOptions,
+              onSelected: (action) => switch (action) {
+                _MenuOverflowAction.share => unawaited(_shareMenu(controller)),
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: _MenuOverflowAction.share,
+                  child: Text(l10n.actionShareMenu),
+                ),
+              ],
+            ),
         ],
       ),
-      body: Column(
-        children: [
-          OfflineBanner(
-            connectivity: widget.connectivity,
-            recheckToken: _recheckToken,
-          ),
-          Expanded(child: _body(context, l10n, controller)),
-        ],
+      // The window's width, not the capped column's, decides the layout:
+      // the cap itself depends on it (issue #225).
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final twoPane =
+              constraints.maxWidth >= menuTwoPaneMinWidth &&
+              (controller.menu?.allDishes.isNotEmpty ?? false);
+          _syncTwoPane(twoPane);
+          return ContentWidth(
+            maxWidth: twoPane ? menuTwoPaneMaxWidth : contentMaxWidth,
+            child: Column(
+              children: [
+                OfflineBanner(
+                  connectivity: widget.connectivity,
+                  recheckToken: _recheckToken,
+                ),
+                Expanded(
+                  child: _body(context, l10n, controller, twoPane: twoPane),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
+  }
+
+  /// Records whether the body is laid out in two panes (issue #225) and,
+  /// when that just changed, re-derives [_headerScrolledPast] after the
+  /// frame: the list it was measured on is not the list now shown.
+  void _syncTwoPane(bool twoPane) {
+    if (twoPane == _twoPane) return;
+    _twoPane = twoPane;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _updateHeaderScrolledPast();
+    });
+  }
+
+  /// Sets [_headerScrolledPast] from the list's offset: past once the
+  /// list's top padding and the whole [_header] are above the viewport.
+  ///
+  /// A [ListView] builds lazily, so a header scrolled far enough away has
+  /// no render box left to measure; any offset above zero then means it
+  /// is gone.
+  ///
+  /// Always false in two panes (issue #225): the header is pinned in the
+  /// side pane there and never scrolls under the bar.
+  void _updateHeaderScrolledPast() {
+    if (_twoPane) {
+      _headerScrolledPast.value = false;
+      return;
+    }
+    if (!_scrollController.hasClients) return;
+    final offset = _scrollController.offset;
+    final box = _headerKey.currentContext?.findRenderObject();
+    _headerScrolledPast.value = box is RenderBox && box.hasSize
+        ? offset >= _listTopPadding + box.size.height
+        : offset > 0;
   }
 
   /// Builds [MenuShareText.build]'s summary of [controller]'s current
@@ -278,18 +400,21 @@ class _MenuScreenState extends State<MenuScreen> {
 
   /// The screen body for the controller's current state: loading, a
   /// failed fetch, or a loaded menu (architecture.md §6.6).
+  ///
+  /// [twoPane] lays a loaded menu out in two panes (issue #225).
   Widget _body(
     BuildContext context,
     AppLocalizations l10n,
-    MenuController controller,
-  ) {
+    MenuController controller, {
+    required bool twoPane,
+  }) {
     final menu = controller.menu;
     if (menu == null) {
       final failure = controller.fetchFailure;
       if (failure == null) return _fetchingSkeleton(l10n);
       return _fetchFailureView(context, l10n, controller, failure);
     }
-    return _loadedView(context, l10n, controller, menu);
+    return _loadedView(context, l10n, controller, menu, twoPane: twoPane);
   }
 
   /// Three [DishCardSkeleton]s in place of the old "Reading the menu…"
@@ -375,12 +500,18 @@ class _MenuScreenState extends State<MenuScreen> {
 
   /// A menu that was fetched, whether or not it was analysed
   /// successfully and whether or not it came from cache.
+  ///
+  /// [twoPane] (issue #225, a window at least [menuTwoPaneMinWidth] wide)
+  /// pins the header, the tiles, the source line, the Filters row and the
+  /// category chips in a side pane of their own, and scrolls only the
+  /// notices and the dishes beside it. Otherwise everything is one list.
   Widget _loadedView(
     BuildContext context,
     AppLocalizations l10n,
     MenuController controller,
-    Menu menu,
-  ) {
+    Menu menu, {
+    required bool twoPane,
+  }) {
     final banners = _banners(context, l10n, controller);
     // The header and the source line name the venue and when its menu was
     // read; neither depends on a successful analysis, so both render for
@@ -430,78 +561,148 @@ class _MenuScreenState extends State<MenuScreen> {
     final localeTag = Localizations.localeOf(context).toLanguageTag();
     final rows = controller.visibleRows;
 
-    return _refreshable(
+    // Header, tiles, category chips, then dishes (issue #234): the
+    // search, the carb budget and the legend sit behind one collapsed
+    // Filters row, so the first dish card fits on a phone screen.
+    final top = <Widget>[
+      KeyedSubtree(key: _headerKey, child: header),
+      const SizedBox(height: 4),
+      if (analysed) ...[
+        const SizedBox(height: 8),
+        VerdictCounterTiles(
+          greenCount: controller.greenCount,
+          yellowCount: controller.yellowCount,
+          redCount: controller.redCount,
+          filter: controller.filter,
+          onFilterChanged: controller.setFilter,
+        ),
+        const SizedBox(height: 10),
+      ],
+      // A Wrap, not a Row (issue #245): the source line sits at the end
+      // of the label's line when both fit, and drops to a line of its
+      // own with the whole width when a long website host would not.
+      Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        spacing: 8,
+        children: [
+          if (analysed)
+            Text(
+              _showingLabel(l10n, controller),
+              style: Theme.of(context).textTheme.labelMedium,
+            )
+          else
+            const SizedBox.shrink(),
+          ?sourceLine,
+        ],
+      ),
+      _filtersRow(context, l10n, controller, analysed: analysed),
+      const SizedBox(height: 4),
+    ];
+    final notices = <Widget>[
+      AnalysisProgressRow(phase: controller.phase),
+      ...banners,
+      if (controller.engine != null) ...[
+        RulesReasonBanner(
+          engine: controller.engine!,
+          onRetry: () => _retry(controller.reanalyse),
+        ),
+        // A rules result is explained by the banner above, so the chip
+        // is shown for an AI result only (audit M14, issue #236).
+        // Aligned rather than stretched: a ListView child is forced to
+        // the full width, which drew this pill as a full-width bar.
+        if (controller.engine is LlmEngine) ...[
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: EngineChip(engine: controller.engine!),
+          ),
+          const SizedBox(height: 12),
+        ],
+      ],
+    ];
+    final chips = <Widget>[
+      CategoryChips(
+        categories: controller.visibleCategories,
+        onSelected: (category) => unawaited(_scrollToCategory(category)),
+        // Wrapped in the side pane, where a mouse cannot drag a
+        // horizontal row to the chips past its edge (issue #225).
+        wrap: twoPane,
+      ),
+      const SizedBox(height: 8),
+    ];
+    final dishes = <Widget>[
+      if (rows.isEmpty)
+        _noVisibleRows(l10n, controller)
+      else
+        ..._dishRows(context, controller, localeTag, rows),
+      if (analysed && controller.unclassifiedRows.isNotEmpty)
+        _unclassifiedSection(context, l10n, controller, localeTag),
+    ];
+    // The dish list keeps [_scrollController] in either layout, so the
+    // chip jump scrolls the dishes wherever the chips sit.
+    final dishList = _refreshable(
       controller,
       ListView(
         controller: _scrollController,
         // Always scrollable, so a menu shorter than the screen can still
         // be pulled down to refresh (RefreshIndicator's own requirement).
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        padding: const EdgeInsets.fromLTRB(20, _listTopPadding, 20, 24),
+        children: twoPane
+            ? [...notices, ...dishes]
+            : [...top, ...notices, ...chips, ...dishes],
+      ),
+    );
+    if (!twoPane) return dishList;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(
+          width: _sidePaneWidth,
+          // Scrolls on its own when an open Filters row or a short window
+          // makes the pane taller than the screen; not the primary scroll
+          // view, which is the dish list's.
+          child: ListView(
+            primary: false,
+            padding: const EdgeInsets.fromLTRB(20, _listTopPadding, 20, 24),
+            children: [...top, ...chips],
+          ),
+        ),
+        const VerticalDivider(width: 1),
+        Expanded(child: dishList),
+      ],
+    );
+  }
+
+  /// The collapsible Filters row (issue #234) holding the search field,
+  /// the carb budget and — once there is a verdict to explain — the
+  /// legend. Collapsing it moves focus out of a field it hides, so the
+  /// keyboard does not stay up for a field the user can no longer see.
+  Widget _filtersRow(
+    BuildContext context,
+    AppLocalizations l10n,
+    MenuController controller, {
+    required bool analysed,
+  }) {
+    final hasBudget = context.watch<CarbBudgetController>().hasBudget;
+    final activeCount =
+        (controller.query.trim().isEmpty ? 0 : 1) + (hasBudget ? 1 : 0);
+    return MenuFiltersRow(
+      expanded: _filtersExpanded,
+      activeCount: activeCount,
+      onToggle: () {
+        if (_filtersExpanded) FocusScope.of(context).unfocus();
+        setState(() => _filtersExpanded = !_filtersExpanded);
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          header,
-          const SizedBox(height: 4),
           MenuSearchField(onChanged: controller.setQuery),
           const SizedBox(height: 8),
           CarbBudgetField(isBudgetAvailable: controller.isBudgetAvailable),
-          const SizedBox(height: 8),
-          if (analysed) ...[
-            const SizedBox(height: 8),
-            VerdictCounterTiles(
-              greenCount: controller.greenCount,
-              yellowCount: controller.yellowCount,
-              redCount: controller.redCount,
-              filter: controller.filter,
-              onFilterChanged: controller.setFilter,
-            ),
-            const SizedBox(height: 10),
-          ],
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (analysed)
-                Expanded(
-                  child: Text(
-                    _showingLabel(l10n, controller),
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
-                )
-              else
-                const Spacer(),
-              ?sourceLine,
-            ],
-          ),
           if (analysed) ...[
             const SizedBox(height: 4),
             _legend(context, l10n, controller.netCarbLimitGrams),
           ],
-          const SizedBox(height: 8),
-          AnalysisProgressRow(phase: controller.phase),
-          ...banners,
-          if (controller.engine != null) ...[
-            RulesReasonBanner(
-              engine: controller.engine!,
-              onRetry: () => _retry(controller.reanalyse),
-            ),
-            // Aligned rather than stretched: a ListView child is forced to
-            // the full width, which drew this pill as a full-width bar.
-            Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: EngineChip(engine: controller.engine!),
-            ),
-            const SizedBox(height: 12),
-          ],
-          CategoryChips(
-            categories: controller.visibleCategories,
-            onSelected: (category) => unawaited(_scrollToCategory(category)),
-          ),
-          const SizedBox(height: 8),
-          if (rows.isEmpty)
-            _noVisibleRows(l10n, controller)
-          else
-            ..._dishRows(context, controller, localeTag, rows),
-          if (analysed && controller.unclassifiedNames.isNotEmpty)
-            _unclassifiedSection(context, l10n, controller),
         ],
       ),
     );
@@ -626,9 +827,8 @@ class _MenuScreenState extends State<MenuScreen> {
 
   /// Opens [ScannedPagesSheet] over [pages] as a dismissible modal.
   Future<void> _openScannedPages(ScannedMenu pages) {
-    return showModalBottomSheet<void>(
+    return showKetoClubSheet<void>(
       context: context,
-      isScrollControlled: true,
       showDragHandle: true,
       builder: (_) => ScannedPagesSheet(scan: pages),
     );
@@ -664,14 +864,15 @@ class _MenuScreenState extends State<MenuScreen> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Bounded, because a website's source is its host (D19), which
-        // can be far longer than a platform's brand.
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 180),
+        // Flexible, not capped: a website's source is its host (D19), which
+        // can be far longer than a platform's brand, so the text takes
+        // whatever width the row leaves beside the icons and wraps to a
+        // second line before it ellipsises (issue #245).
+        Flexible(
           child: Text(
             l10n.menuSourceLine(_sourceName(l10n), age),
             style: Theme.of(context).textTheme.bodySmall,
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -851,6 +1052,10 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
             ),
           Text(l10n.legendNote, style: bodyStyle),
+          const SizedBox(height: 6),
+          Text(l10n.legendEngines, style: bodyStyle),
+          const SizedBox(height: 6),
+          Text(l10n.legendBudget, style: bodyStyle),
         ],
       ),
     );
@@ -864,17 +1069,25 @@ class _MenuScreenState extends State<MenuScreen> {
   ///
   /// Both can apply at once (a stale menu whose fresh analysis failed),
   /// so every applicable line is composed into one column rather than
-  /// one hiding the other.
+  /// one hiding the other. Each line is an [AppNotice.info] (issue #260):
+  /// they explain, they ask for nothing, so each is one muted line with
+  /// an icon.
   List<Widget> _banners(
     BuildContext context,
     AppLocalizations l10n,
     MenuController controller,
   ) {
-    final lines = <String>[];
+    final lines = <AppNotice>[];
     final analysis = controller.analysis;
     if (analysis is MenuAnalysisFailed) {
       lines.add(
-        analysisFailureMessage(analysis.reason, l10n, detail: analysis.detail),
+        AppNotice.info(
+          message: analysisFailureMessage(
+            analysis.reason,
+            l10n,
+            detail: analysis.detail,
+          ),
+        ),
       );
     }
     final cachedAt = controller.cachedAt;
@@ -883,15 +1096,23 @@ class _MenuScreenState extends State<MenuScreen> {
       final formatted = DateFormat.yMMMd(localeTag)
           .add_Hm()
           .format(cachedAt.toLocal());
-      lines.add(l10n.cachedFrom(formatted));
+      lines.add(
+        AppNotice.info(
+          message: l10n.cachedFrom(formatted),
+          icon: Icons.history,
+        ),
+      );
     }
     final staleReason = controller.staleReason;
     if (staleReason != null) {
       lines.add(
-        fetchFailureMessage(
-          staleReason,
-          l10n,
-          platform: _platformName(widget.ref, l10n),
+        AppNotice.info(
+          message: fetchFailureMessage(
+            staleReason,
+            l10n,
+            platform: _platformName(widget.ref, l10n),
+          ),
+          icon: Icons.sync_problem,
         ),
       );
     }
@@ -901,7 +1122,8 @@ class _MenuScreenState extends State<MenuScreen> {
         padding: const EdgeInsets.only(bottom: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [for (final line in lines) Text(line)],
+          spacing: 6,
+          children: lines,
         ),
       ),
     ];
@@ -1005,28 +1227,53 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
-  /// The unclassified section: a neutral heading naming
-  /// [MenuController.unclassifiedNames]'s count, an explanation, and every
-  /// name — never dropped, regardless of [MenuFilter] (architecture.md
-  /// §6.6, constraint 8).
+  /// The unclassified section: a neutral heading naming the count, an
+  /// explanation, a "Try again" that re-analyses, and every dish as a
+  /// [DishCard] with the neutral "Not classified" badge (issue #244) —
+  /// never dropped, regardless of [MenuFilter] (architecture.md §6.6,
+  /// constraint 8).
   Widget _unclassifiedSection(
     BuildContext context,
     AppLocalizations l10n,
     MenuController controller,
+    String localeTag,
   ) {
+    final rows = controller.unclassifiedRows;
     return Padding(
       padding: const EdgeInsets.only(top: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            l10n.unclassifiedTitle(controller.unclassifiedNames.length),
+            l10n.unclassifiedTitle(rows.length),
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 4),
           Text(l10n.unclassifiedExplain),
-          const SizedBox(height: 8),
-          for (final name in controller.unclassifiedNames) Text(name),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton(
+              onPressed: () => _retry(controller.reanalyse),
+              child: Text(l10n.actionRetry),
+            ),
+          ),
+          const SizedBox(height: 4),
+          for (final row in rows)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: DishCard(
+                row: row,
+                localeTag: localeTag,
+                onShowScript: (shown) => unawaited(_openWaiterCard(shown)),
+                unclassified: true,
+                // The same price rule as the classified cards; a dish
+                // the menu does not contain has no price to show.
+                showPrice:
+                    widget.ref.source != MenuSource.scan &&
+                    widget.ref.source != MenuSource.website &&
+                    row.category.isNotEmpty,
+              ),
+            ),
         ],
       ),
     );
@@ -1034,9 +1281,9 @@ class _MenuScreenState extends State<MenuScreen> {
 
   /// Opens the full-screen [WaiterCardSheet] for [row] as a modal.
   Future<void> _openWaiterCard(DishRow row) {
-    return showModalBottomSheet<void>(
+    return showKetoClubSheet<void>(
       context: context,
-      isScrollControlled: true,
+      showDragHandle: true,
       builder: (_) =>
           WaiterCardSheet(row: row, screenBrightness: widget.screenBrightness),
     );
@@ -1050,9 +1297,8 @@ class _MenuScreenState extends State<MenuScreen> {
   /// the callbacks below close over the controller instance directly.
   Future<void> _openNoteEditor(DishRow row) {
     final controller = context.read<MenuController>();
-    return showModalBottomSheet<void>(
+    return showKetoClubSheet<void>(
       context: context,
-      isScrollControlled: true,
       builder: (_) => NoteEditorSheet(
         dishName: row.dish.name,
         initialNote: controller.noteFor(row.dish.id),
@@ -1073,9 +1319,8 @@ class _MenuScreenState extends State<MenuScreen> {
     final menu = controller.menu;
     if (menu == null) return;
     unawaited(
-      showModalBottomSheet<void>(
+      showKetoClubSheet<void>(
         context: context,
-        isScrollControlled: true,
         builder: (_) => AnimatedBuilder(
           animation: controller,
           builder: (_, child) => MenuQuestionSheet(

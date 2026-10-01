@@ -21,6 +21,7 @@ import 'package:ketoclub/services/menu/website/direct_website_fetcher.dart';
 import 'package:ketoclub/services/menu/website/website_adapter.dart';
 import 'package:ketoclub/services/menu/website/website_fetcher.dart';
 import 'package:ketoclub/services/menu/wolt/wolt_adapter.dart';
+import 'package:ketoclub/services/platform/app_info.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
@@ -43,6 +44,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// The name of the Hive box holding cached menus and their analyses.
 const String _menuCacheBoxName = 'menu_cache';
+
+/// The name of the Hive box holding the cache keys of pinned menus, apart
+/// from [_menuCacheBoxName] so the entries' stored shape never changes.
+const String _menuCachePinsBoxName = 'menu_cache_pins';
 
 /// KetoClub's own backend, read at build time (`backend_plan.md` §4.1).
 /// Empty when the app was built with no `--dart-define=KETOCLUB_BACKEND_URL=…`,
@@ -279,6 +284,10 @@ AppDependencies buildDependencies() {
           await Hive.initFlutter();
           return await Hive.openBox<String>(_menuCacheBoxName);
         },
+        openPinBox: () async {
+          await Hive.initFlutter();
+          return await Hive.openBox<String>(_menuCachePinsBoxName);
+        },
       ),
       clock: clock,
     ),
@@ -297,6 +306,8 @@ AppDependencies buildDependencies() {
     connectivity: connectivity,
     screenBrightness: screenBrightness,
     externalLinkOpener: const UrlLauncherLinkOpener(),
+    // Reads the version lazily, after Settings' first frame (issue #258).
+    appInfo: const DeviceAppInfo(),
     menuSharer: const SharePlusMenuSharer(),
     // Every geolocator call defaults to the real plugin inside
     // GeolocatorLocationService itself, so no arguments are needed here

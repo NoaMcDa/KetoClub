@@ -76,15 +76,19 @@ Future<void> enterText(WidgetTester tester, String text) async {
   await tester.pumpAndSettle();
 }
 
-/// The bottom-navigation destination labelled [label].
+/// The navigation destination labelled [label].
 ///
-/// Scoped to the [NavigationBar] on purpose. `navSettings` and
-/// `settingsTitle` are both the literal string "Settings", so a bare
-/// `find.text('Settings')` matches two widgets whenever the Settings tab
-/// is showing — the destination label and the app bar title — and a tap
-/// on an ambiguous finder fails. Every flow test taps tabs through this.
-Finder navDestination(String label) =>
-    find.descendant(of: find.byType(NavigationBar), matching: find.text(label));
+/// Scoped to the [NavigationBar] — or, at 840px and wider, the
+/// [NavigationRail] that replaces it (issue #223; `flutter drive` opens a
+/// 1600px browser window) — on purpose. `navSettings` and `settingsTitle`
+/// are both the literal string "Settings", so a bare `find.text('Settings')`
+/// matches two widgets whenever the Settings tab is showing — the
+/// destination label and the app bar title — and a tap on an ambiguous
+/// finder fails. Every flow test taps tabs through this.
+Finder navDestination(String label) => find.descendant(
+  of: find.byWidgetPredicate((w) => w is NavigationBar || w is NavigationRail),
+  matching: find.text(label),
+);
 
 /// Taps the widget [finder] resolves to and settles.
 Future<void> tapAndSettle(WidgetTester tester, Finder finder) async {
@@ -293,12 +297,19 @@ final class FlowForgetfulMenuCache implements MenuCache {
 
   @override
   Future<void> remove(VenueRef ref) async {}
+
+  @override
+  Future<void> pin(VenueRef ref, {bool pinned = true}) async {}
+
+  @override
+  Future<bool> isPinned(VenueRef ref) async => false;
 }
 
 /// A [MenuRepository] that answers from a scripted map.
 final class FlowFakeMenuRepository implements MenuRepository {
   final Map<String, MenuFetchResult> _stubs = <String, MenuFetchResult>{};
   final Map<String, CachedMenu> _cached = <String, CachedMenu>{};
+  final Set<String> _pins = <String>{};
 
   /// Scripts [load] to answer [result] for [ref].
   void stub(VenueRef ref, MenuFetchResult result) {
@@ -378,15 +389,9 @@ final class FlowFakeMenuRepository implements MenuRepository {
   @override
   Future<List<CachedMenuEntry>> savedMenus() async => [
     for (final entry in _cached.values)
-      CachedMenuEntry(
-        ref: entry.menu.venueRef,
-        venueName: entry.menu.venueName,
-        fetchedAt: entry.menu.fetchedAt,
-        dishCount: entry.menu.allDishes.length,
-        engine: switch (entry.analysis) {
-          final MenuAnalysed analysed => analysed.engine,
-          _ => null,
-        },
+      CachedMenuEntry.summarise(
+        entry,
+        pinned: _pins.contains(entry.menu.venueRef.cacheKey),
       ),
   ];
 
@@ -394,7 +399,19 @@ final class FlowFakeMenuRepository implements MenuRepository {
   Future<int> cachedMenuCount() async => _cached.length;
 
   @override
-  Future<void> remove(VenueRef ref) async => _cached.remove(ref.cacheKey);
+  Future<void> remove(VenueRef ref) async {
+    _cached.remove(ref.cacheKey);
+    _pins.remove(ref.cacheKey);
+  }
+
+  @override
+  Future<void> pin(VenueRef ref, {bool pinned = true}) async {
+    if (!pinned) {
+      _pins.remove(ref.cacheKey);
+    } else if (_cached.containsKey(ref.cacheKey)) {
+      _pins.add(ref.cacheKey);
+    }
+  }
 }
 
 /// A [MenuClassifier] that returns whatever was scripted, or an all-green
@@ -651,6 +668,9 @@ final class FlowFakePagePicker implements PagePicker {
 
   /// The name of every method called, in call order.
   final List<String> calls = <String>[];
+
+  @override
+  bool get canTakePhoto => true;
 
   @override
   Future<List<ScannedPage>> takePhoto() async {

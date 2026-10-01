@@ -1,6 +1,7 @@
 // Widget tests for [CarbBudgetField] (issue #215, architecture.md §6.6).
 //
-// Covers enabled and disabled states, English and Hebrew locales.
+// Covers the enabled state and the render-nothing disabled state, in
+// English and Hebrew.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -49,12 +50,6 @@ void main() {
 
         expect(find.byType(TextField), findsOneWidget);
         expect(find.text(_en.carbBudgetFieldLabel), findsOneWidget);
-      });
-
-      testWidgets('does not show the disabled-reason text', (tester) async {
-        await _pump(tester, isBudgetAvailable: true);
-
-        expect(find.text(_en.carbBudgetDisabledReason), findsNothing);
       });
 
       testWidgets('entering a value and submitting sets the budget', (
@@ -116,32 +111,36 @@ void main() {
     });
 
     group('disabled state (isBudgetAvailable: false)', () {
-      testWidgets('shows the disabled-reason text instead of a TextField', (
+      testWidgets('renders nothing: no field, label, hint or notice', (
         tester,
       ) async {
         await _pump(tester, isBudgetAvailable: false);
 
-        expect(find.text(_en.carbBudgetDisabledReason), findsOneWidget);
         expect(find.byType(TextField), findsNothing);
-      });
-
-      testWidgets('does not show the label or hint', (tester) async {
-        await _pump(tester, isBudgetAvailable: false);
-
         expect(find.text(_en.carbBudgetFieldLabel), findsNothing);
         expect(find.text(_en.carbBudgetFieldHint), findsNothing);
+        expect(tester.getSize(find.byType(CarbBudgetField)), equals(Size.zero));
       });
 
-      testWidgets('shows the Hebrew disabled reason in the he locale', (
-        tester,
-      ) async {
+      testWidgets('renders nothing in the he locale either', (tester) async {
         await _pump(
           tester,
           isBudgetAvailable: false,
           locale: const Locale('he'),
         );
 
-        expect(find.text(_he.carbBudgetDisabledReason), findsOneWidget);
+        expect(find.byType(TextField), findsNothing);
+        expect(find.text(_he.carbBudgetFieldLabel), findsNothing);
+        expect(tester.getSize(find.byType(CarbBudgetField)), equals(Size.zero));
+      });
+
+      testWidgets('shows the field once the budget becomes available', (
+        tester,
+      ) async {
+        await _pump(tester, isBudgetAvailable: false);
+        await _pump(tester, isBudgetAvailable: true);
+
+        expect(find.byType(TextField), findsOneWidget);
       });
     });
   });

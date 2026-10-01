@@ -60,6 +60,44 @@ void main() {
       expect(result, contains('12.50'));
     });
 
+    test('formatPrice drops .00 from a whole amount of 142 in en', () {
+      // Act
+      final result = formatPrice(142, localeTag: 'en');
+      // Assert
+      expect(result, equals('₪142'));
+    });
+
+    test('formatPrice drops .00 from a whole amount of 142 in he', () {
+      // Act
+      final result = formatPrice(142, localeTag: 'he');
+      // Assert: the locale adds its own bidi marks, so check the parts.
+      expect(result, contains('142'));
+      expect(result, contains('₪'));
+      expect(result, isNot(contains('.00')));
+    });
+
+    test('formatPrice groups thousands and keeps the fraction in en', () {
+      // Act
+      final result = formatPrice(1999.99, localeTag: 'en');
+      // Assert
+      expect(result, equals('₪1,999.99'));
+    });
+
+    test('formatPrice groups thousands and keeps the fraction in he', () {
+      // Act
+      final result = formatPrice(1999.99, localeTag: 'he');
+      // Assert
+      expect(result, contains('1,999.99'));
+      expect(result, contains('₪'));
+    });
+
+    test('formatPrice treats an amount that rounds to whole as whole', () {
+      // Act
+      final result = formatPrice(141.999, localeTag: 'en');
+      // Assert: it would otherwise print "₪142.00".
+      expect(result, equals('₪142'));
+    });
+
     test('formatPrice defaults to ILS when currency is omitted', () {
       // Act
       final withDefault = formatPrice(64, localeTag: 'en');

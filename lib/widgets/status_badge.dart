@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 
 /// One dish verdict, shown as an icon **and** a colour together
@@ -43,7 +44,7 @@ class StatusBadge extends StatelessWidget {
           padding: const EdgeInsetsDirectional.fromSTEB(7, 4, 9, 4),
           // Scaled down rather than left to overflow: this pill is meant
           // to read on one line, but at a large text scale the longest
-          // label ("Order with a change") can outgrow the narrow width
+          // label ("Order as-is") can outgrow the narrow width
           // DishCard has left for it once the photo tile and its own
           // padding are accounted for (architecture.md §8.3's large-text
           // pass) — a shrunk pill reads better than a RenderFlex
@@ -103,3 +104,53 @@ _BadgeSpec _specFor(DishVerdict verdict, AppLocalizations l10n) =>
         label: l10n.verdictNonKeto,
       ),
     };
+
+/// The neutral "Not classified" pill for a dish the classifier saw but
+/// could not place (issue #244). Same shape and type as [StatusBadge], but
+/// in the neutral surface colours: it makes no verdict claim, and carries
+/// a help icon next to its label so it is never colour alone.
+class UnclassifiedBadge extends StatelessWidget {
+  /// Creates the badge.
+  const new({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final foreground = theme.colorScheme.onSurfaceVariant;
+    return Semantics(
+      label: l10n.pillSemanticLabel(l10n.unclassifiedBadge),
+      excludeSemantics: true,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: NeutralSurfaces.of(context).surface2,
+          border: Border.all(color: NeutralSurfaces.of(context).line2),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(7, 4, 9, 4),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: AlignmentDirectional.centerStart,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.help_outline, size: 12, color: foreground),
+                const SizedBox(width: 5),
+                Text(
+                  l10n.unclassifiedBadge.toUpperCase(),
+                  style: TextStyle(
+                    color: foreground,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 10,
+                    letterSpacing: 0.7,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
