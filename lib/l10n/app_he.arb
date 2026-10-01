@@ -511,6 +511,10 @@
   "drinksGuideSectionOrderAsIs": "להזמין כמו שזה",
   "drinksGuideSectionSwap": "לבקש החלפה",
   "drinksGuideSectionSkip": "לדלג",
+  "drinksGuideCarbsSemanticLabel": "הערכת פחמימות נטו, לא מאומתת: {range}",
+  "@drinksGuideCarbsSemanticLabel": {
+    "placeholders": { "range": { "type": "String" } }
+  },
   "settingsDrinksGuideTitle": "מדריך שתייה",
   "settingsDrinksGuideSubtitle": "מדריך בר וקפה",
   "actionAskAboutMenu": "שאלו על התפריט הזה",

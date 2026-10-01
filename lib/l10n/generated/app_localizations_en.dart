@@ -1168,6 +1168,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drinksGuideSectionSkip => 'SKIP';
 
   @override
+  String drinksGuideCarbsSemanticLabel(String range) {
+    return 'Estimated net carbs, not confirmed: $range';
+  }
+
+  @override
   String get settingsDrinksGuideTitle => 'DRINKS GUIDE';
 
   @override

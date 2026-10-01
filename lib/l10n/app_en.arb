@@ -511,6 +511,10 @@
   "drinksGuideSectionOrderAsIs": "ORDER AS-IS",
   "drinksGuideSectionSwap": "ASK FOR A SWAP",
   "drinksGuideSectionSkip": "SKIP",
+  "drinksGuideCarbsSemanticLabel": "Estimated net carbs, not confirmed: {range}",
+  "@drinksGuideCarbsSemanticLabel": {
+    "placeholders": { "range": { "type": "String" } }
+  },
   "settingsDrinksGuideTitle": "DRINKS GUIDE",
   "settingsDrinksGuideSubtitle": "Bar and coffee reference",
   "actionAskAboutMenu": "Ask about this menu",

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/drinks_guide_data.dart';
 import 'package:ketoclub/widgets/content_width.dart';
+import 'package:ketoclub/widgets/net_carbs_chip.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
 
 /// The route path for the offline drinks guide (issue #216).
@@ -45,17 +48,38 @@ class DrinksGuideScreen extends StatelessWidget {
             children: [
               _Disclaimer(l10n.drinksGuideDisclaimer),
               const SizedBox(height: 20),
-              _SectionHeader(l10n.drinksGuideSectionOrderAsIs),
+              _SectionHeader(
+                l10n.drinksGuideSectionOrderAsIs,
+                verdict: DishVerdict.orderAsIs,
+              ),
               const SizedBox(height: 8),
-              _DrinkGroup(entries: orderAsIs, showScript: false),
+              _DrinkGroup(
+                entries: orderAsIs,
+                showScript: false,
+                verdict: DishVerdict.orderAsIs,
+              ),
               const SizedBox(height: 20),
-              _SectionHeader(l10n.drinksGuideSectionSwap),
+              _SectionHeader(
+                l10n.drinksGuideSectionSwap,
+                verdict: DishVerdict.modifiable,
+              ),
               const SizedBox(height: 8),
-              _DrinkGroup(entries: askForSwap, showScript: true),
+              _DrinkGroup(
+                entries: askForSwap,
+                showScript: true,
+                verdict: DishVerdict.modifiable,
+              ),
               const SizedBox(height: 20),
-              _SectionHeader(l10n.drinksGuideSectionSkip),
+              _SectionHeader(
+                l10n.drinksGuideSectionSkip,
+                verdict: DishVerdict.nonKeto,
+              ),
               const SizedBox(height: 8),
-              _DrinkGroup(entries: skip, showScript: false),
+              _DrinkGroup(
+                entries: skip,
+                showScript: false,
+                verdict: DishVerdict.nonKeto,
+              ),
             ],
           ),
         ),
@@ -83,20 +107,47 @@ class _Disclaimer extends StatelessWidget {
   }
 }
 
-/// A section heading for one of the three groups.
+/// The verdict icon the counter tiles and the verdict pill use for
+/// [verdict], so a section reads in the menu screen's vocabulary.
+IconData _verdictIcon(DishVerdict verdict) => switch (verdict) {
+  DishVerdict.orderAsIs => Icons.check_circle,
+  DishVerdict.modifiable => Icons.edit_note,
+  DishVerdict.nonKeto => Icons.cancel,
+};
+
+/// A section heading for one of the three groups: the verdict's icon and
+/// text in its tone, as on the menu screen's counter tiles (issue #259).
+/// The icon repeats what the text says, so it is hidden from a screen
+/// reader, and it pairs the colour with a shape for colour-blind readers.
 class _SectionHeader extends StatelessWidget {
-  const new(this.text);
+  const new(this.text, {required this.verdict});
 
   final String text;
+  final DishVerdict verdict;
 
   @override
   Widget build(BuildContext context) {
+    final tone = VerdictColors.of(context).forVerdict(verdict);
     return Padding(
       padding: const EdgeInsetsDirectional.only(start: 2, bottom: 4),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.labelSmall
-            ?.copyWith(fontSize: 12, letterSpacing: 0.6),
+      child: Row(
+        children: [
+          ExcludeSemantics(
+            child: Icon(_verdictIcon(verdict), size: 16, color: tone.rail),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              text,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                fontSize: 12,
+                letterSpacing: 0.6,
+                fontWeight: FontWeight.w700,
+                color: tone.ink,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -104,13 +155,20 @@ class _SectionHeader extends StatelessWidget {
 
 /// A card holding one section's drink entries.
 class _DrinkGroup extends StatelessWidget {
-  const new({required this.entries, required this.showScript});
+  const new({
+    required this.entries,
+    required this.showScript,
+    required this.verdict,
+  });
 
   final List<DrinkEntry> entries;
 
   /// When true, yellow entries render their [DrinkEntry.swapScript] via
   /// [WaiterScriptWidget] for the copy affordance.
   final bool showScript;
+
+  /// The verdict this section stands for, for its rows' chip tone.
+  final DishVerdict verdict;
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +181,11 @@ class _DrinkGroup extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             for (var i = 0; i < entries.length; i++) ...[
-              _DrinkRow(entry: entries[i], showScript: showScript),
+              _DrinkRow(
+                entry: entries[i],
+                showScript: showScript,
+                verdict: verdict,
+              ),
               if (i < entries.length - 1)
                 const Divider(height: 1, indent: 16, endIndent: 16),
             ],
@@ -137,13 +199,20 @@ class _DrinkGroup extends StatelessWidget {
 /// One drink entry row: name, net-carb range chip, and optional
 /// [WaiterScriptWidget] if [showScript] is true and a script exists.
 class _DrinkRow extends StatelessWidget {
-  const new({required this.entry, required this.showScript});
+  const new({
+    required this.entry,
+    required this.showScript,
+    required this.verdict,
+  });
 
   final DrinkEntry entry;
   final bool showScript;
+  final DishVerdict verdict;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final tone = VerdictColors.of(context).forVerdict(verdict);
     final theme = Theme.of(context);
     final script = showScript ? entry.swapScript : null;
     return Padding(
@@ -163,11 +232,13 @@ class _DrinkRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Chip(
-                label: Text(entry.netCarbsRangeLabel),
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                labelStyle: theme.textTheme.labelSmall?.copyWith(fontSize: 11),
-                visualDensity: VisualDensity.compact,
+              NetCarbsChip(
+                label: entry.netCarbsRangeLabel,
+                semanticLabel: l10n.drinksGuideCarbsSemanticLabel(
+                  entry.netCarbsRangeLabel,
+                ),
+                tone: tone,
+                background: netCarbsChipBackground(theme, verdict, tone),
               ),
             ],
           ),

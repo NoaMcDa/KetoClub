@@ -1174,6 +1174,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get drinksGuideSectionSkip => 'לדלג';
 
   @override
+  String drinksGuideCarbsSemanticLabel(String range) {
+    return 'הערכת פחמימות נטו, לא מאומתת: $range';
+  }
+
+  @override
   String get settingsDrinksGuideTitle => 'מדריך שתייה';
 
   @override
