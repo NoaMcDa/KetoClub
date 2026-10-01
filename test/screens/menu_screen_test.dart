@@ -34,11 +34,14 @@ import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
+import 'package:ketoclub/widgets/carb_budget_field.dart';
+import 'package:ketoclub/widgets/category_chips.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
+import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
@@ -129,6 +132,20 @@ void _useTallSurface(WidgetTester tester) {
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
 }
+
+/// Opens the menu screen's collapsed Filters row (issue #234), behind
+/// which the search field, the carb budget and the legend sit.
+Future<void> _openFilters(WidgetTester tester) async {
+  await tester.tap(find.text(_en.menuFilters));
+  await tester.pumpAndSettle();
+}
+
+/// The search field's own [TextField], told apart from the carb-budget
+/// field that an AI-classified menu also shows behind the Filters row.
+final Finder _searchField = find.descendant(
+  of: find.byType(MenuSearchField),
+  matching: find.byType(TextField),
+);
 
 /// A 1×1 transparent PNG, so a page thumbnail decodes like a real one.
 final Uint8List _pngBytes = base64Decode(
@@ -1347,6 +1364,7 @@ void main() {
         );
         await _pump(tester, controller);
         await tester.pumpAndSettle();
+        await _openFilters(tester);
 
         // Act
         await tester.tap(find.text(_en.legendToggle));
@@ -1395,6 +1413,7 @@ void main() {
         );
         await _pump(tester, controller);
         await tester.pumpAndSettle();
+        await _openFilters(tester);
 
         // Assert: collapsed by default.
         expect(find.text(_en.legendToggle), findsOneWidget);
@@ -1755,6 +1774,7 @@ void main() {
       final controller = _controllerFor(repository: repository);
       await _pump(tester, controller);
       await tester.pumpAndSettle();
+      await _openFilters(tester);
 
       // Act
       await tester.enterText(find.byType(TextField), 'sushi');
@@ -2250,6 +2270,7 @@ void main() {
         await _pump(tester, controller);
         await tester.pumpAndSettle();
         expect(find.byType(DishCard), findsNWidgets(2));
+        await _openFilters(tester);
 
         // Act
         await tester.enterText(find.byType(TextField), 'steak');
@@ -2273,6 +2294,7 @@ void main() {
           final controller = _controllerFor(repository: repository);
           await _pump(tester, controller);
           await tester.pumpAndSettle();
+          await _openFilters(tester);
           await tester.enterText(find.byType(TextField), 'steak');
           await tester.pumpAndSettle();
           expect(find.byType(DishCard), findsOneWidget);
@@ -2660,6 +2682,226 @@ void main() {
         // Assert
         expect(pushedNames, contains(drinksRoutePath));
       });
+    });
+
+    group('top of the list and the Filters row (issue #234)', () {
+      testWidgets(
+        'at 390×844 the first dish card is on screen without scrolling for '
+        'a 20-dish menu with a rules banner',
+        (tester) async {
+          // Arrange: twenty described dishes, alternating green and
+          // yellow, classified by the rules because no backend is
+          // configured — the web build's everyday case — so the rules
+          // banner and the engine chip both show above the list.
+          final dishes = <Dish>[
+            for (var i = 0; i < 20; i++)
+              Dish(
+                id: 'd$i',
+                name: 'Grilled chicken plate $i',
+                description: 'Chicken thigh with a side of fries and salad',
+                price: 62,
+                options: const <DishOption>[],
+              ),
+          ];
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf(dishes)));
+          final classifier = FakeMenuClassifier()
+            ..respondWith(
+              MenuAnalysed(
+                dishes: [
+                  for (final (i, dish) in dishes.indexed)
+                    _verdictFor(
+                      dish,
+                      i.isEven ? DishVerdict.orderAsIs : DishVerdict.modifiable,
+                      modification: i.isEven ? null : 'Swap the fries',
+                    ),
+                ],
+                unclassified: const <String>[],
+                engine: const RulesEngine(
+                  reason: MenuAnalysisFailureReason.notConfigured,
+                ),
+                analysedAt: DateTime.utc(2026),
+              ),
+            );
+          final controller = _controllerFor(
+            repository: repository,
+            classifier: classifier,
+          );
+          await _pump(tester, controller, theme: AppTheme.light());
+          tester.view.physicalSize = const Size(390, 844);
+          await tester.pumpAndSettle();
+          expect(find.byType(RulesReasonBanner), findsOneWidget);
+
+          // Assert: the whole first card sits inside the screen.
+          final screen = tester.getRect(find.byType(MenuScreen));
+          final firstCard = tester.getRect(find.byType(DishCard).first);
+          expect(firstCard.top, greaterThanOrEqualTo(screen.top));
+          expect(firstCard.bottom, lessThanOrEqualTo(screen.bottom));
+        },
+      );
+
+      testWidgets(
+        'the Filters row starts collapsed, and opening it shows the search '
+        'field, the carb budget and the legend; closing it hides them again',
+        (tester) async {
+          // Arrange
+          final green = _dish('Steak', id: 'green');
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([green])));
+          final classifier = FakeMenuClassifier()
+            ..respondWith(
+              MenuAnalysed(
+                dishes: [_verdictFor(green, DishVerdict.orderAsIs)],
+                unclassified: const <String>[],
+                engine: const LlmEngine(model: 'served-model'),
+                analysedAt: DateTime.utc(2026),
+              ),
+            );
+          final controller = _controllerFor(
+            repository: repository,
+            classifier: classifier,
+          );
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+
+          // Assert: collapsed — only the row itself shows.
+          expect(find.text(_en.menuFilters), findsOneWidget);
+          expect(find.byType(MenuSearchField), findsNothing);
+          expect(find.byType(CarbBudgetField), findsNothing);
+          expect(find.text(_en.legendToggle), findsNothing);
+
+          // Act
+          await _openFilters(tester);
+
+          // Assert
+          expect(find.byType(MenuSearchField), findsOneWidget);
+          expect(find.byType(CarbBudgetField), findsOneWidget);
+          expect(find.text(_en.legendToggle), findsOneWidget);
+
+          // Act: close it again.
+          await _openFilters(tester);
+
+          // Assert
+          expect(find.byType(MenuSearchField), findsNothing);
+          expect(find.byType(CarbBudgetField), findsNothing);
+          expect(find.text(_en.legendToggle), findsNothing);
+        },
+      );
+
+      testWidgets(
+        'a search typed behind the Filters row keeps narrowing the list '
+        'and keeps its text while the row is closed, and the closed row '
+        'counts it as active',
+        (tester) async {
+          // Arrange
+          final steak = _dish('Grilled Steak', id: 'steak');
+          final salad = _dish('Greek Salad', id: 'salad');
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: _menuOf([steak, salad])));
+          final controller = _controllerFor(repository: repository);
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+          await _openFilters(tester);
+          await tester.enterText(find.byType(TextField), 'steak');
+          await tester.pumpAndSettle();
+
+          // Act: close the row.
+          await tester.tap(find.text(_en.menuFiltersActive(1)));
+          await tester.pumpAndSettle();
+
+          // Assert: still narrowed, and the row says why.
+          expect(find.byType(MenuSearchField), findsNothing);
+          expect(find.byType(DishCard), findsOneWidget);
+          expect(find.text(_en.menuFiltersActive(1)), findsOneWidget);
+
+          // Act: open it again.
+          await tester.tap(find.text(_en.menuFiltersActive(1)));
+          await tester.pumpAndSettle();
+
+          // Assert: the typed text survived.
+          final field = tester.widget<TextField>(find.byType(TextField));
+          expect(field.controller?.text, 'steak');
+        },
+      );
+
+      testWidgets(
+        'a verdict tile, a search behind the Filters row and a category '
+        'chip still combine',
+        (tester) async {
+          // Arrange: a green and a yellow dish in each of two categories.
+          final steak = _dish('Grilled Steak', id: 'steak');
+          final burger = _dish('Steak Burger', id: 'burger');
+          final salad = _dish('Greek Salad', id: 'salad');
+          final wings = _dish('Hot Wings', id: 'wings');
+          final menu = Menu(
+            venueRef: _ref,
+            currency: 'ILS',
+            fetchedAt: DateTime.utc(2026),
+            categories: [
+              MenuCategory(id: 'c1', name: 'Mains', dishes: [steak, burger]),
+              MenuCategory(id: 'c2', name: 'Starters', dishes: [salad, wings]),
+            ],
+          );
+          final repository = FakeMenuRepository()
+            ..stub(_ref, MenuFetched(menu: menu));
+          final classifier = FakeMenuClassifier()
+            ..respondWith(
+              MenuAnalysed(
+                dishes: [
+                  _verdictFor(steak, DishVerdict.orderAsIs),
+                  _verdictFor(
+                    burger,
+                    DishVerdict.modifiable,
+                    modification: 'No bun',
+                  ),
+                  _verdictFor(salad, DishVerdict.orderAsIs),
+                  _verdictFor(wings, DishVerdict.orderAsIs),
+                ],
+                unclassified: const <String>[],
+                engine: const LlmEngine(model: 'served-model'),
+                analysedAt: DateTime.utc(2026),
+              ),
+            );
+          final controller = _controllerFor(
+            repository: repository,
+            classifier: classifier,
+          );
+          await _pump(tester, controller);
+          await tester.pumpAndSettle();
+
+          // Act: green only, then a search for "steak".
+          await tester.tap(
+            find.descendant(
+              of: find.byType(VerdictCounterTiles),
+              matching: find.text(_en.tileGreenLabel.toUpperCase()),
+            ),
+          );
+          await tester.pumpAndSettle();
+          await _openFilters(tester);
+          await tester.enterText(_searchField, 'steak');
+          await tester.pumpAndSettle();
+
+          // Assert: only the green steak is left, under Mains.
+          expect(find.byType(DishCard), findsOneWidget);
+          expect(find.text('Grilled Steak'), findsOneWidget);
+          expect(find.text('Steak Burger'), findsNothing);
+
+          // Act: widen the search to the starters and jump to them.
+          await tester.enterText(_searchField, 'wings');
+          await tester.pumpAndSettle();
+          await tester.tap(
+            find.descendant(
+              of: find.byType(CategoryChips),
+              matching: find.text('Starters'),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          // Assert
+          expect(find.byType(DishCard), findsOneWidget);
+          expect(find.text('Hot Wings'), findsOneWidget);
+        },
+      );
     });
   });
 }

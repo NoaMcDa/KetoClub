@@ -34,6 +34,7 @@ import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/fetch_failure_action.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
+import 'package:ketoclub/widgets/menu_filters_row.dart';
 import 'package:ketoclub/widgets/menu_question_sheet.dart';
 import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
@@ -98,8 +99,10 @@ String _definitionTextFrom(String line) {
 
 /// The classified menu screen: a header naming the venue and its keto
 /// score, the persistent "{platform} · {age}" source line, the three
-/// verdict counter tiles that double as the filter, the engine chip, dish
-/// cards, and the unclassified section (architecture.md §6.6, issue #29).
+/// verdict counter tiles that double as the filter, a collapsed Filters
+/// row over the search, the carb budget and the legend (issue #234), the
+/// engine chip, dish cards, and the unclassified section (architecture.md
+/// §6.6, issue #29).
 ///
 /// Reads its [MenuController] from `provider` and loads [ref] once, after
 /// the first frame, so the initial build never itself triggers I/O. A
@@ -171,6 +174,12 @@ class _MenuScreenState extends State<MenuScreen> {
   /// group's expansion flag local before issue #29 replaced that group
   /// with [MenuFilter.redOnly].
   bool _legendExpanded = false;
+
+  /// Whether the Filters row (issue #234) — the search field, the carb
+  /// budget and the legend — is expanded. Local UI state for the same
+  /// reason as [_legendExpanded]; collapsed by default so the first dish
+  /// card is on screen when the menu opens.
+  bool _filtersExpanded = false;
 
   /// Bumped on every retry action on this screen — the failed-fetch
   /// retry, the [RulesReasonBanner] retry, and pull-to-refresh — so the
@@ -442,13 +451,12 @@ class _MenuScreenState extends State<MenuScreen> {
         // be pulled down to refresh (RefreshIndicator's own requirement).
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        // Header, tiles, category chips, then dishes (issue #234): the
+        // search, the carb budget and the legend sit behind one collapsed
+        // Filters row, so the first dish card fits on a phone screen.
         children: [
           header,
           const SizedBox(height: 4),
-          MenuSearchField(onChanged: controller.setQuery),
-          const SizedBox(height: 8),
-          CarbBudgetField(isBudgetAvailable: controller.isBudgetAvailable),
-          const SizedBox(height: 8),
           if (analysed) ...[
             const SizedBox(height: 8),
             VerdictCounterTiles(
@@ -475,11 +483,8 @@ class _MenuScreenState extends State<MenuScreen> {
               ?sourceLine,
             ],
           ),
-          if (analysed) ...[
-            const SizedBox(height: 4),
-            _legend(context, l10n, controller.netCarbLimitGrams),
-          ],
-          const SizedBox(height: 8),
+          _filtersRow(context, l10n, controller, analysed: analysed),
+          const SizedBox(height: 4),
           AnalysisProgressRow(phase: controller.phase),
           ...banners,
           if (controller.engine != null) ...[
@@ -506,6 +511,41 @@ class _MenuScreenState extends State<MenuScreen> {
             ..._dishRows(context, controller, localeTag, rows),
           if (analysed && controller.unclassifiedNames.isNotEmpty)
             _unclassifiedSection(context, l10n, controller),
+        ],
+      ),
+    );
+  }
+
+  /// The collapsible Filters row (issue #234) holding the search field,
+  /// the carb budget and — once there is a verdict to explain — the
+  /// legend. Collapsing it moves focus out of a field it hides, so the
+  /// keyboard does not stay up for a field the user can no longer see.
+  Widget _filtersRow(
+    BuildContext context,
+    AppLocalizations l10n,
+    MenuController controller, {
+    required bool analysed,
+  }) {
+    final hasBudget = context.watch<CarbBudgetController>().hasBudget;
+    final activeCount =
+        (controller.query.trim().isEmpty ? 0 : 1) + (hasBudget ? 1 : 0);
+    return MenuFiltersRow(
+      expanded: _filtersExpanded,
+      activeCount: activeCount,
+      onToggle: () {
+        if (_filtersExpanded) FocusScope.of(context).unfocus();
+        setState(() => _filtersExpanded = !_filtersExpanded);
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          MenuSearchField(onChanged: controller.setQuery),
+          const SizedBox(height: 8),
+          CarbBudgetField(isBudgetAvailable: controller.isBudgetAvailable),
+          if (analysed) ...[
+            const SizedBox(height: 4),
+            _legend(context, l10n, controller.netCarbLimitGrams),
+          ],
         ],
       ),
     );

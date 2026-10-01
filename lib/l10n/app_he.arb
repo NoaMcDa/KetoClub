@@ -324,6 +324,11 @@
   "noteEditorSave": "שמור",
   "noteEditorClear": "מחק הערה",
 
+  "menuFilters": "סינון",
+  "menuFiltersActive": "{count, plural, one{סינון · 1 פעיל} other{סינון · {count} פעילים}}",
+  "@menuFiltersActive": {
+    "placeholders": { "count": { "type": "num" } }
+  },
   "menuSearchHint": "חפשו מנות",
   "menuSearchSemanticLabel": "חיפוש מנות לפי שם או תיאור",
   "menuSearchClear": "נקה חיפוש",
