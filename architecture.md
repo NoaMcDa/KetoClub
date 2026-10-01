@@ -1731,8 +1731,11 @@ copy) rather than a new one — under C that happens whenever the cached
 analysis was rules-only, and under A it is always the case.
 
 **Consequences.** #40's *Keto 8+* chip filters on the card score, so it is
-hidden until at least one visible card has numbers, rather than offered as a
-filter that always returns an empty list. #42 is rescoped from "fetch menus
+disabled (with a tooltip saying why) until at least one visible card has
+numbers, rather than offered as a filter that always returns an empty list;
+it stays on screen so the chip row never changes shape (issue #231). The
+chips are multi-select and combine; "Nearby" is the default order, not a
+filter, so it has no chip. #42 is rescoped from "fetch menus
 for the visible venues in the background" to "read cached analyses for the
 visible venues, plus the explicit estimate action". The Discovery list's
 performance budget gains a hard rule: **no menu fetch on scroll or on load** —

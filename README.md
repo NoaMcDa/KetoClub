@@ -361,11 +361,10 @@ Roadmap & Milestone Tracking
       shipped alongside it). The discovery and 10bis fixtures this was built
       against are still synthetic, pending a live recording (issues #38, #44).
     * [ ] Search filtering by dish type (e.g., "Show only steakhouses with Green
-      ratings"). The Discovery screen's filter chips (one active at a time)
-      cover distance (the default), "open now", a *Keto 8+* score (D13) and
-      the single most common cuisine tag among the current results — not an
-      arbitrary dish type, and not combinable with the score filter the way
-      the example asks.
+      ratings"). The Discovery screen's filter chips (multi-select, they
+      combine; with none on, results stay in distance order) cover "open now",
+      a *Keto 8+* score (D13) and the single most common cuisine tag among the
+      current results — not an arbitrary dish type.
 * [ ] Phase 3: Persistent Community Database
     * [ ] Verified directory of keto-dedicated and keto-accessible restaurants.
     * [ ] User review feedback loop ("Did the restaurant accommodate your substitution?").

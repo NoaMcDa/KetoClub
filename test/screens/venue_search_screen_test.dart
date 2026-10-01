@@ -246,7 +246,7 @@ void main() {
       expect(find.text(l10n.discoveryUseLocation), findsOneWidget);
       // No location prompt on open: the user has to ask.
       expect(location.currentCallCount, 0);
-      expect(find.byType(ChoiceChip), findsNothing);
+      expect(find.byType(FilterChip), findsNothing);
     });
 
     testWidgets('typing nonsense shows the venueSearchInvalid message', (
@@ -696,7 +696,7 @@ void main() {
 
       // Act
       await tester.tap(
-        find.widgetWithText(ChoiceChip, l10n.discoveryChipOpenNow),
+        find.widgetWithText(FilterChip, l10n.discoveryChipOpenNow),
       );
       await tester.pumpAndSettle();
 
@@ -706,7 +706,7 @@ void main() {
 
       // Act
       await tester.tap(
-        find.widgetWithText(ChoiceChip, l10n.discoveryChipOpenNow),
+        find.widgetWithText(FilterChip, l10n.discoveryChipOpenNow),
       );
       await tester.pumpAndSettle();
 
@@ -714,9 +714,8 @@ void main() {
       expect(find.text('Venue closed'), findsOneWidget);
     });
 
-    testWidgets('Keto 8+ is hidden while no card has numbers (D13)', (
-      tester,
-    ) async {
+    testWidgets('Keto 8+ is always there, disabled with a tooltip, while no '
+        'card has numbers (D13, issue #231)', (tester) async {
       // Arrange
       search.queueFound([_venue('a')]);
       await _pump(tester, controller: controller, pushedNames: pushedNames);
@@ -724,13 +723,96 @@ void main() {
       // Act
       await locate(tester);
 
-      // Assert
+      // Assert: no Nearby chip; Keto 8+ present but not tappable.
       final l10n = _l10n(tester);
-      expect(find.text(l10n.discoveryChipNearby), findsOneWidget);
-      expect(find.text(l10n.discoveryChipKetoEightPlus), findsNothing);
+      expect(find.text('Nearby'), findsNothing);
+      final keto = find.widgetWithText(
+        FilterChip,
+        l10n.discoveryChipKetoEightPlus,
+      );
+      expect(keto, findsOneWidget);
+      expect(tester.widget<FilterChip>(keto).onSelected, isNull);
+      expect(
+        find.byTooltip(l10n.discoveryChipKetoEightPlusHint),
+        findsOneWidget,
+      );
+      expect(
+        tester
+            .widget<FilterChip>(
+              find.widgetWithText(FilterChip, l10n.discoveryChipOpenNow),
+            )
+            .onSelected,
+        isNotNull,
+      );
     });
 
-    testWidgets('Keto 8+ appears once a cached analysis scores a card, and '
+    testWidgets('Open now and Keto 8+ combine, and each chip shows its own '
+        'selected state', (tester) async {
+      // Arrange: both venues are scored 10.0; only one is open.
+      final open = _venue('open', isOnline: true);
+      final closed = _venue('closed', isOnline: false);
+      for (final venue in [open, closed]) {
+        repository.seedCache(
+          CachedMenu(
+            menu: Menu(
+              venueRef: venue.ref,
+              currency: 'ILS',
+              fetchedAt: DateTime.utc(2026),
+              categories: const <MenuCategory>[],
+            ),
+            analysis: MenuAnalysed(
+              dishes: const <AnalysedDish>[
+                AnalysedDish(
+                  dishId: '1',
+                  name: 'Steak',
+                  verdict: DishVerdict.orderAsIs,
+                  why: 'why',
+                ),
+              ],
+              unclassified: const <String>[],
+              engine: const LlmEngine(model: 'test-model'),
+              analysedAt: DateTime.utc(2026),
+            ),
+          ),
+        );
+      }
+      search.queueFound([open, closed]);
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      await locate(tester);
+      final l10n = _l10n(tester);
+      final keto = find.widgetWithText(
+        FilterChip,
+        l10n.discoveryChipKetoEightPlus,
+      );
+      final openNow = find.widgetWithText(
+        FilterChip,
+        l10n.discoveryChipOpenNow,
+      );
+      expect(tester.widget<FilterChip>(keto).onSelected, isNotNull);
+      expect(find.byTooltip(l10n.discoveryChipKetoEightPlusHint), findsNothing);
+
+      // Act
+      await tester.tap(keto);
+      await tester.pumpAndSettle();
+      await tester.tap(openNow);
+      await tester.pumpAndSettle();
+
+      // Assert: both chips are selected at once, and both filters apply.
+      expect(tester.widget<FilterChip>(keto).selected, isTrue);
+      expect(tester.widget<FilterChip>(openNow).selected, isTrue);
+      expect(find.text('Venue open'), findsOneWidget);
+      expect(find.text('Venue closed'), findsNothing);
+
+      // Act: turn Keto 8+ off; Open now stays.
+      await tester.tap(keto);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(tester.widget<FilterChip>(keto).selected, isFalse);
+      expect(tester.widget<FilterChip>(openNow).selected, isTrue);
+    });
+
+    testWidgets('Keto 8+ turns on once a cached analysis scores a card, and '
         'keeps only the 8+ venues', (tester) async {
       // Arrange: 'high' is cached at 10.0; 'plain' has nothing cached.
       final high = _venue('high');
@@ -767,7 +849,7 @@ void main() {
 
       // Act
       await tester.tap(
-        find.widgetWithText(ChoiceChip, l10n.discoveryChipKetoEightPlus),
+        find.widgetWithText(FilterChip, l10n.discoveryChipKetoEightPlus),
       );
       await tester.pumpAndSettle();
 
@@ -795,7 +877,7 @@ void main() {
       final context = tester.element(find.byType(VenueCard));
       expect(Directionality.of(context), TextDirection.rtl);
       expect(search.nearbyCalls.single.language, 'he');
-      expect(find.text(_l10n(tester).discoveryChipNearby), findsOneWidget);
+      expect(find.text(_l10n(tester).discoveryChipOpenNow), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 

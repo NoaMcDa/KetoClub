@@ -29,14 +29,13 @@ enum DiscoveryPhase {
   searching,
 }
 
-/// The Discovery screen's filter chips (`.design/Discovery.dc.html`):
-/// one is active at a time, and [nearby] is the unfiltered default.
+/// The Discovery screen's filter chips (`.design/Discovery.dc.html`).
+/// They combine: a venue is shown when it passes every active one, and
+/// with none active every result shows, nearest first — "Nearby" is the
+/// default order, not a filter, so it has no chip (issue #231).
 enum DiscoveryChip {
-  /// Every result, nearest first — the default and "no filter".
-  nearby,
-
   /// Only venues whose cached analysis scores at least
-  /// [ketoEightPlusThreshold] (D13). Offered only while
+  /// [ketoEightPlusThreshold] (D13). Always shown, but enabled only while
   /// [VenueSearchController.hasAnyNumbers] holds.
   ketoEightPlus,
 
@@ -141,7 +140,7 @@ final class VenueSearchController extends ChangeNotifier {
       const <VenueRef, VenueCardNumbers>{};
   bool _hasSearched = false;
   VenueSearchFailureReason? _failure;
-  DiscoveryChip _activeChip = DiscoveryChip.nearby;
+  final Set<DiscoveryChip> _activeChips = <DiscoveryChip>{};
   Map<VenueRef, VenueCardNumbers> _numbers =
       const <VenueRef, VenueCardNumbers>{};
   Future<VenueSearchResult> Function()? _lastRequest;
@@ -216,8 +215,9 @@ final class VenueSearchController extends ChangeNotifier {
   /// Why the last search failed, or null when it did not.
   VenueSearchFailureReason? get failure => _failure;
 
-  /// The chip filtering [visibleResults].
-  DiscoveryChip get activeChip => _activeChip;
+  /// The chips filtering [visibleResults], all of which a venue must pass;
+  /// empty when nothing is filtered. A read-only view.
+  Set<DiscoveryChip> get activeChips => Set.unmodifiable(_activeChips);
 
   /// The most common entry of [Venue.cuisineTags] across [results] — the
   /// one cuisine chip, so it is never a wall of chips — or null when no
@@ -240,23 +240,21 @@ final class VenueSearchController extends ChangeNotifier {
     return top;
   }
 
-  /// Whether at least one result has card numbers — the gate for the
+  /// Whether at least one result has card numbers — what enables the
   /// *Keto 8+* chip, which would otherwise always filter to nothing (D13).
   bool get hasAnyNumbers => _results.any((v) => _numbers.containsKey(v.ref));
 
-  /// [results] narrowed by [activeChip].
-  List<Venue> get visibleResults => switch (_activeChip) {
-    DiscoveryChip.nearby => _results,
-    DiscoveryChip.ketoEightPlus => [
+  /// [results] narrowed by every chip in [activeChips], in the same order.
+  List<Venue> get visibleResults {
+    if (_activeChips.isEmpty) return _results;
+    final cuisine = _activeChips.contains(DiscoveryChip.cuisine)
+        ? topCuisine
+        : null;
+    return [
       for (final venue in _results)
-        if ((_numbers[venue.ref]?.score ?? -1) >= ketoEightPlusThreshold) venue,
-    ],
-    DiscoveryChip.openNow => [
-      for (final venue in _results)
-        if (venue.isOnline ?? false) venue,
-    ],
-    DiscoveryChip.cuisine => _byCuisine(topCuisine),
-  };
+        if (_passes(venue, cuisine)) venue,
+    ];
+  }
 
   /// Whether some venue in [visibleResults] has no card numbers — the
   /// condition for offering "Estimate this list" (issue #42).
@@ -398,15 +396,14 @@ final class VenueSearchController extends ChangeNotifier {
     );
   }
 
-  /// Makes [chip] the active one, or goes back to [DiscoveryChip.nearby]
-  /// when [chip] is already active — tap again to clear. Notifies
-  /// listeners.
+  /// Turns [chip] on, or off when it is already on, leaving the other
+  /// chips as they are, so the chips combine. Notifies listeners.
   ///
   /// A running [estimateVisible] is cancelled: it was estimating the list
-  /// the chip no longer shows.
-  void selectChip(DiscoveryChip chip) {
+  /// the chips no longer show.
+  void toggleChip(DiscoveryChip chip) {
     _cancelEstimate();
-    _activeChip = chip == _activeChip ? DiscoveryChip.nearby : chip;
+    if (!_activeChips.remove(chip)) _activeChips.add(chip);
     _notify();
   }
 
@@ -534,7 +531,7 @@ final class VenueSearchController extends ChangeNotifier {
         _results = venues;
         _numbers = numbers;
         _hasSearched = true;
-        _activeChip = DiscoveryChip.nearby;
+        _activeChips.clear();
         if (isNearby) {
           _nearbyResults = venues;
           _nearbyNumbers = numbers;
@@ -638,12 +635,20 @@ final class VenueSearchController extends ChangeNotifier {
   static int _count(MenuAnalysed analysis, DishVerdict verdict) =>
       analysis.dishes.where((dish) => dish.verdict == verdict).length;
 
-  List<Venue> _byCuisine(String? cuisine) {
-    if (cuisine == null) return _results;
-    return [
-      for (final venue in _results)
-        if (venue.cuisineTags.contains(cuisine)) venue,
-    ];
+  /// Whether [venue] passes every active chip; [cuisine] is
+  /// [topCuisine] when that chip is on, and a null one filters nothing.
+  bool _passes(Venue venue, String? cuisine) {
+    for (final chip in _activeChips) {
+      final passes = switch (chip) {
+        DiscoveryChip.ketoEightPlus =>
+          (_numbers[venue.ref]?.score ?? -1) >= ketoEightPlusThreshold,
+        DiscoveryChip.openNow => venue.isOnline ?? false,
+        DiscoveryChip.cuisine =>
+          cuisine == null || venue.cuisineTags.contains(cuisine),
+      };
+      if (!passes) return false;
+    }
+    return true;
   }
 
   /// Puts the last nearby list back, or the untouched idle state when
@@ -652,7 +657,7 @@ final class VenueSearchController extends ChangeNotifier {
     final nearby = _nearbyResults;
     _phase = DiscoveryPhase.idle;
     _failure = null;
-    _activeChip = DiscoveryChip.nearby;
+    _activeChips.clear();
     if (nearby == null) {
       _results = const <Venue>[];
       _numbers = const <VenueRef, VenueCardNumbers>{};

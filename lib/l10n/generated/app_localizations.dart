@@ -914,17 +914,17 @@ abstract class AppLocalizations {
   /// **'Use my location'**
   String get discoveryUseLocation;
 
-  /// No description provided for @discoveryChipNearby.
-  ///
-  /// In en, this message translates to:
-  /// **'Nearby'**
-  String get discoveryChipNearby;
-
   /// No description provided for @discoveryChipKetoEightPlus.
   ///
   /// In en, this message translates to:
   /// **'Keto 8+'**
   String get discoveryChipKetoEightPlus;
+
+  /// No description provided for @discoveryChipKetoEightPlusHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs scores first: estimate this list, or open a restaurant.'**
+  String get discoveryChipKetoEightPlusHint;
 
   /// No description provided for @discoveryChipOpenNow.
   ///
