@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/screens/drinks_guide_screen.dart';
+import 'package:ketoclub/services/platform/app_info.dart';
+import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
@@ -58,12 +60,32 @@ const Key apiKeySaveKey = Key('settingsApiKeySave');
 /// The "Remove key" button, shown only while a key is saved.
 const Key apiKeyDeleteKey = Key('settingsApiKeyDelete');
 
+/// The About section's version row (issue #258), showing the version and
+/// build number once [AppInfo.load] answers.
+const Key aboutVersionKey = Key('settingsAboutVersion');
+
+/// The About section's "Open-source licences" row (issue #258).
+const Key aboutLicencesKey = Key('settingsAboutLicences');
+
+/// The About section's collapsed privacy disclosure (issue #258).
+const Key aboutPrivacyKey = Key('settingsAboutPrivacy');
+
+/// The About section's "Report a problem" row (issue #258).
+const Key aboutReportKey = Key('settingsAboutReport');
+
+/// Where "Report a problem" sends the user: the repository's issue tracker.
+final Uri reportProblemUri = Uri.parse(
+  'https://github.com/NoaMcDa/KetoClub/issues',
+);
+
 /// The Settings screen, top to bottom (issue #255): the UI language, the
 /// appearance, the "Your keto rules" dietary toggles, the net-carb limit,
 /// the default menu filter, "AI & privacy" (the AI-analysis consent
 /// checkbox under its collapsed disclosure, and the user's Gemini API key
 /// on iOS and Android), the recent-menus cache and its clearing, and the
-/// drinks guide link (architecture.md §6.6, §11, §12, §13, D17).
+/// drinks guide link (architecture.md §6.6, §11, §12, §13, D17), and last
+/// an "About" group (issue #258): the app version, the open-source
+/// licences, the privacy text and where to report a problem.
 ///
 /// Reads its [SettingsController] from `provider` and calls
 /// [SettingsController.load] once, after the first frame, the same way
@@ -78,8 +100,20 @@ const Key apiKeyDeleteKey = Key('settingsApiKeyDelete');
 /// the controller themselves — so a regression in this wiring fails a
 /// test here, not only in a flow test.
 class SettingsScreen extends StatefulWidget {
-  /// Creates the Settings screen.
-  const new({super.key});
+  /// Creates the Settings screen. [appInfo] supplies the About section's
+  /// version, read once after the first frame; [externalLinkOpener] opens
+  /// its "Report a problem" link outside the app.
+  const new({
+    required this.appInfo,
+    required this.externalLinkOpener,
+    super.key,
+  });
+
+  /// Reads the app's version and build number (issue #258).
+  final AppInfo appInfo;
+
+  /// Opens the issue tracker link outside KetoClub (issue #258).
+  final ExternalLinkOpener externalLinkOpener;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -98,6 +132,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// screen after it is stored.
   final TextEditingController _apiKeyField = TextEditingController();
 
+  /// The app version, null until [AppInfo.load] answers or when it cannot.
+  AppVersion? _version;
+
   @override
   void dispose() {
     _apiKeyField.dispose();
@@ -114,7 +151,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       unawaited(context.read<SettingsController>().load());
+      unawaited(_loadVersion());
     });
+  }
+
+  /// Reads the version after the first frame (issue #258), never from a
+  /// constructor, so building this screen performs no plugin I/O.
+  Future<void> _loadVersion() async {
+    final version = await widget.appInfo.load();
+    if (!mounted) return;
+    setState(() => _version = version);
   }
 
   @override
@@ -157,10 +203,88 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _cacheSection(context, l10n, controller),
               const SizedBox(height: 20),
               _drinksGuideSection(context, l10n),
+              const SizedBox(height: 20),
+              _aboutSection(context, l10n, controller),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  /// The "About" group (issue #258), last on the screen: the version and
+  /// build, the open-source licences (Flutter's own licence page, which
+  /// also lists the font licence `main.dart` registers), the privacy text
+  /// — the consent section's own copy, behind a collapsed disclosure — and
+  /// a link to the issue tracker.
+  Widget _aboutSection(
+    BuildContext context,
+    AppLocalizations l10n,
+    SettingsController controller,
+  ) {
+    final version = _version;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionLabel(l10n.settingsAboutSection),
+        _SettingsGroup(
+          children: [
+            ListTile(
+              key: aboutVersionKey,
+              leading: const Icon(Icons.info_outline),
+              title: Text(l10n.settingsAboutVersion),
+              subtitle: version == null
+                  ? null
+                  : Text(
+                      l10n.settingsAboutVersionValue(
+                        version.version,
+                        version.buildNumber,
+                      ),
+                    ),
+            ),
+            ListTile(
+              key: aboutLicencesKey,
+              leading: const Icon(Icons.description_outlined),
+              title: Text(l10n.settingsAboutLicences),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => showLicensePage(context: context),
+            ),
+            ExpansionTile(
+              key: aboutPrivacyKey,
+              shape: const Border(),
+              collapsedShape: const Border(),
+              leading: const Icon(Icons.privacy_tip_outlined),
+              title: Text(l10n.settingsAboutPrivacy),
+              children: [
+                _GroupNote(
+                  controller.supportsApiKey
+                      ? l10n.settingsConsentBodyDirect
+                      : l10n.settingsConsentBody,
+                ),
+              ],
+            ),
+            ListTile(
+              key: aboutReportKey,
+              leading: const Icon(Icons.bug_report_outlined),
+              title: Text(l10n.settingsAboutReport),
+              subtitle: Text(l10n.settingsAboutReportHint),
+              trailing: const Icon(Icons.open_in_new),
+              onTap: () => unawaited(_openReport(context, l10n)),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// Opens [reportProblemUri] outside the app; says so when the platform
+  /// had no handler for it.
+  Future<void> _openReport(BuildContext context, AppLocalizations l10n) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final opened = await widget.externalLinkOpener.open(reportProblemUri);
+    if (opened || !mounted) return;
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.settingsAboutLinkFailed)),
     );
   }
 

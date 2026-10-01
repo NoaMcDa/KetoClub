@@ -293,6 +293,33 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settingsCacheCleared => 'התפריטים השמורים נוקו.';
 
   @override
+  String get settingsAboutSection => 'אודות';
+
+  @override
+  String get settingsAboutVersion => 'גרסה';
+
+  @override
+  String settingsAboutVersionValue(String version, String build) {
+    return '$version (בנייה $build)';
+  }
+
+  @override
+  String get settingsAboutLicences => 'רישיונות קוד פתוח';
+
+  @override
+  String get settingsAboutPrivacy => 'פרטיות';
+
+  @override
+  String get settingsAboutReport => 'דיווח על תקלה';
+
+  @override
+  String get settingsAboutReportHint =>
+      'פותח את מעקב התקלות של קטוקלאב ב-GitHub';
+
+  @override
+  String get settingsAboutLinkFailed => 'לא ניתן היה לפתוח את הקישור.';
+
+  @override
   String get fetchFailedOffline =>
       'אין חיבור, ולכן לא היה אפשר לקרוא את התפריט.';
 

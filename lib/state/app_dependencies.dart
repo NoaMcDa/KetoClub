@@ -4,6 +4,7 @@ import 'package:ketoclub/services/classifier/menu_question_answerer.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
+import 'package:ketoclub/services/platform/app_info.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
@@ -64,6 +65,7 @@ class AppDependencies {
     required this.venueSearchService,
     required this.scannedPages,
     this.screenBrightness = const NoOpScreenBrightness(),
+    this.appInfo = const NoAppInfo(),
     this.apiKeyStore,
     this.scannedMenuClassifier = const UnavailableScannedMenuClassifier(),
     this.pagePicker = const NoPagePicker(),
@@ -111,6 +113,10 @@ class AppDependencies {
   /// open (architecture.md §6.3). A no-op on platforms with no brightness
   /// API of their own, such as web.
   final ScreenBrightness screenBrightness;
+
+  /// Reads the app's own version for the About section of Settings (issue
+  /// #258). Defaults to [NoAppInfo], which answers null with no plugin I/O.
+  final AppInfo appInfo;
 
   /// Opens a venue's own page on its platform outside KetoClub (issue #53).
   final ExternalLinkOpener externalLinkOpener;

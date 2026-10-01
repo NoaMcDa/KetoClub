@@ -291,6 +291,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsCacheCleared => 'Saved menus cleared.';
 
   @override
+  String get settingsAboutSection => 'About';
+
+  @override
+  String get settingsAboutVersion => 'Version';
+
+  @override
+  String settingsAboutVersionValue(String version, String build) {
+    return '$version (build $build)';
+  }
+
+  @override
+  String get settingsAboutLicences => 'Open-source licences';
+
+  @override
+  String get settingsAboutPrivacy => 'Privacy';
+
+  @override
+  String get settingsAboutReport => 'Report a problem';
+
+  @override
+  String get settingsAboutReportHint =>
+      'Opens KetoClub\'s issue tracker on GitHub';
+
+  @override
+  String get settingsAboutLinkFailed => 'Could not open the link.';
+
+  @override
   String get fetchFailedOffline =>
       'No connection, so the menu could not be read.';
 

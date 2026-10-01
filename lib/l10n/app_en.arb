@@ -114,6 +114,17 @@
   "settingsClearCacheConfirmBody": "This removes every menu saved on this device, including any you can currently open offline. You can save a venue again by opening it once you have a connection.",
   "settingsClearCacheConfirmAction": "Clear",
   "settingsCacheCleared": "Saved menus cleared.",
+  "settingsAboutSection": "About",
+  "settingsAboutVersion": "Version",
+  "settingsAboutVersionValue": "{version} (build {build})",
+  "@settingsAboutVersionValue": {
+    "placeholders": { "version": { "type": "String" }, "build": { "type": "String" } }
+  },
+  "settingsAboutLicences": "Open-source licences",
+  "settingsAboutPrivacy": "Privacy",
+  "settingsAboutReport": "Report a problem",
+  "settingsAboutReportHint": "Opens KetoClub's issue tracker on GitHub",
+  "settingsAboutLinkFailed": "Could not open the link.",
 
   "fetchFailedOffline": "No connection, so the menu could not be read.",
   "fetchFailedBlockedByBrowser": "A web browser cannot read {platform} menus: {platform} blocks requests from other websites. Open this link in the KetoClub phone app instead.",
