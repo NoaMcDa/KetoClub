@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
@@ -31,7 +33,7 @@ List<String> _splitScriptLines(String script) => script
 /// translated wording of its own beyond the copy affordance. Copying
 /// always puts [script] itself on the clipboard, never the numbering this
 /// widget draws around it.
-class WaiterScriptWidget extends StatelessWidget {
+class WaiterScriptWidget extends StatefulWidget {
   /// Creates a widget showing [script] as numbered lines, calling
   /// [onCopied] once the text has been copied to the clipboard.
   const new({
@@ -58,19 +60,42 @@ class WaiterScriptWidget extends StatelessWidget {
   /// 13px text at a 1.55 line height).
   final bool prominent;
 
-  /// Copies [script] verbatim to the clipboard, notifies [onCopied], and
-  /// shows a brief confirmation when [context] has a [ScaffoldMessenger].
-  Future<void> _copy(BuildContext context, AppLocalizations l10n) async {
-    await Clipboard.setData(ClipboardData(text: script));
-    onCopied?.call();
-    if (!context.mounted) return;
-    ScaffoldMessenger.maybeOf(context)
-        ?.showSnackBar(SnackBar(content: Text(l10n.actionCopied)));
+  @override
+  State<WaiterScriptWidget> createState() => _WaiterScriptWidgetState();
+}
+
+/// How long the Copy button reads "Copied" before it flips back.
+const Duration _copiedDuration = Duration(seconds: 2);
+
+class _WaiterScriptWidgetState extends State<WaiterScriptWidget> {
+  Timer? _resetTimer;
+  bool _copied = false;
+
+  @override
+  void dispose() {
+    _resetTimer?.cancel();
+    super.dispose();
+  }
+
+  /// Copies the script verbatim to the clipboard, notifies
+  /// [WaiterScriptWidget.onCopied], and flips the button to its copied
+  /// state for two seconds (issue #246) instead of raising a snack bar,
+  /// which would appear under a bottom sheet and be easy to miss.
+  Future<void> _copy() async {
+    await Clipboard.setData(ClipboardData(text: widget.script));
+    widget.onCopied?.call();
+    if (!mounted) return;
+    _resetTimer?.cancel();
+    setState(() => _copied = true);
+    _resetTimer = Timer(_copiedDuration, () {
+      if (mounted) setState(() => _copied = false);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final script = widget.script;
     final lines = _splitScriptLines(script);
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -100,7 +125,7 @@ class WaiterScriptWidget extends StatelessWidget {
                   child: _NumberedLine(
                     number: i + 1,
                     text: lines[i],
-                    prominent: prominent,
+                    prominent: widget.prominent,
                   ),
                 ),
             ],
@@ -114,11 +139,13 @@ class WaiterScriptWidget extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: [
-            ?trailingAction,
+            ?widget.trailingAction,
             FilledButton.icon(
-              onPressed: () => _copy(context, l10n),
-              icon: const Icon(Icons.copy),
-              label: Text(l10n.waiterCardCopyButton),
+              onPressed: _copy,
+              icon: Icon(_copied ? Icons.check : Icons.copy),
+              label: Text(
+                _copied ? l10n.waiterCardCopied : l10n.waiterCardCopyButton,
+              ),
             ),
           ],
         ),

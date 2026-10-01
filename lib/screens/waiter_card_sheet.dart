@@ -144,6 +144,18 @@ class _WaiterCardSheetState extends State<WaiterCardSheet> {
               ),
             ),
           ),
+          // Pinned below the scrolling body so a hand-over always ends in
+          // one large, obvious control (issue #246).
+          Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(20, 8, 20, 16),
+            child: FilledButton(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(56),
+              ),
+              onPressed: () => Navigator.maybePop(context),
+              child: Text(l10n.waiterCardDone),
+            ),
+          ),
         ],
       ),
     );
