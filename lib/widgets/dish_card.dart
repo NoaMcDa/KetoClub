@@ -105,6 +105,11 @@ class _DishCardState extends State<DishCard> {
     final ambient = Directionality.of(context);
 
     final cardEdge = _cardEdge(theme, neutralSurfaces, verdict, tone);
+    final hasNote =
+        widget.onEditNote != null &&
+        widget.note != null &&
+        widget.note!.isNotEmpty;
+    final showAddNote = widget.onEditNote != null && !hasNote;
     // The badge/name/description/price block and the photo tile sit in one
     // row, per the artboard's dish row (`.design/Main.dc.html`); the note
     // and script-disclosure rows below stay full width, outside it.
@@ -114,8 +119,26 @@ class _DishCardState extends State<DishCard> {
         // Sizes and the 6px rhythm are the artboard's dish row
         // (`.design/Main.dc.html`): a 15px bold name, a 12.5px `--ink2`
         // description at 1.45 line height, and a 13.5px bold price.
-        if (analysis != null) ...[
-          StatusBadge(verdict: analysis.verdict),
+        // The "add a note" icon sits at the corner of this header, opposite
+        // the badge, only while there is no note (issue #240); once a note
+        // exists the full-width note row below replaces it.
+        if (analysis != null || showAddNote) ...[
+          // A Wrap, not a Row: at a large text scale the badge and the
+          // 36px icon can outgrow one line together.
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: analysis != null
+                  ? WrapAlignment.spaceBetween
+                  : WrapAlignment.end,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                if (analysis != null) StatusBadge(verdict: analysis.verdict),
+                if (showAddNote)
+                  _AddNoteButton(onPressed: () => widget.onEditNote!(row)),
+              ],
+            ),
+          ),
           const SizedBox(height: 6),
         ],
         // The name and description are menu content, laid out in the
@@ -184,9 +207,9 @@ class _DishCardState extends State<DishCard> {
               PhotoTile(imageUrl: dish.imageUrl, size: 72),
             ],
           ),
-          if (widget.onEditNote != null) ...[
+          if (hasNote) ...[
             const SizedBox(height: 8),
-            _NoteRow(note: widget.note, onTap: () => widget.onEditNote!(row)),
+            _NoteRow(note: widget.note!, onTap: () => widget.onEditNote!(row)),
           ],
           if (isModifiable && tone != null) ...[
             const SizedBox(height: 8),
@@ -510,17 +533,49 @@ class _HiddenCarbsRow extends StatelessWidget {
   }
 }
 
-/// The personal-note affordance (issue #52): a small tappable icon-and-text
-/// row, showing the note itself once one exists or an "add a note" prompt
-/// before that. Neutral for every verdict — a note is the user's own
-/// annotation, not a verdict colour — so it reads from the theme's own
-/// on-surface-variant colour rather than a [VerdictTone].
+/// The "add a note" affordance (issue #240): one small icon button, shown
+/// only while a dish has no note, so forty dishes do not each carry a muted
+/// text row. Its tooltip is visual; its icon carries the semantics label.
+class _AddNoteButton extends StatelessWidget {
+  const new({required this.onPressed});
+
+  /// Called when the icon is tapped, to open the note editor.
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    // The tooltip is visual only; the icon's own label is the one semantics
+    // announcement, so the two never read twice.
+    return Tooltip(
+      message: l10n.dishCardAddNote,
+      excludeFromSemantics: true,
+      child: IconButton(
+        onPressed: onPressed,
+        icon: Icon(
+          Icons.note_add_outlined,
+          semanticLabel: l10n.dishCardAddNote,
+        ),
+        iconSize: 18,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+      ),
+    );
+  }
+}
+
+/// The personal-note row (issue #52): a small tappable icon-and-text row
+/// showing the note itself. Rendered only once a note exists (issue #240);
+/// before that, [_AddNoteButton] is the affordance. Neutral for every
+/// verdict — a note is the user's own annotation, not a verdict colour — so
+/// it reads from the theme's own on-surface-variant colour rather than a
+/// [VerdictTone].
 class _NoteRow extends StatelessWidget {
   const new({required this.note, required this.onTap});
 
-  /// The note to show, or null/empty to show the "add a note" prompt
-  /// instead.
-  final String? note;
+  /// The (non-empty) note to show.
+  final String note;
 
   /// Called when the row is tapped, to open the note editor.
   final VoidCallback onTap;
@@ -529,14 +584,10 @@ class _NoteRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final hasNote = note != null && note!.isNotEmpty;
     final color = theme.colorScheme.onSurfaceVariant;
-    final label = hasNote ? note! : l10n.dishCardAddNote;
     return Semantics(
       button: true,
-      label: hasNote
-          ? l10n.dishCardEditNoteSemanticLabel(note!)
-          : l10n.dishCardAddNote,
+      label: l10n.dishCardEditNoteSemanticLabel(note),
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,
@@ -545,17 +596,11 @@ class _NoteRow extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Row(
             children: [
-              Icon(
-                hasNote
-                    ? Icons.sticky_note_2_outlined
-                    : Icons.note_add_outlined,
-                size: 15,
-                color: color,
-              ),
+              Icon(Icons.sticky_note_2_outlined, size: 15, color: color),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  label,
+                  note,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(color: color),

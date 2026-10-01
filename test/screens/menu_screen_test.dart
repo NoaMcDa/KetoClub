@@ -2051,7 +2051,7 @@ void main() {
 
           // Assert
           expect(find.text('Ask for no cheese.'), findsOneWidget);
-          expect(find.text(_en.dishCardAddNote), findsNothing);
+          expect(find.byTooltip(_en.dishCardAddNote), findsNothing);
         },
       );
 
@@ -2067,7 +2067,7 @@ void main() {
           await tester.pumpAndSettle();
 
           // Act: open the editor.
-          await tester.tap(find.text(_en.dishCardAddNote));
+          await tester.tap(find.byTooltip(_en.dishCardAddNote));
           await tester.pumpAndSettle();
 
           // Assert: the sheet is open.
@@ -2119,7 +2119,7 @@ void main() {
           // Assert
           expect(find.byType(NoteEditorSheet), findsNothing);
           expect(find.text('Ask for no cheese.'), findsNothing);
-          expect(find.text(_en.dishCardAddNote), findsOneWidget);
+          expect(find.byTooltip(_en.dishCardAddNote), findsOneWidget);
         },
       );
 

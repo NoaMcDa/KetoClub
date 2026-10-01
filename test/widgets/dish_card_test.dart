@@ -596,12 +596,13 @@ void main() {
 
           // Assert: existing call sites that predate this field compile and
           // render unchanged.
-          expect(find.text('Add a note'), findsNothing);
+          expect(find.byTooltip('Add a note'), findsNothing);
         },
       );
 
       testWidgets(
-        'build shows "Add a note" when onEditNote is given but note is null',
+        'build shows only the add-note icon, no note row, when onEditNote is '
+        'given but note is null',
         (tester) async {
           // Arrange
           final row = DishRow(dish: _dish(), category: 'Mains');
@@ -617,8 +618,10 @@ void main() {
             ),
           );
 
-          // Assert
-          expect(find.text('Add a note'), findsOneWidget);
+          // Assert: an icon button with the tooltip, and no text row.
+          expect(find.byTooltip('Add a note'), findsOneWidget);
+          expect(find.text('Add a note'), findsNothing);
+          expect(find.byIcon(Icons.sticky_note_2_outlined), findsNothing);
         },
       );
 
@@ -645,10 +648,50 @@ void main() {
           find.text('Waitstaff happily substituted cauliflower.'),
           findsOneWidget,
         );
-        expect(find.text('Add a note'), findsNothing);
+        expect(find.byTooltip('Add a note'), findsNothing);
+        expect(find.byIcon(Icons.note_add_outlined), findsNothing);
       });
 
-      testWidgets('tapping the note row calls onEditNote with this row', (
+      testWidgets('build keeps the add and edit semantics labels', (
+        tester,
+      ) async {
+        // Arrange
+        final row = DishRow(dish: _dish(), category: 'Mains');
+
+        // Act: no note yet.
+        await _pump(
+          tester,
+          DishCard(
+            row: row,
+            localeTag: 'en',
+            onShowScript: (_) {},
+            onEditNote: (_) {},
+          ),
+        );
+
+        // Assert
+        expect(find.bySemanticsLabel('Add a note'), findsOneWidget);
+
+        // Act: a note exists.
+        await _pump(
+          tester,
+          DishCard(
+            row: row,
+            localeTag: 'en',
+            onShowScript: (_) {},
+            note: 'No cheese.',
+            onEditNote: (_) {},
+          ),
+        );
+
+        // Assert
+        expect(
+          find.bySemanticsLabel('Edit your note: No cheese.'),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('tapping the add-note icon calls onEditNote with this row', (
         tester,
       ) async {
         // Arrange
@@ -665,7 +708,7 @@ void main() {
             onEditNote: (edited) => tapped = edited,
           ),
         );
-        await tester.tap(find.text('Add a note'));
+        await tester.tap(find.byTooltip('Add a note'));
         await tester.pump();
 
         // Assert
