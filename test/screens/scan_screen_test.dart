@@ -16,6 +16,7 @@ import 'package:ketoclub/services/platform/qr_scanner.dart';
 import 'package:ketoclub/state/scan_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/scan_failure_copy.dart';
+import 'package:ketoclub/widgets/scanned_pages_sheet.dart';
 import 'package:provider/provider.dart';
 
 import '../fakes/fake_clock.dart';
@@ -373,6 +374,55 @@ void main() {
       expect(picker.calls, [PagePickerCall.takePhoto]);
       expect(controller.pages, isEmpty);
       expect(find.text(_en.scanScreenPagesHeading), findsNothing);
+    });
+
+    testWidgets('dragging a row handle reorders the pages', (tester) async {
+      // Arrange
+      picker.queuePickImages([_jpeg(1), _jpeg(2), _jpeg(3)]);
+      await _pump(tester, controller, picker: picker);
+      await tester.tap(_action(_en.scanScreenActionChoosePhotos));
+      await tester.pumpAndSettle();
+
+      // Act: drag the first row's handle below the third row.
+      await tester.drag(
+        find.byTooltip(_en.scanScreenReorderPage(1)),
+        const Offset(0, 200),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(controller.pages, [_jpeg(2), _jpeg(3), _jpeg(1)]);
+      expect(find.text(_en.scanScreenPageLabel(3)), findsOneWidget);
+    });
+
+    testWidgets('a single page has no drag handle', (tester) async {
+      picker.queuePickImages([_jpeg(1)]);
+      await _pump(tester, controller, picker: picker);
+      await tester.tap(_action(_en.scanScreenActionChoosePhotos));
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.drag_handle), findsNothing);
+    });
+
+    testWidgets('tapping a thumbnail opens the pages sheet at that page', (
+      tester,
+    ) async {
+      // Arrange
+      picker.queuePickImages([_jpeg(1), _jpeg(2)]);
+      await _pump(tester, controller, picker: picker);
+      await tester.tap(_action(_en.scanScreenActionChoosePhotos));
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(find.byType(Image).at(1));
+      await tester.pumpAndSettle();
+
+      // Assert
+      final sheet = tester.widget<ScannedPagesSheet>(
+        find.byType(ScannedPagesSheet),
+      );
+      expect(sheet.initialPage, 1);
+      expect(sheet.scan.pages, [_jpeg(1), _jpeg(2)]);
     });
 
     testWidgets('the remove button drops that page', (tester) async {

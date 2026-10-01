@@ -999,6 +999,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String scanScreenReorderPage(int number) {
+    return 'Move page $number. Drag to reorder';
+  }
+
+  @override
+  String scanScreenPreviewPage(int number) {
+    return 'Preview page $number';
+  }
+
+  @override
   String scanScreenTooManyPages(int max) {
     return 'One scan holds at most $max pages. The pages over the limit were not added.';
   }

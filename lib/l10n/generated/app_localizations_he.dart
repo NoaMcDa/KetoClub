@@ -1007,6 +1007,16 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String scanScreenReorderPage(int number) {
+    return 'הזזת דף $number. גררו כדי לסדר מחדש';
+  }
+
+  @override
+  String scanScreenPreviewPage(int number) {
+    return 'תצוגה מקדימה של דף $number';
+  }
+
+  @override
   String scanScreenTooManyPages(int max) {
     return 'סריקה אחת כוללת עד $max דפים. הדפים שמעבר למגבלה לא נוספו.';
   }

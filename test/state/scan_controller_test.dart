@@ -346,6 +346,76 @@ void main() {
       expect(notified, 0);
     });
 
+    test('movePage forward puts the page at the target index', () {
+      // Arrange
+      final p = distinct(3);
+      controller
+        ..addPages(p)
+        // Act
+        ..movePage(0, 2);
+
+      // Assert
+      expect(controller.pages, [p[1], p[2], p[0]]);
+    });
+
+    test('movePage backward puts the page at the target index', () {
+      final p = distinct(3);
+      controller
+        ..addPages(p)
+        ..movePage(2, 0);
+
+      expect(controller.pages, [p[2], p[0], p[1]]);
+    });
+
+    test('movePage notifies and clears lastFailure', () async {
+      // Arrange
+      classifier.respondWith(
+        const ScannedMenuFailed(reason: MenuAnalysisFailureReason.timeout),
+      );
+      controller.addPages(distinct(2));
+      await controller.analysePages();
+      expect(controller.lastFailure, isNotNull);
+      var notified = 0;
+      controller
+        ..addListener(() => notified++)
+        // Act
+        ..movePage(0, 1);
+
+      // Assert
+      expect(controller.lastFailure, isNull);
+      expect(notified, 1);
+    });
+
+    test('movePage ignores same, out-of-range and negative indexes', () {
+      final p = distinct(2);
+      var notified = 0;
+      controller
+        ..addPages(p)
+        ..addListener(() => notified++)
+        ..movePage(1, 1)
+        ..movePage(-1, 0)
+        ..movePage(0, -1)
+        ..movePage(2, 0)
+        ..movePage(0, 2);
+
+      expect(controller.pages, p);
+      expect(notified, 0);
+    });
+
+    test('analysePages sends the pages in the moved order', () async {
+      // Arrange
+      final p = distinct(3);
+      controller
+        ..addPages(p)
+        ..movePage(2, 0);
+
+      // Act
+      await controller.analysePages();
+
+      // Assert
+      expect(classifier.calls.single.$1.pages, [p[2], p[0], p[1]]);
+    });
+
     test('analysePages with no pages does nothing', () async {
       expect(await controller.analysePages(), isNull);
       expect(classifier.calls, isEmpty);
@@ -406,6 +476,24 @@ void main() {
           carnivoreOnly: false,
         ),
       );
+    });
+
+    test('movePage during an analysis does nothing', () async {
+      // Arrange
+      final gate = Completer<void>();
+      classifier.gate = gate.future;
+      final p = distinct(2);
+      controller.addPages(p);
+      final pending = controller.analysePages();
+      await pumpEventQueue();
+
+      // Act
+      controller.movePage(0, 1);
+
+      // Assert
+      expect(controller.pages, p);
+      gate.complete();
+      await pending;
     });
 
     test('analysing is true while the classifier is reading', () async {
