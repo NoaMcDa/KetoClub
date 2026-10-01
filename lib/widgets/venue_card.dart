@@ -25,6 +25,13 @@ import 'package:ketoclub/widgets/photo_tile.dart';
 /// ([walkingMinutes]), labelled as walking; with neither, the meta line
 /// shows the cuisine alone.
 ///
+/// Drawn on a [Card] surface (issue #222), so it takes the theme's
+/// `CardThemeData` shape — the rounded `--line` edge — and the photo sits
+/// flush in its top, clipped to the card's corners. The ink well is laid
+/// over the whole card, photo included, so a hover or keyboard focus on
+/// the web lights up the entire tile rather than only the text below an
+/// opaque photo.
+///
 /// Laid out with directional insets and [PositionedDirectional] only, so
 /// the whole card mirrors under a right-to-left [Directionality].
 class VenueCard extends StatelessWidget {
@@ -34,6 +41,7 @@ class VenueCard extends StatelessWidget {
     required this.onTap,
     this.numbers,
     this.distanceKm,
+    this.photoAspectRatio,
     super.key,
   });
 
@@ -51,6 +59,12 @@ class VenueCard extends StatelessWidget {
   /// Called when the card is tapped; the screen opens the venue's menu.
   final VoidCallback onTap;
 
+  /// The photo's width-to-height ratio, or null for the phone's fixed
+  /// [photoHeight] banner. The Discovery grid passes
+  /// [gridPhotoAspectRatio] once it shows two or more cards per row
+  /// (issue #222), where a fixed height would draw a strip.
+  final double? photoAspectRatio;
+
   /// The photo tile's fixed height, from the artboard; its width is the
   /// card's full width ([PhotoTile.width] `double.infinity`), reproducing
   /// the artboard's banner (issue #50). The [Stack] the tile sits in hands
@@ -59,14 +73,40 @@ class VenueCard extends StatelessWidget {
   /// Fixed so an image arriving late never shifts the list.
   static const double photoHeight = 118;
 
+  /// The photo's aspect ratio when the card is one tile of a two- or
+  /// three-column grid (issue #222, `docs/UX_REVIEW.md` §1 item 2): 3:2.
+  static const double gridPhotoAspectRatio = 3 / 2;
+
+  /// The inset around the text below the photo, inside the card's edge;
+  /// `VenueCardSkeleton` reads it so a loading card has the same shape.
+  static const EdgeInsetsDirectional textPadding =
+      EdgeInsetsDirectional.fromSTEB(14, 10, 14, 14);
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
     final verdictColors = VerdictColors.of(context);
     final cardNumbers = numbers;
     final blurb = venue.shortDescription;
     final meta = _meta(l10n);
+    final aspectRatio = photoAspectRatio;
+    // The card's own clip rounds the photo's top corners.
+    final photo = aspectRatio == null
+        ? PhotoTile(
+            imageUrl: venue.imageUrl,
+            size: photoHeight,
+            width: double.infinity,
+            borderRadius: BorderRadius.zero,
+          )
+        : AspectRatio(
+            aspectRatio: aspectRatio,
+            child: PhotoTile(
+              imageUrl: venue.imageUrl,
+              size: double.infinity,
+              width: double.infinity,
+              borderRadius: BorderRadius.zero,
+            ),
+          );
 
     // One node for the whole card: its children are excluded, so the tap
     // is re-exposed here or a screen reader could not open the venue.
@@ -76,84 +116,112 @@ class VenueCard extends StatelessWidget {
       label: _semanticLabel(l10n),
       onTap: onTap,
       excludeSemantics: true,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Card(
+        margin: EdgeInsets.zero,
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
           children: [
-            Stack(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                PhotoTile(
-                  imageUrl: venue.imageUrl,
-                  size: photoHeight,
-                  width: double.infinity,
-                  borderRadius: BorderRadius.circular(16),
+                Stack(
+                  children: [
+                    photo,
+                    if (cardNumbers != null)
+                      PositionedDirectional(
+                        top: 11,
+                        start: 11,
+                        child: _GreenPill(
+                          text: l10n.venueCardGreenCount(cardNumbers.green),
+                          background: verdictColors.green.pill,
+                          foreground: verdictColors.green.on,
+                        ),
+                      ),
+                  ],
                 ),
-                if (cardNumbers != null)
-                  PositionedDirectional(
-                    top: 11,
-                    start: 11,
-                    child: _GreenPill(
-                      text: l10n.venueCardGreenCount(cardNumbers.green),
-                      background: verdictColors.green.pill,
-                      foreground: verdictColors.green.on,
-                    ),
-                  ),
+                Padding(
+                  padding: textPadding,
+                  child: _details(context, l10n, meta, blurb),
+                ),
               ],
             ),
-            const SizedBox(height: 10),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    venue.name,
-                    style: AppTypography.displayStyle(
-                      size: 21,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  ),
-                ),
-                if (cardNumbers != null) ...[
-                  const SizedBox(width: 10),
-                  KetoScoreBadge(score: cardNumbers.score, inline: true),
-                ],
-              ],
+            // Above the content, so the hover and focus highlight covers
+            // the photo too; an ink well under it would paint below the
+            // opaque photo and light up only the text.
+            Positioned.fill(
+              child: Material(
+                type: MaterialType.transparency,
+                child: InkWell(onTap: onTap),
+              ),
             ),
-            if (blurb != null && blurb.trim().isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(
-                blurb,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontSize: 13,
-                  height: 1.45,
-                  color: theme.textTheme.bodySmall?.color,
-                ),
-              ),
-            ],
-            if (meta.isNotEmpty || cardNumbers != null) ...[
-              const SizedBox(height: 6),
-              Wrap(
-                spacing: 10,
-                runSpacing: 6,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  if (meta.isNotEmpty)
-                    Text(meta, style: theme.textTheme.bodySmall),
-                  if (cardNumbers != null)
-                    _YellowCount(
-                      text: l10n.venueCardYellowCount(cardNumbers.yellow),
-                      color: verdictColors.amber.rail,
-                    ),
-                  if (cardNumbers?.engine case final RulesEngine engine)
-                    EngineChip(engine: engine),
-                ],
-              ),
-            ],
           ],
         ),
       ),
+    );
+  }
+
+  /// The name with its score, the blurb, and the meta line with the
+  /// counts: everything below the photo.
+  Widget _details(
+    BuildContext context,
+    AppLocalizations l10n,
+    String meta,
+    String? blurb,
+  ) {
+    final theme = Theme.of(context);
+    final verdictColors = VerdictColors.of(context);
+    final cardNumbers = numbers;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                venue.name,
+                style: AppTypography.displayStyle(
+                  size: 21,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+            ),
+            if (cardNumbers != null) ...[
+              const SizedBox(width: 10),
+              KetoScoreBadge(score: cardNumbers.score, inline: true),
+            ],
+          ],
+        ),
+        if (blurb != null && blurb.trim().isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            blurb,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontSize: 13,
+              height: 1.45,
+              color: theme.textTheme.bodySmall?.color,
+            ),
+          ),
+        ],
+        if (meta.isNotEmpty || cardNumbers != null) ...[
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 10,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              if (meta.isNotEmpty) Text(meta, style: theme.textTheme.bodySmall),
+              if (cardNumbers != null)
+                _YellowCount(
+                  text: l10n.venueCardYellowCount(cardNumbers.yellow),
+                  color: verdictColors.amber.rail,
+                ),
+              if (cardNumbers?.engine case final RulesEngine engine)
+                EngineChip(engine: engine),
+            ],
+          ),
+        ],
+      ],
     );
   }
 

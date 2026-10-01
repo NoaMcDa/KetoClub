@@ -20,8 +20,10 @@ import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
+import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/venue_card.dart';
+import 'package:ketoclub/widgets/venue_grid.dart';
 import 'package:provider/provider.dart';
 
 import '../fakes/fake_connectivity.dart';
@@ -393,7 +395,7 @@ void main() {
       expect(find.text('Rothschild 22'), findsOneWidget);
 
       // Act
-      await tester.tap(find.text('Venue salt-stone'));
+      await tester.tap(find.widgetWithText(VenueCard, 'Venue salt-stone'));
       await tester.pumpAndSettle();
 
       // Assert
@@ -863,19 +865,23 @@ void main() {
         await tester.pumpAndSettle();
       }
 
-      testWidgets('at 1440px a venue card is no wider than the cap and sits '
-          'centred in the window', (tester) async {
+      testWidgets('at 1440px the Discovery column is no wider than its own '
+          'grid cap and sits centred in the window (issue #222)', (
+        tester,
+      ) async {
         // Arrange + Act
         await listAt(tester, 1440);
 
-        // Assert
+        // Assert: the column is capped at discoveryMaxWidth, not the
+        // reading screens' 680, and centred, with the 20px gutters
+        // inside it.
+        final field = tester.getRect(find.byType(TextField));
+        expect(field.width, discoveryMaxWidth - 40);
+        expect(field.width, greaterThan(contentMaxWidth));
+        expect(field.center.dx, closeTo(720, 0.01));
         final cards = find.byType(VenueCard);
         expect(cards, findsNWidgets(2));
-        final rect = tester.getRect(cards.first);
-        expect(rect.width, lessThanOrEqualTo(contentMaxWidth));
-        expect(rect.center.dx, closeTo(720, 0.01));
-        final field = tester.getRect(find.byType(TextField));
-        expect(field.width, lessThanOrEqualTo(contentMaxWidth));
+        expect(tester.getRect(cards.first).left, field.left);
         expect(tester.takeException(), isNull);
       });
 
@@ -889,6 +895,118 @@ void main() {
         expect(rect.left, 20);
         expect(rect.width, 350);
         expect(tester.takeException(), isNull);
+      });
+    });
+
+    group('venue grid (issue #222)', () {
+      /// The cards laid out in the first row: every card whose top edge
+      /// is the first card's.
+      int firstRowCount(WidgetTester tester, Finder cards) {
+        final top = tester.getRect(cards.first).top;
+        return cards
+            .evaluate()
+            .where((e) => tester.getRect(find.byWidget(e.widget)).top == top)
+            .length;
+      }
+
+      /// Pumps the screen, locates, and lays a four-venue list out at
+      /// [width] logical pixels.
+      Future<void> fourAt(WidgetTester tester, double width) async {
+        search.queueFound([
+          _venue('ember-vine'),
+          _venue('salt-stone'),
+          _venue('olive-row'),
+          _venue('cedar-hall'),
+        ]);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await locate(tester);
+        tester.view.physicalSize = Size(width, 2400);
+        await tester.pumpAndSettle();
+      }
+
+      for (final (width, perRow) in [(390.0, 1), (800.0, 2), (1200.0, 3)]) {
+        testWidgets('at ${width.toInt()}px shows $perRow venue card(s) per '
+            'row', (tester) async {
+          // Arrange + Act
+          await fourAt(tester, width);
+
+          // Assert
+          final cards = find.byType(VenueCard);
+          expect(cards, findsNWidgets(4));
+          expect(firstRowCount(tester, cards), perRow);
+          expect(tester.takeException(), isNull);
+        });
+      }
+
+      testWidgets("at 390px the photo keeps the artboard's fixed-height "
+          'banner, and at 1200px it is 3:2', (tester) async {
+        // Arrange + Act
+        await fourAt(tester, 390);
+
+        // Assert
+        final phone = tester.getSize(find.byType(PhotoTile).first);
+        expect(phone, const Size(350, VenueCard.photoHeight));
+
+        // Act
+        tester.view.physicalSize = const Size(1200, 2400);
+        await tester.pumpAndSettle();
+
+        // Assert
+        final grid = tester.getSize(find.byType(PhotoTile).first);
+        expect(
+          grid.width / grid.height,
+          closeTo(VenueCard.gridPhotoAspectRatio, 0.01),
+        );
+      });
+
+      testWidgets('cards in one row share a height, so their surfaces line '
+          'up', (tester) async {
+        // Arrange: one venue with a blurb, so its card is taller.
+        search.queueFound([
+          const Venue(
+            ref: VenueRef(source: MenuSource.wolt, platformId: 'long'),
+            name: 'Venue long',
+            shortDescription: 'A long blurb that adds a line to this card.',
+          ),
+          _venue('short'),
+        ]);
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await locate(tester);
+
+        // Act: 800px, two per row.
+        tester.view.physicalSize = const Size(800, 2400);
+        await tester.pumpAndSettle();
+
+        // Assert
+        final cards = find.byType(VenueCard);
+        expect(
+          tester.getSize(cards.at(0)).height,
+          tester.getSize(cards.at(1)).height,
+        );
+      });
+
+      testWidgets('the loading skeletons follow the same grid at 1200px', (
+        tester,
+      ) async {
+        // Arrange: hold the locate call open on the skeletons.
+        final gate = Completer<void>();
+        location.gate = gate.future;
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        tester.view.physicalSize = const Size(1200, 2400);
+        await tester.pumpAndSettle();
+
+        // Act
+        await tester.tap(find.byTooltip(_l10n(tester).discoveryUseLocation));
+        await tester.pump();
+
+        // Assert: three skeletons, side by side in one row.
+        final skeletons = find.byType(VenueCardSkeleton);
+        expect(skeletons, findsNWidgets(3));
+        expect(firstRowCount(tester, skeletons), 3);
+
+        // Cleanup
+        gate.complete();
+        await tester.pumpAndSettle();
       });
     });
 

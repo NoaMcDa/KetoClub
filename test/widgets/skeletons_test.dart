@@ -68,6 +68,50 @@ void main() {
       },
     );
 
+    testWidgets("build's photo block keeps photoAspectRatio when given, as "
+        'the grid card it stands in for does (issue #222)', (tester) async {
+      // Act
+      await _pump(
+        tester,
+        const Center(
+          child: SizedBox(
+            width: 300,
+            child: VenueCardSkeleton(
+              photoAspectRatio: VenueCard.gridPhotoAspectRatio,
+            ),
+          ),
+        ),
+      );
+
+      // Assert
+      final block = tester.getSize(
+        find
+            .descendant(
+              of: find.byType(AspectRatio),
+              matching: find.byType(DecoratedBox),
+            )
+            .first,
+      );
+      expect(block, const Size(300, 200));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('build draws on the same card surface as VenueCard', (
+      tester,
+    ) async {
+      // Act
+      await _pump(tester, const VenueCardSkeleton());
+
+      // Assert
+      expect(
+        find.descendant(
+          of: find.byType(VenueCardSkeleton),
+          matching: find.byType(Card),
+        ),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('build excludes its own semantics', (tester) async {
       // Act
       await _pump(tester, const VenueCardSkeleton());
