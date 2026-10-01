@@ -882,6 +882,19 @@ class AppLocalizationsHe extends AppLocalizations {
       'צלמו את דפי התפריט, בחרו תמונות מהגלריה או בחרו קובץ PDF. קטוקלאב קורא את המנות מהדפים ומנתח אותן.';
 
   @override
+  String get scanScreenModePages => 'תמונות ו-PDF';
+
+  @override
+  String get scanScreenModePaste => 'הדבקת טקסט';
+
+  @override
+  String get scanScreenModeQr => 'קוד QR';
+
+  @override
+  String get scanScreenQrIntro =>
+      'סרקו את קוד ה-QR שעל השולחן כדי לפתוח את התפריט של המסעדה.';
+
+  @override
   String get scanScreenActionTakePhoto => 'צילום';
 
   @override
@@ -932,9 +945,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get scanScreenAnalysePages => 'נתחו את הדפים';
-
-  @override
-  String get scanScreenPasteHeading => 'או הדביקו את הטקסט';
 
   @override
   String get scanScreenDisclosureWeb =>

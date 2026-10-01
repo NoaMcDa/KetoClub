@@ -55,16 +55,20 @@ MenuFetched _menu(VenueRef ref) => MenuFetched(
   ),
 );
 
-/// The "Scan QR code" action on the Scan tab.
+/// The "Scan QR code" action, the QR code mode's one primary button
+/// (issue #247). `FilledButton.icon` builds a private subclass, hence
+/// `bySubtype`.
 Finder get _scanQr => find.ancestor(
   of: find.text(_en.scanQrAction),
-  matching: find.bySubtype<OutlinedButton>(),
+  matching: find.bySubtype<FilledButton>(),
 );
 
-/// Opens the Scan tab over [fakes] and taps "Scan QR code".
+/// Opens the Scan tab over [fakes], chooses the QR code mode and taps
+/// "Scan QR code".
 Future<void> _scan(WidgetTester tester, FakeAppDependencies fakes) async {
   await pumpApp(tester, fakes);
   await tapAndSettle(tester, navDestination(_en.navScan));
+  await tapAndSettle(tester, find.text(_en.scanScreenModeQr));
   await tapAndSettle(tester, _scanQr);
 }
 

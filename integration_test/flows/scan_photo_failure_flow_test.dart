@@ -67,6 +67,7 @@ void main() {
         ];
         await pumpApp(tester, fakes);
         await tapAndSettle(tester, navDestination(_en.navScan));
+        await tapAndSettle(tester, find.text(_en.scanScreenModePages));
         await tapAndSettle(tester, find.text(_en.scanScreenActionChoosePhotos));
         expect(_retry, findsNothing);
 

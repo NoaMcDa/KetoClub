@@ -54,6 +54,7 @@ void main() {
 
         // Act: open the Scan tab and choose the PDF.
         await tapAndSettle(tester, navDestination(_en.navScan));
+        await tapAndSettle(tester, find.text(_en.scanScreenModePages));
         await tapAndSettle(tester, find.text(_en.scanScreenActionChoosePdf));
 
         // Assert: one page is listed, labelled as a document.

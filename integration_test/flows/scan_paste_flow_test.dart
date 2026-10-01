@@ -74,8 +74,9 @@ void main() {
         fakes.classifier.respondWith(_analysis());
         await pumpApp(tester, fakes);
 
-        // Act: open the Scan tab, paste, and analyse.
+        // Act: open the Scan tab, choose Paste text, paste, and analyse.
         await tapAndSettle(tester, navDestination(_en.navScan));
+        await tapAndSettle(tester, find.text(_en.scanScreenModePaste));
         expect(tester.widget<FilledButton>(_analyse).onPressed, isNull);
         await enterText(tester, _pasted);
         await tapAndSettle(tester, _analyse);
@@ -112,6 +113,7 @@ void main() {
       fakes.classifier.respondWith(_analysis());
       await pumpApp(tester, fakes);
       await tapAndSettle(tester, navDestination(_en.navScan));
+      await tapAndSettle(tester, find.text(_en.scanScreenModePaste));
 
       // Act: paste and analyse, go back, paste and analyse once more.
       await enterText(tester, _pasted);
