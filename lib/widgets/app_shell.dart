@@ -10,12 +10,22 @@ import 'package:ketoclub/widgets/route_title.dart';
 /// reaches no service of its own — `app.dart`'s `generateRoute` is the only
 /// place that decides which index a route gets.
 ///
-/// A tab tap uses [Navigator.pushNamedAndRemoveUntil], clearing every route
-/// beneath it, so the stack never grows — even when the shell was reached
-/// as a pushed route, such as the menu screen's Settings action — and the
-/// web URL tracks the active tab; "active tab reflects the route"
-/// then needs no route observer, since the index is simply passed in by
-/// whichever route built this shell.
+/// A tab tap replaces the whole stack with the new tab root (`_selectTab`),
+/// so the stack never grows — even when the shell was reached as a pushed
+/// route, such as the menu screen's Settings action, which must not leave
+/// the menu beneath the next tab (audit G8) — and the web URL tracks the
+/// active tab; "active tab reflects the route" then needs no route
+/// observer, since the index is simply passed in by whichever route built
+/// this shell.
+///
+/// Back from a tab other than Explore — the browser's Back button, Android's
+/// system back — returns to Explore rather than leaving the app (issue
+/// #262). A `Navigator` without a `Router` tells Flutter web to keep a
+/// single browser-history entry, so the browser's Back is simply a pop of
+/// this navigator; a lone tab root has nothing beneath it to pop to, so
+/// the shell catches that pop (`_backToExplore`) and switches to Explore
+/// instead. Back from Explore still leaves the app. A shell pushed over
+/// another route (Settings over a menu) pops normally, back to that route.
 ///
 /// This is deliberately not an `IndexedStack`: the other routes in
 /// `generateRoute` build a fresh controller on purpose (so two visits to a
@@ -47,12 +57,12 @@ class AppShell extends StatelessWidget {
   static const int settingsIndex = 3;
 
   /// The route pushed for each tab index, in the same order as the
-  /// `NavigationDestination`s built in `build` below. Mirrors the route
-  /// path constants in `app.dart`
-  /// (`scanRoutePath`, `savedRoutePath`, `settingsRoutePath`); this widget
-  /// cannot import `app.dart` to reuse them directly — `widgets/` sits below
-  /// `app.dart` in the layer order (architecture.md §5) — so the four
-  /// literals are the one place this shell must be kept in step with them.
+  /// destinations `_tabs` lists. Mirrors the route path constants in
+  /// `app.dart` (`scanRoutePath`, `savedRoutePath`, `settingsRoutePath`);
+  /// this widget cannot import `app.dart` to reuse them directly —
+  /// `widgets/` sits below `app.dart` in the layer order (architecture.md
+  /// §5) — so the four literals are the one place this shell must be kept
+  /// in step with them.
   static const List<String> _routes = <String>[
     '/',
     '/scan',
@@ -76,15 +86,65 @@ class AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final tabLabels = <String>[
-      l10n.navExplore,
-      l10n.navScan,
-      l10n.navSaved,
-      l10n.navSettings,
-    ];
     return RouteTitle(
-      page: pageTitle ?? tabLabels[currentIndex],
-      child: _scaffold(context, l10n),
+      page: pageTitle ?? _tabs(l10n)[currentIndex].label,
+      child: _backToExplore(context, _scaffold(context, l10n)),
+    );
+  }
+
+  /// The four destinations, in [_routes]' order: icon, selected icon and
+  /// label. The one list every navigation surface builds from, so a
+  /// `NavigationRail` on wide screens (issue #223) cannot drift from the
+  /// bottom bar.
+  static List<({IconData icon, IconData selectedIcon, String label})> _tabs(
+    AppLocalizations l10n,
+  ) => [
+    (
+      icon: Icons.explore_outlined,
+      selectedIcon: Icons.explore,
+      label: l10n.navExplore,
+    ),
+    (
+      icon: Icons.document_scanner_outlined,
+      selectedIcon: Icons.document_scanner,
+      label: l10n.navScan,
+    ),
+    (icon: Icons.history, selectedIcon: Icons.history, label: l10n.navSaved),
+    (icon: Icons.tune, selectedIcon: Icons.tune, label: l10n.navSettings),
+  ];
+
+  /// Switches to tab [index]: the one tap handler every navigation surface
+  /// calls (issue #223 reuses it for the rail).
+  ///
+  /// Removes every route, not just this one, and pushes the tab root, so
+  /// the new tab replaces the current one. When this shell is the only
+  /// route — every tab-to-tab switch — that is exactly a
+  /// `pushReplacementNamed`. When the shell was pushed over other routes —
+  /// Settings from a menu or from the Scan tab, the drinks guide from a
+  /// menu, a deep link Flutter web stacks over `/` — replacing only the top
+  /// would leave the menu and everything under it beneath the new tab, and
+  /// each such round trip grew the stack by a whole menu screen (audit G8).
+  /// Clearing them all handles every such source in this one place, while
+  /// the source itself can still push Settings over the menu so that Back
+  /// from Settings returns to it.
+  void _selectTab(BuildContext context, int index) {
+    if (index == currentIndex) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(_routes[index], (_) => false);
+  }
+
+  /// Wraps [scaffold] so that Back from a lone tab root other than Explore
+  /// switches to Explore instead of leaving the app (issue #262; see the
+  /// class doc). Explore itself, and any shell with a route beneath it to
+  /// pop back to, pop as usual — which also keeps the iOS back-swipe working
+  /// for Settings pushed over a menu.
+  Widget _backToExplore(BuildContext context, Widget scaffold) {
+    if (currentIndex == exploreIndex) return scaffold;
+    return PopScope<Object?>(
+      canPop: ModalRoute.canPopOf(context) ?? true,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _selectTab(context, exploreIndex);
+      },
+      child: scaffold,
     );
   }
 
@@ -93,37 +153,14 @@ class AppShell extends StatelessWidget {
       body: child,
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentIndex,
-        onDestinationSelected: (index) {
-          if (index == currentIndex) return;
-          // Removes every route, not just this one: the shell is also
-          // reached as a pushed route (the menu screen's Settings
-          // action), and replacing only the top would leave the menu
-          // and everything under it stacked beneath the new tab — each
-          // such round trip grew the stack by a whole menu screen.
-          Navigator.of(context)
-              .pushNamedAndRemoveUntil(_routes[index], (_) => false);
-        },
+        onDestinationSelected: (index) => _selectTab(context, index),
         destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.explore_outlined),
-            selectedIcon: const Icon(Icons.explore),
-            label: l10n.navExplore,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.document_scanner_outlined),
-            selectedIcon: const Icon(Icons.document_scanner),
-            label: l10n.navScan,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.history),
-            selectedIcon: const Icon(Icons.history),
-            label: l10n.navSaved,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.tune),
-            selectedIcon: const Icon(Icons.tune),
-            label: l10n.navSettings,
-          ),
+          for (final tab in _tabs(l10n))
+            NavigationDestination(
+              icon: Icon(tab.icon),
+              selectedIcon: Icon(tab.selectedIcon),
+              label: tab.label,
+            ),
         ],
       ),
     );

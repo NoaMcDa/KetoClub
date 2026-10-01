@@ -937,8 +937,13 @@ the four screens above were written: `AppShell` wraps all four tab-root routes
 (Explore `/`, Scan `/scan`, Recent `/saved`, Settings `/settings`) with a
 `NavigationBar`. It is purely presentational — it takes an already-built `child`
 and the `currentIndex` `app.dart`'s `generateRoute` supplies, and switches tabs
-with `Navigator.pushReplacementNamed` rather than an `IndexedStack`, so the stack
-never grows and each visit to a tab rebuilds its controller from scratch. `Scan`
+by replacing the whole stack with the new tab root
+(`pushNamedAndRemoveUntil`) rather than an `IndexedStack`, so the stack never
+grows — Settings pushed over a menu leaves no menu beneath the next tab (audit
+G8) — and each visit to a tab rebuilds its controller from scratch. Back from a
+lone tab root other than Explore — the browser's Back button, which a
+`Router`-less `Navigator` turns into a pop, or Android's — switches to Explore
+instead of leaving the app; Back from Explore leaves it (issue #262). `Scan`
 and `SavedScreen` are stateless placeholders with localized copy explaining what
 is missing, not stubs left silently blank; `MenuScreen` (reached from a search
 result, not a tab) and `WaiterCardSheet` (a modal) sit outside the shell.

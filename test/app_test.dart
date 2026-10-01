@@ -9,6 +9,7 @@ import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/drinks_guide_screen.dart' show drinksRoutePath;
+import 'package:ketoclub/screens/menu_screen.dart';
 import 'package:ketoclub/screens/scan_screen.dart';
 import 'package:ketoclub/screens/settings_screen.dart';
 import 'package:ketoclub/screens/venue_search_screen.dart';
@@ -252,6 +253,88 @@ void main() {
       expect(find.byType(AppShell), findsOneWidget);
       final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
       expect(bar.selectedIndex, equals(AppShell.settingsIndex));
+    });
+  });
+
+  group('route stack (issue #262, audit G8)', () {
+    /// The bottom-navigation destination labelled [label].
+    Finder tab(String label) => find.descendant(
+      of: find.byType(NavigationBar),
+      matching: find.text(label),
+    );
+
+    testWidgets('browser Back after switching to Saved lands on Explore', (
+      tester,
+    ) async {
+      // Arrange
+      await tester.pumpWidget(
+        KetoClubApp(dependencies: FakeAppDependencies().dependencies),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(tab(_en.navSaved));
+      await tester.pumpAndSettle();
+      expect(find.byType(VenueSearchScreen), findsNothing);
+
+      // Act: what the engine sends for the browser's Back button.
+      final handled = await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(handled, isTrue);
+      expect(find.byType(VenueSearchScreen), findsOneWidget);
+      final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
+      expect(bar.selectedIndex, equals(AppShell.exploreIndex));
+    });
+
+    testWidgets('menu, its Settings action, then Explore leaves no menu '
+        'under the stack (audit G8)', (tester) async {
+      // Arrange: a venue menu opened from Explore, then Settings from its
+      // app bar.
+      await tester.pumpWidget(
+        KetoClubApp(dependencies: FakeAppDependencies().dependencies),
+      );
+      await tester.pumpAndSettle();
+      final navigator = tester.state<NavigatorState>(
+        find.byType(Navigator).first,
+      )..pushNamed('/venue/wolt/hamosad', arguments: 'Hamosad');
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip(_en.actionOpenSettings));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsScreen), findsOneWidget);
+
+      // Act
+      await tester.tap(tab(_en.navExplore));
+      await tester.pumpAndSettle();
+
+      // Assert: Explore alone, with no menu kept beneath it.
+      expect(find.byType(VenueSearchScreen), findsOneWidget);
+      expect(find.byType(MenuScreen, skipOffstage: false), findsNothing);
+      expect(navigator.canPop(), isFalse);
+    });
+
+    testWidgets("Back from the menu's Settings returns to the menu", (
+      tester,
+    ) async {
+      // Arrange: the Settings tab pushed over a venue menu.
+      await tester.pumpWidget(
+        KetoClubApp(dependencies: FakeAppDependencies().dependencies),
+      );
+      await tester.pumpAndSettle();
+      tester
+          .state<NavigatorState>(find.byType(Navigator).first)
+          .pushNamed('/venue/wolt/hamosad', arguments: 'Hamosad');
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip(_en.actionOpenSettings));
+      await tester.pumpAndSettle();
+
+      // Act
+      final handled = await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(handled, isTrue);
+      expect(find.byType(MenuScreen), findsOneWidget);
+      expect(find.byType(SettingsScreen), findsNothing);
     });
   });
 
