@@ -17,9 +17,11 @@ import 'package:provider/provider.dart';
 /// coloured left rail, a tinted card, and a net-carb chip that is always
 /// framed as an estimate.
 ///
-/// A [DishVerdict.modifiable] row shows a tappable amber summary that
-/// expands into its waiter script, plus a button to open the full-screen
-/// waiter card; a [DishVerdict.nonKeto] row shows neither; a row whose
+/// A [DishVerdict.modifiable] row shows one tappable amber summary that
+/// expands into its waiter script; the button to open the full-screen
+/// waiter card lives inside that expanded panel, beside Copy, not as a
+/// standing second action (issue #239). A [DishVerdict.nonKeto] row shows
+/// neither; a row whose
 /// [DishRow.analysis] is null shows no verdict claim and no script,
 /// because none has been made yet.
 class DishCard extends StatefulWidget {
@@ -230,19 +232,18 @@ class _DishCardState extends State<DishCard> {
             ),
             if (_scriptExpanded) ...[
               const SizedBox(height: 8),
-              WaiterScriptWidget(script: scriptText!),
+              WaiterScriptWidget(
+                script: scriptText!,
+                trailingAction: _FullScreenAction(
+                  dishName: dish.name,
+                  onPressed: () => widget.onShowScript(row),
+                ),
+              ),
               if (analysis!.hiddenCarbs.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 _HiddenCarbsRow(hiddenCarbs: analysis.hiddenCarbs, tone: tone),
               ],
             ],
-            Align(
-              alignment: AlignmentDirectional.centerEnd,
-              child: TextButton(
-                onPressed: () => widget.onShowScript(row),
-                child: Text(l10n.waiterCardOpen),
-              ),
-            ),
           ],
         ],
       ),
@@ -422,6 +423,10 @@ class _ScriptDisclosure extends StatelessWidget {
       button: true,
       expanded: expanded,
       label: label,
+      // excludeSemantics drops the InkWell's own tap action, so the
+      // action is declared here too; without it a screen reader could
+      // focus the row but never activate it.
+      onTap: onTap,
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,
@@ -457,6 +462,37 @@ class _ScriptDisclosure extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The "Full screen" action shown beside Copy inside the expanded waiter
+/// script (issue #239): opens the full-screen waiter card for the dish.
+///
+/// Announced with the dish name, so a screen reader user hears which
+/// dish's card it opens rather than a bare "Full screen".
+class _FullScreenAction extends StatelessWidget {
+  const new({required this.dishName, required this.onPressed});
+
+  /// The dish's name, spoken as part of the semantic label.
+  final String dishName;
+
+  /// Called when the action is activated.
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Semantics(
+      button: true,
+      label: l10n.dishCardFullScreenSemanticLabel(dishName),
+      onTap: onPressed,
+      excludeSemantics: true,
+      child: OutlinedButton.icon(
+        onPressed: onPressed,
+        icon: const Icon(Icons.fullscreen),
+        label: Text(l10n.dishCardFullScreen),
       ),
     );
   }

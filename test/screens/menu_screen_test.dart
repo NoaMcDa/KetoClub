@@ -1955,7 +1955,9 @@ void main() {
         await tester.pumpAndSettle();
 
         // Act
-        await tester.tap(find.text(_en.waiterCardOpen));
+        await tester.tap(find.text(_en.dishCardAskWaiter));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(_en.dishCardFullScreen));
         await tester.pumpAndSettle();
 
         // Assert
@@ -2002,7 +2004,9 @@ void main() {
         expect(brightness.raiseCount, 0);
 
         // Act
-        await tester.tap(find.text(_en.waiterCardOpen));
+        await tester.tap(find.text(_en.dishCardAskWaiter));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(_en.dishCardFullScreen));
         await tester.pumpAndSettle();
 
         // Assert

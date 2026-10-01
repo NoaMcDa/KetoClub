@@ -219,23 +219,31 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text(fixture.red.name), findsOneWidget);
 
-      // Act: scroll back up to the modifiable dish and open its Waiter
-      // Card — the scroll above may have taken its button out of the
-      // lazy list's built range.
+      // Act: scroll back up to the modifiable dish, expand its script and
+      // open its Waiter Card from inside it — the scroll above may have
+      // taken its disclosure row out of the lazy list's built range.
       await tester.scrollUntilVisible(
-        find.text(_en.waiterCardOpen),
+        find.text(_en.dishCardAskWaiter),
         -200,
         scrollable: _menuList,
       );
       await tester.pumpAndSettle();
-      await tapAndSettle(tester, find.text(_en.waiterCardOpen));
+      await tapAndSettle(tester, find.text(_en.dishCardAskWaiter));
+      await tester.scrollUntilVisible(
+        find.text(_en.dishCardFullScreen),
+        200,
+        scrollable: _menuList,
+      );
+      await tapAndSettle(tester, find.text(_en.dishCardFullScreen));
 
       // Assert: the Waiter Card is open and its script text is on screen.
       expect(find.byType(WaiterCardSheet), findsOneWidget);
       expect(find.text(_yellowScript), findsWidgets);
 
       // Act: copy the script from the Waiter Card.
-      await tapAndSettle(tester, find.text(_en.waiterCardCopyButton));
+      // The dish card behind the sheet has its own Copy button; the sheet's
+      // is the last one in the tree.
+      await tapAndSettle(tester, find.text(_en.waiterCardCopyButton).last);
 
       // Assert: the confirmation shows, and the plain script — not any
       // numbering the card draws around it — reached the clipboard.

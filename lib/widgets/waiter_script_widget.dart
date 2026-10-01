@@ -37,6 +37,7 @@ class WaiterScriptWidget extends StatelessWidget {
   const new({
     required this.script,
     this.onCopied,
+    this.trailingAction,
     this.prominent = false,
     super.key,
   });
@@ -46,6 +47,10 @@ class WaiterScriptWidget extends StatelessWidget {
 
   /// Called after [script] has been copied to the clipboard.
   final VoidCallback? onCopied;
+
+  /// An optional extra action drawn beside the Copy button, such as the
+  /// dish card's "Full screen" button (issue #239). Null draws Copy alone.
+  final Widget? trailingAction;
 
   /// Whether to draw the lines at the full-screen Waiter Card's size
   /// (`.design/WaiterCard.dc.html`: 21px medium text, a 30px number)
@@ -102,13 +107,20 @@ class WaiterScriptWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Align(
-          alignment: AlignmentDirectional.centerEnd,
-          child: FilledButton.icon(
-            onPressed: () => _copy(context, l10n),
-            icon: const Icon(Icons.copy),
-            label: Text(l10n.waiterCardCopyButton),
-          ),
+        // A Wrap, so the two buttons stack rather than overflow at a
+        // large text scale.
+        Wrap(
+          alignment: WrapAlignment.end,
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            ?trailingAction,
+            FilledButton.icon(
+              onPressed: () => _copy(context, l10n),
+              icon: const Icon(Icons.copy),
+              label: Text(l10n.waiterCardCopyButton),
+            ),
+          ],
         ),
       ],
     );

@@ -129,7 +129,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get verdictNonKeto => 'לא קטוגני';
 
   @override
-  String get waiterCardOpen => 'הצג כרטיס למלצר';
+  String get dishCardFullScreen => 'מסך מלא';
+
+  @override
+  String dishCardFullScreenSemanticLabel(String dish) {
+    return 'הצג כרטיס למלצר עבור $dish';
+  }
 
   @override
   String get waiterCardTitle => 'זה מה שאומרים למלצר';

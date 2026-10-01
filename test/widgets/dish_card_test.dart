@@ -142,13 +142,13 @@ void main() {
 
         // Assert: collapsed by default (architecture.md §6.6, issue #30's
         // expandable script), so the script itself is not yet built, but
-        // the summary CTA, the badge and the always-visible full-sheet
-        // button are.
+        // the summary CTA and the badge are, and the full-screen action
+        // is not (issue #239: one waiter action while collapsed).
         expect(find.byType(WaiterScriptWidget), findsNothing);
         expect(find.text(script), findsNothing);
         expect(find.text('Ask your waiter'), findsOneWidget);
         expect(find.byType(StatusBadge), findsOneWidget);
-        expect(find.text('Show the waiter card'), findsOneWidget);
+        expect(find.text('Full screen'), findsNothing);
       },
     );
 
@@ -181,6 +181,7 @@ void main() {
       expect(find.byType(WaiterScriptWidget), findsOneWidget);
       expect(find.text(script), findsOneWidget);
       expect(find.text('Hide the waiter script'), findsOneWidget);
+      expect(find.text('Full screen'), findsOneWidget);
 
       // Act: collapse again
       await tester.tap(find.text('Hide the waiter script'));
@@ -189,8 +190,7 @@ void main() {
       // Assert
       expect(find.byType(WaiterScriptWidget), findsNothing);
       expect(find.text('Ask your waiter'), findsOneWidget);
-      // The full-sheet button never depends on the disclosure state.
-      expect(find.text('Show the waiter card'), findsOneWidget);
+      expect(find.text('Full screen'), findsNothing);
     });
 
     testWidgets(
@@ -255,13 +255,60 @@ void main() {
             onShowScript: (shownRow) => shown = shownRow,
           ),
         );
-        await tester.tap(find.text('Show the waiter card'));
+        await tester.tap(find.text('Ask your waiter'));
+        await tester.pump();
+        await tester.tap(find.text('Full screen'));
         await tester.pumpAndSettle();
 
         // Assert
         expect(shown, row);
       },
     );
+
+    testWidgets('the disclosure row and the full-screen action are announced '
+        'as buttons, the latter with the dish name (issue #239)', (
+      tester,
+    ) async {
+      // Arrange
+      final handle = tester.ensureSemantics();
+      final row = DishRow(
+        dish: _dish(),
+        category: 'Mains',
+        analysis: const AnalysedDish(
+          dishId: 'dish_1',
+          name: 'Grilled Salmon',
+          verdict: DishVerdict.modifiable,
+          why: 'Mostly protein, with a starchy side to swap.',
+          modification: 'Ask for a side salad instead of fries.',
+        ),
+      );
+      await _pump(
+        tester,
+        DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+      );
+
+      // Assert: the collapsed row exposes a tap action to a screen reader.
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Ask your waiter')),
+        matchesSemantics(
+          label: 'Ask your waiter',
+          isButton: true,
+          hasTapAction: true,
+          hasExpandedState: true,
+        ),
+      );
+
+      // Act
+      await tester.tap(find.text('Ask your waiter'));
+      await tester.pump();
+
+      // Assert: the full-screen action names the dish.
+      expect(
+        find.bySemanticsLabel('Show the waiter card for ${_dish().name}'),
+        findsOneWidget,
+      );
+      handle.dispose();
+    });
 
     testWidgets('build shows no waiter script for a non-keto row', (
       tester,
@@ -287,7 +334,7 @@ void main() {
       // Assert
       expect(find.byType(WaiterScriptWidget), findsNothing);
       expect(find.byType(StatusBadge), findsOneWidget);
-      expect(find.text('Show the waiter card'), findsNothing);
+      expect(find.text('Full screen'), findsNothing);
     });
 
     testWidgets(
@@ -582,7 +629,7 @@ void main() {
       },
     );
 
-    testWidgets('build renders the Hebrew waiter-card label in the he locale', (
+    testWidgets('build renders the Hebrew full-screen label in the he locale', (
       tester,
     ) async {
       // Arrange
@@ -605,8 +652,11 @@ void main() {
         locale: const Locale('he'),
       );
 
-      // Assert
-      expect(find.text('הצג כרטיס למלצר'), findsOneWidget);
+      await tester.tap(find.text('שאלו את המלצר'));
+      await tester.pump();
+
+      // Assert: the full-screen action is inside the expanded script.
+      expect(find.text('מסך מלא'), findsOneWidget);
     });
 
     group('personal notes (issue #52)', () {
