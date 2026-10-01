@@ -40,6 +40,7 @@
     "placeholders": { "count": { "type": "int" } }
   },
   "unclassifiedExplain": "קטוקלאב ראה את המנות האלה אבל לא הצליח לסווג אותן. קראו אותן בעצמכם לפני שאתם מזמינים.",
+  "unclassifiedBadge": "לא סווג",
   "engineChipAi": "בינה מלאכותית",
   "engineChipRules": "כללים",
   "rulesNotVerifiedHint": "תוצאה על בסיס כללים, ללא אימות בינה מלאכותית.",

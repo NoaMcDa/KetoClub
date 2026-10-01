@@ -65,6 +65,34 @@ void main() {
       expect(find.text(formatPrice(64, localeTag: 'en')), findsOneWidget);
     });
 
+    testWidgets('build shows the neutral badge only for an unclassified '
+        'null-analysis row (issue #244)', (tester) async {
+      // Arrange
+      final row = DishRow(dish: _dish(), category: 'Mains');
+
+      // Act: a plain null-analysis row has no badge.
+      await _pump(
+        tester,
+        DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+      );
+      expect(find.byType(UnclassifiedBadge), findsNothing);
+
+      // Act: flagged unclassified, it carries the neutral badge.
+      await _pump(
+        tester,
+        DishCard(
+          row: row,
+          localeTag: 'en',
+          onShowScript: (_) {},
+          unclassified: true,
+        ),
+      );
+
+      // Assert
+      expect(find.byType(UnclassifiedBadge), findsOneWidget);
+      expect(find.text('NOT CLASSIFIED'), findsOneWidget);
+    });
+
     testWidgets('build hides the price when showPrice is false', (
       tester,
     ) async {

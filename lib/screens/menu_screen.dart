@@ -559,8 +559,8 @@ class _MenuScreenState extends State<MenuScreen> {
             _noVisibleRows(l10n, controller)
           else
             ..._dishRows(context, controller, localeTag, rows),
-          if (analysed && controller.unclassifiedNames.isNotEmpty)
-            _unclassifiedSection(context, l10n, controller),
+          if (analysed && controller.unclassifiedRows.isNotEmpty)
+            _unclassifiedSection(context, l10n, controller, localeTag),
         ],
       ),
     );
@@ -1102,28 +1102,53 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
-  /// The unclassified section: a neutral heading naming
-  /// [MenuController.unclassifiedNames]'s count, an explanation, and every
-  /// name — never dropped, regardless of [MenuFilter] (architecture.md
-  /// §6.6, constraint 8).
+  /// The unclassified section: a neutral heading naming the count, an
+  /// explanation, a "Try again" that re-analyses, and every dish as a
+  /// [DishCard] with the neutral "Not classified" badge (issue #244) —
+  /// never dropped, regardless of [MenuFilter] (architecture.md §6.6,
+  /// constraint 8).
   Widget _unclassifiedSection(
     BuildContext context,
     AppLocalizations l10n,
     MenuController controller,
+    String localeTag,
   ) {
+    final rows = controller.unclassifiedRows;
     return Padding(
       padding: const EdgeInsets.only(top: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            l10n.unclassifiedTitle(controller.unclassifiedNames.length),
+            l10n.unclassifiedTitle(rows.length),
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 4),
           Text(l10n.unclassifiedExplain),
-          const SizedBox(height: 8),
-          for (final name in controller.unclassifiedNames) Text(name),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton(
+              onPressed: () => _retry(controller.reanalyse),
+              child: Text(l10n.actionRetry),
+            ),
+          ),
+          const SizedBox(height: 4),
+          for (final row in rows)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: DishCard(
+                row: row,
+                localeTag: localeTag,
+                onShowScript: (shown) => unawaited(_openWaiterCard(shown)),
+                unclassified: true,
+                // The same price rule as the classified cards; a dish
+                // the menu does not contain has no price to show.
+                showPrice:
+                    widget.ref.source != MenuSource.scan &&
+                    widget.ref.source != MenuSource.website &&
+                    row.category.isNotEmpty,
+              ),
+            ),
         ],
       ),
     );

@@ -40,6 +40,7 @@
     "placeholders": { "count": { "type": "int" } }
   },
   "unclassifiedExplain": "KetoClub saw these dishes but could not place them. Read them yourself before ordering.",
+  "unclassifiedBadge": "Not classified",
   "engineChipAi": "AI",
   "engineChipRules": "Rules",
   "rulesNotVerifiedHint": "Rule-based result, not AI-verified.",

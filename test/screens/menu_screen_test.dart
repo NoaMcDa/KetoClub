@@ -1710,7 +1710,65 @@ void main() {
       },
     );
 
-    testWidgets('the unclassified section renders its names', (tester) async {
+    testWidgets('the unclassified section renders each dish as a card with '
+        'the neutral badge and its description (issue #244)', (tester) async {
+      // Arrange: one dish the menu has, one name only the model gave.
+      final green = _dish('Steak', id: 'green');
+      const mystery = Dish(
+        id: 'mystery',
+        name: 'Mystery bowl',
+        description: 'Chef special of the day',
+        price: 42,
+        options: <DishOption>[],
+      );
+      final repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: _menuOf([green, mystery])));
+      final classifier = FakeMenuClassifier()
+        ..respondWith(
+          MenuAnalysed(
+            dishes: [_verdictFor(green, DishVerdict.orderAsIs)],
+            unclassified: const <String>['Mystery bowl', 'Invented plate'],
+            engine: const RulesEngine(
+              reason: MenuAnalysisFailureReason.notConfigured,
+            ),
+            analysedAt: DateTime.utc(2026),
+          ),
+        );
+      final controller = _controllerFor(
+        repository: repository,
+        classifier: classifier,
+      );
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+      // Order as-is only: the section still shows them (constraint 8).
+      await controller.setFilter(MenuFilter.greenOnly);
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Invented plate'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      // Assert: heading and explanation stay, each name is a DishCard.
+      expect(find.text(_en.unclassifiedTitle(2)), findsOneWidget);
+      expect(find.text(_en.unclassifiedExplain), findsOneWidget);
+      expect(find.text('Mystery bowl'), findsOneWidget);
+      expect(find.text('Chef special of the day'), findsOneWidget);
+      expect(find.text('Invented plate'), findsOneWidget);
+      expect(find.text(_en.unclassifiedBadge.toUpperCase()), findsNWidgets(2));
+      expect(
+        find.ancestor(
+          of: find.text('Mystery bowl'),
+          matching: find.byType(DishCard),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('the unclassified section Try again re-analyses without a '
+        'new fetch (issue #244)', (tester) async {
       // Arrange
       final green = _dish('Steak', id: 'green');
       final repository = FakeMenuRepository()
@@ -1730,15 +1788,23 @@ void main() {
         repository: repository,
         classifier: classifier,
       );
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text(_en.actionRetry),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      final loadCallsBefore = repository.loadCalls.length;
+      final classifyCallsBefore = classifier.calls.length;
 
       // Act
-      await _pump(tester, controller);
+      await tester.tap(find.text(_en.actionRetry));
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text(_en.unclassifiedTitle(1)), findsOneWidget);
-      expect(find.text(_en.unclassifiedExplain), findsOneWidget);
-      expect(find.text('Mystery bowl'), findsOneWidget);
+      expect(repository.loadCalls.length, equals(loadCallsBefore));
+      expect(classifier.calls.length, greaterThan(classifyCallsBefore));
     });
 
     testWidgets('switching the filter changes which cards are visible', (
