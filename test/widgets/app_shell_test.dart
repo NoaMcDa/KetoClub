@@ -3,10 +3,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
+import 'package:ketoclub/l10n/generated/app_localizations_he.dart';
+import 'package:ketoclub/theme/app_theme.dart';
+import 'package:ketoclub/theme/app_tokens.dart';
 import 'package:ketoclub/widgets/app_shell.dart';
 
 /// The English strings a test can read expected copy from.
 final AppLocalizations _en = AppLocalizationsEn();
+
+/// The Hebrew strings a right-to-left test can read expected copy from.
+final AppLocalizations _he = AppLocalizationsHe();
 
 /// Maps a route name to the tab index it should show, mirroring
 /// `generateRoute`'s own mapping in `app.dart`. This test cannot import
@@ -35,10 +41,18 @@ const String _detailRoute = '/detail';
 /// wrapping a [Text] naming the route, wired through a real [Navigator] the
 /// same way `generateRoute` wires the four tab-root routes in `app.dart`.
 /// That lets a tab tap be followed end to end, rather than only asserting
-/// on the [NavigationBar] in isolation.
-Future<void> _pump(WidgetTester tester, {String initialRoute = '/'}) {
+/// on the [NavigationBar] in isolation. [locale] and [theme] default to the
+/// bare English app every phone-width test below uses.
+Future<void> _pump(
+  WidgetTester tester, {
+  String initialRoute = '/',
+  Locale? locale,
+  ThemeData? theme,
+}) {
   return tester.pumpWidget(
     MaterialApp(
+      locale: locale,
+      theme: theme,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       initialRoute: initialRoute,
@@ -53,6 +67,14 @@ Future<void> _pump(WidgetTester tester, {String initialRoute = '/'}) {
       ),
     ),
   );
+}
+
+/// Sizes the test window to [width] logical pixels wide (and a fixed,
+/// comfortable height), restoring the default once the test ends.
+void _setWidth(WidgetTester tester, double width) {
+  tester.view.devicePixelRatio = 1;
+  tester.view.physicalSize = Size(width, 900);
+  addTearDown(tester.view.reset);
 }
 
 /// The navigator the shell under test lives in.
@@ -311,6 +333,203 @@ void main() {
       // Assert
       expect(handled, isTrue);
       expect(find.text('screen:/'), findsOneWidget);
+      expect(_navigator(tester).canPop(), isFalse);
+    });
+  });
+
+  group('AppShell at 840px and wider (issue #223)', () {
+    for (final (:width, :rail) in [
+      (width: 390.0, rail: false),
+      (width: 839.0, rail: false),
+      (width: AppShell.railBreakpoint, rail: true),
+      (width: 1200.0, rail: true),
+    ]) {
+      testWidgets('at ${width.toInt()}px shows '
+          '${rail ? 'a rail and no bottom bar' : 'the bottom bar, no rail'}', (
+        tester,
+      ) async {
+        // Arrange
+        _setWidth(tester, width);
+
+        // Act
+        await _pump(tester);
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(
+          find.byType(NavigationRail),
+          rail ? findsOneWidget : findsNothing,
+        );
+        expect(
+          find.byType(NavigationBar),
+          rail ? findsNothing : findsOneWidget,
+        );
+      });
+    }
+
+    testWidgets('the rail is compact, shows every label, and selects the '
+        "current route's tab", (tester) async {
+      // Arrange
+      _setWidth(tester, 1200);
+
+      // Act
+      await _pump(tester, initialRoute: '/saved');
+      await tester.pumpAndSettle();
+
+      // Assert
+      final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
+      expect(rail.extended, isFalse);
+      expect(rail.labelType, NavigationRailLabelType.all);
+      expect(rail.selectedIndex, equals(AppShell.savedIndex));
+      for (final label in [
+        _en.navExplore,
+        _en.navScan,
+        _en.navSaved,
+        _en.navSettings,
+      ]) {
+        expect(
+          find.descendant(
+            of: find.byType(NavigationRail),
+            matching: find.text(label),
+          ),
+          findsOneWidget,
+        );
+      }
+    });
+
+    testWidgets('the active tab is drawn in the accent, the rest in ink3', (
+      tester,
+    ) async {
+      // Arrange
+      _setWidth(tester, 1200);
+
+      // Act
+      await _pump(tester, theme: AppTheme.light());
+      await tester.pumpAndSettle();
+
+      // Assert: Explore is active (its filled icon), Scan is not.
+      final active = IconTheme.of(tester.element(find.byIcon(Icons.explore)));
+      final inactive = IconTheme.of(
+        tester.element(find.byIcon(Icons.document_scanner_outlined)),
+      );
+      expect(active.color, AppTokens.lightAccent);
+      expect(inactive.color, AppTokens.lightInk3);
+    });
+
+    testWidgets('in English the rail sits on the left, beside the content', (
+      tester,
+    ) async {
+      // Arrange
+      _setWidth(tester, 1200);
+
+      // Act
+      await _pump(tester);
+      await tester.pumpAndSettle();
+
+      // Assert
+      final rail = tester.getRect(find.byType(NavigationRail));
+      expect(rail.left, 0);
+      expect(tester.getRect(find.text('screen:/')).left, rail.right);
+    });
+
+    testWidgets('in Hebrew the rail mirrors to the right edge', (tester) async {
+      // Arrange
+      _setWidth(tester, 1200);
+
+      // Act
+      await _pump(tester, locale: const Locale('he'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      final rail = tester.getRect(find.byType(NavigationRail));
+      expect(rail.right, 1200);
+      expect(tester.getRect(find.text('screen:/')).right, rail.left);
+      expect(
+        find.descendant(
+          of: find.byType(NavigationRail),
+          matching: find.text(_he.navSaved),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('in Hebrew at phone width the bottom bar is unchanged', (
+      tester,
+    ) async {
+      // Arrange
+      _setWidth(tester, 390);
+
+      // Act
+      await _pump(tester, locale: const Locale('he'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byType(NavigationRail), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byType(NavigationBar),
+          matching: find.text(_he.navSaved),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('a rail tap replaces the tab, exactly as a bar tap does', (
+      tester,
+    ) async {
+      // Arrange
+      _setWidth(tester, 1200);
+      await _pump(tester);
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(find.text(_en.navScan));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(_en.navSaved));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('screen:/saved'), findsOneWidget);
+      final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
+      expect(rail.selectedIndex, equals(AppShell.savedIndex));
+      expect(_navigator(tester).canPop(), isFalse);
+    });
+
+    testWidgets('Back from a tab beside the rail returns to Explore', (
+      tester,
+    ) async {
+      // Arrange
+      _setWidth(tester, 1200);
+      await _pump(tester);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(_en.navSettings));
+      await tester.pumpAndSettle();
+
+      // Act
+      final handled = await _pressBack(tester);
+
+      // Assert
+      expect(handled, isTrue);
+      expect(find.text('screen:/'), findsOneWidget);
+    });
+
+    testWidgets('a rail tap from a tab pushed over a detail route leaves no '
+        'detail route beneath (audit G8)', (tester) async {
+      // Arrange
+      _setWidth(tester, 1200);
+      await _pump(tester);
+      await tester.pumpAndSettle();
+      _navigator(tester).pushNamed(_detailRoute);
+      await tester.pumpAndSettle();
+      _navigator(tester).pushNamed('/settings');
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(find.text(_en.navSaved));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('screen:/saved'), findsOneWidget);
       expect(_navigator(tester).canPop(), isFalse);
     });
   });

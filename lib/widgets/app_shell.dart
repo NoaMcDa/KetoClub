@@ -2,8 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/widgets/route_title.dart';
 
-/// The bottom-navigation shell around the four tab-root routes: Explore,
-/// Scan, Saved and Settings (architecture.md §6.6; issue #11).
+/// The navigation shell around the four tab-root routes: Explore, Scan,
+/// Saved and Settings (architecture.md §6.6; issue #11).
+///
+/// Below [railBreakpoint] logical pixels of width it is a bottom
+/// [NavigationBar]; at [railBreakpoint] and wider — Material 3's medium
+/// breakpoint — a [NavigationRail] on the leading edge (the right one in
+/// Hebrew) takes its place, so four icons are not spread across a desktop
+/// monitor and the wide layout is anchored to one side (issue #223). Both
+/// are built from the same `_tabs` and call the same `_selectTab`, so a tab
+/// behaves identically whichever surface shows it. Each screen already
+/// constrains its own body (`ContentWidth`), so beside a rail that content
+/// centres in the width the rail leaves.
 ///
 /// Purely presentational: it takes an already-built [child] screen and a
 /// `const` [currentIndex] the route builder supplies, and holds no state and
@@ -55,6 +65,11 @@ class AppShell extends StatelessWidget {
 
   /// The Settings tab's index — `/settings`, wrapping `SettingsScreen`.
   static const int settingsIndex = 3;
+
+  /// The narrowest window width, in logical pixels, that shows a
+  /// [NavigationRail] instead of the bottom [NavigationBar]: Material 3's
+  /// medium breakpoint (issue #223).
+  static const double railBreakpoint = 840;
 
   /// The route pushed for each tab index, in the same order as the
   /// destinations `_tabs` lists. Mirrors the route path constants in
@@ -148,21 +163,59 @@ class AppShell extends StatelessWidget {
     );
   }
 
+  /// The shell's scaffold: a [NavigationRail] beside [child] when the
+  /// shell is at least [railBreakpoint] wide, a bottom [NavigationBar]
+  /// under it otherwise.
   Widget _scaffold(BuildContext context, AppLocalizations l10n) {
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: currentIndex,
-        onDestinationSelected: (index) => _selectTab(context, index),
-        destinations: [
-          for (final tab in _tabs(l10n))
-            NavigationDestination(
-              icon: Icon(tab.icon),
-              selectedIcon: Icon(tab.selectedIcon),
-              label: tab.label,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= railBreakpoint) {
+          return Scaffold(
+            body: Row(
+              children: [
+                _rail(context, l10n),
+                Expanded(child: child),
+              ],
             ),
-        ],
-      ),
+          );
+        }
+        return Scaffold(body: child, bottomNavigationBar: _bar(context, l10n));
+      },
+    );
+  }
+
+  /// The bottom bar shown below [railBreakpoint].
+  Widget _bar(BuildContext context, AppLocalizations l10n) {
+    return NavigationBar(
+      selectedIndex: currentIndex,
+      onDestinationSelected: (index) => _selectTab(context, index),
+      destinations: [
+        for (final tab in _tabs(l10n))
+          NavigationDestination(
+            icon: Icon(tab.icon),
+            selectedIcon: Icon(tab.selectedIcon),
+            label: tab.label,
+          ),
+      ],
+    );
+  }
+
+  /// The leading-edge rail shown at [railBreakpoint] and wider: compact
+  /// (`extended: false`) with every label shown, coloured by the theme's
+  /// `navigationRailTheme` to match the bar.
+  Widget _rail(BuildContext context, AppLocalizations l10n) {
+    return NavigationRail(
+      selectedIndex: currentIndex,
+      onDestinationSelected: (index) => _selectTab(context, index),
+      labelType: NavigationRailLabelType.all,
+      destinations: [
+        for (final tab in _tabs(l10n))
+          NavigationRailDestination(
+            icon: Icon(tab.icon),
+            selectedIcon: Icon(tab.selectedIcon),
+            label: Text(tab.label),
+          ),
+      ],
     );
   }
 }
