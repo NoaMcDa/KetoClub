@@ -244,6 +244,20 @@ final class ScanController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Moves the page at [from] so it ends at index [to] of [pages] (the
+  /// position it has afterwards, as `List.insert` after removal), so
+  /// [pages], and the order [analysePages] sends them in, is the order the
+  /// user arranged (issue #250). An out-of-range index, a move to the same
+  /// place and a call during an analysis do nothing. Clears [lastFailure].
+  void movePage(int from, int to) {
+    final last = _pages.length - 1;
+    if (_analysing || from == to) return;
+    if (from < 0 || from > last || to < 0 || to > last) return;
+    _pages.insert(to, _pages.removeAt(from));
+    _lastFailure = null;
+    notifyListeners();
+  }
+
   /// Reads every page in one [classifier] call, stores the resulting menu
   /// and its analysis and returns the [VenueRef] to open, so the menu
   /// screen reuses the analysis instead of classifying again. The pages

@@ -11,8 +11,10 @@ import 'package:ketoclub/state/scan_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
+import 'package:ketoclub/widgets/app_sheet.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/scan_failure_copy.dart';
+import 'package:ketoclub/widgets/scanned_pages_sheet.dart';
 import 'package:provider/provider.dart';
 
 /// The Scan tab (architecture.md §6.6, D15, D18; issues #11, #82, #83):
@@ -98,6 +100,20 @@ class _ScanScreenState extends State<ScanScreen> {
   void _remove(int index) {
     context.read<ScanController>().removePageAt(index);
     if (_rejection != null) setState(() => _rejection = null);
+  }
+
+  /// Opens the pages collected so far in [ScannedPagesSheet], at [index].
+  void _preview(List<ScannedPage> pages, int index) {
+    unawaited(
+      showKetoClubSheet<void>(
+        context: context,
+        showDragHandle: true,
+        builder: (_) => ScannedPagesSheet(
+          scan: ScannedMenu(pages: pages),
+          initialPage: index,
+        ),
+      ),
+    );
   }
 
   Future<void> _analysePages() async {
@@ -243,12 +259,23 @@ class _ScanScreenState extends State<ScanScreen> {
         if (controller.atPageCap)
           Text(l10n.scanScreenCapReached, style: theme.textTheme.bodySmall),
         const SizedBox(height: 8),
-        for (var i = 0; i < pages.length; i++)
-          _PageRow(
-            page: pages[i],
-            number: i + 1,
-            onRemove: controller.analysing ? null : () => _remove(i),
-          ),
+        ReorderableListView(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          buildDefaultDragHandles: false,
+          onReorderItem: controller.movePage,
+          children: [
+            for (var i = 0; i < pages.length; i++)
+              _PageRow(
+                key: ObjectKey(pages[i]),
+                page: pages[i],
+                index: i,
+                reorderable: !controller.analysing && pages.length > 1,
+                onPreview: () => _preview(pages, i),
+                onRemove: controller.analysing ? null : () => _remove(i),
+              ),
+          ],
+        ),
       ],
       const SizedBox(height: 16),
       if (controller.analysing)
@@ -396,13 +423,27 @@ enum _ScanMode {
 }
 
 /// One collected page: a thumbnail (a PDF icon for a document), its label
-/// and size, and a button that removes it. [onRemove] is null while an
-/// analysis is reading the pages.
+/// and size, a drag handle that reorders it (issue #250), and a button that
+/// removes it. Tapping the thumbnail calls [onPreview]. [onRemove] is null
+/// while an analysis is reading the pages, and [reorderable] false.
 class _PageRow extends StatelessWidget {
-  const new({required this.page, required this.number, required this.onRemove});
+  const new({
+    required this.page,
+    required this.index,
+    required this.reorderable,
+    required this.onPreview,
+    required this.onRemove,
+    super.key,
+  });
 
   final ScannedPage page;
-  final int number;
+
+  /// The row's 0-based position in the list; its label counts from 1.
+  final int index;
+
+  /// Whether the drag handle is shown: more than one page and no analysis.
+  final bool reorderable;
+  final VoidCallback onPreview;
   final VoidCallback? onRemove;
 
   static const double _thumb = 56;
@@ -412,32 +453,42 @@ class _PageRow extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final kb = (page.bytes.length / 1024).ceil();
+    final number = index + 1;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          SizedBox.square(
-            dimension: _thumb,
-            child: page.isPdf
-                ? Icon(
-                    Icons.picture_as_pdf_outlined,
-                    size: 32,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  )
-                : ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: Image.memory(
-                      page.bytes,
-                      fit: BoxFit.cover,
-                      cacheWidth: _thumb.toInt() * 2,
-                      gaplessPlayback: true,
-                      excludeFromSemantics: true,
-                      errorBuilder: (_, _, _) => Icon(
-                        Icons.image_outlined,
+          Semantics(
+            button: true,
+            label: l10n.scanScreenPreviewPage(number),
+            excludeSemantics: true,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(6),
+              onTap: onPreview,
+              child: SizedBox.square(
+                dimension: _thumb,
+                child: page.isPdf
+                    ? Icon(
+                        Icons.picture_as_pdf_outlined,
+                        size: 32,
                         color: theme.colorScheme.onSurfaceVariant,
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: Image.memory(
+                          page.bytes,
+                          fit: BoxFit.cover,
+                          cacheWidth: _thumb.toInt() * 2,
+                          gaplessPlayback: true,
+                          excludeFromSemantics: true,
+                          errorBuilder: (_, _, _) => Icon(
+                            Icons.image_outlined,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
+              ),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -457,6 +508,20 @@ class _PageRow extends StatelessWidget {
               ],
             ),
           ),
+          if (reorderable)
+            ReorderableDragStartListener(
+              index: index,
+              child: Tooltip(
+                message: l10n.scanScreenReorderPage(number),
+                child: SizedBox.square(
+                  dimension: 48,
+                  child: Icon(
+                    Icons.drag_handle,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.close),
             tooltip: l10n.scanScreenRemovePage(number),

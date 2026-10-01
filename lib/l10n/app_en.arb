@@ -431,6 +431,14 @@
   "@scanScreenRemovePage": {
     "placeholders": { "number": { "type": "int" } }
   },
+  "scanScreenReorderPage": "Move page {number}. Drag to reorder",
+  "@scanScreenReorderPage": {
+    "placeholders": { "number": { "type": "int" } }
+  },
+  "scanScreenPreviewPage": "Preview page {number}",
+  "@scanScreenPreviewPage": {
+    "placeholders": { "number": { "type": "int" } }
+  },
   "scanScreenTooManyPages": "One scan holds at most {max} pages. The pages over the limit were not added.",
   "@scanScreenTooManyPages": {
     "placeholders": { "max": { "type": "int" } }

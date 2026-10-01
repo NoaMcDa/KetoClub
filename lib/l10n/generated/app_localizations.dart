@@ -1616,6 +1616,18 @@ abstract class AppLocalizations {
   /// **'Remove page {number}'**
   String scanScreenRemovePage(int number);
 
+  /// No description provided for @scanScreenReorderPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Move page {number}. Drag to reorder'**
+  String scanScreenReorderPage(int number);
+
+  /// No description provided for @scanScreenPreviewPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview page {number}'**
+  String scanScreenPreviewPage(int number);
+
   /// No description provided for @scanScreenTooManyPages.
   ///
   /// In en, this message translates to:

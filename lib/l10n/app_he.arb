@@ -431,6 +431,14 @@
   "@scanScreenRemovePage": {
     "placeholders": { "number": { "type": "int" } }
   },
+  "scanScreenReorderPage": "הזזת דף {number}. גררו כדי לסדר מחדש",
+  "@scanScreenReorderPage": {
+    "placeholders": { "number": { "type": "int" } }
+  },
+  "scanScreenPreviewPage": "תצוגה מקדימה של דף {number}",
+  "@scanScreenPreviewPage": {
+    "placeholders": { "number": { "type": "int" } }
+  },
   "scanScreenTooManyPages": "סריקה אחת כוללת עד {max} דפים. הדפים שמעבר למגבלה לא נוספו.",
   "@scanScreenTooManyPages": {
     "placeholders": { "max": { "type": "int" } }
