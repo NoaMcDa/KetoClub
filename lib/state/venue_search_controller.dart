@@ -174,8 +174,15 @@ final class VenueSearchController extends ChangeNotifier {
   /// [VenueRefResolver] also reads it as a Wolt slug: most restaurant
   /// names are one word, and treating every one as a slug would mean
   /// search never runs. The slug reading stays available through
-  /// [resolved] and the screen's open button, exactly as before.
+  /// [resolved], exactly as before.
   bool get isPaste => _isPaste(_input);
+
+  /// Whether [input] is a link or id the screen can open: a pasted
+  /// [isPaste] that also [resolved] to a venue (see
+  /// [VenueRefResolver.isExplicitLink]). A bare word, hyphenated or not,
+  /// is never one; the screen shows its "open link" action only while
+  /// this is true (issue #229).
+  bool get isExplicitLink => VenueRefResolver.isExplicitLink(_input);
 
   /// The most recently opened venue, from [AppSettings.lastVenue], once
   /// [load] has completed; null before that, and null when nothing has

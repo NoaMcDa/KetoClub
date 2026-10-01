@@ -17,7 +17,7 @@
   "venueSearchLabel": "Find a restaurant",
   "venueSearchHint": "Search by name, or paste a Wolt link",
   "venueSearchInvalid": "KetoClub cannot read a menu from that yet. Paste a Wolt restaurant link or its slug.",
-  "venueSearchOpen": "Show the keto menu",
+  "venueSearchOpenLink": "Open link",
   "venueSearchContinueWith": "Continue with {venue}",
   "@venueSearchContinueWith": {
     "placeholders": { "venue": { "type": "String" } }

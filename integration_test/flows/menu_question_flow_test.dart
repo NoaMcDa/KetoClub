@@ -84,7 +84,7 @@ void main() {
 
       // Act: open the menu.
       await enterText(tester, _woltUrl);
-      await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+      await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
       // Assert: the question icon appears in the app bar (LLM analysis
       // succeeded, so isQuestionAvailable is true).
@@ -155,7 +155,7 @@ void main() {
 
       // Act: open the menu and ask a question.
       await enterText(tester, _woltUrl);
-      await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+      await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
       await tapAndSettle(tester, find.byIcon(Icons.question_answer));
       await tester.enterText(
         find.descendant(
@@ -199,7 +199,7 @@ void main() {
 
       // Act: open the menu.
       await enterText(tester, _woltUrl);
-      await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+      await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
       // Assert: the question icon must not appear.
       expect(

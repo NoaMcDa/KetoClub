@@ -28,15 +28,13 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert: the first screen is the venue search screen, with its
-      // paste field and open button built by the real dependencies.
+      // paste field built by the real dependencies. There is no standing
+      // open button any more (#229): a pasted link shows a suffix icon.
       expect(find.text(appName), findsOneWidget);
       expect(find.byType(VenueSearchScreen), findsOneWidget);
       expect(find.text(_en.venueSearchLabel), findsOneWidget);
       expect(find.text(_en.venueSearchHint), findsOneWidget);
-      expect(
-        find.widgetWithText(FilledButton, _en.venueSearchOpen),
-        findsOneWidget,
-      );
+      expect(find.byTooltip(_en.venueSearchOpenLink), findsNothing);
     });
   });
 }

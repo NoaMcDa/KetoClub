@@ -56,7 +56,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'KetoClub cannot read a menu from that yet. Paste a Wolt restaurant link or its slug.';
 
   @override
-  String get venueSearchOpen => 'Show the keto menu';
+  String get venueSearchOpenLink => 'Open link';
 
   @override
   String venueSearchContinueWith(String venue) {

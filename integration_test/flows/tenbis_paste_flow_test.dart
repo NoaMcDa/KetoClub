@@ -91,7 +91,7 @@ void main() {
 
       // Act: paste the 10bis URL and open it.
       await enterText(tester, _tenBisUrl);
-      await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+      await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
       // Assert: a classified menu is shown, sourced from 10bis, with
       // both dishes from the mapped fixture visible.

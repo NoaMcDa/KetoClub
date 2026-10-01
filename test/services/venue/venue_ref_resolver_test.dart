@@ -395,4 +395,33 @@ void main() {
       );
     });
   });
+
+  group('VenueRefResolver.isExplicitLink', () {
+    test('is true for URLs, with or without a scheme, and for digits', () {
+      // Act and assert
+      for (final input in const [
+        'https://wolt.com/en/isr/tel-aviv/restaurant/vitrina',
+        'wolt.com/en/isr/tel-aviv/restaurant/vitrina',
+        'https://www.cafe.co.il/menu',
+        '  123456  ',
+      ]) {
+        expect(VenueRefResolver.isExplicitLink(input), isTrue, reason: input);
+      }
+    });
+
+    test('is false for a bare word, even one that resolves as a slug', () {
+      // Act and assert
+      for (final input in const [
+        'pizza',
+        'vitrina-lilinblum',
+        '',
+        '   ',
+        'a/b',
+        'https://wolt.com/en/isr/tel-aviv',
+      ]) {
+        expect(VenueRefResolver.isExplicitLink(input), isFalse, reason: input);
+      }
+      expect(VenueRefResolver.resolve('vitrina-lilinblum'), isNotNull);
+    });
+  });
 }

@@ -125,7 +125,7 @@ void main() {
 
         // Act: paste the Wolt link and open it.
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: the LLM engine was tried once, and its failure was
         // re-stamped onto the real heuristic's result under the

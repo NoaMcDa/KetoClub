@@ -173,7 +173,7 @@ void main() {
 
         // Act: paste the Wolt link and open it.
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert
         _expectConsentWithheldRulesResult(llm, connectivity);
@@ -216,7 +216,7 @@ void main() {
         // Act: back to Explore, paste the Wolt link and open it.
         await tapAndSettle(tester, navDestination(_en.navExplore));
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert
         _expectConsentWithheldRulesResult(llm, connectivity);
@@ -254,7 +254,7 @@ void main() {
 
         // Act: paste the Wolt link and open it.
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: the LLM classifier WAS called (consent stayed on), so
         // this flow is not withheld.

@@ -82,7 +82,7 @@ void main() {
 
         // Act: paste the link and open the venue.
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: the menu opened.
         expect(find.text('Herb Butter Steak'), findsOneWidget);

@@ -183,7 +183,7 @@ void main() {
 
         // Act: paste the Wolt link and open it.
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: exactly two requests, straight to Wolt then to Google.
         expect(network.hosts, [
@@ -223,7 +223,7 @@ void main() {
 
         // Act: paste the Wolt link and open it.
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: the menu came from Wolt; nothing went to Google.
         expect(network.hosts, ['consumer-api.wolt.com']);

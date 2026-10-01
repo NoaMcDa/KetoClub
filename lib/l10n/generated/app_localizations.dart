@@ -188,11 +188,11 @@ abstract class AppLocalizations {
   /// **'KetoClub cannot read a menu from that yet. Paste a Wolt restaurant link or its slug.'**
   String get venueSearchInvalid;
 
-  /// No description provided for @venueSearchOpen.
+  /// No description provided for @venueSearchOpenLink.
   ///
   /// In en, this message translates to:
-  /// **'Show the keto menu'**
-  String get venueSearchOpen;
+  /// **'Open link'**
+  String get venueSearchOpenLink;
 
   /// No description provided for @venueSearchContinueWith.
   ///
