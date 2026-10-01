@@ -247,6 +247,14 @@
   "@venueCardWalkMinutes": {
     "placeholders": { "minutes": { "type": "int" } }
   },
+  "venueCardDistanceMetres": "{distance} m",
+  "@venueCardDistanceMetres": {
+    "placeholders": { "distance": { "type": "String" } }
+  },
+  "venueCardDistanceKm": "{distance} km",
+  "@venueCardDistanceKm": {
+    "placeholders": { "distance": { "type": "String" } }
+  },
   "venueCardGreenCount": "{count, plural, one{1 dish as-is} other{{count} dishes as-is}}",
   "@venueCardGreenCount": {
     "placeholders": { "count": { "type": "num" } }

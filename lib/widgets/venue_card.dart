@@ -20,6 +20,10 @@ import 'package:ketoclub/widgets/photo_tile.dart';
 /// [EngineChip] label rides along as the "estimate" marker rather than a
 /// new one.
 ///
+/// The meta line also carries the distance from the search position
+/// ([distanceKm]) as metres or kilometres (issue #230), and nothing when
+/// that is null.
+///
 /// The minutes figure is the platform's own delivery estimate when it
 /// gave one, else the walking time from the search position
 /// ([walkingMinutes]), labelled as walking; with neither, the meta line
@@ -235,7 +239,8 @@ class VenueCard extends StatelessWidget {
     );
   }
 
-  /// "{cuisine} · {N} min", leaving out whichever part is unknown.
+  /// "{cuisine} · {distance} · {N} min", leaving out whichever part is
+  /// unknown (issue #230).
   String _meta(AppLocalizations l10n) {
     final cuisine = venue.cuisineTags.isEmpty
         ? null
@@ -250,7 +255,17 @@ class VenueCard extends StatelessWidget {
     } else {
       minutes = null;
     }
-    return [?cuisine, ?minutes].join(' · ');
+    final String? distance;
+    if (km == null) {
+      distance = null;
+    } else {
+      final label = formatDistance(km, locale: l10n.localeName);
+      distance = switch (label.unit) {
+        DistanceUnit.metres => l10n.venueCardDistanceMetres(label.value),
+        DistanceUnit.kilometres => l10n.venueCardDistanceKm(label.value),
+      };
+    }
+    return [?cuisine, ?distance, ?minutes].join(' · ');
   }
 
   /// Name, open or closed when known, the score when there is one, and

@@ -9,6 +9,7 @@ library;
 
 import 'dart:math' as math;
 
+import 'package:intl/intl.dart';
 import 'package:ketoclub/models/venue.dart';
 
 /// The Earth's mean radius in kilometres (IUGG), the radius the haversine
@@ -45,6 +46,49 @@ double distanceKm(double lat1, double lon1, double lat2, double lon2) {
 int walkingMinutes(double km) {
   if (km <= 0) return 0;
   return (km / walkingSpeedKmh * 60).ceil();
+}
+
+/// The unit a [DistanceLabel] is expressed in.
+enum DistanceUnit {
+  /// Whole metres, rounded to the nearest ten: used under one kilometre.
+  metres,
+
+  /// Kilometres to one decimal place: used from one kilometre up.
+  kilometres,
+}
+
+/// A distance ready to show: the locale-formatted `value` and the
+/// `unit` whose ARB template (`venueCardDistanceMetres` or
+/// `venueCardDistanceKm`) wraps it.
+typedef DistanceLabel = ({DistanceUnit unit, String value});
+
+/// How [km] reads on a venue card (issue #230): metres under one
+/// kilometre ("350"), kilometres to one decimal from there ("1.2"), the
+/// number written with [locale]'s digits and decimal separator.
+///
+/// Metres are rounded to the nearest ten, never to zero, since a few
+/// metres of GPS noise is not worth showing; a distance that rounds up
+/// to 1000 m is shown as kilometres, so "1000 m" never appears. A
+/// negative or non-finite distance is treated as zero.
+DistanceLabel formatDistance(double km, {required String locale}) {
+  final safeKm = km.isFinite && km > 0 ? km : 0.0;
+  final metres = math.max(10, (safeKm * 100).round() * 10);
+  if (metres < 1000) {
+    return (
+      unit: DistanceUnit.metres,
+      value: NumberFormat.decimalPatternDigits(
+        locale: locale,
+        decimalDigits: 0,
+      ).format(metres),
+    );
+  }
+  return (
+    unit: DistanceUnit.kilometres,
+    value: NumberFormat.decimalPatternDigits(
+      locale: locale,
+      decimalDigits: 1,
+    ).format(safeKm),
+  );
 }
 
 /// [venues] reordered nearest first from ([latitude], [longitude]).

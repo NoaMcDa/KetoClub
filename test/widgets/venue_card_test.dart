@@ -175,9 +175,75 @@ void main() {
 
       // Assert
       expect(
-        find.text('Sushi · ${_en.venueCardWalkMinutes(12)}'),
+        find.text('Sushi · 1.0 km · ${_en.venueCardWalkMinutes(12)}'),
         findsOneWidget,
       );
+    });
+
+    testWidgets('shows cuisine, distance and the platform estimate together', (
+      tester,
+    ) async {
+      // Act
+      await _pump(
+        tester,
+        VenueCard(
+          venue: const Venue(
+            ref: VenueRef(source: MenuSource.wolt, platformId: 'x'),
+            name: 'X',
+            cuisineTags: <String>['sushi'],
+            estimateMinutes: 25,
+          ),
+          distanceKm: 0.35,
+          onTap: () {},
+        ),
+      );
+
+      // Assert
+      expect(find.text('Sushi · 350 m · 25 min'), findsOneWidget);
+    });
+
+    testWidgets('shows no distance when it is unknown', (tester) async {
+      // Act
+      await _pump(
+        tester,
+        VenueCard(
+          venue: const Venue(
+            ref: VenueRef(source: MenuSource.wolt, platformId: 'x'),
+            name: 'X',
+            cuisineTags: <String>['sushi'],
+            estimateMinutes: 25,
+          ),
+          onTap: () {},
+        ),
+      );
+
+      // Assert
+      expect(find.text('Sushi · 25 min'), findsOneWidget);
+      expect(find.textContaining(' km'), findsNothing);
+      expect(find.textContaining(' m '), findsNothing);
+    });
+
+    testWidgets('writes the distance in Hebrew units under a Hebrew locale', (
+      tester,
+    ) async {
+      // Act
+      await _pump(
+        tester,
+        VenueCard(
+          venue: const Venue(
+            ref: VenueRef(source: MenuSource.wolt, platformId: 'x'),
+            name: 'X',
+            estimateMinutes: 25,
+          ),
+          distanceKm: 12.4,
+          onTap: () {},
+        ),
+        locale: const Locale('he'),
+        rtl: true,
+      );
+
+      // Assert
+      expect(find.textContaining('12.4 ק״מ'), findsOneWidget);
     });
 
     testWidgets('omits the minutes when there is neither an estimate nor a '

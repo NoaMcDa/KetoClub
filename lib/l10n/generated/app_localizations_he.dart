@@ -601,6 +601,16 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String venueCardDistanceMetres(String distance) {
+    return '$distance מ׳';
+  }
+
+  @override
+  String venueCardDistanceKm(String distance) {
+    return '$distance ק״מ';
+  }
+
+  @override
   String venueCardGreenCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
