@@ -33,6 +33,7 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 
 import 'flow_support.dart';
@@ -155,8 +156,8 @@ void main() {
         // screen under the rules engine stamped "offline".
         expect(connectivity.callCount, greaterThan(0));
         expect(llm.calls, isEmpty);
-        expect(find.byType(EngineChip), findsOneWidget);
-        expect(find.text(_en.engineChipRules), findsOneWidget);
+        expect(find.byType(RulesReasonBanner), findsOneWidget);
+        expect(find.byType(EngineChip), findsNothing);
         expect(find.text(_en.analysisOffline), findsOneWidget);
         expect(find.text(_dishName), findsOneWidget);
         expect(find.byType(StatusBadge), findsOneWidget);
@@ -206,8 +207,8 @@ void main() {
         // and the same "offline" reason as the pre-check path above — the
         // UI's copy cannot tell the two paths apart, by design.
         expect(llm.calls, hasLength(1));
-        expect(find.byType(EngineChip), findsOneWidget);
-        expect(find.text(_en.engineChipRules), findsOneWidget);
+        expect(find.byType(RulesReasonBanner), findsOneWidget);
+        expect(find.byType(EngineChip), findsNothing);
         expect(find.text(_en.analysisOffline), findsOneWidget);
         expect(find.text(_dishName), findsOneWidget);
         expect(find.byType(StatusBadge), findsOneWidget);

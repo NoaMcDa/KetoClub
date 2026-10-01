@@ -18,7 +18,7 @@ import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
-import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 
 import 'flow_support.dart';
@@ -71,7 +71,7 @@ Future<void> _scan(WidgetTester tester, FakeAppDependencies fakes) async {
 /// What a menu screen for a scanned venue shows.
 void _expectMenuOpened(FakeAppDependencies fakes, VenueRef ref) {
   expect(find.byType(VerdictCounterTiles), findsOneWidget);
-  expect(find.byType(EngineChip), findsOneWidget);
+  expect(find.byType(RulesReasonBanner), findsOneWidget);
   expect(find.text(_dishName), findsOneWidget);
   expect(fakes.classifier.calls.single.venueRef, ref);
 }
