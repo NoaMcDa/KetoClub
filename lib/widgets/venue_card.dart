@@ -32,6 +32,10 @@ import 'package:ketoclub/widgets/photo_tile.dart';
 /// the web lights up the entire tile rather than only the text below an
 /// opaque photo.
 ///
+/// A venue the platform reports closed (`isOnline == false`) carries a
+/// small "Closed" tag in the photo's top-end corner (issue #227); open and
+/// unknown venues are drawn exactly as before.
+///
 /// Laid out with directional insets and [PositionedDirectional] only, so
 /// the whole card mirrors under a right-to-left [Directionality].
 class VenueCard extends StatelessWidget {
@@ -136,6 +140,12 @@ class VenueCard extends StatelessWidget {
                           background: verdictColors.green.pill,
                           foreground: verdictColors.green.on,
                         ),
+                      ),
+                    if (venue.isOnline == false)
+                      PositionedDirectional(
+                        top: 11,
+                        end: 11,
+                        child: _ClosedPill(text: l10n.venueCardClosed),
                       ),
                   ],
                 ),
@@ -301,6 +311,38 @@ class _GreenPill extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The "Closed" tag over the photo of a venue whose platform reports it
+/// offline (issue #227). Drawn in the theme's own ink on its surface, so
+/// it reads on any photo in both themes; `contrast_test.dart` pins the
+/// pair. Never shown for an unknown (`null`) state.
+class _ClosedPill extends StatelessWidget {
+  const new({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(9),
+      ),
+      child: Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(10, 5, 10, 5),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: colors.onSurface,
+            fontSize: 11.5,
+            fontWeight: FontWeight.w800,
+          ),
         ),
       ),
     );
