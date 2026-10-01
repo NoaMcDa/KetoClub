@@ -208,15 +208,18 @@ void main() {
       });
     }
 
-    testWidgets('build renders the brand, the title and the search field', (
+    testWidgets('build renders the logo mark, the title and the search field', (
       tester,
     ) async {
       // Act
       await _pump(tester, controller: controller, pushedNames: pushedNames);
       final l10n = _l10n(tester);
 
-      // Assert
-      expect(find.text(appName), findsOneWidget);
+      // Assert: the brand is a logo mark, not a text label (#232).
+      final handle = tester.ensureSemantics();
+      expect(find.bySemanticsLabel(appName), findsOneWidget);
+      expect(find.text(appName), findsNothing);
+      handle.dispose();
       expect(find.text(l10n.discoveryTitle), findsOneWidget);
       expect(find.byType(TextField), findsOneWidget);
       expect(find.text(l10n.venueSearchLabel), findsOneWidget);

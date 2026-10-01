@@ -29,13 +29,17 @@ final AppLocalizations _en = AppLocalizationsEn();
 
 void main() {
   group('KetoClubApp', () {
-    testWidgets('shows the app name on launch', (tester) async {
+    testWidgets('shows the logo mark, labelled with the app name, on launch', (
+      tester,
+    ) async {
       // Arrange: the real app on top of faked services.
       await tester.pumpWidget(
         KetoClubApp(dependencies: FakeAppDependencies().dependencies),
       );
-      // Assert
-      expect(find.text(appName), findsOneWidget);
+      // Assert: the logo mark (#232) carries the name as its label.
+      final handle = tester.ensureSemantics();
+      expect(find.bySemanticsLabel(appName), findsOneWidget);
+      handle.dispose();
     });
 
     testWidgets('the Explore tab is selected on launch', (tester) async {
@@ -64,9 +68,9 @@ void main() {
       await tester.pumpWidget(KetoClubApp(dependencies: fakes.dependencies));
       await tester.pumpAndSettle();
 
-      // Assert: appName is untranslated (CLAUDE.md), so it is still on
-      // screen and a stable anchor to read the ambient direction from.
-      final context = tester.element(find.text(appName));
+      // Assert: the navigation bar is a stable anchor to read the ambient
+      // direction from.
+      final context = tester.element(find.byType(NavigationBar));
       expect(Directionality.of(context), TextDirection.rtl);
     });
 
@@ -82,7 +86,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      final context = tester.element(find.text(appName));
+      final context = tester.element(find.byType(NavigationBar));
       expect(Directionality.of(context), TextDirection.ltr);
     });
 
