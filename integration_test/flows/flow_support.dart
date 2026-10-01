@@ -293,12 +293,19 @@ final class FlowForgetfulMenuCache implements MenuCache {
 
   @override
   Future<void> remove(VenueRef ref) async {}
+
+  @override
+  Future<void> pin(VenueRef ref, {bool pinned = true}) async {}
+
+  @override
+  Future<bool> isPinned(VenueRef ref) async => false;
 }
 
 /// A [MenuRepository] that answers from a scripted map.
 final class FlowFakeMenuRepository implements MenuRepository {
   final Map<String, MenuFetchResult> _stubs = <String, MenuFetchResult>{};
   final Map<String, CachedMenu> _cached = <String, CachedMenu>{};
+  final Set<String> _pins = <String>{};
 
   /// Scripts [load] to answer [result] for [ref].
   void stub(VenueRef ref, MenuFetchResult result) {
@@ -377,14 +384,30 @@ final class FlowFakeMenuRepository implements MenuRepository {
 
   @override
   Future<List<CachedMenuEntry>> savedMenus() async => [
-    for (final entry in _cached.values) CachedMenuEntry.summarise(entry),
+    for (final entry in _cached.values)
+      CachedMenuEntry.summarise(
+        entry,
+        pinned: _pins.contains(entry.menu.venueRef.cacheKey),
+      ),
   ];
 
   @override
   Future<int> cachedMenuCount() async => _cached.length;
 
   @override
-  Future<void> remove(VenueRef ref) async => _cached.remove(ref.cacheKey);
+  Future<void> remove(VenueRef ref) async {
+    _cached.remove(ref.cacheKey);
+    _pins.remove(ref.cacheKey);
+  }
+
+  @override
+  Future<void> pin(VenueRef ref, {bool pinned = true}) async {
+    if (!pinned) {
+      _pins.remove(ref.cacheKey);
+    } else if (_cached.containsKey(ref.cacheKey)) {
+      _pins.add(ref.cacheKey);
+    }
+  }
 }
 
 /// A [MenuClassifier] that returns whatever was scripted, or an all-green

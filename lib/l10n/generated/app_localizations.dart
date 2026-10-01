@@ -878,6 +878,60 @@ abstract class AppLocalizations {
   /// **'Removed {venue}.'**
   String savedRemovedMessage(String venue);
 
+  /// No description provided for @savedExpiresMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Expires in 1 minute} other{Expires in {count} minutes}}'**
+  String savedExpiresMinutes(num count);
+
+  /// No description provided for @savedExpiresHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Expires in 1 hour} other{Expires in {count} hours}}'**
+  String savedExpiresHours(num count);
+
+  /// No description provided for @savedExpiresDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Expires in 1 day} other{Expires in {count} days}}'**
+  String savedExpiresDays(num count);
+
+  /// No description provided for @savedExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired, refreshes when opened'**
+  String get savedExpired;
+
+  /// No description provided for @savedKept.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept, no expiry'**
+  String get savedKept;
+
+  /// No description provided for @savedKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep'**
+  String get savedKeep;
+
+  /// No description provided for @savedKeepSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep {venue} past its expiry'**
+  String savedKeepSemanticLabel(String venue);
+
+  /// No description provided for @savedUnkeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop keeping'**
+  String get savedUnkeep;
+
+  /// No description provided for @savedUnkeepSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop keeping {venue}'**
+  String savedUnkeepSemanticLabel(String venue);
+
   /// No description provided for @savedUndo.
   ///
   /// In en, this message translates to:

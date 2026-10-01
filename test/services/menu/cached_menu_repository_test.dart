@@ -240,6 +240,77 @@ void main() {
       },
     );
 
+    test(
+      'load serves a pinned menu past freshFor without refetching',
+      () async {
+        // Arrange
+        final menu = _menuWith(_woltRef, clock.now());
+        await cache.write(CachedMenu(menu: menu));
+        await repository.pin(_woltRef);
+        clock.advance(_freshFor * 5);
+
+        // Act
+        final result = await repository.load(_woltRef);
+
+        // Assert
+        expect(result, equals(MenuFetched(menu: menu, fromCache: true)));
+        expect(adapter.fetchCalls, isEmpty);
+      },
+    );
+
+    test('load with forceRefresh still refetches a pinned menu', () async {
+      // Arrange
+      await cache.write(CachedMenu(menu: _menuWith(_woltRef, clock.now())));
+      await repository.pin(_woltRef);
+
+      // Act
+      await repository.load(_woltRef, forceRefresh: true);
+
+      // Assert: the pin exempts expiry, not an explicit refresh, and the
+      // refetch keeps the pin.
+      expect(adapter.fetchCalls, [_woltRef]);
+      expect(await cache.isPinned(_woltRef), isTrue);
+    });
+
+    test('load refetches a menu whose pin was removed', () async {
+      // Arrange
+      await cache.write(CachedMenu(menu: _menuWith(_woltRef, clock.now())));
+      await repository.pin(_woltRef);
+      await repository.pin(_woltRef, pinned: false);
+      clock.advance(_freshFor + const Duration(milliseconds: 1));
+
+      // Act
+      await repository.load(_woltRef);
+
+      // Assert
+      expect(adapter.fetchCalls, [_woltRef]);
+    });
+
+    test('clearCache clears a pinned menu too', () async {
+      // Arrange
+      await cache.write(CachedMenu(menu: _menuWith(_woltRef, clock.now())));
+      await repository.pin(_woltRef);
+
+      // Act
+      await repository.clearCache();
+
+      // Assert
+      expect(await repository.cachedMenuCount(), 0);
+      expect(await cache.isPinned(_woltRef), isFalse);
+    });
+
+    test('savedMenus reports the pin', () async {
+      // Arrange
+      await cache.write(CachedMenu(menu: _menuWith(_woltRef, clock.now())));
+      await repository.pin(_woltRef);
+
+      // Act
+      final saved = await repository.savedMenus();
+
+      // Assert
+      expect(saved.single.pinned, isTrue);
+    });
+
     test('load adapter failure with a stale cached menu returns it with '
         'the staleReason', () async {
       // Arrange

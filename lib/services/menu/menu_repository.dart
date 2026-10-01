@@ -72,6 +72,12 @@ abstract interface class MenuRepository {
   /// menu untouched. A no-op, not a throw, when nothing is cached for
   /// [ref]. Never throws.
   Future<void> remove(VenueRef ref);
+
+  /// Keeps or stops keeping [ref]'s cached menu past the cache window
+  /// ([MenuCache.pin]). A pinned menu is served from the cache without a
+  /// refetch until [load] is called with `forceRefresh`. A no-op when
+  /// nothing is cached for [ref]. Never throws.
+  Future<void> pin(VenueRef ref, {bool pinned = true});
 }
 
 /// Cache-first [MenuRepository] (architecture.md §6.1, §6.4, §10).
@@ -81,15 +87,16 @@ abstract interface class MenuRepository {
 /// [VenueRef], and fails with [MenuFetchFailureReason.unsupportedSource]
 /// — without reading the cache or touching the network — when none does.
 ///
-/// A cached menu younger than [freshFor] is served without a network
-/// call. Once it goes stale, the adapter is asked again; if that fetch
-/// fails and a stale menu is still on hand, it is served anyway with its
-/// staleness explained (`fromCache: true`, `staleReason` set) rather than
-/// failing outright — architecture.md §10's "No connection. Showing the
-/// cached menu from {date}." row. A refetch that changes no dish text
-/// (by [TextNormaliser.menuFingerprint]) keeps the analysis already
-/// cached for the old menu; a refetch that changes it discards the
-/// analysis, since it described dishes no longer on the menu.
+/// A cached menu younger than [freshFor], or one the user pinned
+/// ([MenuCache.pin]), is served without a network call. Once it goes
+/// stale, the adapter is asked again; if that fetch fails and a stale menu
+/// is still on hand, it is served anyway with its staleness explained
+/// (`fromCache: true`, `staleReason` set) rather than failing outright —
+/// architecture.md §10's "No connection. Showing the cached menu from
+/// {date}." row. A refetch that changes no dish text (by
+/// [TextNormaliser.menuFingerprint]) keeps the analysis already cached for
+/// the old menu; a refetch that changes it discards the analysis, since it
+/// described dishes no longer on the menu.
 @immutable
 final class CachedMenuRepository implements MenuRepository {
   /// Creates a repository over [adapters], caching in [cache] and
@@ -129,7 +136,9 @@ final class CachedMenuRepository implements MenuRepository {
     }
 
     final cached = await cache.read(ref);
-    if (!forceRefresh && cached != null && _isFresh(cached.menu)) {
+    if (!forceRefresh &&
+        cached != null &&
+        (_isFresh(cached.menu) || await cache.isPinned(ref))) {
       return MenuFetched(menu: cached.menu, fromCache: true);
     }
 
@@ -194,6 +203,10 @@ final class CachedMenuRepository implements MenuRepository {
 
   @override
   Future<void> remove(VenueRef ref) => cache.remove(ref);
+
+  @override
+  Future<void> pin(VenueRef ref, {bool pinned = true}) =>
+      cache.pin(ref, pinned: pinned);
 
   /// The first registered adapter that handles [ref], or null when none
   /// does.

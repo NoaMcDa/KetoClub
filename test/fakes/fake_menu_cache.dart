@@ -12,6 +12,7 @@ final class FakeMenuCache implements MenuCache {
   new();
 
   final Map<String, CachedMenu> _entries = <String, CachedMenu>{};
+  final Set<String> _pins = <String>{};
 
   /// When true, every [read] misses regardless of what was written.
   bool failOnRead = false;
@@ -38,6 +39,7 @@ final class FakeMenuCache implements MenuCache {
   Future<void> clear() async {
     clearCallCount++;
     _entries.clear();
+    _pins.clear();
   }
 
   @override
@@ -49,10 +51,27 @@ final class FakeMenuCache implements MenuCache {
   @override
   Future<void> remove(VenueRef ref) async {
     _entries.remove(ref.cacheKey);
+    _pins.remove(ref.cacheKey);
   }
 
   @override
+  Future<void> pin(VenueRef ref, {bool pinned = true}) async {
+    if (!pinned) {
+      _pins.remove(ref.cacheKey);
+    } else if (_entries.containsKey(ref.cacheKey)) {
+      _pins.add(ref.cacheKey);
+    }
+  }
+
+  @override
+  Future<bool> isPinned(VenueRef ref) async => _pins.contains(ref.cacheKey);
+
+  @override
   Future<List<CachedMenuEntry>> entries() async => [
-    for (final cached in _entries.values) CachedMenuEntry.summarise(cached),
+    for (final cached in _entries.values)
+      CachedMenuEntry.summarise(
+        cached,
+        pinned: _pins.contains(cached.menu.venueRef.cacheKey),
+      ),
   ];
 }

@@ -117,5 +117,60 @@ void main() {
         expect(find.text('Herb Butter Steak'), findsOneWidget);
       },
     );
+
+    testWidgets(
+      'user sees when a saved menu expires, keeps it, and lets it go again',
+      (tester) async {
+        // Setup: a menu fetched 19 hours ago, so 5 of its 24 hours remain.
+        final fixtureMenu = Menu(
+          venueRef: _ref,
+          currency: 'ILS',
+          fetchedAt: DateTime.now().subtract(const Duration(hours: 19)),
+          venueName: 'Vitrina',
+          categories: const [
+            MenuCategory(
+              id: 'c1',
+              name: 'Mains',
+              dishes: [
+                Dish(
+                  id: 'green',
+                  name: 'Herb Butter Steak',
+                  description: '',
+                  price: 42,
+                  options: <DishOption>[],
+                ),
+              ],
+            ),
+          ],
+        );
+        final fakes = FakeAppDependencies();
+        fakes.repository.stub(_ref, MenuFetched(menu: fixtureMenu));
+        await pumpApp(tester, fakes);
+
+        // Act: open the venue, come back, and visit Saved.
+        await enterText(tester, _woltUrl);
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
+        await tester.pageBack();
+        await tester.pumpAndSettle();
+        await tapAndSettle(tester, navDestination(_en.navSaved));
+
+        // Assert: the row says how long it has left.
+        expect(find.text(_en.savedExpiresHours(5)), findsOneWidget);
+
+        // Act: keep it.
+        await tapAndSettle(tester, find.byTooltip(_en.savedKeep));
+
+        // Assert: the countdown is replaced by the kept note.
+        expect(find.text(_en.savedKept), findsOneWidget);
+        expect(find.text(_en.savedExpiresHours(5)), findsNothing);
+
+        // Act: stop keeping it.
+        await tapAndSettle(tester, find.byTooltip(_en.savedUnkeep));
+
+        // Assert: the countdown is back.
+        expect(find.text(_en.savedKept), findsNothing);
+        expect(find.text(_en.savedExpiresHours(5)), findsOneWidget);
+      },
+    );
   });
 }

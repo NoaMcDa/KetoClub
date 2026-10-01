@@ -485,6 +485,64 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String savedExpiresMinutes(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'יפוג בעוד $count דקות',
+      two: 'יפוג בעוד דקתיים',
+      one: 'יפוג בעוד דקה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String savedExpiresHours(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'יפוג בעוד $count שעות',
+      two: 'יפוג בעוד שעתיים',
+      one: 'יפוג בעוד שעה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String savedExpiresDays(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'יפוג בעוד $count ימים',
+      two: 'יפוג בעוד יומיים',
+      one: 'יפוג בעוד יום',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get savedExpired => 'פג תוקף, יתרענן בפתיחה';
+
+  @override
+  String get savedKept => 'נשמר, ללא תפוגה';
+
+  @override
+  String get savedKeep => 'שמור';
+
+  @override
+  String savedKeepSemanticLabel(String venue) {
+    return 'שמור את $venue מעבר לתפוגה';
+  }
+
+  @override
+  String get savedUnkeep => 'הפסק לשמור';
+
+  @override
+  String savedUnkeepSemanticLabel(String venue) {
+    return 'הפסק לשמור את $venue';
+  }
+
+  @override
   String get savedUndo => 'בטל';
 
   @override

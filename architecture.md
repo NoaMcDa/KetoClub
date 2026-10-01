@@ -847,6 +847,16 @@ Cache rules:
   answer.
 - The cache never stores the raw platform JSON, only the normalised `Menu`.
 - The user can clear the cache from Settings.
+- A cached menu can be **pinned** (the Recent tab's "Keep" toggle, issue #253;
+  `MenuCache.pin`): a pinned entry is served from the cache without a refetch
+  however old it is, until the user asks for a refresh (`forceRefresh` still
+  refetches, and the pin survives it). The pin is a set of cache keys in a
+  second Hive box (`menu_cache_pins`), so the entries' stored shape is untouched
+  and no migration is needed; it flags a menu, never a user record (D8). Removing
+  an entry unpins it, and Settings' "Clear" clears pinned entries too. The
+  Recent tab shows each unpinned row's remaining time (`fetchedAt` plus
+  `menuCacheTtl`, bucketed like the age label) and "Expired, refreshes when
+  opened" once the window has passed.
 - `MenuCache.size()` reports how many menus are cached — a count of entries, one
   per distinct `VenueRef`, never a byte figure. Hive's `Box` exposes how many keys
   it holds, not the on-disk size of the box file, and on web the box lives in

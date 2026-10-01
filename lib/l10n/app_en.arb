@@ -207,6 +207,30 @@
   "@savedRemovedMessage": {
     "placeholders": { "venue": { "type": "String" } }
   },
+  "savedExpiresMinutes": "{count, plural, one{Expires in 1 minute} other{Expires in {count} minutes}}",
+  "@savedExpiresMinutes": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "savedExpiresHours": "{count, plural, one{Expires in 1 hour} other{Expires in {count} hours}}",
+  "@savedExpiresHours": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "savedExpiresDays": "{count, plural, one{Expires in 1 day} other{Expires in {count} days}}",
+  "@savedExpiresDays": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "savedExpired": "Expired, refreshes when opened",
+  "savedKept": "Kept, no expiry",
+  "savedKeep": "Keep",
+  "savedKeepSemanticLabel": "Keep {venue} past its expiry",
+  "@savedKeepSemanticLabel": {
+    "placeholders": { "venue": { "type": "String" } }
+  },
+  "savedUnkeep": "Stop keeping",
+  "savedUnkeepSemanticLabel": "Stop keeping {venue}",
+  "@savedUnkeepSemanticLabel": {
+    "placeholders": { "venue": { "type": "String" } }
+  },
   "savedUndo": "Undo",
 
   "discoveryTitle": "Where to eat",

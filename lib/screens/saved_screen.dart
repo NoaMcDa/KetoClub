@@ -6,6 +6,7 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/saved_controller.dart';
+import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
@@ -53,6 +54,30 @@ String _ageLabel(DateTime fetchedAt, DateTime now, AppLocalizations l10n) {
   if (elapsed.inHours < 1) return l10n.ageMinutes(elapsed.inMinutes);
   if (elapsed.inDays < 1) return l10n.ageHours(elapsed.inHours);
   return l10n.ageDays(elapsed.inDays);
+}
+
+/// How long a cached menu has left, phrased like [_ageLabel] but looking
+/// forward: the time from [now] to `fetchedAt + ttl`, rounded up to the
+/// next minute and bucketed into minutes, hours and days. A menu already
+/// past its window reads [AppLocalizations.savedExpired] — it is still
+/// listed, and opening it refreshes it.
+///
+/// [ttl] defaults to [menuCacheTtl], the window `CachedMenuRepository`
+/// serves a cached menu for.
+String cacheExpiryLabel(
+  DateTime fetchedAt,
+  DateTime now,
+  AppLocalizations l10n, {
+  Duration ttl = menuCacheTtl,
+}) {
+  final remaining = fetchedAt.add(ttl).difference(now);
+  if (remaining <= Duration.zero) return l10n.savedExpired;
+  final minutes = (remaining.inMicroseconds / Duration.microsecondsPerMinute)
+      .ceil();
+  final rounded = Duration(minutes: minutes);
+  if (rounded.inHours < 1) return l10n.savedExpiresMinutes(rounded.inMinutes);
+  if (rounded.inDays < 1) return l10n.savedExpiresHours(rounded.inHours);
+  return l10n.savedExpiresDays(rounded.inDays);
 }
 
 /// The Saved tab (architecture.md §6.6; issue #48): every cached menu,
@@ -187,6 +212,8 @@ class _SavedScreenState extends State<SavedScreen> {
             arguments: entry.venueName,
           ),
           onRemove: () => _removeWithUndo(context, controller, entry),
+          onTogglePin: () =>
+              unawaited(controller.setPinned(entry.ref, pinned: !entry.pinned)),
         );
       },
     );
@@ -242,7 +269,12 @@ class _SavedScreenState extends State<SavedScreen> {
 /// No photo: the cache holds no venue image (a `Menu` carries none, only
 /// dishes do), so there is nothing honest to show in its place (#252).
 class _SavedEntryTile extends StatelessWidget {
-  const new({required this.entry, required this.onTap, required this.onRemove});
+  const new({
+    required this.entry,
+    required this.onTap,
+    required this.onRemove,
+    required this.onTogglePin,
+  });
 
   /// The cached menu this row summarises.
   final CachedMenuEntry entry;
@@ -253,6 +285,10 @@ class _SavedEntryTile extends StatelessWidget {
   /// Called on a swipe-to-dismiss or a tap on the trailing remove button.
   final VoidCallback onRemove;
 
+  /// Called on a tap on the pin toggle, to keep [entry] past its expiry
+  /// or stop keeping it.
+  final VoidCallback onTogglePin;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -260,6 +296,9 @@ class _SavedEntryTile extends StatelessWidget {
     final title = _entryTitle(entry, l10n);
     final age = _ageLabel(entry.fetchedAt, DateTime.now(), l10n);
     final engine = entry.engine;
+    final expiry = entry.pinned
+        ? l10n.savedKept
+        : cacheExpiryLabel(entry.fetchedAt, DateTime.now(), l10n);
 
     return Dismissible(
       key: ValueKey(entry.ref.cacheKey),
@@ -300,6 +339,8 @@ class _SavedEntryTile extends StatelessWidget {
             children: [
               const SizedBox(height: 4),
               Text(l10n.menuSourceLine(_platformName(entry.ref, l10n), age)),
+              const SizedBox(height: 2),
+              Text(expiry, style: theme.textTheme.bodySmall),
               const SizedBox(height: 4),
               Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
@@ -316,15 +357,35 @@ class _SavedEntryTile extends StatelessWidget {
               ),
             ],
           ),
-          trailing: Semantics(
-            label: l10n.savedRemoveSemanticLabel(title),
-            button: true,
-            excludeSemantics: true,
-            child: IconButton(
-              icon: const Icon(Icons.delete_outline),
-              tooltip: l10n.savedRemove,
-              onPressed: onRemove,
-            ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                label: entry.pinned
+                    ? l10n.savedUnkeepSemanticLabel(title)
+                    : l10n.savedKeepSemanticLabel(title),
+                button: true,
+                toggled: entry.pinned,
+                excludeSemantics: true,
+                child: IconButton(
+                  icon: Icon(
+                    entry.pinned ? Icons.push_pin : Icons.push_pin_outlined,
+                  ),
+                  tooltip: entry.pinned ? l10n.savedUnkeep : l10n.savedKeep,
+                  onPressed: onTogglePin,
+                ),
+              ),
+              Semantics(
+                label: l10n.savedRemoveSemanticLabel(title),
+                button: true,
+                excludeSemantics: true,
+                child: IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  tooltip: l10n.savedRemove,
+                  onPressed: onRemove,
+                ),
+              ),
+            ],
           ),
         ),
       ),
