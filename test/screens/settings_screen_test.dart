@@ -96,11 +96,24 @@ Future<void> _pump(
   );
 }
 
+/// Opens the "What leaves this device" disclosure ([consentDisclosureKey]),
+/// which is collapsed by default (issue #255), so the consent body text is
+/// built and a test can find it.
+Future<void> _expandConsentDisclosure(WidgetTester tester) async {
+  final disclosure = find.byKey(consentDisclosureKey);
+  await tester.ensureVisible(disclosure);
+  await tester.tap(disclosure);
+  await tester.pumpAndSettle();
+}
+
+/// The vertical position of [finder]'s top edge, for asserting the order
+/// of the screen's sections.
+double _top(WidgetTester tester, Finder finder) => tester.getTopLeft(finder).dy;
+
 void main() {
   group('SettingsScreen', () {
-    testWidgets('build shows the consent disclosure and its checkbox', (
-      tester,
-    ) async {
+    testWidgets('the consent body is collapsed by default, with the checkbox '
+        'visible (issue #255)', (tester) async {
       // Arrange
       final controller = _controllerFor();
 
@@ -109,14 +122,59 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
+      expect(find.text(_en.settingsAiPrivacy), findsOneWidget);
       expect(find.text(_en.settingsConsentTitle), findsOneWidget);
-      expect(find.text(_en.settingsConsentBody), findsOneWidget);
+      expect(find.text(_en.settingsConsentBody), findsNothing);
+      expect(find.text(_en.settingsConsentAccept), findsOneWidget);
       expect(find.byType(CheckboxListTile), findsOneWidget);
     });
 
-    testWidgets('the consent section comes before every other section', (
-      tester,
-    ) async {
+    testWidgets('opening the disclosure shows the consent body and keeps '
+        'the checkbox', (tester) async {
+      // Arrange
+      final controller = _controllerFor();
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Act
+      await _expandConsentDisclosure(tester);
+
+      // Assert
+      expect(find.text(_en.settingsConsentBody), findsOneWidget);
+      expect(find.text(_en.settingsConsentAccept), findsOneWidget);
+    });
+
+    testWidgets(
+      'sections run Language, Appearance, keto rules, net carb limit, '
+      'default filter, AI & privacy, Recent menus, drinks guide '
+      '(issue #255)',
+      (tester) async {
+        // Arrange
+        final controller = _controllerFor();
+
+        // Act
+        await _pump(tester, controller);
+        await tester.pumpAndSettle();
+
+        // Assert
+        final tops = [
+          _en.settingsLanguage,
+          _en.settingsAppearance,
+          _en.settingsKetoRules,
+          _en.settingsNetCarbLimit,
+          _en.settingsFilter,
+          _en.settingsAiPrivacy,
+          _en.settingsCacheSection,
+          _en.settingsDrinksGuideTitle,
+        ].map((label) => _top(tester, find.text(label))).toList();
+        for (var i = 1; i < tops.length; i++) {
+          expect(tops[i], greaterThan(tops[i - 1]));
+        }
+      },
+    );
+
+    testWidgets('the cache group carries the "Recent menus" label above '
+        'its count (issue #255)', (tester) async {
       // Arrange
       final controller = _controllerFor();
 
@@ -125,9 +183,12 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      final consentTop = tester.getTopLeft(find.text(_en.settingsConsentTitle));
-      final languageTop = tester.getTopLeft(find.text(_en.settingsLanguage));
-      expect(consentTop.dy, lessThan(languageTop.dy));
+      final label = find.text(_en.settingsCacheSection);
+      expect(label, findsOneWidget);
+      expect(
+        _top(tester, label),
+        lessThan(_top(tester, find.text(_en.settingsCacheSummary(0)))),
+      );
     });
 
     testWidgets(
@@ -750,6 +811,7 @@ void main() {
       // Assert
       expect(find.text(_en.settingsKeySection), findsNothing);
       expect(find.byKey(apiKeyFieldKey), findsNothing);
+      await _expandConsentDisclosure(tester);
       expect(find.text(_en.settingsConsentBody), findsOneWidget);
       expect(find.text(_en.settingsConsentBodyDirect), findsNothing);
     });
@@ -769,8 +831,29 @@ void main() {
       expect(find.text(_en.settingsKeyAbsent), findsOneWidget);
       expect(find.byKey(apiKeySaveKey), findsOneWidget);
       expect(find.byKey(apiKeyDeleteKey), findsNothing);
+      await _expandConsentDisclosure(tester);
       expect(find.text(_en.settingsConsentBodyDirect), findsOneWidget);
       expect(find.text(_en.settingsConsentBody), findsNothing);
+    });
+
+    testWidgets('phone: the key section sits in AI & privacy, after the '
+        'consent checkbox and before Recent menus (issue #255)', (
+      tester,
+    ) async {
+      // Arrange
+      final controller = _controllerFor(apiKeyStore: FakeApiKeyStore());
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      final consent = _top(tester, find.text(_en.settingsConsentAccept));
+      final key = _top(tester, find.text(_en.settingsKeySection));
+      final cache = _top(tester, find.text(_en.settingsCacheSection));
+      expect(_top(tester, find.text(_en.settingsAiPrivacy)), lessThan(consent));
+      expect(key, greaterThan(consent));
+      expect(key, lessThan(cache));
     });
 
     testWidgets('the key field is obscured and never prefilled', (
@@ -803,6 +886,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Act
+      await tester.ensureVisible(find.byKey(apiKeyFieldKey));
       await tester.enterText(find.byKey(apiKeyFieldKey), '  AIza-typed  ');
       // Below the fold on the default 800×600 surface once the content
       // column is capped (issue #221).
@@ -826,6 +910,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Act
+      await tester.ensureVisible(find.byKey(apiKeyFieldKey));
       await tester.enterText(find.byKey(apiKeyFieldKey), '   ');
       await tester.ensureVisible(find.byKey(apiKeySaveKey));
       await tester.tap(find.byKey(apiKeySaveKey));
@@ -863,7 +948,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
+      expect(find.text(_he.settingsAiPrivacy), findsOneWidget);
       expect(find.text(_he.settingsKeySection), findsOneWidget);
+      await _expandConsentDisclosure(tester);
       expect(find.text(_he.settingsConsentBodyDirect), findsOneWidget);
     });
   });

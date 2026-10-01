@@ -338,6 +338,12 @@ abstract class AppLocalizations {
   /// **'Say this to the waiter'**
   String get waiterCardTitle;
 
+  /// No description provided for @settingsAiPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'AI & privacy'**
+  String get settingsAiPrivacy;
+
   /// No description provided for @settingsConsentTitle.
   ///
   /// In en, this message translates to:
@@ -547,6 +553,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Default filter'**
   String get settingsFilter;
+
+  /// No description provided for @settingsCacheSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent menus'**
+  String get settingsCacheSection;
 
   /// No description provided for @settingsCacheSummary.
   ///

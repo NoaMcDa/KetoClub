@@ -143,6 +143,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get waiterCardTitle => 'זה מה שאומרים למלצר';
 
   @override
+  String get settingsAiPrivacy => 'בינה מלאכותית ופרטיות';
+
+  @override
   String get settingsConsentTitle => 'מה יוצא מהמכשיר הזה';
 
   @override
@@ -257,6 +260,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settingsFilter => 'סינון ברירת מחדל';
+
+  @override
+  String get settingsCacheSection => 'תפריטים אחרונים';
 
   @override
   String settingsCacheSummary(num count) {
