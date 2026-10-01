@@ -37,7 +37,9 @@ void main() {
         await pumpApp(tester, fakes);
 
         // Assert: launch lands on Explore.
-        expect(find.text(appName), findsOneWidget);
+        final handle = tester.ensureSemantics();
+        expect(find.bySemanticsLabel(appName), findsOneWidget);
+        handle.dispose();
         expect(find.text(_en.venueSearchLabel), findsOneWidget);
 
         // Act: Scan.

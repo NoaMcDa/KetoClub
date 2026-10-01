@@ -1055,13 +1055,13 @@ abstract class AppLocalizations {
   /// No description provided for @discoveryEstimateList.
   ///
   /// In en, this message translates to:
-  /// **'Estimate this list'**
+  /// **'Quick score (on-device rules)'**
   String get discoveryEstimateList;
 
   /// No description provided for @discoveryEstimateHint.
   ///
   /// In en, this message translates to:
-  /// **'Reads each menu on this list once and scores it with the on-device rules, not the AI. Open a restaurant for the full analysis.'**
+  /// **'Open a restaurant for the full AI analysis.'**
   String get discoveryEstimateHint;
 
   /// No description provided for @discoveryEstimating.

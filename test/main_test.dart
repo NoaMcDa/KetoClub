@@ -11,8 +11,10 @@ void main() {
       app.main();
       await tester.pump();
 
-      // Assert
-      expect(find.text(appName), findsOneWidget);
+      // Assert: the logo mark carries the name as its semantics label.
+      final handle = tester.ensureSemantics();
+      expect(find.bySemanticsLabel(appName), findsOneWidget);
+      handle.dispose();
     });
   });
 }

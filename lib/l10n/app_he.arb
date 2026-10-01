@@ -237,8 +237,8 @@
   "discoveryNoResultsBody": "נסו שם אחר, או נקו את החיפוש.",
   "discoveryClearSearch": "נקה חיפוש",
   "discoveryNoChipResults": "אף מסעדה ברשימה לא מתאימה לסינון הזה.",
-  "discoveryEstimateList": "הערך את הרשימה",
-  "discoveryEstimateHint": "קורא פעם אחת את התפריט של כל מסעדה ברשימה ומדרג אותו לפי הכללים שבמכשיר, לא בבינה מלאכותית. לניתוח המלא, פתחו את המסעדה.",
+  "discoveryEstimateList": "דירוג מהיר (כללים במכשיר)",
+  "discoveryEstimateHint": "לניתוח מלא עם בינה מלאכותית, פתחו מסעדה.",
   "discoveryEstimating": "מעריך {done} מתוך {total}…",
   "@discoveryEstimating": {
     "placeholders": {

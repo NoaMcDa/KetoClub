@@ -29,7 +29,9 @@ void main() {
       // Assert: the first screen is the venue search screen, with its
       // paste field built by the real dependencies. There is no standing
       // open button any more (#229): a pasted link shows a suffix icon.
-      expect(find.text(appName), findsOneWidget);
+      final handle = tester.ensureSemantics();
+      expect(find.bySemanticsLabel(appName), findsOneWidget);
+      handle.dispose();
       expect(find.byType(VenueSearchScreen), findsOneWidget);
       expect(find.text(_en.venueSearchLabel), findsOneWidget);
       expect(find.text(_en.venueSearchHint), findsOneWidget);

@@ -581,11 +581,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'No restaurant in this list matches that filter.';
 
   @override
-  String get discoveryEstimateList => 'Estimate this list';
+  String get discoveryEstimateList => 'Quick score (on-device rules)';
 
   @override
   String get discoveryEstimateHint =>
-      'Reads each menu on this list once and scores it with the on-device rules, not the AI. Open a restaurant for the full analysis.';
+      'Open a restaurant for the full AI analysis.';
 
   @override
   String discoveryEstimating(int done, int total) {

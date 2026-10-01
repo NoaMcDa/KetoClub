@@ -89,6 +89,8 @@ flutter:
     - assets/fonts/OFL-InstrumentSerif.txt
     - assets/fonts/OFL-Rubik.txt
     - assets/fonts/OFL-NotoSansHebrew.txt
+    # The launcher icon, shown as the Explore screen's logo mark (#232).
+    - assets/icon/icon.png
 
   # The type families the .design artboards call for, plus Rubik as the
   # bundled Hebrew-capable fallback. All SIL OFL 1.1; the licence texts sit

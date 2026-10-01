@@ -18,6 +18,12 @@ import 'package:ketoclub/widgets/venue_card.dart';
 import 'package:ketoclub/widgets/venue_grid.dart';
 import 'package:provider/provider.dart';
 
+/// The launcher icon the logo mark shows (declared in `pubspec.yaml`).
+const String _logoAsset = 'assets/icon/icon.png';
+
+/// The logo mark's side, in logical pixels.
+const double _logoSize = 28;
+
 /// The Discovery screen (issue #40; architecture.md §6.5, §6.6, D13;
 /// `phase2_discovery_research.md` §6; `.design/Discovery.dc.html`): a
 /// "Looking around" header with a location button, the search field, the
@@ -198,8 +204,8 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
                 ),
                 _header(context, l10n, controller),
                 const SizedBox(height: 12),
-                Text(appName, style: textTheme.labelSmall),
-                const SizedBox(height: 4),
+                _logoMark(),
+                const SizedBox(height: 8),
                 // The artboard's 34px serif heading.
                 Text(
                   l10n.discoveryTitle,
@@ -488,6 +494,25 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  /// The app's only branding (issue #232): the launcher icon at 28px, read
+  /// as [appName] by a screen reader. Decoded at four times its size, not at
+  /// the asset's 1024px.
+  Widget _logoMark() {
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(7),
+        child: Image.asset(
+          _logoAsset,
+          width: _logoSize,
+          height: _logoSize,
+          cacheWidth: (_logoSize * 4).round(),
+          semanticLabel: appName,
+        ),
+      ),
     );
   }
 
