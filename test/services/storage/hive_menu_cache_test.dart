@@ -296,6 +296,83 @@ void main() {
       expect(result.single.ref, equals(woltRef));
     });
 
+    test(
+      'entries carry the score and verdict counts of the analysis',
+      () async {
+        // Arrange
+        final cache = _buildCache();
+        await cache.write(
+          CachedMenu(
+            menu: _menuFor(woltRef),
+            analysis: MenuAnalysed(
+              dishes: const <AnalysedDish>[
+                AnalysedDish(
+                  dishId: 'a',
+                  name: 'A',
+                  verdict: DishVerdict.orderAsIs,
+                  why: 'No starch.',
+                ),
+                AnalysedDish(
+                  dishId: 'b',
+                  name: 'B',
+                  verdict: DishVerdict.modifiable,
+                  why: 'Has a side.',
+                  modification: 'Swap the side.',
+                ),
+                AnalysedDish(
+                  dishId: 'c',
+                  name: 'C',
+                  verdict: DishVerdict.nonKeto,
+                  why: 'Pasta.',
+                ),
+              ],
+              unclassified: const <String>[],
+              engine: const LlmEngine(model: 'm'),
+              analysedAt: DateTime.utc(2026),
+            ),
+          ),
+        );
+        await cache.write(CachedMenu(menu: _menuFor(tenbisRef)));
+
+        // Act
+        final result = {for (final e in await cache.entries()) e.ref: e};
+
+        // Assert
+        final analysed = result[woltRef]!;
+        expect(analysed.score, 5.0);
+        expect(analysed.greenCount, 1);
+        expect(analysed.yellowCount, 1);
+        final plain = result[tenbisRef]!;
+        expect(plain.score, isNull);
+        expect(plain.greenCount, 0);
+        expect(plain.yellowCount, 0);
+      },
+    );
+
+    test('an analysis that placed no dish has no score or counts', () async {
+      // Arrange
+      final cache = _buildCache();
+      await cache.write(
+        CachedMenu(
+          menu: _menuFor(woltRef),
+          analysis: MenuAnalysed(
+            dishes: const <AnalysedDish>[],
+            unclassified: const <String>[],
+            engine: const LlmEngine(model: 'm'),
+            analysedAt: DateTime.utc(2026),
+          ),
+        ),
+      );
+
+      // Act
+      final entry = (await cache.entries()).single;
+
+      // Assert
+      expect(entry.analysed, isTrue);
+      expect(entry.score, isNull);
+      expect(entry.greenCount, 0);
+    });
+
     test('remove does nothing when opening the box throws', () async {
       // Arrange
       final cache = HiveMenuCache(
