@@ -45,6 +45,18 @@ import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
 
+/// The narrowest window, in logical pixels, at which a loaded menu is laid
+/// out in two panes: the header, the tiles, the Filters row and the
+/// category chips pinned beside a dish list that scrolls on its own
+/// (issue #225, architecture.md §6.6). The same width Discovery's grid
+/// stops growing at (`discoveryMaxWidth`).
+const double menuTwoPaneMinWidth = 1080;
+
+/// The widest the two-pane menu grows (issue #225): the [ContentWidth] cap
+/// the menu route passes in place of [contentMaxWidth] at
+/// [menuTwoPaneMinWidth] and above.
+const double menuTwoPaneMaxWidth = 1200;
+
 /// The brand name shown for [ref]'s source inside failure copy (architecture.md
 /// §10), e.g. "Wolt" in "Venue not found on Wolt. Check the link."
 ///
@@ -210,6 +222,15 @@ class _MenuScreenState extends State<MenuScreen> {
   /// Wraps [_header], so [_updateHeaderScrolledPast] can read its height.
   final GlobalKey _headerKey = GlobalKey();
 
+  /// Whether the last build laid the loaded menu out in two panes (issue
+  /// #225); kept so [_updateHeaderScrolledPast] can tell.
+  bool _twoPane = false;
+
+  /// The side pane's width in the two-pane layout (issue #225): the
+  /// 390px artboard's column, so the header, the tiles and the chips keep
+  /// the proportions they were drawn at.
+  static const double _sidePaneWidth = 380;
+
   /// The stable [GlobalKey] for each category header currently or
   /// previously shown, keyed by category name — see [_categoryKeyFor]
   /// (issue #51).
@@ -295,18 +316,42 @@ class _MenuScreenState extends State<MenuScreen> {
             ),
         ],
       ),
-      body: ContentWidth(
-        child: Column(
-          children: [
-            OfflineBanner(
-              connectivity: widget.connectivity,
-              recheckToken: _recheckToken,
+      // The window's width, not the capped column's, decides the layout:
+      // the cap itself depends on it (issue #225).
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final twoPane =
+              constraints.maxWidth >= menuTwoPaneMinWidth &&
+              (controller.menu?.allDishes.isNotEmpty ?? false);
+          _syncTwoPane(twoPane);
+          return ContentWidth(
+            maxWidth: twoPane ? menuTwoPaneMaxWidth : contentMaxWidth,
+            child: Column(
+              children: [
+                OfflineBanner(
+                  connectivity: widget.connectivity,
+                  recheckToken: _recheckToken,
+                ),
+                Expanded(
+                  child: _body(context, l10n, controller, twoPane: twoPane),
+                ),
+              ],
             ),
-            Expanded(child: _body(context, l10n, controller)),
-          ],
-        ),
+          );
+        },
       ),
     );
+  }
+
+  /// Records whether the body is laid out in two panes (issue #225) and,
+  /// when that just changed, re-derives [_headerScrolledPast] after the
+  /// frame: the list it was measured on is not the list now shown.
+  void _syncTwoPane(bool twoPane) {
+    if (twoPane == _twoPane) return;
+    _twoPane = twoPane;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _updateHeaderScrolledPast();
+    });
   }
 
   /// Sets [_headerScrolledPast] from the list's offset: past once the
@@ -315,7 +360,14 @@ class _MenuScreenState extends State<MenuScreen> {
   /// A [ListView] builds lazily, so a header scrolled far enough away has
   /// no render box left to measure; any offset above zero then means it
   /// is gone.
+  ///
+  /// Always false in two panes (issue #225): the header is pinned in the
+  /// side pane there and never scrolls under the bar.
   void _updateHeaderScrolledPast() {
+    if (_twoPane) {
+      _headerScrolledPast.value = false;
+      return;
+    }
     if (!_scrollController.hasClients) return;
     final offset = _scrollController.offset;
     final box = _headerKey.currentContext?.findRenderObject();
@@ -348,18 +400,21 @@ class _MenuScreenState extends State<MenuScreen> {
 
   /// The screen body for the controller's current state: loading, a
   /// failed fetch, or a loaded menu (architecture.md §6.6).
+  ///
+  /// [twoPane] lays a loaded menu out in two panes (issue #225).
   Widget _body(
     BuildContext context,
     AppLocalizations l10n,
-    MenuController controller,
-  ) {
+    MenuController controller, {
+    required bool twoPane,
+  }) {
     final menu = controller.menu;
     if (menu == null) {
       final failure = controller.fetchFailure;
       if (failure == null) return _fetchingSkeleton(l10n);
       return _fetchFailureView(context, l10n, controller, failure);
     }
-    return _loadedView(context, l10n, controller, menu);
+    return _loadedView(context, l10n, controller, menu, twoPane: twoPane);
   }
 
   /// Three [DishCardSkeleton]s in place of the old "Reading the menu…"
@@ -445,12 +500,18 @@ class _MenuScreenState extends State<MenuScreen> {
 
   /// A menu that was fetched, whether or not it was analysed
   /// successfully and whether or not it came from cache.
+  ///
+  /// [twoPane] (issue #225, a window at least [menuTwoPaneMinWidth] wide)
+  /// pins the header, the tiles, the source line, the Filters row and the
+  /// category chips in a side pane of their own, and scrolls only the
+  /// notices and the dishes beside it. Otherwise everything is one list.
   Widget _loadedView(
     BuildContext context,
     AppLocalizations l10n,
     MenuController controller,
-    Menu menu,
-  ) {
+    Menu menu, {
+    required bool twoPane,
+  }) {
     final banners = _banners(context, l10n, controller);
     // The header and the source line name the venue and when its menu was
     // read; neither depends on a successful analysis, so both render for
@@ -500,7 +561,85 @@ class _MenuScreenState extends State<MenuScreen> {
     final localeTag = Localizations.localeOf(context).toLanguageTag();
     final rows = controller.visibleRows;
 
-    return _refreshable(
+    // Header, tiles, category chips, then dishes (issue #234): the
+    // search, the carb budget and the legend sit behind one collapsed
+    // Filters row, so the first dish card fits on a phone screen.
+    final top = <Widget>[
+      KeyedSubtree(key: _headerKey, child: header),
+      const SizedBox(height: 4),
+      if (analysed) ...[
+        const SizedBox(height: 8),
+        VerdictCounterTiles(
+          greenCount: controller.greenCount,
+          yellowCount: controller.yellowCount,
+          redCount: controller.redCount,
+          filter: controller.filter,
+          onFilterChanged: controller.setFilter,
+        ),
+        const SizedBox(height: 10),
+      ],
+      // A Wrap, not a Row (issue #245): the source line sits at the end
+      // of the label's line when both fit, and drops to a line of its
+      // own with the whole width when a long website host would not.
+      Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        spacing: 8,
+        children: [
+          if (analysed)
+            Text(
+              _showingLabel(l10n, controller),
+              style: Theme.of(context).textTheme.labelMedium,
+            )
+          else
+            const SizedBox.shrink(),
+          ?sourceLine,
+        ],
+      ),
+      _filtersRow(context, l10n, controller, analysed: analysed),
+      const SizedBox(height: 4),
+    ];
+    final notices = <Widget>[
+      AnalysisProgressRow(phase: controller.phase),
+      ...banners,
+      if (controller.engine != null) ...[
+        RulesReasonBanner(
+          engine: controller.engine!,
+          onRetry: () => _retry(controller.reanalyse),
+        ),
+        // A rules result is explained by the banner above, so the chip
+        // is shown for an AI result only (audit M14, issue #236).
+        // Aligned rather than stretched: a ListView child is forced to
+        // the full width, which drew this pill as a full-width bar.
+        if (controller.engine is LlmEngine) ...[
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: EngineChip(engine: controller.engine!),
+          ),
+          const SizedBox(height: 12),
+        ],
+      ],
+    ];
+    final chips = <Widget>[
+      CategoryChips(
+        categories: controller.visibleCategories,
+        onSelected: (category) => unawaited(_scrollToCategory(category)),
+        // Wrapped in the side pane, where a mouse cannot drag a
+        // horizontal row to the chips past its edge (issue #225).
+        wrap: twoPane,
+      ),
+      const SizedBox(height: 8),
+    ];
+    final dishes = <Widget>[
+      if (rows.isEmpty)
+        _noVisibleRows(l10n, controller)
+      else
+        ..._dishRows(context, controller, localeTag, rows),
+      if (analysed && controller.unclassifiedRows.isNotEmpty)
+        _unclassifiedSection(context, l10n, controller, localeTag),
+    ];
+    // The dish list keeps [_scrollController] in either layout, so the
+    // chip jump scrolls the dishes wherever the chips sit.
+    final dishList = _refreshable(
       controller,
       ListView(
         controller: _scrollController,
@@ -508,74 +647,29 @@ class _MenuScreenState extends State<MenuScreen> {
         // be pulled down to refresh (RefreshIndicator's own requirement).
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(20, _listTopPadding, 20, 24),
-        // Header, tiles, category chips, then dishes (issue #234): the
-        // search, the carb budget and the legend sit behind one collapsed
-        // Filters row, so the first dish card fits on a phone screen.
-        children: [
-          KeyedSubtree(key: _headerKey, child: header),
-          const SizedBox(height: 4),
-          if (analysed) ...[
-            const SizedBox(height: 8),
-            VerdictCounterTiles(
-              greenCount: controller.greenCount,
-              yellowCount: controller.yellowCount,
-              redCount: controller.redCount,
-              filter: controller.filter,
-              onFilterChanged: controller.setFilter,
-            ),
-            const SizedBox(height: 10),
-          ],
-          // A Wrap, not a Row (issue #245): the source line sits at the end
-          // of the label's line when both fit, and drops to a line of its
-          // own with the whole width when a long website host would not.
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            spacing: 8,
-            children: [
-              if (analysed)
-                Text(
-                  _showingLabel(l10n, controller),
-                  style: Theme.of(context).textTheme.labelMedium,
-                )
-              else
-                const SizedBox.shrink(),
-              ?sourceLine,
-            ],
-          ),
-          _filtersRow(context, l10n, controller, analysed: analysed),
-          const SizedBox(height: 4),
-          AnalysisProgressRow(phase: controller.phase),
-          ...banners,
-          if (controller.engine != null) ...[
-            RulesReasonBanner(
-              engine: controller.engine!,
-              onRetry: () => _retry(controller.reanalyse),
-            ),
-            // A rules result is explained by the banner above, so the chip
-            // is shown for an AI result only (audit M14, issue #236).
-            // Aligned rather than stretched: a ListView child is forced to
-            // the full width, which drew this pill as a full-width bar.
-            if (controller.engine is LlmEngine) ...[
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: EngineChip(engine: controller.engine!),
-              ),
-              const SizedBox(height: 12),
-            ],
-          ],
-          CategoryChips(
-            categories: controller.visibleCategories,
-            onSelected: (category) => unawaited(_scrollToCategory(category)),
-          ),
-          const SizedBox(height: 8),
-          if (rows.isEmpty)
-            _noVisibleRows(l10n, controller)
-          else
-            ..._dishRows(context, controller, localeTag, rows),
-          if (analysed && controller.unclassifiedRows.isNotEmpty)
-            _unclassifiedSection(context, l10n, controller, localeTag),
-        ],
+        children: twoPane
+            ? [...notices, ...dishes]
+            : [...top, ...notices, ...chips, ...dishes],
       ),
+    );
+    if (!twoPane) return dishList;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(
+          width: _sidePaneWidth,
+          // Scrolls on its own when an open Filters row or a short window
+          // makes the pane taller than the screen; not the primary scroll
+          // view, which is the dish list's.
+          child: ListView(
+            primary: false,
+            padding: const EdgeInsets.fromLTRB(20, _listTopPadding, 20, 24),
+            children: [...top, ...chips],
+          ),
+        ),
+        const VerticalDivider(width: 1),
+        Expanded(child: dishList),
+      ],
     );
   }
 

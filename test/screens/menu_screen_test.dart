@@ -2741,8 +2741,9 @@ void main() {
         await tester.pumpAndSettle();
       }
 
-      testWidgets('at 1440px the dish cards and the verdict tiles are no '
-          'wider than the cap and sit centred in the window', (tester) async {
+      testWidgets('at 1440px the dish cards and the verdict tiles sit '
+          'inside the two-pane cap, centred in the window (issue #225 '
+          'widened the cap past 1080px)', (tester) async {
         // Arrange
         await _pump(tester, analysedController());
         await tester.pumpAndSettle();
@@ -2750,16 +2751,18 @@ void main() {
         // Act
         await resizeTo(tester, 1440);
 
-        // Assert
+        // Assert: the tiles (left pane) and the cards (right pane) sit
+        // 20px inside a capped column with equal margins either side.
+        const gutter = (1440 - menuTwoPaneMaxWidth) / 2;
         final tiles = tester.getRect(find.byType(VerdictCounterTiles));
         expect(tiles.width, lessThanOrEqualTo(contentMaxWidth));
-        expect(tiles.center.dx, closeTo(720, 0.01));
+        expect(tiles.left, closeTo(gutter + 20, 0.01));
         final cards = find.byType(DishCard);
         expect(cards, findsNWidgets(2));
         for (final card in cards.evaluate()) {
           final rect = tester.getRect(find.byWidget(card.widget));
-          expect(rect.width, lessThanOrEqualTo(contentMaxWidth));
-          expect(rect.center.dx, closeTo(720, 0.01));
+          expect(rect.left, greaterThan(tiles.right));
+          expect(rect.right, closeTo(1440 - gutter - 20, 0.01));
         }
         expect(tester.takeException(), isNull);
       });
@@ -2813,6 +2816,286 @@ void main() {
         const gutter = (1440 - contentMaxWidth) / 2;
         expect(rect.left, greaterThanOrEqualTo(gutter));
         expect(rect.right, lessThanOrEqualTo(1440 - gutter));
+      });
+    });
+
+    group('two panes on a wide window (issue #225)', () {
+      /// Eight categories of five dishes, the venue named "Sunny Diner",
+      /// analysed by the model: "Dish 0-0" is the one yellow dish, every
+      /// other dish is green.
+      Menu longMenu() => Menu(
+        venueRef: _ref,
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: [
+          for (var c = 0; c < 8; c++)
+            MenuCategory(
+              id: 'cat$c',
+              name: 'Category $c',
+              dishes: [
+                for (var d = 0; d < 5; d++) _dish('Dish $c-$d', id: 'd$c-$d'),
+              ],
+            ),
+        ],
+        venueName: 'Sunny Diner',
+      );
+
+      /// A controller serving [longMenu] from [repository], analysed.
+      MenuController longController(FakeMenuRepository repository) {
+        final menu = longMenu();
+        repository.stub(_ref, MenuFetched(menu: menu));
+        return _controllerFor(
+          repository: repository,
+          classifier: FakeMenuClassifier()
+            ..respondWith(
+              MenuAnalysed(
+                dishes: [
+                  for (final dish in menu.allDishes)
+                    if (dish.id == 'd0-0')
+                      _verdictFor(
+                        dish,
+                        DishVerdict.modifiable,
+                        modification: 'Swap the fries for a salad.',
+                      )
+                    else
+                      _verdictFor(dish, DishVerdict.orderAsIs),
+                ],
+                unclassified: const <String>[],
+                engine: const LlmEngine(model: 'test-model'),
+                analysedAt: DateTime.utc(2026),
+              ),
+            ),
+        );
+      }
+
+      /// Pumps [controller]'s menu and lays it out [width] logical pixels
+      /// wide and 900 tall.
+      Future<void> pumpAt(
+        WidgetTester tester,
+        MenuController controller,
+        double width,
+      ) async {
+        await _pump(tester, controller);
+        tester.view.physicalSize = Size(width, 900);
+        await tester.pumpAndSettle();
+      }
+
+      /// The dish list: the one [ListView] holding the screen's scroll
+      /// controller, in either layout.
+      final dishList = find.byWidgetPredicate(
+        (widget) => widget is ListView && widget.controller != null,
+        description: 'the dish list',
+      );
+
+      /// The two-pane layout's side pane.
+      final sidePane = find.byWidgetPredicate(
+        (widget) => widget is ListView && widget.primary == false,
+        description: 'the side pane',
+      );
+
+      /// The venue name inside the app bar, not the body header.
+      final nameInAppBar = find.descendant(
+        of: find.byType(AppBar),
+        matching: find.text('Sunny Diner'),
+      );
+
+      testWidgets('at 1200px the header, tiles, Filters row and chips stay '
+          'put beside a dish list that scrolls on its own, and the app bar '
+          'never names the venue; back at 390px it is one list again', (
+        tester,
+      ) async {
+        // Arrange
+        await pumpAt(tester, longController(FakeMenuRepository()), 1200);
+
+        // Assert: two panes, the controls in the side pane, wrapped chips.
+        expect(find.byType(ListView), findsNWidgets(2));
+        expect(find.byType(VerticalDivider), findsOneWidget);
+        for (final type in [
+          VerdictCounterTiles,
+          MenuFiltersRow,
+          CategoryChips,
+          KetoScoreBadge,
+        ]) {
+          expect(
+            find.descendant(of: sidePane, matching: find.byType(type)),
+            findsOneWidget,
+          );
+        }
+        expect(
+          find.descendant(
+            of: find.byType(CategoryChips),
+            matching: find.byType(SingleChildScrollView),
+          ),
+          findsNothing,
+        );
+        final tiles = tester.getRect(find.byType(VerdictCounterTiles));
+        final card = tester.getRect(find.byType(DishCard).first);
+        expect(tiles.right, lessThan(card.left));
+        final header = tester.getRect(find.text('Sunny Diner'));
+
+        // Act
+        await tester.drag(dishList, const Offset(0, -600));
+        await tester.pumpAndSettle();
+
+        // Assert: the dishes moved, the header did not, and the bar stays
+        // empty since the header never went under it.
+        expect(find.text('Dish 0-0'), findsNothing);
+        expect(tester.getRect(find.text('Sunny Diner')), header);
+        expect(nameInAppBar, findsNothing);
+
+        // Act: narrow the window to a phone.
+        tester.view.physicalSize = const Size(390, 900);
+        await tester.pumpAndSettle();
+
+        // Assert: one list from the top, so the bar is still empty, until
+        // the header scrolls under it as before (issue #237).
+        expect(find.byType(ListView), findsOneWidget);
+        expect(find.byType(VerticalDivider), findsNothing);
+        expect(nameInAppBar, findsNothing);
+        await tester.drag(dishList, const Offset(0, -600));
+        await tester.pumpAndSettle();
+        expect(nameInAppBar, findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('at 1200px a category chip jumps the dish list, a search '
+          'narrows it and a verdict tile filters it', (tester) async {
+        // Arrange
+        await pumpAt(tester, longController(FakeMenuRepository()), 1200);
+        final heading = find.byWidgetPredicate(
+          (widget) =>
+              widget is Text &&
+              widget.data == 'Category 7' &&
+              widget.style != null,
+          description: "the 'Category 7' heading",
+        );
+        expect(heading, findsNothing);
+
+        // Act: the chip is in reach without scrolling the chip row.
+        await tester.tap(find.text('Category 7'));
+        await tester.pumpAndSettle();
+
+        // Assert: the heading is on screen inside the dish list.
+        expect(heading, findsOneWidget);
+        final list = tester.getRect(dishList);
+        expect(list.overlaps(tester.getRect(heading)), isTrue);
+
+        // Act
+        await _openFilters(tester);
+        await tester.enterText(_searchField, 'Dish 7-3');
+        await tester.pumpAndSettle();
+
+        // Assert: the one card left is that dish (the field holds the
+        // same text, so the find is scoped to the cards).
+        expect(find.byType(DishCard), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byType(DishCard),
+            matching: find.text('Dish 7-3'),
+          ),
+          findsOneWidget,
+        );
+
+        // Act: clear the search, then filter to the one yellow dish.
+        await tester.tap(find.byIcon(Icons.clear));
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.descendant(
+            of: find.byType(VerdictCounterTiles),
+            matching: find.text(_en.tileYellowLabel.toUpperCase()),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(DishCard), findsOneWidget);
+        expect(find.text('Dish 0-0'), findsOneWidget);
+        expect(find.text(_en.menuShowingYellow), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('at 1200px the refresh action and a pull on the dish list '
+          'both refetch, and a dish still opens its Waiter Card', (
+        tester,
+      ) async {
+        // Arrange
+        final repository = FakeMenuRepository();
+        await pumpAt(tester, longController(repository), 1200);
+        final loadCallsBefore = repository.loadCalls.length;
+
+        // Act
+        await tester.tap(find.byTooltip(_en.actionRefreshMenu));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(repository.loadCalls.length, loadCallsBefore + 1);
+        expect(
+          repository.loadCalls.last,
+          equals((ref: _ref, forceRefresh: true)),
+        );
+
+        // Act: pull the dish list down past RefreshIndicator's threshold.
+        await tester.fling(dishList, const Offset(0, 600), 1000);
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(repository.loadCalls.length, loadCallsBefore + 2);
+        expect(
+          repository.loadCalls.last,
+          equals((ref: _ref, forceRefresh: true)),
+        );
+
+        // Act
+        await tester.tap(find.text(_en.dishCardAskWaiter));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(_en.dishCardFullScreen));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(WaiterCardSheet), findsOneWidget);
+      });
+
+      testWidgets('at 390px the menu is the one list it always was: tiles '
+          'above the first card, chips in a sideways row, no divider', (
+        tester,
+      ) async {
+        // Arrange & Act
+        await pumpAt(tester, longController(FakeMenuRepository()), 390);
+
+        // Assert
+        expect(find.byType(ListView), findsOneWidget);
+        expect(find.byType(VerticalDivider), findsNothing);
+        final tiles = tester.getRect(find.byType(VerdictCounterTiles));
+        final card = tester.getRect(find.byType(DishCard).first);
+        expect(tiles.bottom, lessThan(card.top));
+        expect(tiles.width, 350);
+        expect(
+          find.descendant(
+            of: find.byType(CategoryChips),
+            matching: find.byType(SingleChildScrollView),
+          ),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('at 1200px an empty menu keeps the single capped column', (
+        tester,
+      ) async {
+        // Arrange
+        final repository = FakeMenuRepository()
+          ..stub(_ref, MenuFetched(menu: _menuOf(const <Dish>[])));
+
+        // Act
+        await pumpAt(tester, _controllerFor(repository: repository), 1200);
+
+        // Assert
+        expect(find.text(_en.menuEmpty), findsOneWidget);
+        expect(find.byType(VerticalDivider), findsNothing);
+        final rect = tester.getRect(find.text(_en.menuEmpty));
+        expect(rect.left, greaterThanOrEqualTo((1200 - contentMaxWidth) / 2));
       });
     });
 

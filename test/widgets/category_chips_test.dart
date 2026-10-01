@@ -98,5 +98,44 @@ void main() {
       // Assert
       expect(selected, 'Sides');
     });
+
+    testWidgets('wrap: true lays every chip out within the width, on more '
+        'than one line, and a chip on a later line still reports its tap '
+        '(issue #225)', (tester) async {
+      // Arrange
+      final categories = [for (var i = 0; i < 8; i++) 'Category $i'];
+      String? selected;
+      await _pump(
+        tester,
+        Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: 300,
+            child: CategoryChips(
+              categories: categories,
+              onSelected: (category) => selected = category,
+              wrap: true,
+            ),
+          ),
+        ),
+      );
+
+      // Assert: no sideways scroll, every chip inside the 300px, and the
+      // last chip on a lower line than the first.
+      expect(find.byType(SingleChildScrollView), findsNothing);
+      for (final category in categories) {
+        expect(tester.getRect(find.text(category)).right, lessThan(300));
+      }
+      final first = tester.getRect(find.text('Category 0'));
+      final last = tester.getRect(find.text('Category 7'));
+      expect(last.top, greaterThan(first.bottom));
+
+      // Act
+      await tester.tap(find.text('Category 7'));
+      await tester.pump();
+
+      // Assert
+      expect(selected, 'Category 7');
+    });
   });
 }
