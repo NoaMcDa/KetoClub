@@ -3,6 +3,30 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 
+/// The score at or above which the badge reads as a positive claim (green).
+const double ketoScoreGreenFloor = 7;
+
+/// The score at or above which the badge reads as a middling one (amber);
+/// below it the badge is muted.
+const double ketoScoreAmberFloor = 4;
+
+/// The tone the keto score digit is drawn in (issue #241): `green.ink` from
+/// [ketoScoreGreenFloor] up, `amber.ink` from [ketoScoreAmberFloor] up to
+/// that, and [muted] below — a low score must not read as a positive claim.
+///
+/// Pure. The score is rounded to the one decimal place the badge prints
+/// first, so a "7.0" on screen is never toned as a 6.x.
+Color scoreTone(
+  double score, {
+  required VerdictColors verdicts,
+  required Color muted,
+}) {
+  final shown = double.parse(score.toStringAsFixed(1));
+  if (shown >= ketoScoreGreenFloor) return verdicts.green.ink;
+  if (shown >= ketoScoreAmberFloor) return verdicts.amber.ink;
+  return muted;
+}
+
 /// The menu header's keto score (issue #29): a serif-display digit over a
 /// small uppercase "KETO SCORE" label, matching `.design/Main.dc.html`'s
 /// header row.
@@ -36,11 +60,13 @@ class KetoScoreBadge extends StatelessWidget {
 
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    // The artboard renders the digit in `--green-ink` regardless of the
-    // score's own value — a fixed "positive" tone for the whole badge, not
-    // a severity gradient — so this reads `VerdictColors.of` rather than
-    // branching on `currentScore`.
-    final scoreColor = VerdictColors.of(context).green.ink;
+    // Toned by band (issue #241), not a fixed green: a 3.2 must not read
+    // as a positive claim. The muted band is the theme's `ink3`.
+    final scoreColor = scoreTone(
+      currentScore,
+      verdicts: VerdictColors.of(context),
+      muted: theme.colorScheme.onSurfaceVariant,
+    );
     final labelStyle = theme.textTheme.labelSmall;
     final formatted = currentScore.toStringAsFixed(1);
 
