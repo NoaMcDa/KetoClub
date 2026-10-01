@@ -436,20 +436,20 @@ class AppLocalizationsHe extends AppLocalizations {
   String get navScan => 'סריקה';
 
   @override
-  String get navSaved => 'שמורים';
+  String get navSaved => 'אחרונים';
 
   @override
   String get navSettings => 'הגדרות';
 
   @override
-  String get savedPlaceholderTitle => 'מסעדות שמורות';
+  String get savedPlaceholderTitle => 'תפריטים אחרונים';
 
   @override
   String get savedPlaceholderBody =>
       'פתחו תפריט של מסעדה והוא יופיע כאן אוטומטית, זמין ליממה — גם ללא חיבור לאינטרנט.';
 
   @override
-  String get savedLoading => 'טוען את התפריטים השמורים שלך…';
+  String get savedLoading => 'טוען את התפריטים האחרונים שלך…';
 
   @override
   String savedEntryDishCount(num count) {

@@ -180,11 +180,11 @@
   "engineChipReasonConsentWithheld": "AI not allowed",
   "navExplore": "Explore",
   "navScan": "Scan",
-  "navSaved": "Saved",
+  "navSaved": "Recent",
   "navSettings": "Settings",
-  "savedPlaceholderTitle": "Saved venues",
+  "savedPlaceholderTitle": "Recent menus",
   "savedPlaceholderBody": "Open a venue's menu and it appears here automatically, available for a day — even offline.",
-  "savedLoading": "Loading your saved menus…",
+  "savedLoading": "Loading your recent menus…",
   "savedEntryDishCount": "{count, plural, one{1 dish} other{{count} dishes}}",
   "@savedEntryDishCount": {
     "placeholders": { "count": { "type": "num" } }

@@ -145,7 +145,7 @@ class _SavedScreenState extends State<SavedScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.bookmark_border, size: 48),
+          const Icon(Icons.history, size: 48),
           const SizedBox(height: 16),
           Text(l10n.savedPlaceholderBody, textAlign: TextAlign.center),
           const SizedBox(height: 16),

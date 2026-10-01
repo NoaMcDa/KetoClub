@@ -815,7 +815,7 @@ abstract class AppLocalizations {
   /// No description provided for @navSaved.
   ///
   /// In en, this message translates to:
-  /// **'Saved'**
+  /// **'Recent'**
   String get navSaved;
 
   /// No description provided for @navSettings.
@@ -827,7 +827,7 @@ abstract class AppLocalizations {
   /// No description provided for @savedPlaceholderTitle.
   ///
   /// In en, this message translates to:
-  /// **'Saved venues'**
+  /// **'Recent menus'**
   String get savedPlaceholderTitle;
 
   /// No description provided for @savedPlaceholderBody.
@@ -839,7 +839,7 @@ abstract class AppLocalizations {
   /// No description provided for @savedLoading.
   ///
   /// In en, this message translates to:
-  /// **'Loading your saved menus…'**
+  /// **'Loading your recent menus…'**
   String get savedLoading;
 
   /// No description provided for @savedEntryDishCount.
