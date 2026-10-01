@@ -1478,6 +1478,30 @@ abstract class AppLocalizations {
   /// **'Photograph the pages of a menu, choose photos from your library, or choose a PDF. KetoClub reads the dishes off the pages and analyses them.'**
   String get scanScreenIntro;
 
+  /// No description provided for @scanScreenModePages.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos & PDF'**
+  String get scanScreenModePages;
+
+  /// No description provided for @scanScreenModePaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste text'**
+  String get scanScreenModePaste;
+
+  /// No description provided for @scanScreenModeQr.
+  ///
+  /// In en, this message translates to:
+  /// **'QR code'**
+  String get scanScreenModeQr;
+
+  /// No description provided for @scanScreenQrIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan the QR code on your table to open the restaurant\'s menu.'**
+  String get scanScreenQrIntro;
+
   /// No description provided for @scanScreenActionTakePhoto.
   ///
   /// In en, this message translates to:
@@ -1555,12 +1579,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Analyse pages'**
   String get scanScreenAnalysePages;
-
-  /// No description provided for @scanScreenPasteHeading.
-  ///
-  /// In en, this message translates to:
-  /// **'Or paste the text'**
-  String get scanScreenPasteHeading;
 
   /// No description provided for @scanScreenDisclosureWeb.
   ///

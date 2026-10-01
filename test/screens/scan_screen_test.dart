@@ -113,6 +113,23 @@ bool _enabled(WidgetTester tester, Finder finder) =>
 Finder _analyse(AppLocalizations l10n) =>
     find.widgetWithText(FilledButton, l10n.scanAnalyse);
 
+/// The "Scan QR code" button, the QR mode's one primary action.
+///
+/// `FilledButton.icon` builds a private subclass, hence `bySubtype`.
+Finder _scanQr(AppLocalizations l10n) => find.ancestor(
+  of: find.text(l10n.scanQrAction),
+  matching: find.bySubtype<FilledButton>(),
+);
+
+/// Every primary (filled) button on screen.
+Finder get _filled => find.bySubtype<FilledButton>();
+
+/// Selects the mode segment labelled [label] (issue #247).
+Future<void> _selectMode(WidgetTester tester, String label) async {
+  await tester.tap(find.text(label));
+  await tester.pumpAndSettle();
+}
+
 void main() {
   group('ScanScreen', () {
     late FakeMenuRepository repository;
@@ -130,7 +147,7 @@ void main() {
     ) async {
       // Act
       await _pump(tester, controller);
-      await tester.pumpAndSettle();
+      await _selectMode(tester, _en.scanScreenModePaste);
 
       // Assert
       expect(find.text(_en.scanTitle), findsOneWidget);
@@ -144,7 +161,7 @@ void main() {
       (tester) async {
         // Act
         await _pump(tester, controller, locale: const Locale('he'));
-        await tester.pumpAndSettle();
+        await _selectMode(tester, _he.scanScreenModePaste);
 
         // Assert
         expect(find.text(_he.scanTitle), findsOneWidget);
@@ -160,7 +177,7 @@ void main() {
     testWidgets('Analyse is disabled while the field is empty', (tester) async {
       // Act
       await _pump(tester, controller);
-      await tester.pumpAndSettle();
+      await _selectMode(tester, _en.scanScreenModePaste);
 
       // Assert
       expect(tester.widget<FilledButton>(_analyse(_en)).onPressed, isNull);
@@ -169,6 +186,7 @@ void main() {
     testWidgets('typing enables Analyse', (tester) async {
       // Arrange
       await _pump(tester, controller);
+      await _selectMode(tester, _en.scanScreenModePaste);
 
       // Act
       await tester.enterText(find.byType(TextField), 'Grilled salmon');
@@ -184,6 +202,7 @@ void main() {
       // Arrange
       final pushed = <String>[];
       await _pump(tester, controller, pushed: pushed);
+      await _selectMode(tester, _en.scanScreenModePaste);
       await tester.enterText(
         find.byType(TextField),
         'Grilled salmon 68 ₪\nCaesar salad',
@@ -210,6 +229,7 @@ void main() {
       // Arrange
       final pushed = <String>[];
       await _pump(tester, controller, pushed: pushed);
+      await _selectMode(tester, _en.scanScreenModePaste);
       await tester.enterText(find.byType(TextField), '45 ₪');
       await tester.pump();
 
@@ -226,6 +246,7 @@ void main() {
     testWidgets('editing after the empty-paste copy clears it', (tester) async {
       // Arrange
       await _pump(tester, controller);
+      await _selectMode(tester, _en.scanScreenModePaste);
       await tester.enterText(find.byType(TextField), '45 ₪');
       await tester.pump();
       await tester.tap(_analyse(_en));
@@ -738,6 +759,171 @@ void main() {
     });
   });
 
+  group('ScanScreen modes (issue #247)', () {
+    late FakePagePicker picker;
+    late ScanController controller;
+
+    setUp(() {
+      picker = FakePagePicker();
+      controller = ScanController(
+        classifier: FakeScannedMenuClassifier(),
+        repository: FakeMenuRepository(),
+        clock: FakeClock(DateTime.utc(2026, 9, 29)),
+        settingsStore: FakeSettingsStore(),
+        qrScanner: FakeQrScanner(),
+      );
+    });
+
+    tearDown(() => controller.dispose());
+
+    testWidgets('opens on Photos & PDF with Analyse pages as the one '
+        'primary button', (tester) async {
+      // Act
+      await _pump(tester, controller, picker: picker);
+
+      // Assert
+      expect(find.text(_en.scanScreenModePages), findsOneWidget);
+      expect(find.text(_en.scanScreenModePaste), findsOneWidget);
+      expect(find.text(_en.scanScreenModeQr), findsOneWidget);
+      expect(_action(_en.scanScreenActionTakePhoto), findsOneWidget);
+      expect(_filled, findsOneWidget);
+      expect(_analysePages(_en), findsOneWidget);
+      expect(find.byType(TextField), findsNothing);
+      expect(find.text(_en.scanQrAction), findsNothing);
+    });
+
+    testWidgets('each mode shows its own inputs and exactly one '
+        'FilledButton', (tester) async {
+      // Arrange
+      await _pump(tester, controller, picker: picker);
+
+      // Act & Assert: Paste text.
+      await _selectMode(tester, _en.scanScreenModePaste);
+      expect(_filled, findsOneWidget);
+      expect(_analyse(_en), findsOneWidget);
+      expect(find.byType(TextField), findsOneWidget);
+      expect(find.text(_en.scanScreenActionTakePhoto), findsNothing);
+      expect(find.text(_en.scanQrAction), findsNothing);
+
+      // Act & Assert: QR code.
+      await _selectMode(tester, _en.scanScreenModeQr);
+      expect(_filled, findsOneWidget);
+      expect(_scanQr(_en), findsOneWidget);
+      expect(find.text(_en.scanScreenQrIntro), findsOneWidget);
+      expect(find.byType(TextField), findsNothing);
+      expect(find.text(_en.scanScreenActionTakePhoto), findsNothing);
+
+      // Act & Assert: back to Photos & PDF.
+      await _selectMode(tester, _en.scanScreenModePages);
+      expect(_filled, findsOneWidget);
+      expect(_analysePages(_en), findsOneWidget);
+      expect(find.text(_en.scanQrAction), findsNothing);
+    });
+
+    testWidgets('the pages collected are kept when switching modes', (
+      tester,
+    ) async {
+      // Arrange
+      picker.queuePickImages([_jpeg(1), _jpeg(2)]);
+      await _pump(tester, controller, picker: picker);
+      await tester.tap(_action(_en.scanScreenActionChoosePhotos));
+      await tester.pumpAndSettle();
+
+      // Act
+      await _selectMode(tester, _en.scanScreenModePaste);
+      expect(find.text(_en.scanScreenPageLabel(1)), findsNothing);
+      await _selectMode(tester, _en.scanScreenModeQr);
+      await _selectMode(tester, _en.scanScreenModePages);
+
+      // Assert
+      expect(controller.pages, [_jpeg(1), _jpeg(2)]);
+      expect(find.text(_en.scanScreenPageLabel(1)), findsOneWidget);
+      expect(find.text(_en.scanScreenPageLabel(2)), findsOneWidget);
+      expect(_enabled(tester, _analysePages(_en)), isTrue);
+    });
+
+    testWidgets('the pasted text is kept when switching modes', (tester) async {
+      // Arrange
+      await _pump(tester, controller, picker: picker);
+      await _selectMode(tester, _en.scanScreenModePaste);
+      await tester.enterText(find.byType(TextField), 'Grilled salmon');
+      await tester.pump();
+
+      // Act
+      await _selectMode(tester, _en.scanScreenModePages);
+      await _selectMode(tester, _en.scanScreenModePaste);
+
+      // Assert
+      expect(find.text('Grilled salmon'), findsOneWidget);
+      expect(controller.text, 'Grilled salmon');
+      expect(_enabled(tester, _analyse(_en)), isTrue);
+    });
+
+    testWidgets('the disclosure and its Settings link sit below Analyse '
+        'pages, in small type', (tester) async {
+      // Act
+      await _pump(tester, controller, picker: picker);
+
+      // Assert
+      final button = tester.getBottomLeft(_analysePages(_en)).dy;
+      final disclosure = find.text(_en.scanScreenDisclosureWeb);
+      final link = find.widgetWithText(TextButton, _en.scanScreenSettingsLink);
+      expect(tester.getTopLeft(disclosure).dy, greaterThan(button));
+      expect(
+        tester.getTopLeft(link).dy,
+        greaterThan(tester.getTopLeft(disclosure).dy),
+      );
+      final context = tester.element(disclosure);
+      final small = Theme.of(context).textTheme.bodySmall!.fontSize;
+      expect(tester.widget<Text>(disclosure).style?.fontSize, small);
+    });
+
+    testWidgets('the disclosure is about pages, so Paste text and QR code '
+        'do not show it', (tester) async {
+      // Arrange
+      await _pump(tester, controller, picker: picker);
+
+      // Act & Assert
+      for (final mode in [_en.scanScreenModePaste, _en.scanScreenModeQr]) {
+        await _selectMode(tester, mode);
+        expect(find.text(_en.scanScreenDisclosureWeb), findsNothing);
+        expect(find.text(_en.scanScreenSettingsLink), findsNothing);
+      }
+    });
+
+    testWidgets('the mode switch fits a 360px phone in both languages', (
+      tester,
+    ) async {
+      for (final locale in const [Locale('en'), Locale('he')]) {
+        // Arrange
+        await _pump(tester, controller, picker: picker, locale: locale);
+
+        // Act
+        tester.view.physicalSize = const Size(360, 800);
+        await tester.pumpAndSettle();
+
+        // Assert: no overflow was reported.
+        expect(tester.takeException(), isNull, reason: '$locale');
+      }
+    });
+
+    testWidgets('Hebrew renders the mode labels right to left', (tester) async {
+      // Act
+      await _pump(tester, controller, locale: const Locale('he'));
+      await _selectMode(tester, _he.scanScreenModeQr);
+
+      // Assert
+      expect(find.text(_he.scanScreenModePages), findsOneWidget);
+      expect(find.text(_he.scanScreenModePaste), findsOneWidget);
+      expect(find.text(_he.scanScreenQrIntro), findsOneWidget);
+      expect(_scanQr(_he), findsOneWidget);
+      expect(
+        Directionality.of(tester.element(find.text(_he.scanScreenModeQr))),
+        TextDirection.rtl,
+      );
+    });
+  });
+
   group('ScanScreen QR action (issue #182)', () {
     late FakeQrScanner scanner;
     late ScanController controller;
@@ -760,10 +946,11 @@ void main() {
     testWidgets('shows the action when the build can scan', (tester) async {
       // Arrange & Act
       await _pump(tester, controller);
+      await _selectMode(tester, _en.scanScreenModeQr);
 
       // Assert
-      expect(_action(_en.scanQrAction), findsOneWidget);
-      expect(_enabled(tester, _action(_en.scanQrAction)), isTrue);
+      expect(_scanQr(_en), findsOneWidget);
+      expect(_enabled(tester, _scanQr(_en)), isTrue);
     });
 
     testWidgets('hides the action when the build cannot scan (web)', (
@@ -776,7 +963,8 @@ void main() {
       // Act
       await _pump(tester, web);
 
-      // Assert
+      // Assert: no QR segment to choose, and no QR action anywhere.
+      expect(find.text(_en.scanScreenModeQr), findsNothing);
       expect(find.text(_en.scanQrAction), findsNothing);
       expect(find.text(_en.scanScreenActionTakePhoto), findsOneWidget);
     });
@@ -790,9 +978,10 @@ void main() {
       );
       final pushed = <String>[];
       await _pump(tester, controller, pushed: pushed);
+      await _selectMode(tester, _en.scanScreenModeQr);
 
       // Act
-      await tester.tap(_action(_en.scanQrAction));
+      await tester.tap(_scanQr(_en));
       await tester.pumpAndSettle();
 
       // Assert
@@ -804,9 +993,10 @@ void main() {
       scanner.queuePayload('https://cafe.co.il/menu');
       final pushed = <String>[];
       await _pump(tester, controller, pushed: pushed);
+      await _selectMode(tester, _en.scanScreenModeQr);
 
       // Act
-      await tester.tap(_action(_en.scanQrAction));
+      await tester.tap(_scanQr(_en));
       await tester.pumpAndSettle();
 
       // Assert
@@ -821,16 +1011,17 @@ void main() {
       // Arrange
       final pushed = <String>[];
       await _pump(tester, controller, pushed: pushed);
+      await _selectMode(tester, _en.scanScreenModeQr);
 
       // Act
-      await tester.tap(_action(_en.scanQrAction));
+      await tester.tap(_scanQr(_en));
       await tester.pumpAndSettle();
 
       // Assert
       expect(pushed, isEmpty);
       expect(find.text(_en.scanQrPhotographInstead), findsNothing);
       expect(find.text(_en.scanQrUnsupportedSource('Tabit')), findsNothing);
-      expect(_enabled(tester, _action(_en.scanQrAction)), isTrue);
+      expect(_enabled(tester, _scanQr(_en)), isTrue);
     });
 
     testWidgets('a Tabit code says Tabit is not supported yet', (tester) async {
@@ -838,9 +1029,10 @@ void main() {
       scanner.queuePayload('https://tabitisrael.co.il/tabit-order?siteName=x');
       final pushed = <String>[];
       await _pump(tester, controller, pushed: pushed);
+      await _selectMode(tester, _en.scanScreenModeQr);
 
       // Act
-      await tester.tap(_action(_en.scanQrAction));
+      await tester.tap(_scanQr(_en));
       await tester.pumpAndSettle();
 
       // Assert
@@ -855,9 +1047,10 @@ void main() {
       scanner.queuePayload('https://www.instagram.com/cafe.noa');
       final pushed = <String>[];
       await _pump(tester, controller, pushed: pushed);
+      await _selectMode(tester, _en.scanScreenModeQr);
 
       // Act
-      await tester.tap(_action(_en.scanQrAction));
+      await tester.tap(_scanQr(_en));
       await tester.pumpAndSettle();
 
       // Assert
@@ -873,17 +1066,18 @@ void main() {
       final slow = build(_GatedScanner(gate.future));
       addTearDown(slow.dispose);
       await _pump(tester, slow);
+      await _selectMode(tester, _en.scanScreenModeQr);
 
       // Act
-      await tester.tap(_action(_en.scanQrAction));
+      await tester.tap(_scanQr(_en));
       await tester.pump();
 
       // Assert
-      expect(_enabled(tester, _action(_en.scanQrAction)), isFalse);
+      expect(_enabled(tester, _scanQr(_en)), isFalse);
 
       gate.complete(null);
       await tester.pumpAndSettle();
-      expect(_enabled(tester, _action(_en.scanQrAction)), isTrue);
+      expect(_enabled(tester, _scanQr(_en)), isTrue);
     });
 
     testWidgets('Hebrew renders the action and each notice, right to left', (
@@ -894,6 +1088,7 @@ void main() {
         ..queuePayload('https://tabitisrael.co.il/tabit-order?siteName=x')
         ..queuePayload('https://www.instagram.com/cafe.noa');
       await _pump(tester, controller, locale: const Locale('he'));
+      await _selectMode(tester, _he.scanScreenModeQr);
 
       // Act & Assert
       expect(find.text(_he.scanQrAction), findsOneWidget);
@@ -902,11 +1097,11 @@ void main() {
         TextDirection.rtl,
       );
 
-      await tester.tap(_action(_he.scanQrAction));
+      await tester.tap(_scanQr(_he));
       await tester.pumpAndSettle();
       expect(find.text(_he.scanQrUnsupportedSource('Tabit')), findsOneWidget);
 
-      await tester.tap(_action(_he.scanQrAction));
+      await tester.tap(_scanQr(_he));
       await tester.pumpAndSettle();
       expect(find.text(_he.scanQrPhotographInstead), findsOneWidget);
       expect(find.text(_he.scanQrUnsupportedSource('Tabit')), findsNothing);

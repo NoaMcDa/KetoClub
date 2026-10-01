@@ -381,6 +381,10 @@
   "scannedMenuPdfPage": "מסמך PDF",
   "scannedMenuPagesClose": "סגירה",
   "scanScreenIntro": "צלמו את דפי התפריט, בחרו תמונות מהגלריה או בחרו קובץ PDF. קטוקלאב קורא את המנות מהדפים ומנתח אותן.",
+  "scanScreenModePages": "תמונות ו-PDF",
+  "scanScreenModePaste": "הדבקת טקסט",
+  "scanScreenModeQr": "קוד QR",
+  "scanScreenQrIntro": "סרקו את קוד ה-QR שעל השולחן כדי לפתוח את התפריט של המסעדה.",
   "scanScreenActionTakePhoto": "צילום",
   "scanScreenActionChoosePhotos": "בחירת תמונות",
   "scanScreenActionChoosePdf": "בחירת PDF",
@@ -412,7 +416,6 @@
     "placeholders": { "mb": { "type": "int" } }
   },
   "scanScreenAnalysePages": "נתחו את הדפים",
-  "scanScreenPasteHeading": "או הדביקו את הטקסט",
   "scanScreenDisclosureWeb": "הדפים נשלחים לשרת של קטוקלאב, שמעביר אותם ל-Gemini API של גוגל לקריאה.",
   "scanScreenDisclosureDirect": "הדפים נשלחים ישירות מהמכשיר הזה ל-Gemini API של גוגל, באמצעות מפתח ה-API שלכם.",
   "scanScreenSettingsLink": "הגדרות",

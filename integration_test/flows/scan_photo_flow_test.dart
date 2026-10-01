@@ -60,6 +60,7 @@ void main() {
 
         // Act: open the Scan tab and choose the photos.
         await tapAndSettle(tester, navDestination(_en.navScan));
+        await tapAndSettle(tester, find.text(_en.scanScreenModePages));
         expect(tester.widget<FilledButton>(_analysePages).onPressed, isNull);
         await tapAndSettle(tester, find.text(_en.scanScreenActionChoosePhotos));
 

@@ -381,6 +381,10 @@
   "scannedMenuPdfPage": "PDF document",
   "scannedMenuPagesClose": "Close",
   "scanScreenIntro": "Photograph the pages of a menu, choose photos from your library, or choose a PDF. KetoClub reads the dishes off the pages and analyses them.",
+  "scanScreenModePages": "Photos & PDF",
+  "scanScreenModePaste": "Paste text",
+  "scanScreenModeQr": "QR code",
+  "scanScreenQrIntro": "Scan the QR code on your table to open the restaurant's menu.",
   "scanScreenActionTakePhoto": "Take a photo",
   "scanScreenActionChoosePhotos": "Choose photos",
   "scanScreenActionChoosePdf": "Choose a PDF",
@@ -412,7 +416,6 @@
     "placeholders": { "mb": { "type": "int" } }
   },
   "scanScreenAnalysePages": "Analyse pages",
-  "scanScreenPasteHeading": "Or paste the text",
   "scanScreenDisclosureWeb": "The pages are sent to KetoClub's server, which forwards them to Google's Gemini API to be read.",
   "scanScreenDisclosureDirect": "The pages are sent straight from this device to Google's Gemini API, using your own API key.",
   "scanScreenSettingsLink": "Settings",

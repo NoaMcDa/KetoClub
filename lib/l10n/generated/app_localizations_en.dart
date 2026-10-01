@@ -886,6 +886,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'Photograph the pages of a menu, choose photos from your library, or choose a PDF. KetoClub reads the dishes off the pages and analyses them.';
 
   @override
+  String get scanScreenModePages => 'Photos & PDF';
+
+  @override
+  String get scanScreenModePaste => 'Paste text';
+
+  @override
+  String get scanScreenModeQr => 'QR code';
+
+  @override
+  String get scanScreenQrIntro =>
+      'Scan the QR code on your table to open the restaurant\'s menu.';
+
+  @override
   String get scanScreenActionTakePhoto => 'Take a photo';
 
   @override
@@ -936,9 +949,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scanScreenAnalysePages => 'Analyse pages';
-
-  @override
-  String get scanScreenPasteHeading => 'Or paste the text';
 
   @override
   String get scanScreenDisclosureWeb =>
