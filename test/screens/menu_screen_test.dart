@@ -1062,6 +1062,48 @@ void main() {
       expect(opener.openCalls, [Uri.parse('https://cafe-noir.co.il/menu')]);
     });
 
+    for (final width in [390.0, 680.0]) {
+      testWidgets('a 30-character website host is shown in full beside the '
+          'refresh and open icons at ${width.toInt()}px (issue #245)', (
+        tester,
+      ) async {
+        // Arrange
+        const host = 'cafe-hashalom-tel-aviv-b.co.il';
+        const siteRef = VenueRef(
+          source: MenuSource.website,
+          platformId: 'https://$host/menu',
+        );
+        final repository = FakeMenuRepository()
+          ..stub(
+            siteRef,
+            MenuFetched(menu: _menuOf([_dish('Grilled salmon')], ref: siteRef)),
+          );
+        final controller = _controllerFor(repository: repository);
+
+        // Act
+        await _pump(tester, controller, ref: siteRef);
+        tester.view.physicalSize = Size(width, 1600);
+        await tester.pumpAndSettle();
+
+        // Assert: the text is not cut (on a phone it wraps to two lines, on
+        // a computer it is one line wider than the old 180px cap), and the
+        // icons sit beside it.
+        final source = find.textContaining('$host ·');
+        expect(source, findsOneWidget);
+        final text = tester.getRect(source);
+        final refresh = tester.getRect(find.byTooltip(_en.actionRefreshMenu));
+        final open = tester.getRect(
+          find.byTooltip(_en.menuOpenOnPlatform(host)),
+        );
+        expect(text.width, greaterThan(180));
+        expect(text.right, lessThanOrEqualTo(refresh.left + 0.01));
+        expect(refresh.right, lessThanOrEqualTo(open.left + 0.01));
+        expect(open.right, lessThanOrEqualTo(width));
+        expect(text.center.dy, closeTo(refresh.center.dy, 20));
+        expect(tester.takeException(), isNull);
+      });
+    }
+
     testWidgets('build names the platform matching ref.source in the '
         'failure message', (tester) async {
       // Arrange

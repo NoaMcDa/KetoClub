@@ -468,18 +468,20 @@ class _MenuScreenState extends State<MenuScreen> {
             ),
             const SizedBox(height: 10),
           ],
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          // A Wrap, not a Row (issue #245): the source line sits at the end
+          // of the label's line when both fit, and drops to a line of its
+          // own with the whole width when a long website host would not.
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            spacing: 8,
             children: [
               if (analysed)
-                Expanded(
-                  child: Text(
-                    _showingLabel(l10n, controller),
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
+                Text(
+                  _showingLabel(l10n, controller),
+                  style: Theme.of(context).textTheme.labelMedium,
                 )
               else
-                const Spacer(),
+                const SizedBox.shrink(),
               ?sourceLine,
             ],
           ),
@@ -711,14 +713,15 @@ class _MenuScreenState extends State<MenuScreen> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Bounded, because a website's source is its host (D19), which
-        // can be far longer than a platform's brand.
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 180),
+        // Flexible, not capped: a website's source is its host (D19), which
+        // can be far longer than a platform's brand, so the text takes
+        // whatever width the row leaves beside the icons and wraps to a
+        // second line before it ellipsises (issue #245).
+        Flexible(
           child: Text(
             l10n.menuSourceLine(_sourceName(l10n), age),
             style: Theme.of(context).textTheme.bodySmall,
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
         ),
