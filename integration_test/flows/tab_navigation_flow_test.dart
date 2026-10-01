@@ -1,14 +1,19 @@
 // Flow test (FLOW_TEST_CONVENTIONS.md, architecture.md §18.4; issue #11):
 // the bottom navigation shell — launch, visit every tab, and return to
-// Explore without the navigation stack growing underneath the user; and
-// (issue #233) a search on Explore is still there after a tab switch.
+// Explore without the navigation stack growing underneath the user;
+// (issue #233) a search on Explore is still there after a tab switch; and
+// (issue #262) the browser's Back after a tab switch returns to Explore,
+// and a menu's Settings action followed by a tab leaves no menu behind.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
+import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/menu_screen.dart';
+import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/venue_card.dart';
@@ -23,6 +28,51 @@ final AppLocalizations _en = AppLocalizationsEn();
 /// [navDestination].
 Finder _appBarTitle(String title) =>
     find.descendant(of: find.byType(AppBar), matching: find.text(title));
+
+/// The Wolt venue page the round-trip flow pastes, in the documented
+/// `wolt.com/{lang}/{country}/{city}/restaurant/{slug}` form.
+const String _woltUrl =
+    'https://wolt.com/en/isr/tel-aviv/restaurant/tab-round-trip';
+
+/// The [VenueRef] [_woltUrl] resolves to, and the key the fake repository
+/// is stubbed under.
+const VenueRef _ref = VenueRef(
+  source: MenuSource.wolt,
+  platformId: 'tab-round-trip',
+);
+
+/// The one dish on [_menu], visible once the menu screen has loaded.
+const String _dishName = 'Grilled Salmon';
+
+/// A one-dish [Menu] for [_ref].
+Menu _menu() => Menu(
+  venueRef: _ref,
+  currency: 'ILS',
+  fetchedAt: DateTime.utc(2026),
+  categories: const [
+    MenuCategory(
+      id: 'c1',
+      name: 'Mains',
+      dishes: [
+        Dish(
+          id: 'd1',
+          name: _dishName,
+          description: '',
+          price: 44,
+          options: <DishOption>[],
+        ),
+      ],
+    ),
+  ],
+);
+
+/// Presses the browser's Back button (Android's system back), as the
+/// engine reports it, and settles. Only ever pressed here where the app
+/// handles it: an unhandled Back would leave the page under test.
+Future<void> _pressBack(WidgetTester tester) async {
+  await tester.binding.handlePopRoute();
+  await tester.pumpAndSettle();
+}
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -64,8 +114,8 @@ void main() {
         await tapAndSettle(tester, navDestination(_en.navExplore));
 
         // Assert: Explore again, and nothing left over from Settings —
-        // pushReplacementNamed means the stack never grew, so there is
-        // nothing to pop back through.
+        // each tab replaced the last, so the stack never grew and there
+        // is nothing to pop back through.
         expect(find.text(_en.venueSearchLabel), findsOneWidget);
         expect(_appBarTitle(_en.settingsTitle), findsNothing);
       },
@@ -123,6 +173,59 @@ void main() {
         expect(find.text(open.name), findsOneWidget);
         expect(tester.widget<ChoiceChip>(openNow).selected, isTrue);
         expect(fakes.venueSearchService.byNameCalls, ['sushi']);
+      },
+    );
+
+    testWidgets(
+      'user switches to Saved and presses the browser Back button, and is '
+      'back on Explore rather than off the site (issue #262)',
+      (tester) async {
+        // Setup
+        final fakes = FakeAppDependencies();
+        await pumpApp(tester, fakes);
+
+        // Act: Saved, then Back.
+        await tapAndSettle(tester, navDestination(_en.navSaved));
+        expect(find.text(_en.savedPlaceholderTitle), findsOneWidget);
+        await _pressBack(tester);
+
+        // Assert
+        expect(find.text(_en.venueSearchLabel), findsOneWidget);
+        expect(find.text(_en.savedPlaceholderTitle), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'user opens a menu, its Settings action, goes Back to the menu, then '
+      'to Settings again and on to Explore, and no menu is left behind '
+      '(audit G8, issue #262)',
+      (tester) async {
+        // Setup: one venue the pasted link resolves to.
+        final fakes = FakeAppDependencies();
+        fakes.repository.stub(_ref, MenuFetched(menu: _menu()));
+        await pumpApp(tester, fakes);
+
+        // Act: open the menu, then Settings from its app bar.
+        await enterText(tester, _woltUrl);
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
+        expect(find.text(_dishName), findsOneWidget);
+        await tapAndSettle(tester, find.byTooltip(_en.actionOpenSettings));
+        expect(_appBarTitle(_en.settingsTitle), findsOneWidget);
+
+        // Act: Back returns to the menu Settings was opened from.
+        await _pressBack(tester);
+
+        // Assert
+        expect(find.text(_dishName), findsOneWidget);
+        expect(_appBarTitle(_en.settingsTitle), findsNothing);
+
+        // Act: Settings again, then the Explore tab.
+        await tapAndSettle(tester, find.byTooltip(_en.actionOpenSettings));
+        await tapAndSettle(tester, navDestination(_en.navExplore));
+
+        // Assert: Explore, with no menu screen kept beneath it.
+        expect(find.text(_en.venueSearchLabel), findsOneWidget);
+        expect(find.byType(MenuScreen, skipOffstage: false), findsNothing);
       },
     );
   });
