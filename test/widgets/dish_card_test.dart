@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
@@ -12,6 +13,8 @@ import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
 import 'package:provider/provider.dart';
+
+import '../fakes/focus_ring_probe.dart';
 
 /// Pumps [child] inside a localised [MaterialApp] and a [Scaffold], the
 /// shape every widget test in `test/widgets/` uses. [theme] defaults to
@@ -955,6 +958,50 @@ void main() {
         // Assert
         expect(find.text('Possible hidden carbs'), findsNothing);
       });
+    });
+
+    testWidgets('the amber script disclosure takes a Tab stop with a ring '
+        'and Enter expands it (issue #264)', (tester) async {
+      // Arrange
+      const script = 'Replace the mashed potatoes with a green salad.';
+      final row = DishRow(
+        dish: _dish(),
+        category: 'Mains',
+        analysis: const AnalysedDish(
+          dishId: 'dish_1',
+          name: 'Grilled Salmon',
+          verdict: DishVerdict.modifiable,
+          why: 'Mostly protein, with a starchy side to swap.',
+          modification: script,
+        ),
+      );
+      await _pump(
+        tester,
+        DishCard(row: row, localeTag: 'en', onShowScript: (_) {}),
+      );
+      expect(focusRingShown(tester, find.byType(DishCard)), isFalse);
+
+      // Act
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      // Assert
+      expect(focusRingShown(tester, find.byType(DishCard)), isTrue);
+      expect(find.text(script), findsNothing);
+
+      // Act
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(script), findsOneWidget);
+
+      // Act: Space collapses it again.
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(script), findsNothing);
     });
   });
 }

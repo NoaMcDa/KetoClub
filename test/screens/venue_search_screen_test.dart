@@ -54,6 +54,7 @@ Future<void> _pump(
   ThemeData? theme,
   LocationService? locationService,
   SettingsStore? settingsStore,
+  bool? autofocusSearch,
 }) {
   _useTallSurface(tester);
   return tester.pumpWidget(
@@ -65,6 +66,7 @@ Future<void> _pump(
         supportedLocales: AppLocalizations.supportedLocales,
         locale: locale,
         home: VenueSearchScreen(
+          autofocusSearch: autofocusSearch,
           connectivity: connectivity ?? FakeConnectivity(),
           locationService: locationService ?? FakeLocationService(),
           // Fresh install (D16, issue #167) → the disclosure banner is
@@ -1344,6 +1346,54 @@ void main() {
         expect(l10n.localeName, 'he');
         expect(find.text(l10n.discoveryEstimateList), findsOneWidget);
         expect(find.text(l10n.discoveryEstimateHint), findsOneWidget);
+      });
+    });
+
+    group('search autofocus (issue #264)', () {
+      /// Whether the pumped screen's search field holds primary focus.
+      bool searchFocused(WidgetTester tester) => tester
+          .widget<TextField>(find.byType(TextField))
+          .focusNode!
+          .hasPrimaryFocus;
+
+      testWidgets('takes focus on open when autofocusSearch is on', (
+        tester,
+      ) async {
+        // Arrange & Act
+        await _pump(
+          tester,
+          controller: controller,
+          pushedNames: pushedNames,
+          autofocusSearch: true,
+        );
+        await tester.pump();
+
+        // Assert
+        expect(searchFocused(tester), isTrue);
+      });
+
+      testWidgets('leaves focus alone when autofocusSearch is off, so a '
+          'phone shows no keyboard', (tester) async {
+        // Arrange & Act
+        await _pump(
+          tester,
+          controller: controller,
+          pushedNames: pushedNames,
+          autofocusSearch: false,
+        );
+        await tester.pump();
+
+        // Assert
+        expect(searchFocused(tester), isFalse);
+      });
+
+      testWidgets('defaults to off outside the web build', (tester) async {
+        // Arrange & Act: the flutter_tester VM is not `kIsWeb`.
+        await _pump(tester, controller: controller, pushedNames: pushedNames);
+        await tester.pump();
+
+        // Assert
+        expect(searchFocused(tester), isFalse);
       });
     });
   });

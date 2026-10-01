@@ -7,6 +7,7 @@ import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/geo.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/focus_ring.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
 import 'package:ketoclub/widgets/photo_tile.dart';
 
@@ -124,51 +125,54 @@ class VenueCard extends StatelessWidget {
       label: _semanticLabel(l10n),
       onTap: onTap,
       excludeSemantics: true,
-      child: Card(
-        margin: EdgeInsets.zero,
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Stack(
-                  children: [
-                    photo,
-                    if (cardNumbers != null)
-                      PositionedDirectional(
-                        top: 11,
-                        start: 11,
-                        child: _GreenPill(
-                          text: l10n.venueCardGreenCount(cardNumbers.green),
-                          background: verdictColors.green.pill,
-                          foreground: verdictColors.green.on,
+      child: FocusRing(
+        borderRadius: BorderRadius.circular(15),
+        child: Card(
+          margin: EdgeInsets.zero,
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Stack(
+                    children: [
+                      photo,
+                      if (cardNumbers != null)
+                        PositionedDirectional(
+                          top: 11,
+                          start: 11,
+                          child: _GreenPill(
+                            text: l10n.venueCardGreenCount(cardNumbers.green),
+                            background: verdictColors.green.pill,
+                            foreground: verdictColors.green.on,
+                          ),
                         ),
-                      ),
-                    if (venue.isOnline == false)
-                      PositionedDirectional(
-                        top: 11,
-                        end: 11,
-                        child: _ClosedPill(text: l10n.venueCardClosed),
-                      ),
-                  ],
-                ),
-                Padding(
-                  padding: textPadding,
-                  child: _details(context, l10n, meta, blurb),
-                ),
-              ],
-            ),
-            // Above the content, so the hover and focus highlight covers
-            // the photo too; an ink well under it would paint below the
-            // opaque photo and light up only the text.
-            Positioned.fill(
-              child: Material(
-                type: MaterialType.transparency,
-                child: InkWell(onTap: onTap),
+                      if (venue.isOnline == false)
+                        PositionedDirectional(
+                          top: 11,
+                          end: 11,
+                          child: _ClosedPill(text: l10n.venueCardClosed),
+                        ),
+                    ],
+                  ),
+                  Padding(
+                    padding: textPadding,
+                    child: _details(context, l10n, meta, blurb),
+                  ),
+                ],
               ),
-            ),
-          ],
+              // Above the content, so the hover and focus highlight covers
+              // the photo too; an ink well under it would paint below the
+              // opaque photo and light up only the text.
+              Positioned.fill(
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: InkWell(onTap: onTap),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

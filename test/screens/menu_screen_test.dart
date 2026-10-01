@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 // `intl` (imported below for `DateFormat`) also declares its own
 // `TextDirection` class (`LTR`/`RTL`/`UNKNOWN`), which otherwise wins over
 // `dart:ui`'s `TextDirection` (lowercase `ltr`/`rtl`, the type
@@ -10,6 +9,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart' hide MenuController;
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
@@ -41,6 +41,7 @@ import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
+import 'package:ketoclub/widgets/menu_filters_row.dart';
 import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
@@ -58,6 +59,7 @@ import '../fakes/fake_menu_sharer.dart';
 import '../fakes/fake_notes_store.dart';
 import '../fakes/fake_screen_brightness.dart';
 import '../fakes/fake_settings_store.dart';
+import '../fakes/focus_ring_probe.dart';
 
 /// The venue every test opens, unless a test builds its own.
 const VenueRef _ref = VenueRef(source: MenuSource.wolt, platformId: 'v1');
@@ -3105,6 +3107,92 @@ void main() {
           expect(find.text('Hot Wings'), findsOneWidget);
         },
       );
+    });
+  });
+
+  group('keyboard navigation (issue #264)', () {
+    /// Which region of the menu body the focused widget sits in, or null.
+    String? regionOfFocus() {
+      final context = FocusManager.instance.primaryFocus?.context;
+      if (context == null) return null;
+      if (context.findAncestorWidgetOfExactType<VerdictCounterTiles>() !=
+          null) {
+        return 'tiles';
+      }
+      if (context.findAncestorWidgetOfExactType<MenuFiltersRow>() != null) {
+        return 'filters';
+      }
+      if (context.findAncestorWidgetOfExactType<CategoryChips>() != null) {
+        return 'chips';
+      }
+      if (context.findAncestorWidgetOfExactType<DishCard>() != null) {
+        return 'dish';
+      }
+      return null;
+    }
+
+    testWidgets('Tab visits the tiles, then the Filters row, the category '
+        'chips and the first dish, in that order, and Enter opens the '
+        "dish's script", (tester) async {
+      // Arrange: one yellow dish, so its card has the amber disclosure.
+      final yellow = _dish('Fries', id: 'yellow');
+      final repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: _menuOf([yellow])));
+      final classifier = FakeMenuClassifier()
+        ..respondWith(
+          MenuAnalysed(
+            dishes: [
+              _verdictFor(
+                yellow,
+                DishVerdict.modifiable,
+                modification: 'Swap the fries for a salad.',
+              ),
+            ],
+            unclassified: const <String>[],
+            engine: const RulesEngine(
+              reason: MenuAnalysisFailureReason.notConfigured,
+            ),
+            analysedAt: DateTime.utc(2026),
+          ),
+        );
+      await _pump(
+        tester,
+        _controllerFor(repository: repository, classifier: classifier),
+      );
+      await tester.pumpAndSettle();
+
+      // Act: Tab on, noting each region the first time focus enters it.
+      final visited = <String>[];
+      var tilesVisited = 0;
+      for (var i = 0; i < 40 && !visited.contains('dish'); i++) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pump();
+        final region = regionOfFocus();
+        if (region == 'tiles') tilesVisited++;
+        if (region != null && !visited.contains(region)) visited.add(region);
+      }
+
+      // Assert: three tile stops, then the regions in reading order.
+      expect(tilesVisited, 3);
+      expect(visited, <String>['tiles', 'filters', 'chips', 'dish']);
+
+      // Act: the card's note button comes first; one more Tab reaches the
+      // amber disclosure, which shows the ring.
+      for (var i = 0; i < 3; i++) {
+        if (focusRingShown(tester, find.byType(DishCard))) break;
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pump();
+      }
+
+      // Assert
+      expect(focusRingShown(tester, find.byType(DishCard)), isTrue);
+
+      // Act
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Swap the fries for a salad.'), findsOneWidget);
     });
   });
 }
