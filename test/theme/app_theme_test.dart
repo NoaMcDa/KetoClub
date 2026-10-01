@@ -21,6 +21,55 @@ void main() {
     expect(light.red, isNot(dark.red));
   });
 
+  group('navigationRailTheme (issue #223)', () {
+    for (final (:name, :theme, :bg, :accent, :ink3) in [
+      (
+        name: 'light',
+        theme: AppTheme.light(),
+        bg: AppTokens.lightBg,
+        accent: AppTokens.lightAccent,
+        ink3: AppTokens.lightInk3,
+      ),
+      (
+        name: 'dark',
+        theme: AppTheme.dark(),
+        bg: AppTokens.darkBg,
+        accent: AppTokens.darkAccent,
+        ink3: AppTokens.darkInk3,
+      ),
+    ]) {
+      test('the $name rail is the page --bg, --accent when active and '
+          '--ink3 otherwise, with no indicator', () {
+        // Act
+        final rail = theme.navigationRailTheme;
+
+        // Assert
+        expect(rail.backgroundColor, bg);
+        expect(rail.selectedIconTheme?.color, accent);
+        expect(rail.unselectedIconTheme?.color, ink3);
+        expect(rail.selectedLabelTextStyle?.color, accent);
+        expect(rail.unselectedLabelTextStyle?.color, ink3);
+        expect(rail.useIndicator, isFalse);
+        expect(rail.labelType, NavigationRailLabelType.all);
+      });
+
+      test('the $name rail labels match the bottom bar labels', () {
+        // Arrange
+        final barLabel = theme.navigationBarTheme.labelTextStyle!;
+
+        // Act
+        final rail = theme.navigationRailTheme;
+
+        // Assert
+        expect(
+          rail.selectedLabelTextStyle,
+          barLabel.resolve({WidgetState.selected}),
+        );
+        expect(rail.unselectedLabelTextStyle, barLabel.resolve({}));
+      });
+    }
+  });
+
   group('NeutralSurfaces', () {
     test('the light theme resolves the artboard --surface2 and --line2 '
         'exactly', () {
