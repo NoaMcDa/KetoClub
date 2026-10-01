@@ -1874,6 +1874,12 @@ abstract class AppLocalizations {
   /// **'SKIP'**
   String get drinksGuideSectionSkip;
 
+  /// No description provided for @drinksGuideCarbsSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated net carbs, not confirmed: {range}'**
+  String drinksGuideCarbsSemanticLabel(String range);
+
   /// No description provided for @settingsDrinksGuideTitle.
   ///
   /// In en, this message translates to:

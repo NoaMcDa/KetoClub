@@ -6,6 +6,7 @@ import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/price_format.dart';
 import 'package:ketoclub/widgets/content_direction.dart';
+import 'package:ketoclub/widgets/net_carbs_chip.dart';
 import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
@@ -196,11 +197,13 @@ class _DishCardState extends State<DishCard> {
                 ),
               ),
             if (netCarbs != null && tone != null && verdict != null)
-              _NetCarbsChip(
-                estimate: netCarbs,
+              NetCarbsChip(
+                label: _netCarbsLabel(l10n, netCarbs, leavesGrams),
+                semanticLabel: l10n.netCarbsChipSemanticLabel(
+                  netCarbs.round().toString(),
+                ),
                 tone: tone,
-                background: _carbChipBackground(theme, verdict, tone),
-                leavesGrams: leavesGrams,
+                background: netCarbsChipBackground(theme, verdict, tone),
               ),
           ],
         ),
@@ -325,76 +328,18 @@ Color _cardEdge(
   DishVerdict.nonKeto => neutralSurfaces.line2,
 };
 
-/// The net-carb chip background for [verdict]: the plain surface for
-/// green (the artboard's `--surface`), and [tone]'s own tint for amber and
-/// red (`--amber-tint` / `--red-tint`).
-Color _carbChipBackground(
-  ThemeData theme,
-  DishVerdict verdict,
-  VerdictTone tone,
-) => switch (verdict) {
-  DishVerdict.orderAsIs => theme.cardColor,
-  DishVerdict.modifiable || DishVerdict.nonKeto => tone.tint,
-};
-
-/// The net-carb chip (architecture.md §17.4, reversed by issue #30): a
-/// rough estimate, always framed as one — never rendered as a bare number
-/// — and never shown at all when there is nothing to show.
-class _NetCarbsChip extends StatelessWidget {
-  const new({
-    required this.estimate,
-    required this.tone,
-    required this.background,
-    this.leavesGrams,
-  });
-
-  /// The raw estimate in grams, from the LLM engine only
-  /// ([AnalysedDish.netCarbsEstimate]). Rounded for display; this widget
-  /// is never built when the estimate is null.
-  final double estimate;
-
-  /// This dish's verdict tone, for the chip's foreground colour.
-  final VerdictTone tone;
-
-  /// This chip's background, from [_carbChipBackground].
-  final Color background;
-
-  /// How many grams remain in the budget after this dish, when a budget is
-  /// set. Shown as a suffix inside the chip: "~3g net carbs · leaves 5g".
-  /// Null when no budget is active.
-  final int? leavesGrams;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final grams = estimate.round().toString();
-    final leaves = leavesGrams;
-    final label = leaves != null
-        ? '${l10n.netCarbsChipLabel(grams)}'
-              '${l10n.netCarbsChipLeavesSuffix(leaves)}'
-        : l10n.netCarbsChipLabel(grams);
-    return Semantics(
-      label: l10n.netCarbsChipSemanticLabel(grams),
-      excludeSemantics: true,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: background,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 11.5,
-              fontWeight: FontWeight.w700,
-              color: tone.ink,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+/// The net-carb chip's visible text: "~3g net carbs (estimate)", with a
+/// " · leaves 5g" suffix when a budget is active ([leavesGrams] non-null).
+String _netCarbsLabel(
+  AppLocalizations l10n,
+  double estimate,
+  int? leavesGrams,
+) {
+  final grams = estimate.round().toString();
+  final label = l10n.netCarbsChipLabel(grams);
+  return leavesGrams == null
+      ? label
+      : '$label${l10n.netCarbsChipLeavesSuffix(leavesGrams)}';
 }
 
 /// The tappable amber summary row that expands into the waiter script.

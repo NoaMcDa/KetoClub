@@ -103,6 +103,14 @@ List<_Pair> _closedTagPairs(Color ink, Color surface) => [
   _Pair('closed tag ink/surface', ink, surface),
 ];
 
+/// The drinks guide's carb chips (issue #259): `ink` on the card surface
+/// for green and on the tint for amber and red, as `NetCarbsChip` draws.
+List<_Pair> _carbChipPairs(VerdictColors colors, Color surface) => [
+  _Pair('green carb chip ink/surface', colors.green.ink, surface),
+  _Pair('amber carb chip ink/tint', colors.amber.ink, colors.amber.tint),
+  _Pair('red carb chip ink/tint', colors.red.ink, colors.red.tint),
+];
+
 void main() {
   group('relative luminance and contrast ratio (self-test)', () {
     test('identical colours have a ratio of 1.0', () {
@@ -131,6 +139,7 @@ void main() {
       ..._inkOnBackgroundPairs(colors, background),
       ..._scoreBandPairs(colors, AppTokens.lightInk3, background),
       ..._closedTagPairs(AppTokens.lightInk, AppTokens.lightSurface),
+      ..._carbChipPairs(colors, AppTokens.lightSurface),
     ]);
 
     test('ink1, ink2 and ink3 all clear AA on the background', () {
@@ -166,6 +175,7 @@ void main() {
       ..._inkOnBackgroundPairs(colors, background),
       ..._scoreBandPairs(colors, AppTokens.darkInk3, background),
       ..._closedTagPairs(AppTokens.darkInk, AppTokens.darkSurface),
+      ..._carbChipPairs(colors, AppTokens.darkSurface),
     ]);
 
     test('ink1, ink2 and ink3 all clear AA on the background', () {
