@@ -274,6 +274,27 @@ void main() {
       expect(find.text(_l10n(tester).venueSearchInvalid), findsNothing);
     });
 
+    testWidgets('a controller that already holds a query and results puts '
+        'them back in the field and the list (issue #233)', (tester) async {
+      // Arrange: the app-lifetime controller, searched before the screen
+      // was last left.
+      search.queueFound([_venue('sushi-bar')]);
+      controller.search('sushi', language: 'en', immediate: true);
+      await tester.pumpAndSettle();
+
+      // Act
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller?.text,
+        'sushi',
+      );
+      expect(find.text('Venue sushi-bar'), findsOneWidget);
+      expect(search.byNameCalls, hasLength(1));
+    });
+
     testWidgets('typing a valid slug enables the submit affordance', (
       tester,
     ) async {

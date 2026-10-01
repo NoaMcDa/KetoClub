@@ -107,6 +107,9 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
   @override
   void initState() {
     super.initState();
+    // The controller outlives this screen (issue #233), so a return to the
+    // Explore tab puts back what was typed when the user left it.
+    _field.text = context.read<VenueSearchController>().input;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       unawaited(context.read<VenueSearchController>().load());

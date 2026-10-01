@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart'
-    show MaterialApp, NavigationBar, TextDirection, ThemeMode;
+    show MaterialApp, NavigationBar, TextDirection, TextField, ThemeMode;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,9 +11,11 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/drinks_guide_screen.dart' show drinksRoutePath;
 import 'package:ketoclub/screens/scan_screen.dart';
 import 'package:ketoclub/screens/settings_screen.dart';
+import 'package:ketoclub/screens/venue_search_screen.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:ketoclub/state/scan_controller.dart';
+import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/app_shell.dart';
@@ -192,6 +194,49 @@ void main() {
       expect(fakes.repository.loadCalls.single.ref, ref);
       expect(fakes.estimateClassifier.calls, hasLength(1));
       expect(fakes.classifier.calls, isEmpty);
+    });
+
+    testWidgets('the Explore controller, query and results survive a tab '
+        'switch and the route rebuild it causes (issue #233)', (tester) async {
+      // Arrange: a name search answered on Explore.
+      final fakes = FakeAppDependencies();
+      fakes.venueSearchService.queueFound(const [
+        Venue(
+          ref: VenueRef(source: MenuSource.wolt, platformId: 'sushi-bar'),
+          name: 'Sushi Bar',
+        ),
+      ]);
+      await tester.pumpWidget(KetoClubApp(dependencies: fakes.dependencies));
+      await tester.pumpAndSettle();
+      VenueSearchController explore() => Provider.of<VenueSearchController>(
+        tester.element(find.byType(VenueSearchScreen)),
+        listen: false,
+      );
+      final before = explore();
+      await tester.enterText(find.byType(TextField), 'sushi');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+      expect(find.text('Sushi Bar'), findsOneWidget);
+
+      // Act: away to Saved, which disposes the Explore route, and back.
+      Finder tab(String label) => find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.text(label),
+      );
+      await tester.tap(tab(_en.navSaved));
+      await tester.pumpAndSettle();
+      expect(find.byType(VenueSearchScreen), findsNothing);
+      await tester.tap(tab(_en.navExplore));
+      await tester.pumpAndSettle();
+
+      // Assert: the same controller, its query in a new field, its list.
+      expect(explore(), same(before));
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller?.text,
+        'sushi',
+      );
+      expect(find.text('Sushi Bar'), findsOneWidget);
+      expect(fakes.venueSearchService.byNameCalls, hasLength(1));
     });
 
     testWidgets('a direct route to /settings lands on the Settings tab', (

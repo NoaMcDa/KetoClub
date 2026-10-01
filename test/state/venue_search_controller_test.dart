@@ -321,6 +321,25 @@ void main() {
         // Assert
         expect(notifyCount, 1);
       });
+
+      test('load on a return to Explore keeps the query, results and chip, '
+          'and searches nothing (issue #233)', () async {
+        // Arrange: a search answered and a chip picked, as a user leaves
+        // the tab with them.
+        search.queueFound([_venue('sushi-bar', isOnline: true)]);
+        controller.search('sushi', language: 'en', immediate: true);
+        await pumpEventQueue();
+        controller.selectChip(DiscoveryChip.openNow);
+
+        // Act: the screen's load on coming back.
+        await controller.load();
+
+        // Assert
+        expect(controller.input, 'sushi');
+        expect(controller.results.single.name, 'sushi-bar');
+        expect(controller.activeChip, DiscoveryChip.openNow);
+        expect(search.byNameCalls, hasLength(1));
+      });
     });
 
     group('locate', () {
