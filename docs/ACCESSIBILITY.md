@@ -54,7 +54,7 @@ things:
 
 | Widget | Announces | Test |
 |---|---|---|
-| `StatusBadge` | The verdict word ("Order as-is" / "Order with a change" / "Not keto") — never the colour | `status_badge_test.dart` |
+| `StatusBadge` | The verdict word ("Order as-is" / "With changes" / "Skip") — never the colour | `status_badge_test.dart` |
 | `EngineChip` | "AI engine, model {model}" or "Rules engine, not AI-verified: {reason}" | `engine_chip_test.dart` |
 | `VerdictCounterTiles` | "{verdict}: {count}", `selected` when the tile is the active filter, and — added in this pass — a hint: "Double tap to filter" (inactive) or "Double tap to clear the filter" (active) | `verdict_counter_tiles_test.dart` |
 | `KetoScoreBadge` | "Keto score: {score} out of 10" | `keto_score_badge_test.dart` |

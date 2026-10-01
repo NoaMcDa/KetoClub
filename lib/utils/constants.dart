@@ -262,13 +262,13 @@ const String shareGreenHeadingEn = 'Order as-is:';
 /// output, Hebrew. See [shareGreenHeadingEn].
 const String shareGreenHeadingHe = 'להזמין כמו שהוא:';
 
-/// Heading for the "order with changes" (yellow) group in
+/// Heading for the "with changes" (yellow) group in
 /// `MenuShareText`'s output, English. See [shareGreenHeadingEn].
-const String shareYellowHeadingEn = 'Order with changes:';
+const String shareYellowHeadingEn = 'With changes:';
 
-/// Heading for the "order with changes" (yellow) group in
+/// Heading for the "with changes" (yellow) group in
 /// `MenuShareText`'s output, Hebrew. See [shareGreenHeadingEn].
-const String shareYellowHeadingHe = 'להזמין עם שינויים:';
+const String shareYellowHeadingHe = 'עם שינויים:';
 
 // ---------------------------------------------------------------------------
 // Guard and suppression relation shapes (`vocabulary_spec.md`)

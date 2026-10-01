@@ -92,7 +92,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String redGroupTitle(int count) {
-    return 'לא קטוגני ($count)';
+    return 'לדלג ($count)';
   }
 
   @override
@@ -123,13 +123,13 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get verdictOrderAsIs => 'להזמין כמו שזה';
+  String get verdictOrderAsIs => 'להזמין כמו שהוא';
 
   @override
-  String get verdictModifiable => 'להזמין עם שינוי';
+  String get verdictModifiable => 'עם שינויים';
 
   @override
-  String get verdictNonKeto => 'לא קטוגני';
+  String get verdictNonKeto => 'לדלג';
 
   @override
   String get dishCardFullScreen => 'מסך מלא';
@@ -746,10 +746,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'מוצגות מנות שאפשר להזמין כמו שהן או עם שינוי';
 
   @override
-  String get tileGreenLabel => 'להזמין כמו שהן';
+  String get tileGreenLabel => 'להזמין כמו שהוא';
 
   @override
-  String get tileYellowLabel => 'עם שינוי';
+  String get tileYellowLabel => 'עם שינויים';
 
   @override
   String get tileRedLabel => 'לדלג';

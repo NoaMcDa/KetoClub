@@ -92,7 +92,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String redGroupTitle(int count) {
-    return 'Not keto ($count)';
+    return 'Skip ($count)';
   }
 
   @override
@@ -125,10 +125,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get verdictOrderAsIs => 'Order as-is';
 
   @override
-  String get verdictModifiable => 'Order with a change';
+  String get verdictModifiable => 'With changes';
 
   @override
-  String get verdictNonKeto => 'Not keto';
+  String get verdictNonKeto => 'Skip';
 
   @override
   String get dishCardFullScreen => 'Full screen';

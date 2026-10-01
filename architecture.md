@@ -980,6 +980,21 @@ cannot also be the result of a filter that selects it, so the group went and
 `MenuController.redRows` went with it. The count survives where it now belongs: on
 the Skip counter tile.
 
+**One name per verdict** *(issue #243)*. The tile, the badge, the Settings
+default-filter segment, the legend and the shared text all say the same noun
+phrase, so the filter and the pill on a card never disagree. "Ask your waiter"
+is the name of an action (the dish card's disclosure), not of a verdict.
+
+| Verdict | English | Hebrew | ARB keys | Shared text heading |
+| --- | --- | --- | --- | --- |
+| Green | Order as-is | להזמין כמו שהוא | `verdictOrderAsIs`, `tileGreenLabel` | `shareGreenHeading{En,He}` |
+| Yellow | With changes | עם שינויים | `verdictModifiable`, `tileYellowLabel` | `shareYellowHeading{En,He}` |
+| Red | Skip | לדלג | `verdictNonKeto`, `tileRedLabel`, `redGroupTitle` | none (red is not shared) |
+
+The keys of each row keep their separate names (a badge and a tile are different
+widgets) but must hold the same words; the shared-text headings are Dart
+constants because they follow the menu's language, not the UI locale.
+
 **One button hierarchy and one field style** *(issue #248, Phase 8)*. Each screen
 has one `FilledButton` for its primary action, `OutlinedButton` for a secondary
 one, and `TextButton` for an inline link; `ElevatedButton` is not used anywhere.

@@ -44,7 +44,7 @@ class StatusBadge extends StatelessWidget {
           padding: const EdgeInsetsDirectional.fromSTEB(7, 4, 9, 4),
           // Scaled down rather than left to overflow: this pill is meant
           // to read on one line, but at a large text scale the longest
-          // label ("Order with a change") can outgrow the narrow width
+          // label ("Order as-is") can outgrow the narrow width
           // DishCard has left for it once the photo tile and its own
           // padding are accounted for (architecture.md §8.3's large-text
           // pass) — a shrunk pill reads better than a RenderFlex

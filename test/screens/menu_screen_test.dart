@@ -1730,10 +1730,16 @@ void main() {
         // Assert: the default filter (all) shows every dish, red included.
         expect(find.text('Steak'), findsOneWidget);
         expect(find.text('Spaghetti Carbonara'), findsOneWidget);
-        expect(find.text(_en.tileRedLabel.toUpperCase()), findsOneWidget);
+        // The tile and the red dish's badge now share one name (#243), so
+        // the tile is found inside the counter row.
+        final skipTile = find.descendant(
+          of: find.byType(VerdictCounterTiles),
+          matching: find.text(_en.tileRedLabel.toUpperCase()),
+        );
+        expect(skipTile, findsOneWidget);
 
         // Act: tap the Skip tile.
-        await tester.tap(find.text(_en.tileRedLabel.toUpperCase()));
+        await tester.tap(skipTile);
         await tester.pumpAndSettle();
 
         // Assert: only the red dish shows, and the label says so.
@@ -1742,7 +1748,7 @@ void main() {
         expect(find.text(_en.menuShowingRed), findsOneWidget);
 
         // Act: tap the now-active Skip tile again.
-        await tester.tap(find.text(_en.tileRedLabel.toUpperCase()));
+        await tester.tap(skipTile);
         await tester.pumpAndSettle();
 
         // Assert: back to showing everything.
@@ -2096,8 +2102,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(find.text(_he.tileGreenLabel.toUpperCase()), findsOneWidget);
-      expect(find.text(_he.tileRedLabel.toUpperCase()), findsOneWidget);
+      // Each verdict name appears on its tile and on its dish's badge.
+      expect(find.text(_he.tileGreenLabel.toUpperCase()), findsNWidgets(2));
+      expect(find.text(_he.tileRedLabel.toUpperCase()), findsNWidgets(2));
       expect(find.text(_he.menuKetoScoreLabel.toUpperCase()), findsOneWidget);
     });
 

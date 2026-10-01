@@ -15,7 +15,7 @@ import 'package:ketoclub/theme/app_tokens.dart';
 /// - [rail]: the saturated base colour (`--green` / `--amber` / `--red`).
 ///   Used for the artboard's `rail` role, identically for every verdict.
 /// - [pill]: the artboard's `pillBg` — the base colour for green and amber,
-///   but the *tint* for red, because the artboard renders "Not keto" as a
+///   but the *tint* for red, because the artboard renders the red verdict as a
 ///   quieter badge than the other two. Carried through verbatim rather than
 ///   normalised, so the rendered pill matches the design.
 /// - [tint]: the soft `-tint` background, used for card backgrounds and the
@@ -142,7 +142,7 @@ final class VerdictColors extends ThemeExtension<VerdictColors> {
       ),
       red: VerdictTone(
         rail: AppTokens.lightRed,
-        // The artboard renders "Not keto" as a quieter tint pill, not the
+        // The artboard renders the red verdict as a quieter tint pill, not the
         // loud red — see the class doc comment above.
         pill: AppTokens.lightRedTint,
         tint: AppTokens.lightRedTint,
