@@ -114,8 +114,8 @@ class AppShell extends StatelessWidget {
             label: l10n.navScan,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.bookmark_border),
-            selectedIcon: const Icon(Icons.bookmark),
+            icon: const Icon(Icons.history),
+            selectedIcon: const Icon(Icons.history),
             label: l10n.navSaved,
           ),
           NavigationDestination(

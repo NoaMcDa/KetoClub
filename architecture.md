@@ -250,7 +250,7 @@ ketoclub/
 │   │   ├── waiter_card_sheet.dart        # full-screen high-contrast script + copy button
 │   │   ├── settings_screen.dart          # consent text, net-carb limit, dietary toggles (#56) — no key section (D12)
 │   │   ├── scan_screen.dart              # Scan tab placeholder (Phase 4, issue #11)
-│   │   └── saved_screen.dart             # Saved tab: cached menus, offline access, remove (issue #48)
+│   │   └── saved_screen.dart             # Recent tab (was "Saved"): cached menus, offline access, remove (#48, #251)
 │   │
 │   ├── theme/                            # design tokens as the app theme (rank 4, see below)
 │   │   ├── app_tokens.dart               # raw sRGB constants converted from the artboard's oklch tokens
@@ -283,7 +283,7 @@ ketoclub/
 │   │   ├── app_dependencies.dart         # immutable holder of service interfaces; filled by di.dart
 │   │   ├── venue_search_controller.dart  # the Discovery screen (issue #40, D13)
 │   │   ├── menu_controller.dart
-│   │   ├── saved_controller.dart         # the Saved tab (issue #48)
+│   │   ├── saved_controller.dart         # the Recent tab (issue #48)
 │   │   ├── scanned_pages_registry.dart   # a scan's pages, in memory only, for "View pages" (#89)
 │   │   ├── settings_controller.dart
 │   │   ├── theme_mode_controller.dart    # Light/Dark/System appearance setting (#129)
@@ -918,11 +918,11 @@ Screens:
 | `WaiterCardSheet` | modal | Large-type script with copy |
 | `SettingsScreen` | `/settings` | Key entry, disclosure text, cache clear, language |
 | `ScanScreen` | `/scan` | Collects menu pages from the camera, the photo library or a PDF, or a menu's text pasted into a field (D18). Analyse hands the pages to `ScannedMenuClassifier` in one call (D15), or the parsed paste to `MenuRepository.store`, and opens `/venue/scan/{id}` (#82, #83). "Scan QR code" (not on web) reads a table's QR code through `QrScanner`; `QrPayloadRouter` sends a Wolt, 10bis, website or PDF link to that venue's `/venue/{source}/{id}` route, and answers a Tabit code ("not supported yet") or an Instagram, Linktree or non-URL code ("photograph the menu instead") with copy on the Scan tab (#182) |
-| `SavedScreen` | `/saved` | Placeholder — saving a venue is not built (Phase 3 territory) |
+| `SavedScreen` | `/saved` | The "Recent" tab: the automatic 24-hour cache of every menu opened, pasted, scanned or read from a website, with offline access and remove (#48). Titled "Recent menus" with a history (clock) icon, not "Saved": nothing is saved by the user (#251). The route path and class names stay `/saved` / `SavedScreen` |
 
 **The bottom-navigation shell** *(issue #11, Phase 1)*, not in this document when
 the four screens above were written: `AppShell` wraps all four tab-root routes
-(Explore `/`, Scan `/scan`, Saved `/saved`, Settings `/settings`) with a
+(Explore `/`, Scan `/scan`, Recent `/saved`, Settings `/settings`) with a
 `NavigationBar`. It is purely presentational — it takes an already-built `child`
 and the `currentIndex` `app.dart`'s `generateRoute` supplies, and switches tabs
 with `Navigator.pushReplacementNamed` rather than an `IndexedStack`, so the stack

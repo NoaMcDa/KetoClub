@@ -434,20 +434,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navScan => 'Scan';
 
   @override
-  String get navSaved => 'Saved';
+  String get navSaved => 'Recent';
 
   @override
   String get navSettings => 'Settings';
 
   @override
-  String get savedPlaceholderTitle => 'Saved venues';
+  String get savedPlaceholderTitle => 'Recent menus';
 
   @override
   String get savedPlaceholderBody =>
       'Open a venue\'s menu and it appears here automatically, available for a day — even offline.';
 
   @override
-  String get savedLoading => 'Loading your saved menus…';
+  String get savedLoading => 'Loading your recent menus…';
 
   @override
   String savedEntryDishCount(num count) {

@@ -180,11 +180,11 @@
   "engineChipReasonConsentWithheld": "בינה מלאכותית לא אושרה",
   "navExplore": "גילוי",
   "navScan": "סריקה",
-  "navSaved": "שמורים",
+  "navSaved": "אחרונים",
   "navSettings": "הגדרות",
-  "savedPlaceholderTitle": "מסעדות שמורות",
+  "savedPlaceholderTitle": "תפריטים אחרונים",
   "savedPlaceholderBody": "פתחו תפריט של מסעדה והוא יופיע כאן אוטומטית, זמין ליממה — גם ללא חיבור לאינטרנט.",
-  "savedLoading": "טוען את התפריטים השמורים שלך…",
+  "savedLoading": "טוען את התפריטים האחרונים שלך…",
   "savedEntryDishCount": "{count, plural, one{מנה אחת} two{שתי מנות} other{{count} מנות}}",
   "@savedEntryDishCount": {
     "placeholders": { "count": { "type": "num" } }

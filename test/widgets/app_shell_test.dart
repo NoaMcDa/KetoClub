@@ -63,6 +63,19 @@ void main() {
       expect(find.text(_en.navSettings), findsOneWidget);
     });
 
+    testWidgets('the Recent tab uses a history icon, not a bookmark', (
+      tester,
+    ) async {
+      // Act
+      await _pump(tester);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byIcon(Icons.history), findsOneWidget);
+      expect(find.byIcon(Icons.bookmark_border), findsNothing);
+      expect(find.byIcon(Icons.bookmark), findsNothing);
+    });
+
     testWidgets('the tab matching the current route is selected', (
       tester,
     ) async {
