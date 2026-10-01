@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
@@ -26,7 +28,7 @@ final AppLocalizations _en = AppLocalizationsEn();
 final AppLocalizations _he = AppLocalizationsHe();
 
 /// The `find.text` match for [label], scoped to the language section's
-/// radio group ([languageRadioGroupKey]), so a label that happens to
+/// segmented control ([languageRadioGroupKey]), so a label that happens to
 /// match another section's (as `settingsLanguageSystem` and
 /// `settingsAppearanceSystem` once did) can never make `find.text`
 /// ambiguous.
@@ -36,11 +38,24 @@ Finder _languageOption(String label) => find.descendant(
 );
 
 /// The `find.text` match for [label], scoped to the appearance section's
-/// radio group ([appearanceRadioGroupKey]); see [_languageOption].
+/// segmented control ([appearanceRadioGroupKey]); see [_languageOption].
 Finder _appearanceOption(String label) => find.descendant(
   of: find.byKey(appearanceRadioGroupKey),
   matching: find.text(label),
 );
+
+/// A [SettingsStore] whose [write] waits on [release], so a test can look
+/// at the screen while the controller is busy writing.
+final class _GatedSettingsStore implements SettingsStore {
+  /// Completed by the test to let the pending write finish.
+  final Completer<void> release = Completer<void>();
+
+  @override
+  Future<AppSettings> read() async => const AppSettings();
+
+  @override
+  Future<void> write(AppSettings settings) => release.future;
+}
 
 /// Builds the [SettingsController] the widget under test is pumped over,
 /// from fresh fakes unless the caller seeds one.
@@ -378,6 +393,131 @@ void main() {
           equals(AppThemeMode.system),
         );
         expect(themeModeController.mode, equals(AppThemeMode.system));
+      },
+    );
+
+    testWidgets('language and appearance are one-row segmented controls '
+        'showing the stored choice (issue #256)', (tester) async {
+      // Arrange
+      final controller = _controllerFor(
+        settingsStore: FakeSettingsStore(
+          initial: const AppSettings(
+            languageTag: 'he',
+            themeMode: AppThemeMode.dark,
+          ),
+        ),
+      );
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      final language = tester.widget<SegmentedButton<String?>>(
+        find.descendant(
+          of: find.byKey(languageRadioGroupKey),
+          matching: find.byType(SegmentedButton<String?>),
+        ),
+      );
+      final appearance = tester.widget<SegmentedButton<AppThemeMode>>(
+        find.descendant(
+          of: find.byKey(appearanceRadioGroupKey),
+          matching: find.byType(SegmentedButton<AppThemeMode>),
+        ),
+      );
+      expect(language.selected, equals(<String?>{'he'}));
+      expect(appearance.selected, equals(<AppThemeMode>{AppThemeMode.dark}));
+      expect(find.byType(RadioListTile<String?>), findsNothing);
+      expect(find.byType(RadioListTile<AppThemeMode>), findsNothing);
+    });
+
+    testWidgets('"match my device" shows as selected when no language is '
+        'stored (issue #256)', (tester) async {
+      // Arrange
+      final controller = _controllerFor();
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert: a null segment value is a real selection, not "none".
+      final language = tester.widget<SegmentedButton<String?>>(
+        find.byType(SegmentedButton<String?>),
+      );
+      expect(language.selected, equals(<String?>{null}));
+    });
+
+    testWidgets('language and appearance cannot be changed while the '
+        'screen is busy (issue #256)', (tester) async {
+      // Arrange
+      final store = _GatedSettingsStore();
+      final controller = SettingsController(store, FakeMenuRepository());
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Act: start a write and look before it finishes.
+      final pending = controller.setConsent(given: true);
+      await tester.pump();
+
+      // Assert
+      expect(controller.isBusy, isTrue);
+      expect(
+        tester
+            .widget<SegmentedButton<String?>>(
+              find.byType(SegmentedButton<String?>),
+            )
+            .onSelectionChanged,
+        isNull,
+      );
+      expect(
+        tester
+            .widget<SegmentedButton<AppThemeMode>>(
+              find.byType(SegmentedButton<AppThemeMode>),
+            )
+            .onSelectionChanged,
+        isNull,
+      );
+      store.release.complete();
+      await pending;
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<SegmentedButton<String?>>(
+              find.byType(SegmentedButton<String?>),
+            )
+            .onSelectionChanged,
+        isNotNull,
+      );
+    });
+
+    testWidgets(
+      'in Hebrew at 390px no label wraps or breaks mid-word (issue #256)',
+      (tester) async {
+        // Arrange: a phone-sized, Hebrew screen, the longest labels.
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final controller = _controllerFor();
+
+        // Act
+        await _pump(tester, controller, locale: const Locale('he'));
+        await tester.pumpAndSettle();
+
+        // Assert: the test font (Ahem) is far wider than a real one, so the
+        // fit itself is not assertable here; what is, is that the control
+        // never squeezes a label (no wrap, no mid-word break), because it
+        // sizes to its content and falls back to a sideways scroll.
+        // A single-line label is one line tall; a wrapped one is taller.
+        for (final label in [
+          _he.settingsLanguageSystem,
+          _he.settingsLanguageEnglish,
+          _he.settingsLanguageHebrew,
+          _he.settingsAppearanceSystem,
+          _he.settingsAppearanceLight,
+          _he.settingsAppearanceDark,
+        ]) {
+          expect(tester.getSize(find.text(label)).height, lessThan(24));
+        }
       },
     );
 

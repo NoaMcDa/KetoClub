@@ -140,7 +140,7 @@ void main() {
           .pushReplacementNamed(settingsRoutePath);
       await tester.pumpAndSettle();
 
-      // Act: scoped to the appearance radio group, so a label the
+      // Act: scoped to the appearance segmented control, so a label the
       // language and appearance sections happen to share can never make
       // this finder ambiguous (settings_screen.dart's
       // `appearanceRadioGroupKey`).

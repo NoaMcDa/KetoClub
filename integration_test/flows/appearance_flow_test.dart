@@ -21,7 +21,7 @@ import 'flow_support.dart';
 final AppLocalizations _en = AppLocalizationsEn();
 
 /// The `find.text` match for [label], scoped to the appearance section's
-/// own radio group (`settings_screen.dart`'s `appearanceRadioGroupKey`),
+/// own segmented control (`settings_screen.dart`'s `appearanceRadioGroupKey`),
 /// so a label the language and appearance sections happen to share can
 /// never make this finder ambiguous.
 Finder _appearanceOption(String label) => find.descendant(

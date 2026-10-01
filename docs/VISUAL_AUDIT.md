@@ -173,7 +173,7 @@ reason), or **Decision** — needs a product call before anyone changes it.
 | S3 | — | "Default filter" forced its four segments into equal quarters and broke labels mid-word ("Ever / ythin / g") | **Fixed** — chip-sized labels fit at 390px in English; the longer Hebrew "Order as-is" still wraps onto two lines, at a word boundary rather than mid-word |
 | S4 | "Clear" as a quiet `--red-ink` text action | a large filled green button | **Fixed** |
 | S5 | an "Analysis" group with an API key and a model picker | the consent section | **Left** — the artboard predates D12 (there is no key on the device); the artboard is what should change |
-| S6 | Appearance as a three-way segmented control | a radio list, as is Language | **Decision** — tests address both through `RadioGroup` keys |
+| S6 | Appearance as a three-way segmented control | a radio list, as is Language | **Fixed** (#256) — Language and Appearance are one-row `SegmentedButton`s in the Default filter's style; the `languageRadioGroupKey`/`appearanceRadioGroupKey` keys are kept, and the controls are disabled while the screen is busy. Hebrew labels are not wrapped by construction (the control sizes to its content, with a sideways-scroll fallback); measured with a proxy font the longest group, "לפי ערכת הנושא של המכשיר" + two short labels, is under 300px against 350px available at 390px |
 | S7 | a compact `--surface2` stepper | outlined circular buttons | **Left** |
 
 ### Saved and Scan (no artboard)
