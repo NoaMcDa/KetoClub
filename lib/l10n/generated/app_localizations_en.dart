@@ -759,6 +759,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get waiterCardCopyButton => 'Copy text';
 
   @override
+  String get waiterCardCopied => 'Copied ✓';
+
+  @override
+  String get waiterCardDone => 'Done';
+
+  @override
   String waiterCardAfterText(String grams) {
     return 'With these changes, about ${grams}g net carbs (estimate) — safe to order.';
   }

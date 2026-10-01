@@ -764,6 +764,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get waiterCardCopyButton => 'העתק טקסט';
 
   @override
+  String get waiterCardCopied => 'הועתק ✓';
+
+  @override
+  String get waiterCardDone => 'סיום';
+
+  @override
   String waiterCardAfterText(String grams) {
     return 'עם השינויים האלו, בערך $grams גרם פחמימות נטו (הערכה) — בטוח להזמין.';
   }

@@ -135,19 +135,44 @@ void main() {
       expect(copiedCount, 1);
     });
 
-    testWidgets('tapping copy shows the actionCopied confirmation', (
-      tester,
-    ) async {
+    testWidgets('tapping copy flips the button to the copied label for two '
+        'seconds, with no snack bar', (tester) async {
       // Arrange
       const script = 'Ask for steamed vegetables instead of rice.';
       await _pump(tester, const WaiterScriptWidget(script: script));
 
       // Act
       await tester.tap(find.text(_en.waiterCardCopyButton));
-      await tester.pumpAndSettle();
+      await tester.pump();
 
-      // Assert
-      expect(find.text('Copied'), findsOneWidget);
+      // Assert: copied state shown inline, nothing on the messenger.
+      expect(find.text(_en.waiterCardCopied), findsOneWidget);
+      expect(find.text(_en.waiterCardCopyButton), findsNothing);
+      expect(find.byType(SnackBar), findsNothing);
+
+      // Act: just short of two seconds, then past it.
+      await tester.pump(const Duration(milliseconds: 1900));
+      expect(find.text(_en.waiterCardCopied), findsOneWidget);
+      await tester.pump(const Duration(milliseconds: 200));
+
+      // Assert: back to the plain label.
+      expect(find.text(_en.waiterCardCopyButton), findsOneWidget);
+      expect(find.text(_en.waiterCardCopied), findsNothing);
+    });
+
+    testWidgets('disposing while the copied state is showing leaves no '
+        'pending timer', (tester) async {
+      // Arrange
+      const script = 'Ask for steamed vegetables instead of rice.';
+      await _pump(tester, const WaiterScriptWidget(script: script));
+      await tester.tap(find.text(_en.waiterCardCopyButton));
+      await tester.pump();
+
+      // Act: remove the widget mid-confirmation.
+      await _pump(tester, const SizedBox.shrink());
+
+      // Assert: the framework's pending-timer check would fail the test.
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('tapping copy puts the plain script on the clipboard, not the '

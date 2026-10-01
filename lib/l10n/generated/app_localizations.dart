@@ -1268,6 +1268,18 @@ abstract class AppLocalizations {
   /// **'Copy text'**
   String get waiterCardCopyButton;
 
+  /// No description provided for @waiterCardCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied ✓'**
+  String get waiterCardCopied;
+
+  /// No description provided for @waiterCardDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get waiterCardDone;
+
   /// No description provided for @waiterCardAfterText.
   ///
   /// In en, this message translates to:

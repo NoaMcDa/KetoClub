@@ -247,7 +247,7 @@ void main() {
 
       // Assert: the confirmation shows, and the plain script — not any
       // numbering the card draws around it — reached the clipboard.
-      expect(find.text(_en.actionCopied), findsOneWidget);
+      expect(find.text(_en.waiterCardCopied), findsOneWidget);
       final setData = platformCalls.singleWhere(
         (call) => call.method == 'Clipboard.setData',
       );
