@@ -12,6 +12,7 @@ import 'package:ketoclub/screens/saved_screen.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/state/saved_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
+import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
@@ -545,6 +546,35 @@ void main() {
 
       // Assert
       expect(find.text(_en.savedExpired), findsOneWidget);
+    });
+
+    testWidgets('the remove icon is red ink in both themes and the pin '
+        'stays neutral (#254)', (tester) async {
+      for (final (theme, verdicts) in [
+        (AppTheme.light(), VerdictColors.light()),
+        (AppTheme.dark(), VerdictColors.dark()),
+      ]) {
+        // Arrange
+        final repository = FakeMenuRepository()
+          ..seedCache(
+            CachedMenu(
+              menu: _menuWith(_woltRef, DateTime.now(), venueName: 'Vitrina'),
+            ),
+          );
+        final controller = SavedController(repository);
+        await _pump(tester, controller, theme: theme);
+        await tester.pumpAndSettle();
+
+        // Assert
+        Icon iconIn(String tooltip) => tester.widget<Icon>(
+          find.descendant(
+            of: find.byTooltip(tooltip),
+            matching: find.byType(Icon),
+          ),
+        );
+        expect(iconIn(_en.savedRemove).color, verdicts.red.ink);
+        expect(iconIn(_en.savedKeep).color, isNull);
+      }
     });
 
     testWidgets('the pin toggle keeps an entry and replaces its countdown, '
