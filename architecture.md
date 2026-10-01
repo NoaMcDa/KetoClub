@@ -920,6 +920,8 @@ Screens:
 | `ScanScreen` | `/scan` | Collects menu pages from the camera, the photo library or a PDF, or a menu's text pasted into a field (D18). Analyse hands the pages to `ScannedMenuClassifier` in one call (D15), or the parsed paste to `MenuRepository.store`, and opens `/venue/scan/{id}` (#82, #83). "Scan QR code" (not on web) reads a table's QR code through `QrScanner`; `QrPayloadRouter` sends a Wolt, 10bis, website or PDF link to that venue's `/venue/{source}/{id}` route, and answers a Tabit code ("not supported yet") or an Instagram, Linktree or non-URL code ("photograph the menu instead") with copy on the Scan tab (#182) |
 | `SavedScreen` | `/saved` | Placeholder — saving a venue is not built (Phase 3 territory) |
 
+**The keto score badge's tone** *(issue #241)* follows the score's band, not a fixed green, so a low score never reads as a positive claim: 7 and above is `green.ink`, 4 up to 7 is `amber.ink`, below 4 is the muted `ink3` (`scoreTone`, judged on the score as printed to one decimal), in the menu header and on the venue card alike; `contrast_test.dart` pins each tone against the page background in both themes.
+
 **The bottom-navigation shell** *(issue #11, Phase 1)*, not in this document when
 the four screens above were written: `AppShell` wraps all four tab-root routes
 (Explore `/`, Scan `/scan`, Saved `/saved`, Settings `/settings`) with a

@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/theme/app_tokens.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
+import 'package:ketoclub/widgets/keto_score_badge.dart';
 
 /// WCAG AA's minimum contrast ratio for normal-weight/small text — the
 /// bar every pair below must clear.
@@ -81,6 +82,21 @@ void _expectAllPass(List<_Pair> pairs) {
   }
 }
 
+/// The three tones `scoreTone` can return for [colors] and [muted] — one
+/// per band of `KetoScoreBadge` (issue #241) — against [background].
+List<_Pair> _scoreBandPairs(
+  VerdictColors colors,
+  Color muted,
+  Color background,
+) => [
+  for (final (band, score) in [('high', 9.0), ('mid', 5.0), ('low', 2.0)])
+    _Pair(
+      'keto score $band band/bg',
+      scoreTone(score, verdicts: colors, muted: muted),
+      background,
+    ),
+];
+
 void main() {
   group('relative luminance and contrast ratio (self-test)', () {
     test('identical colours have a ratio of 1.0', () {
@@ -107,6 +123,7 @@ void main() {
     _expectAllPass([
       ..._statusBadgePairs(colors),
       ..._inkOnBackgroundPairs(colors, background),
+      ..._scoreBandPairs(colors, AppTokens.lightInk3, background),
     ]);
 
     test('ink1, ink2 and ink3 all clear AA on the background', () {
@@ -140,6 +157,7 @@ void main() {
     _expectAllPass([
       ..._statusBadgePairs(colors),
       ..._inkOnBackgroundPairs(colors, background),
+      ..._scoreBandPairs(colors, AppTokens.darkInk3, background),
     ]);
 
     test('ink1, ink2 and ink3 all clear AA on the background', () {
