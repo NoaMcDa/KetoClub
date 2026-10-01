@@ -52,7 +52,15 @@
   "verdictModifiable": "להזמין עם שינוי",
   "verdictNonKeto": "לא קטוגני",
 
-  "waiterCardOpen": "הצג כרטיס למלצר",
+  "dishCardFullScreen": "מסך מלא",
+  "dishCardFullScreenSemanticLabel": "הצג כרטיס למלצר עבור {dish}",
+  "@dishCardFullScreenSemanticLabel": {
+    "placeholders": {
+      "dish": {
+        "type": "String"
+      }
+    }
+  },
   "waiterCardTitle": "זה מה שאומרים למלצר",
 
   "settingsConsentTitle": "מה יוצא מהמכשיר הזה",

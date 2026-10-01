@@ -101,6 +101,23 @@ void main() {
       expect(find.text('2'), findsNothing);
     });
 
+    testWidgets('build shows trailingAction beside the copy button', (
+      tester,
+    ) async {
+      // Arrange / Act
+      await _pump(
+        tester,
+        const WaiterScriptWidget(
+          script: 'Ask for a salad.',
+          trailingAction: Text('extra action'),
+        ),
+      );
+
+      // Assert
+      expect(find.text('extra action'), findsOneWidget);
+      expect(find.text(_en.waiterCardCopyButton), findsOneWidget);
+    });
+
     testWidgets('tapping copy invokes onCopied', (tester) async {
       // Arrange
       const script = 'Ask for steamed vegetables instead of rice.';

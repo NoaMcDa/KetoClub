@@ -52,7 +52,15 @@
   "verdictModifiable": "Order with a change",
   "verdictNonKeto": "Not keto",
 
-  "waiterCardOpen": "Show the waiter card",
+  "dishCardFullScreen": "Full screen",
+  "dishCardFullScreenSemanticLabel": "Show the waiter card for {dish}",
+  "@dishCardFullScreenSemanticLabel": {
+    "placeholders": {
+      "dish": {
+        "type": "String"
+      }
+    }
+  },
   "waiterCardTitle": "Say this to the waiter",
 
   "settingsConsentTitle": "What leaves this device",

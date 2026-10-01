@@ -308,11 +308,17 @@ abstract class AppLocalizations {
   /// **'Not keto'**
   String get verdictNonKeto;
 
-  /// No description provided for @waiterCardOpen.
+  /// No description provided for @dishCardFullScreen.
   ///
   /// In en, this message translates to:
-  /// **'Show the waiter card'**
-  String get waiterCardOpen;
+  /// **'Full screen'**
+  String get dishCardFullScreen;
+
+  /// No description provided for @dishCardFullScreenSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the waiter card for {dish}'**
+  String dishCardFullScreenSemanticLabel(String dish);
 
   /// No description provided for @waiterCardTitle.
   ///
