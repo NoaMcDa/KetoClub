@@ -25,6 +25,7 @@ import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
+import 'package:ketoclub/widgets/app_notice.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
 import 'package:ketoclub/widgets/carb_budget_field.dart';
 import 'package:ketoclub/widgets/category_chips.dart';
@@ -983,17 +984,25 @@ class _MenuScreenState extends State<MenuScreen> {
   ///
   /// Both can apply at once (a stale menu whose fresh analysis failed),
   /// so every applicable line is composed into one column rather than
-  /// one hiding the other.
+  /// one hiding the other. Each line is an [AppNotice.info] (issue #260):
+  /// they explain, they ask for nothing, so each is one muted line with
+  /// an icon.
   List<Widget> _banners(
     BuildContext context,
     AppLocalizations l10n,
     MenuController controller,
   ) {
-    final lines = <String>[];
+    final lines = <AppNotice>[];
     final analysis = controller.analysis;
     if (analysis is MenuAnalysisFailed) {
       lines.add(
-        analysisFailureMessage(analysis.reason, l10n, detail: analysis.detail),
+        AppNotice.info(
+          message: analysisFailureMessage(
+            analysis.reason,
+            l10n,
+            detail: analysis.detail,
+          ),
+        ),
       );
     }
     final cachedAt = controller.cachedAt;
@@ -1002,15 +1011,23 @@ class _MenuScreenState extends State<MenuScreen> {
       final formatted = DateFormat.yMMMd(localeTag)
           .add_Hm()
           .format(cachedAt.toLocal());
-      lines.add(l10n.cachedFrom(formatted));
+      lines.add(
+        AppNotice.info(
+          message: l10n.cachedFrom(formatted),
+          icon: Icons.history,
+        ),
+      );
     }
     final staleReason = controller.staleReason;
     if (staleReason != null) {
       lines.add(
-        fetchFailureMessage(
-          staleReason,
-          l10n,
-          platform: _platformName(widget.ref, l10n),
+        AppNotice.info(
+          message: fetchFailureMessage(
+            staleReason,
+            l10n,
+            platform: _platformName(widget.ref, l10n),
+          ),
+          icon: Icons.sync_problem,
         ),
       );
     }
@@ -1020,7 +1037,8 @@ class _MenuScreenState extends State<MenuScreen> {
         padding: const EdgeInsets.only(bottom: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [for (final line in lines) Text(line)],
+          spacing: 6,
+          children: lines,
         ),
       ),
     ];

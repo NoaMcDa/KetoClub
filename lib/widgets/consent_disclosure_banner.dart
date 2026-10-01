@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/widgets/app_notice.dart';
 
 /// The first-launch AI-analysis disclosure banner (D16, issue #167),
 /// shown on Explore only while the [SettingsStore]'s
@@ -11,10 +12,10 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 /// to false. Either button persists `disclosureSeen: true`, so the
 /// banner never appears twice on the same install.
 ///
-/// Shape borrowed from `OfflineBanner`: a rounded box in
-/// `surfaceContainerHighest` with an outline, taking the width of its
-/// parent, so it slots into Explore's [Column] without extra
-/// scaffolding.
+/// Drawn as an [AppNotice.decision] (issue #260): the one banner in the
+/// app that asks for an answer, so it alone is a surface card with a
+/// primary button. It takes the width of its parent, so it slots into
+/// Explore's [Column] without extra scaffolding.
 ///
 /// Takes a [SettingsStore] rather than reading a `SettingsController`
 /// from `provider`: the Explore route builds no `SettingsController`
@@ -99,59 +100,20 @@ class _ConsentDisclosureBannerState extends State<ConsentDisclosureBanner> {
       return const SizedBox.shrink();
     }
     final l10n = AppLocalizations.of(context)!;
-    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: colorScheme.outlineVariant),
+      child: AppNotice.decision(
+        title: l10n.settingsConsentTitle,
+        message: widget.directToGoogle
+            ? l10n.settingsConsentBodyDirect
+            : l10n.settingsConsentBody,
+        primary: AppNoticeAction(
+          label: l10n.consentDisclosureOk,
+          onPressed: _busy ? null : () => unawaited(_acknowledge()),
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    size: 18,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      l10n.settingsConsentTitle,
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                widget.directToGoogle
-                    ? l10n.settingsConsentBodyDirect
-                    : l10n.settingsConsentBody,
-                style: TextStyle(color: colorScheme.onSurfaceVariant),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: [
-                  FilledButton(
-                    onPressed: _busy ? null : () => unawaited(_acknowledge()),
-                    child: Text(l10n.consentDisclosureOk),
-                  ),
-                  OutlinedButton(
-                    onPressed: _busy ? null : () => unawaited(_turnOff()),
-                    child: Text(l10n.consentDisclosureTurnOff),
-                  ),
-                ],
-              ),
-            ],
-          ),
+        secondary: AppNoticeAction(
+          label: l10n.consentDisclosureTurnOff,
+          onPressed: _busy ? null : () => unawaited(_turnOff()),
         ),
       ),
     );

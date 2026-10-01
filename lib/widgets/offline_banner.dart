@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
+import 'package:ketoclub/widgets/app_notice.dart';
 
 /// A persistent banner shown while the device appears to have no route to
 /// the network (issue #68), on the venue search screen and the menu
@@ -16,6 +17,10 @@ import 'package:ketoclub/services/platform/connectivity.dart';
 /// answer is never staler than the screen's own last attempt; a screen
 /// with nothing to retry (`VenueSearchScreen`) passes the same constant
 /// every time, which is exactly a check on screen open and never again.
+///
+/// Drawn as an amber [AppNotice.warning] (issue #260), not a grey info
+/// line: being offline changes what the app can do, so it must not look
+/// like "cached 2 hours ago".
 ///
 /// [Connectivity] is a hint, never a verdict (its own doc comment): this
 /// banner shows or hides itself purely on the last answer it was given,
@@ -68,34 +73,11 @@ class _OfflineBannerState extends State<OfflineBanner> {
   Widget build(BuildContext context) {
     if (!_isOffline) return const SizedBox.shrink();
     final l10n = AppLocalizations.of(context)!;
-    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: colorScheme.outlineVariant),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          child: Row(
-            children: [
-              Icon(
-                Icons.wifi_off,
-                size: 18,
-                color: colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  l10n.offlineBannerMessage,
-                  style: TextStyle(color: colorScheme.onSurfaceVariant),
-                ),
-              ),
-            ],
-          ),
-        ),
+      child: AppNotice.warning(
+        message: l10n.offlineBannerMessage,
+        icon: Icons.wifi_off,
       ),
     );
   }

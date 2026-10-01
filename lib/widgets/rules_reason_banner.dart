@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
+import 'package:ketoclub/widgets/app_notice.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 
 /// A non-blocking banner naming why a menu's analysis is a rules result,
@@ -26,6 +27,10 @@ import 'package:ketoclub/widgets/failure_copy.dart';
 /// widget's layer (architecture.md §5) sits below `app.dart`, which owns
 /// that constant, so the route name is written out here exactly as
 /// `menu_screen.dart`'s own Settings action already does.
+///
+/// Drawn as an [AppNotice.info] line (issue #260): it explains, it asks
+/// for nothing, so it is one muted line with an icon, and its actions move
+/// under the text on a phone-width screen rather than squeezing it.
 ///
 /// **Retry, for the reasons that can genuinely turn out differently on a
 /// second try (issue #68).** [MenuAnalysisFailureReason.offline],
@@ -58,42 +63,19 @@ class RulesReasonBanner extends StatelessWidget {
     if (rules is! RulesEngine) return const SizedBox.shrink();
 
     final l10n = AppLocalizations.of(context)!;
-    final colorScheme = Theme.of(context).colorScheme;
     final message = analysisFailureMessage(rules.reason, l10n);
     final retryCallback = onRetry;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: colorScheme.outlineVariant),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                Icons.info_outline,
-                size: 18,
-                color: colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  message,
-                  style: TextStyle(color: colorScheme.onSurfaceVariant),
-                ),
-              ),
-              if (_isFixableInSettings(rules.reason))
-                _settingsAction(context, l10n, colorScheme),
-              if (retryCallback != null && _isRetryable(rules.reason))
-                _retryAction(l10n, colorScheme, retryCallback),
-            ],
-          ),
-        ),
+      child: AppNotice.info(
+        message: message,
+        actions: [
+          if (_isFixableInSettings(rules.reason))
+            _settingsAction(context, l10n),
+          if (retryCallback != null && _isRetryable(rules.reason))
+            _retryAction(l10n, retryCallback),
+        ],
       ),
     );
   }
@@ -138,34 +120,15 @@ class RulesReasonBanner extends StatelessWidget {
   /// The "Open Settings" action shown only for the reasons
   /// [_isFixableInSettings] approves — the ones the user can fix from
   /// Settings, which is why no other reason gets this action.
-  Widget _settingsAction(
-    BuildContext context,
-    AppLocalizations l10n,
-    ColorScheme colorScheme,
-  ) {
-    return Padding(
-      padding: const EdgeInsetsDirectional.only(start: 8),
-      child: TextButton(
-        onPressed: () => Navigator.pushNamed(context, '/settings'),
-        style: TextButton.styleFrom(foregroundColor: colorScheme.primary),
-        child: Text(l10n.actionOpenSettings),
-      ),
+  AppNoticeAction _settingsAction(BuildContext context, AppLocalizations l10n) {
+    return AppNoticeAction(
+      label: l10n.actionOpenSettings,
+      onPressed: () => Navigator.pushNamed(context, '/settings'),
     );
   }
 
   /// The Retry action shown for every reason [_isRetryable] approves.
-  Widget _retryAction(
-    AppLocalizations l10n,
-    ColorScheme colorScheme,
-    VoidCallback onRetry,
-  ) {
-    return Padding(
-      padding: const EdgeInsetsDirectional.only(start: 8),
-      child: TextButton(
-        onPressed: onRetry,
-        style: TextButton.styleFrom(foregroundColor: colorScheme.primary),
-        child: Text(l10n.actionRetry),
-      ),
-    );
+  AppNoticeAction _retryAction(AppLocalizations l10n, VoidCallback onRetry) {
+    return AppNoticeAction(label: l10n.actionRetry, onPressed: onRetry);
   }
 }
