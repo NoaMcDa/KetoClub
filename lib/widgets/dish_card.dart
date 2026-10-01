@@ -6,6 +6,7 @@ import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/price_format.dart';
 import 'package:ketoclub/widgets/content_direction.dart';
+import 'package:ketoclub/widgets/focus_ring.dart';
 import 'package:ketoclub/widgets/net_carbs_chip.dart';
 import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
@@ -373,37 +374,41 @@ class _ScriptDisclosure extends StatelessWidget {
       // focus the row but never activate it.
       onTap: onTap,
       excludeSemantics: true,
-      child: InkWell(
-        onTap: onTap,
+      child: FocusRing(
         borderRadius: BorderRadius.circular(11),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: tone.tint,
-            borderRadius: BorderRadius.circular(11),
-            border: Border.all(color: tone.rail),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            child: Row(
-              children: [
-                Icon(Icons.restaurant_menu, size: 16, color: tone.ink),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
-                      color: tone.ink,
+        color: tone.rail,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(11),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: tone.tint,
+              borderRadius: BorderRadius.circular(11),
+              border: Border.all(color: tone.rail),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Row(
+                children: [
+                  Icon(Icons.restaurant_menu, size: 16, color: tone.ink),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: tone.ink,
+                      ),
                     ),
                   ),
-                ),
-                AnimatedRotation(
-                  turns: expanded ? 0.5 : 0,
-                  duration: const Duration(milliseconds: 150),
-                  child: Icon(Icons.expand_more, size: 15, color: tone.ink),
-                ),
-              ],
+                  AnimatedRotation(
+                    turns: expanded ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 150),
+                    child: Icon(Icons.expand_more, size: 15, color: tone.ink),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

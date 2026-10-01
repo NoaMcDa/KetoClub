@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
@@ -13,6 +14,8 @@ import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
 import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/venue_card.dart';
+
+import '../fakes/focus_ring_probe.dart';
 
 /// The English strings this file reads expected copy from.
 final AppLocalizations _en = AppLocalizationsEn();
@@ -618,6 +621,29 @@ void main() {
       final name = tester.getCenter(find.text('Ember & Vine'));
       final score = tester.getCenter(find.byType(KetoScoreBadge));
       expect(score.dx, greaterThan(name.dx));
+    });
+
+    testWidgets('Tab focuses the card with a ring and Enter and Space open '
+        'it (issue #264)', (tester) async {
+      // Arrange
+      var opened = 0;
+      await _pump(tester, VenueCard(venue: _venue, onTap: () => opened++));
+      expect(focusRingShown(tester, find.byType(VenueCard)), isFalse);
+
+      // Act
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      // Assert
+      expect(focusRingShown(tester, find.byType(VenueCard)), isTrue);
+
+      // Act
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+
+      // Assert
+      expect(opened, 2);
     });
   });
 }

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_he.dart';
 import 'package:ketoclub/widgets/menu_filters_row.dart';
+
+import '../fakes/focus_ring_probe.dart';
 
 /// The English strings this test reads expected copy from.
 final AppLocalizations _en = AppLocalizationsEn();
@@ -196,6 +199,36 @@ void main() {
       // Assert
       expect(find.text(_he.menuFiltersActive(1)), findsOneWidget);
       expect(find.bySemanticsLabel(_he.menuFiltersActive(1)), findsOneWidget);
+    });
+
+    testWidgets('Tab focuses the row with a ring and Enter and Space toggle '
+        'it (issue #264)', (tester) async {
+      // Arrange
+      var toggles = 0;
+      await _pump(
+        tester,
+        MenuFiltersRow(
+          expanded: false,
+          onToggle: () => toggles++,
+          child: const SizedBox.shrink(),
+        ),
+      );
+      expect(focusRingShown(tester, find.byType(MenuFiltersRow)), isFalse);
+
+      // Act
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      // Assert
+      expect(focusRingShown(tester, find.byType(MenuFiltersRow)), isTrue);
+
+      // Act
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+
+      // Assert
+      expect(toggles, 2);
     });
   });
 }

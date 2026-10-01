@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
+import 'package:ketoclub/widgets/focus_ring.dart';
 
 /// The three verdict counters that double as the menu filter (issue #29):
 /// *"The three counters under the venue name are the filter — tap one"*
@@ -160,61 +161,67 @@ class _Tile extends StatelessWidget {
       // no action, a real gap this pass's own semantics test caught.
       onTap: onTap,
       excludeSemantics: true,
-      child: InkWell(
-        onTap: onTap,
+      // The ring is drawn for a keyboard user's focus only (issue #264);
+      // the InkWell itself takes the Tab stop and Enter/Space activation.
+      child: FocusRing(
         borderRadius: BorderRadius.circular(13),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: active ? tone.tint : theme.cardColor,
-            borderRadius: BorderRadius.circular(13),
-            border: Border.all(
-              color: active ? tone.rail : theme.dividerColor,
-              width: 1.5,
+        color: tone.rail,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(13),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: active ? tone.tint : theme.cardColor,
+              borderRadius: BorderRadius.circular(13),
+              border: Border.all(
+                color: active ? tone.rail : theme.dividerColor,
+                width: 1.5,
+              ),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(10, 9, 10, 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Scaled down rather than left to overflow: at a large text
-                // scale, a three-digit count plus this icon can outgrow a
-                // narrow tile's own width (each tile is one third of the
-                // row, per architecture.md §8.3's large-text pass) — a
-                // shrunk pair reads better than a RenderFlex overflow.
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(icon, size: 13, color: tone.rail),
-                      const SizedBox(width: 6),
-                      Text(
-                        '$count',
-                        // The artboard's tile count: 18px extra-bold, line
-                        // height 1 (`.design/Main.dc.html`).
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontSize: 18,
-                          height: 1,
-                          fontWeight: FontWeight.w800,
-                          color: numberColor,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 9, 10, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Scaled down rather than left to overflow: at a large text
+                  // scale, a three-digit count plus this icon can outgrow a
+                  // narrow tile's own width (each tile is one third of the
+                  // row, per architecture.md §8.3's large-text pass) — a
+                  // shrunk pair reads better than a RenderFlex overflow.
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(icon, size: 13, color: tone.rail),
+                        const SizedBox(width: 6),
+                        Text(
+                          '$count',
+                          // The artboard's tile count: 18px extra-bold, line
+                          // height 1 (`.design/Main.dc.html`).
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontSize: 18,
+                            height: 1,
+                            fontWeight: FontWeight.w800,
+                            color: numberColor,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  label.toUpperCase(),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    fontSize: 9.5,
-                    color: labelColor,
-                    letterSpacing: 0.5,
+                  const SizedBox(height: 3),
+                  Text(
+                    label.toUpperCase(),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontSize: 9.5,
+                      color: labelColor,
+                      letterSpacing: 0.5,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

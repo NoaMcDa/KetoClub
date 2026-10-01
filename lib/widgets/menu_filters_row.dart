@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/widgets/focus_ring.dart';
 
 /// The menu screen's collapsible "Filters" row (issue #234): one compact
 /// disclosure line above the category chips, with the search field, the
@@ -62,27 +63,30 @@ class MenuFiltersRow extends StatelessWidget {
           // the row, not just hear it.
           onTap: onToggle,
           excludeSemantics: true,
-          child: InkWell(
-            onTap: onToggle,
+          child: FocusRing(
             borderRadius: BorderRadius.circular(8),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                children: [
-                  Icon(Icons.tune, size: 16, color: ink),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      label,
-                      style: theme.textTheme.labelLarge?.copyWith(color: ink),
+            child: InkWell(
+              onTap: onToggle,
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  children: [
+                    Icon(Icons.tune, size: 16, color: ink),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        label,
+                        style: theme.textTheme.labelLarge?.copyWith(color: ink),
+                      ),
                     ),
-                  ),
-                  AnimatedRotation(
-                    turns: expanded ? 0.5 : 0,
-                    duration: const Duration(milliseconds: 150),
-                    child: Icon(Icons.expand_more, size: 18, color: ink),
-                  ),
-                ],
+                    AnimatedRotation(
+                      turns: expanded ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 150),
+                      child: Icon(Icons.expand_more, size: 18, color: ink),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/venue.dart';
@@ -78,6 +80,7 @@ class VenueSearchScreen extends StatefulWidget {
     required this.locationService,
     required this.settingsStore,
     this.directToGoogle = false,
+    this.autofocusSearch,
     super.key,
   });
 
@@ -102,6 +105,14 @@ class VenueSearchScreen extends StatefulWidget {
   /// device (iOS and Android, D17), so the disclosure banner says so
   /// rather than naming KetoClub's server (web, D12).
   final bool directToGoogle;
+
+  /// Whether the search field takes focus as soon as the screen opens
+  /// (issue #264). Null, the default, means the web build on a desktop
+  /// platform: search is the main path in a browser, where location is
+  /// often unavailable, while a phone, native or in a mobile browser, must
+  /// not have its keyboard pop up unasked. A test passes an explicit value
+  /// to exercise either branch without `kIsWeb`.
+  final bool? autofocusSearch;
 
   @override
   State<VenueSearchScreen> createState() => _VenueSearchScreenState();
@@ -129,6 +140,15 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     _fieldFocus.dispose();
     super.dispose();
   }
+
+  /// Whether the search field autofocuses: [VenueSearchScreen.autofocusSearch]
+  /// when given, else web on a desktop platform (issue #264).
+  bool get _autofocusSearch =>
+      widget.autofocusSearch ??
+      (kIsWeb &&
+          defaultTargetPlatform != TargetPlatform.android &&
+          defaultTargetPlatform != TargetPlatform.iOS &&
+          defaultTargetPlatform != TargetPlatform.fuchsia);
 
   /// The UI language code every search is made in.
   String get _language => Localizations.localeOf(context).languageCode;
@@ -222,6 +242,7 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
                 TextField(
                   controller: _field,
                   focusNode: _fieldFocus,
+                  autofocus: _autofocusSearch,
                   textInputAction: TextInputAction.search,
                   onChanged: (value) =>
                       controller.search(value, language: _language),

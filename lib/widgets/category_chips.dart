@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/widgets/focus_ring.dart';
 
 /// The horizontal row of category chips above the dish list (issue #51):
 /// one chip per name in `MenuController.visibleCategories`, in menu order.
@@ -44,9 +45,12 @@ class CategoryChips extends StatelessWidget {
                 button: true,
                 label: l10n.categoryChipSemanticLabel(categories[i]),
                 excludeSemantics: true,
-                child: ActionChip(
-                  label: Text(categories[i]),
-                  onPressed: () => onSelected(categories[i]),
+                child: FocusRing(
+                  borderRadius: BorderRadius.circular(8),
+                  child: ActionChip(
+                    label: Text(categories[i]),
+                    onPressed: () => onSelected(categories[i]),
+                  ),
                 ),
               ),
             ],
