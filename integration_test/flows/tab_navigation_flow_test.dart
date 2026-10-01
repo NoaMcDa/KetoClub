@@ -145,7 +145,7 @@ void main() {
         await tester.pump(venueSearchDebounce);
         await tester.pumpAndSettle();
         final openNow = find.widgetWithText(
-          ChoiceChip,
+          FilterChip,
           _en.discoveryChipOpenNow,
         );
         await tester.ensureVisible(openNow);
@@ -171,7 +171,7 @@ void main() {
         );
         expect(find.byType(VenueCard), findsOneWidget);
         expect(find.text(open.name), findsOneWidget);
-        expect(tester.widget<ChoiceChip>(openNow).selected, isTrue);
+        expect(tester.widget<FilterChip>(openNow).selected, isTrue);
         expect(fakes.venueSearchService.byNameCalls, ['sushi']);
       },
     );
