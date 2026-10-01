@@ -13,14 +13,15 @@ import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:provider/provider.dart';
 
-/// Scopes a test's finder to the language section's radio group, so a
-/// label the language and appearance sections happen to share (both offer
+/// Scopes a test's finder to the language section's segmented control, so
+/// a label the language and appearance sections happen to share (both offer
 /// a "follow the device" choice) cannot make `find.text(...)` match two
 /// widgets. Public so tests can reach it without a brittle text lookup.
+/// The name predates the control, which was a radio list until issue #256.
 const Key languageRadioGroupKey = Key('settingsLanguageRadioGroup');
 
-/// Scopes a test's finder to the appearance section's radio group, for the
-/// same reason as [languageRadioGroupKey].
+/// Scopes a test's finder to the appearance section's segmented control,
+/// for the same reason as [languageRadioGroupKey].
 const Key appearanceRadioGroupKey = Key('settingsAppearanceRadioGroup');
 
 /// The net-carb limit stepper's minus button (issue #57), public so a test
@@ -317,33 +318,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _SectionLabel(l10n.settingsLanguage),
-        _SettingsGroup(
-          children: [
-            RadioGroup<String?>(
-              key: languageRadioGroupKey,
-              groupValue: controller.languageTag,
-              onChanged: (tag) =>
-                  unawaited(_setLanguage(context, controller, tag)),
-              child: Column(
-                children: [
-                  RadioListTile<String?>(
-                    title: Text(l10n.settingsLanguageSystem),
-                    value: null,
-                    enabled: !busy,
-                  ),
-                  RadioListTile<String?>(
-                    title: Text(l10n.settingsLanguageEnglish),
-                    value: 'en',
-                    enabled: !busy,
-                  ),
-                  RadioListTile<String?>(
-                    title: Text(l10n.settingsLanguageHebrew),
-                    value: 'he',
-                    enabled: !busy,
-                  ),
-                ],
-              ),
-            ),
+        _ThreeWayControl<String?>(
+          key: languageRadioGroupKey,
+          selected: controller.languageTag,
+          enabled: !busy,
+          onChanged: (tag) => unawaited(_setLanguage(context, controller, tag)),
+          options: [
+            (value: null, label: l10n.settingsLanguageSystem),
+            (value: 'en', label: l10n.settingsLanguageEnglish),
+            (value: 'he', label: l10n.settingsLanguageHebrew),
           ],
         ),
       ],
@@ -380,33 +363,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _SectionLabel(l10n.settingsAppearance),
-        _SettingsGroup(
-          children: [
-            RadioGroup<AppThemeMode>(
-              key: appearanceRadioGroupKey,
-              groupValue: controller.themeMode,
-              onChanged: (mode) =>
-                  unawaited(_setThemeMode(context, controller, mode)),
-              child: Column(
-                children: [
-                  RadioListTile<AppThemeMode>(
-                    title: Text(l10n.settingsAppearanceSystem),
-                    value: AppThemeMode.system,
-                    enabled: !busy,
-                  ),
-                  RadioListTile<AppThemeMode>(
-                    title: Text(l10n.settingsAppearanceLight),
-                    value: AppThemeMode.light,
-                    enabled: !busy,
-                  ),
-                  RadioListTile<AppThemeMode>(
-                    title: Text(l10n.settingsAppearanceDark),
-                    value: AppThemeMode.dark,
-                    enabled: !busy,
-                  ),
-                ],
-              ),
-            ),
+        _ThreeWayControl<AppThemeMode>(
+          key: appearanceRadioGroupKey,
+          selected: controller.themeMode,
+          enabled: !busy,
+          onChanged: (mode) =>
+              unawaited(_setThemeMode(context, controller, mode)),
+          options: [
+            (value: AppThemeMode.system, label: l10n.settingsAppearanceSystem),
+            (value: AppThemeMode.light, label: l10n.settingsAppearanceLight),
+            (value: AppThemeMode.dark, label: l10n.settingsAppearanceDark),
           ],
         ),
       ],
@@ -734,6 +700,68 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
       ],
+    );
+  }
+}
+
+/// One option of a [_ThreeWayControl]: the value it stands for and its label.
+typedef _ThreeWayOption<T> = ({T value, String label});
+
+/// A single-row segmented control for a short, mutually exclusive choice
+/// (issue #256, audit S6): the language and appearance sections, which were
+/// three-row radio lists. Styled like the Default filter's control
+/// (chip-sized labels, compact density) so the two read as one family, and
+/// wrapped in the same sideways scroll that is only the fallback for a
+/// narrower screen or a longer translation (the S3 lesson: forced into
+/// equal thirds, labels break mid-word).
+///
+/// [enabled] false (the screen is busy) removes [onChanged], which is how
+/// [SegmentedButton] disables itself. A `null` option value is a legitimate
+/// selection ("match my device"), so [selected] is passed through as is.
+class _ThreeWayControl<T> extends StatelessWidget {
+  const new({
+    required this.selected,
+    required this.options,
+    required this.enabled,
+    required this.onChanged,
+    super.key,
+  });
+
+  /// The currently chosen option's value.
+  final T selected;
+
+  /// The options, in display order.
+  final List<_ThreeWayOption<T>> options;
+
+  /// Whether a tap may change the choice.
+  final bool enabled;
+
+  /// Called with the newly chosen value.
+  final void Function(T value) onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: SegmentedButton<T>(
+        showSelectedIcon: false,
+        style: SegmentedButton.styleFrom(
+          visualDensity: VisualDensity.compact,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          textStyle: const TextStyle(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        segments: [
+          for (final option in options)
+            ButtonSegment<T>(value: option.value, label: Text(option.label)),
+        ],
+        selected: <T>{selected},
+        onSelectionChanged: enabled
+            ? (selection) => onChanged(selection.first)
+            : null,
+      ),
     );
   }
 }
