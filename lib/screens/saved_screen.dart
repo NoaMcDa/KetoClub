@@ -6,6 +6,7 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/saved_controller.dart';
+import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/content_width.dart';
@@ -380,7 +381,12 @@ class _SavedEntryTile extends StatelessWidget {
                 button: true,
                 excludeSemantics: true,
                 child: IconButton(
-                  icon: const Icon(Icons.delete_outline),
+                  // The one destructive look, shared with Settings' "Clear"
+                  // (#254); the pin beside it stays neutral.
+                  icon: Icon(
+                    Icons.delete_outline,
+                    color: VerdictColors.of(context).red.ink,
+                  ),
                   tooltip: l10n.savedRemove,
                   onPressed: onRemove,
                 ),

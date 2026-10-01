@@ -103,6 +103,12 @@ List<_Pair> _closedTagPairs(Color ink, Color surface) => [
   _Pair('closed tag ink/surface', ink, surface),
 ];
 
+/// The Saved row's remove icon (issue #254): the red `ink` drawn on the
+/// card, which is the theme's `surface`.
+List<_Pair> _removeIconPairs(VerdictColors colors, Color surface) => [
+  _Pair('saved remove icon red ink/surface', colors.red.ink, surface),
+];
+
 void main() {
   group('relative luminance and contrast ratio (self-test)', () {
     test('identical colours have a ratio of 1.0', () {
@@ -131,6 +137,7 @@ void main() {
       ..._inkOnBackgroundPairs(colors, background),
       ..._scoreBandPairs(colors, AppTokens.lightInk3, background),
       ..._closedTagPairs(AppTokens.lightInk, AppTokens.lightSurface),
+      ..._removeIconPairs(colors, AppTokens.lightSurface),
     ]);
 
     test('ink1, ink2 and ink3 all clear AA on the background', () {
@@ -166,6 +173,7 @@ void main() {
       ..._inkOnBackgroundPairs(colors, background),
       ..._scoreBandPairs(colors, AppTokens.darkInk3, background),
       ..._closedTagPairs(AppTokens.darkInk, AppTokens.darkSurface),
+      ..._removeIconPairs(colors, AppTokens.darkSurface),
     ]);
 
     test('ink1, ink2 and ink3 all clear AA on the background', () {
