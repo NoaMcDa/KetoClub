@@ -308,6 +308,7 @@
   "legendHide": "הסתר את המקרא",
   "legendNote": "אותם הכללים שקטוקלאב שולחת למודל הבינה המלאכותית.",
   "legendEngines": "כללים: בדיקות מילות מפתח של קטוקלאב על טקסט המנה, בלי הערכת פחמימות. בינה מלאכותית: Gemini קורא את כל התפריט ומעריך פחמימות נטו.",
+  "legendBudget": "תקציב פחמימות: לאחר ניתוח בינה מלאכותית, שדה בסינון מאפשר לקבוע תקציב פחמימות נטו לארוחה. לתוצאות על בסיס כללים אין הערכת פחמימות, ולכן הוא לא מוצע.",
   "waiterCardCopyButton": "העתק טקסט",
   "waiterCardAfterText": "עם השינויים האלו, בערך {grams} גרם פחמימות נטו (הערכה) — בטוח להזמין.",
   "@waiterCardAfterText": {
@@ -449,7 +450,6 @@
   "carbBudgetFieldLabel": "תקציב הפחמימות הלילה (גרם)",
   "carbBudgetFieldHint": "לדוגמה: 20",
   "carbBudgetFieldClear": "נקה תקציב",
-  "carbBudgetDisabledReason": "קבעו תקציב לאחר ניתוח בינה מלאכותית — לתוצאות על בסיס כללים אין הערכת פחמימות.",
   "netCarbsChipLeavesSuffix": " · נשאר {grams} גרם",
   "@netCarbsChipLeavesSuffix": {
     "placeholders": { "grams": { "type": "int" } }
