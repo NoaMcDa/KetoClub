@@ -600,6 +600,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String venueCardDistanceMetres(String distance) {
+    return '$distance m';
+  }
+
+  @override
+  String venueCardDistanceKm(String distance) {
+    return '$distance km';
+  }
+
+  @override
   String venueCardGreenCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

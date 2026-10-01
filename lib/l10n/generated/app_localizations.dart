@@ -1082,6 +1082,18 @@ abstract class AppLocalizations {
   /// **'{minutes} min walk'**
   String venueCardWalkMinutes(int minutes);
 
+  /// No description provided for @venueCardDistanceMetres.
+  ///
+  /// In en, this message translates to:
+  /// **'{distance} m'**
+  String venueCardDistanceMetres(String distance);
+
+  /// No description provided for @venueCardDistanceKm.
+  ///
+  /// In en, this message translates to:
+  /// **'{distance} km'**
+  String venueCardDistanceKm(String distance);
+
   /// No description provided for @venueCardGreenCount.
   ///
   /// In en, this message translates to:
