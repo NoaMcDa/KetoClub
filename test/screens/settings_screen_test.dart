@@ -17,6 +17,8 @@ import 'package:ketoclub/state/theme_mode_controller.dart';
 import 'package:provider/provider.dart';
 
 import '../fakes/fake_api_key_store.dart';
+import '../fakes/fake_app_info.dart';
+import '../fakes/fake_external_link_opener.dart';
 import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_settings_store.dart';
 
@@ -88,6 +90,8 @@ Future<void> _pump(
   Locale locale = const Locale('en'),
   LocaleController? localeController,
   ThemeModeController? themeModeController,
+  FakeAppInfo? appInfo,
+  FakeExternalLinkOpener? externalLinkOpener,
 }) {
   return tester.pumpWidget(
     MaterialApp(
@@ -105,7 +109,10 @@ Future<void> _pump(
                 themeModeController ?? ThemeModeController(FakeSettingsStore()),
           ),
         ],
-        child: const SettingsScreen(),
+        child: SettingsScreen(
+          appInfo: appInfo ?? FakeAppInfo(),
+          externalLinkOpener: externalLinkOpener ?? FakeExternalLinkOpener(),
+        ),
       ),
     ),
   );
@@ -1105,6 +1112,150 @@ void main() {
       expect(find.text(_he.settingsKeySection), findsOneWidget);
       await _expandConsentDisclosure(tester);
       expect(find.text(_he.settingsConsentBodyDirect), findsOneWidget);
+    });
+  });
+
+  group('About section (issue #258)', () {
+    testWidgets('shows the version and build after the first frame', (
+      tester,
+    ) async {
+      // Arrange
+      final appInfo = FakeAppInfo();
+      await _pump(tester, _controllerFor(), appInfo: appInfo);
+
+      // Act
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.byKey(aboutVersionKey));
+
+      // Assert
+      expect(appInfo.loadCalls, 1);
+      expect(find.text(_en.settingsAboutSection), findsOneWidget);
+      expect(
+        find.text(_en.settingsAboutVersionValue('1.2.3', '45')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('does not read the version while building', (tester) async {
+      // Arrange
+      final appInfo = FakeAppInfo();
+
+      // Act: one frame only, no post-frame work awaited.
+      await _pump(tester, _controllerFor(), appInfo: appInfo);
+
+      // Assert: the load is scheduled after the first frame, then runs.
+      await tester.pumpAndSettle();
+      expect(appInfo.loadCalls, 1);
+    });
+
+    testWidgets('shows no version text when the platform cannot say', (
+      tester,
+    ) async {
+      // Arrange
+      final appInfo = FakeAppInfo(answer: null);
+      await _pump(tester, _controllerFor(), appInfo: appInfo);
+
+      // Act
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.byKey(aboutVersionKey));
+
+      // Assert
+      expect(find.text(_en.settingsAboutVersion), findsOneWidget);
+      expect(find.textContaining('build'), findsNothing);
+    });
+
+    testWidgets('licences row opens the licence page', (tester) async {
+      // Arrange
+      await _pump(tester, _controllerFor());
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.ensureVisible(find.byKey(aboutLicencesKey));
+      await tester.tap(find.byKey(aboutLicencesKey));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byType(LicensePage), findsOneWidget);
+    });
+
+    testWidgets('privacy row reveals the web consent text', (tester) async {
+      // Arrange
+      await _pump(tester, _controllerFor());
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.byKey(aboutPrivacyKey));
+      expect(find.text(_en.settingsConsentBody), findsNothing);
+
+      // Act
+      await tester.tap(find.byKey(aboutPrivacyKey));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.settingsConsentBody), findsOneWidget);
+    });
+
+    testWidgets('privacy row reveals the direct text on a phone', (
+      tester,
+    ) async {
+      // Arrange
+      final controller = _controllerFor(apiKeyStore: FakeApiKeyStore());
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.byKey(aboutPrivacyKey));
+
+      // Act
+      await tester.tap(find.byKey(aboutPrivacyKey));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.settingsConsentBodyDirect), findsOneWidget);
+    });
+
+    testWidgets('report row opens the issue tracker', (tester) async {
+      // Arrange
+      final opener = FakeExternalLinkOpener();
+      await _pump(tester, _controllerFor(), externalLinkOpener: opener);
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.ensureVisible(find.byKey(aboutReportKey));
+      await tester.tap(find.byKey(aboutReportKey));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(opener.openCalls, [reportProblemUri]);
+      expect(find.text(_en.settingsAboutLinkFailed), findsNothing);
+    });
+
+    testWidgets('report row says so when the link cannot open', (tester) async {
+      // Arrange
+      final opener = FakeExternalLinkOpener()..answer = false;
+      await _pump(tester, _controllerFor(), externalLinkOpener: opener);
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.ensureVisible(find.byKey(aboutReportKey));
+      await tester.tap(find.byKey(aboutReportKey));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.settingsAboutLinkFailed), findsOneWidget);
+    });
+
+    testWidgets('renders the About group in Hebrew', (tester) async {
+      // Arrange
+      await _pump(tester, _controllerFor(), locale: const Locale('he'));
+
+      // Act
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.byKey(aboutReportKey));
+
+      // Assert
+      expect(find.text(_he.settingsAboutSection), findsOneWidget);
+      expect(find.text(_he.settingsAboutReport), findsOneWidget);
+      expect(
+        find.text(_he.settingsAboutVersionValue('1.2.3', '45')),
+        findsOneWidget,
+      );
     });
   });
 }

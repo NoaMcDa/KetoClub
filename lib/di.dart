@@ -21,6 +21,7 @@ import 'package:ketoclub/services/menu/website/direct_website_fetcher.dart';
 import 'package:ketoclub/services/menu/website/website_adapter.dart';
 import 'package:ketoclub/services/menu/website/website_fetcher.dart';
 import 'package:ketoclub/services/menu/wolt/wolt_adapter.dart';
+import 'package:ketoclub/services/platform/app_info.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
@@ -305,6 +306,8 @@ AppDependencies buildDependencies() {
     connectivity: connectivity,
     screenBrightness: screenBrightness,
     externalLinkOpener: const UrlLauncherLinkOpener(),
+    // Reads the version lazily, after Settings' first frame (issue #258).
+    appInfo: const DeviceAppInfo(),
     menuSharer: const SharePlusMenuSharer(),
     // Every geolocator call defaults to the real plugin inside
     // GeolocatorLocationService itself, so no arguments are needed here

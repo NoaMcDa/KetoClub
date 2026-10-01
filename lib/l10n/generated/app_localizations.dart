@@ -590,6 +590,54 @@ abstract class AppLocalizations {
   /// **'Saved menus cleared.'**
   String get settingsCacheCleared;
 
+  /// No description provided for @settingsAboutSection.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get settingsAboutSection;
+
+  /// No description provided for @settingsAboutVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get settingsAboutVersion;
+
+  /// No description provided for @settingsAboutVersionValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{version} (build {build})'**
+  String settingsAboutVersionValue(String version, String build);
+
+  /// No description provided for @settingsAboutLicences.
+  ///
+  /// In en, this message translates to:
+  /// **'Open-source licences'**
+  String get settingsAboutLicences;
+
+  /// No description provided for @settingsAboutPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get settingsAboutPrivacy;
+
+  /// No description provided for @settingsAboutReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a problem'**
+  String get settingsAboutReport;
+
+  /// No description provided for @settingsAboutReportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens KetoClub\'s issue tracker on GitHub'**
+  String get settingsAboutReportHint;
+
+  /// No description provided for @settingsAboutLinkFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the link.'**
+  String get settingsAboutLinkFailed;
+
   /// No description provided for @fetchFailedOffline.
   ///
   /// In en, this message translates to:

@@ -237,6 +237,8 @@ const _boundaries = <_Boundary>[
   }),
   _Boundary('github.com/NoaMcDa', {
     'services/menu/website/direct_website_fetcher.dart',
+    // The issue tracker "Report a problem" opens (issue #258).
+    'screens/settings_screen.dart',
   }),
   _Boundary('KETOCLUB_BACKEND_URL', {'di.dart'}),
   _Boundary('package:geolocator/geolocator.dart', {

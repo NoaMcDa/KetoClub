@@ -240,7 +240,10 @@ Route<void>? generateRoute(
             dependencies.menuRepository,
             dependencies.apiKeyStore,
           ),
-          child: const SettingsScreen(),
+          child: SettingsScreen(
+            appInfo: dependencies.appInfo,
+            externalLinkOpener: dependencies.externalLinkOpener,
+          ),
         ),
       ),
     );

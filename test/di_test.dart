@@ -12,6 +12,7 @@ import 'package:ketoclub/services/location/geolocator_location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/website/backend_website_fetcher.dart';
 import 'package:ketoclub/services/menu/website/direct_website_fetcher.dart';
+import 'package:ketoclub/services/platform/app_info.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
@@ -50,6 +51,7 @@ void main() {
       expect(dependencies.screenBrightness, isA<DeviceScreenBrightness>());
       expect(dependencies.connectivity, isA<DeviceConnectivity>());
       expect(dependencies.externalLinkOpener, isA<UrlLauncherLinkOpener>());
+      expect(dependencies.appInfo, isA<DeviceAppInfo>());
       expect(dependencies.menuSharer, isA<SharePlusMenuSharer>());
       expect(dependencies.locationService, isA<GeolocatorLocationService>());
       expect(dependencies.venueSearchService, isA<WoltVenueSearchService>());
