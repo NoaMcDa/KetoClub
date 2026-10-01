@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
+import 'package:ketoclub/l10n/generated/app_localizations_he.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/venue.dart';
@@ -22,6 +23,16 @@ const Venue _venue = Venue(
   shortDescription: 'Charcoal grill and a serious salad list.',
   cuisineTags: <String>['steakhouse', 'grill'],
   isOnline: true,
+  estimateMinutes: 12,
+);
+
+/// [_venue] as the platform reports it when it is shut (issue #227).
+const Venue _closedVenue = Venue(
+  ref: VenueRef(source: MenuSource.wolt, platformId: 'ember-vine'),
+  name: 'Ember & Vine',
+  shortDescription: 'Charcoal grill and a serious salad list.',
+  cuisineTags: <String>['steakhouse', 'grill'],
+  isOnline: false,
   estimateMinutes: 12,
 );
 
@@ -260,6 +271,86 @@ void main() {
           .getSemanticsData()
           .label;
       expect(label, 'X, ${_en.venueCardClosed}');
+      handle.dispose();
+    });
+
+    testWidgets('a closed venue shows a Closed tag over the photo', (
+      tester,
+    ) async {
+      // Act
+      await _pump(tester, VenueCard(venue: _closedVenue, onTap: () {}));
+
+      // Assert: the tag sits inside the photo, not below it.
+      final tag = find.text(_en.venueCardClosed);
+      expect(tag, findsOneWidget);
+      final photo = tester.getRect(find.byType(PhotoTile));
+      expect(photo.contains(tester.getCenter(tag)), isTrue);
+      final pill = tester.widget<DecoratedBox>(
+        find.ancestor(of: tag, matching: find.byType(DecoratedBox)).first,
+      );
+      final scheme = AppTheme.light().colorScheme;
+      expect((pill.decoration as BoxDecoration).color, scheme.surface);
+      expect(tester.widget<Text>(tag).style?.color, scheme.onSurface);
+    });
+
+    testWidgets('an open venue shows no Closed tag', (tester) async {
+      // Act
+      await _pump(tester, VenueCard(venue: _venue, onTap: () {}));
+
+      // Assert
+      expect(find.text(_en.venueCardClosed), findsNothing);
+    });
+
+    testWidgets('a venue with unknown state shows no Closed tag', (
+      tester,
+    ) async {
+      // Act
+      await _pump(
+        tester,
+        VenueCard(
+          venue: const Venue(
+            ref: VenueRef(source: MenuSource.wolt, platformId: 'x'),
+            name: 'X',
+          ),
+          onTap: () {},
+        ),
+      );
+
+      // Assert
+      expect(find.text(_en.venueCardClosed), findsNothing);
+    });
+
+    testWidgets("the Closed tag sits at the photo's end, mirrored under "
+        'right-to-left, and keeps the semantic label', (tester) async {
+      // Arrange
+      final handle = tester.ensureSemantics();
+
+      // Act: left-to-right first.
+      await _pump(tester, VenueCard(venue: _closedVenue, onTap: () {}));
+      final photo = tester.getRect(find.byType(PhotoTile));
+      final ltrX = tester.getCenter(find.text(_en.venueCardClosed)).dx;
+
+      // Assert
+      expect(ltrX, greaterThan(photo.center.dx));
+
+      // Act: right-to-left, Hebrew.
+      await _pump(
+        tester,
+        VenueCard(venue: _closedVenue, onTap: () {}),
+        locale: const Locale('he'),
+        rtl: true,
+      );
+      final heTag = find.text(AppLocalizationsHe().venueCardClosed);
+      final rtlPhoto = tester.getRect(find.byType(PhotoTile));
+
+      // Assert
+      expect(heTag, findsOneWidget);
+      expect(tester.getCenter(heTag).dx, lessThan(rtlPhoto.center.dx));
+      final label = tester
+          .getSemantics(find.byType(VenueCard))
+          .getSemanticsData()
+          .label;
+      expect(label, 'Ember & Vine, ${AppLocalizationsHe().venueCardClosed}');
       handle.dispose();
     });
 

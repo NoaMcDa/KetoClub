@@ -97,6 +97,12 @@ List<_Pair> _scoreBandPairs(
     ),
 ];
 
+/// The "Closed" tag over a venue photo (issue #227): the theme's `ink` on
+/// its `surface`, the pair `VenueCard`'s closed pill draws.
+List<_Pair> _closedTagPairs(Color ink, Color surface) => [
+  _Pair('closed tag ink/surface', ink, surface),
+];
+
 void main() {
   group('relative luminance and contrast ratio (self-test)', () {
     test('identical colours have a ratio of 1.0', () {
@@ -124,6 +130,7 @@ void main() {
       ..._statusBadgePairs(colors),
       ..._inkOnBackgroundPairs(colors, background),
       ..._scoreBandPairs(colors, AppTokens.lightInk3, background),
+      ..._closedTagPairs(AppTokens.lightInk, AppTokens.lightSurface),
     ]);
 
     test('ink1, ink2 and ink3 all clear AA on the background', () {
@@ -158,6 +165,7 @@ void main() {
       ..._statusBadgePairs(colors),
       ..._inkOnBackgroundPairs(colors, background),
       ..._scoreBandPairs(colors, AppTokens.darkInk3, background),
+      ..._closedTagPairs(AppTokens.darkInk, AppTokens.darkSurface),
     ]);
 
     test('ink1, ink2 and ink3 all clear AA on the background', () {
