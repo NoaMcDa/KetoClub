@@ -109,6 +109,12 @@ List<_Pair> _removeIconPairs(VerdictColors colors, Color surface) => [
   _Pair('saved remove icon red ink/surface', colors.red.ink, surface),
 ];
 
+/// The offline notice (issue #260): an `AppNotice.warning` draws its icon
+/// and text in the amber tone's `ink` on its `tint`.
+List<_Pair> _warningNoticePairs(VerdictColors colors) => [
+  _Pair('offline notice amber ink/tint', colors.amber.ink, colors.amber.tint),
+];
+
 void main() {
   group('relative luminance and contrast ratio (self-test)', () {
     test('identical colours have a ratio of 1.0', () {
@@ -138,6 +144,7 @@ void main() {
       ..._scoreBandPairs(colors, AppTokens.lightInk3, background),
       ..._closedTagPairs(AppTokens.lightInk, AppTokens.lightSurface),
       ..._removeIconPairs(colors, AppTokens.lightSurface),
+      ..._warningNoticePairs(colors),
     ]);
 
     test('ink1, ink2 and ink3 all clear AA on the background', () {
@@ -174,6 +181,7 @@ void main() {
       ..._scoreBandPairs(colors, AppTokens.darkInk3, background),
       ..._closedTagPairs(AppTokens.darkInk, AppTokens.darkSurface),
       ..._removeIconPairs(colors, AppTokens.darkSurface),
+      ..._warningNoticePairs(colors),
     ]);
 
     test('ink1, ink2 and ink3 all clear AA on the background', () {
