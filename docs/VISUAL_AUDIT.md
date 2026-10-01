@@ -151,7 +151,7 @@ reason), or **Decision** — needs a product call before anyone changes it.
 | M11 | a floating "Waiter card · 2 dishes" pill opening every modify dish as tabs | only a per-dish "Show the waiter card"; `WaiterCardSheet.forRows` exists but nothing calls it | **Decision** — a floating bar overlaps the list's last cards and needs its own design pass |
 | M12 | "₪142" | "₪142.00" | **Fixed** (#242) — whole-shekel prices drop `.00` (`formatPrice`, #169); a fraction keeps two decimals ("₪12.50") |
 | M13 | pill label "Modify" | "Order with a change" | **Left** — copy |
-| M14 | nothing between the tiles and the dishes | a search field, the legend toggle, the rules banner, the engine chip and category chips — the banner and the chip say the same thing twice | **Decision** — keep one of the two rules notices |
+| M14 | nothing between the tiles and the dishes | a search field, the legend toggle, the rules banner, the engine chip and category chips — the banner and the chip say the same thing twice | **Fixed** (#236) — a rules result shows the banner only; an AI result keeps its chip (no banner covers it); Saved rows and venue cards keep theirs |
 
 ### Waiter Card (`WaiterCard.dc.html`)
 

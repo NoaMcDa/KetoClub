@@ -16,8 +16,8 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
-import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/menu_search_field.dart';
+import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 
 import 'flow_support.dart';
@@ -158,14 +158,14 @@ void main() {
       await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
       // Assert: the classified menu is shown — the verdict counter tiles
-      // and the engine chip only appear once an analysis has succeeded,
+      // and the rules banner only appear once an analysis has landed,
       // the source line names the platform, and every dish is visible
       // under the default filter. Issue #35 changed `AppSettings`'s
       // default from `greenAndYellow` to `all` (no tile could reproduce
       // the old default), so the non-keto dish shows here too; it is
       // third in a deliberately lazy `ListView` (CLAUDE.md's traps), so
       // it must be scrolled into view before it is findable.
-      expect(find.byType(EngineChip), findsOneWidget);
+      expect(find.byType(RulesReasonBanner), findsOneWidget);
       expect(find.byType(VerdictCounterTiles), findsOneWidget);
       expect(find.textContaining('Wolt'), findsWidgets);
       expect(find.text(fixture.green.name), findsOneWidget);

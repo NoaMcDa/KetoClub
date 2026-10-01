@@ -228,7 +228,7 @@ void main() {
         // Assert: the menu came from Wolt; nothing went to Google.
         expect(network.hosts, ['consumer-api.wolt.com']);
         expect(find.text(_dishName), findsOneWidget);
-        expect(find.text(_en.engineChipRules), findsOneWidget);
+        expect(find.text(_en.engineChipRules), findsNothing);
         expect(find.text(_en.analysisApiKeyMissing), findsOneWidget);
 
         // Act: follow the banner to Settings and save a key there.

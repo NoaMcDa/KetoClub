@@ -457,7 +457,7 @@ void main() {
         // Assert
         expect(find.text(_en.menuProgressAskingAi), findsNothing);
         expect(find.byType(CircularProgressIndicator), findsNothing);
-        expect(find.byType(EngineChip), findsOneWidget);
+        expect(find.byType(RulesReasonBanner), findsOneWidget);
       });
 
       testWidgets('the progress copy is Hebrew under the he locale', (
@@ -1147,9 +1147,11 @@ void main() {
       await _pumpWithRoutes(tester, controller, pushedNames);
       await tester.pumpAndSettle();
 
-      // Assert: the full sentence renders, not only the engine chip's
-      // short reason.
+      // Assert: the full sentence renders and the "Rules" chip is gone, as
+      // the banner already says it (audit M14, issue #236).
       expect(find.byType(RulesReasonBanner), findsOneWidget);
+      expect(find.byType(EngineChip), findsNothing);
+      expect(find.text(_en.engineChipRules), findsNothing);
       expect(
         find.text(
           analysisFailureMessage(
@@ -2700,7 +2702,7 @@ void main() {
           // Arrange: twenty described dishes, alternating green and
           // yellow, classified by the rules because no backend is
           // configured — the web build's everyday case — so the rules
-          // banner and the engine chip both show above the list.
+          // banner shows above the list (the chip is dropped, #236).
           final dishes = <Dish>[
             for (var i = 0; i < 20; i++)
               Dish(

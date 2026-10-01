@@ -26,7 +26,7 @@ import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/website/website_adapter.dart';
-import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 
 import 'flow_support.dart';
@@ -129,7 +129,7 @@ void main() {
       expect(asked, [_home, _menuPage]);
       // A classified menu, labelled with the site's host, with every dish
       // and no price anywhere (a site's price is unverified, D19).
-      expect(find.byType(EngineChip), findsOneWidget);
+      expect(find.byType(RulesReasonBanner), findsOneWidget);
       expect(find.byType(VerdictCounterTiles), findsOneWidget);
       expect(find.textContaining('cafe-noir.example'), findsWidgets);
       expect(find.text('Grilled salmon'), findsOneWidget);

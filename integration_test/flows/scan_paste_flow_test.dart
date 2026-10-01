@@ -10,7 +10,7 @@ import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
-import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 
@@ -81,9 +81,9 @@ void main() {
         await tapAndSettle(tester, _analyse);
 
         // Assert: the classified menu is shown, one badge per dish and
-        // the engine chip only an analysis brings.
+        // the rules notice only an analysis brings.
         expect(find.byType(VerdictCounterTiles), findsOneWidget);
-        expect(find.byType(EngineChip), findsOneWidget);
+        expect(find.byType(RulesReasonBanner), findsOneWidget);
         expect(find.byType(DishCard), findsNWidgets(2));
         expect(find.byType(StatusBadge), findsWidgets);
         expect(find.text('Herb butter steak'), findsOneWidget);

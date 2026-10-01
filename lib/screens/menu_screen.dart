@@ -492,13 +492,17 @@ class _MenuScreenState extends State<MenuScreen> {
               engine: controller.engine!,
               onRetry: () => _retry(controller.reanalyse),
             ),
+            // A rules result is explained by the banner above, so the chip
+            // is shown for an AI result only (audit M14, issue #236).
             // Aligned rather than stretched: a ListView child is forced to
             // the full width, which drew this pill as a full-width bar.
-            Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: EngineChip(engine: controller.engine!),
-            ),
-            const SizedBox(height: 12),
+            if (controller.engine is LlmEngine) ...[
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: EngineChip(engine: controller.engine!),
+              ),
+              const SizedBox(height: 12),
+            ],
           ],
           CategoryChips(
             categories: controller.visibleCategories,
