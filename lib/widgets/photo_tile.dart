@@ -36,6 +36,9 @@ class PhotoTile extends StatelessWidget {
   final String? imageUrl;
 
   /// The tile's fixed height, and its width when [width] is null.
+  /// `double.infinity` fills a parent that fixes the height itself, as
+  /// the venue card's `AspectRatio` photo does in the Discovery grid
+  /// (issue #222).
   final double size;
 
   /// The tile's width, when it is not square: `double.infinity` fills the
@@ -63,7 +66,7 @@ class PhotoTile extends StatelessWidget {
               : Image.network(
                   url,
                   width: width.isFinite ? width : null,
-                  height: size,
+                  height: size.isFinite ? size : null,
                   fit: BoxFit.cover,
                   webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
                   loadingBuilder: (context, child, loadingProgress) =>

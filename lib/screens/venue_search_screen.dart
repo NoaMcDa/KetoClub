@@ -15,6 +15,7 @@ import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/venue_card.dart';
+import 'package:ketoclub/widgets/venue_grid.dart';
 import 'package:provider/provider.dart';
 
 /// The Discovery screen (issue #40; architecture.md §6.5, §6.6, D13;
@@ -183,6 +184,7 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
 
     return Scaffold(
       body: ContentWidth(
+        maxWidth: discoveryMaxWidth,
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 24),
@@ -415,15 +417,16 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
           _estimateRow(context, l10n, controller),
           const SizedBox(height: 16),
         ],
-        for (var i = 0; i < visible.length; i++) ...[
-          if (i > 0) const SizedBox(height: 19),
-          VenueCard(
+        VenueGrid(
+          itemCount: visible.length,
+          itemBuilder: (context, i, photoAspectRatio) => VenueCard(
             venue: visible[i],
             numbers: controller.cardNumbers(visible[i]),
             distanceKm: controller.distanceKmTo(visible[i]),
+            photoAspectRatio: photoAspectRatio,
             onTap: () => _openVenue(visible[i].ref, name: visible[i].name),
           ),
-        ],
+        ),
       ],
     );
   }
@@ -541,20 +544,16 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
   /// shaped like the ones about to load, rather than a bare progress
   /// ring. Wrapped in one live [Semantics] label naming what is loading,
   /// since the cards themselves exclude their own semantics — a screen
-  /// reader hears [label] once, not three times.
+  /// reader hears [label] once, not three times. Laid out in the cards'
+  /// own [VenueGrid] (issue #222), so a wide window shows a row of them.
   Widget _skeletons(String label) {
     return Semantics(
       liveRegion: true,
       label: label,
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          VenueCardSkeleton(),
-          SizedBox(height: 19),
-          VenueCardSkeleton(),
-          SizedBox(height: 19),
-          VenueCardSkeleton(),
-        ],
+      child: VenueGrid(
+        itemCount: 3,
+        itemBuilder: (context, i, photoAspectRatio) =>
+            VenueCardSkeleton(photoAspectRatio: photoAspectRatio),
       ),
     );
   }

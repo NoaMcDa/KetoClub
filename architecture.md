@@ -943,8 +943,19 @@ fetch-failure and empty states included), Scan, Saved, Settings and the drinks
 guide — so the `Scaffold` background and app bar stay full-bleed and only the
 content column is capped. At or below the cap it passes its child through
 unchanged, so nothing moves on a phone. The body is pinned to the top, not
-centred vertically. A screen may pass a wider cap (Discovery's venue grid,
-#222); none does yet.
+centred vertically. A screen may pass a wider cap: Discovery passes
+`discoveryMaxWidth` (1080) for its venue grid.
+
+**Discovery lays its venue cards out in a grid on a wide window** *(issue
+#222, Phase 8)*. `VenueGrid` (`widgets/venue_grid.dart`) shows one card per
+row below 680px of list, two from 680px (a 720px window less the 20px
+gutters) and three from 1000px, and the loading skeletons follow the same
+grid. In a single column the photo keeps the artboard's fixed 118px banner,
+so a phone looks as before; in two or three columns it is 3:2, so a card is a
+photo tile rather than a strip, and the cards in a row are stretched to one
+height. Every venue card is drawn on a `Card`, taking the theme's
+`CardThemeData` shape and `--line` edge, with its ink well laid over the
+whole card so a hover or keyboard focus on the web lights up the photo too.
 
 Visual rules: a verdict is always icon **and** colour, never colour alone
 (accessibility). Unclassified dishes are listed under their own neutral heading.

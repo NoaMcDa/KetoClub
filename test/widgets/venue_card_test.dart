@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
@@ -31,13 +32,22 @@ const VenueCardNumbers _llmNumbers = (
   engine: LlmEngine(model: 'test-model'),
 );
 
+/// Numbers from the rules engine, which carry the [EngineChip] marker.
+const VenueCardNumbers _rulesNumbers = (
+  score: 6,
+  green: 3,
+  yellow: 2,
+  engine: RulesEngine(reason: MenuAnalysisFailureReason.offline),
+);
+
 /// Pumps [card] in a themed, localised app at [locale], right-to-left
-/// when [rtl].
+/// when [rtl], [width] wide when given, else the surface's full width.
 Future<void> _pump(
   WidgetTester tester,
   VenueCard card, {
   Locale locale = const Locale('en'),
   bool rtl = false,
+  double? width,
 }) {
   return tester.pumpWidget(
     MaterialApp(
@@ -50,7 +60,12 @@ Future<void> _pump(
           textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(20),
-            child: card,
+            child: width == null
+                ? card
+                : Align(
+                    alignment: AlignmentDirectional.topStart,
+                    child: SizedBox(width: width, child: card),
+                  ),
           ),
         ),
       ),
@@ -304,6 +319,134 @@ void main() {
         expect(tester.takeException(), isNull);
       },
     );
+
+    testWidgets("without an aspect ratio the photo is the artboard's "
+        "fixed-height banner, the card's full width", (tester) async {
+      // Act: a 800-wide surface less the 20px padding each side.
+      await _pump(tester, VenueCard(venue: _venue, onTap: () {}));
+
+      // Assert
+      expect(
+        tester.getSize(find.byType(PhotoTile)),
+        Size(tester.getSize(find.byType(VenueCard)).width, 118),
+      );
+    });
+
+    testWidgets('with gridPhotoAspectRatio the photo is 3:2 at any width '
+        '(issue #222)', (tester) async {
+      for (final width in [240.0, 320.0, 400.0]) {
+        // Act
+        await _pump(
+          tester,
+          VenueCard(
+            venue: _venue,
+            photoAspectRatio: VenueCard.gridPhotoAspectRatio,
+            onTap: () {},
+          ),
+          width: width,
+        );
+
+        // Assert
+        final photo = tester.getSize(find.byType(PhotoTile));
+        expect(photo.width, width);
+        expect(photo.height, closeTo(width * 2 / 3, 0.01));
+      }
+    });
+
+    testWidgets("draws on a Card with the theme's CardThemeData shape, "
+        'the photo clipped to it (issue #222)', (tester) async {
+      // Act
+      await _pump(tester, VenueCard(venue: _venue, onTap: () {}));
+
+      // Assert
+      final card = tester.widget<Card>(
+        find.descendant(
+          of: find.byType(VenueCard),
+          matching: find.byType(Card),
+        ),
+      );
+      expect(card.margin, EdgeInsets.zero);
+      expect(card.clipBehavior, Clip.antiAlias);
+      expect(card.shape, isNull, reason: 'the theme supplies the shape');
+      final material = tester.widget<Material>(
+        find
+            .descendant(of: find.byType(Card), matching: find.byType(Material))
+            .first,
+      );
+      expect(material.shape, AppTheme.light().cardTheme.shape);
+    });
+
+    testWidgets('the ink well covers the whole card, photo included, and a '
+        'hover lights it up (issue #222)', (tester) async {
+      // Arrange
+      await _pump(tester, VenueCard(venue: _venue, onTap: () {}));
+      final inkWell = find.descendant(
+        of: find.byType(VenueCard),
+        matching: find.byType(InkWell),
+      );
+
+      // Assert: the ink well's box is the card's.
+      expect(tester.getRect(inkWell), tester.getRect(find.byType(Card)));
+
+      // Act: hover over the photo.
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      addTearDown(mouse.removePointer);
+      await mouse.addPointer(location: Offset.zero);
+      await mouse.moveTo(tester.getCenter(find.byType(PhotoTile)));
+      await tester.pumpAndSettle();
+
+      // Assert: the hover over the photo reaches the ink well, which
+      // paints its highlight across the whole card.
+      final ink = Material.of(tester.element(inkWell)) as RenderObject;
+      expect(
+        ink,
+        paints..rect(
+          rect: Offset.zero & tester.getSize(find.byType(Card)),
+          color: AppTheme.light().hoverColor,
+        ),
+      );
+    });
+
+    testWidgets('in a row of grid tiles stretched to one height it lays out '
+        'with no error, rules chip and all (issue #222)', (tester) async {
+      // Act: the grid's IntrinsicHeight row asks the card for its
+      // intrinsic height, which a LayoutBuilder could not answer.
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (final numbers in [_llmNumbers, _rulesNumbers])
+                      Expanded(
+                        child: VenueCard(
+                          venue: _venue,
+                          numbers: numbers,
+                          photoAspectRatio: VenueCard.gridPhotoAspectRatio,
+                          onTap: () {},
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Assert
+      expect(tester.takeException(), isNull);
+      final cards = find.byType(VenueCard);
+      expect(
+        tester.getSize(cards.at(0)).height,
+        tester.getSize(cards.at(1)).height,
+      );
+    });
 
     testWidgets('left-to-right keeps the score right of the name', (
       tester,

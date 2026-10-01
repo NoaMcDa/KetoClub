@@ -93,5 +93,36 @@ void main() {
       // Assert
       expect(size, const Size(300, 118));
     });
+
+    testWidgets('an infinite size fills a parent that fixes the height, '
+        "URL and all, as the grid card's AspectRatio does (issue #222)", (
+      tester,
+    ) async {
+      // Arrange
+      await _pump(
+        tester,
+        const Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: 300,
+            child: AspectRatio(
+              aspectRatio: 3 / 2,
+              child: PhotoTile(
+                imageUrl: 'https://images.wolt.com/venue.jpg',
+                size: double.infinity,
+                width: double.infinity,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Act
+      final size = tester.getSize(find.byType(PhotoTile));
+
+      // Assert
+      expect(size, const Size(300, 200));
+      expect(tester.widget<Image>(find.byType(Image)).height, isNull);
+    });
   });
 }
