@@ -165,9 +165,11 @@ scope is described on the milestones themselves.
 
 **Goal**: Act on the UI/UX review in `docs/UX_REVIEW.md` (2026-09-30): make
 the web build read as a designed desktop app on a computer, and polish every
-screen's hierarchy, copy and visual consistency. **Status**: planned; every
-remark is filed as one issue (#221–#264, label `Phase 8`) so they can be
-worked in parallel.
+screen's hierarchy, copy and visual consistency. **Status**: built on the
+`phase-8` branch and open as PR #266 to `main`; every remark was one issue
+(#221–#264, label `Phase 8`), one feature branch and one merge, in eight
+waves with the full gate green after each (architecture.md D20, §16 steps
+18–25).
 
 **Milestone (as created on GitHub):**
 1. `Phase 8: UI Polish & Desktop Web` — the only Phase 8 milestone. Two

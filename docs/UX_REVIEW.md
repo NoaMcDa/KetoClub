@@ -352,7 +352,9 @@ the source line and the keto-score badge. On a 1440px window this means:
 ## 4. Suggested order of work
 
 Every remark above is filed as its own issue under the GitHub milestone
-**Phase 8: UI Polish & Desktop Web** (#221–#264, label `Phase 8`).
+**Phase 8: UI Polish & Desktop Web** (#221–#264, label `Phase 8`), and all of
+them were built on the `phase-8` branch (PR #266) on 2026-10-01; the
+"Decide" items were settled as each issue recommended (architecture.md D20).
 
 1. Content-width constraint (#221) + sheet `maxWidth` (#224) — an
    afternoon, no logic touched, fixes most of "wide and weird".

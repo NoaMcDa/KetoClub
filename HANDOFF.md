@@ -1,4 +1,4 @@
-# KetoClub — handoff after Phase 1, the Phase 3 backend, Phase 2, and Phase 4's scan core
+# KetoClub — handoff after Phase 1, the Phase 3 backend, Phase 2, Phase 4's scan core, and Phase 8
 
 Written at the end of the session that built Phase 1, updated at the close of
 issue #36 after a second wave of parallel work substantially extended it,
@@ -6,7 +6,9 @@ updated again at the close of issue #97 after the Phase 3 backend foundations
 and hosted-classification milestones landed (D11, D12), and updated once more
 now that Phase 2's run (10bis, location and nearby search, the Discovery
 screen, platform setup, and a run of features beyond those) has landed on top
-of both, and again for Phase 4's menu-scanning core (paste, photographs, PDF).
+of both, again for Phase 4's menu-scanning core (paste, photographs, PDF),
+and once more for Phase 8 (the UI/UX review's 44 issues, #221–#264, built in
+parallel on the `phase-8` branch and opened as PR #266).
 It says what exists, what is deliberately unfinished, and which
 mistakes are already paid for so nobody pays for them twice.
 
@@ -18,6 +20,27 @@ request.
 ---
 
 ## What shipped
+
+**Phase 8 — UI Polish & Desktop Web (PR #266, issues #221–#264).** Every
+remark in `docs/UX_REVIEW.md` became one issue and one feature branch
+(`p8/<n>-<slug>`), merged into `phase-8` in eight waves with `tool/check.sh`
+green after each. The two threads: the web build on a computer (a
+`ContentWidth` cap on every screen, a 1/2/3-column venue grid, a
+`NavigationRail` at 840px+, 560px modal sheets, a two-pane menu at 1080px+, a
+web splash, cream manifest colours, path URLs, per-route tab titles, focus
+rings and desktop autofocus) and per-screen polish (see CLAUDE.md's status
+banner for the list). Things to know that the issues did not predict:
+`ContentWidth` is top-aligned, not centred, because a Scaffold body gets loose
+height; the venue photo stays a 118px banner in one column and is 3:2 only in
+the grid; browser Back is handled by a `PopScope` in `AppShell` (a plain
+`pushReplacementNamed` could not work, since `MaterialApp` without a `Router`
+uses single-entry browser history); the Recent tab's Keep pin lives in a
+second Hive box (`menu_cache_pins`), so no schema migration; `package_info_plus`
+backs the About group behind an `AppInfo` seam. **Unverified**: nothing in
+Phase 8 has been seen in a real browser or on a phone; the wide layouts are
+evidenced by widget tests at 1200/1440px and by CI's 1600px headless-Chrome
+flow run only.
+
 
 **Phase 1 — build-order steps 1 to 5 of architecture.md §16**, originally merged
 in #90/#91, then substantially extended by a second wave of parallel work closed

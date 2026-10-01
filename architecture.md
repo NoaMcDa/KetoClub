@@ -2067,6 +2067,28 @@ wrong "dishes", or none). **What it does not do:** no headless browser, no
 sitemap crawl, no second hop, no Wix structured route, and no real site has
 been fetched yet — the fixtures under `test/fixtures/website/` are synthetic.
 
+### D20 — Phase 8: one content width, a responsive Discovery grid, a rail, and the rest of `docs/UX_REVIEW.md`
+
+*(Issues #221–#264, PR #266; `docs/UX_REVIEW.md` is the record of the review
+and `MILESTONE_CONVENTIONS.md` the milestone.)* The artboards are 390px phone
+frames and nothing constrained width, so the web build on a computer stretched
+every card and photo across the window. **Decision:** every screen body sits in
+`ContentWidth` (top-aligned, 680px; Discovery 1080px for its grid; the menu
+route wider for two panes), the venue list is a `VenueGrid` (1/2/3 columns by
+width, 3:2 photos only in the grid, a card surface), `AppShell` shows a
+`NavigationRail` at 840px and wider and handles Back with a `PopScope` (Back
+from a lone non-Explore tab goes to Explore), sheets open through
+`showKetoClubSheet` capped at 560px, and the web shell gets a splash, `--bg`
+manifest colours, path URLs and per-route titles. The per-screen decisions the
+review left open were taken as the issues recorded: the standing open button
+is gone (D8), prices are whole shekels (M12), the menu screen shows the rules
+banner and not the chip (M14), Language and Appearance are segmented (S6),
+Noto Sans Hebrew is bundled (G7), the yellow verdict has one name, the keto
+score is toned by band, and "Saved" is "Recent" with an expiry countdown and a
+Keep pin kept in a second Hive box. **What it costs:** more layout code paths
+(phone, rail, two-pane) that only widget tests at 390/1200/1440px and CI's
+1600px Chrome run exercise; no real browser or phone has shown any of it.
+
 ---
 
 ## 15. Testing strategy
@@ -2227,6 +2249,38 @@ D18 and D19 (§14) are the record of the decisions.
 The person-run vision smoke test (#88, `backend/tools/vision_smoke.py`) is a
 verification step for 11 to 14, not a build step: no real image request has been
 sent yet (§17.1).
+
+**Phase 8 steps (UI polish and the desktop web layout).** Steps 18 to 25 are
+done on the `phase-8` branch (PR #266); each issue in the GitHub milestone
+"Phase 8: UI Polish & Desktop Web" is one feature branch; D20 (§14) is the
+record of the decisions and `docs/UX_REVIEW.md` the review they came from.
+
+18. ✅ **Width and shell** (#221, #224, #226, #248, #261, #263, #242) —
+    `ContentWidth`, `showKetoClubSheet`, the web splash/manifest/path URLs/tab
+    titles, `FilledButton` only with themed fields (architecture test), the
+    bundled Hebrew face, the legend's engine line, whole-shekel prices.
+19. ✅ **Discovery** (#222, #227, #228, #229, #230, #231, #232, #233) —
+    `VenueGrid`, the "Closed" tag, the pre-location invitation, the link icon
+    instead of a standing button, distance, multi-select chips, the logo mark,
+    an app-lifetime `VenueSearchController`.
+20. ✅ **Menu** (#234, #235, #236, #237, #238, #239, #240, #241, #243, #244,
+    #245) — `MenuFiltersRow`, no budget notice for rules, banner not chip,
+    venue name in the bar once scrolled, overflow actions, one waiter action,
+    note row only with a note, score bands, one name per verdict, unclassified
+    cards with retry, a flexible source line.
+21. ✅ **Waiter Card, Scan, Recent** (#246, #247, #249, #250, #251, #252, #253,
+    #254) — Done bar and inline "Copied", three Scan modes, no camera button on
+    web, reorder and preview pages, "Recent" with score, counts, expiry and
+    Keep, red remove icon.
+22. ✅ **Settings and Drinks** (#255, #256, #257, #258, #259) — reorder with a
+    collapsed AI & privacy group, segmented Language/Appearance, the drinks
+    guide on Explore, an About group over `AppInfo`, verdict-toned drink
+    sections and a shared `NetCarbsChip`.
+23. ✅ **Cross-cutting** (#260, #262, #264) — `AppNotice`, Back to Explore via
+    `PopScope`, `FocusRing` and desktop autofocus.
+24. ✅ **Navigation rail** (#223) — `NavigationRail` at 840px and wider.
+25. ✅ **Two-pane menu** (#225) — header, tiles, Filters row and chips beside
+    the scrolling dish list at 1080px and wider.
 
 Extension points already designed in:
 
