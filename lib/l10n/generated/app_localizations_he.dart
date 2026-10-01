@@ -766,6 +766,20 @@ class AppLocalizationsHe extends AppLocalizations {
   String get noteEditorClear => 'מחק הערה';
 
   @override
+  String get menuFilters => 'סינון';
+
+  @override
+  String menuFiltersActive(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'סינון · $count פעילים',
+      one: 'סינון · 1 פעיל',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get menuSearchHint => 'חפשו מנות';
 
   @override

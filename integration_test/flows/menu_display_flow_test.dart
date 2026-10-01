@@ -1,6 +1,7 @@
 // Flow test (FLOW_TEST_CONVENTIONS.md, architecture.md §15, §18.4): the
 // journey of pasting a Wolt link and seeing the resulting menu classified
-// into keto verdicts, filtered, and turned into a waiter script.
+// into keto verdicts, filtered, and turned into a waiter script; and
+// searching it from behind the Filters row (issue #234).
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,6 +17,7 @@ import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 
 import 'flow_support.dart';
@@ -244,5 +246,60 @@ void main() {
       final arguments = setData.arguments as Map<Object?, Object?>;
       expect(arguments['text'], _yellowScript);
     });
+
+    testWidgets(
+      'user opens the Filters row, searches the menu, and the search keeps '
+      'narrowing it alongside a verdict tile once the row is closed',
+      (tester) async {
+        // Setup: the same scripted menu as the journey above.
+        final fixture = _buildFixture();
+        final fakes = FakeAppDependencies();
+        fakes.repository.stub(_ref, MenuFetched(menu: fixture.menu));
+        fakes.classifier.respondWith(fixture.analysis);
+        await pumpApp(tester, fakes);
+        await enterText(tester, _woltUrl);
+        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+
+        // Assert: the search field sits behind the collapsed Filters row,
+        // and the first dish is already on screen above the fold.
+        expect(find.text(_en.menuFilters), findsOneWidget);
+        expect(find.byType(MenuSearchField), findsNothing);
+        expect(find.text(fixture.green.name), findsOneWidget);
+
+        // Act: open the row and search for the steak.
+        await tapAndSettle(tester, find.text(_en.menuFilters));
+        final searchField = find.descendant(
+          of: find.byType(MenuSearchField),
+          matching: find.byType(TextField),
+        );
+        await tester.enterText(searchField, 'steak');
+        await tester.pumpAndSettle();
+
+        // Assert: only the matching dish is left.
+        expect(find.byType(DishCard), findsOneWidget);
+        expect(find.text(fixture.green.name), findsOneWidget);
+        expect(find.text(fixture.yellow.name), findsNothing);
+
+        // Act: close the row, then narrow to the modifiable tile.
+        await tapAndSettle(tester, find.text(_en.menuFiltersActive(1)));
+        await tester.scrollUntilVisible(
+          find.text(_en.tileYellowLabel.toUpperCase()),
+          -200,
+          scrollable: _menuList,
+        );
+        await tester.pumpAndSettle();
+        await tapAndSettle(
+          tester,
+          find.text(_en.tileYellowLabel.toUpperCase()),
+        );
+
+        // Assert: the hidden search still applies with the tile — no
+        // modifiable dish matches "steak" — and the row says a filter is
+        // active, so the empty list is explained.
+        expect(find.byType(DishCard), findsNothing);
+        expect(find.text(_en.menuNoResults), findsOneWidget);
+        expect(find.text(_en.menuFiltersActive(1)), findsOneWidget);
+      },
+    );
   });
 }

@@ -60,6 +60,7 @@ things:
 | `KetoScoreBadge` | "Keto score: {score} out of 10" | `keto_score_badge_test.dart` |
 | `_NetCarbsChip` (DishCard) | "Estimated net carbs, not confirmed: {grams} grams" | `dish_card_test.dart` |
 | `_ScriptDisclosure` / note row (DishCard) | The disclosure label with Flutter's own `expanded` flag; the note text or "Add a note" | `dish_card_test.dart` |
+| `MenuFiltersRow` (menu screen) | "Filters" or "Filters · {count} active", with Flutter's own `expanded` flag and its own tap action, since `excludeSemantics` would otherwise drop the InkWell's (issue #234) | `menu_filters_row_test.dart` |
 | `VenueCard` | Name, open/closed state, and the score and counts as one label (issue #40) | `venue_card_test.dart` |
 | `WaiterScriptWidget` (the waiter card's script) | The whole script's lines as one block — added in this pass, so a screen reader no longer reads each numbered circle and line as its own node | `waiter_script_widget_test.dart`: "announces the whole script as one block, not one node per numbered line" |
 

@@ -324,6 +324,11 @@
   "noteEditorSave": "Save",
   "noteEditorClear": "Clear note",
 
+  "menuFilters": "Filters",
+  "menuFiltersActive": "{count, plural, one{Filters · 1 active} other{Filters · {count} active}}",
+  "@menuFiltersActive": {
+    "placeholders": { "count": { "type": "num" } }
+  },
   "menuSearchHint": "Search dishes",
   "menuSearchSemanticLabel": "Search dishes by name or description",
   "menuSearchClear": "Clear search",

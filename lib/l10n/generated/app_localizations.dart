@@ -1280,6 +1280,18 @@ abstract class AppLocalizations {
   /// **'Clear note'**
   String get noteEditorClear;
 
+  /// No description provided for @menuFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get menuFilters;
+
+  /// No description provided for @menuFiltersActive.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Filters · 1 active} other{Filters · {count} active}}'**
+  String menuFiltersActive(num count);
+
   /// No description provided for @menuSearchHint.
   ///
   /// In en, this message translates to:

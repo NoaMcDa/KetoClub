@@ -761,6 +761,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noteEditorClear => 'Clear note';
 
   @override
+  String get menuFilters => 'Filters';
+
+  @override
+  String menuFiltersActive(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Filters · $count active',
+      one: 'Filters · 1 active',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get menuSearchHint => 'Search dishes';
 
   @override
