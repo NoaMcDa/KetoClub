@@ -46,8 +46,8 @@ import 'package:provider/provider.dart';
 /// (`phase2_discovery_research.md` §6) — deferred, not dropped.
 ///
 /// **Card numbers follow D13**: a score and counts only for venues whose
-/// analysis is already cached on the device, the *Keto 8+* chip only once
-/// some card has them, and no menu fetched on load or on scroll. Above
+/// analysis is already cached on the device, the *Keto 8+* chip enabled only
+/// once some card has them, and no menu fetched on load or on scroll. Above
 /// the cards, while any visible card lacks numbers, an "Estimate this
 /// list" button (issue #42) fetches those menus once, on the user's tap
 /// only, and scores them with the on-device rules; the numbers it adds
@@ -347,35 +347,57 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     return l10n.discoveryAroundYou;
   }
 
-  /// The chip row: *Nearby*, *Keto 8+* (only once a card has numbers,
-  /// D13), *Open now* and the one most common cuisine, when there is one.
-  /// A horizontally scrollable [Row], as `CategoryChips` is.
+  /// The chip row: *Keto 8+* (always there, disabled with a tooltip until a
+  /// card has numbers, D13), *Open now* and the one most common cuisine,
+  /// when there is one. The chips combine (issue #231); "Nearby" is the
+  /// default order, so it is not one. A horizontally scrollable [Row], as
+  /// `CategoryChips` is.
   Widget _chips(AppLocalizations l10n, VenueSearchController controller) {
     final cuisine = controller.topCuisine;
-    final chips = <(DiscoveryChip, String)>[
-      (DiscoveryChip.nearby, l10n.discoveryChipNearby),
-      if (controller.hasAnyNumbers)
-        (DiscoveryChip.ketoEightPlus, l10n.discoveryChipKetoEightPlus),
-      (DiscoveryChip.openNow, l10n.discoveryChipOpenNow),
+    final active = controller.activeChips;
+    final chips = <(DiscoveryChip, String, bool)>[
+      (
+        DiscoveryChip.ketoEightPlus,
+        l10n.discoveryChipKetoEightPlus,
+        controller.hasAnyNumbers,
+      ),
+      (DiscoveryChip.openNow, l10n.discoveryChipOpenNow, true),
       if (cuisine != null)
-        (DiscoveryChip.cuisine, VenueCard.cuisineLabel(cuisine)),
+        (DiscoveryChip.cuisine, VenueCard.cuisineLabel(cuisine), true),
     ];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          for (final (chip, label) in chips)
+          for (final (chip, label, enabled) in chips)
             Padding(
               padding: const EdgeInsetsDirectional.only(end: 8),
-              child: ChoiceChip(
-                label: Text(label),
-                selected: controller.activeChip == chip,
-                onSelected: (_) => controller.selectChip(chip),
+              child: _chipWithHint(
+                l10n,
+                enabled: enabled,
+                chip: FilterChip(
+                  label: Text(label),
+                  selected: enabled && active.contains(chip),
+                  onSelected: enabled
+                      ? (_) => controller.toggleChip(chip)
+                      : null,
+                ),
               ),
             ),
         ],
       ),
     );
+  }
+
+  /// [chip] as it is when [enabled]; otherwise wrapped in the tooltip that
+  /// says why *Keto 8+* cannot be used yet (the only chip ever disabled).
+  Widget _chipWithHint(
+    AppLocalizations l10n, {
+    required bool enabled,
+    required Widget chip,
+  }) {
+    if (enabled) return chip;
+    return Tooltip(message: l10n.discoveryChipKetoEightPlusHint, child: chip);
   }
 
   /// Everything below the chips, by precedence: work in flight, a failed

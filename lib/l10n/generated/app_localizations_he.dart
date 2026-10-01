@@ -502,10 +502,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get discoveryUseLocation => 'השתמש במיקום שלי';
 
   @override
-  String get discoveryChipNearby => 'בסביבה';
+  String get discoveryChipKetoEightPlus => 'קטו 8+';
 
   @override
-  String get discoveryChipKetoEightPlus => 'קטו 8+';
+  String get discoveryChipKetoEightPlusHint =>
+      'צריך ציונים קודם: אפשר להעריך את הרשימה או לפתוח מסעדה.';
 
   @override
   String get discoveryChipOpenNow => 'פתוח עכשיו';

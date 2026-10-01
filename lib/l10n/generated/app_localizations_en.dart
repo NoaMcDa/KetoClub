@@ -499,10 +499,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoveryUseLocation => 'Use my location';
 
   @override
-  String get discoveryChipNearby => 'Nearby';
+  String get discoveryChipKetoEightPlus => 'Keto 8+';
 
   @override
-  String get discoveryChipKetoEightPlus => 'Keto 8+';
+  String get discoveryChipKetoEightPlusHint =>
+      'Needs scores first: estimate this list, or open a restaurant.';
 
   @override
   String get discoveryChipOpenNow => 'Open now';
