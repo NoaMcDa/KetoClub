@@ -142,6 +142,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get waiterCardTitle => 'Say this to the waiter';
 
   @override
+  String get settingsAiPrivacy => 'AI & privacy';
+
+  @override
   String get settingsConsentTitle => 'What leaves this device';
 
   @override
@@ -256,6 +259,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsFilter => 'Default filter';
+
+  @override
+  String get settingsCacheSection => 'Recent menus';
 
   @override
   String settingsCacheSummary(num count) {

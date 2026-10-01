@@ -43,6 +43,11 @@ const Key dairyFreeSwitchKey = Key('settingsDairyFreeSwitch');
 /// The "Carnivore only" switch (issue #56).
 const Key carnivoreOnlySwitchKey = Key('settingsCarnivoreOnlySwitch');
 
+/// The "What leaves this device" disclosure in the AI & privacy section
+/// (issue #255), collapsed by default; a test taps it to read the consent
+/// body text, which is not built while the disclosure is closed.
+const Key consentDisclosureKey = Key('settingsConsentDisclosure');
+
 /// The Gemini API key field (architecture.md D17), shown on iOS and
 /// Android only.
 const Key apiKeyFieldKey = Key('settingsApiKeyField');
@@ -53,10 +58,12 @@ const Key apiKeySaveKey = Key('settingsApiKeySave');
 /// The "Remove key" button, shown only while a key is saved.
 const Key apiKeyDeleteKey = Key('settingsApiKeyDelete');
 
-/// The Settings screen: the AI-analysis consent disclosure, the user's
-/// Gemini API key on iOS and Android, the UI language, the appearance, the
-/// net-carb limit, the "Your keto rules" dietary toggles, the default menu
-/// filter, and cache clearing (architecture.md §6.6, §11, §12, §13, D17).
+/// The Settings screen, top to bottom (issue #255): the UI language, the
+/// appearance, the "Your keto rules" dietary toggles, the net-carb limit,
+/// the default menu filter, "AI & privacy" (the AI-analysis consent
+/// checkbox under its collapsed disclosure, and the user's Gemini API key
+/// on iOS and Android), the recent-menus cache and its clearing, and the
+/// drinks guide link (architecture.md §6.6, §11, §12, §13, D17).
 ///
 /// Reads its [SettingsController] from `provider` and calls
 /// [SettingsController.load] once, after the first frame, the same way
@@ -126,22 +133,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
           padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
+            // The order of issue #255 (`docs/UX_REVIEW.md` §2.6): the
+            // settings most people open this screen for come first, the
+            // privacy text — once the first thing on the page — sits in
+            // its own "AI & privacy" section further down, collapsed.
             children: [
-              _consentSection(context, l10n, controller),
-              const SizedBox(height: 20),
-              if (controller.supportsApiKey) ...[
-                _apiKeySection(context, l10n, controller),
-                const SizedBox(height: 20),
-              ],
               _languageSection(context, l10n, controller),
               const SizedBox(height: 20),
               _appearanceSection(context, l10n, controller),
               const SizedBox(height: 20),
-              _netCarbLimitSection(context, l10n, controller),
-              const SizedBox(height: 20),
               _ketoRulesSection(context, l10n, controller),
               const SizedBox(height: 20),
+              _netCarbLimitSection(context, l10n, controller),
+              const SizedBox(height: 20),
               _filterSection(context, l10n, controller),
+              const SizedBox(height: 20),
+              _consentSection(context, l10n, controller),
+              if (controller.supportsApiKey) ...[
+                const SizedBox(height: 12),
+                _apiKeySection(context, l10n, controller),
+              ],
               const SizedBox(height: 20),
               _cacheSection(context, l10n, controller),
               const SizedBox(height: 20),
@@ -153,15 +164,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  /// The consent disclosure (architecture.md §11, D16 issue #167): the
-  /// same body text the consent-disclosure banner (`ConsentDisclosureBanner`)
-  /// shows once on Explore, with a checkbox that starts ticked on a
-  /// fresh install — AI analysis is on by default (D16). Unticking it
-  /// here sets consent to false and stops any dish text from leaving
-  /// the device. Where dish text goes depends on the build: straight to
-  /// Google with the user's key on iOS and Android (D17), through
-  /// KetoClub's server on web (D12) — so the disclosure follows
-  /// [SettingsController.supportsApiKey].
+  /// The "AI & privacy" section's consent group (architecture.md §11, D16
+  /// issue #167, issue #255): a "What leaves this device" disclosure,
+  /// collapsed by default, over the same body text the consent-disclosure
+  /// banner (`ConsentDisclosureBanner`) shows once on Explore, and below
+  /// it the "Allow AI analysis" checkbox, which is always visible —
+  /// collapsing the explanation never hides the choice. The checkbox
+  /// starts ticked on a fresh install — AI analysis is on by default
+  /// (D16). Unticking it here sets consent to false and stops any dish
+  /// text from leaving the device. Where dish text goes depends on the
+  /// build: straight to Google with the user's key on iOS and Android
+  /// (D17), through KetoClub's server on web (D12) — so the disclosure
+  /// follows [SettingsController.supportsApiKey].
   Widget _consentSection(
     BuildContext context,
     AppLocalizations l10n,
@@ -171,13 +185,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionLabel(l10n.settingsConsentTitle),
+        _SectionLabel(l10n.settingsAiPrivacy),
         _SettingsGroup(
           children: [
-            _GroupNote(
-              controller.supportsApiKey
-                  ? l10n.settingsConsentBodyDirect
-                  : l10n.settingsConsentBody,
+            // Inside a grouped card the expansion tile's default top and
+            // bottom divider lines would double the card's own edge.
+            ExpansionTile(
+              key: consentDisclosureKey,
+              shape: const Border(),
+              collapsedShape: const Border(),
+              title: Text(
+                l10n.settingsConsentTitle,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              children: [
+                _GroupNote(
+                  controller.supportsApiKey
+                      ? l10n.settingsConsentBodyDirect
+                      : l10n.settingsConsentBody,
+                ),
+              ],
             ),
             CheckboxListTile(
               controlAffinity: ListTileControlAffinity.leading,
@@ -195,8 +222,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   /// The Gemini API key field, its save and remove actions and the
-  /// saved/not-saved status line (architecture.md D17, §11). Built only
-  /// when [SettingsController.supportsApiKey] is true.
+  /// saved/not-saved status line (architecture.md D17, §11): the second
+  /// half of the "AI & privacy" section, under [_consentSection] (issue
+  /// #255). Built only when [SettingsController.supportsApiKey] is true.
   ///
   /// The field is [TextField.obscureText] and never prefilled — see
   /// [_apiKeyField].
@@ -606,6 +634,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Named after the tab it manages ("Recent", issue #251), so the
+        // cache group is no longer the one group without a label (#255).
+        _SectionLabel(l10n.settingsCacheSection),
         _SettingsGroup(
           children: [
             Padding(
