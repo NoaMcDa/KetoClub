@@ -44,6 +44,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// The name of the Hive box holding cached menus and their analyses.
 const String _menuCacheBoxName = 'menu_cache';
 
+/// The name of the Hive box holding the cache keys of pinned menus, apart
+/// from [_menuCacheBoxName] so the entries' stored shape never changes.
+const String _menuCachePinsBoxName = 'menu_cache_pins';
+
 /// KetoClub's own backend, read at build time (`backend_plan.md` §4.1).
 /// Empty when the app was built with no `--dart-define=KETOCLUB_BACKEND_URL=…`,
 /// which is every build until issue #99 adds a Settings override. Only the
@@ -278,6 +282,10 @@ AppDependencies buildDependencies() {
         openBox: () async {
           await Hive.initFlutter();
           return await Hive.openBox<String>(_menuCacheBoxName);
+        },
+        openPinBox: () async {
+          await Hive.initFlutter();
+          return await Hive.openBox<String>(_menuCachePinsBoxName);
         },
       ),
       clock: clock,

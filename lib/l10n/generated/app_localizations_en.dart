@@ -485,6 +485,61 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String savedExpiresMinutes(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Expires in $count minutes',
+      one: 'Expires in 1 minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String savedExpiresHours(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Expires in $count hours',
+      one: 'Expires in 1 hour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String savedExpiresDays(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Expires in $count days',
+      one: 'Expires in 1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get savedExpired => 'Expired, refreshes when opened';
+
+  @override
+  String get savedKept => 'Kept, no expiry';
+
+  @override
+  String get savedKeep => 'Keep';
+
+  @override
+  String savedKeepSemanticLabel(String venue) {
+    return 'Keep $venue past its expiry';
+  }
+
+  @override
+  String get savedUnkeep => 'Stop keeping';
+
+  @override
+  String savedUnkeepSemanticLabel(String venue) {
+    return 'Stop keeping $venue';
+  }
+
+  @override
   String get savedUndo => 'Undo';
 
   @override

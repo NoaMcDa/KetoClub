@@ -232,5 +232,46 @@ void main() {
         expect(await repository.cached(_woltRef), isNotNull);
       },
     );
+
+    test('setPinned flips the row at once and tells the repository', () async {
+      // Arrange
+      repository.seedCache(
+        CachedMenu(menu: _menuWith(_woltRef, DateTime.utc(2026))),
+      );
+      await controller.load();
+      expect(controller.entries.single.pinned, isFalse);
+
+      // Act
+      await controller.setPinned(_woltRef, pinned: true);
+
+      // Assert
+      expect(controller.entries.single.pinned, isTrue);
+      expect(repository.pinCalls.single, (ref: _woltRef, pinned: true));
+      await controller.load();
+      expect(controller.entries.single.pinned, isTrue);
+    });
+
+    test('setPinned false unpins', () async {
+      // Arrange
+      repository.seedCache(
+        CachedMenu(menu: _menuWith(_woltRef, DateTime.utc(2026))),
+      );
+      await controller.load();
+      await controller.setPinned(_woltRef, pinned: true);
+
+      // Act
+      await controller.setPinned(_woltRef, pinned: false);
+
+      // Assert
+      expect(controller.entries.single.pinned, isFalse);
+    });
+
+    test('setPinned on an unlisted ref changes nothing', () async {
+      // Act
+      await controller.setPinned(_tenbisRef, pinned: true);
+
+      // Assert
+      expect(repository.pinCalls, isEmpty);
+    });
   });
 }

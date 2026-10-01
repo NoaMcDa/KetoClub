@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
+import 'package:ketoclub/l10n/generated/app_localizations_he.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
@@ -498,6 +499,144 @@ void main() {
 
       // Assert
       expect(find.text(_en.savedPlaceholderBody), findsOneWidget);
+    });
+
+    testWidgets('shows how long a fresh entry has left to live', (
+      tester,
+    ) async {
+      // Arrange: fetched 19 hours ago, so 5 of the 24 remain.
+      final repository = FakeMenuRepository()
+        ..seedCache(
+          CachedMenu(
+            menu: _menuWith(
+              _woltRef,
+              DateTime.now().subtract(const Duration(hours: 19)),
+              venueName: 'Vitrina',
+            ),
+          ),
+        );
+      final controller = SavedController(repository);
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.savedExpiresHours(5)), findsOneWidget);
+    });
+
+    testWidgets('an entry past its window reads as expired', (tester) async {
+      // Arrange
+      final repository = FakeMenuRepository()
+        ..seedCache(
+          CachedMenu(
+            menu: _menuWith(
+              _woltRef,
+              DateTime.now().subtract(const Duration(days: 3)),
+              venueName: 'Vitrina',
+            ),
+          ),
+        );
+      final controller = SavedController(repository);
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.savedExpired), findsOneWidget);
+    });
+
+    testWidgets('the pin toggle keeps an entry and replaces its countdown, '
+        'and a second tap lets it expire again', (tester) async {
+      // Arrange
+      final repository = FakeMenuRepository()
+        ..seedCache(
+          CachedMenu(
+            menu: _menuWith(
+              _woltRef,
+              DateTime.now().subtract(const Duration(hours: 19)),
+              venueName: 'Vitrina',
+            ),
+          ),
+        );
+      final controller = SavedController(repository);
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Act: keep it.
+      await tester.tap(find.byTooltip(_en.savedKeep));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.savedKept), findsOneWidget);
+      expect(find.text(_en.savedExpiresHours(5)), findsNothing);
+      expect(repository.pinCalls.single, (ref: _woltRef, pinned: true));
+
+      // Act: stop keeping it.
+      await tester.tap(find.byTooltip(_en.savedUnkeep));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.savedKept), findsNothing);
+      expect(find.text(_en.savedExpiresHours(5)), findsOneWidget);
+    });
+  });
+
+  group('cacheExpiryLabel', () {
+    final now = DateTime.utc(2026, 6, 1, 12);
+
+    String label(Duration remaining, {Duration ttl = const Duration(days: 3)}) {
+      // fetchedAt is chosen so that exactly [remaining] is left of [ttl].
+      return cacheExpiryLabel(
+        now.add(remaining).subtract(ttl),
+        now,
+        _en,
+        ttl: ttl,
+      );
+    }
+
+    test('reads minutes under an hour, rounding a partial minute up', () {
+      expect(label(const Duration(minutes: 40)), _en.savedExpiresMinutes(40));
+      expect(
+        label(const Duration(minutes: 39, seconds: 1)),
+        _en.savedExpiresMinutes(40),
+      );
+      expect(label(const Duration(seconds: 10)), _en.savedExpiresMinutes(1));
+    });
+
+    test('reads hours from an hour up to a day', () {
+      expect(label(const Duration(hours: 1)), _en.savedExpiresHours(1));
+      expect(label(const Duration(hours: 5)), _en.savedExpiresHours(5));
+      expect(
+        label(const Duration(hours: 23, minutes: 30)),
+        _en.savedExpiresHours(23),
+      );
+    });
+
+    test('reads days from a day up', () {
+      expect(label(const Duration(days: 1)), _en.savedExpiresDays(1));
+      expect(label(const Duration(days: 2)), _en.savedExpiresDays(2));
+    });
+
+    test('defaults to the 24-hour cache window', () {
+      expect(
+        cacheExpiryLabel(now.subtract(const Duration(hours: 19)), now, _en),
+        _en.savedExpiresHours(5),
+      );
+    });
+
+    test('reads expired at and past the end of the window', () {
+      expect(label(Duration.zero), _en.savedExpired);
+      expect(label(const Duration(minutes: -5)), _en.savedExpired);
+    });
+
+    test('reads in Hebrew too', () {
+      final he = AppLocalizationsHe();
+      expect(
+        cacheExpiryLabel(now.subtract(const Duration(hours: 19)), now, he),
+        he.savedExpiresHours(5),
+      );
     });
   });
 }

@@ -23,11 +23,17 @@ Menu _menuFor(VenueRef ref, {DateTime? fetchedAt}) => Menu(
   categories: const <MenuCategory>[],
 );
 
+/// The Hive box name pins are kept in.
+const _pinBoxName = 'menu_cache_pins';
+
 /// Opens (or reuses) the shared test box.
 Future<Box<String>> _openTestBox() => Hive.openBox<String>(_boxName);
 
 /// A fresh [HiveMenuCache] over the shared test box.
-HiveMenuCache _buildCache() => HiveMenuCache(openBox: _openTestBox);
+HiveMenuCache _buildCache() => HiveMenuCache(
+  openBox: _openTestBox,
+  openPinBox: () => Hive.openBox<String>(_pinBoxName),
+);
 
 void main() {
   const woltRef = VenueRef(source: MenuSource.wolt, platformId: 'x');
@@ -391,6 +397,63 @@ void main() {
 
       // Act & Assert
       await expectLater(cache.remove(woltRef), completes);
+    });
+
+    test('pin lives in its own box, leaving the entry box untouched', () async {
+      final cache = _buildCache();
+      await cache.write(CachedMenu(menu: _menuFor(woltRef)));
+      final before = (await _openTestBox()).get(woltRef.cacheKey);
+
+      await cache.pin(woltRef);
+
+      expect((await _openTestBox()).get(woltRef.cacheKey), before);
+      expect((await _openTestBox()).length, 1);
+      expect((await Hive.openBox<String>(_pinBoxName)).keys, [
+        woltRef.cacheKey,
+      ]);
+    });
+
+    test('a pin is read back by a fresh cache over the same boxes', () async {
+      await _buildCache().write(CachedMenu(menu: _menuFor(woltRef)));
+      await _buildCache().pin(woltRef);
+
+      expect(await _buildCache().isPinned(woltRef), isTrue);
+    });
+
+    test('pins are held in memory when no pin box is given', () async {
+      final cache = HiveMenuCache(openBox: _openTestBox);
+      await cache.write(CachedMenu(menu: _menuFor(woltRef)));
+
+      await cache.pin(woltRef);
+      expect(await cache.isPinned(woltRef), isTrue);
+      await cache.clear();
+
+      expect(await cache.isPinned(woltRef), isFalse);
+    });
+
+    test('a pin box that fails to open reads as nothing pinned', () async {
+      final cache = HiveMenuCache(
+        openBox: _openTestBox,
+        openPinBox: () => Future<Box<String>>.error(HiveError('boom')),
+      );
+      await cache.write(CachedMenu(menu: _menuFor(woltRef)));
+
+      await cache.pin(woltRef);
+
+      expect(await cache.isPinned(woltRef), isFalse);
+      expect(await cache.entries(), hasLength(1));
+      await expectLater(cache.clear(), completes);
+    });
+
+    test('pin on a box that never opens is a no-op', () async {
+      final cache = HiveMenuCache(
+        openBox: () => Future<Box<String>>.error(HiveError('boom')),
+        openPinBox: () => Hive.openBox<String>(_pinBoxName),
+      );
+
+      await cache.pin(woltRef);
+
+      expect(await cache.isPinned(woltRef), isFalse);
     });
   });
 }

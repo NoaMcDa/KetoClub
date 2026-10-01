@@ -208,6 +208,30 @@
   "@savedRemovedMessage": {
     "placeholders": { "venue": { "type": "String" } }
   },
+  "savedExpiresMinutes": "{count, plural, one{יפוג בעוד דקה} two{יפוג בעוד דקתיים} other{יפוג בעוד {count} דקות}}",
+  "@savedExpiresMinutes": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "savedExpiresHours": "{count, plural, one{יפוג בעוד שעה} two{יפוג בעוד שעתיים} other{יפוג בעוד {count} שעות}}",
+  "@savedExpiresHours": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "savedExpiresDays": "{count, plural, one{יפוג בעוד יום} two{יפוג בעוד יומיים} other{יפוג בעוד {count} ימים}}",
+  "@savedExpiresDays": {
+    "placeholders": { "count": { "type": "num" } }
+  },
+  "savedExpired": "פג תוקף, יתרענן בפתיחה",
+  "savedKept": "נשמר, ללא תפוגה",
+  "savedKeep": "שמור",
+  "savedKeepSemanticLabel": "שמור את {venue} מעבר לתפוגה",
+  "@savedKeepSemanticLabel": {
+    "placeholders": { "venue": { "type": "String" } }
+  },
+  "savedUnkeep": "הפסק לשמור",
+  "savedUnkeepSemanticLabel": "הפסק לשמור את {venue}",
+  "@savedUnkeepSemanticLabel": {
+    "placeholders": { "venue": { "type": "String" } }
+  },
   "savedUndo": "בטל",
 
   "discoveryTitle": "איפה לאכול",

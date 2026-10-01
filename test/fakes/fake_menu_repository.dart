@@ -49,6 +49,12 @@ final class FakeMenuRepository implements MenuRepository {
   /// Every menu passed to [store], in order.
   final List<Menu> storedMenus = <Menu>[];
 
+  /// Every `(ref, pinned)` pair [pin] was called with, in order.
+  final List<({VenueRef ref, bool pinned})> pinCalls =
+      <({VenueRef ref, bool pinned})>[];
+
+  final Set<String> _pins = <String>{};
+
   /// Every [VenueRef] passed to [remove], in order.
   final List<VenueRef> removedRefs = <VenueRef>[];
 
@@ -125,6 +131,17 @@ final class FakeMenuRepository implements MenuRepository {
   Future<void> clearCache() async {
     clearCacheCallCount++;
     _cached.clear();
+    _pins.clear();
+  }
+
+  @override
+  Future<void> pin(VenueRef ref, {bool pinned = true}) async {
+    pinCalls.add((ref: ref, pinned: pinned));
+    if (!pinned) {
+      _pins.remove(ref.cacheKey);
+    } else if (_cached.containsKey(ref.cacheKey)) {
+      _pins.add(ref.cacheKey);
+    }
   }
 
   @override
@@ -132,7 +149,11 @@ final class FakeMenuRepository implements MenuRepository {
     final pending = savedMenusGate;
     if (pending != null) await pending;
     return [
-      for (final cached in _cached.values) CachedMenuEntry.summarise(cached),
+      for (final cached in _cached.values)
+        CachedMenuEntry.summarise(
+          cached,
+          pinned: _pins.contains(cached.menu.venueRef.cacheKey),
+        ),
     ];
   }
 
@@ -143,5 +164,6 @@ final class FakeMenuRepository implements MenuRepository {
   Future<void> remove(VenueRef ref) async {
     removedRefs.add(ref);
     _cached.remove(ref.cacheKey);
+    _pins.remove(ref.cacheKey);
   }
 }

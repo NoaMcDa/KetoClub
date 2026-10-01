@@ -347,5 +347,79 @@ void runMenuCacheContract(String name, MenuCache Function() build) {
 
       expect(await cache.count(), equals(1));
     });
+
+    test('pin on a cached ref marks it pinned', () async {
+      final cache = build();
+      await cache.write(CachedMenu(menu: _menuFor(woltRef)));
+
+      await cache.pin(woltRef);
+
+      expect(await cache.isPinned(woltRef), isTrue);
+      expect(await cache.isPinned(tenbisRef), isFalse);
+    });
+
+    test('pin on a ref with no entry is a no-op', () async {
+      final cache = build();
+
+      await cache.pin(woltRef);
+
+      expect(await cache.isPinned(woltRef), isFalse);
+    });
+
+    test('pin with pinned false stops keeping the entry', () async {
+      final cache = build();
+      await cache.write(CachedMenu(menu: _menuFor(woltRef)));
+      await cache.pin(woltRef);
+
+      await cache.pin(woltRef, pinned: false);
+
+      expect(await cache.isPinned(woltRef), isFalse);
+    });
+
+    test('entries reports which entries are pinned', () async {
+      final cache = build();
+      await cache.write(CachedMenu(menu: _menuFor(woltRef)));
+      await cache.write(CachedMenu(menu: _menuFor(tenbisRef)));
+      await cache.pin(woltRef);
+
+      final entries = await cache.entries();
+
+      expect({
+        for (final e in entries) e.ref: e.pinned,
+      }, equals({woltRef: true, tenbisRef: false}));
+    });
+
+    test('a pin survives the entry being rewritten', () async {
+      final cache = build();
+      await cache.write(CachedMenu(menu: _menuFor(woltRef)));
+      await cache.pin(woltRef);
+
+      await cache.write(CachedMenu(menu: _menuFor(woltRef)));
+
+      expect(await cache.isPinned(woltRef), isTrue);
+    });
+
+    test('remove drops the pin with the entry', () async {
+      final cache = build();
+      await cache.write(CachedMenu(menu: _menuFor(woltRef)));
+      await cache.pin(woltRef);
+
+      await cache.remove(woltRef);
+      await cache.write(CachedMenu(menu: _menuFor(woltRef)));
+
+      expect(await cache.isPinned(woltRef), isFalse);
+    });
+
+    test('clear clears pinned entries too', () async {
+      final cache = build();
+      await cache.write(CachedMenu(menu: _menuFor(woltRef)));
+      await cache.pin(woltRef);
+
+      await cache.clear();
+      await cache.write(CachedMenu(menu: _menuFor(woltRef)));
+
+      expect(await cache.isPinned(woltRef), isFalse);
+      expect(await cache.entries(), hasLength(1));
+    });
   });
 }
