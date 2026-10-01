@@ -250,6 +250,22 @@ void main() {
         });
       });
 
+      test('isExplicitLink is true for a link or id, false for a word', () {
+        // Act and assert
+        controller.setInput('https://wolt.com/en/isr/tel-aviv/restaurant/v');
+        expect(controller.isExplicitLink, isTrue);
+        controller.setInput('123456');
+        expect(controller.isExplicitLink, isTrue);
+        controller.setInput('pizza');
+        expect(controller.isExplicitLink, isFalse);
+        controller.setInput('vitrina-lilinblum');
+        expect(controller.isExplicitLink, isFalse);
+        controller.setInput('a/b');
+        expect(controller.isExplicitLink, isFalse);
+        controller.setInput('');
+        expect(controller.isExplicitLink, isFalse);
+      });
+
       test('a hyphenated slug still resolves as a Wolt slug', () {
         fakeAsync((async) {
           // Act

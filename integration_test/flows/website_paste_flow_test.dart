@@ -123,7 +123,7 @@ void main() {
 
       // Act: paste the homepage and open it.
       await enterText(tester, _homepage);
-      await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+      await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
       // Assert: the homepage, then the page it links to, were read.
       expect(asked, [_home, _menuPage]);

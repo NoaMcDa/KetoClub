@@ -17,7 +17,7 @@
   "venueSearchLabel": "חיפוש מסעדה",
   "venueSearchHint": "חפשו לפי שם, או הדביקו קישור מוולט",
   "venueSearchInvalid": "קטוקלאב לא יודע לקרוא תפריט משם עדיין. הדביקו קישור למסעדה בוולט או את המזהה שלה.",
-  "venueSearchOpen": "הצג תפריט קטוגני",
+  "venueSearchOpenLink": "פתח קישור",
   "venueSearchContinueWith": "המשיכו עם {venue}",
   "@venueSearchContinueWith": {
     "placeholders": { "venue": { "type": "String" } }

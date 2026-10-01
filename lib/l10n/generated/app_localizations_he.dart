@@ -56,7 +56,7 @@ class AppLocalizationsHe extends AppLocalizations {
       'קטוקלאב לא יודע לקרוא תפריט משם עדיין. הדביקו קישור למסעדה בוולט או את המזהה שלה.';
 
   @override
-  String get venueSearchOpen => 'הצג תפריט קטוגני';
+  String get venueSearchOpenLink => 'פתח קישור';
 
   @override
   String venueSearchContinueWith(String venue) {

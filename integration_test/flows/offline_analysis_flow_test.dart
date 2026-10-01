@@ -144,8 +144,11 @@ void main() {
         await pumpApp(tester, fakes);
 
         // Act: open the venue directly.
-        await enterText(tester, ref.platformId);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await enterText(
+          tester,
+          'https://wolt.com/en/isr/tel-aviv/restaurant/${ref.platformId}',
+        );
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: connectivity was consulted, the LLM engine was never
         // called, and the real heuristic's genuine green verdict is on
@@ -192,8 +195,11 @@ void main() {
         await pumpApp(tester, fakes);
 
         // Act: open the venue directly.
-        await enterText(tester, ref.platformId);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await enterText(
+          tester,
+          'https://wolt.com/en/isr/tel-aviv/restaurant/${ref.platformId}',
+        );
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: the LLM engine was actually attempted this time, once,
         // and its failure was re-stamped onto the same heuristic result

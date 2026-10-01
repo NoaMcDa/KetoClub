@@ -96,7 +96,7 @@ final class _OnlineConnectivity implements Connectivity {
 /// Pastes [_woltUrl] on the Explore screen and opens the venue.
 Future<void> _openVenue(WidgetTester tester) async {
   await enterText(tester, _woltUrl);
-  await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+  await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 }
 
 /// Goes back one screen through the app bar's back button.

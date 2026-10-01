@@ -222,16 +222,13 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
                     errorText: controller.isInvalid
                         ? l10n.venueSearchInvalid
                         : null,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: FilledButton(
-                    onPressed: resolved == null
-                        ? null
-                        : () => _openVenue(resolved),
-                    child: Text(l10n.venueSearchOpen),
+                    suffixIcon: controller.isExplicitLink && resolved != null
+                        ? IconButton(
+                            icon: const Icon(Icons.arrow_forward),
+                            tooltip: l10n.venueSearchOpenLink,
+                            onPressed: () => _openVenue(resolved),
+                          )
+                        : null,
                   ),
                 ),
                 const SizedBox(height: 24),

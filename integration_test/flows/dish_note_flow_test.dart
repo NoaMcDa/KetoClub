@@ -89,7 +89,7 @@ void main() {
 
         // Act: paste the link and open the venue.
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: the dish shows with no note yet.
         expect(find.byType(DishCard), findsOneWidget);
@@ -121,7 +121,7 @@ void main() {
         // (app.dart), over the same fakes.notesStore instance.
         await tapAndSettle(tester, find.byTooltip('Back'));
         await enterText(tester, _woltUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert: the note survived the revisit.
         expect(find.byType(DishCard), findsOneWidget);
@@ -143,7 +143,7 @@ void main() {
 
       // Act: open the venue and see the note already there.
       await enterText(tester, _woltUrl);
-      await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+      await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
       expect(find.text(_note), findsOneWidget);
 
       // Act: open the editor and clear the note.

@@ -95,7 +95,7 @@ void main() {
 
       // Act: paste the 10bis URL and open it.
       await enterText(tester, _tenBisUrl);
-      await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+      await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
       // Assert: a classified menu is shown, sourced from 10bis, with
       // both dishes from the mapped fixture visible.
@@ -119,9 +119,10 @@ void main() {
         fakes.repository.stub(_ref, mapped);
         await pumpApp(tester, fakes);
 
-        // Act: paste a bare numeric id and open it.
+        // Act: paste a bare numeric id and open it from the keyboard.
         await enterText(tester, '654321');
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tester.testTextInput.receiveAction(TextInputAction.search);
+        await tester.pumpAndSettle();
 
         // Assert
         expect(find.byType(EngineChip), findsOneWidget);
@@ -148,7 +149,7 @@ void main() {
 
         // Act
         await enterText(tester, _tenBisUrl);
-        await tapAndSettle(tester, find.text(_en.venueSearchOpen));
+        await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
         // Assert
         expect(find.text(_en.fetchFailedNotFound('10bis')), findsOneWidget);

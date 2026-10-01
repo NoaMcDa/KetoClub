@@ -274,38 +274,68 @@ void main() {
       expect(find.text(_l10n(tester).venueSearchInvalid), findsNothing);
     });
 
-    testWidgets('typing a valid slug enables the submit affordance', (
+    testWidgets('there is no standing open button, and none for a plain name', (
       tester,
     ) async {
       // Arrange
       await _pump(tester, controller: controller, pushedNames: pushedNames);
 
-      // Assert: disabled before anything resolves.
-      expect(
-        tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
-        isNull,
-      );
+      // Assert: nothing typed yet.
+      expect(find.byType(FilledButton), findsNothing);
+      expect(find.byTooltip(_l10n(tester).venueSearchOpenLink), findsNothing);
+
+      // Act
+      await _type(tester, 'pizza');
+
+      // Assert: a bare word offers no open action either.
+      expect(find.byType(FilledButton), findsNothing);
+      expect(find.byTooltip(_l10n(tester).venueSearchOpenLink), findsNothing);
+    });
+
+    testWidgets('a hyphenated bare slug is a name: no open icon', (
+      tester,
+    ) async {
+      // Arrange
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
 
       // Act
       await _type(tester, 'vitrina-lilinblum');
 
       // Assert
-      expect(
-        tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
-        isNotNull,
-      );
+      expect(find.byTooltip(_l10n(tester).venueSearchOpenLink), findsNothing);
+    });
+
+    testWidgets('a pasted link shows the open icon, which goes away when '
+        'the text stops being a link', (tester) async {
+      // Arrange
+      await _pump(tester, controller: controller, pushedNames: pushedNames);
+
+      // Act
+      await _type(tester, 'wolt.com/en/isr/tel-aviv/restaurant/vitrina');
+
+      // Assert
+      final open = find.byTooltip(_l10n(tester).venueSearchOpenLink);
+      expect(open, findsOneWidget);
+
+      // Act
+      await _type(tester, 'vitrina');
+
+      // Assert
+      expect(open, findsNothing);
     });
 
     testWidgets(
-      'tapping the submit affordance pushes the venue route path for a '
-      'Wolt slug',
+      'tapping the open icon pushes the venue route path for a Wolt link',
       (tester) async {
         // Arrange
         await _pump(tester, controller: controller, pushedNames: pushedNames);
-        await _type(tester, 'vitrina-lilinblum');
+        await _type(
+          tester,
+          'https://wolt.com/en/isr/tel-aviv/restaurant/vitrina-lilinblum',
+        );
 
         // Act
-        await tester.tap(find.byType(FilledButton));
+        await tester.tap(find.byTooltip(_l10n(tester).venueSearchOpenLink));
         await tester.pumpAndSettle();
 
         // Assert
@@ -324,7 +354,7 @@ void main() {
         await tester.pump();
 
         // Act
-        await tester.tap(find.byType(FilledButton));
+        await tester.tap(find.byTooltip(_l10n(tester).venueSearchOpenLink));
         await tester.pumpAndSettle();
 
         // Assert
