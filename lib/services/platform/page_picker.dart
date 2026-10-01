@@ -10,6 +10,12 @@ import 'package:ketoclub/models/scanned_menu.dart';
 /// the Scan controller enforces `maxScanPages` and `maxScanPageBytes`
 /// itself, so it can say which bound a page broke.
 abstract interface class PagePicker {
+  /// Whether [takePhoto] can open a camera here. False on a computer's
+  /// browser, where a "take photo" action would only open a file chooser
+  /// beside "Choose photos" (issue #249); the Scan tab hides the action
+  /// then.
+  bool get canTakePhoto;
+
   /// Photographs one page with the camera. Empty when cancelled.
   Future<List<ScannedPage>> takePhoto();
 
@@ -28,6 +34,9 @@ abstract interface class PagePicker {
 final class NoPagePicker implements PagePicker {
   /// Creates the picker; it holds no state.
   const new();
+
+  @override
+  bool get canTakePhoto => false;
 
   @override
   Future<List<ScannedPage>> takePhoto() async => const <ScannedPage>[];

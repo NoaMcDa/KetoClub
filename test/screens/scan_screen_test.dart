@@ -961,12 +961,16 @@ void main() {
       addTearDown(web.dispose);
 
       // Act
-      await _pump(tester, web);
+      await _pump(tester, web, picker: FakePagePicker(canTakePhoto: false));
 
-      // Assert: no QR segment to choose, and no QR action anywhere.
+      // Assert: no QR segment to choose, and no QR action anywhere. A
+      // browser has no camera either (issue #249), so no photo action,
+      // but the library and PDF actions stay.
       expect(find.text(_en.scanScreenModeQr), findsNothing);
       expect(find.text(_en.scanQrAction), findsNothing);
-      expect(find.text(_en.scanScreenActionTakePhoto), findsOneWidget);
+      expect(find.text(_en.scanScreenActionTakePhoto), findsNothing);
+      expect(_action(_en.scanScreenActionChoosePhotos), findsOneWidget);
+      expect(_action(_en.scanScreenActionChoosePdf), findsOneWidget);
     });
 
     testWidgets('a Wolt code opens that venue exactly as a paste does', (
@@ -1125,6 +1129,9 @@ final class _GatedScanner implements QrScanner {
 /// A [PagePicker] whose every method throws an `Error`, which the real
 /// picker's contract forbids: the screen must still not stay wedged.
 final class _ThrowingPagePicker implements PagePicker {
+  @override
+  bool get canTakePhoto => true;
+
   @override
   Future<List<ScannedPage>> takePhoto() async => throw StateError('camera');
 
