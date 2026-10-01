@@ -109,8 +109,18 @@ void main() {
         );
         await pumpApp(tester, fakes);
 
+        // Assert: before locating, the header invites a tap and the page
+        // carries exactly one location action (issue #228).
+        expect(find.text(_en.discoveryLocationInvite), findsOneWidget);
+        expect(find.byTooltip(_en.discoveryUseLocation), findsOneWidget);
+        expect(find.text(_en.discoveryUseLocation), findsNothing);
+
         // Act: locate.
         await tapAndSettle(tester, find.byTooltip(_en.discoveryUseLocation));
+
+        // Assert: the header now names the place.
+        expect(find.text(_en.discoveryLocationInvite), findsNothing);
+        expect(find.text('Rothschild 22'), findsOneWidget);
 
         // Assert: a card per venue, in the order the search service gave
         // them, and the cached venue's card shows its score.

@@ -252,7 +252,13 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     );
   }
 
-  /// "Looking around {place}" with the location button at its end.
+  /// The header: "Looking around {place}" with the location button at its
+  /// end once a position exists; before one, an invitation to tap instead
+  /// of a "Location not set" that reads as an error (issue #228).
+  ///
+  /// The page carries one location action at a time. While the body shows
+  /// a denied or unavailable card, that card owns the retry (see
+  /// [_bodyOwnsLocate]), so the header steps aside rather than repeat it.
   Widget _header(
     BuildContext context,
     AppLocalizations l10n,
@@ -260,6 +266,38 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
   ) {
     final textTheme = Theme.of(context).textTheme;
     final locating = controller.phase == DiscoveryPhase.locating;
+    final invited = controller.position == null;
+    if (invited && _bodyOwnsLocate(controller)) return const SizedBox.shrink();
+    final button = IconButton.filled(
+      tooltip: l10n.discoveryUseLocation,
+      icon: const Icon(Icons.my_location),
+      onPressed: locating ? null : _locate,
+    );
+    if (invited) {
+      // The words are a second target for the same tap, hidden from
+      // assistive technology so the button is the one named action.
+      return Row(
+        children: [
+          Expanded(
+            child: ExcludeSemantics(
+              child: InkWell(
+                onTap: locating ? null : _locate,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Text(
+                    l10n.discoveryLocationInvite,
+                    style: textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          button,
+        ],
+      );
+    }
     return Row(
       children: [
         Expanded(
@@ -282,19 +320,26 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
             ],
           ),
         ),
-        IconButton.filled(
-          tooltip: l10n.discoveryUseLocation,
-          icon: const Icon(Icons.my_location),
-          onPressed: locating ? null : _locate,
-        ),
+        button,
       ],
     );
   }
 
-  /// The header's place: the nearest result's address, "Your location"
-  /// without one, or "Location not set" before any position was read.
+  /// Whether [_body] is showing a denied or unavailable card, which
+  /// carries its own retry or settings action.
+  bool _bodyOwnsLocate(VenueSearchController controller) {
+    if (controller.phase != DiscoveryPhase.idle ||
+        controller.failure != null ||
+        controller.hasSearched) {
+      return false;
+    }
+    final outcome = controller.locationOutcome;
+    return outcome is LocationDenied || outcome is LocationUnavailable;
+  }
+
+  /// The header's place once a position exists: the nearest result's
+  /// address, or "Your location" without one.
   String _place(AppLocalizations l10n, VenueSearchController controller) {
-    if (controller.position == null) return l10n.discoveryLocationNotSet;
     for (final venue in controller.results) {
       final address = venue.address;
       if (address != null && address.trim().isNotEmpty) return address;
@@ -376,13 +421,6 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
         icon: Icons.travel_explore,
         title: l10n.discoveryEmptyTitle,
         body: l10n.discoveryEmptyBody,
-        actions: [
-          OutlinedButton.icon(
-            onPressed: _locate,
-            icon: const Icon(Icons.my_location),
-            label: Text(l10n.discoveryUseLocation),
-          ),
-        ],
       );
     }
 

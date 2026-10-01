@@ -496,7 +496,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get discoveryAroundYou => 'המיקום שלך';
 
   @override
-  String get discoveryLocationNotSet => 'לא נקבע מיקום';
+  String get discoveryLocationInvite => 'הקש כדי להשתמש במיקום שלך';
 
   @override
   String get discoveryUseLocation => 'השתמש במיקום שלי';
