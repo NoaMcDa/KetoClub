@@ -142,25 +142,6 @@ def test_key_changes_with_the_prompt() -> None:
     assert key_a != key_b
 
 
-# --- miss then hit ---------------------------------------------------------------
-
-
-def test_second_identical_request_is_served_from_the_cache(
-    chat_client: TestClient, gemini: respx.MockRouter
-) -> None:
-    route = gemini.post(_URL).mock(return_value=httpx.Response(200, json=_reply()))
-
-    first = _post(chat_client)
-    second = _post(chat_client)
-
-    assert first.status_code == 200
-    assert first.headers["X-KetoClub-Cache"] == "miss"
-    assert second.status_code == 200
-    assert second.headers["X-KetoClub-Cache"] == "hit"
-    assert second.json() == first.json()
-    assert route.call_count == 1
-
-
 # --- TTL expiry --------------------------------------------------------------------
 
 

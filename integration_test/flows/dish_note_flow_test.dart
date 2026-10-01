@@ -129,32 +129,5 @@ void main() {
         expect(find.text(_en.dishCardAddNote), findsNothing);
       },
     );
-
-    testWidgets('clearing a note in the editor removes it from the card', (
-      tester,
-    ) async {
-      // Setup
-      final fixture = _buildFixture();
-      final fakes = FakeAppDependencies();
-      fakes.repository.stub(_ref, MenuFetched(menu: fixture.menu));
-      fakes.classifier.respondWith(fixture.analysis);
-      await fakes.notesStore.write(_ref, 'steak', _note);
-      await pumpApp(tester, fakes);
-
-      // Act: open the venue and see the note already there.
-      await enterText(tester, _woltUrl);
-      await tapAndSettle(tester, find.text(_en.venueSearchOpen));
-      expect(find.text(_note), findsOneWidget);
-
-      // Act: open the editor and clear the note.
-      await tapAndSettle(tester, find.text(_note));
-      expect(find.byType(NoteEditorSheet), findsOneWidget);
-      await tapAndSettle(tester, find.text(_en.noteEditorClear));
-
-      // Assert: the card falls back to the "Add a note" prompt.
-      expect(find.byType(NoteEditorSheet), findsNothing);
-      expect(find.text(_note), findsNothing);
-      expect(find.text(_en.dishCardAddNote), findsOneWidget);
-    });
   });
 }

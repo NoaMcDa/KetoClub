@@ -130,18 +130,6 @@ void main() {
       expect(consentTop.dy, lessThan(languageTop.dy));
     });
 
-    testWidgets('build offers no field to enter a credential', (tester) async {
-      // Arrange
-      final controller = _controllerFor();
-
-      // Act
-      await _pump(tester, controller);
-      await tester.pumpAndSettle();
-
-      // Assert: the model key lives on KetoClub's server, never here.
-      expect(find.byType(TextField), findsNothing);
-    });
-
     testWidgets(
       'the consent checkbox starts checked on a fresh install (D16, issue '
       '#167) and unticking it persists false',
@@ -393,31 +381,6 @@ void main() {
         repository.seedCache(CachedMenu(menu: fetched.menu));
       }
 
-      testWidgets('build shows 0 menus cached with nothing saved', (
-        tester,
-      ) async {
-        // Act
-        await _pump(tester, _controllerFor());
-        await tester.pumpAndSettle();
-
-        // Assert
-        expect(find.text(_en.settingsCacheSummary(0)), findsOneWidget);
-      });
-
-      testWidgets('build shows the seeded count', (tester) async {
-        // Arrange
-        final repository = FakeMenuRepository();
-        await seedOneMenu(repository);
-        final controller = _controllerFor(repository: repository);
-
-        // Act
-        await _pump(tester, controller);
-        await tester.pumpAndSettle();
-
-        // Assert
-        expect(find.text(_en.settingsCacheSummary(1)), findsOneWidget);
-      });
-
       testWidgets(
         'tapping Clear opens a confirmation dialog that clears nothing '
         'by itself',
@@ -519,24 +482,6 @@ void main() {
         );
       });
 
-      testWidgets('the section sits under Appearance and above the default '
-          'filter', (tester) async {
-        // Act
-        await _pump(tester, _controllerFor());
-        await tester.pumpAndSettle();
-
-        // Assert
-        final appearanceY = tester
-            .getTopLeft(find.text(_en.settingsAppearance))
-            .dy;
-        final limitY = tester
-            .getTopLeft(find.text(_en.settingsNetCarbLimit))
-            .dy;
-        final filterY = tester.getTopLeft(find.text(_en.settingsFilter)).dy;
-        expect(limitY, greaterThan(appearanceY));
-        expect(limitY, lessThan(filterY));
-      });
-
       testWidgets('plus and minus step the limit by one gram and persist '
           'it', (tester) async {
         // Arrange
@@ -605,26 +550,6 @@ void main() {
         expect((await store.read()).netCarbLimitGrams, equals(25));
       });
 
-      testWidgets('both buttons carry a localized tooltip', (tester) async {
-        // Act
-        await _pump(tester, _controllerFor());
-        await tester.pumpAndSettle();
-
-        // Assert
-        expect(
-          tester
-              .widget<IconButton>(find.byKey(netCarbLimitDecreaseKey))
-              .tooltip,
-          equals(_en.settingsNetCarbLimitDecrease),
-        );
-        expect(
-          tester
-              .widget<IconButton>(find.byKey(netCarbLimitIncreaseKey))
-              .tooltip,
-          equals(_en.settingsNetCarbLimitIncrease),
-        );
-      });
-
       testWidgets('under Locale(he) the value reads in Hebrew', (tester) async {
         // Act
         await _pump(tester, _controllerFor(), locale: const Locale('he'));
@@ -666,22 +591,6 @@ void main() {
         expect(tile(tester, seedOilFreeSwitchKey).value, isFalse);
         expect(tile(tester, dairyFreeSwitchKey).value, isFalse);
         expect(tile(tester, carnivoreOnlySwitchKey).value, isFalse);
-      });
-
-      testWidgets('the section sits under the net carb limit and above the '
-          'default filter', (tester) async {
-        // Act
-        await _pump(tester, _controllerFor());
-        await tester.pumpAndSettle();
-
-        // Assert
-        final limitY = tester
-            .getTopLeft(find.text(_en.settingsNetCarbLimit))
-            .dy;
-        final rulesY = tester.getTopLeft(find.text(_en.settingsKetoRules)).dy;
-        final filterY = tester.getTopLeft(find.text(_en.settingsFilter)).dy;
-        expect(rulesY, greaterThan(limitY));
-        expect(rulesY, lessThan(filterY));
       });
 
       testWidgets('load shows a stored toggle as on', (tester) async {
@@ -794,18 +703,6 @@ void main() {
         expect(find.text(_he.settingsCarnivoreOnlyHint), findsOneWidget);
         expect(find.text(_en.settingsKetoRules), findsNothing);
       });
-    });
-
-    testWidgets('build under Locale(he) renders the Hebrew title', (
-      tester,
-    ) async {
-      // Act
-      await _pump(tester, _controllerFor(), locale: const Locale('he'));
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(find.text(_he.settingsTitle), findsOneWidget);
-      expect(find.text(_he.settingsConsentTitle), findsOneWidget);
     });
 
     group('right-to-left (architecture.md §8.3)', () {

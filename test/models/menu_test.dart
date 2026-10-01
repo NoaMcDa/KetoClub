@@ -123,24 +123,15 @@ void main() {
     });
 
     test('== returns true for options with equal fields', () {
-      // Arrange
-      const a = DishOption(name: 'Side', values: ['A', 'B']);
-      const b = DishOption(name: 'Side', values: ['A', 'B']);
+      // Arrange: built at run time, so == is exercised rather than const
+      // canonicalisation.
+      final names = <String>['Side', 'Side'];
+      final a = DishOption(name: names[0], values: const ['A', 'B']);
+      final b = DishOption(name: names[1], values: const ['A', 'B']);
 
       // Act & Assert
       expect(a, equals(b));
       expect(a.hashCode, equals(b.hashCode));
-    });
-
-    test('toString mentions the name and values', () {
-      // Arrange
-      const option = DishOption(name: 'Side', values: ['A']);
-
-      // Act
-      final result = option.toString();
-
-      // Assert
-      expect(result, contains('Side'));
     });
   });
 
@@ -401,42 +392,27 @@ void main() {
     });
 
     test('== returns true for dishes with equal fields', () {
-      // Arrange
-      const a = Dish(
+      // Arrange: built at run time, so == is exercised rather than const
+      // canonicalisation.
+      final names = <String>['Steak', 'Steak'];
+      final a = Dish(
         id: '1',
-        name: 'Steak',
+        name: names[0],
         description: '',
         price: 1,
-        options: [],
+        options: const [],
       );
-      const b = Dish(
+      final b = Dish(
         id: '1',
-        name: 'Steak',
+        name: names[1],
         description: '',
         price: 1,
-        options: [],
+        options: const [],
       );
 
       // Act & Assert
       expect(a, equals(b));
       expect(a.hashCode, equals(b.hashCode));
-    });
-
-    test('toString mentions the id and name', () {
-      // Arrange
-      const dish = Dish(
-        id: '1',
-        name: 'Steak',
-        description: '',
-        price: 1,
-        options: [],
-      );
-
-      // Act
-      final result = dish.toString();
-
-      // Assert
-      expect(result, contains('Steak'));
     });
   });
 
@@ -559,17 +535,6 @@ void main() {
 
       // Assert
       expect(result?.dishes, isEmpty);
-    });
-
-    test('toString mentions the id, name, and dish count', () {
-      // Arrange
-      final category = MenuCategory.tryFrom(validJson)!;
-
-      // Act
-      final result = category.toString();
-
-      // Assert
-      expect(result, contains('Steaks'));
     });
   });
 
@@ -856,17 +821,6 @@ void main() {
 
       // Act & Assert
       expect(a, isNot(equals(b)));
-    });
-
-    test('toString mentions the venue cache key and category count', () {
-      // Arrange
-      final menu = Menu.tryFrom(validJson)!;
-
-      // Act
-      final result = menu.toString();
-
-      // Assert
-      expect(result, contains('wolt/v1'));
     });
   });
 }

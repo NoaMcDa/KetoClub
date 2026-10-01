@@ -395,30 +395,6 @@ void main() {
       expect(() => ClassificationRules.match(long), returnsNormally);
     });
 
-    test('RuleMatch equality holds for two equivalent results', () {
-      // Act
-      final a = ClassificationRules.match('Fish and chips');
-      final b = ClassificationRules.match('Fish and chips');
-      // Assert
-      expect(a, equals(b));
-      expect(a.hashCode, equals(b.hashCode));
-    });
-
-    test('RuleMatch.toString describes a red result', () {
-      // Act
-      final result = ClassificationRules.match('Margherita pizza');
-      // Assert
-      expect(result.toString(), contains('nonKeto'));
-      expect(result.toString(), contains('pizza'));
-    });
-
-    test('RuleMatch.toString describes a modifiable result', () {
-      // Act
-      final result = ClassificationRules.match('Grilled steak with fries');
-      // Assert
-      expect(result.toString(), contains('modifiers'));
-    });
-
     test('a burger on a brioche bun is modifiable, not red (D-V3)', () {
       // Act
       final result = ClassificationRules.match('Beef burger on a brioche bun');

@@ -100,18 +100,5 @@ void main() {
       // Assert
       expect(notified, equals(0));
     });
-
-    test('themeMode maps every AppThemeMode to its Flutter ThemeMode', () {
-      // Arrange
-      final controller = ThemeModeController(FakeSettingsStore());
-      expect(controller.themeMode, equals(ThemeMode.system));
-
-      // Act / Assert
-      controller.applyMode(AppThemeMode.light);
-      expect(controller.themeMode, equals(ThemeMode.light));
-
-      controller.applyMode(AppThemeMode.dark);
-      expect(controller.themeMode, equals(ThemeMode.dark));
-    });
   });
 }

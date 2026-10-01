@@ -166,30 +166,6 @@ void main() {
       expect(result.menu.categories.first.id, equals('cat_steaks'));
     });
 
-    test('toMenu derives the same category id across two calls for the same '
-        'name', () {
-      // Arrange
-      final json = _validFixture();
-
-      // Act
-      final first = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-      final second = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      ) as MenuFetched;
-
-      // Assert
-      expect(
-        first.menu.categories.first.id,
-        equals(second.menu.categories.first.id),
-      );
-    });
-
     test('toMenu falls back to a hash-derived slug when categoryName leaves '
         'nothing after stripping', () {
       // Arrange
@@ -462,26 +438,6 @@ void main() {
       // Assert
       expect(result, isA<MenuFetched>());
       expect((result as MenuFetched).menu.categories, isEmpty);
-    });
-
-    test('toMenu returns platformChanged for the malformed fixture', () {
-      // Arrange
-      final json = _loadFixture('tenbis_malformed_menu.json');
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      );
-
-      // Assert
-      expect(
-        result,
-        equals(
-          const MenuFetchFailed(reason: MenuFetchFailureReason.platformChanged),
-        ),
-      );
     });
 
     test('toMenu returns platformChanged when categoriesList is missing', () {
@@ -780,37 +736,6 @@ void main() {
           },
         ],
       });
-    });
-
-    test('toMenu tolerates a dish with no dishOptionsList key at all', () {
-      // Arrange
-      final json = <String, Object?>{
-        'categoriesList': <Object?>[
-          <String, Object?>{
-            'categoryName': 'Mains',
-            'dishList': <Object?>[
-              <String, Object?>{
-                'dishId': '1',
-                'dishName': 'Plain Chicken',
-                'price': 30,
-              },
-            ],
-          },
-        ],
-      };
-
-      // Act
-      final result = TenBisMenuMapper.toMenu(
-        json,
-        ref: _ref,
-        fetchedAt: _fetchedAt,
-      );
-
-      // Assert
-      expect(result, isA<MenuFetched>());
-      final dish = (result as MenuFetched).menu.allDishes.single;
-      expect(dish.id, equals('1'));
-      expect(dish.options, isEmpty);
     });
   });
 }

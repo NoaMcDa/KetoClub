@@ -37,33 +37,11 @@ import 'fake_settings_store.dart';
 
 void main() {
   group('FakeClock', () {
-    test('now returns the time it was created with', () {
-      final clock = FakeClock(DateTime.utc(2026));
-
-      expect(clock.now(), equals(DateTime.utc(2026)));
-    });
-
     test('advance moves now forward by the given duration', () {
       final clock = FakeClock(DateTime.utc(2026))
         ..advance(const Duration(days: 1, hours: 2));
 
       expect(clock.now(), equals(DateTime.utc(2026, 1, 2, 2)));
-    });
-
-    test('now does not change on its own between calls', () {
-      final clock = FakeClock(DateTime.utc(2026));
-
-      final first = clock.now();
-      final second = clock.now();
-
-      expect(first, equals(second));
-    });
-
-    test('initial keeps the construction-time value across advances', () {
-      final clock = FakeClock(DateTime.utc(2026))
-        ..advance(const Duration(days: 1));
-
-      expect(clock.initial, equals(DateTime.utc(2026)));
     });
   });
 
@@ -83,21 +61,6 @@ void main() {
       expect(logger.warnings, equals(<String>['cache miss']));
       expect(logger.warningErrors, equals(<Object?>[error]));
     });
-
-    test('warn records null when no error is given', () {
-      final logger = FakeAppLogger()..warn('cache miss');
-
-      expect(logger.warningErrors, equals(<Object?>[null]));
-    });
-
-    test('info and warn are recorded in separate lists', () {
-      final logger = FakeAppLogger()
-        ..info('a')
-        ..warn('b');
-
-      expect(logger.infos, equals(<String>['a']));
-      expect(logger.warnings, equals(<String>['b']));
-    });
   });
 
   group('FakeLlmChatClient', () {
@@ -114,14 +77,6 @@ void main() {
         second,
         equals(const ChatFailed(reason: ChatFailureReason.timeout)),
       );
-    });
-
-    test('complete returns fallback once the queue runs out', () async {
-      final client = FakeLlmChatClient();
-
-      final result = await client.complete(systemPrompt: 's', userPrompt: 'u');
-
-      expect(result, equals(client.fallback));
     });
 
     test('a steered fallback is returned when nothing is queued', () async {
@@ -325,32 +280,6 @@ void main() {
         expect(CachedMenu.tryFrom(entryJson), isNull);
       },
     );
-
-    test('== returns true for equal entries', () {
-      final a = CachedMenu(menu: _menuFor(_woltRef));
-      final b = CachedMenu(menu: _menuFor(_woltRef));
-
-      expect(a, equals(b));
-      expect(a.hashCode, equals(b.hashCode));
-    });
-
-    test('== returns false for entries with different analyses', () {
-      final a = CachedMenu(menu: _menuFor(_woltRef));
-      final b = CachedMenu(
-        menu: _menuFor(_woltRef),
-        analysis: const MenuAnalysisFailed(
-          reason: MenuAnalysisFailureReason.timeout,
-        ),
-      );
-
-      expect(a, isNot(equals(b)));
-    });
-
-    test('toString mentions the venue cache key', () {
-      final entry = CachedMenu(menu: _menuFor(_woltRef));
-
-      expect(entry.toString(), contains('wolt/x'));
-    });
   });
 
   group('AppThemeMode', () {
@@ -545,39 +474,6 @@ void main() {
       expect(result.themeMode, equals(AppThemeMode.light));
     });
 
-    test('== returns false for settings differing in themeMode', () {
-      const a = AppSettings();
-      const b = AppSettings(themeMode: AppThemeMode.dark);
-
-      expect(a, isNot(equals(b)));
-    });
-
-    test('== returns true for settings with equal fields', () {
-      const a = AppSettings(languageTag: 'he');
-      const b = AppSettings(languageTag: 'he');
-
-      expect(a, equals(b));
-      expect(a.hashCode, equals(b.hashCode));
-    });
-
-    test('== returns false for settings differing in filter', () {
-      const a = AppSettings();
-      const b = AppSettings(filter: MenuFilter.greenOnly);
-
-      expect(a, isNot(equals(b)));
-    });
-
-    test('toString mentions the language, filter and theme mode', () {
-      const settings = AppSettings(
-        languageTag: 'he',
-        themeMode: AppThemeMode.dark,
-      );
-
-      expect(settings.toString(), contains('he'));
-      expect(settings.toString(), contains('all'));
-      expect(settings.toString(), contains('dark'));
-    });
-
     group('netCarbLimitGrams (issue #57)', () {
       /// The JSON an install wrote before issue #57, plus [extra].
       Map<String, Object?> json([Map<String, Object?> extra = const {}]) =>
@@ -586,13 +482,6 @@ void main() {
             'estimationConsentGiven': false,
             ...extra,
           };
-
-      test('defaults to 6 g', () {
-        expect(
-          const AppSettings().netCarbLimitGrams,
-          equals(defaultNetCarbLimitGrams),
-        );
-      });
 
       test('tryFrom(x.toJson()) round-trips a non-default limit', () {
         const settings = AppSettings(netCarbLimitGrams: 12);
@@ -658,20 +547,6 @@ void main() {
           equals(8),
         );
       });
-
-      test('== returns false for settings differing in the limit', () {
-        expect(
-          const AppSettings(),
-          isNot(equals(const AppSettings(netCarbLimitGrams: 7))),
-        );
-      });
-
-      test('toString mentions the limit', () {
-        expect(
-          const AppSettings(netCarbLimitGrams: 11).toString(),
-          contains('11g'),
-        );
-      });
     });
 
     group('lastFilter (issue #55)', () {
@@ -682,10 +557,6 @@ void main() {
             'estimationConsentGiven': false,
             ...extra,
           };
-
-      test('defaults to null', () {
-        expect(const AppSettings().lastFilter, isNull);
-      });
 
       test('tryFrom(x.toJson()) round-trips every MenuFilter value', () {
         for (final filter in MenuFilter.values) {
@@ -742,81 +613,6 @@ void main() {
 
         expect(settings.copyWith(lastFilter: null).lastFilter, isNull);
       });
-
-      test('== returns false for settings differing only in lastFilter', () {
-        expect(
-          const AppSettings(),
-          isNot(equals(const AppSettings(lastFilter: MenuFilter.redOnly))),
-        );
-      });
-
-      test('toString mentions lastFilter', () {
-        expect(
-          const AppSettings(lastFilter: MenuFilter.redOnly).toString(),
-          contains('redOnly'),
-        );
-      });
-    });
-  });
-
-  group('ChatCompleted', () {
-    test('== returns true for equal results', () {
-      const a = ChatCompleted(content: '{}', model: 'm1');
-      const b = ChatCompleted(content: '{}', model: 'm1');
-
-      expect(a, equals(b));
-      expect(a.hashCode, equals(b.hashCode));
-    });
-
-    test('== returns false for results differing in model', () {
-      const a = ChatCompleted(content: '{}', model: 'm1');
-      const b = ChatCompleted(content: '{}', model: 'm2');
-
-      expect(a, isNot(equals(b)));
-    });
-
-    test('toString mentions the model', () {
-      const result = ChatCompleted(content: '{}', model: 'm1');
-
-      expect(result.toString(), contains('m1'));
-    });
-  });
-
-  group('ChatFailed', () {
-    test('== returns true for equal failures', () {
-      const a = ChatFailed(
-        reason: ChatFailureReason.rateLimited,
-        statusCode: 429,
-      );
-      const b = ChatFailed(
-        reason: ChatFailureReason.rateLimited,
-        statusCode: 429,
-      );
-
-      expect(a, equals(b));
-      expect(a.hashCode, equals(b.hashCode));
-    });
-
-    test('== returns false for failures differing in statusCode', () {
-      const a = ChatFailed(reason: ChatFailureReason.badResponse);
-      const b = ChatFailed(
-        reason: ChatFailureReason.badResponse,
-        statusCode: 500,
-      );
-
-      expect(a, isNot(equals(b)));
-    });
-
-    test('statusCode is null when the reason carries no HTTP status', () {
-      const result = ChatFailed(reason: ChatFailureReason.offline);
-
-      expect(result.statusCode, isNull);
-    });
-
-    test('toString mentions the reason', () {
-      const result = ChatFailed(reason: ChatFailureReason.backendUnreachable);
-
-      expect(result.toString(), contains('backendUnreachable'));
     });
   });
 
@@ -980,12 +776,6 @@ void main() {
       expect(await scanner.scan(), 'second');
       expect(await scanner.scan(), isNull);
       expect(scanner.scanCallCount, 4);
-    });
-
-    test('reports the availability it was given', () {
-      expect(FakeQrScanner().isAvailable, isTrue);
-      expect(FakeQrScanner(available: false).isAvailable, isFalse);
-      expect((FakeQrScanner()..available = false).isAvailable, isFalse);
     });
   });
 

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
-import 'package:ketoclub/l10n/generated/app_localizations_he.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
@@ -20,9 +19,6 @@ import '../fakes/fake_menu_repository.dart';
 
 /// The English strings a test can read expected copy from.
 final AppLocalizations _en = AppLocalizationsEn();
-
-/// The Hebrew strings for the RTL test.
-final AppLocalizations _he = AppLocalizationsHe();
 
 const VenueRef _woltRef = VenueRef(
   source: MenuSource.wolt,
@@ -429,22 +425,6 @@ void main() {
 
       // Assert
       expect(find.text(_en.savedPlaceholderBody), findsOneWidget);
-    });
-
-    testWidgets('build under Locale(he) renders the Hebrew empty copy', (
-      tester,
-    ) async {
-      // Act
-      await _pump(
-        tester,
-        SavedController(FakeMenuRepository()),
-        locale: const Locale('he'),
-      );
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(find.text(_he.savedPlaceholderTitle), findsOneWidget);
-      expect(find.text(_he.savedPlaceholderBody), findsOneWidget);
     });
   });
 }

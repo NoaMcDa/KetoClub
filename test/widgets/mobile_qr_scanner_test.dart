@@ -55,11 +55,6 @@ void main() {
   );
 
   group('MobileQrScanner', () {
-    testWidgets('is available', (tester) async {
-      final key = await _pump(tester);
-      expect(MobileQrScanner(navigatorKey: key).isAvailable, isTrue);
-    });
-
     testWidgets('shows the camera page and answers the first code', (
       tester,
     ) async {

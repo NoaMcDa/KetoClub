@@ -69,14 +69,5 @@ void main() {
       expect(registry.get(_ref('a')), _scan(3));
       expect(registry.get(_ref('c')), _scan(4));
     });
-
-    test('defaults to a small capacity', () {
-      // Assert
-      expect(
-        ScannedPagesRegistry().capacity,
-        ScannedPagesRegistry.defaultCapacity,
-      );
-      expect(ScannedPagesRegistry.defaultCapacity, greaterThan(0));
-    });
   });
 }

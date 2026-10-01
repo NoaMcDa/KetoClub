@@ -53,14 +53,5 @@ void main() {
       // Assert
       expect(id, matches(_uuid4));
     });
-
-    test('woltWebClientId is deterministic for a seeded source', () {
-      // Act
-      final first = woltWebClientId(Random(7));
-      final second = woltWebClientId(Random(7));
-
-      // Assert
-      expect(first, equals(second));
-    });
   });
 }

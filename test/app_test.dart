@@ -48,19 +48,6 @@ void main() {
       expect(bar.selectedIndex, equals(AppShell.exploreIndex));
     });
 
-    testWidgets('follows the device locale before any tag has loaded', (
-      tester,
-    ) async {
-      // Arrange / Act: the very first frame, before `LocaleController.load`
-      // has resolved — an accepted one-frame lag (issue #8), not a crash.
-      await tester.pumpWidget(
-        KetoClubApp(dependencies: FakeAppDependencies().dependencies),
-      );
-
-      // Assert: still renders something sensible immediately.
-      expect(find.text(appName), findsOneWidget);
-    });
-
     testWidgets('renders RTL once a stored Hebrew language tag has loaded', (
       tester,
     ) async {

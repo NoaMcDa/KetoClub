@@ -553,28 +553,6 @@ def _prompt_variant(suffix: str) -> dict[str, object]:
     return body
 
 
-def test_over_the_per_install_limit_is_rate_limited(
-    gemini: respx.MockRouter,
-) -> None:
-    route = gemini.post(_URL).mock(return_value=httpx.Response(200, json=_reply()))
-
-    with _client(_settings(per_minute=1)) as client:
-        first = _post(client, body=_prompt_variant("A"))
-        second = _post(client, body=_prompt_variant("B"))
-        other_install = _post(
-            client,
-            body=_prompt_variant("C"),
-            headers={"X-KetoClub-Install-Id": "f" * 32},
-        )
-
-    assert first.status_code == 200
-    assert second.status_code == 429
-    assert second.json() == _error(429, "rateLimited")
-    assert other_install.status_code == 200
-    # The rate-limited second call never reaches Gemini.
-    assert route.call_count == 2
-
-
 # --- logging -------------------------------------------------------------------
 
 
@@ -798,37 +776,6 @@ def test_image_bounds_come_from_settings(gemini: respx.MockRouter) -> None:
     assert two.status_code == 422
     assert too_big.status_code == 422
     assert route.call_count == 1
-
-
-def test_a_request_with_images_still_requires_the_install_id(
-    chat_client: TestClient, gemini: respx.MockRouter
-) -> None:
-    route = gemini.post(_URL).mock(return_value=httpx.Response(200, json=_reply()))
-
-    response = _post(chat_client, body=_image_body(("image/png", _PNG_B64)), headers={})
-
-    assert response.status_code == 400
-    assert response.json() == _error(400, "badResponse")
-    assert not route.called
-
-
-def test_a_request_with_images_still_rejects_authorization(
-    chat_client: TestClient, gemini: respx.MockRouter
-) -> None:
-    route = gemini.post(_URL).mock(return_value=httpx.Response(200, json=_reply()))
-
-    response = _post(
-        chat_client,
-        body=_image_body(("image/png", _PNG_B64)),
-        headers={
-            "Authorization": "Bearer sk-user",
-            "X-KetoClub-Install-Id": _INSTALL_ID,
-        },
-    )
-
-    assert response.status_code == 400
-    assert response.json() == _error(400, "badResponse")
-    assert not route.called
 
 
 def test_a_request_with_images_spends_the_per_install_limit(

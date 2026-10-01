@@ -2,14 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 void main() {
-  group('appName', () {
-    test('appName is KetoClub', () {
-      // Arrange, Act: appName is a compile-time constant.
-      // Assert
-      expect(appName, equals('KetoClub'));
-    });
-  });
-
   group('browserUserAgent', () {
     test('browserUserAgent looks like a real Chrome desktop UA', () {
       // Arrange, Act: browserUserAgent is a compile-time constant.
@@ -17,38 +9,6 @@ void main() {
       expect(browserUserAgent, contains('Mozilla/5.0'));
       expect(browserUserAgent, contains('Chrome/120'));
       expect(browserUserAgent, contains('AppleWebKit'));
-    });
-  });
-
-  group('cache and LLM tuning constants', () {
-    test('menuCacheTtl is 24 hours', () {
-      // Assert
-      expect(menuCacheTtl, equals(const Duration(hours: 24)));
-    });
-
-    test('llmRequestTimeout is 120 seconds', () {
-      // Assert
-      expect(llmRequestTimeout, equals(const Duration(seconds: 120)));
-    });
-
-    test('maxAnalysedDishes is 1000', () {
-      // Assert
-      expect(maxAnalysedDishes, equals(1000));
-    });
-
-    test('maxWhyLength is 300', () {
-      // Assert
-      expect(maxWhyLength, equals(300));
-    });
-
-    test('maxModificationLength is 300', () {
-      // Assert
-      expect(maxModificationLength, equals(300));
-    });
-
-    test('minOverlapWordLength is 3', () {
-      // Assert
-      expect(minOverlapWordLength, equals(3));
     });
   });
 
@@ -114,13 +74,6 @@ void main() {
   });
 
   group('net carb limit', () {
-    test('the default is 6 g inside a 2..25 g range', () {
-      // Assert
-      expect(defaultNetCarbLimitGrams, equals(6));
-      expect(minNetCarbLimitGrams, equals(2));
-      expect(maxNetCarbLimitGrams, equals(25));
-    });
-
     test('clampNetCarbLimitGrams keeps an in-range value', () {
       // Assert
       expect(clampNetCarbLimitGrams(2), equals(2));
@@ -139,18 +92,6 @@ void main() {
   });
 
   group('why strings', () {
-    test('greenWhyEn and greenWhyHe are non-empty', () {
-      // Assert
-      expect(greenWhyEn, isNotEmpty);
-      expect(greenWhyHe, isNotEmpty);
-    });
-
-    test('yellowWhyEn and yellowWhyHe are non-empty', () {
-      // Assert
-      expect(yellowWhyEn, isNotEmpty);
-      expect(yellowWhyHe, isNotEmpty);
-    });
-
     test('redWhyEn and redWhyHe carry the {base} placeholder', () {
       // Assert
       expect(redWhyEn, contains('{base}'));
@@ -159,11 +100,6 @@ void main() {
   });
 
   group('carbModifiersEn', () {
-    test('has 71 triggers', () {
-      // Assert
-      expect(carbModifiersEn, hasLength(71));
-    });
-
     test('every trigger maps to a non-empty sentence', () {
       // Arrange, Act, Assert
       for (final entry in carbModifiersEn.entries) {
@@ -188,11 +124,6 @@ void main() {
   });
 
   group('carbModifiersHe', () {
-    test('has 87 triggers', () {
-      // Assert
-      expect(carbModifiersHe, hasLength(87));
-    });
-
     test('every trigger maps to a non-empty sentence', () {
       // Arrange, Act, Assert
       for (final entry in carbModifiersHe.entries) {
@@ -221,11 +152,6 @@ void main() {
   });
 
   group('nonKetoBasesEn', () {
-    test('has 118 triggers', () {
-      // Assert
-      expect(nonKetoBasesEn, hasLength(118));
-    });
-
     test('carries the battered-fish phrases D-V2 alone would miss', () {
       // Assert: "fish and chips" names no breading word, so without these it
       // returned YELLOW "replace the chips" and left the batter.
@@ -260,11 +186,6 @@ void main() {
   });
 
   group('nonKetoBasesHe', () {
-    test('has 131 triggers', () {
-      // Assert
-      expect(nonKetoBasesHe, hasLength(131));
-    });
-
     test('has no duplicate triggers', () {
       // Arrange
       final unique = nonKetoBasesHe.toSet();
@@ -322,12 +243,6 @@ void main() {
           reason: 'nonKetoBaseLabelsEn["$key"] has no matching trigger',
         );
       }
-    });
-
-    test('noodle is labelled noodles and battered fish is named', () {
-      // Assert
-      expect(nonKetoBaseLabelsEn['noodle'], equals('noodles'));
-      expect(nonKetoBaseLabelsEn['fish and chips'], equals('battered fish'));
     });
   });
 

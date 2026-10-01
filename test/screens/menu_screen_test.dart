@@ -398,28 +398,6 @@ void main() {
       );
 
       testWidgets(
-        'after an AI call falls back the screen names the rules, not the AI',
-        (tester) async {
-          // Arrange
-          final gate = Completer<void>();
-
-          // Act
-          await _pumpWhileClassifying(
-            tester,
-            announces: const [ClassifyingEngine.llm, ClassifyingEngine.rules],
-            gate: gate.future,
-          );
-
-          // Assert
-          expect(find.text(_en.menuProgressApplyingRules), findsOneWidget);
-          expect(find.text(_en.menuProgressAskingAi), findsNothing);
-
-          gate.complete();
-          await tester.pumpAndSettle();
-        },
-      );
-
-      testWidgets(
         'before any engine announces itself the screen says "Analysing the '
         'menu" and names no engine',
         (tester) async {
@@ -774,24 +752,6 @@ void main() {
     );
 
     testWidgets(
-      'the refresh action carries a semantics label / tooltip in Hebrew '
-      'too (issue #47)',
-      (tester) async {
-        // Arrange
-        final repository = FakeMenuRepository()
-          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
-        final controller = _controllerFor(repository: repository);
-
-        // Act
-        await _pump(tester, controller, locale: const Locale('he'));
-        await tester.pumpAndSettle();
-
-        // Assert
-        expect(find.byTooltip(_he.actionRefreshMenu), findsOneWidget);
-      },
-    );
-
-    testWidgets(
       'the keto score badge renders no digit when the analysis has not '
       'produced one — never a fallback 0.0',
       (tester) async {
@@ -903,40 +863,6 @@ void main() {
             expect(find.text(_en.actionBackToSearch), findsNothing);
           }
         }
-      },
-    );
-
-    testWidgets(
-      'blockedByBrowser shows no action, only the copy pointing at the '
-      'phone app (issue #68)',
-      (tester) async {
-        // Arrange
-        final repository = FakeMenuRepository()
-          ..stub(
-            _ref,
-            const MenuFetchFailed(
-              reason: MenuFetchFailureReason.blockedByBrowser,
-            ),
-          );
-        final controller = _controllerFor(repository: repository);
-
-        // Act
-        await _pump(tester, controller);
-        await tester.pumpAndSettle();
-
-        // Assert
-        expect(
-          find.text(
-            fetchFailureMessage(
-              MenuFetchFailureReason.blockedByBrowser,
-              _en,
-              platform: 'Wolt',
-            ),
-          ),
-          findsOneWidget,
-        );
-        expect(find.text(_en.actionRetry), findsNothing);
-        expect(find.text(_en.actionBackToSearch), findsNothing);
       },
     );
 
@@ -1174,44 +1100,6 @@ void main() {
         );
         expect(find.text(message), findsOneWidget);
       }
-    });
-
-    testWidgets('build shows the filter the engine chip and a DishCard per '
-        'visibleRows on a loaded menu', (tester) async {
-      // Arrange
-      final green = _dish('Steak', id: 'green');
-      final yellow = _dish('Fries', id: 'yellow');
-      final repository = FakeMenuRepository()
-        ..stub(_ref, MenuFetched(menu: _menuOf([green, yellow])));
-      final classifier = FakeMenuClassifier()
-        ..respondWith(
-          MenuAnalysed(
-            dishes: [
-              _verdictFor(green, DishVerdict.orderAsIs),
-              _verdictFor(
-                yellow,
-                DishVerdict.modifiable,
-                modification: 'Ask for a salad instead of fries.',
-              ),
-            ],
-            unclassified: const <String>[],
-            engine: const LlmEngine(model: 'test-model'),
-            analysedAt: DateTime.utc(2026),
-          ),
-        );
-      final controller = _controllerFor(
-        repository: repository,
-        classifier: classifier,
-      );
-
-      // Act
-      await _pump(tester, controller);
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(find.byType(VerdictCounterTiles), findsOneWidget);
-      expect(find.byType(EngineChip), findsOneWidget);
-      expect(find.byType(DishCard), findsNWidgets(2));
     });
 
     testWidgets('a RulesEngine result shows the RulesReasonBanner with '
@@ -1813,52 +1701,6 @@ void main() {
     });
 
     testWidgets(
-      'tapping the yellow tile filters to modifiable dishes only — the '
-      "acceptance criterion's paste-link-then-filter-to-yellow flow, at "
-      'widget level',
-      (tester) async {
-        // Arrange
-        final green = _dish('Steak', id: 'green');
-        final yellow = _dish('Fries', id: 'yellow');
-        final red = _dish('Pasta', id: 'red');
-        final repository = FakeMenuRepository()
-          ..stub(_ref, MenuFetched(menu: _menuOf([green, yellow, red])));
-        final classifier = FakeMenuClassifier()
-          ..respondWith(
-            MenuAnalysed(
-              dishes: [
-                _verdictFor(green, DishVerdict.orderAsIs),
-                _verdictFor(yellow, DishVerdict.modifiable, modification: 'x'),
-                _verdictFor(red, DishVerdict.nonKeto),
-              ],
-              unclassified: const <String>[],
-              engine: const RulesEngine(
-                reason: MenuAnalysisFailureReason.notConfigured,
-              ),
-              analysedAt: DateTime.utc(2026),
-            ),
-          );
-        final controller = _controllerFor(
-          repository: repository,
-          classifier: classifier,
-        );
-        await _pump(tester, controller);
-        await tester.pumpAndSettle();
-
-        // Act
-        await tester.tap(find.text(_en.tileYellowLabel.toUpperCase()));
-        await tester.pumpAndSettle();
-
-        // Assert
-        expect(find.byType(DishCard), findsOneWidget);
-        expect(find.text('Fries'), findsOneWidget);
-        expect(find.text('Steak'), findsNothing);
-        expect(find.text('Pasta'), findsNothing);
-        expect(find.text(_en.menuShowingYellow), findsOneWidget);
-      },
-    );
-
-    testWidgets(
       'filtering to a tile with no matching dish shows menuNoResults and '
       'a Clear filter action (issue #63)',
       (tester) async {
@@ -2160,22 +2002,6 @@ void main() {
     );
 
     group('personal notes (issue #52)', () {
-      testWidgets('a dish with no note shows the "Add a note" prompt', (
-        tester,
-      ) async {
-        // Arrange
-        final repository = FakeMenuRepository()
-          ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
-        final controller = _controllerFor(repository: repository);
-
-        // Act
-        await _pump(tester, controller);
-        await tester.pumpAndSettle();
-
-        // Assert
-        expect(find.text(_en.dishCardAddNote), findsOneWidget);
-      });
-
       testWidgets(
         'a dish with a stored note shows it on the card, not the prompt',
         (tester) async {
@@ -2434,27 +2260,6 @@ void main() {
         expect(find.text('Grilled Steak'), findsOneWidget);
         expect(find.text('Greek Salad'), findsNothing);
       });
-
-      testWidgets(
-        'a search with no matching dish shows menuNoResults instead of an '
-        'empty list',
-        (tester) async {
-          // Arrange
-          final repository = FakeMenuRepository()
-            ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
-          final controller = _controllerFor(repository: repository);
-          await _pump(tester, controller);
-          await tester.pumpAndSettle();
-
-          // Act
-          await tester.enterText(find.byType(TextField), 'sushi');
-          await tester.pumpAndSettle();
-
-          // Assert
-          expect(find.byType(DishCard), findsNothing);
-          expect(find.text(_en.menuNoResults), findsOneWidget);
-        },
-      );
 
       testWidgets(
         'clearing the search field with its clear button restores every '

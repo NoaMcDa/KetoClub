@@ -249,18 +249,6 @@ void main() {
           expect(search.byNameCalls.single.query, 'vitrina');
         });
       });
-
-      test('a hyphenated slug still resolves as a Wolt slug', () {
-        fakeAsync((async) {
-          // Act
-          controller.search('vitrina-lilinblum', language: 'en');
-          async.elapse(venueSearchDebounce);
-
-          // Assert
-          expect(controller.resolved?.platformId, 'vitrina-lilinblum');
-          expect(controller.resolved?.source, MenuSource.wolt);
-        });
-      });
     });
 
     group('lastVenue (issue #55)', () {

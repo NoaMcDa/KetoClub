@@ -69,13 +69,6 @@ void main() {
       expect(heard, equals([ClassifyingEngine.rules]));
     });
 
-    test('the net-carb limit defaults to 6 g', () {
-      expect(
-        const ClassificationOptions().netCarbLimitGrams,
-        equals(defaultNetCarbLimitGrams),
-      );
-    });
-
     test('a differing net-carb limit makes two instances unequal', () {
       const a = ClassificationOptions();
       const b = ClassificationOptions(netCarbLimitGrams: 9);

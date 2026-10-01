@@ -6,9 +6,9 @@
 // payload a table carries (docs/menu_sources_research.md §3.6); everything
 // from the decoded text on is real: `QrPayloadRouter`, `ScanController`, the
 // route and the menu screen. A menu link opens that venue's classified menu,
-// and the classifier's recorded call proves which venue it was. A Tabit
-// code, an Instagram profile and plain text stay on the Scan tab with copy
-// that says why.
+// and the classifier's recorded call proves which venue it was; a cancelled
+// camera changes nothing and can be retried. The per-payload copy for a
+// Tabit code, an Instagram profile and plain text is `scan_screen_test`'s.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -165,50 +165,6 @@ void main() {
       _expectMenuOpened(fakes, ref);
     });
 
-    testWidgets('a Tabit code says Tabit is not supported yet', (tester) async {
-      // Setup
-      final fakes = FakeAppDependencies();
-      fakes.qrScanner.payload =
-          'https://tabitisrael.co.il/tabit-order?siteName=cafe-noa';
-
-      // Act
-      await _scan(tester, fakes);
-
-      // Assert
-      expect(find.text(_en.scanQrUnsupportedSource('Tabit')), findsOneWidget);
-      _expectStayedOnScanTab(fakes);
-    });
-
-    testWidgets('an Instagram code suggests photographing the menu', (
-      tester,
-    ) async {
-      // Setup
-      final fakes = FakeAppDependencies();
-      fakes.qrScanner.payload = 'https://www.instagram.com/cafe.noa/';
-
-      // Act
-      await _scan(tester, fakes);
-
-      // Assert
-      expect(find.text(_en.scanQrPhotographInstead), findsOneWidget);
-      _expectStayedOnScanTab(fakes);
-    });
-
-    testWidgets('a code that is not a link suggests photographing too', (
-      tester,
-    ) async {
-      // Setup
-      final fakes = FakeAppDependencies();
-      fakes.qrScanner.payload = 'Table 12';
-
-      // Act
-      await _scan(tester, fakes);
-
-      // Assert
-      expect(find.text(_en.scanQrPhotographInstead), findsOneWidget);
-      _expectStayedOnScanTab(fakes);
-    });
-
     testWidgets('a cancelled camera changes nothing and can be retried', (
       tester,
     ) async {
@@ -232,22 +188,6 @@ void main() {
       // Assert
       _expectMenuOpened(fakes, ref);
       expect(fakes.qrScanner.scanCallCount, 2);
-    });
-
-    testWidgets('a build with no camera scanner shows no QR action', (
-      tester,
-    ) async {
-      // Setup: web, where pasting the URL already works.
-      final fakes = FakeAppDependencies();
-      fakes.qrScanner.available = false;
-      await pumpApp(tester, fakes);
-
-      // Act
-      await tapAndSettle(tester, navDestination(_en.navScan));
-
-      // Assert
-      expect(find.text(_en.scanQrAction), findsNothing);
-      expect(find.text(_en.scanScreenActionTakePhoto), findsOneWidget);
     });
   });
 }

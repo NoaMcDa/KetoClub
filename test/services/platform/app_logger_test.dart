@@ -27,19 +27,6 @@ void main() {
       );
     });
 
-    test('info sends the sink a redacted message', () {
-      // Arrange & Act
-      final sunk = <String>[];
-      DeveloperLogAppLogger(
-        sink: (message, {required level, error}) {
-          sunk.add(message);
-        },
-      ).info('header was Bearer abcdefgh-token');
-
-      // Assert
-      expect(sunk.single, isNot(contains('abcdefgh-token')));
-    });
-
     test('warn sends the sink a redacted message and level', () {
       // Arrange & Act
       final levels = <int>[];

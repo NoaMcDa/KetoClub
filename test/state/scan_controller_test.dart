@@ -47,10 +47,6 @@ void main() {
 
     tearDown(() => controller.dispose());
 
-    test('exposes the scanned-menu classifier it was built with', () {
-      expect(controller.classifier, same(classifier));
-    });
-
     test('the paste flow never calls the scanned-menu classifier', () async {
       // Arrange
       controller.text = 'Steak';

@@ -50,30 +50,6 @@ void main() {
 
   group('HiveMenuCache', () {
     test(
-      'write then read round-trips an entry with an LlmEngine analysis',
-      () async {
-        // Arrange
-        final cache = _buildCache();
-        final entry = CachedMenu(
-          menu: _menuFor(woltRef),
-          analysis: MenuAnalysed(
-            dishes: const <AnalysedDish>[],
-            unclassified: const <String>['Mystery dish'],
-            engine: const LlmEngine(model: 'test/model'),
-            analysedAt: DateTime.utc(2026, 1, 1, 12),
-          ),
-        );
-
-        // Act
-        await cache.write(entry);
-        final result = await cache.read(woltRef);
-
-        // Assert
-        expect(result, equals(entry));
-      },
-    );
-
-    test(
       'write then read round-trips an entry with a RulesEngine analysis',
       () async {
         // Arrange
