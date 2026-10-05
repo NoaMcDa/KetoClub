@@ -44,12 +44,15 @@ _PNG_B64 = (
 _PDF_B64 = base64.b64encode(b"%PDF-1.4 a one-page menu").decode("ascii")
 
 
-def _settings(api_key: str = _KEY, per_minute: int = 100) -> Settings:
+def _settings(
+    api_key: str = _KEY, per_minute: int = 100, log_upstream_errors: bool = False
+) -> Settings:
     return Settings(
         DATABASE_URL="sqlite:///:memory:",
         GEMINI_API_KEY=api_key,
         RATE_LIMIT_PER_MINUTE=per_minute,
         RATE_LIMIT_PER_DAY=1000,
+        GEMINI_LOG_UPSTREAM_ERRORS=log_upstream_errors,
     )
 
 
@@ -837,7 +840,7 @@ def test_a_404_names_the_error_status_and_the_model_hint_without_the_body(
 
     chat_lines = [r.getMessage() for r in caplog.records if r.name == "ketoclub.chat"]
     assert "gemini upstream_status=404" in chat_lines
-    assert "gemini upstream error_status=NOT_FOUND" in chat_lines
+    assert "gemini upstream error_status=NOT_FOUND error_code=404" in chat_lines
     hints = [line for line in chat_lines if "GEMINI_MODEL" in line]
     assert len(hints) == 1
     assert "404" in hints[0]
@@ -870,3 +873,260 @@ def test_a_non_404_error_without_a_status_logs_only_the_status_code(
     assert "gemini upstream_status=500" in chat_lines
     assert not any("error_status" in line for line in chat_lines)
     assert not any("GEMINI_MODEL" in line for line in chat_lines)
+
+
+# --- request / reply shape lines ----------------------------------------------
+
+
+def _chat_lines(caplog: pytest.LogCaptureFixture) -> list[str]:
+    return [r.getMessage() for r in caplog.records if r.name == "ketoclub.chat"]
+
+
+def test_a_request_and_its_reply_are_described_by_shape_only(
+    chat_client: TestClient,
+    gemini: respx.MockRouter,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    reply = _reply()
+    reply["usageMetadata"] = {
+        "promptTokenCount": 1234,
+        "candidatesTokenCount": 567,
+        "totalTokenCount": 1801,
+    }
+    upstream = httpx.Response(200, json=reply)
+    gemini.post(_URL).mock(return_value=upstream)
+    body = _request_body()
+    body["user_prompt"] = f"{_USER}\n2 | Mains | Salmon | with rice USER-MARKER"
+
+    with caplog.at_level(logging.INFO):
+        assert _post(chat_client, body=body).status_code == 200
+
+    lines = _chat_lines(caplog)
+    assert (
+        "gemini request attempt=1 model=gemini-3.5-flash schema=yes "
+        f"system_chars={len(_SYSTEM)} user_chars={len(body['user_prompt'])} "
+        "user_lines=2 images=0 image_bytes=0 max_output_tokens=65536 "
+        "thinking_budget=0"
+    ) in lines
+    responses = [line for line in lines if line.startswith("gemini response ")]
+    assert len(responses) == 1
+    assert responses[0].startswith("gemini response status=200 latency_ms=")
+    assert responses[0].endswith(f" body_bytes={len(upstream.content)}")
+    assert (
+        f"gemini reply finish_reason=STOP content_chars={len(_ANSWER)} "
+        "prompt_tokens=1234 output_tokens=567 thoughts_tokens=none "
+        "total_tokens=1801"
+    ) in lines
+    assert "USER-MARKER" not in caplog.text
+    assert "SYSTEM-MARKER" not in caplog.text
+
+
+def test_the_schema_less_retry_is_described_as_a_second_attempt(
+    chat_client: TestClient,
+    gemini: respx.MockRouter,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    gemini.post(_URL).mock(
+        side_effect=[
+            httpx.Response(400, json=_GENERIC_400_BODY),
+            httpx.Response(200, json=_reply()),
+        ]
+    )
+
+    with caplog.at_level(logging.INFO):
+        assert _post(chat_client).status_code == 200
+
+    requests = [
+        line for line in _chat_lines(caplog) if line.startswith("gemini request ")
+    ]
+    assert len(requests) == 2
+    assert requests[0].startswith(
+        "gemini request attempt=1 model=gemini-3.5-flash schema=yes "
+    )
+    assert requests[1].startswith(
+        "gemini request attempt=2 model=gemini-3.5-flash schema=no "
+    )
+
+
+def test_an_image_request_logs_the_byte_count_never_the_bytes(
+    chat_client: TestClient,
+    gemini: respx.MockRouter,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    gemini.post(_URL).mock(return_value=httpx.Response(200, json=_reply()))
+
+    with caplog.at_level(logging.INFO):
+        body = _image_body(("image/png", _PNG_B64), ("application/pdf", _PDF_B64))
+        assert _post(chat_client, body=body).status_code == 200
+
+    requests = [
+        line for line in _chat_lines(caplog) if line.startswith("gemini request ")
+    ]
+    assert len(requests) == 1
+    assert f" images=2 image_bytes={len(_PNG_B64) + len(_PDF_B64)} " in requests[0]
+    assert _PNG_B64[:16] not in caplog.text
+    assert "image/png" not in caplog.text
+
+
+@pytest.mark.parametrize(
+    ("upstream", "reason"),
+    [
+        (
+            httpx.Response(200, json=_reply(finish_reason="MAX_TOKENS")),
+            "finish_reason=MAX_TOKENS",
+        ),
+        (
+            httpx.Response(200, json=_reply(finish_reason="SAFETY")),
+            "finish_reason=SAFETY",
+        ),
+        (
+            httpx.Response(200, json=_reply(finish_reason="<html>")),
+            "finish_reason=other",
+        ),
+        (httpx.Response(200, json={"candidates": []}), "no_candidates"),
+        (
+            httpx.Response(200, json={"candidates": [{"finishReason": "STOP"}]}),
+            "no_content",
+        ),
+        (httpx.Response(200, json=_reply(parts=[{"text": ""}])), "no_text_part"),
+        (httpx.Response(200, text="not json"), "not_json"),
+        (httpx.Response(200, json=[]), "not_an_object"),
+    ],
+    ids=[
+        "max-tokens",
+        "safety",
+        "free-text-finish",
+        "no-candidates",
+        "no-content",
+        "empty-text",
+        "not-json",
+        "not-an-object",
+    ],
+)
+def test_a_thrown_away_200_names_why(
+    chat_client: TestClient,
+    gemini: respx.MockRouter,
+    caplog: pytest.LogCaptureFixture,
+    upstream: httpx.Response,
+    reason: str,
+) -> None:
+    gemini.post(_URL).mock(return_value=upstream)
+
+    with caplog.at_level(logging.INFO):
+        response = _post(chat_client)
+
+    assert response.status_code == 502
+    assert response.json() == _error(502, "badResponse")
+    unusable = [line for line in _chat_lines(caplog) if "reply unusable" in line]
+    assert len(unusable) == 1
+    assert unusable[0].startswith(f"gemini reply unusable reason={reason}")
+
+
+def test_a_max_tokens_reply_logs_the_token_counts_it_hit(
+    chat_client: TestClient,
+    gemini: respx.MockRouter,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    reply = _reply(finish_reason="MAX_TOKENS")
+    reply["usageMetadata"] = {
+        "promptTokenCount": 9000,
+        "candidatesTokenCount": 8192,
+        "thoughtsTokenCount": 0,
+        "totalTokenCount": 17192,
+    }
+    gemini.post(_URL).mock(return_value=httpx.Response(200, json=reply))
+
+    with caplog.at_level(logging.INFO):
+        assert _post(chat_client).status_code == 502
+
+    assert (
+        "gemini reply unusable reason=finish_reason=MAX_TOKENS prompt_tokens=9000 "
+        "output_tokens=8192 thoughts_tokens=0 total_tokens=17192"
+    ) in _chat_lines(caplog)
+
+
+# --- GEMINI_LOG_UPSTREAM_ERRORS ------------------------------------------------
+
+_UNAVAILABLE_BODY = {
+    "error": {
+        "code": 503,
+        "message": (
+            f"The model is overloaded. Please try again later. key={_KEY} "
+            "UPSTREAM-BODY-MARKER"
+        ),
+        "status": "UNAVAILABLE",
+        "details": [
+            {
+                "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+                "reason": "OVERLOADED",
+            },
+            {"@type": "type.googleapis.com/google.rpc.Help"},
+        ],
+    }
+}
+
+
+def test_upstream_error_message_is_not_logged_by_default(
+    chat_client: TestClient,
+    gemini: respx.MockRouter,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    gemini.post(_URL).mock(return_value=httpx.Response(503, json=_UNAVAILABLE_BODY))
+
+    with caplog.at_level(logging.INFO):
+        assert _post(chat_client).status_code == 502
+
+    lines = _chat_lines(caplog)
+    assert "gemini upstream error_status=UNAVAILABLE error_code=503" in lines
+    assert not [line for line in lines if "error_message=" in line]
+    assert "UPSTREAM-BODY-MARKER" not in caplog.text
+    assert "OVERLOADED" not in caplog.text
+    assert _KEY not in caplog.text
+
+
+def test_upstream_error_message_is_logged_with_the_key_redacted_when_enabled(
+    gemini: respx.MockRouter,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    gemini.post(_URL).mock(return_value=httpx.Response(503, json=_UNAVAILABLE_BODY))
+
+    with _client(_settings(log_upstream_errors=True)) as client:
+        with caplog.at_level(logging.INFO):
+            assert _post(client).status_code == 502
+
+    lines = _chat_lines(caplog)
+    assert "gemini upstream error_status=UNAVAILABLE error_code=503" in lines
+    assert (
+        "gemini upstream error_message='The model is overloaded. Please try again "
+        "later. key=<redacted> UPSTREAM-BODY-MARKER' error_reasons=OVERLOADED"
+    ) in lines
+    assert _KEY not in caplog.text
+
+
+def test_an_enabled_error_message_is_capped_and_absent_without_an_error_object(
+    gemini: respx.MockRouter,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    gemini.post(_URL).mock(
+        side_effect=[
+            httpx.Response(
+                500,
+                json={
+                    "error": {"code": 500, "status": "INTERNAL", "message": "x" * 2000}
+                },
+            ),
+            httpx.Response(500, text="<html>a proxy error page</html>"),
+        ]
+    )
+
+    with _client(_settings(log_upstream_errors=True)) as client:
+        with caplog.at_level(logging.INFO):
+            assert _post(client).status_code == 502
+            assert _post(client, body=_prompt_variant("second")).status_code == 502
+
+    messages = [line for line in _chat_lines(caplog) if "error_message=" in line]
+    assert len(messages) == 1
+    assert messages[0] == (
+        f"gemini upstream error_message='{'x' * 500}' error_reasons=none"
+    )
+    assert "proxy error page" not in caplog.text

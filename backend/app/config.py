@@ -45,6 +45,11 @@ class Settings(BaseSettings):
     # against the output budget above, and this is a classification task
     # with a strict schema, so the default spends none on thinking.
     GEMINI_THINKING_BUDGET: int = 0
+    # When true, an upstream error reply's ``error.message`` and its
+    # ``details[].reason`` entries are logged (key redacted) on top of the
+    # always-on ``error_status`` line.  Off by default: Google's message can
+    # quote the request, and the status enum is what the app acts on.
+    GEMINI_LOG_UPSTREAM_ERRORS: bool = False
 
     # --- Vision (D15, #170) ---------------------------------------------------
     # Bounds on the optional ``images`` of POST /v1/chat: menu pages sent to

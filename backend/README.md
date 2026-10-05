@@ -138,6 +138,29 @@ Logs carry the install id's first 8 characters, an image count, the
 `cache=hit|miss|bypass` outcome, upstream status codes and, on an error, Google's `error.status`
 enum only: never the key, prompt text or an upstream body.
 
+### Reading a `/v1/chat` exchange in the log
+
+Every upstream call prints its shape, so a failure can be read against the
+menu's size without anything quoting the menu (logger `ketoclub.chat`):
+
+```
+gemini request attempt=1 model=gemini-3.5-flash schema=yes system_chars=4210 user_chars=3880 user_lines=56 images=0 image_bytes=0 max_output_tokens=65536 thinking_budget=0
+gemini upstream_status=200
+gemini response status=200 latency_ms=33512.4 body_bytes=18340
+gemini reply finish_reason=STOP content_chars=17902 prompt_tokens=2970 output_tokens=6120 thoughts_tokens=none total_tokens=9090
+```
+
+- `user_lines` is the dish count for the menu prompt (one dish per line);
+  `attempt=2 … schema=no` is the one schema-less re-send after a 400.
+- `gemini reply unusable reason=…` names why a 200 was thrown away:
+  `finish_reason=MAX_TOKENS` (the output cap, #188; the `output_tokens`
+  beside it is how far it got), `finish_reason=SAFETY`, `no_candidates`,
+  `no_text_part`, `not_json`.
+- An error reply prints `error_status=UNAVAILABLE error_code=503` (Google's
+  enum and code). Set `GEMINI_LOG_UPSTREAM_ERRORS=true` in `.env` to also
+  print its `error_message` (key redacted, capped at 500 characters) and
+  `details[].reason` entries while diagnosing.
+
 #### The shared completion cache (#103)
 
 Identical menus produce identical prompts, so a completion is cached
@@ -391,6 +414,7 @@ that need them (`/v1/chat`, and `/v1/admin/*` in a later issue). See
 | `GEMINI_BASE_URL` | `https://generativelanguage.googleapis.com` | Upstream host; never taken from a request |
 | `GEMINI_MAX_OUTPUT_TOKENS` | `65536` | `generationConfig.maxOutputTokens`; must exceed a full menu's verdicts (#188) |
 | `GEMINI_THINKING_BUDGET` | `0` | Thinking tokens count against the output budget, and this is a classification task |
+| `GEMINI_LOG_UPSTREAM_ERRORS` | `false` | Also log an upstream error reply's `error.message` (key redacted) and `details[].reason`; the shape lines above are always on |
 | `VISION_MAX_IMAGES` | `6` | Most `images` parts one `/v1/chat` request may carry (#170) |
 | `VISION_MAX_IMAGE_BYTES` | `3145728` | Largest `images` part once decoded, in bytes (3 MiB) |
 | `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_PER_DAY` | `5`, `40` | Per install id on `/v1/chat`, in memory |
