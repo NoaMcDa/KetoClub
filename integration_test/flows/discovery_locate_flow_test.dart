@@ -16,6 +16,7 @@ import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
+import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/venue_card.dart';
 
 import 'flow_support.dart';
@@ -136,7 +137,12 @@ void main() {
 
         expect(readsBefore(offline.name, scored.name), isTrue);
         expect(readsBefore(scored.name, plain.name), isTrue);
-        expect(find.text('10.0'), findsOneWidget);
+        // Two scores: the cached venue's, and the plain venue's from the
+        // automatic quick score (D21) — the fake estimate engine marks
+        // its one dish green — carrying the rules marker. The offline
+        // venue has no stubbed menu, so it gets no number.
+        expect(find.text('10.0'), findsNWidgets(2));
+        expect(find.byType(EngineChip), findsOneWidget);
 
         // Act: open the plain venue's card. It is the third card, below the
         // fold on the web-server surface: the Discovery list is a Column

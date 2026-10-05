@@ -302,6 +302,90 @@ void main() {
       expect(result.single.ref, equals(woltRef));
     });
 
+    test('entries count food only: a drink is listed in dishCount but never '
+        'in the score (D21)', () async {
+      // Arrange: a steak (green) and a cola (green) under a drinks heading.
+      final cache = _buildCache();
+      await cache.write(
+        CachedMenu(
+          menu: Menu(
+            venueRef: woltRef,
+            currency: 'ILS',
+            fetchedAt: DateTime.utc(2026),
+            categories: const <MenuCategory>[
+              MenuCategory(
+                id: 'mains',
+                name: 'Mains',
+                dishes: <Dish>[
+                  Dish(
+                    id: 'steak',
+                    name: 'Steak',
+                    description: '',
+                    price: 80,
+                    options: <DishOption>[],
+                  ),
+                  Dish(
+                    id: 'pasta',
+                    name: 'Pasta',
+                    description: '',
+                    price: 60,
+                    options: <DishOption>[],
+                  ),
+                ],
+              ),
+              MenuCategory(
+                id: 'drinks',
+                name: 'Drinks',
+                dishes: <Dish>[
+                  Dish(
+                    id: 'cola',
+                    name: 'Diet Coke',
+                    description: '',
+                    price: 12,
+                    options: <DishOption>[],
+                  ),
+                ],
+              ),
+            ],
+          ),
+          analysis: MenuAnalysed(
+            dishes: const <AnalysedDish>[
+              AnalysedDish(
+                dishId: 'steak',
+                name: 'Steak',
+                verdict: DishVerdict.orderAsIs,
+                why: 'No starch.',
+              ),
+              AnalysedDish(
+                dishId: 'pasta',
+                name: 'Pasta',
+                verdict: DishVerdict.nonKeto,
+                why: 'Pasta.',
+              ),
+              AnalysedDish(
+                dishId: 'cola',
+                name: 'Diet Coke',
+                verdict: DishVerdict.orderAsIs,
+                why: 'Zero sugar.',
+              ),
+            ],
+            unclassified: const <String>[],
+            engine: const LlmEngine(model: 'm'),
+            analysedAt: DateTime.utc(2026),
+          ),
+        ),
+      );
+
+      // Act
+      final entry = (await cache.entries()).single;
+
+      // Assert: 1 green of 2 food dishes, not 2 of 3.
+      expect(entry.dishCount, 3);
+      expect(entry.greenCount, 1);
+      expect(entry.yellowCount, 0);
+      expect(entry.score, 5.0);
+    });
+
     test(
       'entries carry the score and verdict counts of the analysis',
       () async {

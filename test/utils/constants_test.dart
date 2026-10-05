@@ -537,4 +537,73 @@ void main() {
       expect(optionBaseModificationHe, contains('{base}'));
     });
   });
+
+  group('dish kinds (D21)', () {
+    test('the drink keys stay keys of carbModifiers', () {
+      for (final key in yellowDrinkTriggersEn) {
+        expect(carbModifiersEn, contains(key), reason: key);
+      }
+      for (final key in yellowDrinkTriggersHe) {
+        expect(carbModifiersHe, contains(key), reason: key);
+      }
+    });
+
+    test('the drink bases stay inside nonKetoBases, once each', () {
+      for (final base in nonKetoDrinkBasesEn) {
+        expect(nonKetoBasesEn.where((b) => b == base), hasLength(1));
+      }
+      for (final base in nonKetoDrinkBasesHe) {
+        expect(nonKetoBasesHe.where((b) => b == base), hasLength(1));
+      }
+    });
+
+    test('every kind list is non-empty, lower-case, trimmed and '
+        'duplicate-free', () {
+      final lists = <String, List<String>>{
+        'drinkCategoryWordsEn': drinkCategoryWordsEn,
+        'drinkCategoryWordsHe': drinkCategoryWordsHe,
+        'extraCategoryWordsEn': extraCategoryWordsEn,
+        'extraCategoryWordsHe': extraCategoryWordsHe,
+        'foodCategoryWordsEn': foodCategoryWordsEn,
+        'foodCategoryWordsHe': foodCategoryWordsHe,
+        'noticeCategoryWordsEn': noticeCategoryWordsEn,
+        'noticeCategoryWordsHe': noticeCategoryWordsHe,
+        'plainDrinkWordsEn': plainDrinkWordsEn,
+        'plainDrinkWordsHe': plainDrinkWordsHe,
+        'drinkNameGuardWordsEn': drinkNameGuardWordsEn,
+        'drinkNameGuardWordsHe': drinkNameGuardWordsHe,
+      };
+      for (final entry in lists.entries) {
+        expect(entry.value, isNotEmpty, reason: entry.key);
+        expect(
+          entry.value.toSet(),
+          hasLength(entry.value.length),
+          reason: entry.key,
+        );
+        for (final word in entry.value) {
+          expect(word, isNotEmpty, reason: entry.key);
+          expect(
+            word,
+            word.toLowerCase().trim(),
+            reason: '${entry.key} "$word"',
+          );
+        }
+      }
+    });
+
+    test('sides are never extras: תוספות is not an extras heading', () {
+      expect(extraCategoryWordsHe, isNot(contains('תוספות')));
+      expect(extraCategoryWordsEn, isNot(contains('sides')));
+      expect(foodCategoryWordsHe, contains('תוספות'));
+    });
+
+    test('the automatic quick score is on by default, within the fetch '
+        'bound', () {
+      expect(venueAutoEstimateLimit, greaterThan(0));
+      expect(
+        venueEstimateConcurrency,
+        lessThanOrEqualTo(venueAutoEstimateLimit),
+      );
+    });
+  });
 }

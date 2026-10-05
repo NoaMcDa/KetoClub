@@ -53,6 +53,13 @@ const double _hiddenCarbYellowWeight = 0.25;
 /// zero keto-friendly", a materially different and false claim from "we
 /// could not read this menu".
 ///
+/// **Which dishes feed the counts is decided upstream, in
+/// `utils/verdict_counts.dart` (D21): food only.** A drink, a sauce or
+/// add-on, or a notice line is classified and listed but never counted,
+/// so ten safe drinks cannot lift a menu's score; every caller reduces
+/// an analysis through `VerdictCounts.of` rather than counting verdicts
+/// itself.
+///
 /// This formula is invented product logic with no nutrition research
 /// behind it. Decision D13 (architecture.md §14, issue #41) looked for
 /// a basis, found none, and kept the formula with that status stated

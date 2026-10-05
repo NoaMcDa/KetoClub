@@ -266,9 +266,16 @@ class _MenuScreenState extends State<MenuScreen> {
     // non-empty summary from (issue #54); a failed or not-yet-run analysis
     // — where every count below reads 0 — hides it rather than sharing an
     // empty card.
+    // Any green or yellow dish, drinks included: the counts are food only
+    // (D21), but a card of safe drinks is still worth sharing.
+    final analysis = controller.analysis;
     final canShare =
-        controller.analysis is MenuAnalysed &&
-        (controller.greenCount > 0 || controller.yellowCount > 0);
+        analysis is MenuAnalysed &&
+        analysis.dishes.any(
+          (dish) =>
+              dish.verdict == DishVerdict.orderAsIs ||
+              dish.verdict == DishVerdict.modifiable,
+        );
     return Scaffold(
       appBar: AppBar(
         // The venue name, once the body header has scrolled under the bar
@@ -1054,6 +1061,8 @@ class _MenuScreenState extends State<MenuScreen> {
           Text(l10n.legendNote, style: bodyStyle),
           const SizedBox(height: 6),
           Text(l10n.legendEngines, style: bodyStyle),
+          const SizedBox(height: 6),
+          Text(l10n.legendFoodOnly, style: bodyStyle),
           const SizedBox(height: 6),
           Text(l10n.legendBudget, style: bodyStyle),
         ],

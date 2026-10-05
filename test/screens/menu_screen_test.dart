@@ -1547,6 +1547,7 @@ void main() {
         );
         expect(find.text(_en.legendNote), findsOneWidget);
         expect(find.text(_en.legendEngines), findsOneWidget);
+        expect(find.text(_en.legendFoodOnly), findsOneWidget);
         expect(find.text(_en.legendBudget), findsOneWidget);
 
         // Assert: a rules result shows no budget field and no notice about

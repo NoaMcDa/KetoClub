@@ -292,8 +292,10 @@ AppDependencies buildDependencies() {
       clock: clock,
     ),
     menuClassifier: RoutingMenuClassifier(llm, heuristic, connectivity),
-    // The rule engine on its own, for "Estimate this list" (issue #42,
-    // D13): the explicit action must never reach the language model.
+    // The rule engine on its own, for the quick score — the automatic run
+    // when a result list arrives and the explicit "Quick score the rest"
+    // tap alike (issue #42, D13, D21): neither may reach the router or the
+    // language model.
     estimateClassifier: heuristic,
     menuQuestionAnswerer: menuQuestionAnswerer,
     settingsStore: settingsStore,

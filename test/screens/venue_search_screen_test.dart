@@ -114,6 +114,32 @@ Venue _venue(String slug, {bool? isOnline, String? address}) => Venue(
   address: address,
 );
 
+/// A fetched menu for [ref] holding one dish, so the quick score has
+/// something to place (the default [FakeMenuClassifier] answer marks it
+/// green, scoring 10.0).
+MenuFetched _fetchedWithOneDish(VenueRef ref) => MenuFetched(
+  menu: Menu(
+    venueRef: ref,
+    currency: 'ILS',
+    fetchedAt: DateTime.utc(2026),
+    categories: const <MenuCategory>[
+      MenuCategory(
+        id: 'mains',
+        name: 'Mains',
+        dishes: <Dish>[
+          Dish(
+            id: 'steak',
+            name: 'Steak',
+            description: '',
+            price: 80,
+            options: <DishOption>[],
+          ),
+        ],
+      ),
+    ],
+  ),
+);
+
 void main() {
   group('VenueSearchScreen', () {
     late FakeSettingsStore settingsStore;
@@ -124,19 +150,26 @@ void main() {
     late VenueSearchController controller;
     late List<String> pushedNames;
 
+    /// A controller with the automatic quick score (D21) off unless
+    /// [autoEstimateLimit] says otherwise, so a test sees only the
+    /// fetches it asks for.
+    VenueSearchController buildController({int autoEstimateLimit = 0}) =>
+        VenueSearchController(
+          settingsStore,
+          repository,
+          locationService: location,
+          venueSearchService: search,
+          estimateClassifier: estimator,
+          autoEstimateLimit: autoEstimateLimit,
+        );
+
     setUp(() {
       settingsStore = FakeSettingsStore();
       repository = FakeMenuRepository();
       location = FakeLocationService();
       search = FakeVenueSearchService();
       estimator = FakeMenuClassifier();
-      controller = VenueSearchController(
-        settingsStore,
-        repository,
-        locationService: location,
-        venueSearchService: search,
-        estimateClassifier: estimator,
-      );
+      controller = buildController();
       pushedNames = <String>[];
     });
 
@@ -612,9 +645,16 @@ void main() {
       expect(find.text(_l10n(tester).discoveryAroundYou), findsOneWidget);
     });
 
-    testWidgets('loading the list never fetches a menu (D13)', (tester) async {
-      // Arrange
-      search.queueFound([_venue('a'), _venue('b'), _venue('c')]);
+    testWidgets('loading the list scores its first cards on its own with the '
+        'rule engine, marked as estimates, and scrolling fetches nothing '
+        '(D13, D21)', (tester) async {
+      // Arrange: three venues, a cap of two, each with a one-dish menu.
+      controller = buildController(autoEstimateLimit: 2);
+      final venues = [_venue('a'), _venue('b'), _venue('c')];
+      for (final venue in venues) {
+        repository.stub(venue.ref, _fetchedWithOneDish(venue.ref));
+      }
+      search.queueFound(venues);
       await _pump(tester, controller: controller, pushedNames: pushedNames);
 
       // Act
@@ -622,9 +662,17 @@ void main() {
       await tester.drag(find.byType(Scrollable).first, const Offset(0, -300));
       await tester.pumpAndSettle();
 
-      // Assert
+      // Assert: two cards scored with the rules marker, no AI, and the
+      // third on offer for "Quick score the rest".
       expect(find.byType(VenueCard), findsNWidgets(3));
-      expect(repository.loadCalls, isEmpty);
+      expect(find.text('10.0'), findsNWidgets(2));
+      expect(find.byType(EngineChip), findsNWidgets(2));
+      expect(
+        repository.loadCalls.map((call) => call.ref),
+        venues.take(2).map((venue) => venue.ref),
+      );
+      expect(estimator.calls, hasLength(2));
+      expect(find.text(_l10n(tester).discoveryEstimateList), findsOneWidget);
     });
 
     testWidgets('a denied location explains itself and "Type a name '
@@ -1270,7 +1318,7 @@ void main() {
       });
     });
 
-    group('Estimate this list (issue #42)', () {
+    group('Quick score the rest (issue #42), the automatic run off', () {
       /// Scripts [venues] to load a one-dish menu each.
       void stubMenus(List<Venue> venues) {
         for (final venue in venues) {

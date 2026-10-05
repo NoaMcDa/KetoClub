@@ -761,6 +761,53 @@ void main() {
       expect(controller.engine, isNull);
     });
 
+    test('verdict counts and the score cover food only; the filtered list '
+        'still shows the drink (D21)', () async {
+      // Arrange: a steak and a pasta under Mains, a cola under a drinks
+      // heading — all three placed, the cola green.
+      final steak = _dish('Steak', id: 'steak');
+      final pasta = _dish('Pasta', id: 'pasta');
+      final cola = _dish('Diet Coke', id: 'cola');
+      final menu = Menu(
+        venueRef: _ref,
+        currency: 'ILS',
+        fetchedAt: clock.now(),
+        categories: [
+          MenuCategory(id: 'c1', name: 'Mains', dishes: [steak, pasta]),
+          MenuCategory(id: 'c2', name: 'שתייה', dishes: [cola]),
+        ],
+      );
+      repository.stub(_ref, MenuFetched(menu: menu));
+      classifier.respondWith(
+        MenuAnalysed(
+          dishes: [
+            _verdictFor(steak, DishVerdict.orderAsIs),
+            _verdictFor(pasta, DishVerdict.nonKeto),
+            _verdictFor(cola, DishVerdict.orderAsIs),
+          ],
+          unclassified: const <String>[],
+          engine: const LlmEngine(model: 'test-model'),
+          analysedAt: clock.now(),
+        ),
+      );
+      await controller.open(_ref);
+
+      // Act
+      await controller.setFilter(MenuFilter.greenOnly);
+
+      // Assert: one green of two food dishes, the cola uncounted but
+      // still listed under the green filter; the raw total still counts
+      // every dish on the menu.
+      expect(controller.greenCount, 1);
+      expect(controller.redCount, 1);
+      expect(controller.ketoScoreOutOfTen, 5.0);
+      expect(controller.totalDishCount, 3);
+      expect(
+        controller.visibleRows.map((row) => row.dish.id),
+        containsAll(<String>['steak', 'cola']),
+      );
+    });
+
     group('refresh (issue #49)', () {
       test('refresh before any open is a no-op: no repository call and no '
           'notification', () async {

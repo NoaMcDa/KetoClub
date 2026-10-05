@@ -54,13 +54,14 @@ const double _logoSize = 28;
 /// geocoding that no anonymous Wolt endpoint provides
 /// (`phase2_discovery_research.md` §6) — deferred, not dropped.
 ///
-/// **Card numbers follow D13**: a score and counts only for venues whose
-/// analysis is already cached on the device, the *Keto 8+* chip enabled only
-/// once some card has them, and no menu fetched on load or on scroll. Above
-/// the cards, while any visible card lacks numbers, an "Estimate this
-/// list" button (issue #42) fetches those menus once, on the user's tap
-/// only, and scores them with the on-device rules; the numbers it adds
-/// carry the rules engine's estimate marker.
+/// **Card numbers follow D13 as amended by D21**: a score and counts from
+/// an analysis cached on the device, or from the quick score — the rule
+/// engine over each menu, never the AI — which the controller runs on its
+/// own for the first `venueAutoEstimateLimit` cards of every result list,
+/// and on the user's tap ("Quick score the rest", issue #42) for the cards
+/// past that cap. Nothing is fetched on scroll. The *Keto 8+* chip is
+/// enabled once some card has numbers, and every number the quick score
+/// adds carries the rules engine's estimate marker.
 ///
 /// A permanently denied permission (issue #40) also offers "Open Settings",
 /// which deep-links to the platform's own permission page through
@@ -522,7 +523,7 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (controller.isEstimating || controller.hasVisibleWithoutNumbers) ...[
+        if (controller.isEstimating || controller.hasVisibleToEstimate) ...[
           _estimateRow(context, l10n, controller),
           const SizedBox(height: 16),
         ],
@@ -559,10 +560,12 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     );
   }
 
-  /// The "Estimate this list" action (issue #42, D13) and the line saying
-  /// what it does: rules on this device, not the AI. While it runs, the
-  /// button is disabled and reads "Estimating {done} of {total}…"; a
-  /// static icon rather than a spinner, so nothing animates forever.
+  /// The quick-score row (issue #42, D13, D21): the "Quick score the
+  /// rest" action for the cards past the automatic run's cap, and the line
+  /// saying what the quick score is — rules on this device, food only, not
+  /// the AI. While any run is in progress, automatic or tapped, the button
+  /// is disabled and reads "Estimating {done} of {total}…"; a static icon
+  /// rather than a spinner, so nothing animates forever.
   Widget _estimateRow(
     BuildContext context,
     AppLocalizations l10n,

@@ -107,13 +107,18 @@ void main() {
     late FakeMenuClassifier estimator;
     late VenueSearchController controller;
 
-    VenueSearchController build() => VenueSearchController(
-      settings,
-      repository,
-      locationService: location,
-      venueSearchService: search,
-      estimateClassifier: estimator,
-    );
+    /// A controller with the automatic quick score (D21) off unless
+    /// [autoEstimateLimit] says otherwise, so every group but the one
+    /// about that run sees only the fetches it asks for.
+    VenueSearchController build({int autoEstimateLimit = 0}) =>
+        VenueSearchController(
+          settings,
+          repository,
+          locationService: location,
+          venueSearchService: search,
+          estimateClassifier: estimator,
+          autoEstimateLimit: autoEstimateLimit,
+        );
 
     setUp(() {
       settings = FakeSettingsStore();
@@ -839,10 +844,12 @@ void main() {
         expect(controller.cardNumbers(empty), isNull);
       });
 
-      test('never fetch a menu or touch a classifier', () async {
-        // Arrange: the controller holds the rule engine for "Estimate
-        // this list" (issue #42); nothing but that explicit action may
-        // reach it, and the repository is otherwise only ever read.
+      test('with the automatic quick score off, never fetch a menu or touch '
+          'a classifier', () async {
+        // Arrange: the controller holds the rule engine for the quick
+        // score (issue #42, D21); with the automatic run off, nothing but
+        // the explicit tap may reach it, and the repository is otherwise
+        // only ever read.
         final classifier = estimator;
         repository.seedCache(_analysed(venue.ref, green: 3, yellow: 1, red: 1));
         search
@@ -868,7 +875,7 @@ void main() {
       });
     });
 
-    group('estimateVisible (issue #42, D13)', () {
+    group('estimateVisible (issue #42, D13), the automatic run off', () {
       /// [count] venues named `v0`, `v1`, …, each scripted to load a menu
       /// with one dish, so the default [FakeMenuClassifier] answer places
       /// one green dish and scores it 10.0.
@@ -930,7 +937,7 @@ void main() {
         );
         final venues = venuesWithMenus(2);
         await list(venues);
-        expect(controller.hasVisibleWithoutNumbers, isTrue);
+        expect(controller.hasVisibleToEstimate, isTrue);
 
         // Act
         await controller.estimateVisible();
@@ -953,7 +960,7 @@ void main() {
           expect(numbers?.engine, isA<RulesEngine>());
         }
         expect(controller.hasAnyNumbers, isTrue);
-        expect(controller.hasVisibleWithoutNumbers, isFalse);
+        expect(controller.hasVisibleToEstimate, isFalse);
       });
 
       test('reports progress as each venue finishes', () async {
@@ -1103,7 +1110,7 @@ void main() {
 
         // Assert
         expect(repository.loadCalls, isEmpty);
-        expect(controller.hasVisibleWithoutNumbers, isFalse);
+        expect(controller.hasVisibleToEstimate, isFalse);
 
         // Arrange: a list whose only venue is already scored.
         final venue = _venue('scored');
@@ -1134,6 +1141,316 @@ void main() {
         // Assert
         expect(controller.results.single, venue);
         expect(controller.cardNumbers(venue)?.engine, isA<RulesEngine>());
+      });
+    });
+
+    group('automatic quick score (D21)', () {
+      /// [count] venues named `v0`, `v1`, …, each scripted to load a
+      /// one-dish menu the default [FakeMenuClassifier] answer scores
+      /// 10.0, all taking orders so the *Open now* chip keeps them.
+      List<Venue> venuesWithMenus(int count) {
+        final venues = [
+          for (var i = 0; i < count; i++) _venue('v$i', isOnline: true),
+        ];
+        for (final venue in venues) {
+          repository.stub(venue.ref, _fetchedWithOneDish(venue.ref));
+        }
+        return venues;
+      }
+
+      /// Lets a run started by the controller itself finish.
+      Future<void> settle() async {
+        while (controller.isEstimating) {
+          await pumpEventQueue();
+        }
+      }
+
+      setUp(() {
+        controller.dispose();
+        controller = build(autoEstimateLimit: 4);
+      });
+
+      test('scores the first autoEstimateLimit venues on its own when a '
+          'list arrives, at most venueEstimateConcurrency at a time', () async {
+        // Arrange: seven venues, none scored.
+        final venues = venuesWithMenus(7);
+        search.queueFound(venues);
+        final gate = Completer<void>();
+        repository.loadGate = gate.future;
+
+        // Act: the list lands; nothing is tapped.
+        await controller.locate(language: 'en');
+        await pumpEventQueue();
+
+        // Assert: a run is going, bounded, over the cap's worth of venues.
+        expect(controller.isEstimating, isTrue);
+        expect(controller.estimateTotal, 4);
+        expect(repository.loadCalls, hasLength(venueEstimateConcurrency));
+
+        // Act
+        gate.complete();
+        await settle();
+
+        // Assert: the first four, in list order, scored and marked as
+        // estimates; the rest untouched and still on offer.
+        expect(repository.maxConcurrentLoads, venueEstimateConcurrency);
+        expect(
+          repository.loadCalls.map((call) => call.ref),
+          venues.take(4).map((venue) => venue.ref),
+        );
+        expect(estimator.calls, hasLength(4));
+        for (final venue in venues.take(4)) {
+          expect(controller.cardNumbers(venue)?.score, 10.0);
+          expect(controller.cardNumbers(venue)?.engine, isA<RulesEngine>());
+        }
+        for (final venue in venues.skip(4)) {
+          expect(controller.cardNumbers(venue), isNull);
+        }
+        expect(controller.hasVisibleToEstimate, isTrue);
+      });
+
+      test(
+        '"Quick score the rest" then covers the venues past the cap',
+        () async {
+          // Arrange
+          final venues = venuesWithMenus(7);
+          search.queueFound(venues);
+          await controller.locate(language: 'en');
+          await settle();
+
+          // Act
+          await controller.estimateVisible();
+
+          // Assert
+          expect(
+            repository.loadCalls.map((call) => call.ref),
+            venues.map((venue) => venue.ref),
+          );
+          for (final venue in venues) {
+            expect(controller.cardNumbers(venue), isNotNull);
+          }
+          expect(controller.hasVisibleToEstimate, isFalse);
+        },
+      );
+
+      test('a by-name result list starts it too', () async {
+        // Arrange
+        final venues = venuesWithMenus(2);
+        search.queueFound(venues);
+
+        // Act
+        controller.search('v', language: 'en', immediate: true);
+        await pumpEventQueue();
+        await settle();
+
+        // Assert
+        expect(repository.loadCalls, hasLength(2));
+        expect(controller.cardNumbers(venues.last)?.score, 10.0);
+      });
+
+      test('a venue already scored from the cache is not fetched', () async {
+        // Arrange
+        final venues = venuesWithMenus(3);
+        repository.seedCache(
+          _analysed(venues[1].ref, green: 1, yellow: 0, red: 0),
+        );
+        search.queueFound(venues);
+
+        // Act
+        await controller.locate(language: 'en');
+        await settle();
+
+        // Assert
+        expect(repository.loadCalls.map((call) => call.ref), [
+          venues[0].ref,
+          venues[2].ref,
+        ]);
+      });
+
+      test('a chip change scores only venues no run has fetched yet, and '
+          'a second toggle fetches nothing', () async {
+        // Arrange: six venues, the first four scored on arrival.
+        final venues = venuesWithMenus(6);
+        search.queueFound(venues);
+        await controller.locate(language: 'en');
+        await settle();
+        expect(repository.loadCalls, hasLength(4));
+
+        // Act: every venue is taking orders, so the chip shows all six.
+        controller.toggleChip(DiscoveryChip.openNow);
+        await settle();
+
+        // Assert: only the two the first run never reached.
+        expect(repository.loadCalls.skip(4).map((call) => call.ref), [
+          venues[4].ref,
+          venues[5].ref,
+        ]);
+
+        // Act
+        controller.toggleChip(DiscoveryChip.openNow);
+        await settle();
+        controller.toggleChip(DiscoveryChip.openNow);
+        await settle();
+
+        // Assert
+        expect(repository.loadCalls, hasLength(6));
+        expect(controller.hasVisibleToEstimate, isFalse);
+      });
+
+      test('a venue whose menu could not be read is not fetched again until '
+          'a new list arrives', () async {
+        // Arrange
+        final broken = _venue('broken', isOnline: true);
+        repository.stub(
+          broken.ref,
+          const MenuFetchFailed(reason: MenuFetchFailureReason.offline),
+        );
+        final venues = [broken, ...venuesWithMenus(2)];
+        search.queueFound(venues);
+        await controller.locate(language: 'en');
+        await settle();
+        expect(repository.loadCalls, hasLength(3));
+        expect(controller.cardNumbers(broken), isNull);
+
+        // Act: a chip change starts a run with nothing left to fetch.
+        controller.toggleChip(DiscoveryChip.openNow);
+        await settle();
+
+        // Assert: no card is on offer either, so no tap can repeat it.
+        expect(repository.loadCalls, hasLength(3));
+        expect(controller.hasVisibleToEstimate, isFalse);
+
+        // Act: a fresh list is a fresh start.
+        search.queueFound(venues);
+        await controller.locate(language: 'en');
+        await settle();
+
+        // Assert
+        expect(repository.loadCalls, hasLength(6));
+      });
+
+      test('clearing a search back to the nearby list fetches nothing: it '
+          'was scored when it arrived', () async {
+        // Arrange
+        final nearby = venuesWithMenus(1).single;
+        search.queueFound([nearby]);
+        await controller.locate(language: 'en');
+        await settle();
+        final other = _venue('other');
+        repository.stub(other.ref, _fetchedWithOneDish(other.ref));
+        search.queueFound([other]);
+        controller.search('other', language: 'en', immediate: true);
+        await pumpEventQueue();
+        await settle();
+        expect(repository.loadCalls, hasLength(2));
+
+        // Act
+        controller.clearSearch();
+        await pumpEventQueue();
+
+        // Assert
+        expect(repository.loadCalls, hasLength(2));
+        expect(controller.results.single, nearby);
+        expect(controller.cardNumbers(nearby)?.engine, isA<RulesEngine>());
+        expect(controller.hasVisibleToEstimate, isFalse);
+      });
+
+      test('a new query cancels a run in flight, and its venues are not '
+          'refetched by the next automatic run of the same list', () async {
+        // Arrange
+        final venues = venuesWithMenus(4);
+        search.queueFound(venues);
+        final gate = Completer<void>();
+        repository.loadGate = gate.future;
+        await controller.locate(language: 'en');
+        await pumpEventQueue();
+        expect(repository.loadCalls, hasLength(venueEstimateConcurrency));
+        search.queueFound([_venue('sushi-bar')]);
+
+        // Act
+        controller.search('sushi', language: 'en', immediate: true);
+        gate.complete();
+        await pumpEventQueue();
+        await settle();
+
+        // Assert: the three in flight were dropped, the fourth never
+        // started, and the new list's one venue was fetched instead.
+        expect(estimator.calls.map((call) => call.$1.venueRef), [
+          const VenueRef(source: MenuSource.wolt, platformId: 'sushi-bar'),
+        ]);
+        expect(repository.loadCalls, hasLength(venueEstimateConcurrency + 1));
+        expect(controller.cardNumbers(venues.first), isNull);
+      });
+
+      test('card numbers count food only: a drinks category is listed but '
+          'never scored (D21)', () async {
+        // Arrange: a steak and a cola; the fake engine marks both green.
+        final venue = _venue('bar', isOnline: true);
+        repository.stub(
+          venue.ref,
+          MenuFetched(
+            menu: Menu(
+              venueRef: venue.ref,
+              currency: 'ILS',
+              fetchedAt: DateTime.utc(2026),
+              categories: const <MenuCategory>[
+                MenuCategory(
+                  id: 'mains',
+                  name: 'Mains',
+                  dishes: <Dish>[
+                    Dish(
+                      id: 'steak',
+                      name: 'Steak',
+                      description: '',
+                      price: 80,
+                      options: <DishOption>[],
+                    ),
+                  ],
+                ),
+                MenuCategory(
+                  id: 'drinks',
+                  name: 'שתייה',
+                  dishes: <Dish>[
+                    Dish(
+                      id: 'cola',
+                      name: 'קולה',
+                      description: '',
+                      price: 12,
+                      options: <DishOption>[],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+        search.queueFound([venue]);
+
+        // Act
+        await controller.locate(language: 'en');
+        await settle();
+
+        // Assert
+        final numbers = controller.cardNumbers(venue);
+        expect(numbers?.score, 10.0);
+        expect(numbers?.green, 1);
+        expect(numbers?.yellow, 0);
+      });
+
+      test('a limit of 0 turns the automatic run off', () async {
+        // Arrange
+        controller.dispose();
+        controller = build();
+        final venues = venuesWithMenus(2);
+        search.queueFound(venues);
+
+        // Act
+        await controller.locate(language: 'en');
+        await pumpEventQueue();
+
+        // Assert
+        expect(repository.loadCalls, isEmpty);
+        expect(controller.hasVisibleToEstimate, isTrue);
       });
     });
 

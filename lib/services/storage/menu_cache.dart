@@ -6,7 +6,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
-import 'package:ketoclub/utils/keto_score.dart';
+import 'package:ketoclub/utils/verdict_counts.dart';
 
 /// The reason whose `name` equals [wire], or null when none does.
 ///
@@ -157,22 +157,9 @@ final class CachedMenuEntry {
         pinned: pinned,
       );
     }
-    int count(DishVerdict verdict) =>
-        analysis.dishes.where((dish) => dish.verdict == verdict).length;
-    final green = count(DishVerdict.orderAsIs);
-    final yellow = count(DishVerdict.modifiable);
-    final hiddenCarbYellow = analysis.dishes
-        .where(
-          (d) =>
-              d.verdict == DishVerdict.modifiable && d.hiddenCarbs.isNotEmpty,
-        )
-        .length;
-    final score = ketoScore(
-      greenCount: green,
-      hiddenCarbYellowCount: hiddenCarbYellow,
-      otherYellowCount: yellow - hiddenCarbYellow,
-      redCount: count(DishVerdict.nonKeto),
-    );
+    // Food only (D21): a drink or an extra is listed but never counted.
+    final counts = VerdictCounts.of(menu, analysis);
+    final score = counts.score;
     return CachedMenuEntry(
       ref: menu.venueRef,
       venueName: menu.venueName,
@@ -180,8 +167,8 @@ final class CachedMenuEntry {
       dishCount: menu.allDishes.length,
       engine: analysis.engine,
       score: score,
-      greenCount: score == null ? 0 : green,
-      yellowCount: score == null ? 0 : yellow,
+      greenCount: score == null ? 0 : counts.green,
+      yellowCount: score == null ? 0 : counts.yellow,
       pinned: pinned,
     );
   }
