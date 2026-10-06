@@ -268,6 +268,9 @@ const _boundaries = <_Boundary>[
   _Boundary('package:file_picker/', {
     'services/platform/device_page_picker.dart',
   }),
+  // The pure-Dart image decode/re-encode behind the Scan tab's downscaler;
+  // one file touches it so the heavy codec is reached from one place.
+  _Boundary('package:image/', {'services/platform/image_downscaler.dart'}),
   // The Scan tab's QR camera (issue #182). It sits in widgets/, not
   // services/platform/, because it owns a full-screen page; one file
   // touches the plugin either way.

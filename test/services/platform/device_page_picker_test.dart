@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/services/platform/device_page_picker.dart';
+import 'package:ketoclub/services/platform/image_downscaler.dart';
 
 import 'page_picker_contract.dart';
 
@@ -114,6 +115,7 @@ void main() {
     () => DevicePagePicker(
       imagePicker: _FakeImagePicker(),
       pdfPick: () async => null,
+      downscaler: const NoImageDownscaler(),
     ),
   );
 
@@ -347,6 +349,8 @@ void main() {
       });
     });
 
+    _downscalerSuite();
+
     group('an Error thrown by a plugin', () {
       test('answers empty from every method, never throws', () async {
         // Arrange
@@ -389,4 +393,96 @@ final class _ThrowingXFile extends XFile {
 
   @override
   Future<Uint8List> readAsBytes() async => throw StateError('read');
+}
+
+/// A downscaler that swaps every page for a sentinel, so a test can see
+/// that the picker ran its pages through the downscaler. PDFs are also
+/// swapped: the picker only sends images here, so a PDF swap would show a
+/// bug in the picker.
+final class _StubImageDownscaler implements ImageDownscaler {
+  new(this.replacement);
+
+  final ScannedPage replacement;
+  final List<ScannedPage> seen = <ScannedPage>[];
+
+  @override
+  Future<ScannedPage> downscale(ScannedPage page) async {
+    seen.add(page);
+    return replacement;
+  }
+}
+
+void _downscalerSuite() {
+  group('downscaler', () {
+    test('runs every picked image through the downscaler', () async {
+      // Arrange
+      final sentinel = ScannedPage(
+        mimeType: ScannedPage.jpeg,
+        bytes: Uint8List.fromList(const <int>[0xFF, 0xD8, 0xFF, 0xDB, 42]),
+      );
+      final stub = _StubImageDownscaler(sentinel);
+      final picker = DevicePagePicker(
+        imagePicker: _FakeImagePicker(
+          library: [
+            _xfile(_jpegBytes, name: 'a.jpg', mimeType: 'image/jpeg'),
+            _xfile(_pngBytes, name: 'b.png', mimeType: 'image/png'),
+          ],
+        ),
+        downscaler: stub,
+      );
+
+      // Act
+      final pages = await picker.pickImages();
+
+      // Assert
+      expect(stub.seen.map((p) => p.mimeType), [
+        ScannedPage.jpeg,
+        ScannedPage.png,
+      ]);
+      expect(pages, [sentinel, sentinel]);
+    });
+
+    test('runs a photographed page through the downscaler too', () async {
+      // Arrange
+      final sentinel = ScannedPage(
+        mimeType: ScannedPage.jpeg,
+        bytes: Uint8List.fromList(const <int>[0xFF, 0xD8, 0xFF, 0xDB, 7]),
+      );
+      final stub = _StubImageDownscaler(sentinel);
+      final picker = DevicePagePicker(
+        imagePicker: _FakeImagePicker(
+          photo: _xfile(_jpegBytes, mimeType: 'image/jpeg'),
+        ),
+        downscaler: stub,
+      );
+
+      // Act
+      final pages = await picker.takePhoto();
+
+      // Assert
+      expect(stub.seen.single.mimeType, ScannedPage.jpeg);
+      expect(pages, [sentinel]);
+    });
+
+    test('does not run a PDF through the downscaler', () async {
+      // Arrange
+      final sentinel = ScannedPage(
+        mimeType: ScannedPage.jpeg,
+        bytes: Uint8List.fromList(const <int>[0xFF, 0xD8, 0xFF, 0xDB, 1]),
+      );
+      final stub = _StubImageDownscaler(sentinel);
+      final picker = DevicePagePicker(
+        pdfPick: () async => _FakePlatformFile('menu.pdf', _pdfBytes),
+        downscaler: stub,
+      );
+
+      // Act
+      final pages = await picker.pickPdf();
+
+      // Assert
+      expect(stub.seen, isEmpty);
+      expect(pages.single.mimeType, ScannedPage.pdf);
+      expect(pages.single.bytes, _pdfBytes);
+    });
+  });
 }
