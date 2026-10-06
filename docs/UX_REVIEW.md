@@ -131,7 +131,9 @@ the source line and the keto-score badge. On a 1440px window this means:
 - **Fix — the estimate row's copy is long** ("Reads each menu on this
   list once and scores it with the on-device rules, not the AI. Open a
   restaurant for the full analysis."). "Quick score (on-device rules)"
-  as the button and one short hint line is enough.
+  as the button and one short hint line is enough. *Superseded by
+  `architecture.md` D21: the quick score now runs on its own for the first
+  cards, and the button reads "Quick score the rest".*
 - **Fix — the "KetoClub" label above "Where to eat"** (line 194; audit
   D7) is the app's only branding and it is a 10px muted label. Either a
   small logo mark or nothing.

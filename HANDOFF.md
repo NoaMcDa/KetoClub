@@ -139,8 +139,9 @@ out the Discovery chain that first run had deferred:
   `WoltVenueSearchService` (#150, issue #39) back a real Discovery screen
   (#154, issue #40) with a location header, search, filter chips and venue
   cards. `architecture.md` D13 (added by #147) governs what a venue card may
-  claim before its menu is ever opened: a score and counts only for venues
-  whose analysis is already cached on the device, nothing fetched on load or
+  claim before its menu is ever opened: a score and counts for venues whose
+  analysis is cached on the device or, since D21, scored by the capped
+  rules-only quick score that runs when a list arrives; nothing fetched on
   scroll. Both discovery fixtures (`wolt_pages_restaurants.json`,
   `wolt_pages_search.json`) are synthetic, same reason and same tracking
   issue (#38) as the Wolt menu fixture below.
@@ -369,11 +370,12 @@ spacing values) is enforced by a test; pixel fidelity by no test at all.
   Mac. Until then, and until a Hebrew phone has shown the result, a
   Hebrew-speaking user may still see the English prompt.
 - **Wolt's discovery endpoints are unofficial and origin-locked**, and Wolt's
-  ToS forbid "systematic retrieval" by a bot. The Discovery screen fetches a
-  menu only when the user opens a venue — nothing pre-scores a whole list of
-  results by fetching every menu in it — precisely to stay on the side of
-  that line; see `phase2_discovery_research.md` §7 for the reasoning issue
-  #41/#42 (D13) settled.
+  ToS forbid "systematic retrieval" by a bot. Since D21 the Discovery screen
+  does pre-score the first `venueAutoEstimateLimit` (12) venues of a list by
+  fetching their menus for the rule engine, three at a time, each once per
+  list — an exposure the owner accepted knowingly; see `architecture.md` D21
+  for the bounds and `phase2_discovery_research.md` §7 for the reasoning
+  issue #41/#42 (D13) originally settled the other way.
 
 ---
 

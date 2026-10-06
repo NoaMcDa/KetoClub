@@ -608,7 +608,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get discoveryChipKetoEightPlusHint =>
-      'צריך ציונים קודם: אפשר להעריך את הרשימה או לפתוח מסעדה.';
+      'צריך ציונים קודם: הם מופיעים כשהרשימה מדורגת, או כשפותחים מסעדה.';
 
   @override
   String get discoveryChipOpenNow => 'פתוח עכשיו';
@@ -676,11 +676,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get discoveryNoChipResults => 'אף מסעדה ברשימה לא מתאימה לסינון הזה.';
 
   @override
-  String get discoveryEstimateList => 'דירוג מהיר (כללים במכשיר)';
+  String get discoveryEstimateList => 'דירוג מהיר לשאר (כללים במכשיר)';
 
   @override
   String get discoveryEstimateHint =>
-      'לניתוח מלא עם בינה מלאכותית, פתחו מסעדה.';
+      'המסעדות הראשונות מדורגות אוטומטית לפי כללים במכשיר, למנות אוכל בלבד. לניתוח מלא עם בינה מלאכותית, פתחו מסעדה.';
 
   @override
   String discoveryEstimating(int done, int total) {
@@ -849,6 +849,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get legendEngines =>
       'כללים: בדיקות מילות מפתח של קטוקלאב על טקסט המנה, בלי הערכת פחמימות. בינה מלאכותית: Gemini קורא את כל התפריט ומעריך פחמימות נטו.';
+
+  @override
+  String get legendFoodOnly =>
+      'הציון והמונים מתייחסים למנות אוכל בלבד. משקאות, רטבים ותוספות עדיין מסווגים ומוצגים, אך אינם נספרים.';
 
   @override
   String get legendBudget =>

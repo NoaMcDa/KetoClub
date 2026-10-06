@@ -603,7 +603,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discoveryChipKetoEightPlusHint =>
-      'Needs scores first: estimate this list, or open a restaurant.';
+      'Needs scores first: they appear as the list is scored, or when you open a restaurant.';
 
   @override
   String get discoveryChipOpenNow => 'Open now';
@@ -673,11 +673,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'No restaurant in this list matches that filter.';
 
   @override
-  String get discoveryEstimateList => 'Quick score (on-device rules)';
+  String get discoveryEstimateList => 'Quick score the rest (on-device rules)';
 
   @override
   String get discoveryEstimateHint =>
-      'Open a restaurant for the full AI analysis.';
+      'The first restaurants are scored automatically with on-device rules, for food only. Open a restaurant for the full AI analysis.';
 
   @override
   String discoveryEstimating(int done, int total) {
@@ -842,6 +842,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get legendEngines =>
       'Rules: KetoClub\'s own keyword checks on the dish text, with no carb estimate. AI: Gemini reads the whole menu and estimates net carbs.';
+
+  @override
+  String get legendFoodOnly =>
+      'The score and the counters cover food only. Drinks, sauces and extras are still judged and listed, but are not counted.';
 
   @override
   String get legendBudget =>

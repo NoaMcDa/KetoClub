@@ -19,7 +19,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > links resolve and fetch end to end, not just parse), location and nearby
 > search (`LocationService` over `geolocator`, `WoltVenueSearchService`, and
 > a real Discovery screen at `venue_search_screen.dart` with a location
-> header, search, filter chips and venue cards — `architecture.md` D13), and
+> header, search, filter chips and venue cards — `architecture.md` D13,
+> amended by D21: the first cards of every list are scored on their own by
+> the rule engine, and every score and count covers food only), and
 > platform setup (icons, splash, bundle ids, permissions). The same run also
 > built a real Saved tab, dish/venue photos, and several Settings features
 > (appearance, net-carb limit, dietary rule toggles, saved-menus management)
@@ -304,6 +306,10 @@ The long form is in `HANDOFF.md`; these are the ones that bite while writing cod
 - **A web flow test's imports must be same-directory or `package:`** — `flutter drive`
   roots the compile at the test file's own directory. Only `flutter drive` catches a
   violation; `flutter test` and `flutter build web --target=…` both pass regardless.
+- **A dish's kind (food, drink, extra, notice; D21) is computed, never
+  stored.** `utils/dish_kind.dart` reads it from the heading and the name;
+  do not add a field to `Dish` or a column to the Hive cache for it, and
+  reduce an analysis to counts only through `VerdictCounts.of`.
 - **Serialise test runs when several agents share a worktree:**
   `flock /tmp/ketoclub.lock -c 'flutter test …'`.
 

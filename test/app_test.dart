@@ -158,8 +158,10 @@ void main() {
       expect(app.themeMode, equals(ThemeMode.dark));
     });
 
-    testWidgets('Estimate this list reaches the rule engine alone, never the '
-        'routing classifier (issue #42, D13)', (tester) async {
+    testWidgets('listing Explore results scores them with the rule engine '
+        'alone, never the routing classifier (issue #42, D13, D21)', (
+      tester,
+    ) async {
       // Arrange: the real Explore route over faked services, so this
       // checks the wiring in generateRoute, not a controller built by
       // hand.
@@ -170,22 +172,18 @@ void main() {
       ]);
       await tester.pumpWidget(KetoClubApp(dependencies: fakes.dependencies));
       await tester.pumpAndSettle();
+
+      // Act: the list lands; nothing is tapped.
       await tester.tap(find.byTooltip(_en.discoveryUseLocation));
       await tester.pumpAndSettle();
 
-      // Assert: listing fetched nothing.
-      expect(fakes.repository.loadCalls, isEmpty);
-
-      // Act
-      final estimate = find.text(_en.discoveryEstimateList);
-      await tester.ensureVisible(estimate);
-      await tester.tap(estimate);
-      await tester.pumpAndSettle();
-
-      // Assert
+      // Assert: the automatic quick score fetched the one venue and
+      // classified it with the estimate engine only; with every card
+      // attempted there is nothing left to offer the tap for.
       expect(fakes.repository.loadCalls.single.ref, ref);
       expect(fakes.estimateClassifier.calls, hasLength(1));
       expect(fakes.classifier.calls, isEmpty);
+      expect(find.text(_en.discoveryEstimateList), findsNothing);
     });
 
     testWidgets('the Explore controller, query and results survive a tab '

@@ -38,11 +38,15 @@ const String _hePrefixes = 'בהוכלמש';
 /// prefix is `משמרים` ("preservatives", as in "ללא חומרים משמרים"), and
 /// `הפוך` collides with "to flip/reverse" (e.g. `להפוך`), so all three
 /// are compiled with no permissive prefix — see
-/// [_hebrewTriggerPattern]'s `allowPrefix`. Applied to both
+/// [hebrewTriggerPattern]'s `allowPrefix`. Applied to both
 /// [_compileBasesHe] and [_compileCarbHe].
 const Set<String> _noPrefixHebrewTriggers = <String>{'חלה', 'שמרים', 'הפוך'};
 
-/// Builds a Hebrew trigger pattern. Permissive on the left when
+/// Builds a Hebrew trigger pattern for one already-normalised trigger.
+///
+/// Public so `utils/dish_kind.dart` (D21) matches category headings and
+/// dish names with the same boundary rule as the classifier; there is one
+/// Hebrew word-boundary in this codebase. Permissive on the left when
 /// [allowPrefix] is true (ב/ה/ו/כ/ל/מ/ש are grammatical particles, so
 /// `הפסטה` and `בפסטה` must match), strict on the right always (a suffix
 /// means a different word, so folded `לחמ` must not match inside
@@ -60,7 +64,7 @@ const Set<String> _noPrefixHebrewTriggers = <String>{'חלה', 'שמרים', 'ה
 /// non-word character to the regex engine, so no `\b` boundary ever
 /// exists beside one. This function's lookaround, built on the Hebrew
 /// letter range directly, is the fix.
-RegExp _hebrewTriggerPattern(
+RegExp hebrewTriggerPattern(
   String normalisedTrigger, {
   bool allowInflection = false,
   bool allowPrefix = true,
@@ -75,9 +79,11 @@ RegExp _hebrewTriggerPattern(
 }
 
 /// Builds a Latin trigger pattern with a plain, case-insensitive word
-/// boundary. Never loosened to a substring match: `toasted almonds` and
-/// `Sacramento tomato salad` would turn red if it were.
-RegExp _latinTriggerPattern(String normalisedTrigger) =>
+/// boundary, for one already-normalised trigger. Never loosened to a
+/// substring match: `toasted almonds` and `Sacramento tomato salad` would
+/// turn red if it were. Public for the same reason as
+/// [hebrewTriggerPattern].
+RegExp latinTriggerPattern(String normalisedTrigger) =>
     RegExp('\\b${RegExp.escape(normalisedTrigger)}\\b', caseSensitive: false);
 
 /// Compiles [nonKetoBasesEn], normalising each key at compile time so a
@@ -87,7 +93,7 @@ List<_CompiledBase> _compileBasesEn() => nonKetoBasesEn
     .map(
       (key) => (
         key: key,
-        pattern: _latinTriggerPattern(TextNormaliser.normalise(key)),
+        pattern: latinTriggerPattern(TextNormaliser.normalise(key)),
       ),
     )
     .toList(growable: false);
@@ -97,7 +103,7 @@ List<_CompiledBase> _compileBasesHe() => nonKetoBasesHe
     .map(
       (key) => (
         key: key,
-        pattern: _hebrewTriggerPattern(
+        pattern: hebrewTriggerPattern(
           TextNormaliser.normalise(key),
           allowPrefix: !_noPrefixHebrewTriggers.contains(key),
         ),
@@ -110,7 +116,7 @@ List<_CompiledModifier> _compileCarbEn() => carbModifiersEn.entries
     .map(
       (entry) => (
         key: entry.key,
-        pattern: _latinTriggerPattern(TextNormaliser.normalise(entry.key)),
+        pattern: latinTriggerPattern(TextNormaliser.normalise(entry.key)),
         sentence: entry.value,
       ),
     )
@@ -122,7 +128,7 @@ List<_CompiledModifier> _compileCarbHe() => carbModifiersHe.entries
     .map(
       (entry) => (
         key: entry.key,
-        pattern: _hebrewTriggerPattern(
+        pattern: hebrewTriggerPattern(
           TextNormaliser.normalise(entry.key),
           allowPrefix: !_noPrefixHebrewTriggers.contains(entry.key),
         ),
@@ -139,18 +145,18 @@ List<_CompiledBase> _compileDietaryEn(List<String> triggers) => triggers
     .map(
       (key) => (
         key: key,
-        pattern: _latinTriggerPattern(TextNormaliser.normalise(key)),
+        pattern: latinTriggerPattern(TextNormaliser.normalise(key)),
       ),
     )
     .toList(growable: false);
 
 /// Compiles a dietary-rule trigger list (issue #56) in Hebrew, through
-/// [_hebrewTriggerPattern]'s unicode lookaround — never `\b`.
+/// [hebrewTriggerPattern]'s unicode lookaround — never `\b`.
 List<_CompiledBase> _compileDietaryHe(List<String> triggers) => triggers
     .map(
       (key) => (
         key: key,
-        pattern: _hebrewTriggerPattern(TextNormaliser.normalise(key)),
+        pattern: hebrewTriggerPattern(TextNormaliser.normalise(key)),
       ),
     )
     .toList(growable: false);

@@ -15,8 +15,8 @@ import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
-import 'package:ketoclub/utils/keto_score.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
+import 'package:ketoclub/utils/verdict_counts.dart';
 
 /// The state of a user-initiated menu question (architecture.md §9.5;
 /// issue #214).
@@ -254,41 +254,60 @@ final class MenuController extends ChangeNotifier {
   String? get venueName => _menu?.venueName;
 
   /// A rough "how keto-friendly is this menu" score out of 10, or null
-  /// when [analysis] is not a [MenuAnalysed] — see [ketoScore] for the
-  /// formula and the judgement calls behind it. Never render a fallback
-  /// number in its place; a null here means "not computable", not zero.
-  double? get ketoScoreOutOfTen => ketoScore(
-    greenCount: greenCount,
-    hiddenCarbYellowCount: hiddenCarbYellowCount,
-    otherYellowCount: yellowCount - hiddenCarbYellowCount,
-    redCount: redCount,
-  );
+  /// when [analysis] is not a [MenuAnalysed] — see `utils/keto_score.dart`
+  /// for the formula and the judgement calls behind it, and
+  /// [VerdictCounts] for which dishes feed it (food only, D21). Never
+  /// render a fallback number in its place; a null here means "not
+  /// computable", not zero.
+  double? get ketoScoreOutOfTen => _counts.score;
 
-  /// How many dishes in [analysis] were classified [DishVerdict.orderAsIs]
-  /// (green); 0 when there is no [MenuAnalysed] result.
-  int get greenCount => _countOf(DishVerdict.orderAsIs);
+  /// How many *food* dishes in [analysis] were classified
+  /// [DishVerdict.orderAsIs] (green); 0 when there is no [MenuAnalysed]
+  /// result. A drink, an extra or a notice line (D21, `dishKindOf`) is
+  /// still listed under its verdict but never counted here.
+  int get greenCount => _counts.green;
 
-  /// How many dishes in [analysis] were classified [DishVerdict.modifiable]
-  /// (yellow); 0 when there is no [MenuAnalysed] result.
-  int get yellowCount => _countOf(DishVerdict.modifiable);
+  /// How many food dishes in [analysis] were classified
+  /// [DishVerdict.modifiable] (yellow); 0 when there is no [MenuAnalysed]
+  /// result. Food only, as [greenCount].
+  int get yellowCount => _counts.yellow;
 
-  /// How many [DishVerdict.modifiable] dishes in [analysis] were demoted
-  /// from green because of a hidden-carb flag (issue #213); 0 when there
-  /// is no [MenuAnalysed] result. A subset of [yellowCount].
-  int get hiddenCarbYellowCount {
+  /// How many [DishVerdict.modifiable] food dishes in [analysis] were
+  /// demoted from green because of a hidden-carb flag (issue #213); 0 when
+  /// there is no [MenuAnalysed] result. A subset of [yellowCount].
+  int get hiddenCarbYellowCount => _counts.hiddenCarbYellow;
+
+  /// How many food dishes in [analysis] were classified
+  /// [DishVerdict.nonKeto] (red); 0 when there is no [MenuAnalysed]
+  /// result. Food only, as [greenCount].
+  int get redCount => _counts.red;
+
+  /// The food-only verdict counts of [analysis] over [menu]
+  /// ([VerdictCounts.of], D21), computed once per (menu, analysis) pair
+  /// rather than per getter: the kind of every dish is a regex pass over
+  /// the whole menu, and a build reads four of these getters.
+  VerdictCounts get _counts {
+    final currentMenu = _menu;
     final currentAnalysis = _analysis;
-    if (currentAnalysis is! MenuAnalysed) return 0;
-    return currentAnalysis.dishes
-        .where(
-          (d) =>
-              d.verdict == DishVerdict.modifiable && d.hiddenCarbs.isNotEmpty,
-        )
-        .length;
+    if (currentMenu == null || currentAnalysis is! MenuAnalysed) {
+      return VerdictCounts.zero;
+    }
+    final memo = _countsMemo;
+    if (memo != null &&
+        identical(memo.menu, currentMenu) &&
+        identical(memo.analysis, currentAnalysis)) {
+      return memo.counts;
+    }
+    final counts = VerdictCounts.of(currentMenu, currentAnalysis);
+    _countsMemo = (
+      menu: currentMenu,
+      analysis: currentAnalysis,
+      counts: counts,
+    );
+    return counts;
   }
 
-  /// How many dishes in [analysis] were classified [DishVerdict.nonKeto]
-  /// (red); 0 when there is no [MenuAnalysed] result.
-  int get redCount => _countOf(DishVerdict.nonKeto);
+  ({Menu menu, MenuAnalysed analysis, VerdictCounts counts})? _countsMemo;
 
   /// How many dish names [analysis] saw on the menu but could not place;
   /// 0 when there is no [MenuAnalysed] result. Same source as
@@ -313,16 +332,6 @@ final class MenuController extends ChangeNotifier {
     final currentMenu = _menu;
     if (currentMenu == null) return 0;
     return currentMenu.allDishes.length;
-  }
-
-  /// How many dishes in [analysis] carry [verdict]; 0 when there is no
-  /// [MenuAnalysed] result.
-  int _countOf(DishVerdict verdict) {
-    final currentAnalysis = _analysis;
-    if (currentAnalysis is! MenuAnalysed) return 0;
-    return currentAnalysis.dishes
-        .where((dish) => dish.verdict == verdict)
-        .length;
   }
 
   /// The net-carb limit in grams [analysis] was produced under (issue #57),

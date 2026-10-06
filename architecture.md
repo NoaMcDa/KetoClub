@@ -900,9 +900,10 @@ gracefully to "type an address or a venue name" on denial or on web without HTTP
    `POST restaurant-api.wolt.com/v1/pages/search` for a typed name, both
    anonymous, origin-locked (so the web build goes through the backend, as menus
    do under D11) and not yet confirmed by a recording (§17 question 2). What a
-   result card shows before its menu is opened is D13: a score and counts only
-   from an analysis already in the device cache, and no menu fetch on scroll or
-   on load.
+   result card shows before its menu is opened is D13 as amended by D21: a
+   score and counts from an analysis already in the device cache, or from the
+   capped rules-only quick score that runs when a list arrives; no menu fetch
+   on scroll.
 
 Venues are not persisted beyond "last opened" until Phase 3 adds a community
 directory.
@@ -1759,16 +1760,20 @@ Three options were compared:
   Wolt slug to the verdict counts of a fresh shared completion, so "someone
   analysed it" has a population behind it. Until the backend runs somewhere
   other than `localhost` (§17 question 6), that population is one developer.
-- **A is never background behaviour.** At most it is an explicit "Estimate
-  this list" action the user taps: it fetches the visible venues' menus once,
-  bounded by a concurrency constant in `constants.dart`, runs only the
-  heuristic classifier, and is cancelled when the list changes. It never runs
-  on scroll or on load, so the retrieval is something the user asked for.
+- **A, bounded, since D21.** As decided here, A was never background
+  behaviour: an explicit "Estimate this list" tap only. D21 reverses that
+  one point — the first `venueAutoEstimateLimit` visible venues are scored on
+  their own when a list arrives — and keeps every bound: the rules engine
+  only, `venueEstimateConcurrency` fetches at a time, each venue once per
+  result set, cancelled when the list changes, never on scroll. The tap
+  remains, as "Quick score the rest", for the venues past the cap.
 
 **The score formula is kept exactly as `utils/keto_score.dart` computes it**:
 `10 × (green + 0.5 × yellow) / (green + yellow + red)`, rounded to one
 decimal, with unclassified dishes in neither numerator nor denominator, and
-null — nothing rendered — when no dish was placed. The card reuses that
+null — nothing rendered — when no dish was placed. Since D21 only *food*
+dishes feed those counts: a drink, a sauce or add-on, or a notice line is
+listed but not counted. The card reuses that
 function; there is no second formula. Its status is stated plainly: **it is a
 UI ranking heuristic with no nutrition basis, never a health claim.** No
 source says a dish needing one swap is worth half a safe one; #41 was meant
@@ -1787,8 +1792,9 @@ chips are multi-select and combine; "Nearby" is the default order, not a
 filter, so it has no chip. #42 is rescoped from "fetch menus
 for the visible venues in the background" to "read cached analyses for the
 visible venues, plus the explicit estimate action". The Discovery list's
-performance budget gains a hard rule: **no menu fetch on scroll or on load** —
-scrolling reads the device cache and nothing else.
+performance budget gains a hard rule: **no menu fetch on scroll** — scrolling
+reads the device cache and nothing else. (On load, D21's capped rules run is
+the one fetch this rule now allows.)
 
 **What it costs:** most cards on a first visit show no score, which is further
 from the artboard than any other option; the artboard's every-card score is
@@ -2107,6 +2113,70 @@ score is toned by band, and "Saved" is "Recent" with an expiry countdown and a
 Keep pin kept in a second Hive box. **What it costs:** more layout code paths
 (phone, rail, two-pane) that only widget tests at 390/1200/1440px and CI's
 1600px Chrome run exercise; no real browser or phone has shown any of it.
+
+### D21 — The quick score runs on its own for the first cards, and scores count food only
+
+*(Reverses one bullet of D13; answers the owner's review of the Discovery
+screen on 2026-10-05.)*
+
+**What changed.** D13 kept option A — fetch the visible venues' menus and
+score them with the rule engine — behind an explicit "Estimate this list"
+tap, so that fetching N menus in the background was never something the app
+did on its own. In practice most cards on a first visit showed no score at
+all, which was further from the artboard than the terms risk warranted, and
+the tap was mistaken for an AI action that spent tokens (it never did: the
+quick score has only ever run `HeuristicMenuClassifier`). Two decisions:
+
+1. **The quick score starts on its own.** When a result list lands (nearby
+   or by name), and after a chip change puts venues in view,
+   `VenueSearchController` scores the first `venueAutoEstimateLimit` (12)
+   visible venues that have no numbers and that no run has fetched in this
+   result set. The explicit tap stays as "Quick score the rest" for the
+   venues past the cap. Opening a venue is unchanged: `MenuController`
+   reuses only an `LlmEngine` analysis, so the AI still runs on open and
+   its result overwrites the estimate.
+2. **Scores and counts cover food only.** `utils/dish_kind.dart` reads
+   each dish's kind — food, drink, extra (sauces, add-ons, cutlery,
+   deposits, delivery, gift cards) or notice ("לקוחות יקרים", "coming
+   soon") — from the category heading first and the dish name second, never
+   the description, and `utils/verdict_counts.dart` is the one place an
+   analysis is reduced to counts: the menu header and tiles, the Discovery
+   card and the Recent tab all read it. A non-food line is still classified
+   and listed under its heading and its verdict filter; it just moves no
+   number. On doubt a dish is food, and a dish the menu does not hold is
+   food. The kind is computed, never stored: no field on `Dish`, no cache
+   schema change.
+
+**What it accepts.** The background fetches are the "systematic retrieval"
+pattern D13 refused. The owner accepted that exposure with these bounds: at
+most 12 menus per list, 3 in flight, each venue once per result set, cancelled
+on any list change, nothing on scroll, nothing when the remembered nearby
+list is put back, and on web every fetch goes through the backend's 1 h
+menu cache. `/v1/chat` spend stays zero: the rule engine is the only
+classifier the quick score may hold (`estimateClassifier` in `di.dart`).
+
+**Vocabulary decisions.** `תוספות` is *not* an extras heading: on an Israeli
+menu it means sides, which are food. A heading that names food beside a
+drink or extras word — "תוספות ורטבים", "Sauces & Sides", "קפה ומאפה",
+"Beers & Burgers" — decides nothing, and each dish under it is read by its
+own name, so the croissant counts and the latte does not. Hebrew headings
+are matched without the permissive grammatical prefix so `ורטבים` cannot
+fire the sauces word. A
+drink word in a dish name is an ingredient, not the dish, when a guard word
+sits beside it ("beer-battered", "wine-braised", "ברוטב יין"). The drink
+lists reuse the classifier's own (`nonKetoDrinkBasesEn/He`, the drink keys of
+`carbModifiers`) plus the plain drinks the rules never trigger on (water,
+coffee, tea, dry wine, spirits).
+
+**Known limitation.** While *Keto 8+* is on, venues without numbers are
+hidden, so a run started by a chip change has nothing to score until the chip
+is turned off. Tiles count food only while a tile's filter still lists every
+dish of that verdict, drinks included; the legend says so.
+
+**What it costs.** Cards past the cap are still blank until the tap; a 30-venue
+nearby list is scored to the twelfth card. The automatic run adds up to 12
+Wolt fetches per list, which D13's reading of Wolt's terms counted as a
+different category from one fetch per user action.
 
 ---
 

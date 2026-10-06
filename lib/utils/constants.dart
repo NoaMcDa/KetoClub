@@ -56,11 +56,18 @@ const Duration venueSearchDebounce = Duration(milliseconds: 400);
 /// inclusive.
 const double ketoEightPlusThreshold = 8;
 
-/// How many menus the Discovery screen's explicit "Estimate this list"
-/// action fetches at once (issue #42, D13). The action runs only when the
-/// user taps it, never on load or scroll; this bound keeps even that one
-/// request from arriving at the platform as a burst.
+/// How many menus the Discovery screen's quick score fetches at once
+/// (issue #42, D13, D21) — the automatic run that starts when a result
+/// list arrives and the explicit "Quick score the rest" tap alike. The
+/// bound keeps either from arriving at the platform as a burst.
 const int venueEstimateConcurrency = 3;
+
+/// How many visible venues the Discovery screen scores on its own with the
+/// rule engine when a result list arrives, or a chip change puts new
+/// venues in view (architecture.md D21). Venues past this cap wait for the
+/// explicit "Quick score the rest" tap. Never on scroll. `0` turns the
+/// automatic run off, which the tests of the explicit action use.
+const int venueAutoEstimateLimit = 12;
 
 // ---------------------------------------------------------------------------
 // Cache and LLM request tuning (architecture.md §6.4, §9.3, §9.4)
@@ -604,6 +611,37 @@ const Map<String, String> carbModifiersHe = <String, String>{
   'טוניק': 'אפשר בבקשה לשים סודה במקום הטוניק? הטוניק עתיר סוכר.',
 };
 
+/// The drink entries of [nonKetoBasesEn] — red (#216): sugary drinks that
+/// cannot be made keto. Spread into [nonKetoBasesEn] at the position they
+/// have always had, and reused on their own by `utils/dish_kind.dart` to
+/// tell a drink named in a food category from a dish (D21). Guards in
+/// [ketoQualifierGuardsEn] rescue zero/diet variants. `beer batter` is a
+/// breading trigger (D-V2), so a bare `beer` here is safe — the longer
+/// trigger takes priority when both match the same text. `juice` is the
+/// generic form; `orange juice` and `apple juice` are included for
+/// display-label precision. `smoothie` lives here only (the milkshake
+/// cluster above has `milkshake`, not `smoothie`).
+const List<String> nonKetoDrinkBasesEn = <String>[
+  'cola',
+  'coke',
+  'pepsi',
+  'sprite',
+  'fanta',
+  'lemonade',
+  'juice',
+  'orange juice',
+  'apple juice',
+  'beer',
+  'lager',
+  'stout',
+  'ale',
+  'liqueur',
+  'smoothie',
+  'sweet wine',
+  'moscato',
+  'port wine',
+];
+
 // ---------------------------------------------------------------------------
 // nonKetoBases — English (100 triggers)
 // ---------------------------------------------------------------------------
@@ -664,24 +702,36 @@ const List<String> nonKetoBasesEn = <String>[
   'danish', 'pastry', 'pastries', 'rugelach', 'muffin', 'muffins',
   'scone', 'scones',
 
-  // Drink bases — red (#216). Sugary drinks that cannot be made keto.
-  // Guards below rescue zero/diet variants. `beer batter` is already
-  // above (D-V2 breading), so a bare `beer` entry here is safe — the
-  // longer trigger takes priority when both match the same text.
-  // `juice` is the generic form; compound forms `orange juice` and
-  // `apple juice` are included too for display-label precision.
-  // `smoothie` was already in the list above (milkshake cluster); kept
-  // consistent by NOT duplicating it here — only `milkshake` was there.
-  'cola', 'coke', 'pepsi', 'sprite', 'fanta',
-  'lemonade',
-  'juice', 'orange juice', 'apple juice',
-  'beer', 'lager', 'stout', 'ale',
-  'liqueur',
-  'smoothie',
-  'sweet wine', 'moscato', 'port wine',
+  // Drink bases — red (#216): see [nonKetoDrinkBasesEn].
+  ...nonKetoDrinkBasesEn,
 
   // See the doc comment above: required by D-V3's decision record and by
   // nonKetoBaseLabelsEn, missing from the spec's own enumeration.
+];
+
+/// The drink entries of [nonKetoBasesHe] — red (#216); the Hebrew
+/// [nonKetoDrinkBasesEn], spread into [nonKetoBasesHe] at the position
+/// they have always had and reused by `utils/dish_kind.dart` (D21).
+/// Guards in [ketoQualifierGuardsHe] rescue zero/diet variants. `בירה`
+/// catches `בירה שחורה` too (both red). `מיץ` is a bare trigger with the
+/// compound forms added for label precision; if it ever false-reds a
+/// proper name ("מיצי"), drop it and keep only the compounds.
+const List<String> nonKetoDrinkBasesHe = <String>[
+  'קולה', // cola
+  'קוקה קולה', // Coca-Cola (compound first — suppresses bare `קולה` match)
+  'ספרייט', // sprite
+  'פאנטה', // fanta
+  'פריגת', // Prigat (Israeli juice brand)
+  'מיץ', // juice (bare; see note above)
+  'מיץ תפוזים', // orange juice
+  'מיץ ענבים', // grape juice
+  'לימונדה', // lemonade
+  'בירה', // beer
+  'בירה שחורה', // stout / dark beer
+  'שיכר', // alcoholic malt drink
+  'ליקר', // liqueur
+  'סמוטי', // smoothie
+  'יין מתוק', // sweet wine
 ];
 
 // ---------------------------------------------------------------------------
@@ -758,28 +808,297 @@ const List<String> nonKetoBasesHe = <String>[
   'עוגיה', // cookie (singular; עוגיות is above)
   'מאפין', 'מאפינס', // muffin / muffins
   'סקון', // scone
-  // Drink bases — red (#216). Guards below rescue zero/diet variants.
-  // `בירה` has a guard for `בירה לבנה` (white beer — still red, no
-  // guard needed) but `בירה שחורה` is also red, and the bare `בירה`
-  // trigger catches both. `מיץ` is a bare trigger; the compound forms
-  // `מיץ תפוזים` / `מיץ ענבים` are added for label precision too.
-  // Note: if bare `מיץ` false-reds a dish name that is a proper name
-  // (e.g. "מיצי"), drop it and keep only the compound forms.
-  'קולה', // cola
-  'קוקה קולה', // Coca-Cola (compound first — suppresses bare `קולה` match)
-  'ספרייט', // sprite
-  'פאנטה', // fanta
-  'פריגת', // Prigat (Israeli juice brand)
-  'מיץ', // juice (bare; see note above)
-  'מיץ תפוזים', // orange juice
-  'מיץ ענבים', // grape juice
-  'לימונדה', // lemonade
-  'בירה', // beer
-  'בירה שחורה', // stout / dark beer
-  'שיכר', // alcoholic malt drink
-  'ליקר', // liqueur
-  'סמוטי', // smoothie
-  'יין מתוק', // sweet wine
+  // Drink bases — red (#216): see [nonKetoDrinkBasesHe].
+  ...nonKetoDrinkBasesHe,
+];
+
+// ---------------------------------------------------------------------------
+// Dish kinds (architecture.md D21)
+// ---------------------------------------------------------------------------
+//
+// The keto score and every verdict count cover food only: a drink, a sauce
+// or add-on, a non-edible line (cutlery, a deposit, delivery) or a notice
+// entry is still classified and listed, but never counted. The kind is
+// read by `utils/dish_kind.dart`, from the category heading first and the
+// dish name second, and is computed, never stored. Entries are written in
+// their natural spelling and normalised at compile time, like every other
+// list here. Hebrew headings are matched without the permissive prefix:
+// a heading is not a sentence, and `ורטבים` in "תוספות ורטבים" (sides and
+// sauces) must not turn a sides category into extras.
+
+/// Category headings that hold drinks, English.
+const List<String> drinkCategoryWordsEn = <String>[
+  'drinks',
+  'drink',
+  'beverages',
+  'beverage',
+  'soft drinks',
+  'hot drinks',
+  'cold drinks',
+  'beer',
+  'beers',
+  'wine',
+  'wines',
+  'cocktails',
+  'alcohol',
+  'bar',
+  'coffee',
+  'coffees',
+  'tea',
+  'shakes',
+  'smoothies',
+  'juices',
+];
+
+/// Category headings that hold drinks, Hebrew.
+const List<String> drinkCategoryWordsHe = <String>[
+  'שתייה',
+  'שתיה',
+  'שתייה קלה',
+  'שתייה חמה',
+  'שתייה קרה',
+  'משקאות',
+  'משקה',
+  'בירות',
+  'בירה',
+  'יינות',
+  'יין',
+  'אלכוהול',
+  'קוקטיילים',
+  'קפה',
+  'תה',
+  'שייקים',
+  'מיצים',
+  'בר',
+];
+
+/// Category headings that hold sauces, add-ons and non-edible lines,
+/// English. Not `sides`: a side of fries or salad is food, and a mixed
+/// "Sauces & Sides" heading stays food through [foodCategoryWordsEn].
+const List<String> extraCategoryWordsEn = <String>[
+  'sauces',
+  'sauce',
+  'dips',
+  'dip',
+  'add-ons',
+  'add ons',
+  'extras',
+  'toppings',
+  'cutlery',
+  'utensils',
+  'deposit',
+  'delivery',
+  'gift card',
+  'gift cards',
+  'packaging',
+];
+
+/// [extraCategoryWordsEn] in Hebrew. **Not `תוספות`**: on an Israeli menu
+/// it means sides (fries, salad, rice) — food — far more often than
+/// add-ons; the test suite pins its absence. `סכום` is `סכו"ם` once the
+/// normaliser has dropped the gershayim.
+const List<String> extraCategoryWordsHe = <String>[
+  'רטבים',
+  'רוטב',
+  'מטבלים',
+  'סכום',
+  'פיקדון',
+  'משלוח',
+  'דמי משלוח',
+  'שובר',
+  'שוברים',
+  'גיפט קארד',
+  'אריזה',
+];
+
+/// Headings that name food, English. When one of these sits beside a
+/// drink or extras word ("Sauces & Sides", "Coffee & Pastries", "Beers &
+/// Burgers") the heading decides nothing and each dish is read by its
+/// own name instead: the croissant stays food, the latte reads as a
+/// drink.
+const List<String> foodCategoryWordsEn = <String>[
+  'sides',
+  'side dishes',
+  'salads',
+  'pastries',
+  'pastry',
+  'bakery',
+  'breakfast',
+  'brunch',
+  'desserts',
+  'dessert',
+  'mains',
+  'burgers',
+  'sandwiches',
+  'specials',
+  'snacks',
+];
+
+/// [foodCategoryWordsEn] in Hebrew: "קפה ומאפה" is the common case.
+const List<String> foodCategoryWordsHe = <String>[
+  'תוספות',
+  'סלטים',
+  'מאפים',
+  'מאפה',
+  'קינוחים',
+  'קינוח',
+  'ארוחת בוקר',
+  'בראנץ',
+  'עיקריות',
+  'המבורגרים',
+  'סנדוויצים',
+  'כריכים',
+  'ספיישלים',
+  'נשנושים',
+];
+
+/// Headings (and, at a price of zero, dish names) that are a notice to
+/// the customer rather than something to order, English.
+const List<String> noticeCategoryWordsEn = <String>[
+  'dear customers',
+  'notice',
+  'announcement',
+  'please note',
+  'coming soon',
+  'important',
+];
+
+/// [noticeCategoryWordsEn] in Hebrew.
+const List<String> noticeCategoryWordsHe = <String>[
+  'לקוחות יקרים',
+  'הודעה',
+  'שימו לב',
+  'בקרוב',
+  'חשוב',
+];
+
+/// The drink keys of [carbModifiersEn] — yellow drinks with a swap script
+/// (#216) — as a list `utils/dish_kind.dart` can read. Every entry must
+/// be a key of [carbModifiersEn]; a test pins it. `syrup` is left out:
+/// it is a dessert word as often as a drink one.
+const List<String> yellowDrinkTriggersEn = <String>[
+  'latte',
+  'iced latte',
+  'cappuccino',
+  'iced coffee',
+  'frappe',
+  'tonic',
+  'tonic water',
+];
+
+/// [yellowDrinkTriggersEn] for [carbModifiersHe].
+const List<String> yellowDrinkTriggersHe = <String>[
+  'הפוך',
+  'הפוך קר',
+  'לאטה',
+  "קפוצ'ינו",
+  'קפה קר',
+  'טוניק',
+];
+
+/// Drinks the rule engine has no trigger for because they are keto as
+/// they are — water, black coffee, tea, dry wine, spirits — named so a
+/// drink in a food category can still be told from a dish (D21).
+const List<String> plainDrinkWordsEn = <String>[
+  'water',
+  'mineral water',
+  'soda',
+  'soda water',
+  'sparkling water',
+  'coffee',
+  'espresso',
+  'americano',
+  'macchiato',
+  'tea',
+  'iced tea',
+  'diet coke',
+  'coke zero',
+  'cocktail',
+  'vodka',
+  'whisky',
+  'whiskey',
+  'gin',
+  'rum',
+  'arak',
+  'red wine',
+  'white wine',
+  'wine',
+  'prosecco',
+  'champagne',
+  'milkshake',
+];
+
+/// [plainDrinkWordsEn] in Hebrew.
+const List<String> plainDrinkWordsHe = <String>[
+  'מים',
+  'מים מינרלים',
+  'סודה',
+  'קפה',
+  'אספרסו',
+  'אמריקנו',
+  'מקיאטו',
+  'תה',
+  'תה קר',
+  'קוקטייל',
+  'וודקה',
+  'ויסקי',
+  'גין',
+  'רום',
+  'ערק',
+  'יין אדום',
+  'יין לבן',
+  'יין',
+  'פרוסקו',
+  'שמפניה',
+  'מילקשייק',
+  'קולה זירו',
+];
+
+/// Every word that marks a dish *name* as a drink, English: the red
+/// drink bases, the yellow drink triggers and the plain drinks together.
+const List<String> drinkNameTriggersEn = <String>[
+  ...nonKetoDrinkBasesEn,
+  ...yellowDrinkTriggersEn,
+  ...plainDrinkWordsEn,
+];
+
+/// [drinkNameTriggersEn] in Hebrew.
+const List<String> drinkNameTriggersHe = <String>[
+  ...nonKetoDrinkBasesHe,
+  ...yellowDrinkTriggersHe,
+  ...plainDrinkWordsHe,
+];
+
+/// Words that mean a drink word in a dish name is an ingredient, not the
+/// dish, English: "beer-battered fish", "wine-braised beef", "coffee-rubbed
+/// steak" are food. Any one of them in the name keeps the dish food.
+const List<String> drinkNameGuardWordsEn = <String>[
+  'batter',
+  'battered',
+  'braised',
+  'rubbed',
+  'smoked',
+  'glaze',
+  'glazed',
+  'sauce',
+  'marinated',
+  'marinade',
+  'infused',
+  'reduction',
+];
+
+/// [drinkNameGuardWordsEn] in Hebrew: "עוף ברוטב יין" is food.
+const List<String> drinkNameGuardWordsHe = <String>[
+  'בלילה',
+  'בלילת',
+  'ברוטב',
+  'רוטב',
+  'צלוי',
+  'מעושן',
+  'בציפוי',
+  'זיגוג',
+  'מרינדה',
+  'מושרה',
 ];
 
 // ---------------------------------------------------------------------------
