@@ -36,9 +36,15 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   http: ^1.1.0
-  # The Scan tab's camera and photo library (issue #82); the plugin
-  # downsizes, so no image library is needed. Only device_page_picker.dart
-  # imports it.
+  # Pure-Dart image decode and re-encode for the Scan tab's downscaler
+  # (services/platform/image_downscaler.dart): a picked photograph larger
+  # than Gemini's practical inline cap is shrunk here before it reaches the
+  # classifier. Only image_downscaler.dart imports it.
+  image: ^4.5.4
+  # The Scan tab's camera and photo library (issue #82); the plugin's own
+  # downsize is kept as a first pass, with image_downscaler.dart as a
+  # second pass whose target is Gemini's practical cap. Only
+  # device_page_picker.dart imports it.
   image_picker: ^1.2.3
   intl: ^0.20.3
   # The Scan tab's "Scan QR code" (issue #182): the camera view that reads a

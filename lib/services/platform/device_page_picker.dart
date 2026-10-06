@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
+import 'package:ketoclub/services/platform/image_downscaler.dart';
 import 'package:ketoclub/services/platform/page_picker.dart';
 
 /// Picks one PDF, or answers null when cancelled. The seam over
@@ -37,19 +38,25 @@ final class DevicePagePicker implements PagePicker {
   /// Creates a picker over [imagePicker] and [pdfPick]; each defaults to
   /// the real plugin. Tests pass fakes. [runsInBrowser] defaults to
   /// [kIsWeb]: `image_picker` has no camera capture on web, so
-  /// [canTakePhoto] is false there (issue #249).
+  /// [canTakePhoto] is false there (issue #249). [downscaler] shrinks a
+  /// picked photograph larger than [inlineImageByteTarget] before it is
+  /// handed back; it defaults to a [JpegImageDownscaler] and is replaceable
+  /// in tests with [NoImageDownscaler] so the fakes do not need a decoder.
   new({
     ImagePicker? imagePicker,
     PdfFilePick? pdfPick,
+    ImageDownscaler? downscaler,
     this.runsInBrowser = kIsWeb,
   }) : _images = imagePicker ?? ImagePicker(),
-       _pdfPick = pdfPick ?? _pickPdfFile;
+       _pdfPick = pdfPick ?? _pickPdfFile,
+       _downscaler = downscaler ?? const JpegImageDownscaler();
 
   /// Whether this instance runs in a browser (defaults to [kIsWeb]).
   final bool runsInBrowser;
 
   final ImagePicker _images;
   final PdfFilePick _pdfPick;
+  final ImageDownscaler _downscaler;
 
   static Future<PlatformFile?> _pickPdfFile() => FilePicker.pickFile(
     type: FileType.custom,
@@ -106,7 +113,10 @@ final class DevicePagePicker implements PagePicker {
   }
 
   /// Reads each of [files], keeping those whose type is an accepted image.
-  /// A file that cannot be read is skipped, not fatal to the others.
+  /// A file that cannot be read is skipped, not fatal to the others. Every
+  /// kept page passes through [_downscaler], which the real
+  /// [JpegImageDownscaler] uses to shrink a photograph larger than
+  /// [inlineImageByteTarget] below the vision request's practical cap.
   Future<List<ScannedPage>> _pagesFrom(List<XFile> files) async {
     final pages = <ScannedPage>[];
     for (final file in files) {
@@ -114,7 +124,11 @@ final class DevicePagePicker implements PagePicker {
         final bytes = await file.readAsBytes();
         final mimeType = _imageMimeType(file, bytes);
         if (mimeType == null || bytes.isEmpty) continue;
-        pages.add(ScannedPage(mimeType: mimeType, bytes: bytes));
+        pages.add(
+          await _downscaler.downscale(
+            ScannedPage(mimeType: mimeType, bytes: bytes),
+          ),
+        );
       } on Object {
         continue;
       }
