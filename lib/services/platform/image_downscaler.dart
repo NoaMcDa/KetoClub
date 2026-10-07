@@ -26,6 +26,20 @@ const int downscaledImageMaxLongEdge = 1280;
 /// compression stays faithful to printed text.
 const int downscaledJpegQuality = 75;
 
+/// The (long edge in pixels, JPEG quality) steps
+/// [JpegImageDownscaler.downscaleTo] tries in order, each smaller than the
+/// last, until one fits its target (issue #298). The first rung is the
+/// same 1280 px at quality 75 as [JpegImageDownscaler.downscale]; the
+/// last, 640 px at 55, is about the floor at which printed dish names stay
+/// legible to the vision model.
+const List<(int, int)> downscaleLadder = <(int, int)>[
+  (1280, 75),
+  (1024, 70),
+  (900, 65),
+  (768, 60),
+  (640, 55),
+];
+
 /// Shrinks a picked [ScannedPage] below the practical inline cap of the
 /// vision request. PDFs and already-small images are returned untouched.
 ///
@@ -35,6 +49,12 @@ abstract interface class ImageDownscaler {
   /// Returns [page] with its bytes reduced below [inlineImageByteTarget]
   /// when the implementation can do so, otherwise [page] itself.
   Future<ScannedPage> downscale(ScannedPage page);
+
+  /// Returns [page] re-encoded towards [targetBytes] (issue #298): the
+  /// first attempt at or below it, otherwise the smallest attempt, and
+  /// never anything larger than [page]. A PDF, an undecodable image and an
+  /// implementation that cannot shrink answer [page] itself.
+  Future<ScannedPage> downscaleTo(ScannedPage page, {required int targetBytes});
 }
 
 /// The [ImageDownscaler] that does nothing: every page comes back as it
@@ -46,6 +66,12 @@ final class NoImageDownscaler implements ImageDownscaler {
 
   @override
   Future<ScannedPage> downscale(ScannedPage page) async => page;
+
+  @override
+  Future<ScannedPage> downscaleTo(
+    ScannedPage page, {
+    required int targetBytes,
+  }) async => page;
 }
 
 /// The real [ImageDownscaler], over the pure-Dart `image` package.
@@ -90,6 +116,41 @@ final class JpegImageDownscaler implements ImageDownscaler {
       );
       if (encoded.isEmpty || encoded.length >= page.bytes.length) return page;
       return ScannedPage(mimeType: ScannedPage.jpeg, bytes: encoded);
+    } on Object {
+      return page;
+    }
+  }
+
+  /// Walks [downscaleLadder] from its first rung, decoding [page] once,
+  /// and returns the first encoding at or below [targetBytes]; when none
+  /// is, the smallest encoding produced, or [page] itself if that is no
+  /// smaller. A page already at or below [targetBytes], a PDF and an
+  /// undecodable image are returned untouched. Never throws.
+  @override
+  Future<ScannedPage> downscaleTo(
+    ScannedPage page, {
+    required int targetBytes,
+  }) async {
+    if (page.isPdf) return page;
+    if (page.bytes.length <= targetBytes) return page;
+    try {
+      final decoded = img.decodeImage(page.bytes);
+      if (decoded == null) return page;
+      Uint8List? smallest;
+      for (final (edge, quality) in downscaleLadder) {
+        final encoded = Uint8List.fromList(
+          img.encodeJpg(_fitInside(decoded, edge), quality: quality),
+        );
+        if (encoded.isEmpty) continue;
+        if (smallest == null || encoded.length < smallest.length) {
+          smallest = encoded;
+        }
+        if (encoded.length <= targetBytes) break;
+      }
+      if (smallest == null || smallest.length >= page.bytes.length) {
+        return page;
+      }
+      return ScannedPage(mimeType: ScannedPage.jpeg, bytes: smallest);
     } on Object {
       return page;
     }

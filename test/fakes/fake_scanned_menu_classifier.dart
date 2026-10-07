@@ -10,7 +10,8 @@ import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 ///
 /// With no scripted result set, [classify] stands in for a working vision
 /// classifier: a scan with at least one page is read as one dish per page
-/// ("Scanned dish 1", …) in a single `scanned` category, under a
+/// ("Scanned dish 1", …, each carrying the 1-based page it stands for as
+/// its [Dish.page]) in a single `scanned` category, under a
 /// `MenuSource.scan` reference, every dish [DishVerdict.orderAsIs] with a
 /// fixed [defaultWhy], stamped [derivedEngine] and recording the options
 /// it was given; a scan with no pages answers
@@ -84,6 +85,7 @@ final class FakeScannedMenuClassifier implements ScannedMenuClassifier {
           description: '',
           price: 0,
           options: const <DishOption>[],
+          page: i,
         ),
     ];
     final menu = Menu(

@@ -437,4 +437,76 @@ void main() {
       expect(read.analysis.unclassified, isEmpty);
     });
   });
+
+  group('parseScanned: the page each dish is printed on (issue #299)', () {
+    /// Parses the pages fixture with [pageCount] and expects a read.
+    ScannedMenuRead readPages({int? pageCount}) {
+      final result = MenuResponseParser.parseScanned(
+        _fixture('llm/llm_scanned_pages.json'),
+        ref: _ref,
+        analysedAt: _analysedAt,
+        engine: _engine,
+        pageCount: pageCount,
+      );
+      expect(result, isA<ScannedMenuRead>());
+      return result as ScannedMenuRead;
+    }
+
+    test('keeps only an integral page from 1 to pageCount', () {
+      // Act
+      final read = readPages(pageCount: 3);
+
+      // Assert: 1, 2, 0, 7, "2", 2.0, null, absent.
+      expect(
+        read.menu.allDishes.map((dish) => dish.page),
+        equals(<int?>[1, 2, null, null, null, 2, null, null]),
+      );
+    });
+
+    test('a bad page is never a rejection: every dish keeps its verdict', () {
+      // Act
+      final read = readPages(pageCount: 3);
+
+      // Assert
+      expect(read.menu.allDishes, hasLength(8));
+      expect(read.analysis.unclassified, isEmpty);
+      expect(
+        read.analysis.dishes.map((dish) => dish.verdict).toSet(),
+        equals(<DishVerdict>{DishVerdict.orderAsIs}),
+      );
+    });
+
+    test('with no pageCount every page is null', () {
+      // Act
+      final read = readPages();
+
+      // Assert
+      expect(
+        read.menu.allDishes.map((dish) => dish.page).toSet(),
+        equals(<int?>{null}),
+      );
+      expect(read.analysis.dishes, hasLength(8));
+    });
+
+    test('a reply with no page keys reads exactly as before', () {
+      // Arrange
+      final body = _fixture('llm/llm_scanned_valid.json');
+
+      // Act
+      final withCount = MenuResponseParser.parseScanned(
+        body,
+        ref: _ref,
+        analysedAt: _analysedAt,
+        engine: _engine,
+        pageCount: 3,
+      );
+
+      // Assert
+      expect(withCount, equals(_parse(body)));
+      expect(
+        (withCount as ScannedMenuRead).menu.allDishes.map((d) => d.page),
+        everyElement(isNull),
+      );
+    });
+  });
 }

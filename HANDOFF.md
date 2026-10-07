@@ -196,6 +196,18 @@ stored under `MenuSource.scan` and opened at `/venue/scan/{id}` like any venue:
   that touches the camera, gallery or file system.
 - **No on-device OCR** (D15; #81 closed as not planned): Gemini reads the page
   itself, so a misread column cannot be lost before classification starts.
+- **A scan is budgeted whole, and dishes remember their page** (#294–#303,
+  D22). Gemini's 503 at about 1.5 MB on the wire is per request, so
+  `ScanBudget` fits all image pages into one 900 KiB budget before sending,
+  shrinking each down `downscaleLadder` (never below 120 KiB a page); a scan
+  that still does not fit sends nothing and shows a no-Retry message
+  (`ScanController.pagesTooLarge`, not a failure reason). The vision reply
+  carries a per-dish `page` (`visionResponseSchema`, vision only); the parser
+  keeps it only as a whole number in 1..N, else null, never a rejection. A
+  multi-page scan's menu screen is grouped under `ScannedPageHeader`s with
+  `ScannedPageChips` to filter, and an "unknown" group for unplaced dishes;
+  a one-page scan is unchanged, and once the registry has lost the pages the
+  headers stay but an info notice says the pages are gone.
 
 Also shipped: flow tests for the three scan paths (**#84**), menus read
 from a restaurant's own website (**#181**, D19: paste any restaurant URL; the
@@ -361,6 +373,11 @@ spacing values) is enforced by a test; pixel fidelity by no test at all.
   transcription is cached, and the registry keeps the pages of at most the last
   four scans, so "View pages" disappears once the app is closed (or the scan is
   evicted) and the menu then reads like a pasted one.
+- **PDFs are outside a scan's byte budget, and page provenance is only as good
+  as the model's `page`** (D22). The downscaler cannot shrink a PDF, so a large
+  PDF can still meet the 503 that `ScanBudget` prevents for images, and the
+  model's `page` values have never been observed on a real request (#88): a
+  dish it does not place lands under the "unknown" header.
 - **The iOS Hebrew permission strings are unregistered until someone runs one
   Xcode step.** `ios/Runner/{en,he}.lproj/InfoPlist.strings` hold the location,
   camera and photo-library prompts in both languages (#169, #196, #205), but
@@ -489,6 +506,10 @@ this is the short list.
   should stay lazy — so a test asserting on content below its fold must scroll first.
   `SettingsScreen` uses a `Column` in a `SingleChildScrollView` for the opposite
   reason: it is short, and a screen reader should not have to scroll to find a control.
+- **Two reply schemas: the text path's has exactly seven dish properties; the
+  vision path's `visionResponseSchema` adds `page`.** A field that lives on
+  `Menu`/`Dish` never needs a `schemaVersion` bump — bumping it re-analyses
+  every cached scan through the text classifier and loses the pages (D22).
 - **`FLOW_TEST_CONVENTIONS.md`'s examples do not match this codebase.** They
   reference `HomeScreen`, `VenueListScreen` and a string `status` field, none of which
   exist. They are illustrative, not runnable. Same for the hypothetical workflow files

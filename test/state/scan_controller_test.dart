@@ -9,7 +9,9 @@ import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
+import 'package:ketoclub/services/platform/image_downscaler.dart';
 import 'package:ketoclub/services/platform/qr_scanner.dart';
+import 'package:ketoclub/services/platform/scan_budget.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/venue/qr_payload_router.dart';
 import 'package:ketoclub/state/scan_controller.dart';
@@ -688,6 +690,159 @@ void main() {
     });
   });
 
+  group('ScanController scan budget (issue #298)', () {
+    late FakeMenuRepository repository;
+    late FakeScannedMenuClassifier classifier;
+    late ScannedPagesRegistry registry;
+    late _TargetDownscaler downscaler;
+    late ScanController controller;
+
+    ScannedPage sized(int bytes, {int seed = 0, String? mime}) => ScannedPage(
+      mimeType: mime ?? ScannedPage.jpeg,
+      bytes: Uint8List.fromList(
+        List<int>.generate(bytes, (i) => (i + seed) & 0xff),
+      ),
+    );
+
+    setUp(() {
+      repository = FakeMenuRepository();
+      classifier = FakeScannedMenuClassifier();
+      registry = ScannedPagesRegistry();
+      downscaler = _TargetDownscaler();
+      controller = ScanController(
+        classifier: classifier,
+        repository: repository,
+        clock: FakeClock(_epoch),
+        settingsStore: FakeSettingsStore(),
+        pagesRegistry: registry,
+        scanBudget: ScanBudget(downscaler: downscaler),
+      );
+    });
+
+    tearDown(() => controller.dispose());
+
+    test('the fitted scan reaches the classifier and the registry, the '
+        'originals stay in pages', () async {
+      // Arrange: two 800 KiB pages are 1.6 MiB together.
+      final originals = [sized(800 * 1024), sized(800 * 1024, seed: 1)];
+      controller.addPages(originals);
+
+      // Act
+      final ref = await controller.analysePages();
+
+      // Assert
+      expect(ref, isNotNull);
+      final sent = classifier.calls.single.$1;
+      expect(sent.totalBytes, lessThanOrEqualTo(scanInlineByteBudget));
+      expect(sent.pages, hasLength(2));
+      expect(sent.pages.first, isNot(originals.first));
+      expect(registry.get(ref!), sent);
+      expect(controller.pages, originals);
+      expect(controller.pagesTooLarge, isFalse);
+    });
+
+    test('one small page is sent as it is', () async {
+      // Arrange
+      final page = sized(10 * 1024);
+      controller.addPages([page]);
+
+      // Act
+      final ref = await controller.analysePages();
+
+      // Assert: nothing was shrunk.
+      expect(downscaler.calls, 0);
+      final sent = classifier.calls.single.$1;
+      expect(identical(sent.pages.single, page), isTrue);
+      expect(identical(registry.get(ref!), sent), isTrue);
+    });
+
+    test(
+      'a scan that cannot fit sets pagesTooLarge and sends nothing',
+      () async {
+        // Arrange: a budget over a downscaler that cannot shrink anything.
+        final stuck = ScanController(
+          classifier: classifier,
+          repository: repository,
+          clock: FakeClock(_epoch),
+          settingsStore: FakeSettingsStore(),
+          scanBudget: ScanBudget(downscaler: _StuckDownscaler()),
+        )..addPages([sized(1024 * 1024)]);
+        addTearDown(stuck.dispose);
+        var notified = 0;
+        stuck.addListener(() => notified++);
+
+        // Act
+        final ref = await stuck.analysePages();
+
+        // Assert
+        expect(ref, isNull);
+        expect(stuck.pagesTooLarge, isTrue);
+        expect(stuck.lastFailure, isNull);
+        expect(stuck.analysing, isFalse);
+        expect(classifier.calls, isEmpty);
+        expect(repository.storedMenus, isEmpty);
+        expect(stuck.pages, hasLength(1));
+        expect(notified, greaterThanOrEqualTo(2));
+        stuck.removePageAt(0);
+        expect(stuck.pagesTooLarge, isFalse);
+      },
+    );
+
+    test('the default budget refuses a scan over budget', () async {
+      // Arrange: the controller built with no scanBudget.
+      final plain = ScanController(
+        classifier: classifier,
+        repository: repository,
+        clock: FakeClock(_epoch),
+        settingsStore: FakeSettingsStore(),
+      )..addPages([sized(1024 * 1024)]);
+      addTearDown(plain.dispose);
+
+      // Act
+      await plain.analysePages();
+
+      // Assert
+      expect(plain.pagesTooLarge, isTrue);
+      expect(classifier.calls, isEmpty);
+    });
+
+    test('adding or moving pages clears pagesTooLarge', () async {
+      // Arrange
+      final stuck = ScanController(
+        classifier: classifier,
+        repository: repository,
+        clock: FakeClock(_epoch),
+        settingsStore: FakeSettingsStore(),
+      )..addPages([sized(800 * 1024), sized(800 * 1024, seed: 1)]);
+      addTearDown(stuck.dispose);
+      await stuck.analysePages();
+      expect(stuck.pagesTooLarge, isTrue, reason: 'test setup');
+
+      // Act & Assert
+      stuck.movePage(0, 1);
+      expect(stuck.pagesTooLarge, isFalse);
+      await stuck.analysePages();
+      expect(stuck.pagesTooLarge, isTrue, reason: 'test setup');
+      stuck.addPages([sized(4, seed: 9)]);
+      expect(stuck.pagesTooLarge, isFalse);
+    });
+
+    test('a PDF page reaches the classifier untouched', () async {
+      // Arrange: a 2 MiB PDF beside a 1 MiB image.
+      final pdf = sized(2 * 1024 * 1024, mime: ScannedPage.pdf);
+      controller.addPages([pdf, sized(1024 * 1024, seed: 1)]);
+
+      // Act
+      await controller.analysePages();
+
+      // Assert
+      final sent = classifier.calls.single.$1;
+      expect(identical(sent.pages.first, pdf), isTrue);
+      expect(sent.pages.last.bytes.length, lessThan(1024 * 1024));
+      expect(downscaler.calls, 1);
+    });
+  });
+
   group('ScanController QR codes (issue #182)', () {
     late FakeQrScanner scanner;
     late ScanController controller;
@@ -904,4 +1059,40 @@ final class _GatedQrScanner implements QrScanner {
     scanCallCount++;
     return gate;
   }
+}
+
+/// A downscaler that answers a JPEG of exactly the target it was given,
+/// counting its [downscaleTo] calls.
+final class _TargetDownscaler implements ImageDownscaler {
+  int calls = 0;
+
+  @override
+  Future<ScannedPage> downscale(ScannedPage page) async => page;
+
+  @override
+  Future<ScannedPage> downscaleTo(
+    ScannedPage page, {
+    required int targetBytes,
+  }) async {
+    calls++;
+    if (page.bytes.length <= targetBytes) return page;
+    return ScannedPage(
+      mimeType: ScannedPage.jpeg,
+      bytes: Uint8List.fromList(
+        List<int>.generate(targetBytes, (i) => (i * 7 + calls) & 0xff),
+      ),
+    );
+  }
+}
+
+/// A downscaler that never shrinks a page, whatever the target.
+final class _StuckDownscaler implements ImageDownscaler {
+  @override
+  Future<ScannedPage> downscale(ScannedPage page) async => page;
+
+  @override
+  Future<ScannedPage> downscaleTo(
+    ScannedPage page, {
+    required int targetBytes,
+  }) async => page;
 }

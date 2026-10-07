@@ -298,6 +298,153 @@ void main() {
       expect(a, isNot(equals(b)));
     });
 
+    test('tryFrom decodes a map with no page key to a null page', () {
+      // Arrange: a Hive entry written before page existed.
+      final json = <String, Object?>{...validJson}..remove('page');
+
+      // Act
+      final result = Dish.tryFrom(json);
+
+      // Assert
+      expect(result, isNotNull);
+      expect(result?.page, isNull);
+    });
+
+    test('tryFrom decodes a null page to null', () {
+      // Arrange
+      final json = <String, Object?>{...validJson, 'page': null};
+
+      // Act
+      final result = Dish.tryFrom(json);
+
+      // Assert
+      expect(result, isNotNull);
+      expect(result?.page, isNull);
+    });
+
+    test('tryFrom decodes a non-int page to null, not a failure', () {
+      for (final raw in <Object?>['2', 2.5, true]) {
+        // Arrange
+        final json = <String, Object?>{...validJson, 'page': raw};
+
+        // Act
+        final result = Dish.tryFrom(json);
+
+        // Assert
+        expect(result, isNotNull, reason: 'page: $raw');
+        expect(result?.page, isNull, reason: 'page: $raw');
+      }
+    });
+
+    test('tryFrom decodes a page below 1 to null, not a failure', () {
+      for (final raw in <int>[0, -3]) {
+        // Arrange
+        final json = <String, Object?>{...validJson, 'page': raw};
+
+        // Act
+        final result = Dish.tryFrom(json);
+
+        // Assert
+        expect(result, isNotNull, reason: 'page: $raw');
+        expect(result?.page, isNull, reason: 'page: $raw');
+      }
+    });
+
+    test('tryFrom reads a present page', () {
+      // Arrange
+      final json = <String, Object?>{...validJson, 'page': 3};
+
+      // Act
+      final result = Dish.tryFrom(json);
+
+      // Assert
+      expect(result?.page, equals(3));
+    });
+
+    test('toJson writes the page', () {
+      // Arrange
+      const dish = Dish(
+        id: 'dish_1',
+        name: 'Ribeye',
+        description: '',
+        price: 0,
+        options: [],
+        page: 2,
+      );
+
+      // Act
+      final json = dish.toJson();
+
+      // Assert
+      expect(json['page'], equals(2));
+    });
+
+    test('tryFrom(x.toJson()) round-trips a dish with a page', () {
+      // Arrange
+      const dish = Dish(
+        id: 'dish_1',
+        name: 'Ribeye',
+        description: '300g',
+        price: 45.5,
+        options: [],
+        page: 2,
+      );
+
+      // Act
+      final result = Dish.tryFrom(dish.toJson());
+
+      // Assert
+      expect(result, equals(dish));
+      expect(result?.page, equals(2));
+    });
+
+    test('== returns false when page differs', () {
+      // Arrange
+      const a = Dish(
+        id: '1',
+        name: 'Steak',
+        description: '',
+        price: 1,
+        options: [],
+        page: 1,
+      );
+      const b = Dish(
+        id: '1',
+        name: 'Steak',
+        description: '',
+        price: 1,
+        options: [],
+        page: 2,
+      );
+
+      // Act & Assert
+      expect(a, isNot(equals(b)));
+    });
+
+    test('equal dishes with the same page share a hashCode', () {
+      // Arrange
+      const a = Dish(
+        id: '1',
+        name: 'Steak',
+        description: '',
+        price: 1,
+        options: [],
+        page: 2,
+      );
+      const b = Dish(
+        id: '1',
+        name: 'Steak',
+        description: '',
+        price: 1,
+        options: [],
+        page: 2,
+      );
+
+      // Act & Assert
+      expect(a, equals(b));
+      expect(a.hashCode, equals(b.hashCode));
+    });
+
     test('tryFrom returns null when id is empty', () {
       // Arrange
       final json = <String, Object?>{...validJson, 'id': ''};

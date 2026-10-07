@@ -45,6 +45,8 @@ import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
+import 'package:ketoclub/widgets/scanned_page_chips.dart';
+import 'package:ketoclub/widgets/scanned_page_header.dart';
 import 'package:ketoclub/widgets/scanned_pages_sheet.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
@@ -182,6 +184,56 @@ MenuController _scanController() => _controllerFor(
         fromCache: true,
       ),
     ),
+);
+
+/// A dish named [name] printed on scanned [page] (null: unknown page).
+Dish _pagedDish(String name, String id, int? page) => Dish(
+  id: id,
+  name: name,
+  description: '',
+  price: 10,
+  options: const <DishOption>[],
+  page: page,
+);
+
+/// A controller whose repository serves, at [ref] (default [_scanRef]), a
+/// menu with two dishes on page 1, one on page 2 and one on no known page
+/// (issue #296) — or [dishes] instead, when given.
+MenuController _pagedScanController({
+  VenueRef ref = _scanRef,
+  List<Dish>? dishes,
+}) => _controllerFor(
+  repository: FakeMenuRepository()
+    ..stub(
+      ref,
+      MenuFetched(
+        menu: _menuOf(
+          dishes ??
+              [
+                _pagedDish('Grilled salmon', 'p1a', 1),
+                _pagedDish('Caesar salad', 'p1b', 1),
+                _pagedDish('Ribeye', 'p2a', 2),
+                _pagedDish('Mystery dish', 'pu', null),
+              ],
+          ref: ref,
+        ),
+        fromCache: true,
+      ),
+    ),
+);
+
+/// The header of scanned page [n] (issue #296).
+Finder _pageHeader(int n) => find.byKey(ValueKey('scannedPageHeader-$n'));
+
+/// The header of the dishes no scanned page was matched to (issue #296).
+final Finder _unknownPageHeader = find.byKey(
+  const ValueKey('scannedPageHeader-unknown'),
+);
+
+/// The chip labelled [label] inside the page chip row (issue #296).
+Finder _pageChip(String label) => find.descendant(
+  of: find.byType(ScannedPageChips),
+  matching: find.text(label),
 );
 
 /// Pumps a [MenuScreen] for [ref] over [controller], inside a localised
@@ -2703,6 +2755,308 @@ void main() {
 
         // Assert
         expect(find.text(_he.scannedMenuPagesTitle), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+    });
+
+    group('scanned pages by dish (issue #296)', () {
+      testWidgets('a held scan heads its dishes by page in order, unknown '
+          'last, each with its page and dish count', (tester) async {
+        // Arrange
+        final registry = ScannedPagesRegistry()..put(_scanRef, _threePages());
+
+        // Act
+        await _pump(
+          tester,
+          _pagedScanController(),
+          ref: _scanRef,
+          scannedPages: registry,
+        );
+        await tester.pumpAndSettle();
+
+        // Assert: three headers, top to bottom, no category heading.
+        expect(find.byType(ScannedPageHeader), findsNWidgets(3));
+        final one = tester.getTopLeft(_pageHeader(1)).dy;
+        final two = tester.getTopLeft(_pageHeader(2)).dy;
+        final unknown = tester.getTopLeft(_unknownPageHeader).dy;
+        expect(one, lessThan(two));
+        expect(two, lessThan(unknown));
+        expect(find.text(_en.scannedPageHeader(1, 3)), findsOneWidget);
+        expect(find.text(_en.scannedPageHeader(2, 3)), findsOneWidget);
+        expect(find.text(_en.scannedPageDishCount(2)), findsOneWidget);
+        expect(
+          find.descendant(
+            of: _pageHeader(2),
+            matching: find.text(_en.scannedPageDishCount(1)),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: _unknownPageHeader,
+            matching: find.text(_en.scannedPageUnknown),
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('Mains'), findsNothing);
+
+        // Assert: each dish sits under its own page's header.
+        final salad = tester.getTopLeft(find.text('Caesar salad')).dy;
+        final ribeye = tester.getTopLeft(find.text('Ribeye')).dy;
+        final mystery = tester.getTopLeft(find.text('Mystery dish')).dy;
+        expect(salad, inExclusiveRange(one, two));
+        expect(ribeye, inExclusiveRange(two, unknown));
+        expect(mystery, greaterThan(unknown));
+
+        // Assert: a held scan shows thumbnails and no pages-gone notice.
+        expect(
+          find.descendant(of: _pageHeader(1), matching: find.byType(Image)),
+          findsOneWidget,
+        );
+        expect(find.text(_en.scannedMenuPagesGone), findsNothing);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('tapping a page header opens the pages sheet at that '
+          'page', (tester) async {
+        // Arrange
+        final registry = ScannedPagesRegistry()..put(_scanRef, _threePages());
+        await _pump(
+          tester,
+          _pagedScanController(),
+          ref: _scanRef,
+          scannedPages: registry,
+        );
+        await tester.pumpAndSettle();
+
+        // Act
+        await tester.tap(_pageHeader(2));
+        await tester.pumpAndSettle();
+
+        // Assert
+        final sheet = tester.widget<ScannedPagesSheet>(
+          find.byType(ScannedPagesSheet),
+        );
+        expect(sheet.initialPage, 1);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('the page chips filter the dishes and All pages restores '
+          'them', (tester) async {
+        // Arrange
+        final registry = ScannedPagesRegistry()..put(_scanRef, _threePages());
+        await _pump(
+          tester,
+          _pagedScanController(),
+          ref: _scanRef,
+          scannedPages: registry,
+        );
+        await tester.pumpAndSettle();
+        expect(find.byType(DishCard), findsNWidgets(4));
+        expect(_pageChip(_en.scannedPageUnknown), findsOneWidget);
+
+        // Act
+        await tester.tap(_pageChip(_en.scannedMenuPageLabel(2)));
+        await tester.pumpAndSettle();
+
+        // Assert: page 2 alone, under its own header only.
+        expect(find.byType(DishCard), findsOneWidget);
+        expect(find.text('Ribeye'), findsOneWidget);
+        expect(_pageHeader(2), findsOneWidget);
+        expect(_pageHeader(1), findsNothing);
+        expect(_unknownPageHeader, findsNothing);
+
+        // Act: the last chip sits past the row's edge until scrolled to.
+        await tester.ensureVisible(_pageChip(_en.scannedPageUnknown));
+        await tester.pumpAndSettle();
+        await tester.tap(_pageChip(_en.scannedPageUnknown));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(DishCard), findsOneWidget);
+        expect(find.text('Mystery dish'), findsOneWidget);
+        expect(_unknownPageHeader, findsOneWidget);
+        expect(_pageHeader(2), findsNothing);
+
+        // Act
+        await tester.ensureVisible(_pageChip(_en.scannedPageChipAll));
+        await tester.pumpAndSettle();
+        await tester.tap(_pageChip(_en.scannedPageChipAll));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(DishCard), findsNWidgets(4));
+        expect(find.byType(ScannedPageHeader), findsNWidgets(3));
+      });
+
+      testWidgets('a one-page scan shows no page header and no page chips', (
+        tester,
+      ) async {
+        // Arrange
+        final registry = ScannedPagesRegistry()
+          ..put(
+            _scanRef,
+            ScannedMenu(
+              pages: <ScannedPage>[
+                ScannedPage(mimeType: ScannedPage.png, bytes: _pngBytes),
+              ],
+            ),
+          );
+
+        // Act
+        await _pump(
+          tester,
+          _pagedScanController(
+            dishes: [
+              _pagedDish('Grilled salmon', 'a', 1),
+              _pagedDish('Caesar salad', 'b', 1),
+            ],
+          ),
+          ref: _scanRef,
+          scannedPages: registry,
+        );
+        await tester.pumpAndSettle();
+
+        // Assert: the category heading, as before issue #296.
+        expect(find.byType(ScannedPageHeader), findsNothing);
+        expect(find.byType(ScannedPageChips), findsNothing);
+        expect(find.text('Mains'), findsWidgets);
+        expect(find.byType(DishCard), findsNWidgets(2));
+        expect(find.text(_en.scannedMenuPagesGone), findsNothing);
+      });
+
+      testWidgets('with the pages gone from memory the headers are numbered '
+          'only, open nothing, and a notice says why', (tester) async {
+        // Act: no registry holds this scan's pages.
+        await _pump(
+          tester,
+          _pagedScanController(),
+          ref: _scanRef,
+          scannedPages: ScannedPagesRegistry(),
+        );
+        await tester.pumpAndSettle();
+
+        // Assert: the count is the highest page a dish names.
+        expect(find.text(_en.scannedPageHeader(1, 2)), findsOneWidget);
+        expect(find.text(_en.scannedPageHeader(2, 2)), findsOneWidget);
+        expect(_unknownPageHeader, findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byType(ScannedPageHeader),
+            matching: find.byType(Image),
+          ),
+          findsNothing,
+        );
+        expect(
+          find.descendant(
+            of: find.byType(ScannedPageHeader),
+            matching: find.byType(InkWell),
+          ),
+          findsNothing,
+        );
+        expect(find.bySemanticsLabel(_en.scannedPageHeaderOpen), findsNothing);
+        expect(find.text(_en.scannedMenuPagesGone), findsOneWidget);
+        expect(find.text(_en.scannedMenuViewPages), findsNothing);
+
+        // Act: a tap opens nothing; the chips still filter.
+        await tester.tap(_pageHeader(1));
+        await tester.pumpAndSettle();
+        expect(find.byType(ScannedPagesSheet), findsNothing);
+        await tester.tap(_pageChip(_en.scannedMenuPageLabel(1)));
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(DishCard), findsNWidgets(2));
+        expect(_pageHeader(2), findsNothing);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('a Wolt menu shows no page header, chip or notice', (
+        tester,
+      ) async {
+        // Arrange: Wolt dishes that, oddly, name pages.
+        final registry = ScannedPagesRegistry()..put(_ref, _threePages());
+
+        // Act
+        await _pump(
+          tester,
+          _pagedScanController(ref: _ref),
+          scannedPages: registry,
+        );
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.byType(ScannedPageHeader), findsNothing);
+        expect(find.byType(ScannedPageChips), findsNothing);
+        expect(find.text(_en.scannedMenuPagesGone), findsNothing);
+        expect(find.text('Mains'), findsWidgets);
+        expect(find.byType(DishCard), findsNWidgets(4));
+      });
+
+      testWidgets('at 1200px the page chips wrap in the side pane beside '
+          'the headed dish list', (tester) async {
+        // Arrange
+        final registry = ScannedPagesRegistry()..put(_scanRef, _threePages());
+        await _pump(
+          tester,
+          _pagedScanController(),
+          ref: _scanRef,
+          scannedPages: registry,
+        );
+
+        // Act
+        tester.view.physicalSize = const Size(1200, 900);
+        await tester.pumpAndSettle();
+
+        // Assert
+        final sidePane = find.byWidgetPredicate(
+          (widget) => widget is ListView && widget.primary == false,
+          description: 'the side pane',
+        );
+        expect(
+          find.descendant(
+            of: sidePane,
+            matching: find.byType(ScannedPageChips),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: find.byType(ScannedPageChips),
+            matching: find.byType(SingleChildScrollView),
+          ),
+          findsNothing,
+        );
+        expect(
+          find.descendant(of: sidePane, matching: _pageHeader(1)),
+          findsNothing,
+        );
+        expect(_pageHeader(1), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('under Locale(he) the page headers and chips are Hebrew '
+          'and right-to-left', (tester) async {
+        // Arrange
+        final registry = ScannedPagesRegistry()..put(_scanRef, _threePages());
+
+        // Act
+        await _pump(
+          tester,
+          _pagedScanController(),
+          ref: _scanRef,
+          locale: const Locale('he'),
+          scannedPages: registry,
+        );
+        await tester.pumpAndSettle();
+
+        // Assert
+        final title = find.text(_he.scannedPageHeader(1, 3));
+        expect(title, findsOneWidget);
+        expect(_pageChip(_he.scannedPageChipAll), findsOneWidget);
+        expect(Directionality.of(tester.element(title)), ui.TextDirection.rtl);
+        final header = tester.getRect(_pageHeader(1));
+        expect(tester.getRect(title).right, greaterThan(header.center.dx));
         expect(tester.takeException(), isNull);
       });
     });

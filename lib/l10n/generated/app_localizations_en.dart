@@ -975,6 +975,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scannedMenuPagesClose => 'Close';
 
   @override
+  String scannedPageHeader(int number, int total) {
+    return 'Page $number of $total';
+  }
+
+  @override
+  String get scannedPageUnknown => 'Page unknown';
+
+  @override
+  String get scannedPageUnknownExplain =>
+      'The AI did not say which page these dishes are on.';
+
+  @override
+  String scannedPageDishCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dishes',
+      one: '1 dish',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scannedPageHeaderOpen => 'View this page';
+
+  @override
+  String get scannedPageChipAll => 'All pages';
+
+  @override
+  String scannedPageChipSemanticLabel(String page) {
+    return 'Show dishes read from $page';
+  }
+
+  @override
+  String get scannedMenuPagesGone =>
+      'The photographs of this scan are no longer on this device, so its pages are listed by number only.';
+
+  @override
+  String get scannedPagesReadFromPage => 'Read from this page';
+
+  @override
   String get scanScreenIntro =>
       'Photograph the pages of a menu, choose photos from your library, or choose a PDF. KetoClub reads the dishes off the pages and analyses them.';
 
@@ -1103,6 +1144,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get scanScreenFailureApiKeyMissing =>
       'Add your Gemini API key in Settings to scan a menu.';
+
+  @override
+  String get scanScreenFailurePagesTooLarge =>
+      'Your pages are too large to send together, even after shrinking them. Remove a page and try again.';
 
   @override
   String get scanScreenFailureApiKeyRejected =>

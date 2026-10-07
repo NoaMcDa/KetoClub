@@ -7,7 +7,9 @@ import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/text/text_menu_source.dart';
 import 'package:ketoclub/services/platform/clock.dart';
+import 'package:ketoclub/services/platform/image_downscaler.dart';
 import 'package:ketoclub/services/platform/qr_scanner.dart';
+import 'package:ketoclub/services/platform/scan_budget.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/venue/qr_payload_router.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
@@ -57,7 +59,9 @@ final class ScanController extends ChangeNotifier {
   /// `settingsStore` gives: consent, the net-carb limit and the dietary
   /// toggles, the same ones the menu screen classifies with. The pages of
   /// a successful read are put in `pagesRegistry` (issue #89), when one is
-  /// given, so the menu screen can show them.
+  /// given, so the menu screen can show them. [scanBudget] fits the pages
+  /// into one request before they are sent (issue #298); its default
+  /// shrinks nothing, so it only refuses a scan already over budget.
   new({
     required this.classifier,
     required this._repository,
@@ -65,6 +69,7 @@ final class ScanController extends ChangeNotifier {
     required this._settingsStore,
     this._pagesRegistry,
     this.qrScanner = const NoQrScanner(),
+    this.scanBudget = const ScanBudget(downscaler: NoImageDownscaler()),
   });
 
   /// Reads and classifies scanned pages in one request (architecture.md
@@ -76,6 +81,10 @@ final class ScanController extends ChangeNotifier {
   /// scanner shows no QR action.
   final QrScanner qrScanner;
 
+  /// Fits the pages' images into one request's inline budget before
+  /// [analysePages] sends them (issue #298).
+  final ScanBudget scanBudget;
+
   final MenuRepository _repository;
   final Clock _clock;
   final SettingsStore _settingsStore;
@@ -84,6 +93,7 @@ final class ScanController extends ChangeNotifier {
   final List<ScannedPage> _pages = <ScannedPage>[];
   bool _analysing = false;
   MenuAnalysisFailureReason? _lastFailure;
+  bool _pagesTooLarge = false;
 
   String _text = '';
   bool _emptyPaste = false;
@@ -197,6 +207,12 @@ final class ScanController extends ChangeNotifier {
   /// failed and again once a later attempt succeeds or the pages change.
   MenuAnalysisFailureReason? get lastFailure => _lastFailure;
 
+  /// Whether the last [analysePages] refused the pages because even
+  /// shrunk they do not fit one request (issue #298). Not a
+  /// [lastFailure]: nothing was sent, and Retry would refuse them again,
+  /// so the user has to remove a page. Cleared with [lastFailure].
+  bool get pagesTooLarge => _pagesTooLarge;
+
   /// Whether the pages can be analysed now: at least one is held and no
   /// analysis is in flight.
   bool get canAnalysePages => _pages.isNotEmpty && !_analysing;
@@ -229,6 +245,7 @@ final class ScanController extends ChangeNotifier {
     }
     if (added) {
       _lastFailure = null;
+      _pagesTooLarge = false;
       _qrNotice = null;
       notifyListeners();
     }
@@ -241,6 +258,7 @@ final class ScanController extends ChangeNotifier {
     if (_analysing || index < 0 || index >= _pages.length) return;
     _pages.removeAt(index);
     _lastFailure = null;
+    _pagesTooLarge = false;
     notifyListeners();
   }
 
@@ -255,6 +273,7 @@ final class ScanController extends ChangeNotifier {
     if (from < 0 || from > last || to < 0 || to > last) return;
     _pages.insert(to, _pages.removeAt(from));
     _lastFailure = null;
+    _pagesTooLarge = false;
     notifyListeners();
   }
 
@@ -264,6 +283,11 @@ final class ScanController extends ChangeNotifier {
   /// that were read go into the pages registry under that reference, so
   /// the menu screen can offer them for checking; a failure puts nothing.
   ///
+  /// The pages are first fitted into one request by [scanBudget]; what is
+  /// sent, and what the registry keeps, is the fitted scan, while [pages]
+  /// keeps the originals. When they cannot be fitted, nothing is sent:
+  /// this returns null and sets [pagesTooLarge] instead of [lastFailure].
+  ///
   /// Returns null, and sets [lastFailure], when the classifier could not
   /// read the pages; the pages are kept, so calling this again is Retry.
   /// Also null when there are no pages or an analysis is already running.
@@ -271,12 +295,22 @@ final class ScanController extends ChangeNotifier {
     if (!canAnalysePages) return null;
     _analysing = true;
     _lastFailure = null;
+    _pagesTooLarge = false;
     notifyListeners();
 
     final settings = await _settingsStore.read();
     // An unmodifiable copy: the registry keeps exactly the pages that were
     // read, even if the user edits the list afterwards.
-    final scan = ScannedMenu(pages: _pages);
+    final ScannedMenu scan;
+    switch (await scanBudget.fit(ScannedMenu(pages: _pages))) {
+      case ScanFitted(scan: final fitted):
+        scan = fitted;
+      case ScanTooLarge():
+        _pagesTooLarge = true;
+        _analysing = false;
+        _notify();
+        return null;
+    }
     final result = await classifier.classify(
       scan,
       options: ClassificationOptions(

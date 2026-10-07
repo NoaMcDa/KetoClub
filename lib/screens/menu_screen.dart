@@ -40,6 +40,8 @@ import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
+import 'package:ketoclub/widgets/scanned_page_chips.dart';
+import 'package:ketoclub/widgets/scanned_page_header.dart';
 import 'package:ketoclub/widgets/scanned_pages_sheet.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
@@ -567,6 +569,7 @@ class _MenuScreenState extends State<MenuScreen> {
     final analysed = controller.analysis is MenuAnalysed;
     final localeTag = Localizations.localeOf(context).toLanguageTag();
     final rows = controller.visibleRows;
+    final paging = _pagingFor(controller);
 
     // Header, tiles, category chips, then dishes (issue #234): the
     // search, the carb budget and the legend sit behind one collapsed
@@ -582,6 +585,18 @@ class _MenuScreenState extends State<MenuScreen> {
           redCount: controller.redCount,
           filter: controller.filter,
           onFilterChanged: controller.setFilter,
+        ),
+        const SizedBox(height: 10),
+      ],
+      // A scan read from several pages is filtered by page right under
+      // the tiles (issue #296), so in two panes it sits in the side pane.
+      if (paging != null) ...[
+        ScannedPageChips(
+          pageCount: paging.pageCount,
+          hasUnknown: controller.hasUnattributedDishes,
+          selected: controller.pageFilter,
+          onSelected: controller.setPageFilter,
+          wrap: twoPane,
         ),
         const SizedBox(height: 10),
       ],
@@ -628,7 +643,11 @@ class _MenuScreenState extends State<MenuScreen> {
     ];
     final chips = <Widget>[
       CategoryChips(
-        categories: controller.visibleCategories,
+        // A paged scan is headed by page, not by category (issue #296),
+        // so there is no category heading for a chip to jump to.
+        categories: paging != null
+            ? const <String>[]
+            : controller.visibleCategories,
         onSelected: (category) => unawaited(_scrollToCategory(category)),
         // Wrapped in the side pane, where a mouse cannot drag a
         // horizontal row to the chips past its edge (issue #225).
@@ -640,7 +659,7 @@ class _MenuScreenState extends State<MenuScreen> {
       if (rows.isEmpty)
         _noVisibleRows(l10n, controller)
       else
-        ..._dishRows(context, controller, localeTag, rows),
+        ..._dishRows(context, controller, localeTag, rows, paging: paging),
       if (analysed && controller.unclassifiedRows.isNotEmpty)
         _unclassifiedSection(context, l10n, controller, localeTag),
     ];
@@ -832,12 +851,13 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
-  /// Opens [ScannedPagesSheet] over [pages] as a dismissible modal.
-  Future<void> _openScannedPages(ScannedMenu pages) {
+  /// Opens [ScannedPagesSheet] over [pages] as a dismissible modal, at
+  /// the 0-based [initialPage] when given (issue #296).
+  Future<void> _openScannedPages(ScannedMenu pages, {int? initialPage}) {
     return showKetoClubSheet<void>(
       context: context,
       showDragHandle: true,
-      builder: (_) => ScannedPagesSheet(scan: pages),
+      builder: (_) => ScannedPagesSheet(scan: pages, initialPage: initialPage),
     );
   }
 
@@ -1125,6 +1145,19 @@ class _MenuScreenState extends State<MenuScreen> {
         ),
       );
     }
+    // A scan whose dishes name their pages, opened after its photographs
+    // left memory (a restart, or eviction): the page headers still number
+    // the dishes, but nothing can show the pages themselves (issue #296).
+    if (widget.ref.source == MenuSource.scan &&
+        controller.attributedPages.isNotEmpty &&
+        _scannedPages == null) {
+      lines.add(
+        AppNotice.info(
+          message: l10n.scannedMenuPagesGone,
+          icon: Icons.photo_library_outlined,
+        ),
+      );
+    }
     if (lines.isEmpty) return const <Widget>[];
     return <Widget>[
       Padding(
@@ -1138,23 +1171,59 @@ class _MenuScreenState extends State<MenuScreen> {
     ];
   }
 
+  /// How a scan read from several pages is laid out by page (issue
+  /// #296), or null when the menu is not headed by page: a platform menu,
+  /// a pasted one, a scan whose dishes name no page, and a one-page scan.
+  ///
+  /// The page count is the held scan's own; once its pages have left
+  /// memory, it is the highest page a dish names.
+  _Paging? _pagingFor(MenuController controller) {
+    final attributed = controller.attributedPages;
+    if (attributed.isEmpty) return null;
+    final pages = _scannedPages;
+    final pageCount = pages?.pages.length ?? attributed.last;
+    if (pageCount < 2) return null;
+    return _Paging(pageCount: pageCount, pages: pages);
+  }
+
   /// One widget per row in [rows], with a keyed category header inserted
   /// before the first row of each category (issue #51) — the same
   /// [GlobalKey] [CategoryChips.onSelected] scrolls to through
   /// [_scrollToCategory].
+  ///
+  /// With [paging] (issue #296) a [ScannedPageHeader] heads each page's
+  /// rows instead, the unknown-page header heading the rows no page was
+  /// matched to; [rows] are already in page order, unknown last. A page
+  /// the page filter emptied has no rows, so no header either.
   List<Widget> _dishRows(
     BuildContext context,
     MenuController controller,
     String localeTag,
-    List<DishRow> rows,
-  ) {
+    List<DishRow> rows, {
+    _Paging? paging,
+  }) {
     final widgets = <Widget>[];
+    final perPage = <int?, int>{};
+    if (paging != null) {
+      for (final row in rows) {
+        perPage.update(row.dish.page, (n) => n + 1, ifAbsent: () => 1);
+      }
+    }
     String? lastCategory;
+    int? lastPage;
+    var first = true;
     for (final row in rows) {
-      if (row.category != lastCategory) {
+      if (paging != null) {
+        final page = row.dish.page;
+        if (first || page != lastPage) {
+          lastPage = page;
+          widgets.add(_pageHeader(paging, page, perPage[page] ?? 0));
+        }
+      } else if (row.category != lastCategory) {
         lastCategory = row.category;
         widgets.add(_categoryHeader(context, row.category));
       }
+      first = false;
       widgets.add(
         Padding(
           padding: const EdgeInsets.only(bottom: 12),
@@ -1174,6 +1243,33 @@ class _MenuScreenState extends State<MenuScreen> {
       );
     }
     return widgets;
+  }
+
+  /// The [ScannedPageHeader] over [page]'s [dishCount] visible dishes
+  /// (issue #296), or over the dishes no page was matched to when [page]
+  /// is null. While the scan's pages are held, it shows the page's
+  /// thumbnail and opens the pages sheet at that page when tapped.
+  Widget _pageHeader(_Paging paging, int? page, int dishCount) {
+    final Widget header;
+    if (page == null) {
+      header = ScannedPageHeader.unknown(dishCount: dishCount);
+    } else {
+      final pages = paging.pages;
+      final held = pages != null && page <= pages.pages.length;
+      header = ScannedPageHeader(
+        number: page,
+        total: paging.pageCount,
+        thumbnail: held ? pages.pages[page - 1] : null,
+        dishCount: dishCount,
+        onTap: held
+            ? () => unawaited(_openScannedPages(pages, initialPage: page - 1))
+            : null,
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.only(top: 4, bottom: 10),
+      child: header,
+    );
   }
 
   /// The keyed heading shown before a category's first visible row
@@ -1344,4 +1440,17 @@ class _MenuScreenState extends State<MenuScreen> {
       ),
     );
   }
+}
+
+/// How a scan read from several pages is laid out by page on the menu
+/// screen (issue #296).
+final class _Paging {
+  const new({required this.pageCount, required this.pages});
+
+  /// How many pages the scan has: the held scan's own count, or the
+  /// highest page a dish names once the pages have left memory.
+  final int pageCount;
+
+  /// The scan's pages, or null once they have left memory.
+  final ScannedMenu? pages;
 }

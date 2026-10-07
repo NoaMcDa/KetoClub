@@ -982,6 +982,48 @@ class AppLocalizationsHe extends AppLocalizations {
   String get scannedMenuPagesClose => 'סגירה';
 
   @override
+  String scannedPageHeader(int number, int total) {
+    return 'עמוד $number מתוך $total';
+  }
+
+  @override
+  String get scannedPageUnknown => 'עמוד לא ידוע';
+
+  @override
+  String get scannedPageUnknownExplain =>
+      'ה-AI לא ציין באיזה עמוד נמצאות המנות האלה.';
+
+  @override
+  String scannedPageDishCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count מנות',
+      two: 'שתי מנות',
+      one: 'מנה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scannedPageHeaderOpen => 'הצגת העמוד הזה';
+
+  @override
+  String get scannedPageChipAll => 'כל העמודים';
+
+  @override
+  String scannedPageChipSemanticLabel(String page) {
+    return 'הצגת מנות שנקראו מ$page';
+  }
+
+  @override
+  String get scannedMenuPagesGone =>
+      'התמונות של הסריקה הזאת כבר אינן במכשיר, ולכן העמודים מוצגים לפי מספר בלבד.';
+
+  @override
+  String get scannedPagesReadFromPage => 'נקרא מהעמוד הזה';
+
+  @override
   String get scanScreenIntro =>
       'צלמו את דפי התפריט, בחרו תמונות מהגלריה או בחרו קובץ PDF. קטוקלאב קורא את המנות מהדפים ומנתח אותן.';
 
@@ -1109,6 +1151,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get scanScreenFailureApiKeyMissing =>
       'הוסיפו את מפתח ה-API של Gemini בהגדרות כדי לסרוק תפריט.';
+
+  @override
+  String get scanScreenFailurePagesTooLarge =>
+      'העמודים גדולים מכדי להישלח יחד, גם לאחר הקטנתם. הסירו עמוד ונסו שוב.';
 
   @override
   String get scanScreenFailureApiKeyRejected =>

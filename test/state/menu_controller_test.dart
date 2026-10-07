@@ -2798,6 +2798,248 @@ void main() {
       });
     });
   });
+
+  // ── Scanned pages (issue #300) ───────────────────────────────────────────
+
+  group('MenuController scanned pages (issue #300)', () {
+    const scanRef = VenueRef(source: MenuSource.scan, platformId: 'scan-1');
+    late FakeMenuRepository repository;
+    late FakeMenuClassifier classifier;
+    late MenuController controller;
+
+    setUp(() {
+      repository = FakeMenuRepository();
+      classifier = FakeMenuClassifier();
+      controller = MenuController(
+        repository,
+        classifier,
+        FakeSettingsStore(),
+        FakeNotesStore(),
+        CarbBudgetController(),
+      );
+    });
+
+    /// A dish named [name] with id [id], printed on [page].
+    Dish pagedDish(String name, String id, int? page) => Dish(
+      id: id,
+      name: name,
+      description: '',
+      price: 0,
+      options: const <DishOption>[],
+      page: page,
+    );
+
+    /// A menu for [ref] holding [dishes] under one category.
+    Menu menuFor(VenueRef ref, List<Dish> dishes) => Menu(
+      venueRef: ref,
+      currency: 'ILS',
+      fetchedAt: DateTime.utc(2026),
+      categories: <MenuCategory>[
+        MenuCategory(id: 'c1', name: 'Scanned menu', dishes: dishes),
+      ],
+    );
+
+    final salad = pagedDish('Salad', 's', 2);
+    final mystery = pagedDish('Mystery', 'm', null);
+    final steak = pagedDish('Steak', 't', 1);
+    final pasta = pagedDish('Pasta', 'p', 1);
+
+    /// Opens a scan of [salad, mystery, steak, pasta] (pages 2, null, 1,
+    /// 1), with steak green, pasta red and the rest yellow.
+    Future<void> openFourDishScan() async {
+      repository.stub(
+        scanRef,
+        MenuFetched(menu: menuFor(scanRef, [salad, mystery, steak, pasta])),
+      );
+      classifier.respondWith(
+        MenuAnalysed(
+          dishes: [
+            _verdictFor(salad, DishVerdict.modifiable, modification: 'm'),
+            _verdictFor(mystery, DishVerdict.modifiable, modification: 'm'),
+            _verdictFor(steak, DishVerdict.orderAsIs),
+            _verdictFor(pasta, DishVerdict.nonKeto),
+          ],
+          unclassified: const <String>[],
+          engine: const LlmEngine(model: 'vision-model'),
+          analysedAt: DateTime.utc(2026),
+        ),
+      );
+      await controller.open(scanRef);
+    }
+
+    List<String> visibleNames() =>
+        controller.visibleRows.map((row) => row.dish.name).toList();
+
+    test('attributedPages lists distinct pages ascending and '
+        'hasUnattributedDishes sees the null page', () async {
+      // Act
+      await openFourDishScan();
+
+      // Assert
+      expect(controller.attributedPages, [1, 2]);
+      expect(controller.hasUnattributedDishes, isTrue);
+      expect(controller.pageFilter, isNull);
+    });
+
+    test('visibleRows groups rows by page with the unknown page last, '
+        'keeping menu order within a page', () async {
+      // Act
+      await openFourDishScan();
+
+      // Assert
+      expect(visibleNames(), ['Steak', 'Pasta', 'Salad', 'Mystery']);
+      expect(controller.visibleRows.map((row) => row.dish.page), [
+        1,
+        1,
+        2,
+        null,
+      ]);
+    });
+
+    test('setPageFilter keeps one page, the unknown page, or every '
+        'page', () async {
+      // Arrange
+      await openFourDishScan();
+
+      // Act / Assert
+      controller.setPageFilter(1);
+      expect(visibleNames(), ['Steak', 'Pasta']);
+
+      controller.setPageFilter(scanPageUnknown);
+      expect(visibleNames(), ['Mystery']);
+
+      controller.setPageFilter(null);
+      expect(visibleNames(), ['Steak', 'Pasta', 'Salad', 'Mystery']);
+    });
+
+    test('the page filter combines with a verdict filter', () async {
+      // Arrange
+      await openFourDishScan();
+
+      // Act
+      await controller.setFilter(MenuFilter.yellowOnly);
+      controller.setPageFilter(2);
+
+      // Assert
+      expect(visibleNames(), ['Salad']);
+
+      // Act: page 1 holds no yellow dish.
+      controller.setPageFilter(1);
+
+      // Assert
+      expect(visibleNames(), isEmpty);
+    });
+
+    test('the page filter combines with a search query', () async {
+      // Arrange
+      await openFourDishScan();
+
+      // Act
+      controller
+        ..setQuery('pa')
+        ..setPageFilter(1);
+
+      // Assert: "Pasta" is on page 1; nothing else on it matches "pa".
+      expect(visibleNames(), ['Pasta']);
+
+      // Act
+      controller.setPageFilter(2);
+
+      // Assert
+      expect(visibleNames(), isEmpty);
+    });
+
+    test('a Wolt menu has no attributed pages and ignores a page '
+        'filter', () async {
+      // Arrange: pages set on a platform menu are not a scan's pages.
+      final dishes = [salad, mystery, steak, pasta];
+      repository.stub(_ref, MenuFetched(menu: menuFor(_ref, dishes)));
+      await controller.open(_ref);
+      final before = visibleNames();
+
+      // Act
+      controller.setPageFilter(1);
+
+      // Assert
+      expect(controller.attributedPages, isEmpty);
+      expect(controller.hasUnattributedDishes, isFalse);
+      expect(before, ['Salad', 'Mystery', 'Steak', 'Pasta']);
+      expect(visibleNames(), before);
+    });
+
+    test('a one-page scan keeps menu order exactly', () async {
+      // Arrange
+      final dishes = [
+        pagedDish('B', 'b', 1),
+        pagedDish('A', 'a', 1),
+        pagedDish('C', 'c', 1),
+      ];
+      repository.stub(scanRef, MenuFetched(menu: menuFor(scanRef, dishes)));
+
+      // Act
+      await controller.open(scanRef);
+
+      // Assert
+      expect(controller.attributedPages, [1]);
+      expect(controller.hasUnattributedDishes, isFalse);
+      expect(visibleNames(), ['B', 'A', 'C']);
+    });
+
+    test('a scan with no pages keeps menu order and offers no '
+        'pages', () async {
+      // Arrange
+      final dishes = [pagedDish('B', 'b', null), pagedDish('A', 'a', null)];
+      repository.stub(scanRef, MenuFetched(menu: menuFor(scanRef, dishes)));
+
+      // Act
+      await controller.open(scanRef);
+
+      // Assert
+      expect(controller.attributedPages, isEmpty);
+      expect(controller.hasUnattributedDishes, isFalse);
+      expect(visibleNames(), ['B', 'A']);
+    });
+
+    test('open of another ref resets pageFilter to null', () async {
+      // Arrange
+      await openFourDishScan();
+      controller.setPageFilter(2);
+      const otherRef = VenueRef(source: MenuSource.scan, platformId: 's2');
+      repository.stub(
+        otherRef,
+        MenuFetched(menu: menuFor(otherRef, [steak, salad])),
+      );
+
+      // Act
+      await controller.open(otherRef);
+
+      // Assert
+      expect(controller.pageFilter, isNull);
+      expect(visibleNames(), ['Steak', 'Salad']);
+    });
+
+    test('setPageFilter notifies once per change and never on a '
+        'no-op', () async {
+      // Arrange
+      await openFourDishScan();
+      var notifications = 0;
+      controller
+        ..addListener(() => notifications++)
+        // Act / Assert
+        ..setPageFilter(null);
+      expect(notifications, 0);
+
+      controller.setPageFilter(1);
+      expect(notifications, 1);
+
+      controller.setPageFilter(1);
+      expect(notifications, 1);
+
+      controller.setPageFilter(scanPageUnknown);
+      expect(notifications, 2);
+      expect(controller.pageFilter, scanPageUnknown);
+    });
+  });
 }
 
 /// A [MenuQuestionAnswerer] that blocks until a gate completes, then returns

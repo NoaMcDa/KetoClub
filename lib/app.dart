@@ -206,6 +206,7 @@ Route<void>? generateRoute(
             settingsStore: dependencies.settingsStore,
             pagesRegistry: dependencies.scannedPages,
             qrScanner: dependencies.qrScanner,
+            scanBudget: dependencies.scanBudget,
           ),
           child: ScanScreen(
             pagePicker: dependencies.pagePicker,

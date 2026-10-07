@@ -843,9 +843,11 @@ const List<String> scannedReplyDishNames = <String>[
 
 /// A vision reply the response parser accepts, transcribing the first [n]
 /// of [scannedReplyDishNames] (1 to 4): ids `v1..vN`, a green, a yellow with
-/// its waiter instruction, a red and a green.
-String validScannedReply(int n) {
+/// its waiter instruction, a red and a green. Each dish names its `page`:
+/// [pages]`[i]` when given (null sends `null`), else `i + 1`.
+String validScannedReply(int n, {List<int?>? pages}) {
   assert(n >= 1 && n <= scannedReplyDishNames.length, 'n out of range');
+  assert(pages == null || pages.length >= n, 'pages shorter than n');
   const verdicts = <String>['orderAsIs', 'modifiable', 'nonKeto', 'orderAsIs'];
   const reasons = <String>[
     'Grilled fish with lemon butter, nothing starchy.',
@@ -865,6 +867,7 @@ String validScannedReply(int n) {
               ? 'Replace the fries with a green salad.'
               : null,
           'net_carbs_estimate': null,
+          'page': pages == null ? i + 1 : pages[i],
         },
     ],
   });
