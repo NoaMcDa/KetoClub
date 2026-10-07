@@ -410,6 +410,15 @@ final class _StubImageDownscaler implements ImageDownscaler {
     seen.add(page);
     return replacement;
   }
+
+  @override
+  Future<ScannedPage> downscaleTo(
+    ScannedPage page, {
+    required int targetBytes,
+  }) async {
+    seen.add(page);
+    return replacement;
+  }
 }
 
 void _downscalerSuite() {

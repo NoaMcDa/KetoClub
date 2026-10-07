@@ -20,6 +20,7 @@ import 'package:ketoclub/services/platform/device_page_picker.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/qr_scanner.dart';
+import 'package:ketoclub/services/platform/scan_budget.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
@@ -70,6 +71,8 @@ void main() {
       // The QR camera scanner, off the web (issue #182).
       expect(dependencies.qrScanner, isA<MobileQrScanner>());
       expect(dependencies.qrScanner.isAvailable, isTrue);
+      // The scan budget over the real JPEG downscaler (issue #298).
+      expect(dependencies.scanBudget, isA<ScanBudget>());
     });
 
     test('performs no plugin I/O while building the graph', () {

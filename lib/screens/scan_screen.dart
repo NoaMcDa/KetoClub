@@ -307,6 +307,20 @@ class _ScanScreenState extends State<ScanScreen> {
         ),
         const SizedBox(height: 8),
       ],
+      // Pages that even shrunk do not fit one request (issue #298): no
+      // Retry, since retrying sends the same pages; removing one is the fix.
+      if (controller.pagesTooLarge && !controller.analysing) ...[
+        Semantics(
+          liveRegion: true,
+          child: Text(
+            l10n.scanScreenFailurePagesTooLarge,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.error,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+      ],
       SizedBox(
         width: double.infinity,
         child: FilledButton(

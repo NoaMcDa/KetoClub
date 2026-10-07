@@ -27,8 +27,10 @@ import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/device_page_picker.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
+import 'package:ketoclub/services/platform/image_downscaler.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/qr_scanner.dart';
+import 'package:ketoclub/services/platform/scan_budget.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/install_id_store.dart';
@@ -336,6 +338,9 @@ AppDependencies buildDependencies() {
     pagePicker: DevicePagePicker(),
     // Opens no camera until a scan is asked for (issue #182).
     qrScanner: qrScanner,
+    // Pure Dart and const: decodes nothing until a scan is over budget
+    // (issue #298).
+    scanBudget: const ScanBudget(downscaler: JpegImageDownscaler()),
     navigatorKey: navigatorKey,
   );
 }

@@ -9,9 +9,11 @@ import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
+import 'package:ketoclub/services/platform/image_downscaler.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/page_picker.dart';
 import 'package:ketoclub/services/platform/qr_scanner.dart';
+import 'package:ketoclub/services/platform/scan_budget.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
@@ -47,6 +49,10 @@ class AppDependencies {
   /// hides its QR action, and a null key leaves the root navigator to
   /// `MaterialApp` (issue #182).
   ///
+  /// [scanBudget] defaults to a budget over [NoImageDownscaler], which
+  /// shrinks nothing and so does no decode; `di.dart` passes one over the
+  /// real JPEG downscaler (issue #298).
+  ///
   /// [menuQuestionAnswerer] defaults to null: a caller that never uses the
   /// question feature need not construct one, and `MenuController` hides the
   /// action when it is absent.
@@ -70,6 +76,7 @@ class AppDependencies {
     this.scannedMenuClassifier = const UnavailableScannedMenuClassifier(),
     this.pagePicker = const NoPagePicker(),
     this.qrScanner = const NoQrScanner(),
+    this.scanBudget = const ScanBudget(downscaler: NoImageDownscaler()),
     this.navigatorKey,
     this.menuQuestionAnswerer,
   });
@@ -155,6 +162,10 @@ class AppDependencies {
   /// code" action (issue #182). Unavailable on web, where pasting the URL
   /// already works.
   final QrScanner qrScanner;
+
+  /// Fits a scan's pages into one vision request before the Scan tab
+  /// sends them (issue #298).
+  final ScanBudget scanBudget;
 
   /// The app's root navigator, when a service has to push a page of its own
   /// (the QR camera, issue #182). `MaterialApp` uses it as its

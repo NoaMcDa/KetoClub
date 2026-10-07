@@ -36,6 +36,32 @@ Uint8List _noisyJpeg({
   ),
 );
 
+/// A width x height photograph stand-in: smooth gradients under noise of
+/// [amplitude] (0 to 256), so it is noisy enough that the first rungs of
+/// [downscaleLadder] miss a 150 KiB target, yet compresses the way a
+/// photograph does rather than the way pure noise does.
+Uint8List _photoJpeg({
+  required int width,
+  required int height,
+  int amplitude = 48,
+}) {
+  final image = img.Image(width: width, height: height);
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      final n = (((x + 1) * 2654435761) ^ ((y + 1) * 40503)) & 0xff;
+      final d = (n * amplitude) >> 8;
+      image.setPixelRgb(
+        x,
+        y,
+        (x * 255 ~/ width + d) & 0xff,
+        (y * 255 ~/ height + d) & 0xff,
+        ((x + y) & 0xff) ~/ 2 + d ~/ 2,
+      );
+    }
+  }
+  return Uint8List.fromList(img.encodeJpg(image, quality: 90));
+}
+
 /// Encodes [_noisyImage] as PNG.
 Uint8List _noisyPng({required int width, required int height}) =>
     Uint8List.fromList(
@@ -215,6 +241,147 @@ void main() {
       // Assert: the implementation keeps the original rather than return
       // a re-encode that gained bytes.
       expect(identical(result, page), isTrue);
+    });
+  });
+
+  group('downscaleTo (issue #298)', () {
+    test('NoImageDownscaler returns the page it was given', () async {
+      // Arrange
+      final page = ScannedPage(
+        mimeType: ScannedPage.jpeg,
+        bytes: Uint8List(4096),
+      );
+
+      // Act
+      final result = await const NoImageDownscaler().downscaleTo(
+        page,
+        targetBytes: 1,
+      );
+
+      // Assert
+      expect(identical(result, page), isTrue);
+    });
+
+    test('walks the ladder to a 150 KiB target on a noisy photo', () async {
+      // Arrange: a 2000 x 1500 noisy JPEG is far over 150 KiB, and so is
+      // its first rung, so the ladder has to walk down.
+      final bytes = _photoJpeg(width: 2000, height: 1500);
+      expect(bytes.length, greaterThan(150 * 1024), reason: 'test setup');
+      final firstRung = img.encodeJpg(
+        img.copyResize(img.decodeImage(bytes)!, width: 1280),
+        quality: 75,
+      );
+      expect(firstRung.length, greaterThan(150 * 1024), reason: 'setup');
+      final page = ScannedPage(mimeType: ScannedPage.jpeg, bytes: bytes);
+
+      // Act
+      final result = await const JpegImageDownscaler().downscaleTo(
+        page,
+        targetBytes: 150 * 1024,
+      );
+
+      // Assert
+      expect(result.mimeType, ScannedPage.jpeg);
+      expect(result.bytes.length, lessThanOrEqualTo(150 * 1024));
+      final decoded = img.decodeImage(result.bytes);
+      expect(decoded, isNotNull);
+      expect(decoded!.width, lessThanOrEqualTo(1280));
+      expect(decoded.height, lessThanOrEqualTo(1280));
+    });
+
+    test('returns the smallest attempt when no rung reaches the target, '
+        'never larger than the input', () async {
+      // Arrange: a 1-byte target no encoding can reach.
+      final bytes = _noisyJpeg(width: 1600, height: 1200);
+      final page = ScannedPage(mimeType: ScannedPage.jpeg, bytes: bytes);
+
+      // Act
+      final result = await const JpegImageDownscaler().downscaleTo(
+        page,
+        targetBytes: 1,
+      );
+
+      // Assert: smaller than the input, and fitted to the last rung.
+      expect(result.bytes.length, lessThan(page.bytes.length));
+      final decoded = img.decodeImage(result.bytes);
+      expect(decoded!.width, lessThanOrEqualTo(downscaleLadder.last.$1));
+    });
+
+    test('keeps the input when every rung would be larger', () async {
+      // Arrange: an input at JPEG quality 1 is smaller than any rung.
+      final cheap = _noisyJpeg(width: 64, height: 64, quality: 1);
+      final page = ScannedPage(mimeType: ScannedPage.jpeg, bytes: cheap);
+
+      // Act
+      final result = await const JpegImageDownscaler().downscaleTo(
+        page,
+        targetBytes: 1,
+      );
+
+      // Assert
+      expect(identical(result, page), isTrue);
+    });
+
+    test('passes a page already under the target through', () async {
+      // Arrange
+      final page = ScannedPage(
+        mimeType: ScannedPage.jpeg,
+        bytes: _noisyJpeg(width: 48, height: 48),
+      );
+
+      // Act
+      final result = await const JpegImageDownscaler().downscaleTo(
+        page,
+        targetBytes: page.bytes.length,
+      );
+
+      // Assert
+      expect(identical(result, page), isTrue);
+    });
+
+    test('returns a PDF untouched', () async {
+      // Arrange
+      final page = ScannedPage(
+        mimeType: ScannedPage.pdf,
+        bytes: Uint8List(4096),
+      );
+
+      // Act
+      final result = await const JpegImageDownscaler().downscaleTo(
+        page,
+        targetBytes: 1024,
+      );
+
+      // Assert
+      expect(identical(result, page), isTrue);
+    });
+
+    test('returns undecodable bytes untouched', () async {
+      // Arrange
+      final page = ScannedPage(
+        mimeType: ScannedPage.jpeg,
+        bytes: Uint8List.fromList(List<int>.filled(4096, 0x42)),
+      );
+
+      // Act
+      final result = await const JpegImageDownscaler().downscaleTo(
+        page,
+        targetBytes: 1024,
+      );
+
+      // Assert
+      expect(identical(result, page), isTrue);
+    });
+
+    test('the ladder starts at the downscale rung and only shrinks', () {
+      expect(downscaleLadder.first, (
+        downscaledImageMaxLongEdge,
+        downscaledJpegQuality,
+      ));
+      for (var i = 1; i < downscaleLadder.length; i++) {
+        expect(downscaleLadder[i].$1, lessThan(downscaleLadder[i - 1].$1));
+        expect(downscaleLadder[i].$2, lessThan(downscaleLadder[i - 1].$2));
+      }
     });
   });
 

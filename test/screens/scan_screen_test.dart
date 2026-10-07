@@ -711,6 +711,50 @@ void main() {
       }
     });
 
+    testWidgets('pages too large to send show their own copy and no Retry', (
+      tester,
+    ) async {
+      // Arrange: one 1 MiB page, over the scan budget, and the default
+      // budget cannot shrink it (issue #298).
+      await _pump(tester, controller, picker: picker);
+      controller.addPages([_jpeg(1, bytes: 1024 * 1024)]);
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(_analysePages(_en));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.scanScreenFailurePagesTooLarge), findsOneWidget);
+      expect(
+        find.widgetWithText(OutlinedButton, _en.actionRetry),
+        findsNothing,
+      );
+      expect(classifier.calls, isEmpty);
+      expect(find.text(_en.scanScreenPageLabel(1)), findsOneWidget);
+
+      // Act: removing the page clears the copy.
+      controller.removePageAt(0);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.scanScreenFailurePagesTooLarge), findsNothing);
+    });
+
+    test('the too-large copy differs from every failure copy', () {
+      for (final l10n in [_en, _he]) {
+        for (final reason in MenuAnalysisFailureReason.values) {
+          for (final direct in [false, true]) {
+            expect(
+              scanFailureMessage(reason, l10n, directToGoogle: direct),
+              isNot(l10n.scanScreenFailurePagesTooLarge),
+              reason: '${l10n.localeName} $reason direct=$direct',
+            );
+          }
+        }
+      }
+    });
+
     testWidgets('on phones notConfigured says scanning is unavailable', (
       tester,
     ) async {
