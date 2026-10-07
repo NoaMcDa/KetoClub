@@ -158,6 +158,7 @@ final class MenuController extends ChangeNotifier {
   MenuFetchFailureReason? _staleReason;
   MenuFilter _filter = MenuFilter.all;
   String _query = '';
+  int? _pageFilter;
   VenueRef? _openRef;
   Map<String, String> _dishNotes = const <String, String>{};
 
@@ -367,6 +368,39 @@ final class MenuController extends ChangeNotifier {
   /// dish to show. `''` (the default) matches every dish.
   String get query => _query;
 
+  /// Which scanned page [visibleRows] keeps (issue #300): null keeps every
+  /// page, [scanPageUnknown] keeps only dishes whose [Dish.page] is
+  /// unknown, and any other value n keeps only dishes printed on page n.
+  /// Reset to null on every [open].
+  int? get pageFilter => _pageFilter;
+
+  /// The distinct [Dish.page] values on [menu], ascending (issue #300).
+  ///
+  /// Empty before a menu is loaded, when no dish carries a page, and for
+  /// every menu whose source is not [MenuSource.scan] — a platform menu
+  /// has no pages, so no page control is ever offered for one.
+  List<int> get attributedPages {
+    final currentMenu = _menu;
+    if (currentMenu == null) return const <int>[];
+    if (currentMenu.venueRef.source != MenuSource.scan) {
+      return const <int>[];
+    }
+    final pages = <int>{
+      for (final dish in currentMenu.allDishes)
+        if (dish.page case final int page) page,
+    };
+    return pages.toList()..sort();
+  }
+
+  /// Whether [attributedPages] is non-empty and at least one dish on
+  /// [menu] has no [Dish.page] (issue #300) — when true, a page control
+  /// also offers [scanPageUnknown].
+  bool get hasUnattributedDishes {
+    final currentMenu = _menu;
+    if (currentMenu == null || attributedPages.isEmpty) return false;
+    return currentMenu.allDishes.any((dish) => dish.page == null);
+  }
+
   /// The dishes to render, honouring [filter] and, once it is non-blank,
   /// [query].
   ///
@@ -396,30 +430,67 @@ final class MenuController extends ChangeNotifier {
   /// cost the user the menu — which architecture.md §6.6 forbids. Keeping
   /// that rule here rather than in a screen means no screen has to reach
   /// around this controller to rebuild rows for itself.
+  ///
+  /// **Scanned pages (issue #300).** When [attributedPages] is non-empty,
+  /// [pageFilter] applies last, in both cases above, and the rows are
+  /// stably sorted by [Dish.page], unknown pages last, so each page's
+  /// dishes sit together in their transcribed order. A one-page scan and
+  /// every platform menu keep menu order exactly.
   List<DishRow> get visibleRows {
     final currentMenu = _menu;
     if (currentMenu == null) return const <DishRow>[];
     final normalisedQuery = TextNormaliser.normalise(_query);
+    final List<DishRow> rows;
     if (analysis is! MenuAnalysed) {
-      return _allRows(currentMenu)
+      rows = _allRows(currentMenu)
           .where((row) => _matchesQuery(row.dish, normalisedQuery))
           .toList();
-    }
-    final analysedById = _analysedById();
-    final rows = <DishRow>[];
-    for (final category in currentMenu.categories) {
-      for (final dish in category.dishes) {
-        final verdict = analysedById[dish.id];
-        if (!_matchesFilter(verdict)) continue;
-        if (!_matchesQuery(dish, normalisedQuery)) continue;
-        if (!_matchesBudget(verdict)) continue;
-        rows.add(
-          DishRow(dish: dish, category: category.name, analysis: verdict),
-        );
+    } else {
+      final analysedById = _analysedById();
+      rows = <DishRow>[];
+      for (final category in currentMenu.categories) {
+        for (final dish in category.dishes) {
+          final verdict = analysedById[dish.id];
+          if (!_matchesFilter(verdict)) continue;
+          if (!_matchesQuery(dish, normalisedQuery)) continue;
+          if (!_matchesBudget(verdict)) continue;
+          rows.add(
+            DishRow(dish: dish, category: category.name, analysis: verdict),
+          );
+        }
       }
     }
-    return rows;
+    if (attributedPages.isEmpty) return rows;
+    return _byPage(rows.where((row) => _matchesPage(row.dish)).toList());
   }
+
+  /// Whether [dish] passes [pageFilter]: every dish when it is null, a
+  /// dish with no page when it is [scanPageUnknown], and otherwise a dish
+  /// printed on exactly that page. Only consulted when [attributedPages]
+  /// is non-empty, so a platform menu ignores any page filter.
+  bool _matchesPage(Dish dish) => switch (_pageFilter) {
+    null => true,
+    scanPageUnknown => dish.page == null,
+    final int page => dish.page == page,
+  };
+
+  /// [rows] stably sorted by [Dish.page], unknown pages last. `List.sort`
+  /// is not guaranteed stable, so the original index breaks ties.
+  List<DishRow> _byPage(List<DishRow> rows) {
+    final indexed = <(int, DishRow)>[
+      for (var i = 0; i < rows.length; i++) (i, rows[i]),
+    ];
+    int pageOf(DishRow row) => row.dish.page ?? _unknownPageSortKey;
+    indexed.sort((a, b) {
+      final byPage = pageOf(a.$2).compareTo(pageOf(b.$2));
+      return byPage != 0 ? byPage : a.$1.compareTo(b.$1);
+    });
+    return <DishRow>[for (final (_, row) in indexed) row];
+  }
+
+  /// The sort key a dish with no page takes in [_byPage]: after every
+  /// real page.
+  static const int _unknownPageSortKey = 1 << 30;
 
   /// The categories that still have at least one row in [visibleRows], in
   /// menu order (issue #51's category jump) — the same order
@@ -537,11 +608,12 @@ final class MenuController extends ChangeNotifier {
   ///
   /// Otherwise the classifier runs, and a successful [MenuAnalysed] is
   /// persisted through the repository for the next open to reuse.
-  /// [filter] is reset from the user's stored default on every call.
-  /// Never throws.
+  /// [filter] is reset from the user's stored default on every call, and
+  /// [pageFilter] to null. Never throws.
   Future<void> open(VenueRef ref, {bool forceRefresh = false}) async {
     _ref = ref;
     _phase = LoadPhase.fetching;
+    _pageFilter = null;
     notifyListeners();
 
     _openRef = ref;
@@ -838,6 +910,17 @@ final class MenuController extends ChangeNotifier {
   /// sent anywhere.
   void setQuery(String query) {
     _query = query;
+    notifyListeners();
+  }
+
+  /// Changes [pageFilter] to [page] (issue #300): null for every page,
+  /// [scanPageUnknown] for dishes whose page is unknown, or a 1-based
+  /// page number. Notifies listeners only when the value actually
+  /// changes. Not persisted: a page belongs to one scan, so the next
+  /// [open] starts from every page again.
+  void setPageFilter(int? page) {
+    if (page == _pageFilter) return;
+    _pageFilter = page;
     notifyListeners();
   }
 

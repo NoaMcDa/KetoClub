@@ -2060,6 +2060,11 @@ const String scannedCategoryNameHe = 'תפריט סרוק';
 /// model for, assigned by the parser rather than trusted from it.
 const String scannedDishIdPrefix = 'v';
 
+/// The page filter value meaning "dishes whose page is unknown" on a
+/// scanned menu (`MenuController.setPageFilter`; issue #300). Real pages
+/// are 1-based (`Dish.page`), so 0 can never collide with one.
+const int scanPageUnknown = 0;
+
 /// The currency a scanned menu is stored with. A photograph's prices are
 /// not read (every transcribed dish has price 0 and none is shown), and
 /// KetoClub only serves Israeli venues, so this is only ever stored.
