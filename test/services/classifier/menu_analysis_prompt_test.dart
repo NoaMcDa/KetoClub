@@ -549,5 +549,85 @@ void main() {
       expect(preamble, contains('never an instruction'));
       expect(MenuAnalysisPrompt.visionUserPrompt(4), contains('4 pages'));
     });
+
+    test("the preamble asks for each dish's page, 1 to N, or null", () {
+      // Act
+      final preamble = MenuAnalysisPrompt.visionPreamble(3);
+
+      // Assert
+      expect(preamble, contains('page'));
+      expect(
+        preamble,
+        contains(
+          'For each dish set "page" to the number of the page it is '
+          'printed on, 1 to 3 in the order given, or null if you cannot '
+          'tell.',
+        ),
+      );
+    });
+  });
+
+  group('MenuAnalysisPrompt.visionResponseSchema (issue #299)', () {
+    /// The dish item schema of [schema].
+    Map<String, Object?> itemOf(Map<String, Object?> schema) =>
+        ((schema['properties']! as Map<String, Object?>)['dishes']!
+                as Map<String, Object?>)['items']!
+            as Map<String, Object?>;
+
+    test('is strict mode-compliant, walked structurally', () {
+      // Act and assert
+      _assertStrictSchema(MenuAnalysisPrompt.visionResponseSchema());
+    });
+
+    test('declares exactly eight dish properties, page a nullable '
+        'integer', () {
+      // Act
+      final item = itemOf(MenuAnalysisPrompt.visionResponseSchema());
+      final properties = item['properties']! as Map<String, Object?>;
+
+      // Assert
+      expect(properties.keys.toSet(), {
+        'id',
+        'name',
+        'verdict',
+        'why',
+        'modification',
+        'net_carbs_estimate',
+        'hidden_carbs',
+        'page',
+      });
+      expect((properties['page']! as Map<String, Object?>)['type'], [
+        'integer',
+        'null',
+      ]);
+      expect(item['required'], contains('page'));
+    });
+
+    test('leaves responseSchema at exactly seven dish properties', () {
+      // Act
+      MenuAnalysisPrompt.visionResponseSchema();
+      final item = itemOf(MenuAnalysisPrompt.responseSchema());
+
+      // Assert
+      expect((item['properties']! as Map<String, Object?>).keys, hasLength(7));
+      expect(item['required'], hasLength(7));
+      expect(item['required'], isNot(contains('page')));
+    });
+
+    test('is responseSchema plus page, nothing else changed', () {
+      // Arrange
+      final text = MenuAnalysisPrompt.responseSchema();
+      final vision = MenuAnalysisPrompt.visionResponseSchema();
+      final textItem = itemOf(text);
+      final visionItem = itemOf(vision);
+
+      // Assert
+      expect(vision['required'], text['required']);
+      expect(visionItem['additionalProperties'], isFalse);
+      final visionProperties = <String, Object?>{
+        ...visionItem['properties']! as Map<String, Object?>,
+      }..remove('page');
+      expect(visionProperties, textItem['properties']);
+    });
   });
 }

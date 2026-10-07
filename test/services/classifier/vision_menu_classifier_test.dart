@@ -116,7 +116,7 @@ void main() {
       );
     });
 
-    test('sends the text path schema and schema name, unchanged', () async {
+    test('sends the vision schema under the text path schema name', () async {
       // Arrange
       final client = _answering();
 
@@ -126,7 +126,7 @@ void main() {
 
       // Assert
       final request = client.requests.single;
-      expect(request.responseSchema, MenuAnalysisPrompt.responseSchema());
+      expect(request.responseSchema, MenuAnalysisPrompt.visionResponseSchema());
       expect(request.schemaName, MenuAnalysisPrompt.schemaName);
     });
 
@@ -202,6 +202,48 @@ void main() {
       // Assert
       final skewers = (result as ScannedMenuRead).analysis.dishes.last;
       expect(skewers.verdict, DishVerdict.orderAsIs);
+    });
+
+    test('dishes carry the pages the reply named, within the scan', () async {
+      // Arrange: the pages fixture, read over a three-page scan.
+      final client = FakeLlmChatClient()
+        ..fallback = ChatCompleted(
+          content: File('test/fixtures/llm/llm_scanned_pages.json')
+              .readAsStringSync(),
+          model: _model,
+        );
+
+      // Act
+      final result = await _classifier(client)
+          .classify(_threePages(), options: _steered);
+
+      // Assert: 1, 2, 0, 7, "2", 2.0, null, absent.
+      expect(
+        (result as ScannedMenuRead).menu.allDishes.map((dish) => dish.page),
+        <int?>[1, 2, null, null, null, 2, null, null],
+      );
+    });
+
+    test('a page beyond the pages sent is dropped', () async {
+      // Arrange: the same reply over a one-page scan.
+      final client = FakeLlmChatClient()
+        ..fallback = ChatCompleted(
+          content: File('test/fixtures/llm/llm_scanned_pages.json')
+              .readAsStringSync(),
+          model: _model,
+        );
+
+      // Act
+      final result = await _classifier(client).classify(
+        ScannedMenu(pages: <ScannedPage>[_page(1)]),
+        options: _steered,
+      );
+
+      // Assert: only the page-1 dish keeps its page.
+      expect(
+        (result as ScannedMenuRead).menu.allDishes.map((dish) => dish.page),
+        <int?>[1, null, null, null, null, null, null, null],
+      );
     });
 
     test('a reply the parser rejects is badResponse', () async {

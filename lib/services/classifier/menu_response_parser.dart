@@ -172,6 +172,12 @@ abstract final class MenuResponseParser {
   /// script follows (architecture.md §12). Its [Menu.fetchedAt] is
   /// [analysedAt] and it has no [Menu.venueName].
   ///
+  /// Each transcribed [Dish.page] is the element's `page` (issue #299)
+  /// only when it is an integral number from 1 to [pageCount] — `2.0`
+  /// reads as 2. Anything else — absent, null, a string, a fraction, out
+  /// of range, or any value when [pageCount] is null — leaves the page
+  /// null. A bad page is never a rejection: the dish keeps its verdict.
+  ///
   /// Static, pure, and never throws, like [parse].
   static ScannedMenuResult parseScanned(
     String body, {
@@ -179,6 +185,7 @@ abstract final class MenuResponseParser {
     required DateTime analysedAt,
     required AnalysisEngine engine,
     int netCarbLimitGrams = defaultNetCarbLimitGrams,
+    int? pageCount,
   }) {
     final decoded = _decode(body);
     if (decoded == null) return _scannedBadResponse();
@@ -208,6 +215,7 @@ abstract final class MenuResponseParser {
         description: '',
         price: 0,
         options: const <DishOption>[],
+        page: _page(rawDish['page'], pageCount),
       );
       transcribed.add(dish);
       _judge(
@@ -249,6 +257,16 @@ abstract final class MenuResponseParser {
         schemaVersion: schemaVersion,
       ),
     );
+  }
+
+  /// The 1-based page [raw] names, when it is an integral number from 1
+  /// to [pageCount]; null otherwise, and always null when [pageCount] is
+  /// null (issue #299).
+  static int? _page(Object? raw, int? pageCount) {
+    if (pageCount == null || raw is! num || !raw.isFinite) return null;
+    if (raw != raw.truncate()) return null;
+    final page = raw.toInt();
+    return page >= 1 && page <= pageCount ? page : null;
   }
 
   static ScannedMenuFailed _scannedBadResponse() =>

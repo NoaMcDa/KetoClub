@@ -1,0 +1,76 @@
+{
+  "_fixture_note": "synthetic fixture: a vision reply over 3 scanned pages naming each dish's page (issue #299). Only an integral page from 1 to the page count is kept: 1 and 2 are kept, 2.0 reads as 2, and 0, 7, the string \"2\", null and an absent page all leave the page null. Every dish keeps its green verdict: a bad page is never a rejection.",
+  "dishes": [
+    {
+      "id": "v1",
+      "name": "Grilled Salmon",
+      "verdict": "orderAsIs",
+      "why": "Grilled protein, nothing starchy.",
+      "modification": null,
+      "net_carbs_estimate": null,
+      "page": 1
+    },
+    {
+      "id": "v2",
+      "name": "Lamb Chops",
+      "verdict": "orderAsIs",
+      "why": "Grilled protein, nothing starchy.",
+      "modification": null,
+      "net_carbs_estimate": null,
+      "page": 2
+    },
+    {
+      "id": "v3",
+      "name": "Caesar Salad",
+      "verdict": "orderAsIs",
+      "why": "Grilled protein, nothing starchy.",
+      "modification": null,
+      "net_carbs_estimate": null,
+      "page": 0
+    },
+    {
+      "id": "v4",
+      "name": "Ribeye Steak",
+      "verdict": "orderAsIs",
+      "why": "Grilled protein, nothing starchy.",
+      "modification": null,
+      "net_carbs_estimate": null,
+      "page": 7
+    },
+    {
+      "id": "v5",
+      "name": "Shakshuka",
+      "verdict": "orderAsIs",
+      "why": "Grilled protein, nothing starchy.",
+      "modification": null,
+      "net_carbs_estimate": null,
+      "page": "2"
+    },
+    {
+      "id": "v6",
+      "name": "Chicken Skewers",
+      "verdict": "orderAsIs",
+      "why": "Grilled protein, nothing starchy.",
+      "modification": null,
+      "net_carbs_estimate": null,
+      "page": 2.0
+    },
+    {
+      "id": "v7",
+      "name": "Beef Carpaccio",
+      "verdict": "orderAsIs",
+      "why": "Grilled protein, nothing starchy.",
+      "modification": null,
+      "net_carbs_estimate": null,
+      "page": null
+    },
+    {
+      "id": "v8",
+      "name": "Tuna Tartare",
+      "verdict": "orderAsIs",
+      "why": "Grilled protein, nothing starchy.",
+      "modification": null,
+      "net_carbs_estimate": null
+    }
+  ]
+}

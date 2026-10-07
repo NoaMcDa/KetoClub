@@ -27,8 +27,12 @@ import 'package:ketoclub/services/platform/clock.dart';
 /// Sends exactly one chat completion per [classify] call, all pages in it
 /// (D6): the system prompt is [MenuAnalysisPrompt.visionSystemPrompt] —
 /// the text path's own prompt behind a vision preamble — and the response
-/// schema and its name are the text path's, unchanged, so the server's
-/// schema handling is the one it already has. A two-request design
+/// schema is [MenuAnalysisPrompt.visionResponseSchema], the text path's
+/// with one more dish property, `page` (issue #299), under the text
+/// path's schema name, so the server's schema handling is the one it
+/// already has. Each transcribed dish carries the page the reply named
+/// when it is in range ([MenuResponseParser.parseScanned]'s `pageCount`
+/// is the number of pages sent). A two-request design
 /// (transcribe, then run the text path) was rejected: checking provenance
 /// against a transcript the model wrote checks the model against itself,
 /// and spends two of the day's calls.
@@ -69,7 +73,7 @@ final class VisionMenuClassifier implements ScannedMenuClassifier {
         options: options,
       ),
       userPrompt: MenuAnalysisPrompt.visionUserPrompt(pageCount),
-      responseSchema: MenuAnalysisPrompt.responseSchema(),
+      responseSchema: MenuAnalysisPrompt.visionResponseSchema(),
       schemaName: MenuAnalysisPrompt.schemaName,
       images: <ChatImagePart>[
         for (final page in scan.pages)
@@ -88,6 +92,7 @@ final class VisionMenuClassifier implements ScannedMenuClassifier {
           analysedAt: readAt,
           engine: LlmEngine(model: model),
           netCarbLimitGrams: options.netCarbLimitGrams,
+          pageCount: pageCount,
         );
         return switch (parsed) {
           ScannedMenuRead(:final menu, :final analysis) => ScannedMenuRead(

@@ -69,7 +69,9 @@ final class Dish {
   /// Creates a dish. [description] should be `''`, never null, when the
   /// platform did not supply one. [imageUrl] is null when the platform
   /// supplied no photo, or one that could not be read — a missing or
-  /// malformed image must never fail the whole fetch.
+  /// malformed image must never fail the whole fetch. [page] is the
+  /// 1-based page of a scanned menu the dish is printed on, and null for
+  /// every platform menu and whenever the page is unknown.
   const new({
     required this.id,
     required this.name,
@@ -77,6 +79,7 @@ final class Dish {
     required this.price,
     required this.options,
     this.imageUrl,
+    this.page,
   });
 
   /// Reads a dish written by [toJson].
@@ -85,7 +88,9 @@ final class Dish {
   /// [price] or a malformed option — and never throws. `imageUrl` is
   /// read tolerantly: absent (as in every entry cached before this
   /// field existed), null, non-String or empty all decode to a null
-  /// [imageUrl], never to a failure of the whole entry.
+  /// [imageUrl], never to a failure of the whole entry. `page` is read
+  /// the same way: absent, null, non-int or below 1 all decode to a null
+  /// [page].
   static Dish? tryFrom(Map<String, Object?> json) {
     final id = json['id'];
     final name = json['name'];
@@ -93,6 +98,7 @@ final class Dish {
     final rawPrice = json['price'];
     final rawOptions = json['options'];
     final rawImageUrl = json['imageUrl'];
+    final rawPage = json['page'];
     if (id is! String || id.isEmpty) return null;
     if (name is! String || name.isEmpty) return null;
     if (rawDescription != null && rawDescription is! String) return null;
@@ -115,6 +121,7 @@ final class Dish {
       imageUrl: rawImageUrl is String && rawImageUrl.isNotEmpty
           ? rawImageUrl
           : null,
+      page: rawPage is int && rawPage >= 1 ? rawPage : null,
     );
   }
 
@@ -143,6 +150,11 @@ final class Dish {
   /// (architecture.md §17).
   final String? imageUrl;
 
+  /// The 1-based page of a scanned menu this dish is printed on. Null for
+  /// a platform menu, and whenever the page is unknown or was not a
+  /// positive integer.
+  final int? page;
+
   /// Writes a form [tryFrom] can read back.
   Map<String, Object?> toJson() => <String, Object?>{
     'id': id,
@@ -151,6 +163,7 @@ final class Dish {
     'price': price,
     'options': options.map((option) => option.toJson()).toList(),
     'imageUrl': imageUrl,
+    'page': page,
   };
 
   @override
@@ -161,7 +174,8 @@ final class Dish {
       other.description == description &&
       other.price == price &&
       _listEquals(other.options, options) &&
-      other.imageUrl == imageUrl;
+      other.imageUrl == imageUrl &&
+      other.page == page;
 
   @override
   int get hashCode => Object.hash(
@@ -171,10 +185,12 @@ final class Dish {
     price,
     Object.hashAll(options),
     imageUrl,
+    page,
   );
 
   @override
-  String toString() => 'Dish($id: $name)';
+  String toString() =>
+      page == null ? 'Dish($id: $name)' : 'Dish($id: $name, page $page)';
 }
 
 /// One menu section, e.g. "Steaks" (architecture.md §7).
