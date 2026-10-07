@@ -1244,7 +1244,8 @@ dropping `additionalProperties`, rewriting `["T", "null"]` to `{type: T,
 nullable: true}`, recursing into `properties` and `items`, leaving `enum` and
 `required` untouched — so this schema, the parser, and the Dart-side contract
 tests stay exactly as they were before D12; only the backend knows Gemini's
-`responseSchema` dialect exists.
+`responseSchema` dialect exists. The scan path sends this schema plus one
+more dish property, `page`; see D22 (§14).
 
 *(Phase 1)* **A `description` property is deliberately absent, and should stay
 absent.** `m16_structured_output_fix.md` lists `description` among its nullable
@@ -1379,6 +1380,9 @@ honest substitute — so:
   `parseScanned` to prove it, alongside `llm/llm_scanned_{valid,
   duplicate_names,nameless_element,over_cap,empty}.json` for the replaced
   rules. Rule 8 reads as: no kept element → `noDishesFound`.
+- **A page rule is added (D22).** A kept element's `page` becomes `Dish.page`
+  only when it is a whole number from 1 to the scan's page count; anything
+  else leaves it null and is never a rejection.
 
 ---
 
@@ -1890,6 +1894,9 @@ against the photograph. Consent withheld means no page is sent; offline means
 no request is spent; and there is no rules fallback. No real image request
 has yet been sent with this prompt (#88).
 
+*(D22 amends this: the pages are budgeted as a whole before the request, and
+the vision reply's schema gains a per-dish `page`.)*
+
 **D16 — AI analysis is on by default.** *(2026-09-28; answers issue #167;
 amends §11.)* D2 makes the language model the primary classifier, but
 `AppSettings.estimationConsentGiven` defaulted to `false`, so a fresh
@@ -2177,6 +2184,97 @@ dish of that verdict, drinks included; the legend says so.
 nearby list is scored to the twelfth card. The automatic run adds up to 12
 Wolt fetches per list, which D13's reading of Wolt's terms counted as a
 different category from one fetch per user action.
+
+### D22 — A scan is budgeted as a whole before it is sent, and every transcribed dish remembers its page
+
+*(Amends D15 and the scanned variant of §9.4; adds one vision-only property to
+§9.2. Issues #294 (the 503 on a multi-page scan), #295, #296 and #297–#303.)*
+
+**What changed.** D15 sent the pages as they came, each shrunk on its own to
+`inlineImageByteTarget` (900 KiB). That limit is per request, not per page:
+Gemini answered 503 UNAVAILABLE once the body passed about 1.5 MB on the wire,
+so three pages each just under the target still failed together (#294). And
+the transcription threw away where a dish came from: a six-page menu was one
+flat list, and the only way to check a dish was to open every page. Two
+decisions:
+
+1. **A scan is budgeted as a whole (#295, #298).** `ScanBudget`
+   (`services/platform/scan_budget.dart`) holds `scanInlineByteBudget`, the
+   same 900 KiB as the per-page target but summed over every image page of
+   the request. `ScanController.analysePages` runs `fit` before the
+   classifier is called. A scan already within budget goes through as the
+   same object. Otherwise each image page is shrunk towards an even share of
+   the budget (never below `minScanPageTargetBytes`, 120 KiB, under which
+   printed text stops being legible) by `ImageDownscaler.downscaleTo`, which
+   walks `downscaleLadder` — (1280 px, q75), (1024, 70), (900, 65), (768, 60),
+   (640, 55) — decoding once and keeping the first rung at or below the
+   target, else the smallest, never anything larger than the input. If the
+   shrunk pages still exceed the budget, nothing is sent: `fit` answers
+   `ScanTooLarge` and the controller sets `pagesTooLarge`. What is sent, and
+   what `ScannedPagesRegistry` keeps, is the fitted scan; the controller's
+   own page list keeps the originals.
+   - **`pagesTooLarge` is its own state, not a `MenuAnalysisFailureReason`.**
+     No request was made, so nothing failed at a service boundary, and the
+     failure vocabulary (§10) stays a list of things a call can do. It also
+     has no Retry: retrying would send the same pages. The Scan tab says so
+     and the way out is to remove a page.
+   - **PDFs are exempt, a known limit.** The downscaler cannot shrink one,
+     and the backend and the direct client already cap a PDF on its own
+     (`VISION_MAX_IMAGE_BYTES`, `maxScanPageBytes`). A PDF is neither counted
+     nor refused here, so a large PDF can still meet the 503 this decision
+     removes for images.
+2. **Every transcribed dish remembers its page (#296, #299–#303).**
+   `Dish.page` is a nullable 1-based number. On the wire:
+   - **`visionResponseSchema` is the one vision-only divergence from §9.2.**
+     It is `responseSchema` plus a `page` property, `["integer", "null"]` and
+     in `required` like every other (strict mode has no "optional"), and the
+     vision preamble asks for "the number of the page it is printed on, 1 to
+     N in the order given, or null". The text schema keeps exactly seven
+     properties: a platform or pasted menu has no pages, and a shared schema
+     would put a meaningless field in front of every text reply and move the
+     backend's completion-cache key for a request that did not change.
+   - **The page rule (§9.4, scanned variant).** `parseScanned` keeps an
+     element's `page` only when it is a whole number from 1 to the scan's
+     page count; `2.0` counts, `2.5`, `0`, `N+1`, a string and `null` do not.
+     A bad page leaves the dish's `page` null and is never a rejection: the
+     dish keeps its verdict, because a wrong page costs a header, a wrong
+     rejection costs a dish.
+   - **`schemaVersion` is deliberately not bumped.** `page` lives on `Menu`
+     and `Dish`, not in the analysis cache's shape, and an older cached scan
+     simply has dishes with no page. Bumping the version would re-analyse
+     every cached scan through the text classifier, which has no pages to
+     read, and lose the page numbers of every scan that has them. A field
+     that lives on `Menu`/`Dish` never needs the bump.
+   - **The menu screen groups by page (§6.6).** `MenuController` derives
+     `attributedPages` (the distinct pages dishes name, ascending; empty for a
+     platform menu), `hasUnattributedDishes` and `pageFilter` (null for every
+     page, a page number, or `scanPageUnknown`, 0, for the dishes no page was
+     matched to). `visibleRows` applies the page filter last and stably sorts
+     by page, unknown last, so each page's dishes sit together in their
+     transcribed order. `ScannedPageHeader` heads each group with the page's
+     thumbnail, "Page n of N" and its dish count, and opens that page;
+     `ScannedPageHeader.unknown` heads the unplaced dishes and is plain
+     information. `ScannedPageChips` filters by page and offers "unknown" only
+     when some dish has no page. **A one-page scan, a scan whose dishes name
+     no page and every platform or pasted menu are unchanged**: no header, no
+     chips, category headers as before.
+   - **When the registry no longer holds the pages** (a restart, or eviction
+     past the last few scans), the headers still number the dishes but cannot
+     show a thumbnail or open a page; the page count is then the highest page
+     a dish names, and an info notice says the pages are gone.
+
+**What it accepts.** Page provenance is only as good as the model's `page`,
+and it has not been observed on a real request (#88). A dish the model could
+not place falls under the unknown header, which is honest but unhelpful on a
+scan where the model never fills it. Shrinking harder than 640 px is refused
+rather than attempted, so a scan of many dense pages may be told it is too
+large where a lossier encoding would have gone through.
+
+**What it costs.** Up to five decode-and-encode passes per oversize page on
+the device before every analysis of an oversize scan; a vision reply carries
+one more integer per dish; the registry holds the fitted, lower-resolution
+pages, so "View pages" shows what the model saw, not the original photograph.
+The Scan tab gained a state with no failure reason behind it.
 
 ---
 

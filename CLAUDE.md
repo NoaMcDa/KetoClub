@@ -43,7 +43,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > A table's QR code is a menu source too (#182): the Scan tab's "Scan QR code"
 > action (phones, not web) reads it with the camera and routes a Wolt, 10bis,
 > website or PDF link to that menu. No real Gemini request carrying images
-> has been sent yet (#88).
+> has been sent yet (#88). D22 (#295, #296) budgets a scan's image bytes as a
+> whole before it is sent (`ScanBudget`, shrinking each page down a ladder, or
+> refusing with no Retry) and has every transcribed dish remember its page
+> (`Dish.page`, the vision-only `page` property), so the menu screen groups a
+> multi-page scan under page headers and page chips.
 > **Phase 8 ("UI Polish & Desktop Web", issues #221–#264, `docs/UX_REVIEW.md`)
 > shipped on top of all of that, on the `phase-8` branch (PR #266):** every
 > screen body sits in a `ContentWidth` cap (680px; Discovery 1080px), Discovery
@@ -198,6 +202,7 @@ lib/
 │                              # wolt_headers (the web-client header set, #168)
 ├── services/
 │   ├── platform/              # clock, app_logger, connectivity (D10), screen_brightness,
+│   │                          # scan_budget (a scan's image bytes fitted into one request, D22),
 │   │                          # page_picker (interface + a null picker) and
 │   │                          # device_page_picker (camera, gallery and PDF over
 │   │                          # image_picker and file_picker, #82) and qr_scanner
@@ -228,6 +233,8 @@ lib/
 │                              # venue_card, category_chips, photo_tile, offline_banner,
 │                              # fetch_failure_action, analysis_progress_row, menu_search_field,
 │                              # note_editor_sheet, rules_reason_banner, scanned_pages_sheet,
+│                              # scanned_page_header, scanned_page_chips (a scan's pages on
+│                              # the menu screen, D22),
 │                              # scan_failure_copy, mobile_qr_scanner (the QR camera page and
 │                              # its QrScanner, the one file over mobile_scanner, #182)
 └── screens/                   # venue_search (the Discovery screen, D13), menu,
@@ -310,6 +317,10 @@ The long form is in `HANDOFF.md`; these are the ones that bite while writing cod
   stored.** `utils/dish_kind.dart` reads it from the heading and the name;
   do not add a field to `Dish` or a column to the Hive cache for it, and
   reduce an analysis to counts only through `VerdictCounts.of`.
+- **Two reply schemas: the text path's has exactly seven dish properties; the
+  vision path's `visionResponseSchema` adds `page`.** A field that lives on
+  `Menu`/`Dish` never needs a `schemaVersion` bump — bumping it re-analyses
+  every cached scan through the text classifier and loses the pages (D22).
 - **Serialise test runs when several agents share a worktree:**
   `flock /tmp/ketoclub.lock -c 'flutter test …'`.
 
