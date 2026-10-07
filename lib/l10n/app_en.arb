@@ -418,6 +418,24 @@
   },
   "scannedMenuPdfPage": "PDF document",
   "scannedMenuPagesClose": "Close",
+  "scannedPageHeader": "Page {number} of {total}",
+  "@scannedPageHeader": {
+    "placeholders": { "number": { "type": "int" }, "total": { "type": "int" } }
+  },
+  "scannedPageUnknown": "Page unknown",
+  "scannedPageUnknownExplain": "The AI did not say which page these dishes are on.",
+  "scannedPageDishCount": "{count, plural, =1{1 dish} other{{count} dishes}}",
+  "@scannedPageDishCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "scannedPageHeaderOpen": "View this page",
+  "scannedPageChipAll": "All pages",
+  "scannedPageChipSemanticLabel": "Show dishes read from {page}",
+  "@scannedPageChipSemanticLabel": {
+    "placeholders": { "page": { "type": "String" } }
+  },
+  "scannedMenuPagesGone": "The photographs of this scan are no longer on this device, so its pages are listed by number only.",
+  "scannedPagesReadFromPage": "Read from this page",
   "scanScreenIntro": "Photograph the pages of a menu, choose photos from your library, or choose a PDF. KetoClub reads the dishes off the pages and analyses them.",
   "scanScreenModePages": "Photos & PDF",
   "scanScreenModePaste": "Paste text",
@@ -475,6 +493,7 @@
   "scanScreenFailureBackendUnreachable": "KetoClub's server could not be reached. Your pages are kept; try again.",
   "scanScreenFailureConsentWithheld": "Scanning sends the pages to Google's Gemini API to be read. Allow AI analysis in Settings to scan a menu.",
   "scanScreenFailureApiKeyMissing": "Add your Gemini API key in Settings to scan a menu.",
+  "scanScreenFailurePagesTooLarge": "Your pages are too large to send together, even after shrinking them. Remove a page and try again.",
   "scanScreenFailureApiKeyRejected": "Gemini rejected your API key. Check it in Settings, then try again.",
 
   "websiteMenuNotFound": "KetoClub could not find a menu it can read on {site}.",

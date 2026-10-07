@@ -1592,6 +1592,60 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get scannedMenuPagesClose;
 
+  /// No description provided for @scannedPageHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {number} of {total}'**
+  String scannedPageHeader(int number, int total);
+
+  /// No description provided for @scannedPageUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Page unknown'**
+  String get scannedPageUnknown;
+
+  /// No description provided for @scannedPageUnknownExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI did not say which page these dishes are on.'**
+  String get scannedPageUnknownExplain;
+
+  /// No description provided for @scannedPageDishCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dish} other{{count} dishes}}'**
+  String scannedPageDishCount(int count);
+
+  /// No description provided for @scannedPageHeaderOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'View this page'**
+  String get scannedPageHeaderOpen;
+
+  /// No description provided for @scannedPageChipAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All pages'**
+  String get scannedPageChipAll;
+
+  /// No description provided for @scannedPageChipSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Show dishes read from {page}'**
+  String scannedPageChipSemanticLabel(String page);
+
+  /// No description provided for @scannedMenuPagesGone.
+  ///
+  /// In en, this message translates to:
+  /// **'The photographs of this scan are no longer on this device, so its pages are listed by number only.'**
+  String get scannedMenuPagesGone;
+
+  /// No description provided for @scannedPagesReadFromPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Read from this page'**
+  String get scannedPagesReadFromPage;
+
   /// No description provided for @scanScreenIntro.
   ///
   /// In en, this message translates to:
@@ -1789,6 +1843,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add your Gemini API key in Settings to scan a menu.'**
   String get scanScreenFailureApiKeyMissing;
+
+  /// No description provided for @scanScreenFailurePagesTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Your pages are too large to send together, even after shrinking them. Remove a page and try again.'**
+  String get scanScreenFailurePagesTooLarge;
 
   /// No description provided for @scanScreenFailureApiKeyRejected.
   ///

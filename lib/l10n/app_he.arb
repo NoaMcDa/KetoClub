@@ -415,6 +415,24 @@
   },
   "scannedMenuPdfPage": "מסמך PDF",
   "scannedMenuPagesClose": "סגירה",
+  "scannedPageHeader": "עמוד {number} מתוך {total}",
+  "@scannedPageHeader": {
+    "placeholders": { "number": { "type": "int" }, "total": { "type": "int" } }
+  },
+  "scannedPageUnknown": "עמוד לא ידוע",
+  "scannedPageUnknownExplain": "ה-AI לא ציין באיזה עמוד נמצאות המנות האלה.",
+  "scannedPageDishCount": "{count, plural, one{מנה אחת} two{שתי מנות} other{{count} מנות}}",
+  "@scannedPageDishCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "scannedPageHeaderOpen": "הצגת העמוד הזה",
+  "scannedPageChipAll": "כל העמודים",
+  "scannedPageChipSemanticLabel": "הצגת מנות שנקראו מ{page}",
+  "@scannedPageChipSemanticLabel": {
+    "placeholders": { "page": { "type": "String" } }
+  },
+  "scannedMenuPagesGone": "התמונות של הסריקה הזאת כבר אינן במכשיר, ולכן העמודים מוצגים לפי מספר בלבד.",
+  "scannedPagesReadFromPage": "נקרא מהעמוד הזה",
   "scanScreenIntro": "צלמו את דפי התפריט, בחרו תמונות מהגלריה או בחרו קובץ PDF. קטוקלאב קורא את המנות מהדפים ומנתח אותן.",
   "scanScreenModePages": "תמונות ו-PDF",
   "scanScreenModePaste": "הדבקת טקסט",
@@ -472,6 +490,7 @@
   "scanScreenFailureBackendUnreachable": "לא ניתן להגיע לשרת של קטוקלאב. הדפים נשמרו; נסו שוב.",
   "scanScreenFailureConsentWithheld": "סריקה שולחת את הדפים ל-Gemini API של גוגל לקריאה. אפשרו ניתוח AI בהגדרות כדי לסרוק תפריט.",
   "scanScreenFailureApiKeyMissing": "הוסיפו את מפתח ה-API של Gemini בהגדרות כדי לסרוק תפריט.",
+  "scanScreenFailurePagesTooLarge": "העמודים גדולים מכדי להישלח יחד, גם לאחר הקטנתם. הסירו עמוד ונסו שוב.",
   "scanScreenFailureApiKeyRejected": "Gemini דחה את מפתח ה-API שלכם. בדקו אותו בהגדרות ונסו שוב.",
 
   "websiteMenuNotFound": "קטוקלאב לא מצאה ב־{site} תפריט שאפשר לקרוא.",
