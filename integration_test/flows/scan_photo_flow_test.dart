@@ -1,6 +1,7 @@
 // Flow test (FLOW_TEST_CONVENTIONS.md, architecture.md §6.2, §18.4; issue
 // #84, D15): the journey of choosing two photographed menu pages on the Scan
-// tab, having the vision model read them, and seeing the transcribed menu.
+// tab, having the vision model read them, and seeing the transcribed menu
+// headed by the page each dish was read from (issue #296).
 //
 // The real `RoutingScannedMenuClassifier`, `VisionMenuClassifier`, prompt
 // builder and response parser run; only the `LlmChatClient` at the far end is
@@ -16,6 +17,8 @@ import 'package:ketoclub/services/classifier/menu_analysis_prompt.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
 import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
+import 'package:ketoclub/widgets/scanned_page_chips.dart';
+import 'package:ketoclub/widgets/scanned_page_header.dart';
 import 'package:ketoclub/widgets/scanned_pages_sheet.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 
@@ -28,6 +31,12 @@ final AppLocalizations _en = AppLocalizationsEn();
 /// The Analyse-pages button on the Scan tab.
 Finder get _analysePages =>
     find.widgetWithText(FilledButton, _en.scanScreenAnalysePages);
+
+/// The chip labelled [label] in the menu's page chip row (issue #296).
+Finder _pageChip(String label) => find.descendant(
+  of: find.byType(ScannedPageChips),
+  matching: find.text(label),
+);
 
 /// Gives the surface a phone-tall viewport, so a lazy `ListView` builds
 /// every card (CLAUDE.md's traps); reset when the test ends.
@@ -46,11 +55,11 @@ void main() {
       'two chosen photos are read in one request and shown as a scanned menu',
       (tester) async {
         // Setup: the real vision path over a faked chat client that will
-        // answer with a valid two-dish transcription.
+        // answer with a valid two-dish transcription, one dish per page.
         _useTallSurface(tester);
         final fakes = FakeAppDependencies();
         final client = FlowFakeLlmChatClient()
-          ..enqueueReply(validScannedReply(2));
+          ..enqueueReply(validScannedReply(2, pages: [1, 2]));
         fakes.scannedClassifierOverride = realScannedClassifier(fakes, client);
         fakes.pagePicker.images = [
           ScannedPage(mimeType: ScannedPage.png, bytes: whitePngBytes),
@@ -143,6 +152,47 @@ void main() {
 
         // Assert: a scan has no price, so no currency symbol anywhere.
         expect(find.textContaining('₪'), findsNothing);
+
+        // Assert: each dish is headed by its page, of two (issue #296).
+        expect(find.byType(ScannedPageHeader), findsNWidgets(2));
+        expect(find.text(_en.scannedPageHeader(1, 2)), findsOneWidget);
+        expect(find.text(_en.scannedPageHeader(2, 2)), findsOneWidget);
+
+        // Act: keep page 2 only.
+        await tapAndSettle(tester, _pageChip(_en.scannedMenuPageLabel(2)));
+
+        // Assert
+        expect(find.byType(DishCard), findsOneWidget);
+        expect(find.text(scannedReplyDishNames[1]), findsOneWidget);
+        expect(find.text(_en.scannedPageHeader(1, 2)), findsNothing);
+
+        // Act: every page again, then open page 1 from its header.
+        await tapAndSettle(tester, _pageChip(_en.scannedPageChipAll));
+        expect(find.byType(DishCard), findsNWidgets(2));
+        await tapAndSettle(
+          tester,
+          find.byKey(const ValueKey('scannedPageHeader-1')),
+        );
+
+        // Assert: the pages sheet opens at page 1.
+        expect(find.byType(ScannedPagesSheet), findsOneWidget);
+        expect(
+          tester
+              .widget<ScannedPagesSheet>(find.byType(ScannedPagesSheet))
+              .initialPage,
+          0,
+        );
+
+        // Act: close the full-screen view, then the sheet.
+        await tapAndSettle(
+          tester,
+          find.descendant(
+            of: find.byType(Dialog),
+            matching: find.byTooltip(_en.scannedMenuPagesClose),
+          ),
+        );
+        await tapAndSettle(tester, find.byTooltip(_en.scannedMenuPagesClose));
+        expect(find.byType(ScannedPagesSheet), findsNothing);
 
         // Act: open the pages the menu was read from.
         await tapAndSettle(tester, find.text(_en.scannedMenuViewPages));
