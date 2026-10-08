@@ -250,7 +250,8 @@ ketoclub/
 │   │   ├── waiter_card_sheet.dart        # full-screen high-contrast script + copy button
 │   │   ├── settings_screen.dart          # consent text, net-carb limit, dietary toggles (#56) — no key section (D12)
 │   │   ├── scan_screen.dart              # Scan tab placeholder (Phase 4, issue #11)
-│   │   └── saved_screen.dart             # Recent tab (was "Saved"): cached menus, offline access, remove (#48, #251)
+│   │   └── saved_screen.dart             # Recent tab (was "Saved"): the visit history joined to the cache,
+│   │                                     # offline access, remove, rename a scan (#48, #251, #313, #315; D23)
 │   │
 │   ├── theme/                            # design tokens as the app theme (rank 4, see below)
 │   │   ├── app_tokens.dart               # raw sRGB constants converted from the artboard's oklch tokens
@@ -276,6 +277,7 @@ ketoclub/
 │   │   ├── menu_search_field.dart        # search within a loaded menu (#140)
 │   │   ├── note_editor_sheet.dart        # personal, local-only notes on a dish (#131)
 │   │   ├── rules_reason_banner.dart      # why a menu fell back to the rule engine (#125)
+│   │   ├── rename_menu_dialog.dart       # a scanned menu's name and city (#315, D23)
 │   │   └── mobile_qr_scanner.dart        # MobileQrScanner + its camera page; the ONLY file importing
 │   │                                     # package:mobile_scanner (#182); here, not in services/, since it owns a page
 │   │
@@ -283,7 +285,7 @@ ketoclub/
 │   │   ├── app_dependencies.dart         # immutable holder of service interfaces; filled by di.dart
 │   │   ├── venue_search_controller.dart  # the Discovery screen (issue #40, D13)
 │   │   ├── menu_controller.dart
-│   │   ├── saved_controller.dart         # the Recent tab (issue #48)
+│   │   ├── saved_controller.dart         # the Recent tab (#48, #313): RecentEntry = VisitEntry + cached copy
 │   │   ├── scanned_pages_registry.dart   # a scan's pages, in memory only, for "View pages" (#89)
 │   │   ├── settings_controller.dart
 │   │   ├── theme_mode_controller.dart    # Light/Dark/System appearance setting (#129)
@@ -301,7 +303,9 @@ ketoclub/
 │   │   │   ├── install_id_store.dart     # interface + PrefsInstallIdStore; replaces key_store.dart (D12)
 │   │   │   ├── menu_cache.dart           # interface + HiveMenuCache
 │   │   │   ├── notes_store.dart          # interface + PrefsNotesStore: personal, local-only dish notes (#131)
-│   │   │   └── settings_store.dart       # interface + PrefsSettingsStore
+│   │   │   ├── settings_store.dart       # interface + PrefsSettingsStore
+│   │   │   └── visit_history_store.dart  # interface + HiveVisitHistoryStore: the menus opened on this
+│   │   │                                 # device, `menu_history` box; never leaves it (D23, #307)
 │   │   ├── llm/                          # rank 0
 │   │   │   ├── llm_chat_client.dart      # interface, ChatResult, ChatFailureReason
 │   │   │   ├── backend_chat_client.dart  # the ONLY file naming `/v1/chat`; the web build's client (D12)
@@ -316,6 +320,8 @@ ketoclub/
 │   │   │   └── wolt/
 │   │   │       ├── wolt_venue_search_service.dart # HTTP only; delegates to the mapper
 │   │   │       └── wolt_venue_mapper.dart # pure: Wolt discovery JSON → Venue (fixture-tested, no I/O)
+│   │   ├── community/                    # rank 0 — KetoClub's shared menu store (D24)
+│   │   │   └── menu_store_client.dart    # interface + BackendMenuStoreClient; the ONLY file naming `/v1/menus` (#309)
 │   │   ├── menu/                         # rank 1 — may import storage/ and platform/
 │   │   │   ├── menu_repository.dart      # interface + CachedMenuRepository (cache-first, adapter registry)
 │   │   │   ├── platform_menu_adapter.dart# interface: fetch(VenueRef) → MenuFetchResult
@@ -350,6 +356,8 @@ ketoclub/
 │   │   ├── text_normaliser.dart          # lowercase, strip niqqud/punctuation, for provenance
 │   │   ├── price_format.dart             # agorot → ILS, locale-aware formatting
 │   │   ├── wolt_headers.dart             # wolt.com's web-client header set (#168)
+│   │   ├── venue_route.dart              # venueRoutePath + VenueOpenHint {name, city}, the venue
+│   │   │                                 # route's arguments; replaced a bare String (D23, #307)
 │   │   └── keto_score.dart               # menu-level score from the dish verdicts, for KetoScoreBadge
 │   │
 │   └── l10n/
@@ -385,8 +393,9 @@ ketoclub/
     ├── app/
     │   ├── main.py                       # app factory: CORS, lifespan, routers
     │   ├── config.py                     # pydantic-settings (GEMINI_*, WOLT_BASE_URL, …)
-    │   ├── routers/                      # health.py, proxy.py, chat.py
-    │   └── services/                     # wolt.py, gemini.py, cache.py, rate_limit.py
+    │   ├── models.py                     # menu_cache, chat_cache, stored_menus (D24; no install-id column)
+    │   ├── routers/                      # health.py, proxy.py, chat.py, discovery.py, website.py, menus.py (D24)
+    │   └── services/                     # wolt.py, gemini.py, cache.py, rate_limit.py, menu_store.py (D24), …
     ├── tests/                            # respx-mocked; no test reaches the network
     ├── check.sh                          # mirrors tool/check.sh; its own required CI job
     └── README.md                         # setup, routes, the manual end-to-end check
@@ -427,8 +436,9 @@ literal.
   `services/menu/wolt/wolt_adapter.dart`, whose consumer-assortment path
   (direct and through `/v1/proxy/wolt/venues/…`) appears nowhere else, and
   the retired `menu/data` path nowhere at all (#168); `/v1/chat` only in
-  `services/llm/backend_chat_client.dart`; `KETOCLUB_BACKEND_URL` only in
-  `di.dart`; `googleapis.com` and the `x-goog-api-key` header only in
+  `services/llm/backend_chat_client.dart`; `/v1/menus` only in
+  `services/community/menu_store_client.dart` (D24); `KETOCLUB_BACKEND_URL`
+  only in `di.dart`; `googleapis.com` and the `x-goog-api-key` header only in
   `services/llm/gemini_chat_client.dart`, the phones' direct client (D17);
   `package:flutter_secure_storage/` only in `services/storage/api_key_store.dart`;
   and `openrouter` and `sk-or-` appear nowhere under `lib/` at all. Concrete
@@ -733,9 +743,11 @@ then the text path's `systemPrompt` byte for byte. The user prompt is one
 short line; the response schema and `schemaName` are the text path's,
 unchanged, so the backend's schema conversion is untouched. The reply goes to
 `MenuResponseParser.parseScanned` (§9.4), which returns the transcribed `Menu`
-and its `MenuAnalysed` together: `VenueRef(scan, <hex of the clock's
-millisecond stamp>)`, one category `scanned` (named "Scanned menu" /
-"תפריט סרוק" in the menu's own language, §12), every dish `price: 0` with no
+and its `MenuAnalysed` together: `VenueRef(scan, <8 hex digits of
+TextNormaliser.menuFingerprint of the transcription>)` — the paste scheme
+(D18), so reading the same pages twice is one entry (D23, #308; the clock
+stamps only `fetchedAt` and `analysedAt`) — one category `scanned` (named
+"Scanned menu" / "תפריט סרוק" in the menu's own language, §12), every dish `price: 0` with no
 description or options, and no `venueName`. The analysis is stamped
 `LlmEngine(model)` with the model the provider reported and records the
 options snapshot, exactly as the text path does. Chat failures map one to one
@@ -822,6 +834,7 @@ no physical device has exercised it (`HANDOFF.md`).
 | `InstallIdStore` | `shared_preferences` | a random 32-hex-character anonymous install id (D12), generated on first use, never in a constructor | until the app's storage is cleared |
 | `MenuCache` | `hive` | `venueRef → {menu, analysis, fetchedAt, engine}`; the analysis also records the options it was made under (net-carb limit, dietary constraints; issue #57) | 24 h for the menu; analysis kept as long as the menu it was computed from, and reused by `MenuController` only for an unchanged menu, an AI result, consent still given and matching options |
 | `SettingsStore` | `shared_preferences` | UI language, filter defaults, consent flag, last venue, appearance, net-carb limit (2–25 g, default 6), dietary toggles (seed-oil free, dairy-free, carnivore only; all off by default, a missing key reads as off) | until cleared |
+| `VisitHistoryStore` | `hive` (`menu_history` box) | one `VisitEntry` per `VenueRef` opened on this device (D23): the name and city it was shown under, first and last opened, open count, and the dish count, score and green/yellow counts it last had | until the row is removed or Settings clears saved menus |
 
 The install id is unlinkable to a person (D8 stays true in spirit) and is sent
 only as `X-KetoClub-Install-Id` to KetoClub's own backend, for its per-install
@@ -837,6 +850,13 @@ by a hash of the request (`CHAT_CACHE_TTL_SECONDS`, default 24 h, equal to
 `menuCacheTtl`) so one venue's analysis serves every user of it. Neither stores
 an install id alongside its content (§11, `backend_plan.md` §3.5).
 
+**Server-side, and not a cache (D24).** The `stored_menus` table keeps one row
+per `(source, platform_id)` that a consenting device opened: the menu, its
+language-model analysis without `options`, the venue name and city, and
+first/last-seen times with an upload count. It has no expiry and no install-id
+column; the id `POST /v1/menus` requires spends the rate limiter and is
+deleted before anything is stored or logged.
+
 Cache rules:
 
 - A cached **menu** is fresh for 24 hours. After that it is refetched; the old
@@ -846,7 +866,18 @@ Cache rules:
   the LLM engine is available, without asking, because it was always the weaker
   answer.
 - The cache never stores the raw platform JSON, only the normalised `Menu`.
-- The user can clear the cache from Settings.
+- The user can clear the cache from Settings; since D23 (#314) the same Clear
+  empties the visit history too, so the Recent tab is empty afterwards.
+- **The Recent tab lists the visit history, not the cache** (D23, #313). A
+  visit is recorded only by `MenuController.open`, never by Discovery's quick
+  score, which writes cache entries for venues nobody opened. Each history entry
+  is joined to its cached copy by `VenueRef` into a `RecentEntry` whose numbers
+  prefer the cached copy and fall back to the visit's snapshot, and whose
+  availability is one of four states: kept (pinned), the expiry countdown
+  ("Expired, refreshes when opened" once past), "Not on this device, opens
+  online" (no cached copy), or, for a scan with no cached copy, "No longer on
+  this device" — inert, since no platform can serve a scan again, but still
+  removable. Removing a row removes both the history entry and the cached copy.
 - A cached menu can be **pinned** (the Recent tab's "Keep" toggle, issue #253;
   `MenuCache.pin`): a pinned entry is served from the cache without a refetch
   however old it is, until the user asks for a refresh (`forceRefresh` still
@@ -871,8 +902,8 @@ freshness boundary is **exclusive**: a menu exactly 24 hours old refetches, beca
 early return, not the cache *read*, so a forced refetch that fails still falls back
 to whatever is cached and is never worse than the ordinary path.
 
-No health data, no diary, no user profile is stored. KetoClub's storage is a cache
-and one secret.
+No health data, no diary, no user profile is stored. KetoClub's storage is a
+cache, one secret, and a list of the menus opened on this device (D23).
 
 ### 6.5 Location and venue search
 
@@ -925,11 +956,11 @@ Screens:
 | Screen | Route | Purpose |
 |---|---|---|
 | `VenueSearchScreen` | `/` | Locate, search, or paste; opens a venue; a card under the search field opens the drinks guide (#257) |
-| `MenuScreen` | `/venue/:source/:id` | Classified menu with filters and engine chip; `/venue/scan/{id}` opens a pasted menu (D18) |
+| `MenuScreen` | `/venue/:source/:id` | Classified menu with filters and engine chip; `/venue/scan/{id}` opens a pasted menu (D18). The route's `arguments` are a `VenueOpenHint {name, city}` (D23). For a scan, the overflow's "Rename" sets the name and city kept in the visit history (#315) |
 | `WaiterCardSheet` | modal | Large-type script with copy |
-| `SettingsScreen` | `/settings` | In this order (#255, `docs/UX_REVIEW.md` §2.6): Language, Appearance, Your keto rules, Net carb limit, Default filter; then "AI & privacy" — the consent text collapsed behind a "What leaves this device" disclosure with the "Allow AI analysis" checkbox always visible, and the Gemini key entry on iOS and Android (D17); then "Recent menus" (the cache count and clear, labelled after the tab, #251); then nothing: the drinks guide moved to an Explore card (#257) |
+| `SettingsScreen` | `/settings` | In this order (#255, `docs/UX_REVIEW.md` §2.6): Language, Appearance, Your keto rules, Net carb limit, Default filter; then "AI & privacy" — the consent text collapsed behind a "What leaves this device" disclosure with the "Allow AI analysis" checkbox always visible, and the Gemini key entry on iOS and Android (D17); then "Recent menus" (the cache count and clear, labelled after the tab, #251; the clear empties the visit history too, D23, #314); then nothing: the drinks guide moved to an Explore card (#257) |
 | `ScanScreen` | `/scan` | Collects menu pages from the camera, the photo library or a PDF, or a menu's text pasted into a field (D18). Analyse hands the pages to `ScannedMenuClassifier` in one call (D15), or the parsed paste to `MenuRepository.store`, and opens `/venue/scan/{id}` (#82, #83). "Scan QR code" (not on web) reads a table's QR code through `QrScanner`; `QrPayloadRouter` sends a Wolt, 10bis, website or PDF link to that venue's `/venue/{source}/{id}` route, and answers a Tabit code ("not supported yet") or an Instagram, Linktree or non-URL code ("photograph the menu instead") with copy on the Scan tab (#182) |
-| `SavedScreen` | `/saved` | The "Recent" tab: the automatic 24-hour cache of every menu opened, pasted, scanned or read from a website, with offline access and remove (#48). Titled "Recent menus" with a history (clock) icon, not "Saved": nothing is saved by the user (#251). The route path and class names stay `/saved` / `SavedScreen` |
+| `SavedScreen` | `/saved` | The "Recent" tab: since D23 (#313) the visit history of every menu opened, pasted, scanned or read from a website on this device, most recent first, each joined to its cached copy for offline access, with remove, and rename on a long-press of a scan row (#315). Titled "Recent menus" with a history (clock) icon, not "Saved": nothing is saved by the user (#251). The route path and class names stay `/saved` / `SavedScreen` |
 
 **The keto score badge's tone** *(issue #241)* follows the score's band, not a fixed green, so a low score never reads as a positive claim: 7 and above is `green.ink`, 4 up to 7 is `amber.ink`, below 4 is the muted `ink3` (`scoreTone`, judged on the score as printed to one decimal), in the menu header and on the venue card alike; `contrast_test.dart` pins each tone against the page background in both themes.
 
@@ -1121,6 +1152,7 @@ fields and are not modelled until then.
 | **Restaurant website** (D19) | `GET` the pasted URL, then at most one linked menu page or PDF, plus `/robots.txt` | none; logged out, `KetoClubBot/1.0 (+contact URL)` | Phase 4 (#181) | Phones fetch directly; web goes through the route below. `robots.txt`, `noai` and TDM reservations honoured; size-capped |
 | **KetoClub backend — website fetch** | `POST {KETOCLUB_BACKEND_URL}/v1/website/fetch` `{"url"}` | `X-KetoClub-Install-Id` | Phase 4 (D19) | Fetches one public page or PDF: `{kind, content_type, body, final_url}` or a distinct `{reason, status_code}`; public hosts only, per-host and per-install limits, nothing cached |
 | **KetoClub backend — chat** | `POST {KETOCLUB_BACKEND_URL}/v1/chat` | `X-KetoClub-Install-Id` (no model key from the client) | Phase 3 (D12) | Forwards one completion per menu to Google Gemini; see §9 |
+| **KetoClub backend — menu store** (D24) | `POST {KETOCLUB_BACKEND_URL}/v1/menus` `{source, platform_id, venue_name, city, menu, analysis}`; `GET …/v1/menus/{source}/{platform_id}` | `X-KetoClub-Install-Id` on the POST, for the rate limiter only (the `/v1/chat` bucket); none on the GET | Phase 3 (#310, #312) | Upserts one opened menu keyed by venue: 201 new, 200 refreshed. Called on **every** platform built with a backend URL, phones included, and only with the AI-analysis consent; the analysis travels without its `options`. The app does not call the GET |
 
 All restaurant endpoints are undocumented internal APIs discovered by network
 inspection (`menu_api_research`). Each adapter therefore:
@@ -1358,8 +1390,8 @@ tests free of a real clock.)* In order:
 All caps and verdict names live in `constants.dart`.
 
 **The scanned variant (D15, #89).** `MenuResponseParser.parseScanned(String
-body, {required VenueRef ref, required DateTime analysedAt, required
-AnalysisEngine engine, int netCarbLimitGrams})` returns a `ScannedMenuResult`
+body, {required DateTime analysedAt, required AnalysisEngine engine, int
+netCarbLimitGrams, int? pageCount})` returns a `ScannedMenuResult`
 — the transcribed `Menu` and its `MenuAnalysed` together, or a failure. It
 shares `_decode`, the `badResponse` path and the per-element verdict rules
 with `parse`; only how an element finds its dish differs. A scan has no source
@@ -1383,6 +1415,14 @@ honest substitute — so:
 - **A page rule is added (D22).** A kept element's `page` becomes `Dish.page`
   only when it is a whole number from 1 to the scan's page count; anything
   else leaves it null and is never a rejection.
+- **The ref is derived from the content, not passed in (D23, #308).** The
+  transcribed menu is addressed `VenueRef(scan, <8 hex digits of
+  TextNormaliser.menuFingerprint>)`, the scheme `TextMenuSource` uses for a
+  paste (D18): a provisional menu is fingerprinted and the final one built
+  under that ref. The fingerprint reads dish text only, so `Dish.page` and
+  `analysedAt` never move it, and the same dishes read twice, or read once and
+  pasted once, are one entry. It replaced a ref the caller built from the
+  clock, which made every re-read a new entry.
 
 ---
 
@@ -1459,8 +1499,9 @@ should not reach a log or a widget, even with no bearer token left to leak.
     anonymous install id also goes to the backend, for rate limiting only — it
     is never forwarded to Google, and the backend's completion cache never
     stores it alongside the cached content, `backend_plan.md` §3.5. A phone
-    sends no install id anywhere for analysis. No location, no venue name, no
-    user identity, ever.
+    sends no install id anywhere for analysis. No location and no user
+    identity, ever; the venue name and city leave only for the shared menu
+    store, below (D24).
   - Menu pages, when the user scans one (D15): the photographs or PDF go to
     Google Gemini as `inline_data` parts, the same two routes as dish text —
     straight from a phone with the user's key (D17), or on web through the
@@ -1469,6 +1510,17 @@ should not reach a log or a widget, even with no bearer token left to leak.
     and never reaches a log line — the chat log carries an image count, never
     bytes, a media type or base64. A photograph can hold more than the menu
     (a hand, a face, a receipt); what is in the frame is sent as taken.
+  - To KetoClub's shared menu store (D24, `POST /v1/menus`), on every
+    platform built with a backend URL — phones included, the one backend
+    route a phone calls — and only under the AI-analysis consent: the menu as
+    the device normalised it, its analysis when the language model made it
+    (without `options`, so no net-carb limit or dietary toggle), and the
+    venue's name and city (Wolt's, or what the user typed when renaming a
+    scan). Never a position. The install id goes in the same request for the
+    rate limiter only and is deleted before anything is stored or logged:
+    `stored_menus` has no column for it and no log line puts it beside the
+    content. The consent copy in Settings and the Scan tab's disclosure, on
+    both builds, says what is stored.
   - Nowhere else. There is no telemetry.
 - **Consent (D16, issue #167).** AI analysis is **on by default** on a
   fresh install: `AppSettings.estimationConsentGiven` defaults to `true`.
@@ -1580,6 +1632,8 @@ documents. Each names what was decided, why, and what it supersedes.
 Supersedes README §9 ("Backend Service Setup", PostgreSQL). The MVP has nothing a
 server would do better, and a server would need a hosted key and a data policy. A
 backend enters at Phase 3 for community data and, optionally, a CORS proxy for web.
+*(D11 amends this; D24 adds the first server-side record that outlives a
+cache, `stored_menus`: opened menus keyed by venue, never by user.)*
 
 **D2 — The LLM is the primary classifier; rules are the fallback.**
 Supersedes README §3/§6 and `CLAUDE.md`'s "heuristic-based classification". Follows
@@ -1623,7 +1677,10 @@ are generated in the menu's language.
 **D8 — Nothing about the user is stored.**
 No diary, no macro tracking, no profile. The meal-logging design in
 `m15_meal_entry_research.md` belongs to the other application and is out of scope
-here.
+here. *(D23 and D24 keep this true by what they key on: the visit history is a
+list of the menus opened on this device, like pins and notes, and the shared
+menu store holds menus keyed by venue with no install id beside them. Neither is
+a record of the user.)*
 
 **D9 — Web is a first-class target for classification and a second-class target for
 live fetching**, until a CORS proxy exists (§13). *(D11 delivers that proxy. With
@@ -1729,6 +1786,10 @@ for someone who has never heard of OpenRouter. `notConfigured` becomes a wider
 reason than it was (no backend URL compiled in, *or* the server has no key),
 which is a coarser signal than the old "you have no key" but is the honest one:
 the user cannot fix a missing server key either way.
+
+*(D24 amends this: `POST /v1/menus` spends the same per-install bucket as
+`/v1/chat`, and the backend now keeps one table that is not a cache,
+`stored_menus`, beside its two caches.)*
 
 **D13 — Venue cards show only numbers already computed.** *(Answers issue
 #41; rescopes #42; extends §6.5's "Search nearby" to what a result card may
@@ -1895,7 +1956,9 @@ no request is spent; and there is no rules fallback. No real image request
 has yet been sent with this prompt (#88).
 
 *(D22 amends this: the pages are budgeted as a whole before the request, and
-the vision reply's schema gains a per-dish `page`.)*
+the vision reply's schema gains a per-dish `page`. D23 supersedes the scan's
+clock-stamped ref: a read menu is `VenueRef(scan, <menuFingerprint hex>)`, the
+paste scheme, so reading the same pages twice is one entry.)*
 
 **D16 — AI analysis is on by default.** *(2026-09-28; answers issue #167;
 amends §11.)* D2 makes the language model the primary classifier, but
@@ -1919,8 +1982,10 @@ own contract.
 **D17 — iOS and Android call Wolt and Gemini themselves; the backend is for
 the web build only.** *(Issue #194. Supersedes D12 on iOS and Android; D12
 still describes the web build. Leaves D11 unchanged: the menu proxy was
-already web-only.)* D11 promised that the backend is "an accelerator, never a
-dependency", but D12 made every platform's AI analysis depend on it: a phone
+already web-only. **Amended by D24 for one route only:** a phone built with
+`KETOCLUB_BACKEND_URL` posts the menus it opens to the shared menu store,
+`/v1/menus`; it still calls Wolt and Gemini directly.)* D11 promised that
+the backend is "an accelerator, never a dependency", but D12 made every platform's AI analysis depend on it: a phone
 with no backend compiled in was rules-only by construction, and there is still
 no hosted backend (§17.6, issue #109). The CORS problem that justifies the
 proxy does not exist in native HTTP either. So on iOS and Android every request
@@ -2021,6 +2086,11 @@ fallback when a platform blocks the browser (§6, §13); this builds it.
 - **What it does not do.** No OCR, no language detection beyond what the
   classifier already does, and no editing of a stored paste: to change one, paste
   it again. Pasted text is treated exactly as untrusted as a fetched menu.
+
+*(D23 amends this: a scan read from photographs now takes the same
+content-addressed ref, a scan can be given a name and a city through "Rename"
+(kept in the visit history, never on the `Menu`), and its Recent row outlives
+its cache entry as an inert "No longer on this device".)*
 
 **D19 — Website menu source: a restaurant's own site, read politely.**
 *(Issue #181, 2026-09-29; follows `docs/menu_sources_research.md` §1, §3.2,
@@ -2275,6 +2345,200 @@ the device before every analysis of an oversize scan; a vision reply carries
 one more integer per dish; the registry holds the fitted, lower-resolution
 pages, so "View pages" shows what the model saw, not the original photograph.
 The Scan tab gained a state with no failure reason behind it.
+
+### D23 — A permanent on-device history of opened menus, and a scan is addressed by its content
+
+*(Amends §6.4, D8's framing, D15's scan addressing and D18. Issues #305,
+#307, #308, #312, #313, #314 and #315.)*
+
+**What changed.** The Recent tab was the menu cache under another name. A
+menu was listed while its cached copy lived, so an unpinned venue dropped off
+the list a day after it was last opened, and Discovery's quick score (D21), which
+writes cache entries for venues the user never opened, put menus nobody had
+looked at in it. A scan had a second problem: its ref was the clock's
+millisecond stamp, so reading the same pages twice made two entries. Seven
+decisions:
+
+1. **A visit history, separate from the cache (#307).** `VisitHistoryStore`
+   (`services/storage/visit_history_store.dart`) holds one `VisitEntry` per
+   `VenueRef`: the name and city the menu was shown under, when it was first
+   and last opened, how often, and the dish count, keto score and green and
+   yellow counts it last had. `HiveVisitHistoryStore` keeps it in a third
+   Hive box, `menu_history`, opened by a closure on first use like the
+   cache's. An entry never expires. Every method never throws: a broken box
+   reads as an empty history, so a bad history degrades the Recent list
+   rather than the screen above it. It is a list of menus, like pins and
+   notes; nothing in it names who opened them, and it leaves the device
+   through nothing (D8).
+2. **A visit is recorded only in `MenuController.open` (#312).** "In the
+   cache" is not "visited". One successful `open` records one visit, once the
+   analysis is settled: the name the menu carries, else the opener's hint;
+   the hint's city; the dish count; and, for a completed analysis, its score
+   and counts through `VerdictCounts.of`. A null never erases a value an
+   earlier visit recorded. A failed fetch records nothing, and neither does
+   `refresh`. Before fetching, `open` reads the entry so the header can name
+   the venue while the menu loads.
+3. **`VenueOpenHint` replaces the route's `String` argument (#307).** The
+   venue route's `arguments` were the venue's name as a bare string (#169);
+   they are now a `VenueOpenHint {name, city}` (`utils/venue_route.dart`),
+   passed by a Discovery card and a Recent row and handed by `app.dart`'s
+   route builder to `MenuController.open(hint:)`. A deep link carries none.
+   Because names and cities are persisted in the history and read back, a
+   menu reopened from Recent shows its name, not its slug, cached or not.
+4. **The Recent tab lists the history (#313).** `SavedController` joins
+   `VisitHistoryStore.entries()` to the cache by ref into `RecentEntry`s,
+   most recently opened first; a cached menu with no visit is not listed.
+   A row's numbers prefer the cached copy (the menu as it is now) and fall
+   back to the visit's snapshot. Its availability is one of four states:
+   kept (pinned); the expiry countdown, "Expired, refreshes when opened"
+   once past; "Not on this device, opens online" when nothing is cached; and
+   "No longer on this device" for a scan whose cached copy has gone. No
+   platform can serve a scan again, so that last row is inert: it cannot
+   open, but it can be removed. Removing a row removes both the history
+   entry and the cached copy.
+5. **A scan can be renamed (#315).** A scan has no name of its own (D18).
+   The menu screen's overflow offers "Rename" for a `scan` ref, and a
+   long-press on a scan row in Recent does the same: a dialog takes a name
+   and a city, each trimmed and blank meaning none, written by
+   `VisitHistoryStore.rename`, which never creates an entry. The name and
+   city live in the history, never on the `Menu`, so the cache, the
+   fingerprint and the ref are untouched. Renaming from the menu screen
+   uploads the menu again under the new name and city when the user consents
+   (D24); renaming from Recent writes the history only.
+6. **Settings' Clear clears the history (#314).** "Recent menus → Clear"
+   empties the cache and the history together, so the tab it is labelled
+   after is empty afterwards.
+7. **A scan is addressed by its content (#308).**
+   `MenuResponseParser.parseScanned` derives the ref the way
+   `TextMenuSource` does for a paste (D18): `VenueRef(scan, <8 hex digits of
+   TextNormaliser.menuFingerprint of the transcription>)`. The fingerprint
+   reads dish text only, so `Dish.page` and the read time never move it; the
+   clock now stamps only `Menu.fetchedAt` and `analysedAt`. The same pages
+   read twice, or a photograph and a paste of the same dishes, are one cache
+   entry and one Recent row.
+
+**What it accepts.**
+
+- **No backfill.** Menus cached before this change have no visit and are not
+  listed until they are opened again, and a scan stored under a clock ref is
+  listed nowhere unless the same pages are read again, under the new ref.
+- **Collisions.** The fingerprint is 32-bit FNV-1a, so two different
+  transcriptions could share an entry, exactly as two pastes already could
+  (D18); a collision shows the other menu's dishes, never an invented one.
+- **`refresh` does not re-snapshot.** A refresh that changes the menu leaves
+  the visit's numbers as they were at open; the Recent row shows fresh ones
+  only while the cached copy lasts, because it prefers that copy.
+- **Scan-gone rows are inert.** A scan's Recent row outlives its only copy
+  and says so; the way back is to scan or paste the menu again.
+
+**What it costs.** One more Hive box, and one more interface threaded
+through `di.dart` into `AppDependencies.visitHistory` and three controllers
+(menu, Recent, Settings). Two store calls per open: one read before the
+fetch, one write after. The Recent tab now joins two stores instead of
+reading one.
+
+### D24 — A shared menu store: opened menus, keyed by venue, on KetoClub's backend
+
+*(Amends §11, D1's and D8's "no server database" framing, D12 and D17.
+Issues #306, #309, #310, #311 and #312.)*
+
+**What changed.** Nothing the app saw used to outlive the backend's short
+caches: every analysis of a venue lived on one device, and Phase 3's
+community work (`backend_plan.md` §5, milestone C) has nothing to attach a
+rating to until a venue's menu exists server-side. Seven decisions:
+
+1. **One table, `stored_menus` (#310).** One row per `(source,
+   platform_id)`: `venue_name`, `city`, `menu_json` (the client's normalised
+   `Menu`), `analysis_json`, `dish_count`, `score`, `first_seen_at`,
+   `last_seen_at` and `submission_count` (uploads, not installs). **There is
+   no install-id column.** `menu_json` and `dish_count` are replaced on every
+   upload; `analysis_json` and `score`, `venue_name` and `city` only when the
+   upload carries one, so a rules-only upload never erases a stored model
+   analysis.
+2. **Two routes (#310).** `POST /v1/menus` upserts: 201 when the row is new,
+   200 when it was refreshed. It rejects an `Authorization` header as
+   `/v1/chat` does, and checks the body against `MENU_STORE_MAX_BODY_BYTES`
+   (1 MiB; `Content-Length` first, then the bytes actually read) before
+   anything parses it, answering 413 `payloadTooLarge`. It requires
+   `X-KetoClub-Install-Id`, which spends the per-install limiter — the same
+   `RATE_LIMIT_*` bucket as `/v1/chat` — and is then deleted from scope: it
+   is never passed to `services/menu_store.py` and never logged, not even
+   truncated. `GET /v1/menus/{source}/{platform_id}` reads a row back with no
+   install id and no quota; the app does not call it yet.
+   `MENU_STORE_ENABLED` (default true) mounts the router; false makes both
+   routes a plain 404.
+3. **One client, `MenuStoreClient` (#309),** in a new rank-0 sub-package,
+   `services/community/`, and the only file under `lib/` that may name
+   `/v1/menus` (an architecture-test boundary). `BackendMenuStoreClient`
+   sends one POST per upload — no retries, no pre-check, a 20 s timeout — and
+   refuses a body over `maxMenuUploadBytes` (768 KiB) on the device. It
+   answers a sealed `MenuStoreResult` with seven distinct failure reasons,
+   none collapsed into another (§10), and logs one line per failure, never a
+   body or the install id.
+   `MenuUpload.toJson` strips the analysis's `options`: the net-carb limit and
+   dietary toggles are personal settings and never travel.
+   `NoMenuStoreClient` is the default for any dependency set that does not
+   name one.
+4. **Every platform uploads (amends D17 for this route only).** `di.dart`
+   builds the client from `backendBaseUrl(KETOCLUB_BACKEND_URL)` on every
+   platform, not from `menuProxyBase`, which is null off the web. So a phone
+   built with a backend URL posts here while still calling Wolt and Gemini
+   itself, and reads the install id for this alone. With no URL the client
+   answers `notConfigured` with no I/O at all.
+5. **When it uploads (#312).** In `MenuController.open`, right after the
+   visit is recorded (D23), in the background, and only when the user
+   consents to AI analysis and the store is configured — and then only when
+   the visit is new, or a language-model (`LlmEngine`) analysis was freshly
+   classified in this open, or the cached `LlmEngine` analysis is newer than
+   the previous visit (a scan or a background fetch saved it since). The
+   analysis rides along only when the model made it, so a menu only the
+   rules judged uploads once, on its first visit, with `analysis` null: a
+   rules result is never reused, and counting it as news would upload on
+   every open. Renaming a scan from its menu screen (D23) uploads it again
+   under the new name and city. The result is never shown.
+6. **The AI consent covers it.** There is no second switch: the consent D16
+   defaults on gates the upload, and its copy now says what is stored —
+   `settingsConsentBody` and `settingsConsentBodyDirect` ("The menu, its
+   analysis, the venue name and city are also stored on KetoClub's server,
+   with nothing that identifies you, so others can find them"), and the Scan
+   tab's `scanScreenDisclosureWeb` and `scanScreenDisclosureDirect`.
+7. **A venue knows its city (#311).** `Venue.city` is read from Wolt's
+   discovery items by `WoltVenueMapper` and carried by `VenueOpenHint` into
+   the history and the upload. A scan's city is whatever the user types into
+   the rename dialog. No platform menu payload carries a city of its own.
+
+**What it accepts.**
+
+- **Over-disclosure on a phone build without a backend URL.** The consent
+  copy is chosen per route (web or direct), not per configuration, so such a
+  build says menus are stored on KetoClub's server while it sends nothing.
+- **Two limiter hits per open on web.** The upload shares the 5/minute,
+  40/day bucket with `/v1/chat`, so a first open spends two units where it
+  used to spend one, and an upload can leave the next open's analysis
+  rate-limited into a rules fallback.
+- **A rules-only menu is stored without an analysis.** The row holds the
+  dishes and nothing judged until a consenting device with a model opens it.
+- **No hosting yet (#109, §17.6).** The store lives in whichever backend a
+  build points at, so until the backend is hosted it is shared only by the
+  builds pointed at one developer's `localhost`.
+- **Fire-and-forget.** A failed upload is neither retried nor surfaced; the
+  next qualifying open sends again.
+- **The content is unverified and the guard is spoofable.** Any client can
+  post any menu for any venue; the install id is random and spoofable
+  (`backend_plan.md` §3.4), which is acceptable while the backend is local
+  and is #109's to revisit.
+- **A stored name can be replaced, not removed.** A rename that clears a
+  scan's name or city uploads null, which the store reads as "keep the last
+  one".
+- **`score` is null for every upload the app makes.** The backend copies a
+  top-level `score` from the analysis and computes none; `MenuAnalysed`
+  carries no such field.
+
+**What it costs.** A new `services/` sub-package and its rank entry in the
+architecture test, one boundary string, one table, one client, and one more
+`AppDependencies` field (`menuStoreClient`) and `MenuController` argument.
+A phone build with a backend URL now depends on the backend for something,
+though nothing the user sees waits on it.
 
 ---
 
@@ -2539,7 +2803,10 @@ default the implementation follows until answered.
    with the repository checked out. Default: `localhost:8000` only, tracked as
    its own issue (#109, `backend_plan.md` §5), and the app's "the backend is an
    accelerator, never a dependency" property (D11) is exactly what makes leaving
-   this open safe — every build works with no backend configured at all.
+   this open safe — every build works with no backend configured at all. Since
+   D24 the shared menu store lives in that same backend, so until this is
+   answered the store is shared only by the builds pointed at one developer's
+   `localhost`.
 
 ---
 

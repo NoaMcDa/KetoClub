@@ -183,9 +183,17 @@ revisits abuse posture for a public host.
 
 ### 3.5 Privacy and logging
 
-Only dish text and model verdicts are ever stored (in `chat_cache`), never an
-install ID alongside them. One structured log line per request: request id,
-route, status, latency, `install_id[:8]`, upstream status, cache hit. Never the
+Two kinds of content are ever stored, and never an install ID alongside
+either. `chat_cache` holds dish text and model verdicts. Since
+`architecture.md` D24 (#310), `stored_menus` holds the menus consenting
+devices opened: the normalised menu, its analysis without `options` (no
+net-carb limit, no dietary toggle), the venue name and city, first/last-seen
+times and an upload count — one row per `(source, platform_id)`, keyed by
+venue, never by install ID, and with no column that could hold one.
+`POST /v1/menus` reads the ID for the rate limiter (the `/v1/chat` bucket) and
+deletes it before the store is called. One structured log line per request:
+request id, route, status, latency, `install_id[:8]`, upstream status, cache
+hit — except on `/v1/menus`, which logs no part of the ID at all. Never the
 server key, an `Authorization` header, an upstream error body or prompt text
 (§10, §11 carried over).
 
