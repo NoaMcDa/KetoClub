@@ -13,7 +13,6 @@ import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
-import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/llm_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_analysis_prompt.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
@@ -37,10 +36,12 @@ import 'package:ketoclub/services/platform/clock.dart';
 /// against a transcript the model wrote checks the model against itself,
 /// and spends two of the day's calls.
 ///
-/// A read menu is addressed `VenueRef(scan, <hex of the clock's
-/// millisecond stamp>)`, so two scans never share a cache entry the way
-/// two identical pastes do. Its analysis carries `LlmEngine(model)` with
-/// the model the provider reported, and the options snapshot.
+/// A read menu is addressed by the fingerprint of its transcription
+/// (`VenueRef(scan, <8 hex digits>)`, D23), so a re-read of the same
+/// pages, or a paste of the same dishes, is one cache entry. The clock
+/// only stamps when it was read (`Menu.fetchedAt` and the analysis's
+/// `analysedAt`). Its analysis carries `LlmEngine(model)` with the model
+/// the provider reported, and the options snapshot.
 ///
 /// Never throws. There is no rules fallback here or in the router in
 /// front of it: the rule engine needs text a photograph does not have.
@@ -85,10 +86,6 @@ final class VisionMenuClassifier implements ScannedMenuClassifier {
         final readAt = _clock.now();
         final parsed = MenuResponseParser.parseScanned(
           content,
-          ref: VenueRef(
-            source: MenuSource.scan,
-            platformId: readAt.millisecondsSinceEpoch.toRadixString(16),
-          ),
           analysedAt: readAt,
           engine: LlmEngine(model: model),
           netCarbLimitGrams: options.netCarbLimitGrams,
