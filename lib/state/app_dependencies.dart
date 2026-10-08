@@ -65,6 +65,10 @@ class AppDependencies {
   ///
   /// [menuStoreClient] defaults to [NoMenuStoreClient], which sends nothing
   /// and does no I/O; `di.dart` passes the backend's (issue #312, D24).
+  ///
+  /// [backendConfigured] defaults to false, which is also the no-backend
+  /// build's real value; `di.dart` passes whether a backend URL is set
+  /// (issue #330).
   const new({
     required this.menuRepository,
     required this.menuClassifier,
@@ -90,6 +94,7 @@ class AppDependencies {
     this.menuQuestionAnswerer,
     this.visitHistory = const NoVisitHistoryStore(),
     this.menuStoreClient = const NoMenuStoreClient(),
+    this.backendConfigured = false,
   });
 
   /// Loads a venue's menu, cache first (architecture.md §6.1).
@@ -205,4 +210,10 @@ class AppDependencies {
   /// shared menu store on the backend (issue #312, D24), with the user's
   /// AI-analysis consent. Sends no personal setting: see `MenuUpload`.
   final MenuStoreClient menuStoreClient;
+
+  /// Whether this build has a KetoClub backend (a build-time backend URL).
+  /// On a phone it means menu text and scan pages go to the server first,
+  /// with the user's own Gemini key used only if the server cannot be
+  /// reached (issue #330); the consent and scan disclosures follow it.
+  final bool backendConfigured;
 }

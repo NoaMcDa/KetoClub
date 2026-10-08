@@ -49,7 +49,17 @@ class ScanScreen extends StatefulWidget {
   /// straight to Google's Gemini API with the user's own key, and false on
   /// web, where they go through KetoClub's server. It only picks the
   /// disclosure line and the wording of a `notConfigured` failure.
-  const new({required this.pagePicker, this.directToGoogle = false, super.key});
+  ///
+  /// [backendConfigured] is true when the build has a KetoClub backend. On
+  /// a phone ([directToGoogle]) it makes the disclosure say the pages go to
+  /// the server first, with the user's own key only as the fallback (issue
+  /// #330).
+  const new({
+    required this.pagePicker,
+    this.directToGoogle = false,
+    this.backendConfigured = false,
+    super.key,
+  });
 
   /// Where photos, images and PDFs come from.
   final PagePicker pagePicker;
@@ -57,6 +67,9 @@ class ScanScreen extends StatefulWidget {
   /// Whether pages go straight from this device to Google (iOS and
   /// Android, D17) rather than through KetoClub's server (web, D12).
   final bool directToGoogle;
+
+  /// Whether this build has a KetoClub backend (issue #330).
+  final bool backendConfigured;
 
   @override
   State<ScanScreen> createState() => _ScanScreenState();
@@ -189,6 +202,16 @@ class _ScanScreenState extends State<ScanScreen> {
         ),
       ),
     );
+  }
+
+  /// Where the pages go: through KetoClub's server on web (D12), through it
+  /// first with the user's own key as the fallback on a phone with a
+  /// backend (issue #330), straight to Google on a phone without one (D17).
+  String _disclosure(AppLocalizations l10n) {
+    if (!widget.directToGoogle) return l10n.scanScreenDisclosureWeb;
+    return widget.backendConfigured
+        ? l10n.scanScreenDisclosureDirectViaBackend
+        : l10n.scanScreenDisclosureDirect;
   }
 
   /// "Photos & PDF": the three pickers, the pages collected, the analysis'
@@ -331,12 +354,7 @@ class _ScanScreenState extends State<ScanScreen> {
         ),
       ),
       const SizedBox(height: 12),
-      Text(
-        widget.directToGoogle
-            ? l10n.scanScreenDisclosureDirect
-            : l10n.scanScreenDisclosureWeb,
-        style: theme.textTheme.bodySmall,
-      ),
+      Text(_disclosure(l10n), style: theme.textTheme.bodySmall),
       Align(
         alignment: AlignmentDirectional.centerStart,
         child: TextButton(

@@ -41,6 +41,7 @@ Future<void> _pump(
   List<String>? pushed,
   PagePicker? picker,
   bool directToGoogle = false,
+  bool backendConfigured = false,
 }) async {
   // Tall enough that the whole screen is built: a ListView builds lazily,
   // so anything below the fold would be absent from the tree.
@@ -62,6 +63,7 @@ Future<void> _pump(
               child: ScanScreen(
                 pagePicker: picker ?? FakePagePicker(),
                 directToGoogle: directToGoogle,
+                backendConfigured: backendConfigured,
               ),
             );
           }
@@ -802,6 +804,45 @@ void main() {
       expect(find.text(_en.scanScreenDisclosureWeb), findsNothing);
       expect(_en.scanScreenDisclosureDirect, contains('straight'));
       expect(_en.scanScreenDisclosureDirect, contains('Gemini API'));
+    });
+
+    testWidgets('the disclosure line says the server comes first on phones '
+        'with a backend (issue #330)', (tester) async {
+      // Act
+      await _pump(
+        tester,
+        controller,
+        picker: picker,
+        directToGoogle: true,
+        backendConfigured: true,
+      );
+
+      // Assert
+      expect(
+        find.text(_en.scanScreenDisclosureDirectViaBackend),
+        findsOneWidget,
+      );
+      expect(find.text(_en.scanScreenDisclosureDirect), findsNothing);
+      expect(find.text(_en.scanScreenDisclosureWeb), findsNothing);
+      expect(
+        _en.scanScreenDisclosureDirectViaBackend,
+        contains("KetoClub's server"),
+      );
+      expect(
+        _en.scanScreenDisclosureDirectViaBackend,
+        contains('only if the server cannot be reached'),
+      );
+    });
+
+    testWidgets('a configured backend leaves the web disclosure unchanged', (
+      tester,
+    ) async {
+      // Act
+      await _pump(tester, controller, picker: picker, backendConfigured: true);
+
+      // Assert
+      expect(find.text(_en.scanScreenDisclosureWeb), findsOneWidget);
+      expect(find.text(_en.scanScreenDisclosureDirectViaBackend), findsNothing);
     });
 
     testWidgets('the Settings link opens /settings', (tester) async {
