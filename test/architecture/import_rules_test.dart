@@ -235,6 +235,29 @@ const _boundaries = <_Boundary>[
   _Boundary('/v1/website/fetch', {
     'services/menu/website/backend_website_fetcher.dart',
   }),
+  // The thin client's complete-result routes (architecture.md D25, issue
+  // #321), each pinned to the one Backend* service that calls it. The
+  // venue routes are named in full: a bare `/v1/venues/` is also a
+  // substring of Wolt's own `consumer-assortment/v1/venues/slug/` path in
+  // the Wolt menu adapter.
+  _Boundary('/v1/venue-menus', {
+    'services/menu/backend/backend_menu_adapter.dart',
+  }),
+  _Boundary('/v1/website-menu', {
+    'services/menu/backend/backend_menu_adapter.dart',
+  }),
+  _Boundary('/v1/classify', {
+    'services/classifier/backend_menu_classifier.dart',
+  }),
+  _Boundary('/v1/scan', {
+    'services/classifier/backend_scanned_menu_classifier.dart',
+  }),
+  _Boundary('/v1/venues/nearby', {
+    'services/venue/backend_venue_search_service.dart',
+  }),
+  _Boundary('/v1/venues/search', {
+    'services/venue/backend_venue_search_service.dart',
+  }),
   _Boundary('KetoClubBot/', {
     'services/menu/website/direct_website_fetcher.dart',
   }),

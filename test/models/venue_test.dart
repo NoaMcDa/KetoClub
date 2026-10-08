@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/venue.dart';
 
@@ -254,5 +256,146 @@ void main() {
       expect(placed.city, 'Tel Aviv');
       expect(placed.toString(), contains('Tel Aviv'));
     });
+  });
+
+  group('Venue JSON', () {
+    const ref = VenueRef(source: MenuSource.wolt, platformId: 'hamosad');
+    const full = Venue(
+      ref: ref,
+      name: 'HaMosad',
+      address: 'Dizengoff 1',
+      latitude: 32.0853,
+      longitude: 34.7818,
+      sourceUrl: 'https://wolt.com/en/isr/tel-aviv/restaurant/hamosad',
+      cuisineTags: <String>['steak', 'grill'],
+      isOnline: true,
+      imageUrl: 'https://imageproxy.wolt.com/venue/hamosad.jpg',
+      shortDescription: 'Grill house',
+      platformRating: 9.2,
+      estimateMinutes: 35,
+      city: 'Tel Aviv',
+    );
+
+    Map<String, Object?> fullJson() => full.toJson();
+
+    test('toJson writes every key in the order the backend writes', () {
+      // Arrange: the same bytes backend/tests/test_keto_models.py pins as
+      // _FULL_VENUE (architecture.md D25).
+      // Each break inside a value with a space falls after that space.
+      const expected =
+          '{"ref":{"source":"wolt","platformId":"hamosad"},"name":"HaMosad",'
+          '"address":"Dizengoff '
+          '1","latitude":32.0853,"longitude":34.7818,'
+          '"sourceUrl":"https://wolt.com/en/isr/tel-aviv/restaurant/hamosad",'
+          '"cuisineTags":["steak","grill"],"isOnline":true,'
+          '"imageUrl":"https://imageproxy.wolt.com/venue/hamosad.jpg",'
+          '"shortDescription":"Grill '
+          'house","platformRating":9.2,'
+          '"estimateMinutes":35,"city":"Tel Aviv"}';
+
+      // Act
+      final encoded = jsonEncode(full.toJson());
+
+      // Assert
+      expect(encoded, expected);
+    });
+
+    test('toJson keeps null keys for a venue with only a ref and name', () {
+      // Arrange
+      const bare = Venue(ref: ref, name: 'Diner');
+
+      // Act
+      final json = bare.toJson();
+
+      // Assert
+      expect(json.keys, fullJson().keys);
+      expect(json['cuisineTags'], isEmpty);
+      expect(json['city'], isNull);
+      expect(json['platformRating'], isNull);
+    });
+
+    test('tryFrom(x.toJson()) round-trips a full and a bare venue', () {
+      // Arrange
+      const bare = Venue(ref: ref, name: 'Diner');
+
+      // Act
+      final decodedFull = Venue.tryFrom(fullJson());
+      final decodedBare = Venue.tryFrom(bare.toJson());
+
+      // Assert
+      expect(decodedFull, full);
+      expect(decodedBare, bare);
+    });
+
+    test('tryFrom round-trips through jsonEncode and jsonDecode', () {
+      // Arrange
+      final wire = jsonEncode(full.toJson());
+
+      // Act
+      final decoded = Venue.tryFrom(jsonDecode(wire) as Map<String, Object?>);
+
+      // Assert
+      expect(decoded, full);
+    });
+
+    test('tryFrom reads absent and null optional keys as their defaults', () {
+      // Arrange
+      final json = <String, Object?>{
+        'ref': ref.toJson(),
+        'name': 'Diner',
+        'cuisineTags': null,
+        'city': null,
+      };
+
+      // Act
+      final venue = Venue.tryFrom(json);
+
+      // Assert
+      expect(venue, const Venue(ref: ref, name: 'Diner'));
+      expect(venue?.cuisineTags, isEmpty);
+    });
+
+    test('tryFrom reads an integer coordinate or rating as a double', () {
+      // Arrange
+      final json = fullJson()
+        ..['latitude'] = 32
+        ..['platformRating'] = 9;
+
+      // Act
+      final venue = Venue.tryFrom(json);
+
+      // Assert
+      expect(venue?.latitude, 32.0);
+      expect(venue?.platformRating, 9.0);
+    });
+
+    final badShapes = <String, Map<String, Object?> Function()>{
+      'no ref': () => fullJson()..remove('ref'),
+      'a ref that is not a map': () => fullJson()..['ref'] = 'wolt/x',
+      'an invalid ref': () => fullJson()
+        ..['ref'] = <String, Object?>{'source': 'doordash', 'platformId': 'x'},
+      'no name': () => fullJson()..remove('name'),
+      'an empty name': () => fullJson()..['name'] = '',
+      'a non-string address': () => fullJson()..['address'] = 1,
+      'a non-string city': () => fullJson()..['city'] = 7,
+      'a string latitude': () => fullJson()..['latitude'] = '32.1',
+      'a bool rating': () => fullJson()..['platformRating'] = true,
+      'a double estimate': () => fullJson()..['estimateMinutes'] = 35.5,
+      'a string isOnline': () => fullJson()..['isOnline'] = 'yes',
+      'cuisineTags not a list': () => fullJson()..['cuisineTags'] = 'steak',
+      'a non-string tag': () => fullJson()..['cuisineTags'] = <Object?>[1],
+    };
+    for (final entry in badShapes.entries) {
+      test('tryFrom returns null for ${entry.key}', () {
+        // Arrange
+        final json = entry.value();
+
+        // Act
+        final venue = Venue.tryFrom(json);
+
+        // Assert
+        expect(venue, isNull);
+      });
+    }
   });
 }
