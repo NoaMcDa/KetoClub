@@ -100,6 +100,8 @@ backend/
 | `MENU_CACHE_TTL_SECONDS` | 3600 | Raw Wolt body cache |
 | `CHAT_CACHE_TTL_SECONDS` | 86400 | Equal to the app's `menuCacheTtl` |
 | `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_PER_DAY` | 5, 40 | Per install ID, on `/v1/chat` and the write endpoints |
+| `ANALYSIS_RATE_LIMIT_PER_MINUTE`, `ANALYSIS_RATE_LIMIT_PER_DAY` | 10, 60 | Per install ID, the D25 analysis bucket (§3.3): spent only when a Gemini call is about to be made (#333) |
+| `ANALYSIS_CACHE_TTL_SECONDS` | 604800 | The D25 analysis cache (§3.3, #333) |
 
 CORS: `allow_origin_regex` from config, `allow_methods=[GET, POST]`,
 `allow_headers=[Content-Type, Accept, X-KetoClub-Install-Id]`, no credentials.
@@ -107,69 +109,131 @@ The custom header forces a preflight; the middleware answers it.
 
 ### 3.3 API contract (all under `/v1`)
 
-**`GET /health`** → `{status, version, llm_configured}`.
+> **Rewritten for D25 (#321).** The route table below is the contract the
+> thin-client work (#318, #319) builds against: every route the backend
+> serves today, then the seven D25 routes that serve complete results. Where
+> this section and the code disagree for a route that has shipped, the code
+> (and `architecture.md`) wins; for a D25 route not yet built, this section
+> is the spec. The `/v1/venues/{source}/{platform_id}` community endpoints
+> this section used to list were never built and are no longer planned under
+> that path (it now names venue search); milestone C (#105–#108) will pick
+> its own paths.
 
-**`GET /proxy/wolt/v4/venues/slug/{slug}/menu/data`** — the only proxy route.
-- `slug` must match `^[a-z0-9][a-z0-9-]{0,99}$`, else 422.
-- Upstream request headers are built from scratch: `User-Agent` equal to the
-  Dart `browserUserAgent` (duplicated on purpose, because a browser cannot set
-  it; both sides carry a comment) and `Accept: application/json`. Nothing from
-  the browser (`Origin`, `Cookie`, `Authorization`, the install ID) is forwarded.
-- **Transparent passthrough**: Wolt's status, body and `Content-Type` come back
-  unchanged, 404 included. The Dart adapter's mapping (404 → `notFound`, other
-  non-2xx → `platformChanged` with the status) therefore needs no change.
-- Proxy-originated statuses are exactly two: 502 (Wolt unreachable) and 504
-  (Wolt timed out), both with a `{reason, status_code}` body. httpx timeouts:
-  connect 5 s, read 15 s.
-- 2xx bodies are cached per slug for `MENU_CACHE_TTL_SECONDS`; the response
-  carries `X-KetoClub-Cache: hit|miss`. Failures are never cached.
+**Conventions every route shares.**
 
-**`POST /chat`** — the hosted-key endpoint, **built against Google Gemini, not
-OpenRouter (D12 — this whole section was written before that decision and is
-corrected here)**. The body mirrors `LlmChatClient.complete` one to one:
-`{system_prompt, user_prompt, response_schema?, schema_name?}`, with
-`max_length` bounds (422). Any inbound `Authorization` header is rejected with
-400: the server holds the only key there is, and the client never sends one.
-- Forwarded as `POST {GEMINI_BASE_URL}/v1beta/models/{GEMINI_MODEL}
-  :generateContent` with header `x-goog-api-key` (never a `?key=` query
-  parameter), `generationConfig.maxOutputTokens` and `.thinkingConfig
-  .thinkingBudget` from config, `temperature: 0`; read timeout 110 s (the Dart
-  client's 120 s is the outer bound).
-- Retry rule: strict `responseSchema` first; on an upstream 400 whose error body
-  is **not** `API_KEY_INVALID`, exactly one re-send with `responseMimeType`
-  only and no schema; 401, 403, 429 and 5xx are never retried (§9.3). The JSON
-  schema Dart sends is converted to Gemini's `responseSchema` subset by a pure
-  `to_gemini_schema` function before either attempt.
-- 200 → `{content, model}`, `model` from the upstream `modelVersion`, else the
-  configured `GEMINI_MODEL`.
-- Errors → `{reason, status_code}` with `reason` a `ChatFailureReason` name:
+- Every error the backend itself originates is `{reason, status_code}`
+  (`app.errors.BackendError`); a body or query that fails validation is
+  FastAPI's 422 `{detail: [{type, loc, msg}]}`, which never echoes the input.
+- `X-KetoClub-Install-Id` (32 lowercase hex, §3.4) is required wherever a
+  rate limiter is listed below; missing or malformed is 400 `badResponse`.
+  An inbound `Authorization` header is 400 `badResponse` on every route
+  marked "no auth header". The install id is read for limiting only: no
+  route stores it, and only `install_id[:8]` is ever logged (none at all on
+  `/v1/menus`, D24).
+- `X-KetoClub-Cache: hit|miss|bypass` reports the route's own cache where
+  it has one; CORS exposes it.
+- The pre-D25 bodies (`/v1/chat`, `/v1/website/fetch`, `/v1/menus`, the
+  discovery search) are **snake_case**. The D25 bodies are **camelCase**:
+  they carry the Dart `Menu`, `MenuAnalysed` and `Venue` JSON verbatim
+  (`app.keto.models`, byte-identical to the Dart `toJson`, every key present
+  and null ones included), so one casing runs through each body. Their
+  pydantic models are in `app/schemas.py`.
+
+**Rate-limit buckets** (all in memory, per install id unless noted):
+
+| Bucket | Limit | Spent by |
+|---|---|---|
+| chat (`RATE_LIMIT_*`) | 5/min, 40/day | `/v1/chat` cache misses, `POST /v1/menus` |
+| discovery (`DISCOVERY_RATE_LIMIT_PER_MINUTE`) | 20/min, no daily cap | discovery-proxy and `/v1/venues/*` cache misses |
+| website install / host (`WEBSITE_*`) | 10/min per install; 6/min per site across installs | `/v1/website/fetch`, `/v1/website-menu` (every upstream fetch, link hops included) |
+| analysis (`ANALYSIS_RATE_LIMIT_*`, D25) | 10/min, 60/day | only when a Gemini call is about to be made: never on an analysis-cache hit, never for a rules-only result |
+
+#### Routes that exist today
+
+| Route | Request | Success | Errors | Limiter / cache |
+|---|---|---|---|---|
+| `GET /health` | — | 200 `{status, version, llm_configured}` | — | — |
+| `POST /chat` (#100, D12; images D15) | `{system_prompt, user_prompt, response_schema?, schema_name?, images?: [{mime_type, data}]}`; no auth header | 200 `{content, model}` | 400, 422, 429 `rateLimited`, 502 `offline`/`badResponse`, 503 `notConfigured`, 504 `timeout` (table below) | chat bucket on a miss; completion cache keyed by request hash, `CHAT_CACHE_TTL_SECONDS`; a request with images bypasses it |
+| `GET /proxy/wolt/venues/slug/{slug}/assortment` (#95, #168) | `slug` `^[a-z0-9][a-z0-9-]{0,99}$` | Wolt's status, body and `Content-Type`, unchanged (404 included) | 502 `offline`, 504 `timeout` | none; 2xx bodies cached per slug, `MENU_CACHE_TTL_SECONDS` |
+| `GET /proxy/tenbis/api/v1.0/Restaurants/{restaurant_id}/Menu` (#122) | `restaurant_id` `^[0-9]{1,12}$` | 10bis's status, body and `Content-Type`, unchanged | 502 `offline`, 504 `timeout` | as the Wolt proxy |
+| `GET /proxy/wolt/pages/restaurants?lat&lon&lang` (#123) | `lat` −90..90, `lon` −180..180, `lang` `en`\|`he` | Wolt's status and body, unchanged (410 included) | 400, 422, 429 `rateLimited`, 502 `offline`, 504 `timeout` | discovery bucket on a miss; 2xx cached, `DISCOVERY_CACHE_TTL_SECONDS` |
+| `POST /proxy/wolt/pages/search` (#123) | `{q (1..80, trimmed), lat?, lon? (together or neither), lang}` | as above | as above | as above |
+| `POST /website/fetch` (D19, #181) | `{url (1..2048)}` | 200 `{kind: html\|pdf, content_type, body, final_url}` (`body` is base64 for a PDF) | 400 `invalidUrl`, 403 `disallowedByRobots`/`aiReserved`, 404 `notFound`, 413 `tooLarge`, 415 `unsupportedContent`, 422 `jsOnlyPage`, 429 `rateLimited`, 502 `offline`/`upstreamStatus`, 504 `timeout` | website install and host buckets; nothing cached; public hosts only, robots.txt and AI opt-outs honoured |
+| `POST /menus` (D24, #310) | `{source, platform_id, venue_name?, city?, menu, analysis?}`, ≤ `MENU_STORE_MAX_BODY_BYTES`; no auth header | 201 (new) / 200 (refreshed) `{created, submission_count}` | 400, 413 `payloadTooLarge`, 422, 429 `rateLimited` | chat bucket; keyed by `(source, platform_id)`, never by install id |
+| `GET /menus/{source}/{platform_id}` (D24) | — | 200 the stored row | 404 `menuNotFound` | — |
+
+`/v1/chat`'s own errors, `reason` a `ChatFailureReason` name:
 
 | Status | `reason` | When |
 |---|---|---|
-| 503 | `notConfigured` | No server key, or upstream 400 `API_KEY_INVALID`/401/403. There is no `unauthorised` reason — a rejected server key is the operator's problem, not something client copy can tell the user to fix |
+| 503 | `notConfigured` | No server key, or upstream 400 `API_KEY_INVALID`/401/403 |
 | 502 | `offline` | Upstream connect error |
 | 504 | `timeout` | Upstream read timeout |
-| 429 | `rateLimited` | Upstream 429, or the per-install limit |
+| 429 | `rateLimited` | Upstream 429, or the install's chat bucket |
 | 502 | `badResponse` | Any other upstream status, a non-`STOP` finish reason, or an unusable body |
 
-- **Shared cache** (`feature_prioratization` Tier D, for free): key = sha256 of
-  canonical JSON `{model, system_prompt, user_prompt, response_schema,
-  schema_name}`. Identical menus produce identical prompts, so one completion
-  serves every user of that venue. Only 200s are cached, for
-  `CHAT_CACHE_TTL_SECONDS`; hits bypass the rate limiter and carry
-  `X-KetoClub-Cache: hit`.
+Gemini is called as `POST {GEMINI_BASE_URL}/v1beta/models/{GEMINI_MODEL}
+:generateContent` with `x-goog-api-key` (never `?key=`), `temperature: 0`,
+the configured output and thinking budgets, and a read timeout of 110 s.
+Strict `responseSchema` first; on an upstream 400 that is not
+`API_KEY_INVALID`, exactly one re-send without the schema; 401, 403, 429 and
+5xx are never retried. The D25 routes reuse this client (`app.services.gemini`)
+and its failure mapping.
 
-**Community endpoints**
+#### D25 routes: complete results (#318; built by #333, #334, #335)
 
-| Endpoint | Body / reply |
-|---|---|
-| `GET /venues/{source}/{platform_id}` | 200 `{keto_rating_score: float\|null, rating_count, is_verified_keto_friendly, dish_feedback: {dish_id: {accepted, rejected}}}`. Unknown venue → 200 with the empty summary; the client needs no `notFound` branch |
-| `POST /venues/{source}/{platform_id}/rating` | `{score: 1..5}`; upsert on `(source, platform_id, install_id)` |
-| `POST /venues/{source}/{platform_id}/feedback` | `{dish_id, dish_name, accepted}`; upsert on `(source, platform_id, dish_id, install_id)`. Keyed by the platform dish id (stable per venue); `dish_name` is display only |
-| `POST /submissions` | `{name, address?, link}` → 201 `pending`; duplicate link → 409 |
-| `GET /admin/submissions?status=`, `POST /admin/submissions/{id}/approve`, `…/reject`, `POST /admin/venues/{source}/{platform_id}/verify` | `X-Admin-Token`, compared with `secrets.compare_digest`. A curl cookbook in `backend/README.md` is the admin UI while the backend is local |
+Shared rules for the four routes that analyse a menu:
 
-`source` is validated against `wolt|tenbis|tabit|ontopo` everywhere.
+- **Options** are `ClassificationOptionsBody`: `{netCarbLimitGrams: int
+  1..50, dietaryConstraints: [string] (≤ 3)}`. Each constraint is one of the
+  Dart prompt fragments verbatim (`seedOilFreePromptFragment`,
+  `dairyFreePromptFragment`, `carnivoreOnlyPromptFragment`); anything else
+  is 422, because free text would reach the system prompt under the
+  server's key. Consent is not a field: calling a route that analyses is the
+  consent, so a client without it does not call one.
+- **The returned analysis** is a Dart `MenuAnalysed`: `options` is the
+  request's options as an `AnalysisOptionsSnapshot` (`ClassificationOptionsBody
+  .snapshot()`), `schemaVersion` is 1, and `engine` is `{"kind": "llm",
+  "model": …}` from Gemini or `{"kind": "rules", "reason": …}` from the
+  ported heuristic — so the client's `_reusableAnalysis` accepts it as if it
+  had made it.
+- **A Gemini failure is not an error** on the text routes: the server runs
+  the ported heuristic and stamps it `{"kind": "rules", "reason": <the
+  failure's name>}` (`offline`, `timeout`, `rateLimited`, `badResponse`,
+  `notConfigured`), exactly as the client's `RoutingMenuClassifier` falls
+  back.
+- **An empty analysis bucket**: a route whose only product is the analysis
+  (`/v1/classify`, `/v1/text-menu`, `/v1/scan`) answers 429 `rateLimited`
+  and the client falls back on device; a route that also fetched a menu
+  (`/v1/venue-menus`, `/v1/website-menu`) keeps the menu and returns the
+  heuristic stamped `{"kind": "rules", "reason": "rateLimited"}`.
+- **Analysis cache** (`analysis_cache`, `ANALYSIS_CACHE_TTL_SECONDS`, 7 days):
+  key `sha256(fingerprint|model|schemaVersion|netCarbLimitGrams|constraints)`
+  over the menu's dish-text fingerprint. A hit spends nothing; only an `llm`
+  analysis is written. Scans (images) never touch it.
+- All seven routes require `X-KetoClub-Install-Id` and refuse an
+  `Authorization` header.
+
+| Route | Request | Success | Errors |
+|---|---|---|---|
+| `GET /venue-menus/{source}/{platform_id}` | `source` `wolt`\|`tenbis` (else 422); `platform_id` the proxy's slug or restaurant-id pattern. Query: `classify` (bool, default `false`), `netCarbLimitGrams` (int 1..50, default 6), `constraints` (repeated, ≤ 3, the fragment rule above; repeated rather than comma-joined because a fragment contains commas) | 200 `VenueMenuResponse {menu, analysis \| null, fromCache, fetchedAt}`; `analysis` is null when `classify` is false or the menu has no dish to classify; `fetchedAt` is the upstream fetch time (= `menu.fetchedAt`); `X-KetoClub-Cache` reports the menu cache | 404 `notFound` (platform 404), 502 `platformChanged` (other upstream status, or a payload the mapper cannot read), 502 `offline`, 504 `timeout`, 422 |
+| `POST /classify` | `ClassifyRequest {menu, options}`, ≤ 768 KiB | 200 `ClassifyResponse {analysis}` | 413 `payloadTooLarge`, 422 (incl. `noDishesFound` as a `{reason, status_code}` body when the menu has no dish), 429 `rateLimited` |
+| `POST /text-menu` | `TextMenuRequest {text (1..100,000 chars), options}` | 200 `ScannedMenuResponse {menu, analysis}`; `menu.venueRef` is `scan/<fingerprint hex>` (D18, D23) | 422 `noDishesFound` (nothing parses; no bucket spent), 429 `rateLimited` |
+| `POST /scan` | `ScanRequest {pages: [{mimeType: image/jpeg\|png\|webp\|application/pdf, data: base64}] (1..6), options}`; each page ≤ `VISION_MAX_IMAGE_BYTES` decoded, at most `VISION_MAX_IMAGES` pages (422 otherwise) | 200 `ScannedMenuResponse {menu, analysis}`; `menu.venueRef` is `scan/<fingerprint hex>`; every dish carries its `page` (D22) | **no rules fallback** (D15): the `/v1/chat` statuses and reasons (503 `notConfigured`, 502 `offline`/`badResponse`, 504 `timeout`, 429 `rateLimited`), 422 `noDishesFound` |
+| `POST /website-menu` | `WebsiteMenuRequest {url (1..2048), options}` | 200 `WebsiteMenuResponse {menu, analysis \| null}`; `menu.venueRef` is `website/<normalised url>`; `analysis` is null only when the menu has no dish to classify | every `/v1/website/fetch` reason and status above, plus 404 `menuNotFound` (no menu on the site or its one linked page), 502 with the `/v1/scan` reasons when a linked PDF cannot be read |
+| `GET /venues/nearby?lat&lon&lang` | the discovery proxy's query rules | 200 `VenuesResponse {venues: [Venue]}`, Wolt's order (the client sorts nearest-first); `X-KetoClub-Cache` | 429 `rateLimited` (discovery bucket), 502 `platformChanged` (non-2xx upstream, 410 included, or a payload the mapper cannot read), 502 `offline`, 504 `timeout` |
+| `POST /venues/search` | `VenueSearchRequest {query (1..100, trimmed), lang, lat?, lon? (together or neither)}` | as `/venues/nearby` | as `/venues/nearby` |
+
+Limiters and caches on the D25 routes: `/v1/venue-menus` shares the menu
+proxy's per-venue body cache and spends the analysis bucket only for a
+Gemini call; `/v1/classify`, `/v1/text-menu` and `/v1/scan` spend only the
+analysis bucket (a scan always, since it is never cached); `/v1/website-menu`
+spends the website buckets for every fetch and the analysis bucket for a
+Gemini call (a linked PDF is read through the `/v1/scan` path); the two
+venue routes reuse the discovery routes' cache keys and the discovery bucket.
+`/v1/venue-menus` and `/v1/website-menu` upsert `stored_menus` (D24) when
+they return an analysis; `/v1/classify`, `/v1/text-menu` and `/v1/scan`
+never do — the client's own upload rule covers those.
 
 ### 3.4 Install ID and rate limiting
 

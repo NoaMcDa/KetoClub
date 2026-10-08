@@ -9,11 +9,19 @@ from pydantic import (
     BaseModel,
     Field,
     PrivateAttr,
+    StrictInt,
     StringConstraints,
     field_validator,
     model_validator,
 )
 
+from app.keto.models import (
+    AnalysisOptionsSnapshot,
+    Menu,
+    MenuAnalysed,
+    Venue,
+    WireModel,
+)
 from app.services.wolt import WoltLang
 
 
@@ -33,6 +41,30 @@ class ErrorResponse(BaseModel):
 
 
 ImageMimeType = Literal["image/jpeg", "image/png", "image/webp", "application/pdf"]
+
+
+def _strict_base64(value: str) -> str:
+    """``value`` unchanged when it is strict, padded standard base64.
+
+    Shared by ``ImagePart`` and ``ScanPage``. The message is fixed: the
+    default one would not quote the value, but nothing about a page's bytes
+    belongs in an error either.
+    """
+    try:
+        base64.b64decode(value, validate=True)
+    except (binascii.Error, ValueError):
+        raise ValueError("data must be standard base64") from None
+    return value
+
+
+def _base64_decoded_size(data: str) -> int:
+    """The decoded length of base64 ``_strict_base64`` accepted.
+
+    Exact for such input: every 4 characters are 3 bytes, less one per
+    ``=`` of padding.
+    """
+    padding = len(data) - len(data.rstrip("="))
+    return len(data) * 3 // 4 - padding
 
 
 class ImagePart(BaseModel):
@@ -57,20 +89,11 @@ class ImagePart(BaseModel):
     @field_validator("data")
     @classmethod
     def _data_is_base64(cls, value: str) -> str:
-        try:
-            base64.b64decode(value, validate=True)
-        except (binascii.Error, ValueError):
-            # A fixed message: the default one would not quote the value,
-            # but nothing about a page's bytes belongs in an error either.
-            raise ValueError("data must be standard base64") from None
-        return value
+        return _strict_base64(value)
 
     @model_validator(mode="after")
     def _record_decoded_size(self) -> "ImagePart":
-        # Exact for input _data_is_base64 accepted: every 4 characters are
-        # 3 bytes, less one per "=" of padding.
-        padding = len(self.data) - len(self.data.rstrip("="))
-        self._decoded_size = len(self.data) * 3 // 4 - padding
+        self._decoded_size = _base64_decoded_size(self.data)
         return self
 
     @property
@@ -240,3 +263,201 @@ class StoredMenuResponse(BaseModel):
     first_seen_at: datetime
     last_seen_at: datetime
     submission_count: int
+
+
+# --- D25: complete results (#321) ---------------------------------------------
+#
+# Every model below is camelCase on the wire (``WireModel``), unlike the
+# snake_case bodies above: they carry the Dart ``Menu``/``MenuAnalysed``/
+# ``Venue`` JSON (``app.keto.models``) and are read by the same Dart
+# ``tryFrom`` code, so one casing runs through each body. Routes are added by
+# #333 (classify, venue-menus, text-menu), #334 (scan, website-menu) and
+# #335 (venues); ``backend_plan.md`` §3.3 is the route contract.
+
+MAX_DIETARY_CONSTRAINTS: Final = 3
+"""As many constraints as the app has "Your keto rules" toggles (#56)."""
+
+MAX_DIETARY_CONSTRAINT_CHARS: Final = 1000
+
+MAX_SCAN_PAGES: Final = 6
+"""The schema's hard bound; ``VISION_MAX_IMAGES`` may only lower it."""
+
+MAX_TEXT_MENU_CHARS: Final = 100_000
+
+DietaryConstraint = Annotated[
+    str, Field(min_length=1, max_length=MAX_DIETARY_CONSTRAINT_CHARS)
+]
+
+
+class ClassificationOptionsBody(WireModel):
+    """The options one analysis is made under: ``{netCarbLimitGrams,
+    dietaryConstraints}``, the Dart ``AnalysisOptionsSnapshot`` with bounds.
+
+    ``dietaryConstraints`` holds the prompt fragments themselves, exactly as
+    the Dart ``ClassificationOptions.dietaryConstraints`` holds them
+    (``seedOilFreePromptFragment`` and its two siblings), so the server can
+    echo them back as the result's ``options`` snapshot byte for byte and the
+    client's ``_reusableAnalysis`` accepts it. **The route must refuse any
+    item that is not one of those known fragments** (422): free text here
+    would reach the system prompt under the server's own key.
+    """
+
+    net_carb_limit_grams: Annotated[StrictInt, Field(ge=1, le=50)]
+    dietary_constraints: list[DietaryConstraint] = Field(
+        default_factory=list, max_length=MAX_DIETARY_CONSTRAINTS
+    )
+
+    def snapshot(self) -> AnalysisOptionsSnapshot:
+        """These options as the snapshot a returned analysis records."""
+        return AnalysisOptionsSnapshot(
+            net_carb_limit_grams=self.net_carb_limit_grams,
+            dietary_constraints=list(self.dietary_constraints),
+        )
+
+
+class VenueMenuResponse(WireModel):
+    """``GET /v1/venue-menus/{source}/{platform_id}``: one platform menu.
+
+    ``analysis`` is null when the request did not ask for one
+    (``classify=false``) or the menu has no dish to classify.
+    ``fromCache`` says whether the menu came from the server's platform
+    cache rather than a fresh upstream fetch, and ``fetchedAt`` (ISO-8601,
+    as Dart writes it) is when that upstream fetch happened: the same
+    instant as ``menu.fetchedAt``.
+    """
+
+    menu: Menu
+    analysis: MenuAnalysed | None
+    from_cache: bool
+    fetched_at: str
+
+    @field_validator("fetched_at")
+    @classmethod
+    def _fetched_at_is_iso(cls, value: str) -> str:
+        datetime.fromisoformat(value)
+        return value
+
+
+class ClassifyRequest(WireModel):
+    """``POST /v1/classify``: a menu the client already holds, to analyse."""
+
+    menu: Menu
+    options: ClassificationOptionsBody
+
+
+class ClassifyResponse(WireModel):
+    """A successful ``POST /v1/classify``."""
+
+    analysis: MenuAnalysed
+
+
+class ScanPage(WireModel):
+    """One page on ``POST /v1/scan``: ``{mimeType, data}``.
+
+    Validated exactly like ``ImagePart`` on ``/v1/chat``: one of the four
+    types Gemini reads natively, and strict, padded standard base64.
+    """
+
+    mime_type: ImageMimeType
+    data: str = Field(..., min_length=1)
+    _decoded_size: int = PrivateAttr(default=0)
+
+    @field_validator("data")
+    @classmethod
+    def _data_is_base64(cls, value: str) -> str:
+        return _strict_base64(value)
+
+    @model_validator(mode="after")
+    def _record_decoded_size(self) -> "ScanPage":
+        self._decoded_size = _base64_decoded_size(self.data)
+        return self
+
+    @property
+    def decoded_size(self) -> int:
+        """The page's size in bytes once decoded."""
+        return self._decoded_size
+
+
+class ScanRequest(WireModel):
+    """``POST /v1/scan``: one to ``MAX_SCAN_PAGES`` photographed or PDF
+    pages of one menu, read and classified in one Gemini request (D15)."""
+
+    pages: list[ScanPage] = Field(..., min_length=1, max_length=MAX_SCAN_PAGES)
+    options: ClassificationOptionsBody
+
+    def page_bound_violation(self, max_pages: int, max_bytes: int) -> str | None:
+        """Why ``pages`` breaks the configured bounds, or None when it does not.
+
+        ``ChatRequest.image_bound_violation``'s rule: more than ``max_pages``
+        pages, or any page over ``max_bytes`` once decoded.
+        """
+        if len(self.pages) > max_pages:
+            return f"at most {max_pages} pages per request"
+        for index, page in enumerate(self.pages):
+            if page.decoded_size > max_bytes:
+                return f"page {index} is over {max_bytes} bytes once decoded"
+        return None
+
+
+class ScannedMenuResponse(WireModel):
+    """A successful ``POST /v1/scan`` or ``POST /v1/text-menu``: the menu
+    read from the user's pages or text (``venueRef.source`` is ``scan``) and
+    its analysis, which is never null on these routes."""
+
+    menu: Menu
+    analysis: MenuAnalysed
+
+
+class TextMenuRequest(WireModel):
+    """``POST /v1/text-menu``: a menu pasted as text (D18)."""
+
+    text: str = Field(..., min_length=1, max_length=MAX_TEXT_MENU_CHARS)
+    options: ClassificationOptionsBody
+
+
+class WebsiteMenuRequest(WireModel):
+    """``POST /v1/website-menu``: a restaurant's own site (D19).
+
+    The URL is in the body, as on ``/v1/website/fetch``, so the request log
+    (which records the path) never carries it.
+    """
+
+    url: str = Field(..., min_length=1, max_length=2048)
+    options: ClassificationOptionsBody
+
+
+class WebsiteMenuResponse(WireModel):
+    """A successful ``POST /v1/website-menu``. ``analysis`` is null only when
+    the menu found has no dish to classify."""
+
+    menu: Menu
+    analysis: MenuAnalysed | None
+
+
+class VenueSearchRequest(WireModel):
+    """``POST /v1/venues/search``: venues by name, ``{query, lang, lat?,
+    lon?}``.
+
+    ``DiscoverySearchRequest``'s rules: ``query`` trimmed before its bounds
+    apply, and ``lat``/``lon`` given together or not at all.
+    """
+
+    query: Annotated[
+        str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)
+    ]
+    lang: WoltLang = "en"
+    lat: float | None = Field(default=None, ge=-90, le=90)
+    lon: float | None = Field(default=None, ge=-180, le=180)
+
+    @model_validator(mode="after")
+    def _position_is_all_or_nothing(self) -> "VenueSearchRequest":
+        if (self.lat is None) != (self.lon is None):
+            raise ValueError("lat and lon must be given together or not at all")
+        return self
+
+
+class VenuesResponse(WireModel):
+    """A successful ``GET /v1/venues/nearby`` or ``POST /v1/venues/search``:
+    the venues in Wolt's order (the client sorts nearest-first)."""
+
+    venues: list[Venue]
