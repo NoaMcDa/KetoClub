@@ -12,28 +12,28 @@ from typing import Annotated
 
 import httpx
 from fastapi import APIRouter, Path, Request, Response
-from starlette.concurrency import run_in_threadpool
 
 from app.schemas import ErrorResponse
+from app.services.platform_menu import (
+    RESTAURANT_ID_PATTERN,
+    SLUG_PATTERN,
+    UpstreamUnreachable,
+    fetch_menu_body,
+)
 from app.services.tenbis import SOURCE as TENBIS_SOURCE
 from app.services.tenbis import TENBIS_HEADERS, TENBIS_TIMEOUT, tenbis_menu_url
 from app.services.wolt import SOURCE as WOLT_SOURCE
 from app.services.wolt import (
     WOLT_MENU_LANG,
     WOLT_TIMEOUT,
-    read_cached_menu,
     wolt_assortment_url,
     wolt_web_headers,
-    write_cached_menu,
 )
 
 router = APIRouter()
 
-_SLUG_PATTERN = r"^[a-z0-9][a-z0-9-]{0,99}$"
-_RESTAURANT_ID_PATTERN = r"^[0-9]{1,12}$"
-
-SlugPath = Annotated[str, Path(pattern=_SLUG_PATTERN)]
-RestaurantIdPath = Annotated[str, Path(pattern=_RESTAURANT_ID_PATTERN)]
+SlugPath = Annotated[str, Path(pattern=SLUG_PATTERN)]
+RestaurantIdPath = Annotated[str, Path(pattern=RESTAURANT_ID_PATTERN)]
 
 
 @router.get("/proxy/wolt/venues/slug/{slug}/assortment")
@@ -100,7 +100,9 @@ async def _proxy_menu(
 ) -> Response:
     """Serve one proxied menu fetch from cache, or fetch and cache it.
 
-    Shared by every proxy route: a cache hit answers without an upstream
+    Shared by every proxy route; the mechanics live in
+    ``app.services.platform_menu.fetch_menu_body`` (shared with
+    ``GET /v1/venue-menus``, #333): a cache hit answers without an upstream
     call; a miss fetches ``url`` with headers built from scratch (nothing of
     the inbound request is forwarded) and caches only a 2xx result with a
     non-empty body under ``(source, cache_key)``. An empty 2xx body is how
@@ -109,44 +111,25 @@ async def _proxy_menu(
     an upstream that recovers is seen on the very next request.
     """
     settings = request.app.state.settings
-    engine = request.app.state.engine
-
-    cached = await run_in_threadpool(
-        read_cached_menu, engine, source, cache_key, settings.MENU_CACHE_TTL_SECONDS
-    )
-    if cached is not None:
-        return Response(
-            content=cached.body,
-            status_code=cached.status_code,
-            media_type=cached.content_type,
-            headers={"X-KetoClub-Cache": "hit"},
-        )
-
-    http_client: httpx.AsyncClient = request.app.state.http_client
     try:
-        upstream = await http_client.get(url, headers=headers, timeout=timeout)
-    except httpx.ConnectError:
-        return _proxy_error(reason="offline", status_code=502)
-    except httpx.TimeoutException:
-        return _proxy_error(reason="timeout", status_code=504)
-
-    content_type = upstream.headers.get("content-type", "application/json")
-    if 200 <= upstream.status_code < 300 and upstream.content:
-        await run_in_threadpool(
-            write_cached_menu,
-            engine,
-            source,
-            cache_key,
-            upstream.status_code,
-            content_type,
-            upstream.text,
+        fetched = await fetch_menu_body(
+            engine=request.app.state.engine,
+            http_client=request.app.state.http_client,
+            ttl_seconds=settings.MENU_CACHE_TTL_SECONDS,
+            source=source,
+            cache_key=cache_key,
+            url=url,
+            headers=headers,
+            timeout=timeout,
         )
+    except UpstreamUnreachable as error:
+        return _proxy_error(reason=error.reason, status_code=error.status_code)
 
     return Response(
-        content=upstream.content,
-        status_code=upstream.status_code,
-        media_type=content_type,
-        headers={"X-KetoClub-Cache": "miss"},
+        content=fetched.body,
+        status_code=fetched.status_code,
+        media_type=fetched.content_type,
+        headers={"X-KetoClub-Cache": "hit" if fetched.from_cache else "miss"},
     )
 
 

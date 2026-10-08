@@ -14,6 +14,7 @@ would blur more than it saves. Only two routes exist; there is no wildcard
 passthrough.
 """
 
+from dataclasses import dataclass
 from typing import Annotated, Literal
 
 import httpx
@@ -60,22 +61,10 @@ async def search_wolt_nearby(
     "no results". A fresh cache hit skips both the upstream call and the
     rate limiter; only a 2xx response is cached.
     """
-    settings = request.app.state.settings
-    headers = wolt_web_headers(
-        lang=lang,
-        client_id=request.app.state.wolt_web_client_id,
-        client_version=settings.WOLT_CLIENT_VERSION,
-    )
     return await _proxy_discovery(
         request=request,
         install_id=install_id,
-        source=SOURCE_RESTAURANTS,
-        cache_key=f"{lat:.4f},{lon:.4f},{lang}",
-        method="GET",
-        url=wolt_restaurants_url(settings.WOLT_CONSUMER_BASE_URL),
-        headers=headers,
-        params={"lat": lat, "lon": lon},
-        json_body=None,
+        call=nearby_call(request, lat=lat, lon=lon, lang=lang),
     )
 
 
@@ -92,46 +81,122 @@ async def search_wolt_by_name(
     never be used to proxy a dish search instead. Otherwise shaped exactly
     like ``search_wolt_nearby`` above.
     """
-    settings = request.app.state.settings
-    headers = wolt_web_headers(
-        lang=body.lang,
-        client_id=request.app.state.wolt_web_client_id,
-        client_version=settings.WOLT_CLIENT_VERSION,
-    )
-    # A search without a position (location denied, #37) is its own cache
-    # row and is forwarded without `lat`/`lon` rather than with nulls.
-    has_position = body.lat is not None and body.lon is not None
-    position = f"{body.lat:.4f},{body.lon:.4f}" if has_position else "none"
-    cache_key = f"{body.q.lower()},{position},{body.lang}"
-    json_body: dict[str, object] = {"q": body.q, "target": "venues"}
-    if has_position:
-        json_body["lat"] = body.lat
-        json_body["lon"] = body.lon
     return await _proxy_discovery(
         request=request,
         install_id=install_id,
+        call=search_call(request, q=body.q, lat=body.lat, lon=body.lon, lang=body.lang),
+    )
+
+
+@dataclass(frozen=True)
+class DiscoveryCall:
+    """One upstream discovery request: where it goes and how it is cached."""
+
+    source: str
+    cache_key: str
+    method: Literal["GET", "POST"]
+    url: str
+    headers: dict[str, str]
+    params: dict[str, float] | None
+    json_body: dict[str, object] | None
+
+
+@dataclass(frozen=True)
+class DiscoveryReply:
+    """What Wolt (or the cache) answered: status, type and body, unchanged."""
+
+    status_code: int
+    content_type: str
+    body: bytes
+    cache: Literal["hit", "miss"]
+
+
+@dataclass(frozen=True)
+class DiscoveryFailure:
+    """The upstream could not be reached: ``offline`` (502) or ``timeout``
+    (504). A refused limiter is not one of these; it raises ``BackendError``.
+    """
+
+    reason: Literal["offline", "timeout"]
+    status_code: Literal[502, 504]
+
+
+def nearby_call(
+    request: Request, *, lat: float, lon: float, lang: WoltLang
+) -> DiscoveryCall:
+    """The "venues near a point" request and its cache key."""
+    settings = request.app.state.settings
+    return DiscoveryCall(
+        source=SOURCE_RESTAURANTS,
+        cache_key=f"{lat:.4f},{lon:.4f},{lang}",
+        method="GET",
+        url=wolt_restaurants_url(settings.WOLT_CONSUMER_BASE_URL),
+        headers=_web_headers(request, lang),
+        params={"lat": lat, "lon": lon},
+        json_body=None,
+    )
+
+
+def search_call(
+    request: Request,
+    *,
+    q: str,
+    lat: float | None,
+    lon: float | None,
+    lang: WoltLang,
+) -> DiscoveryCall:
+    """The "search venues by name" request and its cache key.
+
+    ``target`` is fixed to ``"venues"`` here, never taken from a client, so
+    no route can be used to proxy a dish search instead. A search without a
+    position (location denied, #37) is its own cache row and is forwarded
+    without ``lat``/``lon`` rather than with nulls.
+    """
+    settings = request.app.state.settings
+    has_position = lat is not None and lon is not None
+    position = f"{lat:.4f},{lon:.4f}" if has_position else "none"
+    json_body: dict[str, object] = {"q": q, "target": "venues"}
+    if has_position:
+        json_body["lat"] = lat
+        json_body["lon"] = lon
+    return DiscoveryCall(
         source=SOURCE_SEARCH,
-        cache_key=cache_key,
+        cache_key=f"{q.lower()},{position},{lang}",
         method="POST",
         url=wolt_search_url(settings.WOLT_BASE_URL),
-        headers=headers,
+        headers=_web_headers(request, lang),
         params=None,
         json_body=json_body,
     )
 
 
+def _web_headers(request: Request, lang: WoltLang) -> dict[str, str]:
+    settings = request.app.state.settings
+    return wolt_web_headers(
+        lang=lang,
+        client_id=request.app.state.wolt_web_client_id,
+        client_version=settings.WOLT_CLIENT_VERSION,
+    )
+
+
 async def _proxy_discovery(
-    *,
-    request: Request,
-    install_id: str,
-    source: str,
-    cache_key: str,
-    method: Literal["GET", "POST"],
-    url: str,
-    headers: dict[str, str],
-    params: dict[str, float] | None,
-    json_body: dict[str, object] | None,
+    *, request: Request, install_id: str, call: DiscoveryCall
 ) -> Response:
+    """Serve ``call`` as Wolt's own response, status and body unchanged."""
+    outcome = await fetch_discovery(request=request, install_id=install_id, call=call)
+    if isinstance(outcome, DiscoveryFailure):
+        return _discovery_error(reason=outcome.reason, status_code=outcome.status_code)
+    return Response(
+        content=outcome.body,
+        status_code=outcome.status_code,
+        media_type=outcome.content_type,
+        headers={"X-KetoClub-Cache": outcome.cache},
+    )
+
+
+async def fetch_discovery(
+    *, request: Request, install_id: str, call: DiscoveryCall
+) -> DiscoveryReply | DiscoveryFailure:
     """Serve one discovery request from cache, or rate-limit, fetch and cache.
 
     The cache is checked before the rate limiter, the same order
@@ -139,8 +204,10 @@ async def _proxy_discovery(
     install's quota. ``menu_cache`` is reused as-is (``source`` keeps a
     discovery row from ever colliding with a menu row); nothing of the
     inbound request (``Origin``, ``Cookie``, ``Authorization``, the install
-    id) reaches Wolt — only ``headers``, built from scratch by the caller,
-    does.
+    id) reaches Wolt — only ``call.headers``, built from scratch, does.
+    Shared by the proxy routes above and ``/v1/venues/*`` (#335).
+
+    Raises ``BackendError`` (429 ``rateLimited``) when the bucket is empty.
     """
     settings = request.app.state.settings
     engine = request.app.state.engine
@@ -148,16 +215,16 @@ async def _proxy_discovery(
     cached = await run_in_threadpool(
         read_cached_menu,
         engine,
-        source,
-        cache_key,
+        call.source,
+        call.cache_key,
         settings.DISCOVERY_CACHE_TTL_SECONDS,
     )
     if cached is not None:
-        return Response(
-            content=cached.body,
+        return DiscoveryReply(
             status_code=cached.status_code,
-            media_type=cached.content_type,
-            headers={"X-KetoClub-Cache": "hit"},
+            content_type=cached.content_type,
+            body=cached.body.encode("utf-8"),
+            cache="hit",
         )
 
     limiter: RateLimiter = request.app.state.discovery_rate_limiter
@@ -166,36 +233,42 @@ async def _proxy_discovery(
 
     http_client: httpx.AsyncClient = request.app.state.http_client
     try:
-        if method == "GET":
+        if call.method == "GET":
             upstream = await http_client.get(
-                url, headers=headers, params=params, timeout=WOLT_TIMEOUT
+                call.url,
+                headers=call.headers,
+                params=call.params,
+                timeout=WOLT_TIMEOUT,
             )
         else:
             upstream = await http_client.post(
-                url, headers=headers, json=json_body, timeout=WOLT_TIMEOUT
+                call.url,
+                headers=call.headers,
+                json=call.json_body,
+                timeout=WOLT_TIMEOUT,
             )
     except httpx.ConnectError:
-        return _discovery_error(reason="offline", status_code=502)
+        return DiscoveryFailure(reason="offline", status_code=502)
     except httpx.TimeoutException:
-        return _discovery_error(reason="timeout", status_code=504)
+        return DiscoveryFailure(reason="timeout", status_code=504)
 
     content_type = upstream.headers.get("content-type", "application/json")
     if 200 <= upstream.status_code < 300:
         await run_in_threadpool(
             write_cached_menu,
             engine,
-            source,
-            cache_key,
+            call.source,
+            call.cache_key,
             upstream.status_code,
             content_type,
             upstream.text,
         )
 
-    return Response(
-        content=upstream.content,
+    return DiscoveryReply(
         status_code=upstream.status_code,
-        media_type=content_type,
-        headers={"X-KetoClub-Cache": "miss"},
+        content_type=content_type,
+        body=upstream.content,
+        cache="miss",
     )
 
 

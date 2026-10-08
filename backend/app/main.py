@@ -24,7 +24,20 @@ from app.config import Settings, get_settings
 from app.db import build_engine
 from app.errors import BackendError, handle_backend_error, handle_validation_error
 from app.models import Base
-from app.routers import chat, discovery, health, menus, proxy, website
+from app.routers import (
+    chat,
+    classify,
+    discovery,
+    health,
+    menus,
+    proxy,
+    scan,
+    text_menu,
+    venue_menus,
+    venues,
+    website,
+    website_menu,
+)
 from app.services.rate_limit import RateLimiter
 from app.services.request_logging import RequestLoggingMiddleware
 
@@ -93,6 +106,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # The website route's limits (D19): per site across every install, so
     # KetoClub never hammers one restaurant, and per install, so the route
     # is no open proxy. Minute windows only.
+    # The D25 analysis bucket (#333): spent only when a Gemini call is about
+    # to be made by /v1/classify, /v1/venue-menus, /v1/text-menu, /v1/scan
+    # (always: images are never cached) or /v1/website-menu — never
+    # on an analysis-cache hit, never for a rules-only result.
+    app.state.analysis_rate_limiter = RateLimiter(
+        per_minute=resolved_settings.ANALYSIS_RATE_LIMIT_PER_MINUTE,
+        per_day=resolved_settings.ANALYSIS_RATE_LIMIT_PER_DAY,
+    )
     app.state.website_host_limiter = RateLimiter(
         per_minute=resolved_settings.WEBSITE_HOST_RATE_LIMIT_PER_MINUTE,
         per_day=_DISCOVERY_NO_DAILY_CAP,
@@ -124,7 +145,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(chat.router, prefix="/v1")
     app.include_router(proxy.router, prefix="/v1")
     app.include_router(discovery.router, prefix="/v1")
+    app.include_router(venues.router, prefix="/v1")
     app.include_router(website.router, prefix="/v1")
+    app.include_router(classify.router, prefix="/v1")
+    app.include_router(venue_menus.router, prefix="/v1")
+    app.include_router(text_menu.router, prefix="/v1")
+    app.include_router(scan.router, prefix="/v1")
+    app.include_router(website_menu.router, prefix="/v1")
     # The menu store (#310) is opt-out: when disabled it is not mounted at
     # all, so its paths are an ordinary 404.
     if resolved_settings.MENU_STORE_ENABLED:

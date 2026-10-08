@@ -27,10 +27,13 @@ Routes shipped so far:
 | `POST /v1/website/fetch` | #181 | **yes** | **yes** (`WEBSITE_RATE_LIMIT_PER_MINUTE`, and per host) | One restaurant page or PDF for the web build, fetched politely (D19), see below |
 | `POST /v1/menus` | #310 | **yes** (rate limiting only) | **yes** (`RATE_LIMIT_*`, shared with `/v1/chat`) | Stores one opened menu in the anonymous shared store, see below |
 | `GET /v1/menus/{source}/{platform_id}` | #310 | no | no | Reads one stored menu back, see below |
+| `POST /v1/classify` | #333 | **yes** | **yes** (`ANALYSIS_RATE_LIMIT_*`, only for a Gemini call) | A complete analysis of a menu the client holds (D25), see below |
+| `GET /v1/venue-menus/{source}/{platform_id}` | #333 | **yes** | **yes** (`ANALYSIS_RATE_LIMIT_*`, only for a Gemini call) | One Wolt or 10bis menu, mapped and optionally analysed (D25), see below |
+| `POST /v1/text-menu` | #333 | **yes** | **yes** (`ANALYSIS_RATE_LIMIT_*`, only for a Gemini call) | A pasted menu, read and analysed (D18, D25), see below |
 
 Menu proxies are one fetch per user action and have no per-install
-identity; `/v1/chat`, the two discovery routes, the website route and
-`POST /v1/menus` require
+identity; `/v1/chat`, the two discovery routes, the website route,
+`POST /v1/menus` and the three D25 analysis routes require
 `X-KetoClub-Install-Id` and enforce a per-install limit. A missing or
 malformed install id is answered `400 {"reason":"badResponse"}` — a
 client that misses the header sees the same shape as a bad prompt.
@@ -384,6 +387,51 @@ curl -sS localhost:8000/v1/website/fetch \
   -d '{"url": "https://example.com/"}'
 ```
 
+## The D25 analysis routes (#333)
+
+`POST /v1/classify`, `GET /v1/venue-menus/{source}/{platform_id}` and
+`POST /v1/text-menu` answer with complete results: the Dart `Menu` and
+`MenuAnalysed` JSON (camelCase, `app.keto.models`), made on the server by
+the ported rule engine, prompt and parser (`app/keto/`, `app/platforms/`).
+`backend_plan.md` §3.3 is the contract; in short:
+
+- **Options** are `{netCarbLimitGrams: 1..50, dietaryConstraints: [...]}`,
+  each constraint one of the three Dart prompt fragments verbatim, at most
+  once (422 otherwise). `/v1/venue-menus` takes them as `netCarbLimitGrams`
+  and one repeated `constraints` query parameter per fragment.
+- **The analysis** carries the request's options and `schemaVersion: 1`.
+  Its engine is `{"kind": "llm", "model": …}`, or the rule engine's
+  `{"kind": "rules", "reason": …}` when Gemini failed (`notConfigured`,
+  `offline`, `timeout`, `rateLimited`, `badResponse`): a Gemini failure is
+  never an error here, as the client's `RoutingMenuClassifier` falls back.
+- **Analysis cache** (`analysis_cache`, `ANALYSIS_CACHE_TTL_SECONDS`): keyed
+  by `sha256(fingerprint|model|schemaVersion|netCarbLimitGrams|constraints)`.
+  A hit is free; only an `llm` analysis is written. A hit whose dish ids do
+  not match the menu's (the same dishes under other ids) is a miss.
+- **Analysis bucket** (`ANALYSIS_RATE_LIMIT_*`): spent only just before a
+  Gemini call. Empty: `/v1/classify` and `/v1/text-menu` answer 429
+  `rateLimited`; `/v1/venue-menus` keeps the menu and answers the rules
+  stamped `rateLimited`.
+- `/v1/venue-menus` reads the menu proxies' own `menu_cache` rows
+  (`X-KetoClub-Cache` reports that cache), maps the payload, and with
+  `classify=true` analyses it and upserts `stored_menus` (without the
+  analysis's `options`). Errors: 404 `notFound`, 502 `platformChanged`,
+  502 `offline`, 504 `timeout`. `/v1/classify` (body ≤
+  `CLASSIFY_MAX_BODY_BYTES`, else 413 `payloadTooLarge`) and
+  `/v1/text-menu` never write `stored_menus`; a menu or text with no dish is
+  422 `noDishesFound`.
+- The install id keys the analysis bucket only: it is never stored and
+  never logged on these routes.
+
+```bash
+curl -sS 'localhost:8000/v1/venue-menus/wolt/hamosad?classify=true&netCarbLimitGrams=6' \
+  -H 'X-KetoClub-Install-Id: 0123456789abcdef0123456789abcdef'
+curl -sS localhost:8000/v1/text-menu \
+  -H 'Content-Type: application/json' \
+  -H 'X-KetoClub-Install-Id: 0123456789abcdef0123456789abcdef' \
+  -d '{"text": "Steak\nPasta carbonara", "options": {"netCarbLimitGrams": 6, "dietaryConstraints": []}}'
+```
+
 ## The menu store (#310)
 
 An anonymous, shared store of the menus people open: one row per
@@ -480,6 +528,9 @@ that need them (`/v1/chat`, and `/v1/admin/*` in a later issue). See
 | `WOLT_CLIENT_VERSION` | `1.16.125` | Wolt web-client version sent on menu and discovery requests |
 | `DISCOVERY_CACHE_TTL_SECONDS` | `300` | Discovery response cache TTL |
 | `DISCOVERY_RATE_LIMIT_PER_MINUTE` | `20` | Per install id, across both discovery routes; no daily cap |
+| `ANALYSIS_RATE_LIMIT_PER_MINUTE`, `ANALYSIS_RATE_LIMIT_PER_DAY` | `10`, `60` | Per install id, the D25 analysis bucket: spent only just before a Gemini call (#333) |
+| `ANALYSIS_CACHE_TTL_SECONDS` | `604800` | The D25 analysis cache's TTL (7 days, #333) |
+| `CLASSIFY_MAX_BODY_BYTES` | `786432` | Largest `POST /v1/classify` body (768 KiB); over it → 413 `payloadTooLarge` |
 | `WEBSITE_USER_AGENT` | `KetoClubBot/1.0 (+https://github.com/NoaMcDa/KetoClub; menu reader)` | Sent on every website fetch; names the fetcher and a contact URL (D19) |
 | `WEBSITE_MAX_HTML_BYTES`, `WEBSITE_MAX_PDF_BYTES` | `2097152`, `3145728` | Size caps for a fetched page and PDF; the PDF cap matches `VISION_MAX_IMAGE_BYTES` |
 | `WEBSITE_MAX_ROBOTS_BYTES`, `WEBSITE_ROBOTS_TTL_SECONDS` | `524288`, `3600` | How much of `robots.txt` is read, and how long it is cached per host |
