@@ -53,7 +53,8 @@ class ScanScreen extends StatefulWidget {
   /// [backendConfigured] is true when the build has a KetoClub backend. On
   /// a phone ([directToGoogle]) it makes the disclosure say the pages go to
   /// the server first, with the user's own key only as the fallback (issue
-  /// #330).
+  /// #330); on every platform it makes a `notConfigured` failure name the
+  /// server (issue #331).
   const new({
     required this.pagePicker,
     this.directToGoogle = false,
@@ -312,6 +313,7 @@ class _ScanScreenState extends State<ScanScreen> {
               failure,
               l10n,
               directToGoogle: widget.directToGoogle,
+              backendConfigured: widget.backendConfigured,
             ),
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.error,

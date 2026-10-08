@@ -685,7 +685,11 @@ final class MenuController extends ChangeNotifier {
   /// on every open: a menu only the rules judged uploads once, on its first
   /// visit, without an analysis. An analysis rides along only when the
   /// language model made it. [lastUpload] completes when that upload does;
-  /// its result is never shown.
+  /// its result is never shown. **Except** when the analysis arrived with
+  /// the fetch ([MenuFetched.analysis], KetoClub's backend answering with
+  /// the menu and its analysis, D25): the backend already stored both, so
+  /// nothing is uploaded unless a language-model analysis was made on this
+  /// device in this open after all (issue #331).
   ///
   /// Never throws.
   Future<void> open(
@@ -715,6 +719,7 @@ final class MenuController extends ChangeNotifier {
         menu: final fetchedMenu,
         :final fromCache,
         :final staleReason,
+        analysis: final fetchedAnalysis,
       ):
         _menu = fetchedMenu;
         _isFromCache = fromCache;
@@ -743,6 +748,7 @@ final class MenuController extends ChangeNotifier {
           previous: previous,
           classified: reusable == null,
           consentGiven: appSettings.estimationConsentGiven,
+          analysedByFetch: fetchedAnalysis != null,
         );
       case MenuFetchFailed(:final reason, :final statusCode):
         _menu = null;
@@ -763,7 +769,8 @@ final class MenuController extends ChangeNotifier {
   ///
   /// [previous] is the entry read before the fetch, [classified] whether
   /// this open ran the classifier rather than reusing a cached analysis,
-  /// and [consentGiven] the user's AI-analysis consent.
+  /// [consentGiven] the user's AI-analysis consent, and [analysedByFetch]
+  /// whether the fetch itself carried an analysis (D25).
   Future<void> _recordVisit(
     VenueRef ref,
     Menu menu, {
@@ -771,6 +778,7 @@ final class MenuController extends ChangeNotifier {
     required VisitEntry? previous,
     required bool classified,
     required bool consentGiven,
+    required bool analysedByFetch,
   }) async {
     final analysis = _analysis;
     final counts = analysis is MenuAnalysed
@@ -803,6 +811,9 @@ final class MenuController extends ChangeNotifier {
         llm != null &&
         previous != null &&
         llm.analysedAt.isAfter(previous.lastOpenedAt);
+    // The backend that answered with the menu and its analysis stored
+    // both (D24, D25); only a model analysis made here since is news.
+    if (analysedByFetch && !fresh) return;
     if (previous != null && !fresh && !newer) return;
     _startUpload(ref, menu, llm);
   }
@@ -882,7 +893,10 @@ final class MenuController extends ChangeNotifier {
   /// reclassifies and persists the new result exactly as [open] does. So
   /// does an unchanged fingerprint whose analysis was made under options
   /// other than the user's current ones — a net-carb limit changed since
-  /// [open], say (issue #57).
+  /// [open], say (issue #57). Except that a refetch which carried its own
+  /// model analysis under the current options ([MenuFetched.analysis],
+  /// KetoClub's backend, D25) shows that one instead of classifying again
+  /// (issue #331).
   ///
   /// A refetch that fails outright (no adapter succeeded and nothing was
   /// cached to fall back to — the only way [MenuRepository.load] returns
@@ -910,6 +924,7 @@ final class MenuController extends ChangeNotifier {
         menu: final fetchedMenu,
         :final fromCache,
         :final staleReason,
+        analysis: final fetchedAnalysis,
       ):
         final unchanged =
             previousMenu != null &&
@@ -930,6 +945,12 @@ final class MenuController extends ChangeNotifier {
           // moves forward — and spend no classifier call
           // (architecture.md §6.4).
           _analysis = previousAnalysis;
+        } else if (_arrivedReusable(fetchedAnalysis, fetchedMenu, options)
+            case final arrived?) {
+          // The fetch itself carried a model analysis under these options
+          // (KetoClub's backend, D25; issue #331), and the repository has
+          // already cached it: classifying again would spend a second call.
+          _analysis = arrived;
         } else {
           await _classify(currentRef, fetchedMenu, options);
         }
@@ -1024,6 +1045,20 @@ final class MenuController extends ChangeNotifier {
         // part in [ClassificationOptions.matches] or equality.
         onEngineStarted: _onEngineStarted,
       );
+
+  /// [analysis], the one that arrived with the fetch of [menu], when
+  /// [_reusableAnalysis] would reuse it had it been cached; else null.
+  static MenuAnalysed? _arrivedReusable(
+    MenuAnalysed? analysis,
+    Menu menu,
+    ClassificationOptions options,
+  ) => analysis == null
+      ? null
+      : _reusableAnalysis(
+          CachedMenu(menu: menu, analysis: analysis),
+          menu,
+          options,
+        );
 
   /// [cached]'s analysis when [open] may show it for [fetched] under
   /// [options] instead of classifying again, or null when it must

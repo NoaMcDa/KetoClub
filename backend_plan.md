@@ -14,7 +14,12 @@
 > `MILESTONE_CONVENTIONS.md`). `KETOCLUB_BACKEND_URL` is read in `lib/di.dart`
 > and the web build fetches live Wolt menus and hosted-model analysis through
 > it when configured; with no backend URL the app is exactly the client-only
-> app D1 first described. **This document's design is now largely history**:
+> app D1 first described. **D25 (#318, #319, #320–#335) then made the backend
+> serve complete results to every platform** (§3.3's seven routes, a Python
+> port of the Dart menu logic pinned by a golden corpus, an analysis cache and
+> bucket), with the device's own adapters and engines as the fallback; §2, §3.3
+> and §4 below are corrected where they said the backend was a dumb passthrough
+> or web-only. **This document's design is now largely history**:
 > `architecture.md` is authoritative (D11, D12 in §14) and this plan is kept
 > for the reasoning and the milestone/issue breakdown, corrected below where it
 > named OpenRouter or a bring-your-own-key path that no longer exists. Still
@@ -41,7 +46,7 @@ the full Phase 3 backend so the work is planned once.
 | Trigger | The web build is blocked by CORS |
 | Scope | Full Phase 3 backend: menu proxy, hosted model key, shared analysis cache, community data |
 | Stack | Python 3.11+, FastAPI, in `backend/` of this repository; run locally on `localhost:8000` for now; hosting is #109 |
-| Routing | The **web** build fetches menus through the backend. **Mobile keeps calling Wolt directly**; the backend URL is simply not defined in mobile builds |
+| Routing | The **web** build fetches menus through the backend. **Mobile keeps calling Wolt directly**; the backend URL is simply not defined in mobile builds. **Amended by D25 (architecture.md §14): every platform built with a backend URL asks the backend's complete-result routes first (§3.3), and the direct adapters and engines are the fallback** |
 | Model owner | **Decided (D12), supersedes the row below as originally written.** The backend holds one Google Gemini key. There is no bring-your-own-key fallback: the app never holds a model key at all, `KeyStore` and `flutter_secure_storage` are removed, and the on-device rules engine is the only fallback, reached through the router exactly as it always was for every other failure reason |
 | ~~Model owner (original)~~ | ~~The backend holds one OpenRouter key. The user's own key (BYOK, D3) stays as the fallback; the on-device rules engine stays as the last fallback~~ — superseded by D12 before #100 was built; struck through rather than deleted so the decision that was reversed stays visible |
 | Identity | Anonymous per-install ID sent as a header. No accounts, no login |
@@ -49,11 +54,17 @@ the full Phase 3 backend so the work is planned once.
 
 **Principle: the backend is an accelerator, never a dependency.** With no
 backend URL the app behaves exactly as it does today, including the web build's
-paste path. The backend is deliberately dumb: it forwards, holds a key, caches
+paste path. ~~The backend is deliberately dumb: it forwards, holds a key, caches
 and stores community data. It does **not** normalise Wolt JSON, build prompts
 or parse model replies. Those stay in Dart, where 1418 tests already cover them,
-so nothing is duplicated in Python. D10 extends to the backend: the call is the
-probe, and the client never pre-checks whether the server is up.
+so nothing is duplicated in Python.~~ **Reversed by D25:** the backend now
+normalises Wolt and 10bis JSON, builds the prompt, parses the model's reply and
+runs the rule engine, from a Python port (`backend/app/keto`, `platforms`,
+`website`) that is proven equal to the Dart code by a golden corpus
+(`tool/golden`, `backend/tests/fixtures/golden/`). Dart remains the source of
+truth; the duplication is the price of a complete result in one request. D10
+extends to the backend: the call is the probe, and the client never pre-checks
+whether the server is up.
 
 ## 3. Backend service (`backend/`)
 
@@ -79,9 +90,16 @@ backend/
 │   ├── db.py            # sync engine, check_same_thread=False, WAL, session per request
 │   ├── models.py        # menu_cache, chat_cache, venues, ratings, dish_feedback, submissions
 │   ├── schemas.py
-│   ├── routers/         # health, proxy, chat, venues, submissions, admin
-│   └── services/        # wolt, gemini, cache, rate_limit, install_id
-└── tests/               # conftest: app over in-memory SQLite (StaticPool) + respx router
+│   ├── routers/         # health, proxy, chat, discovery, website, menus; D25: venue_menus, classify,
+│   │                    # text_menu, scan, website_menu, venues (submissions, admin still planned)
+│   ├── services/        # wolt, gemini, chat_cache, rate_limit, install_id; D25: classify, scan,
+│   │                    # analysis_cache, platform_menu, website_fetch, request_body
+│   ├── keto/            # D25: the Python port of the Dart menu logic (vocabulary.json, normaliser, rules,
+│   │                    # heuristic, prompt, parser, text_menu, dish_kind, score, fingerprint, wire models)
+│   ├── platforms/       # D25: Wolt menu, 10bis menu and Wolt venue mappers
+│   └── website/         # D25: website locator, JSON-LD and HTML reader
+└── tests/               # conftest: app over in-memory SQLite (StaticPool) + respx router;
+                         # fixtures/golden/ holds the 14 documents the port replays
 ```
 
 ### 3.2 Configuration (`.env`)
@@ -91,7 +109,7 @@ backend/
 | `GEMINI_API_KEY` | unset | The server's key, sent only as `x-goog-api-key`. Unset means `/v1/chat` answers `notConfigured` (superseded `OPENROUTER_API_KEY`, D12) |
 | `GEMINI_MODEL` | `gemini-3.5-flash` | Model requested at `generateContent` (superseded `OPENROUTER_MODEL`; superseded: see architecture.md D12 note for the default) |
 | `GEMINI_BASE_URL` | `https://generativelanguage.googleapis.com` | Upstream host; never taken from a request |
-| `GEMINI_MAX_OUTPUT_TOKENS` | `8192` | `generationConfig.maxOutputTokens` |
+| `GEMINI_MAX_OUTPUT_TOKENS` | `65536` | `generationConfig.maxOutputTokens` (was `8192`; see `config.py`) |
 | `GEMINI_THINKING_BUDGET` | `0` | Thinking tokens count against the output budget, and this is a classification task |
 | `WOLT_BASE_URL` | `https://restaurant-api.wolt.com` | Upstream host for the proxy; never taken from a request |
 | `DATABASE_URL` | `sqlite:///./ketoclub.db` | Postgres is an env-var swap later; Alembic arrives with it |
@@ -102,6 +120,7 @@ backend/
 | `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_PER_DAY` | 5, 40 | Per install ID, on `/v1/chat` and the write endpoints |
 | `ANALYSIS_RATE_LIMIT_PER_MINUTE`, `ANALYSIS_RATE_LIMIT_PER_DAY` | 10, 60 | Per install ID, the D25 analysis bucket (§3.3): spent only when a Gemini call is about to be made (#333) |
 | `ANALYSIS_CACHE_TTL_SECONDS` | 604800 | The D25 analysis cache (§3.3, #333) |
+| `CLASSIFY_MAX_BODY_BYTES` | 786432 | Largest `POST /v1/classify` body (768 KiB); over it → 413 `payloadTooLarge` (#333) |
 
 CORS: `allow_origin_regex` from config, `allow_methods=[GET, POST]`,
 `allow_headers=[Content-Type, Accept, X-KetoClub-Install-Id]`, no credentials.
@@ -109,12 +128,12 @@ The custom header forces a preflight; the middleware answers it.
 
 ### 3.3 API contract (all under `/v1`)
 
-> **Rewritten for D25 (#321).** The route table below is the contract the
-> thin-client work (#318, #319) builds against: every route the backend
-> serves today, then the seven D25 routes that serve complete results. Where
-> this section and the code disagree for a route that has shipped, the code
-> (and `architecture.md`) wins; for a D25 route not yet built, this section
-> is the spec. The `/v1/venues/{source}/{platform_id}` community endpoints
+> **Rewritten for D25 (#321); all seven D25 routes are built (#333–#335) and
+> wired in the client (#327–#329, #331).** The route table below is the
+> contract the thin-client work (#318, #319) built against: every route the
+> backend serves, then the seven D25 routes that serve complete results. Where
+> this section and the code disagree, the code (and `architecture.md`) wins.
+> The `/v1/venues/{source}/{platform_id}` community endpoints
 > this section used to list were never built and are no longer planned under
 > that path (it now names venue search); milestone C (#105–#108) will pick
 > its own paths.
@@ -239,16 +258,22 @@ never do — the client's own upload rule covers those.
 
 The app generates 16 bytes from `Random.secure()` once per install, stores the
 hex in `shared_preferences`, and sends it as `X-KetoClub-Install-Id` (32
-lowercase hex; missing or malformed → 400). The backend keeps an in-memory
-limiter per ID and uses the ID for one-vote-per-install upserts. It is random
+lowercase hex; missing or malformed → 400). The backend keeps in-memory
+limiters per ID — the chat bucket, the discovery bucket, the website buckets and
+(D25) the analysis bucket, §3.3's table — and uses the ID for one-vote-per-install upserts. It is random
 and unlinkable to a person, so D8 ("nothing about the user is stored") holds in
 spirit. It is spoofable, which is acceptable while the backend is local; #109
 revisits abuse posture for a public host.
 
 ### 3.5 Privacy and logging
 
-Two kinds of content are ever stored, and never an install ID alongside
-either. `chat_cache` holds dish text and model verdicts. Since
+Three kinds of content are ever stored, and never an install ID alongside
+any. `chat_cache` holds dish text and model verdicts. Since D25 (#333),
+`analysis_cache` holds one complete language-model `MenuAnalysed` per
+`sha256(menu fingerprint | model | schemaVersion | netCarbLimitGrams |
+constraints)` for `ANALYSIS_CACHE_TTL_SECONDS` (7 days): the verdicts for a
+menu's dish text, with the options they were made under and nothing about
+who asked. Only an `llm` analysis is written. Since
 `architecture.md` D24 (#310), `stored_menus` holds the menus consenting
 devices opened: the normalised menu, its analysis without `options` (no
 net-carb limit, no dietary toggle), the venue name and city, first/last-seen
@@ -257,9 +282,13 @@ venue, never by install ID, and with no column that could hold one.
 `POST /v1/menus` reads the ID for the rate limiter (the `/v1/chat` bucket) and
 deletes it before the store is called. One structured log line per request:
 request id, route, status, latency, `install_id[:8]`, upstream status, cache
-hit — except on `/v1/menus`, which logs no part of the ID at all. Never the
-server key, an `Authorization` header, an upstream error body or prompt text
-(§10, §11 carried over).
+hit — except on `/v1/menus` and the D25 routes, which log no part of the ID at
+all (on those it keys the analysis, discovery or website bucket and nothing
+else). Never the server key, an `Authorization` header, an upstream error body,
+prompt text, a scanned page's bytes (a page count only) or a website URL
+(§10, §11 carried over). `/v1/venue-menus` and `/v1/website-menu` also write
+`stored_menus` when they return an analysis, without its `options` and keyed
+by venue, so the D24 store fills without the client uploading.
 
 ### 3.6 SQLite notes
 
@@ -337,7 +366,23 @@ Everything plugs into seams that already exist. Nothing above the adapters
    `import_rules_test.dart`: `restaurant-api.wolt.com` only in
    `wolt_adapter.dart`, `/v1/chat` only in `backend_chat_client.dart`,
    `KETOCLUB_BACKEND_URL` only in `di.dart`, and `openrouter`, `sk-or-` and
-   `googleapis.com` nowhere under `lib/` at all.
+   `googleapis.com` nowhere under `lib/` at all. (D25 adds six more, one per
+   complete-result route, each pinned to the one client file that calls it.)
+9. **Complete results on every platform (D25, #327–#331).** The Dart side of
+   §3.3's routes: `BackendMenuAdapter` (`/v1/venue-menus`, `/v1/website-menu`,
+   120 s timeout), `BackendMenuClassifier` (`/v1/classify`),
+   `BackendScannedMenuClassifier` (`/v1/scan`) and `BackendVenueSearchService`
+   (`/v1/venues/*`), each paired with the engine the app used before in a
+   `Fallback*` wrapper that hands over only when the backend could not answer
+   (`backendUnreachable`, `timeout`, `rateLimited`, `notConfigured`; for menus
+   `backendUnreachable` and `offline`). `di.dart` builds the chains on every
+   platform when a URL is configured, behind the routers that check consent and
+   connectivity; a `FallbackChatClient` does the same for menu questions.
+   `/v1/text-menu` has no client yet. Discovery's quick score reads through
+   `estimateMenuRepository` over the direct adapters, so it never spends the
+   analysis bucket. This reverses §2's "mobile keeps calling Wolt directly", and item 3's "no
+   fallback chain" (true of web only since D17): a phone with a URL now has the
+   backend as its primary and its own key as the secondary.
 
 ## 5. Milestones, issues and priority
 
@@ -375,6 +420,20 @@ because milestone A is what makes Wolt work on web.
 | #107 | Submissions and admin endpoints | medium |
 | #108 | `CommunityClient` and `VenueCommunitySummary` in the app | high |
 | #109 | Hosting beyond localhost (research) | low |
+
+### D — D25: complete results on every platform (waves 0–4)
+
+| # | Issue | Status |
+|---|---|---|
+| #318, #319 | Epics: the backend serves complete results; the thin client | ✅ shipped |
+| #320 | Golden parity corpus (`tool/golden`, `test/golden`, `backend/tests/fixtures/golden/`) and the surrogate-pair fix | ✅ shipped |
+| #321 | Route contracts, wire models, Venue codec, boundary pins, this document's §3.3 | ✅ shipped |
+| #322–#326 | The Python port: normaliser and fingerprint, mappers, rules and heuristic, prompt and parser, text menu and website locator | ✅ shipped |
+| #327–#329 | `BackendMenuAdapter`, the backend and fallback classifiers, `BackendVenueSearchService` | ✅ shipped |
+| #330 | Disclosure copy branches on backend configuration | ✅ shipped |
+| #331 | `di.dart` wiring, estimate repository, upload skip, backend flow tests | ✅ shipped (flows proven under `flutter-tester` only) |
+| #332 | This documentation pass | ✅ shipped |
+| #333–#335 | The routes: analysis cache and `/v1/classify`, `/v1/venue-menus`, `/v1/text-menu`; `/v1/scan` and `/v1/website-menu`; `/v1/venues/*` | ✅ shipped |
 
 ### Build order
 

@@ -209,7 +209,9 @@ def test_an_empty_bucket_keeps_the_menu_and_answers_the_rules(
     assert analysis["options"] == {"netCarbLimitGrams": 6, "dietaryConstraints": []}
     MenuAnalysed.model_validate(analysis)
     assert not gemini.called
-    assert len(stored) == 1
+    # The menu is stored; a rules result is not (D24).
+    (row,) = stored
+    assert row.analysis_json is None
 
 
 def test_a_gemini_failure_answers_the_rules_with_its_reason(
@@ -379,3 +381,33 @@ def test_the_install_id_is_in_no_row_and_no_log_line(
     assert INSTALL_ID not in dumped and INSTALL_ID[:8] not in dumped
     with Session(engine) as session:
         assert session.scalar(select(func.count()).select_from(StoredMenu)) == 1
+
+
+def test_a_rules_answer_never_replaces_a_stored_model_analysis(
+    app_client: TestClient, upstream: respx.MockRouter
+) -> None:
+    """D24: a rules result refreshes the menu but keeps the model analysis."""
+    entry = _wolt()
+    upstream.get(_WOLT_URL).respond(200, json=entry["raw"])
+    menu = Menu.model_validate(entry["menu"])
+    gemini = upstream.post(GEMINI_URL).respond(
+        200, json=gemini_answer(all_green_reply(menu))
+    )
+    first = _get(app_client, _WOLT_PATH, {"classify": "true"})
+    assert first.json()["analysis"]["engine"]["kind"] == "llm"
+    (row,) = _stored(app_client)
+    model_analysis = row.analysis_json
+
+    # Other options miss the analysis cache; Gemini now times out.
+    gemini.mock(side_effect=httpx.ReadTimeout("slow"))
+    second = _get(
+        app_client, _WOLT_PATH, {"classify": "true", "netCarbLimitGrams": "9"}
+    )
+
+    assert second.json()["analysis"]["engine"] == {
+        "kind": "rules",
+        "reason": "timeout",
+    }
+    (row,) = _stored(app_client)
+    assert row.analysis_json == model_analysis
+    assert row.submission_count == 2

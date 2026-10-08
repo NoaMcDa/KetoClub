@@ -26,14 +26,19 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:ketoclub/app.dart';
+import 'package:ketoclub/di.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/menu_question.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
+import 'package:ketoclub/services/classifier/llm_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_question_answerer.dart';
 import 'package:ketoclub/services/classifier/menu_response_parser.dart';
@@ -45,6 +50,7 @@ import 'package:ketoclub/services/llm/llm_chat_client.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
+import 'package:ketoclub/services/menu/wolt/wolt_adapter.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
@@ -59,6 +65,7 @@ import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
+import 'package:ketoclub/services/venue/wolt/wolt_venue_search_service.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
@@ -218,6 +225,20 @@ final class FakeAppDependencies {
   /// When set, [dependencies] wires this in place of [pagePicker].
   PagePicker? pagePickerOverride;
 
+  /// When set, [dependencies] wires this as the quick score's repository
+  /// (D25, issue #331); otherwise the quick score shares the menu
+  /// screen's, as a build with no backend does. See [wireBackendBuild].
+  MenuRepository? estimateRepositoryOverride;
+
+  /// When set, [dependencies] wires this in place of [venueSearchService]
+  /// — for a flow that runs the real venue search chain over a scripted
+  /// HTTP client (see [wireBackendBuild]).
+  VenueSearchService? venueSearchOverride;
+
+  /// Whether the app is told it has a KetoClub backend (issues #330,
+  /// #331). False by default, the no-backend build's value.
+  bool backendConfigured = false;
+
   /// The user's own Gemini API key store, as `di.dart` provides it on iOS
   /// and Android (architecture.md D17). Null by default — the web build's
   /// value — so Settings shows no key section unless a flow sets one.
@@ -232,6 +253,8 @@ final class FakeAppDependencies {
   /// The dependency set to hand to the app widget.
   AppDependencies get dependencies => AppDependencies(
     menuRepository: repositoryOverride ?? repository,
+    estimateMenuRepository: estimateRepositoryOverride,
+    backendConfigured: backendConfigured,
     menuClassifier: classifierOverride ?? classifier,
     estimateClassifier: estimateClassifier,
     settingsStore: settingsStore,
@@ -242,7 +265,7 @@ final class FakeAppDependencies {
     externalLinkOpener: externalLinkOpener,
     menuSharer: menuSharer,
     locationService: locationService,
-    venueSearchService: venueSearchService,
+    venueSearchService: venueSearchOverride ?? venueSearchService,
     apiKeyStore: apiKeyStore,
     scannedMenuClassifier: scannedClassifierOverride ?? scannedClassifier,
     pagePicker: pagePickerOverride ?? pagePicker,
@@ -978,4 +1001,332 @@ String validScannedReply(int n, {List<int?>? pages}) {
         },
     ],
   });
+}
+
+/// A [MenuCache] kept in memory for the life of one flow, so a real
+/// `CachedMenuRepository` — or two sharing it, as `di.dart` builds them
+/// with a backend (issue #331) — behaves as it would over Hive.
+final class FlowMemoryMenuCache implements MenuCache {
+  final Map<String, CachedMenu> _entries = <String, CachedMenu>{};
+  final Set<String> _pins = <String>{};
+
+  @override
+  Future<CachedMenu?> read(VenueRef ref) async => _entries[ref.cacheKey];
+
+  @override
+  Future<void> write(CachedMenu entry) async {
+    _entries[entry.menu.venueRef.cacheKey] = entry;
+  }
+
+  @override
+  Future<void> clear() async {
+    _entries.clear();
+    _pins.clear();
+  }
+
+  @override
+  Future<int> size() async => _entries.length;
+
+  @override
+  Future<List<CachedMenuEntry>> entries() async => [
+    for (final entry in _entries.values)
+      CachedMenuEntry.summarise(
+        entry,
+        pinned: _pins.contains(entry.menu.venueRef.cacheKey),
+      ),
+  ];
+
+  @override
+  Future<int> count() async => _entries.length;
+
+  @override
+  Future<void> remove(VenueRef ref) async {
+    _entries.remove(ref.cacheKey);
+    _pins.remove(ref.cacheKey);
+  }
+
+  @override
+  Future<void> pin(VenueRef ref, {bool pinned = true}) async {
+    if (!pinned) {
+      _pins.remove(ref.cacheKey);
+    } else if (_entries.containsKey(ref.cacheKey)) {
+      _pins.add(ref.cacheKey);
+    }
+  }
+
+  @override
+  Future<bool> isPinned(VenueRef ref) async => _pins.contains(ref.cacheKey);
+}
+
+/// The backend URL [wireBackendBuild] compiles in.
+const String flowBackendUrl = 'http://localhost:8000';
+
+/// The host of [flowBackendUrl].
+const String flowBackendHost = 'localhost';
+
+/// Wolt's consumer API host, which the direct Wolt adapter reads.
+const String flowWoltHost = 'consumer-api.wolt.com';
+
+/// Google's Gemini API host, which a phone's own key reaches.
+const String flowGeminiHost = 'generativelanguage.googleapis.com';
+
+/// A scripted network for the D25 flows (issue #331): KetoClub's backend
+/// at [flowBackendUrl], Wolt's consumer API and Google's Gemini API, as
+/// one `MockClient` that records every request.
+///
+/// The backend answers the routes the thin client calls — `GET
+/// /v1/venues/nearby` with [venues], `GET /v1/venue-menus/wolt/{slug}` with
+/// [menu] and a model analysis of it under the request's options, and
+/// `POST /v1/classify` with a model analysis of the posted menu — the way
+/// `backend_plan.md` §3.3 specifies them; anything else is a 404. Wolt
+/// answers [menu] as an assortment. Gemini answers every dish
+/// order-as-is. [backendReachable] and [woltReachable] false make that
+/// host throw the `ClientException` an unreachable server produces.
+final class FlowBackendNetwork {
+  /// Creates a network serving [menu] for every venue, and [venues] from
+  /// the nearby search.
+  new({
+    required this.menu,
+    this.venues = const <Venue>[],
+    this.backendReachable = true,
+    this.woltReachable = true,
+  });
+
+  /// The menu every venue has. Its dish ids are the ones Wolt's items
+  /// carry, so a menu read either way names the same dishes.
+  final Menu menu;
+
+  /// What the backend's nearby search finds.
+  final List<Venue> venues;
+
+  /// Whether KetoClub's backend answers at all.
+  bool backendReachable;
+
+  /// Whether Wolt answers this device at all.
+  bool woltReachable;
+
+  /// Every request, in order.
+  final List<http.Request> requests = <http.Request>[];
+
+  /// The model name every analysis this network makes carries.
+  static const String model = 'gemini-3.5-flash';
+
+  /// The client the app's services are built over.
+  late final http.Client client = MockClient(_answer);
+
+  /// The path of every request to [host], in order.
+  List<String> pathsTo(String host) => [
+    for (final request in requests)
+      if (request.url.host == host) request.url.path,
+  ];
+
+  Future<http.Response> _answer(http.Request request) async {
+    requests.add(request);
+    final host = request.url.host;
+    if (host == flowBackendHost) {
+      if (!backendReachable) {
+        throw http.ClientException('connection refused', request.url);
+      }
+      return _backend(request);
+    }
+    if (host == flowWoltHost) {
+      if (!woltReachable) {
+        throw http.ClientException('connection refused', request.url);
+      }
+      return _json(_assortment());
+    }
+    if (host == flowGeminiHost) return _json(_geminiReply());
+    return http.Response('unexpected host', 599);
+  }
+
+  http.Response _backend(http.Request request) {
+    final path = request.url.path;
+    if (request.method == 'GET' && path == '/v1/venues/nearby') {
+      return _json(<String, Object?>{
+        'venues': [for (final venue in venues) venue.toJson()],
+      });
+    }
+    if (request.method == 'GET' && path.startsWith('/v1/venue-menus/wolt/')) {
+      final query = request.url.queryParametersAll;
+      final options = AnalysisOptionsSnapshot(
+        netCarbLimitGrams: int.parse(query['netCarbLimitGrams']!.single),
+        dietaryConstraints: query['constraints'] ?? const <String>[],
+      );
+      return _json(<String, Object?>{
+        'menu': menu.toJson(),
+        'analysis': _analysisOf(menu, options).toJson(),
+        'fromCache': false,
+        'fetchedAt': menu.fetchedAt.toIso8601String(),
+      });
+    }
+    if (request.method == 'POST' && path == '/v1/classify') {
+      final body = jsonDecode(request.body) as Map<String, Object?>;
+      final posted = Menu.tryFrom(body['menu']! as Map<String, Object?>)!;
+      final options = AnalysisOptionsSnapshot.tryFrom(
+        body['options']! as Map<String, Object?>,
+      )!;
+      return _json(<String, Object?>{
+        'analysis': _analysisOf(posted, options).toJson(),
+      });
+    }
+    return http.Response(
+      jsonEncode(<String, Object?>{'reason': 'notFound', 'status_code': 404}),
+      404,
+    );
+  }
+
+  /// A model analysis placing every dish of [of] as order-as-is under
+  /// [options], as the backend's Gemini call would.
+  MenuAnalysed _analysisOf(Menu of, AnalysisOptionsSnapshot options) =>
+      MenuAnalysed(
+        dishes: [
+          for (final dish in of.allDishes)
+            AnalysedDish(
+              dishId: dish.id,
+              name: dish.name,
+              verdict: DishVerdict.orderAsIs,
+              why: 'Protein and fat, no starch.',
+            ),
+        ],
+        unclassified: const <String>[],
+        engine: const LlmEngine(model: model),
+        analysedAt: FlowFakeClock().now(),
+        options: options,
+        schemaVersion: MenuResponseParser.schemaVersion,
+      );
+
+  /// [menu] in Wolt's consumer-assortment shape.
+  Map<String, Object?> _assortment() => <String, Object?>{
+    'categories': [
+      for (final category in menu.categories)
+        <String, Object?>{
+          'id': category.id,
+          'name': category.name,
+          'item_ids': [for (final dish in category.dishes) dish.id],
+        },
+    ],
+    'items': [
+      for (final dish in menu.allDishes)
+        <String, Object?>{
+          'id': dish.id,
+          'name': dish.name,
+          'description': dish.description,
+          'price': (dish.price * 100).round(),
+        },
+    ],
+    'options': const <Object?>[],
+  };
+
+  /// Gemini's reply placing every dish of [menu] as order-as-is.
+  Map<String, Object?> _geminiReply() => <String, Object?>{
+    'candidates': [
+      <String, Object?>{
+        'finishReason': 'STOP',
+        'content': <String, Object?>{
+          'parts': [
+            <String, Object?>{
+              'text': jsonEncode(<String, Object?>{
+                'dishes': [
+                  for (final dish in menu.allDishes)
+                    <String, Object?>{
+                      'id': dish.id,
+                      'name': dish.name,
+                      'verdict': 'orderAsIs',
+                      'why': 'Protein and fat, no starch.',
+                      'modification': null,
+                      'net_carbs_estimate': 2,
+                    },
+                ],
+              }),
+            },
+          ],
+        },
+      },
+    ],
+    'modelVersion': model,
+  };
+
+  static http.Response _json(Map<String, Object?> body) => http.Response(
+    jsonEncode(body),
+    200,
+    headers: const <String, String>{
+      'content-type': 'application/json; charset=utf-8',
+    },
+  );
+}
+
+/// Wires [fakes] the way `di.dart` wires a phone build compiled with
+/// [flowBackendUrl] (architecture.md D25, issue #331), over [client]: the
+/// same selectors, a real `CachedMenuRepository` over [menuAdaptersFor]
+/// and a second one over the direct Wolt adapter for the quick score,
+/// sharing one [FlowMemoryMenuCache]; a real `RoutingMenuClassifier` over
+/// [llmClassifierFor] with the phone's own `LlmMenuClassifier` behind it;
+/// and [venueSearchFor] over the direct Wolt search. [apiKeyStore] is the
+/// user's key store, empty unless given.
+void wireBackendBuild(
+  FakeAppDependencies fakes,
+  http.Client client, {
+  ApiKeyStore? apiKeyStore,
+}) {
+  final base = backendBaseUrl(flowBackendUrl);
+  final installIds = FlowFakeInstallIdStore();
+  final keys = apiKeyStore ?? FlowFakeApiKeyStore();
+  final proxyBase = menuProxyBase(
+    runsInBrowser: false,
+    configured: flowBackendUrl,
+  );
+  Future<ClassificationOptions> readOptions() async =>
+      ClassificationOptions.fromSettings(await fakes.settingsStore.read());
+  final direct = <PlatformMenuAdapter>[
+    WoltMenuAdapter(client: client, proxyBase: proxyBase, runsInBrowser: false),
+  ];
+  final cache = FlowMemoryMenuCache();
+  fakes
+    ..apiKeyStore = keys
+    ..backendConfigured = base != null
+    ..repositoryOverride = CachedMenuRepository(
+      adapters: menuAdaptersFor(
+        backendBase: base,
+        client: client,
+        installIdStore: installIds,
+        readOptions: readOptions,
+        direct: direct,
+      ),
+      cache: cache,
+      clock: fakes.clock,
+    )
+    ..estimateRepositoryOverride = CachedMenuRepository(
+      adapters: direct,
+      cache: cache,
+      clock: fakes.clock,
+    )
+    ..classifierOverride = RoutingMenuClassifier(
+      llmClassifierFor(
+        backendBase: base,
+        client: client,
+        installIdStore: installIds,
+        device: LlmMenuClassifier(
+          deviceChatClientFor(
+            client: client,
+            apiKeyStore: keys,
+            backendBase: base,
+            installIdStore: installIds,
+          ),
+          fakes.clock,
+        ),
+      ),
+      HeuristicMenuClassifier(clock: fakes.clock),
+      fakes.connectivity,
+    )
+    ..venueSearchOverride = venueSearchFor(
+      backendBase: base,
+      client: client,
+      installIdStore: installIds,
+      direct: WoltVenueSearchService(
+        client: client,
+        installIdStore: installIds,
+        proxyBase: proxyBase,
+        runsInBrowser: false,
+      ),
+    );
 }

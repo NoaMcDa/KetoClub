@@ -662,8 +662,9 @@ void main() {
       // Act
       final result = await repository.load(websiteRef, forceRefresh: true);
 
-      // Assert: the caller gets the menu; the cache holds both.
-      expect(result, MenuFetched(menu: menu));
+      // Assert: the caller gets the menu and the analysis that came with
+      // it (issue #331); the cache holds both.
+      expect(result, MenuFetched(menu: menu, analysis: analysis));
       final cached = await cache.read(websiteRef);
       expect(cached?.menu, menu);
       expect(cached?.analysis, analysis);

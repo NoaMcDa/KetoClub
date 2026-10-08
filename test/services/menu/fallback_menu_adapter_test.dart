@@ -250,6 +250,78 @@ void main() {
       );
     });
 
+    test('a usePrimary that says no sends the fetch to the fallback only, '
+        'and its failure is the answer (issue #331)', () async {
+      // Arrange: the AI consent is withheld, so the backend is not asked.
+      var asked = 0;
+      final gated = FallbackMenuAdapter(
+        primary: primary,
+        fallback: fallback,
+        usePrimary: () async {
+          asked++;
+          return false;
+        },
+      );
+      fallback.queueFailed(MenuFetchFailureReason.notFound);
+
+      // Act
+      final result = await gated.fetch(_woltRef);
+
+      // Assert
+      expect(asked, 1);
+      expect(primary.fetchCalls, isEmpty);
+      expect(fallback.fetchCalls, <VenueRef>[_woltRef]);
+      expect(
+        result,
+        const MenuFetchFailed(reason: MenuFetchFailureReason.notFound),
+      );
+    });
+
+    test('a usePrimary that says yes asks the primary first', () async {
+      // Arrange
+      final gated = FallbackMenuAdapter(
+        primary: primary,
+        fallback: fallback,
+        usePrimary: () async => true,
+      );
+      primary.queueFetched(_menu('primary'));
+
+      // Act
+      final result = await gated.fetch(_woltRef);
+
+      // Assert
+      expect((result as MenuFetched).menu.venueName, 'primary');
+      expect(fallback.fetchCalls, isEmpty);
+    });
+
+    test(
+      'usePrimary is not asked for a ref the primary cannot handle',
+      () async {
+        // Arrange
+        var asked = 0;
+        final gated = FallbackMenuAdapter(
+          primary: _SelectiveAdapter(handles: false),
+          fallback: fallback,
+          usePrimary: () async {
+            asked++;
+            return true;
+          },
+        );
+        fallback.queueFetched(_menu('fallback'));
+
+        // Act
+        final result = await gated.fetch(_woltRef);
+
+        // Assert
+        expect((result as MenuFetched).menu.venueName, 'fallback');
+        expect(asked, 0);
+      },
+    );
+
+    test('usePrimary defaults to always', () async {
+      expect(await adapter.usePrimary(), isTrue);
+    });
+
     test('defaults to BackendMenuAdapter.shouldFallBack', () {
       expect(
         identical(adapter.shouldFallBack, BackendMenuAdapter.shouldFallBack),

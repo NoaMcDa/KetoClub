@@ -1,4 +1,4 @@
-# KetoClub — handoff after Phase 1, the Phase 3 backend, Phase 2, Phase 4's scan core, and Phase 8
+# KetoClub — handoff after Phase 1, the Phase 3 backend, Phase 2, Phase 4's scan core, Phase 8 and D25
 
 Written at the end of the session that built Phase 1, updated at the close of
 issue #36 after a second wave of parallel work substantially extended it,
@@ -9,7 +9,9 @@ screen, platform setup, and a run of features beyond those) has landed on top
 of both, again for Phase 4's menu-scanning core (paste, photographs, PDF),
 and once more for Phase 8 (the UI/UX review's 44 issues, #221–#264, built in
 parallel on the `phase-8` branch and opened as PR #266), and for the menu
-history and the shared menu store that followed it (#305, #306; D23, D24).
+history and the shared menu store that followed it (#305, #306; D23, D24), and
+for D25, the backend serving complete results to every platform (#318, #319,
+#320–#335, branch `claude/d25-wave-4`).
 It says what exists, what is deliberately unfinished, and which
 mistakes are already paid for so nobody pays for them twice.
 
@@ -21,6 +23,56 @@ request.
 ---
 
 ## What shipped
+
+**D25 — the backend serves complete results on every platform; the device is
+the fallback (#318, #319; sub-issues #320–#335, waves 0–4 on
+`claude/d25-wave-4`).** Read `architecture.md` D25 first; `backend_plan.md`
+§3.3 is the route contract; `backend/README.md` the operator's view. In short:
+
+- **Seven new routes**, camelCase bodies carrying the Dart `Menu`,
+  `MenuAnalysed` and `Venue` JSON: `GET /v1/venue-menus/{wolt|tenbis}/{id}`,
+  `POST /v1/classify`, `/v1/scan`, `/v1/text-menu`, `/v1/website-menu`,
+  `GET /v1/venues/nearby`, `POST /v1/venues/search`. A new `analysis_cache`
+  table (LLM analyses only, 7 days) and a new per-install **analysis bucket**
+  (10/minute, 60/day, spent only on a real Gemini call) back them; four new
+  settings, `ANALYSIS_CACHE_TTL_SECONDS`, `ANALYSIS_RATE_LIMIT_PER_MINUTE`,
+  `ANALYSIS_RATE_LIMIT_PER_DAY` and `CLASSIFY_MAX_BODY_BYTES`.
+- **A Python port of the Dart menu logic** (`backend/app/keto`, `platforms`,
+  `website`): vocabulary, normaliser, fingerprint, rules, heuristic, prompt,
+  parser, text menu, dish kind, score, the Wolt/10bis/venue mappers, the website
+  locator. **Dart is the source of truth.** `tool/golden` runs the real Dart code
+  over a fixed corpus and writes 14 documents to
+  `backend/tests/fixtures/golden/`; `test/golden/golden_drift_test.dart` fails CI
+  when they drift (`flutter test --dart-define=UPDATE_GOLDEN=true test/golden`
+  regenerates); `backend/tests/test_golden_*.py` replay every entry exactly.
+  Building the corpus found a Dart bug, fixed in #320: the 300-unit caps could cut
+  a surrogate pair in half.
+- **The thin client** (#327–#331): `BackendMenuAdapter` and `FallbackMenuAdapter`
+  (`services/menu/`), `BackendMenuClassifier`, `BackendScannedMenuClassifier` and
+  `fallback_classifiers.dart` (`services/classifier/`),
+  `BackendVenueSearchService` with `FallbackVenueSearchService`
+  (`services/venue/`), `FallbackChatClient` (`services/llm/`). `di.dart` builds
+  each chain from the backend URL on **every** platform, behind the routers that
+  check consent and connectivity first; with no URL it builds exactly the pre-D25
+  graph. A menu fetch uses the backend only with the AI consent
+  (`FallbackMenuAdapter.usePrimary`). Discovery's quick score reads
+  `AppDependencies.estimateMenuRepository` (direct adapters, same Hive cache), so
+  it never classifies on the server. `MenuFetched.analysis` now also means "the
+  backend answered with this"; `MenuController` skips the D24 upload then.
+  `AppDependencies.backendConfigured` switches the consent, key-section and scan
+  disclosure copy (#330); there is one new scan failure string,
+  `scanScreenFailureServerNotConfigured`.
+- **Decisions the code made that the issues did not predict.** A server rules
+  result (`rules(timeout)` and so on) is an answer and is not retried on the
+  device; only "could not answer at all" falls through. `/v1/text-menu` has no
+  client caller. The server's store write can put a rules-stamped analysis over a
+  stored model one (see "Known limitations"). The analysis cache is checked
+  before it is served (same engine, schema version, options, and every verdict's
+  dish id and name must be in the menu), because its key holds only a 32-bit
+  fingerprint. Two flows prove the wiring end to end under `flutter-tester`:
+  `backend_classify_flow_test.dart` and `backend_fallback_flow_test.dart`,
+  built on `wireBackendBuild` and `FlowBackendNetwork` in `flow_support.dart`,
+  which drive `di.dart`'s own selectors with only the network scripted.
 
 **The menu history and the shared menu store (#305 → D23, #306 → D24; issues
 #307–#315, branch `claude/history-and-menu-store`).** Two epics, built
@@ -343,7 +395,25 @@ on GitHub — tooling exists for several of them, it did not close any of them.
 7. **The performance budget is unmeasured on a real device** (issue #65).
    `tool/perf_menu.dart` and its 16 ms-per-frame budget table (`tool/README.md`)
    exist; the 60-dish-fixture, real-phone, real-4G measurement itself does not.
-8. **No human has reviewed the code.** §18.6 wants a review by someone who did
+8. **No D25 result has run against a live backend** (#318, #319). The routes
+   are proven against respx-mocked Wolt and Gemini, the Python port against the
+   golden corpus and the Dart clients against fakes. Unobserved: a real
+   `/v1/venue-menus` fetch (does Wolt answer a server's address as it answers a
+   phone's? a 403 or 429 would be 502 `platformChanged`, which does **not** fall
+   back to the phone), a real `/v1/classify` and `/v1/scan` round trip with the
+   shared prompt, a real website read, and a phone built with the define talking
+   to a backend on a LAN address. `backend/README.md` step 5b has the curls. The
+   `wolt_venues` and `tenbis_menu` goldens replay **synthetic** payloads (#38,
+   #44), so the venue and 10bis ports are proven equal to the Dart mappers, not to
+   what the platforms send.
+9. **`flutter drive` could not complete in the environment that built D25** (a
+   chromedriver/Chromium mismatch: runs hang after "Debug service listening",
+   including flows that predate D25), so the two new flows are proven only under
+   `flutter test -d flutter-tester`. Run all flows once on a machine with a
+   matching browser before release. Also: the `app_launch` and `discovery_denied`
+   flows already fail under `flutter-tester` at the pre-D25 commit (`680845e`);
+   that is not a D25 regression, and it was not investigated here.
+10. **No human has reviewed the code.** §18.6 wants a review by someone who did
    not write it; none of #90, #91, the second wave, or Phase 2's run, was
    merged with one.
 
@@ -419,6 +489,25 @@ spacing values) is enforced by a test; pixel fidelity by no test at all.
   listed nowhere. A scan's Recent row outlives its only cached copy and then
   cannot open ("No longer on this device"); it can only be removed. `refresh`
   does not re-snapshot the visit's numbers.
+- **The D25 fallbacks do not cover every backend failure.** Menus fall through on
+  `backendUnreachable` and `offline` only; a platform's own non-2xx reaches the
+  user as `platformChanged`/`notFound`. A phone with a backend and no key whose
+  server then fails sees the backend's reason (`backendUnreachable`,
+  `rateLimited`), not `apiKeyMissing`, because the primary's failure is the one
+  reported unless it was `notConfigured`. After a dead backend the first call
+  costs one failed round trip before the device engine starts, up to the 120 s
+  menu timeout in the worst case.
+- **The consent copy says a position goes "to Wolt" and is "not stored" on every
+  build.** With a backend URL (web since D11, phones since D25) a search position
+  goes to KetoClub's server first and sits, at four decimals, in the key of a
+  response cached for five minutes. Not reworded (`architecture.md` §17.7).
+- **The port has two known gaps against Dart** (`backend/app/keto/rules.py`
+  and `backend/app/platforms/_dart.py` say so): Dart's `List.sort` is an unstable
+  quicksort above 33 elements and Python's is stable, so a dish with more than 33
+  rule matches and two at one offset could order its sentences differently (no
+  corpus dish reaches it); and the 10bis mapper's category-id fallback for a
+  name with no letter or digit uses a hand-ported `String.hashCode` that no
+  golden verifies.
 - **Menu uploads share the chat limiter, and the store is not hosted** (D24).
   On web `POST /v1/menus` spends the same 5/minute, 40/day bucket as
   `/v1/chat`, so a first open costs two units and an upload can push the next
@@ -563,6 +652,31 @@ this is the short list.
   clock.** And "in the cache" is not "visited": Discovery's quick score writes
   cache entries for venues never opened, so a visit is recorded only in
   `MenuController.open`, and Recent lists the history, not the cache.
+- **Any change to the Dart vocabulary, normaliser, rules, prompt or parser needs
+  `flutter test --dart-define=UPDATE_GOLDEN=true test/golden`, a copy of the new
+  `vocabulary.json` to `backend/app/keto/vocabulary.json`, and a Python replay
+  (`backend/check.sh`) (D25).** The system prompt is `/v1/chat`'s cache key, so
+  `prompt.py` must stay byte-equal; the analysis cache's key has no prompt text,
+  so a change that should retire stored analyses needs a `schemaVersion` bump
+  (weigh the D22 cost) or waits out the 7 days.
+- **Python parity (D25): `re.ASCII` for Latin `\b`, the `regex` module for
+  `\p{}`, UTF-16 code units for the 300-char caps and the fingerprint, Dart's
+  `trim` not Python's `strip`.** Also Dart's lowercasing (`İ`→`i`, no final
+  sigma), `toStringAsFixed(1)` ties-up for the score, half-away-from-zero
+  `round()`, VM `num.toString()` for 10bis ids and `Uri.toString()` escapes for
+  website links. `normalise` is not idempotent (`Ÿ`→`ÿ`→`y`); keep it so.
+  `jsonDecode` rejects NaN/Infinity, so Python uses `parse_constant`.
+- **A fallback chain falls through only when the backend could not answer
+  (D25), and its `switch`es have no `default`.** Menus: `backendUnreachable`,
+  `offline`. Classifiers, scans, chat: `notConfigured`, `backendUnreachable`,
+  `timeout`, `rateLimited`. Venue search: `backendUnreachable`, `timeout`,
+  `rateLimited`. A new failure reason must be placed deliberately.
+- **Quick score reads `estimateMenuRepository`, not `menuRepository` (D25).**
+  Pointing it at the backend-routed one classifies every Discovery card on the
+  server.
+- **Each D25 route name is pinned to one client file** by the architecture test
+  (`/v1/venues/nearby` is written in full because a bare `/v1/venues/` is a
+  substring of Wolt's own path). `/v1/text-menu` is not pinned: nothing calls it.
 - **Never put the install id beside content (D24).** `/v1/menus` reads it for
   rate limiting and deletes it; `stored_menus` has no column for it and no log
   line carries it.
@@ -576,7 +690,7 @@ this is the short list.
 
 ## Where the reasoning lives
 
-- `architecture.md` §14 — the decisions log, now D1 to D18, each
+- `architecture.md` §14 — the decisions log, now D1 to D25, each
   recording what was decided, why, and what it supersedes. The `(Phase 1)` markers throughout
   were added across both waves of that work. D10 was rewritten in place, not
   appended to: it first recorded that a connectivity pre-check was deliberately
@@ -588,6 +702,10 @@ this is the short list.
   (Phase 2, issue #41/#42) records what a Discovery venue card may claim before
   its menu is opened — a score and counts only for venues already cached on the
   device, nothing fetched on load or scroll.
+- D25 (`architecture.md` §14) is the newest entry: its "What it accepts" and
+  "What it costs" lists are the honest summary of the risk (Wolt and a server's
+  address, the two copies of the logic, the unhosted backend). `backend_plan.md`
+  §3.3 is the route contract and §4 item 9 the client seams.
 - `architecture.md` §17 — open questions, each with the default the code
   follows. Open question 1 ("which OpenRouter model to pin") is closed as posed
   by D12 — there is no OpenRouter model any more — but the pre-release

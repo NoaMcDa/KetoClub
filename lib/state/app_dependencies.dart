@@ -69,6 +69,11 @@ class AppDependencies {
   /// [backendConfigured] defaults to false, which is also the no-backend
   /// build's real value; `di.dart` passes whether a backend URL is set
   /// (issue #330).
+  ///
+  /// [estimateMenuRepository] defaults to [menuRepository], which is also
+  /// the no-backend build's real value; with a backend `di.dart` passes a
+  /// repository over the direct adapters sharing the same cache (issue
+  /// #331).
   const new({
     required this.menuRepository,
     required this.menuClassifier,
@@ -95,10 +100,17 @@ class AppDependencies {
     this.visitHistory = const NoVisitHistoryStore(),
     this.menuStoreClient = const NoMenuStoreClient(),
     this.backendConfigured = false,
-  });
+    MenuRepository? estimateMenuRepository,
+  }) : estimateMenuRepository = estimateMenuRepository ?? menuRepository;
 
   /// Loads a venue's menu, cache first (architecture.md §6.1).
   final MenuRepository menuRepository;
+
+  /// Loads a venue's menu for Discovery's quick score (D13, D21): the
+  /// same cache as [menuRepository], but read through the device's own
+  /// adapters only, so a quick score never asks KetoClub's backend to
+  /// classify a menu (D25, issue #331).
+  final MenuRepository estimateMenuRepository;
 
   /// Classifies a whole menu in one call, LLM first and rules as the
   /// fallback (architecture.md §6.2).

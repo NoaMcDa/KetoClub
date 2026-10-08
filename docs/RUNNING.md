@@ -22,9 +22,11 @@ backend) are in `docs/RUNNING_IOS.md`.
 
 ## 1. The app on its own (no backend)
 
-The backend is for the web build only (`architecture.md` D11, D17). iOS and
-Android never call it, even when it is configured: they call Wolt and
-Google's Gemini API themselves. What each platform can reach with no backend:
+With no `KETOCLUB_BACKEND_URL` the backend plays no part on any platform:
+iOS and Android call Wolt and Google's Gemini API themselves (D17) and the web
+build can reach neither. (With a backend configured, every platform asks it
+first and falls back to what this table says, D25: see §2 and §3.) What each
+platform can reach with no backend:
 
 | Platform | Menus (Wolt, 10bis) | Nearby / by-name search | AI analysis | Scan tab (camera, photos, PDF, QR codes) |
 |---|---|---|---|---|
@@ -53,8 +55,14 @@ flutter run -d <device-id>  # phone or simulator; `flutter devices` lists ids
 
 The backend gives the web build live menus and search (it forwards the
 requests Wolt and 10bis refuse from a browser) and AI analysis, because it
-holds the Gemini key server-side, so the browser never holds one (D12). Phones
-do not use it (D17).
+holds the Gemini key server-side, so the browser never holds one (D12). Since
+D25 it also **serves complete results to every platform built with its URL**,
+phones included: a menu and its analysis in one request (`/v1/venue-menus`),
+a pasted or fetched website menu (`/v1/website-menu`), a scan (`/v1/scan`), an
+analysis of a menu the app already holds (`/v1/classify`) and venue search
+(`/v1/venues/…`). A phone asks it first and uses Wolt and its own Gemini key
+only when the backend cannot answer, so a phone with a backend needs no key
+of its own while the backend is up.
 
 ```bash
 cd backend
@@ -67,9 +75,19 @@ Check it: `curl http://localhost:8000/v1/health` → `{"status":"ok","version":�
 "llm_configured":true}` (`false` means `GEMINI_API_KEY` is unset; the app then
 falls back to the rules engine and says so).
 
-Everything else in `.env` has a safe default. `DATABASE_URL` defaults to a
+Everything else in `.env` has a safe default. Four variables govern the D25
+routes (`backend/README.md` and `.env.example` have the full text):
+
+| Variable | Default | What it sets |
+|---|---|---|
+| `ANALYSIS_CACHE_TTL_SECONDS` | `604800` (7 days) | how long a complete language-model analysis is reused for the same dish text, model and options |
+| `ANALYSIS_RATE_LIMIT_PER_MINUTE` | `10` | per install id, Gemini calls made for the D25 routes (a cache hit or a rules-only answer is free) |
+| `ANALYSIS_RATE_LIMIT_PER_DAY` | `60` | the same, per day |
+| `CLASSIFY_MAX_BODY_BYTES` | `786432` (768 KiB) | largest `POST /v1/classify` body; larger is refused with 413 |
+
+`DATABASE_URL` defaults to a
 local SQLite file (`backend/ketoclub.db`, gitignored) holding the
-menu/search/completion caches and, since #310, the `stored_menus` table: the
+menu/search/completion/analysis caches and, since #310, the `stored_menus` table: the
 anonymous shared store of opened menus behind `POST /v1/menus`, keyed by
 venue and never by install id. Two variables govern it:
 `MENU_STORE_ENABLED` (default `true`; `false` unmounts the routes, which then
@@ -78,15 +96,28 @@ upload is refused with 413). The tables are created on startup, so an
 existing `ketoclub.db` gains `stored_menus` the next time the backend starts.
 `backend/README.md` documents every route, error and cache.
 
-## 3. The web app talking to the backend
+## 3. The app talking to the backend
 
 The backend URL is compiled in with a `--dart-define`; there is no in-app
-setting for it. Only the web build reads it: a phone build ignores it (D17).
+setting for it. Every platform reads it since D25 (a phone ignored it between
+D17 and D25).
 
 ```bash
 # web, backend on the same machine
 flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
+
+# a phone: the backend must listen beyond localhost and the phone must reach it
+cd backend && uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
+flutter run -d <device-id> --dart-define=KETOCLUB_BACKEND_URL=http://<lan-ip>:8000
 ```
+
+On a phone with the define, dish text, scan pages and venue-search positions
+go to the backend first; the Gemini key field in Settings stays and says the
+key is used only if the server cannot be reached. An iOS device on a plain
+`http://` LAN address needs the ATS exception in `docs/RUNNING_IOS.md`.
+Nothing is sent to the analysis routes without the AI-analysis consent
+(Settings, on by default): without it the app reads and classifies on the
+device exactly as it does with no backend.
 
 Then in the app: **AI analysis is on by default** on a fresh install (D16,
 issue #167). On first launch a one-off disclosure banner on the Discovery
@@ -110,7 +141,7 @@ flutter build ios --no-codesign  # needs Xcode
 ```
 
 Add the same `--dart-define=KETOCLUB_BACKEND_URL=…` to a build that should
-talk to a backend.
+talk to a backend — any platform, since D25.
 
 ### Web shell: path URLs, splash and tab titles (issue #226)
 
@@ -189,7 +220,8 @@ for issue #38, and `backend/README.md` the 10bis curl for issue #44.
 | Web: "AI analysis is not available on this build or server" | no backend URL compiled in, or `GEMINI_API_KEY` unset | §3 / `.env` |
 | Phone: "Add your Gemini API key in Settings" | no key saved | §1, "AI analysis on a phone" |
 | Phone: "Gemini rejected your API key" | the saved key is wrong, revoked, or not enabled for the Gemini API | paste a fresh key from Google AI Studio |
-| "Showing rule-based results" after a wait | web: backend unreachable or Gemini timed out; phone: Gemini timed out | web: `curl /v1/health` |
+| "Showing rule-based results" after a wait | web: backend unreachable or Gemini timed out; phone: Gemini timed out, or (with a backend) the backend and then your key both failed | web or phone with a backend: `curl /v1/health` |
+| Phone with a backend: menus load but "AI" never shows, or the Wolt menu says Wolt changed its format | the backend answered but Wolt refused its address (502 `platformChanged` does not fall back to the phone), or its analysis bucket (10/min, 60/day) is empty and you have no key | read the backend log; `backend/README.md` step 5b |
 | Nearby search says "blocked by browser" | web without a backend | §3 |
 | Scan tab (web): "Scanning needs KetoClub's server" | no backend URL compiled in | §2 and §3; pasting the menu text works without it |
 | Scan tab (phone): "Add your Gemini API key in Settings" | no key saved; pages go straight to Gemini | §1, "AI analysis on a phone" |

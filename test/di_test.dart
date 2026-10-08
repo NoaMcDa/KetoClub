@@ -1,16 +1,29 @@
+import 'dart:typed_data';
+
 import 'package:flutter/widgets.dart' show GlobalKey, NavigatorState;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:ketoclub/di.dart';
+import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/failures.dart';
+import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/classifier_router.dart';
+import 'package:ketoclub/services/classifier/fallback_classifiers.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
+import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/scanned_classifier_router.dart';
 import 'package:ketoclub/services/community/menu_store_client.dart';
 import 'package:ketoclub/services/llm/backend_chat_client.dart';
+import 'package:ketoclub/services/llm/fallback_chat_client.dart';
 import 'package:ketoclub/services/llm/gemini_chat_client.dart';
 import 'package:ketoclub/services/location/geolocator_location_service.dart';
+import 'package:ketoclub/services/menu/backend/backend_menu_adapter.dart';
+import 'package:ketoclub/services/menu/fallback_menu_adapter.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
+import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/menu/website/backend_website_fetcher.dart';
 import 'package:ketoclub/services/menu/website/direct_website_fetcher.dart';
 import 'package:ketoclub/services/platform/app_info.dart';
@@ -27,12 +40,60 @@ import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/storage/visit_history_store.dart';
+import 'package:ketoclub/services/venue/backend_venue_search_service.dart';
 import 'package:ketoclub/services/venue/wolt/wolt_venue_search_service.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/widgets/mobile_qr_scanner.dart';
 
 import 'fakes/fake_api_key_store.dart';
 import 'fakes/fake_install_id_store.dart';
+import 'fakes/fake_menu_classifier.dart';
+import 'fakes/fake_platform_menu_adapter.dart';
+import 'fakes/fake_scanned_menu_classifier.dart';
+import 'fakes/fake_venue_search_service.dart';
+
+/// The backend address every "with a URL" case configures.
+final Uri _base = Uri.parse('http://localhost:8000');
+
+/// A client that records every request and answers none: each throws the
+/// `ClientException` an unreachable backend produces.
+final class _UnreachableNetwork {
+  /// Every request, in order.
+  final List<http.BaseRequest> requests = <http.BaseRequest>[];
+
+  /// The client the services under test are built over.
+  late final http.Client client = MockClient((request) async {
+    requests.add(request);
+    throw http.ClientException('unreachable', request.url);
+  });
+
+  /// The host and path of every request, in order.
+  List<String> get targets => [
+    for (final r in requests) '${r.url.host}${r.url.path}',
+  ];
+}
+
+/// A one-dish menu to classify.
+final Menu _menu = Menu(
+  venueRef: const VenueRef(source: MenuSource.wolt, platformId: 'hamosad'),
+  currency: 'ILS',
+  fetchedAt: DateTime.utc(2026),
+  categories: const <MenuCategory>[
+    MenuCategory(
+      id: 'c1',
+      name: 'Mains',
+      dishes: <Dish>[
+        Dish(
+          id: 'd1',
+          name: 'Entrecote',
+          description: '',
+          price: 98,
+          options: <DishOption>[],
+        ),
+      ],
+    ),
+  ],
+);
 
 void main() {
   group('buildDependencies', () {
@@ -84,6 +145,16 @@ void main() {
       final menuStore = dependencies.menuStoreClient as BackendMenuStoreClient;
       expect(menuStore.baseUrl, isNull);
       expect(menuStore.isConfigured, isFalse);
+      // No backend URL: nothing goes to a backend first (issue #331), and
+      // the quick score shares the menu screen's repository.
+      expect(dependencies.backendConfigured, isFalse);
+      expect(
+        identical(
+          dependencies.estimateMenuRepository,
+          dependencies.menuRepository,
+        ),
+        isTrue,
+      );
     });
 
     test('performs no plugin I/O while building the graph', () {
@@ -212,14 +283,82 @@ void main() {
     });
   });
 
-  group('chatClientFor (architecture.md D17)', () {
-    test('with a key store calls Gemini directly, ignoring a configured '
-        'backend', () {
+  group('deviceChatClientFor (architecture.md D17, D25)', () {
+    test(
+      'with a key store calls Gemini directly, ignoring a configured '
+      'backend: the backend was already asked by the classifier in front',
+      () {
+        // Act
+        final client = deviceChatClientFor(
+          client: http.Client(),
+          apiKeyStore: FakeApiKeyStore(),
+          backendBase: _base,
+          installIdStore: FakeInstallIdStore(),
+        );
+
+        // Assert
+        expect(client, isA<GeminiChatClient>());
+      },
+    );
+
+    test('with no key store goes through the backend', () {
+      // Act
+      final client = deviceChatClientFor(
+        client: http.Client(),
+        apiKeyStore: null,
+        backendBase: _base,
+        installIdStore: FakeInstallIdStore(),
+      );
+
+      // Assert
+      expect(client, isA<BackendChatClient>());
+      expect((client as BackendChatClient).baseUrl, _base);
+    });
+
+    test('with no key store and no backend is a backend client that '
+        'answers notConfigured', () {
+      // Act
+      final client = deviceChatClientFor(
+        client: http.Client(),
+        apiKeyStore: null,
+        backendBase: null,
+        installIdStore: FakeInstallIdStore(),
+      );
+
+      // Assert
+      expect((client as BackendChatClient).baseUrl, isNull);
+    });
+  });
+
+  group('chatClientFor (architecture.md D17, D25)', () {
+    test('a phone with a backend asks the backend first and its own key '
+        'second', () async {
+      // Arrange
+      final network = _UnreachableNetwork();
+
+      // Act
+      final client = chatClientFor(
+        client: network.client,
+        apiKeyStore: FakeApiKeyStore(seed: 'AIza-test'),
+        backendBase: _base,
+        installIdStore: FakeInstallIdStore(),
+      );
+      await client.complete(systemPrompt: 's', userPrompt: 'u');
+
+      // Assert: the backend, unreachable, then Google with the key.
+      expect(client, isA<FallbackChatClient>());
+      expect(network.requests.map((r) => r.url.host), <String>[
+        'localhost',
+        'generativelanguage.googleapis.com',
+      ]);
+    });
+
+    test('a phone with no backend calls Gemini directly (D17)', () {
       // Act
       final client = chatClientFor(
         client: http.Client(),
         apiKeyStore: FakeApiKeyStore(),
-        backendBase: Uri.parse('http://localhost:8000'),
+        backendBase: null,
         installIdStore: FakeInstallIdStore(),
       );
 
@@ -227,25 +366,21 @@ void main() {
       expect(client, isA<GeminiChatClient>());
     });
 
-    test('with no key store goes through the backend', () {
-      // Arrange
-      final base = Uri.parse('http://localhost:8000');
-
+    test('a browser with a backend goes through it', () {
       // Act
       final client = chatClientFor(
         client: http.Client(),
         apiKeyStore: null,
-        backendBase: base,
+        backendBase: _base,
         installIdStore: FakeInstallIdStore(),
       );
 
       // Assert
-      expect(client, isA<BackendChatClient>());
-      expect((client as BackendChatClient).baseUrl, base);
+      expect((client as BackendChatClient).baseUrl, _base);
     });
 
-    test('with no key store and no backend is a backend client that '
-        'answers notConfigured', () {
+    test('a browser with no backend is a backend client that answers '
+        'notConfigured', () {
       // Act
       final client = chatClientFor(
         client: http.Client(),
@@ -256,6 +391,250 @@ void main() {
 
       // Assert
       expect((client as BackendChatClient).baseUrl, isNull);
+    });
+  });
+
+  group('llmClassifierFor (D25)', () {
+    test('with no backend is the device engine itself', () {
+      // Arrange
+      final device = FakeMenuClassifier();
+
+      // Act
+      final classifier = llmClassifierFor(
+        backendBase: null,
+        client: http.Client(),
+        installIdStore: FakeInstallIdStore(),
+        device: device,
+      );
+
+      // Assert
+      expect(identical(classifier, device), isTrue);
+    });
+
+    test('with a backend asks its classify route first, then the device '
+        'engine when it cannot be reached', () async {
+      // Arrange
+      final network = _UnreachableNetwork();
+      final device = FakeMenuClassifier();
+
+      // Act
+      final classifier = llmClassifierFor(
+        backendBase: _base,
+        client: network.client,
+        installIdStore: FakeInstallIdStore(),
+        device: device,
+      );
+      final result = await classifier.classify(_menu);
+
+      // Assert
+      expect(classifier, isA<FallbackMenuClassifier>());
+      expect(network.targets, <String>['localhost/v1/classify']);
+      expect(device.calls, hasLength(1));
+      expect(result, isA<MenuAnalysed>());
+    });
+  });
+
+  group('scannedClassifierFor (D15, D25)', () {
+    final scan = ScannedMenu(
+      pages: <ScannedPage>[
+        ScannedPage(
+          mimeType: ScannedPage.jpeg,
+          bytes: Uint8List.fromList(<int>[1, 2, 3]),
+        ),
+      ],
+    );
+
+    test('with no backend is the device engine itself', () {
+      // Arrange
+      final device = FakeScannedMenuClassifier();
+
+      // Act
+      final classifier = scannedClassifierFor(
+        backendBase: null,
+        client: http.Client(),
+        installIdStore: FakeInstallIdStore(),
+        device: device,
+      );
+
+      // Assert
+      expect(identical(classifier, device), isTrue);
+    });
+
+    test('with a backend asks its scan route first, then the device engine '
+        'when it cannot be reached', () async {
+      // Arrange
+      final network = _UnreachableNetwork();
+      final device = FakeScannedMenuClassifier();
+
+      // Act
+      final classifier = scannedClassifierFor(
+        backendBase: _base,
+        client: network.client,
+        installIdStore: FakeInstallIdStore(),
+        device: device,
+      );
+      await classifier.classify(
+        scan,
+        options: const ClassificationOptions(estimationConsentGiven: true),
+      );
+
+      // Assert
+      expect(classifier, isA<FallbackScannedMenuClassifier>());
+      expect(network.targets, <String>['localhost/v1/scan']);
+      expect(device.calls, hasLength(1));
+    });
+  });
+
+  group('venueSearchFor (D13, D25)', () {
+    test('with no backend is the direct search itself', () {
+      // Arrange
+      final direct = FakeVenueSearchService();
+
+      // Act
+      final service = venueSearchFor(
+        backendBase: null,
+        client: http.Client(),
+        installIdStore: FakeInstallIdStore(),
+        direct: direct,
+      );
+
+      // Assert
+      expect(identical(service, direct), isTrue);
+    });
+
+    test('with a backend asks it first and the direct search second', () {
+      // Arrange
+      final direct = FakeVenueSearchService();
+
+      // Act
+      final service = venueSearchFor(
+        backendBase: _base,
+        client: http.Client(),
+        installIdStore: FakeInstallIdStore(),
+        direct: direct,
+      );
+
+      // Assert
+      final fallback = service as FallbackVenueSearchService;
+      final primary = fallback.primary as BackendVenueSearchService;
+      expect(primary.baseUrl, _base);
+      expect(identical(fallback.fallback, direct), isTrue);
+    });
+  });
+
+  group('menuAdaptersFor (D25)', () {
+    late List<PlatformMenuAdapter> direct;
+
+    setUp(() {
+      direct = <PlatformMenuAdapter>[
+        FakePlatformMenuAdapter(),
+        FakePlatformMenuAdapter(source: MenuSource.tenbis),
+        FakePlatformMenuAdapter(source: MenuSource.website),
+      ];
+    });
+
+    test('with no backend are the direct adapters themselves', () {
+      // Act
+      final adapters = menuAdaptersFor(
+        backendBase: null,
+        client: http.Client(),
+        installIdStore: FakeInstallIdStore(),
+        readOptions: () async => const ClassificationOptions(),
+        direct: direct,
+      );
+
+      // Assert
+      expect(identical(adapters, direct), isTrue);
+    });
+
+    test('with a backend put a backend adapter for the same source in '
+        'front of each direct one, in order, with the long timeout', () {
+      // Act
+      final adapters = menuAdaptersFor(
+        backendBase: _base,
+        client: http.Client(),
+        installIdStore: FakeInstallIdStore(),
+        readOptions: () async => const ClassificationOptions(),
+        direct: direct,
+      );
+
+      // Assert
+      expect(adapters, hasLength(3));
+      for (var i = 0; i < 3; i++) {
+        final chain = adapters[i] as FallbackMenuAdapter;
+        final primary = chain.primary as BackendMenuAdapter;
+        expect(identical(chain.fallback, direct[i]), isTrue);
+        expect(primary.source, direct[i].source);
+        expect(primary.baseUrl, _base);
+        expect(primary.timeout, backendMenuTimeout);
+      }
+      // Longer than the backend's own 110 s Gemini timeout.
+      expect(backendMenuTimeout, greaterThan(const Duration(seconds: 110)));
+    });
+
+    test('the backend is asked only with the AI-analysis consent', () async {
+      // Arrange
+      var consent = false;
+      final adapters = menuAdaptersFor(
+        backendBase: _base,
+        client: http.Client(),
+        installIdStore: FakeInstallIdStore(),
+        readOptions: () async =>
+            ClassificationOptions(estimationConsentGiven: consent),
+        direct: direct,
+      );
+      final chain = adapters.first as FallbackMenuAdapter;
+
+      // Act & Assert
+      expect(await chain.usePrimary(), isFalse);
+      consent = true;
+      expect(await chain.usePrimary(), isTrue);
+    });
+
+    test('without consent a fetch never reaches the backend', () async {
+      // Arrange
+      final network = _UnreachableNetwork();
+      final wolt = FakePlatformMenuAdapter();
+      final adapters = menuAdaptersFor(
+        backendBase: _base,
+        client: network.client,
+        installIdStore: FakeInstallIdStore(),
+        readOptions: () async => const ClassificationOptions(),
+        direct: <PlatformMenuAdapter>[wolt],
+      );
+
+      // Act
+      await adapters.single.fetch(_menu.venueRef);
+
+      // Assert
+      expect(network.requests, isEmpty);
+      expect(wolt.fetchCalls, <VenueRef>[_menu.venueRef]);
+    });
+
+    test('with consent an unreachable backend falls back to the direct '
+        'adapter', () async {
+      // Arrange
+      final network = _UnreachableNetwork();
+      final wolt = FakePlatformMenuAdapter()
+        ..queueFailed(MenuFetchFailureReason.notFound);
+      final adapters = menuAdaptersFor(
+        backendBase: _base,
+        client: network.client,
+        installIdStore: FakeInstallIdStore(),
+        readOptions: () async =>
+            const ClassificationOptions(estimationConsentGiven: true),
+        direct: <PlatformMenuAdapter>[wolt],
+      );
+
+      // Act
+      final result = await adapters.single.fetch(_menu.venueRef);
+
+      // Assert: the backend was tried, then the device's own adapter.
+      expect(network.targets, <String>[
+        'localhost/v1/venue-menus/wolt/hamosad',
+      ]);
+      expect(wolt.fetchCalls, <VenueRef>[_menu.venueRef]);
+      expect(result, isA<MenuFetchFailed>());
     });
   });
 

@@ -103,9 +103,10 @@ flutter build ios --release --no-codesign   # what CI runs; proves it compiles
 flutter build ipa                            # signed archive for TestFlight; needs a paid account
 ```
 
-An iOS build needs no `--dart-define`: `KETOCLUB_BACKEND_URL` is read only by
-the web build (D17). The Gemini key is never compiled in; each user pastes
-their own in Settings.
+An iOS build needs no `--dart-define`: with none, it calls Wolt and Gemini
+itself (D17). With `KETOCLUB_BACKEND_URL` set, it asks that backend first and
+uses its own calls only as the fallback (D25). The Gemini key is never compiled
+in; each user pastes their own in Settings.
 
 ## Camera and photo-library permissions (Scan tab)
 
