@@ -65,6 +65,8 @@ from pydantic import (
 )
 from pydantic.alias_generators import to_camel
 
+from app.keto.dart_text import dart_trim
+
 WIRE_CONFIG: Final = ConfigDict(
     alias_generator=to_camel,
     validate_by_name=True,
@@ -244,7 +246,9 @@ class HiddenCarb(WireModel):
     @field_validator("source", "waiter_question")
     @classmethod
     def _not_blank(cls, value: str) -> str:
-        if not value.strip():
+        # Dart's trim, not Python's strip: U+001C-U+001F are not blank in
+        # Dart, so a flag Dart wrote must read back here.
+        if not dart_trim(value):
             raise ValueError("must not be blank")
         return value
 

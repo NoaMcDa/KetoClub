@@ -18,6 +18,7 @@ Future<FakeSettingsStore> _pump(
   WidgetTester tester, {
   FakeSettingsStore? store,
   bool directToGoogle = false,
+  bool backendConfigured = false,
 }) async {
   final backing = store ?? FakeSettingsStore();
   await tester.pumpWidget(
@@ -28,6 +29,7 @@ Future<FakeSettingsStore> _pump(
         body: ConsentDisclosureBanner(
           settingsStore: backing,
           directToGoogle: directToGoogle,
+          backendConfigured: backendConfigured,
         ),
       ),
     ),
@@ -62,6 +64,34 @@ void main() {
         // Assert
         expect(find.text(_en.settingsConsentBodyDirect), findsOneWidget);
         expect(find.text(_en.settingsConsentBody), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'says the server comes first on a phone with a backend (issue #330), '
+      'and leaves the web text alone',
+      (tester) async {
+        // Act
+        await _pump(tester, directToGoogle: true, backendConfigured: true);
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(
+          find.text(_en.settingsConsentBodyDirectViaBackend),
+          findsOneWidget,
+        );
+        expect(find.text(_en.settingsConsentBodyDirect), findsNothing);
+
+        // Act: web with a backend.
+        await _pump(tester, backendConfigured: true);
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text(_en.settingsConsentBody), findsOneWidget);
+        expect(
+          find.text(_en.settingsConsentBodyDirectViaBackend),
+          findsNothing,
+        );
       },
     );
 

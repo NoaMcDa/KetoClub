@@ -34,6 +34,7 @@ class ConsentDisclosureBanner extends StatefulWidget {
   const new({
     required this.settingsStore,
     this.directToGoogle = false,
+    this.backendConfigured = false,
     super.key,
   });
 
@@ -43,6 +44,11 @@ class ConsentDisclosureBanner extends StatefulWidget {
   /// Whether dish text goes straight from this device to Google (iOS and
   /// Android, D17) rather than through KetoClub's server (web, D12).
   final bool directToGoogle;
+
+  /// Whether this build has a KetoClub backend (issue #330). On a phone it
+  /// makes the text say dish text goes to the server first and the user's
+  /// own key is only the fallback.
+  final bool backendConfigured;
 
   @override
   State<ConsentDisclosureBanner> createState() =>
@@ -93,6 +99,13 @@ class _ConsentDisclosureBannerState extends State<ConsentDisclosureBanner> {
     });
   }
 
+  String _message(AppLocalizations l10n) {
+    if (!widget.directToGoogle) return l10n.settingsConsentBody;
+    return widget.backendConfigured
+        ? l10n.settingsConsentBodyDirectViaBackend
+        : l10n.settingsConsentBodyDirect;
+  }
+
   @override
   Widget build(BuildContext context) {
     final settings = _settings;
@@ -104,9 +117,7 @@ class _ConsentDisclosureBannerState extends State<ConsentDisclosureBanner> {
       padding: const EdgeInsets.only(bottom: 12),
       child: AppNotice.decision(
         title: l10n.settingsConsentTitle,
-        message: widget.directToGoogle
-            ? l10n.settingsConsentBodyDirect
-            : l10n.settingsConsentBody,
+        message: _message(l10n),
         primary: AppNoticeAction(
           label: l10n.consentDisclosureOk,
           onPressed: _busy ? null : () => unawaited(_acknowledge()),

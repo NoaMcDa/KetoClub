@@ -374,6 +374,12 @@ abstract class AppLocalizations {
   /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. The menu, its analysis, the venue name and city are also stored on KetoClub\'s server, with nothing that identifies you, so others can find them. Untick this to keep every menu on this device.'**
   String get settingsConsentBodyDirect;
 
+  /// No description provided for @settingsConsentBodyDirectViaBackend.
+  ///
+  /// In en, this message translates to:
+  /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent from this device to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Your own API key is used only if the server cannot be reached. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. The menu, its analysis, the venue name and city are also stored on KetoClub\'s server, with nothing that identifies you, so others can find them. Untick this to keep every menu on this device.'**
+  String get settingsConsentBodyDirectViaBackend;
+
   /// No description provided for @settingsKeySection.
   ///
   /// In en, this message translates to:
@@ -1849,6 +1855,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The pages are sent straight from this device to Google\'s Gemini API, using your own API key. The transcribed menu, its analysis, and the name and city you give it are also stored on KetoClub\'s server, anonymously.'**
   String get scanScreenDisclosureDirect;
+
+  /// No description provided for @scanScreenDisclosureDirectViaBackend.
+  ///
+  /// In en, this message translates to:
+  /// **'The pages are sent from this device to KetoClub\'s server, which forwards them to Google\'s Gemini API to be read. Your own API key is used only if the server cannot be reached. The transcribed menu, its analysis, and the name and city you give it are also stored on KetoClub\'s server, anonymously.'**
+  String get scanScreenDisclosureDirectViaBackend;
 
   /// No description provided for @scanScreenSettingsLink.
   ///

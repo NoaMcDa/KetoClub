@@ -102,10 +102,14 @@ final Uri reportProblemUri = Uri.parse(
 class SettingsScreen extends StatefulWidget {
   /// Creates the Settings screen. [appInfo] supplies the About section's
   /// version, read once after the first frame; [externalLinkOpener] opens
-  /// its "Report a problem" link outside the app.
+  /// its "Report a problem" link outside the app. [backendConfigured] is
+  /// true when the build has a KetoClub backend, which on a phone changes
+  /// the consent text: dish text goes to the server first and the user's
+  /// own key is only the fallback (issue #330).
   const new({
     required this.appInfo,
     required this.externalLinkOpener,
+    this.backendConfigured = false,
     super.key,
   });
 
@@ -114,6 +118,11 @@ class SettingsScreen extends StatefulWidget {
 
   /// Opens the issue tracker link outside KetoClub (issue #258).
   final ExternalLinkOpener externalLinkOpener;
+
+  /// Whether this build has a KetoClub backend (issue #330). Only read on
+  /// a phone, where it picks between the direct and via-backend consent
+  /// text.
+  final bool backendConfigured;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -253,13 +262,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               collapsedShape: const Border(),
               leading: const Icon(Icons.privacy_tip_outlined),
               title: Text(l10n.settingsAboutPrivacy),
-              children: [
-                _GroupNote(
-                  controller.supportsApiKey
-                      ? l10n.settingsConsentBodyDirect
-                      : l10n.settingsConsentBody,
-                ),
-              ],
+              children: [_GroupNote(_consentBody(l10n, controller))],
             ),
             ListTile(
               key: aboutReportKey,
@@ -273,6 +276,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ],
     );
+  }
+
+  /// The consent text for this build: through KetoClub's server first with
+  /// the user's own key as the fallback on a phone with a backend (issue
+  /// #330), straight to Google on a phone without one (D17), through
+  /// KetoClub's server on web (D12).
+  String _consentBody(AppLocalizations l10n, SettingsController controller) {
+    if (!controller.supportsApiKey) return l10n.settingsConsentBody;
+    return widget.backendConfigured
+        ? l10n.settingsConsentBodyDirectViaBackend
+        : l10n.settingsConsentBodyDirect;
   }
 
   /// Opens [reportProblemUri] outside the app; says so when the platform
@@ -320,13 +334,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 l10n.settingsConsentTitle,
                 style: Theme.of(context).textTheme.titleSmall,
               ),
-              children: [
-                _GroupNote(
-                  controller.supportsApiKey
-                      ? l10n.settingsConsentBodyDirect
-                      : l10n.settingsConsentBody,
-                ),
-              ],
+              children: [_GroupNote(_consentBody(l10n, controller))],
             ),
             CheckboxListTile(
               controlAffinity: ListTileControlAffinity.leading,
