@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_question_answerer.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
+import 'package:ketoclub/services/community/menu_store_client.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/app_info.dart';
@@ -18,6 +19,7 @@ import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
 
@@ -56,6 +58,13 @@ class AppDependencies {
   /// [menuQuestionAnswerer] defaults to null: a caller that never uses the
   /// question feature need not construct one, and `MenuController` hides the
   /// action when it is absent.
+  ///
+  /// [visitHistory] defaults to [NoVisitHistoryStore], which remembers
+  /// nothing and does no I/O; `di.dart` passes the Hive-backed one (issue
+  /// #307).
+  ///
+  /// [menuStoreClient] defaults to [NoMenuStoreClient], which sends nothing
+  /// and does no I/O; `di.dart` passes the backend's (issue #312, D24).
   const new({
     required this.menuRepository,
     required this.menuClassifier,
@@ -79,6 +88,8 @@ class AppDependencies {
     this.scanBudget = const ScanBudget(downscaler: NoImageDownscaler()),
     this.navigatorKey,
     this.menuQuestionAnswerer,
+    this.visitHistory = const NoVisitHistoryStore(),
+    this.menuStoreClient = const NoMenuStoreClient(),
   });
 
   /// Loads a venue's menu, cache first (architecture.md §6.1).
@@ -184,4 +195,14 @@ class AppDependencies {
   /// analysed (architecture.md §9.5; issue #214). Null when the question
   /// feature is not wired — `MenuController` hides the action in that case.
   final MenuQuestionAnswerer? menuQuestionAnswerer;
+
+  /// The menus opened on this device, for the Recent list (issue #307,
+  /// architecture.md D8): a list kept on the device, like pins and notes,
+  /// that never leaves it through this store.
+  final VisitHistoryStore visitHistory;
+
+  /// Contributes each newly seen menu, and its AI analysis, to KetoClub's
+  /// shared menu store on the backend (issue #312, D24), with the user's
+  /// AI-analysis consent. Sends no personal setting: see `MenuUpload`.
+  final MenuStoreClient menuStoreClient;
 }

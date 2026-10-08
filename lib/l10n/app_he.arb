@@ -66,11 +66,11 @@
 
   "settingsAiPrivacy": "בינה מלאכותית ופרטיות",
   "settingsConsentTitle": "מה יוצא מהמכשיר הזה",
-  "settingsConsentBody": "ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות — וכל שאלה שאתם כותבים על תפריט — נשלחים לשרת של קטוקלאב, שמעביר אותם לניתוח ב‑Gemini API של Google. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.",
+  "settingsConsentBody": "ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות — וכל שאלה שאתם כותבים על תפריט — נשלחים לשרת של קטוקלאב, שמעביר אותם לניתוח ב‑Gemini API של Google. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. התפריט, הניתוח שלו, שם המסעדה והעיר נשמרים גם בשרת של קטוקלאב, בלי שום פרט שמזהה אתכם, כדי שאחרים יוכלו למצוא אותם. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.",
   "settingsConsentAccept": "אפשר ניתוח בינה מלאכותית",
   "consentDisclosureOk": "אישור",
   "consentDisclosureTurnOff": "כבה",
-  "settingsConsentBodyDirect": "ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות — וכל שאלה שאתם כותבים על תפריט — נשלחים ישירות מהמכשיר הזה ל‑Gemini API של Google, עם מפתח ה‑API שלכם. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.",
+  "settingsConsentBodyDirect": "ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות — וכל שאלה שאתם כותבים על תפריט — נשלחים ישירות מהמכשיר הזה ל‑Gemini API של Google, עם מפתח ה‑API שלכם. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. התפריט, הניתוח שלו, שם המסעדה והעיר נשמרים גם בשרת של קטוקלאב, בלי שום פרט שמזהה אתכם, כדי שאחרים יוכלו למצוא אותם. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.",
   "settingsKeySection": "מפתח Gemini API",
   "settingsKeyBody": "בטלפון הזה, ניתוח בינה מלאכותית פונה ישירות ל‑Gemini API של Google עם המפתח שלכם. אפשר ליצור מפתח בחינם ב‑Google AI Studio. המפתח נשמר באחסון המאובטח של המכשיר ונשלח רק ל‑Google.",
   "settingsKeyHint": "הדביקו את מפתח ה‑Gemini API שלכם",
@@ -110,9 +110,9 @@
   },
   "settingsClearCache": "נקה תפריטים שמורים",
   "settingsClearCacheConfirmTitle": "לנקות את התפריטים השמורים?",
-  "settingsClearCacheConfirmBody": "פעולה זו תמחק את כל התפריטים השמורים במכשיר הזה, כולל כל תפריט שאפשר לפתוח כרגע בלי אינטרנט. אפשר לשמור מסעדה מחדש בכל עת, על ידי פתיחתה כשיש חיבור.",
+  "settingsClearCacheConfirmBody": "פעולה זו תמחק את כל התפריטים השמורים במכשיר הזה ותנקה את רשימת האחרונים, כולל כל תפריט שאפשר לפתוח כרגע בלי אינטרנט. פתחו מסעדה שוב כדי לשמור אותה.",
   "settingsClearCacheConfirmAction": "נקה",
-  "settingsCacheCleared": "התפריטים השמורים נוקו.",
+  "settingsCacheCleared": "התפריטים השמורים ורשימת האחרונים נוקו.",
   "settingsAboutSection": "אודות",
   "settingsAboutVersion": "גרסה",
   "settingsAboutVersionValue": "{version} (בנייה {build})",
@@ -202,7 +202,7 @@
   "navSaved": "אחרונים",
   "navSettings": "הגדרות",
   "savedPlaceholderTitle": "תפריטים אחרונים",
-  "savedPlaceholderBody": "פתחו תפריט של מסעדה והוא יופיע כאן אוטומטית, זמין ליממה — גם ללא חיבור לאינטרנט.",
+  "savedPlaceholderBody": "כל תפריט שאתם פותחים מופיע כאן עם הציון ומספרי המנות שלו, עד שתסירו אותו. תפריטים שנפתחו ביממה האחרונה זמינים גם ללא חיבור לאינטרנט.",
   "savedLoading": "טוען את התפריטים האחרונים שלך…",
   "savedEntryDishCount": "{count, plural, one{מנה אחת} two{שתי מנות} other{{count} מנות}}",
   "@savedEntryDishCount": {
@@ -242,6 +242,21 @@
     "placeholders": { "venue": { "type": "String" } }
   },
   "savedUndo": "בטל",
+  "savedOpenedAgo": "נפתח {age}",
+  "@savedOpenedAgo": {
+    "placeholders": { "age": { "type": "String" } }
+  },
+  "savedOpenCount": "{count, plural, one{נפתח פעם אחת} two{נפתח פעמיים} other{נפתח {count} פעמים}}",
+  "@savedOpenCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "savedNotOnDevice": "לא שמור במכשיר הזה, ייפתח כשיש חיבור",
+  "savedScanGone": "כבר לא שמור במכשיר הזה",
+  "savedRename": "שנה שם",
+  "savedRenameSemanticLabel": "שנה את השם של {venue}",
+  "@savedRenameSemanticLabel": {
+    "placeholders": { "venue": { "type": "String" } }
+  },
 
   "discoveryTitle": "איפה לאכול",
   "discoveryEmptyTitle": "מצאו איפה לאכול",
@@ -390,6 +405,11 @@
   "menuSearchClear": "נקה חיפוש",
   "menuNoResults": "אין מנות שמתאימות לחיפוש שלכם.",
   "menuClearFilter": "נקה סינון",
+  "menuRenameAction": "שנה שם",
+  "menuRenameTitle": "תנו שם לתפריט",
+  "menuRenameHint": "שם המסעדה",
+  "menuRenameCityHint": "עיר",
+  "menuRenameSave": "שמור",
   "categoryChipSemanticLabel": "עברו אל {category}",
   "@categoryChipSemanticLabel": {
     "placeholders": { "category": { "type": "String" } }
@@ -402,6 +422,13 @@
   "scanAnalyse": "נתחו",
   "scanEmptyPaste": "קטוקלאב לא מצא מנות בטקסט הזה. הדביקו את התפריט עם מנה אחת בכל שורה.",
   "sourceScanned": "תפריט שהודבק",
+  "sourceWithCity": "{platform} · {city}",
+  "@sourceWithCity": {
+    "placeholders": {
+      "platform": { "type": "String" },
+      "city": { "type": "String" }
+    }
+  },
   "fetchFailedScanNotSaved": "התפריט שהודבק כבר לא שמור במכשיר הזה. הדביקו אותו שוב כדי לנתח אותו.",
 
   "scannedMenuTitle": "תפריט סרוק",
@@ -477,8 +504,8 @@
     "placeholders": { "mb": { "type": "int" } }
   },
   "scanScreenAnalysePages": "נתחו את הדפים",
-  "scanScreenDisclosureWeb": "הדפים נשלחים לשרת של קטוקלאב, שמעביר אותם ל-Gemini API של גוגל לקריאה.",
-  "scanScreenDisclosureDirect": "הדפים נשלחים ישירות מהמכשיר הזה ל-Gemini API של גוגל, באמצעות מפתח ה-API שלכם.",
+  "scanScreenDisclosureWeb": "הדפים נשלחים לשרת של קטוקלאב, שמעביר אותם ל-Gemini API של גוגל לקריאה. התפריט שתומלל, הניתוח שלו, והשם והעיר שתתנו לו נשמרים גם בשרת של קטוקלאב, באופן אנונימי.",
+  "scanScreenDisclosureDirect": "הדפים נשלחים ישירות מהמכשיר הזה ל-Gemini API של גוגל, באמצעות מפתח ה-API שלכם. התפריט שתומלל, הניתוח שלו, והשם והעיר שתתנו לו נשמרים גם בשרת של קטוקלאב, באופן אנונימי.",
   "scanScreenSettingsLink": "הגדרות",
   "scanScreenFailureNotConfigured": "סריקה אינה זמינה בגרסה הזאת.",
   "scanScreenFailureNeedsServer": "סריקה דורשת את השרת של קטוקלאב, והגרסה הזאת לא מחוברת לשרת. הדבקת טקסט התפריט עדיין עובדת.",

@@ -9,12 +9,14 @@ import 'fake_location_service.dart';
 import 'fake_menu_classifier.dart';
 import 'fake_menu_repository.dart';
 import 'fake_menu_sharer.dart';
+import 'fake_menu_store_client.dart';
 import 'fake_notes_store.dart';
 import 'fake_page_picker.dart';
 import 'fake_qr_scanner.dart';
 import 'fake_scanned_menu_classifier.dart';
 import 'fake_settings_store.dart';
 import 'fake_venue_search_service.dart';
+import 'fake_visit_history_store.dart';
 
 /// Builds an [AppDependencies] of fakes, for widget and flow tests.
 ///
@@ -101,6 +103,14 @@ final class FakeAppDependencies {
   /// pages".
   final ScannedPagesRegistry scannedPages;
 
+  /// The faked visit history behind the Recent list (issue #307), stamped
+  /// by [clock]; seed it with [FakeVisitHistoryStore.seed].
+  late final FakeVisitHistoryStore visitHistory = FakeVisitHistoryStore(clock);
+
+  /// The faked shared menu store (issue #312); inspect
+  /// [FakeMenuStoreClient.uploads].
+  final FakeMenuStoreClient menuStoreClient = FakeMenuStoreClient();
+
   /// The dependency set to hand to the app widget.
   AppDependencies get dependencies => AppDependencies(
     menuRepository: repository,
@@ -119,5 +129,7 @@ final class FakeAppDependencies {
     pagePicker: pagePicker,
     qrScanner: qrScanner,
     scannedPages: scannedPages,
+    visitHistory: visitHistory,
+    menuStoreClient: menuStoreClient,
   );
 }

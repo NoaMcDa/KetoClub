@@ -292,9 +292,11 @@ void main() {
         KetoClubApp(dependencies: FakeAppDependencies().dependencies),
       );
       await tester.pumpAndSettle();
-      final navigator = tester.state<NavigatorState>(
-        find.byType(Navigator).first,
-      )..pushNamed('/venue/wolt/hamosad', arguments: 'Hamosad');
+      final navigator =
+          tester.state<NavigatorState>(find.byType(Navigator).first)..pushNamed(
+            '/venue/wolt/hamosad',
+            arguments: const VenueOpenHint(name: 'Hamosad'),
+          );
       await tester.pumpAndSettle();
       await tester.tap(find.byTooltip(_en.actionOpenSettings));
       await tester.pumpAndSettle();
@@ -320,7 +322,10 @@ void main() {
       await tester.pumpAndSettle();
       tester
           .state<NavigatorState>(find.byType(Navigator).first)
-          .pushNamed('/venue/wolt/hamosad', arguments: 'Hamosad');
+          .pushNamed(
+            '/venue/wolt/hamosad',
+            arguments: const VenueOpenHint(name: 'Hamosad'),
+          );
       await tester.pumpAndSettle();
       await tester.tap(find.byTooltip(_en.actionOpenSettings));
       await tester.pumpAndSettle();
@@ -378,7 +383,10 @@ void main() {
       expect(titles.last, documentTitle(_en.navSettings));
 
       // Act / Assert: a venue route is titled with the name the card passed.
-      navigator.pushNamed('/venue/wolt/hamosad', arguments: 'Hamosad');
+      navigator.pushNamed(
+        '/venue/wolt/hamosad',
+        arguments: const VenueOpenHint(name: 'Hamosad'),
+      );
       await tester.pumpAndSettle();
       expect(titles.last, documentTitle('Hamosad'));
       navigator.pop();

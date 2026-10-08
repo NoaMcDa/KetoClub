@@ -24,6 +24,7 @@ import 'package:ketoclub/state/theme_mode_controller.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/app_shell.dart';
 import 'package:ketoclub/widgets/route_title.dart';
 import 'package:provider/provider.dart';
@@ -77,6 +78,7 @@ class _KetoClubAppState extends State<KetoClubApp> {
       locationService: dependencies.locationService,
       venueSearchService: dependencies.venueSearchService,
       estimateClassifier: dependencies.estimateClassifier,
+      visitHistory: dependencies.visitHistory,
     );
     // Fire-and-forget: the first frame renders in the device locale (and,
     // for appearance, ThemeMode.system) and flips once each resolves
@@ -223,7 +225,10 @@ Route<void>? generateRoute(
       builder: (_) => AppShell(
         currentIndex: AppShell.savedIndex,
         child: ChangeNotifierProvider<SavedController>(
-          create: (_) => SavedController(dependencies.menuRepository),
+          create: (_) => SavedController(
+            dependencies.menuRepository,
+            dependencies.visitHistory,
+          ),
           child: const SavedScreen(),
         ),
       ),
@@ -240,6 +245,7 @@ Route<void>? generateRoute(
             dependencies.settingsStore,
             dependencies.menuRepository,
             dependencies.apiKeyStore,
+            dependencies.visitHistory,
           ),
           child: SettingsScreen(
             appInfo: dependencies.appInfo,
@@ -263,6 +269,10 @@ Route<void>? generateRoute(
 
   final ref = venueRefFromPath(name);
   if (ref != null) {
+    // What the opener already knew about the venue (issue #307); null on a
+    // deep link.
+    final arguments = settings.arguments;
+    final hint = arguments is VenueOpenHint ? arguments : null;
     return MaterialPageRoute<void>(
       settings: settings,
       builder: (context) => ChangeNotifierProvider<MenuController>(
@@ -273,18 +283,17 @@ Route<void>? generateRoute(
           dependencies.notesStore,
           context.read<CarbBudgetController>(),
           dependencies.menuQuestionAnswerer,
+          dependencies.visitHistory,
+          dependencies.menuStoreClient,
         ),
         child: _VenueTitle(
-          fallback: settings.arguments is String
-              ? settings.arguments! as String
-              : null,
+          fallback: hint?.name,
           child: MenuScreen(
             ref: ref,
-            // A venue card passes the name it already shows (see
-            // VenueSearchScreen._openVenue); a deep link carries none.
-            venueNameHint: settings.arguments is String
-                ? settings.arguments! as String
-                : null,
+            // A venue card or a Recent row passes the name and city it
+            // already shows (see VenueSearchScreen._openVenue); a deep
+            // link carries none.
+            hint: hint,
             screenBrightness: dependencies.screenBrightness,
             connectivity: dependencies.connectivity,
             externalLinkOpener: dependencies.externalLinkOpener,
@@ -322,7 +331,9 @@ VenueRef? venueRefFromPath(String path) {
 }
 
 /// Titles the venue route after the venue: the loaded menu's own name, else
-/// the name a venue card passed, else just the app name (issue #226).
+/// the name the opener passed, else the name the visit history remembers
+/// for it (issue #312), else just the app name (issue #226) — the same
+/// order the menu header names it in.
 class _VenueTitle extends StatelessWidget {
   const new({required this.fallback, required this.child});
 
@@ -331,7 +342,9 @@ class _VenueTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = context.select<MenuController, String?>((c) => c.venueName);
-    return RouteTitle(page: name ?? fallback, child: child);
+    final name = context.select<MenuController, String?>(
+      (c) => c.venueName ?? fallback ?? c.historyName,
+    );
+    return RouteTitle(page: name, child: child);
   }
 }

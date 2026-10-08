@@ -66,11 +66,11 @@
 
   "settingsAiPrivacy": "AI & privacy",
   "settingsConsentTitle": "What leaves this device",
-  "settingsConsentBody": "AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent to KetoClub's server, which forwards them to Google's Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.",
+  "settingsConsentBody": "AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent to KetoClub's server, which forwards them to Google's Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. The menu, its analysis, the venue name and city are also stored on KetoClub's server, with nothing that identifies you, so others can find them. Untick this to keep every menu on this device.",
   "settingsConsentAccept": "Allow AI analysis",
   "consentDisclosureOk": "OK",
   "consentDisclosureTurnOff": "Turn off",
-  "settingsConsentBodyDirect": "AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent straight from this device to Google's Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.",
+  "settingsConsentBodyDirect": "AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent straight from this device to Google's Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. The menu, its analysis, the venue name and city are also stored on KetoClub's server, with nothing that identifies you, so others can find them. Untick this to keep every menu on this device.",
   "settingsKeySection": "Gemini API key",
   "settingsKeyBody": "On this phone, AI analysis calls Google's Gemini API directly with your own key. You can create one for free in Google AI Studio. It is kept in this device's secure storage and sent only to Google.",
   "settingsKeyHint": "Paste your Gemini API key",
@@ -110,9 +110,9 @@
   },
   "settingsClearCache": "Clear saved menus",
   "settingsClearCacheConfirmTitle": "Clear saved menus?",
-  "settingsClearCacheConfirmBody": "This removes every menu saved on this device, including any you can currently open offline. You can save a venue again by opening it once you have a connection.",
+  "settingsClearCacheConfirmBody": "This removes every menu saved on this device and clears your Recent list, including any menu you can currently open offline. Open a venue again to save it.",
   "settingsClearCacheConfirmAction": "Clear",
-  "settingsCacheCleared": "Saved menus cleared.",
+  "settingsCacheCleared": "Saved menus and Recent list cleared.",
   "settingsAboutSection": "About",
   "settingsAboutVersion": "Version",
   "settingsAboutVersionValue": "{version} (build {build})",
@@ -205,7 +205,7 @@
   "navSaved": "Recent",
   "navSettings": "Settings",
   "savedPlaceholderTitle": "Recent menus",
-  "savedPlaceholderBody": "Open a venue's menu and it appears here automatically, available for a day — even offline.",
+  "savedPlaceholderBody": "Every menu you open is listed here with its score and counts until you remove it. Menus opened in the last day also work offline.",
   "savedLoading": "Loading your recent menus…",
   "savedEntryDishCount": "{count, plural, one{1 dish} other{{count} dishes}}",
   "@savedEntryDishCount": {
@@ -245,6 +245,21 @@
     "placeholders": { "venue": { "type": "String" } }
   },
   "savedUndo": "Undo",
+  "savedOpenedAgo": "Opened {age}",
+  "@savedOpenedAgo": {
+    "placeholders": { "age": { "type": "String" } }
+  },
+  "savedOpenCount": "{count, plural, one{Opened once} other{Opened {count} times}}",
+  "@savedOpenCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "savedNotOnDevice": "Not on this device, opens online",
+  "savedScanGone": "No longer on this device",
+  "savedRename": "Rename",
+  "savedRenameSemanticLabel": "Rename {venue}",
+  "@savedRenameSemanticLabel": {
+    "placeholders": { "venue": { "type": "String" } }
+  },
 
   "discoveryTitle": "Where to eat",
   "discoveryEmptyTitle": "Find somewhere to eat",
@@ -393,6 +408,11 @@
   "menuSearchClear": "Clear search",
   "menuNoResults": "No dishes match your search.",
   "menuClearFilter": "Clear filter",
+  "menuRenameAction": "Rename",
+  "menuRenameTitle": "Name this menu",
+  "menuRenameHint": "Restaurant name",
+  "menuRenameCityHint": "City",
+  "menuRenameSave": "Save",
   "categoryChipSemanticLabel": "Jump to {category}",
   "@categoryChipSemanticLabel": {
     "placeholders": { "category": { "type": "String" } }
@@ -405,6 +425,13 @@
   "scanAnalyse": "Analyse",
   "scanEmptyPaste": "KetoClub found no dishes in that text. Paste the menu with one dish per line.",
   "sourceScanned": "Pasted menu",
+  "sourceWithCity": "{platform} · {city}",
+  "@sourceWithCity": {
+    "placeholders": {
+      "platform": { "type": "String" },
+      "city": { "type": "String" }
+    }
+  },
   "fetchFailedScanNotSaved": "This pasted menu is no longer saved on this device. Paste it again to analyse it.",
 
   "scannedMenuTitle": "Scanned menu",
@@ -480,8 +507,8 @@
     "placeholders": { "mb": { "type": "int" } }
   },
   "scanScreenAnalysePages": "Analyse pages",
-  "scanScreenDisclosureWeb": "The pages are sent to KetoClub's server, which forwards them to Google's Gemini API to be read.",
-  "scanScreenDisclosureDirect": "The pages are sent straight from this device to Google's Gemini API, using your own API key.",
+  "scanScreenDisclosureWeb": "The pages are sent to KetoClub's server, which forwards them to Google's Gemini API to be read. The transcribed menu, its analysis, and the name and city you give it are also stored on KetoClub's server, anonymously.",
+  "scanScreenDisclosureDirect": "The pages are sent straight from this device to Google's Gemini API, using your own API key. The transcribed menu, its analysis, and the name and city you give it are also stored on KetoClub's server, anonymously.",
   "scanScreenSettingsLink": "Settings",
   "scanScreenFailureNotConfigured": "Scanning is not available on this build.",
   "scanScreenFailureNeedsServer": "Scanning needs KetoClub's server, and this build is not connected to one. Pasting the menu text still works.",

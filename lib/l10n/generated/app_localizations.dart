@@ -347,7 +347,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsConsentBody.
   ///
   /// In en, this message translates to:
-  /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.'**
+  /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. The menu, its analysis, the venue name and city are also stored on KetoClub\'s server, with nothing that identifies you, so others can find them. Untick this to keep every menu on this device.'**
   String get settingsConsentBody;
 
   /// No description provided for @settingsConsentAccept.
@@ -371,7 +371,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsConsentBodyDirect.
   ///
   /// In en, this message translates to:
-  /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.'**
+  /// **'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. The menu, its analysis, the venue name and city are also stored on KetoClub\'s server, with nothing that identifies you, so others can find them. Untick this to keep every menu on this device.'**
   String get settingsConsentBodyDirect;
 
   /// No description provided for @settingsKeySection.
@@ -575,7 +575,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsClearCacheConfirmBody.
   ///
   /// In en, this message translates to:
-  /// **'This removes every menu saved on this device, including any you can currently open offline. You can save a venue again by opening it once you have a connection.'**
+  /// **'This removes every menu saved on this device and clears your Recent list, including any menu you can currently open offline. Open a venue again to save it.'**
   String get settingsClearCacheConfirmBody;
 
   /// No description provided for @settingsClearCacheConfirmAction.
@@ -587,7 +587,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsCacheCleared.
   ///
   /// In en, this message translates to:
-  /// **'Saved menus cleared.'**
+  /// **'Saved menus and Recent list cleared.'**
   String get settingsCacheCleared;
 
   /// No description provided for @settingsAboutSection.
@@ -905,7 +905,7 @@ abstract class AppLocalizations {
   /// No description provided for @savedPlaceholderBody.
   ///
   /// In en, this message translates to:
-  /// **'Open a venue\'s menu and it appears here automatically, available for a day — even offline.'**
+  /// **'Every menu you open is listed here with its score and counts until you remove it. Menus opened in the last day also work offline.'**
   String get savedPlaceholderBody;
 
   /// No description provided for @savedLoading.
@@ -997,6 +997,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Undo'**
   String get savedUndo;
+
+  /// No description provided for @savedOpenedAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'Opened {age}'**
+  String savedOpenedAgo(String age);
+
+  /// No description provided for @savedOpenCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Opened once} other{Opened {count} times}}'**
+  String savedOpenCount(int count);
+
+  /// No description provided for @savedNotOnDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Not on this device, opens online'**
+  String get savedNotOnDevice;
+
+  /// No description provided for @savedScanGone.
+  ///
+  /// In en, this message translates to:
+  /// **'No longer on this device'**
+  String get savedScanGone;
+
+  /// No description provided for @savedRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get savedRename;
+
+  /// No description provided for @savedRenameSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename {venue}'**
+  String savedRenameSemanticLabel(String venue);
 
   /// No description provided for @discoveryTitle.
   ///
@@ -1490,6 +1526,36 @@ abstract class AppLocalizations {
   /// **'Clear filter'**
   String get menuClearFilter;
 
+  /// No description provided for @menuRenameAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get menuRenameAction;
+
+  /// No description provided for @menuRenameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Name this menu'**
+  String get menuRenameTitle;
+
+  /// No description provided for @menuRenameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Restaurant name'**
+  String get menuRenameHint;
+
+  /// No description provided for @menuRenameCityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get menuRenameCityHint;
+
+  /// No description provided for @menuRenameSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get menuRenameSave;
+
   /// No description provided for @categoryChipSemanticLabel.
   ///
   /// In en, this message translates to:
@@ -1537,6 +1603,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pasted menu'**
   String get sourceScanned;
+
+  /// No description provided for @sourceWithCity.
+  ///
+  /// In en, this message translates to:
+  /// **'{platform} · {city}'**
+  String sourceWithCity(String platform, String city);
 
   /// No description provided for @fetchFailedScanNotSaved.
   ///
@@ -1769,13 +1841,13 @@ abstract class AppLocalizations {
   /// No description provided for @scanScreenDisclosureWeb.
   ///
   /// In en, this message translates to:
-  /// **'The pages are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API to be read.'**
+  /// **'The pages are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API to be read. The transcribed menu, its analysis, and the name and city you give it are also stored on KetoClub\'s server, anonymously.'**
   String get scanScreenDisclosureWeb;
 
   /// No description provided for @scanScreenDisclosureDirect.
   ///
   /// In en, this message translates to:
-  /// **'The pages are sent straight from this device to Google\'s Gemini API, using your own API key.'**
+  /// **'The pages are sent straight from this device to Google\'s Gemini API, using your own API key. The transcribed menu, its analysis, and the name and city you give it are also stored on KetoClub\'s server, anonymously.'**
   String get scanScreenDisclosureDirect;
 
   /// No description provided for @scanScreenSettingsLink.

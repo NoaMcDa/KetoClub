@@ -147,7 +147,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settingsConsentBody =>
-      'ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות — וכל שאלה שאתם כותבים על תפריט — נשלחים לשרת של קטוקלאב, שמעביר אותם לניתוח ב‑Gemini API של Google. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.';
+      'ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות — וכל שאלה שאתם כותבים על תפריט — נשלחים לשרת של קטוקלאב, שמעביר אותם לניתוח ב‑Gemini API של Google. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. התפריט, הניתוח שלו, שם המסעדה והעיר נשמרים גם בשרת של קטוקלאב, בלי שום פרט שמזהה אתכם, כדי שאחרים יוכלו למצוא אותם. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.';
 
   @override
   String get settingsConsentAccept => 'אפשר ניתוח בינה מלאכותית';
@@ -160,7 +160,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settingsConsentBodyDirect =>
-      'ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות — וכל שאלה שאתם כותבים על תפריט — נשלחים ישירות מהמכשיר הזה ל‑Gemini API של Google, עם מפתח ה‑API שלכם. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.';
+      'ניתוח בינה מלאכותית פועל כברירת מחדל: כשאתם פותחים או מדביקים תפריט, שמות המנות, התיאורים ושמות התוספות — וכל שאלה שאתם כותבים על תפריט — נשלחים ישירות מהמכשיר הזה ל‑Gemini API של Google, עם מפתח ה‑API שלכם. שום דבר אחר עליכם או על ההיסטוריה שלכם לא נשלח. המיקום שלכם נשלח ל‑Wolt רק כשאתם מחפשים מסעדות בקרבתכם, ואינו נשמר. אין איסוף נתונים. התפריט, הניתוח שלו, שם המסעדה והעיר נשמרים גם בשרת של קטוקלאב, בלי שום פרט שמזהה אתכם, כדי שאחרים יוכלו למצוא אותם. בטלו את הסימון כדי להשאיר כל תפריט על המכשיר.';
 
   @override
   String get settingsKeySection => 'מפתח Gemini API';
@@ -281,13 +281,13 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settingsClearCacheConfirmBody =>
-      'פעולה זו תמחק את כל התפריטים השמורים במכשיר הזה, כולל כל תפריט שאפשר לפתוח כרגע בלי אינטרנט. אפשר לשמור מסעדה מחדש בכל עת, על ידי פתיחתה כשיש חיבור.';
+      'פעולה זו תמחק את כל התפריטים השמורים במכשיר הזה ותנקה את רשימת האחרונים, כולל כל תפריט שאפשר לפתוח כרגע בלי אינטרנט. פתחו מסעדה שוב כדי לשמור אותה.';
 
   @override
   String get settingsClearCacheConfirmAction => 'נקה';
 
   @override
-  String get settingsCacheCleared => 'התפריטים השמורים נוקו.';
+  String get settingsCacheCleared => 'התפריטים השמורים ורשימת האחרונים נוקו.';
 
   @override
   String get settingsAboutSection => 'אודות';
@@ -487,7 +487,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get savedPlaceholderBody =>
-      'פתחו תפריט של מסעדה והוא יופיע כאן אוטומטית, זמין ליממה — גם ללא חיבור לאינטרנט.';
+      'כל תפריט שאתם פותחים מופיע כאן עם הציון ומספרי המנות שלו, עד שתסירו אותו. תפריטים שנפתחו ביממה האחרונה זמינים גם ללא חיבור לאינטרנט.';
 
   @override
   String get savedLoading => 'טוען את התפריטים האחרונים שלך…';
@@ -577,6 +577,37 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get savedUndo => 'בטל';
+
+  @override
+  String savedOpenedAgo(String age) {
+    return 'נפתח $age';
+  }
+
+  @override
+  String savedOpenCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'נפתח $count פעמים',
+      two: 'נפתח פעמיים',
+      one: 'נפתח פעם אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get savedNotOnDevice => 'לא שמור במכשיר הזה, ייפתח כשיש חיבור';
+
+  @override
+  String get savedScanGone => 'כבר לא שמור במכשיר הזה';
+
+  @override
+  String get savedRename => 'שנה שם';
+
+  @override
+  String savedRenameSemanticLabel(String venue) {
+    return 'שנה את השם של $venue';
+  }
 
   @override
   String get discoveryTitle => 'איפה לאכול';
@@ -922,6 +953,21 @@ class AppLocalizationsHe extends AppLocalizations {
   String get menuClearFilter => 'נקה סינון';
 
   @override
+  String get menuRenameAction => 'שנה שם';
+
+  @override
+  String get menuRenameTitle => 'תנו שם לתפריט';
+
+  @override
+  String get menuRenameHint => 'שם המסעדה';
+
+  @override
+  String get menuRenameCityHint => 'עיר';
+
+  @override
+  String get menuRenameSave => 'שמור';
+
+  @override
   String categoryChipSemanticLabel(String category) {
     return 'עברו אל $category';
   }
@@ -949,6 +995,11 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get sourceScanned => 'תפריט שהודבק';
+
+  @override
+  String sourceWithCity(String platform, String city) {
+    return '$platform · $city';
+  }
 
   @override
   String get fetchFailedScanNotSaved =>
@@ -1104,11 +1155,11 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get scanScreenDisclosureWeb =>
-      'הדפים נשלחים לשרת של קטוקלאב, שמעביר אותם ל-Gemini API של גוגל לקריאה.';
+      'הדפים נשלחים לשרת של קטוקלאב, שמעביר אותם ל-Gemini API של גוגל לקריאה. התפריט שתומלל, הניתוח שלו, והשם והעיר שתתנו לו נשמרים גם בשרת של קטוקלאב, באופן אנונימי.';
 
   @override
   String get scanScreenDisclosureDirect =>
-      'הדפים נשלחים ישירות מהמכשיר הזה ל-Gemini API של גוגל, באמצעות מפתח ה-API שלכם.';
+      'הדפים נשלחים ישירות מהמכשיר הזה ל-Gemini API של גוגל, באמצעות מפתח ה-API שלכם. התפריט שתומלל, הניתוח שלו, והשם והעיר שתתנו לו נשמרים גם בשרת של קטוקלאב, באופן אנונימי.';
 
   @override
   String get scanScreenSettingsLink => 'הגדרות';

@@ -6,6 +6,7 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/scanned_classifier_router.dart';
+import 'package:ketoclub/services/community/menu_store_client.dart';
 import 'package:ketoclub/services/llm/backend_chat_client.dart';
 import 'package:ketoclub/services/llm/gemini_chat_client.dart';
 import 'package:ketoclub/services/location/geolocator_location_service.dart';
@@ -25,6 +26,7 @@ import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/services/venue/wolt/wolt_venue_search_service.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/widgets/mobile_qr_scanner.dart';
@@ -73,6 +75,15 @@ void main() {
       expect(dependencies.qrScanner.isAvailable, isTrue);
       // The scan budget over the real JPEG downscaler (issue #298).
       expect(dependencies.scanBudget, isA<ScanBudget>());
+      // The Recent list's on-device history (issue #307).
+      expect(dependencies.visitHistory, isA<HiveVisitHistoryStore>());
+      // The shared menu store, on a phone too (issue #312, D24 amending
+      // D17). This test is built with no KETOCLUB_BACKEND_URL, so it has
+      // no address and sends nothing.
+      expect(dependencies.menuStoreClient, isA<BackendMenuStoreClient>());
+      final menuStore = dependencies.menuStoreClient as BackendMenuStoreClient;
+      expect(menuStore.baseUrl, isNull);
+      expect(menuStore.isConfigured, isFalse);
     });
 
     test('performs no plugin I/O while building the graph', () {
