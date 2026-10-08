@@ -4,11 +4,38 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 
 import '../fakes/fake_api_key_store.dart';
+import '../fakes/fake_clock.dart';
 import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_settings_store.dart';
+import '../fakes/fake_visit_history_store.dart';
+
+/// A history that notes how many repository clears had happened when
+/// [clear] ran, so a test can pin the order of the two clears. Every other
+/// method is forwarded to a [FakeVisitHistoryStore].
+final class _OrderRecordingHistory implements VisitHistoryStore {
+  new(this.repository);
+
+  final FakeMenuRepository repository;
+  final FakeVisitHistoryStore inner = FakeVisitHistoryStore(
+    FakeClock(DateTime.utc(2026)),
+  );
+
+  /// The repository's clear count at each [clear] call.
+  final List<int> repositoryClearsAtClear = <int>[];
+
+  @override
+  Future<void> clear() {
+    repositoryClearsAtClear.add(repository.clearCacheCallCount);
+    return inner.clear();
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 void main() {
   group('SettingsController', () {
@@ -261,6 +288,26 @@ void main() {
       await controller.clearCache();
 
       // Assert
+      expect(repository.clearCacheCallCount, 1);
+    });
+
+    test('clearCache clears the visit history once, after the repository '
+        '(issue #314)', () async {
+      // Arrange
+      final history = _OrderRecordingHistory(repository);
+      final withHistory = SettingsController(
+        settings,
+        repository,
+        null,
+        history,
+      );
+
+      // Act
+      await withHistory.clearCache();
+
+      // Assert: one clear, made when the repository had cleared once.
+      expect(history.inner.clearCallCount, 1);
+      expect(history.repositoryClearsAtClear, [1]);
       expect(repository.clearCacheCallCount, 1);
     });
 

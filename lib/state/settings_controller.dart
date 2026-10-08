@@ -3,6 +3,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 /// Screen state for the Settings screen (architecture.md §6.6).
@@ -33,12 +34,23 @@ final class SettingsController extends ChangeNotifier {
   /// private field cannot be a named initializing formal in Dart and the
   /// alternative was suppressing a lint on every field. The distinct
   /// types mean a misordered call does not compile.
-  /// The key store is optional because the web build has none.
-  new(this._settings, this._repository, [this._apiKeyStore]);
+  /// The key store is optional because the web build has none. The visit
+  /// history defaults to [NoVisitHistoryStore], which remembers nothing
+  /// (issue #307).
+  new(
+    this._settings,
+    this._repository, [
+    this._apiKeyStore,
+    this._history = const NoVisitHistoryStore(),
+  ]);
 
   final SettingsStore _settings;
   final MenuRepository _repository;
   final ApiKeyStore? _apiKeyStore;
+
+  /// The menus opened on this device (issue #307). [clearCache] empties it
+  /// along with the saved menus (issue #314, D23).
+  final VisitHistoryStore _history;
 
   bool _isBusy = false;
   AppSettings _appSettings = const AppSettings();
@@ -281,7 +293,8 @@ final class SettingsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Forgets every cached menu and analysis, through the repository, then
+  /// Forgets every cached menu and analysis, through the repository, and
+  /// empties the Recent list (the visit history, D23, issue #314), then
   /// re-reads [cachedMenuCount] so the Settings screen's count reflects
   /// the clear immediately, without a second [load] call. Also clears the
   /// last-opened venue and last-used filter (issue #55) — a stale
@@ -292,6 +305,7 @@ final class SettingsController extends ChangeNotifier {
     notifyListeners();
 
     await _repository.clearCache();
+    await _history.clear();
     _cachedMenuCount = await _repository.cachedMenuCount();
     _appSettings = _appSettings.copyWith(lastVenue: null, lastFilter: null);
     await _settings.write(_appSettings);
