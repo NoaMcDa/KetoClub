@@ -22,6 +22,7 @@ from app.keto.models import (
     Venue,
     WireModel,
 )
+from app.keto.vocabulary import vocabulary
 from app.services.wolt import WoltLang
 
 
@@ -289,6 +290,20 @@ DietaryConstraint = Annotated[
 ]
 
 
+def known_dietary_constraints() -> frozenset[str]:
+    """The three Dart prompt fragments a ``dietaryConstraints`` item may be
+    (``seedOilFreePromptFragment``, ``dairyFreePromptFragment``,
+    ``carnivoreOnlyPromptFragment``), verbatim from the shared vocabulary."""
+    prompt = vocabulary().prompt
+    return frozenset(
+        {
+            prompt.seed_oil_free_prompt_fragment,
+            prompt.dairy_free_prompt_fragment,
+            prompt.carnivore_only_prompt_fragment,
+        }
+    )
+
+
 class ClassificationOptionsBody(WireModel):
     """The options one analysis is made under: ``{netCarbLimitGrams,
     dietaryConstraints}``, the Dart ``AnalysisOptionsSnapshot`` with bounds.
@@ -297,15 +312,28 @@ class ClassificationOptionsBody(WireModel):
     the Dart ``ClassificationOptions.dietaryConstraints`` holds them
     (``seedOilFreePromptFragment`` and its two siblings), so the server can
     echo them back as the result's ``options`` snapshot byte for byte and the
-    client's ``_reusableAnalysis`` accepts it. **The route must refuse any
-    item that is not one of those known fragments** (422): free text here
-    would reach the system prompt under the server's own key.
+    client's ``_reusableAnalysis`` accepts it. **Any item that is not one of
+    those known fragments is refused** (422, by ``_known_fragments_only``),
+    as is one given twice: free text here would reach the system prompt
+    under the server's own key.
     """
 
     net_carb_limit_grams: Annotated[StrictInt, Field(ge=1, le=50)]
     dietary_constraints: list[DietaryConstraint] = Field(
         default_factory=list, max_length=MAX_DIETARY_CONSTRAINTS
     )
+
+    @field_validator("dietary_constraints")
+    @classmethod
+    def _known_fragments_only(cls, value: list[str]) -> list[str]:
+        # The message names the rule, never the value: free text sent here
+        # is exactly what must not travel any further, a log line included.
+        known = known_dietary_constraints()
+        if any(item not in known for item in value):
+            raise ValueError("each dietary constraint must be a known fragment")
+        if len(set(value)) != len(value):
+            raise ValueError("a dietary constraint may be given only once")
+        return value
 
     def snapshot(self) -> AnalysisOptionsSnapshot:
         """These options as the snapshot a returned analysis records."""

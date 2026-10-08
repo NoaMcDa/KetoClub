@@ -136,6 +136,10 @@ class Settings(BaseSettings):
     # MENU_CACHE_TTL_SECONDS: a venue list (opens/closes, online state)
     # changes far more often than a menu.
     DISCOVERY_CACHE_TTL_SECONDS: int = 300
+    # The D25 analysis cache (#333): one complete LLM analysis per menu
+    # fingerprint, model, schema version and options. A week: a menu's dish
+    # text rarely changes, and a changed one is a different fingerprint.
+    ANALYSIS_CACHE_TTL_SECONDS: int = 604800
 
     # --- Rate limits ----------------------------------------------------------
     # Per-install-ID limits on /v1/chat and write endpoints (#101), the menu
@@ -147,6 +151,15 @@ class Settings(BaseSettings):
     # (phase2_discovery_research.md §2.3), so this exists to protect the
     # backend's own IP, not to ration a scarce upstream quota.
     DISCOVERY_RATE_LIMIT_PER_MINUTE: int = 20
+    # Per-install-ID limit on the D25 analysis bucket (#333): spent only when
+    # a Gemini call is about to be made, never on an analysis-cache hit and
+    # never for a rules-only result.
+    ANALYSIS_RATE_LIMIT_PER_MINUTE: int = 10
+    ANALYSIS_RATE_LIMIT_PER_DAY: int = 60
+    # Largest POST /v1/classify body in bytes (768 KiB), checked against
+    # Content-Length and the body actually read. Over it → 413
+    # payloadTooLarge before any parsing.
+    CLASSIFY_MAX_BODY_BYTES: int = 786_432
 
     @property
     def llm_configured(self) -> bool:

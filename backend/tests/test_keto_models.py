@@ -42,6 +42,7 @@ from app.schemas import (
     VenuesResponse,
     WebsiteMenuRequest,
     WebsiteMenuResponse,
+    known_dietary_constraints,
 )
 
 _BACKEND = Path(__file__).resolve().parent.parent
@@ -569,11 +570,12 @@ _PNG = "iVBORw0KGgo="  # the 8-byte PNG signature
 
 
 def test_classification_options_bounds() -> None:
+    fragments = sorted(known_dietary_constraints())
     body = ClassificationOptionsBody.model_validate(
-        {"netCarbLimitGrams": 50, "dietaryConstraints": ["a", "b", "c"]}
+        {"netCarbLimitGrams": 50, "dietaryConstraints": fragments}
     )
     assert body.snapshot() == AnalysisOptionsSnapshot(
-        net_carb_limit_grams=50, dietary_constraints=["a", "b", "c"]
+        net_carb_limit_grams=50, dietary_constraints=fragments
     )
     assert (
         ClassificationOptionsBody.model_validate(
@@ -586,7 +588,10 @@ def test_classification_options_bounds() -> None:
         {"netCarbLimitGrams": 51},
         {"netCarbLimitGrams": 6.0},
         {"netCarbLimitGrams": "6"},
-        {"netCarbLimitGrams": 6, "dietaryConstraints": ["a", "b", "c", "d"]},
+        {"netCarbLimitGrams": 6, "dietaryConstraints": [*fragments, fragments[0]]},
+        {"netCarbLimitGrams": 6, "dietaryConstraints": ["a"]},
+        {"netCarbLimitGrams": 6, "dietaryConstraints": [fragments[0][:-1]]},
+        {"netCarbLimitGrams": 6, "dietaryConstraints": [fragments[0]] * 2},
         {"netCarbLimitGrams": 6, "dietaryConstraints": [""]},
         {"netCarbLimitGrams": 6, "dietaryConstraints": ["x" * 1001]},
         {"net_carb_limit_grams": 6, "consent": True},
