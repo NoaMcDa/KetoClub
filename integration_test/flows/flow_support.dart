@@ -40,6 +40,7 @@ import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 import 'package:ketoclub/services/classifier/scanned_classifier_router.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/vision_menu_classifier.dart';
+import 'package:ketoclub/services/community/menu_store_client.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
@@ -56,6 +57,7 @@ import 'package:ketoclub/services/storage/install_id_store.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
@@ -117,6 +119,8 @@ final class FakeAppDependencies {
       scannedClassifier = FlowFakeScannedMenuClassifier(),
       pagePicker = FlowFakePagePicker(),
       qrScanner = FlowFakeQrScanner(),
+      visitHistory = FlowFakeVisitHistoryStore(),
+      menuStoreClient = FlowFakeMenuStoreClient(),
       scannedPages = ScannedPagesRegistry();
 
   /// The faked menu repository; script it with [FlowFakeMenuRepository.stub].
@@ -172,6 +176,14 @@ final class FakeAppDependencies {
   /// The faked question answerer (issue #214); script it with
   /// [FlowFakeMenuQuestionAnswerer.enqueue] and friends.
   final FlowFakeMenuQuestionAnswerer questionAnswerer;
+
+  /// The faked visit history behind the Recent list (issue #307); persists
+  /// across screens for the life of the flow, stamped by [clock]'s time.
+  final FlowFakeVisitHistoryStore visitHistory;
+
+  /// The faked shared menu store (issue #312); inspect
+  /// [FlowFakeMenuStoreClient.uploads].
+  final FlowFakeMenuStoreClient menuStoreClient;
 
   /// The in-memory scanned-pages registry (issue #89) — the real one, as
   /// it does no I/O, shared by the Scan tab and the menu screen.
@@ -237,6 +249,8 @@ final class FakeAppDependencies {
     qrScanner: qrScanner,
     scannedPages: scannedPages,
     menuQuestionAnswerer: questionAnswerer,
+    visitHistory: visitHistory,
+    menuStoreClient: menuStoreClient,
   );
 }
 
@@ -586,6 +600,99 @@ final class FlowFakeNotesStore implements NotesStore {
       Map<String, String>.from(
         _notes[ref.cacheKey] ?? const <String, String>{},
       );
+}
+
+/// A [VisitHistoryStore] backed by an in-memory map — mirrors `test/fakes`'
+/// `FakeVisitHistoryStore`, duplicated here for the reason this file's own
+/// top doc comment gives. Every visit is stamped with [FlowFakeClock]'s
+/// fixed time.
+final class FlowFakeVisitHistoryStore implements VisitHistoryStore {
+  final Map<String, VisitEntry> _entries = <String, VisitEntry>{};
+
+  /// Puts [entry] in the history as if it had been recorded.
+  void seed(VisitEntry entry) => _entries[entry.ref.cacheKey] = entry;
+
+  @override
+  Future<VisitEntry?> read(VenueRef ref) async => _entries[ref.cacheKey];
+
+  @override
+  Future<List<VisitEntry>> entries() async =>
+      List<VisitEntry>.of(_entries.values);
+
+  @override
+  Future<void> recordVisit(
+    VenueRef ref, {
+    String? name,
+    String? city,
+    int? dishCount,
+    double? score,
+    int? greenCount,
+    int? yellowCount,
+  }) async {
+    final now = FlowFakeClock().now();
+    final existing = _entries[ref.cacheKey];
+    _entries[ref.cacheKey] = VisitEntry(
+      ref: ref,
+      name: name ?? existing?.name,
+      city: city ?? existing?.city,
+      firstOpenedAt: existing?.firstOpenedAt ?? now,
+      lastOpenedAt: now,
+      openCount: (existing?.openCount ?? 0) + 1,
+      dishCount: dishCount ?? existing?.dishCount,
+      score: score ?? existing?.score,
+      greenCount: greenCount ?? existing?.greenCount,
+      yellowCount: yellowCount ?? existing?.yellowCount,
+    );
+  }
+
+  @override
+  Future<void> rename(
+    VenueRef ref, {
+    required String? name,
+    required String? city,
+  }) async {
+    final existing = _entries[ref.cacheKey];
+    if (existing == null) return;
+    _entries[ref.cacheKey] = VisitEntry(
+      ref: existing.ref,
+      name: name,
+      city: city,
+      firstOpenedAt: existing.firstOpenedAt,
+      lastOpenedAt: existing.lastOpenedAt,
+      openCount: existing.openCount,
+      dishCount: existing.dishCount,
+      score: existing.score,
+      greenCount: existing.greenCount,
+      yellowCount: existing.yellowCount,
+    );
+  }
+
+  @override
+  Future<void> remove(VenueRef ref) async {
+    _entries.remove(ref.cacheKey);
+  }
+
+  @override
+  Future<void> clear() async {
+    _entries.clear();
+  }
+}
+
+/// A [MenuStoreClient] that records every upload and accepts it — mirrors
+/// `test/fakes`' `FakeMenuStoreClient`, duplicated here for the reason this
+/// file's own top doc comment gives.
+final class FlowFakeMenuStoreClient implements MenuStoreClient {
+  /// Every upload the app sent, in call order.
+  final List<MenuUpload> uploads = <MenuUpload>[];
+
+  @override
+  bool get isConfigured => true;
+
+  @override
+  Future<MenuStoreResult> upload(MenuUpload upload) async {
+    uploads.add(upload);
+    return const MenuStored(created: true);
+  }
 }
 
 /// A [VenueSearchService] answering one settable [result] and recording

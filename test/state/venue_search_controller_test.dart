@@ -10,15 +10,19 @@ import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/venue_route.dart';
 
+import '../fakes/fake_clock.dart';
 import '../fakes/fake_location_service.dart';
 import '../fakes/fake_menu_classifier.dart';
 import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_settings_store.dart';
 import '../fakes/fake_venue_search_service.dart';
+import '../fakes/fake_visit_history_store.dart';
 
 /// A Wolt venue addressed by [slug], with the card fields a test sets.
 Venue _venue(
@@ -105,6 +109,7 @@ void main() {
     late FakeLocationService location;
     late FakeVenueSearchService search;
     late FakeMenuClassifier estimator;
+    late FakeVisitHistoryStore history;
     late VenueSearchController controller;
 
     /// A controller with the automatic quick score (D21) off unless
@@ -118,6 +123,7 @@ void main() {
           venueSearchService: search,
           estimateClassifier: estimator,
           autoEstimateLimit: autoEstimateLimit,
+          visitHistory: history,
         );
 
     setUp(() {
@@ -126,6 +132,7 @@ void main() {
       location = FakeLocationService();
       search = FakeVenueSearchService();
       estimator = FakeMenuClassifier();
+      history = FakeVisitHistoryStore(FakeClock(DateTime.utc(2026)));
       controller = build();
     });
 
@@ -317,6 +324,83 @@ void main() {
 
         // Assert
         expect(controller.lastVenueName, equals('vitrina'));
+        // The fallback is for showing, never for passing on (issue #312).
+        expect(controller.lastVenueHint, const VenueOpenHint());
+      });
+
+      test('load names the last venue from the visit history before the '
+          'cache, with its city (issue #312)', () async {
+        // Arrange
+        const ref = VenueRef(source: MenuSource.wolt, platformId: 'vitrina');
+        await settings.write(const AppSettings(lastVenue: ref));
+        repository.seedCache(
+          CachedMenu(
+            menu: Menu(
+              venueRef: ref,
+              venueName: 'Cached Name',
+              currency: 'ILS',
+              fetchedAt: DateTime.utc(2026),
+              categories: const <MenuCategory>[],
+            ),
+          ),
+        );
+        history.seed(
+          VisitEntry(
+            ref: ref,
+            name: 'Vitrina',
+            city: 'Tel Aviv',
+            firstOpenedAt: DateTime.utc(2026),
+            lastOpenedAt: DateTime.utc(2026),
+            openCount: 1,
+          ),
+        );
+
+        // Act
+        await controller.load();
+
+        // Assert
+        expect(controller.lastVenueName, 'Vitrina');
+        expect(
+          controller.lastVenueHint,
+          const VenueOpenHint(name: 'Vitrina', city: 'Tel Aviv'),
+        );
+      });
+
+      test('load falls back to the cached name when the visit history '
+          'names none, keeping the history city (issue #312)', () async {
+        // Arrange
+        const ref = VenueRef(source: MenuSource.wolt, platformId: 'vitrina');
+        await settings.write(const AppSettings(lastVenue: ref));
+        repository.seedCache(
+          CachedMenu(
+            menu: Menu(
+              venueRef: ref,
+              venueName: 'Cached Name',
+              currency: 'ILS',
+              fetchedAt: DateTime.utc(2026),
+              categories: const <MenuCategory>[],
+            ),
+          ),
+        );
+        history.seed(
+          VisitEntry(
+            ref: ref,
+            city: 'Haifa',
+            firstOpenedAt: DateTime.utc(2026),
+            lastOpenedAt: DateTime.utc(2026),
+            openCount: 1,
+          ),
+        );
+
+        // Act
+        await controller.load();
+
+        // Assert
+        expect(controller.lastVenueName, 'Cached Name');
+        expect(
+          controller.lastVenueHint,
+          const VenueOpenHint(name: 'Cached Name', city: 'Haifa'),
+        );
       });
 
       test('load notifies listeners exactly once', () async {

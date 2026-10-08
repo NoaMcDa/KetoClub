@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
@@ -8,14 +10,17 @@ import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_question_answerer.dart';
 import 'package:ketoclub/services/classifier/menu_question_prompt.dart';
 import 'package:ketoclub/services/classifier/menu_response_parser.dart';
+import 'package:ketoclub/services/community/menu_store_client.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
+import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/utils/verdict_counts.dart';
 
 /// The state of a user-initiated menu question (architecture.md §9.5;
@@ -116,6 +121,12 @@ final class MenuController extends ChangeNotifier {
   /// one. When null, [isQuestionAvailable] returns false and [askQuestion]
   /// is a no-op.
   ///
+  /// The optional [VisitHistoryStore] defaults to [NoVisitHistoryStore],
+  /// which remembers nothing; the app passes the device's own (issue #307).
+  ///
+  /// The optional [MenuStoreClient] defaults to [NoMenuStoreClient], which
+  /// sends nothing; the app passes the backend's (issue #312, D24).
+  ///
   /// No `Clock` is injected. Every timestamp this controller exposes comes
   /// from the result it was read from — [cachedAt] and [fetchedAt] from
   /// `Menu.fetchedAt`, `analysedAt` from the classifier — so a clock here
@@ -128,6 +139,8 @@ final class MenuController extends ChangeNotifier {
     this._notes,
     this._carbBudget, [
     this._answerer,
+    this._history = const NoVisitHistoryStore(),
+    this._menuStore = const NoMenuStoreClient(),
   ]) {
     _carbBudget.addListener(_onBudgetChange);
   }
@@ -138,6 +151,27 @@ final class MenuController extends ChangeNotifier {
   final NotesStore _notes;
   final CarbBudgetController _carbBudget;
   final MenuQuestionAnswerer? _answerer;
+
+  /// The menus opened on this device (issue #307): [open] reads the
+  /// venue's entry for [historyName] and [historyCity], and records every
+  /// successful open in it (issue #312).
+  final VisitHistoryStore _history;
+
+  /// Contributes a fetched menu to the shared menu store (issue #312,
+  /// D24); see [open] for when.
+  final MenuStoreClient _menuStore;
+
+  /// The name the visit history holds for the open venue; see
+  /// [historyName].
+  String? _historyName;
+
+  /// The city the visit history holds for the open venue; see
+  /// [historyCity].
+  String? _historyCity;
+
+  /// The upload [open] last started, or an already-complete future when
+  /// none has been; see [lastUpload].
+  Future<void> _lastUpload = Future<void>.value();
 
   @override
   void dispose() {
@@ -253,6 +287,25 @@ final class MenuController extends ChangeNotifier {
   /// something else — the pasted venue reference, per [Menu.venueName]'s
   /// own doc comment — never to a placeholder guessed in this class.
   String? get venueName => _menu?.venueName;
+
+  /// The name the visit history remembers for the open venue (issue #307),
+  /// for a header to fall back to when [venueName] is null.
+  ///
+  /// Read at the start of [open], before the menu is fetched, so a header
+  /// can show it while the menu loads; refreshed once [open] has recorded
+  /// the visit. Null before [open] and for a venue never named.
+  String? get historyName => _historyName;
+
+  /// The city the visit history remembers for the open venue (issue #307),
+  /// read and refreshed exactly as [historyName]; null when none is known.
+  String? get historyCity => _historyCity;
+
+  /// Completes when the most recent menu upload [open] started has
+  /// finished (issue #312); already complete when none has been started.
+  ///
+  /// The upload's result is never surfaced — the client logs its own
+  /// failures — so this exists for a test to wait on, nothing else.
+  Future<void> get lastUpload => _lastUpload;
 
   /// A rough "how keto-friendly is this menu" score out of 10, or null
   /// when [analysis] is not a [MenuAnalysed] — see `utils/keto_score.dart`
@@ -609,8 +662,37 @@ final class MenuController extends ChangeNotifier {
   /// Otherwise the classifier runs, and a successful [MenuAnalysed] is
   /// persisted through the repository for the next open to reuse.
   /// [filter] is reset from the user's stored default on every call, and
-  /// [pageFilter] to null. Never throws.
-  Future<void> open(VenueRef ref, {bool forceRefresh = false}) async {
+  /// [pageFilter] to null.
+  ///
+  /// **The visit history (issue #312).** Before fetching, the venue's
+  /// history entry is read into [historyName] and [historyCity], and
+  /// listeners are told when that changes either, so a header can name the
+  /// venue while it loads.
+  /// Every successful fetch then records exactly one visit, once the
+  /// analysis is settled: the name the menu itself carries, else
+  /// [hint]'s; [hint]'s city; the dish count; and, when the analysis
+  /// succeeded, the score and the green and yellow counts. A failed fetch
+  /// records nothing, and neither does [refresh].
+  ///
+  /// **The shared menu store (issue #312, D24).** Right after recording,
+  /// and only when the user consents to AI analysis and the store is
+  /// configured, the menu is uploaded in the background when it is news to
+  /// the store from this device: the venue was never opened here before, or
+  /// a language-model analysis ([LlmEngine]) was made in this open, or the
+  /// cached language-model analysis is newer than the previous visit (a
+  /// background fetch or a scan saved it since). A rules analysis is never
+  /// news after the first visit, since it is never reused and would upload
+  /// on every open: a menu only the rules judged uploads once, on its first
+  /// visit, without an analysis. An analysis rides along only when the
+  /// language model made it. [lastUpload] completes when that upload does;
+  /// its result is never shown.
+  ///
+  /// Never throws.
+  Future<void> open(
+    VenueRef ref, {
+    bool forceRefresh = false,
+    VenueOpenHint? hint,
+  }) async {
     _ref = ref;
     _phase = LoadPhase.fetching;
     _pageFilter = null;
@@ -620,6 +702,12 @@ final class MenuController extends ChangeNotifier {
     final appSettings = await _settings.read();
     _filter = appSettings.lastFilter ?? appSettings.filter;
     _dishNotes = await _notes.readAll(ref);
+    final previous = await _history.read(ref);
+    if (previous?.name != _historyName || previous?.city != _historyCity) {
+      _historyName = previous?.name;
+      _historyCity = previous?.city;
+      notifyListeners();
+    }
 
     final fetchResult = await _repository.load(ref, forceRefresh: forceRefresh);
     switch (fetchResult) {
@@ -648,6 +736,14 @@ final class MenuController extends ChangeNotifier {
         } else {
           await _classify(ref, fetchedMenu, options);
         }
+        await _recordVisit(
+          ref,
+          fetchedMenu,
+          hint: hint,
+          previous: previous,
+          classified: reusable == null,
+          consentGiven: appSettings.estimationConsentGiven,
+        );
       case MenuFetchFailed(:final reason, :final statusCode):
         _menu = null;
         _analysis = null;
@@ -659,6 +755,119 @@ final class MenuController extends ChangeNotifier {
 
     _phase = LoadPhase.idle;
     notifyListeners();
+  }
+
+  /// Records [ref]'s visit after [open] fetched [menu] and settled its
+  /// analysis, refreshes [historyName] and [historyCity] from what was
+  /// recorded, and starts the upload [open] describes when it is due.
+  ///
+  /// [previous] is the entry read before the fetch, [classified] whether
+  /// this open ran the classifier rather than reusing a cached analysis,
+  /// and [consentGiven] the user's AI-analysis consent.
+  Future<void> _recordVisit(
+    VenueRef ref,
+    Menu menu, {
+    required VenueOpenHint? hint,
+    required VisitEntry? previous,
+    required bool classified,
+    required bool consentGiven,
+  }) async {
+    final analysis = _analysis;
+    final counts = analysis is MenuAnalysed
+        ? VerdictCounts.of(menu, analysis)
+        : null;
+    final name = menu.venueName ?? hint?.name;
+    final city = hint?.city;
+    await _history.recordVisit(
+      ref,
+      name: name,
+      city: city,
+      dishCount: menu.allDishes.length,
+      score: counts?.score,
+      greenCount: counts?.green,
+      yellowCount: counts?.yellow,
+    );
+    // The store never lets a null erase a recorded value, so what it now
+    // holds is what was written, else what it held before.
+    _historyName = name ?? previous?.name;
+    _historyCity = city ?? previous?.city;
+
+    if (!consentGiven || !_menuStore.isConfigured) return;
+    // Only a language-model analysis is news: a rules result is never
+    // reused, so counting it would upload on every open.
+    final llm = analysis is MenuAnalysed && analysis.engine is LlmEngine
+        ? analysis
+        : null;
+    final fresh = llm != null && classified;
+    final newer =
+        llm != null &&
+        previous != null &&
+        llm.analysedAt.isAfter(previous.lastOpenedAt);
+    if (previous != null && !fresh && !newer) return;
+    _startUpload(ref, menu, llm);
+  }
+
+  /// Sends [menu] and [analysis] (null when the language model made none)
+  /// to the shared menu store under [historyName] and [historyCity], in
+  /// the background; [lastUpload] tracks it.
+  void _startUpload(VenueRef ref, Menu menu, MenuAnalysed? analysis) {
+    final upload = MenuUpload(
+      ref: ref,
+      venueName: _historyName,
+      city: _historyCity,
+      menu: menu,
+      analysis: analysis,
+    );
+    final pending = _menuStore.upload(upload).then((_) {});
+    _lastUpload = pending;
+    unawaited(pending);
+  }
+
+  /// Whether the open menu is a scanned one, whose name and city the user
+  /// may set with [renameVisit] (issue #315); a venue from a platform
+  /// carries its own.
+  bool get canRename => _ref?.source == MenuSource.scan;
+
+  /// Names the open scanned menu [name] in [city] (issue #315): both are
+  /// trimmed and an empty one becomes null, which clears it.
+  ///
+  /// Writes the visit history, updates [historyName] and [historyCity],
+  /// and tells listeners. Then, when the user consents to AI analysis,
+  /// the menu store is configured and a menu is loaded, uploads the menu
+  /// again under the new name and city ([lastUpload] tracks it), with the
+  /// analysis only when the language model made it. A no-op before
+  /// [open].
+  Future<void> renameVisit({
+    required String? name,
+    required String? city,
+  }) async {
+    final ref = _ref;
+    if (ref == null) return;
+    final cleanName = _blankToNull(name);
+    final cleanCity = _blankToNull(city);
+    await _history.rename(ref, name: cleanName, city: cleanCity);
+    _historyName = cleanName;
+    _historyCity = cleanCity;
+    notifyListeners();
+
+    final menu = _menu;
+    if (menu == null || !_menuStore.isConfigured) return;
+    final appSettings = await _settings.read();
+    if (!appSettings.estimationConsentGiven) return;
+    final analysis = _analysis;
+    _startUpload(
+      ref,
+      menu,
+      analysis is MenuAnalysed && analysis.engine is LlmEngine
+          ? analysis
+          : null,
+    );
+  }
+
+  /// [value] trimmed, or null when nothing is left of it.
+  static String? _blankToNull(String? value) {
+    final trimmed = value?.trim();
+    return trimmed == null || trimmed.isEmpty ? null : trimmed;
   }
 
   /// Force-refetches the venue last passed to [open], skipping

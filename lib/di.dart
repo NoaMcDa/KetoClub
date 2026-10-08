@@ -10,6 +10,7 @@ import 'package:ketoclub/services/classifier/llm_menu_question_answerer.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/scanned_classifier_router.dart';
 import 'package:ketoclub/services/classifier/vision_menu_classifier.dart';
+import 'package:ketoclub/services/community/menu_store_client.dart';
 import 'package:ketoclub/services/llm/backend_chat_client.dart';
 import 'package:ketoclub/services/llm/gemini_chat_client.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
@@ -37,6 +38,7 @@ import 'package:ketoclub/services/storage/install_id_store.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/services/venue/wolt/wolt_venue_search_service.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
@@ -51,13 +53,25 @@ const String _menuCacheBoxName = 'menu_cache';
 /// from [_menuCacheBoxName] so the entries' stored shape never changes.
 const String _menuCachePinsBoxName = 'menu_cache_pins';
 
+/// The name of the Hive box holding the visit history behind the Recent list
+/// (issue #307): one entry per menu opened on this device.
+const String _menuHistoryBoxName = 'menu_history';
+
 /// KetoClub's own backend, read at build time (`backend_plan.md` §4.1).
 /// Empty when the app was built with no `--dart-define=KETOCLUB_BACKEND_URL=…`,
-/// which is every build until issue #99 adds a Settings override. Only the
-/// web build reads it: there AI analysis goes through the backend, which
-/// holds the model key, and so do menus (see [menuProxyBase]). iOS and
-/// Android call Wolt and Gemini directly and ignore it (architecture.md
-/// D17, see [chatClientFor]).
+/// which is every build until issue #99 adds a Settings override. On the
+/// web build AI analysis goes through the backend, which holds the model
+/// key, and so do menus (see [menuProxyBase]). iOS and Android call Wolt
+/// and Gemini directly and ignore it for those (architecture.md D17, see
+/// [chatClientFor]).
+///
+/// **D24 amends D17 for one route: the shared menu store.** Every platform,
+/// phones included, contributes the menus it opens to the backend's
+/// menu-store upload route through [BackendMenuStoreClient] at this
+/// address — [backendBaseUrl], not [menuProxyBase], which is null off the
+/// web (issue #312). With no address configured that client answers
+/// `notConfigured` without I/O, so a build with no backend still sends
+/// nothing anywhere.
 const String _configuredBackendUrl = String.fromEnvironment(
   'KETOCLUB_BACKEND_URL',
 );
@@ -191,11 +205,12 @@ AppDependencies buildDependencies() {
   final client = http.Client();
   const clock = SystemClock();
   final connectivity = DeviceConnectivity(plus.Connectivity());
-  // Passed to the chat client and the venue search: the install id is
-  // sent nowhere but the `X-KetoClub-Install-Id` header on a request to
-  // KetoClub's own backend (`backend_plan.md` §3.4), which rate-limits
-  // both the chat route and the discovery routes by it. Only the web build
-  // makes such requests; on a phone the id is never read.
+  // Passed to the chat client, the venue search and the menu store: the
+  // install id is sent nowhere but the `X-KetoClub-Install-Id` header on a
+  // request to KetoClub's own backend (`backend_plan.md` §3.4), which
+  // rate-limits the chat route, the discovery routes and the menu store by
+  // it. Only the web build makes the first two; a phone reads the id only
+  // for a menu upload (D24).
   final installIdStore = PrefsInstallIdStore(
     load: SharedPreferences.getInstance,
   );
@@ -204,6 +219,7 @@ AppDependencies buildDependencies() {
   // client and written by Settings (architecture.md D17). Web: null.
   final apiKeyStore = apiKeyStoreFor(runsInBrowser: kIsWeb);
 
+  const logger = DeveloperLogAppLogger();
   const heuristic = HeuristicMenuClassifier(clock: clock);
   // One chat client for both engines that reach the model: the text
   // classifier, the scan path's vision classifier (issue #89), and the
@@ -303,7 +319,7 @@ AppDependencies buildDependencies() {
     settingsStore: settingsStore,
     notesStore: PrefsNotesStore(load: SharedPreferences.getInstance),
     clock: clock,
-    logger: const DeveloperLogAppLogger(),
+    logger: logger,
     // The same instance the classifier router already pre-checks with
     // (architecture.md §14 D10) — the persistent offline banner (issue
     // #68) reads it too, rather than opening a second platform channel.
@@ -342,5 +358,25 @@ AppDependencies buildDependencies() {
     // (issue #298).
     scanBudget: const ScanBudget(downscaler: JpegImageDownscaler()),
     navigatorKey: navigatorKey,
+    // Opened on first use, like the menu cache's boxes; the history never
+    // leaves the device through this store (issue #307, D8).
+    visitHistory: HiveVisitHistoryStore(
+      openBox: () async {
+        await Hive.initFlutter();
+        return await Hive.openBox<String>(_menuHistoryBoxName);
+      },
+      clock: clock,
+    ),
+    // On every platform, phones included (D24 amending D17; see
+    // [_configuredBackendUrl]): the menu store is the backend's alone.
+    // Sends only with the user's AI-analysis consent (MenuController.open),
+    // never a personal setting, and nothing at all when no backend is
+    // configured. The constructor reads no install id and sends nothing.
+    menuStoreClient: BackendMenuStoreClient(
+      client: client,
+      baseUrl: backendBaseUrl(_configuredBackendUrl),
+      installIdStore: installIdStore,
+      logger: logger,
+    ),
   );
 }

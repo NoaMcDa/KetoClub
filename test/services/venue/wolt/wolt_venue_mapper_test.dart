@@ -142,6 +142,15 @@ void main() {
       expect(shila.isOnline, isFalse);
     });
 
+    test('reads the city of each venue in the fixture', () {
+      // Act
+      final venues = WoltVenueMapper.map(_restaurants())!;
+
+      // Assert
+      expect(venues, isNotEmpty);
+      expect(venues.map((v) => v.city), everyElement(equals('Tel Aviv')));
+    });
+
     test('reads an integer rating score as a double', () {
       // Act
       final venues = WoltVenueMapper.map(_restaurants())!;
@@ -191,6 +200,7 @@ void main() {
         ]),
       );
       expect(_bySlug(venues, 'pizza-lena').name, equals('פיצה לנה'));
+      expect(venues.map((v) => v.city), everyElement(equals('Tel Aviv')));
       expect(_bySlug(venues, 'tony-vespa-allenby').name, equals('Tony Vespa'));
     });
   });
@@ -272,7 +282,33 @@ void main() {
       expect(venue.shortDescription, isNull);
       expect(venue.platformRating, isNull);
       expect(venue.estimateMinutes, isNull);
+      expect(venue.city, isNull);
       expect(venue.sourceUrl, isNotNull);
+    });
+
+    test('a blank, missing or non-string city is null', () {
+      // Act & Assert
+      expect(_single(<String, Object?>{'slug': 's', 'name': 'N'}).city, isNull);
+      for (final city in <Object?>['', '   ', 7, <Object?>[]]) {
+        final venue = _single(<String, Object?>{
+          'slug': 's',
+          'name': 'N',
+          'city': city,
+        });
+        expect(venue.city, isNull, reason: 'city: $city');
+      }
+    });
+
+    test('does not read the country as a city', () {
+      // Act
+      final venue = _single(<String, Object?>{
+        'slug': 's',
+        'name': 'N',
+        'country': 'ISR',
+      });
+
+      // Assert
+      expect(venue.city, isNull);
     });
 
     test('treats every optional field of the wrong type as absent', () {

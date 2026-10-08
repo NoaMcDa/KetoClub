@@ -23,6 +23,7 @@ import '../services/storage/install_id_store_contract.dart';
 import '../services/storage/menu_cache_contract.dart';
 import '../services/storage/notes_store_contract.dart';
 import '../services/storage/settings_store_contract.dart';
+import '../services/storage/visit_history_store_contract.dart';
 import 'fake_api_key_store.dart';
 import 'fake_app_logger.dart';
 import 'fake_clock.dart';
@@ -34,6 +35,7 @@ import 'fake_page_picker.dart';
 import 'fake_qr_scanner.dart';
 import 'fake_scanned_menu_classifier.dart';
 import 'fake_settings_store.dart';
+import 'fake_visit_history_store.dart';
 
 void main() {
   group('FakeClock', () {
@@ -629,6 +631,10 @@ void main() {
   );
   runPagePickerContract('FakePagePicker', FakePagePicker.new);
   runQrScannerContract('FakeQrScanner', FakeQrScanner.new);
+  runVisitHistoryStoreContract(
+    'FakeVisitHistoryStore',
+    FakeVisitHistoryStore.new,
+  );
 
   group('FakeScannedMenuClassifier', () {
     test('reads one dish per page under a scan reference by default', () async {

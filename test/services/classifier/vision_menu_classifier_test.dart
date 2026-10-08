@@ -165,20 +165,16 @@ void main() {
   });
 
   group('VisionMenuClassifier read', () {
-    test('addresses the menu by the hex of the clock stamp', () async {
+    test('addresses the menu by its transcription, stamped with the '
+        'clock', () async {
       // Act
       final result = await _classifier(_answering())
           .classify(_threePages(), options: _steered);
 
       // Assert
       final read = result as ScannedMenuRead;
-      expect(
-        read.menu.venueRef,
-        VenueRef(
-          source: MenuSource.scan,
-          platformId: _now.millisecondsSinceEpoch.toRadixString(16),
-        ),
-      );
+      expect(read.menu.venueRef.source, MenuSource.scan);
+      expect(read.menu.venueRef.platformId, matches(RegExp(r'^[0-9a-f]{8}$')));
       expect(read.menu.fetchedAt, _now);
       expect(read.analysis.analysedAt, _now);
     });

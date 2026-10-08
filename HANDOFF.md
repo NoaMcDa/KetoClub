@@ -8,7 +8,8 @@ now that Phase 2's run (10bis, location and nearby search, the Discovery
 screen, platform setup, and a run of features beyond those) has landed on top
 of both, again for Phase 4's menu-scanning core (paste, photographs, PDF),
 and once more for Phase 8 (the UI/UX review's 44 issues, #221–#264, built in
-parallel on the `phase-8` branch and opened as PR #266).
+parallel on the `phase-8` branch and opened as PR #266), and for the menu
+history and the shared menu store that followed it (#305, #306; D23, D24).
 It says what exists, what is deliberately unfinished, and which
 mistakes are already paid for so nobody pays for them twice.
 
@@ -20,6 +21,40 @@ request.
 ---
 
 ## What shipped
+
+**The menu history and the shared menu store (#305 → D23, #306 → D24; issues
+#307–#315, branch `claude/history-and-menu-store`).** Two epics, built
+together because the upload hangs off the visit:
+
+- **D23, a permanent on-device history.** `VisitHistoryStore` (a third Hive
+  box, `menu_history`) keeps one `VisitEntry` per menu opened on this device —
+  name, city, first and last opened, open count, and the last dish count,
+  score and counts — until the row is removed or Settings' Clear empties it
+  with the cache (#314). A visit is recorded only by `MenuController.open`
+  (#312), never by Discovery's quick score. The venue route's argument is now
+  a `VenueOpenHint {name, city}` (`utils/venue_route.dart`) instead of a bare
+  name string. The Recent tab lists the history joined to the cache
+  (`RecentEntry`, #313), with four availability states: kept, the expiry
+  countdown, "Not on this device, opens online", and an inert "No longer on
+  this device" for a scan whose only copy has gone. A scan can be renamed,
+  name and city, from the menu screen's overflow or a long-press in Recent
+  (#315). And a photographed scan is now addressed by its content fingerprint,
+  `scan/<menuFingerprint hex>`, like a paste (#308), so reading the same
+  pages twice is one entry.
+- **D24, a shared menu store.** The backend's `stored_menus` table (#310), one
+  row per `(source, platform_id)`, filled by `POST /v1/menus` and read back by
+  an optional `GET` the app does not call yet; `MENU_STORE_ENABLED` and
+  `MENU_STORE_MAX_BODY_BYTES` configure it. The client is `MenuStoreClient`
+  in a new `services/community/` sub-package (#309), built in `di.dart` from
+  `backendBaseUrl` on **every** platform, so it is the one backend route a
+  phone calls when `KETOCLUB_BACKEND_URL` is set. `MenuController.open`
+  uploads, in the background and only under the AI consent, when the visit
+  is new, a language-model analysis was freshly made, or the cached one is
+  newer than the last visit; a rules-only menu uploads once, on its first
+  visit, without an analysis (#312). The analysis travels without its
+  `options`. `Venue.city` now comes from Wolt's discovery items (#311) and,
+  for a scan, from the rename dialog. The consent copy in Settings and the
+  Scan tab says what is stored.
 
 **Phase 8 — UI Polish & Desktop Web (PR #266, issues #221–#264).** Every
 remark in `docs/UX_REVIEW.md` became one issue and one feature branch
@@ -378,6 +413,20 @@ spacing values) is enforced by a test; pixel fidelity by no test at all.
   PDF can still meet the 503 that `ScanBudget` prevents for images, and the
   model's `page` values have never been observed on a real request (#88): a
   dish it does not place lands under the "unknown" header.
+- **The visit history has no backfill, and a gone scan's row is inert**
+  (D23). Menus cached before the history existed are not listed in Recent
+  until they are opened again, and a scan stored under the old clock ref is
+  listed nowhere. A scan's Recent row outlives its only cached copy and then
+  cannot open ("No longer on this device"); it can only be removed. `refresh`
+  does not re-snapshot the visit's numbers.
+- **Menu uploads share the chat limiter, and the store is not hosted** (D24).
+  On web `POST /v1/menus` spends the same 5/minute, 40/day bucket as
+  `/v1/chat`, so a first open costs two units and an upload can push the next
+  analysis into a rate-limited rules fallback. Uploads are fire-and-forget:
+  never retried, never shown. Until #109 hosts the backend, the "shared"
+  store is whichever `localhost` a build points at. A phone build with no
+  backend URL still shows consent copy saying menus are stored on the server,
+  while sending nothing.
 - **The iOS Hebrew permission strings are unregistered until someone runs one
   Xcode step.** `ios/Runner/{en,he}.lproj/InfoPlist.strings` hold the location,
   camera and photo-library prompts in both languages (#169, #196, #205), but
@@ -510,6 +559,13 @@ this is the short list.
   vision path's `visionResponseSchema` adds `page`.** A field that lives on
   `Menu`/`Dish` never needs a `schemaVersion` bump — bumping it re-analyses
   every cached scan through the text classifier and loses the pages (D22).
+- **A scan's ref is its content fingerprint (D23); never key one on the
+  clock.** And "in the cache" is not "visited": Discovery's quick score writes
+  cache entries for venues never opened, so a visit is recorded only in
+  `MenuController.open`, and Recent lists the history, not the cache.
+- **Never put the install id beside content (D24).** `/v1/menus` reads it for
+  rate limiting and deletes it; `stored_menus` has no column for it and no log
+  line carries it.
 - **`FLOW_TEST_CONVENTIONS.md`'s examples do not match this codebase.** They
   reference `HomeScreen`, `VenueListScreen` and a string `status` field, none of which
   exist. They are illustrative, not runnable. Same for the hypothetical workflow files

@@ -19,34 +19,20 @@ import logging
 from datetime import UTC, datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, Request, Response
+from fastapi import APIRouter, Depends, Request, Response
 from fastapi.exceptions import RequestValidationError
 from starlette.concurrency import run_in_threadpool
 
 from app.errors import BackendError
 from app.schemas import ChatRequest, ChatResponse, ErrorResponse
 from app.services import chat_cache, gemini
+from app.services.auth import reject_authorization
 from app.services.install_id import log_safe, require_install_id
 from app.services.rate_limit import RateLimiter
 
 router = APIRouter()
 
 logger = logging.getLogger("ketoclub.chat")
-
-
-def reject_authorization(
-    authorization: Annotated[str | None, Header()] = None,
-) -> None:
-    """400 ``badResponse`` for any inbound ``Authorization`` header.
-
-    The backend holds the key; a client sending one is either confused or
-    trying to have its own credential forwarded, and neither is served.
-    Declared as a route-level dependency so it runs before anything else,
-    body validation included.
-    """
-    if authorization is not None:
-        raise BackendError(400, "badResponse")
-
 
 _ERROR_RESPONSES: dict[int | str, dict[str, object]] = {
     status: {"model": ErrorResponse} for status in (400, 429, 502, 503, 504)

@@ -146,7 +146,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsConsentBody =>
-      'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.';
+      'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. The menu, its analysis, the venue name and city are also stored on KetoClub\'s server, with nothing that identifies you, so others can find them. Untick this to keep every menu on this device.';
 
   @override
   String get settingsConsentAccept => 'Allow AI analysis';
@@ -159,7 +159,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsConsentBodyDirect =>
-      'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. Untick this to keep every menu on this device.';
+      'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. The menu, its analysis, the venue name and city are also stored on KetoClub\'s server, with nothing that identifies you, so others can find them. Untick this to keep every menu on this device.';
 
   @override
   String get settingsKeySection => 'Gemini API key';
@@ -279,13 +279,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsClearCacheConfirmBody =>
-      'This removes every menu saved on this device, including any you can currently open offline. You can save a venue again by opening it once you have a connection.';
+      'This removes every menu saved on this device and clears your Recent list, including any menu you can currently open offline. Open a venue again to save it.';
 
   @override
   String get settingsClearCacheConfirmAction => 'Clear';
 
   @override
-  String get settingsCacheCleared => 'Saved menus cleared.';
+  String get settingsCacheCleared => 'Saved menus and Recent list cleared.';
 
   @override
   String get settingsAboutSection => 'About';
@@ -485,7 +485,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get savedPlaceholderBody =>
-      'Open a venue\'s menu and it appears here automatically, available for a day — even offline.';
+      'Every menu you open is listed here with its score and counts until you remove it. Menus opened in the last day also work offline.';
 
   @override
   String get savedLoading => 'Loading your recent menus…';
@@ -571,6 +571,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get savedUndo => 'Undo';
+
+  @override
+  String savedOpenedAgo(String age) {
+    return 'Opened $age';
+  }
+
+  @override
+  String savedOpenCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Opened $count times',
+      one: 'Opened once',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get savedNotOnDevice => 'Not on this device, opens online';
+
+  @override
+  String get savedScanGone => 'No longer on this device';
+
+  @override
+  String get savedRename => 'Rename';
+
+  @override
+  String savedRenameSemanticLabel(String venue) {
+    return 'Rename $venue';
+  }
 
   @override
   String get discoveryTitle => 'Where to eat';
@@ -915,6 +945,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get menuClearFilter => 'Clear filter';
 
   @override
+  String get menuRenameAction => 'Rename';
+
+  @override
+  String get menuRenameTitle => 'Name this menu';
+
+  @override
+  String get menuRenameHint => 'Restaurant name';
+
+  @override
+  String get menuRenameCityHint => 'City';
+
+  @override
+  String get menuRenameSave => 'Save';
+
+  @override
   String categoryChipSemanticLabel(String category) {
     return 'Jump to $category';
   }
@@ -942,6 +987,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sourceScanned => 'Pasted menu';
+
+  @override
+  String sourceWithCity(String platform, String city) {
+    return '$platform · $city';
+  }
 
   @override
   String get fetchFailedScanNotSaved =>
@@ -1096,11 +1146,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scanScreenDisclosureWeb =>
-      'The pages are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API to be read.';
+      'The pages are sent to KetoClub\'s server, which forwards them to Google\'s Gemini API to be read. The transcribed menu, its analysis, and the name and city you give it are also stored on KetoClub\'s server, anonymously.';
 
   @override
   String get scanScreenDisclosureDirect =>
-      'The pages are sent straight from this device to Google\'s Gemini API, using your own API key.';
+      'The pages are sent straight from this device to Google\'s Gemini API, using your own API key. The transcribed menu, its analysis, and the name and city you give it are also stored on KetoClub\'s server, anonymously.';
 
   @override
   String get scanScreenSettingsLink => 'Settings';

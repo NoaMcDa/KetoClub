@@ -137,9 +137,16 @@ abstract final class MenuResponseParser {
 
   /// Parses [body] — the raw reply to a vision request that transcribed
   /// and classified photographed or PDF pages in one call — into the
-  /// transcribed [Menu] addressed to [ref] and its analysis, stamped
-  /// [analysedAt] with [engine] (architecture.md §9.4, scanned variant;
-  /// D15, issue #89).
+  /// transcribed [Menu] and its analysis, stamped [analysedAt] with
+  /// [engine] (architecture.md §9.4, scanned variant; D15, issue #89).
+  ///
+  /// The menu's reference is content-addressed (D23, issue #308):
+  /// `VenueRef(scan, <8 hex digits of`
+  /// [TextNormaliser.menuFingerprint]` of the transcription>)`, exactly
+  /// the scheme a pasted menu follows, so a photograph and a paste of
+  /// the same dishes are one entry, and reading the same pages twice is
+  /// one entry too. The fingerprint reads dish text only, so a dish's
+  /// [Dish.page] and the read time never change it.
   ///
   /// There is no source menu to check a reply against: the pages are the
   /// source, and the user checks the transcription against them ("View
@@ -181,7 +188,6 @@ abstract final class MenuResponseParser {
   /// Static, pure, and never throws, like [parse].
   static ScannedMenuResult parseScanned(
     String body, {
-    required VenueRef ref,
     required DateTime analysedAt,
     required AnalysisEngine engine,
     int netCarbLimitGrams = defaultNetCarbLimitGrams,
@@ -235,17 +241,30 @@ abstract final class MenuResponseParser {
     final isHebrew = transcribed.any(
       (dish) => TextNormaliser.containsHebrew(dish.name),
     );
-    final menu = Menu(
-      venueRef: ref,
+    final categories = <MenuCategory>[
+      MenuCategory(
+        id: scannedCategoryId,
+        name: isHebrew ? scannedCategoryNameHe : scannedCategoryNameEn,
+        dishes: transcribed,
+      ),
+    ];
+    // The paste scheme (TextMenuSource): fingerprint a provisional menu,
+    // then address the final one by it.
+    final provisional = Menu(
+      venueRef: const VenueRef(source: MenuSource.scan, platformId: 'pending'),
       currency: scannedMenuCurrency,
       fetchedAt: analysedAt,
-      categories: <MenuCategory>[
-        MenuCategory(
-          id: scannedCategoryId,
-          name: isHebrew ? scannedCategoryNameHe : scannedCategoryNameEn,
-          dishes: transcribed,
-        ),
-      ],
+      categories: categories,
+    );
+    final fingerprint = TextNormaliser.menuFingerprint(provisional);
+    final menu = Menu(
+      venueRef: VenueRef(
+        source: MenuSource.scan,
+        platformId: fingerprint.toRadixString(16).padLeft(8, '0'),
+      ),
+      currency: scannedMenuCurrency,
+      fetchedAt: analysedAt,
+      categories: categories,
     );
     return ScannedMenuRead(
       menu: menu,

@@ -68,9 +68,15 @@ Check it: `curl http://localhost:8000/v1/health` â†’ `{"status":"ok","version":â
 falls back to the rules engine and says so).
 
 Everything else in `.env` has a safe default. `DATABASE_URL` defaults to a
-local SQLite file (`backend/ketoclub.db`, gitignored) holding only the
-menu/search/completion caches. `backend/README.md` documents every route,
-error and cache.
+local SQLite file (`backend/ketoclub.db`, gitignored) holding the
+menu/search/completion caches and, since #310, the `stored_menus` table: the
+anonymous shared store of opened menus behind `POST /v1/menus`, keyed by
+venue and never by install id. Two variables govern it:
+`MENU_STORE_ENABLED` (default `true`; `false` unmounts the routes, which then
+answer 404) and `MENU_STORE_MAX_BODY_BYTES` (default `1048576`; a larger
+upload is refused with 413). The tables are created on startup, so an
+existing `ketoclub.db` gains `stored_menus` the next time the backend starts.
+`backend/README.md` documents every route, error and cache.
 
 ## 3. The web app talking to the backend
 

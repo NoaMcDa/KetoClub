@@ -104,6 +104,17 @@ class Settings(BaseSettings):
     # Fetches per install in any 60 s, so the route is no open proxy.
     WEBSITE_RATE_LIMIT_PER_MINUTE: int = 10
 
+    # --- Menu store (#310) -----------------------------------------------------
+    # POST /v1/menus and GET /v1/menus/{source}/{platform_id}: an anonymous
+    # shared store of opened menus, keyed by venue and never by install id.
+    # When false the menus router is not mounted at all, so both routes
+    # answer 404 like any unknown path.
+    MENU_STORE_ENABLED: bool = True
+    # Largest POST /v1/menus body in bytes (1 MiB), checked against
+    # Content-Length and the body actually read.  Over it → 413
+    # payloadTooLarge before any parsing.
+    MENU_STORE_MAX_BODY_BYTES: int = 1_048_576
+
     # --- Database -------------------------------------------------------------
     DATABASE_URL: str = "sqlite:///./ketoclub.db"
 
@@ -127,7 +138,8 @@ class Settings(BaseSettings):
     DISCOVERY_CACHE_TTL_SECONDS: int = 300
 
     # --- Rate limits ----------------------------------------------------------
-    # Per-install-ID limits on /v1/chat and write endpoints (#101).
+    # Per-install-ID limits on /v1/chat and write endpoints (#101), the menu
+    # store's POST /v1/menus (#310) among them: one bucket shared by both.
     RATE_LIMIT_PER_MINUTE: int = 5
     RATE_LIMIT_PER_DAY: int = 40
     # Per-install-ID, minute-window-only limit on the two discovery routes

@@ -47,7 +47,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > whole before it is sent (`ScanBudget`, shrinking each page down a ladder, or
 > refusing with no Retry) and has every transcribed dish remember its page
 > (`Dish.page`, the vision-only `page` property), so the menu screen groups a
-> multi-page scan under page headers and page chips.
+> multi-page scan under page headers and page chips. D23 (#305, #307, #308,
+> #312–#315) gives the device a permanent history of the menus opened on it
+> (`VisitHistoryStore`, the `menu_history` box), which the Recent tab now
+> lists joined to the cache, lets a scan be renamed with a city, and addresses
+> a scan by its content fingerprint, as a paste already was. D24 (#306,
+> #309–#312) adds a shared menu store on the backend (`stored_menus`,
+> `POST /v1/menus`, keyed by venue, never by install id) that every platform
+> built with a backend URL uploads opened menus to, under the AI consent.
 > **Phase 8 ("UI Polish & Desktop Web", issues #221–#264, `docs/UX_REVIEW.md`)
 > shipped on top of all of that, on the `phase-8` branch (PR #266):** every
 > screen body sits in a `ContentWidth` cap (680px; Discovery 1080px), Discovery
@@ -95,20 +102,29 @@ backend (`backend/`, D11) that is an accelerator, never a dependency — with no
   unreachable backend surfaces as `backendUnreachable` from the failing call. On
   a phone there is no server in between: a failed call to Google is `offline`.
 - **API Integration**: Direct calls to restaurant platform APIs from the client on
-  iOS/Android, which never call the backend even when `KETOCLUB_BACKEND_URL` is
-  set (D17); the web build routes Wolt and 10bis through the backend's proxy
-  routes when configured (D11), because neither platform's API sends CORS
-  headers. **Wolt and 10bis are implemented**; Tabit and Ontopo are not built.
-  The backend also proxies Wolt's discovery ("nearby"/"by name") endpoints for
-  the web build (`architecture.md` §16 step 9, D13).
+  iOS/Android, which never call the backend for menus or analysis even when
+  `KETOCLUB_BACKEND_URL` is set (D17). The one route a phone does call, when
+  that URL is set, is the shared menu store's upload, `POST /v1/menus` (D24),
+  and only with the AI-analysis consent. The web build routes Wolt and 10bis
+  through the backend's proxy routes when configured (D11), because neither
+  platform's API sends CORS headers. **Wolt and 10bis are implemented**; Tabit
+  and Ontopo are not built. The backend also proxies Wolt's discovery
+  ("nearby"/"by name") endpoints for the web build (`architecture.md` §16
+  step 9, D13).
 - **Local Storage**: Hive caches the normalised menu and its analysis for 24 hours;
   `shared_preferences` holds non-secret settings and, since D12, an anonymous
   install id (`InstallIdStore`) the web build sends to the backend only for rate
   limiting. On iOS and Android, `flutter_secure_storage` (reinstated by D17)
   holds the user's Gemini key through `ApiKeyStore`; web has no key store.
+  Since D23 a third Hive box, `menu_history`, holds `VisitHistoryStore`: one
+  entry per menu opened on this device, kept until removed or cleared in
+  Settings, which is what the Recent tab lists.
 - **No client-side database**: menu analysis happens on the user's device; the
-  backend, when configured, keeps only a short-lived Wolt-proxy cache and a
-  shared completion cache keyed by request hash (D12, issue #103), never a
+  device keeps the cache and a list of the menus opened on it (D23), which
+  never leaves it. The backend, when configured, keeps a short-lived
+  Wolt-proxy cache, a shared completion cache keyed by request hash (D12,
+  issue #103) and, since D24, the shared menu store (`stored_menus`: menu,
+  analysis without `options`, venue name and city, keyed by venue) — never a
   per-user record.
 
 ### Menu Ingestion & API Integration
@@ -199,7 +215,9 @@ lib/
 │                              # one scan, in memory only) — plain immutable Dart
 ├── utils/                     # constants (the keto vocabulary), text_normaliser,
 │                              # classification_rules, price_format, keto_score,
-│                              # wolt_headers (the web-client header set, #168)
+│                              # wolt_headers (the web-client header set, #168),
+│                              # venue_route (venueRoutePath + VenueOpenHint {name, city},
+│                              # the venue route's arguments, D23)
 ├── services/
 │   ├── platform/              # clock, app_logger, connectivity (D10), screen_brightness,
 │   │                          # scan_budget (a scan's image bytes fitted into one request, D22),
@@ -208,9 +226,12 @@ lib/
 │   │                          # image_picker and file_picker, #82) and qr_scanner
 │   │                          # (interface + a null scanner, #182)
 │   ├── storage/               # install_id_store, menu_cache, settings_store, notes_store,
-│   │                          # api_key_store (the user's Gemini key, phones only, D17)
+│   │                          # api_key_store (the user's Gemini key, phones only, D17),
+│   │                          # visit_history_store (the menus opened on this device, D23)
 │   ├── llm/                   # llm_chat_client, backend_chat_client (web, D12),
 │   │                          # gemini_chat_client (phones, direct to Google, D17)
+│   ├── community/             # menu_store_client (MenuStoreClient + BackendMenuStoreClient,
+│   │                          # the shared menu store's upload; names /v1/menus, D24)
 │   ├── location/              # location_service, geolocator_location_service (issue #37)
 │   ├── venue/                 # venue_ref_resolver (paste-a-URL, pure), qr_payload_router
 │   │                          # (a scanned QR payload → venue / unsupported / photograph, pure, #182),
@@ -236,12 +257,14 @@ lib/
 │                              # scanned_page_header, scanned_page_chips (a scan's pages on
 │                              # the menu screen, D22),
 │                              # scan_failure_copy, mobile_qr_scanner (the QR camera page and
-│                              # its QrScanner, the one file over mobile_scanner, #182)
+│                              # its QrScanner, the one file over mobile_scanner, #182),
+│                              # rename_menu_dialog (a scan's name and city, #315)
 └── screens/                   # venue_search (the Discovery screen, D13), menu,
                                # waiter_card_sheet, settings (a Gemini key section on
-                               # phones only, D17), saved (a real
-                               # cached-menus tab, issue #48) and scan (real now: photograph
-                               # pages, pick images, pick a PDF, or paste; #82, #83)
+                               # phones only, D17), saved (the Recent tab: the visit
+                               # history joined to the cache, #48, #313, D23) and
+                               # scan (real now: photograph pages, pick images, pick
+                               # a PDF, or paste; #82, #83)
 
 test/                          # mirrors lib/, plus architecture/, fakes/, fixtures/, l10n/
 integration_test/flows/        # flow tests + flow_support.dart (same-directory helper)
@@ -321,6 +344,15 @@ The long form is in `HANDOFF.md`; these are the ones that bite while writing cod
   vision path's `visionResponseSchema` adds `page`.** A field that lives on
   `Menu`/`Dish` never needs a `schemaVersion` bump — bumping it re-analyses
   every cached scan through the text classifier and loses the pages (D22).
+- **A scan's ref is its content fingerprint (D23); never key one on the
+  clock.** `parseScanned` addresses a read menu `scan/<menuFingerprint hex>`,
+  the paste scheme, so the same dishes are one entry. **And "in the cache" ≠
+  "visited":** Discovery's quick score writes cache entries for venues never
+  opened, so a visit is recorded only in `MenuController.open`, and the Recent
+  tab lists the history, not the cache.
+- **Never put the install id beside content (D24).** `/v1/menus` reads it for
+  rate limiting and deletes it; `stored_menus` has no column for it and no log
+  line carries it.
 - **Serialise test runs when several agents share a worktree:**
   `flock /tmp/ketoclub.lock -c 'flutter test …'`.
 
@@ -461,7 +493,8 @@ up next.
   QR code (#182). There is no on-device OCR by design (D15), and a Tabit QR
   code answers "not supported yet" until the Tabit adapter exists (#176).
   Also not built: community features — venue ratings, reviews, submissions
-  (Phase 3, `backend_plan.md` §5's milestone C).
+  (Phase 3, `backend_plan.md` §5's milestone C). The shared menu store they
+  would build on exists (D24), but nothing in the app reads it back yet.
 - Backend hosting beyond `localhost` (issue #109, `architecture.md` §17.6). The
   backend is designed to be run locally by whoever has the repository checked
   out; nothing yet says where it runs for anyone else.
@@ -551,6 +584,16 @@ Built, but not confirmed end to end, and not to be reported as done:
   and lists what it left and why. It saw only rules-engine results (no
   model is reachable here) and no phone; token fidelity is enforced by a
   test, pixel fidelity by no test at all.
+- **No real menu upload has run (D24).** `BackendMenuStoreClient` is tested
+  against a mocked HTTP client and `POST /v1/menus` against an in-memory
+  SQLite; no app build has posted a menu to a running backend, from a browser
+  or a phone, and the upload rule in `MenuController.open` is evidenced by
+  fakes only.
+- **The Wolt `city` field (D24, #311) comes from synthetic fixtures.**
+  `WoltVenueMapper` reads `city` from the discovery items in
+  `wolt_pages_restaurants.json` and `wolt_pages_search.json`, which were
+  hand-built (#38), so whether Wolt's real items carry it under that name is
+  unobserved.
 - **No human has reviewed this code.**
 - The three colour pairs that failed WCAG AA contrast (green-on-green at
   4.08:1, light `ink3`-on-bg at 2.78:1, dark `ink3`-on-bg at 4.02:1) were
@@ -569,7 +612,7 @@ Built, but not confirmed end to end, and not to be reported as done:
    is Phase 3's remaining milestone (community database, reviews, submissions;
    `backend_plan.md` §5 milestone C, issues #105–#108) and Phase 4's open
    scan issue (#88; §16's Phase 4 steps). §14 has the decisions
-   log D1–D19, §17 the open questions with the default the code follows.
+   log D1–D24, §17 the open questions with the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing

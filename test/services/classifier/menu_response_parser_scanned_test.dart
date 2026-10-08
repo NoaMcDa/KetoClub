@@ -13,10 +13,8 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
+import 'package:ketoclub/services/menu/text/text_menu_source.dart';
 import 'package:ketoclub/utils/constants.dart';
-
-/// The reference every scan parsed in this file is addressed to.
-const VenueRef _ref = VenueRef(source: MenuSource.scan, platformId: 'abc123');
 
 /// The engine every successful parse in this file is stamped with.
 const AnalysisEngine _engine = LlmEngine(model: 'vision-test-model');
@@ -34,13 +32,11 @@ ScannedMenuResult _parse(String body, {int? netCarbLimitGrams}) =>
     netCarbLimitGrams == null
     ? MenuResponseParser.parseScanned(
         body,
-        ref: _ref,
         analysedAt: _analysedAt,
         engine: _engine,
       )
     : MenuResponseParser.parseScanned(
         body,
-        ref: _ref,
         analysedAt: _analysedAt,
         engine: _engine,
         netCarbLimitGrams: netCarbLimitGrams,
@@ -103,13 +99,14 @@ void main() {
       }
     });
 
-    test('is addressed to the given reference, stamped with the read '
-        'time, with no venue name', () {
+    test('is addressed by the fingerprint of its transcription, stamped '
+        'with the read time, with no venue name', () {
       // Act
       final menu = _read(_fixture('llm/llm_scanned_valid.json')).menu;
 
       // Assert
-      expect(menu.venueRef, _ref);
+      expect(menu.venueRef.source, MenuSource.scan);
+      expect(menu.venueRef.platformId, matches(RegExp(r'^[0-9a-f]{8}$')));
       expect(menu.fetchedAt, _analysedAt);
       expect(menu.venueName, isNull);
       expect(menu.currency, scannedMenuCurrency);
@@ -438,12 +435,98 @@ void main() {
     });
   });
 
+  group('parseScanned: the content-addressed reference (issue #308)', () {
+    /// A reply naming [names] in order, each on [page] when given.
+    String namesReply(List<String> names, {List<Object?>? pages}) =>
+        jsonEncode(<String, Object?>{
+          'dishes': <Object?>[
+            for (var i = 0; i < names.length; i++)
+              <String, Object?>{
+                'id': 'v${i + 1}',
+                'name': names[i],
+                'verdict': 'orderAsIs',
+                'why': 'Grilled protein.',
+                'modification': null,
+                'net_carbs_estimate': null,
+                'page': ?pages?[i],
+              },
+          ],
+        });
+
+    const names = <String>['Grilled Salmon', 'Chicken Skewers', 'Green Salad'];
+
+    test('formats as scan/ and eight lowercase hex digits', () {
+      // Act
+      final menu = _read(namesReply(names)).menu;
+
+      // Assert
+      expect(menu.venueRef.source, MenuSource.scan);
+      expect(menu.venueRef.platformId, matches(RegExp(r'^[0-9a-f]{8}$')));
+    });
+
+    test('the same reply twice is the same reference, whatever the time', () {
+      // Act
+      final first = _read(namesReply(names)).menu;
+      final second = MenuResponseParser.parseScanned(
+        namesReply(names),
+        analysedAt: DateTime.utc(2030),
+        engine: _engine,
+      );
+
+      // Assert
+      expect((second as ScannedMenuRead).menu.venueRef, first.venueRef);
+    });
+
+    test('one dish named differently is a different reference', () {
+      // Act
+      final original = _read(namesReply(names)).menu;
+      final changed = _read(
+        namesReply(<String>['Grilled Salmon', 'Chicken Skewer', 'Green Salad']),
+      ).menu;
+
+      // Assert
+      expect(changed.venueRef, isNot(original.venueRef));
+    });
+
+    test('pages alone never change the reference', () {
+      // Act
+      final unpaged = _read(namesReply(names)).menu;
+      final paged = MenuResponseParser.parseScanned(
+        namesReply(names, pages: <Object?>[1, 2, 2]),
+        analysedAt: _analysedAt,
+        engine: _engine,
+        pageCount: 2,
+      );
+      final repaged = MenuResponseParser.parseScanned(
+        namesReply(names, pages: <Object?>[2, 1, 1]),
+        analysedAt: _analysedAt,
+        engine: _engine,
+        pageCount: 2,
+      );
+
+      // Assert
+      expect((paged as ScannedMenuRead).menu.allDishes.first.page, 1);
+      expect(paged.menu.venueRef, unpaged.venueRef);
+      expect((repaged as ScannedMenuRead).menu.venueRef, unpaged.venueRef);
+    });
+
+    test('equals the reference TextMenuSource gives the same dish names '
+        'pasted one per line', () {
+      // Act
+      final scanned = _read(namesReply(names)).menu;
+      final pasted = TextMenuSource.parse(names.join('\n'), now: _analysedAt);
+
+      // Assert
+      expect(pasted, isNotNull);
+      expect(scanned.venueRef, pasted!.venueRef);
+    });
+  });
+
   group('parseScanned: the page each dish is printed on (issue #299)', () {
     /// Parses the pages fixture with [pageCount] and expects a read.
     ScannedMenuRead readPages({int? pageCount}) {
       final result = MenuResponseParser.parseScanned(
         _fixture('llm/llm_scanned_pages.json'),
-        ref: _ref,
         analysedAt: _analysedAt,
         engine: _engine,
         pageCount: pageCount,
@@ -495,7 +578,6 @@ void main() {
       // Act
       final withCount = MenuResponseParser.parseScanned(
         body,
-        ref: _ref,
         analysedAt: _analysedAt,
         engine: _engine,
         pageCount: 3,

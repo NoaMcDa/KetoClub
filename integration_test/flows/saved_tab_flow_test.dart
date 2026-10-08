@@ -1,7 +1,9 @@
-// Flow test (FLOW_TEST_CONVENTIONS.md, architecture.md §18.4; issue #48):
-// open a venue's menu, find it listed on the Saved tab, and reopen it from
-// there — the "works offline" promise, driven end to end through the real
-// UI rather than by asserting on FlowFakeMenuRepository directly.
+// Flow test (FLOW_TEST_CONVENTIONS.md, architecture.md §18.4; issues #48,
+// #313): open a venue's menu, find it listed on the Recent tab, and reopen
+// it from there — the "works offline" promise, driven end to end through
+// the real UI rather than by asserting on FlowFakeMenuRepository directly —
+// and find a menu still listed after its cached copy has gone, reopening it
+// online.
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -12,6 +14,8 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
+import 'package:ketoclub/services/storage/menu_cache.dart';
+import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
 
@@ -30,6 +34,33 @@ const VenueRef _ref = VenueRef(
 /// The English strings this test reads expected copy from, computed the
 /// same way the app itself does.
 final AppLocalizations _en = AppLocalizationsEn();
+
+/// The fixed part of the "Opened {age}" label: the age depends on how long
+/// ago the fixed flow clock was, so a test matches the prefix only.
+String get _openedPrefix => _en.savedOpenedAgo('\u0000').split('\u0000').first;
+
+/// A named, single-dish menu for [_ref], fetched at [fetchedAt].
+Menu _vitrinaMenu(DateTime fetchedAt) => Menu(
+  venueRef: _ref,
+  currency: 'ILS',
+  fetchedAt: fetchedAt,
+  venueName: 'Vitrina',
+  categories: const [
+    MenuCategory(
+      id: 'c1',
+      name: 'Mains',
+      dishes: [
+        Dish(
+          id: 'green',
+          name: 'Herb Butter Steak',
+          description: '',
+          price: 42,
+          options: <DishOption>[],
+        ),
+      ],
+    ),
+  ],
+);
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -145,9 +176,20 @@ void main() {
         );
         final fakes = FakeAppDependencies();
         fakes.repository.stub(_ref, MenuFetched(menu: fixtureMenu));
+        // The Recent list is the visit history (issue #313); seeded here
+        // so this flow does not depend on how the menu screen records it.
+        fakes.visitHistory.seed(
+          VisitEntry(
+            ref: _ref,
+            name: 'Vitrina',
+            firstOpenedAt: DateTime.utc(2026),
+            lastOpenedAt: DateTime.utc(2026),
+            openCount: 1,
+          ),
+        );
         await pumpApp(tester, fakes);
 
-        // Act: open the venue, come back, and visit Saved.
+        // Act: open the venue, come back, and visit Recent.
         await enterText(tester, _woltUrl);
         await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
         await tester.pageBack();
@@ -170,6 +212,76 @@ void main() {
         // Assert: the countdown is back.
         expect(find.text(_en.savedKept), findsNothing);
         expect(find.text(_en.savedExpiresHours(5)), findsOneWidget);
+      },
+    );
+    testWidgets(
+      'user finds a menu opened earlier on Recent after its cached copy '
+      'has gone, and reopens it online (issue #313)',
+      (tester) async {
+        // Setup: a menu opened earlier — recorded in the visit history with
+        // its snapshot, and cached — whose platform still serves it.
+        final menu = _vitrinaMenu(DateTime.utc(2026));
+        final fakes = FakeAppDependencies();
+        fakes.repository
+          ..stub(_ref, MenuFetched(menu: menu))
+          ..seedCache(CachedMenu(menu: menu));
+        fakes.visitHistory.seed(
+          VisitEntry(
+            ref: _ref,
+            name: 'Vitrina',
+            city: 'Tel Aviv',
+            firstOpenedAt: DateTime.utc(2026),
+            lastOpenedAt: DateTime.utc(2026),
+            openCount: 1,
+            dishCount: 1,
+            score: 10,
+            greenCount: 1,
+            yellowCount: 0,
+          ),
+        );
+        await pumpApp(tester, fakes);
+
+        // Act: visit Recent.
+        await tapAndSettle(tester, navDestination(_en.navSaved));
+
+        // Assert: listed, with its city and when it was last opened.
+        expect(find.text('Vitrina'), findsOneWidget);
+        expect(find.textContaining(_openedPrefix), findsOneWidget);
+        expect(
+          find.textContaining(_en.sourceWithCity('Wolt', 'Tel Aviv')),
+          findsOneWidget,
+        );
+        expect(find.text(_en.savedNotOnDevice), findsNothing);
+
+        // Act: the cached copy goes (expired and swept, or cleared), and
+        // the user comes back to Recent.
+        await fakes.repository.clearCache();
+        await tapAndSettle(tester, navDestination(_en.navExplore));
+        await tapAndSettle(tester, navDestination(_en.navSaved));
+
+        // Assert: still listed from the history, with its last score, and
+        // saying it opens online.
+        expect(find.text('Vitrina'), findsOneWidget);
+        expect(find.text(_en.savedNotOnDevice), findsOneWidget);
+        expect(find.text('10.0'), findsOneWidget);
+        expect(find.text(_en.venueCardGreenCount(1)), findsOneWidget);
+
+        // Act: tap it.
+        await tapAndSettle(tester, find.text('Vitrina'));
+
+        // Assert: the menu loads again from the platform.
+        expect(find.text('Herb Butter Steak'), findsOneWidget);
+
+        // Act: back, and round to Recent again.
+        await tester.pageBack();
+        await tester.pumpAndSettle();
+        await tapAndSettle(tester, navDestination(_en.navExplore));
+        await tapAndSettle(tester, navDestination(_en.navSaved));
+
+        // Assert: the load cached it again, so it is on this device once
+        // more.
+        expect(find.text('Vitrina'), findsOneWidget);
+        expect(find.text(_en.savedNotOnDevice), findsNothing);
       },
     );
   });

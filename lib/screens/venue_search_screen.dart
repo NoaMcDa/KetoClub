@@ -155,12 +155,18 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
   /// The UI language code every search is made in.
   String get _language => Localizations.localeOf(context).languageCode;
 
-  /// Opens [ref]'s menu route. [name], when the screen already knows the
-  /// venue's display name (a venue card), rides along as the route's
-  /// arguments so the menu header can show it: no documented menu payload
-  /// names the venue, so without it the header falls back to the slug.
-  void _openVenue(VenueRef ref, {String? name}) {
-    Navigator.pushNamed(context, venueRoutePath(ref), arguments: name);
+  /// Opens [ref]'s menu route. [hint], when the screen already knows the
+  /// venue's display name and city (a venue card, the Continue row), rides
+  /// along as the route's arguments so the menu header can show them and
+  /// the visit history can record them (issue #312): no documented menu
+  /// payload names the venue, so without it the header falls back to the
+  /// slug.
+  void _openVenue(VenueRef ref, {VenueOpenHint? hint}) {
+    Navigator.pushNamed(
+      context,
+      venueRoutePath(ref),
+      arguments: hint ?? const VenueOpenHint(),
+    );
   }
 
   void _locate() {
@@ -534,7 +540,10 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
             numbers: controller.cardNumbers(visible[i]),
             distanceKm: controller.distanceKmTo(visible[i]),
             photoAspectRatio: photoAspectRatio,
-            onTap: () => _openVenue(visible[i].ref, name: visible[i].name),
+            onTap: () => _openVenue(
+              visible[i].ref,
+              hint: VenueOpenHint(name: visible[i].name, city: visible[i].city),
+            ),
           ),
         ),
       ],
@@ -719,15 +728,18 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
 
   /// The "Continue with {venue}" row (issue #55): tapping it opens
   /// [lastVenue]'s menu route exactly as the open button does, using
-  /// [VenueSearchController.lastVenueName] for the venue's display name.
+  /// [VenueSearchController.lastVenueName] for the venue's display name and
+  /// passing [VenueSearchController.lastVenueHint] — the name and city the
+  /// visit history or the cache knows, never the fallback — to the route.
   Widget _continueRow(
     BuildContext context,
     AppLocalizations l10n,
     VenueRef lastVenue,
   ) {
+    final controller = context.read<VenueSearchController>();
     // A pasted menu's id is a hash, not something to show a person.
     final name =
-        context.read<VenueSearchController>().lastVenueName ??
+        controller.lastVenueName ??
         (lastVenue.source == MenuSource.scan
             ? l10n.sourceScanned
             : lastVenue.platformId);
@@ -736,7 +748,7 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
       child: ListTile(
         leading: const Icon(Icons.history),
         title: Text(l10n.venueSearchContinueWith(name)),
-        onTap: () => _openVenue(lastVenue, name: name),
+        onTap: () => _openVenue(lastVenue, hint: controller.lastVenueHint),
       ),
     );
   }

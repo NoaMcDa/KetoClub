@@ -26,12 +26,14 @@ import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
+import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
+import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/carb_budget_field.dart';
 import 'package:ketoclub/widgets/category_chips.dart';
@@ -52,6 +54,7 @@ import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
 
+import '../fakes/fake_clock.dart';
 import '../fakes/fake_connectivity.dart';
 import '../fakes/fake_external_link_opener.dart';
 import '../fakes/fake_menu_classifier.dart';
@@ -60,6 +63,7 @@ import '../fakes/fake_menu_sharer.dart';
 import '../fakes/fake_notes_store.dart';
 import '../fakes/fake_screen_brightness.dart';
 import '../fakes/fake_settings_store.dart';
+import '../fakes/fake_visit_history_store.dart';
 import '../fakes/focus_ring_probe.dart';
 
 /// The venue every test opens, unless a test builds its own.
@@ -114,12 +118,15 @@ MenuController _controllerFor({
   FakeSettingsStore? settings,
   FakeNotesStore? notes,
   CarbBudgetController? carbBudget,
+  VisitHistoryStore history = const NoVisitHistoryStore(),
 }) => MenuController(
   repository,
   classifier ?? FakeMenuClassifier(),
   settings ?? FakeSettingsStore(),
   notes ?? FakeNotesStore(),
   carbBudget ?? CarbBudgetController(),
+  null,
+  history,
 );
 
 /// Gives the test surface a phone-tall viewport for the rest of the test.
@@ -249,7 +256,7 @@ Future<void> _pump(
   FakeExternalLinkOpener? externalLinkOpener,
   FakeMenuSharer? menuSharer,
   ThemeData? theme,
-  String? venueNameHint,
+  VenueOpenHint? hint,
   ScannedPagesRegistry? scannedPages,
   CarbBudgetController? carbBudget,
 }) {
@@ -280,7 +287,7 @@ Future<void> _pump(
             connectivity: connectivity ?? FakeConnectivity(),
             externalLinkOpener: externalLinkOpener ?? FakeExternalLinkOpener(),
             menuSharer: menuSharer ?? FakeMenuSharer(),
-            venueNameHint: venueNameHint,
+            hint: hint,
             scannedPages: scannedPages,
           ),
         ),
@@ -565,12 +572,78 @@ void main() {
       final controller = _controllerFor(repository: repository);
 
       // Act
-      await _pump(tester, controller, venueNameHint: 'Vitrina');
+      await _pump(
+        tester,
+        controller,
+        hint: const VenueOpenHint(name: 'Vitrina'),
+      );
       await tester.pumpAndSettle();
 
       // Assert
       expect(find.text('Vitrina'), findsOneWidget);
       expect(find.text(_ref.platformId), findsNothing);
+    });
+
+    testWidgets('a hint-less reopen names the venue from the visit history '
+        'the first open recorded (issue #312)', (tester) async {
+      // Arrange: the menu names no venue; the first open came from a card.
+      final repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+      final history = FakeVisitHistoryStore(FakeClock(DateTime.utc(2026)));
+      await _pump(
+        tester,
+        _controllerFor(repository: repository, history: history),
+        hint: const VenueOpenHint(name: 'Vitrina'),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Vitrina'), findsOneWidget);
+
+      // Act: a deep link reopens it, with no hint.
+      await tester.pumpWidget(const SizedBox.shrink());
+      await _pump(
+        tester,
+        _controllerFor(repository: repository, history: history),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Vitrina'), findsOneWidget);
+      expect(find.text(_ref.platformId), findsNothing);
+    });
+
+    testWidgets('the remembered name shows while the menu is still being '
+        'analysed (issue #312)', (tester) async {
+      // Arrange: the history already names the venue; analysis is held.
+      final repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+      final history = FakeVisitHistoryStore(FakeClock(DateTime.utc(2026)))
+        ..seed(
+          VisitEntry(
+            ref: _ref,
+            name: 'Vitrina',
+            firstOpenedAt: DateTime.utc(2025),
+            lastOpenedAt: DateTime.utc(2025),
+            openCount: 1,
+          ),
+        );
+      final gate = Completer<void>();
+      final classifier = FakeMenuClassifier()..gate = gate.future;
+      final controller = _controllerFor(
+        repository: repository,
+        classifier: classifier,
+        history: history,
+      );
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pump();
+      await tester.pump();
+
+      // Assert
+      expect(controller.phase.isClassifying, isTrue);
+      expect(find.text('Vitrina'), findsOneWidget);
+      gate.complete();
+      await tester.pumpAndSettle();
     });
 
     testWidgets('the header shows Menu.venueName when the platform named '
@@ -685,6 +758,81 @@ void main() {
         );
       },
     );
+
+    testWidgets('the source line names the city the opener passed '
+        '(issue #312)', (tester) async {
+      // Arrange
+      final fetchedAt = DateTime.now().toUtc().subtract(
+        const Duration(minutes: 2),
+      );
+      final repository = FakeMenuRepository()
+        ..stub(
+          _ref,
+          MenuFetched(menu: _menuOf([_dish('Steak')], fetchedAt: fetchedAt)),
+        );
+      final controller = _controllerFor(repository: repository);
+
+      // Act
+      await _pump(
+        tester,
+        controller,
+        hint: const VenueOpenHint(name: 'Vitrina', city: 'Tel Aviv'),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(
+        find.text(
+          _en.menuSourceLine(
+            _en.sourceWithCity('Wolt', 'Tel Aviv'),
+            _en.ageMinutes(2),
+          ),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('with no hint, the source line names the city the visit '
+        'history remembers (issue #312)', (tester) async {
+      // Arrange
+      final fetchedAt = DateTime.now().toUtc().subtract(
+        const Duration(minutes: 2),
+      );
+      final repository = FakeMenuRepository()
+        ..stub(
+          _ref,
+          MenuFetched(menu: _menuOf([_dish('Steak')], fetchedAt: fetchedAt)),
+        );
+      final history = FakeVisitHistoryStore(FakeClock(DateTime.utc(2026)))
+        ..seed(
+          VisitEntry(
+            ref: _ref,
+            city: 'Haifa',
+            firstOpenedAt: DateTime.utc(2025),
+            lastOpenedAt: DateTime.utc(2025),
+            openCount: 1,
+          ),
+        );
+      final controller = _controllerFor(
+        repository: repository,
+        history: history,
+      );
+
+      // Act
+      await _pump(tester, controller);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(
+        find.text(
+          _en.menuSourceLine(
+            _en.sourceWithCity('Wolt', 'Haifa'),
+            _en.ageMinutes(2),
+          ),
+        ),
+        findsOneWidget,
+      );
+    });
 
     group('open on platform (issue #53)', () {
       testWidgets(
@@ -3785,6 +3933,202 @@ void main() {
 
       // Assert
       expect(find.text('Swap the fries for a salad.'), findsOneWidget);
+    });
+  });
+
+  group('rename a scanned menu (issue #315)', () {
+    /// A history that already names [_scanRef] [name] in [city].
+    FakeVisitHistoryStore namedHistory({String? name, String? city}) =>
+        FakeVisitHistoryStore(FakeClock(DateTime.utc(2026)))..seed(
+          VisitEntry(
+            ref: _scanRef,
+            name: name,
+            city: city,
+            firstOpenedAt: DateTime.utc(2025),
+            lastOpenedAt: DateTime.utc(2025),
+            openCount: 1,
+          ),
+        );
+
+    MenuController scanControllerOver(VisitHistoryStore history) =>
+        _controllerFor(
+          repository: FakeMenuRepository()
+            ..stub(
+              _scanRef,
+              MenuFetched(
+                menu: _menuOf([_dish('Grilled salmon')], ref: _scanRef),
+                fromCache: true,
+              ),
+            ),
+          history: history,
+        );
+
+    Future<void> openOverflow(WidgetTester tester) async {
+      await tester.tap(find.byTooltip(_en.actionMoreMenuOptions));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets("a platform menu's overflow has Share but no Rename", (
+      tester,
+    ) async {
+      // Arrange
+      final repository = FakeMenuRepository()
+        ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+
+      // Act
+      await _pump(tester, _controllerFor(repository: repository));
+      await tester.pumpAndSettle();
+      await openOverflow(tester);
+
+      // Assert
+      expect(find.text(_en.actionShareMenu), findsOneWidget);
+      expect(find.text(_en.menuRenameAction), findsNothing);
+    });
+
+    testWidgets("a scanned menu's overflow has Rename beside Share", (
+      tester,
+    ) async {
+      // Act
+      await _pump(tester, scanControllerOver(namedHistory()), ref: _scanRef);
+      await tester.pumpAndSettle();
+      await openOverflow(tester);
+
+      // Assert
+      expect(find.text(_en.menuRenameAction), findsOneWidget);
+      expect(find.text(_en.actionShareMenu), findsOneWidget);
+    });
+
+    testWidgets('a scanned menu with nothing to share still offers Rename', (
+      tester,
+    ) async {
+      // Arrange
+      final controller = _controllerFor(
+        repository: FakeMenuRepository()
+          ..stub(
+            _scanRef,
+            MenuFetched(
+              menu: _menuOf([_dish('Grilled salmon')], ref: _scanRef),
+              fromCache: true,
+            ),
+          ),
+        classifier: FakeMenuClassifier()
+          ..respondWith(
+            const MenuAnalysisFailed(
+              reason: MenuAnalysisFailureReason.badResponse,
+            ),
+          ),
+      );
+
+      // Act
+      await _pump(tester, controller, ref: _scanRef);
+      await tester.pumpAndSettle();
+      await openOverflow(tester);
+
+      // Assert
+      expect(find.text(_en.menuRenameAction), findsOneWidget);
+      expect(find.text(_en.actionShareMenu), findsNothing);
+    });
+
+    testWidgets('the dialog opens prefilled; saving renames the header and '
+        'the source line without reopening', (tester) async {
+      // Arrange
+      final history = namedHistory(name: 'Old name', city: 'Lod');
+      await _pump(tester, scanControllerOver(history), ref: _scanRef);
+      await tester.pumpAndSettle();
+      expect(find.text('Old name'), findsOneWidget);
+
+      // Act
+      await openOverflow(tester);
+      await tester.tap(find.text(_en.menuRenameAction));
+      await tester.pumpAndSettle();
+
+      // Assert: the dialog is titled and prefilled.
+      expect(find.text(_en.menuRenameTitle), findsOneWidget);
+      expect(
+        tester
+            .widget<TextField>(find.byKey(const ValueKey('menuRenameName')))
+            .controller!
+            .text,
+        'Old name',
+      );
+      expect(
+        tester
+            .widget<TextField>(find.byKey(const ValueKey('menuRenameCity')))
+            .controller!
+            .text,
+        'Lod',
+      );
+
+      // Act
+      await tester.enterText(
+        find.byKey(const ValueKey('menuRenameName')),
+        '  Café Noam ',
+      );
+      await tester.enterText(
+        find.byKey(const ValueKey('menuRenameCity')),
+        'Haifa',
+      );
+      await tester.tap(find.byKey(const ValueKey('menuRenameSave')));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(find.text('Café Noam'), findsOneWidget);
+      expect(find.text('Old name'), findsNothing);
+      expect(
+        find.textContaining(_en.sourceWithCity(_en.sourceScanned, 'Haifa')),
+        findsOneWidget,
+      );
+      final stored = await history.read(_scanRef);
+      expect(stored!.name, 'Café Noam');
+      expect(stored.city, 'Haifa');
+    });
+
+    testWidgets('an empty name falls back to the Pasted menu title and an '
+        'empty city leaves the source line bare', (tester) async {
+      // Arrange
+      final history = namedHistory(name: 'Old name', city: 'Lod');
+      await _pump(tester, scanControllerOver(history), ref: _scanRef);
+      await tester.pumpAndSettle();
+
+      // Act
+      await openOverflow(tester);
+      await tester.tap(find.text(_en.menuRenameAction));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const ValueKey('menuRenameName')), '');
+      await tester.enterText(find.byKey(const ValueKey('menuRenameCity')), ' ');
+      await tester.tap(find.byKey(const ValueKey('menuRenameSave')));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text('Old name'), findsNothing);
+      expect(find.text(_en.sourceScanned), findsWidgets);
+      expect(find.textContaining('Lod'), findsNothing);
+      expect((await history.read(_scanRef))!.name, isNull);
+      expect((await history.read(_scanRef))!.city, isNull);
+    });
+
+    testWidgets('cancelling changes nothing', (tester) async {
+      // Arrange
+      final history = namedHistory(name: 'Old name', city: 'Lod');
+      await _pump(tester, scanControllerOver(history), ref: _scanRef);
+      await tester.pumpAndSettle();
+
+      // Act
+      await openOverflow(tester);
+      await tester.tap(find.text(_en.menuRenameAction));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const ValueKey('menuRenameName')),
+        'Café Noam',
+      );
+      await tester.tap(find.text(_en.actionCancel));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(find.text('Old name'), findsOneWidget);
+      expect(history.renameCalls, isEmpty);
     });
   });
 }
