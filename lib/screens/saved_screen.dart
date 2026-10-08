@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/venue.dart';
-import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/saved_controller.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
@@ -12,6 +12,7 @@ import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
+import 'package:ketoclub/widgets/rename_menu_dialog.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:provider/provider.dart';
 
@@ -35,22 +36,49 @@ String _platformName(VenueRef ref, AppLocalizations l10n) =>
       MenuSource.website => VenueRefResolver.websiteHost(ref) ?? ref.platformId,
     };
 
-/// The title a saved entry shows: its venue name, else its reference —
-/// except for a pasted menu, whose reference is a hash and reads as
+/// The title a Recent row shows (issue #313): the venue name its visit
+/// recorded, else its cached menu's own, else its reference — except for
+/// a pasted menu, whose reference is a hash and reads as
 /// [AppLocalizations.sourceScanned], and a website, which reads as its
 /// host.
-String _entryTitle(CachedMenuEntry entry, AppLocalizations l10n) =>
+String _entryTitle(RecentEntry entry, AppLocalizations l10n) =>
     entry.venueName ??
     switch (entry.ref.source) {
       MenuSource.scan || MenuSource.website => _platformName(entry.ref, l10n),
       _ => entry.ref.platformId,
     };
 
-/// The bucketed "time ago" phrase for [fetchedAt] relative to [now] — this
+/// Where a Recent row's menu came from (issue #313): its platform, with
+/// the venue's city beside it when the visit recorded one.
+String _sourceLabel(RecentEntry entry, AppLocalizations l10n) {
+  final platform = _platformName(entry.ref, l10n);
+  final city = entry.city;
+  if (city == null || city.trim().isEmpty) return platform;
+  return l10n.sourceWithCity(platform, city);
+}
+
+/// Whether a Recent row's menu can be opened, and for how long it opens
+/// from this device (issue #313): kept, the cache countdown, expired, not
+/// on this device (opens online), or — for a scan, which no platform can
+/// serve again — gone.
+String _availabilityLabel(
+  RecentEntry entry,
+  DateTime now,
+  AppLocalizations l10n,
+) {
+  final cached = entry.cached;
+  if (cached == null) {
+    return entry.isGone ? l10n.savedScanGone : l10n.savedNotOnDevice;
+  }
+  if (cached.pinned) return l10n.savedKept;
+  return cacheExpiryLabel(cached.fetchedAt, now, l10n);
+}
+
+/// The bucketed "time ago" phrase for [then] relative to [now] — this
 /// file's own copy of `menu_screen.dart`'s `_ageLabel`, kept local for the
 /// same self-containment reason as [_platformName].
-String _ageLabel(DateTime fetchedAt, DateTime now, AppLocalizations l10n) {
-  final elapsed = now.difference(fetchedAt);
+String _ageLabel(DateTime then, DateTime now, AppLocalizations l10n) {
+  final elapsed = now.difference(then);
   if (elapsed.inMinutes < 1) return l10n.ageJustNow;
   if (elapsed.inHours < 1) return l10n.ageMinutes(elapsed.inMinutes);
   if (elapsed.inDays < 1) return l10n.ageHours(elapsed.inHours);
@@ -81,15 +109,16 @@ String cacheExpiryLabel(
   return l10n.savedExpiresDays(rounded.inDays);
 }
 
-/// The Saved tab (architecture.md §6.6; issue #48): every cached menu,
-/// newest first, opening offline exactly as it did online — the
-/// repository behind [SavedController] serves cache first — with swipe
-/// or a trailing action to remove one.
+/// The Recent tab (architecture.md §6.6; issues #48, #313): every menu
+/// opened on this device, most recently opened first, with swipe or a
+/// trailing action to remove one.
 ///
-/// Every menu the user has ever opened is cached automatically for a day
-/// (`MenuCache`, architecture.md §6.4); this screen is not a separate
-/// "save this venue" feature, it is a view onto that cache — matching the
-/// "works offline" promise on the Settings artboard.
+/// The list is the visit history (`VisitHistoryStore`, issue #307), not
+/// the cache: a menu stays listed, with the score and counts it last had,
+/// after its cached copy has expired or gone. Each row joins the cache to
+/// say how fresh it is — kept, a countdown, expired, or not on this device
+/// — and a cached menu opens offline exactly as it did online, the
+/// repository behind [SavedController] serving cache first.
 ///
 /// Reads its [SavedController] from `provider` and loads it once, after
 /// the first frame, the same way `MenuScreen` and `SettingsScreen` defer
@@ -156,7 +185,7 @@ class _SavedScreenState extends State<SavedScreen> {
     );
   }
 
-  /// Shown when nothing is cached yet — before the first menu has ever
+  /// Shown when nothing is listed yet — before the first menu has ever
   /// been opened, or once every entry has been removed. The same icon and
   /// layout issue #11's original placeholder used; only the body copy
   /// changed, since this screen is no longer "coming in a later update".
@@ -185,7 +214,7 @@ class _SavedScreenState extends State<SavedScreen> {
     ),
   );
 
-  /// The cached-menu list, `controller.entries` already newest-fetched
+  /// The Recent list, `controller.entries` already most recently opened
   /// first.
   Widget _list(
     BuildContext context,
@@ -201,34 +230,64 @@ class _SavedScreenState extends State<SavedScreen> {
         final entry = entries[index];
         return _SavedEntryTile(
           entry: entry,
-          onTap: () => Navigator.pushNamed(
-            context,
-            venueRoutePath(entry.ref),
-            // Issue #169: pass the cached venue name through the route
-            // as arguments, so the menu header shows the venue's real
-            // name rather than the raw slug when the cache has one
-            // (`_generateRoute` in app.dart reads a String argument as
-            // `venueNameHint`). Null-safe: an entry with no cached name
-            // falls back to the slug, unchanged.
-            arguments: entry.venueName,
-          ),
+          // A scan whose copy has gone cannot open: no platform can serve
+          // it again (issue #313).
+          onTap: entry.isGone
+              ? null
+              : () => Navigator.pushNamed(
+                  context,
+                  venueRoutePath(entry.ref),
+                  // Issue #169: pass the venue's name (and, since #313,
+                  // its city) through the route in a VenueOpenHint (issue
+                  // #307), so the menu header shows the venue's real name
+                  // rather than the raw slug — cached or not
+                  // (`_generateRoute` in app.dart reads it). Null-safe: an
+                  // entry with no name falls back to the slug, unchanged.
+                  arguments: VenueOpenHint(
+                    name: entry.venueName,
+                    city: entry.city,
+                  ),
+                ),
           onRemove: () => _removeWithUndo(context, controller, entry),
-          onTogglePin: () =>
-              unawaited(controller.setPinned(entry.ref, pinned: !entry.pinned)),
+          // Only a scanned menu is the user's to name (issue #315).
+          onRename: entry.ref.source == MenuSource.scan
+              ? () => unawaited(_rename(context, controller, entry))
+              : null,
+          onTogglePin: () => unawaited(
+            controller.setPinned(entry.ref, pinned: !entry.isPinned),
+          ),
         );
       },
     );
+  }
+
+  /// Asks for a new name and city for the scanned menu [entry] and hands
+  /// them to [SavedController.rename] (issue #315); nothing happens when
+  /// the dialog is cancelled.
+  Future<void> _rename(
+    BuildContext context,
+    SavedController controller,
+    RecentEntry entry,
+  ) async {
+    final result = await showRenameMenuDialog(
+      context,
+      initialName: entry.venueName,
+      initialCity: entry.city,
+    );
+    if (result == null) return;
+    await controller.rename(entry.ref, name: result.name, city: result.city);
   }
 
   /// Takes [entry] out of the visible list through [SavedController.hide]
   /// and offers an undo `SnackBar`. Undone within the `SnackBar`'s
   /// lifetime, [SavedController.restore] puts it back and nothing is ever
   /// deleted from storage; left to run out, [SavedController.commitRemoval]
-  /// deletes it once the `SnackBar` closes.
+  /// deletes it — from the history and the cache — once the `SnackBar`
+  /// closes.
   void _removeWithUndo(
     BuildContext context,
     SavedController controller,
-    CachedMenuEntry entry,
+    RecentEntry entry,
   ) {
     final removed = controller.hide(entry.ref);
     if (removed == null) return;
@@ -262,10 +321,17 @@ class _SavedScreenState extends State<SavedScreen> {
   }
 }
 
-/// One row in the Saved list: venue name with its keto score inline,
-/// platform and age, dish count, the green and yellow counts the Explore
-/// venue card shows, an [EngineChip] when the cached menu was analysed,
-/// and a way to remove it by swipe or by [onRemove]'s trailing button.
+/// One row in the Recent list (issue #313): venue name with its keto
+/// score inline; platform, city and when it was last opened; whether and
+/// for how long it opens from this device; dish count, the green and
+/// yellow counts the Explore venue card shows, and an [EngineChip] when
+/// the cached menu was analysed; and a way to remove it by swipe or by
+/// [onRemove]'s trailing button.
+///
+/// The numbers come from the cached menu when there is one, else from the
+/// snapshot the visit took. The pin shows only while a cached copy exists
+/// to keep. A scan whose copy has gone ([RecentEntry.isGone]) is listed
+/// disabled — [onTap] is null — but can still be removed.
 ///
 /// No photo: the cache holds no venue image (a `Menu` carries none, only
 /// dishes do), so there is nothing honest to show in its place (#252).
@@ -274,17 +340,24 @@ class _SavedEntryTile extends StatelessWidget {
     required this.entry,
     required this.onTap,
     required this.onRemove,
+    required this.onRename,
     required this.onTogglePin,
   });
 
-  /// The cached menu this row summarises.
-  final CachedMenuEntry entry;
+  /// The opened menu this row summarises.
+  final RecentEntry entry;
 
-  /// Called when the row itself is tapped, to open [entry]'s menu.
-  final VoidCallback onTap;
+  /// Called when the row itself is tapped, to open [entry]'s menu; null
+  /// when it cannot open, which disables the row.
+  final VoidCallback? onTap;
 
   /// Called on a swipe-to-dismiss or a tap on the trailing remove button.
   final VoidCallback onRemove;
+
+  /// Called on a long-press on the row, or by the screen reader's
+  /// "Rename" action, to name [entry]'s scanned menu (issue #315); null
+  /// for a menu a platform names, which has neither.
+  final VoidCallback? onRename;
 
   /// Called on a tap on the pin toggle, to keep [entry] past its expiry
   /// or stop keeping it.
@@ -294,12 +367,25 @@ class _SavedEntryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final now = DateTime.now();
     final title = _entryTitle(entry, l10n);
-    final age = _ageLabel(entry.fetchedAt, DateTime.now(), l10n);
+    final opened = l10n.savedOpenedAgo(
+      _ageLabel(entry.visit.lastOpenedAt, now, l10n),
+    );
+    final availability = _availabilityLabel(entry, now, l10n);
+    final score = entry.score;
+    final dishCount = entry.dishCount;
+    final green = entry.greenCount;
+    final yellow = entry.yellowCount;
     final engine = entry.engine;
-    final expiry = entry.pinned
-        ? l10n.savedKept
-        : cacheExpiryLabel(entry.fetchedAt, DateTime.now(), l10n);
+    final openCount = entry.visit.openCount;
+    final counts = <Widget>[
+      if (dishCount != null) Text(l10n.savedEntryDishCount(dishCount)),
+      if (score != null && green != null) Text(l10n.venueCardGreenCount(green)),
+      if (score != null && yellow != null)
+        Text(l10n.venueCardYellowCount(yellow)),
+      if (engine != null) EngineChip(engine: engine),
+    ];
 
     return Dismissible(
       key: ValueKey(entry.ref.cacheKey),
@@ -321,80 +407,108 @@ class _SavedEntryTile extends StatelessWidget {
           ),
         ),
       ),
-      child: Card(
-        margin: EdgeInsets.zero,
-        child: ListTile(
-          onTap: onTap,
-          title: Row(
-            children: [
-              Expanded(child: Text(title)),
-              if (entry.score != null) ...[
-                const SizedBox(width: 10),
-                KetoScoreBadge(score: entry.score, inline: true),
-              ],
-            ],
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 4),
-              Text(l10n.menuSourceLine(_platformName(entry.ref, l10n), age)),
-              const SizedBox(height: 2),
-              Text(expiry, style: theme.textTheme.bodySmall),
-              const SizedBox(height: 4),
-              Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 8,
-                runSpacing: 4,
-                children: [
-                  Text(l10n.savedEntryDishCount(entry.dishCount)),
-                  if (entry.score != null) ...[
-                    Text(l10n.venueCardGreenCount(entry.greenCount)),
-                    Text(l10n.venueCardYellowCount(entry.yellowCount)),
-                  ],
-                  if (engine != null) EngineChip(engine: engine),
+      child: _renamable(
+        l10n,
+        title,
+        Card(
+          margin: EdgeInsets.zero,
+          child: ListTile(
+            enabled: onTap != null,
+            onTap: onTap,
+            title: Row(
+              children: [
+                Expanded(child: Text(title)),
+                if (score != null) ...[
+                  const SizedBox(width: 10),
+                  KetoScoreBadge(score: score, inline: true),
                 ],
-              ),
-            ],
-          ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Semantics(
-                label: entry.pinned
-                    ? l10n.savedUnkeepSemanticLabel(title)
-                    : l10n.savedKeepSemanticLabel(title),
-                button: true,
-                toggled: entry.pinned,
-                excludeSemantics: true,
-                child: IconButton(
-                  icon: Icon(
-                    entry.pinned ? Icons.push_pin : Icons.push_pin_outlined,
+              ],
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 4),
+                Text(l10n.menuSourceLine(_sourceLabel(entry, l10n), opened)),
+                const SizedBox(height: 2),
+                Text(availability, style: theme.textTheme.bodySmall),
+                if (openCount > 1) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    l10n.savedOpenCount(openCount),
+                    style: theme.textTheme.bodySmall,
                   ),
-                  tooltip: entry.pinned ? l10n.savedUnkeep : l10n.savedKeep,
-                  onPressed: onTogglePin,
-                ),
-              ),
-              Semantics(
-                label: l10n.savedRemoveSemanticLabel(title),
-                button: true,
-                excludeSemantics: true,
-                child: IconButton(
-                  // The one destructive look, shared with Settings' "Clear"
-                  // (#254); the pin beside it stays neutral.
-                  icon: Icon(
-                    Icons.delete_outline,
-                    color: VerdictColors.of(context).red.ink,
+                ],
+                if (counts.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: counts,
                   ),
-                  tooltip: l10n.savedRemove,
-                  onPressed: onRemove,
+                ],
+              ],
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (entry.isCached)
+                  Semantics(
+                    label: entry.isPinned
+                        ? l10n.savedUnkeepSemanticLabel(title)
+                        : l10n.savedKeepSemanticLabel(title),
+                    button: true,
+                    toggled: entry.isPinned,
+                    excludeSemantics: true,
+                    child: IconButton(
+                      icon: Icon(
+                        entry.isPinned
+                            ? Icons.push_pin
+                            : Icons.push_pin_outlined,
+                      ),
+                      tooltip: entry.isPinned
+                          ? l10n.savedUnkeep
+                          : l10n.savedKeep,
+                      onPressed: onTogglePin,
+                    ),
+                  ),
+                Semantics(
+                  label: l10n.savedRemoveSemanticLabel(title),
+                  button: true,
+                  excludeSemantics: true,
+                  child: IconButton(
+                    // The one destructive look, shared with Settings' "Clear"
+                    // (#254); the pin beside it stays neutral.
+                    icon: Icon(
+                      Icons.delete_outline,
+                      color: VerdictColors.of(context).red.ink,
+                    ),
+                    tooltip: l10n.savedRemove,
+                    onPressed: onRemove,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  /// [card] with the rename gestures when [onRename] is set (issue #315):
+  /// a long-press, and a screen-reader action labelled for [title]. A
+  /// [GestureDetector] rather than the tile's own `onLongPress`, which a
+  /// disabled tile (a gone scan) ignores.
+  Widget _renamable(AppLocalizations l10n, String title, Widget card) {
+    final rename = onRename;
+    if (rename == null) return card;
+    return Semantics(
+      customSemanticsActions: <CustomSemanticsAction, VoidCallback>{
+        CustomSemanticsAction(label: l10n.savedRenameSemanticLabel(title)):
+            rename,
+      },
+      child: GestureDetector(onLongPress: rename, child: card),
     );
   }
 }
