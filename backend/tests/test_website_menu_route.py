@@ -212,6 +212,8 @@ def test_a_json_ld_menu_is_read_and_classified_by_the_rules_without_a_key(
     assert body["analysis"]["options"] == _OPTIONS
     assert not gemini.called
     assert [(row.source, row.platform_id) for row in rows] == [("website", _SITE)]
+    # The menu is stored; a rules result is not (D24).
+    assert rows[0].analysis_json is None
 
 
 def test_an_llm_analysis_is_cached_and_stored_without_options_or_install_id(

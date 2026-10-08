@@ -44,13 +44,19 @@ no log line carries it, nor the install id.
 import base64
 import logging
 from datetime import UTC, datetime
-from typing import Annotated, Final
+from typing import Annotated, Any, Final
 
 from fastapi import APIRouter, Depends, Request, Response
 from starlette.concurrency import run_in_threadpool
 
 from app.errors import BackendError
-from app.keto.models import AnalysisOptionsSnapshot, Menu, MenuAnalysed, VenueRef
+from app.keto.models import (
+    AnalysisOptionsSnapshot,
+    LlmEngine,
+    Menu,
+    MenuAnalysed,
+    VenueRef,
+)
 from app.keto.models import to_json as model_to_json
 from app.schemas import (
     ErrorResponse,
@@ -213,8 +219,13 @@ async def _store(request: Request, menu: Menu, analysis: MenuAnalysed) -> None:
     """
     if not request.app.state.settings.MENU_STORE_ENABLED:
         return
-    shared = model_to_json(analysis)
-    shared.pop("options", None)
+    # Only a model analysis is stored, as the app's own upload rule says
+    # (D24): a rules result refreshes the menu but never replaces a stored
+    # model analysis.
+    shared: dict[str, Any] | None = None
+    if isinstance(analysis.engine, LlmEngine):
+        shared = model_to_json(analysis)
+        shared.pop("options", None)
     try:
         await run_in_threadpool(
             lambda: menu_store.upsert(
