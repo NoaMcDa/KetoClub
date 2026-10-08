@@ -31,10 +31,12 @@ from app.routers import (
     health,
     menus,
     proxy,
+    scan,
     text_menu,
     venue_menus,
     venues,
     website,
+    website_menu,
 )
 from app.services.rate_limit import RateLimiter
 from app.services.request_logging import RequestLoggingMiddleware
@@ -105,7 +107,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # KetoClub never hammers one restaurant, and per install, so the route
     # is no open proxy. Minute windows only.
     # The D25 analysis bucket (#333): spent only when a Gemini call is about
-    # to be made by /v1/classify, /v1/venue-menus or /v1/text-menu — never
+    # to be made by /v1/classify, /v1/venue-menus, /v1/text-menu, /v1/scan
+    # (always: images are never cached) or /v1/website-menu — never
     # on an analysis-cache hit, never for a rules-only result.
     app.state.analysis_rate_limiter = RateLimiter(
         per_minute=resolved_settings.ANALYSIS_RATE_LIMIT_PER_MINUTE,
@@ -147,6 +150,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(classify.router, prefix="/v1")
     app.include_router(venue_menus.router, prefix="/v1")
     app.include_router(text_menu.router, prefix="/v1")
+    app.include_router(scan.router, prefix="/v1")
+    app.include_router(website_menu.router, prefix="/v1")
     # The menu store (#310) is opt-out: when disabled it is not mounted at
     # all, so its paths are an ordinary 404.
     if resolved_settings.MENU_STORE_ENABLED:

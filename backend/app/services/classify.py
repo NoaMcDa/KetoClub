@@ -272,19 +272,19 @@ def _finished(
     """
     raw = to_json(analysis.model_copy(update={"options": options}))
     try:
-        return MenuAnalysed.model_validate(_scrubbed(raw))
+        return MenuAnalysed.model_validate(scrubbed(raw))
     except ValidationError:
         return None
 
 
-def _scrubbed(value: Any) -> Any:
+def scrubbed(value: Any) -> Any:
     """``value`` with every string's lone surrogates replaced by U+FFFD."""
     if isinstance(value, str):
         return scrub_lone_surrogates(value)
     if isinstance(value, list):
-        return [_scrubbed(item) for item in value]
+        return [scrubbed(item) for item in value]
     if isinstance(value, dict):
-        return {key: _scrubbed(item) for key, item in value.items()}
+        return {key: scrubbed(item) for key, item in value.items()}
     return value
 
 
