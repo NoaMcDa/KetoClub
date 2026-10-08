@@ -1,0 +1,2851 @@
+{
+  "caps": {
+    "defaultNetCarbLimitGrams": 6,
+    "maxAnalysedDishes": 1000,
+    "maxHiddenCarbsPerDish": 3,
+    "maxModificationLength": 300,
+    "maxNetCarbLimitGrams": 25,
+    "maxScanPageBytes": 3145728,
+    "maxScanPages": 6,
+    "maxWhyLength": 300,
+    "minNetCarbLimitGrams": 2,
+    "minOverlapWordLength": 3,
+    "parserSchemaVersion": 1
+  },
+  "carbModifiersEn": [
+    [
+      "puree",
+      "Swap potato purée for green salad or steamed vegetables"
+    ],
+    [
+      "mashed potatoes",
+      "Swap mashed potatoes for leafy greens"
+    ],
+    [
+      "fries",
+      "Replace French fries with a fresh green salad or a fried egg"
+    ],
+    [
+      "chips",
+      "Replace chips with fresh vegetables or salad"
+    ],
+    [
+      "rice",
+      "Omit rice and request double vegetables or salad"
+    ],
+    [
+      "carrot",
+      "Ask to leave out carrots from the dish/salad"
+    ],
+    [
+      "carrots",
+      "Ask to leave out carrots from the dish/salad"
+    ],
+    [
+      "corn",
+      "Ask to leave out sweet corn"
+    ],
+    [
+      "beets",
+      "Omit beets from the dish"
+    ],
+    [
+      "sweet potato",
+      "Omit sweet potato or substitute with zucchini/broccoli"
+    ],
+    [
+      "teriyaki",
+      "Request without teriyaki sauce (contains sugar/mirin)"
+    ],
+    [
+      "honey",
+      "Ask for the dish to be prepared without honey"
+    ],
+    [
+      "bbq",
+      "Ask for barbecue glaze to be omitted (high in sugar)"
+    ],
+    [
+      "potato",
+      "Please swap the potatoes for a green salad or steamed vegetables."
+    ],
+    [
+      "potatoes",
+      "Please swap the potatoes for a green salad or steamed vegetables."
+    ],
+    [
+      "mash",
+      "Swap the mash for leafy greens"
+    ],
+    [
+      "mashed potato",
+      "Swap the mash for leafy greens"
+    ],
+    [
+      "potato mash",
+      "Swap the mash for leafy greens"
+    ],
+    [
+      "beet",
+      "Omit the beetroot from the dish"
+    ],
+    [
+      "beetroot",
+      "Omit the beetroot from the dish"
+    ],
+    [
+      "sweet potatoes",
+      "Omit sweet potato or substitute with zucchini/broccoli"
+    ],
+    [
+      "barbecue",
+      "Ask for barbecue glaze to be omitted (high in sugar)"
+    ],
+    [
+      "barbeque",
+      "Ask for barbecue glaze to be omitted (high in sugar)"
+    ],
+    [
+      "bbqed",
+      "Ask for barbecue glaze to be omitted (high in sugar)"
+    ],
+    [
+      "maple",
+      "Please prepare it without the maple syrup."
+    ],
+    [
+      "balsamic glaze",
+      "Please leave out the balsamic glaze; it is reduced with sugar."
+    ],
+    [
+      "burger",
+      "Please serve the burger without the bun, wrapped in lettuce, and swap the fries for a green salad or a fried egg."
+    ],
+    [
+      "burgers",
+      "Please serve the burger without the bun, wrapped in lettuce, and swap the fries for a green salad or a fried egg."
+    ],
+    [
+      "hamburger",
+      "Please serve the burger without the bun, wrapped in lettuce, and swap the fries for a green salad or a fried egg."
+    ],
+    [
+      "cheeseburger",
+      "Please serve the burger without the bun, wrapped in lettuce, and swap the fries for a green salad or a fried egg."
+    ],
+    [
+      "bun",
+      "Please serve the burger without the bun, wrapped in lettuce, and swap the fries for a green salad or a fried egg."
+    ],
+    [
+      "buns",
+      "Please serve the burger without the bun, wrapped in lettuce, and swap the fries for a green salad or a fried egg."
+    ],
+    [
+      "burger bun",
+      "Please serve the burger without the bun, wrapped in lettuce, and swap the fries for a green salad or a fried egg."
+    ],
+    [
+      "sandwich",
+      "Please serve the filling on a plate, without the bread."
+    ],
+    [
+      "sandwiches",
+      "Please serve the filling on a plate, without the bread."
+    ],
+    [
+      "toast",
+      "Please serve it without the bread, with salad or vegetables instead."
+    ],
+    [
+      "toasts",
+      "Please serve it without the bread, with salad or vegetables instead."
+    ],
+    [
+      "bread",
+      "Please leave out the bread and bring salad or vegetables instead."
+    ],
+    [
+      "pita",
+      "Please serve it on a plate, without the pita."
+    ],
+    [
+      "laffa",
+      "Please serve it on a plate, without the laffa."
+    ],
+    [
+      "tortilla",
+      "Please serve the filling in a bowl, without the tortilla."
+    ],
+    [
+      "wrap",
+      "Please serve the filling in a bowl, without the tortilla."
+    ],
+    [
+      "baguette",
+      "Please serve the filling on a plate, without the baguette."
+    ],
+    [
+      "hummus",
+      "Please leave out the hummus and add tahini or a green salad instead."
+    ],
+    [
+      "bulgur",
+      "Please leave out the bulgur and add double vegetables instead."
+    ],
+    [
+      "quinoa",
+      "Please leave out the quinoa and add leafy greens instead."
+    ],
+    [
+      "lentils",
+      "Please leave out the lentils and add steamed vegetables instead."
+    ],
+    [
+      "silan",
+      "Please prepare it without the date syrup — it is almost pure sugar."
+    ],
+    [
+      "date honey",
+      "Please prepare it without the date honey — it is almost pure sugar."
+    ],
+    [
+      "sweet tahini",
+      "Please use plain tahini instead of the sweet tahini."
+    ],
+    [
+      "sweet chili",
+      "Please leave out the sweet chili sauce; it is high in sugar."
+    ],
+    [
+      "ketchup",
+      "Please leave out the ketchup; mayonnaise or tahini instead is perfect."
+    ],
+    [
+      "croutons",
+      "Please prepare the salad without croutons."
+    ],
+    [
+      "cranberries",
+      "Please leave out the dried cranberries."
+    ],
+    [
+      "dates",
+      "Please leave out the dates."
+    ],
+    [
+      "thousand island",
+      "Please bring olive oil and lemon on the side instead of the thousand island."
+    ],
+    [
+      "house dressing",
+      "Please bring olive oil and lemon on the side instead of the house dressing."
+    ],
+    [
+      "vinaigrette",
+      "Please bring olive oil and lemon on the side instead of the vinaigrette."
+    ],
+    [
+      "peas",
+      "Please leave out the peas."
+    ],
+    [
+      "crispy onion",
+      "Please leave out the crispy onions — they are coated in flour."
+    ],
+    [
+      "tamarind",
+      "Please leave out the tamarind sauce; it contains sugar."
+    ],
+    [
+      "hoisin",
+      "Please leave out the hoisin sauce; it contains sugar."
+    ],
+    [
+      "latte",
+      "Please make it with black coffee or unsweetened almond milk, no added sugar."
+    ],
+    [
+      "iced latte",
+      "Please make it with black coffee or unsweetened almond milk, no added sugar."
+    ],
+    [
+      "cappuccino",
+      "Please make it with black coffee or unsweetened almond milk, no added sugar."
+    ],
+    [
+      "iced coffee",
+      "Please make it without sugar or flavoured syrup; just espresso and ice."
+    ],
+    [
+      "frappe",
+      "Please skip the sugar and any flavoured syrup; just espresso, ice, and water or unsweetened almond milk."
+    ],
+    [
+      "tonic",
+      "Please substitute soda water for the tonic; tonic is high in sugar."
+    ],
+    [
+      "tonic water",
+      "Please substitute soda water for the tonic; tonic is high in sugar."
+    ],
+    [
+      "syrup",
+      "Please leave out the flavoured syrup."
+    ],
+    [
+      "flavoured syrup",
+      "Please leave out the flavoured syrup."
+    ]
+  ],
+  "carbModifiersHe": [
+    [
+      "פירה",
+      "אפשר בבקשה להחליף את הפירה בסלט ירוק או בירקות מאודים?"
+    ],
+    [
+      "מחית תפוחי אדמה",
+      "אפשר בבקשה להחליף את המחית בסלט ירוק או בירקות מאודים?"
+    ],
+    [
+      "מחית תפו\"א",
+      "אפשר בבקשה להחליף את המחית בסלט ירוק או בירקות מאודים?"
+    ],
+    [
+      "פירה תפוחי אדמה",
+      "אפשר בבקשה להחליף את פירה תפוחי האדמה בעלים ירוקים או בסלט?"
+    ],
+    [
+      "פירה תפו\"א",
+      "אפשר בבקשה להחליף את פירה תפוחי האדמה בעלים ירוקים או בסלט?"
+    ],
+    [
+      "צ'יפס",
+      "אפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?"
+    ],
+    [
+      "תפוחי אדמה מטוגנים",
+      "אפשר בבקשה להחליף את תפוחי האדמה המטוגנים בסלט ירוק או בביצת עין?"
+    ],
+    [
+      "קריספס",
+      "אפשר בבקשה להחליף את הקריספס בירקות טריים או בסלט?"
+    ],
+    [
+      "אורז",
+      "אפשר בבקשה בלי האורז, ועם כפול ירקות או סלט במקום?"
+    ],
+    [
+      "אורז יסמין",
+      "אפשר בבקשה בלי האורז, ועם כפול ירקות או סלט במקום?"
+    ],
+    [
+      "אורז מלא",
+      "אפשר בבקשה בלי האורז, ועם כפול ירקות או סלט במקום?"
+    ],
+    [
+      "גזר",
+      "אפשר בבקשה להכין את המנה בלי גזר?"
+    ],
+    [
+      "גזרים",
+      "אפשר בבקשה להכין את המנה בלי גזר?"
+    ],
+    [
+      "גזר גמדי",
+      "אפשר בבקשה להכין את המנה בלי גזר?"
+    ],
+    [
+      "תירס",
+      "אפשר בבקשה בלי התירס?"
+    ],
+    [
+      "גרעיני תירס",
+      "אפשר בבקשה בלי התירס?"
+    ],
+    [
+      "תירס גמדי",
+      "אפשר בבקשה בלי התירס?"
+    ],
+    [
+      "סלק",
+      "אפשר בבקשה להוציא את הסלק מהמנה?"
+    ],
+    [
+      "סלקים",
+      "אפשר בבקשה להוציא את הסלק מהמנה?"
+    ],
+    [
+      "סלק צלוי",
+      "אפשר בבקשה להוציא את הסלק מהמנה?"
+    ],
+    [
+      "בטטה",
+      "אפשר בבקשה בלי הבטטה, או להחליף אותה בקישואים או בברוקולי?"
+    ],
+    [
+      "בטטות",
+      "אפשר בבקשה בלי הבטטה, או להחליף אותה בקישואים או בברוקולי?"
+    ],
+    [
+      "תפוח אדמה מתוק",
+      "אפשר בבקשה בלי הבטטה, או להחליף אותה בקישואים או בברוקולי?"
+    ],
+    [
+      "טריאקי",
+      "אפשר בבקשה בלי רוטב הטריאקי? יש בו סוכר."
+    ],
+    [
+      "טריקי",
+      "אפשר בבקשה בלי רוטב הטריאקי? יש בו סוכר."
+    ],
+    [
+      "דבש",
+      "אפשר בבקשה להכין את המנה בלי דבש?"
+    ],
+    [
+      "זיגוג דבש",
+      "אפשר בבקשה להכין את המנה בלי זיגוג הדבש?"
+    ],
+    [
+      "חרדל דבש",
+      "אפשר בבקשה בלי רוטב חרדל־דבש? אפשר שמן זית ולימון בצד במקום."
+    ],
+    [
+      "ברביקיו",
+      "אפשר בבקשה בלי זיגוג הברביקיו? יש בו הרבה סוכר."
+    ],
+    [
+      "בבקיו",
+      "אפשר בבקשה בלי זיגוג הברביקיו? יש בו הרבה סוכר."
+    ],
+    [
+      "רוטב ברביקיו",
+      "אפשר בבקשה בלי רוטב הברביקיו? יש בו הרבה סוכר."
+    ],
+    [
+      "תפוח אדמה",
+      "אפשר בבקשה להחליף את תפוחי האדמה בסלט ירוק או בירקות מאודים?"
+    ],
+    [
+      "תפוחי אדמה",
+      "אפשר בבקשה להחליף את תפוחי האדמה בסלט ירוק או בירקות מאודים?"
+    ],
+    [
+      "תפו\"א",
+      "אפשר בבקשה להחליף את תפוחי האדמה בסלט ירוק או בירקות מאודים?"
+    ],
+    [
+      "תפוד",
+      "אפשר בבקשה להחליף את תפוחי האדמה בסלט ירוק או בירקות מאודים?"
+    ],
+    [
+      "תפודים",
+      "אפשר בבקשה להחליף את תפוחי האדמה בסלט ירוק או בירקות מאודים?"
+    ],
+    [
+      "לחמנייה",
+      "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?"
+    ],
+    [
+      "לחמניה",
+      "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?"
+    ],
+    [
+      "לחמניות",
+      "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?"
+    ],
+    [
+      "לחמניית",
+      "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?"
+    ],
+    [
+      "לחמנית",
+      "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?"
+    ],
+    [
+      "המבורגר",
+      "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?"
+    ],
+    [
+      "בורגר",
+      "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?"
+    ],
+    [
+      "צ'יזבורגר",
+      "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?"
+    ],
+    [
+      "כריך",
+      "אפשר בבקשה את המילוי בצלחת, בלי הלחם?"
+    ],
+    [
+      "כריכים",
+      "אפשר בבקשה את המילוי בצלחת, בלי הלחם?"
+    ],
+    [
+      "סנדוויץ'",
+      "אפשר בבקשה את המילוי בצלחת, בלי הלחם?"
+    ],
+    [
+      "סנדוויצ'ים",
+      "אפשר בבקשה את המילוי בצלחת, בלי הלחם?"
+    ],
+    [
+      "סנדביץ",
+      "אפשר בבקשה את המילוי בצלחת, בלי הלחם?"
+    ],
+    [
+      "טוסט",
+      "אפשר בבקשה בלי הלחם, ועם סלט או ירקות במקום?"
+    ],
+    [
+      "טוסטים",
+      "אפשר בבקשה בלי הלחם, ועם סלט או ירקות במקום?"
+    ],
+    [
+      "לחם",
+      "אפשר בבקשה בלי הלחם, ועם סלט או ירקות במקום?"
+    ],
+    [
+      "פיתה",
+      "אפשר בבקשה לקבל את זה בצלחת, בלי הפיתה?"
+    ],
+    [
+      "לאפה",
+      "אפשר בבקשה לקבל את זה בצלחת, בלי הלאפה?"
+    ],
+    [
+      "טורטייה",
+      "אפשר בבקשה לקבל את המנה בקערה, בלי הטורטייה?"
+    ],
+    [
+      "טורטיה",
+      "אפשר בבקשה לקבל את המנה בקערה, בלי הטורטייה?"
+    ],
+    [
+      "באגט",
+      "אפשר בבקשה את המילוי בצלחת, בלי הבאגט?"
+    ],
+    [
+      "חומוס",
+      "אפשר בבקשה בלי החומוס, ועם טחינה או סלט ירוק במקום?"
+    ],
+    [
+      "בורגול",
+      "אפשר בבקשה בלי הבורגול, ועם כפול ירקות במקום?"
+    ],
+    [
+      "קינואה",
+      "אפשר בבקשה בלי הקינואה, ועם עלים ירוקים במקום?"
+    ],
+    [
+      "עדשים",
+      "אפשר בבקשה בלי העדשים, ועם ירקות מאודים במקום?"
+    ],
+    [
+      "סילן",
+      "אפשר בבקשה בלי הסילן? הוא סוכר כמעט לגמרי."
+    ],
+    [
+      "דבש תמרים",
+      "אפשר בבקשה בלי דבש התמרים? הוא סוכר כמעט לגמרי."
+    ],
+    [
+      "טחינה מתוקה",
+      "אפשר בבקשה טחינה רגילה במקום הטחינה המתוקה?"
+    ],
+    [
+      "צ'ילי מתוק",
+      "אפשר בבקשה בלי רוטב הצ'ילי המתוק? יש בו הרבה סוכר."
+    ],
+    [
+      "קטשופ",
+      "אפשר בבקשה בלי קטשופ? אפשר מיונז או טחינה במקום."
+    ],
+    [
+      "קרוטונים",
+      "אפשר בבקשה סלט בלי קרוטונים?"
+    ],
+    [
+      "צנוברים מסוכרים",
+      "אפשר בבקשה בלי הפיצוחים המסוכרים?"
+    ],
+    [
+      "חמוציות",
+      "אפשר בבקשה בלי החמוציות המיובשות?"
+    ],
+    [
+      "תמרים",
+      "אפשר בבקשה בלי התמרים?"
+    ],
+    [
+      "אלף האיים",
+      "אפשר בבקשה שמן זית ולימון בצד במקום רוטב אלף האיים?"
+    ],
+    [
+      "רוטב הבית",
+      "אפשר בבקשה שמן זית ולימון בצד במקום רוטב הבית?"
+    ],
+    [
+      "ויניגרט",
+      "אפשר בבקשה שמן זית ולימון בצד במקום הוויניגרט?"
+    ],
+    [
+      "אפונה",
+      "אפשר בבקשה בלי האפונה?"
+    ],
+    [
+      "בצל מטוגן",
+      "אפשר בבקשה בלי הבצל המטוגן? הוא מקומח."
+    ],
+    [
+      "תמרינד",
+      "אפשר בבקשה בלי רוטב התמרינד? יש בו סוכר."
+    ],
+    [
+      "הויסין",
+      "אפשר בבקשה בלי רוטב ההויסין? יש בו סוכר."
+    ],
+    [
+      "מייפל",
+      "אפשר בבקשה בלי סירופ המייפל?"
+    ],
+    [
+      "זיגוג בלסמי",
+      "אפשר בבקשה בלי זיגוג הבלסמי? הוא מצומצם עם סוכר."
+    ],
+    [
+      "ראפ",
+      "אפשר בבקשה לקבל את המילוי בקערה, בלי הראפ?"
+    ],
+    [
+      "הפוך",
+      "אפשר בבקשה קפה הפוך עם חלב שקדים ללא סוכר, בלי תוספת סירופ?"
+    ],
+    [
+      "הפוך קר",
+      "אפשר בבקשה קפה הפוך קר עם חלב שקדים ללא סוכר, בלי תוספת סירופ?"
+    ],
+    [
+      "לאטה",
+      "אפשר בבקשה להכין את הלאטה עם חלב שקדים ללא סוכר, בלי תוספת סירופ?"
+    ],
+    [
+      "קפוצ'ינו",
+      "אפשר בבקשה להכין את הקפוצ'ינו עם חלב שקדים ללא סוכר?"
+    ],
+    [
+      "קפה קר",
+      "אפשר בבקשה קפה קר בלי סוכר ובלי סירופ?"
+    ],
+    [
+      "סירופ",
+      "אפשר בבקשה בלי הסירופ?"
+    ],
+    [
+      "טוניק",
+      "אפשר בבקשה לשים סודה במקום הטוניק? הטוניק עתיר סוכר."
+    ]
+  ],
+  "carbOnlyBaseLabels": {
+    "buns": "bun",
+    "burger bun": "bun",
+    "לחמניית": "לחמנייה",
+    "לחמנית": "לחמנייה",
+    "מחית תפו\"א": "מחית תפוחי אדמה",
+    "פירה תפו\"א": "פירה תפוחי אדמה",
+    "תפו\"א": "תפוחי אדמה",
+    "תפוד": "תפוח אדמה",
+    "תפודים": "תפוחי אדמה"
+  },
+  "carbOnlyEligibleTriggers": [
+    "fries",
+    "chips",
+    "potato",
+    "potatoes",
+    "puree",
+    "mash",
+    "mashed potato",
+    "mashed potatoes",
+    "potato mash",
+    "sweet potato",
+    "sweet potatoes",
+    "rice",
+    "bulgur",
+    "quinoa",
+    "hummus",
+    "bread",
+    "pita",
+    "laffa",
+    "bun",
+    "buns",
+    "burger bun",
+    "baguette",
+    "tortilla",
+    "פירה",
+    "מחית תפוחי אדמה",
+    "מחית תפו\"א",
+    "פירה תפוחי אדמה",
+    "פירה תפו\"א",
+    "צ'יפס",
+    "תפוחי אדמה מטוגנים",
+    "קריספס",
+    "אורז",
+    "אורז יסמין",
+    "אורז מלא",
+    "בטטה",
+    "בטטות",
+    "תפוח אדמה מתוק",
+    "תפוח אדמה",
+    "תפוחי אדמה",
+    "תפו\"א",
+    "תפוד",
+    "תפודים",
+    "בורגול",
+    "קינואה",
+    "חומוס",
+    "לחם",
+    "פיתה",
+    "לאפה",
+    "לחמנייה",
+    "לחמניה",
+    "לחמניות",
+    "לחמניית",
+    "לחמנית",
+    "באגט",
+    "טורטייה",
+    "טורטיה"
+  ],
+  "carbOnlyQualifiersEn": [
+    "a",
+    "an",
+    "of",
+    "the",
+    "and",
+    "with",
+    "portion",
+    "side",
+    "bag",
+    "tray",
+    "basket",
+    "bowl",
+    "extra",
+    "plain",
+    "regular",
+    "large",
+    "small",
+    "big",
+    "mini",
+    "whole",
+    "half",
+    "fresh",
+    "homemade",
+    "home",
+    "made",
+    "house",
+    "sourdough",
+    "gluten",
+    "free",
+    "white",
+    "brown",
+    "wholemeal",
+    "wholewheat",
+    "crispy",
+    "hot",
+    "french",
+    "steamed",
+    "jasmine",
+    "basmati",
+    "curly",
+    "thick",
+    "thin",
+    "cut",
+    "seasoned",
+    "salted",
+    "baked",
+    "roasted",
+    "boiled",
+    "fried",
+    "style",
+    "classic",
+    "original"
+  ],
+  "carbOnlyQualifiersHe": [
+    "מנת",
+    "מנה",
+    "מגש",
+    "שקית",
+    "סלסלת",
+    "סלסלה",
+    "קערת",
+    "תוספת",
+    "אקסטרה",
+    "רגיל",
+    "רגילה",
+    "גדול",
+    "גדולה",
+    "קטן",
+    "קטנה",
+    "מיני",
+    "ללא",
+    "בלי",
+    "גלוטן",
+    "מחמצת",
+    "מלא",
+    "מלאה",
+    "לבן",
+    "לבנה",
+    "טרי",
+    "טריה",
+    "טרייה",
+    "בית",
+    "ביתי",
+    "ביתית",
+    "חצי",
+    "שלם",
+    "שלמה",
+    "חם",
+    "חמה",
+    "פריך",
+    "פריכה",
+    "עם",
+    "מתובל",
+    "מתובלים",
+    "אפוי",
+    "אפויים",
+    "אפויות",
+    "צלוי",
+    "צלויים",
+    "מבושל",
+    "קלוי",
+    "קלאסי",
+    "קלאסית",
+    "מטוגן",
+    "מטוגנים",
+    "מטוגנות",
+    "דק",
+    "עבה"
+  ],
+  "dairyGuardsEn": {
+    "butter": {
+      "after": [],
+      "before": [
+        "peanut",
+        "almond",
+        "cashew",
+        "nut",
+        "cocoa",
+        "vegan"
+      ]
+    },
+    "cheese": {
+      "after": [],
+      "before": [
+        "vegan",
+        "cashew"
+      ]
+    },
+    "cream": {
+      "after": [],
+      "before": [
+        "coconut",
+        "cashew",
+        "oat",
+        "soy",
+        "vegan",
+        "balsamic"
+      ]
+    },
+    "milk": {
+      "after": [],
+      "before": [
+        "coconut",
+        "almond",
+        "oat",
+        "soy",
+        "cashew",
+        "vegan"
+      ]
+    },
+    "yoghurt": {
+      "after": [],
+      "before": [
+        "coconut",
+        "soy",
+        "almond",
+        "vegan"
+      ]
+    },
+    "yogurt": {
+      "after": [],
+      "before": [
+        "coconut",
+        "soy",
+        "almond",
+        "vegan"
+      ]
+    }
+  },
+  "dairyGuardsHe": {
+    "גבינה": {
+      "after": [
+        "טבעונית",
+        "טבעוניות",
+        "קשיו"
+      ],
+      "before": [
+        "טבעונית",
+        "טבעוניות",
+        "קשיו"
+      ]
+    },
+    "גבינות": {
+      "after": [
+        "טבעונית",
+        "טבעוניות",
+        "קשיו"
+      ],
+      "before": [
+        "טבעונית",
+        "טבעוניות",
+        "קשיו"
+      ]
+    },
+    "גבינת": {
+      "after": [
+        "טבעונית",
+        "טבעוניות",
+        "קשיו"
+      ],
+      "before": [
+        "טבעונית",
+        "טבעוניות",
+        "קשיו"
+      ]
+    },
+    "חלב": {
+      "after": [
+        "קוקוס",
+        "שקדים",
+        "סויה",
+        "שיבולת",
+        "קשיו",
+        "טבעוני",
+        "טבעונית",
+        "בלסמי",
+        "בלסמית"
+      ],
+      "before": [
+        "קוקוס",
+        "שקדים",
+        "סויה",
+        "שיבולת",
+        "קשיו",
+        "טבעוני",
+        "טבעונית",
+        "בלסמי",
+        "בלסמית"
+      ]
+    },
+    "חמאה": {
+      "after": [
+        "בוטנים",
+        "שקדים",
+        "קשיו",
+        "קקאו",
+        "טבעונית"
+      ],
+      "before": [
+        "בוטנים",
+        "שקדים",
+        "קשיו",
+        "קקאו",
+        "טבעונית"
+      ]
+    },
+    "חמאת": {
+      "after": [
+        "בוטנים",
+        "שקדים",
+        "קשיו",
+        "קקאו",
+        "טבעונית"
+      ],
+      "before": [
+        "בוטנים",
+        "שקדים",
+        "קשיו",
+        "קקאו",
+        "טבעונית"
+      ]
+    },
+    "יוגורט": {
+      "after": [
+        "קוקוס",
+        "שקדים",
+        "סויה",
+        "שיבולת",
+        "קשיו",
+        "טבעוני",
+        "טבעונית",
+        "בלסמי",
+        "בלסמית"
+      ],
+      "before": [
+        "קוקוס",
+        "שקדים",
+        "סויה",
+        "שיבולת",
+        "קשיו",
+        "טבעוני",
+        "טבעונית",
+        "בלסמי",
+        "בלסמית"
+      ]
+    },
+    "קרם": {
+      "after": [
+        "קוקוס",
+        "שקדים",
+        "סויה",
+        "שיבולת",
+        "קשיו",
+        "טבעוני",
+        "טבעונית",
+        "בלסמי",
+        "בלסמית"
+      ],
+      "before": [
+        "קוקוס",
+        "שקדים",
+        "סויה",
+        "שיבולת",
+        "קשיו",
+        "טבעוני",
+        "טבעונית",
+        "בלסמי",
+        "בלסמית"
+      ]
+    },
+    "שמנת": {
+      "after": [
+        "קוקוס",
+        "שקדים",
+        "סויה",
+        "שיבולת",
+        "קשיו",
+        "טבעוני",
+        "טבעונית",
+        "בלסמי",
+        "בלסמית"
+      ],
+      "before": [
+        "קוקוס",
+        "שקדים",
+        "סויה",
+        "שיבולת",
+        "קשיו",
+        "טבעוני",
+        "טבעונית",
+        "בלסמי",
+        "בלסמית"
+      ]
+    }
+  },
+  "dairyTriggersEn": [
+    "cheese",
+    "cheeses",
+    "cheesy",
+    "cream",
+    "creamy",
+    "butter",
+    "buttery",
+    "buttermilk",
+    "yogurt",
+    "yoghurt",
+    "milk",
+    "feta",
+    "parmesan",
+    "mozzarella",
+    "burrata",
+    "cheddar",
+    "ricotta",
+    "labneh",
+    "halloumi",
+    "mascarpone",
+    "gorgonzola",
+    "brie",
+    "camembert",
+    "gouda",
+    "creme fraiche",
+    "kefir",
+    "tzatziki",
+    "paneer"
+  ],
+  "dairyTriggersHe": [
+    "גבינה",
+    "גבינות",
+    "גבינת",
+    "שמנת",
+    "חמאה",
+    "חמאת",
+    "יוגורט",
+    "חלב",
+    "פטה",
+    "פרמזן",
+    "מוצרלה",
+    "בוראטה",
+    "צ'דר",
+    "ריקוטה",
+    "לאבנה",
+    "חלומי",
+    "מסקרפונה",
+    "גורגונזולה",
+    "קממבר",
+    "גאודה",
+    "רוקפור",
+    "צפתית",
+    "בולגרית",
+    "קוטג'",
+    "קרם",
+    "קרמי",
+    "קרמית",
+    "קפיר",
+    "צזיקי"
+  ],
+  "dishKinds": {
+    "drinkCategoryWordsEn": [
+      "drinks",
+      "drink",
+      "beverages",
+      "beverage",
+      "soft drinks",
+      "hot drinks",
+      "cold drinks",
+      "beer",
+      "beers",
+      "wine",
+      "wines",
+      "cocktails",
+      "alcohol",
+      "bar",
+      "coffee",
+      "coffees",
+      "tea",
+      "shakes",
+      "smoothies",
+      "juices"
+    ],
+    "drinkCategoryWordsHe": [
+      "שתייה",
+      "שתיה",
+      "שתייה קלה",
+      "שתייה חמה",
+      "שתייה קרה",
+      "משקאות",
+      "משקה",
+      "בירות",
+      "בירה",
+      "יינות",
+      "יין",
+      "אלכוהול",
+      "קוקטיילים",
+      "קפה",
+      "תה",
+      "שייקים",
+      "מיצים",
+      "בר"
+    ],
+    "drinkNameGuardWordsEn": [
+      "batter",
+      "battered",
+      "braised",
+      "rubbed",
+      "smoked",
+      "glaze",
+      "glazed",
+      "sauce",
+      "marinated",
+      "marinade",
+      "infused",
+      "reduction"
+    ],
+    "drinkNameGuardWordsHe": [
+      "בלילה",
+      "בלילת",
+      "ברוטב",
+      "רוטב",
+      "צלוי",
+      "מעושן",
+      "בציפוי",
+      "זיגוג",
+      "מרינדה",
+      "מושרה"
+    ],
+    "drinkNameTriggersEn": [
+      "cola",
+      "coke",
+      "pepsi",
+      "sprite",
+      "fanta",
+      "lemonade",
+      "juice",
+      "orange juice",
+      "apple juice",
+      "beer",
+      "lager",
+      "stout",
+      "ale",
+      "liqueur",
+      "smoothie",
+      "sweet wine",
+      "moscato",
+      "port wine",
+      "latte",
+      "iced latte",
+      "cappuccino",
+      "iced coffee",
+      "frappe",
+      "tonic",
+      "tonic water",
+      "water",
+      "mineral water",
+      "soda",
+      "soda water",
+      "sparkling water",
+      "coffee",
+      "espresso",
+      "americano",
+      "macchiato",
+      "tea",
+      "iced tea",
+      "diet coke",
+      "coke zero",
+      "cocktail",
+      "vodka",
+      "whisky",
+      "whiskey",
+      "gin",
+      "rum",
+      "arak",
+      "red wine",
+      "white wine",
+      "wine",
+      "prosecco",
+      "champagne",
+      "milkshake"
+    ],
+    "drinkNameTriggersHe": [
+      "קולה",
+      "קוקה קולה",
+      "ספרייט",
+      "פאנטה",
+      "פריגת",
+      "מיץ",
+      "מיץ תפוזים",
+      "מיץ ענבים",
+      "לימונדה",
+      "בירה",
+      "בירה שחורה",
+      "שיכר",
+      "ליקר",
+      "סמוטי",
+      "יין מתוק",
+      "הפוך",
+      "הפוך קר",
+      "לאטה",
+      "קפוצ'ינו",
+      "קפה קר",
+      "טוניק",
+      "מים",
+      "מים מינרלים",
+      "סודה",
+      "קפה",
+      "אספרסו",
+      "אמריקנו",
+      "מקיאטו",
+      "תה",
+      "תה קר",
+      "קוקטייל",
+      "וודקה",
+      "ויסקי",
+      "גין",
+      "רום",
+      "ערק",
+      "יין אדום",
+      "יין לבן",
+      "יין",
+      "פרוסקו",
+      "שמפניה",
+      "מילקשייק",
+      "קולה זירו"
+    ],
+    "extraCategoryWordsEn": [
+      "sauces",
+      "sauce",
+      "dips",
+      "dip",
+      "add-ons",
+      "add ons",
+      "extras",
+      "toppings",
+      "cutlery",
+      "utensils",
+      "deposit",
+      "delivery",
+      "gift card",
+      "gift cards",
+      "packaging"
+    ],
+    "extraCategoryWordsHe": [
+      "רטבים",
+      "רוטב",
+      "מטבלים",
+      "סכום",
+      "פיקדון",
+      "משלוח",
+      "דמי משלוח",
+      "שובר",
+      "שוברים",
+      "גיפט קארד",
+      "אריזה"
+    ],
+    "foodCategoryWordsEn": [
+      "sides",
+      "side dishes",
+      "salads",
+      "pastries",
+      "pastry",
+      "bakery",
+      "breakfast",
+      "brunch",
+      "desserts",
+      "dessert",
+      "mains",
+      "burgers",
+      "sandwiches",
+      "specials",
+      "snacks"
+    ],
+    "foodCategoryWordsHe": [
+      "תוספות",
+      "סלטים",
+      "מאפים",
+      "מאפה",
+      "קינוחים",
+      "קינוח",
+      "ארוחת בוקר",
+      "בראנץ",
+      "עיקריות",
+      "המבורגרים",
+      "סנדוויצים",
+      "כריכים",
+      "ספיישלים",
+      "נשנושים"
+    ],
+    "hebrewPrefixAllowed": {
+      "drinkCategories": false,
+      "drinkNameGuards": true,
+      "drinkNames": true,
+      "extraCategories": false,
+      "foodCategories": true,
+      "notice": false
+    },
+    "noticeCategoryWordsEn": [
+      "dear customers",
+      "notice",
+      "announcement",
+      "please note",
+      "coming soon",
+      "important"
+    ],
+    "noticeCategoryWordsHe": [
+      "לקוחות יקרים",
+      "הודעה",
+      "שימו לב",
+      "בקרוב",
+      "חשוב"
+    ],
+    "plainDrinkWordsEn": [
+      "water",
+      "mineral water",
+      "soda",
+      "soda water",
+      "sparkling water",
+      "coffee",
+      "espresso",
+      "americano",
+      "macchiato",
+      "tea",
+      "iced tea",
+      "diet coke",
+      "coke zero",
+      "cocktail",
+      "vodka",
+      "whisky",
+      "whiskey",
+      "gin",
+      "rum",
+      "arak",
+      "red wine",
+      "white wine",
+      "wine",
+      "prosecco",
+      "champagne",
+      "milkshake"
+    ],
+    "plainDrinkWordsHe": [
+      "מים",
+      "מים מינרלים",
+      "סודה",
+      "קפה",
+      "אספרסו",
+      "אמריקנו",
+      "מקיאטו",
+      "תה",
+      "תה קר",
+      "קוקטייל",
+      "וודקה",
+      "ויסקי",
+      "גין",
+      "רום",
+      "ערק",
+      "יין אדום",
+      "יין לבן",
+      "יין",
+      "פרוסקו",
+      "שמפניה",
+      "מילקשייק",
+      "קולה זירו"
+    ],
+    "yellowDrinkTriggersEn": [
+      "latte",
+      "iced latte",
+      "cappuccino",
+      "iced coffee",
+      "frappe",
+      "tonic",
+      "tonic water"
+    ],
+    "yellowDrinkTriggersHe": [
+      "הפוך",
+      "הפוך קר",
+      "לאטה",
+      "קפוצ'ינו",
+      "קפה קר",
+      "טוניק"
+    ]
+  },
+  "fillingProteinTriggersEn": [
+    "chicken",
+    "beef",
+    "lamb",
+    "steak",
+    "meat",
+    "meatballs",
+    "shawarma",
+    "kebab",
+    "kebabs",
+    "falafel",
+    "sabich",
+    "egg",
+    "eggs",
+    "omelette",
+    "omelet",
+    "tuna",
+    "fish",
+    "salmon",
+    "turkey",
+    "sausage",
+    "pastrami",
+    "bacon",
+    "liver",
+    "schnitzel",
+    "burger",
+    "patty"
+  ],
+  "fillingProteinTriggersHe": [
+    "עוף",
+    "בקר",
+    "טלה",
+    "סטייק",
+    "בשר",
+    "קציצה",
+    "קציצות",
+    "שווארמה",
+    "שוארמה",
+    "שווארמת",
+    "קבב",
+    "פלאפל",
+    "סביח",
+    "ביצה",
+    "ביצים",
+    "חביתה",
+    "טונה",
+    "דג",
+    "דגים",
+    "סלמון",
+    "הודו",
+    "נקניק",
+    "נקניקיה",
+    "פסטרמה",
+    "בייקון",
+    "כבד",
+    "שניצל",
+    "המבורגר",
+    "קציצת"
+  ],
+  "hebrewTriggerPatternExample": {
+    "trigger": "פסטה",
+    "withInflection": "(?<![א-ת])[בהוכלמש]{0,2}פסטה(?:ימ|ות|יות|י|ית)?(?![א-ת])",
+    "withPrefix": "(?<![א-ת])[בהוכלמש]{0,2}פסטה(?![א-ת])",
+    "withoutPrefix": "(?<![א-ת])פסטה(?![א-ת])"
+  },
+  "ketoQualifierGuardsEn": {
+    "ale": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "beer": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "bread": {
+      "after": [],
+      "before": [
+        "keto",
+        "cloud",
+        "almond"
+      ]
+    },
+    "burger": {
+      "after": [],
+      "before": [
+        "lettuce",
+        "keto",
+        "bunless",
+        "naked"
+      ]
+    },
+    "burgers": {
+      "after": [],
+      "before": [
+        "lettuce",
+        "keto",
+        "bunless",
+        "naked"
+      ]
+    },
+    "cheeseburger": {
+      "after": [],
+      "before": [
+        "lettuce",
+        "keto",
+        "bunless",
+        "naked"
+      ]
+    },
+    "chips": {
+      "after": [],
+      "before": [
+        "kale",
+        "parmesan",
+        "cheese",
+        "zucchini",
+        "courgette",
+        "cabbage",
+        "coconut",
+        "keto"
+      ]
+    },
+    "coke": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "cola": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "danish": {
+      "after": [
+        "blue",
+        "meatballs",
+        "rye",
+        "style"
+      ],
+      "before": []
+    },
+    "fanta": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "hamburger": {
+      "after": [],
+      "before": [
+        "lettuce",
+        "keto",
+        "bunless",
+        "naked"
+      ]
+    },
+    "juice": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "lager": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "lemonade": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "muffin": {
+      "after": [],
+      "before": [
+        "egg",
+        "keto",
+        "almond",
+        "coconut"
+      ]
+    },
+    "muffins": {
+      "after": [],
+      "before": [
+        "egg",
+        "keto",
+        "almond",
+        "coconut"
+      ]
+    },
+    "noodle": {
+      "after": [],
+      "before": [
+        "zucchini",
+        "courgette",
+        "konjac",
+        "shirataki",
+        "palmini",
+        "keto"
+      ]
+    },
+    "noodles": {
+      "after": [],
+      "before": [
+        "zucchini",
+        "courgette",
+        "cauliflower",
+        "konjac",
+        "shirataki",
+        "palmini",
+        "keto",
+        "cabbage",
+        "kelp"
+      ]
+    },
+    "pancake": {
+      "after": [],
+      "before": [
+        "keto",
+        "almond",
+        "coconut"
+      ]
+    },
+    "pepsi": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "pizza": {
+      "after": [],
+      "before": [
+        "cauliflower",
+        "keto",
+        "almond",
+        "fathead",
+        "low carb",
+        "lowcarb"
+      ]
+    },
+    "rice": {
+      "after": [],
+      "before": [
+        "cauliflower",
+        "broccoli",
+        "konjac",
+        "shirataki",
+        "keto",
+        "cabbage"
+      ]
+    },
+    "risotto": {
+      "after": [],
+      "before": [
+        "cauliflower",
+        "konjac",
+        "keto"
+      ]
+    },
+    "spaghetti": {
+      "after": [
+        "squash"
+      ],
+      "before": []
+    },
+    "sprite": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "toast": {
+      "after": [],
+      "before": [
+        "keto",
+        "cloud",
+        "almond"
+      ]
+    },
+    "tonic": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "tonic water": {
+      "after": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ],
+      "before": [
+        "zero",
+        "diet",
+        "sugar-free",
+        "sugar free",
+        "no sugar",
+        "zero sugar",
+        "unsweetened",
+        "light"
+      ]
+    },
+    "waffle": {
+      "after": [],
+      "before": [
+        "keto",
+        "chaffle",
+        "almond"
+      ]
+    }
+  },
+  "ketoQualifierGuardsHe": {
+    "אורז": {
+      "after": [
+        "כרובית",
+        "קונגאק",
+        "שיראטקי",
+        "קטו",
+        "כרוב"
+      ],
+      "before": [
+        "כרובית",
+        "קונגאק",
+        "שיראטקי",
+        "קטו",
+        "כרוב"
+      ]
+    },
+    "אטריות": {
+      "after": [
+        "קישואים",
+        "קישוא",
+        "כרובית",
+        "קונגאק",
+        "שיראטקי",
+        "קטו"
+      ],
+      "before": [
+        "קישואים",
+        "קישוא",
+        "כרובית",
+        "קונגאק",
+        "שיראטקי",
+        "קטו"
+      ]
+    },
+    "בורגר": {
+      "after": [
+        "חסה",
+        "בחסה",
+        "קטו"
+      ],
+      "before": [
+        "חסה",
+        "בחסה",
+        "קטו"
+      ]
+    },
+    "בירה": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
+    "בירה שחורה": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
+    "המבורגר": {
+      "after": [
+        "חסה",
+        "בחסה",
+        "קטו"
+      ],
+      "before": [
+        "חסה",
+        "בחסה",
+        "קטו"
+      ]
+    },
+    "טוניק": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
+    "טוסט": {
+      "after": [
+        "קטו",
+        "ענן",
+        "שקדים"
+      ],
+      "before": [
+        "קטו",
+        "ענן",
+        "שקדים"
+      ]
+    },
+    "לחם": {
+      "after": [
+        "קטו",
+        "ענן",
+        "שקדים",
+        "דלת פחמימות"
+      ],
+      "before": [
+        "קטו",
+        "ענן",
+        "שקדים",
+        "דלת פחמימות"
+      ]
+    },
+    "לחמנייה": {
+      "after": [
+        "קטו",
+        "ענן",
+        "שקדים",
+        "דלת פחמימות"
+      ],
+      "before": [
+        "קטו",
+        "ענן",
+        "שקדים",
+        "דלת פחמימות"
+      ]
+    },
+    "לחמניית": {
+      "after": [
+        "קטו",
+        "ענן",
+        "שקדים",
+        "דלת פחמימות"
+      ],
+      "before": [
+        "קטו",
+        "ענן",
+        "שקדים",
+        "דלת פחמימות"
+      ]
+    },
+    "לחמנית": {
+      "after": [
+        "קטו",
+        "ענן",
+        "שקדים",
+        "דלת פחמימות"
+      ],
+      "before": [
+        "קטו",
+        "ענן",
+        "שקדים",
+        "דלת פחמימות"
+      ]
+    },
+    "לימונדה": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
+    "מיץ": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
+    "נודלס": {
+      "after": [
+        "קישואים",
+        "קישוא",
+        "כרובית",
+        "קונגאק",
+        "שיראטקי",
+        "קטו"
+      ],
+      "before": [
+        "קישואים",
+        "קישוא",
+        "כרובית",
+        "קונגאק",
+        "שיראטקי",
+        "קטו"
+      ]
+    },
+    "ספרייט": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
+    "פאנטה": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
+    "פיצה": {
+      "after": [
+        "כרובית",
+        "קטו",
+        "שקדים",
+        "דלת פחמימות"
+      ],
+      "before": [
+        "כרובית",
+        "קטו",
+        "שקדים",
+        "דלת פחמימות"
+      ]
+    },
+    "פריגת": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
+    "צ'יזבורגר": {
+      "after": [
+        "חסה",
+        "בחסה",
+        "קטו"
+      ],
+      "before": [
+        "חסה",
+        "בחסה",
+        "קטו"
+      ]
+    },
+    "צ'יפס": {
+      "after": [
+        "קישואים",
+        "כרוב",
+        "פרמזן",
+        "גבינה",
+        "קייל",
+        "קטו"
+      ],
+      "before": [
+        "קישואים",
+        "כרוב",
+        "פרמזן",
+        "גבינה",
+        "קייל",
+        "קטו"
+      ]
+    },
+    "קולה": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
+    "קוקה קולה": {
+      "after": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ],
+      "before": [
+        "זירו",
+        "דיאט",
+        "ללא סוכר",
+        "ללא סוכרים"
+      ]
+    },
+    "ריזוטו": {
+      "after": [
+        "כרובית",
+        "קטו"
+      ],
+      "before": [
+        "כרובית",
+        "קטו"
+      ]
+    },
+    "שמרים": {
+      "after": [
+        "תזונתיים",
+        "תזונתי"
+      ],
+      "before": [
+        "תזונתיים",
+        "תזונתי"
+      ]
+    }
+  },
+  "ketoScoreWeights": {
+    "hiddenCarbYellow": 0.25,
+    "yellow": 0.5
+  },
+  "latinTriggerPatternExample": {
+    "caseSensitive": false,
+    "pattern": "\\bsweet potato\\b",
+    "trigger": "sweet potato",
+    "unicode": false
+  },
+  "noPrefixHebrewTriggers": [
+    "הפוך",
+    "חלה",
+    "שמרים"
+  ],
+  "nonKetoBaseLabelsEn": {
+    "fish and chips": "battered fish",
+    "fish chips": "battered fish",
+    "noodle": "noodles"
+  },
+  "nonKetoBaseLabelsHe": {
+    "דג וצ'יפס": "דג מצופה",
+    "ספאגטי": "ספגטי",
+    "פיצות": "פיצה",
+    "פיש אנד צ'יפס": "דג מצופה",
+    "רזוטו": "ריזוטו",
+    "רמן": "ראמן"
+  },
+  "nonKetoBasesEn": [
+    "fish and chips",
+    "fish chips",
+    "pasta",
+    "spaghetti",
+    "penne",
+    "fettuccine",
+    "gnocchi",
+    "pizza",
+    "calzone",
+    "risotto",
+    "noodle",
+    "noodles",
+    "ramen",
+    "pancake",
+    "waffle",
+    "pastas",
+    "pizzas",
+    "calzones",
+    "pancakes",
+    "waffles",
+    "breaded",
+    "battered",
+    "crumbed",
+    "panko",
+    "tempura",
+    "beer batter",
+    "schnitzel",
+    "nuggets",
+    "crispy coating",
+    "breadcrumbs",
+    "katsu",
+    "milanese",
+    "lasagna",
+    "lasagne",
+    "ravioli",
+    "tortellini",
+    "cannelloni",
+    "tagliatelle",
+    "linguine",
+    "rigatoni",
+    "orzo",
+    "macaroni",
+    "mac and cheese",
+    "udon",
+    "soba",
+    "pad thai",
+    "lo mein",
+    "vermicelli",
+    "couscous",
+    "mujadara",
+    "tabbouleh",
+    "freekeh",
+    "moghrabieh",
+    "polenta",
+    "grits",
+    "burekas",
+    "malawach",
+    "jachnun",
+    "sambusak",
+    "lahmajun",
+    "focaccia",
+    "phyllo",
+    "filo",
+    "puff pastry",
+    "empanada",
+    "dumpling",
+    "gyoza",
+    "bao",
+    "arancini",
+    "croquette",
+    "crepe",
+    "blintz",
+    "cake",
+    "cookie",
+    "brownie",
+    "tart",
+    "pie",
+    "baklava",
+    "knafeh",
+    "malabi",
+    "souffle",
+    "ice cream",
+    "milkshake",
+    "challah",
+    "bagel",
+    "croissant",
+    "doughnut",
+    "donut",
+    "latkes",
+    "burrito",
+    "quesadilla",
+    "taco shell",
+    "danish",
+    "pastry",
+    "pastries",
+    "rugelach",
+    "muffin",
+    "muffins",
+    "scone",
+    "scones",
+    "cola",
+    "coke",
+    "pepsi",
+    "sprite",
+    "fanta",
+    "lemonade",
+    "juice",
+    "orange juice",
+    "apple juice",
+    "beer",
+    "lager",
+    "stout",
+    "ale",
+    "liqueur",
+    "smoothie",
+    "sweet wine",
+    "moscato",
+    "port wine"
+  ],
+  "nonKetoBasesHe": [
+    "פסטה",
+    "פסטות",
+    "ספגטי",
+    "ספאגטי",
+    "פטוצ'יני",
+    "פטוצייני",
+    "ניוקי",
+    "גנוקי",
+    "פיצה",
+    "פיצות",
+    "קלצונה",
+    "קלזונה",
+    "ריזוטו",
+    "רזוטו",
+    "נודלס",
+    "נודל",
+    "אטריות",
+    "אטריה",
+    "ראמן",
+    "רמן",
+    "בריוש",
+    "שניצל",
+    "שניצלים",
+    "פאנקו",
+    "טמפורה",
+    "בציפוי פריך",
+    "פירורי לחם",
+    "בלילה",
+    "נאגטס",
+    "קריספי",
+    "בבלילת בירה",
+    "מטוגן בפירורים",
+    "בורקס",
+    "בורקסים",
+    "מלווח",
+    "מלאווח",
+    "ג'חנון",
+    "סמבוסק",
+    "לחמג'ון",
+    "פוקצה",
+    "פוקצ'ה",
+    "קובה",
+    "סיגרים",
+    "פילו",
+    "בצק עלים",
+    "קוסקוס",
+    "פתיתים",
+    "מג'דרה",
+    "מגדרה",
+    "טאבולה",
+    "פריקה",
+    "מוגרבייה",
+    "לזניה",
+    "רביולי",
+    "טורטליני",
+    "קנלוני",
+    "טליאטלה",
+    "לינגוויני",
+    "ריגטוני",
+    "אורזו",
+    "אודון",
+    "סובה",
+    "פאד תאי",
+    "לו מיין",
+    "ורמישלי",
+    "קרפ",
+    "קראפ",
+    "בלינצ'ס",
+    "מלבי",
+    "קנאפה",
+    "בקלאווה",
+    "סופלה",
+    "בראוניז",
+    "עוגה",
+    "עוגיות",
+    "טארט",
+    "קרם ברולה",
+    "חלבה",
+    "גלידה",
+    "מילקשייק",
+    "חלה",
+    "בייגל",
+    "קרואסון",
+    "דונאט",
+    "לביבות",
+    "ניוקי בטטה",
+    "פיש אנד צ'יפס",
+    "דג וצ'יפס",
+    "פנקייק",
+    "פנקייקים",
+    "וופל",
+    "וופלים",
+    "קטסו",
+    "מילנז",
+    "מקרוני",
+    "מק אנד צ'יז",
+    "פולנטה",
+    "גריטס",
+    "אמפנדה",
+    "גיוזה",
+    "באו",
+    "ארנצ'יני",
+    "קרוקט",
+    "פאי",
+    "בוריטו",
+    "קסדיה",
+    "קליפת טאקו",
+    "דניש",
+    "שמרים",
+    "מאפה",
+    "מאפים",
+    "רוגלך",
+    "עוגיה",
+    "מאפין",
+    "מאפינס",
+    "סקון",
+    "קולה",
+    "קוקה קולה",
+    "ספרייט",
+    "פאנטה",
+    "פריגת",
+    "מיץ",
+    "מיץ תפוזים",
+    "מיץ ענבים",
+    "לימונדה",
+    "בירה",
+    "בירה שחורה",
+    "שיכר",
+    "ליקר",
+    "סמוטי",
+    "יין מתוק"
+  ],
+  "nonKetoDrinkBasesEn": [
+    "cola",
+    "coke",
+    "pepsi",
+    "sprite",
+    "fanta",
+    "lemonade",
+    "juice",
+    "orange juice",
+    "apple juice",
+    "beer",
+    "lager",
+    "stout",
+    "ale",
+    "liqueur",
+    "smoothie",
+    "sweet wine",
+    "moscato",
+    "port wine"
+  ],
+  "nonKetoDrinkBasesHe": [
+    "קולה",
+    "קוקה קולה",
+    "ספרייט",
+    "פאנטה",
+    "פריגת",
+    "מיץ",
+    "מיץ תפוזים",
+    "מיץ ענבים",
+    "לימונדה",
+    "בירה",
+    "בירה שחורה",
+    "שיכר",
+    "ליקר",
+    "סמוטי",
+    "יין מתוק"
+  ],
+  "optionRemovalWordsEn": [
+    "no",
+    "without",
+    "skip"
+  ],
+  "optionRemovalWordsHe": [
+    "ללא",
+    "בלי"
+  ],
+  "pasted": {
+    "pastedHeaderMaxWords": 4,
+    "pastedPriceSuffix": {
+      "caseSensitive": false,
+      "pattern": "(?:^|\\s+|\\s*[-–—:]\\s*)(?:₪\\s*)?\\d+(?:[.,]\\d{1,2})?(?:\\s*(?:₪|NIS|ILS))?\\s*$",
+      "unicode": false
+    }
+  },
+  "plantTriggersEn": [
+    "salad",
+    "salads",
+    "slaw",
+    "coleslaw",
+    "vegetable",
+    "vegetables",
+    "veggies",
+    "greens",
+    "lettuce",
+    "tomato",
+    "tomatoes",
+    "cucumber",
+    "cucumbers",
+    "onion",
+    "onions",
+    "peppers",
+    "bell pepper",
+    "zucchini",
+    "courgette",
+    "eggplant",
+    "aubergine",
+    "mushroom",
+    "mushrooms",
+    "spinach",
+    "broccoli",
+    "cauliflower",
+    "kale",
+    "arugula",
+    "cabbage",
+    "avocado",
+    "olives",
+    "asparagus",
+    "celery",
+    "radish",
+    "artichoke",
+    "pickles",
+    "beans",
+    "chickpeas",
+    "tahini",
+    "herbs",
+    "fruit"
+  ],
+  "plantTriggersHe": [
+    "סלט",
+    "סלטים",
+    "ירק",
+    "ירקות",
+    "עלים",
+    "חסה",
+    "עגבניה",
+    "עגבנייה",
+    "עגבניות",
+    "מלפפון",
+    "מלפפונים",
+    "בצל",
+    "בצלים",
+    "פלפלים",
+    "פלפל קלוי",
+    "קישוא",
+    "קישואים",
+    "חציל",
+    "חצילים",
+    "פטריה",
+    "פטרייה",
+    "פטריות",
+    "תרד",
+    "ברוקולי",
+    "כרובית",
+    "קייל",
+    "ארוגולה",
+    "רוקט",
+    "כרוב",
+    "אבוקדו",
+    "זיתים",
+    "אספרגוס",
+    "סלרי",
+    "צנון",
+    "צנוניות",
+    "ארטישוק",
+    "חמוצים",
+    "שעועית",
+    "גרגרי חומוס",
+    "טחינה",
+    "עשבי תיבול",
+    "פירות"
+  ],
+  "prompt": {
+    "carnivoreOnlyPromptFragment": "Carnivore only: the user eats only animal foods (meat, fish, seafood, eggs and animal fats). A dish that includes any vegetable, salad, fruit, legume, herb garnish or other plant is modifiable, with a modification asking for only the meat, fish or eggs, with no plants, unless it is already nonKeto.",
+    "dairyFreePromptFragment": "Dairy-free keto: the user eats no dairy. A dish containing cheese, cream, butter, milk or yogurt is modifiable, with a modification asking for it without the dairy component, unless it is already nonKeto.",
+    "dietaryConstraintsPreamble": "The user has these additional dietary constraints. A dish that violates one is not orderAsIs even if it otherwise would be — mark it modifiable or nonKeto, whichever fits:",
+    "netCarbLimitPlaceholder": "{limit}",
+    "outputRules": "Every \"modifiable\" dish must carry a non-empty \"modification\" naming the exact component to remove and the exact substitute to ask for. A dish with no compliant path is \"nonKeto\" and must not carry a \"modification\".\nRespond with JSON matching the supplied schema and nothing else: no markdown fence, no heading, no commentary before or after the JSON object.",
+    "promptKetoRulesTemplate": "Net carbs of {limit}g or less per dish make it green (orderAsIs).\nStarchy sides, root vegetables, sugary sauces and glazes, breading, and bread that only carries the dish (a bun, pita, toast) make an otherwise-compliant dish yellow (modifiable): name the exact component to remove and the exact substitute to ask for.\nPasta, pizza, rice bowls, noodles, breaded or battered proteins, and pastry make a dish red (nonKeto), even with modifications, and get no modification text.\nDrinks: cola, sprite, juice, lemonade, beer, sweet wine, and liqueur are red; iced coffee, latte, cappuccino, and tonic are yellow (ask for black coffee, unsweetened almond milk, or soda water instead); zero-sugar or diet versions of soda or beer, plain water, black coffee, espresso, tea, dry wine, and spirits are green.\nWrite \"why\" and \"modification\" in the language the menu is written in, each under 300 characters. Return only dishes present in the input, using their given id and exact printed name.\nHidden carbs: breading crumbs, sweet marinades, house dressings, thickeners and glazes often contain sugar, honey, flour or cornstarch even when the dish name reads clean. For each dish, list any such suspected or confirmed hidden carb under \"hidden_carbs\" as {source, certainty (\"suspected\" or \"likely\"), waiter_question} — the question to ask the waiter, in the menu's language, under 300 characters. Use an empty array when none apply.",
+    "promptVerdictDefinitionsTemplate": "orderAsIs — net carbohydrates {limit}g or less, a healthy fat-and-protein base, and no starchy side, sugary sauce, or flour coating: order it exactly as printed.\nmodifiable — the core protein, fish, egg, or salad is keto-compliant, but the dish arrives with a starchy side (fries, mash, rice, bread), a root vegetable (carrot, beet, corn), or a sugary sauce or glaze (teriyaki, honey, barbecue): order it with the stated substitution or removal.\nnonKeto — the dish is built on a high-carbohydrate foundation no substitution can fix, such as pasta, pizza crust, a rice bowl, noodles, a breaded or battered protein, or a pastry or dessert base: skip it.",
+    "rolePreamble": "You are the keto-diet menu analyst for KetoClub. Classify every dish in the user message into exactly one of three verdicts.",
+    "schemaName": "menu_analysis",
+    "seedOilFreePromptFragment": "Strict seed-oil free: the user avoids industrial seed oils (canola, rapeseed, soybean, sunflower, corn, cottonseed and generic vegetable oil). A dish that is fried, deep-fried or cooked in one of them is modifiable, with a modification asking for it to be cooked in olive oil, butter or tallow instead, unless it is already nonKeto."
+  },
+  "scanned": {
+    "scannedCategoryId": "scanned",
+    "scannedCategoryNameEn": "Scanned menu",
+    "scannedCategoryNameHe": "תפריט סרוק",
+    "scannedDishIdPrefix": "v",
+    "scannedMenuCurrency": "ILS"
+  },
+  "seedOilTriggersEn": [
+    "fried",
+    "deep fried",
+    "canola",
+    "rapeseed",
+    "soybean oil",
+    "soy oil",
+    "sunflower oil",
+    "vegetable oil",
+    "corn oil",
+    "cottonseed",
+    "seed oil",
+    "seed oils"
+  ],
+  "seedOilTriggersHe": [
+    "מטוגן",
+    "מטוגנת",
+    "מטוגנים",
+    "מטוגנות",
+    "טיגון",
+    "קנולה",
+    "שמן סויה",
+    "שמן חמניות",
+    "שמן צמחי",
+    "שמן תירס",
+    "שמן זרעים"
+  ],
+  "templates": {
+    "carnivoreOnlyModificationEn": "Please serve only the meat, fish or eggs, with no vegetables, salad or other plants on the plate.",
+    "carnivoreOnlyModificationHe": "אפשר בבקשה להגיש רק את הבשר, הדג או הביצים, בלי ירקות, סלט או צמחים אחרים בצלחת?",
+    "dairyFreeModificationEn": "Please make it with no dairy: no cheese, cream, butter, milk or yogurt.",
+    "dairyFreeModificationHe": "אפשר בבקשה להכין את המנה בלי מוצרי חלב: בלי גבינה, שמנת, חמאה, חלב או יוגורט?",
+    "dietaryRuleWhyEn": "This dish is keto, but it breaks one of the rules you turned on in Settings. Ask for the change below.",
+    "dietaryRuleWhyHe": "המנה מתאימה לקטו, אבל לא לאחד הכללים שהפעלתם בהגדרות. בקשו את השינוי שמופיע כאן.",
+    "greenWhyEn": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed.",
+    "greenWhyHe": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא.",
+    "optionBaseModificationEn": "Among the options, skip the {base} and choose a salad or vegetables instead.",
+    "optionBaseModificationHe": "מבין האפשרויות, בלי {base} — בחרו סלט או ירקות במקום.",
+    "redWhyEn": "Built on {base}, which cannot be made keto.",
+    "redWhyHe": "המנה מבוססת על {base}, ואי אפשר להפוך אותה לקטוגנית.",
+    "seedOilFreeModificationEn": "Please cook it in olive oil, butter or tallow, with no canola, soybean, sunflower or other seed oil.",
+    "seedOilFreeModificationHe": "אפשר בבקשה להכין את המנה בשמן זית, בחמאה או בשומן בקר, בלי שמן קנולה, סויה, חמניות או כל שמן זרעים אחר?",
+    "yellowWhyEn": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below.",
+    "yellowWhyHe": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+  },
+  "triggerSuppresses": {
+    "date honey": [
+      "honey"
+    ],
+    "mash": [
+      "potato",
+      "potatoes"
+    ],
+    "mashed potato": [
+      "potato",
+      "potatoes"
+    ],
+    "mashed potatoes": [
+      "potato",
+      "potatoes",
+      "puree",
+      "mash"
+    ],
+    "potato mash": [
+      "potato",
+      "potatoes"
+    ],
+    "puree": [
+      "potato",
+      "potatoes"
+    ],
+    "sweet potato": [
+      "potato",
+      "potatoes"
+    ],
+    "sweet potatoes": [
+      "potato",
+      "potatoes"
+    ],
+    "בטטה": [
+      "תפוח אדמה",
+      "תפוחי אדמה"
+    ],
+    "בטטות": [
+      "תפוח אדמה",
+      "תפוחי אדמה"
+    ],
+    "דבש תמרים": [
+      "דבש"
+    ],
+    "פירה תפו\"א": [
+      "פירה",
+      "תפוח אדמה",
+      "תפוחי אדמה"
+    ],
+    "פירה תפוחי אדמה": [
+      "פירה",
+      "תפוח אדמה",
+      "תפוחי אדמה"
+    ],
+    "צ'יפס": [
+      "תפוח אדמה",
+      "תפוחי אדמה"
+    ],
+    "תפוח אדמה מתוק": [
+      "תפוח אדמה",
+      "תפוחי אדמה"
+    ]
+  },
+  "website": {
+    "jsOnlyNoscriptTextChars": 200,
+    "jsOnlyTextChars": 50,
+    "menuWords": [
+      "menu",
+      "תפריט"
+    ],
+    "minPricedLines": 3,
+    "websiteCategoryNameEn": "Menu",
+    "websiteCategoryNameHe": "תפריט"
+  }
+}
