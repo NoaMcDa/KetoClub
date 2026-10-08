@@ -13,10 +13,12 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
@@ -27,12 +29,14 @@ import 'package:ketoclub/widgets/venue_card.dart';
 import 'package:ketoclub/widgets/venue_grid.dart';
 import 'package:provider/provider.dart';
 
+import '../fakes/fake_clock.dart';
 import '../fakes/fake_connectivity.dart';
 import '../fakes/fake_location_service.dart';
 import '../fakes/fake_menu_classifier.dart';
 import '../fakes/fake_menu_repository.dart';
 import '../fakes/fake_settings_store.dart';
 import '../fakes/fake_venue_search_service.dart';
+import '../fakes/fake_visit_history_store.dart';
 
 /// Gives the test a surface tall enough that a short venue list is laid
 /// out in full, the same helper `menu_screen_test.dart` uses.
@@ -45,11 +49,13 @@ void _useTallSurface(WidgetTester tester) {
 
 /// Pumps the real [VenueSearchScreen] over a real
 /// [VenueSearchController], recording every route name pushed via
-/// [Navigator.pushNamed] into [pushedNames].
+/// [Navigator.pushNamed] into [pushedNames], and each push's arguments
+/// into [pushedArguments] when given.
 Future<void> _pump(
   WidgetTester tester, {
   required VenueSearchController controller,
   required List<String> pushedNames,
+  List<Object?>? pushedArguments,
   Locale locale = const Locale('en'),
   Connectivity? connectivity,
   ThemeData? theme,
@@ -84,6 +90,7 @@ Future<void> _pump(
         ),
         onGenerateRoute: (settings) {
           pushedNames.add(settings.name ?? '');
+          pushedArguments?.add(settings.arguments);
           return MaterialPageRoute<void>(
             builder: (_) => const SizedBox.shrink(),
             settings: settings,
@@ -147,6 +154,7 @@ void main() {
     late FakeLocationService location;
     late FakeVenueSearchService search;
     late FakeMenuClassifier estimator;
+    late FakeVisitHistoryStore history;
     late VenueSearchController controller;
     late List<String> pushedNames;
 
@@ -161,9 +169,11 @@ void main() {
           venueSearchService: search,
           estimateClassifier: estimator,
           autoEstimateLimit: autoEstimateLimit,
+          visitHistory: history,
         );
 
     setUp(() {
+      history = FakeVisitHistoryStore(FakeClock(DateTime.utc(2026)));
       settingsStore = FakeSettingsStore();
       repository = FakeMenuRepository();
       location = FakeLocationService();
@@ -1161,6 +1171,96 @@ void main() {
         expect(pushedNames, contains('/venue/wolt/vitrina'));
       },
     );
+
+    testWidgets('the Continue row names the venue from the visit history '
+        'and passes its name and city to the route (issue #312)', (
+      tester,
+    ) async {
+      // Arrange: no cached menu; only the history remembers the venue.
+      const ref = VenueRef(source: MenuSource.wolt, platformId: 'vitrina');
+      await settingsStore.write(const AppSettings(lastVenue: ref));
+      history.seed(
+        VisitEntry(
+          ref: ref,
+          name: 'Vitrina',
+          city: 'Tel Aviv',
+          firstOpenedAt: DateTime.utc(2026),
+          lastOpenedAt: DateTime.utc(2026),
+          openCount: 2,
+        ),
+      );
+      final arguments = <Object?>[];
+      await _pump(
+        tester,
+        controller: controller,
+        pushedNames: pushedNames,
+        pushedArguments: arguments,
+      );
+      await tester.pumpAndSettle();
+      final l10n = _l10n(tester);
+
+      // Act
+      await tester.tap(find.text(l10n.venueSearchContinueWith('Vitrina')));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(pushedNames.last, '/venue/wolt/vitrina');
+      expect(
+        arguments.last,
+        const VenueOpenHint(name: 'Vitrina', city: 'Tel Aviv'),
+      );
+    });
+
+    testWidgets('a Continue row known by its slug alone passes no name to '
+        'the route (issue #312)', (tester) async {
+      // Arrange
+      const ref = VenueRef(source: MenuSource.wolt, platformId: 'vitrina');
+      await settingsStore.write(const AppSettings(lastVenue: ref));
+      final arguments = <Object?>[];
+      await _pump(
+        tester,
+        controller: controller,
+        pushedNames: pushedNames,
+        pushedArguments: arguments,
+      );
+      await tester.pumpAndSettle();
+      final l10n = _l10n(tester);
+
+      // Act
+      await tester.tap(find.text(l10n.venueSearchContinueWith('vitrina')));
+      await tester.pumpAndSettle();
+
+      // Assert: the slug is shown, never recorded as the venue's name.
+      expect(arguments.last, const VenueOpenHint());
+    });
+
+    testWidgets('tapping a card passes its name and city to the route '
+        '(issue #312)', (tester) async {
+      // Arrange
+      search.queueFound([
+        const Venue(
+          ref: VenueRef(source: MenuSource.wolt, platformId: 'ember'),
+          name: 'Ember',
+          city: 'Haifa',
+        ),
+      ]);
+      final arguments = <Object?>[];
+      await _pump(
+        tester,
+        controller: controller,
+        pushedNames: pushedNames,
+        pushedArguments: arguments,
+      );
+      await locate(tester);
+
+      // Act
+      await tester.tap(find.widgetWithText(VenueCard, 'Ember'));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(pushedNames.last, '/venue/wolt/ember');
+      expect(arguments.last, const VenueOpenHint(name: 'Ember', city: 'Haifa'));
+    });
 
     group('content width on a wide window (issue #221)', () {
       /// Pumps the screen, locates, and lays the two-venue list out at

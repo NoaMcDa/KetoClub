@@ -23,6 +23,7 @@ import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
+import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/app_notice.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
@@ -39,6 +40,7 @@ import 'package:ketoclub/widgets/menu_question_sheet.dart';
 import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
+import 'package:ketoclub/widgets/rename_menu_dialog.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/scanned_page_chips.dart';
 import 'package:ketoclub/widgets/scanned_page_header.dart';
@@ -137,7 +139,7 @@ class MenuScreen extends StatefulWidget {
     required this.connectivity,
     required this.externalLinkOpener,
     required this.menuSharer,
-    this.venueNameHint,
+    this.hint,
     this.scannedPages,
     super.key,
   });
@@ -145,11 +147,16 @@ class MenuScreen extends StatefulWidget {
   /// Which venue, on which platform, to load a menu for.
   final VenueRef ref;
 
-  /// The venue's display name when the screen that opened this one
-  /// already knew it (a Discovery venue card), shown in the header when
-  /// the menu itself names no venue — which no documented Wolt payload
-  /// does — ahead of the bare [VenueRef.platformId] slug.
-  final String? venueNameHint;
+  /// What the screen that opened this one already knew about the venue
+  /// (a Discovery venue card, the Continue row, a Recent row; issue #312),
+  /// or null on a deep link.
+  ///
+  /// Its name is shown in the header when the menu itself names no venue
+  /// — which no documented Wolt payload does — ahead of the name the visit
+  /// history remembers and the bare [VenueRef.platformId] slug. Its city
+  /// joins the source line. [MenuController.open] records both in the
+  /// visit history.
+  final VenueOpenHint? hint;
 
   /// Raises the screen brightness while the Waiter Card is open, so the
   /// card stays readable across a restaurant table, and restores it on
@@ -182,6 +189,9 @@ class MenuScreen extends StatefulWidget {
 enum _MenuOverflowAction {
   /// Shares the menu's green and yellow dishes as text.
   share,
+
+  /// Names a scanned menu (issue #315).
+  rename,
 }
 
 class _MenuScreenState extends State<MenuScreen> {
@@ -256,7 +266,9 @@ class _MenuScreenState extends State<MenuScreen> {
     // side effects.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      unawaited(context.read<MenuController>().open(widget.ref));
+      unawaited(
+        context.read<MenuController>().open(widget.ref, hint: widget.hint),
+      );
     });
   }
 
@@ -307,20 +319,30 @@ class _MenuScreenState extends State<MenuScreen> {
             tooltip: l10n.actionOpenSettings,
             onPressed: () => Navigator.pushNamed(context, '/settings'),
           ),
-          // The overflow holds only "Share" since the drinks guide moved
-          // to Explore (issue #257), so with nothing to share it is hidden
-          // rather than opening an empty menu.
-          if (canShare)
+          // The overflow holds "Share" (since the drinks guide moved to
+          // Explore, issue #257) and, for a scanned menu, "Rename" (issue
+          // #315), so with neither it is hidden rather than opening an
+          // empty menu.
+          if (canShare || controller.canRename)
             PopupMenuButton<_MenuOverflowAction>(
               tooltip: l10n.actionMoreMenuOptions,
               onSelected: (action) => switch (action) {
                 _MenuOverflowAction.share => unawaited(_shareMenu(controller)),
+                _MenuOverflowAction.rename => unawaited(
+                  _renameMenu(context, controller),
+                ),
               },
               itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: _MenuOverflowAction.share,
-                  child: Text(l10n.actionShareMenu),
-                ),
+                if (canShare)
+                  PopupMenuItem(
+                    value: _MenuOverflowAction.share,
+                    child: Text(l10n.actionShareMenu),
+                  ),
+                if (controller.canRename)
+                  PopupMenuItem(
+                    value: _MenuOverflowAction.rename,
+                    child: Text(l10n.menuRenameAction),
+                  ),
               ],
             ),
         ],
@@ -477,8 +499,13 @@ class _MenuScreenState extends State<MenuScreen> {
             const SizedBox(height: 16),
             FetchFailureAction(
               reason: failure,
-              onRetry: () =>
-                  _retry(() => controller.open(widget.ref, forceRefresh: true)),
+              onRetry: () => _retry(
+                () => controller.open(
+                  widget.ref,
+                  forceRefresh: true,
+                  hint: widget.hint,
+                ),
+              ),
               onBackToSearch: () => _backToSearch(context),
             ),
           ],
@@ -751,17 +778,37 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
+  /// Asks for a name and a city for a scanned menu and hands them to
+  /// [MenuController.renameVisit] (issue #315); nothing happens when the
+  /// dialog is cancelled.
+  Future<void> _renameMenu(
+    BuildContext context,
+    MenuController controller,
+  ) async {
+    final result = await showRenameMenuDialog(
+      context,
+      initialName: controller.historyName,
+      initialCity: controller.historyCity,
+    );
+    if (result == null) return;
+    await controller.renameVisit(name: result.name, city: result.city);
+  }
+
   /// The name the header and the shared text give the venue: the menu's
-  /// own, the hint a venue card passed, else the reference — except for a
-  /// pasted menu, whose reference is a hash and reads as "Pasted menu",
-  /// and a website, whose reference is a URL and reads as its host.
+  /// own, the hint the opener passed, the name the visit history
+  /// remembers (issue #312), else the reference — except for a pasted
+  /// menu, whose reference is a hash and reads as "Pasted menu", and a
+  /// website, whose reference is a URL and reads as its host.
   String _displayName(MenuController controller, AppLocalizations l10n) {
     final fallback = switch (widget.ref.source) {
       MenuSource.scan => _scanSourceName(l10n),
       MenuSource.website => _platformName(widget.ref, l10n),
       _ => widget.ref.platformId,
     };
-    return controller.venueName ?? widget.venueNameHint ?? fallback;
+    return controller.venueName ??
+        widget.hint?.name ??
+        controller.historyName ??
+        fallback;
   }
 
   /// The pages this menu was read from, when it is a scan whose pages are
@@ -888,6 +935,12 @@ class _MenuScreenState extends State<MenuScreen> {
     final fetchedAt = controller.fetchedAt;
     if (fetchedAt == null) return null;
     final age = _ageLabel(fetchedAt, DateTime.now(), l10n);
+    // The venue's city, when the opener or the visit history knows it
+    // (issue #312): "Wolt · Tel Aviv · 4 min ago".
+    final city = widget.hint?.city ?? controller.historyCity;
+    final source = city == null
+        ? _sourceName(l10n)
+        : l10n.sourceWithCity(_sourceName(l10n), city);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -897,7 +950,7 @@ class _MenuScreenState extends State<MenuScreen> {
         // second line before it ellipsises (issue #245).
         Flexible(
           child: Text(
-            l10n.menuSourceLine(_sourceName(l10n), age),
+            l10n.menuSourceLine(source, age),
             style: Theme.of(context).textTheme.bodySmall,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,

@@ -22,9 +22,11 @@ import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/venue_route.dart';
 
 import '../fakes/fake_clock.dart';
 import '../fakes/fake_connectivity.dart';
@@ -33,9 +35,11 @@ import '../fakes/fake_menu_cache.dart';
 import '../fakes/fake_menu_classifier.dart';
 import '../fakes/fake_menu_question_answerer.dart';
 import '../fakes/fake_menu_repository.dart';
+import '../fakes/fake_menu_store_client.dart';
 import '../fakes/fake_notes_store.dart';
 import '../fakes/fake_platform_menu_adapter.dart';
 import '../fakes/fake_settings_store.dart';
+import '../fakes/fake_visit_history_store.dart';
 
 /// The venue every test opens, unless a test builds its own.
 const VenueRef _ref = VenueRef(source: MenuSource.wolt, platformId: 'v1');
@@ -3038,6 +3042,633 @@ void main() {
       controller.setPageFilter(scanPageUnknown);
       expect(notifications, 2);
       expect(controller.pageFilter, scanPageUnknown);
+    });
+  });
+
+  // ── Visit history and menu upload (issue #312) ─────────────────────────
+
+  group('MenuController visit history and menu upload (issue #312)', () {
+    final steak = _dish('Steak');
+    final salad = _dish('Salad', id: 'd2');
+
+    late FakeMenuRepository repository;
+    late FakeMenuClassifier classifier;
+    late FakeSettingsStore settings;
+    late FakeClock historyClock;
+    late FakeVisitHistoryStore history;
+    late FakeMenuStoreClient store;
+
+    /// A controller over this group's fakes; a new one per open mirrors
+    /// the app, which builds one per venue route.
+    MenuController newController() => MenuController(
+      repository,
+      classifier,
+      settings,
+      FakeNotesStore(),
+      CarbBudgetController(),
+      null,
+      history,
+      store,
+    );
+
+    /// Opens [_ref] on a fresh controller, waits for its upload, and
+    /// returns the controller.
+    Future<MenuController> openOnce({VenueOpenHint? hint}) async {
+      final controller = newController();
+      await controller.open(_ref, hint: hint);
+      await controller.lastUpload;
+      return controller;
+    }
+
+    /// An entry for [_ref], last opened at [lastOpenedAt].
+    VisitEntry visit({
+      required DateTime lastOpenedAt,
+      String? name,
+      String? city,
+    }) => VisitEntry(
+      ref: _ref,
+      name: name,
+      city: city,
+      firstOpenedAt: DateTime.utc(2025),
+      lastOpenedAt: lastOpenedAt,
+      openCount: 1,
+    );
+
+    /// Seeds the cache with an LLM analysis of [menu] made at [analysedAt]
+    /// under the default settings, so the next open reuses it.
+    void seedReusable(Menu menu, {required DateTime analysedAt}) {
+      repository.seedCache(
+        CachedMenu(
+          menu: menu,
+          analysis: MenuAnalysed(
+            dishes: [
+              for (final dish in menu.allDishes)
+                _verdictFor(dish, DishVerdict.orderAsIs),
+            ],
+            unclassified: const <String>[],
+            engine: const LlmEngine(model: 'cached-model'),
+            analysedAt: analysedAt,
+            options: ClassificationOptions.fromSettings(const AppSettings())
+                .snapshot,
+            schemaVersion: MenuResponseParser.schemaVersion,
+          ),
+        ),
+      );
+    }
+
+    setUp(() {
+      repository = FakeMenuRepository();
+      classifier = FakeMenuClassifier();
+      settings = FakeSettingsStore();
+      historyClock = FakeClock(DateTime.utc(2026, 3));
+      history = FakeVisitHistoryStore(historyClock);
+      store = FakeMenuStoreClient();
+    });
+
+    test('a successful open records exactly one visit, with the dish '
+        'count, the score and the verdict counts', () async {
+      // Arrange
+      final menu = _menuOf([steak, salad]);
+      repository.stub(_ref, MenuFetched(menu: menu));
+      classifier.respondWith(
+        MenuAnalysed(
+          dishes: [
+            _verdictFor(steak, DishVerdict.orderAsIs),
+            _verdictFor(salad, DishVerdict.modifiable, modification: 'No'),
+          ],
+          unclassified: const <String>[],
+          engine: const LlmEngine(model: 'test-model'),
+          analysedAt: DateTime.utc(2026),
+        ),
+      );
+
+      // Act
+      final controller = await openOnce();
+
+      // Assert
+      final call = history.recordCalls.single;
+      expect(call.ref, _ref);
+      expect(call.dishCount, 2);
+      expect(call.greenCount, 1);
+      expect(call.yellowCount, 1);
+      expect(call.score, controller.ketoScoreOutOfTen);
+      expect(call.score, isNotNull);
+      expect((await history.read(_ref))!.openCount, 1);
+    });
+
+    test('a failed analysis records the visit with its dish count but no '
+        'score or counts', () async {
+      // Arrange
+      repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+      classifier.respondWith(
+        const MenuAnalysisFailed(
+          reason: MenuAnalysisFailureReason.noDishesFound,
+        ),
+      );
+
+      // Act
+      await openOnce();
+
+      // Assert
+      final call = history.recordCalls.single;
+      expect(call.dishCount, 1);
+      expect(call.score, isNull);
+      expect(call.greenCount, isNull);
+      expect(call.yellowCount, isNull);
+    });
+
+    test('a failed fetch records nothing and uploads nothing', () async {
+      // Arrange
+      repository.stub(
+        _ref,
+        const MenuFetchFailed(reason: MenuFetchFailureReason.notFound),
+      );
+
+      // Act
+      await openOnce(hint: const VenueOpenHint(name: 'Vitrina'));
+
+      // Assert
+      expect(history.recordCalls, isEmpty);
+      expect(store.uploads, isEmpty);
+    });
+
+    test('refresh records nothing', () async {
+      // Arrange
+      repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+      final controller = await openOnce();
+
+      // Act
+      await controller.refresh();
+
+      // Assert
+      expect(history.recordCalls, hasLength(1));
+    });
+
+    test('the name the menu carries wins over the hint, and the city comes '
+        'from the hint', () async {
+      // Arrange
+      final named = Menu(
+        venueRef: _ref,
+        venueName: 'Sunny Diner',
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: <MenuCategory>[
+          MenuCategory(id: 'c1', name: 'Mains', dishes: [steak]),
+        ],
+      );
+      repository.stub(_ref, MenuFetched(menu: named));
+
+      // Act
+      final controller = await openOnce(
+        hint: const VenueOpenHint(name: 'Vitrina', city: 'Tel Aviv'),
+      );
+
+      // Assert
+      expect(history.recordCalls.single.name, 'Sunny Diner');
+      expect(history.recordCalls.single.city, 'Tel Aviv');
+      expect(controller.historyName, 'Sunny Diner');
+      expect(controller.historyCity, 'Tel Aviv');
+    });
+
+    test('with no name on the menu the hint names the visit, and a later '
+        'hint-less open keeps that name', () async {
+      // Arrange
+      repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+      await openOnce(
+        hint: const VenueOpenHint(name: 'Vitrina', city: 'Tel Aviv'),
+      );
+
+      // Act
+      final reopened = await openOnce();
+
+      // Assert
+      expect(history.recordCalls.first.name, 'Vitrina');
+      expect(history.recordCalls.last.name, isNull);
+      final entry = (await history.read(_ref))!;
+      expect(entry.name, 'Vitrina');
+      expect(entry.city, 'Tel Aviv');
+      expect(entry.openCount, 2);
+      expect(reopened.historyName, 'Vitrina');
+      expect(reopened.historyCity, 'Tel Aviv');
+    });
+
+    test('historyName and historyCity are read before classification '
+        'completes, and listeners hear of them', () async {
+      // Arrange
+      history.seed(
+        visit(lastOpenedAt: DateTime.utc(2026), name: 'Vitrina', city: 'Haifa'),
+      );
+      repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+      final gate = Completer<void>();
+      classifier.gate = gate.future;
+      final controller = newController();
+      final seen = <String?>[];
+      controller.addListener(() => seen.add(controller.historyName));
+
+      // Act
+      final opening = controller.open(_ref);
+      await pumpEventQueue();
+
+      // Assert
+      expect(controller.phase.isClassifying, isTrue);
+      expect(controller.historyName, 'Vitrina');
+      expect(controller.historyCity, 'Haifa');
+      expect(seen, contains('Vitrina'));
+      gate.complete();
+      await opening;
+    });
+
+    test('a venue never opened before is uploaded, with the recorded name '
+        'and city and no analysis for a rules result', () async {
+      // Arrange: the fake classifier's default result is a rules one.
+      repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+
+      // Act
+      await openOnce(
+        hint: const VenueOpenHint(name: 'Vitrina', city: 'Tel Aviv'),
+      );
+
+      // Assert
+      final upload = store.uploads.single;
+      expect(upload.ref, _ref);
+      expect(upload.venueName, 'Vitrina');
+      expect(upload.city, 'Tel Aviv');
+      expect(upload.menu, _menuOf([steak]));
+      expect(upload.analysis, isNull);
+      expect(upload.toJson()['analysis'], isNull);
+    });
+
+    test('an LLM analysis rides along without the user options', () async {
+      // Arrange
+      repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+      classifier.derivedEngine = const LlmEngine(model: 'test-model');
+
+      // Act
+      final controller = await openOnce();
+
+      // Assert
+      final upload = store.uploads.single;
+      expect(upload.analysis, controller.analysis);
+      final body = upload.toJson();
+      final analysis = body['analysis']! as Map<String, Object?>;
+      expect(analysis.containsKey('options'), isFalse);
+      expect(analysis['dishes'], isNotEmpty);
+    });
+
+    test('a known venue whose LLM analysis was made in this open is '
+        'uploaded, named from the history', () async {
+      // Arrange
+      history.seed(visit(lastOpenedAt: DateTime.utc(2026, 2), name: 'Vitrina'));
+      repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+      classifier.derivedEngine = const LlmEngine(model: 'test-model');
+
+      // Act
+      await openOnce();
+
+      // Assert
+      expect(classifier.calls, hasLength(1));
+      expect(store.uploads.single.venueName, 'Vitrina');
+      expect(store.uploads.single.analysis, isNotNull);
+    });
+
+    test('a known venue whose rules analysis was made in this open is not '
+        'uploaded: a rules result is never reused', () async {
+      // Arrange: the fake classifier's default result is a rules one.
+      history.seed(visit(lastOpenedAt: DateTime.utc(2026, 2), name: 'Vitrina'));
+      repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+
+      // Act
+      await openOnce();
+
+      // Assert
+      expect(classifier.calls, hasLength(1));
+      expect(store.uploads, isEmpty);
+    });
+
+    test('a rules-analysed venue uploads once, on its first open, with no '
+        'analysis, and not on the second', () async {
+      // Arrange
+      repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+
+      // Act
+      await openOnce();
+      historyClock.advance(const Duration(minutes: 5));
+      await openOnce();
+
+      // Assert
+      expect(classifier.calls, hasLength(2));
+      expect(store.uploads, hasLength(1));
+      expect(store.uploads.single.analysis, isNull);
+      expect(history.recordCalls, hasLength(2));
+    });
+
+    test('a known venue reusing an analysis older than its last visit is '
+        'not uploaded', () async {
+      // Arrange
+      final menu = _menuOf([steak]);
+      repository.stub(_ref, MenuFetched(menu: menu));
+      seedReusable(menu, analysedAt: DateTime.utc(2026));
+      history.seed(visit(lastOpenedAt: DateTime.utc(2026, 2)));
+
+      // Act
+      await openOnce();
+
+      // Assert
+      expect(classifier.calls, isEmpty);
+      expect(store.uploads, isEmpty);
+      expect(history.recordCalls, hasLength(1));
+    });
+
+    test('a known venue reusing an analysis newer than its last visit is '
+        'uploaded with that analysis', () async {
+      // Arrange
+      final menu = _menuOf([steak]);
+      repository.stub(_ref, MenuFetched(menu: menu));
+      seedReusable(menu, analysedAt: DateTime.utc(2026, 2));
+      history.seed(visit(lastOpenedAt: DateTime.utc(2026)));
+
+      // Act
+      final controller = await openOnce();
+
+      // Assert
+      expect(classifier.calls, isEmpty);
+      expect(store.uploads.single.analysis, controller.analysis);
+    });
+
+    test('with AI-analysis consent off nothing is uploaded, though the '
+        'visit is recorded', () async {
+      // Arrange
+      await settings.write(const AppSettings(estimationConsentGiven: false));
+      repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+
+      // Act
+      await openOnce(hint: const VenueOpenHint(name: 'Vitrina'));
+
+      // Assert
+      expect(store.uploads, isEmpty);
+      expect(history.recordCalls, hasLength(1));
+    });
+
+    test('an unconfigured store is never asked to upload', () async {
+      // Arrange
+      store.isConfigured = false;
+      repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+
+      // Act
+      await openOnce();
+
+      // Assert
+      expect(store.uploads, isEmpty);
+    });
+
+    test('lastUpload completes only once the upload has finished', () async {
+      // Arrange
+      repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+      final gate = Completer<void>();
+      store.gate = gate;
+      final controller = newController();
+      expect(controller.lastUpload, completes);
+      await controller.open(_ref);
+      var finished = false;
+      unawaited(controller.lastUpload.then((_) => finished = true));
+
+      // Act and assert: held while the store is.
+      await pumpEventQueue();
+      expect(store.uploads, hasLength(1));
+      expect(finished, isFalse);
+      gate.complete();
+      await controller.lastUpload;
+      expect(finished, isTrue);
+    });
+
+    group('renameVisit (issue #315)', () {
+      const scanRef = VenueRef(source: MenuSource.scan, platformId: 'abc');
+      final scanMenu = Menu(
+        venueRef: scanRef,
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: <MenuCategory>[
+          MenuCategory(id: 'c1', name: 'Mains', dishes: [steak]),
+        ],
+      );
+
+      /// A scan opened on a fresh controller, its first upload awaited.
+      Future<MenuController> openScan() async {
+        repository.stub(scanRef, MenuFetched(menu: scanMenu));
+        final controller = newController();
+        await controller.open(scanRef);
+        await controller.lastUpload;
+        return controller;
+      }
+
+      test('canRename is true only for a scanned menu', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+        final wolt = await openOnce();
+        final scan = await openScan();
+
+        // Assert
+        expect(wolt.canRename, isFalse);
+        expect(scan.canRename, isTrue);
+        expect(newController().canRename, isFalse);
+      });
+
+      test('writes the trimmed name and city to the history and shows '
+          'them', () async {
+        // Arrange
+        final controller = await openScan();
+        var notified = 0;
+        controller.addListener(() => notified++);
+
+        // Act
+        await controller.renameVisit(name: '  Café Noam ', city: ' Haifa  ');
+
+        // Assert
+        expect(history.renameCalls.single.ref, scanRef);
+        expect(history.renameCalls.single.name, 'Café Noam');
+        expect(history.renameCalls.single.city, 'Haifa');
+        expect(controller.historyName, 'Café Noam');
+        expect(controller.historyCity, 'Haifa');
+        expect(notified, greaterThan(0));
+        expect((await history.read(scanRef))!.name, 'Café Noam');
+      });
+
+      test('an empty or blank name or city is stored as null', () async {
+        // Arrange
+        final controller = await openScan();
+        await controller.renameVisit(name: 'Café Noam', city: 'Haifa');
+
+        // Act
+        await controller.renameVisit(name: '   ', city: '');
+        await controller.lastUpload;
+
+        // Assert
+        expect(history.renameCalls.last.name, isNull);
+        expect(history.renameCalls.last.city, isNull);
+        expect(controller.historyName, isNull);
+        expect(controller.historyCity, isNull);
+        expect(store.uploads.last.venueName, isNull);
+        expect(store.uploads.last.city, isNull);
+      });
+
+      test('re-uploads the menu once under the new name and city', () async {
+        // Arrange
+        final controller = await openScan();
+        expect(store.uploads, hasLength(1));
+
+        // Act
+        await controller.renameVisit(name: 'Café Noam', city: 'Haifa');
+        await controller.lastUpload;
+
+        // Assert
+        expect(store.uploads, hasLength(2));
+        final upload = store.uploads.last;
+        expect(upload.ref, scanRef);
+        expect(upload.venueName, 'Café Noam');
+        expect(upload.city, 'Haifa');
+        expect(upload.menu, scanMenu);
+        expect(upload.analysis, isNull);
+      });
+
+      test('the re-upload carries an LLM analysis', () async {
+        // Arrange
+        classifier.derivedEngine = const LlmEngine(model: 'test-model');
+        final controller = await openScan();
+
+        // Act
+        await controller.renameVisit(name: 'Café Noam', city: null);
+        await controller.lastUpload;
+
+        // Assert
+        expect(store.uploads.last.analysis, controller.analysis);
+        expect(store.uploads.last.analysis, isNotNull);
+      });
+
+      test(
+        'without AI-analysis consent it renames but uploads nothing',
+        () async {
+          // Arrange
+          await settings.write(
+            const AppSettings(estimationConsentGiven: false),
+          );
+          final controller = await openScan();
+
+          // Act
+          await controller.renameVisit(name: 'Café Noam', city: 'Haifa');
+          await controller.lastUpload;
+
+          // Assert
+          expect(store.uploads, isEmpty);
+          expect(history.renameCalls, hasLength(1));
+          expect(controller.historyName, 'Café Noam');
+        },
+      );
+
+      test(
+        'with an unconfigured store it renames but uploads nothing',
+        () async {
+          // Arrange
+          store.isConfigured = false;
+          final controller = await openScan();
+
+          // Act
+          await controller.renameVisit(name: 'Café Noam', city: 'Haifa');
+          await controller.lastUpload;
+
+          // Assert
+          expect(store.uploads, isEmpty);
+          expect(controller.historyName, 'Café Noam');
+        },
+      );
+
+      test('with no menu loaded it renames but uploads nothing', () async {
+        // Arrange: the fetch fails, so no menu is loaded.
+        repository.stub(
+          scanRef,
+          const MenuFetchFailed(reason: MenuFetchFailureReason.notFound),
+        );
+        final controller = newController();
+        await controller.open(scanRef);
+
+        // Act
+        await controller.renameVisit(name: 'Café Noam', city: 'Haifa');
+        await controller.lastUpload;
+
+        // Assert
+        expect(history.renameCalls, hasLength(1));
+        expect(controller.historyName, 'Café Noam');
+        expect(store.uploads, isEmpty);
+      });
+
+      test('before open it does nothing', () async {
+        // Arrange
+        final controller = newController();
+
+        // Act
+        await controller.renameVisit(name: 'Café Noam', city: 'Haifa');
+
+        // Assert
+        expect(history.renameCalls, isEmpty);
+        expect(controller.historyName, isNull);
+        expect(store.uploads, isEmpty);
+      });
+    });
+
+    test('a freshly scanned menu uploads on its first open and not on the '
+        'next', () async {
+      // Arrange: the Scan tab's hand-off, as the scanned-menu group does.
+      final scanClock = FakeClock(DateTime.utc(2026, 9, 29));
+      final scanRepository = CachedMenuRepository(
+        adapters: const [],
+        cache: FakeMenuCache(),
+        clock: scanClock,
+      );
+      final client = FakeLlmChatClient()
+        ..fallback = ChatCompleted(
+          content: File('test/fixtures/llm/llm_scanned_valid.json')
+              .readAsStringSync(),
+          model: 'vision-model',
+        );
+      final read =
+          await VisionMenuClassifier(client: client, clock: scanClock).classify(
+            ScannedMenu(
+              pages: <ScannedPage>[
+                ScannedPage(
+                  mimeType: ScannedPage.jpeg,
+                  bytes: Uint8List.fromList(<int>[0xff, 0xd8]),
+                ),
+              ],
+            ),
+            options: const ClassificationOptions(estimationConsentGiven: true),
+          ) as ScannedMenuRead;
+      await scanRepository.store(read.menu);
+      await scanRepository.saveAnalysis(read.menu.venueRef, read.analysis);
+      final scanHistory = FakeVisitHistoryStore(scanClock);
+      MenuController scanController() => MenuController(
+        scanRepository,
+        classifier,
+        settings,
+        FakeNotesStore(),
+        CarbBudgetController(),
+        null,
+        scanHistory,
+        store,
+      );
+
+      // Act
+      final first = scanController();
+      await first.open(read.menu.venueRef);
+      await first.lastUpload;
+      scanClock.advance(const Duration(minutes: 5));
+      final second = scanController();
+      await second.open(read.menu.venueRef);
+      await second.lastUpload;
+
+      // Assert
+      expect(classifier.calls, isEmpty);
+      expect(store.uploads, hasLength(1));
+      expect(store.uploads.single.analysis, read.analysis);
+      expect(scanHistory.recordCalls, hasLength(2));
     });
   });
 }

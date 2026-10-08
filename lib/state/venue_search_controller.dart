@@ -9,10 +9,12 @@ import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/geo.dart';
+import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/utils/verdict_counts.dart';
 
 /// Which step of finding venues [VenueSearchController] is in
@@ -93,7 +95,8 @@ typedef VenueCardNumbers = ({
 ///
 /// It also reads [AppSettings.lastVenue] (issue #55) so the screen can
 /// offer a "Continue with {venue}" row instead of opening it directly on
-/// launch. The name shown for that row comes from the cached menu's own
+/// launch. The name shown for that row comes from the visit history first
+/// (issue #312), then from the cached menu's own
 /// `CachedMenuEntry.venueName` through [MenuRepository.savedMenus] when
 /// one is on hand, falling back to the platform id otherwise — the same
 /// fallback `SavedScreen` and `MenuScreen` already use for a venue Wolt
@@ -116,6 +119,9 @@ final class VenueSearchController extends ChangeNotifier {
   /// to [venueEstimateConcurrency], and `autoEstimateLimit` how many
   /// visible venues the automatic run covers (D21), defaulting to
   /// [venueAutoEstimateLimit]; 0 turns the automatic run off.
+  ///
+  /// `visitHistory` defaults to [NoVisitHistoryStore], which remembers
+  /// nothing (issue #307).
   new(
     this._settings,
     this._repository, {
@@ -125,9 +131,11 @@ final class VenueSearchController extends ChangeNotifier {
     this._debounce = venueSearchDebounce,
     this._estimateConcurrency = venueEstimateConcurrency,
     this._autoEstimateLimit = venueAutoEstimateLimit,
+    VisitHistoryStore visitHistory = const NoVisitHistoryStore(),
   }) : _location = locationService,
        _search = venueSearchService,
-       _estimator = estimateClassifier;
+       _estimator = estimateClassifier,
+       _history = visitHistory;
 
   final SettingsStore _settings;
   final MenuRepository _repository;
@@ -138,10 +146,15 @@ final class VenueSearchController extends ChangeNotifier {
   final int _estimateConcurrency;
   final int _autoEstimateLimit;
 
+  /// The menus opened on this device (issue #307): the Continue row's
+  /// name and city are read from it first (issue #312).
+  final VisitHistoryStore _history;
+
   String _input = '';
   VenueRef? _resolved;
   VenueRef? _lastVenue;
   String? _lastVenueName;
+  VenueOpenHint? _lastVenueHint;
 
   DiscoveryPhase _phase = DiscoveryPhase.idle;
   LocationResult? _locationOutcome;
@@ -206,9 +219,18 @@ final class VenueSearchController extends ChangeNotifier {
   VenueRef? get lastVenue => _lastVenue;
 
   /// The name to show for [lastVenue] in the "Continue with…" row: the
-  /// cached menu's own venue name when one is saved for it, or its
-  /// platform id otherwise. Null exactly when [lastVenue] is null.
+  /// name the visit history holds for it, else the cached menu's own venue
+  /// name when one is saved for it, else its website's host, else its
+  /// platform id. Null exactly when [lastVenue] is null.
   String? get lastVenueName => _lastVenueName;
+
+  /// What is known about [lastVenue] to pass to its menu route (issue
+  /// #312): the name and city its visit-history entry holds, else the
+  /// cached menu's own venue name. Never a fallback: unlike
+  /// [lastVenueName], a hint carries no platform id or host, so the menu
+  /// screen never records one as the venue's name. Null exactly when
+  /// [lastVenue] is null.
+  VenueOpenHint? get lastVenueHint => _lastVenueHint;
 
   /// Which step of finding venues is in progress.
   DiscoveryPhase get phase => _phase;
@@ -440,7 +462,13 @@ final class VenueSearchController extends ChangeNotifier {
   Future<void> load() async {
     final lastVenue = (await _settings.read()).lastVenue;
     _lastVenue = lastVenue;
-    _lastVenueName = lastVenue == null ? null : await _nameFor(lastVenue);
+    final known = lastVenue == null ? null : await _knownFor(lastVenue);
+    _lastVenueHint = known;
+    _lastVenueName = lastVenue == null
+        ? null
+        : known?.name ??
+              VenueRefResolver.websiteHost(lastVenue) ??
+              lastVenue.platformId;
     _notify();
   }
 
@@ -738,16 +766,26 @@ final class VenueSearchController extends ChangeNotifier {
     return trimmed.contains('/') || _digitsOnly.hasMatch(trimmed);
   }
 
-  /// The display name for [ref]: the cached menu's
-  /// `CachedMenuEntry.venueName` when [ref] is saved, else its website's
-  /// host (D19), else [VenueRef.platformId].
-  Future<String> _nameFor(VenueRef ref) async {
-    final fallback = VenueRefResolver.websiteHost(ref) ?? ref.platformId;
+  /// What is known about [ref] (issue #312): the name and city its
+  /// visit-history entry holds, with the cached menu's
+  /// `CachedMenuEntry.venueName` standing in for a name the history does
+  /// not hold. Either field is null when nothing names it; [load] falls
+  /// back to the website's host (D19), else [VenueRef.platformId], for
+  /// the name it shows.
+  Future<VenueOpenHint> _knownFor(VenueRef ref) async {
+    final visit = await _history.read(ref);
+    final city = visit?.city;
+    final remembered = visit?.name;
+    if (remembered != null) {
+      return VenueOpenHint(name: remembered, city: city);
+    }
     final saved = await _repository.savedMenus();
     for (final entry in saved) {
-      if (entry.ref == ref) return entry.venueName ?? fallback;
+      if (entry.ref == ref) {
+        return VenueOpenHint(name: entry.venueName, city: city);
+      }
     }
-    return fallback;
+    return VenueOpenHint(city: city);
   }
 }
 
