@@ -1,18 +1,22 @@
 # KetoClub backend
 
-A small FastAPI service that makes live Wolt menus work in the web build.
-Wolt's APIs send no CORS headers for foreign origins, so a browser refuses the
-request before it leaves; this service forwards it (`backend_plan.md` §1).
+A small FastAPI service that makes live Wolt menus work in the web build and,
+since D25, reads, classifies and scans menus for every platform. Wolt's APIs
+send no CORS headers for foreign origins, so a browser refuses the request
+before it leaves; this service forwards it (`backend_plan.md` §1).
 
 **The backend is an accelerator, never a dependency.** With no backend URL
 configured, the app behaves exactly as it does without one, including the
 web build's paste-a-link path.
 
-**It serves the web build only** (`architecture.md` D17, issue #194). iOS and
-Android call Wolt and Google's Gemini API themselves, with a key the user
-pastes into the app's Settings, and never call this service even when
-`KETOCLUB_BACKEND_URL` is compiled into a phone build. `/v1/chat` is the web
-build's only path to a model.
+**It serves every platform built with `KETOCLUB_BACKEND_URL`** (`architecture.md`
+D25, which amends D17). The app asks it first for complete results — a menu
+and its analysis in one request, a scan, a website menu, venue search — and
+calls Wolt and Gemini itself (a phone) or the raw proxy and `/v1/chat` routes
+(web) only when this service cannot answer. A phone built with the define
+sends it the anonymous install id, dish text, scan pages and a search position,
+and its own Gemini key stays on the phone as the fallback. The raw proxy,
+website-fetch and `/v1/chat` routes below still exist for those fallbacks.
 
 Routes shipped so far:
 
@@ -30,10 +34,14 @@ Routes shipped so far:
 | `POST /v1/classify` | #333 | **yes** | **yes** (`ANALYSIS_RATE_LIMIT_*`, only for a Gemini call) | A complete analysis of a menu the client holds (D25), see below |
 | `GET /v1/venue-menus/{source}/{platform_id}` | #333 | **yes** | **yes** (`ANALYSIS_RATE_LIMIT_*`, only for a Gemini call) | One Wolt or 10bis menu, mapped and optionally analysed (D25), see below |
 | `POST /v1/text-menu` | #333 | **yes** | **yes** (`ANALYSIS_RATE_LIMIT_*`, only for a Gemini call) | A pasted menu, read and analysed (D18, D25), see below |
+| `POST /v1/scan` | #334 | **yes** | **yes** (`ANALYSIS_RATE_LIMIT_*`, every request) | Menu pages read and classified in one Gemini request (D15, D25), see below |
+| `POST /v1/website-menu` | #334 | **yes** | **yes** (`WEBSITE_*` for each fetch, `ANALYSIS_RATE_LIMIT_*` for a Gemini call) | A restaurant's site fetched, read and analysed (D19, D25), see below |
+| `GET /v1/venues/nearby` | #335 | **yes** | **yes** (`DISCOVERY_RATE_LIMIT_PER_MINUTE`, shared with the discovery proxies) | Wolt venues near a point, mapped to `Venue` JSON (D25), see below |
+| `POST /v1/venues/search` | #335 | **yes** | **yes** (`DISCOVERY_RATE_LIMIT_PER_MINUTE`) | Wolt venues by name, mapped to `Venue` JSON (D25), see below |
 
 Menu proxies are one fetch per user action and have no per-install
 identity; `/v1/chat`, the two discovery routes, the website route,
-`POST /v1/menus` and the three D25 analysis routes require
+`POST /v1/menus` and all seven D25 routes require
 `X-KetoClub-Install-Id` and enforce a per-install limit. A missing or
 malformed install id is answered `400 {"reason":"badResponse"}` — a
 client that misses the header sees the same shape as a bad prompt.
@@ -389,11 +397,13 @@ curl -sS localhost:8000/v1/website/fetch \
 
 ## The D25 analysis routes (#333)
 
-`POST /v1/classify`, `GET /v1/venue-menus/{source}/{platform_id}` and
-`POST /v1/text-menu` answer with complete results: the Dart `Menu` and
-`MenuAnalysed` JSON (camelCase, `app.keto.models`), made on the server by
-the ported rule engine, prompt and parser (`app/keto/`, `app/platforms/`).
-`backend_plan.md` §3.3 is the contract; in short:
+`POST /v1/classify`, `GET /v1/venue-menus/{source}/{platform_id}`,
+`POST /v1/text-menu`, `POST /v1/scan` and `POST /v1/website-menu` answer with
+complete results: the Dart `Menu` and `MenuAnalysed` JSON (camelCase,
+`app.keto.models`), made on the server by the ported rule engine, prompt and
+parser (`app/keto/`, `app/platforms/`, `app/website/`). The ports are proven
+equal to the Dart code by the golden corpus; see "Keeping the port honest"
+below. `backend_plan.md` §3.3 is the contract; in short:
 
 - **Options** are `{netCarbLimitGrams: 1..50, dietaryConstraints: [...]}`,
   each constraint one of the three Dart prompt fragments verbatim, at most
@@ -422,6 +432,8 @@ the ported rule engine, prompt and parser (`app/keto/`, `app/platforms/`).
   422 `noDishesFound`.
 - The install id keys the analysis bucket only: it is never stored and
   never logged on these routes.
+- `/v1/scan` and `/v1/website-menu` are below; `/v1/venues/*` is under
+  "Complete venue search".
 
 ```bash
 curl -sS 'localhost:8000/v1/venue-menus/wolt/hamosad?classify=true&netCarbLimitGrams=6' \
@@ -431,6 +443,79 @@ curl -sS localhost:8000/v1/text-menu \
   -H 'X-KetoClub-Install-Id: 0123456789abcdef0123456789abcdef' \
   -d '{"text": "Steak\nPasta carbonara", "options": {"netCarbLimitGrams": 6, "dietaryConstraints": []}}'
 ```
+
+## `POST /v1/scan` (#334)
+
+`{pages: [{mimeType, data}], options}`: one to six pages, each `image/jpeg`,
+`image/png`, `image/webp` or `application/pdf`, `data` strict standard base64,
+at most `VISION_MAX_IMAGES` pages and `VISION_MAX_IMAGE_BYTES` decoded per page
+(422 otherwise). The body is read by hand under a cap sized for the largest
+valid request, so a bigger one is 413 `payloadTooLarge` before any parsing.
+The pages go to Gemini in one request with the ported vision prompt and
+schema, and the answer is `{menu, analysis}`: `menu.venueRef` is
+`scan/<fingerprint hex>` and every dish carries its `page` (D22).
+
+- **No rules fallback** (D15): a Gemini failure is `/v1/chat`'s status and
+  reason (503 `notConfigured`, 502 `offline`/`badResponse`, 504 `timeout`,
+  429 `rateLimited`), a reply naming no dish is 422 `noDishesFound`, and an
+  empty analysis bucket is 429 `rateLimited`.
+- Every scan spends the analysis bucket (images are never cached; the answer
+  carries `X-KetoClub-Cache: bypass`). A server with no key answers 503
+  without spending it.
+- Pages are forwarded and dropped: nothing stores them and no log line carries
+  more than their count. The route never writes `stored_menus`.
+
+## `POST /v1/website-menu` (#334)
+
+`{url, options}`. The server does what the app's `WebsiteMenuAdapter` does:
+it fetches the pasted URL through the `/v1/website/fetch` rules (public hosts
+only, robots.txt and the AI opt-outs, size caps, the per-install and per-site
+budgets, now in `app/services/website_fetch.py` and shared by both routes),
+reads the page with the ported locator (JSON-LD, or the page's own priced
+text), follows **one** menu link, and sends a PDF to the scan path. A text or
+JSON-LD menu is analysed with the rules fallback and the "empty bucket keeps the
+menu, stamps `rateLimited`" rule; a menu with no dish answers `analysis: null`.
+The menu is `website/<normalised url>`, priced in ILS, with no venue name.
+
+Errors are every `/v1/website/fetch` reason at its status, plus 404
+`menuNotFound` and, for an unreadable linked PDF, 502 with the scan reason (or
+422 `noDishesFound`). A returned analysis is also upserted into `stored_menus`
+(without `options`) when the store is enabled; a store failure is logged and
+never fails the read. The URL travels in the body and no log line carries it.
+
+## Complete venue search (#335)
+
+`GET /v1/venues/nearby?lat&lon&lang` and `POST /v1/venues/search
+{query, lang, lat?, lon?}` fetch Wolt's discovery page through the same helpers,
+cache rows and bucket as the discovery proxies above, then map it with the
+port of the Dart `WoltVenueMapper` and answer `{venues: [Venue JSON]}` in
+Wolt's order (the client sorts nearest-first). A hit spends no quota.
+Errors: 429 `rateLimited`, 502 `offline`, 504 `timeout`, and 502
+`platformChanged` for any non-2xx upstream status (410 included), a body
+that is not JSON or a page the mapper cannot read. The install id and the
+position are used for limiting and the cache key only.
+
+## Keeping the port honest (D25)
+
+`app/keto`, `app/platforms` and `app/website` are Python ports of Dart code;
+**Dart is the source of truth**. `tool/golden` (in the repository root) runs
+the real Dart code over a fixed corpus and writes 14 JSON documents to
+`tests/fixtures/golden/`; `test_golden_*.py` replay every entry and must match
+it exactly, with no skips. After any change to the Dart vocabulary
+(`lib/utils/constants.dart`), normaliser, rules, prompt, parser, text menu,
+website locator or platform mappers:
+
+```bash
+flutter test --dart-define=UPDATE_GOLDEN=true test/golden      # regenerate
+cp backend/tests/fixtures/golden/vocabulary.json backend/app/keto/vocabulary.json
+cd backend && ./check.sh                                       # the Python replay
+```
+
+The system prompt is part of `/v1/chat`'s cache key, so `prompt.py` must stay
+byte-equal to the Dart prompt. The analysis cache's key does not include the
+prompt text: a prompt or parser change that should retire stored analyses
+needs a `schemaVersion` bump (see `architecture.md` D25), or the old ones
+live out `ANALYSIS_CACHE_TTL_SECONDS`.
 
 ## The menu store (#310)
 
@@ -499,8 +584,19 @@ Point the Flutter web build at it:
 flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
 ```
 
-An iOS or Android build ignores the define (D17): phones reach Wolt and
-Gemini directly, so there is no reason to point one at this service.
+An iOS or Android build uses the define too since D25: it asks this service
+first for menus, analyses, scans and venue search, and falls back to calling
+Wolt and Gemini itself (with the user's own key) when this service cannot
+answer. A phone must be able to reach the address, so use the machine's LAN
+address, not `localhost`:
+
+```bash
+flutter run -d <device> --dart-define=KETOCLUB_BACKEND_URL=http://<lan-ip>:8000
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000   # listen beyond localhost
+```
+
+CORS does not matter to a phone; the install id and the 10/60 analysis bucket
+do. Hosting beyond a developer's machine is still open (#109).
 
 ## Configuration
 
@@ -517,8 +613,8 @@ that need them (`/v1/chat`, and `/v1/admin/*` in a later issue). See
 | `GEMINI_MAX_OUTPUT_TOKENS` | `65536` | `generationConfig.maxOutputTokens`; must exceed a full menu's verdicts (#188) |
 | `GEMINI_THINKING_BUDGET` | `0` | Thinking tokens count against the output budget, and this is a classification task |
 | `GEMINI_LOG_UPSTREAM_ERRORS` | `false` | Also log an upstream error reply's `error.message` (key redacted) and `details[].reason`; the shape lines above are always on |
-| `VISION_MAX_IMAGES` | `6` | Most `images` parts one `/v1/chat` request may carry (#170) |
-| `VISION_MAX_IMAGE_BYTES` | `3145728` | Largest `images` part once decoded, in bytes (3 MiB) |
+| `VISION_MAX_IMAGES` | `6` | Most `images` parts one `/v1/chat` request, or pages one `/v1/scan` request, may carry (#170, #334) |
+| `VISION_MAX_IMAGE_BYTES` | `3145728` | Largest `images` part or scan page once decoded, in bytes (3 MiB) |
 | `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_PER_DAY` | `5`, `40` | Per install id on `/v1/chat` and `POST /v1/menus` (one shared bucket), in memory |
 | `MENU_STORE_ENABLED` | `true` | `false` → the menu store's router is not mounted and both `/v1/menus` routes answer 404 (#310) |
 | `MENU_STORE_MAX_BODY_BYTES` | `1048576` | Largest `POST /v1/menus` body (1 MiB); over it → 413 `payloadTooLarge` |
@@ -528,7 +624,7 @@ that need them (`/v1/chat`, and `/v1/admin/*` in a later issue). See
 | `WOLT_CLIENT_VERSION` | `1.16.125` | Wolt web-client version sent on menu and discovery requests |
 | `DISCOVERY_CACHE_TTL_SECONDS` | `300` | Discovery response cache TTL |
 | `DISCOVERY_RATE_LIMIT_PER_MINUTE` | `20` | Per install id, across both discovery routes; no daily cap |
-| `ANALYSIS_RATE_LIMIT_PER_MINUTE`, `ANALYSIS_RATE_LIMIT_PER_DAY` | `10`, `60` | Per install id, the D25 analysis bucket: spent only just before a Gemini call (#333) |
+| `ANALYSIS_RATE_LIMIT_PER_MINUTE`, `ANALYSIS_RATE_LIMIT_PER_DAY` | `10`, `60` | Per install id, the D25 analysis bucket: spent only just before a Gemini call (#333); every `/v1/scan` spends it |
 | `ANALYSIS_CACHE_TTL_SECONDS` | `604800` | The D25 analysis cache's TTL (7 days, #333) |
 | `CLASSIFY_MAX_BODY_BYTES` | `786432` | Largest `POST /v1/classify` body (768 KiB); over it → 413 `payloadTooLarge` |
 | `WEBSITE_USER_AGENT` | `KetoClubBot/1.0 (+https://github.com/NoaMcDa/KetoClub; menu reader)` | Sent on every website fetch; names the fetcher and a contact URL (D19) |
@@ -596,7 +692,9 @@ an always-green one.
 `uv run pytest` runs the suite over an in-memory SQLite database
 (`sqlite:///:memory:`, `StaticPool`) with respx blocking any real network
 call — no test in this suite ever reaches the network
-(`architecture.md` constraint 12).
+(`architecture.md` constraint 12). `tests/test_golden_*.py` replay the 14
+golden documents the Dart exporter wrote (D25) and are part of the same run;
+see "Keeping the port honest" above for regenerating them.
 
 ## Manual end-to-end check
 
@@ -637,6 +735,22 @@ once.
    or run the Flutter app and search by name or "near me" once #40 lands.
    A real response carries a `sections` list of venues; run either curl
    twice to see `x-ketoclub-cache` flip from `miss` to `hit`.
+5b. **The D25 routes, against real Wolt and Gemini:**
+   ```bash
+   ID=0123456789abcdef0123456789abcdef
+   curl -sS "localhost:8000/v1/venue-menus/wolt/hamosad?classify=true&netCarbLimitGrams=6" \
+     -H "X-KetoClub-Install-Id: $ID" | head -c 600
+   curl -sS "localhost:8000/v1/venues/nearby?lat=32.0853&lon=34.7818&lang=en" \
+     -H "X-KetoClub-Install-Id: $ID" | head -c 600
+   ```
+   The first returns `{menu, analysis, fromCache, fetchedAt}` with an `llm`
+   engine (a repeat is an analysis-cache hit: no Gemini call, no bucket);
+   the second `{venues: [...]}`. If Wolt answers this machine's address with a
+   403 or 429 these read 502 `platformChanged`, which the app does **not** fall
+   back from (`architecture.md` D25, "What it accepts"). A scan needs real
+   pages: base64 one JPEG into `{"pages": [{"mimeType": "image/jpeg", "data":
+   "…"}], "options": {"netCarbLimitGrams": 6, "dietaryConstraints": []}}`
+   and `POST` it to `/v1/scan`.
 6. **The Flutter app, end to end:**
    ```bash
    flutter run -d chrome --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000
@@ -644,7 +758,9 @@ once.
    Paste a real Wolt venue link. The menu loads live (not from the checked-in
    fixture) and is classified with the engine chip showing the Gemini model
    name — with no key entered anywhere in the app, because there is nowhere
-   to enter one (D12).
+   to enter one (D12). Run the same on a phone with the machine's LAN address
+   (see "Running locally") to see the D25 path: the menu arrives already
+   classified, from one `/v1/venue-menus` request, and the Recent tab lists it.
 7. **The unreachable-backend path.** Stop the `uvicorn` process (Ctrl-C) and
    retry the same paste in the still-running Flutter app: the fetch fails with
    "KetoClub's server could not be reached, so the menu could not be read.",
