@@ -42,6 +42,7 @@ const serviceRank = <String, int>{
   'llm': 0,
   'location': 0,
   'venue': 0,
+  'community': 0,
   'menu': 1,
   'classifier': 1,
 };
@@ -226,6 +227,8 @@ const _boundaries = <_Boundary>[
     'services/venue/venue_ref_resolver.dart',
   }),
   _Boundary('/v1/chat', {'services/llm/backend_chat_client.dart'}),
+  // The shared menu store (issue #309): one client posts to it.
+  _Boundary('/v1/menus', {'services/community/menu_store_client.dart'}),
   // A restaurant's own website (architecture.md D19): the web build asks
   // the backend's fetch route, a phone fetches directly with the named
   // User-Agent. Each lives in exactly one file.
