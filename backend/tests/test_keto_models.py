@@ -700,3 +700,11 @@ def test_venues_response_writes_each_venue_in_the_dart_shape() -> None:
     assert _dart_encode(to_json(response)) == (
         '{"venues":[' + _FULL_VENUE + "," + _MINIMAL_VENUE + "]}"
     )
+
+
+def test_hidden_carb_blank_check_follows_dart_trim() -> None:
+    """A source Dart keeps (U+001C is not whitespace to Dart) reads back."""
+    carb = HiddenCarb.model_validate(
+        {"source": "\x1c", "certainty": "likely", "waiterQuestion": "Is it?"}
+    )
+    assert carb.source == "\x1c"
