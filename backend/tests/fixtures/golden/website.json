@@ -1,0 +1,1383 @@
+[
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://www.cafe-noir.example/",
+    "html": "<!doctype html>\n<!-- Synthetic fixture (issue #181): a Hebrew homepage whose menu link says תפריט only in its text. -->\n<html lang=\"he\" dir=\"rtl\"><head><title>קפה נואר</title></head>\n<body>\n<header><a href=\"/\">דף הבית</a> <a href=\"/%D7%90%D7%95%D7%93%D7%95%D7%AA\">אודות</a> <a href=\"/page-3\"><span>התפריט</span> שלנו</a></header>\n<main><h1>ברוכים הבאים</h1><p>ביסטרו שכונתי בלב העיר.</p></main>\n</body></html>\n",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "דף הבית אודות התפריט שלנו",
+      "ברוכים הבאים",
+      "ביסטרו שכונתי בלב העיר."
+    ],
+    "links": [
+      {
+        "text": "דף הבית",
+        "uri": "https://www.cafe-noir.example/"
+      },
+      {
+        "text": "אודות",
+        "uri": "https://www.cafe-noir.example/%D7%90%D7%95%D7%93%D7%95%D7%AA"
+      },
+      {
+        "text": "התפריט שלנו",
+        "uri": "https://www.cafe-noir.example/page-3"
+      }
+    ],
+    "located": {
+      "isPdf": false,
+      "kind": "link",
+      "uri": "https://www.cafe-noir.example/page-3"
+    },
+    "menuText": null,
+    "name": "hebrew_menu_link.html",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": false,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<!doctype html>\n<!-- Synthetic fixture (issue #181): a homepage carrying a schema.org menu in JSON-LD. -->\n<html lang=\"en\"><head><title>Cafe Noir</title>\n<script type=\"application/ld+json\">\n{\"@context\": \"https://schema.org\", \"@graph\": [\n  {\"@type\": \"WebSite\", \"name\": \"Cafe Noir\"},\n  {\"@type\": \"Restaurant\", \"name\": \"Cafe Noir\",\n   \"hasMenu\": {\"@type\": \"Menu\", \"name\": \"Dinner\",\n     \"hasMenuSection\": [\n       {\"@type\": \"MenuSection\", \"name\": \"Starters\",\n        \"hasMenuItem\": [\n          {\"@type\": \"MenuItem\", \"name\": \"Caesar salad\", \"description\": \"Romaine, parmesan, croutons\", \"offers\": {\"@type\": \"Offer\", \"price\": \"52\", \"priceCurrency\": \"ILS\"}},\n          {\"@type\": \"MenuItem\", \"name\": \"  \", \"description\": \"nameless, skipped\"}\n        ]},\n       {\"@type\": \"MenuSection\", \"name\": \"Mains\",\n        \"hasMenuItem\": {\"@type\": \"MenuItem\", \"name\": \"Entrecote steak\", \"description\": \"300 g, with fries\"},\n        \"hasMenuSection\": {\"@type\": \"MenuSection\", \"name\": \"Pasta\",\n          \"hasMenuItem\": [{\"@type\": \"MenuItem\", \"name\": \"Spaghetti carbonara\"}]}}\n     ]}}\n]}\n</script>\n<script type=\"application/ld+json\">{ not json </script>\n</head><body><h1>Cafe Noir</h1><p>Open daily 12:00 to 23:00.</p>\n<a href=\"/menu\">Menu</a></body></html>\n",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "name": "Cafe Noir"
+          },
+          {
+            "@type": "Restaurant",
+            "hasMenu": {
+              "@type": "Menu",
+              "hasMenuSection": [
+                {
+                  "@type": "MenuSection",
+                  "hasMenuItem": [
+                    {
+                      "@type": "MenuItem",
+                      "description": "Romaine, parmesan, croutons",
+                      "name": "Caesar salad",
+                      "offers": {
+                        "@type": "Offer",
+                        "price": "52",
+                        "priceCurrency": "ILS"
+                      }
+                    },
+                    {
+                      "@type": "MenuItem",
+                      "description": "nameless, skipped",
+                      "name": "  "
+                    }
+                  ],
+                  "name": "Starters"
+                },
+                {
+                  "@type": "MenuSection",
+                  "hasMenuItem": {
+                    "@type": "MenuItem",
+                    "description": "300 g, with fries",
+                    "name": "Entrecote steak"
+                  },
+                  "hasMenuSection": {
+                    "@type": "MenuSection",
+                    "hasMenuItem": [
+                      {
+                        "@type": "MenuItem",
+                        "name": "Spaghetti carbonara"
+                      }
+                    ],
+                    "name": "Pasta"
+                  },
+                  "name": "Mains"
+                }
+              ],
+              "name": "Dinner"
+            },
+            "name": "Cafe Noir"
+          }
+        ]
+      }
+    ],
+    "jsonLdCategories": [
+      {
+        "dishes": [
+          {
+            "description": "Romaine, parmesan, croutons",
+            "id": "j1",
+            "imageUrl": null,
+            "name": "Caesar salad",
+            "options": [],
+            "page": null,
+            "price": 0.0
+          }
+        ],
+        "id": "jsonld-1",
+        "name": "Starters"
+      },
+      {
+        "dishes": [
+          {
+            "description": "300 g, with fries",
+            "id": "j2",
+            "imageUrl": null,
+            "name": "Entrecote steak",
+            "options": [],
+            "page": null,
+            "price": 0.0
+          }
+        ],
+        "id": "jsonld-2",
+        "name": "Mains"
+      },
+      {
+        "dishes": [
+          {
+            "description": "",
+            "id": "j3",
+            "imageUrl": null,
+            "name": "Spaghetti carbonara",
+            "options": [],
+            "page": null,
+            "price": 0.0
+          }
+        ],
+        "id": "jsonld-3",
+        "name": "Pasta"
+      }
+    ],
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Cafe Noir",
+      "Open daily 12:00 to 23:00.",
+      "Menu"
+    ],
+    "links": [
+      {
+        "text": "Menu",
+        "uri": "https://cafe-noir.example/menu"
+      }
+    ],
+    "located": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "Romaine, parmesan, croutons",
+              "id": "j1",
+              "imageUrl": null,
+              "name": "Caesar salad",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "jsonld-1",
+          "name": "Starters"
+        },
+        {
+          "dishes": [
+            {
+              "description": "300 g, with fries",
+              "id": "j2",
+              "imageUrl": null,
+              "name": "Entrecote steak",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "jsonld-2",
+          "name": "Mains"
+        },
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "j3",
+              "imageUrl": null,
+              "name": "Spaghetti carbonara",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "jsonld-3",
+          "name": "Pasta"
+        }
+      ],
+      "kind": "jsonLd"
+    },
+    "menuText": null,
+    "name": "jsonld_menu.html",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<!doctype html>\n<!-- Synthetic fixture (issue #181): an older Hebrew site whose only menu link is תפריט percent-encoded in windows-1255, not UTF-8, next to a %FF link. -->\n<html lang=\"he\" dir=\"rtl\"><head><meta charset=\"windows-1255\"><title>Cafe Noir</title></head>\n<body>\n<header><a href=\"/\">Home</a> <a href=\"/about%FF.html\">About</a> <a href=\"/%FA%F4%F8%E9%E8.html\">Click here</a></header>\n<main><h1>Welcome</h1><p>A neighbourhood bistro.</p></main>\n</body></html>\n",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Home About Click here",
+      "Welcome",
+      "A neighbourhood bistro."
+    ],
+    "links": [
+      {
+        "text": "Home",
+        "uri": "https://cafe-noir.example/"
+      },
+      {
+        "text": "About",
+        "uri": "https://cafe-noir.example/about%FF.html"
+      },
+      {
+        "text": "Click here",
+        "uri": "https://cafe-noir.example/%FA%F4%F8%E9%E8.html"
+      }
+    ],
+    "located": {
+      "isPdf": false,
+      "kind": "link",
+      "uri": "https://cafe-noir.example/%FA%F4%F8%E9%E8.html"
+    },
+    "menuText": null,
+    "name": "legacy_encoded_menu_link.html",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<!doctype html>\n<!-- Synthetic fixture (issue #181): a homepage whose nav links to its menu page. -->\n<html lang=\"en\"><head><title>Cafe Noir</title></head>\n<body>\n<nav><a href=\"/\">Home</a> <a href=\"/about\">About</a> <a href=\"/food/menu/\">Our food</a> <a href=\"#contact\">Contact</a></nav>\n<main><h1>Welcome to Cafe Noir</h1><p>A neighbourhood bistro since 1998.</p>\n<p><a href=\"https://wolt.com/en/isr/tel-aviv/restaurant/cafe-noir\">Order from our menu on Wolt</a></p>\n<p><a href=\"mailto:hello@cafe-noir.example\">Email us</a></p></main>\n<footer><p>Rothschild 1, Tel Aviv. Tel 03-5551234</p></footer>\n</body></html>\n",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Welcome to Cafe Noir",
+      "A neighbourhood bistro since 1998.",
+      "Order from our menu on Wolt",
+      "Email us"
+    ],
+    "links": [
+      {
+        "text": "Home",
+        "uri": "https://cafe-noir.example/"
+      },
+      {
+        "text": "About",
+        "uri": "https://cafe-noir.example/about"
+      },
+      {
+        "text": "Our food",
+        "uri": "https://cafe-noir.example/food/menu/"
+      },
+      {
+        "text": "Order from our menu on Wolt",
+        "uri": "https://wolt.com/en/isr/tel-aviv/restaurant/cafe-noir"
+      }
+    ],
+    "located": {
+      "isPdf": false,
+      "kind": "link",
+      "uri": "https://cafe-noir.example/food/menu/"
+    },
+    "menuText": null,
+    "name": "menu_link.html",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": false,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<!doctype html>\n<!-- Synthetic fixture (issue #181): an English menu page, a table row per dish with its price. -->\n<html lang=\"en\"><head><title>Menu</title></head>\n<body>\n<p>Home | About | Menu</p>\n<h2>Starters</h2>\n<table>\n<tr><td>Caesar salad</td><td>52</td></tr>\n<tr><td colspan=\"2\">romaine, parmesan, croutons</td></tr>\n<tr><td>soup of the day</td><td>38 NIS</td></tr>\n</table>\n<h2>Mains</h2>\n<table>\n<tr><td>&bull; Grilled salmon</td><td>&#8362; 96</td></tr>\n<tr><td>Burger &amp; fries</td><td>74</td></tr>\n</table>\n<p>Open Sunday-Thursday 12-23</p>\n<p>Tel 03-5551234</p>\n</body></html>\n",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Home | About | Menu",
+      "Starters",
+      "Caesar salad 52",
+      "romaine, parmesan, croutons",
+      "soup of the day 38 NIS",
+      "Mains",
+      "• Grilled salmon ₪ 96",
+      "Burger & fries 74",
+      "Open Sunday-Thursday 12-23",
+      "Tel 03-5551234"
+    ],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": "Starters:\nCaesar salad\n- romaine, parmesan, croutons\nSoup of the day\nMains:\nGrilled salmon\nBurger & fries",
+    "name": "menu_page_inline_prices.html",
+    "reservesAi": false,
+    "textMenu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "romaine, parmesan, croutons",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "Caesar salad",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "Soup of the day",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted-1",
+          "name": "Starters"
+        },
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "Grilled salmon",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p4",
+              "imageUrl": null,
+              "name": "Burger & fries",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted-2",
+          "name": "Mains"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "a68be95e",
+        "source": "scan"
+      }
+    }
+  },
+  {
+    "anyCharacterReversed": false,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<!doctype html>\n<!-- Synthetic fixture (issue #181): a Hebrew menu page, prices in their own elements. -->\n<html lang=\"he\" dir=\"rtl\"><head><title>תפריט</title><style>.price{color:red}</style></head>\n<body>\n<nav><a href=\"/\">דף הבית</a><a href=\"/menu\">תפריט</a><a href=\"/contact\">צור קשר</a></nav>\n<div class=\"section\"><h2>סלטים</h2>\n  <div class=\"dish\"><h3>סלט קיסר</h3><p>חסה, פרמזן וקרוטונים</p><span class=\"price\">52 ₪</span></div>\n  <div class=\"dish\"><h3>סלט יווני</h3><p>עגבניות, מלפפון, פטה</p><span class=\"price\">48</span></div>\n</div>\n<div class=\"section\"><h2>עיקריות</h2>\n  <div class=\"dish\"><h3>אנטריקוט</h3><p>300 גרם עם צ׳יפס</p><span class=\"price\">₪128</span></div>\n  <div class=\"dish\"><h3>פסטה ברוטב שמנת</h3><span class=\"price\">69</span></div>\n</div>\n<footer><p>רוטשילד 1, תל אביב</p><p>טלפון 03-5551234</p></footer>\n<script>track();</script>\n</body></html>\n",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "סלטים",
+      "סלט קיסר",
+      "חסה, פרמזן וקרוטונים",
+      "52 ₪",
+      "סלט יווני",
+      "עגבניות, מלפפון, פטה",
+      "48",
+      "עיקריות",
+      "אנטריקוט",
+      "300 גרם עם צ׳יפס",
+      "₪128",
+      "פסטה ברוטב שמנת",
+      "69"
+    ],
+    "links": [
+      {
+        "text": "דף הבית",
+        "uri": "https://cafe-noir.example/"
+      },
+      {
+        "text": "תפריט",
+        "uri": "https://cafe-noir.example/menu"
+      },
+      {
+        "text": "צור קשר",
+        "uri": "https://cafe-noir.example/contact"
+      }
+    ],
+    "located": {
+      "isPdf": false,
+      "kind": "link",
+      "uri": "https://cafe-noir.example/menu"
+    },
+    "menuText": "סלטים:\nסלט קיסר\n- חסה, פרמזן וקרוטונים\nסלט יווני\n- עגבניות, מלפפון, פטה\nעיקריות:\nאנטריקוט\n- 300 גרם עם צ׳יפס\nפסטה ברוטב שמנת",
+    "name": "menu_page_separate_prices.html",
+    "reservesAi": false,
+    "textMenu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "חסה, פרמזן וקרוטונים",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "סלט קיסר",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "עגבניות, מלפפון, פטה",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "סלט יווני",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted-1",
+          "name": "סלטים"
+        },
+        {
+          "dishes": [
+            {
+              "description": "300 גרם עם צ׳יפס",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "אנטריקוט",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p4",
+              "imageUrl": null,
+              "name": "פסטה ברוטב שמנת",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted-2",
+          "name": "עיקריות"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "681625e2",
+        "source": "scan"
+      }
+    }
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<!doctype html>\n<!-- Synthetic fixture (issue #181): a homepage with no menu anywhere. -->\n<html lang=\"en\"><head><title>Cafe Noir</title></head>\n<body>\n<nav><a href=\"/\">Home</a> <a href=\"/about\">About</a> <a href=\"/contact\">Contact</a></nav>\n<h1>Cafe Noir</h1>\n<p>A neighbourhood bistro since 1998. Lunch from 45.</p>\n<p>Book a table: call us any day.</p>\n<footer>Rothschild 1, Tel Aviv</footer>\n</body></html>\n",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Cafe Noir",
+      "A neighbourhood bistro since 1998. Lunch from 45.",
+      "Book a table: call us any day."
+    ],
+    "links": [
+      {
+        "text": "Home",
+        "uri": "https://cafe-noir.example/"
+      },
+      {
+        "text": "About",
+        "uri": "https://cafe-noir.example/about"
+      },
+      {
+        "text": "Contact",
+        "uri": "https://cafe-noir.example/contact"
+      }
+    ],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": null,
+    "name": "no_menu.html",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<!doctype html>\n<!-- Synthetic fixture (issue #181): a homepage linking its menu as a PDF on a file host. -->\n<html lang=\"en\"><head><title>Cafe Noir</title></head>\n<body>\n<a href=\"/files/wine-list.pdf\">Wine list</a>\n<a href=\"/about\">About us</a>\n<a href=\"https://files.example-cdn.com/cafe-noir/Menu-2026.pdf?v=3\">Download our menu</a>\n<p>We are open every day.</p>\n</body></html>\n",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Wine list",
+      "About us",
+      "Download our menu",
+      "We are open every day."
+    ],
+    "links": [
+      {
+        "text": "Wine list",
+        "uri": "https://cafe-noir.example/files/wine-list.pdf"
+      },
+      {
+        "text": "About us",
+        "uri": "https://cafe-noir.example/about"
+      },
+      {
+        "text": "Download our menu",
+        "uri": "https://files.example-cdn.com/cafe-noir/Menu-2026.pdf?v=3"
+      }
+    ],
+    "located": {
+      "isPdf": true,
+      "kind": "link",
+      "uri": "https://files.example-cdn.com/cafe-noir/Menu-2026.pdf?v=3"
+    },
+    "menuText": null,
+    "name": "pdf_link.html",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<a href=\"/docs/today.pdf\">Today</a>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Today"
+    ],
+    "links": [
+      {
+        "text": "Today",
+        "uri": "https://cafe-noir.example/docs/today.pdf"
+      }
+    ],
+    "located": {
+      "isPdf": true,
+      "kind": "link",
+      "uri": "https://cafe-noir.example/docs/today.pdf"
+    },
+    "menuText": null,
+    "name": "inline_any_pdf",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<script type=\"application/ld+json\">{\"@type\": \"Restaurant\", \"hasMenu\": \"/our-food\"}</script><a href=\"/menu\">Menu</a>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [
+      {
+        "@type": "Restaurant",
+        "hasMenu": "/our-food"
+      }
+    ],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": "https://cafe-noir.example/our-food",
+    "lines": [
+      "Menu"
+    ],
+    "links": [
+      {
+        "text": "Menu",
+        "uri": "https://cafe-noir.example/menu"
+      }
+    ],
+    "located": {
+      "isPdf": false,
+      "kind": "link",
+      "uri": "https://cafe-noir.example/our-food"
+    },
+    "menuText": null,
+    "name": "inline_jsonld_has_menu_first",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<script type=\"application/ld+json\">[{\"hasMenu\": {\"url\": \"https://x.example/m\"}}, {\"@type\": \"Menu\", \"url\": \"/food\"}]</script>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [
+      [
+        {
+          "hasMenu": {
+            "url": "https://x.example/m"
+          }
+        },
+        {
+          "@type": "Menu",
+          "url": "/food"
+        }
+      ]
+    ],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": "https://x.example/m",
+    "lines": [],
+    "links": [],
+    "located": {
+      "isPdf": false,
+      "kind": "link",
+      "uri": "https://x.example/m"
+    },
+    "menuText": null,
+    "name": "inline_jsonld_has_menu_object_and_menu_url",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<script type=\"application/ld+json\">[{\"hasMenu\": \"mailto:a@b.c\"}, {\"hasMenu\": \"http://[bad\"}, {\"hasMenu\": 7}]</script><script type=\"application/ld+json\">{not json}</script>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [
+      [
+        {
+          "hasMenu": "mailto:a@b.c"
+        },
+        {
+          "hasMenu": "http://[bad"
+        },
+        {
+          "hasMenu": 7
+        }
+      ]
+    ],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": null,
+    "name": "inline_jsonld_bad_has_menu",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": false,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<script type=\"application/ld+json\">{\"@type\": [\"Menu\", \"CreativeWork\"], \"hasMenuItem\": [{\"@type\": \"MenuItem\", \"name\": \" Soup \"}, \"not an item\", {\"name\": \"  \"}]}</script>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [
+      {
+        "@type": [
+          "Menu",
+          "CreativeWork"
+        ],
+        "hasMenuItem": [
+          {
+            "@type": "MenuItem",
+            "name": " Soup "
+          },
+          "not an item",
+          {
+            "name": "  "
+          }
+        ]
+      }
+    ],
+    "jsonLdCategories": [
+      {
+        "dishes": [
+          {
+            "description": "",
+            "id": "j1",
+            "imageUrl": null,
+            "name": "Soup",
+            "options": [],
+            "page": null,
+            "price": 0.0
+          }
+        ],
+        "id": "jsonld-1",
+        "name": "Menu"
+      }
+    ],
+    "jsonLdMenuUrl": null,
+    "lines": [],
+    "links": [],
+    "located": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "j1",
+              "imageUrl": null,
+              "name": "Soup",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "jsonld-1",
+          "name": "Menu"
+        }
+      ],
+      "kind": "jsonLd"
+    },
+    "menuText": null,
+    "name": "inline_jsonld_items_on_menu",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": false,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<script type=\"application/ld+json\">{\"@graph\": [{\"@type\": \"Menu\", \"name\": \"Dinner\", \"hasMenuSection\": [{\"@type\": \"MenuSection\", \"hasMenuItem\": {\"name\": \"Steak\", \"description\": \"Aged\"}, \"hasMenuSection\": [{\"name\": \"Fish\", \"hasMenuItem\": [{\"name\": \"Bream\"}]}]}]}]}</script>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [
+      {
+        "@graph": [
+          {
+            "@type": "Menu",
+            "hasMenuSection": [
+              {
+                "@type": "MenuSection",
+                "hasMenuItem": {
+                  "description": "Aged",
+                  "name": "Steak"
+                },
+                "hasMenuSection": [
+                  {
+                    "hasMenuItem": [
+                      {
+                        "name": "Bream"
+                      }
+                    ],
+                    "name": "Fish"
+                  }
+                ]
+              }
+            ],
+            "name": "Dinner"
+          }
+        ]
+      }
+    ],
+    "jsonLdCategories": [
+      {
+        "dishes": [
+          {
+            "description": "Aged",
+            "id": "j1",
+            "imageUrl": null,
+            "name": "Steak",
+            "options": [],
+            "page": null,
+            "price": 0.0
+          }
+        ],
+        "id": "jsonld-1",
+        "name": "Dinner"
+      },
+      {
+        "dishes": [
+          {
+            "description": "",
+            "id": "j2",
+            "imageUrl": null,
+            "name": "Bream",
+            "options": [],
+            "page": null,
+            "price": 0.0
+          }
+        ],
+        "id": "jsonld-2",
+        "name": "Fish"
+      }
+    ],
+    "jsonLdMenuUrl": null,
+    "lines": [],
+    "links": [],
+    "located": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "Aged",
+              "id": "j1",
+              "imageUrl": null,
+              "name": "Steak",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "jsonld-1",
+          "name": "Dinner"
+        },
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "j2",
+              "imageUrl": null,
+              "name": "Bream",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "jsonld-2",
+          "name": "Fish"
+        }
+      ],
+      "kind": "jsonLd"
+    },
+    "menuText": null,
+    "name": "inline_jsonld_nested_sections_graph",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<a href=\"/about%FF.html\">About</a><a href=\"/menu%FF\">Food</a>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "About Food"
+    ],
+    "links": [
+      {
+        "text": "About",
+        "uri": "https://cafe-noir.example/about%FF.html"
+      },
+      {
+        "text": "Food",
+        "uri": "https://cafe-noir.example/menu%FF"
+      }
+    ],
+    "located": {
+      "isPdf": false,
+      "kind": "link",
+      "uri": "https://cafe-noir.example/menu%FF"
+    },
+    "menuText": null,
+    "name": "inline_malformed_escapes",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/menu",
+    "html": "<a href=\"/menu/\">Menu</a><a href=\"/menu?x=1\">Menu again</a>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Menu Menu again"
+    ],
+    "links": [
+      {
+        "text": "Menu",
+        "uri": "https://cafe-noir.example/menu/"
+      },
+      {
+        "text": "Menu again",
+        "uri": "https://cafe-noir.example/menu?x=1"
+      }
+    ],
+    "located": {
+      "isPdf": false,
+      "kind": "link",
+      "uri": "https://cafe-noir.example/menu?x=1"
+    },
+    "menuText": null,
+    "name": "inline_link_back_to_self",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe.example/he/",
+    "html": "<a href=\"menu\">Menu</a><a href=\"/files/m.pdf#page=2\">PDF</a><a href=\"https://other.example/x?a=1&amp;b=2\">Other</a><a href=\"#top\">Top</a><a href=\"javascript:void(0)\">JS</a><a href=\"mailto:a@b.c\">Mail</a><a href=\" \">Blank</a><a class='x' href='../up/MENU.PDF'>Up</a><a href=//www.cafe.example/menu>Proto-relative</a><a>No href</a>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Menu PDF Other Top JS Mail Blank Up Proto-relative No href"
+    ],
+    "links": [
+      {
+        "text": "Menu",
+        "uri": "https://cafe.example/he/menu"
+      },
+      {
+        "text": "PDF",
+        "uri": "https://cafe.example/files/m.pdf"
+      },
+      {
+        "text": "Other",
+        "uri": "https://other.example/x?a=1&b=2"
+      },
+      {
+        "text": "Up",
+        "uri": "https://cafe.example/up/MENU.PDF"
+      },
+      {
+        "text": "Proto-relative",
+        "uri": "https://www.cafe.example/menu"
+      }
+    ],
+    "located": {
+      "isPdf": true,
+      "kind": "link",
+      "uri": "https://cafe.example/up/MENU.PDF"
+    },
+    "menuText": null,
+    "name": "inline_links_resolution",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<p>Salad 40</p><p>Soup 30</p>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Salad 40",
+      "Soup 30"
+    ],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": null,
+    "name": "inline_too_few_prices",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": false,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<p>Kebab 50</p><p>With tahini, salad</p><p>Grill</p><p>Steak 90</p><p>Aged 30 days</p><p>From the farm</p><p>Desserts</p><p>Tiramisu 40</p><p>Classic</p>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Kebab 50",
+      "With tahini, salad",
+      "Grill",
+      "Steak 90",
+      "Aged 30 days",
+      "From the farm",
+      "Desserts",
+      "Tiramisu 40",
+      "Classic"
+    ],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": "Kebab\n- With tahini, salad\nGrill:\nSteak\n- Aged 30 days From the farm\nDesserts:\nTiramisu",
+    "name": "inline_prices_inline_gaps",
+    "reservesAi": false,
+    "textMenu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "With tahini, salad",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "Kebab",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "Menu"
+        },
+        {
+          "dishes": [
+            {
+              "description": "Aged 30 days From the farm",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "Steak",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted-1",
+          "name": "Grill"
+        },
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "Tiramisu",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted-2",
+          "name": "Desserts"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "128b930e",
+        "source": "scan"
+      }
+    }
+  },
+  {
+    "anyCharacterReversed": false,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<p>Olives</p><p>12</p><p>12</p><p>Bread</p><p>- warm</p><p>15</p><p>:</p><p>9</p>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Olives",
+      "12",
+      "12",
+      "Bread",
+      "- warm",
+      "15",
+      ":",
+      "9"
+    ],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": "Olives\nBread\n- warm",
+    "name": "inline_prices_separate_single_lines",
+    "reservesAi": false,
+    "textMenu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "Olives",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "warm",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "Bread",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "Menu"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "4baf08c4",
+        "source": "scan"
+      }
+    }
+  },
+  {
+    "anyCharacterReversed": false,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<table><tr><td>סלט&nbsp;יווני</td><td>48 ש\"ח</td></tr><tr><td>שקשוקה</td><td>&#8362;52</td></tr><tr><td>steak &amp; eggs</td><td>89&nbsp;₪</td></tr><tr><td>Tel 03-5551234</td></tr><tr><td>Sunday&ndash;Thursday 12–23</td></tr></table><p>&unknown; &#0; &#x110000; &#xD83D; &lt;b&gt;</p>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "סלט יווני 48 ש\"ח",
+      "שקשוקה ₪52",
+      "steak & eggs 89 ₪",
+      "Tel 03-5551234",
+      "Sunday–Thursday 12–23",
+      "&unknown; \ud83d <b>"
+    ],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": "סלט יווני\nשקשוקה\nSteak & eggs",
+    "name": "inline_prices_hebrew_and_entities",
+    "reservesAi": false,
+    "textMenu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "סלט יווני",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "שקשוקה",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "Steak & eggs",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted",
+          "name": "תפריט"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "edb2d313",
+        "source": "scan"
+      }
+    }
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<meta name=\"robots\" content=\"index, NoAI\"><p>Hi</p>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Hi"
+    ],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": null,
+    "name": "inline_reserves_ai_robots",
+    "reservesAi": true,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<meta content='1' name='tdm-reservation'>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": null,
+    "name": "inline_reserves_ai_tdm",
+    "reservesAi": true,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<meta name=\"robots\" content=\"noaix\"><meta name=other content=1>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": null,
+    "name": "inline_reserves_ai_not",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<html><body><div id=\"root\"></div><script src=\"a.js\"></script>",
+    "isJavaScriptOnly": true,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": null,
+    "name": "inline_js_only_script",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<noscript>You need to enable JavaScript to run this app.</noscript><p>A short welcome line that is long enough to pass fifty chars.</p>",
+    "isJavaScriptOnly": true,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "A short welcome line that is long enough to pass fifty chars."
+    ],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": null,
+    "name": "inline_js_only_noscript",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": null,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<script type=\"application/ld+json\">{\"@type\": \"Restaurant\"}</script><p>Hello</p>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [
+      {
+        "@type": "Restaurant"
+      }
+    ],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Hello"
+    ],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": null,
+    "name": "inline_jsonld_is_not_a_script",
+    "reservesAi": false,
+    "textMenu": null
+  },
+  {
+    "anyCharacterReversed": false,
+    "baseUrl": "https://cafe-noir.example/",
+    "html": "<head><title>Cafe</title></head><nav>Menu 1 2 3</nav><!-- Steak 90 --><style>p{}</style><svg><text>Fries 12</text></svg><template>Soup 30</template><footer>Tel 03 1234567</footer><main><h1>Our menu</h1><ul><li>Steak 90</li><li>Salmon 80</li><li>Burger 60</li></ul></main>",
+    "isJavaScriptOnly": false,
+    "jsonLdBlocks": [],
+    "jsonLdCategories": null,
+    "jsonLdMenuUrl": null,
+    "lines": [
+      "Our menu",
+      "Steak 90",
+      "Salmon 80",
+      "Burger 60"
+    ],
+    "links": [],
+    "located": {
+      "kind": "none"
+    },
+    "menuText": "Our menu:\nSteak\nSalmon\nBurger",
+    "name": "inline_hidden_regions",
+    "reservesAi": false,
+    "textMenu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "",
+              "id": "p1",
+              "imageUrl": null,
+              "name": "Steak",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p2",
+              "imageUrl": null,
+              "name": "Salmon",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            },
+            {
+              "description": "",
+              "id": "p3",
+              "imageUrl": null,
+              "name": "Burger",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "pasted-1",
+          "name": "Our menu"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "9ba7410e",
+        "source": "scan"
+      }
+    }
+  }
+]

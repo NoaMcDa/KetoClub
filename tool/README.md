@@ -66,6 +66,36 @@ design canvas runtime) renders the `.design/` artboards at the same size.
 `docs/VISUAL_AUDIT.md` has the full recipe and what the first run found.
 None of it runs in CI.
 
+## `golden/` — the golden parity corpus (D25, issue #320)
+
+`backend/tests/fixtures/golden/*.json` pins what the Dart menu logic does,
+so a Python port of it can be proven byte-equal to the Dart source of
+truth. `golden_corpus.dart` holds the inputs (edge-case strings, rule
+texts and dishes, hand-built bilingual menus, pasted texts, hand-written
+model replies, synthetic platform payloads, website pages);
+`golden_export.dart` runs the real Dart code over them, the vocabulary in
+`lib/utils/constants.dart` and the fixtures in `test/fixtures/`, and
+returns one JSON document per file: the vocabulary, the normaliser, menu
+fingerprints, the rule engine, the heuristic classifier, the prompt, the
+reply parser, pasted menus, website pages, the Wolt and 10bis mappers,
+Wolt venues, dish kinds and the keto score. Every file is written with
+sorted keys, two-space indentation and a fixed clock, so a rebuild is
+byte-identical.
+
+Like `perf_menu.dart` it runs under `flutter test`, not `dart run`.
+
+- **Check** (part of the normal test run, so CI catches drift):
+  ```bash
+  flutter test test/golden/golden_drift_test.dart
+  ```
+- **Regenerate** after a deliberate behaviour change, then review the diff:
+  ```bash
+  flutter test --dart-define=UPDATE_GOLDEN=true test/golden/golden_drift_test.dart
+  ```
+
+The Python replay lives in `backend/tests/test_golden_*.py`: a changed
+golden means the Python port must change with it.
+
 ## Model verification moved to the backend (D12)
 
 **There is no `measure_model_latency.dart` any more.** Before D12, this
