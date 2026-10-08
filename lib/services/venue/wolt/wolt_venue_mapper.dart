@@ -23,7 +23,8 @@ import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 ///   latitude. Anything but two in-range numbers leaves both null.
 /// - `tags` become [Venue.cuisineTags] (non-empty strings only, order
 ///   kept); `online` becomes [Venue.isOnline]; `short_description`,
-///   `address` are copied when non-empty strings.
+///   `address` and `city` (Wolt's display name, e.g. `Tel Aviv`; the
+///   `country` code is not read) are copied when non-empty strings.
 /// - The item's own `image.url` becomes [Venue.imageUrl], falling back
 ///   to the venue's `brand_image.url`.
 /// - `rating.score` (Wolt's 0–10 customer score, not a keto score)
@@ -78,6 +79,7 @@ abstract final class WoltVenueMapper {
       ref: ref,
       name: name,
       address: _nonEmptyString(raw['address']),
+      city: _nonEmptyString(raw['city']),
       latitude: position?.latitude,
       longitude: position?.longitude,
       sourceUrl: VenueRefResolver.platformUrl(ref)?.toString(),

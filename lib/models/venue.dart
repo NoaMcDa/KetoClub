@@ -110,6 +110,7 @@ final class Venue {
     this.shortDescription,
     this.platformRating,
     this.estimateMinutes,
+    this.city,
   });
 
   /// How to fetch this venue's menu.
@@ -156,6 +157,10 @@ final class Venue {
   /// `estimate`), when it gives one.
   final int? estimateMinutes;
 
+  /// The city the platform lists the venue in, e.g. 'Tel Aviv'; null when
+  /// the platform does not say (10bis, websites).
+  final String? city;
+
   @override
   bool operator ==(Object other) =>
       other is Venue &&
@@ -170,7 +175,8 @@ final class Venue {
       other.imageUrl == imageUrl &&
       other.shortDescription == shortDescription &&
       other.platformRating == platformRating &&
-      other.estimateMinutes == estimateMinutes;
+      other.estimateMinutes == estimateMinutes &&
+      other.city == city;
 
   @override
   int get hashCode => Object.hash(
@@ -186,8 +192,9 @@ final class Venue {
     shortDescription,
     platformRating,
     estimateMinutes,
+    city,
   );
 
   @override
-  String toString() => 'Venue(${ref.cacheKey}: $name)';
+  String toString() => 'Venue(${ref.cacheKey}: $name, city: $city)';
 }

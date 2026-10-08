@@ -214,6 +214,7 @@ void main() {
         String? shortDescription = 'Sushi bar',
         double? platformRating = 9.1,
         int? estimateMinutes = 25,
+        String? city = 'Tel Aviv',
       }) => Venue(
         ref: ref,
         name: 'Diner',
@@ -223,6 +224,7 @@ void main() {
         shortDescription: shortDescription,
         platformRating: platformRating,
         estimateMinutes: estimateMinutes,
+        city: city,
       );
       final base = build();
 
@@ -236,6 +238,21 @@ void main() {
       expect(build(shortDescription: 'Other'), isNot(equals(base)));
       expect(build(platformRating: 8), isNot(equals(base)));
       expect(build(estimateMinutes: 30), isNot(equals(base)));
+      expect(build(city: 'Haifa'), isNot(equals(base)));
+      expect(build(city: null), isNot(equals(base)));
+      expect(build(city: 'Haifa').hashCode, isNot(base.hashCode));
+    });
+
+    test('city defaults to null and toString names it', () {
+      // Arrange
+      const ref = VenueRef(source: MenuSource.wolt, platformId: 'v1');
+      const bare = Venue(ref: ref, name: 'Diner');
+      const placed = Venue(ref: ref, name: 'Diner', city: 'Tel Aviv');
+
+      // Act & Assert
+      expect(bare.city, isNull);
+      expect(placed.city, 'Tel Aviv');
+      expect(placed.toString(), contains('Tel Aviv'));
     });
   });
 }
