@@ -25,14 +25,17 @@ Routes shipped so far:
 | `GET /v1/proxy/wolt/pages/restaurants` | #123 | **yes** | **yes** (`DISCOVERY_RATE_LIMIT_PER_MINUTE`) | Nearby-venue search for the web build, see below |
 | `POST /v1/proxy/wolt/pages/search` | #123 | **yes** | **yes** (`DISCOVERY_RATE_LIMIT_PER_MINUTE`) | By-name venue search for the web build, see below |
 | `POST /v1/website/fetch` | #181 | **yes** | **yes** (`WEBSITE_RATE_LIMIT_PER_MINUTE`, and per host) | One restaurant page or PDF for the web build, fetched politely (D19), see below |
+| `POST /v1/menus` | #310 | **yes** (rate limiting only) | **yes** (`RATE_LIMIT_*`, shared with `/v1/chat`) | Stores one opened menu in the anonymous shared store, see below |
+| `GET /v1/menus/{source}/{platform_id}` | #310 | no | no | Reads one stored menu back, see below |
 
 Menu proxies are one fetch per user action and have no per-install
-identity; `/v1/chat`, the two discovery routes and the website route require
+identity; `/v1/chat`, the two discovery routes, the website route and
+`POST /v1/menus` require
 `X-KetoClub-Install-Id` and enforce a per-install limit. A missing or
 malformed install id is answered `400 {"reason":"badResponse"}` — a
 client that misses the header sees the same shape as a bad prompt.
 
-Community routes are later issues (`backend_plan.md` §5).
+The other community routes are later issues (`backend_plan.md` §5).
 
 ### `POST /v1/chat`
 
@@ -381,6 +384,57 @@ curl -sS localhost:8000/v1/website/fetch \
   -d '{"url": "https://example.com/"}'
 ```
 
+## The menu store (#310)
+
+An anonymous, shared store of the menus people open: one row per
+`(source, platform_id)` in the `stored_menus` table. **Rows are keyed by
+venue, never by install id.** `POST /v1/menus` requires
+`X-KetoClub-Install-Id` only to spend the per-install rate limiter (the
+`RATE_LIMIT_*` bucket `/v1/chat` uses); the id is then dropped. It is never
+stored, never passed to the store's service and never logged, not even
+truncated (D12, #164).
+
+`POST /v1/menus` body:
+
+| Field | Type | Notes |
+|---|---|---|
+| `source` | `"wolt"`, `"tenbis"`, `"tabit"`, `"ontopo"`, `"scan"` or `"website"` | Anything else is 422 |
+| `platform_id` | string, 1–512 chars after trimming | The platform's own id for the menu (a Wolt slug, a 10bis restaurant id, …) |
+| `venue_name`, `city` | string ≤ 200, or null | Optional |
+| `menu` | object | The client's normalised menu, stored as-is; `dish_count` counts `categories[*].dishes` (0 if the shape is off) |
+| `analysis` | object or null | Optional; a top-level numeric `score` in it becomes the row's `score`, which is otherwise null. The backend computes no verdicts and no score |
+
+The first upload of a venue answers **201** `{"created": true,
+"submission_count": 1}`; a later one answers **200** `{"created": false,
+"submission_count": n}`, keeps `first_seen_at`, moves `last_seen_at` and
+always replaces the menu. A null (or omitted) `venue_name`, `city` or
+`analysis` never erases what an earlier upload stored.
+`submission_count` counts uploads, not distinct installs.
+
+`GET /v1/menus/{source}/{platform_id}` answers 200 with `{source,
+platform_id, venue_name, city, menu, analysis, dish_count, score,
+first_seen_at, last_seen_at, submission_count}` (UTC timestamps).
+`platform_id` may contain `/`. It needs no install id and spends no quota.
+
+| Status | `reason` | When |
+|---|---|---|
+| 400 | `badResponse` | `POST`: missing or malformed install id; either route: an inbound `Authorization` header |
+| 404 | `menuNotFound` | `GET`: no row for that pair |
+| 404 | (FastAPI's own) | Either route when `MENU_STORE_ENABLED=false`: the router is not mounted |
+| 413 | `payloadTooLarge` | `POST`: `Content-Length` or the bytes read over `MENU_STORE_MAX_BODY_BYTES` (1 MiB) |
+| 422 | (FastAPI's `detail`) | A body or path that does not validate, or a `NaN`/`Infinity` in the JSON; spends no quota |
+| 429 | `rateLimited` | `POST`: over `RATE_LIMIT_PER_MINUTE` / `RATE_LIMIT_PER_DAY` for this install |
+
+```bash
+curl -sS localhost:8000/v1/menus \
+  -H 'Content-Type: application/json' \
+  -H 'X-KetoClub-Install-Id: 0123456789abcdef0123456789abcdef' \
+  -d '{"source":"wolt","platform_id":"hamosad","venue_name":"Hamosad",
+       "menu":{"categories":[{"name":"Mains","dishes":[{"name":"Steak"}]}]}}'
+# {"created":true,"submission_count":1}
+curl -sS localhost:8000/v1/menus/wolt/hamosad
+```
+
 ## Running locally
 
 ```bash
@@ -417,7 +471,9 @@ that need them (`/v1/chat`, and `/v1/admin/*` in a later issue). See
 | `GEMINI_LOG_UPSTREAM_ERRORS` | `false` | Also log an upstream error reply's `error.message` (key redacted) and `details[].reason`; the shape lines above are always on |
 | `VISION_MAX_IMAGES` | `6` | Most `images` parts one `/v1/chat` request may carry (#170) |
 | `VISION_MAX_IMAGE_BYTES` | `3145728` | Largest `images` part once decoded, in bytes (3 MiB) |
-| `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_PER_DAY` | `5`, `40` | Per install id on `/v1/chat`, in memory |
+| `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_PER_DAY` | `5`, `40` | Per install id on `/v1/chat` and `POST /v1/menus` (one shared bucket), in memory |
+| `MENU_STORE_ENABLED` | `true` | `false` → the menu store's router is not mounted and both `/v1/menus` routes answer 404 (#310) |
+| `MENU_STORE_MAX_BODY_BYTES` | `1048576` | Largest `POST /v1/menus` body (1 MiB); over it → 413 `payloadTooLarge` |
 | `WOLT_BASE_URL` | `https://restaurant-api.wolt.com` | Upstream host for the by-name discovery route (the menu proxy left it in #168); never taken from a request |
 | `TENBIS_BASE_URL` | `https://www.10bis.co.il` | Upstream host for the 10bis proxy; never taken from a request |
 | `WOLT_CONSUMER_BASE_URL` | `https://consumer-api.wolt.com` | Upstream host for the Wolt menu proxy (#168) and the nearby-venue discovery route; never taken from a request |

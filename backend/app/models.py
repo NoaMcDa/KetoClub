@@ -1,19 +1,23 @@
 """SQLAlchemy ORM models.
 
-``menu_cache`` (#95) and ``chat_cache`` (#103) are the tables so far. Future
-issues declare more tables here against ``app.db.Base`` — ``venues`` and
-``ratings``/``dish_feedback`` (#105, #106), ``submissions`` (#107) — so one
-``Base.metadata.create_all`` call in the lifespan creates every table.
+``menu_cache`` (#95), ``chat_cache`` (#103) and ``stored_menus`` (#310) are
+the tables so far. Future issues declare more tables here against
+``app.db.Base`` — ``venues`` and ``ratings``/``dish_feedback`` (#105, #106),
+``submissions`` (#107) — so one ``Base.metadata.create_all`` call in the
+lifespan creates every table.
+
+No table holds an install id (D12, #164): the id keys the in-memory rate
+limiter and nothing else. ``stored_menus`` in particular is keyed by venue.
 """
 
 from datetime import datetime
 
-from sqlalchemy import DateTime, Integer, String, Text
+from sqlalchemy import DateTime, Float, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
 
-__all__ = ["Base", "ChatCache", "MenuCache"]
+__all__ = ["Base", "ChatCache", "MenuCache", "StoredMenu"]
 
 
 class MenuCache(Base):
@@ -59,3 +63,40 @@ class ChatCache(Base):
     content: Mapped[str] = mapped_column(Text, nullable=False)
     model: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class StoredMenu(Base):
+    """One opened menu in the anonymous shared store (#310).
+
+    Keyed by ``(source, platform_id)`` — the platform a menu came from
+    (``"wolt"``, ``"tenbis"``, ``"tabit"``, ``"ontopo"``, ``"scan"``,
+    ``"website"``) and that platform's own id for it — so a row describes a
+    venue's menu, never who opened it. There is deliberately no install-id
+    column: the id that ``POST /v1/menus`` requires keys the rate limiter
+    only (D12, #164), and it never reaches this table or a log line beside
+    its content.
+
+    ``menu_json`` is the client's normalised menu as JSON text, replaced on
+    every upload. ``analysis_json`` is the client's analysis, replaced only
+    when an upload carries one; ``venue_name`` and ``city`` likewise keep
+    their last non-null value. ``dish_count`` is counted from the menu's
+    ``categories[*].dishes``; ``score`` is copied from a top-level numeric
+    ``score`` in the analysis and is otherwise null — the backend computes
+    neither verdicts nor scores. ``first_seen_at`` / ``last_seen_at`` are
+    naive UTC timestamps (the ``MenuCache.fetched_at`` convention) and
+    ``submission_count`` counts uploads, not distinct installs.
+    """
+
+    __tablename__ = "stored_menus"
+
+    source: Mapped[str] = mapped_column(String(16), primary_key=True)
+    platform_id: Mapped[str] = mapped_column(String(512), primary_key=True)
+    venue_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    city: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    menu_json: Mapped[str] = mapped_column(Text, nullable=False)
+    analysis_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    dish_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    score: Mapped[float | None] = mapped_column(Float, nullable=True)
+    first_seen_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    last_seen_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    submission_count: Mapped[int] = mapped_column(Integer, nullable=False)

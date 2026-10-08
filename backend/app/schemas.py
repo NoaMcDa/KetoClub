@@ -2,7 +2,8 @@
 
 import base64
 import binascii
-from typing import Annotated, Literal
+from datetime import datetime
+from typing import Annotated, Any, Final, Literal, get_args
 
 from pydantic import (
     BaseModel,
@@ -175,3 +176,67 @@ class DiscoverySearchRequest(BaseModel):
         if (self.lat is None) != (self.lon is None):
             raise ValueError("lat and lon must be given together or not at all")
         return self
+
+
+MenuStoreSource = Literal["wolt", "tenbis", "tabit", "ontopo", "scan", "website"]
+"""Where a stored menu came from: the Dart ``MenuSource`` names (#310)."""
+
+MENU_STORE_SOURCES: Final[frozenset[str]] = frozenset(get_args(MenuStoreSource))
+
+MENU_STORE_MAX_PLATFORM_ID: Final = 512
+
+PlatformId = Annotated[
+    str,
+    StringConstraints(
+        strip_whitespace=True, min_length=1, max_length=MENU_STORE_MAX_PLATFORM_ID
+    ),
+]
+
+
+class MenuUploadRequest(BaseModel):
+    """Request body for ``POST /v1/menus`` (#310): one menu a user opened.
+
+    ``(source, platform_id)`` names the venue's menu on its platform (a Wolt
+    slug, a 10bis restaurant id, a scan's or website's own key) and is the
+    stored row's whole identity. Nothing in the body names the sender, and
+    the install id the route requires never reaches the store.
+
+    ``menu`` is the client's normalised menu, stored as-is; its dishes are
+    counted from ``categories[*].dishes``. ``analysis`` is optional, and a
+    top-level numeric ``score`` in it is the only value the backend reads
+    out of it. A null ``venue_name``, ``city`` or ``analysis`` never erases
+    what an earlier upload stored.
+    """
+
+    source: MenuStoreSource
+    platform_id: PlatformId
+    venue_name: str | None = Field(default=None, max_length=200)
+    city: str | None = Field(default=None, max_length=200)
+    menu: dict[str, Any]
+    analysis: dict[str, Any] | None = None
+
+
+class MenuStoredResponse(BaseModel):
+    """A successful ``POST /v1/menus``: 201 when the row is new, else 200."""
+
+    created: bool
+    submission_count: int
+
+
+class StoredMenuResponse(BaseModel):
+    """Response body for ``GET /v1/menus/{source}/{platform_id}`` (#310).
+
+    Timestamps are UTC (stored naive, the ``MenuCache`` convention).
+    """
+
+    source: MenuStoreSource
+    platform_id: str
+    venue_name: str | None
+    city: str | None
+    menu: dict[str, Any]
+    analysis: dict[str, Any] | None
+    dish_count: int
+    score: float | None
+    first_seen_at: datetime
+    last_seen_at: datetime
+    submission_count: int

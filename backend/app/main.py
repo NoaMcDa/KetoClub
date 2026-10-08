@@ -24,7 +24,7 @@ from app.config import Settings, get_settings
 from app.db import build_engine
 from app.errors import BackendError, handle_backend_error, handle_validation_error
 from app.models import Base
-from app.routers import chat, discovery, health, proxy, website
+from app.routers import chat, discovery, health, menus, proxy, website
 from app.services.rate_limit import RateLimiter
 from app.services.request_logging import RequestLoggingMiddleware
 
@@ -125,6 +125,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(proxy.router, prefix="/v1")
     app.include_router(discovery.router, prefix="/v1")
     app.include_router(website.router, prefix="/v1")
+    # The menu store (#310) is opt-out: when disabled it is not mounted at
+    # all, so its paths are an ordinary 404.
+    if resolved_settings.MENU_STORE_ENABLED:
+        app.include_router(menus.router, prefix="/v1")
 
     return app
 
