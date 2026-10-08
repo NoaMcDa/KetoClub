@@ -33,6 +33,10 @@ abstract interface class MenuRepository {
   /// answered from the cache alone, `fromCache: true` and never stale, or
   /// with `scanNotSaved` on a miss, and [forceRefresh] changes nothing for
   /// it. Never throws.
+  ///
+  /// A fresh fetch whose adapter classified the menu as it read it carries
+  /// that analysis on [MenuFetched.analysis], as well as caching it; a
+  /// cached menu never does (issue #331).
   Future<MenuFetchResult> load(VenueRef ref, {bool forceRefresh = false});
 
   /// The cached menu and analysis for [ref], fresh or stale, or null on a miss.
@@ -146,14 +150,16 @@ final class CachedMenuRepository implements MenuRepository {
     switch (result) {
       case MenuFetched(menu: final fetched, :final analysis):
         // An analysis the adapter made while reading the menu (a website
-        // PDF, D19) is the freshest there is; otherwise the cached one is
-        // kept only if the dish text did not change.
+        // PDF, D19; the backend's complete result, D25) is the freshest
+        // there is; otherwise the cached one is kept only if the dish text
+        // did not change. It rides on the result too, so the caller knows
+        // it came with this fetch (issue #331).
         await cache.write(
           analysis != null
               ? CachedMenu(menu: fetched, analysis: analysis)
               : _merge(previous: cached, fetched: fetched),
         );
-        return MenuFetched(menu: fetched);
+        return MenuFetched(menu: fetched, analysis: analysis);
       case MenuFetchFailed(:final reason):
         if (cached != null) {
           return MenuFetched(

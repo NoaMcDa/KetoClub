@@ -174,6 +174,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'בטלפון הזה, ניתוח בינה מלאכותית פונה ישירות ל‑Gemini API של Google עם המפתח שלכם. אפשר ליצור מפתח בחינם ב‑Google AI Studio. המפתח נשמר באחסון המאובטח של המכשיר ונשלח רק ל‑Google.';
 
   @override
+  String get settingsKeyBodyViaBackend =>
+      'בטלפון הזה, ניתוח בינה מלאכותית נשלח קודם לשרת של קטוקלאב. המפתח שלכם משמש רק אם אי אפשר להגיע לשרת: אז המכשיר פונה איתו ישירות ל‑Gemini API של Google. אפשר ליצור מפתח בחינם ב‑Google AI Studio. המפתח נשמר באחסון המאובטח של המכשיר ונשלח רק ל‑Google.';
+
+  @override
   String get settingsKeyHint => 'הדביקו את מפתח ה‑Gemini API שלכם';
 
   @override
@@ -1178,6 +1182,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get scanScreenFailureNeedsServer =>
       'סריקה דורשת את השרת של קטוקלאב, והגרסה הזאת לא מחוברת לשרת. הדבקת טקסט התפריט עדיין עובדת.';
+
+  @override
+  String get scanScreenFailureServerNotConfigured =>
+      'השרת של קטוקלאב עדיין לא מוגדר לקריאת דפי תפריט. הדבקת טקסט התפריט עדיין עובדת.';
 
   @override
   String get scanScreenFailureOffline =>

@@ -1017,6 +1017,9 @@ void main() {
       );
       expect(find.text(_en.settingsConsentBodyDirect), findsNothing);
       expect(find.text(_en.settingsConsentBody), findsNothing);
+      // The key section's note says the same (issue #331).
+      expect(find.text(_en.settingsKeyBodyViaBackend), findsOneWidget);
+      expect(find.text(_en.settingsKeyBody), findsNothing);
       expect(
         _en.settingsConsentBodyDirectViaBackend,
         contains("KetoClub's server"),

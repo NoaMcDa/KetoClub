@@ -121,7 +121,7 @@ class SettingsScreen extends StatefulWidget {
 
   /// Whether this build has a KetoClub backend (issue #330). Only read on
   /// a phone, where it picks between the direct and via-backend consent
-  /// text.
+  /// text and the key section's note (issue #331).
   final bool backendConfigured;
 
   @override
@@ -370,7 +370,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _SectionLabel(l10n.settingsKeySection),
         _SettingsGroup(
           children: [
-            _GroupNote(l10n.settingsKeyBody),
+            // Through the server first with the key as the fallback when
+            // the build has a backend (D25, issue #331).
+            _GroupNote(
+              widget.backendConfigured
+                  ? l10n.settingsKeyBodyViaBackend
+                  : l10n.settingsKeyBody,
+            ),
             Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(16, 6, 16, 4),
               child: TextField(

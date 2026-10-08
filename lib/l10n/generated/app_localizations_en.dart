@@ -173,6 +173,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'On this phone, AI analysis calls Google\'s Gemini API directly with your own key. You can create one for free in Google AI Studio. It is kept in this device\'s secure storage and sent only to Google.';
 
   @override
+  String get settingsKeyBodyViaBackend =>
+      'On this phone, AI analysis goes to KetoClub\'s server first. Your own key is used only if the server cannot be reached: then this device calls Google\'s Gemini API directly with it. You can create one for free in Google AI Studio. It is kept in this device\'s secure storage and sent only to Google.';
+
+  @override
   String get settingsKeyHint => 'Paste your Gemini API key';
 
   @override
@@ -1170,6 +1174,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get scanScreenFailureNeedsServer =>
       'Scanning needs KetoClub\'s server, and this build is not connected to one. Pasting the menu text still works.';
+
+  @override
+  String get scanScreenFailureServerNotConfigured =>
+      'KetoClub\'s server is not set up to read menu pages yet. Pasting the menu text still works.';
 
   @override
   String get scanScreenFailureOffline =>

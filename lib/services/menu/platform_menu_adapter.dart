@@ -42,9 +42,12 @@ final class MenuFetched extends MenuFetchResult {
 
   /// The verdicts for [menu], when the adapter produced them while reading
   /// it: a website's PDF menu, transcribed and classified by the vision
-  /// path in one request (architecture.md D6, D19). The repository caches
-  /// it beside [menu], so the menu screen reuses it rather than spending a
-  /// second model call. Null for every other fetch.
+  /// path in one request (architecture.md D6, D19), or the menu and its
+  /// analysis KetoClub's backend answered with together (D25). The
+  /// repository caches it beside [menu], so the menu screen reuses it
+  /// rather than spending a second model call, and passes it on, so the
+  /// menu screen knows it came with the fetch. Null for every other fetch,
+  /// a cached menu included.
   final MenuAnalysed? analysis;
 
   @override
