@@ -73,8 +73,15 @@ abstract final class MenuQuestionParser {
         reason: MenuQuestionFailureReason.badResponse,
       );
     }
+    // Never cut between the two halves of a surrogate pair (#320).
+    final cut =
+        answer.length > _maxAnswerLength &&
+            answer.codeUnitAt(_maxAnswerLength - 1) >= 0xD800 &&
+            answer.codeUnitAt(_maxAnswerLength - 1) <= 0xDBFF
+        ? _maxAnswerLength - 1
+        : _maxAnswerLength;
     final cappedAnswer = answer.length > _maxAnswerLength
-        ? answer.substring(0, _maxAnswerLength)
+        ? answer.substring(0, cut)
         : answer;
 
     final rawIds = decoded['dish_ids'];

@@ -137,11 +137,16 @@ def wolt_search_url(base_url: str) -> str:
 
 @dataclass(frozen=True)
 class CachedMenuResponse:
-    """A cached Wolt response, detached from its originating session."""
+    """A cached Wolt response, detached from its originating session.
+
+    ``fetched_at`` is when the upstream fetch that wrote the row happened,
+    as an aware UTC timestamp: ``GET /v1/venue-menus`` reports it (#333).
+    """
 
     status_code: int
     content_type: str
     body: str
+    fetched_at: datetime | None = None
 
 
 def _run_in_session[T](engine: Engine, fn: Callable[[Session], T]) -> T:
@@ -191,6 +196,7 @@ def read_cached_menu(
             status_code=row.status_code,
             content_type=row.content_type,
             body=row.body,
+            fetched_at=fetched_at,
         )
 
     return _run_in_session(engine, _read)
@@ -203,12 +209,17 @@ def write_cached_menu(
     status_code: int,
     content_type: str,
     body: str,
+    fetched_at: datetime | None = None,
 ) -> None:
     """Insert or replace the cached response for ``(source, slug)``.
 
     Only ever called for a 2xx upstream response (``backend_plan.md`` §3.3):
-    a failed fetch is never cached.
+    a failed fetch is never cached. ``fetched_at`` (default: now) is when
+    the upstream fetch happened; it is stored naive UTC.
     """
+    moment = fetched_at if fetched_at is not None else datetime.now(UTC)
+    if moment.tzinfo is not None:
+        moment = moment.astimezone(UTC).replace(tzinfo=None)
 
     def _write(session: Session) -> None:
         session.merge(
@@ -218,7 +229,7 @@ def write_cached_menu(
                 status_code=status_code,
                 content_type=content_type,
                 body=body,
-                fetched_at=datetime.now(UTC).replace(tzinfo=None),
+                fetched_at=moment,
             )
         )
 

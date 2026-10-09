@@ -1,10 +1,10 @@
 """SQLAlchemy ORM models.
 
-``menu_cache`` (#95), ``chat_cache`` (#103) and ``stored_menus`` (#310) are
-the tables so far. Future issues declare more tables here against
-``app.db.Base`` — ``venues`` and ``ratings``/``dish_feedback`` (#105, #106),
-``submissions`` (#107) — so one ``Base.metadata.create_all`` call in the
-lifespan creates every table.
+``menu_cache`` (#95), ``chat_cache`` (#103), ``stored_menus`` (#310) and
+``analysis_cache`` (#333) are the tables so far. Future issues declare more
+tables here against ``app.db.Base`` — ``venues`` and
+``ratings``/``dish_feedback`` (#105, #106), ``submissions`` (#107) — so one
+``Base.metadata.create_all`` call in the lifespan creates every table.
 
 No table holds an install id (D12, #164): the id keys the in-memory rate
 limiter and nothing else. ``stored_menus`` in particular is keyed by venue.
@@ -17,7 +17,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
 
-__all__ = ["Base", "ChatCache", "MenuCache", "StoredMenu"]
+__all__ = ["AnalysisCache", "Base", "ChatCache", "MenuCache", "StoredMenu"]
 
 
 class MenuCache(Base):
@@ -100,3 +100,25 @@ class StoredMenu(Base):
     first_seen_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     last_seen_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     submission_count: Mapped[int] = mapped_column(Integer, nullable=False)
+
+
+class AnalysisCache(Base):
+    """A complete LLM analysis of one menu, keyed by request hash (D25, #333).
+
+    ``key`` is ``analysis_cache.cache_key``'s sha256 hex digest over the
+    menu's dish-text fingerprint, the model, the parser's schema version and
+    the options (net-carb limit, dietary constraints): every caller of the
+    same menu under the same options shares one Gemini call. Only an
+    analysis the language model made is ever written here, never a rules
+    fallback. ``analysis_json`` is the Dart ``MenuAnalysed`` JSON, options
+    snapshot included: dish ids, verdicts and the model's text, never an
+    install id. ``created_at`` is a naive UTC timestamp, the
+    ``MenuCache.fetched_at`` convention: a row older than
+    ``Settings.ANALYSIS_CACHE_TTL_SECONDS`` is a miss and is replaced.
+    """
+
+    __tablename__ = "analysis_cache"
+
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    analysis_json: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)

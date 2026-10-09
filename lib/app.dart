@@ -74,7 +74,9 @@ class _KetoClubAppState extends State<KetoClubApp> {
     final dependencies = widget.dependencies;
     _venueSearch = VenueSearchController(
       dependencies.settingsStore,
-      dependencies.menuRepository,
+      // The quick score reads through the device's own adapters, never the
+      // backend's classifying routes (issue #331).
+      dependencies.estimateMenuRepository,
       locationService: dependencies.locationService,
       venueSearchService: dependencies.venueSearchService,
       estimateClassifier: dependencies.estimateClassifier,
@@ -190,6 +192,7 @@ Route<void>? generateRoute(
           locationService: dependencies.locationService,
           settingsStore: dependencies.settingsStore,
           directToGoogle: dependencies.apiKeyStore != null,
+          backendConfigured: dependencies.backendConfigured,
         ),
       ),
     );
@@ -213,6 +216,7 @@ Route<void>? generateRoute(
           child: ScanScreen(
             pagePicker: dependencies.pagePicker,
             directToGoogle: dependencies.apiKeyStore != null,
+            backendConfigured: dependencies.backendConfigured,
           ),
         ),
       ),
@@ -250,6 +254,7 @@ Route<void>? generateRoute(
           child: SettingsScreen(
             appInfo: dependencies.appInfo,
             externalLinkOpener: dependencies.externalLinkOpener,
+            backendConfigured: dependencies.backendConfigured,
           ),
         ),
       ),

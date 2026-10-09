@@ -82,6 +82,7 @@ class VenueSearchScreen extends StatefulWidget {
     required this.locationService,
     required this.settingsStore,
     this.directToGoogle = false,
+    this.backendConfigured = false,
     this.autofocusSearch,
     super.key,
   });
@@ -107,6 +108,11 @@ class VenueSearchScreen extends StatefulWidget {
   /// device (iOS and Android, D17), so the disclosure banner says so
   /// rather than naming KetoClub's server (web, D12).
   final bool directToGoogle;
+
+  /// Whether this build has a KetoClub backend (issues #330, #331): on a
+  /// phone the disclosure banner then says dish text goes to the server
+  /// first, with the user's own key only as the fallback.
+  final bool backendConfigured;
 
   /// Whether the search field takes focus as soon as the screen opens
   /// (issue #264). Null, the default, means the web build on a desktop
@@ -229,6 +235,7 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
                 ConsentDisclosureBanner(
                   settingsStore: widget.settingsStore,
                   directToGoogle: widget.directToGoogle,
+                  backendConfigured: widget.backendConfigured,
                 ),
                 _header(context, l10n, controller),
                 const SizedBox(height: 12),

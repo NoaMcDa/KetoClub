@@ -1,15 +1,18 @@
 // Flow test (FLOW_TEST_CONVENTIONS.md, architecture.md §18.4, D17; issue
-// #194): on iOS and Android the app talks to Wolt and to Google's Gemini
-// API itself — never through KetoClub's backend, even when a backend URL
-// is compiled in.
+// #194): on iOS and Android built with no backend URL, the app talks to
+// Wolt and to Google's Gemini API itself. (Since D25 a phone built *with*
+// a backend asks it first; `backend_classify_flow_test.dart` and
+// `backend_fallback_flow_test.dart` cover that build.)
 //
 // Everything from the HTTP client up is real and wired the way `di.dart`
-// wires a phone build: a real `CachedMenuRepository` over a real
-// `WoltMenuAdapter` whose proxy base comes from `menuProxyBase` with
-// `runsInBrowser: false`, and a real `RoutingMenuClassifier` over a real
-// `LlmMenuClassifier` whose chat client comes from `chatClientFor` given a
-// key store. Only the network itself is scripted, by one `MockClient` that
-// records every request, so the flow can assert where each one went.
+// wires a phone build with no backend: a real `CachedMenuRepository` over
+// the adapters `menuAdaptersFor` answers — a real `WoltMenuAdapter` whose
+// proxy base comes from `menuProxyBase` with `runsInBrowser: false` — and a
+// real `RoutingMenuClassifier` over the engine `llmClassifierFor` answers,
+// a real `LlmMenuClassifier` whose chat client comes from
+// `deviceChatClientFor` given a key store. Only the network itself is
+// scripted, by one `MockClient` that records every request, so the flow
+// can assert where each one went.
 
 import 'dart:convert';
 
@@ -24,6 +27,7 @@ import 'package:ketoclub/screens/settings_screen.dart';
 import 'package:ketoclub/services/classifier/classifier_router.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/llm_menu_classifier.dart';
+import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/menu/wolt/wolt_adapter.dart';
 import 'package:ketoclub/services/storage/install_id_store.dart';
@@ -40,9 +44,8 @@ final AppLocalizations _en = AppLocalizationsEn();
 const String _woltUrl =
     'https://wolt.com/en/isr/tel-aviv/restaurant/direct-venue';
 
-/// A backend URL, compiled in as a web build would have it. A phone must
-/// ignore it for both the menu and the analysis.
-const String _configuredBackend = 'http://localhost:8000';
+/// The backend URL this build was compiled with: none.
+const String _configuredBackend = '';
 
 /// The key the user saved in Settings.
 const String _key = 'AIza-flow-test-key';
@@ -109,28 +112,39 @@ void _wirePhoneBuild(
   fakes
     ..apiKeyStore = keys
     ..repositoryOverride = CachedMenuRepository(
-      adapters: [
-        WoltMenuAdapter(
-          client: network.client,
-          proxyBase: menuProxyBase(
+      adapters: menuAdaptersFor(
+        backendBase: backendBaseUrl(_configuredBackend),
+        client: network.client,
+        installIdStore: network.installIds,
+        readOptions: () async => const ClassificationOptions(),
+        direct: [
+          WoltMenuAdapter(
+            client: network.client,
+            proxyBase: menuProxyBase(
+              runsInBrowser: false,
+              configured: _configuredBackend,
+            ),
             runsInBrowser: false,
-            configured: _configuredBackend,
           ),
-          runsInBrowser: false,
-        ),
-      ],
+        ],
+      ),
       cache: FlowForgetfulMenuCache(),
       clock: fakes.clock,
     )
     ..classifierOverride = RoutingMenuClassifier(
-      LlmMenuClassifier(
-        chatClientFor(
-          client: network.client,
-          apiKeyStore: keys,
-          backendBase: backendBaseUrl(_configuredBackend),
-          installIdStore: network.installIds,
+      llmClassifierFor(
+        backendBase: backendBaseUrl(_configuredBackend),
+        client: network.client,
+        installIdStore: network.installIds,
+        device: LlmMenuClassifier(
+          deviceChatClientFor(
+            client: network.client,
+            apiKeyStore: keys,
+            backendBase: backendBaseUrl(_configuredBackend),
+            installIdStore: network.installIds,
+          ),
+          fakes.clock,
         ),
-        fakes.clock,
       ),
       HeuristicMenuClassifier(clock: fakes.clock),
       fakes.connectivity,
@@ -166,7 +180,7 @@ final class _Network {
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  group('Direct Wolt and Gemini flow on a phone (D17)', () {
+  group('Direct Wolt and Gemini flow on a phone with no backend (D17)', () {
     testWidgets(
       'with a key saved, the menu comes from Wolt and the verdicts from '
       "Gemini, and KetoClub's backend is never called",
@@ -257,9 +271,9 @@ void main() {
   });
 }
 
-/// The install id store a phone build never reads for analysis: its only
-/// reader there is the backend chat client, which `chatClientFor` does not
-/// build when given a key store. Counts reads so the flow can say so.
+/// The install id store a phone build with no backend never reads: its
+/// only readers are KetoClub's backend clients, which the selectors do not
+/// build without a backend URL. Counts reads so the flow can say so.
 final class _CountingInstallIdStore implements InstallIdStore {
   /// How many times [id] was called.
   int reads = 0;

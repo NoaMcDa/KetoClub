@@ -3421,6 +3421,158 @@ void main() {
       expect(store.uploads, isEmpty);
     });
 
+    /// An analysis of [menu] by [engine] under the default settings, made
+    /// at [analysedAt], as KetoClub's backend answers with one (D25).
+    MenuAnalysed arrivedAnalysis(
+      Menu menu, {
+      AnalysisEngine engine = const LlmEngine(model: 'server-model'),
+      DateTime? analysedAt,
+    }) => MenuAnalysed(
+      dishes: [
+        for (final dish in menu.allDishes)
+          _verdictFor(dish, DishVerdict.orderAsIs),
+      ],
+      unclassified: const <String>[],
+      engine: engine,
+      analysedAt: analysedAt ?? DateTime.utc(2026, 3),
+      options: ClassificationOptions.fromSettings(const AppSettings()).snapshot,
+      schemaVersion: MenuResponseParser.schemaVersion,
+    );
+
+    /// Stubs [_ref] to fetch [menu] with [analysis] riding on the fetch,
+    /// cached beside it as the real repository does.
+    void stubArrived(Menu menu, MenuAnalysed analysis) {
+      repository
+        ..stub(_ref, MenuFetched(menu: menu, analysis: analysis))
+        ..seedCache(CachedMenu(menu: menu, analysis: analysis));
+    }
+
+    test('a new venue whose model analysis arrived with the fetch is shown '
+        'without classifying and is not uploaded: the backend stored it '
+        '(issue #331)', () async {
+      // Arrange
+      final menu = _menuOf([steak]);
+      final analysis = arrivedAnalysis(menu);
+      stubArrived(menu, analysis);
+
+      // Act
+      final controller = await openOnce(
+        hint: const VenueOpenHint(name: 'Vitrina', city: 'Tel Aviv'),
+      );
+
+      // Assert
+      expect(controller.analysis, analysis);
+      expect(classifier.calls, isEmpty);
+      expect(store.uploads, isEmpty);
+      expect(history.recordCalls, hasLength(1));
+    });
+
+    test('a known venue whose fresh analysis arrived with the fetch is not '
+        'uploaded either (issue #331)', () async {
+      // Arrange: the analysis is newer than the last visit.
+      history.seed(visit(lastOpenedAt: DateTime.utc(2026)));
+      final menu = _menuOf([steak]);
+      stubArrived(
+        menu,
+        arrivedAnalysis(menu, analysedAt: DateTime.utc(2026, 2)),
+      );
+
+      // Act
+      await openOnce();
+
+      // Assert
+      expect(classifier.calls, isEmpty);
+      expect(store.uploads, isEmpty);
+    });
+
+    test(
+      'a rules analysis that arrived with the fetch is classified again '
+      'here, and a model analysis made here is uploaded (issue #331)',
+      () async {
+        // Arrange: the server's model failed, so it answered with rules.
+        final menu = _menuOf([steak]);
+        stubArrived(
+          menu,
+          arrivedAnalysis(
+            menu,
+            engine: const RulesEngine(
+              reason: MenuAnalysisFailureReason.rateLimited,
+            ),
+          ),
+        );
+        classifier.derivedEngine = const LlmEngine(model: 'device-model');
+
+        // Act
+        final controller = await openOnce();
+
+        // Assert
+        expect(classifier.calls, hasLength(1));
+        expect(store.uploads.single.analysis, controller.analysis);
+      },
+    );
+
+    test('a rules analysis that arrived with the fetch and a rules result '
+        'here upload nothing: the backend has the menu (issue #331)', () async {
+      // Arrange
+      final menu = _menuOf([steak]);
+      stubArrived(
+        menu,
+        arrivedAnalysis(
+          menu,
+          engine: const RulesEngine(
+            reason: MenuAnalysisFailureReason.rateLimited,
+          ),
+        ),
+      );
+
+      // Act
+      await openOnce();
+
+      // Assert: the fake classifier's default result is a rules one.
+      expect(classifier.calls, hasLength(1));
+      expect(store.uploads, isEmpty);
+    });
+
+    test('a refresh whose refetch carried a reusable analysis shows it '
+        'without classifying again (issue #331)', () async {
+      // Arrange: opened once, then the menu changed upstream.
+      repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+      final controller = await openOnce();
+      final changed = _menuOf([steak, salad]);
+      final analysis = arrivedAnalysis(changed);
+      stubArrived(changed, analysis);
+      final callsBefore = classifier.calls.length;
+
+      // Act
+      await controller.refresh();
+
+      // Assert
+      expect(controller.analysis, analysis);
+      expect(classifier.calls, hasLength(callsBefore));
+    });
+
+    test('a refresh whose refetch carried a rules analysis classifies again '
+        '(issue #331)', () async {
+      // Arrange
+      repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));
+      final controller = await openOnce();
+      final changed = _menuOf([steak, salad]);
+      stubArrived(
+        changed,
+        arrivedAnalysis(
+          changed,
+          engine: const RulesEngine(reason: MenuAnalysisFailureReason.timeout),
+        ),
+      );
+      final callsBefore = classifier.calls.length;
+
+      // Act
+      await controller.refresh();
+
+      // Assert
+      expect(classifier.calls, hasLength(callsBefore + 1));
+    });
+
     test('lastUpload completes only once the upload has finished', () async {
       // Arrange
       repository.stub(_ref, MenuFetched(menu: _menuOf([steak])));

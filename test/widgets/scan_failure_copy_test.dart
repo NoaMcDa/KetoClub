@@ -42,6 +42,52 @@ void main() {
         );
       });
 
+      test('with a backend, notConfigured names the server on web and '
+          'phones alike, apart from both no-backend messages in $language '
+          '(issue #331)', () {
+        // Act
+        String message({required bool direct, required bool backend}) =>
+            scanFailureMessage(
+              MenuAnalysisFailureReason.notConfigured,
+              l10n,
+              directToGoogle: direct,
+              backendConfigured: backend,
+            );
+
+        // Assert
+        expect(
+          message(direct: true, backend: true),
+          l10n.scanScreenFailureServerNotConfigured,
+        );
+        expect(
+          message(direct: false, backend: true),
+          l10n.scanScreenFailureServerNotConfigured,
+        );
+        expect(<String>{
+          l10n.scanScreenFailureServerNotConfigured,
+          message(direct: true, backend: false),
+          message(direct: false, backend: false),
+        }, hasLength(3));
+      });
+
+      test('with a backend every reason still has its own copy in '
+          '$language', () {
+        // Act
+        final messages = [
+          for (final reason in MenuAnalysisFailureReason.values)
+            scanFailureMessage(
+              reason,
+              l10n,
+              directToGoogle: true,
+              backendConfigured: true,
+            ),
+        ];
+
+        // Assert
+        expect(messages, everyElement(isNotEmpty));
+        expect(messages.toSet(), hasLength(messages.length));
+      });
+
       test('no scan message promises rule-based results in $language', () {
         // A photograph has no rules fallback (architecture.md D15).
         for (final reason in MenuAnalysisFailureReason.values) {

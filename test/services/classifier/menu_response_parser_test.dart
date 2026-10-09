@@ -521,6 +521,35 @@ void main() {
         expect(analysed.why, hasLength(maxWhyLength));
         expect(analysed.why, rawWhy.substring(0, maxWhyLength));
       });
+
+      test('parse given a why whose cut would split an emoji drops the '
+          'whole emoji rather than leaving a lone surrogate (#320)', () {
+        // Arrange: the emoji's two UTF-16 halves straddle maxWhyLength.
+        final source = _menuOf([_dish('dish-steak', 'Grilled Steak')]);
+        final why = '${'a' * (maxWhyLength - 1)}\u{1F969}tail';
+        final body = jsonEncode({
+          'dishes': [
+            {
+              'id': 'dish-steak',
+              'name': 'Grilled Steak',
+              'verdict': 'orderAsIs',
+              'why': why,
+              'modification': null,
+              'net_carbs_estimate': null,
+              'hidden_carbs': <Object?>[],
+            },
+          ],
+        });
+
+        // Act
+        final result = _parse(body, source) as MenuAnalysed;
+
+        // Assert
+        final analysed = result.dishes.single;
+        expect(analysed.why, 'a' * (maxWhyLength - 1));
+        final last = analysed.why.codeUnitAt(analysed.why.length - 1);
+        expect(last >= 0xD800 && last <= 0xDBFF, isFalse);
+      });
     });
 
     group('parse given a dish the model skipped entirely (rule 7)', () {

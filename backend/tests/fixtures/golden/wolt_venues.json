@@ -1,0 +1,1148 @@
+[
+  {
+    "name": "wolt_pages_restaurants.json",
+    "raw": {
+      "_fixture_note": "SYNTHETIC, not a recorded Wolt response. Hand-built from phase2_discovery_research.md section 2.1 (the pages/restaurants venue object) because consumer-api.wolt.com is unreachable from the build environment. Re-record per section 2.4 before release and keep this key or change wolt_venue_mapper_test.dart with it. See test/fixtures/README.md, 'Wolt discovery'.",
+      "city": "tel-aviv",
+      "created": {
+        "$date": 1790000000000
+      },
+      "expires_in_seconds": 300,
+      "sections": [
+        {
+          "items": [
+            {
+              "image": {
+                "blurhash": "j2UeTQ1bJ3DaYWq",
+                "url": "https://imageproxy.wolt.com/promo/free.jpg"
+              },
+              "link": {
+                "target": "promo-1",
+                "type": "url"
+              },
+              "template": "banner",
+              "title": "Free delivery this week",
+              "track_id": "promo-free-delivery"
+            },
+            {
+              "image": {
+                "blurhash": "j2UeTQ1bJ3DaYWq",
+                "url": "https://imageproxy.wolt.com/venue/vitrina-lilinblum.jpg"
+              },
+              "link": {
+                "target": "vitrinalilin0001",
+                "type": "venue-id"
+              },
+              "template": "venue-large",
+              "title": "Vitrina",
+              "track_id": "venue-vitrina-lilinblum",
+              "unknown_item_key": "ignored",
+              "venue": {
+                "address": "Lilienblum St 36, Tel Aviv",
+                "badges": [],
+                "brand_image": {
+                  "blurhash": "j2UeTQ1bJ3DaYWq",
+                  "url": "https://imageproxy.wolt.com/brand/vitrina-lilinblum.jpg"
+                },
+                "city": "Tel Aviv",
+                "country": "ISR",
+                "currency": "ILS",
+                "delivers": true,
+                "delivery_price_int": 1500,
+                "estimate": 25,
+                "estimate_range": "20-30",
+                "id": "vitrinalilin0001",
+                "location": [
+                  34.7702,
+                  32.0625
+                ],
+                "name": "Vitrina",
+                "online": true,
+                "price_range": 2,
+                "product_line": "restaurant",
+                "promotions": [],
+                "rating": {
+                  "rating": 4,
+                  "score": 9.2,
+                  "unknown_rating_key": true,
+                  "volume": 250
+                },
+                "short_description": "Burgers and sandwiches",
+                "slug": "vitrina-lilinblum",
+                "tags": [
+                  "burgers",
+                  "sandwiches"
+                ],
+                "unknown_venue_key": {
+                  "nested": [
+                    1,
+                    2,
+                    3
+                  ]
+                }
+              }
+            },
+            {
+              "image": {
+                "blurhash": "j2UeTQ1bJ3DaYWq",
+                "url": "https://imageproxy.wolt.com/venue/hakosem.jpg"
+              },
+              "link": {
+                "target": "hakosem0001",
+                "type": "venue-id"
+              },
+              "template": "venue-large",
+              "title": "הקוסם",
+              "track_id": "venue-hakosem",
+              "unknown_item_key": "ignored",
+              "venue": {
+                "address": "שלמה המלך 1, תל אביב",
+                "badges": [],
+                "brand_image": {
+                  "blurhash": "j2UeTQ1bJ3DaYWq",
+                  "url": "https://imageproxy.wolt.com/brand/hakosem.jpg"
+                },
+                "city": "Tel Aviv",
+                "country": "ISR",
+                "currency": "ILS",
+                "delivers": true,
+                "delivery_price_int": 1500,
+                "estimate": 20,
+                "estimate_range": "15-25",
+                "id": "hakosem0001",
+                "location": [
+                  34.773,
+                  32.0795
+                ],
+                "name": "הקוסם",
+                "online": true,
+                "price_range": 2,
+                "product_line": "restaurant",
+                "promotions": [],
+                "rating": {
+                  "rating": 4,
+                  "score": 9.6,
+                  "unknown_rating_key": true,
+                  "volume": 250
+                },
+                "short_description": "פלאפל ושווארמה",
+                "slug": "hakosem",
+                "tags": [
+                  "falafel",
+                  "מזרחי"
+                ],
+                "unknown_venue_key": {
+                  "nested": [
+                    1,
+                    2,
+                    3
+                  ]
+                }
+              }
+            }
+          ],
+          "name": "popular",
+          "template": "venue-large-carousel",
+          "title": "Popular right now",
+          "unknown_section_key": [
+            "ignored"
+          ]
+        },
+        {
+          "items": [
+            {
+              "image": {
+                "blurhash": "j2UeTQ1bJ3DaYWq",
+                "url": "https://imageproxy.wolt.com/venue/vitrina-lilinblum.jpg"
+              },
+              "link": {
+                "target": "vitrinalilin0001",
+                "type": "venue-id"
+              },
+              "template": "venue-large",
+              "title": "Vitrina (listed again)",
+              "track_id": "venue-vitrina-lilinblum",
+              "unknown_item_key": "ignored",
+              "venue": {
+                "address": "Lilienblum St 36, Tel Aviv",
+                "badges": [],
+                "brand_image": {
+                  "blurhash": "j2UeTQ1bJ3DaYWq",
+                  "url": "https://imageproxy.wolt.com/brand/vitrina-lilinblum.jpg"
+                },
+                "city": "Tel Aviv",
+                "country": "ISR",
+                "currency": "ILS",
+                "delivers": true,
+                "delivery_price_int": 1500,
+                "estimate": 25,
+                "estimate_range": "20-30",
+                "id": "vitrinalilin0001",
+                "location": [
+                  34.7702,
+                  32.0625
+                ],
+                "name": "Vitrina (listed again)",
+                "online": true,
+                "price_range": 2,
+                "product_line": "restaurant",
+                "promotions": [],
+                "rating": {
+                  "rating": 4,
+                  "score": 9.2,
+                  "unknown_rating_key": true,
+                  "volume": 250
+                },
+                "short_description": "Burgers and sandwiches",
+                "slug": "vitrina-lilinblum",
+                "tags": [
+                  "burgers",
+                  "sandwiches"
+                ],
+                "unknown_venue_key": {
+                  "nested": [
+                    1,
+                    2,
+                    3
+                  ]
+                }
+              }
+            },
+            {
+              "image": {
+                "blurhash": "j2UeTQ1bJ3DaYWq",
+                "url": "https://imageproxy.wolt.com/venue/shila-sharon-cohen.jpg"
+              },
+              "link": {
+                "target": "shilasharonc0001",
+                "type": "venue-id"
+              },
+              "template": "venue-large",
+              "title": "Shila",
+              "track_id": "venue-shila-sharon-cohen",
+              "unknown_item_key": "ignored",
+              "venue": {
+                "address": "Ben Yehuda St 182, Tel Aviv",
+                "badges": [],
+                "brand_image": {
+                  "blurhash": "j2UeTQ1bJ3DaYWq",
+                  "url": "https://imageproxy.wolt.com/brand/shila-sharon-cohen.jpg"
+                },
+                "city": "Tel Aviv",
+                "country": "ISR",
+                "currency": "ILS",
+                "delivers": true,
+                "delivery_price_int": 1500,
+                "estimate": 35,
+                "estimate_range": "30-40",
+                "id": "shilasharonc0001",
+                "location": [
+                  34.7738,
+                  32.0874
+                ],
+                "name": "Shila",
+                "online": false,
+                "price_range": 2,
+                "product_line": "restaurant",
+                "promotions": [],
+                "rating": {
+                  "rating": 4,
+                  "score": 8.8,
+                  "unknown_rating_key": true,
+                  "volume": 250
+                },
+                "short_description": "Seafood bar",
+                "slug": "shila-sharon-cohen",
+                "tags": [
+                  "seafood"
+                ],
+                "unknown_venue_key": {
+                  "nested": [
+                    1,
+                    2,
+                    3
+                  ]
+                }
+              }
+            },
+            {
+              "link": {
+                "target": "mashya0001",
+                "type": "venue-id"
+              },
+              "template": "venue-large",
+              "title": "משייה",
+              "track_id": "venue-mashya",
+              "unknown_item_key": "ignored",
+              "venue": {
+                "address": "מנדלי מוכר ספרים 5, תל אביב",
+                "badges": [],
+                "city": "Tel Aviv",
+                "country": "ISR",
+                "currency": "ILS",
+                "delivers": true,
+                "delivery_price_int": 1500,
+                "estimate": 40,
+                "estimate_range": "35-45",
+                "id": "mashya0001",
+                "location": [
+                  34.7685,
+                  32.0822
+                ],
+                "name": "משייה",
+                "online": true,
+                "price_range": 2,
+                "product_line": "restaurant",
+                "promotions": [],
+                "rating": {
+                  "rating": 4,
+                  "score": 9,
+                  "unknown_rating_key": true,
+                  "volume": 250
+                },
+                "slug": "mashya",
+                "tags": [
+                  "israeli"
+                ],
+                "unknown_venue_key": {
+                  "nested": [
+                    1,
+                    2,
+                    3
+                  ]
+                }
+              }
+            },
+            {
+              "image": {
+                "blurhash": "j2UeTQ1bJ3DaYWq",
+                "url": "https://imageproxy.wolt.com/venue/ghost-kitchen-tlv.jpg"
+              },
+              "link": {
+                "target": "ghostkitchen0001",
+                "type": "venue-id"
+              },
+              "template": "venue-large",
+              "title": "Ghost Kitchen",
+              "track_id": "venue-ghost-kitchen-tlv",
+              "unknown_item_key": "ignored",
+              "venue": {
+                "badges": [],
+                "brand_image": {
+                  "blurhash": "j2UeTQ1bJ3DaYWq",
+                  "url": "https://imageproxy.wolt.com/brand/ghost-kitchen-tlv.jpg"
+                },
+                "city": "Tel Aviv",
+                "country": "ISR",
+                "currency": "ILS",
+                "delivers": true,
+                "delivery_price_int": 1500,
+                "estimate": 30,
+                "estimate_range": "25-35",
+                "id": "ghostkitchen0001",
+                "name": "Ghost Kitchen",
+                "online": true,
+                "price_range": 2,
+                "product_line": "restaurant",
+                "promotions": [],
+                "rating": {
+                  "rating": 4,
+                  "score": 7.4,
+                  "unknown_rating_key": true,
+                  "volume": 250
+                },
+                "short_description": "Delivery only",
+                "slug": "ghost-kitchen-tlv",
+                "tags": [],
+                "unknown_venue_key": {
+                  "nested": [
+                    1,
+                    2,
+                    3
+                  ]
+                }
+              }
+            },
+            {
+              "image": {
+                "blurhash": "j2UeTQ1bJ3DaYWq",
+                "url": "https://imageproxy.wolt.com/venue/port-said.jpg"
+              },
+              "link": {
+                "target": "portsaid0001",
+                "type": "venue-id"
+              },
+              "template": "venue-large",
+              "title": "פורט סעיד",
+              "track_id": "venue-port-said",
+              "unknown_item_key": "ignored",
+              "venue": {
+                "address": "הר סיני 5, תל אביב",
+                "badges": [],
+                "brand_image": {
+                  "blurhash": "j2UeTQ1bJ3DaYWq",
+                  "url": "https://imageproxy.wolt.com/brand/port-said.jpg"
+                },
+                "city": "Tel Aviv",
+                "country": "ISR",
+                "currency": "ILS",
+                "delivers": true,
+                "delivery_price_int": 1500,
+                "estimate": 30,
+                "estimate_range": "25-35",
+                "id": "portsaid0001",
+                "location": [
+                  34.7727,
+                  32.0636
+                ],
+                "name": "פורט סעיד",
+                "online": true,
+                "price_range": 2,
+                "product_line": "restaurant",
+                "promotions": [],
+                "slug": "port-said",
+                "tags": [
+                  "mediterranean"
+                ],
+                "unknown_venue_key": {
+                  "nested": [
+                    1,
+                    2,
+                    3
+                  ]
+                }
+              }
+            }
+          ],
+          "name": "restaurants",
+          "template": "venue-vertical-list",
+          "title": "All restaurants"
+        }
+      ]
+    },
+    "venues": [
+      {
+        "address": "Lilienblum St 36, Tel Aviv",
+        "city": "Tel Aviv",
+        "cuisineTags": [
+          "burgers",
+          "sandwiches"
+        ],
+        "estimateMinutes": 25,
+        "imageUrl": "https://imageproxy.wolt.com/venue/vitrina-lilinblum.jpg",
+        "isOnline": true,
+        "latitude": 32.0625,
+        "longitude": 34.7702,
+        "name": "Vitrina",
+        "platformRating": 9.2,
+        "ref": {
+          "platformId": "vitrina-lilinblum",
+          "source": "wolt"
+        },
+        "shortDescription": "Burgers and sandwiches",
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/vitrina-lilinblum"
+      },
+      {
+        "address": "שלמה המלך 1, תל אביב",
+        "city": "Tel Aviv",
+        "cuisineTags": [
+          "falafel",
+          "מזרחי"
+        ],
+        "estimateMinutes": 20,
+        "imageUrl": "https://imageproxy.wolt.com/venue/hakosem.jpg",
+        "isOnline": true,
+        "latitude": 32.0795,
+        "longitude": 34.773,
+        "name": "הקוסם",
+        "platformRating": 9.6,
+        "ref": {
+          "platformId": "hakosem",
+          "source": "wolt"
+        },
+        "shortDescription": "פלאפל ושווארמה",
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/hakosem"
+      },
+      {
+        "address": "Ben Yehuda St 182, Tel Aviv",
+        "city": "Tel Aviv",
+        "cuisineTags": [
+          "seafood"
+        ],
+        "estimateMinutes": 35,
+        "imageUrl": "https://imageproxy.wolt.com/venue/shila-sharon-cohen.jpg",
+        "isOnline": false,
+        "latitude": 32.0874,
+        "longitude": 34.7738,
+        "name": "Shila",
+        "platformRating": 8.8,
+        "ref": {
+          "platformId": "shila-sharon-cohen",
+          "source": "wolt"
+        },
+        "shortDescription": "Seafood bar",
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/shila-sharon-cohen"
+      },
+      {
+        "address": "מנדלי מוכר ספרים 5, תל אביב",
+        "city": "Tel Aviv",
+        "cuisineTags": [
+          "israeli"
+        ],
+        "estimateMinutes": 40,
+        "imageUrl": null,
+        "isOnline": true,
+        "latitude": 32.0822,
+        "longitude": 34.7685,
+        "name": "משייה",
+        "platformRating": 9.0,
+        "ref": {
+          "platformId": "mashya",
+          "source": "wolt"
+        },
+        "shortDescription": null,
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/mashya"
+      },
+      {
+        "address": null,
+        "city": "Tel Aviv",
+        "cuisineTags": [],
+        "estimateMinutes": 30,
+        "imageUrl": "https://imageproxy.wolt.com/venue/ghost-kitchen-tlv.jpg",
+        "isOnline": true,
+        "latitude": null,
+        "longitude": null,
+        "name": "Ghost Kitchen",
+        "platformRating": 7.4,
+        "ref": {
+          "platformId": "ghost-kitchen-tlv",
+          "source": "wolt"
+        },
+        "shortDescription": "Delivery only",
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/ghost-kitchen-tlv"
+      },
+      {
+        "address": "הר סיני 5, תל אביב",
+        "city": "Tel Aviv",
+        "cuisineTags": [
+          "mediterranean"
+        ],
+        "estimateMinutes": 30,
+        "imageUrl": "https://imageproxy.wolt.com/venue/port-said.jpg",
+        "isOnline": true,
+        "latitude": 32.0636,
+        "longitude": 34.7727,
+        "name": "פורט סעיד",
+        "platformRating": null,
+        "ref": {
+          "platformId": "port-said",
+          "source": "wolt"
+        },
+        "shortDescription": null,
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/port-said"
+      }
+    ]
+  },
+  {
+    "name": "wolt_pages_search.json",
+    "raw": {
+      "_fixture_note": "SYNTHETIC, not a recorded Wolt response. Hand-built from phase2_discovery_research.md section 2.1 (the pages/search venue object) because restaurant-api.wolt.com is unreachable from the build environment. Re-record per section 2.4 before release and keep this key or change wolt_venue_mapper_test.dart with it. See test/fixtures/README.md, 'Wolt discovery'.",
+      "query": "pizza",
+      "sections": [
+        {
+          "items": [
+            {
+              "image": {
+                "blurhash": "j2UeTQ1bJ3DaYWq",
+                "url": "https://imageproxy.wolt.com/venue/pizza-romana.jpg"
+              },
+              "link": {
+                "target": "pizzaromana0001",
+                "type": "venue-id"
+              },
+              "template": "venue-large",
+              "title": "Pizza Romana",
+              "track_id": "venue-pizza-romana",
+              "unknown_item_key": "ignored",
+              "venue": {
+                "address": "Ibn Gabirol St 60, Tel Aviv",
+                "badges": [],
+                "brand_image": {
+                  "blurhash": "j2UeTQ1bJ3DaYWq",
+                  "url": "https://imageproxy.wolt.com/brand/pizza-romana.jpg"
+                },
+                "city": "Tel Aviv",
+                "country": "ISR",
+                "currency": "ILS",
+                "delivers": true,
+                "delivery_price_int": 1500,
+                "estimate": 30,
+                "estimate_range": "25-35",
+                "id": "pizzaromana0001",
+                "location": [
+                  34.7784,
+                  32.0741
+                ],
+                "name": "Pizza Romana",
+                "online": true,
+                "price_range": 2,
+                "product_line": "restaurant",
+                "promotions": [],
+                "rating": {
+                  "rating": 4,
+                  "score": 8.9,
+                  "unknown_rating_key": true,
+                  "volume": 250
+                },
+                "short_description": "Roman-style pizza",
+                "slug": "pizza-romana",
+                "tags": [
+                  "pizza",
+                  "italian"
+                ],
+                "unknown_venue_key": {
+                  "nested": [
+                    1,
+                    2,
+                    3
+                  ]
+                }
+              }
+            },
+            {
+              "link": {
+                "target": "pizzalena0001",
+                "type": "venue-id"
+              },
+              "template": "venue-large",
+              "title": "פיצה לנה",
+              "track_id": "venue-pizza-lena",
+              "unknown_item_key": "ignored",
+              "venue": {
+                "address": "דיזנגוף 200, תל אביב",
+                "badges": [],
+                "city": "Tel Aviv",
+                "country": "ISR",
+                "currency": "ILS",
+                "delivers": true,
+                "delivery_price_int": 1500,
+                "estimate": 25,
+                "estimate_range": "20-30",
+                "id": "pizzalena0001",
+                "location": [
+                  34.7805,
+                  32.0856
+                ],
+                "name": "פיצה לנה",
+                "online": true,
+                "price_range": 2,
+                "product_line": "restaurant",
+                "promotions": [],
+                "rating": {
+                  "rating": 4,
+                  "score": 9.1,
+                  "unknown_rating_key": true,
+                  "volume": 250
+                },
+                "slug": "pizza-lena",
+                "tags": [
+                  "pizza"
+                ],
+                "unknown_venue_key": {
+                  "nested": [
+                    1,
+                    2,
+                    3
+                  ]
+                }
+              }
+            },
+            {
+              "image": {
+                "blurhash": "j2UeTQ1bJ3DaYWq",
+                "url": "https://imageproxy.wolt.com/venue/tony-vespa-allenby.jpg"
+              },
+              "link": {
+                "target": "tonyvespaall0001",
+                "type": "venue-id"
+              },
+              "template": "venue-large",
+              "title": "Tony Vespa",
+              "track_id": "venue-tony-vespa-allenby",
+              "unknown_item_key": "ignored",
+              "venue": {
+                "badges": [],
+                "brand_image": {
+                  "blurhash": "j2UeTQ1bJ3DaYWq",
+                  "url": "https://imageproxy.wolt.com/brand/tony-vespa-allenby.jpg"
+                },
+                "city": "Tel Aviv",
+                "country": "ISR",
+                "currency": "ILS",
+                "delivers": true,
+                "delivery_price_int": 1500,
+                "estimate": 20,
+                "estimate_range": "15-25",
+                "id": "tonyvespaall0001",
+                "location": [
+                  34.7717,
+                  32.068
+                ],
+                "name": "Tony Vespa",
+                "online": false,
+                "price_range": 2,
+                "product_line": "restaurant",
+                "promotions": [],
+                "rating": {
+                  "rating": 4,
+                  "score": 8.1,
+                  "unknown_rating_key": true,
+                  "volume": 250
+                },
+                "short_description": "Pizza by the slice",
+                "slug": "tony-vespa-allenby",
+                "tags": [
+                  "pizza"
+                ],
+                "unknown_venue_key": {
+                  "nested": [
+                    1,
+                    2,
+                    3
+                  ]
+                }
+              }
+            },
+            {
+              "image": {
+                "blurhash": "j2UeTQ1bJ3DaYWq",
+                "url": "https://imageproxy.wolt.com/venue/pizza-cloud.jpg"
+              },
+              "link": {
+                "target": "pizzacloud0001",
+                "type": "venue-id"
+              },
+              "template": "venue-large",
+              "title": "Pizza Cloud",
+              "track_id": "venue-pizza-cloud",
+              "unknown_item_key": "ignored",
+              "venue": {
+                "badges": [],
+                "brand_image": {
+                  "blurhash": "j2UeTQ1bJ3DaYWq",
+                  "url": "https://imageproxy.wolt.com/brand/pizza-cloud.jpg"
+                },
+                "city": "Tel Aviv",
+                "country": "ISR",
+                "currency": "ILS",
+                "delivers": true,
+                "delivery_price_int": 1500,
+                "id": "pizzacloud0001",
+                "name": "Pizza Cloud",
+                "online": true,
+                "price_range": 2,
+                "product_line": "restaurant",
+                "promotions": [],
+                "slug": "pizza-cloud",
+                "tags": [
+                  "pizza"
+                ],
+                "unknown_venue_key": {
+                  "nested": [
+                    1,
+                    2,
+                    3
+                  ]
+                }
+              }
+            }
+          ],
+          "name": "search-results",
+          "template": "venue-vertical-list",
+          "title": "Restaurants",
+          "unknown_section_key": 1
+        },
+        {
+          "items": [
+            {
+              "menu_item": {
+                "currency": "ILS",
+                "id": "m1",
+                "name": "Margherita",
+                "price": 5400,
+                "venue_id": "pizzaromana0001",
+                "venue_name": "Pizza Romana"
+              },
+              "template": "menu-item",
+              "title": "Margherita",
+              "track_id": "item-1"
+            },
+            {
+              "image": {
+                "blurhash": "j2UeTQ1bJ3DaYWq",
+                "url": "https://imageproxy.wolt.com/venue/tony-vespa-allenby.jpg"
+              },
+              "link": {
+                "target": "tonyvespaall0001",
+                "type": "venue-id"
+              },
+              "template": "venue-large",
+              "title": "Tony Vespa (listed again)",
+              "track_id": "venue-tony-vespa-allenby",
+              "unknown_item_key": "ignored",
+              "venue": {
+                "badges": [],
+                "brand_image": {
+                  "blurhash": "j2UeTQ1bJ3DaYWq",
+                  "url": "https://imageproxy.wolt.com/brand/tony-vespa-allenby.jpg"
+                },
+                "city": "Tel Aviv",
+                "country": "ISR",
+                "currency": "ILS",
+                "delivers": true,
+                "delivery_price_int": 1500,
+                "estimate": 20,
+                "estimate_range": "15-25",
+                "id": "tonyvespaall0001",
+                "location": [
+                  34.7717,
+                  32.068
+                ],
+                "name": "Tony Vespa (listed again)",
+                "online": false,
+                "price_range": 2,
+                "product_line": "restaurant",
+                "promotions": [],
+                "rating": {
+                  "rating": 4,
+                  "score": 8.1,
+                  "unknown_rating_key": true,
+                  "volume": 250
+                },
+                "short_description": "Pizza by the slice",
+                "slug": "tony-vespa-allenby",
+                "tags": [
+                  "pizza"
+                ],
+                "unknown_venue_key": {
+                  "nested": [
+                    1,
+                    2,
+                    3
+                  ]
+                }
+              }
+            }
+          ],
+          "name": "search-items",
+          "template": "menu-item-list",
+          "title": "Dishes"
+        }
+      ]
+    },
+    "venues": [
+      {
+        "address": "Ibn Gabirol St 60, Tel Aviv",
+        "city": "Tel Aviv",
+        "cuisineTags": [
+          "pizza",
+          "italian"
+        ],
+        "estimateMinutes": 30,
+        "imageUrl": "https://imageproxy.wolt.com/venue/pizza-romana.jpg",
+        "isOnline": true,
+        "latitude": 32.0741,
+        "longitude": 34.7784,
+        "name": "Pizza Romana",
+        "platformRating": 8.9,
+        "ref": {
+          "platformId": "pizza-romana",
+          "source": "wolt"
+        },
+        "shortDescription": "Roman-style pizza",
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/pizza-romana"
+      },
+      {
+        "address": "דיזנגוף 200, תל אביב",
+        "city": "Tel Aviv",
+        "cuisineTags": [
+          "pizza"
+        ],
+        "estimateMinutes": 25,
+        "imageUrl": null,
+        "isOnline": true,
+        "latitude": 32.0856,
+        "longitude": 34.7805,
+        "name": "פיצה לנה",
+        "platformRating": 9.1,
+        "ref": {
+          "platformId": "pizza-lena",
+          "source": "wolt"
+        },
+        "shortDescription": null,
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/pizza-lena"
+      },
+      {
+        "address": null,
+        "city": "Tel Aviv",
+        "cuisineTags": [
+          "pizza"
+        ],
+        "estimateMinutes": 20,
+        "imageUrl": "https://imageproxy.wolt.com/venue/tony-vespa-allenby.jpg",
+        "isOnline": false,
+        "latitude": 32.068,
+        "longitude": 34.7717,
+        "name": "Tony Vespa",
+        "platformRating": 8.1,
+        "ref": {
+          "platformId": "tony-vespa-allenby",
+          "source": "wolt"
+        },
+        "shortDescription": "Pizza by the slice",
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/tony-vespa-allenby"
+      },
+      {
+        "address": null,
+        "city": "Tel Aviv",
+        "cuisineTags": [
+          "pizza"
+        ],
+        "estimateMinutes": null,
+        "imageUrl": "https://imageproxy.wolt.com/venue/pizza-cloud.jpg",
+        "isOnline": true,
+        "latitude": null,
+        "longitude": null,
+        "name": "Pizza Cloud",
+        "platformRating": null,
+        "ref": {
+          "platformId": "pizza-cloud",
+          "source": "wolt"
+        },
+        "shortDescription": null,
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/pizza-cloud"
+      }
+    ]
+  },
+  {
+    "name": "synthetic_fields",
+    "raw": {
+      "sections": [
+        "not a map",
+        {
+          "items": "not a list"
+        },
+        {
+          "items": [
+            {
+              "venue": {
+                "address": "Dizengoff 1",
+                "brand_image": {
+                  "url": "https://b/a.jpg"
+                },
+                "city": "  ",
+                "estimate": 2.5,
+                "location": [
+                  34.7,
+                  32.1
+                ],
+                "name": "Venue a",
+                "online": "yes",
+                "rating": {
+                  "score": 9
+                },
+                "short_description": "",
+                "slug": "a",
+                "tags": [
+                  "sushi",
+                  "  ",
+                  7,
+                  "ramen"
+                ]
+              }
+            },
+            {
+              "image": {
+                "url": "https://i/b.jpg"
+              },
+              "venue": {
+                "brand_image": {
+                  "url": "https://b/b.jpg"
+                },
+                "city": "Tel Aviv",
+                "estimate": 3.5,
+                "location": [
+                  200,
+                  32.1
+                ],
+                "name": "Venue b",
+                "online": false,
+                "slug": "b"
+              }
+            },
+            {
+              "venue": {
+                "estimate": -0.5,
+                "location": [
+                  34.7
+                ],
+                "name": "Venue c",
+                "rating": {
+                  "score": "9"
+                },
+                "slug": "c"
+              }
+            },
+            {
+              "venue": {
+                "estimate": 20,
+                "location": [
+                  34.7,
+                  -91
+                ],
+                "name": "Venue d",
+                "rating": "nine",
+                "slug": "d"
+              }
+            },
+            {
+              "venue": {
+                "name": "Duplicate a",
+                "slug": "a"
+              }
+            },
+            {
+              "venue": {
+                "name": "   ",
+                "slug": "e"
+              }
+            },
+            {
+              "venue": "not a map"
+            },
+            42,
+            {
+              "venue": {
+                "location": [
+                  "34.7",
+                  32
+                ],
+                "name": "קפה תל אביב",
+                "slug": "קפה-תל-אביב"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "venues": [
+      {
+        "address": "Dizengoff 1",
+        "city": null,
+        "cuisineTags": [
+          "sushi",
+          "ramen"
+        ],
+        "estimateMinutes": 3,
+        "imageUrl": "https://b/a.jpg",
+        "isOnline": null,
+        "latitude": 32.1,
+        "longitude": 34.7,
+        "name": "Venue a",
+        "platformRating": 9.0,
+        "ref": {
+          "platformId": "a",
+          "source": "wolt"
+        },
+        "shortDescription": null,
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/a"
+      },
+      {
+        "address": null,
+        "city": "Tel Aviv",
+        "cuisineTags": [],
+        "estimateMinutes": 4,
+        "imageUrl": "https://i/b.jpg",
+        "isOnline": false,
+        "latitude": null,
+        "longitude": null,
+        "name": "Venue b",
+        "platformRating": null,
+        "ref": {
+          "platformId": "b",
+          "source": "wolt"
+        },
+        "shortDescription": null,
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/b"
+      },
+      {
+        "address": null,
+        "city": null,
+        "cuisineTags": [],
+        "estimateMinutes": -1,
+        "imageUrl": null,
+        "isOnline": null,
+        "latitude": null,
+        "longitude": null,
+        "name": "Venue c",
+        "platformRating": null,
+        "ref": {
+          "platformId": "c",
+          "source": "wolt"
+        },
+        "shortDescription": null,
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/c"
+      },
+      {
+        "address": null,
+        "city": null,
+        "cuisineTags": [],
+        "estimateMinutes": 20,
+        "imageUrl": null,
+        "isOnline": null,
+        "latitude": null,
+        "longitude": null,
+        "name": "Venue d",
+        "platformRating": null,
+        "ref": {
+          "platformId": "d",
+          "source": "wolt"
+        },
+        "shortDescription": null,
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/d"
+      },
+      {
+        "address": null,
+        "city": null,
+        "cuisineTags": [],
+        "estimateMinutes": null,
+        "imageUrl": null,
+        "isOnline": null,
+        "latitude": null,
+        "longitude": null,
+        "name": "קפה תל אביב",
+        "platformRating": null,
+        "ref": {
+          "platformId": "קפה-תל-אביב",
+          "source": "wolt"
+        },
+        "shortDescription": null,
+        "sourceUrl": "https://wolt.com/en/isr/tel-aviv/restaurant/%D7%A7%D7%A4%D7%94-%D7%AA%D7%9C-%D7%90%D7%91%D7%99%D7%91"
+      }
+    ]
+  },
+  {
+    "name": "synthetic_no_sections",
+    "raw": {
+      "sections": "none"
+    },
+    "venues": null
+  },
+  {
+    "name": "synthetic_empty_sections",
+    "raw": {
+      "sections": []
+    },
+    "venues": []
+  }
+]

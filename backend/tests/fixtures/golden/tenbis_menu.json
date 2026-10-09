@@ -1,0 +1,440 @@
+[
+  {
+    "fetchedAt": "2026-01-01T00:00:00.000Z",
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "Served with butter-infused potato purée",
+              "id": "1001",
+              "imageUrl": "https://example.invalid/entrecote.jpg",
+              "name": "Entrecôte 300g",
+              "options": [
+                {
+                  "name": "Choice of Side",
+                  "values": [
+                    "Potato Purée",
+                    "Green Salad"
+                  ]
+                }
+              ],
+              "page": null,
+              "price": 142.0
+            },
+            {
+              "description": "",
+              "id": "1002-shared",
+              "imageUrl": null,
+              "name": "Grilled Halloumi Salad",
+              "options": [
+                {
+                  "name": "Add Extras",
+                  "values": [
+                    "Extra Halloumi",
+                    "Olives"
+                  ]
+                }
+              ],
+              "page": null,
+              "price": 56.0
+            }
+          ],
+          "id": "cat_steaks",
+          "name": "Steaks"
+        },
+        {
+          "dishes": [
+            {
+              "description": "On the house",
+              "id": "1003",
+              "imageUrl": null,
+              "name": "Bread Basket (complimentary)",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "cat_chef-s-specials",
+          "name": "Chef's Specials"
+        },
+        {
+          "dishes": [
+            {
+              "description": "עגבניות, מלפפון, שמנים",
+              "id": "1004",
+              "imageUrl": null,
+              "name": "סלט ירקות",
+              "options": [],
+              "page": null,
+              "price": 38.0
+            },
+            {
+              "description": "",
+              "id": "1005",
+              "imageUrl": null,
+              "name": "Baby Gem with Tahini",
+              "options": [],
+              "page": null,
+              "price": 42.0
+            }
+          ],
+          "id": "cat_סלטים",
+          "name": "סלטים"
+        },
+        {
+          "dishes": [],
+          "id": "cat_coming-soon",
+          "name": "Coming Soon"
+        }
+      ],
+      "currency": "ILS",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": "Vitrina Tel Aviv",
+      "venueRef": {
+        "platformId": "9001",
+        "source": "tenbis"
+      }
+    },
+    "name": "tenbis_synthetic_menu.json",
+    "raw": {
+      "_synthetic": "SYNTHETIC. Built from menu_api_research §3.2 and issue #44's own body text (categoriesList -> dishList, decimal prices, kosher flags, dishOptionsList, image fields), not a recorded response. www.10bis.co.il is blocked from the build environment, so this could not be recorded. Re-record once #44's proxy route (phase2_plan.md §5 B1) lands: curl -sS localhost:8000/v1/proxy/tenbis/api/v1.0/Restaurants/{id}/Menu -o test/fixtures/tenbis_{id}_menu.json",
+      "categoriesList": [
+        {
+          "categoryName": "Steaks",
+          "dishList": [
+            {
+              "dishDescription": "Served with butter-infused potato purée",
+              "dishId": 1001,
+              "dishImageUrl": "https://example.invalid/entrecote.jpg",
+              "dishName": "Entrecôte 300g",
+              "dishOptionsList": [
+                {
+                  "name": "Choice of Side",
+                  "values": [
+                    {
+                      "name": "Potato Purée",
+                      "unknown_value_field": "extra"
+                    },
+                    {
+                      "name": "Green Salad"
+                    }
+                  ]
+                }
+              ],
+              "kosher": false,
+              "price": 142.0
+            },
+            {
+              "dishId": "1002-shared",
+              "dishName": "Grilled Halloumi Salad",
+              "dishOptionsList": [
+                {
+                  "name": "Add Extras",
+                  "values": [
+                    {
+                      "name": "Extra Halloumi"
+                    },
+                    {
+                      "name": "Olives"
+                    }
+                  ]
+                }
+              ],
+              "price": 56.0
+            }
+          ],
+          "unknown_category_field": true
+        },
+        {
+          "categoryName": "Chef's Specials",
+          "dishList": [
+            {
+              "dishId": "1002-shared",
+              "dishName": "Grilled Halloumi Salad (duplicate listing)",
+              "price": 56.0
+            },
+            {
+              "dishDescription": "On the house",
+              "dishId": 1003,
+              "dishName": "Bread Basket (complimentary)",
+              "kosher": true,
+              "price": 0
+            }
+          ]
+        },
+        {
+          "categoryName": "סלטים",
+          "dishList": [
+            {
+              "dishDescription": "עגבניות, מלפפון, שמנים",
+              "dishId": "1004",
+              "dishName": "סלט ירקות",
+              "price": 38.0
+            },
+            {
+              "dishId": "1005",
+              "dishName": "Baby Gem with Tahini",
+              "price": 42.0
+            }
+          ]
+        },
+        {
+          "categoryName": "Coming Soon",
+          "dishList": []
+        }
+      ],
+      "restaurantName": "Vitrina Tel Aviv",
+      "unknown_top_level_field": "10bis may add fields; the mapper must ignore this"
+    },
+    "ref": {
+      "platformId": "9001",
+      "source": "tenbis"
+    }
+  },
+  {
+    "fetchedAt": "2026-01-01T00:00:00.000Z",
+    "menu": null,
+    "name": "tenbis_malformed_menu.json",
+    "raw": {
+      "_synthetic": "SYNTHETIC. A 2xx body 10bis has never been observed to send, used to exercise the platformChanged path when the response is valid JSON but not the Restaurants/{id}/Menu shape this mapper knows (architecture.md §8).",
+      "errorCode": 1,
+      "errorMessage": "restaurant temporarily closed"
+    },
+    "ref": {
+      "platformId": "9001",
+      "source": "tenbis"
+    }
+  },
+  {
+    "fetchedAt": "2026-01-01T00:00:00.000Z",
+    "menu": {
+      "categories": [
+        {
+          "dishes": [
+            {
+              "description": "Description of 7",
+              "id": "7",
+              "imageUrl": null,
+              "name": "Dish 7",
+              "options": [],
+              "page": null,
+              "price": 42.5
+            },
+            {
+              "description": "Description of 12.0",
+              "id": "12.0",
+              "imageUrl": null,
+              "name": "Dish 12.0",
+              "options": [],
+              "page": null,
+              "price": 42.5
+            },
+            {
+              "description": "Description of 12.5",
+              "id": "12.5",
+              "imageUrl": null,
+              "name": "Dish 12.5",
+              "options": [],
+              "page": null,
+              "price": 42.5
+            },
+            {
+              "description": "",
+              "id": "a-1",
+              "imageUrl": null,
+              "name": "Dish a-1",
+              "options": [],
+              "page": null,
+              "price": 0.0
+            }
+          ],
+          "id": "cat_hot-drinks",
+          "name": "Hot Drinks!"
+        },
+        {
+          "dishes": [
+            {
+              "description": "Description of b-2",
+              "id": "b-2",
+              "imageUrl": "https://example.invalid/b2.jpg",
+              "name": "Dish b-2",
+              "options": [
+                {
+                  "name": "Size",
+                  "values": [
+                    "Large"
+                  ]
+                }
+              ],
+              "page": null,
+              "price": 42.5
+            }
+          ],
+          "id": "cat_שתייה-קרה",
+          "name": "שתייה קרה"
+        },
+        {
+          "dishes": [],
+          "id": "cat_n-code-caf",
+          "name": "--Ünïcode Café--"
+        },
+        {
+          "dishes": [],
+          "id": "cat_ספיישל-special",
+          "name": "ספיישל 🌟 Special"
+        }
+      ],
+      "currency": "USD",
+      "fetchedAt": "2026-01-01T00:00:00.000Z",
+      "venueName": null,
+      "venueRef": {
+        "platformId": "9001",
+        "source": "tenbis"
+      }
+    },
+    "name": "synthetic_ids_and_slugs",
+    "raw": {
+      "categoriesList": [
+        {
+          "categoryName": "Hot Drinks!",
+          "dishList": [
+            {
+              "dishDescription": "Description of 7",
+              "dishId": 7,
+              "dishName": "Dish 7",
+              "price": 42.5
+            },
+            {
+              "dishDescription": "Description of 12.0",
+              "dishId": 12.0,
+              "dishName": "Dish 12.0",
+              "price": 42.5
+            },
+            {
+              "dishDescription": "Description of 12.5",
+              "dishId": 12.5,
+              "dishName": "Dish 12.5",
+              "price": 42.5
+            },
+            {
+              "dishDescription": null,
+              "dishId": "a-1",
+              "dishImageUrl": "",
+              "dishName": "Dish a-1",
+              "price": 0
+            }
+          ]
+        },
+        {
+          "categoryName": "שתייה קרה",
+          "dishList": [
+            {
+              "dishDescription": "Description of 7",
+              "dishId": 7,
+              "dishName": "Dish 7",
+              "price": 42.5
+            },
+            {
+              "dishDescription": "Description of b-2",
+              "dishId": "b-2",
+              "dishImageUrl": "https://example.invalid/b2.jpg",
+              "dishName": "Dish b-2",
+              "dishOptionsList": [
+                {
+                  "name": "Size",
+                  "values": [
+                    {
+                      "name": "Large"
+                    }
+                  ]
+                }
+              ],
+              "price": 42.5
+            }
+          ]
+        },
+        {
+          "categoryName": "--Ünïcode Café--",
+          "dishList": []
+        },
+        {
+          "categoryName": "ספיישל 🌟 Special",
+          "dishList": []
+        }
+      ],
+      "currency": "USD",
+      "restaurantName": ""
+    },
+    "ref": {
+      "platformId": "9001",
+      "source": "tenbis"
+    }
+  },
+  {
+    "fetchedAt": "2026-01-01T00:00:00.000Z",
+    "menu": null,
+    "name": "synthetic_fail_dish_id_empty",
+    "raw": {
+      "categoriesList": [
+        {
+          "categoryName": "Mains",
+          "dishList": [
+            {
+              "dishDescription": "Description of ",
+              "dishId": "",
+              "dishName": "Dish ",
+              "price": 42.5
+            }
+          ]
+        }
+      ]
+    },
+    "ref": {
+      "platformId": "9001",
+      "source": "tenbis"
+    }
+  },
+  {
+    "fetchedAt": "2026-01-01T00:00:00.000Z",
+    "menu": null,
+    "name": "synthetic_fail_category_unnamed",
+    "raw": {
+      "categoriesList": [
+        {
+          "categoryName": "",
+          "dishList": []
+        }
+      ]
+    },
+    "ref": {
+      "platformId": "9001",
+      "source": "tenbis"
+    }
+  },
+  {
+    "fetchedAt": "2026-01-01T00:00:00.000Z",
+    "menu": null,
+    "name": "synthetic_fail_options_not_list",
+    "raw": {
+      "categoriesList": [
+        {
+          "categoryName": "Mains",
+          "dishList": [
+            {
+              "dishDescription": "Description of 1",
+              "dishId": 1,
+              "dishName": "Dish 1",
+              "dishOptionsList": "x",
+              "price": 42.5
+            }
+          ]
+        }
+      ]
+    },
+    "ref": {
+      "platformId": "9001",
+      "source": "tenbis"
+    }
+  }
+]

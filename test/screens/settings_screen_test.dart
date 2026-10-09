@@ -92,6 +92,7 @@ Future<void> _pump(
   ThemeModeController? themeModeController,
   FakeAppInfo? appInfo,
   FakeExternalLinkOpener? externalLinkOpener,
+  bool backendConfigured = false,
 }) {
   return tester.pumpWidget(
     MaterialApp(
@@ -112,6 +113,7 @@ Future<void> _pump(
         child: SettingsScreen(
           appInfo: appInfo ?? FakeAppInfo(),
           externalLinkOpener: externalLinkOpener ?? FakeExternalLinkOpener(),
+          backendConfigured: backendConfigured,
         ),
       ),
     ),
@@ -994,6 +996,61 @@ void main() {
       await _expandConsentDisclosure(tester);
       expect(find.text(_en.settingsConsentBodyDirect), findsOneWidget);
       expect(find.text(_en.settingsConsentBody), findsNothing);
+    });
+
+    testWidgets('phone with a backend: the disclosure says the server comes '
+        'first and the own key is only the fallback (issue #330)', (
+      tester,
+    ) async {
+      // Arrange
+      final controller = _controllerFor(apiKeyStore: FakeApiKeyStore());
+
+      // Act
+      await _pump(tester, controller, backendConfigured: true);
+      await tester.pumpAndSettle();
+
+      // Assert
+      await _expandConsentDisclosure(tester);
+      expect(
+        find.text(_en.settingsConsentBodyDirectViaBackend),
+        findsOneWidget,
+      );
+      expect(find.text(_en.settingsConsentBodyDirect), findsNothing);
+      expect(find.text(_en.settingsConsentBody), findsNothing);
+      // The key section's note says the same (issue #331).
+      expect(find.text(_en.settingsKeyBodyViaBackend), findsOneWidget);
+      expect(find.text(_en.settingsKeyBody), findsNothing);
+      expect(
+        _en.settingsConsentBodyDirectViaBackend,
+        contains("KetoClub's server"),
+      );
+      expect(
+        _en.settingsConsentBodyDirectViaBackend,
+        contains('only if the server cannot be reached'),
+      );
+    });
+
+    testWidgets('phone without a backend keeps the direct copy, and web '
+        'keeps the server copy even when a backend is configured', (
+      tester,
+    ) async {
+      // Act: a phone, no backend.
+      await _pump(tester, _controllerFor(apiKeyStore: FakeApiKeyStore()));
+      await tester.pumpAndSettle();
+      await _expandConsentDisclosure(tester);
+
+      // Assert
+      expect(find.text(_en.settingsConsentBodyDirect), findsOneWidget);
+      expect(find.text(_en.settingsConsentBodyDirectViaBackend), findsNothing);
+
+      // Act: web (no key store) with the backend configured.
+      await _pump(tester, _controllerFor(), backendConfigured: true);
+      await tester.pumpAndSettle();
+      await _expandConsentDisclosure(tester);
+
+      // Assert
+      expect(find.text(_en.settingsConsentBody), findsOneWidget);
+      expect(find.text(_en.settingsConsentBodyDirectViaBackend), findsNothing);
     });
 
     testWidgets('phone: the key section sits in AI & privacy, after the '

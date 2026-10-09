@@ -534,7 +534,17 @@ abstract final class MenuResponseParser {
   }
 
   /// [text], cut to at most [maxLength] characters (architecture.md §9.4
-  /// rule 6 — truncated, never rejected for length alone).
-  static String _truncated(String text, int maxLength) =>
-      text.length > maxLength ? text.substring(0, maxLength) : text;
+  /// rule 6 — truncated, never rejected for length alone). The cut never
+  /// lands between the two halves of a surrogate pair: a lone surrogate
+  /// is not valid UTF-8, so the analysis could not be sent to or stored by
+  /// the backend (D25, found by the golden corpus, #320).
+  static String _truncated(String text, int maxLength) {
+    if (text.length <= maxLength) return text;
+    final end = _isHighSurrogate(text.codeUnitAt(maxLength - 1))
+        ? maxLength - 1
+        : maxLength;
+    return text.substring(0, end);
+  }
+
+  static bool _isHighSurrogate(int unit) => unit >= 0xD800 && unit <= 0xDBFF;
 }

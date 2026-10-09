@@ -9,10 +9,13 @@ import 'package:ketoclub/models/failures.dart';
 /// rule engine needs text the pages do not have, so nothing is shown at
 /// all. These sentences say instead that the pages are kept.
 ///
-/// [directToGoogle] is true on iOS and Android (D17), where the pages go
-/// straight to Google; it only changes [MenuAnalysisFailureReason
-/// .notConfigured], which on web means there is no KetoClub server to send
-/// them through.
+/// [directToGoogle] is true on iOS and Android, where the user's own key
+/// can reach Google (D17), and [backendConfigured] when the build has a
+/// KetoClub backend, which every platform asks first (D25). Together they
+/// change only [MenuAnalysisFailureReason.notConfigured]: with a backend
+/// it means the server has no model set up to read pages; without one, on
+/// web, that there is no server to send them through, and on a phone that
+/// scanning is unavailable on this build.
 ///
 /// An exhaustive switch with no `default`: adding a reason without adding
 /// its scan copy here is a compile error, never a silently collapsed
@@ -21,9 +24,12 @@ String scanFailureMessage(
   MenuAnalysisFailureReason reason,
   AppLocalizations l10n, {
   required bool directToGoogle,
+  bool backendConfigured = false,
 }) => switch (reason) {
   MenuAnalysisFailureReason.notConfigured =>
-    directToGoogle
+    backendConfigured
+        ? l10n.scanScreenFailureServerNotConfigured
+        : directToGoogle
         ? l10n.scanScreenFailureNotConfigured
         : l10n.scanScreenFailureNeedsServer,
   MenuAnalysisFailureReason.offline => l10n.scanScreenFailureOffline,

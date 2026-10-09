@@ -162,11 +162,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent straight from this device to Google\'s Gemini API, using your own API key. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. The menu, its analysis, the venue name and city are also stored on KetoClub\'s server, with nothing that identifies you, so others can find them. Untick this to keep every menu on this device.';
 
   @override
+  String get settingsConsentBodyDirectViaBackend =>
+      'AI analysis is on by default: when you open or paste a menu, dish names, descriptions and option labels — and any questions you type about a menu — are sent from this device to KetoClub\'s server, which forwards them to Google\'s Gemini API for analysis. Your own API key is used only if the server cannot be reached. Nothing about you or your history is sent otherwise. Your position is sent to Wolt only when you search nearby, and is not stored. There are no analytics. The menu, its analysis, the venue name and city are also stored on KetoClub\'s server, with nothing that identifies you, so others can find them. Untick this to keep every menu on this device.';
+
+  @override
   String get settingsKeySection => 'Gemini API key';
 
   @override
   String get settingsKeyBody =>
       'On this phone, AI analysis calls Google\'s Gemini API directly with your own key. You can create one for free in Google AI Studio. It is kept in this device\'s secure storage and sent only to Google.';
+
+  @override
+  String get settingsKeyBodyViaBackend =>
+      'On this phone, AI analysis goes to KetoClub\'s server first. Your own key is used only if the server cannot be reached: then this device calls Google\'s Gemini API directly with it. You can create one for free in Google AI Studio. It is kept in this device\'s secure storage and sent only to Google.';
 
   @override
   String get settingsKeyHint => 'Paste your Gemini API key';
@@ -1153,6 +1161,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The pages are sent straight from this device to Google\'s Gemini API, using your own API key. The transcribed menu, its analysis, and the name and city you give it are also stored on KetoClub\'s server, anonymously.';
 
   @override
+  String get scanScreenDisclosureDirectViaBackend =>
+      'The pages are sent from this device to KetoClub\'s server, which forwards them to Google\'s Gemini API to be read. Your own API key is used only if the server cannot be reached. The transcribed menu, its analysis, and the name and city you give it are also stored on KetoClub\'s server, anonymously.';
+
+  @override
   String get scanScreenSettingsLink => 'Settings';
 
   @override
@@ -1162,6 +1174,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get scanScreenFailureNeedsServer =>
       'Scanning needs KetoClub\'s server, and this build is not connected to one. Pasting the menu text still works.';
+
+  @override
+  String get scanScreenFailureServerNotConfigured =>
+      'KetoClub\'s server is not set up to read menu pages yet. Pasting the menu text still works.';
 
   @override
   String get scanScreenFailureOffline =>

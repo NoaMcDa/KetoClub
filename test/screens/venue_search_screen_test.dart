@@ -62,6 +62,8 @@ Future<void> _pump(
   LocationService? locationService,
   SettingsStore? settingsStore,
   bool? autofocusSearch,
+  bool directToGoogle = false,
+  bool backendConfigured = false,
 }) {
   _useTallSurface(tester);
   return tester.pumpWidget(
@@ -74,6 +76,8 @@ Future<void> _pump(
         locale: locale,
         home: VenueSearchScreen(
           autofocusSearch: autofocusSearch,
+          directToGoogle: directToGoogle,
+          backendConfigured: backendConfigured,
           connectivity: connectivity ?? FakeConnectivity(),
           locationService: locationService ?? FakeLocationService(),
           // Fresh install (D16, issue #167) → the disclosure banner is
@@ -188,6 +192,28 @@ void main() {
       await tester.tap(find.byTooltip(_l10n(tester).discoveryUseLocation));
       await tester.pumpAndSettle();
     }
+
+    testWidgets('on a phone with a backend the first-launch disclosure '
+        'says the server comes first (issue #331)', (tester) async {
+      // Arrange: a fresh install, so the banner shows.
+      await _pump(
+        tester,
+        controller: controller,
+        pushedNames: pushedNames,
+        settingsStore: FakeSettingsStore(),
+        directToGoogle: true,
+        backendConfigured: true,
+      );
+      await tester.pumpAndSettle();
+      final l10n = _l10n(tester);
+
+      // Assert
+      expect(
+        find.text(l10n.settingsConsentBodyDirectViaBackend),
+        findsOneWidget,
+      );
+      expect(find.text(l10n.settingsConsentBodyDirect), findsNothing);
+    });
 
     for (final entry in {
       'light': AppTheme.light(),

@@ -113,6 +113,80 @@ final class Venue {
     this.city,
   });
 
+  /// Reads a venue written by [toJson], or by the backend's `Venue` model
+  /// (architecture.md D25), which writes the same keys in the same order.
+  ///
+  /// Returns null for any shape mismatch and never throws. Only `ref` and
+  /// a non-empty `name` are required. Every other key may be absent or
+  /// null, which reads as null (`cuisineTags` as empty); a present value of
+  /// the wrong type fails the whole venue, as a non-string `venueName` fails
+  /// a `Menu`. The `double` fields accept any number (a web build or Python
+  /// may write `32` for `32.0`); `estimateMinutes` accepts only an int.
+  static Venue? tryFrom(Map<String, Object?> json) {
+    final rawRef = json['ref'];
+    final name = json['name'];
+    if (rawRef is! Map<String, Object?>) return null;
+    final ref = VenueRef.tryFrom(rawRef);
+    if (ref == null) return null;
+    if (name is! String || name.isEmpty) return null;
+    final rawTags = json['cuisineTags'];
+    final tags = <String>[];
+    if (rawTags != null) {
+      if (rawTags is! List<Object?>) return null;
+      for (final tag in rawTags) {
+        if (tag is! String) return null;
+        tags.add(tag);
+      }
+    }
+    final rawIsOnline = json['isOnline'];
+    if (rawIsOnline != null && rawIsOnline is! bool) return null;
+    final rawMinutes = json['estimateMinutes'];
+    if (rawMinutes != null && rawMinutes is! int) return null;
+    final strings = <String, String?>{};
+    for (final key in _optionalStringKeys) {
+      final value = json[key];
+      if (value != null && value is! String) return null;
+      strings[key] = value as String?;
+    }
+    final doubles = <String, double?>{};
+    for (final key in _optionalDoubleKeys) {
+      final value = json[key];
+      if (value != null && value is! num) return null;
+      doubles[key] = (value as num?)?.toDouble();
+    }
+    return Venue(
+      ref: ref,
+      name: name,
+      address: strings['address'],
+      latitude: doubles['latitude'],
+      longitude: doubles['longitude'],
+      sourceUrl: strings['sourceUrl'],
+      cuisineTags: tags,
+      isOnline: rawIsOnline as bool?,
+      imageUrl: strings['imageUrl'],
+      shortDescription: strings['shortDescription'],
+      platformRating: doubles['platformRating'],
+      estimateMinutes: rawMinutes as int?,
+      city: strings['city'],
+    );
+  }
+
+  /// The optional keys [tryFrom] reads as a `String?`.
+  static const _optionalStringKeys = <String>[
+    'address',
+    'sourceUrl',
+    'imageUrl',
+    'shortDescription',
+    'city',
+  ];
+
+  /// The optional keys [tryFrom] reads as a `double?`.
+  static const _optionalDoubleKeys = <String>[
+    'latitude',
+    'longitude',
+    'platformRating',
+  ];
+
   /// How to fetch this venue's menu.
   final VenueRef ref;
 
@@ -160,6 +234,25 @@ final class Venue {
   /// The city the platform lists the venue in, e.g. 'Tel Aviv'; null when
   /// the platform does not say (10bis, websites).
   final String? city;
+
+  /// Writes a form [tryFrom] can read back: every key, in declaration
+  /// order, null ones included. The backend's `Venue` model writes the same
+  /// bytes (architecture.md D25), so the order here is a wire contract.
+  Map<String, Object?> toJson() => <String, Object?>{
+    'ref': ref.toJson(),
+    'name': name,
+    'address': address,
+    'latitude': latitude,
+    'longitude': longitude,
+    'sourceUrl': sourceUrl,
+    'cuisineTags': cuisineTags,
+    'isOnline': isOnline,
+    'imageUrl': imageUrl,
+    'shortDescription': shortDescription,
+    'platformRating': platformRating,
+    'estimateMinutes': estimateMinutes,
+    'city': city,
+  };
 
   @override
   bool operator ==(Object other) =>
