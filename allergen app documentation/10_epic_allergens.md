@@ -602,8 +602,17 @@ stronger than anything the engine can infer, and it is free.
   `suspected` for an A entry (the restaurant can be wrong; principle 3).
 - **First task of the issue:** record one real Wolt menu in Israel that has
   non-empty `dietary_preferences`, or establish that the field is unused
-  here (`tool/record_wolt_fixture.sh`). If unused, the feature ships
-  10bis-only and Wolt reads stay tolerant.
+  here (`tool/record_wolt_fixture.sh`). File 12 §4.4 found that what Wolt
+  Israel *shows* is venue-level (🌱 🌾 beside the venue name, city category
+  pages) and that dish-level information is restaurant-written text; 10bis
+  puts "ללא גלוטן" and "טבעוני" as free text in section headings, item names
+  and footnotes. So the likelier shape of this feature is **text
+  self-declarations**: the ALG-01 vocabulary gains 🌱, 🌾, "טבעוני",
+  "ללא גלוטן", "צמחוני", "vegan", "gluten-free" as *declared-by-restaurant*
+  guards that lower certainty and never clear an A entry, read from the
+  category heading as well as the dish (the D21 `dish_kind` precedent). If
+  the JSON field is unused, that text path is the whole feature and Wolt
+  reads stay tolerant.
 
 ### Tests
 - Mapper tests with a fixture carrying tags; evaluator tests for the
@@ -745,8 +754,11 @@ highest-value moment for retention and the gap Equal Eats half-fills.
 - **A destination picker** (country) that sets a `tripJurisdiction` beside
   the profile. From the taxonomy's jurisdiction tags the app shows, per A/B
   entry: "regulated here — the restaurant must be able to tell you" or
-  "not regulated here — you must ask every time". For Israel it shows the
-  2028 date.
+  "not regulated here — you must ask every time". The tag must distinguish
+  *packaged-food* regulation from a *restaurant* duty: Israel's 2028 rule
+  and the US FASTER Act cover packaged food, so in both home markets the
+  hint is "ask every time"; the EU/UK and SB 68 chains are where a
+  restaurant must answer (file 12 §4).
 - **A local hidden-ingredient lexicon** per country: a small, reviewed list
   per destination (first: Israel, the EU's largest tourist countries, the
   UK, the US, Japan) of dishes and ingredients that hide each restriction,
@@ -852,7 +864,8 @@ already go through the scan path.
 ### Problem
 Regulation is producing allergen matrices (EU 14 for non-prepacked food,
 UK written information, California SB 68 per-dish allergens for chains from
-July 2026, Israel 2028). Nothing in KetoClub can read one. A matrix turns a
+July 2026; Israel's 2028 rule covers packaged food only, so Israeli
+matrices will be voluntary). Nothing in KetoClub can read one. A matrix turns a
 dish's concern from inferred to `declared` and is the strongest evidence
 the app will ever have without a kitchen visit.
 

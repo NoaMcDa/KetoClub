@@ -16,7 +16,7 @@ the additions, and they decide what the product's taxonomy has to look like.
 | **Canada** | 10 + gluten + sulphites | Mustard, molluscs, sesame | Bilingual labelling (English/French) |
 | **Australia / New Zealand** (PEAL) | ~12–13 | Sesame, lupin, molluscs, sulphites; tree nuts named by type | A "Contains" statement is mandatory |
 | **Japan** | 8 mandatory + ~20 recommended | Buckwheat, crab, shrimp and walnut mandatory; cashew in transition; soy and sesame only recommended | Buckwheat, critical in Japan, is on no Western list. Recommended list includes kiwi, banana, apple, peach, beef, chicken, pork, salmon, salmon roe, mackerel, gelatin and more |
-| **Israel** | aligned to the EU list | Allergens emphasised inside the ingredient list; a "fava beans — not suitable for G6PD-deficient" marking | **Mandatory from January 2028** |
+| **Israel** | aligned to the EU list (the same 14) | Allergens emphasised inside the ingredient list; a "fava beans — not suitable for G6PD-deficient" marking | Voluntary from 1 Jan 2025, **mandatory from 1 Jan 2028 — for pre-packaged food only.** The 2022 draft defers non-pre-packaged (restaurant) food to "a later stage"; no restaurant duty was found (file 12 §4) |
 
 ## What it means for the product
 
@@ -27,7 +27,11 @@ the additions, and they decide what the product's taxonomy has to look like.
   regulated there), buckwheat in Japan (regulated only there), lupin in
   France (regulated in the EU, used in flour).
 - Israel's own list is EU-shaped, which makes the EU 14 the natural home
-  list for the pilot market, with a 2028 regulatory tailwind.
+  list for the pilot market. **Correction after file 12:** the 2028 rule
+  reaches packaged food only; Israeli restaurant allergen information is
+  voluntary today and no date for a restaurant duty was found. The
+  tailwind is in what chains *could* publish from their packaged-ingredient
+  labels, not in what they must.
 
 ## Less common allergens worth supporting
 
