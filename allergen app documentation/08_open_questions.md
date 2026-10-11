@@ -13,9 +13,14 @@
    before it.
 2. Start with level A (anaphylaxis) despite its legal risk, or launch with
    B–D and add A later?
-   **Answer: not yet decided** (the question needed rephrasing; see the
-   plain-language version in `09_conclusions.md` D-b). The epic assumes
-   "build for A from day one, behind the consent and helper-tool wording".
+   **Answer (2026-10-11): there are no levels.** "An allergy is an allergy
+   whether or not it is life-threatening. We do not promise 100% accuracy;
+   the user must ask the restaurant about everything. The app is only a
+   helper tool and is not legally bound to be accurate." The epic was
+   rewritten: a restriction is strict (allergen, celiac) or flexible
+   (intolerance, diet, keto) by its kind, never by a question to the user;
+   one helper-tool sentence appears at onboarding and in every menu's
+   legend; "ask the restaurant" is the wording floor for every allergen.
 3. Which first market: Israel (pilot, Hebrew, small), the UK or EU
    (regulation on our side), or the US (largest, most competitive)?
    **Answer: Israel and the United States.** Consequences: the home

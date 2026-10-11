@@ -2,8 +2,17 @@
 
 **One epic, one milestone: turn KetoClub's keto-only engine into a
 profile-driven engine for every dietary restriction, without losing a
-single keto behaviour and without ever telling an anaphylactic user a dish
-is "safe".**
+single keto behaviour and without ever telling a user with an allergy that
+a dish is "safe".**
+
+> **Decision 2026-10-11 (owner):** there are no severity levels. An allergy
+> is an allergy whether or not it is life-threatening. The app is a helper
+> tool, promises no accuracy, and the user must ask the restaurant about
+> everything. Every feature below is written to that rule: a restriction is
+> either **strict** (an allergen, or celiac disease) or **flexible** (an
+> intolerance, a lifestyle or religious diet, keto), and that follows from
+> the restriction's *kind* in the taxonomy, never from a question to the
+> user.
 
 Each feature below is written to become one GitHub issue under
 `ISSUE_CONVENTIONS.md` (`[feature] …`, description, context, acceptance
@@ -32,8 +41,8 @@ created by hand (the session had no token for milestone creation) and the
 ## Goal
 
 A user enters every restriction they live with — allergies, celiac,
-lactose, vegan, keto, and later FODMAP, GLP-1 and others — once, with a
-severity for each. From then on every menu KetoClub can read (Wolt, 10bis,
+lactose, vegan, keto, and later FODMAP, GLP-1 and others — once. From then
+on every menu KetoClub can read (Wolt, 10bis,
 paste, photo, PDF, website, QR) is analysed against that whole profile in
 one request, and each dish answers four questions: *can I order it as is,
 can I order it with a change, what must I ask the kitchen, or should I
@@ -58,11 +67,14 @@ hand to the waiter.
 1. **A keto-only profile is today's app, byte for byte.** Prompt text,
    cache keys, goldens, score and copy are unchanged when the profile holds
    only keto and its three toggles. A regression suite proves it.
-2. **The model proposes, the rules dispose for level A and B.** The LLM
-   extracts; a deterministic layer can add a concern or block a verdict,
-   never remove one.
-3. **No "safe" for level A.** The strongest wording a level-A restriction
-   ever gets is "no trigger found in the menu text — confirm with staff".
+2. **The model proposes, the rules dispose for every strict entry.** The
+   LLM extracts; a deterministic layer can add a concern or block a
+   verdict, never remove one.
+3. **No "safe" for a strict entry, and "ask the restaurant" everywhere.**
+   The strongest wording an allergen or celiac entry ever gets is "no
+   trigger found in the menu text — ask the restaurant". The app is a
+   helper, not a guarantee, and says so once at onboarding and once in
+   every menu's legend.
 4. **Every concern names its evidence.** Declared by the platform, stated
    in the menu text, inferred from a dish name, or suspected hidden — the
    tier is shown, not just the colour.
@@ -110,9 +122,9 @@ Two artefacts, both in `constants.dart` and mirrored into
    `gluten`, `lactose`, `vegan`, `keto` …), a `kind` (`allergen`,
    `intolerance`, `autoimmune`, `lifestyle`, `religiousComponent`, `keto`),
    the jurisdictions where it is regulated (file 02: `us`, `eu`, `uk`, `ca`,
-   `anz`, `jp`, `il`), the allowed severities (an allergen allows A–D,
-   lactose allows C–D, vegan allows D only), bilingual display names, and
-   the *default* severity shown in onboarding. First release: the EU 14 +
+   `anz`, `jp`, `il`), its **strictness** — derived from the kind: `allergen`
+   and `autoimmune` are *strict*, everything else *flexible*; never a user
+   choice — and bilingual display names. First release: the EU 14 +
    US 9 union (16 ids: peanuts, tree nuts, milk, eggs, soy, wheat/gluten
    cereals, fish, crustaceans, molluscs, sesame, celery, mustard, lupin,
    sulphites, plus gluten split from wheat for celiac), `lactose` (distinct
@@ -165,57 +177,52 @@ Two artefacts, both in `constants.dart` and mirrored into
 
 ---
 
-## ALG-02 — Dietary profile with severity levels
+## ALG-02 — Dietary profile
 
 **Size:** M · **Phase:** P0 · **Depends on:** ALG-01 · **Blocks:** ALG-03, ALG-05, ALG-11
 
 ### Problem
 Settings has three keto booleans and a net-carb slider. There is no way to
-say "peanuts, anaphylactic; lactose, intolerant; vegetarian".
+say "peanuts; lactose; vegetarian".
 
 ### What it is
 A `DietaryProfile` value in `AppSettings`: an ordered set of
-`ProfileEntry {restrictionId, severity, exceptions}` where severity is one
-of **A** (anaphylaxis / life-threatening), **B** (autoimmune or
-trace-sensitive, e.g. celiac), **C** (intolerance / discomfort), **D**
-(preference / lifestyle), and `exceptions` is a small list of tolerated
-forms ("baked milk", "cooked tomato") shown to the model as text. Keto and
-its three toggles and the net-carb limit become one entry of kind `keto`
-with severity D, so the profile is the single source of what the engine is
-asked for.
+`ProfileEntry {restrictionId, exceptions}` where `exceptions` is a small
+list of tolerated forms ("baked milk", "cooked tomato") shown to the model
+as text. **There is no severity field.** Whether an entry is strict or
+flexible is read from the taxonomy's `kind` (ALG-01): allergens and celiac
+disease are strict, intolerances and diets are flexible. Keto and its three
+toggles and the net-carb limit become one entry of kind `keto`, so the
+profile is the single source of what the engine is asked for.
 
 `ClassificationOptions.fromSettings` now builds `dietaryConstraints` from
-the profile: one canonical sentence per entry, in a fixed order (by
-taxonomy order, then severity), so the same profile always yields the same
-prompt and the same cache key. The keto entry yields exactly the three
-existing fragments when its toggles are on, so a keto-only profile is
-byte-identical to today's prompt (principle 1).
+the profile: one canonical sentence per entry, in taxonomy order, so the
+same profile always yields the same prompt and the same cache key. The keto
+entry yields exactly the three existing fragments when its toggles are on,
+so a keto-only profile is byte-identical to today's prompt (principle 1).
 
 ### UX
 - **Settings → "My restrictions"** replaces "Your keto rules": a list of
-  entries, each a row with the restriction name, a severity segmented
-  control labelled in plain words (not letters): *Life-threatening ·
-  Must avoid · Makes me unwell · Prefer to avoid*, and an optional
-  "exceptions" field. An "Add restriction" sheet lists the taxonomy grouped
-  by kind, with a search field, Hebrew and English names, and the
-  jurisdiction hint ("regulated in Israel from 2028").
+  entries, each a row with the restriction name, its kind as a small label
+  ("allergy", "intolerance", "diet"), and an optional "exceptions" field.
+  An "Add restriction" sheet lists the taxonomy grouped by kind, with a
+  search field, Hebrew and English names, and the jurisdiction hint
+  ("on the US list", "on the Israeli packaged-food list from 2028").
 - **First-run onboarding** (new, skippable): "What do you avoid?" — chips
-  for the first-release taxonomy; tapping one asks the severity with a
-  one-line explanation of each level and what the app will and will not
-  say at that level. Keto users who already have settings see nothing new
-  until they open Settings.
-- Severity A entries show a persistent one-line notice under the row:
-  "KetoClub reads menu text. It cannot see the kitchen. Always confirm
-  with the staff."
+  for the first-release taxonomy. No severity question. Adding the first
+  entry shows the helper-tool sentence once (ALG-11): "This app reads
+  menus to help you choose. It cannot see the kitchen and makes no
+  promise. Always ask the restaurant." Keto users who already have
+  settings see nothing new until they open Settings.
 - The profile summary ("Peanuts · Lactose · Vegetarian · Keto") appears in
   the menu screen's Filters row so the user always sees what a verdict was
   computed against.
 
 ### Data and storage
 - `shared_preferences` under one JSON key, read tolerantly (unknown ids
-  dropped, unknown severity → D, missing → empty profile). The three old
-  boolean keys and the limit are migrated into the keto entry on first
-  read and then left in place for one release.
+  dropped, missing → empty profile). The three old boolean keys and the
+  limit are migrated into the keto entry on first read and then left in
+  place for one release.
 - The analysis cache's `AnalysisOptionsSnapshot` already records the
   constraint list; nothing else to persist. The profile never enters the
   Hive cache, the visit history or `stored_menus`.
@@ -224,14 +231,14 @@ byte-identical to today's prompt (principle 1).
 - `AppSettings` round-trip, migration from the old keys, canonical
   ordering, keto-only byte-equality against a pinned prompt fixture.
 - Widget tests for the Settings list and the add sheet in both locales and
-  RTL; a flow test "add peanuts (A) → open menu → Filters row shows it".
+  RTL; a flow test "add peanuts → open menu → Filters row shows it".
 
 ### Acceptance criteria
 - [ ] Profile model, storage, migration and canonical constraint building.
 - [ ] Settings and onboarding screens, English and Hebrew, RTL verified.
 - [ ] `test/golden` unchanged for the keto-only profile.
-- [ ] Severity levels documented in `architecture.md` §7 and a new decision
-      record (D26) recorded in §14.
+- [ ] The strict/flexible rule documented in `architecture.md` §7 and a new
+      decision record (D26) recorded in §14.
 
 ---
 
@@ -266,8 +273,8 @@ Two ways to ask the model, and the epic recommends **B**:
 
   Why B: one extraction serves every profile, so the analysis cache and
   the shared store become useful again; the verdict is reproducible and
-  testable without a model; the rules layer is the authority for level A
-  by construction, not by a post-hoc veto; and "why" can cite the exact
+  testable without a model; the rules layer is the authority for strict
+  entries by construction, not by a post-hoc veto; and "why" can cite the exact
   extracted ingredient. Cost: the extraction reply is larger (an
   ingredient list per dish), and the evaluator is new code in Dart *and*
   Python.
@@ -307,10 +314,10 @@ Two ways to ask the model, and the epic recommends **B**:
   - concerns only on removable roles → `modifiable` with the sentence;
   - no concern → `orderAsIs`;
   - the "ask" state is **derived** in the UI (ALG-05): any `suspected`
-    concern on a level-A or level-B entry, whatever the verdict.
+    concern on a strict entry, whatever the verdict.
 - **Backend.** `/v1/classify`, `/v1/venue-menus`, `/v1/scan`,
   `/v1/website-menu` and `/v1/text-menu` accept the profile in `options`
-  (ids and severities only), run the same extraction prompt, and evaluate
+  (restriction ids only), run the same extraction prompt, and evaluate
   with the Python evaluator so the client gets a complete result as D25
   promises. The analysis cache key gains the profile *only through* the
   keto constraints and exceptions text — the extraction itself is cached
@@ -321,14 +328,14 @@ Two ways to ask the model, and the epic recommends **B**:
   get rules-only concerns (ALG-04) and an `inferred` evidence tier.
 - Model cannot answer at all → the whole analysis is rules-only as today,
   stamped `rules(reason)`; the UI's existing "rules" chip plus ALG-05's
-  severity wording cover it.
+  strict-entry wording cover it.
 - The user changes the profile → re-evaluate locally from the cached
   extraction without a new request (the big win of option B).
 
 ### Tests
 - Prompt byte-equality for a keto-only profile; schema validity; parser
-  table tests per rule; evaluator table tests per restriction × severity ×
-  role; a Python replay of the same tables through the goldens.
+  table tests per rule; evaluator table tests per restriction × strictness
+  × role; a Python replay of the same tables through the goldens.
 - Backend: respx-mocked Gemini, the five routes with a profile.
 
 ### Acceptance criteria
@@ -340,13 +347,13 @@ Two ways to ask the model, and the epic recommends **B**:
 
 ---
 
-## ALG-04 — Allergen rules engine and the level-A veto
+## ALG-04 — Allergen rules engine and the strict-entry veto
 
 **Size:** M · **Phase:** P1 · **Depends on:** ALG-01, ALG-03 · **Blocks:** ALG-05
 
 ### Problem
 Today the rules engine is a fallback: it runs only when the model cannot.
-For an anaphylactic user the model must never be the only thing between
+For a user with an allergy the model must never be the only thing between
 them and a dish, and the model's extraction can miss a trigger that sits in
 plain sight in the dish name.
 
@@ -361,17 +368,17 @@ plain sight in the dish name.
    missed is added; a concern both found keeps the higher certainty; a
    concern the model found that rules did not is kept. Rules never remove
    a model concern.
-3. **The veto.** For a profile entry at severity A or B, a rules concern
-   with certainty `stated`/`likely` forces the verdict to at least
+3. **The veto.** For a strict entry (any allergen, celiac), a rules
+   concern with certainty `stated`/`likely` forces the verdict to at least
    `modifiable` (if the trigger sits on a removable role) or `nonKeto`
-   (otherwise), whatever the model said. For severity C/D the model's
+   (otherwise), whatever the model said. For a flexible entry the model's
    verdict stands and the rules concern is shown as evidence only. This is
    the only place in the engine where rules outrank the model, and it is
    documented as such.
 4. **Rules-only mode.** When the model cannot answer, the rules pass is the
    whole analysis (as today for keto), the engine chip says "rules", and
-   ALG-05 wording for level A becomes stricter still ("menu text checked
-   by rules only — ask").
+   ALG-05 wording for strict entries becomes stricter still ("menu text
+   checked by rules only — ask the restaurant").
 
 ### Design notes
 - Runs on the device after any analysis, including one that came complete
@@ -386,10 +393,10 @@ plain sight in the dish name.
 ### Tests
 - Table tests: for each first-release restriction, a dish that the model
   "missed" (fake LLM extraction without the trigger) ends up with the
-  rules concern and, at severity A, the vetoed verdict; at D, the model's
-  verdict.
+  rules concern and, for a strict entry, the vetoed verdict; for a
+  flexible one, the model's verdict.
 - A flow test: fake model says `orderAsIs` for "סלט עם טחינה", profile has
-  sesame at A → the dish shows "avoid / ask" with the sesame concern.
+  sesame → the dish shows "avoid / ask" with the sesame concern.
 
 ### Acceptance criteria
 - [ ] Allergen pass in `ClassificationRules` and in `backend/app/keto/rules.py`.
@@ -399,7 +406,7 @@ plain sight in the dish name.
 
 ---
 
-## ALG-05 — Four-state verdict UI: safe / modify / ask / avoid, by severity
+## ALG-05 — Four-state verdict UI: fits / modify / ask / avoid, by strictness
 
 **Size:** M · **Phase:** P1 · **Depends on:** ALG-02, ALG-03, ALG-04
 
@@ -407,30 +414,30 @@ plain sight in the dish name.
 The menu screen speaks keto: green "order as is", yellow "modifiable", red
 "non-keto", a keto score, verdict tiles and filters named after them. An
 allergy user needs a fourth state — *ask* — and must never read the word
-"safe" beside a life-threatening restriction.
+"safe" beside an allergy.
 
 ### What it is
 - **Derived state per dish:** `fits` (green), `fitsWithChange` (yellow),
   `ask` (new, amber/outlined), `avoid` (red). `ask` = any `suspected`
-  concern on an A/B entry, or any concern at all on an A entry whose
+  concern on a strict entry, or any concern at all on a strict entry whose
   verdict is green (because "no stated trigger" is not "safe"). The wire
   verdict is unchanged; this is a `utils/` function with a table test.
-- **Wording by severity.** Verdict names, the legend, tile labels and the
-  share text (`menu_share_text.dart`) come from one function of (state,
-  highest severity in the profile). With keto only: today's names,
-  verbatim. With any A entry: green reads "No trigger found — confirm",
-  never "Safe"; the legend carries the helper-tool sentence. A test
-  asserts no string containing "safe"/"בטוח" is ever produced for a
-  profile with an A entry — the sibling of `failure_copy.dart`'s
-  no-shared-copy test.
+- **Wording by strictness.** Verdict names, the legend, tile labels and
+  the share text (`menu_share_text.dart`) come from one function of (state,
+  whether the profile has a strict entry). With keto only: today's names,
+  verbatim. With any strict entry: green reads "No trigger found — ask the
+  restaurant", never "Safe"; the legend carries the helper-tool sentence
+  on every menu. A test asserts no string containing "safe"/"בטוח" is
+  ever produced for a profile with a strict entry — the sibling of
+  `failure_copy.dart`'s no-shared-copy test.
 - **Dish card.** Under the verdict, one line per concern: a restriction
-  chip (named, coloured by its severity), the source ("in the name", "in
+  chip (named, coloured by its kind), the source ("in the name", "in
   the description", "option: bread", "hidden: soy sauce"), and the
   certainty as words. The existing one-waiter-action row becomes the
   concern's `waiterQuestion` or the modification, whichever applies.
 - **Counter tiles and filters.** Four tiles when the profile has a non-keto
   entry; `MenuFilter` gains `askOnly` and the default filter for a profile
-  with an A entry is "fits + ask" (hide avoid, show what to check).
+  with a strict entry is "fits + ask" (hide avoid, show what to check).
 - **The headline number.** The keto score stays only when keto is in the
   profile; otherwise the header shows "N fit · M with a change · K to
   ask" and no score (file 09 §5). `VerdictCounts.of` is extended, not
@@ -440,18 +447,18 @@ allergy user needs a fourth state — *ask* — and must never read the word
   applied.
 
 ### Accessibility and RTL
-Severity colour is never the only signal: each state has an icon and a
+Colour is never the only signal: each state has an icon and a
 word; the concern chip has the restriction's name. Hebrew names come from
 the taxonomy, not ARB, because they are read beside the Hebrew dish name.
 
 ### Tests
 - Table test of the derived state; copy test for the "safe" ban; widget
   tests of the card, tiles and filters in both locales; a flow test
-  "profile with peanuts (A) → menu → default filter hides avoid, a dish
+  "profile with peanuts → menu → default filter hides avoid, a dish
   with 'אגוזים' is ask, share text has no 'safe'".
 
 ### Acceptance criteria
-- [ ] Derived state, severity wording, dish-card concerns, tiles, filters,
+- [ ] Derived state, strictness wording, dish-card concerns, tiles, filters,
       header counts, share text.
 - [ ] `docs/UX_REVIEW.md`-style pass on the menu screen at 390px and
       desktop, light and dark, Hebrew and English.
@@ -515,12 +522,12 @@ menu nearly always true, which is exactly the point). Each signal maps to
 the restrictions it threatens and to a standard question for the staff.
 
 The menu screen shows a collapsible "Kitchen" notice under the header when
-any signal threatens an A/B entry: "This menu has a fryer and a bakery. For
+any signal threatens a strict entry: "This menu has a fryer and a bakery. For
 celiac disease, ask whether fries share the fryer with breaded dishes." It
 never changes a dish's verdict — it is a menu-level fact beside the
 per-dish answer — but it does add a `suspected` concern with tier
-`inferred` to green dishes in the affected category when the entry is A
-(so they become *ask*, by ALG-05's rule).
+`inferred` to green dishes in the affected category when the entry is
+strict (so they become *ask*, by ALG-05's rule).
 
 ### Tests
 - Signal table tests on the Wolt and 10bis fixtures and on Hebrew paste
@@ -529,7 +536,7 @@ per-dish answer — but it does add a `suspected` concern with tier
 
 ### Acceptance criteria
 - [ ] `KitchenSignals.of(menu)` in Dart and Python; the notice; the
-      A-entry demotion; no effect for keto-only.
+      strict-entry demotion; no effect for keto-only.
 
 ---
 
@@ -550,12 +557,12 @@ and what to *ask* — in the restaurant's language.
   the Waiter Card shows them all.
 - **The chef card.** A new full-screen page (reusing the Waiter Card's
   shell: brightness, large type, copy button, share) composed from the
-  profile: a heading line per A/B entry ("I have a severe allergy to
-  sesame — even traces can be dangerous"), the dish's name as printed,
+  profile: a heading line per strict entry ("I have an allergy to sesame —
+  please check every ingredient, including sauces"), the dish's name as printed,
   the dish's modification and questions, and a closing line asking the
   kitchen to confirm cross-contact precautions when ALG-07 raised a
   signal. The whole card is produced from sentence templates per
-  restriction and severity in both languages — the §6.3 exception extended
+  restriction and strictness in both languages — the §6.3 exception extended
   — and, when the menu's language is neither, by one request to the
   existing menu-question path (#214) asking for a translation, cached per
   (card text, language).
@@ -566,8 +573,8 @@ and what to *ask* — in the restaurant's language.
   path), for sending to a restaurant's WhatsApp before a visit.
 
 ### Tests
-- Template rendering table tests per restriction × severity × language;
-  widget test of the card page; a flow test "profile with sesame (A) →
+- Template rendering table tests per restriction × strictness × language;
+  widget test of the card page; a flow test "profile with sesame →
   dish → Waiter Card → chef card shows the sesame line and the dish's
   question in Hebrew for a Hebrew menu".
 
@@ -599,7 +606,7 @@ stronger than anything the engine can infer, and it is free.
   the only kosher statement the app ever makes, and is attributed to the
   platform, not to KetoClub).
 - A `declared` absence lowers a concern's certainty but **never** below
-  `suspected` for an A entry (the restaurant can be wrong; principle 3).
+  `suspected` for a strict entry (the restaurant can be wrong; principle 3).
 - **First task of the issue:** record one real Wolt menu in Israel that has
   non-empty `dietary_preferences`, or establish that the field is unused
   here (`tool/record_wolt_fixture.sh`). File 12 §4.4 found that what Wolt
@@ -609,7 +616,7 @@ stronger than anything the engine can infer, and it is free.
   and footnotes. So the likelier shape of this feature is **text
   self-declarations**: the ALG-01 vocabulary gains 🌱, 🌾, "טבעוני",
   "ללא גלוטן", "צמחוני", "vegan", "gluten-free" as *declared-by-restaurant*
-  guards that lower certainty and never clear an A entry, read from the
+  guards that lower certainty and never clear a strict entry, read from the
   category heading as well as the dish (the D21 `dish_kind` precedent). If
   the JSON field is unused, that text path is the whole feature and Wolt
   reads stay tolerant.
@@ -630,7 +637,7 @@ stronger than anything the engine can infer, and it is free.
 **Size:** M · **Phase:** P0 (corpus) and P1 (gate) · **Depends on:** ALG-01; the gate on ALG-03/04
 
 ### Problem
-The research's first metric is the critical-miss rate on level-A triggers,
+The research's first metric is the critical-miss rate on allergen triggers,
 and its evidence that unguarded LLMs miss 7% of gluten dishes. Nothing in
 the current test suite measures misses per restriction.
 
@@ -644,7 +651,7 @@ the current test suite measures misses per restriction.
   file header.
 - **A rules-only replay** (`flutter test` and `pytest`): the ALG-04 pass
   over the corpus must find every *contains* label at certainty ≥ likely
-  for every A-capable restriction. Any miss fails CI: that is the gate.
+  for every strict restriction. Any miss fails CI: that is the gate.
   `may contain` must be ≥ suspected. False positives are reported, not
   gating (a false alarm is the acceptable direction).
 - **A model replay** (`backend/tools/allergen_eval.py`, person-run like
@@ -658,7 +665,7 @@ the current test suite measures misses per restriction.
 
 ### Acceptance criteria
 - [ ] Corpus with ≥ 300 labelled dishes across ≥ 15 menus, half Hebrew.
-- [ ] CI gate on rules recall for A-capable restrictions.
+- [ ] CI gate on rules recall for strict restrictions.
 - [ ] The person-run model evaluation script and a `docs/` page for its
       last result.
 
@@ -676,27 +683,28 @@ leaves it, and the product must say what it is not.
 ### What it is
 - **What leaves the device, exactly:** with ALG-03 option B, only the keto
   constraint fragments, the `exceptions` free text and any ALG-17 free-text
-  restriction travel with a request; restriction ids and severities do
-  not. The "What leaves this device" disclosure in Settings states this in
+  restriction travel with a request; restriction ids do not. The "What leaves this device" disclosure in Settings states this in
   both languages, and the architecture test pins that no field named
-  `severity` or `restrictionId` appears in any request body built under
+  `restrictionId` appears in any request body built under
   `lib/services/`.
 - **A second consent** is not added: the existing AI consent covers the
   request, but its copy changes and a changed copy re-shows the
   disclosure once (`disclosureSeen` is reset by a copy version).
 - **`stored_menus` keeps dropping options** (D24); add a backend test that
   a `/v1/menus` body with any profile field is rejected with 422.
-- **Liability copy, once, in three places:** onboarding when the first A
-  entry is added, the Settings notice (ALG-02), and the legend (ALG-05):
-  "KetoClub reads menus. It cannot see the kitchen, verify a recipe or
-  replace asking the staff. For a life-threatening allergy, always
-  confirm." No diagnosis or treatment wording anywhere — a copy test over
+- **Helper-tool copy, in three places:** onboarding when the first entry
+  of any kind is added, the Settings header, and the legend of every menu
+  (ALG-05): "This app reads menus to help you choose. It cannot see the
+  kitchen, verify a recipe or promise accuracy. Always ask the
+  restaurant." One sentence, the same for every restriction — the owner's
+  decision (2026-10-11) is that the product makes no accuracy promise and
+  the user asks about everything. No diagnosis or treatment wording anywhere — a copy test over
   the ARB files for a short banned-word list ("diagnose", "treat",
   "medical device", "מאבחן", "מטפל").
-- **Terms:** a `docs/TERMS_NOTES.md` listing what counsel must review
-  before an A-entry build ships to a store (the research's "clear terms,
-  insurance, helper-tool" items), so the dependency on a human is
-  written down.
+- **Terms:** a `docs/TERMS_NOTES.md` recording the product stance (a
+  helper tool with no accuracy promise) and the clauses the terms of use
+  and the store listings must carry to say so. Counsel review is
+  recommended, not a release gate.
 
 ### Acceptance criteria
 - [ ] Disclosure copy, the architecture-test pin, the backend 422 test, the
@@ -747,13 +755,13 @@ research's differentiator 7 and nobody offers it.
 Abroad, the user does not know which allergens the local restaurant is
 obliged to disclose, which local dishes hide their trigger (buckwheat soba
 in Japan, lupin flour in France, mustard in every German sauce), or how to
-say "anaphylaxis" in the local language. The research names this as the
+say "allergy" in the local language. The research names this as the
 highest-value moment for retention and the gap Equal Eats half-fills.
 
 ### What it is
 - **A destination picker** (country) that sets a `tripJurisdiction` beside
-  the profile. From the taxonomy's jurisdiction tags the app shows, per A/B
-  entry: "regulated here — the restaurant must be able to tell you" or
+  the profile. From the taxonomy's jurisdiction tags the app shows, per
+  strict entry: "regulated here — the restaurant must be able to tell you" or
   "not regulated here — you must ask every time". The tag must distinguish
   *packaged-food* regulation from a *restaurant* duty: Israel's 2028 rule
   and the US FASTER Act cover packaged food, so in both home markets the
@@ -793,7 +801,7 @@ can have *per-dish, per-visit facts* instead, and they are the only way the
 cooperation.
 
 ### What it is
-- **The prompt:** a few hours after a menu was opened with an A/B entry
+- **The prompt:** a few hours after a menu was opened with a strict entry
   (a local notification, opt-in, no server), or from the Recent tab: "Did
   you ask about *sesame* in *סלט חצילים*?" with three answers per concern:
   *confirmed present · confirmed absent · didn't ask*, plus "they changed
@@ -808,7 +816,7 @@ cooperation.
   id and polarity** — a count, a first and last date, never an install id,
   never a note (the D24 rule). The server returns the counts with
   `/v1/venue-menus`, and the evaluator uses them only as evidence tier
-  (`denied` by N people lowers certainty but, for an A entry, never below
+  (`denied` by N people lowers certainty but, for a strict entry, never below
   `suspected`; `confirmed` raises it). There is **no rating**: a venue is
   never summed into a number, which is the whole difference from
   AllergyEats and Spokin.
@@ -818,7 +826,7 @@ cooperation.
 
 ### Tests
 - Store round-trip; evaluator tier effects; the "never below suspected for
-  A" rule; backend tests for the table, the 422 on any install id or note,
+  a strict entry" rule; backend tests for the table, the 422 on any install id or note,
   the ≥ 3 threshold; a flow test from Recent to the prompt to the tier
   shown.
 
@@ -914,28 +922,28 @@ the US) restrictions. Each has a different shape, so each needs its own
 design rather than a new row in the taxonomy.
 
 ### What it is
-- **Legumes and mustard** are ordinary allergen entries (A-capable):
+- **Legumes and mustard** are ordinary (strict) allergen entries:
   vocabulary + corpus only. Legumes matter in Israel (hummus, falafel,
   lentil soup) and are the first to add.
 - **Alpha-gal** is an allergen whose trigger is a *class* (mammalian meat
   and derivatives: beef, lamb, pork, gelatin, lard, dairy for some): an
   entry with a class vocabulary and an "includes dairy" exception toggle.
 - **FODMAP and histamine** are *dose and preparation* sensitivities
-  (onion and garlic in a sauce; aged, fermented, cured foods): C-only
+  (onion and garlic in a sauce; aged, fermented, cured foods): flexible
   entries whose vocabulary carries a `highDose`/`lowDose` note and whose
   concerns always read as "may be high in …", never avoid. The research
   says nobody serves these at the restaurant and the data basis is thin,
   so they ship as "preference" with a clear "based on common FODMAP
   guidance, not a measurement" line.
 - **GLP-1 (small portions, protein first)** is not a restriction but a
-  *preference signal*: a D-only entry that asks the extraction prompt for
+  *preference signal*: a flexible entry that asks the extraction prompt for
   the portion hint and protein role it already extracts (ALG-03) and sorts
   or tags dishes "protein-forward · small portion" rather than colouring
   them. No nutrition numbers are shown (none exist).
 - **Free-text restriction** ("I react to kiwi") — the only thing sent to
   the model as a constraint sentence beyond keto's (ALG-11), evaluated by
-  the model, tier `suspected` at most, severity capped at B until a
-  vocabulary entry exists.
+  the model, tier `suspected` at most, and strict (an allergy by the
+  user's word is an allergy) until a vocabulary entry exists.
 
 ### Acceptance criteria
 - [ ] Each sub-feature as its own PR with vocabulary, corpus labels, the
@@ -965,7 +973,7 @@ payments, no accounts, and a per-install rate limit that is the only
   issue.
 - **What is never gated:** the chef card for the profile (ALG-08's
   Settings card), the liability copy, confirmations (ALG-14), and anything
-  about a level-A entry already in the profile. Gating safety is the
+  about an allergen already in the profile. Gating safety is the
   research's complaint 4 and the fastest way to lose trust.
 - **What is gated:** more than one restriction in the active profile,
   group profiles, trip mode, scans past the monthly count.
@@ -982,14 +990,15 @@ payments, no accounts, and a per-install rate limit that is the only
 
 ## Cross-cutting work that is not a feature
 
-- **Architecture records.** D26 (profile, severities, extraction +
+- **Architecture records.** D26 (profile, strict/flexible by kind, extraction +
   evaluation, three wire verdicts + derived state), D27 (confirmations and
   the no-rating rule), amendments to D2, D15 (scan transcribes
   descriptions), D22 (the one schema bump), D24 (new table, same install-id
   rule), D25 (profile in `options`).
 - **Docs:** `architecture.md` §6.2, §6.3, §7, §9, §11, §14, §17;
   `CLAUDE.md` status banner and traps (add: "rules outrank the model only
-  for A/B", "no 'safe' for A", "a profile never enters a request body");
+  for strict entries", "no 'safe' for a strict entry", "a profile never
+  enters a request body");
   `HANDOFF.md`; `README.md`'s classification narrative.
 - **CI:** the ALG-10 gate as a required job beside `backend/check.sh`.
 - **Regression promise:** a `test/architecture/keto_unchanged_test.dart`

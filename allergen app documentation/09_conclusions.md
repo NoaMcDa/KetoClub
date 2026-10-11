@@ -26,9 +26,11 @@ Two things the research gets right that must drive the design:
 - **The failure that matters is the critical miss**, not the false alarm.
   A keto false negative costs a few grams of carbs; an allergen false
   negative can be an anaphylaxis. This inverts the tuning of the whole
-  engine for level-A and level-B restrictions: prefer "ask" over "safe",
+  engine for every allergen and celiac entry: prefer "ask" over "safe",
   let rules block but never unblock, and measure the critical-miss rate
-  before anything ships.
+  in CI. (The owner's stance, 2026-10-11: the app is a helper and promises
+  no accuracy — which is exactly why its wording floor is "ask the
+  restaurant", for every allergy alike.)
 
 ## 2. What the codebase already gives us
 
@@ -58,22 +60,22 @@ Two things the research gets right that must drive the design:
    text must be byte-identical to today's, so the server's chat cache and
    every golden stay valid.
 2. **A fourth state is needed but should not be a fourth wire verdict.**
-   "Ask" is what a level-A restriction with an *uncertain* trigger
+   "Ask" is what an allergen entry with an *uncertain* trigger
    demands. Modelling it as a verdict would touch the cache format, the
    Python port, the goldens, the score and every filter. Modelling it as
    **per-dish `concerns`** — a generalisation of `hiddenCarbs` to
    `{restrictionId, source, certainty, waiterQuestion}` — keeps three wire
-   verdicts and derives "ask" in the UI from "any suspected concern on a
-   level-A or level-B restriction". The existing `hiddenCarbs` becomes the
+   verdicts and derives "ask" in the UI from "any suspected concern on an
+   allergen or celiac entry". The existing `hiddenCarbs` becomes the
    keto member of that list. This is one `schemaVersion` bump (1 → 2),
    which re-analyses cached menus once and loses the pages of cached scans
    (D22's cost) — acceptable once, so bundle every schema change of the
    epic into that one bump.
 3. **The rules engine must be allowed to veto.** Today the rules engine
-   runs only when the model cannot answer. For level A/B it must *also*
-   run after the model and add any trigger the model missed (union of
-   concerns), and a dish with a level-A trigger found by rules can never
-   be shown as safe, whatever the model said. That is the "deterministic
+   runs only when the model cannot answer. For every allergen and celiac
+   entry it must *also* run after the model and add any trigger the model
+   missed (union of concerns), and a dish with such a trigger found by
+   rules can never be shown as safe, whatever the model said. That is the "deterministic
    layer blocks, never unblocks" principle from the research, and it is
    the one thing a chat window cannot offer.
 4. **The vocabulary becomes a safety artefact.** The keto vocabulary is
@@ -89,14 +91,15 @@ Two things the research gets right that must drive the design:
    stays on the device; what leaves it is the constraint sentences, which
    today already go to Gemini under the AI consent. The consent copy must
    say so explicitly, and `stored_menus` must keep ignoring options.
-6. **Copy is now a liability surface.** No screen may say "safe" for a
-   level-A restriction. The verdict names, the legend, the score label and
-   the share text all change by severity. `failure_copy.dart`'s rule — no
-   two reasons share a message — gets a sibling: no level-A dish is ever
-   labelled with the green verdict's unqualified word.
+6. **Copy is the product's promise.** No screen may say "safe" for an
+   allergen or celiac entry; the floor is "ask the restaurant". The
+   verdict names, the legend, the score label and the share text all
+   change when the profile holds a strict entry. `failure_copy.dart`'s
+   rule — no two reasons share a message — gets a sibling: no dish is ever
+   labelled with the green verdict's unqualified word for such a profile.
 7. **Cost and cache fragmentation.** Every distinct profile is its own
-   analysis-cache key and chat-cache key. With ~30 restrictions × 4
-   severities the server-side sharing of analyses across users mostly
+   analysis-cache key and chat-cache key. With ~30 restrictions in any
+   combination the server-side sharing of analyses across users mostly
    disappears. Two mitigations are in the epic: normalise the constraint
    list to a canonical order (already the case for the three toggles), and
    split the request into a profile-independent *ingredient extraction*
@@ -109,7 +112,7 @@ Two things the research gets right that must drive the design:
 | # | Decision | Recommendation |
 |---|---|---|
 | D-a | Ship allergens as a mode inside KetoClub, or rename first | **Decided 2026-10-11: a rename is planned, name not chosen.** The engine work is the same either way. Keep every `keto*` identifier and wire name; change UI copy only; the rename is a branding and store-listing task tracked outside the epic |
-| D-b | Launch with level A | **Build for level A from day one, launch it behind the consent and the "helper tool" wording.** Designing B–D first and bolting A on later would mean re-tuning the engine; the critical-miss gate exists to make A shippable. *In plain words:* level A is a user whose allergy can kill them. The question is whether the first release lets such a user mark an allergy as life-threatening (and accepts the legal exposure that comes with the app answering them), or whether the first release serves only people for whom a mistake means discomfort, and adds life-threatening allergies later. **Still open with the owner; the epic assumes the first.** |
+| D-b | Severity levels | **Decided 2026-10-11: none.** The owner's rule: an allergy is an allergy whether or not it is life-threatening; the app promises no accuracy, is a helper tool only, and the user asks the restaurant about everything. So the research's A–D levels are dropped. A restriction is *strict* (allergen, celiac) or *flexible* (intolerance, diet, keto) by its kind in the taxonomy; the rules veto, the "ask" state and the no-"safe" wording apply to every strict entry; one helper-tool sentence appears at onboarding and in every menu's legend. The critical-miss gate stays as an engineering quality gate, not a legal shield |
 | D-c | Pilot market | **Decided 2026-10-11: Israel and the United States.** Hebrew is already first-class, Wolt and 10bis are integrated, the Israeli list is EU-shaped (2028, packaged food only — restaurants have no duty, file 12 §4), sesame and legumes are locally critical, and the competition is empty; the US is the largest market and brings SB 68-style chain allergen data (ALG-16). The home taxonomy is the EU 14 ∪ US 9, which the first-release scope already is. Trip mode (ALG-13) becomes a later feature: both markets are home markets |
 | D-d | Where the engine's profile evaluation runs | **Extraction in the model, evaluation on the device/server by rules** (ALG-03 option B) — reproducible, cheaper, cache-friendly, and it makes the rules layer the authority for level A |
 | D-e | Taxonomy scope for the first release | The EU 14 + US 9 union (16 items) — confirmed by the Israel + US market decision — celiac, lactose, vegan/vegetarian, and today's keto with its three toggles. Legumes and sesame are already in the 16 for Israel. FODMAP, histamine, GLP-1, alpha-gal are phase 2 (ALG-17) |

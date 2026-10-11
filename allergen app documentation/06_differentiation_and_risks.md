@@ -8,7 +8,9 @@
    a level: **A** anaphylaxis, **B** autoimmune or trace-sensitive (celiac),
    **C** intolerance, **D** preference. The threshold and the *language of
    risk* change by level: "probably safe" is never shown for a level-A
-   restriction.
+   restriction. *(Owner's decision 2026-10-11: levels dropped. Every allergy
+   is treated the same — the strict wording applies to all of them — and
+   the app is a helper tool that promises no accuracy; see file 09 D-b.)*
 2. **A hybrid engine, not an LLM alone.** The LLM extracts the ingredient
    list of each dish, including the *likely hidden* ones (soy sauce,
    marinade, seed oil). A deterministic rules layer maps ingredients to
