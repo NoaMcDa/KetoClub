@@ -11,6 +11,24 @@ criteria, unit and flow tests, related issues). Feature ids are `ALG-nn`;
 they are stable references inside this folder, not issue numbers. Sizes
 are S (days), M (one to two weeks), L (several weeks) for one engineer.
 
+## GitHub issues (created 2026-10-11)
+
+Parent epic: **#342**. No milestone yet — `Phase 9: Allergens` must be
+created by hand (the session had no token for milestone creation) and the
+19 issues assigned to it.
+
+| Feature | Issue | Feature | Issue |
+|---|---|---|---|
+| ALG-01 taxonomy and vocabulary | #343 | ALG-10 safety corpus and gate | #352 |
+| ALG-02 dietary profile | #344 | ALG-11 privacy and consent | #353 |
+| ALG-03 prompt, schema v2, evaluator | #345 | ALG-12 group profiles | #354 |
+| ALG-04 rules pass and veto | #346 | ALG-13 trip mode | #355 |
+| ALG-05 four-state UI | #347 | ALG-14 confirmations | #356 |
+| ALG-06 evidence tiers | #348 | ALG-15 delivery note | #357 |
+| ALG-07 kitchen signals | #349 | ALG-16 allergen matrices | #358 |
+| ALG-08 chef card | #350 | ALG-17 extended restrictions | #359 |
+| ALG-09 platform tags | #351 | ALG-18 premium gating | #360 |
+
 ## Goal
 
 A user enters every restriction they live with — allergies, celiac,
@@ -714,7 +732,7 @@ research's differentiator 7 and nobody offers it.
 
 ## ALG-13 — Trip mode
 
-**Size:** M · **Phase:** P3 · **Depends on:** ALG-01 (jurisdictions), ALG-08
+**Size:** M · **Phase:** P3 · **Depends on:** ALG-01 (jurisdictions), ALG-08 · **Priority note (2026-10-11):** both launch markets (Israel, US) are home markets, so this is the last of P3
 
 ### Problem
 Abroad, the user does not know which allergens the local restaurant is

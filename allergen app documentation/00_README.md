@@ -35,6 +35,8 @@ is the feature plan, written as one epic called **Allergens**.
 | `08_open_questions.md` | The eight open questions the research ends with, plus the ones this documentation pass adds |
 | `09_conclusions.md` | Conclusions: what the research means for KetoClub specifically, what the codebase already gives us, what has to change, and the decisions that must be taken before building |
 | `10_epic_allergens.md` | **The epic.** Goal, non-goals, principles, phases, and every feature described in depth with data model, engine, UI, tests and acceptance criteria |
+| `11_hidden_allergen_sources.md` | Sourced hidden-allergen research (FARE, FDA, FSA, Coeliac UK …): triggers, hidden sources, guards, cross-contact, confusions, the official lists — the basis for every vocabulary entry |
+| `12_israeli_and_us_menu_lexicon.md` | How allergens hide in Israeli menus (Hebrew spellings, פרווה/חלבי/בשרי semantics), Israeli epidemiology and regulation, Wolt/10bis tags, and US cuisine-specific risks |
 
 ## How to read it
 
@@ -46,7 +48,12 @@ is the feature plan, written as one epic called **Allergens**.
 
 ## Status
 
-Research documented and concluded; epic written; **nothing built**. No
-GitHub issues or milestone exist yet for this work. The epic is written
-so each feature can become one issue under `ISSUE_CONVENTIONS.md` and the
-whole epic one milestone under `MILESTONE_CONVENTIONS.md`.
+Research documented and concluded; epic written; **nothing built**.
+GitHub: parent epic **#342** with sub-issues **#343–#360** (one per
+feature; the table at the top of file 10 maps them). The milestone
+`Phase 9: Allergens` still has to be created by hand. Decisions taken on
+2026-10-11 (markets Israel + US, rename planned, no clinical reviewer, no
+users yet) are recorded in files 08 and 09.
+
+Files 11 and 12 are web desk research that stands in for a clinical
+reviewer: sourced hidden-allergen lists and an Israeli/US menu lexicon.
