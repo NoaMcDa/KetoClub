@@ -32,6 +32,11 @@ the additions, and they decide what the product's taxonomy has to look like.
   voluntary today and no date for a restaurant duty was found. The
   tailwind is in what chains *could* publish from their packaged-ingredient
   labels, not in what they must.
+  File 11 §19 adds: the gov.il reform guide defers non-prepacked food, with
+  a snippet naming 1 Jan 2032 (flagged for verification), and the FDA
+  revised its Tree Nut List on 6 Jan 2025, removing coconut, chestnut,
+  pili, shea and lichee — so "tree nuts" differs between the US list and
+  common usage, and the taxonomy must name the nuts it means.
 
 ## Less common allergens worth supporting
 
