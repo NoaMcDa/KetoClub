@@ -22,11 +22,19 @@ const String allergenContextEn = 'Served with {t} on the side';
 const String allergenContextHe = 'מוגש עם {t} בצד';
 
 /// Words put between a guard and a term to push the guard out of the
-/// two-word window.
+/// keto engine's two-word window.
 const String allergenGuardFillerEn = 'big fat';
 
 /// [allergenGuardFillerEn] in Hebrew.
 const String allergenGuardFillerHe = 'גדול שמן';
+
+/// One word put between a guard and a term: inside the keto engine's
+/// two-word window, but not in the slot adjacent to the term, so the
+/// allergen guard does not reach it (ALG-04a).
+const String allergenGuardGapEn = 'big';
+
+/// [allergenGuardGapEn] in Hebrew.
+const String allergenGuardGapHe = 'גדול';
 
 /// Hand-written menu lines in English and Hebrew, over every restriction
 /// group, the way Israeli and US menus write them.
@@ -65,6 +73,24 @@ const List<String> allergenMatcherTexts = <String>[
   'קפה הפוך על חלב שקדים',
   'לחמניה ללא גלוטן',
   'חומוס ללא טחינה',
+  // ALG-04a: a guard lowers, never cancels; only the adjacent slot counts;
+  // a term's own guards; the maqaf joins words.
+  'Hummus, no sesame or tahini',
+  'Sesame-free tahini',
+  'Bun made with rice flour',
+  'Toast with rice flour and wheat flour',
+  'Flat white with almond milk',
+  'Coconut milk curry',
+  'Oyster mushroom risotto',
+  'Crab apple jelly',
+  'Crab cakes',
+  'חמאת־בוטנים',
+  'פיתה עם חמאת־בוטנים',
+  'קפה עם חלב־שקדים',
+  'קפה עם חלב השקדים',
+  'קפה עם חלב ושקדים',
+  'חומוס וללא טחינה',
+  'ללא גלוטן ועם טחינה',
 ];
 
 /// A dish named [name] with [description] and [options], built the way a
@@ -115,6 +141,13 @@ final List<Dish> allergenMatcherDishes = <Dish>[
       DishOption(name: 'תוספת', values: <String>['פרמזן', 'אנשובי']),
     ],
   ),
+  allergenDish(
+    'טוסט',
+    description: 'עם חמאת־בוטנים',
+    options: const <DishOption>[
+      DishOption(name: 'שינויים', values: <String>['ללא־שומשום']),
+    ],
+  ),
 ];
 
 /// A test-only vocabulary that exercises every matcher rule, so the
@@ -140,6 +173,10 @@ const Map<RestrictionId, RestrictionVocabulary> allergenFixtureVocabulary =
           beforeEn: <String>['oat', 'almond', 'dairy free'],
           afterHe: <String>['שקדים', 'סויה'],
         ),
+        termGuards: <String, AllergenGuards>{
+          'milk': AllergenGuards(beforeEn: <String>['coconut']),
+          'חלב': AllergenGuards(afterHe: <String>['קוקוס']),
+        },
         sources: <String>['11 §3'],
       ),
       RestrictionId.lactose: RestrictionVocabulary(
@@ -163,7 +200,7 @@ const Map<RestrictionId, RestrictionVocabulary> allergenFixtureVocabulary =
         sources: <String>['11 §6'],
       ),
       RestrictionId.wheat: RestrictionVocabulary(
-        directEn: <String>['bun', 'toast'],
+        directEn: <String>['bun', 'toast', 'flour'],
         directHe: <String>['חיטה', 'פיתה'],
         hiddenEn: <HiddenTrigger>[
           HiddenTrigger(
@@ -188,6 +225,9 @@ const Map<RestrictionId, RestrictionVocabulary> allergenFixtureVocabulary =
           beforeEn: <String>['gluten free'],
           afterHe: <String>['ללא גלוטן'],
         ),
+        termGuards: <String, AllergenGuards>{
+          'flour': AllergenGuards(beforeEn: <String>['rice']),
+        },
         noPrefixHe: <String>['חיטה'],
         sources: <String>['11 §7'],
       ),
@@ -220,6 +260,31 @@ const Map<RestrictionId, RestrictionVocabulary> allergenFixtureVocabulary =
           ),
         ],
         sources: <String>['11 §12'],
+      ),
+      RestrictionId.peanuts: RestrictionVocabulary(
+        directEn: <String>['peanut', 'peanut butter'],
+        directHe: <String>['בוטנים', 'חמאת בוטנים'],
+        guards: AllergenGuards(afterEn: <String>['free']),
+        sources: <String>['11 §1'],
+      ),
+      RestrictionId.treeNuts: RestrictionVocabulary(
+        directEn: <String>['almond milk', 'coconut milk'],
+        directHe: <String>['שקדים'],
+        sources: <String>['11 §2'],
+      ),
+      RestrictionId.crustaceans: RestrictionVocabulary(
+        directEn: <String>['crab'],
+        termGuards: <String, AllergenGuards>{
+          'crab': AllergenGuards(afterEn: <String>['apple']),
+        },
+        sources: <String>['11 §9'],
+      ),
+      RestrictionId.molluscs: RestrictionVocabulary(
+        directEn: <String>['oyster'],
+        termGuards: <String, AllergenGuards>{
+          'oyster': AllergenGuards(afterEn: <String>['mushroom']),
+        },
+        sources: <String>['11 §10'],
       ),
       RestrictionId.sulphites: RestrictionVocabulary(
         hiddenEn: <HiddenTrigger>[

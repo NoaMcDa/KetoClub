@@ -415,9 +415,10 @@ abstract final class ClassificationRules {
   /// first, and a multi-word phrase must be adjacent inside the window.
   /// A null [guard] cancels nothing.
   ///
-  /// Public so the allergen matcher (`utils/allergens/allergen_matcher
-  /// .dart`, ALG-01) applies its guards with exactly the keto semantics;
-  /// there is one guard window in this codebase. Never throws.
+  /// Made public for the allergen matcher (ALG-01); since ALG-04a that
+  /// matcher checks only the slot adjacent to a term, with its own helper
+  /// in `utils/allergens/allergen_matcher.dart`, and lowers rather than
+  /// cancels. This window is the keto engine's alone. Never throws.
   static bool isGuarded(
     String haystack,
     int start,

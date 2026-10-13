@@ -116,14 +116,34 @@ void main() {
         });
 
         test('every guard phrase normalises to something', () {
-          final guards = vocabulary.guards;
-          for (final phrase in <String>[
-            ...guards.beforeEn,
-            ...guards.afterEn,
-            ...guards.beforeHe,
-            ...guards.afterHe,
+          for (final guards in <AllergenGuards>[
+            vocabulary.guards,
+            ...vocabulary.termGuards.values,
           ]) {
-            expect(TextNormaliser.normalise(phrase), isNotEmpty);
+            for (final phrase in <String>[
+              ...guards.beforeEn,
+              ...guards.afterEn,
+              ...guards.beforeHe,
+              ...guards.afterHe,
+            ]) {
+              expect(TextNormaliser.normalise(phrase), isNotEmpty);
+            }
+          }
+        });
+
+        test('every term guard names one of its terms, in its language', () {
+          final english = _englishTerms(vocabulary).toSet();
+          final hebrew = _hebrewTerms(vocabulary).toSet();
+          for (final MapEntry(key: term, value: guards)
+              in vocabulary.termGuards.entries) {
+            expect(english.union(hebrew), contains(term));
+            if (english.contains(term)) {
+              expect(guards.beforeHe, isEmpty, reason: term);
+              expect(guards.afterHe, isEmpty, reason: term);
+            } else {
+              expect(guards.beforeEn, isEmpty, reason: term);
+              expect(guards.afterEn, isEmpty, reason: term);
+            }
           }
         });
       });
@@ -139,6 +159,7 @@ void main() {
       expect(empty.isEmpty, isTrue);
       expect(empty.guards.beforeEn, isEmpty);
       expect(empty.guards.afterHe, isEmpty);
+      expect(empty.termGuards, isEmpty);
       expect(empty.noPrefixHe, isEmpty);
       expect(empty.sources, isEmpty);
     });

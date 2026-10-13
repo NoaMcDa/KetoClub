@@ -3079,6 +3079,33 @@ keto and added ids left out; the app sheet width). Keto stays the existing
 toggles, and nothing reads the profile for classification yet
 (`ClassificationOptions` is unchanged; Wave 2 does that).
 
+**The matcher's guards lower, sit beside their term, and read the maqaf
+(ALG-04a, related to #346).** Three allergen-only rules replace the keto guard
+window inside `AllergenMatcher`, and its Python twin follows them. **A guard
+lowers, never cancels** (file 11 §0): a guarded trigger ("peanut-free", "oat
+milk" beside dairy milk) is still a hit, `suspected` with a new
+`AllergenHit.guarded` flag (in equality, `toString` and the golden), because
+the app never tells an allergic person something is absent on a heuristic.
+**A guard counts only in the slot adjacent to its term**: a `before` phrase
+must end on the word just before the match and an `after` phrase start on
+the word just after it, so "no sesame or tahini" lowers sesame and leaves
+tahini stated; a Hebrew guard's first word may carry one or two prefix
+letters before its term ("וללא טחינה") but only the article ה after it ("חלב
+השקדים"; "חלב וסויה" is milk *and* soy). `ClassificationRules.isGuarded` and
+its two-word window are unchanged and keto's alone. **Per-term guards**,
+`RestrictionVocabulary.termGuards` (term as written → `AllergenGuards`,
+default empty), add to the restriction's guards for that one term, for the
+compounds that name another food: rice flour, coconut/almond/oat/soy milk,
+oyster mushroom, crab apple; a compound that names an allergen of its own
+stays a stated trigger of it ("almond milk" is tree nuts). **The maqaf
+U+05BE reads as a space** before the matcher normalises
+(`AllergenMatcher.matchText`, `dishMatchText`), where `TextNormaliser`
+deletes it as a Hebrew point and glues "חמאת־בוטנים" into one word; the
+normaliser itself is untouched, the replacement is length-preserving, and
+offsets index the match text, which equals the normalised text wherever
+there is no maqaf. `allergens.json` gains `termGuards`, each hit's `guarded`
+and each case's `matchText`; no keto golden changed.
+
 ---
 
 ## 15. Testing strategy
