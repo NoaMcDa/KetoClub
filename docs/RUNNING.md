@@ -143,6 +143,18 @@ flutter build ios --no-codesign  # needs Xcode
 Add the same `--dart-define=KETOCLUB_BACKEND_URL=…` to a build that should
 talk to a backend — any platform, since D25.
 
+### Building Banto
+
+Banto is the same codebase with every new surface behind one compile-time
+flag, read in `lib/utils/banto_mode.dart` only (`architecture.md` D26).
+Without `--dart-define=BANTO_MODE=true` the app is KetoClub byte for byte;
+with it the display name is "Banto". For the web, `tool/build_web.sh --banto`
+runs `flutter build web --release --dart-define=BANTO_MODE=true` and copies
+`web/manifest.banto.json` over `build/web/manifest.json`, so the installed
+app is named Banto too. `tool/build_web.sh` with no argument is the plain
+KetoClub web build. For a phone or a debug run, pass the same define to
+`flutter run` or `flutter build`.
+
 ### Web shell: path URLs, splash and tab titles (issue #226)
 
 The web build uses **path URLs**: a shared link reads
@@ -197,6 +209,23 @@ cd backend && uv run pytest
 
 `test/` and `integration_test/` are held to the same lints as `lib/`
 (80 columns, `public_member_api_docs`).
+
+### Cloud sessions
+
+A Claude Code cloud session starts with no Flutter SDK. The SessionStart hook
+in `.claude/settings.json` runs `.claude/hooks/session-start.sh`
+synchronously, so the checks above work as soon as the session opens. It:
+
+- clones Flutter 3.47.4 (`git clone --depth 1 --branch 3.47.4`) into
+  `/opt/flutter`, or skips the clone when that directory already holds 3.47.4;
+- runs `flutter config --no-analytics` and `flutter precache --web`;
+- runs `flutter pub get` in the repository and `uv sync --frozen` in
+  `backend/` (a missing `uv` prints a message and does not fail the session);
+- appends `export PATH=/opt/flutter/bin:$PATH` to `$CLAUDE_ENV_FILE`, so every
+  later shell finds `flutter`.
+
+It does nothing unless `CLAUDE_CODE_REMOTE=true`, so it is a no-op on your
+own machine, and a second run changes nothing.
 
 ## 5. Things that need a real network path
 

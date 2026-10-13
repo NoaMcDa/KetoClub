@@ -137,7 +137,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [web, apk]
+        target: [web, web-banto, apk]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -154,6 +154,9 @@ jobs:
       - name: Build web
         if: matrix.target == 'web'
         run: flutter build web --release
+      - name: Build web (Banto)
+        if: matrix.target == 'web-banto'
+        run: flutter build web --release --dart-define=BANTO_MODE=true
       - name: Build Android (debug)
         if: matrix.target == 'apk'
         run: flutter build apk --debug

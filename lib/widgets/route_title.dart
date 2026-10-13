@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'
     show ApplicationSwitcherDescription, SystemChrome;
-import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
 
 /// The browser-tab (and task-switcher) title for a page called [page]:
 /// `"Hamosad · KetoClub"`, or just the app name when [page] is null or blank
@@ -12,7 +12,7 @@ import 'package:ketoclub/utils/constants.dart';
 /// Pure, so the format is tested without a widget tree. The separator is a
 /// middle dot with a space either side; the page comes first so a row of
 /// narrow tabs still shows the part that tells them apart.
-String documentTitle(String? page, {String app = appName}) {
+String documentTitle(String? page, {String app = BantoMode.appName}) {
   final trimmed = page?.trim() ?? '';
   return trimmed.isEmpty ? app : '$trimmed · $app';
 }

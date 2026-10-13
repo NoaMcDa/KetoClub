@@ -1757,6 +1757,13 @@ should not reach a log or a widget, even with no bearer token left to leak.
   it fails or passes the parser like any other.
 - **No secrets in the repo.** `.gitignore` already excludes `.env*`; there is nothing
   to put in one.
+- **Banto (C1): the restriction profile never leaves the device, not even as ids.**
+  Only the menu text and the keto settings are ever sent. Two tests pin it:
+  `test/architecture/no_profile_on_the_wire_test.dart` (no file under
+  `lib/services/` can name a restriction id, a dietary profile or a severity) and
+  `backend/tests/test_menus_profile_rejected.py` (`POST /v1/menus` answers 422 to a
+  body that carries one). The product is a helper tool that makes no accuracy or
+  medical claim; see `docs/TERMS_NOTES.md`.
 
 ---
 
@@ -2987,7 +2994,37 @@ architecture-test host-string boundaries; one `AppDependencies` field for the
 estimate repository and one for `backendConfigured`; and `MenuFetched.analysis`
 now meaning "the backend answered with this" as well as "a website PDF was read".
 
-### D26 — Banto
+### D26 — Banto: a profile for every restriction (in progress)
+
+*Stub; the decision grows with the Banto work.* Banto extends the menu
+analysis from keto alone to a profile of dietary restrictions. Everything it
+adds sits behind one compile-time flag, `--dart-define=BANTO_MODE=true`, read
+in exactly one file, `lib/utils/banto_mode.dart` (`BantoMode.enabled`; the
+display name `BantoMode.appName` is "Banto" with the flag and "KetoClub"
+without). Without the define the app is KetoClub byte for byte. The web build
+of Banto is `tool/build_web.sh --banto`, with its own manifest
+(`web/manifest.banto.json`) and its own CI build target.
+
+**Convention.** Every gated widget or function takes
+`bool bantoMode = BantoMode.enabled` as a parameter (the
+`backendBaseUrl(configured)` precedent in `lib/di.dart`), so tests exercise
+both branches with no define.
+
+**Contract decisions.**
+
+- **C1:** The restriction profile never leaves the device, not even as ids.
+  The model extracts ingredients per dish independently of the profile; the
+  rules pass emits concerns for every taxonomy id it finds; the device
+  filters by the profile and derives the state. The backend performs the same
+  two profile-independent steps.
+- **C2:** The extraction prompt section and the `ingredients` schema property
+  are added only when `ClassificationOptions.restrictionsRequested` is true
+  (flag on and the profile has a non-keto entry); the options snapshot writes
+  that key only when true, so a keto-only profile's prompt, schema, snapshot
+  and cache key are byte-identical to today's.
+- **C3:** No `schemaVersion` bump: new `AnalysedDish` fields are read
+  tolerantly (absent → empty), and a Banto profile's stale cache is retired by
+  `restrictionsRequested` entering `AnalysisOptionsSnapshot.matches`.
 
 **The restriction taxonomy, the allergen vocabulary and its golden (ALG-01a,
 #343).** `lib/models/restriction.dart` names the 20 restrictions a profile can
@@ -3488,6 +3525,11 @@ Rules:
   file under `lib/`, so an untested file counts as zero rather than disappearing.
 - **The architecture test is a test.** `test/architecture/import_rules_test.dart`
   runs with the unit tests and is a required check.
+- **A keto-only profile is today's app, byte for byte.**
+  `test/architecture/keto_unchanged_test.dart` pins its prompt, schemas,
+  cache-key material, rules verdicts, score, verdict copy and share text
+  against hand-edited files in `test/fixtures/keto_baseline/`. It has no
+  update switch: an intended keto change edits a fixture by hand, in review.
 
 ### 18.5 Continuous integration
 

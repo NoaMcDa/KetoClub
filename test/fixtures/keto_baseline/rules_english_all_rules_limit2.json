@@ -1,0 +1,171 @@
+{
+  "dishes": [
+    {
+      "dishId": "e1",
+      "hiddenCarbs": [],
+      "modification": "Please prepare the salad without croutons.\nPlease serve only the meat, fish or eggs, with no vegetables, salad or other plants on the plate.",
+      "name": "Caesar salad",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+    },
+    {
+      "dishId": "e2",
+      "hiddenCarbs": [],
+      "modification": "Ask for the dish to be prepared without honey\nPlease make it with no dairy: no cheese, cream, butter, milk or yogurt.",
+      "name": "Halloumi",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+    },
+    {
+      "dishId": "e3",
+      "hiddenCarbs": [],
+      "modification": "Please cook it in olive oil, butter or tallow, with no canola, soybean, sunflower or other seed oil.",
+      "name": "Calamari",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "This dish is keto, but it breaks one of the rules you turned on in Settings. Ask for the change below."
+    },
+    {
+      "dishId": "e4",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Bread basket",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "Built on bread, which cannot be made keto."
+    },
+    {
+      "dishId": "e5",
+      "hiddenCarbs": [],
+      "modification": "Among the options, skip the pasta and choose a salad or vegetables instead.\nSwap potato purée for green salad or steamed vegetables\nPlease make it with no dairy: no cheese, cream, butter, milk or yogurt.\nPlease serve only the meat, fish or eggs, with no vegetables, salad or other plants on the plate.",
+      "name": "Entrecôte 300g",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+    },
+    {
+      "dishId": "e6",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Grilled salmon",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    },
+    {
+      "dishId": "e7",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Spaghetti carbonara",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "Built on spaghetti, which cannot be made keto."
+    },
+    {
+      "dishId": "e8",
+      "hiddenCarbs": [],
+      "modification": "Please serve the burger without the bun, wrapped in lettuce, and swap the fries for a green salad or a fried egg.\nReplace French fries with a fresh green salad or a fried egg\nPlease make it with no dairy: no cheese, cream, butter, milk or yogurt.",
+      "name": "Beef burger",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+    },
+    {
+      "dishId": "e9",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Chicken curry",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    },
+    {
+      "dishId": "e10",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Steak & eggs",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    },
+    {
+      "dishId": "e11",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "French fries",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "Built on fries, which cannot be made keto."
+    },
+    {
+      "dishId": "e12",
+      "hiddenCarbs": [],
+      "modification": "Ask for barbecue glaze to be omitted (high in sugar)",
+      "name": "BBQ sauce",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+    },
+    {
+      "dishId": "e13",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Coca-Cola",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "Built on cola, which cannot be made keto."
+    },
+    {
+      "dishId": "e14",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Coke Zero",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    },
+    {
+      "dishId": "e15",
+      "hiddenCarbs": [],
+      "modification": "Please make it with black coffee or unsweetened almond milk, no added sugar.\nPlease make it with no dairy: no cheese, cream, butter, milk or yogurt.",
+      "name": "Latte",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+    },
+    {
+      "dishId": "e16",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Espresso",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    },
+    {
+      "dishId": "e17",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "We close at 22:00",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    }
+  ],
+  "engine": {
+    "kind": "rules",
+    "reason": "notConfigured"
+  },
+  "options": {
+    "dietaryConstraints": [
+      "Strict seed-oil free: the user avoids industrial seed oils (canola, rapeseed, soybean, sunflower, corn, cottonseed and generic vegetable oil). A dish that is fried, deep-fried or cooked in one of them is modifiable, with a modification asking for it to be cooked in olive oil, butter or tallow instead, unless it is already nonKeto.",
+      "Dairy-free keto: the user eats no dairy. A dish containing cheese, cream, butter, milk or yogurt is modifiable, with a modification asking for it without the dairy component, unless it is already nonKeto.",
+      "Carnivore only: the user eats only animal foods (meat, fish, seafood, eggs and animal fats). A dish that includes any vegetable, salad, fruit, legume, herb garnish or other plant is modifiable, with a modification asking for only the meat, fish or eggs, with no plants, unless it is already nonKeto."
+    ],
+    "netCarbLimitGrams": 2
+  },
+  "schemaVersion": 0,
+  "unclassified": []
+}

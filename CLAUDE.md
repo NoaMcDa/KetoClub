@@ -89,6 +89,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > skipped when the analysis came with the fetch. With no URL the app is exactly
 > the pre-D25 graph. D25 amends D2, D11, D15, D17, D19 and D24.
 >
+> Banto: every new surface sits behind `--dart-define=BANTO_MODE=true`
+> (`lib/utils/banto_mode.dart`); without it the app is KetoClub byte for byte.
+>
 > **Read `architecture.md` first — it is authoritative.** This file and `README.md`
 > predate the code in places; where any of them disagrees with `architecture.md`,
 > architecture.md wins. **`HANDOFF.md` is the fastest way in**: what exists, what is
@@ -352,7 +355,10 @@ platform falls back to the on-device rule engine for classification.
 
 **Flutter 3.47.4 / Dart 3.13.3**, pinned in `.github/workflows/ci.yml` and
 `pubspec.yaml`; bump both in one commit. `tool/check.sh` runs exactly what the
-`quality` and `test` CI jobs run — run it before pushing.
+`quality` and `test` CI jobs run — run it before pushing. In a Claude Code
+cloud session the SessionStart hook (`.claude/hooks/session-start.sh`) installs
+Flutter 3.47.4 at `/opt/flutter` and the app and backend dependencies, and puts
+Flutter on `PATH` (`docs/RUNNING.md`, "Cloud sessions").
 
 An **info-level lint fails the build** (`--fatal-infos`), including the 80-column
 limit and `public_member_api_docs`, in `test/` and `integration_test/` too.
