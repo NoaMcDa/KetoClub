@@ -166,8 +166,11 @@ test/all_lib_imports_test.dart
 .design/*.html
 !.design/*.dc.html
 
-# Claude Code local state and agent worktrees
-.claude/
+# Claude Code local state and agent worktrees; the shared project settings
+# and hooks (the cloud-session SessionStart hook) are committed on purpose.
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
 
 # Python backend. backend/uv.lock is committed on purpose.
 backend/.venv/

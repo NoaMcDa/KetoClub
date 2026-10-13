@@ -198,6 +198,23 @@ cd backend && uv run pytest
 `test/` and `integration_test/` are held to the same lints as `lib/`
 (80 columns, `public_member_api_docs`).
 
+### Cloud sessions
+
+A Claude Code cloud session starts with no Flutter SDK. The SessionStart hook
+in `.claude/settings.json` runs `.claude/hooks/session-start.sh`
+synchronously, so the checks above work as soon as the session opens. It:
+
+- clones Flutter 3.47.4 (`git clone --depth 1 --branch 3.47.4`) into
+  `/opt/flutter`, or skips the clone when that directory already holds 3.47.4;
+- runs `flutter config --no-analytics` and `flutter precache --web`;
+- runs `flutter pub get` in the repository and `uv sync --frozen` in
+  `backend/` (a missing `uv` prints a message and does not fail the session);
+- appends `export PATH=/opt/flutter/bin:$PATH` to `$CLAUDE_ENV_FILE`, so every
+  later shell finds `flutter`.
+
+It does nothing unless `CLAUDE_CODE_REMOTE=true`, so it is a no-op on your
+own machine, and a second run changes nothing.
+
 ## 5. Things that need a real network path
 
 The CI runners and the cloud sandbox cannot reach `restaurant-api.wolt.com`,

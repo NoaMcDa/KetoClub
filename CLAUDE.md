@@ -352,7 +352,10 @@ platform falls back to the on-device rule engine for classification.
 
 **Flutter 3.47.4 / Dart 3.13.3**, pinned in `.github/workflows/ci.yml` and
 `pubspec.yaml`; bump both in one commit. `tool/check.sh` runs exactly what the
-`quality` and `test` CI jobs run — run it before pushing.
+`quality` and `test` CI jobs run — run it before pushing. In a Claude Code
+cloud session the SessionStart hook (`.claude/hooks/session-start.sh`) installs
+Flutter 3.47.4 at `/opt/flutter` and the app and backend dependencies, and puts
+Flutter on `PATH` (`docs/RUNNING.md`, "Cloud sessions").
 
 An **info-level lint fails the build** (`--fatal-infos`), including the 80-column
 limit and `public_member_api_docs`, in `test/` and `integration_test/` too.
