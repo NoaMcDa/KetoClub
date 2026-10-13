@@ -3121,6 +3121,52 @@ severity exists to vary it. The card needs no menu and sends nothing anywhere
 (C1). The per-dish card with a dish's name, modification and questions, and the
 cross-contact closing line driven by ALG-07 signals, are ALG-08b.
 
+**Kitchen cross-contact signals, the pure part (ALG-07, #349).**
+`KitchenSignals.of(menu)` in `lib/utils/allergens/kitchen_signals.dart`
+(twin: `backend/app/keto/kitchen_signals.py`) is a rules-only pass over a
+whole menu, never a dish, that reports what the menu reveals about its
+kitchen as `KitchenSignal`s in `KitchenSignalKind` order: `fryer`, `wok`,
+`sharedGrill`, `bakery`, `nuts`, `sesame`. Each carries the restrictions it
+threatens (taxonomy order), up to three dish names as evidence and one
+standard question for the staff in both languages. The questions live in Dart
+beside the term lists (the §6.3 exception, as the waiter templates do), are
+questions and never assurances, and pass the banned-words list. A dish shows
+a kind when its own rules text or its category heading does; the term lists
+compile as the keto vocabulary does (`latinTriggerPattern`,
+`hebrewTriggerPattern`, `isGuarded`), with guards for "stir fried", "pan
+fried", "air fried" and "fried rice" (a wok dish, not a fryer one),
+"chocolate chips" and plant-based burgers. The nuts, sesame and seafood facts
+come from `AllergenMatcher` (any certainty), never from a list of this file.
+`sharedGrill` needs a grilled meat dish and a grilled fish dish. The mapping
+is a fryer to wheat and gluten plus fish, crustaceans or molluscs when a fried
+dish names that seafood, a wok to peanuts, soy, wheat, gluten, crustaceans,
+molluscs and sesame, a shared grill to the seafood three, a bakery to milk,
+eggs, wheat, gluten and sesame, nuts to peanuts and tree nuts, sesame to
+sesame; wheat is added beside gluten wherever flour is the cause, because a
+wheat allergy shares the cause with celiac disease. A signal is a menu-level
+fact beside the per-dish answer: it changes no verdict, and nothing consults
+it yet (the notice, the demotion of green dishes for strict entries and the
+keto-only no-op are ALG-07's later part). A new golden, `kitchen_signals.json`,
+carries the term lists, guards, threat table and questions and the signals of
+every golden menu, the allergen corpus menus and menus built for each rule,
+all under a small nuts, sesame and seafood vocabulary of its own
+(`tool/golden/kitchen_signals_corpus.dart`) so it does not move when the group
+vocabulary files are filled; no other golden changed.
+
+**The Why sheet (ALG-06, #348).** `lib/widgets/why_sheet.dart` is the "why this
+result" bottom sheet, built and tested on its own and wired into no screen
+yet. `WhySheet` takes a dish name, a list of `Concern` and whether the profile
+is strict, and shows one row per concern: the restriction's name in the UI
+language, the evidence tier as a phrase (declared by the platform, stated on
+the menu, inferred from a typical recipe, suspected (please ask), confirmed by
+you, ruled out by you), where it was found, the matched text quoted and the
+waiter question. Confidence is words, never a number or a percentage. An empty
+list says nothing in the menu text points to the profile, adding "still ask the
+restaurant" for a strict profile, and never says the dish is fine; the footer
+is `helperToolSentence`. `showWhySheet` opens it through `showKetoClubSheet`
+(560 px cap) and, like the widget, does nothing with `bantoMode` off. The
+strings are new ARB keys (`why*`), so the banned-words test covers them.
+
 **The matcher's guards lower, sit beside their term, and read the maqaf
 (ALG-04a, related to #346).** Three allergen-only rules replace the keto guard
 window inside `AllergenMatcher`, and its Python twin follows them. **A guard
