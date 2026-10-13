@@ -3026,6 +3026,32 @@ both branches with no define.
   tolerantly (absent → empty), and a Banto profile's stale cache is retired by
   `restrictionsRequested` entering `AnalysisOptionsSnapshot.matches`.
 
+**The restriction taxonomy, the allergen vocabulary and its golden (ALG-01a,
+#343).** `lib/models/restriction.dart` names the 20 restrictions a profile can
+hold (`RestrictionId`, wire form by name; a test pins the list) and their
+`RestrictionKind`. There are no severity levels: a restriction is **strict**
+when its kind is `allergen` or `autoimmune` (celiac, the `gluten` id, distinct
+from the `wheat` allergy) and **flexible** otherwise (`lactose` is an
+intolerance, `vegan`/`vegetarian` lifestyle, `keto` keto); strictness is derived
+from the kind, never stored or asked. `lib/utils/allergens/taxonomy.dart`
+holds one entry per id with the jurisdictions whose labelling law names it
+(file 02) and English/Hebrew names, which follow the menu's language as the
+waiter sentences do (§12). Each restriction's triggers — direct, hidden with a
+`likely`/`suspected` certainty, guards on a stated side, and Hebrew terms that
+take no prefix — live in six group files assembled by
+`utils/allergens/vocabulary.dart`; every source cites file 11 or 12. Nothing in
+`constants.dart` changes. `AllergenMatcher` compiles them with the keto
+engine's own `latinTriggerPattern`, `hebrewTriggerPattern`, normaliser and
+guard window (`ClassificationRules.isGuarded`, made public for it) and reports
+every restriction it finds, whatever the profile (C1); a dish is read as
+`dishRulesText`, so removal options are skipped. A new golden,
+`allergens.json`, carries the taxonomy, the compiled vocabulary and the
+matcher's hits over `tool/golden/allergen_corpus.dart` and over a fixture
+vocabulary that pins the matcher before the groups are filled;
+`backend/app/keto/allergens.py` replays it, and its packaged copy is pinned
+byte-equal. Nothing consults the matcher yet (ALG-04 will); no keto golden
+changed.
+
 ---
 
 ## 15. Testing strategy

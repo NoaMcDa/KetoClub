@@ -407,6 +407,24 @@ bool _listEquals<T>(List<T> a, List<T> b) {
 /// Runs the bilingual heuristic vocabulary over one dish's text
 /// (`vocabulary_spec.md`; architecture.md §6.2).
 abstract final class ClassificationRules {
+  /// Whether [guard] cancels the match spanning [start]-[end] (`end`
+  /// exclusive) in the normalised [haystack] — the guard window every
+  /// table in this file uses (D-V1): a phrase from `guard.before` among
+  /// the up-to-two words just before the match, or one from `guard.after`
+  /// among the up-to-two words just after it. Each phrase is normalised
+  /// first, and a multi-word phrase must be adjacent inside the window.
+  /// A null [guard] cancels nothing.
+  ///
+  /// Public so the allergen matcher (`utils/allergens/allergen_matcher
+  /// .dart`, ALG-01) applies its guards with exactly the keto semantics;
+  /// there is one guard window in this codebase. Never throws.
+  static bool isGuarded(
+    String haystack,
+    int start,
+    int end,
+    GuardWords? guard,
+  ) => _isGuarded(haystack, start, end, guard);
+
   /// Runs both the English and Hebrew vocabularies over [rawText]
   /// unconditionally — Israeli menus mix scripts. Never throws.
   ///
