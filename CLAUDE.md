@@ -89,6 +89,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > skipped when the analysis came with the fetch. With no URL the app is exactly
 > the pre-D25 graph. D25 amends D2, D11, D15, D17, D19 and D24.
 >
+> Banto: every new surface sits behind `--dart-define=BANTO_MODE=true`
+> (`lib/utils/banto_mode.dart`); without it the app is KetoClub byte for byte.
+>
 > **Read `architecture.md` first — it is authoritative.** This file and `README.md`
 > predate the code in places; where any of them disagrees with `architecture.md`,
 > architecture.md wins. **`HANDOFF.md` is the fastest way in**: what exists, what is

@@ -23,7 +23,7 @@ import 'package:ketoclub/state/settings_controller.dart';
 import 'package:ketoclub/state/theme_mode_controller.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
-import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/app_shell.dart';
 import 'package:ketoclub/widgets/route_title.dart';
@@ -124,7 +124,7 @@ class _KetoClubAppState extends State<KetoClubApp> {
         animation: Listenable.merge([_localeController, _themeModeController]),
         builder: (context, _) => MaterialApp(
           navigatorKey: widget.dependencies.navigatorKey,
-          title: appName,
+          title: BantoMode.appName,
           onGenerateTitle: (_) => documentTitle(null),
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
