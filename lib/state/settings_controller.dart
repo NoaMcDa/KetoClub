@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/dietary_profile.dart';
+import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -104,6 +106,10 @@ final class SettingsController extends ChangeNotifier {
   /// convenience for tests and any future caller in a scope that
   /// already holds a controller.
   bool get disclosureSeen => _appSettings.disclosureSeen;
+
+  /// The restrictions the user chose (Banto, ALG-02a, issue #344), kept on
+  /// this device only (contract decision C1).
+  DietaryProfile get profile => _appSettings.profile;
 
   /// How many menus are currently cached (issue #61's Settings section). A
   /// count of entries, never a byte figure —
@@ -279,6 +285,35 @@ final class SettingsController extends ChangeNotifier {
   Future<void> declineDisclosure() => _update(
     _appSettings.copyWith(estimationConsentGiven: false, disclosureSeen: true),
   );
+
+  /// Adds [id] to the profile, last, with no exceptions (issue #344).
+  ///
+  /// A no-op, with no write, when the profile already holds [id], so a
+  /// double tap cannot reset its exceptions.
+  Future<void> addRestriction(RestrictionId id) async {
+    if (profile.contains(id)) return;
+    await _update(_appSettings.copyWith(profile: profile.withEntry(id)));
+  }
+
+  /// Removes [id] and its exceptions from the profile (issue #344). A
+  /// no-op, with no write, when the profile does not hold [id].
+  Future<void> removeRestriction(RestrictionId id) async {
+    if (!profile.contains(id)) return;
+    await _update(_appSettings.copyWith(profile: profile.withoutEntry(id)));
+  }
+
+  /// Replaces the exceptions of [id] with [exceptions], trimmed,
+  /// de-duplicated and capped ([ProfileEntry.normaliseExceptions]; issue
+  /// #344). A no-op, with no write, when the profile does not hold [id]:
+  /// setting exceptions never adds a restriction by the back door.
+  Future<void> setExceptions(RestrictionId id, List<String> exceptions) async {
+    if (!profile.contains(id)) return;
+    await _update(
+      _appSettings.copyWith(
+        profile: profile.withEntry(id, exceptions: exceptions),
+      ),
+    );
+  }
 
   /// Replaces the held settings with [next] and persists them, marking
   /// [isBusy] around the write exactly as every other setter here does.

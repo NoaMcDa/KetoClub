@@ -24,6 +24,7 @@ import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_analysis_prompt.dart';
@@ -33,6 +34,7 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/utils/keto_score.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
 import 'package:ketoclub/utils/verdict_counts.dart';
+import 'package:ketoclub/widgets/route_title.dart';
 
 import '../../tool/golden/golden_corpus.dart';
 import '../fakes/fake_clock.dart';
@@ -94,6 +96,7 @@ final List<String> _fixtureNames = <String>[
   'options_snapshot_defaults.json',
   'options_snapshot_all_rules_limit2.json',
   'app_settings_defaults.json',
+  'document_title.txt',
   for (final menu in goldenHandBuiltMenus.keys)
     for (final options in _optionSets.keys) 'rules_${menu}_$options.json',
   'copy_en.json',
@@ -206,11 +209,30 @@ typedef _BantoSeam = ({
   String Function({required bool bantoMode}) build,
 });
 
-/// The second layer: every seam that takes `bantoMode`. Empty today — no
-/// production code takes the parameter yet (W0-A has not merged). Each
-/// later wave adds its seam here, e.g. the system prompt once
-/// `systemPrompt` takes `bantoMode`, against `system_prompt_defaults.txt`.
-final List<_BantoSeam> _bantoSeams = <_BantoSeam>[];
+/// The second layer: every seam that takes `bantoMode`, or that Banto
+/// touches, with the keto-only fixture it must still build. Each later
+/// wave adds its seam here, e.g. the system prompt once `systemPrompt`
+/// takes `bantoMode`, against `system_prompt_defaults.txt`.
+///
+/// The first two (ALG-02a, issue #344): the document title a build without
+/// the define shows, and the settings record with an explicitly empty
+/// dietary profile, which must store exactly what a keto-only install
+/// stored before the profile existed.
+final List<_BantoSeam> _bantoSeams = <_BantoSeam>[
+  (
+    fixture: 'document_title.txt',
+    // `app` defaults to BantoMode.appName, the build's display name.
+    build: ({required bool bantoMode}) => documentTitle(null),
+  ),
+  (
+    fixture: 'app_settings_defaults.json',
+    // Through copyWith, so the empty profile is set explicitly rather than
+    // left at the constructor's default.
+    build: ({required bool bantoMode}) => _canonicalJson(
+      const AppSettings().copyWith(profile: DietaryProfile.empty).toJson(),
+    ),
+  ),
+];
 
 void main() {
   group('the baseline folder', () {
@@ -318,6 +340,15 @@ void main() {
       // Assert
       _expectFixture('app_settings_defaults.json', json);
     });
+
+    test('the default settings write no dietaryProfile key', () {
+      // Act
+      final json = const AppSettings().toJson();
+
+      // Assert: an empty profile is never written (ALG-02a, issue #344),
+      // so a keto-only install's stored record does not change.
+      expect(json.containsKey('dietaryProfile'), isFalse);
+    });
   });
 
   group('the rule engine verdicts', () {
@@ -423,6 +454,14 @@ void main() {
   });
 
   group('with bantoMode: true', () {
+    test('lists its seams', () {
+      // Assert: a seam dropped by accident would otherwise pass silently.
+      expect(_bantoSeams.map((seam) => seam.fixture), <String>[
+        'document_title.txt',
+        'app_settings_defaults.json',
+      ]);
+    });
+
     test('every bantoMode seam still builds its keto-only fixture', () {
       for (final seam in _bantoSeams) {
         // Act

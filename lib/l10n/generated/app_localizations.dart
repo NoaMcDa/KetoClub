@@ -518,6 +518,66 @@ abstract class AppLocalizations {
   /// **'Each rule you turn on applies from the next menu you open.'**
   String get settingsKetoRulesBody;
 
+  /// Banto (ALG-02a): the Settings section listing the user's dietary restrictions.
+  ///
+  /// In en, this message translates to:
+  /// **'My restrictions'**
+  String get settingsRestrictions;
+
+  /// No description provided for @settingsRestrictionsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You have not added a restriction yet.'**
+  String get settingsRestrictionsEmpty;
+
+  /// No description provided for @settingsRestrictionsAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add restriction'**
+  String get settingsRestrictionsAdd;
+
+  /// Tooltip and screen-reader label of a restriction row's remove button.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name}'**
+  String settingsRestrictionsRemove(String name);
+
+  /// No description provided for @restrictionKindAllergy.
+  ///
+  /// In en, this message translates to:
+  /// **'Allergy'**
+  String get restrictionKindAllergy;
+
+  /// The kind label of celiac disease (the gluten restriction).
+  ///
+  /// In en, this message translates to:
+  /// **'Autoimmune'**
+  String get restrictionKindAutoimmune;
+
+  /// No description provided for @restrictionKindIntolerance.
+  ///
+  /// In en, this message translates to:
+  /// **'Intolerance'**
+  String get restrictionKindIntolerance;
+
+  /// No description provided for @restrictionKindDiet.
+  ///
+  /// In en, this message translates to:
+  /// **'Diet'**
+  String get restrictionKindDiet;
+
+  /// One line under a restriction in the picker: which official allergen-labelling lists name it.
+  ///
+  /// In en, this message translates to:
+  /// **'{lists, select, usEu{On the US and EU allergen lists} us{On the US allergen list} eu{On the EU allergen list} other{Not on any official allergen list}}'**
+  String restrictionJurisdictionHint(String lists);
+
+  /// No description provided for @restrictionPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a restriction'**
+  String get restrictionPickerTitle;
+
   /// No description provided for @settingsSeedOilFree.
   ///
   /// In en, this message translates to:

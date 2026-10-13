@@ -242,6 +242,47 @@ class AppLocalizationsEn extends AppLocalizations {
       'Each rule you turn on applies from the next menu you open.';
 
   @override
+  String get settingsRestrictions => 'My restrictions';
+
+  @override
+  String get settingsRestrictionsEmpty =>
+      'You have not added a restriction yet.';
+
+  @override
+  String get settingsRestrictionsAdd => 'Add restriction';
+
+  @override
+  String settingsRestrictionsRemove(String name) {
+    return 'Remove $name';
+  }
+
+  @override
+  String get restrictionKindAllergy => 'Allergy';
+
+  @override
+  String get restrictionKindAutoimmune => 'Autoimmune';
+
+  @override
+  String get restrictionKindIntolerance => 'Intolerance';
+
+  @override
+  String get restrictionKindDiet => 'Diet';
+
+  @override
+  String restrictionJurisdictionHint(String lists) {
+    String _temp0 = intl.Intl.selectLogic(lists, {
+      'usEu': 'On the US and EU allergen lists',
+      'us': 'On the US allergen list',
+      'eu': 'On the EU allergen list',
+      'other': 'Not on any official allergen list',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get restrictionPickerTitle => 'Add a restriction';
+
+  @override
   String get settingsSeedOilFree => 'Strict seed-oil free';
 
   @override

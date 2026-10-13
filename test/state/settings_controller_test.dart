@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/dietary_profile.dart';
+import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
@@ -556,6 +558,139 @@ void main() {
       await controller.setSeedOilFree(enabled: true);
       await controller.setDairyFree(enabled: true);
       await controller.setCarnivoreOnly(enabled: true);
+
+      // Assert
+      expect(states, [true, false, true, false, true, false]);
+    });
+  });
+
+  group('SettingsController dietary profile (ALG-02a, issue #344)', () {
+    late FakeSettingsStore settings;
+    late SettingsController controller;
+
+    setUp(() {
+      settings = FakeSettingsStore();
+      controller = SettingsController(settings, FakeMenuRepository());
+    });
+
+    test('the profile is empty before load', () {
+      expect(controller.profile, DietaryProfile.empty);
+    });
+
+    test('load populates the profile', () async {
+      // Arrange
+      final profile = DietaryProfile.empty.withEntry(RestrictionId.sesame);
+      await settings.write(AppSettings(profile: profile));
+
+      // Act
+      await controller.load();
+
+      // Assert
+      expect(controller.profile, profile);
+    });
+
+    test('addRestriction persists the entry without clobbering the other '
+        'settings', () async {
+      // Arrange
+      await controller.setLanguage('he');
+      await controller.setSeedOilFree(enabled: true);
+
+      // Act
+      await controller.addRestriction(RestrictionId.sesame);
+      await controller.addRestriction(RestrictionId.lactose);
+
+      // Assert
+      final stored = await settings.read();
+      expect(
+        stored.profile.entries.map((entry) => entry.restrictionId),
+        <RestrictionId>[RestrictionId.sesame, RestrictionId.lactose],
+      );
+      expect(controller.profile, stored.profile);
+      expect(stored.languageTag, 'he');
+      expect(stored.seedOilFree, isTrue);
+    });
+
+    test('addRestriction of a present id writes nothing and keeps its '
+        'exceptions', () async {
+      // Arrange
+      await controller.addRestriction(RestrictionId.milk);
+      await controller.setExceptions(RestrictionId.milk, <String>['ghee']);
+      final writes = settings.writeCallCount;
+
+      // Act
+      await controller.addRestriction(RestrictionId.milk);
+
+      // Assert
+      expect(settings.writeCallCount, writes);
+      expect(
+        controller.profile.entryFor(RestrictionId.milk)!.exceptions,
+        <String>['ghee'],
+      );
+    });
+
+    test('removeRestriction removes the entry and persists it', () async {
+      // Arrange
+      await controller.addRestriction(RestrictionId.fish);
+      await controller.addRestriction(RestrictionId.eggs);
+
+      // Act
+      await controller.removeRestriction(RestrictionId.fish);
+
+      // Assert
+      final stored = await settings.read();
+      expect(stored.profile.contains(RestrictionId.fish), isFalse);
+      expect(stored.profile.contains(RestrictionId.eggs), isTrue);
+    });
+
+    test('removeRestriction of an absent id writes nothing', () async {
+      // Act
+      await controller.removeRestriction(RestrictionId.fish);
+
+      // Assert
+      expect(settings.writeCallCount, 0);
+    });
+
+    test('setExceptions stores the normalised exceptions', () async {
+      // Arrange
+      await controller.addRestriction(RestrictionId.lactose);
+
+      // Act
+      await controller.setExceptions(RestrictionId.lactose, <String>[
+        ' butter ',
+        '',
+        'butter',
+        'hard cheese',
+      ]);
+
+      // Assert
+      final stored = await settings.read();
+      expect(
+        stored.profile.entryFor(RestrictionId.lactose)!.exceptions,
+        <String>['butter', 'hard cheese'],
+      );
+    });
+
+    test(
+      'setExceptions for an absent id adds nothing and writes nothing',
+      () async {
+        // Act
+        await controller.setExceptions(RestrictionId.soy, <String>['sauce']);
+
+        // Assert
+        expect(controller.profile, DietaryProfile.empty);
+        expect(settings.writeCallCount, 0);
+      },
+    );
+
+    test('each profile setter toggles isBusy true then false', () async {
+      // Arrange
+      final states = <bool>[];
+      controller.addListener(() => states.add(controller.isBusy));
+
+      // Act
+      await controller.addRestriction(RestrictionId.celery);
+      await controller.setExceptions(RestrictionId.celery, <String>['salt']);
+      await controller.removeRestriction(RestrictionId.celery);
 
       // Assert
       expect(states, [true, false, true, false, true, false]);
