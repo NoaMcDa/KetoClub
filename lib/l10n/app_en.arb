@@ -627,5 +627,27 @@
   "helperToolTitle": "A helper, not a guarantee",
   "@helperToolTitle": { "description": "Heading that sits above the helper-tool sentence." },
   "whatLeavesDeviceBanto": "Your restriction profile stays on this device. When AI analysis is on, only the menu text and the keto settings are sent — never which restrictions you have.",
-  "@whatLeavesDeviceBanto": { "description": "Plain statement of what leaves the device once restriction profiles exist; the profile never does." }
+  "@whatLeavesDeviceBanto": { "description": "Plain statement of what leaves the device once restriction profiles exist; the profile never does." },
+
+  "whySheetTitle": "Why this result",
+  "@whySheetTitle": { "description": "Title of the bottom sheet that lists the concerns behind a dish's state (Banto, ALG-06)." },
+  "whySheetDishName": "{dish}",
+  "@whySheetDishName": { "description": "The dish the Why sheet is about, shown under the title.", "placeholders": { "dish": { "type": "String" } } },
+  "whyTierDeclared": "Declared by the platform",
+  "@whyTierDeclared": { "description": "Evidence tier phrase: the platform said so. The tier phrases are words, never a percentage." },
+  "whyTierStated": "Stated on the menu",
+  "whyTierInferred": "Inferred from a typical recipe",
+  "whyTierSuspected": "Suspected \u2014 please ask",
+  "whyTierConfirmed": "Confirmed by you",
+  "whyTierDenied": "Ruled out by you",
+  "whySourceName": "Found in the dish name",
+  "whySourceDescription": "Found in the dish description",
+  "whySourceOption": "Found in one of the options",
+  "whySourceHidden": "A hidden source the text implies",
+  "whySourceModel": "Read by the AI, not in the menu text",
+  "whyMatchedText": "Matched: \u201c{text}\u201d",
+  "@whyMatchedText": { "description": "The exact menu text a concern matched, quoted.", "placeholders": { "text": { "type": "String" } } },
+  "whyWaiterQuestionLabel": "Ask the waiter",
+  "whyEmptyStrict": "Nothing in the menu text points to your restrictions. Still ask the restaurant.",
+  "whyEmptyFlexible": "Nothing in the menu text points to your restrictions."
 }

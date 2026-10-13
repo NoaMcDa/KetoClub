@@ -1430,4 +1430,61 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get whatLeavesDeviceBanto =>
       'Your restriction profile stays on this device. When AI analysis is on, only the menu text and the keto settings are sent — never which restrictions you have.';
+
+  @override
+  String get whySheetTitle => 'Why this result';
+
+  @override
+  String whySheetDishName(String dish) {
+    return '$dish';
+  }
+
+  @override
+  String get whyTierDeclared => 'Declared by the platform';
+
+  @override
+  String get whyTierStated => 'Stated on the menu';
+
+  @override
+  String get whyTierInferred => 'Inferred from a typical recipe';
+
+  @override
+  String get whyTierSuspected => 'Suspected — please ask';
+
+  @override
+  String get whyTierConfirmed => 'Confirmed by you';
+
+  @override
+  String get whyTierDenied => 'Ruled out by you';
+
+  @override
+  String get whySourceName => 'Found in the dish name';
+
+  @override
+  String get whySourceDescription => 'Found in the dish description';
+
+  @override
+  String get whySourceOption => 'Found in one of the options';
+
+  @override
+  String get whySourceHidden => 'A hidden source the text implies';
+
+  @override
+  String get whySourceModel => 'Read by the AI, not in the menu text';
+
+  @override
+  String whyMatchedText(String text) {
+    return 'Matched: “$text”';
+  }
+
+  @override
+  String get whyWaiterQuestionLabel => 'Ask the waiter';
+
+  @override
+  String get whyEmptyStrict =>
+      'Nothing in the menu text points to your restrictions. Still ask the restaurant.';
+
+  @override
+  String get whyEmptyFlexible =>
+      'Nothing in the menu text points to your restrictions.';
 }
