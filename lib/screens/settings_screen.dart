@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/screens/chef_card_screen.dart';
 import 'package:ketoclub/services/platform/app_info.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
+import 'package:ketoclub/services/platform/menu_sharer.dart';
+import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
@@ -17,6 +20,10 @@ import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/restriction_picker_sheet.dart';
 import 'package:provider/provider.dart';
+
+/// The "Show my chef card" button in the "My restrictions" section (Banto,
+/// ALG-08a, issue #350), present only for a non-empty profile.
+const Key restrictionsChefCardKey = Key('settingsRestrictionsChefCard');
 
 /// Scopes a test's finder to the language section's segmented control, so
 /// a label the language and appearance sections happen to share (both offer
@@ -134,6 +141,8 @@ class SettingsScreen extends StatefulWidget {
     required this.externalLinkOpener,
     this.backendConfigured = false,
     this.bantoMode = BantoMode.enabled,
+    this.screenBrightness = const NoOpScreenBrightness(),
+    this.menuSharer,
     super.key,
   });
 
@@ -152,6 +161,14 @@ class SettingsScreen extends StatefulWidget {
   /// "My restrictions" section. Defaults to the build's flag; a test
   /// passes either value with no `--dart-define`.
   final bool bantoMode;
+
+  /// Raised while the chef card opened from the "My restrictions" section
+  /// is on screen (ALG-08a, issue #350). Only used with [bantoMode] on.
+  final ScreenBrightness screenBrightness;
+
+  /// Shares the chef card as text; null leaves its Share button out. Only
+  /// used with [bantoMode] on.
+  final MenuSharer? menuSharer;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -683,6 +700,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     onPressed: busy
                         ? null
                         : () => unawaited(_pickRestriction(context, added)),
+                  ),
+                ),
+              ),
+            if (entries.isNotEmpty)
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(16, 4, 16, 12),
+                child: Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: FilledButton.icon(
+                    key: restrictionsChefCardKey,
+                    icon: const Icon(Icons.restaurant_menu),
+                    label: Text(l10n.chefCardShowButton),
+                    onPressed: () => Navigator.of(context).push<void>(
+                      MaterialPageRoute<void>(
+                        builder: (_) => ChefCardScreen(
+                          profile: controller.profile,
+                          screenBrightness: widget.screenBrightness,
+                          menuSharer: widget.menuSharer,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
