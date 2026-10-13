@@ -9,7 +9,7 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "grilled fish with olive oil, lemon and herbs",
+          "evidence": "grilled fish with olive oil, lemon and herbs; cross-contact not assessed",
           "source": "11 §3"
         },
         "fish": {
@@ -66,6 +66,12 @@
           "role": "garnish",
           "evidence": "\"סומסום\" (a spelling of שומשום)",
           "source": "12 §1.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"סויה\"",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -457,6 +463,12 @@
           "evidence": "a seafood version of חריימה exists",
           "source": "12 §1.7"
         },
+        "molluscs": {
+          "label": "may_contain",
+          "role": "unknown",
+          "evidence": "a seafood version of חריימה exists",
+          "source": "12 §1.7"
+        },
         "vegan": {
           "label": "contains",
           "role": "protein",
@@ -613,7 +625,7 @@
         },
         "fish": {
           "label": "free",
-          "evidence": "a vegetable and cheese salad",
+          "evidence": "a vegetable and cheese salad; cross-contact not assessed",
           "source": "11 §8"
         },
         "celery": {
@@ -647,9 +659,9 @@
           "source": "11 §4.3"
         },
         "eggs": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "sauce",
-          "evidence": "Caesar dressing is egg-based",
+          "evidence": "Caesar dressing is made with egg",
           "source": "12 §5"
         },
         "wheat": {
@@ -682,6 +694,12 @@
           "evidence": "Caesar dressing lists mustard",
           "source": "12 §5"
         },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "prawns are a sulphite source",
+          "source": "11 §15.2"
+        },
         "vegan": {
           "label": "contains",
           "role": "garnish",
@@ -703,7 +721,7 @@
       "labels": {
         "fish": {
           "label": "free",
-          "evidence": "the text says the chips are fried in separate oil",
+          "evidence": "the text says the chips are fried in separate oil; cross-contact not assessed",
           "source": "11 §8.4"
         },
         "sulphites": {
@@ -813,7 +831,7 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "a glass of wine",
+          "evidence": "a glass of wine; cross-contact not assessed",
           "source": "11 §3"
         },
         "sulphites": {

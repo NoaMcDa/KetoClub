@@ -60,7 +60,7 @@
           "label": "may_contain",
           "role": "base",
           "evidence": "laminated pastry uses butter",
-          "source": "11 §3.2"
+          "source": "11 §4.2"
         },
         "eggs": {
           "label": "may_contain",
@@ -85,6 +85,12 @@
           "role": "base",
           "evidence": "a croissant is a wheat pastry",
           "source": "12 §1.4"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "soy is a legume: chocolate commonly contains soy lecithin",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "may_contain",
@@ -115,7 +121,7 @@
           "label": "may_contain",
           "role": "base",
           "evidence": "laminated pastry uses butter",
-          "source": "11 §3.2"
+          "source": "11 §4.2"
         },
         "eggs": {
           "label": "may_contain",
@@ -207,7 +213,7 @@
           "label": "may_contain",
           "role": "hidden",
           "evidence": "baked goods commonly contain milk or butter",
-          "source": "11 §3.2"
+          "source": "11 §4.2"
         },
         "eggs": {
           "label": "may_contain",
@@ -298,7 +304,7 @@
           "label": "may_contain",
           "role": "hidden",
           "evidence": "cakes and chocolate commonly contain butter or milk",
-          "source": "11 §3.2"
+          "source": "11 §4.2"
         },
         "eggs": {
           "label": "contains",
@@ -307,9 +313,16 @@
           "source": "11 §5.1"
         },
         "wheat": {
-          "label": "free",
-          "evidence": "\"ללא קמח\" is a restaurant claim of no flour; cross-contact is not assessed",
-          "source": "12 §2.2"
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "guard: 'ללא קמח' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §7.3"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "guard: 'ללא קמח' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §7.3"
         },
         "vegan": {
           "label": "contains",
@@ -363,7 +376,7 @@
       "labels": {
         "eggs": {
           "label": "free",
-          "evidence": "bread, avocado and za'atar",
+          "evidence": "bread, avocado and za'atar; cross-contact not assessed",
           "source": "11 §5"
         },
         "wheat": {
@@ -403,10 +416,10 @@
           "source": "12 §1.5"
         },
         "lactose": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "garnish",
-          "evidence": "a yellow cheese is a hard cheese",
-          "source": "11 §4.3"
+          "evidence": "\"גבינה צהובה\" melted young: not a hard aged cheese",
+          "source": "11 §4.2"
         },
         "wheat": {
           "label": "contains",
@@ -448,7 +461,7 @@
           "label": "may_contain",
           "role": "hidden",
           "evidence": "canned tuna can contain casein",
-          "source": "11 §3.2"
+          "source": "11 §4.2"
         },
         "eggs": {
           "label": "contains",
@@ -505,11 +518,17 @@
       "description": "עגבניות, מוצרלה, בזיליקום וחמאת פסטו",
       "options": [],
       "labels": {
-        "treeNuts": {
+        "peanuts": {
           "label": "may_contain",
           "role": "sauce",
-          "evidence": "\"פסטו\" is made with pine nuts or walnuts",
-          "source": "11 §2.2"
+          "evidence": "pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
+        "treeNuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"pesto\" is made with pine nuts (or walnuts)",
+          "source": "11 §2.1"
         },
         "milk": {
           "label": "contains",
@@ -522,6 +541,12 @@
           "role": "garnish",
           "evidence": "fresh mozzarella",
           "source": "11 §4.1"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -589,7 +614,7 @@
           "label": "contains",
           "role": "sauce",
           "evidence": "hollandaise is made with butter",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "eggs": {
           "label": "contains",
@@ -632,7 +657,7 @@
           "label": "may_contain",
           "role": "hidden",
           "evidence": "granola commonly contains nuts",
-          "source": "11 §1.2"
+          "source": "11 §2.2"
         },
         "milk": {
           "label": "contains",
@@ -656,6 +681,12 @@
           "label": "free",
           "evidence": "no lupin ingredient named in the dish text; kitchen cross-contact is not assessed",
           "source": "11 §14"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "peanuts is a legume: granola is a documented peanut hiding place",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -739,8 +770,9 @@
       "options": [],
       "labels": {
         "milk": {
-          "label": "free",
-          "evidence": "\"שיבולת שועל\" is an oat drink, not dairy",
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "guard: 'שיבולת שועל' (11 §0): a guard lowers certainty but never clears a strict restriction",
           "source": "11 §3.3"
         },
         "lactose": {
@@ -774,7 +806,7 @@
         },
         "milk": {
           "label": "free",
-          "evidence": "almond milk is not dairy",
+          "evidence": "almond milk is not dairy; cross-contact not assessed",
           "source": "11 §3.3"
         }
       }
@@ -830,7 +862,7 @@
           "label": "may_contain",
           "role": "hidden",
           "evidence": "cookies commonly contain butter",
-          "source": "11 §3.2"
+          "source": "11 §4.2"
         },
         "eggs": {
           "label": "may_contain",
@@ -849,6 +881,12 @@
           "role": "base",
           "evidence": "a cookie is a wheat pastry",
           "source": "11 §7.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "peanuts is a legume: \"בוטנים\"",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "may_contain",
@@ -886,6 +924,12 @@
           "role": "sauce",
           "evidence": "the manufacturer lists sesame in the filled Bamba",
           "source": "12 §1.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "soy is a legume: the manufacturer lists soy in every Bamba variant",
+          "source": "11 §16.1"
         }
       }
     },
@@ -896,12 +940,12 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "squeezed oranges",
+          "evidence": "squeezed oranges; cross-contact not assessed",
           "source": "11 §3"
         },
         "eggs": {
           "label": "free",
-          "evidence": "squeezed oranges",
+          "evidence": "squeezed oranges; cross-contact not assessed",
           "source": "11 §5"
         }
       }
@@ -913,12 +957,12 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "herbal tea",
+          "evidence": "herbal tea; cross-contact not assessed",
           "source": "11 §3"
         },
         "wheat": {
           "label": "free",
-          "evidence": "herbal tea",
+          "evidence": "herbal tea; cross-contact not assessed",
           "source": "11 §7"
         }
       }

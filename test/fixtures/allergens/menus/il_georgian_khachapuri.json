@@ -130,7 +130,7 @@
         },
         "fish": {
           "label": "free",
-          "evidence": "dough, cheese and egg",
+          "evidence": "dough, cheese and egg; cross-contact not assessed",
           "source": "11 §8"
         },
         "vegan": {
@@ -156,7 +156,7 @@
           "label": "may_contain",
           "role": "base",
           "evidence": "filled breads are often brushed with butter",
-          "source": "11 §3.2"
+          "source": "11 §4.2"
         },
         "wheat": {
           "label": "contains",
@@ -295,7 +295,7 @@
         },
         "milk": {
           "label": "free",
-          "evidence": "eggplant, walnut paste and pomegranate",
+          "evidence": "eggplant, walnut paste and pomegranate; cross-contact not assessed",
           "source": "11 §3"
         },
         "vegan": {
@@ -326,6 +326,12 @@
           "label": "free",
           "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
           "source": "11 §8"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: a bare \"אגוזים\" leaves the peanut status unknown; ask",
+          "source": "11 §16.1"
         }
       }
     },
@@ -335,13 +341,20 @@
       "options": [],
       "labels": {
         "milk": {
-          "label": "free",
-          "evidence": "grilled beef with onion and sumac",
-          "source": "11 §3"
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "grilled steak is often finished with butter",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
         },
         "eggs": {
           "label": "free",
-          "evidence": "grilled beef with onion and sumac",
+          "evidence": "grilled beef with onion and sumac; cross-contact not assessed",
           "source": "11 §5"
         },
         "vegan": {
@@ -365,7 +378,7 @@
       "labels": {
         "sesame": {
           "label": "free",
-          "evidence": "grilled lamb skewers",
+          "evidence": "grilled lamb skewers; cross-contact not assessed",
           "source": "11 §11"
         },
         "vegan": {
@@ -532,7 +545,7 @@
           "label": "may_contain",
           "role": "base",
           "evidence": "mashed potato is commonly made with butter or milk",
-          "source": "11 §3.2"
+          "source": "11 §4.2"
         },
         "fish": {
           "label": "free",
@@ -567,13 +580,26 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "lemon, tarragon and sugar",
+          "evidence": "lemon, tarragon and sugar; cross-contact not assessed",
           "source": "11 §3"
         },
         "vegan": {
           "label": "free",
           "evidence": "only plant ingredients named",
           "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "יין לבן גאורגי (מכיל סולפיטים)",
+      "description": "",
+      "options": [],
+      "labels": {
+        "sulphites": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"סולפיטים\" named in the dish",
+          "source": "11 §15.1"
         }
       }
     }

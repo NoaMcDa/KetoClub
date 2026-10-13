@@ -20,9 +20,9 @@
           "source": "12 §5"
         },
         "eggs": {
-          "label": "may_contain",
-          "role": "hidden",
-          "evidence": "Caesar dressing is egg-based (egg, anchovy, mustard, milk)",
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "Caesar dressing is made with egg",
           "source": "12 §5"
         },
         "wheat": {
@@ -50,9 +50,9 @@
           "source": "12 §5"
         },
         "vegan": {
-          "label": "may_contain",
-          "role": "hidden",
-          "evidence": "animal-derived: Caesar dressing lists milk (Parmesan)",
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: Caesar dressing is made with egg",
           "source": "12 §5"
         },
         "vegetarian": {
@@ -75,10 +75,10 @@
           "source": "12 §1.5"
         },
         "lactose": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "protein",
-          "evidence": "halloumi is a brined semi-hard cheese; its lactose content is not documented in 11/12",
-          "source": "11 §4.3"
+          "evidence": "halloumi is a fresh-style cheese; no source documents it as low in lactose",
+          "source": "11 §4.1"
         },
         "vegan": {
           "label": "contains",
@@ -170,6 +170,12 @@
           "role": "hidden",
           "evidence": "seeds are often hidden in bread dough",
           "source": "11 §11.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "soy is a legume: baked goods commonly contain soy",
+          "source": "11 §16.1"
         }
       }
     },
@@ -238,7 +244,7 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "grilled salmon with lemon and dill; no dairy named",
+          "evidence": "grilled salmon with lemon and dill; no dairy named; cross-contact not assessed",
           "source": "11 §3"
         },
         "fish": {
@@ -276,7 +282,7 @@
           "label": "contains",
           "role": "sauce",
           "evidence": "\"Cream\"",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "eggs": {
           "label": "contains",
@@ -335,6 +341,12 @@
           "evidence": "brioche is an enriched bread",
           "source": "11 §4.2"
         },
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"brioche bun\" is an enriched bread made with eggs",
+          "source": "11 §5.2"
+        },
         "wheat": {
           "label": "contains",
           "role": "base",
@@ -346,6 +358,12 @@
           "role": "base",
           "evidence": "\"Brioche bun\"",
           "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "a burger bun can carry a sesame topping",
+          "source": "11 §11.2"
         },
         "sulphites": {
           "label": "may_contain",
@@ -379,13 +397,14 @@
           "source": "11 §1.2"
         },
         "treeNuts": {
-          "label": "free",
-          "evidence": "coconut is not a tree nut",
-          "source": "11 §2.5"
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "curry pastes and sauces are a documented tree-nut hiding place (coconut itself is not a tree nut, 11 §2.5)",
+          "source": "11 §2.2"
         },
         "milk": {
           "label": "free",
-          "evidence": "coconut cream is not a dairy product",
+          "evidence": "coconut cream is not a dairy product; cross-contact not assessed",
           "source": "11 §3.3"
         },
         "mustard": {
@@ -393,6 +412,12 @@
           "role": "sauce",
           "evidence": "curries are a documented mustard source",
           "source": "11 §13.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: curries are a documented peanut hiding place",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -423,7 +448,7 @@
           "label": "may_contain",
           "role": "hidden",
           "evidence": "restaurants often finish grilled steak with butter",
-          "source": "11 §3.2"
+          "source": "11 §4.2"
         },
         "eggs": {
           "label": "contains",
@@ -452,7 +477,7 @@
       "labels": {
         "eggs": {
           "label": "free",
-          "evidence": "plain fries; no egg named",
+          "evidence": "plain fries; no egg named; cross-contact not assessed",
           "source": "11 §5"
         },
         "sulphites": {
@@ -476,8 +501,14 @@
         },
         "sesame": {
           "label": "free",
-          "evidence": "barbecue sauce; no sesame named",
+          "evidence": "barbecue sauce; no sesame named; cross-contact not assessed",
           "source": "11 §11"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "ketchup and barbecue sauce are made with vinegar",
+          "source": "11 §15.2"
         },
         "vegan": {
           "label": "may_contain",
@@ -500,7 +531,7 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "soft drink",
+          "evidence": "soft drink; cross-contact not assessed",
           "source": "11 §3"
         }
       }
@@ -512,7 +543,7 @@
       "labels": {
         "eggs": {
           "label": "free",
-          "evidence": "soft drink",
+          "evidence": "soft drink; cross-contact not assessed",
           "source": "11 §5"
         }
       }
@@ -532,11 +563,11 @@
           "label": "contains",
           "role": "base",
           "evidence": "\"Whole milk\"",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "eggs": {
           "label": "free",
-          "evidence": "espresso and milk",
+          "evidence": "espresso and milk; cross-contact not assessed",
           "source": "11 §5"
         },
         "vegan": {
@@ -554,7 +585,7 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "black coffee, no milk named",
+          "evidence": "black coffee, no milk named; cross-contact not assessed",
           "source": "11 §3"
         }
       }

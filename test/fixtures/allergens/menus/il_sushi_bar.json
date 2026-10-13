@@ -37,6 +37,12 @@
           "evidence": "sushi rice is seasoned with vinegar",
           "source": "11 §15.2"
         },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"רוטב סויה\"",
+          "source": "11 §16.1"
+        },
         "vegan": {
           "label": "contains",
           "role": "protein",
@@ -86,6 +92,12 @@
           "evidence": "sushi rice is seasoned with vinegar",
           "source": "11 §15.2"
         },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"רוטב סויה\"",
+          "source": "11 §16.1"
+        },
         "vegan": {
           "label": "contains",
           "role": "protein",
@@ -128,6 +140,12 @@
           "role": "protein",
           "evidence": "\"סורימי\" (imitation crab)",
           "source": "11 §8.1"
+        },
+        "crustaceans": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "\"סורימי\" (surimi) may carry crab extract",
+          "source": "11 §9.2"
         },
         "sesame": {
           "label": "contains",
@@ -195,6 +213,18 @@
           "evidence": "\"שומשום\"",
           "source": "12 §1.1"
         },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise and aioli sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"רוטב סויה\"",
+          "source": "11 §16.1"
+        },
         "vegan": {
           "label": "contains",
           "role": "sauce",
@@ -221,10 +251,10 @@
           "source": "12 §1.6"
         },
         "soy": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "sauce",
-          "evidence": "unagi sauce is a soy-sauce glaze; Asian sauces are a soy hiding place",
-          "source": "11 §6.2"
+          "evidence": "\"אונאגי\" (unagi sauce) is a soy-sauce glaze",
+          "source": "11 §6.1"
         },
         "wheat": {
           "label": "contains",
@@ -249,6 +279,24 @@
           "role": "garnish",
           "evidence": "sesame is common in sushi rolls",
           "source": "12 §5"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise and aioli sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "prawns are a sulphite source",
+          "source": "11 §15.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"אונאגי\" (unagi sauce) is a soy-sauce glaze",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -289,7 +337,7 @@
         },
         "fish": {
           "label": "free",
-          "evidence": "avocado, cucumber and carrot only",
+          "evidence": "avocado, cucumber and carrot only; cross-contact not assessed",
           "source": "11 §8"
         },
         "sesame": {
@@ -303,6 +351,12 @@
           "role": "base",
           "evidence": "sushi rice is seasoned with vinegar",
           "source": "11 §15.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"רוטב סויה\"",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "free",
@@ -346,6 +400,12 @@
           "evidence": "\"שומשום\"",
           "source": "12 §1.1"
         },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise and aioli sauces often carry mustard",
+          "source": "11 §13.2"
+        },
         "vegan": {
           "label": "contains",
           "role": "sauce",
@@ -367,13 +427,26 @@
       "labels": {
         "eggs": {
           "label": "free",
-          "evidence": "raw salmon on radish",
+          "evidence": "raw salmon on radish; cross-contact not assessed",
           "source": "11 §5"
         },
+        "soy": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "sashimi is customarily served with soy sauce",
+          "source": "12 §5"
+        },
         "wheat": {
-          "label": "free",
-          "evidence": "raw salmon on radish; no soy sauce or batter named",
-          "source": "11 §7"
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "sashimi is customarily served with soy sauce, which is brewed with wheat",
+          "source": "12 §5"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "sashimi is customarily served with soy sauce, which is brewed with wheat",
+          "source": "12 §5"
         },
         "fish": {
           "label": "contains",
@@ -385,6 +458,12 @@
           "label": "free",
           "evidence": "no celery ingredient named in the dish text; kitchen cross-contact is not assessed",
           "source": "11 §12"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "soy is a legume: sashimi is customarily served with soy sauce",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -407,14 +486,38 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "raw tuna with wasabi and ginger",
+          "evidence": "raw tuna with wasabi and ginger; cross-contact not assessed",
           "source": "11 §3"
+        },
+        "soy": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "sashimi is customarily served with soy sauce",
+          "source": "12 §5"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "sashimi is customarily served with soy sauce, which is brewed with wheat",
+          "source": "12 §5"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "sashimi is customarily served with soy sauce, which is brewed with wheat",
+          "source": "12 §5"
         },
         "fish": {
           "label": "contains",
           "role": "protein",
           "evidence": "\"טונה\"",
           "source": "12 §1.7"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "soy is a legume: sashimi is customarily served with soy sauce",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -524,6 +627,12 @@
           "role": "hidden",
           "evidence": "sesame oil is common in Asian-style dishes",
           "source": "12 §5"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"פונזו\" is a soy-sauce dip",
+          "source": "11 §16.1"
         }
       }
     },
@@ -555,6 +664,12 @@
           "role": "hidden",
           "evidence": "sesame oil is common in Asian-style dishes",
           "source": "12 §5"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"טריאקי\"",
+          "source": "11 §16.1"
         }
       }
     },
@@ -593,6 +708,12 @@
           "evidence": "sesame oil is common in fried rice",
           "source": "11 §11.2"
         },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"רוטב סויה\"",
+          "source": "11 §16.1"
+        },
         "vegan": {
           "label": "contains",
           "role": "base",
@@ -617,6 +738,12 @@
           "role": "garnish",
           "evidence": "\"שומשום קלוי\" and \"רוטב שומשום\"",
           "source": "12 §1.1"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy is a legume: sesame dressings in Asian salads often contain soy sauce",
+          "source": "11 §16.1"
         }
       }
     },
@@ -637,10 +764,10 @@
           "source": "12 §5"
         },
         "soy": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "sauce",
-          "evidence": "tentsuyu dip is soy-sauce based",
-          "source": "11 §6.2"
+          "evidence": "\"טנצוי\" dip is a soy-sauce dip",
+          "source": "11 §6.1"
         },
         "wheat": {
           "label": "contains",
@@ -654,11 +781,29 @@
           "evidence": "\"טמפורה\" batter",
           "source": "11 §7.1"
         },
+        "fish": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "tentsuyu dip is made with dashi (bonito) stock",
+          "source": "11 §8.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"טנצוי\" dip is a soy-sauce dip",
+          "source": "11 §16.1"
+        },
         "vegan": {
           "label": "may_contain",
           "role": "base",
           "evidence": "animal-derived: tempura batter often carries egg",
           "source": "12 §5"
+        },
+        "vegetarian": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "fish/shellfish: tentsuyu dip is made with dashi (bonito) stock",
+          "source": "11 §8.1"
         }
       }
     },
@@ -713,12 +858,12 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "rice wine",
+          "evidence": "rice wine; cross-contact not assessed",
           "source": "11 §3"
         },
         "eggs": {
           "label": "free",
-          "evidence": "rice wine",
+          "evidence": "rice wine; cross-contact not assessed",
           "source": "11 §5"
         }
       }

@@ -85,6 +85,12 @@
           "evidence": "satay marinades commonly use soy sauce",
           "source": "11 §6.2"
         },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: \"peanut sauce\"",
+          "source": "11 §16.1"
+        },
         "vegan": {
           "label": "contains",
           "role": "protein",
@@ -111,13 +117,14 @@
           "source": "11 §1.2"
         },
         "treeNuts": {
-          "label": "free",
-          "evidence": "coconut is not a tree nut",
-          "source": "11 §2.5"
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "curry pastes and sauces are a documented tree-nut hiding place (coconut itself is not a tree nut, 11 §2.5)",
+          "source": "11 §2.2"
         },
         "milk": {
           "label": "free",
-          "evidence": "\"coconut milk\" is not dairy",
+          "evidence": "\"coconut milk\" is not dairy; cross-contact not assessed",
           "source": "11 §3.3"
         },
         "fish": {
@@ -131,6 +138,18 @@
           "role": "sauce",
           "evidence": "curry paste commonly contains shrimp paste",
           "source": "11 §9.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mustard seed is used in curry pastes",
+          "source": "12 §1.8"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: curries are a documented peanut hiding place",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -157,11 +176,35 @@
           "evidence": "\"roasted peanuts\"",
           "source": "11 §1.1"
         },
+        "treeNuts": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "curry pastes and sauces are a documented tree-nut hiding place (coconut itself is not a tree nut, 11 §2.5)",
+          "source": "11 §2.2"
+        },
+        "fish": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "curry paste commonly contains fish sauce or shrimp paste",
+          "source": "11 §8.2"
+        },
         "crustaceans": {
           "label": "may_contain",
           "role": "sauce",
           "evidence": "curry paste commonly contains shrimp paste",
           "source": "11 §9.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mustard seed is used in curry pastes",
+          "source": "12 §1.8"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "peanuts is a legume: \"roasted peanuts\"",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -199,6 +242,12 @@
           "role": "hidden",
           "evidence": "seafood soups are often finished with oyster sauce",
           "source": "11 §10.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "prawns are a sulphite source",
+          "source": "11 §15.2"
         },
         "vegan": {
           "label": "contains",
@@ -254,6 +303,12 @@
           "evidence": "no celery ingredient named in the dish text; kitchen cross-contact is not assessed",
           "source": "11 §12"
         },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy is a legume: fillings are commonly seasoned with soy sauce",
+          "source": "11 §16.1"
+        },
         "vegan": {
           "label": "may_contain",
           "role": "base",
@@ -290,6 +345,12 @@
           "role": "base",
           "evidence": "egg roll wrappers are wheat",
           "source": "11 §7.1"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "peanuts is a legume: egg rolls are a documented peanut hiding place",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -346,6 +407,12 @@
           "evidence": "\"rice vinegar\"",
           "source": "11 §15.2"
         },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"soy sauce\"",
+          "source": "11 §16.1"
+        },
         "vegan": {
           "label": "contains",
           "role": "protein",
@@ -395,6 +462,12 @@
           "evidence": "sesame chicken styles use sesame seeds and oil",
           "source": "12 §5"
         },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"soy glaze\"",
+          "source": "11 §16.1"
+        },
         "vegan": {
           "label": "contains",
           "role": "protein",
@@ -437,6 +510,12 @@
           "role": "garnish",
           "evidence": "\"sesame seeds\"",
           "source": "11 §11.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"soy sauce\"",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -486,6 +565,12 @@
           "evidence": "no mustard ingredient named in the dish text; kitchen cross-contact is not assessed",
           "source": "11 §13"
         },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy is a legume: stir-fry sauces commonly contain soy sauce",
+          "source": "11 §16.1"
+        },
         "vegan": {
           "label": "contains",
           "role": "protein",
@@ -534,6 +619,12 @@
           "role": "sauce",
           "evidence": "\"oyster sauce\"",
           "source": "11 §10.1"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy is a legume: noodle sauces commonly contain soy sauce",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -658,6 +749,12 @@
           "evidence": "\"hoisin sauce\" contains sesame",
           "source": "12 §5"
         },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"hoisin sauce\" contains soy",
+          "source": "11 §16.1"
+        },
         "vegan": {
           "label": "contains",
           "role": "protein",
@@ -683,11 +780,29 @@
           "evidence": "stir-fry sauces commonly contain soy sauce",
           "source": "11 §6.2"
         },
+        "wheat": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy-based stir-fry sauce carries wheat",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy-based stir-fry sauce carries wheat",
+          "source": "11 §7.2"
+        },
         "crustaceans": {
           "label": "contains",
           "role": "protein",
           "evidence": "\"prawns\"",
           "source": "11 §9.1"
+        },
+        "molluscs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "oyster sauce is common in prawn and garlic stir-fry sauces",
+          "source": "11 §10.2"
         },
         "lupin": {
           "label": "free",
@@ -699,6 +814,12 @@
           "role": "protein",
           "evidence": "prawns are a sulphite source",
           "source": "11 §9.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy is a legume: stir-fry sauces commonly contain soy sauce",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -749,6 +870,12 @@
           "evidence": "\"vinegar\"",
           "source": "11 §15.2"
         },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"soy\"",
+          "source": "11 §16.1"
+        },
         "vegan": {
           "label": "contains",
           "role": "protein",
@@ -774,6 +901,18 @@
           "evidence": "stir-fry sauces commonly contain soy sauce",
           "source": "11 §6.2"
         },
+        "wheat": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy-based stir-fry sauce carries wheat",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy-based stir-fry sauce carries wheat",
+          "source": "11 §7.2"
+        },
         "molluscs": {
           "label": "may_contain",
           "role": "hidden",
@@ -785,6 +924,12 @@
           "role": "hidden",
           "evidence": "sesame oil is common in Chinese stir-fry oils",
           "source": "11 §11.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy is a legume: stir-fry sauces commonly contain soy sauce",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "may_contain",
@@ -834,6 +979,12 @@
           "role": "sauce",
           "evidence": "\"sesame\"",
           "source": "11 §11.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: \"peanut\"",
+          "source": "11 §16.1"
         }
       }
     },
@@ -844,12 +995,12 @@
       "labels": {
         "peanuts": {
           "label": "free",
-          "evidence": "plain rice",
+          "evidence": "plain rice; cross-contact not assessed",
           "source": "11 §1"
         },
         "soy": {
           "label": "free",
-          "evidence": "plain rice",
+          "evidence": "plain rice; cross-contact not assessed",
           "source": "11 §6"
         }
       }
@@ -861,12 +1012,12 @@
       "labels": {
         "treeNuts": {
           "label": "free",
-          "evidence": "coconut is not a tree nut",
+          "evidence": "coconut is not a tree nut; cross-contact not assessed",
           "source": "11 §2.5"
         },
         "milk": {
           "label": "free",
-          "evidence": "\"coconut cream\" is not dairy",
+          "evidence": "\"coconut cream\" is not dairy; cross-contact not assessed",
           "source": "11 §3.3"
         },
         "celery": {

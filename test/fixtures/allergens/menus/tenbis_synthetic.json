@@ -29,7 +29,7 @@
         },
         "sesame": {
           "label": "free",
-          "evidence": "steak with a potato purée or salad side",
+          "evidence": "steak with a potato purée or salad side; cross-contact not assessed",
           "source": "11 §11"
         },
         "vegan": {
@@ -66,14 +66,14 @@
           "source": "12 §1.5"
         },
         "lactose": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "protein",
-          "evidence": "halloumi is a brined semi-hard cheese; its lactose content is not documented in 11/12",
-          "source": "11 §4.3"
+          "evidence": "halloumi is a fresh-style cheese; no source documents it as low in lactose",
+          "source": "11 §4.1"
         },
         "eggs": {
           "label": "free",
-          "evidence": "a salad of grilled cheese; no egg named",
+          "evidence": "a salad of grilled cheese; no egg named; cross-contact not assessed",
           "source": "11 §5"
         },
         "vegan": {
@@ -114,7 +114,7 @@
         },
         "fish": {
           "label": "free",
-          "evidence": "bread; no fish named",
+          "evidence": "bread; no fish named; cross-contact not assessed",
           "source": "11 §8"
         },
         "sesame": {
@@ -122,6 +122,12 @@
           "role": "base",
           "evidence": "bakery bread may be seeded or cross-contacted",
           "source": "11 §11.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "soy is a legume: baked goods commonly contain soy flour or lecithin",
+          "source": "11 §16.1"
         }
       }
     },
@@ -132,12 +138,12 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "a plain vegetable salad",
+          "evidence": "a plain vegetable salad; cross-contact not assessed",
           "source": "11 §3"
         },
         "sesame": {
           "label": "free",
-          "evidence": "a plain vegetable salad (עגבניות, מלפפון)",
+          "evidence": "a plain vegetable salad (עגבניות, מלפפון); cross-contact not assessed",
           "source": "11 §11"
         },
         "vegan": {
@@ -154,7 +160,7 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "baby gem lettuce with tahini; no dairy named",
+          "evidence": "baby gem lettuce with tahini; no dairy named; cross-contact not assessed",
           "source": "11 §3"
         },
         "sesame": {

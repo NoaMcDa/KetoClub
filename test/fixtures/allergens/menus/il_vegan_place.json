@@ -8,9 +8,10 @@
       "options": [],
       "labels": {
         "eggs": {
-          "label": "free",
-          "evidence": "\"ללא ביצה\" (no egg) is stated",
-          "source": "12 §1.6"
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "guard: 'ללא ביצה' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §5.3"
         },
         "wheat": {
           "label": "contains",
@@ -35,6 +36,12 @@
           "role": "garnish",
           "evidence": "sabich is often served with hummus or chickpeas",
           "source": "12 §1.3"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: guard: 'ללא ביצה' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §5.3"
         }
       }
     },
@@ -74,9 +81,16 @@
       "description": "קציצת סויה ואפונה, חסה, עגבנייה ומיונז טבעוני בלחמנייה",
       "options": [],
       "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"מיונז טבעוני\": a vegan substitute product; טבעוני does not clear a milk allergy",
+          "source": "12 §2.1"
+        },
         "eggs": {
-          "label": "free",
-          "evidence": "\"מיונז טבעוני\" is an egg-free vegan mayonnaise",
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "guard: 'מיונז טבעוני' (11 §0): a guard lowers certainty but never clears a strict restriction",
           "source": "11 §5.3"
         },
         "soy": {
@@ -108,11 +122,23 @@
           "evidence": "\"לחמנייה\" can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise and aioli sauces often carry mustard",
+          "source": "11 §13.2"
+        },
         "legumes": {
           "label": "contains",
           "role": "protein",
           "evidence": "\"סויה ואפונה\"",
           "source": "12 §1.3"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: guard: 'מיונז טבעוני' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §5.3"
         }
       }
     },
@@ -124,7 +150,7 @@
         "milk": {
           "label": "may_contain",
           "role": "protein",
-          "evidence": "a processed vegan substitute: טבעוני does not clear a milk allergy",
+          "evidence": "a processed vegan substitute: טבעוני does not clear a milk allergy Note: 'חלבון' (protein) contains the letters of 'חלב' (milk) but is not milk.",
           "source": "12 §2.1"
         },
         "lactose": {
@@ -132,6 +158,12 @@
           "role": "protein",
           "evidence": "a processed vegan substitute: טבעוני does not clear a milk allergy",
           "source": "12 §2.1"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "schnitzel coating is egg-bound; a vegan schnitzel is a processed substitute",
+          "source": "12 §6.2"
         },
         "soy": {
           "label": "contains",
@@ -158,9 +190,10 @@
           "source": "11 §16.1"
         },
         "vegan": {
-          "label": "free",
-          "evidence": "sold as vegan (טבעוני); label is a hint only",
-          "source": "12 §2.2"
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "animal-derived: schnitzel coating is egg-bound; a vegan schnitzel is a processed substitute",
+          "source": "12 §6.2"
         }
       }
     },
@@ -172,7 +205,7 @@
         "milk": {
           "label": "may_contain",
           "role": "protein",
-          "evidence": "a processed vegan substitute: טבעוני does not clear a milk allergy",
+          "evidence": "a processed vegan substitute: טבעוני does not clear a milk allergy Note: 'חלבון' (protein) contains the letters of 'חלב' (milk) but is not milk.",
           "source": "12 §2.1"
         },
         "lactose": {
@@ -198,6 +231,18 @@
           "role": "protein",
           "evidence": "\"חלבון חיטה\" (wheat protein)",
           "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "a burger bun can carry a sesame topping",
+          "source": "11 §11.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "soy is a legume: \"סויה\"",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "free",
@@ -231,8 +276,13 @@
         },
         "eggs": {
           "label": "free",
-          "evidence": "cashew cheese and crackers; no egg named",
+          "evidence": "cashew cheese and crackers; no egg named; cross-contact not assessed",
           "source": "11 §5"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "cashew-based; only plant ingredients named",
+          "source": "12 §2.2"
         }
       }
     },
@@ -275,6 +325,11 @@
           "label": "free",
           "evidence": "no celery ingredient named in the dish text; kitchen cross-contact is not assessed",
           "source": "11 §12"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "cashew-based; only plant ingredients named",
+          "source": "12 §2.2"
         }
       }
     },
@@ -359,7 +414,7 @@
       "labels": {
         "wheat": {
           "label": "free",
-          "evidence": "quinoa is not a wheat grain",
+          "evidence": "quinoa is not a wheat grain; cross-contact not assessed",
           "source": "11 §7.3"
         },
         "sesame": {
@@ -430,9 +485,10 @@
       "options": [],
       "labels": {
         "eggs": {
-          "label": "free",
-          "evidence": "the vegan version replaces eggs with tofu",
-          "source": "12 §1.6"
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "guard: 'שקשוקה טבעונית' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §5.3"
         },
         "soy": {
           "label": "contains",
@@ -457,6 +513,12 @@
           "role": "protein",
           "evidence": "tofu is soy",
           "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: guard: 'שקשוקה טבעונית' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §5.3"
         }
       }
     },
@@ -478,9 +540,16 @@
           "source": "12 §2.1"
         },
         "eggs": {
-          "label": "free",
-          "evidence": "brushed with olive oil instead of egg",
-          "source": "12 §1.1"
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "guard: 'מצופה בשמן זית' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §5.3"
+        },
+        "soy": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"מרגרינה\" (margarine) commonly contains soy",
+          "source": "12 §1.11"
         },
         "wheat": {
           "label": "contains",
@@ -499,6 +568,18 @@
           "role": "garnish",
           "evidence": "\"שומשום\"",
           "source": "12 §1.1"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "soy is a legume: \"מרגרינה\" (margarine) commonly contains soy",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: guard: 'מצופה בשמן זית' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §5.3"
         }
       }
     },
@@ -509,7 +590,7 @@
       "labels": {
         "treeNuts": {
           "label": "free",
-          "evidence": "coconut is not a tree nut",
+          "evidence": "coconut is not a tree nut; cross-contact not assessed",
           "source": "11 §2.5"
         },
         "milk": {
@@ -527,6 +608,11 @@
           "label": "free",
           "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
           "source": "11 §8"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "sold as vegan (טבעוני); label is a hint only",
+          "source": "12 §2.2"
         }
       }
     },
@@ -547,8 +633,9 @@
           "source": "11 §4.3"
         },
         "eggs": {
-          "label": "free",
-          "evidence": "\"ללא ביצים\" (no eggs) is stated",
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "guard: 'ללא ביצים' (11 §0): a guard lowers certainty but never clears a strict restriction",
           "source": "11 §5.3"
         },
         "soy": {
@@ -568,6 +655,18 @@
           "role": "base",
           "evidence": "a cake is made with flour",
           "source": "11 §7.1"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "soy is a legume: chocolate commonly contains soy lecithin",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: guard: 'ללא ביצים' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §5.3"
         }
       }
     },
@@ -584,7 +683,7 @@
         },
         "milk": {
           "label": "free",
-          "evidence": "\"חלב שקדים\" is a nut milk, not dairy",
+          "evidence": "\"חלב שקדים\" is a nut milk, not dairy; cross-contact not assessed",
           "source": "11 §3.3"
         }
       }
@@ -595,8 +694,9 @@
       "options": [],
       "labels": {
         "milk": {
-          "label": "free",
-          "evidence": "\"חלב סויה\" is a soy drink, not dairy",
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "guard: 'חלב סויה' (11 §0): a guard lowers certainty but never clears a strict restriction",
           "source": "11 §3.3"
         },
         "soy": {
@@ -610,6 +710,11 @@
           "role": "base",
           "evidence": "soy milk",
           "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only plant ingredients named",
+          "source": "12 §2.2"
         }
       }
     },
@@ -620,7 +725,7 @@
       "labels": {
         "sesame": {
           "label": "free",
-          "evidence": "spinach, banana, apple and water",
+          "evidence": "spinach, banana, apple and water; cross-contact not assessed",
           "source": "11 §11"
         },
         "celery": {
@@ -641,9 +746,10 @@
       "options": [],
       "labels": {
         "eggs": {
-          "label": "free",
-          "evidence": "the vegan version replaces eggs with tofu",
-          "source": "12 §1.6"
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "guard: 'טופו מקושקש' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §5.3"
         },
         "soy": {
           "label": "contains",
@@ -668,6 +774,35 @@
           "role": "protein",
           "evidence": "tofu is soy",
           "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: guard: 'טופו מקושקש' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §5.3"
+        }
+      }
+    },
+    {
+      "name": "פנקייק קמח חומוס",
+      "description": "פנקייק מקמח חומוס וקמח אורז עם סירופ תמרים",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "free",
+          "evidence": "\"קמח חומוס\" and \"קמח אורז\" are gluten-free flours, not wheat flour; cross-contact not assessed",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "free",
+          "evidence": "\"קמח חומוס\" and \"קמח אורז\" are gluten-free flours; cross-contact not assessed",
+          "source": "12 §1.4"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"קמח חומוס\" is chickpea flour",
+          "source": "12 §1.3"
         }
       }
     }

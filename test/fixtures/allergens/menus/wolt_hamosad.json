@@ -144,15 +144,15 @@
           "source": "11 §5.2"
         },
         "wheat": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "protein",
-          "evidence": "\"נאגטס פריכים\": nuggets carry a breaded coating",
-          "source": "11 §7.2"
+          "evidence": "\"נאגטס\" are breaded and the breading is wheat",
+          "source": "11 §7.1"
         },
         "gluten": {
-          "label": "may_contain",
-          "role": "option",
-          "evidence": "drink option \"בירה שחורה\" (dark beer) is brewed from barley",
+          "label": "contains",
+          "role": "protein",
+          "evidence": "breaded nuggets: the breading is wheat",
           "source": "11 §7.1"
         },
         "sulphites": {
@@ -187,12 +187,12 @@
         },
         "milk": {
           "label": "free",
-          "evidence": "soft drink or water",
+          "evidence": "soft drink or water; cross-contact not assessed",
           "source": "11 §3"
         },
         "eggs": {
           "label": "free",
-          "evidence": "soft drink or water",
+          "evidence": "soft drink or water; cross-contact not assessed",
           "source": "11 §5"
         }
       }
@@ -289,6 +289,11 @@
           "role": "base",
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
         },
         "mustard": {
           "label": "may_contain",
@@ -477,12 +482,12 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "soft drink or water",
+          "evidence": "soft drink or water; cross-contact not assessed",
           "source": "11 §3"
         },
         "eggs": {
           "label": "free",
-          "evidence": "soft drink or water",
+          "evidence": "soft drink or water; cross-contact not assessed",
           "source": "11 §5"
         }
       }
@@ -494,12 +499,12 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "soft drink or water",
+          "evidence": "soft drink or water; cross-contact not assessed",
           "source": "11 §3"
         },
         "eggs": {
           "label": "free",
-          "evidence": "soft drink or water",
+          "evidence": "soft drink or water; cross-contact not assessed",
           "source": "11 §5"
         },
         "fish": {
@@ -565,7 +570,7 @@
         "milk": {
           "label": "may_contain",
           "role": "sauce",
-          "evidence": "\"גבינת צ'דר טבעונית\": a vegan substitute; טבעוני does not clear a milk allergy",
+          "evidence": "\"גבינת צ'דר טבעונית\": a vegan substitute; טבעוני does not clear a milk allergy Note: 'חלבון' (protein) contains the letters of 'חלב' (milk) but is not milk.",
           "source": "12 §2.1"
         },
         "lactose": {
@@ -646,7 +651,7 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "potato wedges with celery salt; no dairy named",
+          "evidence": "potato wedges with celery salt; no dairy named; cross-contact not assessed",
           "source": "11 §3"
         },
         "eggs": {
@@ -702,7 +707,7 @@
         },
         "milk": {
           "label": "free",
-          "evidence": "plain fries; no dairy named",
+          "evidence": "plain fries; no dairy named; cross-contact not assessed",
           "source": "11 §3"
         },
         "eggs": {
@@ -831,6 +836,11 @@
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
         "mustard": {
           "label": "may_contain",
           "role": "sauce",
@@ -951,6 +961,11 @@
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
         "mustard": {
           "label": "may_contain",
           "role": "sauce",
@@ -1070,6 +1085,11 @@
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
         "mustard": {
           "label": "may_contain",
           "role": "option",
@@ -1103,12 +1123,12 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "soft drink or water",
+          "evidence": "soft drink or water; cross-contact not assessed",
           "source": "11 §3"
         },
         "eggs": {
           "label": "free",
-          "evidence": "soft drink or water",
+          "evidence": "soft drink or water; cross-contact not assessed",
           "source": "11 §5"
         }
       }
@@ -1244,6 +1264,11 @@
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
         "mustard": {
           "label": "may_contain",
           "role": "sauce",
@@ -1277,12 +1302,12 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "soft drink or water",
+          "evidence": "soft drink or water; cross-contact not assessed",
           "source": "11 §3"
         },
         "eggs": {
           "label": "free",
-          "evidence": "soft drink or water",
+          "evidence": "soft drink or water; cross-contact not assessed",
           "source": "11 §5"
         }
       }
@@ -1294,12 +1319,12 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "soft drink or water",
+          "evidence": "soft drink or water; cross-contact not assessed",
           "source": "11 §3"
         },
         "eggs": {
           "label": "free",
-          "evidence": "soft drink or water",
+          "evidence": "soft drink or water; cross-contact not assessed",
           "source": "11 §5"
         }
       }
@@ -1403,6 +1428,11 @@
           "role": "base",
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
         },
         "mustard": {
           "label": "may_contain",
@@ -1675,7 +1705,7 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "barbecue sauce; no dairy named",
+          "evidence": "barbecue sauce; no dairy named; cross-contact not assessed",
           "source": "11 §3"
         },
         "fish": {
@@ -1683,6 +1713,12 @@
           "role": "hidden",
           "evidence": "barbecue sauce often contains Worcestershire (anchovy)",
           "source": "11 §8.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "ketchup and barbecue sauce are made with vinegar",
+          "source": "11 §15.2"
         },
         "vegan": {
           "label": "may_contain",
@@ -1733,15 +1769,29 @@
       "description": "30 מ\"ל",
       "options": [],
       "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"מיונז טבעוני\": a vegan substitute product; טבעוני does not clear a milk allergy",
+          "source": "12 §2.1"
+        },
         "eggs": {
-          "label": "free",
-          "evidence": "\"מיונז טבעוני\" is an egg-free vegan mayonnaise",
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "guard: 'מיונז טבעוני' (11 §0): a guard lowers certainty but never clears a strict restriction",
           "source": "11 §5.3"
         },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise and aioli sauces often carry mustard",
+          "source": "11 §13.2"
+        },
         "vegan": {
-          "label": "free",
-          "evidence": "sold as vegan (טבעוני)",
-          "source": "12 §2.2"
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "animal-derived: guard: 'מיונז טבעוני' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §5.3"
         }
       }
     },
@@ -1877,6 +1927,11 @@
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
         "mustard": {
           "label": "may_contain",
           "role": "sauce",
@@ -1992,6 +2047,11 @@
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
         "mustard": {
           "label": "may_contain",
           "role": "sauce",
@@ -2097,6 +2157,11 @@
           "role": "base",
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
         },
         "mustard": {
           "label": "may_contain",
@@ -2222,6 +2287,11 @@
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
         "mustard": {
           "label": "may_contain",
           "role": "sauce",
@@ -2255,7 +2325,7 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "juice; no dairy named",
+          "evidence": "juice; no dairy named; cross-contact not assessed",
           "source": "11 §3"
         },
         "sulphites": {
@@ -2273,12 +2343,12 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "juice; no dairy named",
+          "evidence": "juice; no dairy named; cross-contact not assessed",
           "source": "11 §3"
         },
         "eggs": {
           "label": "free",
-          "evidence": "juice; no egg named",
+          "evidence": "juice; no egg named; cross-contact not assessed",
           "source": "11 §5"
         }
       }
@@ -2409,6 +2479,11 @@
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
         "mustard": {
           "label": "may_contain",
           "role": "sauce",
@@ -2440,6 +2515,12 @@
       "description": "כנפי עוף פריכות ברוטב מתקתק סודי \nשף יוצר : יפתח קורן",
       "options": [],
       "labels": {
+        "soy": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"רוטב מתקתק סודי\": sweet wing glazes commonly contain soy sauce",
+          "source": "11 §6.2"
+        },
         "wheat": {
           "label": "may_contain",
           "role": "protein",
@@ -2451,6 +2532,18 @@
           "role": "protein",
           "evidence": "\"כנפי עוף פריכות\": crispy wings are usually floured",
           "source": "11 §7.2"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "a secret sauce may carry mustard",
+          "source": "11 §13.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"רוטב מתקתק סודי\": sweet wing glazes commonly contain soy sauce",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -2593,6 +2686,11 @@
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
         "mustard": {
           "label": "may_contain",
           "role": "sauce",
@@ -2640,6 +2738,12 @@
           "role": "sauce",
           "evidence": "mayonnaise often carries mustard",
           "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "ketchup and barbecue sauce are made with vinegar",
+          "source": "11 §15.2"
         },
         "vegan": {
           "label": "contains",
@@ -2693,6 +2797,12 @@
           "evidence": "option \"חרדל\" (mustard) can be added",
           "source": "11 §13.1"
         },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "chips from pre-cut potato may be sulphite-treated",
+          "source": "11 §15.2"
+        },
         "vegan": {
           "label": "contains",
           "role": "garnish",
@@ -2728,16 +2838,16 @@
           "source": "11 §5.2"
         },
         "wheat": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "protein",
-          "evidence": "\"נאגטס פריכים\": nuggets carry a breaded coating",
-          "source": "11 §7.2"
+          "evidence": "\"נאגטס\" are breaded and the breading is wheat",
+          "source": "11 §7.1"
         },
         "gluten": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "protein",
-          "evidence": "\"נאגטס פריכים\": nuggets carry a breaded coating",
-          "source": "11 §7.2"
+          "evidence": "\"נאגטס\" are breaded and the breading is wheat",
+          "source": "11 §7.1"
         },
         "mustard": {
           "label": "may_contain",
@@ -2878,6 +2988,11 @@
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
         "mustard": {
           "label": "may_contain",
           "role": "sauce",
@@ -2933,6 +3048,12 @@
         }
       ],
       "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "buffalo sauce is traditionally finished with butter",
+          "source": "11 §3.2"
+        },
         "eggs": {
           "label": "contains",
           "role": "sauce",
@@ -3117,7 +3238,13 @@
       "name": "💙",
       "description": "\u202bקציצת הבקר שלנו מיוצרת מדי יום במקום, מבלנד מוקפד של בקר הולשטיין מקומי מובחר, ליצירת איזון מושלם בין עסיסיות וטעם עשיר.  הקציצה נעשית במתכון סודי אשר לא ניתן לשינוי ומכילה בצל מטוגן.\n\nהתפריט שלנו מורכב מהמבורגרים, שכל אחד מהם הוא יצירה של שף אחר עם חתימה קולינרית ייחודית ודיוק עד הביס המושלם. לכן, חלק מהמנות מוגשות כפי שהן ללא שינויים כדי לשמור על החוויה מושלמת.  \n\nכל מנה מגיעה עם 2 שקיות קטשופ ו-2 שקיות מיונז במידה ותרצו עוד רטבים מוזמנים להוסיף קיט רטבים 💙 \n\nאנחנו עושים את מירב המאמצים לשמור על מידת העשייה שבחרתם אך לא תמיד זה מתאפשר במשלוח 🙏",
       "options": [],
-      "labels": {}
+      "labels": {
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        }
+      }
     },
     {
       "name": "המבורגר האיטלקי, תוספת ושתייה",
@@ -3208,11 +3335,17 @@
         }
       ],
       "labels": {
-        "treeNuts": {
+        "peanuts": {
           "label": "may_contain",
           "role": "sauce",
-          "evidence": "\"פסטו\": pesto is made with pine nuts or walnuts",
-          "source": "11 §2.2"
+          "evidence": "pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
+        "treeNuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"pesto\" is made with pine nuts (or walnuts)",
+          "source": "11 §2.1"
         },
         "milk": {
           "label": "contains",
@@ -3250,6 +3383,11 @@
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
         "mustard": {
           "label": "may_contain",
           "role": "sauce",
@@ -3261,6 +3399,12 @@
           "role": "option",
           "evidence": "drink option \"ענבים\" (grape juice)",
           "source": "12 §1.10"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -3383,6 +3527,11 @@
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
         "mustard": {
           "label": "may_contain",
           "role": "sauce",
@@ -3468,11 +3617,17 @@
         }
       ],
       "labels": {
-        "treeNuts": {
+        "peanuts": {
           "label": "may_contain",
           "role": "sauce",
-          "evidence": "\"פסטו\": pesto is made with pine nuts or walnuts",
-          "source": "11 §2.2"
+          "evidence": "pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
+        "treeNuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"pesto\" is made with pine nuts (or walnuts)",
+          "source": "11 §2.1"
         },
         "milk": {
           "label": "contains",
@@ -3515,11 +3670,22 @@
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
         "mustard": {
           "label": "may_contain",
           "role": "sauce",
           "evidence": "\"מיונז\": mayonnaise-style sauces often carry mustard",
           "source": "11 §13.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -3595,11 +3761,17 @@
         }
       ],
       "labels": {
-        "treeNuts": {
+        "peanuts": {
           "label": "may_contain",
           "role": "sauce",
-          "evidence": "\"פסטו\": pesto is made with pine nuts or walnuts",
-          "source": "11 §2.2"
+          "evidence": "pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
+        "treeNuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"pesto\" is made with pine nuts (or walnuts)",
+          "source": "11 §2.1"
         },
         "milk": {
           "label": "contains",
@@ -3637,11 +3809,22 @@
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
         "mustard": {
           "label": "may_contain",
           "role": "sauce",
           "evidence": "\"מיונז\": mayonnaise-style sauces often carry mustard",
           "source": "11 §13.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -3662,9 +3845,15 @@
       "description": "כנפי עוף ברוטב באפלו סודי 🌶\nשף יוצר: אביב סולימאני",
       "options": [],
       "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "buffalo sauce is traditionally finished with butter",
+          "source": "11 §3.2"
+        },
         "sesame": {
           "label": "free",
-          "evidence": "wings in buffalo sauce; no sesame named",
+          "evidence": "wings in buffalo sauce; no sesame named; cross-contact not assessed",
           "source": "11 §11"
         },
         "vegan": {
@@ -3784,6 +3973,12 @@
           "evidence": "a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise and aioli sauces often carry mustard",
+          "source": "11 §13.2"
+        },
         "sulphites": {
           "label": "may_contain",
           "role": "option",
@@ -3902,6 +4097,11 @@
           "role": "base",
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
         },
         "mustard": {
           "label": "may_contain",
@@ -4134,6 +4334,11 @@
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
         "mustard": {
           "label": "may_contain",
           "role": "sauce",
@@ -4272,6 +4477,11 @@
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
         },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
         "mustard": {
           "label": "may_contain",
           "role": "sauce",
@@ -4407,6 +4617,11 @@
           "role": "base",
           "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
           "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
         },
         "mustard": {
           "label": "may_contain",

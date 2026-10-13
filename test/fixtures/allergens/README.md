@@ -33,9 +33,7 @@ test/fixtures/allergens/
   menus/*.json      one file per menu
 ```
 
-Seventeen menus, 372 dishes, 252 of them Hebrew (by a Hebrew letter in the
-dish name or description). Five are copied from existing fixtures, twelve are
-written for the corpus:
+Seventeen menus: five are copied from existing fixtures and twelve are written for the corpus. More than half of the dishes are Hebrew (a Hebrew letter in the name or description); the shape test enforces that and the minimum sizes, so this file states no counts that could go stale.
 
 | File | Source | Language |
 |---|---|---|
@@ -98,7 +96,7 @@ must not change when a golden does.
 - `language` is `he`, `en` or `mixed`.
 - `name`, `description` and `options` are the dish as a menu shows it. They
   are copied unchanged from the source menu, bidi control characters
-  included (written as `‫` escapes), so the engine meets what a platform
+  included (written as `\u202b` escapes), so the engine meets what a platform
   really sends.
 - `labels` maps a restriction id to a label. **Absence means `free`.**
 
@@ -109,7 +107,7 @@ Exactly these twenty strings, the names of the `RestrictionId` enum:
 `fish`, `crustaceans`, `molluscs`, `sesame`, `celery`, `mustard`, `lupin`,
 `sulphites`, `legumes`, `vegan`, `vegetarian`, `keto`.
 
-`keto` is never labelled. `strict` restrictions are every id except
+`keto` is never labelled. **Strict** restrictions are every id except
 `lactose`, `vegan`, `vegetarian` and `keto`.
 
 ### `label`
@@ -123,8 +121,15 @@ Exactly these twenty strings, the names of the `RestrictionId` enum:
   ambiguous.
 - `free`: the dish is plainly free of the restriction **according to its
   text**. It is written for dishes the menu's other dishes contain, so
-  false-positive measurement has material. It never means "safe": kitchen
-  cross-contact is not assessed.
+  false-positive measurement has material. It never means "safe": the
+  evidence of a `free` label on a strict restriction must say that
+  cross-contact is not assessed (the shape test checks this). **A guard
+  phrase alone is never `free`** (11 §0): "dairy-free", "ללא ביצה",
+  "vegan" or "flourless" turns a match into `may_contain` with the
+  evidence `guard: '…' (11 §0)`, never into `free`. A guard may be
+  `free` only for the non-strict `lactose`, and for a word that is not
+  the allergen at all (coconut and nutmeg are not tree nuts, an almond
+  or coconut drink is not dairy, halva is sesame and not milk).
 
 A kitchen fact counts only when the dish text states it (a "shared fryer"
 note in the description). The corpus does not label what a kitchen might do.
@@ -136,7 +141,10 @@ Rules for particular restrictions:
   are `milk: contains` with `lactose: may_contain` (11 §4.3).
 - `wheat` is the allergy; `gluten` is the superset for celiac disease. Soy
   sauce is `wheat: contains` and `gluten: contains`. Beer and barley are
-  `gluten` only.
+  `gluten` only. Whenever `wheat` is labelled, `gluten` is at least as
+  strong and carries the same `role`.
+- `legumes` covers `peanuts`, `soy` and `lupin` (11 §16.1; 12 §1.3): it is at
+  least as strong as each of them.
 - `vegan` and `vegetarian` mean "**contains an ingredient that is not**
   vegan / vegetarian". A dish with eggs is `vegetarian` free (unlabelled)
   and `vegan: contains`. They are derived from the animal ingredients named
@@ -165,8 +173,34 @@ the label. `source` is the **citation rule**: every label, `free` included,
 cites a section of file 11 or 12 as `^1[12] §\d+(\.\d+)?$`, for example
 `11 §11` (sesame, whole section), `11 §14.2` (lupin hidden sources) or
 `12 §1.1` (Israeli sesame dishes). A label no section supports does not
-belong in the corpus. The shape test enforces the pattern, not that the
-section says what the label claims.
+belong in the corpus. The shape test enforces the pattern **and** that
+the section exists (a whitelist of the headings of files 11 and 12; `12 §6.1`
+to `§6.5` are the items of the numbered list in 12 §6). It cannot check that
+the section says what the label claims.
+
+### Labels must agree with one another
+
+The shape test fails when they do not. With the strength of a label ranked
+free or absent 0, `may_contain` 1, `contains` 2:
+
+- `gluten` is at least `wheat`, with the same `role`.
+- `legumes` is at least `peanuts`, `soy` and `lupin`.
+- `milk` is at least `lactose`.
+- `vegetarian` is at least `fish`, `crustaceans` and `molluscs`.
+- `vegan` is at least `eggs`, `fish`, `crustaceans`, `molluscs`, `vegetarian`
+  and `milk`. The one exception is an explicit `vegan: free` beside a
+  `milk: may_contain` that is a substitute-product caveat (12 §2.1) or a
+  plant-milk guard, because טבעוני never clears a milk allergy but is still vegan.
+
+### Matcher traps and spelling variants
+
+Some dishes exist to be measured against a naive matcher, each with an explicit
+`free` label naming the trap: `טירמיסו` contains `מיסו` (miso), `ליצירת` contains
+`ציר` (stock), `חלבון` contains `חלב` (milk), `גרגירי חומוס` are not hummus
+(tahini), `שקדי מרק` are wheat croutons and not almonds, `פתיתי אורז` is the
+rice version of פתיתים, and `קמח חומוס` / `קמח אורז` are not wheat flour. The spellings
+file 12 §1 asks a parser to accept appear too: `ג'חנון` with an ASCII
+apostrophe, `מלווח`, `טחינא`, `שומשומין`.
 
 ## Adding a menu
 
@@ -181,6 +215,23 @@ section says what the label claims.
 4. Add `free` labels with evidence for dishes plainly free of a restriction
    other dishes in the menu contain, about one for every three dishes.
 5. Run `flutter test test/utils/allergens/corpus_shape_test.dart`.
+
+## Gate design notes
+
+For the test that will replay an engine over this corpus:
+
+- **False positives are measured only against explicit `free` labels.** An
+  absent label is *unlabelled*, not `free`: nobody asserted the engine is wrong
+  to flag it.
+- **Report `n` with every recall figure.** The shape test prints the number of
+  `contains` labels and explicit `free` labels per restriction, and requires
+  at least three `contains` for every strict one. A recall of 100% over three
+  dishes is not a finding.
+- Recall of `contains` labels is the gate (certainty at least likely for strict
+  restrictions); `may_contain` need only reach suspected; false alarms are
+  reported, not gating.
+- The labels are unreviewed (see the top of this file), so a miss may be a
+  wrong label. Review the Hebrew labels before quoting a number.
 
 ## What this is not
 

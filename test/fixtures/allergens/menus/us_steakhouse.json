@@ -48,7 +48,7 @@
           "label": "contains",
           "role": "sauce",
           "evidence": "béarnaise is made with butter",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "eggs": {
           "label": "contains",
@@ -81,6 +81,18 @@
       "description": "Strip steak glazed with a house Worcestershire reduction",
       "options": [],
       "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "grilled steak is often finished with butter",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
+        },
         "fish": {
           "label": "contains",
           "role": "sauce",
@@ -119,9 +131,9 @@
           "source": "11 §4.2"
         },
         "eggs": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "base",
-          "evidence": "brioche is enriched with egg",
+          "evidence": "\"brioche bun\" is an enriched bread made with eggs",
           "source": "11 §5.2"
         },
         "wheat": {
@@ -135,6 +147,12 @@
           "role": "base",
           "evidence": "\"brioche bun\"",
           "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "a burger bun can carry a sesame topping",
+          "source": "11 §11.2"
         },
         "vegan": {
           "label": "contains",
@@ -165,7 +183,7 @@
           "label": "contains",
           "role": "sauce",
           "evidence": "\"blue cheese dressing\"",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "eggs": {
           "label": "may_contain",
@@ -216,9 +234,9 @@
           "source": "11 §4.3"
         },
         "eggs": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "sauce",
-          "evidence": "Caesar dressing is egg-based",
+          "evidence": "Caesar dressing is made with egg",
           "source": "12 §5"
         },
         "wheat": {
@@ -305,7 +323,7 @@
           "label": "contains",
           "role": "sauce",
           "evidence": "\"butter\"",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "wheat": {
           "label": "contains",
@@ -401,7 +419,7 @@
       "labels": {
         "treeNuts": {
           "label": "free",
-          "evidence": "\"nutmeg\" is not a tree nut",
+          "evidence": "\"nutmeg\" is not a tree nut; cross-contact not assessed",
           "source": "11 §2.5"
         },
         "milk": {
@@ -520,6 +538,18 @@
           "evidence": "\"sour cream\"",
           "source": "11 §4.1"
         },
+        "wheat": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "baked potatoes are sometimes flour-dusted",
+          "source": "12 §5"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "baked potatoes are sometimes flour-dusted",
+          "source": "12 §5"
+        },
         "vegan": {
           "label": "contains",
           "role": "garnish",
@@ -541,7 +571,7 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "asparagus, olive oil, lemon and salt",
+          "evidence": "asparagus, olive oil, lemon and salt; cross-contact not assessed",
           "source": "11 §3"
         },
         "vegan": {
@@ -588,12 +618,12 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "herb and oil sauce",
+          "evidence": "herb and oil sauce; cross-contact not assessed",
           "source": "11 §3"
         },
         "eggs": {
           "label": "free",
-          "evidence": "herb and oil sauce",
+          "evidence": "herb and oil sauce; cross-contact not assessed",
           "source": "11 §5"
         },
         "sulphites": {
@@ -718,7 +748,7 @@
           "label": "contains",
           "role": "garnish",
           "evidence": "\"whipped cream\"",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "eggs": {
           "label": "may_contain",
@@ -758,7 +788,7 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "a glass of wine",
+          "evidence": "a glass of wine; cross-contact not assessed",
           "source": "11 §3"
         },
         "sulphites": {

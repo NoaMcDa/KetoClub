@@ -32,10 +32,10 @@
           "source": "11 §14.1"
         },
         "legumes": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "base",
-          "evidence": "lupin is a legume",
-          "source": "11 §14.5"
+          "evidence": "lupin is a legume: \"lupin flour\"",
+          "source": "11 §16.1"
         }
       }
     },
@@ -69,10 +69,10 @@
           "source": "11 §14.1"
         },
         "legumes": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "base",
-          "evidence": "lupin is a legume",
-          "source": "11 §14.5"
+          "evidence": "lupin is a legume: \"lupin flour\"",
+          "source": "11 §16.1"
         }
       }
     },
@@ -93,6 +93,12 @@
           "evidence": "fresh mozzarella",
           "source": "11 §4.1"
         },
+        "wheat": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "a gluten-free base from a wheat-flour bakery is a documented risk",
+          "source": "11 §7.3"
+        },
         "gluten": {
           "label": "may_contain",
           "role": "base",
@@ -104,6 +110,12 @@
           "role": "base",
           "evidence": "gluten-free bases are a documented lupin flour carrier",
           "source": "11 §14.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "lupin is a legume: gluten-free bases are a documented lupin flour carrier",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -159,6 +171,12 @@
           "evidence": "pastries are a documented undeclared lupin carrier",
           "source": "11 §14.2"
         },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "lupin is a legume: pastries are a documented undeclared lupin carrier",
+          "source": "11 §16.1"
+        },
         "vegan": {
           "label": "contains",
           "role": "base",
@@ -188,7 +206,7 @@
           "label": "may_contain",
           "role": "base",
           "evidence": "laminated pastry uses butter",
-          "source": "11 §3.2"
+          "source": "11 §4.2"
         },
         "eggs": {
           "label": "may_contain",
@@ -244,6 +262,12 @@
           "role": "hidden",
           "evidence": "part-baked bread rolls are a documented lupin carrier",
           "source": "11 §14.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "lupin is a legume: part-baked bread rolls are a documented lupin carrier",
+          "source": "11 §16.1"
         }
       }
     },
@@ -293,7 +317,7 @@
           "label": "contains",
           "role": "base",
           "evidence": "\"custard\"",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "eggs": {
           "label": "contains",
@@ -396,7 +420,7 @@
           "label": "may_contain",
           "role": "base",
           "evidence": "enriched buns commonly contain milk",
-          "source": "11 §3.2"
+          "source": "11 §4.2"
         },
         "eggs": {
           "label": "may_contain",
@@ -494,7 +518,7 @@
           "label": "may_contain",
           "role": "hidden",
           "evidence": "cakes commonly contain butter or milk",
-          "source": "11 §3.2"
+          "source": "11 §4.2"
         },
         "eggs": {
           "label": "may_contain",
@@ -540,8 +564,15 @@
           "source": "11 §5.1"
         },
         "wheat": {
-          "label": "free",
-          "evidence": "\"Flourless\" states that no flour is used",
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "guard: 'Flourless' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §7.3"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "guard: 'Flourless' (11 §0): a guard lowers certainty but never clears a strict restriction",
           "source": "11 §7.3"
         },
         "vegan": {
@@ -615,7 +646,7 @@
           "label": "contains",
           "role": "base",
           "evidence": "\"cheese\" and \"custard\"",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "eggs": {
           "label": "contains",
@@ -640,6 +671,12 @@
           "role": "hidden",
           "evidence": "pastry cases are a documented undeclared lupin carrier",
           "source": "11 §14.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "lupin is a legume: pastry cases are a documented undeclared lupin carrier",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -670,7 +707,7 @@
           "label": "may_contain",
           "role": "hidden",
           "evidence": "sausages can contain casein",
-          "source": "11 §3.2"
+          "source": "11 §4.2"
         },
         "eggs": {
           "label": "contains",
@@ -702,6 +739,12 @@
           "evidence": "sausages are a sulphite source",
           "source": "11 §15.2"
         },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "soy is a legume: sausages and processed meats commonly contain soy",
+          "source": "11 §16.1"
+        },
         "vegan": {
           "label": "contains",
           "role": "protein",
@@ -731,7 +774,7 @@
           "label": "contains",
           "role": "garnish",
           "evidence": "\"cheddar\" and \"butter\"",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "wheat": {
           "label": "contains",
@@ -783,13 +826,15 @@
           "source": "11 §2.1"
         },
         "milk": {
-          "label": "free",
-          "evidence": "\"no dairy\" is stated",
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "guard: 'no dairy' (11 §0): a guard lowers certainty but never clears a strict restriction",
           "source": "11 §3.3"
         },
         "eggs": {
-          "label": "free",
-          "evidence": "\"no eggs\" is stated",
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "guard: 'no eggs' (11 §0): a guard lowers certainty but never clears a strict restriction",
           "source": "11 §5.3"
         },
         "wheat": {
@@ -803,6 +848,12 @@
           "role": "base",
           "evidence": "a brownie is made with flour",
           "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: guard: 'no eggs' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §5.3"
         }
       }
     },
@@ -874,12 +925,12 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "espresso and hot water",
+          "evidence": "espresso and hot water; cross-contact not assessed",
           "source": "11 §3"
         },
         "wheat": {
           "label": "free",
-          "evidence": "espresso and hot water",
+          "evidence": "espresso and hot water; cross-contact not assessed",
           "source": "11 §7"
         }
       }
@@ -891,13 +942,62 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "squeezed oranges",
+          "evidence": "squeezed oranges; cross-contact not assessed",
           "source": "11 §3"
         },
         "eggs": {
           "label": "free",
-          "evidence": "squeezed oranges",
+          "evidence": "squeezed oranges; cross-contact not assessed",
           "source": "11 §5"
+        }
+      }
+    },
+    {
+      "name": "Dried Apricot & Almond Slice",
+      "description": "Traybake of flour, butter, almonds and dried apricots preserved with sulphur dioxide (E220)",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"almonds\"",
+          "source": "11 §2.1"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"butter\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"butter\"",
+          "source": "11 §4.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"flour\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"flour\"",
+          "source": "11 §7.1"
+        },
+        "sulphites": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"sulphur dioxide (E220)\"",
+          "source": "11 §15.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"butter\"",
+          "source": "11 §3.1"
         }
       }
     }

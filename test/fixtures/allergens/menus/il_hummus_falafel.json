@@ -18,7 +18,7 @@
       "labels": {
         "eggs": {
           "label": "free",
-          "evidence": "chickpeas, olive oil and paprika only",
+          "evidence": "chickpeas, olive oil and paprika only; cross-contact not assessed",
           "source": "11 §5"
         },
         "wheat": {
@@ -132,7 +132,7 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "falafel, salad, pickles and tahini",
+          "evidence": "falafel, salad, pickles and tahini; cross-contact not assessed",
           "source": "11 §3"
         },
         "sesame": {
@@ -140,6 +140,12 @@
           "role": "sauce",
           "evidence": "\"טחינה\"; sesame is also in many falafel batters",
           "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "pickled products are a documented mustard source",
+          "source": "11 §13.2"
         },
         "sulphites": {
           "label": "may_contain",
@@ -174,12 +180,6 @@
         }
       ],
       "labels": {
-        "eggs": {
-          "label": "may_contain",
-          "role": "option",
-          "evidence": "option \"חצילים\" can come in mayonnaise",
-          "source": "12 §1.6"
-        },
         "wheat": {
           "label": "contains",
           "role": "base",
@@ -198,6 +198,12 @@
           "evidence": "\"טחינה\" and \"חומוס\"",
           "source": "12 §1.1"
         },
+        "mustard": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "pickled products are a documented mustard source",
+          "source": "11 §13.2"
+        },
         "sulphites": {
           "label": "may_contain",
           "role": "garnish",
@@ -209,12 +215,6 @@
           "role": "protein",
           "evidence": "\"פלאפל\" and \"חומוס\"",
           "source": "12 §1.3"
-        },
-        "vegan": {
-          "label": "may_contain",
-          "role": "option",
-          "evidence": "animal-derived: option \"חצילים\" can come in mayonnaise",
-          "source": "12 §1.6"
         }
       }
     },
@@ -240,6 +240,12 @@
           "role": "sauce",
           "evidence": "\"טחינה\"",
           "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "pickled products are a documented mustard source",
+          "source": "11 §13.2"
         },
         "sulphites": {
           "label": "may_contain",
@@ -310,7 +316,7 @@
       "labels": {
         "eggs": {
           "label": "free",
-          "evidence": "the tahini version, not the mayonnaise one",
+          "evidence": "the tahini version, not the mayonnaise one; cross-contact not assessed",
           "source": "12 §1.1"
         },
         "sesame": {
@@ -334,7 +340,7 @@
         },
         "sesame": {
           "label": "free",
-          "evidence": "the mayonnaise version; no tahini named",
+          "evidence": "the mayonnaise version; no tahini named; cross-contact not assessed",
           "source": "12 §1.1"
         },
         "mustard": {
@@ -383,12 +389,12 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "a plain chopped salad",
+          "evidence": "a plain chopped salad; cross-contact not assessed",
           "source": "11 §3"
         },
         "sesame": {
           "label": "free",
-          "evidence": "a plain chopped salad",
+          "evidence": "a plain chopped salad; cross-contact not assessed",
           "source": "11 §11"
         },
         "celery": {
@@ -548,6 +554,12 @@
           "evidence": "\"בורגול\" is cracked wheat",
           "source": "12 §1.4"
         },
+        "celery": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "the soup the kubbeh is served in is a stock",
+          "source": "11 §12.2"
+        },
         "vegan": {
           "label": "contains",
           "role": "protein",
@@ -590,6 +602,12 @@
           "role": "sauce",
           "evidence": "\"חומוס\" is made with tahini",
           "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise and aioli sauces often carry mustard",
+          "source": "11 §13.2"
         },
         "legumes": {
           "label": "contains",
@@ -654,16 +672,16 @@
       "options": [],
       "labels": {
         "wheat": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "garnish",
-          "evidence": "\"פתיתים\" are usually toasted wheat pasta, but a rice version exists",
-          "source": "12 §1.4"
+          "evidence": "\"פתיתים\" are toasted wheat pasta",
+          "source": "12 §6.2"
         },
         "gluten": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "garnish",
-          "evidence": "\"פתיתים\" are usually toasted wheat pasta, but a rice version exists",
-          "source": "12 §1.4"
+          "evidence": "\"פתיתים\" are toasted wheat pasta",
+          "source": "12 §6.2"
         },
         "fish": {
           "label": "free",
@@ -707,6 +725,11 @@
           "evidence": "\"קוסקוס\" is wheat semolina",
           "source": "12 §1.4"
         },
+        "sesame": {
+          "label": "free",
+          "evidence": "\"גרגירי חומוס\" are whole chickpeas, not the tahini-based spread; no tahini is named; cross-contact not assessed",
+          "source": "12 §1.3"
+        },
         "sulphites": {
           "label": "may_contain",
           "role": "garnish",
@@ -726,6 +749,12 @@
       "description": "תורמוס כבוש עם לימון ופלפל חריף",
       "options": [],
       "labels": {
+        "mustard": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "pickled products are a documented mustard source",
+          "source": "11 §13.2"
+        },
         "lupin": {
           "label": "contains",
           "role": "base",
@@ -772,7 +801,7 @@
         },
         "milk": {
           "label": "free",
-          "evidence": "חלבה is halva (sesame), not a milk product despite the spelling",
+          "evidence": "חלבה is halva (sesame), not a milk product despite the spelling; cross-contact not assessed",
           "source": "12 §1.1"
         },
         "sesame": {
@@ -795,12 +824,12 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "plain rice",
+          "evidence": "plain rice; cross-contact not assessed",
           "source": "11 §3"
         },
         "sesame": {
           "label": "free",
-          "evidence": "plain rice",
+          "evidence": "plain rice; cross-contact not assessed",
           "source": "11 §11"
         }
       }
@@ -812,7 +841,7 @@
       "labels": {
         "eggs": {
           "label": "free",
-          "evidence": "plain chips",
+          "evidence": "plain chips; cross-contact not assessed",
           "source": "11 §5"
         },
         "sulphites": {
@@ -830,13 +859,72 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "lemon, mint and sugar",
+          "evidence": "lemon, mint and sugar; cross-contact not assessed",
           "source": "11 §3"
         },
         "vegan": {
           "label": "free",
           "evidence": "only plant ingredients named",
           "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "מרק עוף עם שקדי מרק",
+      "description": "מרק עוף חם עם גזר ושקדי מרק פריכים",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "\"שקדי מרק\" contains the word שקדים (almonds) but is a soup crouton, not a nut; cross-contact not assessed",
+          "source": "12 §1.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"שקדי מרק\" are wheat croutons despite the name",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"שקדי מרק\" are wheat croutons despite the name",
+          "source": "12 §1.4"
+        },
+        "celery": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "chicken soup is made with celery in the stock",
+          "source": "12 §1.9"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "פתיתי אורז",
+      "description": "פתיתי אורז עם ירקות ושמן זית",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "free",
+          "evidence": "\"פתיתי אורז\" names the rice version of ptitim; cross-contact not assessed",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "free",
+          "evidence": "rice ptitim with vegetables and olive oil; cross-contact not assessed",
+          "source": "11 §11"
         }
       }
     }

@@ -66,7 +66,7 @@
           "label": "contains",
           "role": "base",
           "evidence": "\"הפוך\" is a milk coffee",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "vegan": {
           "label": "contains",
@@ -91,7 +91,7 @@
           "label": "contains",
           "role": "base",
           "evidence": "\"latte\" is espresso with milk",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "vegan": {
           "label": "contains",
@@ -116,7 +116,7 @@
           "label": "may_contain",
           "role": "hidden",
           "evidence": "baked goods commonly contain milk or butter",
-          "source": "11 §3.2"
+          "source": "11 §4.2"
         },
         "eggs": {
           "label": "may_contain",
@@ -172,6 +172,18 @@
           "role": "base",
           "evidence": "\"לחמנייה\" can carry a sesame topping",
           "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise and aioli sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "chips from pre-cut potato may be sulphite-treated",
+          "source": "11 §15.2"
         },
         "vegan": {
           "label": "contains",
@@ -231,12 +243,12 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "no dairy named",
+          "evidence": "no dairy named; cross-contact not assessed",
           "source": "11 §3"
         },
         "wheat": {
           "label": "free",
-          "evidence": "cauliflower stands in for the grain; no cereal named",
+          "evidence": "cauliflower stands in for the grain; no cereal named; cross-contact not assessed",
           "source": "11 §7.3"
         }
       }
@@ -332,6 +344,18 @@
       "description": "",
       "options": [],
       "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "grilled steak is often finished with butter",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
+        },
         "vegan": {
           "label": "contains",
           "role": "protein",
@@ -372,7 +396,7 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "soft drink",
+          "evidence": "soft drink; cross-contact not assessed",
           "source": "11 §3"
         }
       }
@@ -405,6 +429,12 @@
           "role": "base",
           "evidence": "a burger is normally served in a bun",
           "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "a burger bun can carry a sesame topping",
+          "source": "11 §11.2"
         },
         "vegan": {
           "label": "contains",

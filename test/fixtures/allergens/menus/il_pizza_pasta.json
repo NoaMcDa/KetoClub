@@ -166,11 +166,17 @@
       "description": "פסטו בזיליקום, גבינת עיזים ועגבניות שרי",
       "options": [],
       "labels": {
-        "treeNuts": {
+        "peanuts": {
           "label": "may_contain",
           "role": "sauce",
-          "evidence": "\"פסטו\" is made with pine nuts or walnuts",
-          "source": "11 §2.2"
+          "evidence": "pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
+        "treeNuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"pesto\" is made with pine nuts (or walnuts)",
+          "source": "11 §2.1"
         },
         "milk": {
           "label": "contains",
@@ -195,6 +201,12 @@
           "role": "base",
           "evidence": "\"פיצה\" dough",
           "source": "11 §7.1"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -338,7 +350,7 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "spaghetti with tomato and basil; no cream or cheese named",
+          "evidence": "spaghetti with tomato and basil; no cream or cheese named; cross-contact not assessed",
           "source": "11 §3"
         },
         "wheat": {
@@ -451,6 +463,12 @@
       "description": "פנה ברוטב פסטו בזיליקום, צנוברים ופרמזן",
       "options": [],
       "labels": {
+        "peanuts": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
         "treeNuts": {
           "label": "contains",
           "role": "sauce",
@@ -480,6 +498,12 @@
           "role": "base",
           "evidence": "\"פנה\" (penne)",
           "source": "12 §1.4"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §16.1"
         },
         "vegan": {
           "label": "contains",
@@ -648,14 +672,27 @@
           "source": "12 §5"
         },
         "wheat": {
-          "label": "free",
-          "evidence": "rice-based dish; no cereal named",
-          "source": "11 §7.3"
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "risotto stock may be made with stock cubes that contain wheat",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "risotto stock may be made with stock cubes that contain wheat",
+          "source": "11 §7.2"
         },
         "fish": {
           "label": "free",
           "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
           "source": "11 §8"
+        },
+        "celery": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "stock cubes and stocks are documented celery carriers",
+          "source": "11 §12.2"
         },
         "sulphites": {
           "label": "may_contain",
@@ -689,9 +726,9 @@
           "source": "12 §1.5"
         },
         "eggs": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "sauce",
-          "evidence": "Caesar dressing is egg-based",
+          "evidence": "Caesar dressing is made with egg",
           "source": "12 §5"
         },
         "wheat": {
@@ -822,6 +859,11 @@
           "role": "base",
           "evidence": "tiramisu is made with egg yolks",
           "source": "11 §5.1"
+        },
+        "soy": {
+          "label": "free",
+          "evidence": "\"טירמיסו\" contains the letters מיסו (miso) but is a mascarpone dessert; no soy is named; cross-contact not assessed",
+          "source": "11 §6"
         },
         "wheat": {
           "label": "contains",

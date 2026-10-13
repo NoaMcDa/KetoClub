@@ -9,7 +9,7 @@
       "labels": {
         "sesame": {
           "label": "free",
-          "evidence": "a plain vegetable salad (nikud spelling)",
+          "evidence": "a plain vegetable salad (nikud spelling); cross-contact not assessed",
           "source": "11 §11"
         },
         "vegan": {
@@ -82,7 +82,7 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "roast beetroot in mustard and honey",
+          "evidence": "roast beetroot in mustard and honey; cross-contact not assessed",
           "source": "11 §3"
         },
         "mustard": {
@@ -105,9 +105,9 @@
       "options": [],
       "labels": {
         "eggs": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "protein",
-          "evidence": "schnitzel coating is normally egg-bound",
+          "evidence": "\"שניצל\" coating is egg-bound",
           "source": "12 §1.6"
         },
         "wheat": {
@@ -172,7 +172,7 @@
           "label": "may_contain",
           "role": "side",
           "evidence": "\"פירה\" (mashed potato) is commonly made with butter or milk",
-          "source": "11 §3.2"
+          "source": "11 §4.2"
         },
         "vegan": {
           "label": "contains",
@@ -244,12 +244,12 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "no cheese or butter named",
+          "evidence": "no cheese or butter named; cross-contact not assessed",
           "source": "11 §3"
         },
         "sesame": {
           "label": "free",
-          "evidence": "a lettuce-wrapped burger has no bun to carry seeds",
+          "evidence": "a lettuce-wrapped burger has no bun to carry seeds; cross-contact not assessed",
           "source": "11 §11"
         },
         "vegan": {
@@ -318,13 +318,13 @@
           "label": "may_contain",
           "role": "protein",
           "evidence": "fried fish is commonly floured or battered",
-          "source": "11 §8.4"
+          "source": "11 §7.2"
         },
         "gluten": {
           "label": "may_contain",
           "role": "protein",
           "evidence": "fried fish is commonly floured or battered",
-          "source": "11 §8.4"
+          "source": "11 §7.2"
         },
         "fish": {
           "label": "contains",
@@ -390,7 +390,7 @@
       "labels": {
         "milk": {
           "label": "free",
-          "evidence": "soft drink",
+          "evidence": "soft drink; cross-contact not assessed",
           "source": "11 §3"
         }
       }
@@ -402,7 +402,7 @@
       "labels": {
         "eggs": {
           "label": "free",
-          "evidence": "soft drink",
+          "evidence": "soft drink; cross-contact not assessed",
           "source": "11 §5"
         }
       }
@@ -419,14 +419,20 @@
           "source": "11 §2.1"
         },
         "milk": {
-          "label": "free",
-          "evidence": "\"חלב שקדים\" is a nut milk, not dairy",
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "guard: 'חלב שקדים' (11 §0): a guard lowers certainty but never clears a strict restriction",
           "source": "11 §3.3"
         },
         "lactose": {
           "label": "free",
           "evidence": "almond milk contains no lactose",
           "source": "11 §4.3"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only plant ingredients named",
+          "source": "12 §2.2"
         }
       }
     },
@@ -450,8 +456,14 @@
       "labels": {
         "sesame": {
           "label": "free",
-          "evidence": "ketchup; no sesame named",
+          "evidence": "ketchup; no sesame named; cross-contact not assessed",
           "source": "11 §11"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "ketchup and barbecue sauce are made with vinegar",
+          "source": "11 §15.2"
         }
       }
     }

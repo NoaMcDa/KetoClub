@@ -66,7 +66,7 @@
           "label": "contains",
           "role": "garnish",
           "evidence": "\"American cheese\"",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "wheat": {
           "label": "contains",
@@ -129,6 +129,12 @@
           "evidence": "brioche is an enriched bread",
           "source": "11 §4.2"
         },
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"brioche bun\" is an enriched bread made with eggs",
+          "source": "11 §5.2"
+        },
         "wheat": {
           "label": "contains",
           "role": "base",
@@ -140,6 +146,12 @@
           "role": "base",
           "evidence": "\"brioche bun\"",
           "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "a burger bun can carry a sesame topping",
+          "source": "11 §11.2"
         },
         "vegan": {
           "label": "contains",
@@ -226,6 +238,12 @@
           "evidence": "\"toasted bread\"",
           "source": "11 §7.1"
         },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise and aioli sauces often carry mustard",
+          "source": "11 §13.2"
+        },
         "vegan": {
           "label": "contains",
           "role": "protein",
@@ -255,7 +273,7 @@
           "label": "contains",
           "role": "garnish",
           "evidence": "\"provolone\"",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "wheat": {
           "label": "contains",
@@ -308,7 +326,7 @@
         },
         "gluten": {
           "label": "contains",
-          "role": "sauce",
+          "role": "protein",
           "evidence": "\"malt vinegar\" and beer batter",
           "source": "11 §7.1"
         },
@@ -349,6 +367,12 @@
       "description": "Breaded popcorn shrimp with fries, fried in the same oil as our breaded chicken and shrimp, and cocktail sauce",
       "options": [],
       "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "the text says the oil is shared with buttermilk chicken",
+          "source": "12 §5"
+        },
         "eggs": {
           "label": "may_contain",
           "role": "protein",
@@ -591,7 +615,7 @@
           "label": "contains",
           "role": "garnish",
           "evidence": "\"cheddar\"",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "eggs": {
           "label": "contains",
@@ -645,7 +669,7 @@
           "label": "contains",
           "role": "sauce",
           "evidence": "hollandaise is made with butter",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "eggs": {
           "label": "contains",
@@ -697,9 +721,9 @@
           "source": "11 §4.3"
         },
         "eggs": {
-          "label": "may_contain",
+          "label": "contains",
           "role": "sauce",
-          "evidence": "Caesar dressing is egg-based",
+          "evidence": "Caesar dressing is made with egg",
           "source": "12 §5"
         },
         "wheat": {
@@ -755,7 +779,7 @@
           "label": "contains",
           "role": "garnish",
           "evidence": "\"blue cheese\" and ranch",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "eggs": {
           "label": "contains",
@@ -804,7 +828,7 @@
           "label": "contains",
           "role": "garnish",
           "evidence": "\"cheddar\" and \"sour cream\"",
-          "source": "11 §3.1"
+          "source": "11 §4.1"
         },
         "legumes": {
           "label": "contains",
@@ -1049,7 +1073,7 @@
           "label": "may_contain",
           "role": "base",
           "evidence": "a creamy filling is usually made with cream cheese or cream",
-          "source": "11 §3.2"
+          "source": "11 §4.2"
         },
         "eggs": {
           "label": "may_contain",
@@ -1069,6 +1093,12 @@
           "evidence": "\"cookie crust\"",
           "source": "11 §7.1"
         },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "peanuts is a legume: \"peanut butter\"",
+          "source": "11 §16.1"
+        },
         "vegan": {
           "label": "may_contain",
           "role": "base",
@@ -1084,7 +1114,7 @@
       "labels": {
         "peanuts": {
           "label": "free",
-          "evidence": "tea and ice",
+          "evidence": "tea and ice; cross-contact not assessed",
           "source": "11 §1"
         },
         "treeNuts": {
@@ -1094,7 +1124,7 @@
         },
         "milk": {
           "label": "free",
-          "evidence": "tea and ice",
+          "evidence": "tea and ice; cross-contact not assessed",
           "source": "11 §3"
         }
       }
@@ -1106,12 +1136,12 @@
       "labels": {
         "eggs": {
           "label": "free",
-          "evidence": "black coffee",
+          "evidence": "black coffee; cross-contact not assessed",
           "source": "11 §5"
         },
         "wheat": {
           "label": "free",
-          "evidence": "black coffee",
+          "evidence": "black coffee; cross-contact not assessed",
           "source": "11 §7"
         }
       }
