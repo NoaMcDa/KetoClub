@@ -15,7 +15,10 @@ are done or tracked as issues.
   after ARB edits, `dart format lib test integration_test test_driver tool`,
   `flutter analyze --fatal-infos --fatal-warnings` clean; backend: `uv sync
   --frozen`, `ruff check`, `ruff format --check`, `mypy app tests`.
-  `/opt/flutter/bin` must be on `PATH`.
+  `/opt/flutter/bin` must be on `PATH`. Since the SessionStart hook
+  (`.claude/hooks/session-start.sh`), cloud sessions have Flutter 3.47.4 at
+  `/opt/flutter` and workers run the scoped checks before pushing (Banto
+  work merges into `banto`, not `main`).
 - Merge `origin/main` into a PR branch (never rebase or force-push a
   worker's branch); resolve keep-both; watch initializer lists (`,` vs `;`);
   PRs that touch the same screen merge one at a time, each merging main first.
