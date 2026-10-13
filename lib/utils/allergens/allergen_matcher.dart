@@ -401,9 +401,9 @@ abstract final class AllergenMatcher {
       _findIn(dishMatchText(dish), _registry);
 
   /// [find] over [vocabulary] instead of [allergenVocabulary], compiled
-  /// once per map instance: for the tests and the golden exporter, which pin the
-  /// matcher's behaviour with a vocabulary of their own rather than the
-  /// group files. Production code calls [find].
+  /// once per map instance: for the tests and the golden exporter, which
+  /// pin the matcher's behaviour with a vocabulary of their own rather than
+  /// the group files. Production code calls [find].
   static List<AllergenHit> findWith(
     String rawText,
     Map<RestrictionId, RestrictionVocabulary> vocabulary,

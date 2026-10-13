@@ -87,7 +87,9 @@ async def scan(
     request = ChatRequest.model_construct(
         system_prompt=prompt.vision_system_prompt(page_count, options),
         user_prompt=prompt.vision_user_prompt(page_count),
-        response_schema=prompt.vision_response_schema(),
+        response_schema=prompt.vision_response_schema(
+            extract=options.restrictions_requested
+        ),
         schema_name=prompt.SCHEMA_NAME,
         images=[
             ImagePart.model_construct(mime_type=page.mime_type, data=page.data)
@@ -106,6 +108,7 @@ async def scan(
         analysed_at=dart_now(now or datetime.now(UTC)),
         net_carb_limit_grams=options.net_carb_limit_grams,
         page_count=page_count,
+        extract=options.restrictions_requested,
     )
     if isinstance(parsed, parser.Failed):
         logger.info("scan pages=%d outcome=%s", page_count, parsed.reason)

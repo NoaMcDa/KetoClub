@@ -42,6 +42,51 @@ _DISH_PROPERTIES: Final = (
 """The seven dish properties of the text path's schema, in ``required``
 order."""
 
+_INGREDIENT_CERTAINTIES: Final = ("stated", "likely", "suspected")
+"""Dart ``Certainty.values`` names, in declaration order."""
+
+_COMPONENT_ROLES: Final = (
+    "base",
+    "protein",
+    "side",
+    "sauce",
+    "garnish",
+    "option",
+    "unknown",
+)
+"""Dart ``ComponentRole.values`` names, in declaration order."""
+
+EXTRACTION_SECTION: Final[str] = (
+    "Separately from the keto verdict, for every dish also fill "
+    '"ingredients": each ingredient the dish\'s text states, or that a '
+    'standard recipe for the dish implies, as an object with "name", '
+    '"certainty" and "role". Include the hidden sources a standard recipe '
+    "carries even when the text does not name them: tahini in sabich, "
+    "butter in a cream sauce, flour and egg in a schnitzel coating, soy "
+    'sauce in a stir-fry. Set "certainty" to "stated" only when the '
+    'dish\'s own text names the ingredient, to "likely" when a standard '
+    'recipe for the dish almost always holds it, and to "suspected" when '
+    "it only sometimes does or you are guessing; be honest, never raise a "
+    'certainty to sound sure. Set "role" to the part of the dish the '
+    'ingredient belongs to: "base", "protein", "side", "sauce", "garnish", '
+    '"option" (part of a choice the diner makes) or "unknown". Name each '
+    "ingredient in the menu's own language, as the text names it. List "
+    "ingredients whatever the verdict, an empty list only for a dish with "
+    "nothing to list, and never add a dish that is not in the menu."
+)
+"""Dart ``_extractionSection`` (Banto; ALG-03, D26 C1-C2): the
+profile-independent ingredient extraction, appended last only when the
+options request restrictions. Restated here like :func:`vision_preamble`,
+and pinned by the golden ``prompt.json``'s ``restrictions`` entries."""
+
+VISION_DESCRIPTION_SECTION: Final[str] = (
+    'For each dish also set "description" to the description printed with '
+    "it, exactly as printed and in the menu's own language — never "
+    "translate it — or null when none is printed."
+)
+"""Dart ``_visionDescriptionSection``: what an extracting vision request
+asks beyond :data:`EXTRACTION_SECTION` (ALG-03)."""
+
 
 def _default_options() -> AnalysisOptionsSnapshot:
     return AnalysisOptionsSnapshot(
@@ -57,6 +102,8 @@ def system_prompt(options: AnalysisOptionsSnapshot | None = None) -> str:
     section of one ``- `` line each. No trailing newline.
 
     ``None`` means the defaults (6 g, no constraints): the default prompt.
+    When ``options.restrictions_requested`` (D26 C2, ALG-03),
+    :data:`EXTRACTION_SECTION` follows last after a blank line.
     """
     chosen = options if options is not None else _default_options()
     text = vocabulary().prompt
@@ -73,6 +120,8 @@ def system_prompt(options: AnalysisOptionsSnapshot | None = None) -> str:
     if constraints:
         lines = "\n".join(f"- {constraint}" for constraint in constraints)
         prompt += f"\n\n{text.dietary_constraints_preamble}\n{lines}"
+    if chosen.restrictions_requested:
+        prompt += f"\n\n{EXTRACTION_SECTION}"
     return prompt
 
 
@@ -99,8 +148,13 @@ def vision_system_prompt(
     page_count: int, options: AnalysisOptionsSnapshot | None = None
 ) -> str:
     """``MenuAnalysisPrompt.visionSystemPrompt``: :func:`vision_preamble`, a
-    blank line, then :func:`system_prompt` byte for byte."""
-    return f"{vision_preamble(page_count)}\n\n{system_prompt(options)}"
+    blank line, then :func:`system_prompt` byte for byte; with
+    ``restrictions_requested`` (ALG-03), a blank line and
+    :data:`VISION_DESCRIPTION_SECTION` after it."""
+    prompt = f"{vision_preamble(page_count)}\n\n{system_prompt(options)}"
+    if options is not None and options.restrictions_requested:
+        prompt += f"\n\n{VISION_DESCRIPTION_SECTION}"
+    return prompt
 
 
 def vision_user_prompt(page_count: int) -> str:
@@ -132,9 +186,43 @@ def user_prompt(menu: Menu) -> str:
     return "\n".join(lines)
 
 
-def response_schema() -> dict[str, Any]:
+def _ingredients_schema() -> dict[str, Any]:
+    """Dart ``_ingredientsSchema``: the ``ingredients`` property (ALG-03)."""
+    return {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["name", "certainty", "role"],
+            "properties": {
+                "name": {"type": "string"},
+                "certainty": {
+                    "type": "string",
+                    "enum": list(_INGREDIENT_CERTAINTIES),
+                },
+                "role": {"type": "string", "enum": list(_COMPONENT_ROLES)},
+            },
+        },
+    }
+
+
+def response_schema(*, extract: bool = False) -> dict[str, Any]:
     """``MenuAnalysisPrompt.responseSchema``: the strict JSON schema of the
-    reply (§9.2). A fresh object on every call, so a caller may mutate it."""
+    reply (§9.2). A fresh object on every call, so a caller may mutate it.
+
+    With ``extract`` (ALG-03, D26 C2) the dish object gains ``ingredients``,
+    last in ``required``; without it the schema is today's. There is no
+    ``concerns`` property: concerns are never taken from the model (C1).
+    """
+    schema = _base_response_schema()
+    if extract:
+        item = schema["properties"]["dishes"]["items"]
+        item["required"].append("ingredients")
+        item["properties"]["ingredients"] = _ingredients_schema()
+    return schema
+
+
+def _base_response_schema() -> dict[str, Any]:
     return {
         "type": "object",
         "additionalProperties": False,
@@ -180,12 +268,17 @@ def response_schema() -> dict[str, Any]:
     }
 
 
-def vision_response_schema() -> dict[str, Any]:
+def vision_response_schema(*, extract: bool = False) -> dict[str, Any]:
     """``MenuAnalysisPrompt.visionResponseSchema``: :func:`response_schema`
     with one more required dish property, ``page``, typed
-    ``["integer", "null"]`` (issue #299)."""
-    schema = response_schema()
+    ``["integer", "null"]`` (issue #299). With ``extract`` (ALG-03) it is
+    built on the extracting schema and ``description``, typed
+    ``["string", "null"]``, follows ``page``."""
+    schema = response_schema(extract=extract)
     item = schema["properties"]["dishes"]["items"]
     item["required"].append("page")
     item["properties"]["page"] = {"type": ["integer", "null"]}
+    if extract:
+        item["required"].append("description")
+        item["properties"]["description"] = {"type": ["string", "null"]}
     return schema

@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/dietary_profile.dart';
+import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/utils/constants.dart';
@@ -169,7 +171,8 @@ void main() {
   });
 
   group('ClassificationOptions.restrictionsRequested (D26 W2-0)', () {
-    test('defaults to false, and fromSettings leaves it false', () {
+    test('defaults to false, and fromSettings leaves it false by '
+        'default', () {
       expect(const ClassificationOptions().restrictionsRequested, isFalse);
       expect(
         ClassificationOptions.fromSettings(const AppSettings())
@@ -214,6 +217,51 @@ void main() {
       expect(on.matches(null), isFalse);
       expect(off.matches(on.snapshot), isFalse);
       expect(on.matches(on.snapshot), isTrue);
+    });
+  });
+
+  group('ClassificationOptions.fromSettings restrictionsRequested '
+      '(ALG-03, D26 C2)', () {
+    AppSettings withProfile(List<RestrictionId> ids) {
+      var profile = DietaryProfile.empty;
+      for (final id in ids) {
+        profile = profile.withEntry(id);
+      }
+      return const AppSettings().copyWith(profile: profile);
+    }
+
+    // (profile, bantoMode, expected)
+    const table = <(List<RestrictionId>, bool, bool)>[
+      (<RestrictionId>[], false, false),
+      (<RestrictionId>[], true, false),
+      (<RestrictionId>[RestrictionId.keto], true, false),
+      (<RestrictionId>[RestrictionId.sesame], false, false),
+      (<RestrictionId>[RestrictionId.sesame], true, true),
+      (<RestrictionId>[RestrictionId.keto, RestrictionId.gluten], true, true),
+    ];
+    for (final (ids, bantoMode, expected) in table) {
+      test('is $expected for ${ids.map((id) => id.name).toList()} with '
+          'bantoMode $bantoMode', () {
+        // Act
+        final options = ClassificationOptions.fromSettings(
+          withProfile(ids),
+          bantoMode: bantoMode,
+        );
+
+        // Assert
+        expect(options.restrictionsRequested, expected);
+      });
+    }
+
+    test('a keto-only profile with bantoMode on gives the keto options', () {
+      // Act
+      final options = ClassificationOptions.fromSettings(
+        withProfile(const <RestrictionId>[RestrictionId.keto]),
+        bantoMode: true,
+      );
+
+      // Assert
+      expect(options, ClassificationOptions.fromSettings(const AppSettings()));
     });
   });
 }

@@ -375,7 +375,9 @@ def _compile(
     return tuple(compiled)
 
 
-_COMPILED: dict[int, tuple[Mapping[str, RestrictionVocabulary], tuple[_CompiledRestriction, ...]]] = {}
+_COMPILED: dict[
+    int, tuple[Mapping[str, RestrictionVocabulary], tuple[_CompiledRestriction, ...]]
+] = {}
 """Dart ``_compiledCache``: every vocabulary compiled so far, keyed on the
 mapping's identity (the mapping is kept alive beside its compiled form, so
 an id is never reused while it is cached)."""

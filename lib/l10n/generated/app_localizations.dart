@@ -2311,6 +2311,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Card language'**
   String get chefCardLanguageLabel;
+
+  /// Title of the bottom sheet that lists the concerns behind a dish's state (Banto, ALG-06).
+  ///
+  /// In en, this message translates to:
+  /// **'Why this result'**
+  String get whySheetTitle;
+
+  /// The dish the Why sheet is about, shown under the title.
+  ///
+  /// In en, this message translates to:
+  /// **'{dish}'**
+  String whySheetDishName(String dish);
+
+  /// Evidence tier phrase: the platform said so. The tier phrases are words, never a percentage.
+  ///
+  /// In en, this message translates to:
+  /// **'Declared by the platform'**
+  String get whyTierDeclared;
+
+  /// No description provided for @whyTierStated.
+  ///
+  /// In en, this message translates to:
+  /// **'Stated on the menu'**
+  String get whyTierStated;
+
+  /// No description provided for @whyTierInferred.
+  ///
+  /// In en, this message translates to:
+  /// **'Inferred from a typical recipe'**
+  String get whyTierInferred;
+
+  /// No description provided for @whyTierSuspected.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspected — please ask'**
+  String get whyTierSuspected;
+
+  /// No description provided for @whyTierConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed by you'**
+  String get whyTierConfirmed;
+
+  /// No description provided for @whyTierDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Ruled out by you'**
+  String get whyTierDenied;
+
+  /// No description provided for @whySourceName.
+  ///
+  /// In en, this message translates to:
+  /// **'Found in the dish name'**
+  String get whySourceName;
+
+  /// No description provided for @whySourceDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Found in the dish description'**
+  String get whySourceDescription;
+
+  /// No description provided for @whySourceOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Found in one of the options'**
+  String get whySourceOption;
+
+  /// No description provided for @whySourceHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'A hidden source the text implies'**
+  String get whySourceHidden;
+
+  /// No description provided for @whySourceModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Read by the AI, not in the menu text'**
+  String get whySourceModel;
+
+  /// The exact menu text a concern matched, quoted.
+  ///
+  /// In en, this message translates to:
+  /// **'Matched: “{text}”'**
+  String whyMatchedText(String text);
+
+  /// No description provided for @whyWaiterQuestionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the waiter'**
+  String get whyWaiterQuestionLabel;
+
+  /// No description provided for @whyEmptyStrict.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing in the menu text points to your restrictions. Still ask the restaurant.'**
+  String get whyEmptyStrict;
+
+  /// No description provided for @whyEmptyFlexible.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing in the menu text points to your restrictions.'**
+  String get whyEmptyFlexible;
+
+  /// Banto (ALG-02b): heading of the first-run screen where the user picks their restrictions.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you avoid?'**
+  String get restrictionOnboardingTitle;
+
+  /// No description provided for @restrictionOnboardingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick everything that applies. You can change this any time in Settings. Skip it to use keto only.'**
+  String get restrictionOnboardingBody;
+
+  /// No description provided for @restrictionOnboardingContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get restrictionOnboardingContinue;
+
+  /// No description provided for @restrictionOnboardingSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get restrictionOnboardingSkip;
+
+  /// Banto (ALG-02b): the menu screen's one-line summary of the restrictions the menu is read against. Tapping it opens Settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking for: {names}'**
+  String menuProfileSummary(String names);
 }
 
 class _AppLocalizationsDelegate

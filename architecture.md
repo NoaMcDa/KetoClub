@@ -3153,6 +3153,74 @@ all under a small nuts, sesame and seafood vocabulary of its own
 (`tool/golden/kitchen_signals_corpus.dart`) so it does not move when the group
 vocabulary files are filled; no other golden changed.
 
+**The Why sheet (ALG-06, #348).** `lib/widgets/why_sheet.dart` is the "why this
+result" bottom sheet, built and tested on its own and wired into no screen
+yet. `WhySheet` takes a dish name, a list of `Concern` and whether the profile
+is strict, and shows one row per concern: the restriction's name in the UI
+language, the evidence tier as a phrase (declared by the platform, stated on
+the menu, inferred from a typical recipe, suspected (please ask), confirmed by
+you, ruled out by you), where it was found, the matched text quoted and the
+waiter question. Confidence is words, never a number or a percentage. An empty
+list says nothing in the menu text points to the profile, adding "still ask the
+restaurant" for a strict profile, and never says the dish is fine; the footer
+is `helperToolSentence`. `showWhySheet` opens it through `showKetoClubSheet`
+(560 px cap) and, like the widget, does nothing with `bantoMode` off. The
+strings are new ARB keys (`why*`), so the banned-words test covers them.
+
+ALG-02b (#344) adds the profile's two other surfaces, both behind `bantoMode`.
+`AppSettings.onboardingSeen` (JSON key `restrictionOnboardingSeen`, **written
+only when true**, so the keto record stays byte-identical) records that the
+first-run "What do you avoid?" screen was completed or skipped.
+`RestrictionOnboardingGate` wraps the `/` route: with the flag off it returns
+its child at once and builds no controller; with it on it reads the settings
+once and shows `RestrictionOnboardingScreen` (the taxonomy as chips grouped by
+kind, no severity question, the helper-tool sentence, "Continue" which saves
+the picks in tap order, "Skip" which saves none, both marking it seen) only
+when it was not seen and the profile is still empty, so a user who added
+restrictions in Settings first is never asked. Deep links to a venue skip it.
+On the menu screen `MenuFiltersRow` takes an optional `summary` line kept
+visible under the disclosure row; with the flag on and a non-empty profile
+`ProfileSummaryLine` fills it with "Checking for: sesame, lactose" in the UI
+language, naming restrictions only and never calling a menu safe. Tapping it
+opens Settings and `MenuController.refreshProfile` re-reads the profile on
+return. `MenuController.profile` is read from the device's settings in `open`
+and goes nowhere else.
+
+**Ingredient extraction: prompt, schema and parser (ALG-03, #345).**
+`ClassificationOptions.fromSettings(settings, {bantoMode})` sets
+`restrictionsRequested` when the flag is on and the profile holds an entry
+other than keto (`DietaryProfile.hasNonKetoEntry`, a model getter, because a
+service may not name the profile's types); the quick score and the Scan tab
+build their own options and stay keto-only. Only then does `systemPrompt`
+append a last, profile-independent extraction section (each dish's
+`ingredients` as `{name, certainty, role}`, hidden sources a standard recipe
+implies, honest certainty, the menu's own language, never a new dish; no
+restriction is named), `visionSystemPrompt` add a paragraph asking for each
+dish's printed `description`, `responseSchema(extract:)` add `ingredients`
+last in `required`, and `visionResponseSchema(extract:)` add `ingredients`
+and, after `page`, a nullable `description`; with the flag off all four are
+byte for byte today's, which `keto_unchanged_test`'s banto layer pins through
+`fromSettings` with an empty and a keto-only profile. There is no `concerns`
+property: concerns are computed on the device (C1). `MenuResponseParser`
+reads `ingredients` only with `extract`: an entry with a non-string, blank or
+over-100-unit name or an unknown certainty is dropped, an unknown role reads as
+`unknown`, names that normalise alike keep the first, at most 40 are kept, and
+an ingredient whose normalised name is not a substring of the dish's
+`dishRulesText` (removal options skipped) is kept but capped at `suspected`;
+`parseScanned` keeps the description (trimmed, cut at 1000 units), which
+enters the scan's fingerprint. A described dish whose extraction came back
+empty keeps its keto verdict and an empty list; `extractionMissing` computes
+that mark rather than storing it or demoting the dish, so ALG-04's rules pass
+is its only source of concerns. The backend clients send
+`restrictionsRequested: true` (`restrictionsRequested=true` on the venue
+route) only when true; `ClassificationOptionsBody` accepts that strict bool
+and still forbids every other key, the services pass it to the same prompt,
+schema and parser (`backend/app/keto/prompt.py`, `parser.py`), and the
+analysis-cache key gains a `|restrictions` part only when it is true. The
+goldens gain a `restrictions` option set in `prompt.json`, the two extracting
+schemas and `extractText`/`extractScanned` in `parser.json`, replayed by
+Python; no existing entry changed and `schemaVersion` stays 1.
+
 **The matcher's guards lower, sit beside their term, and read the maqaf
 (ALG-04a, related to #346).** Three allergen-only rules replace the keto guard
 window inside `AllergenMatcher`, and its Python twin follows them. **A guard
