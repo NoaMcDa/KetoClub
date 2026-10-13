@@ -3233,6 +3233,35 @@ likely one in the name. `MenuController.evaluatedRows` pairs each analysed
 visible row with its evaluation for the profile recorded when the menu was
 last classified; nothing renders it yet (ALG-05).
 
+**The rules-recall gate over the corpus (ALG-10, closes #352).**
+`test/utils/allergens/corpus_recall_test.dart` replays every dish of
+`test/fixtures/allergens/menus/` through `ClassificationRules.allergenConcerns`
+(no model, no network) and holds one rule per strict restriction (every id
+whose `RestrictionKind` is `allergen` or `autoimmune`): a `contains` label
+needs a concern of at least `likely` certainty and a `may_contain` label one
+of at least `suspected`. A concern on a `free` or unlabelled dish is printed
+as a false-positive count and never fails. Its twin,
+`backend/tests/test_allergen_corpus_recall.py`, runs the same corpus through
+`app.keto.rules.allergen_concerns` and must agree, and both print the same
+per-restriction table so the denominator travels with every figure. The
+vocabulary does not close every label yet, and the gate is not weakened and no
+label is edited to pass it: the misses that remain are listed one by one, with
+a reason and the vocabulary addition that would close it, in
+`test/fixtures/allergens/known_misses.json`, which both twins read. A miss not
+on the list fails the build, and so does a listed entry that no longer misses
+(delete it), so the list can only shrink; it is the visible debt, counted in
+every run. The labels are still unreviewed desk research, so a recall figure
+is a question for the labels as much as for the engine until a clinical
+reviewer reads them. The person-run half, `backend/tools/allergen_eval.py`
+(like `vision_smoke.py`, #88, imported by no gate), sends each corpus menu
+through the extraction request with the backend's own model client and
+reports recall per restriction for the model alone, the rules alone and the
+merge of the two, splicing the result into `docs/ALLERGEN_EVAL.md`, which
+says "not yet run" until a person with a key has run it. Its scoring
+functions are pure and unit-tested offline, and a model's ingredient list is
+scored through the same matcher the on-device evaluator uses, cut to the
+weaker of the two certainties.
+
 ---
 
 ## 15. Testing strategy
