@@ -429,7 +429,9 @@ void main() {
       _hit('רול עם רוטב אונאגי', RestrictionId.legumes, <String>[
         'אונאגי:likely',
       ]),
-      _hit('חטיף במבה', RestrictionId.legumes, <String>['במבה:likely']),
+      _hit('חטיף במבה', RestrictionId.legumes, <String>[
+        'במבה:stated',
+      ], why: 'a direct peanut term, so a direct legume term'),
       _hit('Peking duck with hoisin sauce', RestrictionId.legumes, <String>[
         'hoisin:likely',
       ]),

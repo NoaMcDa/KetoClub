@@ -32,6 +32,8 @@
 library;
 
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/utils/allergens/vocab_gluten_grains.dart';
+import 'package:ketoclub/utils/allergens/vocab_nuts_seeds.dart';
 import 'package:ketoclub/utils/allergens/vocabulary_types.dart';
 
 /// Soy's direct English triggers, shared with `legumes` (soy is a legume).
@@ -236,11 +238,6 @@ const List<HiddenTrigger> _soyHiddenHe = <HiddenTrigger>[
     source: '11 §6.2',
   ),
   HiddenTrigger(
-    term: 'במבה',
-    certainty: TriggerCertainty.likely,
-    source: '12 §1.2',
-  ),
-  HiddenTrigger(
     term: 'לציטין',
     certainty: TriggerCertainty.suspected,
     source: '12 §1.11',
@@ -307,39 +304,22 @@ const List<HiddenTrigger> _soyHiddenHe = <HiddenTrigger>[
   ),
 ];
 
-/// Peanut's direct English triggers: a peanut is a legume, so `legumes`
-/// carries every spelling the peanut vocabulary does (a test compares them).
-const List<String> _peanutDirectEn = <String>[
-  'peanut',
-  'peanuts',
+/// Legume-only English spellings for peanut and lupin dishes that the
+/// sibling groups do not list as direct triggers. `legumes` spreads the
+/// sibling lists ([peanutDirectEn], [lupinDirectEn]) and these, so it
+/// carries every peanut and lupin spelling (a test compares them).
+const List<String> _peanutLupinExtraEn = <String>[
   'peanut butter',
   'peanut flour',
   'peanut oil',
   'peanut sauce',
   'arachis oil',
-  'groundnut',
-  'groundnuts',
-  'monkey nut',
   'satay',
   'sate',
-];
-
-/// Peanut's direct Hebrew triggers; see `_peanutDirectEn`.
-const List<String> _peanutDirectHe = <String>['בוטנים', 'בוטן', 'אגוזי אדמה'];
-
-/// Lupin's direct English triggers; see `_peanutDirectEn`.
-const List<String> _lupinDirectEn = <String>[
-  'lupin',
-  'lupine',
-  'lupins',
-  'lupini',
   'lupini beans',
   'lupin flour',
   'lupin protein',
 ];
-
-/// Lupin's direct Hebrew triggers; see `_peanutDirectEn`.
-const List<String> _lupinDirectHe = <String>['תורמוס', 'לופין'];
 
 /// Plants and additives: one entry per restriction this group owns.
 const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
@@ -348,7 +328,16 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
         directEn: <String>[..._soyDirectEn],
         directHe: <String>[..._soyDirectHe],
         hiddenEn: <HiddenTrigger>[..._soyHiddenEn],
-        hiddenHe: <HiddenTrigger>[..._soyHiddenHe],
+        hiddenHe: <HiddenTrigger>[
+          ..._soyHiddenHe,
+          // Bamba lists soy (12 §1.2). Not in the shared list: `legumes`
+          // already has it as a direct peanut term.
+          HiddenTrigger(
+            term: 'במבה',
+            certainty: TriggerCertainty.likely,
+            source: '12 §1.2',
+          ),
+        ],
         guards: AllergenGuards(
           beforeEn: <String>['no', 'without'],
           afterEn: <String>['free'],
@@ -1175,8 +1164,9 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
       RestrictionId.legumes: RestrictionVocabulary(
         directEn: <String>[
           ..._soyDirectEn,
-          ..._peanutDirectEn,
-          ..._lupinDirectEn,
+          ...peanutDirectEn,
+          ...lupinDirectEn,
+          ..._peanutLupinExtraEn,
           'legume',
           'legumes',
           'pulses',
@@ -1225,8 +1215,8 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
         ],
         directHe: <String>[
           ..._soyDirectHe,
-          ..._peanutDirectHe,
-          ..._lupinDirectHe,
+          ...peanutDirectHe,
+          ...lupinDirectHe,
           'קטניות',
           'קטנית',
           'חומוס',
