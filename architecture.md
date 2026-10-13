@@ -3079,6 +3079,25 @@ keto and added ids left out; the app sheet width). Keto stays the existing
 toggles, and nothing reads the profile for classification yet
 (`ClassificationOptions` is unchanged; Wave 2 does that).
 
+**The Wave 2 contract (W2-0, #345, #346).** `lib/models/concern.dart` holds
+the wire types the allergen engine will fill: `Concern {restrictionId,
+source, certainty, tier, matchedText?, waiterQuestion?}` and
+`ExtractedIngredient {name, certainty, role}`, over `ConcernSource` (name,
+description, option, hidden, model), `Certainty` (stated, likely, suspected:
+the vocabulary's `TriggerCertainty` names, which a model may not import, so a
+trigger converts by name and a test pins the two equal), `EvidenceTier`
+(declared, stated, inferred, suspected, confirmed, denied; ALG-06) and
+`ComponentRole` (base, protein, side, sauce, garnish, option, unknown). Each
+reads tolerantly: an unknown enum name fails the entry and the list drops it,
+except an unknown role, which reads as `unknown` so an ingredient is never
+lost over it. `AnalysedDish` gains `ingredients` and `concerns` (absent →
+empty, written only when non-empty) and `ClassificationOptions` and
+`AnalysisOptionsSnapshot` gain `restrictionsRequested` (the snapshot key
+written only when true, part of `matches`); `fromSettings` leaves it false and
+nothing produces a concern yet. `backend/app/keto/models.py` mirrors all of
+it, omitting the same keys through a `model_serializer`. Per C3 there is no
+`schemaVersion` bump, and no golden or keto baseline changed.
+
 **The profile-only chef card (ALG-08a, #350).** With `bantoMode` on and a
 non-empty profile, the "My restrictions" section gains a "Show my chef card"
 button that pushes `ChefCardScreen`: a full-screen page that mirrors the Waiter
