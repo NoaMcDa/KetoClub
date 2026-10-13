@@ -1,0 +1,14 @@
+{
+  "legendBudget": "Carb budget: after an AI analysis, a Filters field lets you set a net-carb budget for the meal. Rule-based results have no carb estimates, so it is not offered.",
+  "legendEngines": "Rules: KetoClub's own keyword checks on the dish text, with no carb estimate. AI: Gemini reads the whole menu and estimates net carbs.",
+  "legendFoodOnly": "The score and the counters cover food only. Drinks, sauces and extras are still judged and listed, but are not counted.",
+  "legendHide": "Hide the legend",
+  "legendNote": "The same rules KetoClub sends to the AI model.",
+  "legendToggle": "What do the colours mean?",
+  "tileGreenLabel": "Order as-is",
+  "tileRedLabel": "Skip",
+  "tileYellowLabel": "With changes",
+  "verdictModifiable": "With changes",
+  "verdictNonKeto": "Skip",
+  "verdictOrderAsIs": "Order as-is"
+}

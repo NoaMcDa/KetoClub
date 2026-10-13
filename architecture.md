@@ -3492,6 +3492,11 @@ Rules:
   file under `lib/`, so an untested file counts as zero rather than disappearing.
 - **The architecture test is a test.** `test/architecture/import_rules_test.dart`
   runs with the unit tests and is a required check.
+- **A keto-only profile is today's app, byte for byte.**
+  `test/architecture/keto_unchanged_test.dart` pins its prompt, schemas,
+  cache-key material, rules verdicts, score, verdict copy and share text
+  against hand-edited files in `test/fixtures/keto_baseline/`. It has no
+  update switch: an intended keto change edits a fixture by hand, in review.
 
 ### 18.5 Continuous integration
 

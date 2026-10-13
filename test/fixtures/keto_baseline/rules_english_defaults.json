@@ -1,0 +1,167 @@
+{
+  "dishes": [
+    {
+      "dishId": "e1",
+      "hiddenCarbs": [],
+      "modification": "Please prepare the salad without croutons.",
+      "name": "Caesar salad",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+    },
+    {
+      "dishId": "e2",
+      "hiddenCarbs": [],
+      "modification": "Ask for the dish to be prepared without honey",
+      "name": "Halloumi",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+    },
+    {
+      "dishId": "e3",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Calamari",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    },
+    {
+      "dishId": "e4",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Bread basket",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "Built on bread, which cannot be made keto."
+    },
+    {
+      "dishId": "e5",
+      "hiddenCarbs": [],
+      "modification": "Among the options, skip the pasta and choose a salad or vegetables instead.\nSwap potato purée for green salad or steamed vegetables",
+      "name": "Entrecôte 300g",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+    },
+    {
+      "dishId": "e6",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Grilled salmon",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    },
+    {
+      "dishId": "e7",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Spaghetti carbonara",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "Built on spaghetti, which cannot be made keto."
+    },
+    {
+      "dishId": "e8",
+      "hiddenCarbs": [],
+      "modification": "Please serve the burger without the bun, wrapped in lettuce, and swap the fries for a green salad or a fried egg.\nReplace French fries with a fresh green salad or a fried egg",
+      "name": "Beef burger",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+    },
+    {
+      "dishId": "e9",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Chicken curry",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    },
+    {
+      "dishId": "e10",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Steak & eggs",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    },
+    {
+      "dishId": "e11",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "French fries",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "Built on fries, which cannot be made keto."
+    },
+    {
+      "dishId": "e12",
+      "hiddenCarbs": [],
+      "modification": "Ask for barbecue glaze to be omitted (high in sugar)",
+      "name": "BBQ sauce",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+    },
+    {
+      "dishId": "e13",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Coca-Cola",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "Built on cola, which cannot be made keto."
+    },
+    {
+      "dishId": "e14",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Coke Zero",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    },
+    {
+      "dishId": "e15",
+      "hiddenCarbs": [],
+      "modification": "Please make it with black coffee or unsweetened almond milk, no added sugar.",
+      "name": "Latte",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+    },
+    {
+      "dishId": "e16",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Espresso",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    },
+    {
+      "dishId": "e17",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "We close at 22:00",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    }
+  ],
+  "engine": {
+    "kind": "rules",
+    "reason": "notConfigured"
+  },
+  "options": {
+    "dietaryConstraints": [],
+    "netCarbLimitGrams": 6
+  },
+  "schemaVersion": 0,
+  "unclassified": []
+}

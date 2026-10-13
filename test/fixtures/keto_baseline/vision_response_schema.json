@@ -1,0 +1,90 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "dishes": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "hidden_carbs": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "certainty": {
+                  "enum": [
+                    "suspected",
+                    "likely"
+                  ],
+                  "type": "string"
+                },
+                "source": {
+                  "type": "string"
+                },
+                "waiter_question": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "source",
+                "certainty",
+                "waiter_question"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "string"
+          },
+          "modification": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "net_carbs_estimate": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "page": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "verdict": {
+            "enum": [
+              "orderAsIs",
+              "modifiable",
+              "nonKeto"
+            ],
+            "type": "string"
+          },
+          "why": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "verdict",
+          "why",
+          "modification",
+          "net_carbs_estimate",
+          "hidden_carbs",
+          "page"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "dishes"
+  ],
+  "type": "object"
+}

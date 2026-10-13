@@ -1,0 +1,26 @@
+Golden Bistro
+
+Order as-is:
+- Calamari
+- Grilled salmon
+- Chicken curry
+- Steak & eggs
+- Coke Zero
+- Espresso
+- We close at 22:00
+
+With changes:
+- Caesar salad
+  Please prepare the salad without croutons.
+- Halloumi
+  Ask for the dish to be prepared without honey
+- Entrecôte 300g
+  Among the options, skip the pasta and choose a salad or vegetables instead.
+  Swap potato purée for green salad or steamed vegetables
+- Beef burger
+  Please serve the burger without the bun, wrapped in lettuce, and swap the fries for a green salad or a fried egg.
+  Replace French fries with a fresh green salad or a fried egg
+- BBQ sauce
+  Ask for barbecue glaze to be omitted (high in sugar)
+- Latte
+  Please make it with black coffee or unsweetened almond milk, no added sugar.
