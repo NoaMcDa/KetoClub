@@ -32,7 +32,9 @@ def cache_key(
     menu: Menu, *, model: str, schema_version: int, options: AnalysisOptionsSnapshot
 ) -> str:
     """The sha256 hex digest of ``fingerprint|model|schemaVersion|
-    netCarbLimitGrams|constraints``.
+    netCarbLimitGrams|constraints``, with ``|restrictions`` appended only
+    when ``options.restrictions_requested`` (Banto; ALG-03, D26 C2), so
+    every keto key is the one it was before the flag existed.
 
     ``fingerprint`` is the menu's dish-text fingerprint
     (``app.keto.fingerprint``, the one a scan is addressed by), so the same
@@ -50,6 +52,7 @@ def cache_key(
             str(schema_version),
             str(options.net_carb_limit_grams),
             constraints,
+            *(["restrictions"] if options.restrictions_requested else []),
         ]
     )
     return hashlib.sha256(material.encode("utf-8")).hexdigest()

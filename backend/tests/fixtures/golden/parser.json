@@ -1,4 +1,882 @@
 {
+  "extractScanned": [
+    {
+      "extractionMissing": [
+        "v4",
+        "v5"
+      ],
+      "name": "hand_extract_scanned_descriptions",
+      "netCarbLimitGrams": 6,
+      "pageCount": 1,
+      "reply": "{\"dishes\":[{\"id\":\"ignored\",\"name\":\"Sabich\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[],\"page\":1,\"ingredients\":[{\"name\":\"tahini\",\"certainty\":\"stated\",\"role\":\"sauce\"},{\"name\":\"egg\",\"certainty\":\"stated\",\"role\":\"protein\"}],\"description\":\"  Fried eggplant and tahini  \"},{\"id\":\"ignored\",\"name\":\"Steak\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[],\"page\":1,\"ingredients\":[],\"description\":null},{\"id\":\"ignored\",\"name\":\"Salmon\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[],\"page\":1,\"ingredients\":[],\"description\":42},{\"id\":\"ignored\",\"name\":\"Soup\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[],\"page\":1,\"ingredients\":[],\"description\":\"ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\"},{\"id\":\"ignored\",\"name\":\"Cod\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[],\"description\":\"Battered\"}]}",
+      "result": {
+        "analysis": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [
+            {
+              "dishId": "v1",
+              "hiddenCarbs": [],
+              "ingredients": [
+                {
+                  "certainty": "stated",
+                  "name": "tahini",
+                  "role": "sauce"
+                },
+                {
+                  "certainty": "stated",
+                  "name": "egg",
+                  "role": "protein"
+                }
+              ],
+              "modification": null,
+              "name": "Sabich",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Plain grilled protein."
+            },
+            {
+              "dishId": "v2",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Steak",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Plain grilled protein."
+            },
+            {
+              "dishId": "v3",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Salmon",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Plain grilled protein."
+            },
+            {
+              "dishId": "v4",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Soup",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Plain grilled protein."
+            },
+            {
+              "dishId": "v5",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Cod",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Plain grilled protein."
+            }
+          ],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": []
+        },
+        "menu": {
+          "categories": [
+            {
+              "dishes": [
+                {
+                  "description": "Fried eggplant and tahini",
+                  "id": "v1",
+                  "imageUrl": null,
+                  "name": "Sabich",
+                  "options": [],
+                  "page": 1,
+                  "price": 0.0
+                },
+                {
+                  "description": "",
+                  "id": "v2",
+                  "imageUrl": null,
+                  "name": "Steak",
+                  "options": [],
+                  "page": 1,
+                  "price": 0.0
+                },
+                {
+                  "description": "",
+                  "id": "v3",
+                  "imageUrl": null,
+                  "name": "Salmon",
+                  "options": [],
+                  "page": 1,
+                  "price": 0.0
+                },
+                {
+                  "description": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+                  "id": "v4",
+                  "imageUrl": null,
+                  "name": "Soup",
+                  "options": [],
+                  "page": 1,
+                  "price": 0.0
+                },
+                {
+                  "description": "Battered",
+                  "id": "v5",
+                  "imageUrl": null,
+                  "name": "Cod",
+                  "options": [],
+                  "page": null,
+                  "price": 0.0
+                }
+              ],
+              "id": "scanned",
+              "name": "Scanned menu"
+            }
+          ],
+          "currency": "ILS",
+          "fetchedAt": "2026-01-01T00:00:00.000Z",
+          "venueName": null,
+          "venueRef": {
+            "platformId": "9601c8f5",
+            "source": "scan"
+          }
+        }
+      }
+    }
+  ],
+  "extractText": [
+    {
+      "extractionMissing": [],
+      "name": "hand_extract_support_cap",
+      "netCarbLimitGrams": 6,
+      "reply": "{\"dishes\":[{\"id\":\"dish-sabich\",\"name\":\"Sabich\",\"verdict\":\"nonKeto\",\"why\":\"Pita is bread.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[],\"ingredients\":[{\"name\":\"  Eggplant  \",\"certainty\":\"stated\",\"role\":\"protein\"},{\"name\":\"egg\",\"certainty\":\"likely\",\"role\":\"protein\"},{\"name\":\"Tahini\",\"certainty\":\"stated\",\"role\":\"option\"},{\"name\":\"sesame\",\"certainty\":\"stated\",\"role\":\"sauce\"},{\"name\":\"flour\",\"certainty\":\"likely\",\"role\":\"base\"},{\"name\":\"pita\",\"certainty\":\"suspected\",\"role\":\"base\"},{\"name\":\"🌶\",\"certainty\":\"stated\",\"role\":\"garnish\"}]},{\"id\":\"dish-schnitzel\",\"name\":\"שניצל\",\"verdict\":\"nonKeto\",\"why\":\"מצופה בפירורי לחם.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[],\"ingredients\":[{\"name\":\"טחינה\",\"certainty\":\"stated\",\"role\":\"sauce\"},{\"name\":\"עוף\",\"certainty\":\"stated\",\"role\":\"protein\"},{\"name\":\"קמח\",\"certainty\":\"likely\",\"role\":\"base\"}]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [
+            {
+              "dishId": "dish-sabich",
+              "hiddenCarbs": [],
+              "ingredients": [
+                {
+                  "certainty": "stated",
+                  "name": "Eggplant",
+                  "role": "protein"
+                },
+                {
+                  "certainty": "likely",
+                  "name": "egg",
+                  "role": "protein"
+                },
+                {
+                  "certainty": "stated",
+                  "name": "Tahini",
+                  "role": "option"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "sesame",
+                  "role": "sauce"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "flour",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "pita",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "🌶",
+                  "role": "garnish"
+                }
+              ],
+              "modification": null,
+              "name": "Sabich",
+              "netCarbsEstimate": null,
+              "verdict": "nonKeto",
+              "why": "Pita is bread."
+            },
+            {
+              "dishId": "dish-schnitzel",
+              "hiddenCarbs": [],
+              "ingredients": [
+                {
+                  "certainty": "stated",
+                  "name": "טחינה",
+                  "role": "sauce"
+                },
+                {
+                  "certainty": "stated",
+                  "name": "עוף",
+                  "role": "protein"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "קמח",
+                  "role": "base"
+                }
+              ],
+              "modification": null,
+              "name": "שניצל",
+              "netCarbsEstimate": null,
+              "verdict": "nonKeto",
+              "why": "מצופה בפירורי לחם."
+            }
+          ],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "Green Salad",
+            "Water"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "Fried eggplant, egg and amba in pita",
+                "id": "dish-sabich",
+                "imageUrl": null,
+                "name": "Sabich",
+                "options": [
+                  {
+                    "name": "Extras",
+                    "values": [
+                      "Tahini",
+                      "No sesame"
+                    ]
+                  }
+                ],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "עוף בציפוי פירורי לחם עם הטחינה",
+                "id": "dish-schnitzel",
+                "imageUrl": null,
+                "name": "שניצל",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "Lettuce, cucumber, lemon dressing",
+                "id": "dish-salad",
+                "imageUrl": null,
+                "name": "Green Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "dish-water",
+                "imageUrl": null,
+                "name": "Water",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "extractionMissing": [],
+      "name": "hand_extract_filtered_entries",
+      "netCarbLimitGrams": 6,
+      "reply": "{\"dishes\":[{\"id\":\"dish-sabich\",\"name\":\"Sabich\",\"verdict\":\"nonKeto\",\"why\":\"Pita is bread.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[],\"ingredients\":[\"not a map\",{\"name\":null,\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":3,\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"   \",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"egg\",\"certainty\":\"Stated\",\"role\":\"base\"},{\"name\":\"egg\",\"certainty\":null,\"role\":\"base\"},{\"name\":\"Egg\",\"certainty\":\"stated\",\"role\":\"topping\"},{\"name\":\"EGG!\",\"certainty\":\"likely\",\"role\":\"base\"},{\"name\":\"amba\",\"certainty\":\"stated\"}]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [
+            {
+              "dishId": "dish-sabich",
+              "hiddenCarbs": [],
+              "ingredients": [
+                {
+                  "certainty": "suspected",
+                  "name": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+                  "role": "base"
+                },
+                {
+                  "certainty": "stated",
+                  "name": "Egg",
+                  "role": "unknown"
+                },
+                {
+                  "certainty": "stated",
+                  "name": "amba",
+                  "role": "unknown"
+                }
+              ],
+              "modification": null,
+              "name": "Sabich",
+              "netCarbsEstimate": null,
+              "verdict": "nonKeto",
+              "why": "Pita is bread."
+            }
+          ],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "שניצל",
+            "Green Salad",
+            "Water"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "Fried eggplant, egg and amba in pita",
+                "id": "dish-sabich",
+                "imageUrl": null,
+                "name": "Sabich",
+                "options": [
+                  {
+                    "name": "Extras",
+                    "values": [
+                      "Tahini",
+                      "No sesame"
+                    ]
+                  }
+                ],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "עוף בציפוי פירורי לחם עם הטחינה",
+                "id": "dish-schnitzel",
+                "imageUrl": null,
+                "name": "שניצל",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "Lettuce, cucumber, lemon dressing",
+                "id": "dish-salad",
+                "imageUrl": null,
+                "name": "Green Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "dish-water",
+                "imageUrl": null,
+                "name": "Water",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "extractionMissing": [],
+      "name": "hand_extract_count_cap",
+      "netCarbLimitGrams": 6,
+      "reply": "{\"dishes\":[{\"id\":\"dish-sabich\",\"name\":\"Sabich\",\"verdict\":\"nonKeto\",\"why\":\"Pita is bread.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[],\"ingredients\":[{\"name\":\"item 0\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 1\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 2\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 3\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 4\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 5\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 6\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 7\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 8\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 9\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 10\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 11\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 12\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 13\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 14\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 15\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 16\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 17\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 18\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 19\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 20\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 21\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 22\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 23\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 24\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 25\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 26\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 27\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 28\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 29\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 30\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 31\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 32\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 33\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 34\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 35\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 36\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 37\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 38\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 39\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 40\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 41\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 42\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 43\",\"certainty\":\"stated\",\"role\":\"base\"},{\"name\":\"item 44\",\"certainty\":\"stated\",\"role\":\"base\"}]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [
+            {
+              "dishId": "dish-sabich",
+              "hiddenCarbs": [],
+              "ingredients": [
+                {
+                  "certainty": "suspected",
+                  "name": "item 0",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 1",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 2",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 3",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 4",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 5",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 6",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 7",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 8",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 9",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 10",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 11",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 12",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 13",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 14",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 15",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 16",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 17",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 18",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 19",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 20",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 21",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 22",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 23",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 24",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 25",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 26",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 27",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 28",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 29",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 30",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 31",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 32",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 33",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 34",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 35",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 36",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 37",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 38",
+                  "role": "base"
+                },
+                {
+                  "certainty": "suspected",
+                  "name": "item 39",
+                  "role": "base"
+                }
+              ],
+              "modification": null,
+              "name": "Sabich",
+              "netCarbsEstimate": null,
+              "verdict": "nonKeto",
+              "why": "Pita is bread."
+            }
+          ],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "שניצל",
+            "Green Salad",
+            "Water"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "Fried eggplant, egg and amba in pita",
+                "id": "dish-sabich",
+                "imageUrl": null,
+                "name": "Sabich",
+                "options": [
+                  {
+                    "name": "Extras",
+                    "values": [
+                      "Tahini",
+                      "No sesame"
+                    ]
+                  }
+                ],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "עוף בציפוי פירורי לחם עם הטחינה",
+                "id": "dish-schnitzel",
+                "imageUrl": null,
+                "name": "שניצל",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "Lettuce, cucumber, lemon dressing",
+                "id": "dish-salad",
+                "imageUrl": null,
+                "name": "Green Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "dish-water",
+                "imageUrl": null,
+                "name": "Water",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "extractionMissing": [
+        "dish-salad",
+        "dish-sabich"
+      ],
+      "name": "hand_extract_concerns_ignored_and_missing",
+      "netCarbLimitGrams": 6,
+      "reply": "{\"dishes\":[{\"id\":\"dish-salad\",\"name\":\"Green Salad\",\"verdict\":\"orderAsIs\",\"why\":\"Leaves and a lemon dressing.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[],\"ingredients\":[],\"concerns\":[{\"restrictionId\":\"sesame\",\"source\":\"model\",\"certainty\":\"stated\",\"tier\":\"stated\"}]},{\"id\":\"dish-water\",\"name\":\"Water\",\"verdict\":\"orderAsIs\",\"why\":\"No carbs.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[],\"ingredients\":\"not a list\"},{\"id\":\"dish-sabich\",\"name\":\"Sabich\",\"verdict\":\"nonKeto\",\"why\":\"Pita is bread.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [
+            {
+              "dishId": "dish-salad",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Green Salad",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Leaves and a lemon dressing."
+            },
+            {
+              "dishId": "dish-water",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Water",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "No carbs."
+            },
+            {
+              "dishId": "dish-sabich",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Sabich",
+              "netCarbsEstimate": null,
+              "verdict": "nonKeto",
+              "why": "Pita is bread."
+            }
+          ],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "שניצל"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "Fried eggplant, egg and amba in pita",
+                "id": "dish-sabich",
+                "imageUrl": null,
+                "name": "Sabich",
+                "options": [
+                  {
+                    "name": "Extras",
+                    "values": [
+                      "Tahini",
+                      "No sesame"
+                    ]
+                  }
+                ],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "עוף בציפוי פירורי לחם עם הטחינה",
+                "id": "dish-schnitzel",
+                "imageUrl": null,
+                "name": "שניצל",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "Lettuce, cucumber, lemon dressing",
+                "id": "dish-salad",
+                "imageUrl": null,
+                "name": "Green Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "dish-water",
+                "imageUrl": null,
+                "name": "Water",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "extractionMissing": [],
+      "name": "llm_fenced_valid.json@extract",
+      "netCarbLimitGrams": 6,
+      "reply": "```json\n{\n  \"_fixture_note\": \"synthetic fixture: a valid reply wrapped in a markdown code fence (architecture.md §9.4 rule 1, positive case).\",\n  \"dishes\": [\n    {\n      \"id\": \"dish-steak\",\n      \"name\": \"Grilled Steak\",\n      \"verdict\": \"orderAsIs\",\n      \"why\": \"Plain grilled protein, nothing starchy or sweet.\",\n      \"modification\": null,\n      \"net_carbs_estimate\": 1\n    }\n  ]\n}\n```\n",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [
+            {
+              "dishId": "dish-steak",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Grilled Steak",
+              "netCarbsEstimate": 1.0,
+              "verdict": "orderAsIs",
+              "why": "Plain grilled protein, nothing starchy or sweet."
+            }
+          ],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": []
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "dish-steak",
+                "imageUrl": null,
+                "name": "Grilled Steak",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    }
+  ],
   "scanned": [
     {
       "name": "llm_scanned_duplicate_names.json",

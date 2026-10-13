@@ -19,6 +19,7 @@ from app.keto.parser import (
     Analysed,
     Failed,
     ScannedRead,
+    extraction_missing,
     parse,
     parse_scanned,
 )
@@ -27,6 +28,8 @@ _GOLDEN = Path(__file__).parent / "fixtures" / "golden" / "parser.json"
 _RAW: dict[str, Any] = json.loads(_GOLDEN.read_text(encoding="utf-8"))
 _TEXT: list[dict[str, Any]] = _RAW["text"]
 _SCANNED: list[dict[str, Any]] = _RAW["scanned"]
+_EXTRACT_TEXT: list[dict[str, Any]] = _RAW["extractText"]
+_EXTRACT_SCANNED: list[dict[str, Any]] = _RAW["extractScanned"]
 _ENGINE = LlmEngine(model="golden-model")
 _NOW = "2026-01-01T00:00:00.000Z"
 
@@ -74,6 +77,92 @@ def test_every_golden_scanned_reply_parses_as_dart_does(
         case Failed(reason=reason):
             actual = {"failed": reason}
     assert _canonical(actual) == _canonical(entry["result"])
+
+
+def _missing(menu: Menu, analysis: Any) -> list[str]:
+    """The ids whose extraction is missing, as the golden lists them."""
+    by_id = {dish.id: dish for dish in menu.all_dishes()}
+    return [
+        verdict.dish_id
+        for verdict in analysis.dishes
+        if extraction_missing(by_id[verdict.dish_id], verdict, extract=True)
+    ]
+
+
+@pytest.mark.parametrize("entry", _EXTRACT_TEXT, ids=[e["name"] for e in _EXTRACT_TEXT])
+def test_every_golden_extracting_text_reply_parses_as_dart_does(
+    entry: dict[str, Any],
+) -> None:
+    assert set(entry) == {
+        "name",
+        "reply",
+        "sourceMenu",
+        "netCarbLimitGrams",
+        "result",
+        "extractionMissing",
+    }
+    source = Menu.model_validate(entry["sourceMenu"])
+    result = parse(
+        entry["reply"],
+        source=source,
+        engine=_ENGINE,
+        net_carb_limit_grams=entry["netCarbLimitGrams"],
+        analysed_at=_NOW,
+        extract=True,
+    )
+    assert isinstance(result, Analysed)
+    assert _canonical({"analysed": to_json(result.analysis)}) == _canonical(
+        entry["result"]
+    )
+    assert _missing(source, result.analysis) == entry["extractionMissing"]
+
+
+@pytest.mark.parametrize(
+    "entry", _EXTRACT_SCANNED, ids=[e["name"] for e in _EXTRACT_SCANNED]
+)
+def test_every_golden_extracting_scanned_reply_parses_as_dart_does(
+    entry: dict[str, Any],
+) -> None:
+    result = parse_scanned(
+        entry["reply"],
+        engine=_ENGINE,
+        analysed_at=_NOW,
+        net_carb_limit_grams=entry["netCarbLimitGrams"],
+        page_count=entry["pageCount"],
+        extract=True,
+    )
+    assert isinstance(result, ScannedRead)
+    actual = {"menu": to_json(result.menu), "analysis": to_json(result.analysis)}
+    assert _canonical(actual) == _canonical(entry["result"])
+    assert _missing(result.menu, result.analysis) == entry["extractionMissing"]
+
+
+def test_the_extracting_corpus_reaches_every_parser_rule() -> None:
+    dishes = [
+        dish
+        for entry in _EXTRACT_TEXT
+        for dish in entry["result"]["analysed"]["dishes"]
+    ]
+    certainties = {i["certainty"] for d in dishes for i in d.get("ingredients", [])}
+    roles = {i["role"] for d in dishes for i in d.get("ingredients", [])}
+    assert certainties == {"stated", "likely", "suspected"}
+    assert "unknown" in roles
+    assert all("concerns" not in dish for dish in dishes)
+    assert any(entry["extractionMissing"] for entry in _EXTRACT_TEXT)
+    assert any(entry["extractionMissing"] for entry in _EXTRACT_SCANNED)
+
+
+def test_without_extract_the_ingredients_are_never_read() -> None:
+    for entry in _EXTRACT_TEXT:
+        result = parse(
+            entry["reply"],
+            source=Menu.model_validate(entry["sourceMenu"]),
+            engine=_ENGINE,
+            net_carb_limit_grams=entry["netCarbLimitGrams"],
+            analysed_at=_NOW,
+        )
+        assert isinstance(result, Analysed)
+        assert all(not dish.ingredients for dish in result.analysis.dishes)
 
 
 def test_the_corpus_reaches_both_outcomes_of_both_parsers() -> None:

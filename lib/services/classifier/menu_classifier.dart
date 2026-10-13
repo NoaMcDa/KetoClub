@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 /// Element-wise list equality, used by the equality operator on
@@ -61,9 +62,16 @@ final class ClassificationOptions {
   /// The menu screen and the website adapter's PDF read (D19) both build
   /// their options here, so an analysis one of them caches is one the
   /// other's [matches] accepts.
+  ///
+  /// [restrictionsRequested] is true only with [bantoMode] on and a
+  /// profile holding a restriction other than keto (D26 C2, ALG-03): only
+  /// then are ingredients extracted. Without the flag, or with a keto-only
+  /// or empty profile, the options are exactly today's. Only the flag
+  /// leaves here; the profile itself never does (C1).
   factory fromSettings(
     AppSettings settings, {
     void Function(ClassifyingEngine engine)? onEngineStarted,
+    bool bantoMode = BantoMode.enabled,
   }) => ClassificationOptions(
     estimationConsentGiven: settings.estimationConsentGiven,
     netCarbLimitGrams: settings.netCarbLimitGrams,
@@ -72,6 +80,7 @@ final class ClassificationOptions {
       dairyFree: settings.dairyFree,
       carnivoreOnly: settings.carnivoreOnly,
     ),
+    restrictionsRequested: bantoMode && settings.profile.hasNonKetoEntry,
     onEngineStarted: onEngineStarted,
   );
 
@@ -144,9 +153,10 @@ final class ClassificationOptions {
 
   /// Whether the analysis should also extract ingredients and find
   /// restriction concerns (Banto; D26 C2): true only with the Banto flag
-  /// on and a profile holding a non-keto entry. Nothing reads it yet, and
-  /// [ClassificationOptions.fromSettings] always leaves it false; Wave 2
-  /// adds the extraction prompt and schema behind it.
+  /// on and a profile holding a non-keto entry
+  /// ([ClassificationOptions.fromSettings]). When true the prompt gains
+  /// its extraction section, the schema its `ingredients` property and
+  /// the parser reads them (ALG-03); when false all three are today's.
   ///
   /// It changes what an analysis holds, so [snapshot] records it and
   /// [matches] compares it: a cached analysis made without it is retired

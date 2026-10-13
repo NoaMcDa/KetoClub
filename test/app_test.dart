@@ -10,6 +10,7 @@ import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/drinks_guide_screen.dart' show drinksRoutePath;
 import 'package:ketoclub/screens/menu_screen.dart';
+import 'package:ketoclub/screens/restriction_onboarding_screen.dart';
 import 'package:ketoclub/screens/scan_screen.dart';
 import 'package:ketoclub/screens/settings_screen.dart';
 import 'package:ketoclub/screens/venue_search_screen.dart';
@@ -469,6 +470,34 @@ void main() {
           reason: 'no route for $path',
         );
       }
+    });
+
+    testWidgets('the home route shows the restriction onboarding first in a '
+        'Banto build (ALG-02b)', (tester) async {
+      final dependencies = FakeAppDependencies().dependencies;
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          onGenerateRoute: (settings) =>
+              generateRoute(settings, dependencies, bantoMode: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(RestrictionOnboardingScreen), findsOneWidget);
+      expect(find.byType(AppShell), findsNothing);
+    });
+
+    testWidgets('the home route is Explore, with no onboarding, in a '
+        'KetoClub build (ALG-02b)', (tester) async {
+      await tester.pumpWidget(
+        KetoClubApp(dependencies: FakeAppDependencies().dependencies),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(RestrictionOnboardingScreen), findsNothing);
+      expect(find.byType(VenueSearchScreen), findsOneWidget);
     });
 
     testWidgets('the scan route hands ScanController the scanned-menu '

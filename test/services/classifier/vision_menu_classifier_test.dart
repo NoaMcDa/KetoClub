@@ -130,6 +130,27 @@ void main() {
       expect(request.schemaName, MenuAnalysisPrompt.schemaName);
     });
 
+    test('with restrictionsRequested, sends the extracting vision prompt '
+        'and schema (ALG-03)', () async {
+      // Arrange
+      final client = _answering();
+      const options = ClassificationOptions(restrictionsRequested: true);
+
+      // Act
+      await _classifier(client).classify(_threePages(), options: options);
+
+      // Assert
+      final request = client.requests.single;
+      expect(
+        request.systemPrompt,
+        MenuAnalysisPrompt.visionSystemPrompt(pageCount: 3, options: options),
+      );
+      expect(
+        request.responseSchema,
+        MenuAnalysisPrompt.visionResponseSchema(extract: true),
+      );
+    });
+
     test('announces the model engine before sending', () async {
       // Arrange
       final announced = <ClassifyingEngine>[];

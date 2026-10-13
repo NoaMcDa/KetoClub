@@ -3121,6 +3121,107 @@ severity exists to vary it. The card needs no menu and sends nothing anywhere
 (C1). The per-dish card with a dish's name, modification and questions, and the
 cross-contact closing line driven by ALG-07 signals, are ALG-08b.
 
+**Kitchen cross-contact signals, the pure part (ALG-07, #349).**
+`KitchenSignals.of(menu)` in `lib/utils/allergens/kitchen_signals.dart`
+(twin: `backend/app/keto/kitchen_signals.py`) is a rules-only pass over a
+whole menu, never a dish, that reports what the menu reveals about its
+kitchen as `KitchenSignal`s in `KitchenSignalKind` order: `fryer`, `wok`,
+`sharedGrill`, `bakery`, `nuts`, `sesame`. Each carries the restrictions it
+threatens (taxonomy order), up to three dish names as evidence and one
+standard question for the staff in both languages. The questions live in Dart
+beside the term lists (the §6.3 exception, as the waiter templates do), are
+questions and never assurances, and pass the banned-words list. A dish shows
+a kind when its own rules text or its category heading does; the term lists
+compile as the keto vocabulary does (`latinTriggerPattern`,
+`hebrewTriggerPattern`, `isGuarded`), with guards for "stir fried", "pan
+fried", "air fried" and "fried rice" (a wok dish, not a fryer one),
+"chocolate chips" and plant-based burgers. The nuts, sesame and seafood facts
+come from `AllergenMatcher` (any certainty), never from a list of this file.
+`sharedGrill` needs a grilled meat dish and a grilled fish dish. The mapping
+is a fryer to wheat and gluten plus fish, crustaceans or molluscs when a fried
+dish names that seafood, a wok to peanuts, soy, wheat, gluten, crustaceans,
+molluscs and sesame, a shared grill to the seafood three, a bakery to milk,
+eggs, wheat, gluten and sesame, nuts to peanuts and tree nuts, sesame to
+sesame; wheat is added beside gluten wherever flour is the cause, because a
+wheat allergy shares the cause with celiac disease. A signal is a menu-level
+fact beside the per-dish answer: it changes no verdict, and nothing consults
+it yet (the notice, the demotion of green dishes for strict entries and the
+keto-only no-op are ALG-07's later part). A new golden, `kitchen_signals.json`,
+carries the term lists, guards, threat table and questions and the signals of
+every golden menu, the allergen corpus menus and menus built for each rule,
+all under a small nuts, sesame and seafood vocabulary of its own
+(`tool/golden/kitchen_signals_corpus.dart`) so it does not move when the group
+vocabulary files are filled; no other golden changed.
+
+**The Why sheet (ALG-06, #348).** `lib/widgets/why_sheet.dart` is the "why this
+result" bottom sheet, built and tested on its own and wired into no screen
+yet. `WhySheet` takes a dish name, a list of `Concern` and whether the profile
+is strict, and shows one row per concern: the restriction's name in the UI
+language, the evidence tier as a phrase (declared by the platform, stated on
+the menu, inferred from a typical recipe, suspected (please ask), confirmed by
+you, ruled out by you), where it was found, the matched text quoted and the
+waiter question. Confidence is words, never a number or a percentage. An empty
+list says nothing in the menu text points to the profile, adding "still ask the
+restaurant" for a strict profile, and never says the dish is fine; the footer
+is `helperToolSentence`. `showWhySheet` opens it through `showKetoClubSheet`
+(560 px cap) and, like the widget, does nothing with `bantoMode` off. The
+strings are new ARB keys (`why*`), so the banned-words test covers them.
+
+ALG-02b (#344) adds the profile's two other surfaces, both behind `bantoMode`.
+`AppSettings.onboardingSeen` (JSON key `restrictionOnboardingSeen`, **written
+only when true**, so the keto record stays byte-identical) records that the
+first-run "What do you avoid?" screen was completed or skipped.
+`RestrictionOnboardingGate` wraps the `/` route: with the flag off it returns
+its child at once and builds no controller; with it on it reads the settings
+once and shows `RestrictionOnboardingScreen` (the taxonomy as chips grouped by
+kind, no severity question, the helper-tool sentence, "Continue" which saves
+the picks in tap order, "Skip" which saves none, both marking it seen) only
+when it was not seen and the profile is still empty, so a user who added
+restrictions in Settings first is never asked. Deep links to a venue skip it.
+On the menu screen `MenuFiltersRow` takes an optional `summary` line kept
+visible under the disclosure row; with the flag on and a non-empty profile
+`ProfileSummaryLine` fills it with "Checking for: sesame, lactose" in the UI
+language, naming restrictions only and never calling a menu safe. Tapping it
+opens Settings and `MenuController.refreshProfile` re-reads the profile on
+return. `MenuController.profile` is read from the device's settings in `open`
+and goes nowhere else.
+
+**Ingredient extraction: prompt, schema and parser (ALG-03, #345).**
+`ClassificationOptions.fromSettings(settings, {bantoMode})` sets
+`restrictionsRequested` when the flag is on and the profile holds an entry
+other than keto (`DietaryProfile.hasNonKetoEntry`, a model getter, because a
+service may not name the profile's types); the quick score and the Scan tab
+build their own options and stay keto-only. Only then does `systemPrompt`
+append a last, profile-independent extraction section (each dish's
+`ingredients` as `{name, certainty, role}`, hidden sources a standard recipe
+implies, honest certainty, the menu's own language, never a new dish; no
+restriction is named), `visionSystemPrompt` add a paragraph asking for each
+dish's printed `description`, `responseSchema(extract:)` add `ingredients`
+last in `required`, and `visionResponseSchema(extract:)` add `ingredients`
+and, after `page`, a nullable `description`; with the flag off all four are
+byte for byte today's, which `keto_unchanged_test`'s banto layer pins through
+`fromSettings` with an empty and a keto-only profile. There is no `concerns`
+property: concerns are computed on the device (C1). `MenuResponseParser`
+reads `ingredients` only with `extract`: an entry with a non-string, blank or
+over-100-unit name or an unknown certainty is dropped, an unknown role reads as
+`unknown`, names that normalise alike keep the first, at most 40 are kept, and
+an ingredient whose normalised name is not a substring of the dish's
+`dishRulesText` (removal options skipped) is kept but capped at `suspected`;
+`parseScanned` keeps the description (trimmed, cut at 1000 units), which
+enters the scan's fingerprint. A described dish whose extraction came back
+empty keeps its keto verdict and an empty list; `extractionMissing` computes
+that mark rather than storing it or demoting the dish, so ALG-04's rules pass
+is its only source of concerns. The backend clients send
+`restrictionsRequested: true` (`restrictionsRequested=true` on the venue
+route) only when true; `ClassificationOptionsBody` accepts that strict bool
+and still forbids every other key, the services pass it to the same prompt,
+schema and parser (`backend/app/keto/prompt.py`, `parser.py`), and the
+analysis-cache key gains a `|restrictions` part only when it is true. The
+goldens gain a `restrictions` option set in `prompt.json`, the two extracting
+schemas and `extractText`/`extractScanned` in `parser.json`, replayed by
+Python; no existing entry changed and `schemaVersion` stays 1.
+
+
 **The matcher's guards lower, sit beside their term, and read the maqaf
 (ALG-04a, related to #346).** Three allergen-only rules replace the keto guard
 window inside `AllergenMatcher`, and its Python twin follows them. **A guard
@@ -3145,6 +3246,18 @@ U+05BE reads as a space** before the matcher normalises
 deletes it as a Hebrew point and glues "חמאת־בוטנים" into one word; the
 normaliser itself is untouched, the replacement is length-preserving, and
 offsets index the match text, which equals the normalised text wherever
+there is no maqaf; terms and guard phrases are read the same way, so a term
+written with a maqaf ("סויה־דבש") still matches. The filled group vocabularies
+follow the rules: compound guards moved into `termGuards` (the plant bases on
+the dairy words, the flours that are not wheat on `flour`/`קמח`, coffee,
+cocoa and jelly on `bean`, apple on `crab`, mushroom on `oyster`), and phrases
+the old window reached from two words away are listed whole ("dairy free",
+"peanut free" and the like after a term, "no added", "ללא גלוטן", "ללא
+מוצרי" before one). `KitchenSignals` counts only unguarded hits: an
+"almond-free" dish is no evidence that the kitchen handles nuts.
+`allergens.json` gains `termGuards`, each hit's `guarded` and each case's
+`matchText`; no keto golden changed.
+
 there is no maqaf. `allergens.json` gains `termGuards`, each hit's `guarded`
 and each case's `matchText`; no keto golden changed.
 

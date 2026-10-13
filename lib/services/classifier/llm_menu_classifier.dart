@@ -82,7 +82,9 @@ final class LlmMenuClassifier implements MenuClassifier {
     final result = await _client.complete(
       systemPrompt: systemPrompt,
       userPrompt: userPrompt,
-      responseSchema: MenuAnalysisPrompt.responseSchema(),
+      responseSchema: MenuAnalysisPrompt.responseSchema(
+        extract: options.restrictionsRequested,
+      ),
       schemaName: MenuAnalysisPrompt.schemaName,
     );
     switch (result) {
@@ -97,6 +99,9 @@ final class LlmMenuClassifier implements MenuClassifier {
           // The same limit the prompt stated, so the parser holds the
           // model to its own green definition (issue #57).
           netCarbLimitGrams: options.netCarbLimitGrams,
+          // Ingredients are read only when the prompt asked for them
+          // (ALG-03, D26 C2).
+          extract: options.restrictionsRequested,
         );
         return switch (parsed) {
           final MenuAnalysed analysed => analysed.copyWithOptions(

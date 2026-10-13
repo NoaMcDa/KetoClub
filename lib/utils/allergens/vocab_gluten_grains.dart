@@ -831,8 +831,9 @@ const List<HiddenTrigger> _glutenHiddenHe = <HiddenTrigger>[
   ),
 ];
 
-/// English lupin triggers (11 §14.1).
-const List<String> _lupinEn = <String>[
+/// English lupin triggers (11 §14.1). Public because `legumes`
+/// (vocab_plants_additives.dart) spreads them: lupin is a legume.
+const List<String> lupinDirectEn = <String>[
   'lupin',
   'lupine',
   'lupins',
@@ -841,8 +842,8 @@ const List<String> _lupinEn = <String>[
   'altramuces',
 ];
 
-/// Hebrew lupin triggers (11 §14.1, 12 §1.3).
-const List<String> _lupinHe = <String>['תורמוס', 'לופין'];
+/// Hebrew lupin triggers (11 §14.1, 12 §1.3); see [lupinDirectEn].
+const List<String> lupinDirectHe = <String>['תורמוס', 'לופין'];
 
 /// Gluten-free bakery, where lupin flour is a common substitute
 /// (11 §14.2, §14.5).
@@ -1005,12 +1006,44 @@ const List<HiddenTrigger> _lupinHiddenHe = <HiddenTrigger>[
 
 /// Gluten and grains: one entry per restriction this group owns.
 ///
-/// Guards are deliberately only the negations and the gluten-free family
-/// (`no`, `without`, `gluten free`, `GF`, `ללא`): the guard window cancels
-/// any trigger beside the guard word, so a modifier guard such as `rice`
-/// (rice flour, rice noodles) would also cancel the pita in "rice, pita
-/// and salad". A rice, corn or chickpea flour therefore still reads as a
-/// bare `flour` (likely), the safe error.
+/// The grains a flour can be milled from that are not wheat, before the
+/// English `flour` (ALG-04a term guards): a mill or a bakery may still
+/// share it with wheat, so the hit is lowered, never dropped.
+const List<String> _otherFloursEn = <String>[
+  'rice',
+  'corn',
+  'chickpea',
+  'almond',
+  'coconut',
+  'buckwheat',
+  'tapioca',
+  'potato',
+];
+
+/// [_otherFloursEn] after the Hebrew `קמח` ("קמח אורז").
+const List<String> _otherFloursHe = <String>[
+  'אורז',
+  'תירס',
+  'חומוס',
+  'שקדים',
+  'קוקוס',
+  'כוסמת',
+  'טפיוקה',
+  'תפוחי אדמה',
+];
+
+/// The term guards of wheat and gluten: the flours that are not wheat.
+const Map<String, AllergenGuards> _flourGuards = <String, AllergenGuards>{
+  'flour': AllergenGuards(beforeEn: _otherFloursEn),
+  'קמח': AllergenGuards(afterHe: _otherFloursHe),
+};
+
+/// The restriction-wide guards are only the negations and the gluten-free
+/// family (`no`, `without`, `gluten free`, `GF`, `ללא`). A guard lowers a
+/// hit to `suspected` from the slot beside its term and never cancels it
+/// (ALG-04a). The flours that are not wheat ("rice flour", "קמח אורז") are
+/// term guards on `flour` and `קמח` alone, so a rice beside a pita ("rice,
+/// pita and salad") still leaves the pita stated.
 const Map<RestrictionId, RestrictionVocabulary> glutenGrainsVocabulary =
     <RestrictionId, RestrictionVocabulary>{
       RestrictionId.wheat: RestrictionVocabulary(
@@ -1028,8 +1061,18 @@ const Map<RestrictionId, RestrictionVocabulary> glutenGrainsVocabulary =
             'wheat free',
             'gf',
           ],
-          afterEn: <String>['free', 'gf'],
-          beforeHe: <String>['ללא', 'בלי', 'נטול'],
+          afterEn: <String>['free', 'gf', 'gluten free', 'wheat free'],
+          beforeHe: <String>[
+            'ללא',
+            'בלי',
+            'נטול',
+            'ללא גלוטן',
+            'בלי גלוטן',
+            'נטול גלוטן',
+            'ללא חיטה',
+            'בלי חיטה',
+            'נטול חיטה',
+          ],
           afterHe: <String>[
             'ללא גלוטן',
             'נטול גלוטן',
@@ -1040,6 +1083,7 @@ const Map<RestrictionId, RestrictionVocabulary> glutenGrainsVocabulary =
             'gf',
           ],
         ),
+        termGuards: _flourGuards,
         noPrefixHe: <String>['חיטה', 'חלה', 'חלות'],
         sources: <String>['11 §7.1', '11 §7.3', '12 §1.4'],
       ),
@@ -1057,21 +1101,29 @@ const Map<RestrictionId, RestrictionVocabulary> glutenGrainsVocabulary =
             'gluten free',
             'gf',
           ],
-          afterEn: <String>['free', 'gf'],
-          beforeHe: <String>['ללא', 'בלי', 'נטול'],
+          afterEn: <String>['free', 'gf', 'gluten free'],
+          beforeHe: <String>[
+            'ללא',
+            'בלי',
+            'נטול',
+            'ללא גלוטן',
+            'בלי גלוטן',
+            'נטול גלוטן',
+          ],
           afterHe: <String>['ללא גלוטן', 'נטול גלוטן', 'בלי גלוטן', 'gf'],
         ),
+        termGuards: _flourGuards,
         noPrefixHe: <String>['חיטה', 'חלה', 'חלות', 'בירה'],
         sources: <String>['11 §7.1', '11 §7.3', '11 §7.5', '12 §1.4'],
       ),
       RestrictionId.lupin: RestrictionVocabulary(
-        directEn: _lupinEn,
-        directHe: _lupinHe,
+        directEn: lupinDirectEn,
+        directHe: lupinDirectHe,
         hiddenEn: _lupinHiddenEn,
         hiddenHe: _lupinHiddenHe,
         guards: AllergenGuards(
           beforeEn: <String>['no', 'without', 'free of', 'free from'],
-          afterEn: <String>['free'],
+          afterEn: <String>['free', 'lupin free'],
           beforeHe: <String>['ללא', 'בלי', 'נטול'],
         ),
         sources: <String>['11 §14.1', '11 §14.2', '12 §1.3'],

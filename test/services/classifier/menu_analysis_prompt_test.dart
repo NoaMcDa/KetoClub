@@ -630,4 +630,167 @@ void main() {
       expect(visionProperties, textItem['properties']);
     });
   });
+
+  group('MenuAnalysisPrompt ingredient extraction (ALG-03)', () {
+    const extracting = ClassificationOptions(restrictionsRequested: true);
+
+    /// The dish item schema of [schema].
+    Map<String, Object?> itemOf(Map<String, Object?> schema) =>
+        ((schema['properties']! as Map<String, Object?>)['dishes']!
+                as Map<String, Object?>)['items']!
+            as Map<String, Object?>;
+
+    test('the keto prompt names no ingredient extraction', () {
+      // Act
+      final prompt = MenuAnalysisPrompt.systemPrompt();
+
+      // Assert
+      expect(prompt, isNot(contains('"ingredients"')));
+    });
+
+    test('appends the extraction section last, after a blank line, and '
+        'leaves the keto prompt before it byte for byte', () {
+      // Act
+      final ketoPrompt = MenuAnalysisPrompt.systemPrompt();
+      final prompt = MenuAnalysisPrompt.systemPrompt(options: extracting);
+
+      // Assert
+      expect(prompt.startsWith('$ketoPrompt\n\n'), isTrue);
+      final section = prompt.substring(ketoPrompt.length + 2);
+      expect(section, contains('"ingredients"'));
+      expect(section, contains('tahini in sabich'));
+      expect(section, contains('"stated"'));
+      expect(section, contains('"likely"'));
+      expect(section, contains('"suspected"'));
+      expect(section, isNot(contains('\n')));
+      expect(prompt.endsWith('\n'), isFalse);
+    });
+
+    test('follows the dietary constraints section when both are present', () {
+      // Arrange
+      final constraints = ClassificationOptions.dietaryConstraintsFor(
+        seedOilFree: true,
+        dairyFree: false,
+        carnivoreOnly: false,
+      );
+      final ketoOptions = ClassificationOptions(
+        dietaryConstraints: constraints,
+      );
+      final both = ClassificationOptions(
+        dietaryConstraints: constraints,
+        restrictionsRequested: true,
+      );
+
+      // Act
+      final ketoPrompt = MenuAnalysisPrompt.systemPrompt(options: ketoOptions);
+      final prompt = MenuAnalysisPrompt.systemPrompt(options: both);
+
+      // Assert
+      expect(prompt.startsWith('$ketoPrompt\n\n'), isTrue);
+      expect(ketoPrompt, endsWith('- $seedOilFreePromptFragment'));
+    });
+
+    test('names no restriction, so one extraction serves every '
+        'profile (C1)', () {
+      // Act
+      final section = MenuAnalysisPrompt.systemPrompt(options: extracting)
+          .substring(MenuAnalysisPrompt.systemPrompt().length);
+
+      // Assert
+      for (final word in <String>['allerg', 'profile', 'gluten', 'vegan']) {
+        expect(section.toLowerCase(), isNot(contains(word)));
+      }
+    });
+
+    test('the vision prompt adds the description paragraph last', () {
+      // Act
+      final ketoVision = MenuAnalysisPrompt.visionSystemPrompt(pageCount: 2);
+      final vision = MenuAnalysisPrompt.visionSystemPrompt(
+        pageCount: 2,
+        options: extracting,
+      );
+
+      // Assert
+      final textPrompt = MenuAnalysisPrompt.systemPrompt(options: extracting);
+      final prefix =
+          '${MenuAnalysisPrompt.visionPreamble(2)}\n\n'
+          '$textPrompt\n\n';
+      expect(vision.startsWith(prefix), isTrue);
+      expect(vision.substring(prefix.length), contains('"description"'));
+      expect(ketoVision, isNot(contains('"description"')));
+      expect(ketoVision, isNot(contains('"ingredients"')));
+    });
+
+    test('the extracting schema is strict and adds ingredients last', () {
+      // Act
+      final schema = MenuAnalysisPrompt.responseSchema(extract: true);
+      final item = itemOf(schema);
+      final properties = item['properties']! as Map<String, Object?>;
+      final ingredients = properties['ingredients']! as Map<String, Object?>;
+      final entry = ingredients['items']! as Map<String, Object?>;
+      final entryProperties = entry['properties']! as Map<String, Object?>;
+
+      // Assert
+      _assertStrictSchema(schema);
+      expect((item['required']! as List<Object?>).last, 'ingredients');
+      expect(item['required'], hasLength(8));
+      expect(entry['required'], <String>['name', 'certainty', 'role']);
+      expect(
+        (entryProperties['certainty']! as Map<String, Object?>)['enum'],
+        <String>['stated', 'likely', 'suspected'],
+      );
+      expect(
+        (entryProperties['role']! as Map<String, Object?>)['enum'],
+        <String>[
+          'base',
+          'protein',
+          'side',
+          'sauce',
+          'garnish',
+          'option',
+          'unknown',
+        ],
+      );
+      expect(properties, isNot(contains('concerns')));
+    });
+
+    test('the extracting schema is the keto one plus ingredients', () {
+      // Act
+      final keto = itemOf(MenuAnalysisPrompt.responseSchema());
+      final extracting = itemOf(
+        MenuAnalysisPrompt.responseSchema(extract: true),
+      );
+
+      // Assert
+      expect(
+        <String, Object?>{...extracting['properties']! as Map<String, Object?>}
+          ..remove('ingredients'),
+        keto['properties'],
+      );
+    });
+
+    test('the extracting vision schema adds ingredients, page and a '
+        'nullable description', () {
+      // Act
+      final schema = MenuAnalysisPrompt.visionResponseSchema(extract: true);
+      final item = itemOf(schema);
+      final properties = item['properties']! as Map<String, Object?>;
+
+      // Assert
+      _assertStrictSchema(schema);
+      expect((item['required']! as List<Object?>).sublist(7), <String>[
+        'ingredients',
+        'page',
+        'description',
+      ]);
+      expect((properties['description']! as Map<String, Object?>)['type'], [
+        'string',
+        'null',
+      ]);
+      expect(
+        itemOf(MenuAnalysisPrompt.visionResponseSchema())['properties'],
+        isNot(contains('description')),
+      );
+    });
+  });
 }

@@ -187,7 +187,7 @@ async def classify(
     request = ChatRequest.model_construct(
         system_prompt=prompt.system_prompt(options),
         user_prompt=prompt.user_prompt(menu),
-        response_schema=prompt.response_schema(),
+        response_schema=prompt.response_schema(extract=options.restrictions_requested),
         schema_name=prompt.SCHEMA_NAME,
         images=[],
     )
@@ -202,6 +202,7 @@ async def classify(
         engine=LlmEngine(model=reply.model),
         net_carb_limit_grams=options.net_carb_limit_grams,
         analysed_at=analysed_at,
+        extract=options.restrictions_requested,
     )
     if isinstance(parsed, parser.Failed):
         if parsed.reason == "noDishesFound":  # pragma: no cover - rule 7
