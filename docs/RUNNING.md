@@ -143,6 +143,18 @@ flutter build ios --no-codesign  # needs Xcode
 Add the same `--dart-define=KETOCLUB_BACKEND_URL=…` to a build that should
 talk to a backend — any platform, since D25.
 
+### Building Banto
+
+Banto is the same codebase with every new surface behind one compile-time
+flag, read in `lib/utils/banto_mode.dart` only (`architecture.md` D26).
+Without `--dart-define=BANTO_MODE=true` the app is KetoClub byte for byte;
+with it the display name is "Banto". For the web, `tool/build_web.sh --banto`
+runs `flutter build web --release --dart-define=BANTO_MODE=true` and copies
+`web/manifest.banto.json` over `build/web/manifest.json`, so the installed
+app is named Banto too. `tool/build_web.sh` with no argument is the plain
+KetoClub web build. For a phone or a debug run, pass the same define to
+`flutter run` or `flutter build`.
+
 ### Web shell: path URLs, splash and tab titles (issue #226)
 
 The web build uses **path URLs**: a shared link reads
