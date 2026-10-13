@@ -9,6 +9,7 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/drinks_guide_screen.dart';
 import 'package:ketoclub/screens/menu_screen.dart';
+import 'package:ketoclub/screens/restriction_onboarding_screen.dart';
 import 'package:ketoclub/screens/saved_screen.dart';
 import 'package:ketoclub/screens/scan_screen.dart';
 import 'package:ketoclub/screens/settings_screen.dart';
@@ -176,23 +177,36 @@ class _KetoClubAppState extends State<KetoClubApp> {
 /// present as a blank screen.
 Route<void>? generateRoute(
   RouteSettings settings,
-  AppDependencies dependencies,
-) {
+  AppDependencies dependencies, {
+  bool bantoMode = BantoMode.enabled,
+}) {
   final name = settings.name ?? '/';
 
   if (name == '/' || name.isEmpty) {
     return MaterialPageRoute<void>(
       settings: settings,
-      builder: (_) => AppShell(
-        currentIndex: AppShell.exploreIndex,
-        // No provider here: the screen reads the app-lifetime
-        // VenueSearchController KetoClubApp provides (issue #233).
-        child: VenueSearchScreen(
-          connectivity: dependencies.connectivity,
-          locationService: dependencies.locationService,
-          settingsStore: dependencies.settingsStore,
-          directToGoogle: dependencies.apiKeyStore != null,
-          backendConfigured: dependencies.backendConfigured,
+      // The first-run restriction onboarding stands in front of Explore,
+      // only in a Banto build and only until it is seen or skipped
+      // (ALG-02b); with the flag off the gate returns its child at once.
+      builder: (_) => RestrictionOnboardingGate(
+        bantoMode: bantoMode,
+        createController: () => SettingsController(
+          dependencies.settingsStore,
+          dependencies.menuRepository,
+          dependencies.apiKeyStore,
+          dependencies.visitHistory,
+        ),
+        child: AppShell(
+          currentIndex: AppShell.exploreIndex,
+          // No provider here: the screen reads the app-lifetime
+          // VenueSearchController KetoClubApp provides (issue #233).
+          child: VenueSearchScreen(
+            connectivity: dependencies.connectivity,
+            locationService: dependencies.locationService,
+            settingsStore: dependencies.settingsStore,
+            directToGoogle: dependencies.apiKeyStore != null,
+            backendConfigured: dependencies.backendConfigured,
+          ),
         ),
       ),
     );
@@ -306,6 +320,7 @@ Route<void>? generateRoute(
             externalLinkOpener: dependencies.externalLinkOpener,
             menuSharer: dependencies.menuSharer,
             scannedPages: dependencies.scannedPages,
+            bantoMode: bantoMode,
           ),
         ),
       ),

@@ -39,6 +39,7 @@ import 'package:ketoclub/services/menu/wolt/wolt_menu_mapper.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/venue/wolt/wolt_venue_mapper.dart';
 import 'package:ketoclub/utils/allergens/allergen_matcher.dart';
+import 'package:ketoclub/utils/allergens/kitchen_signals.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/allergens/vocabulary.dart';
 import 'package:ketoclub/utils/classification_rules.dart';
@@ -51,6 +52,7 @@ import 'package:ketoclub/utils/verdict_counts.dart';
 
 import 'allergen_corpus.dart';
 import 'golden_corpus.dart';
+import 'kitchen_signals_corpus.dart';
 
 /// Where the golden files live, relative to the repository root.
 const String goldenDirectory = 'backend/tests/fixtures/golden';
@@ -72,6 +74,7 @@ const List<String> goldenFileNames = <String>[
   'dish_kind.json',
   'score.json',
   'allergens.json',
+  'kitchen_signals.json',
 ];
 
 /// [document] in the corpus's canonical form: two-space indentation, every
@@ -111,6 +114,7 @@ Future<Map<String, Object?>> buildGoldens() async {
     'dish_kind.json': _dishKinds(inputs),
     'score.json': await _scores(inputs),
     'allergens.json': _allergens(),
+    'kitchen_signals.json': _kitchenSignals(inputs),
   };
 }
 
@@ -1652,3 +1656,81 @@ Map<String, Object?> _allergens() => <String, Object?>{
     ),
   },
 };
+
+// ---------------------------------------------------------------------------
+// kitchen_signals.json (Banto; ALG-07, issue #349)
+// ---------------------------------------------------------------------------
+
+/// The allergen safety corpus's menus whose dishes are not already a
+/// golden menu (`wolt_hamosad` and `tenbis_synthetic` are its copies of the
+/// Wolt and 10bis fixtures), each as one category of its dishes in file
+/// order.
+Map<String, Menu> _kitchenCorpusMenus() {
+  final files =
+      Directory('test/fixtures/allergens/menus')
+          .listSync()
+          .whereType<File>()
+          .where((file) => file.path.endsWith('.json'))
+          .toList()
+        ..sort((a, b) => a.path.compareTo(b.path));
+  final menus = <String, Menu>{};
+  for (final file in files) {
+    final name = file.uri.pathSegments.last.replaceAll('.json', '');
+    if (name == 'wolt_hamosad' || name == 'tenbis_synthetic') continue;
+    final raw = _readJson(file.path);
+    final dishes = <Dish>[];
+    for (final (index, entry) in (raw['dishes']! as List<Object?>).indexed) {
+      final map = entry! as Map<String, Object?>;
+      dishes.add(
+        Dish(
+          id: 'k${index + 1}',
+          name: map['name']! as String,
+          description: map['description']! as String,
+          price: 0,
+          options: <DishOption>[
+            for (final option in map['options']! as List<Object?>)
+              DishOption.tryFrom(option! as Map<String, Object?>)!,
+          ],
+        ),
+      );
+    }
+    menus[name] = Menu(
+      venueRef: VenueRef(source: MenuSource.scan, platformId: name),
+      currency: 'ILS',
+      fetchedAt: goldenNow,
+      categories: <MenuCategory>[
+        MenuCategory(id: name, name: 'Menu', dishes: dishes),
+      ],
+    );
+  }
+  return menus;
+}
+
+/// The term lists, guards, threat table and questions (`vocabulary`), the
+/// vocabulary the cases run under (`fixtureVocabulary`), and for each menu
+/// the signals [KitchenSignals.ofWith] reports (`cases`).
+Map<String, Object?> _kitchenSignals(_Inputs inputs) {
+  final menus = <String, Menu>{
+    ...inputs.menus,
+    ..._kitchenCorpusMenus(),
+    ...kitchenSignalMenus,
+  };
+  return <String, Object?>{
+    'vocabulary': KitchenSignals.vocabularyJson(),
+    'fixtureVocabulary': _allergenVocabulary(kitchenFixtureVocabulary),
+    'cases': <Object?>[
+      for (final MapEntry(key: name, value: menu) in menus.entries)
+        <String, Object?>{
+          'name': name,
+          'menu': menu.toJson(),
+          'signals': <Object?>[
+            for (final signal in KitchenSignals.ofWith(
+              menu,
+              kitchenFixtureVocabulary,
+            ))
+              signal.toJson(),
+          ],
+        },
+    ],
+  };
+}
