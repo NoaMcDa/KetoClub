@@ -1,0 +1,938 @@
+{
+  "_fixture_note": "synthetic Israeli pizza-and-pasta place written for the corpus from 11 §3, §5, §7 and 12 §1.4, §1.5, §5; labels are unreviewed desk research; Hebrew",
+  "language": "he",
+  "dishes": [
+    {
+      "name": "פיצה מרגריטה",
+      "description": "עגבניות, מוצרלה ובזיליקום",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"מוצרלה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "fresh mozzarella",
+          "source": "11 §4.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיצה\" dough",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיצה\" dough",
+          "source": "11 §7.1"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"מוצרלה\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "פיצה פטריות וזיתים",
+      "description": "רוטב עגבניות, מוצרלה, פטריות וזיתים",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"מוצרלה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "fresh mozzarella",
+          "source": "11 §4.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיצה\" dough",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיצה\" dough",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"מוצרלה\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "פיצה בולגרית",
+      "description": "גבינה בולגרית, עגבניות שרי וזעתר",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינה בולגרית\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "brined fresh cheese",
+          "source": "11 §4.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיצה\" dough",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיצה\" dough",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"זעתר\" blends usually contain sesame",
+          "source": "11 §11.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"גבינה בולגרית\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "פיצה ארבע גבינות",
+      "description": "מוצרלה, גורגונזולה, פרמזן וגאודה",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "four cheeses named",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "mozzarella and gorgonzola are soft cheeses",
+          "source": "11 §4.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיצה\" dough",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיצה\" dough",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: four cheeses named",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "פיצה פסטו וגבינת עיזים",
+      "description": "פסטו בזיליקום, גבינת עיזים ועגבניות שרי",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
+        "treeNuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"pesto\" is made with pine nuts (or walnuts)",
+          "source": "11 §2.1"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינת עיזים\": goat milk is treated as milk",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "fresh goat cheese",
+          "source": "11 §4.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיצה\" dough",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיצה\" dough",
+          "source": "11 §7.1"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"גבינת עיזים\": goat milk is treated as milk",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "פיצה טבעונית",
+      "description": "גבינה טבעונית, ירקות צלויים ורוטב עגבניות",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"גבינה טבעונית\": a vegan substitute; טבעוני does not clear a milk allergy",
+          "source": "12 §2.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"גבינה טבעונית\": a vegan substitute; טבעוני does not clear a milk allergy",
+          "source": "12 §2.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיצה\" dough",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיצה\" dough",
+          "source": "11 §7.1"
+        },
+        "crustaceans": {
+          "label": "free",
+          "evidence": "no crustacean ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §9"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "sold as vegan (טבעוני); label is a hint only",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "פיצה אנשובי",
+      "description": "רוטב עגבניות, מוצרלה, אנשובי וזיתים",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"מוצרלה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "fresh mozzarella",
+          "source": "11 §4.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיצה\" dough",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיצה\" dough",
+          "source": "11 §7.1"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"אנשובי\" (anchovy)",
+          "source": "12 §1.7"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"מוצרלה\"",
+          "source": "12 §1.5"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"אנשובי\" (anchovy)",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "קלצונה",
+      "description": "בצק פיצה סגור במילוי ריקוטה, תרד ופרמזן",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"ריקוטה\" and \"פרמזן\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "ricotta is a fresh cheese",
+          "source": "11 §4.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בצק פיצה\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בצק פיצה\"",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"ריקוטה\" and \"פרמזן\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "ספגטי עגבניות",
+      "description": "ספגטי ברוטב עגבניות ובזיליקום",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "spaghetti with tomato and basil; no cream or cheese named; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ספגטי\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ספגטי\"",
+          "source": "12 §1.4"
+        }
+      }
+    },
+    {
+      "name": "פטוצ׳יני אלפרדו",
+      "description": "פטוצ׳יני ברוטב שמנת ופרמזן",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"שמנת\" and \"פרמזן\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"שמנת\" and \"פרמזן\"",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "fresh ribbon pasta usually contains egg",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פטוצ׳יני\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פטוצ׳יני\"",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"שמנת\" and \"פרמזן\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "ספגטי בולונז",
+      "description": "ספגטי ברוטב בשר, יין אדום וירקות",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ספגטי\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ספגטי\"",
+          "source": "12 §1.4"
+        },
+        "celery": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "ragù starts from a soffritto of celery",
+          "source": "11 §12.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"יין אדום\"",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"רוטב בשר\" (meat sauce)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"רוטב בשר\" (meat sauce)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "פנה פסטו",
+      "description": "פנה ברוטב פסטו בזיליקום, צנוברים ופרמזן",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
+        "treeNuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"צנוברים\" (pine nuts)",
+          "source": "12 §1.2"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"פרמזן\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "parmesan is a hard cheese",
+          "source": "11 §4.3"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פנה\" (penne)",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פנה\" (penne)",
+          "source": "12 §1.4"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"פרמזן\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "ספגטי קרבונרה",
+      "description": "ספגטי, ביצה, פנצ׳טה, פרמזן ופלפל שחור",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"פרמזן\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "parmesan is a hard cheese",
+          "source": "11 §4.3"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"קרבונרה\" is an egg sauce",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ספגטי\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ספגטי\"",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"פנצ׳טה\" (cured pork)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"פנצ׳טה\" (cured pork)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "ניוקי גורגונזולה",
+      "description": "ניוקי תפוחי אדמה ברוטב גורגונזולה ואגוזי מלך",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"אגוזי מלך\"",
+          "source": "12 §1.2"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"גורגונזולה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "a soft blue cheese in a sauce",
+          "source": "11 §4.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "gnocchi dough contains flour",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "gnocchi dough contains flour",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"גורגונזולה\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "לזניה בולונז",
+      "description": "לזניה בשכבות עם בשר, בשמל וגבינה",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"בשמל\" and \"גבינה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"בשמל\" and \"גבינה\"",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "some lasagne sheets contain egg",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לזניה\" sheets",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לזניה\" sheets",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"בשר\" (meat)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"בשר\" (meat)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "ריזוטו פטריות",
+      "description": "ריזוטו פטריות יער ביין לבן, חמאה ופרמזן",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"חמאה\" and \"פרמזן\"",
+          "source": "12 §5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"חמאה\" and \"פרמזן\"",
+          "source": "12 §5"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "risotto stock may be made with stock cubes that contain wheat",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "risotto stock may be made with stock cubes that contain wheat",
+          "source": "11 §7.2"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "celery": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "stock cubes and stocks are documented celery carriers",
+          "source": "11 §12.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"יין לבן\"",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"חמאה\" and \"פרמזן\"",
+          "source": "12 §5"
+        }
+      }
+    },
+    {
+      "name": "סלט קיסר",
+      "description": "חסה רומית, קרוטונים, פרמזן ורוטב קיסר",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"פרמזן\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"פרמזן\"",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "Caesar dressing is made with egg",
+          "source": "12 §5"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"קרוטונים\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"קרוטונים\"",
+          "source": "12 §1.4"
+        },
+        "fish": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "\"רוטב קיסר\" often carries anchovy",
+          "source": "12 §1.7"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "Caesar dressing lists mustard",
+          "source": "12 §5"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"פרמזן\"",
+          "source": "12 §1.5"
+        },
+        "vegetarian": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "fish/shellfish: \"רוטב קיסר\" often carries anchovy",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "סלט רוקט",
+      "description": "רוקט, פרמזן, עגבניות שרי, צנוברים וויניגרט",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"צנוברים\"",
+          "source": "12 §1.2"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"פרמזן\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "parmesan is a hard cheese",
+          "source": "11 §4.3"
+        },
+        "mustard": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"ויניגרט\" is a mustard vinaigrette",
+          "source": "12 §1.8"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "vinaigrette is made with vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"פרמזן\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "פוקאצ׳ה שום",
+      "description": "פוקאצ׳ה עם שום, רוזמרין ושמן זית",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פוקאצ׳ה\" is a wheat bread",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פוקאצ׳ה\" is a wheat bread",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "seeds may be pressed onto flatbreads",
+          "source": "11 §11.2"
+        }
+      }
+    },
+    {
+      "name": "טירמיסו",
+      "description": "מסקרפונה, ביסקוויטים ספוגים בקפה וקקאו",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"מסקרפונה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"מסקרפונה\"",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "tiramisu is made with egg yolks",
+          "source": "11 §5.1"
+        },
+        "soy": {
+          "label": "free",
+          "evidence": "\"טירמיסו\" contains the letters מיסו (miso) but is a mascarpone dessert; no soy is named; cross-contact not assessed",
+          "source": "11 §6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ביסקוויטים\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ביסקוויטים\"",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"מסקרפונה\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "גלידת וניל",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גלידה\" (ice cream)",
+          "source": "11 §4.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "ice cream",
+          "source": "11 §4.1"
+        },
+        "crustaceans": {
+          "label": "free",
+          "evidence": "no crustacean ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §9"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"גלידה\" (ice cream)",
+          "source": "11 §4.1"
+        }
+      }
+    },
+    {
+      "name": "בירה",
+      "description": "בירה מהחבית",
+      "options": [],
+      "labels": {
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "beer is brewed from barley malt",
+          "source": "11 §7.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "beer is a sulphite source",
+          "source": "11 §15.2"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,454 @@
+{
+  "_fixture_note": "hand-built in tool/golden/golden_corpus.dart (goldenMixedMenu), dish texts copied (Hebrew and English in one dish, notices, astral letters; the repeated id is dropped); labels are unreviewed desk research; mixed",
+  "language": "mixed",
+  "dishes": [
+    {
+      "name": "שימו לב: המטבח נסגר ב-22:00",
+      "description": "",
+      "options": [],
+      "labels": {}
+    },
+    {
+      "name": "קרואסון חמאה",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חמאה\" (butter)",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "pastry is glazed with egg wash",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a croissant is a wheat pastry",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a croissant is a wheat pastry",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"חמאה\" (butter)",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "הפוך קר",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"הפוך\" is a milk coffee",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"הפוך\" is a milk coffee",
+          "source": "11 §4.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"הפוך\" is a milk coffee",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Iced latte",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"latte\" is espresso with milk",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"latte\" is espresso with milk",
+          "source": "11 §4.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"latte\" is espresso with milk",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Cinnamon danish",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "baked goods commonly contain milk or butter",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "baked goods commonly contain milk or butter",
+          "source": "11 §4.2"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "pastry is glazed with egg wash",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a danish is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a danish is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: baked goods commonly contain milk or butter",
+          "source": "11 §3.2"
+        }
+      }
+    },
+    {
+      "name": "Beef Burger בלחמנייה",
+      "description": "עם צ׳יפס and coleslaw",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "\"coleslaw\" is typically mayonnaise-based",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בלחמנייה\" (in a bun)",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בלחמנייה\" (in a bun)",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\" can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise and aioli sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "chips from pre-cut potato may be sulphite-treated",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Beef Burger\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Beef Burger\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "פיצה pizza 4 גבינות",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"4 גבינות\" (four cheeses)",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "four cheeses include soft and fresh ones",
+          "source": "11 §4.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"pizza\" dough",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"pizza\" dough",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"4 גבינות\" (four cheeses)",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "Cauliflower rice bowl",
+      "description": "אורז כרובית",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "no dairy named; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "wheat": {
+          "label": "free",
+          "evidence": "cauliflower stands in for the grain; no cereal named; cross-contact not assessed",
+          "source": "11 §7.3"
+        }
+      }
+    },
+    {
+      "name": "Beer-battered fish",
+      "description": "Tartare",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"Tartare\" is mayonnaise-based",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Beer-battered\": batter is wheat flour",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "beer is brewed from barley malt",
+          "source": "11 §7.1"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"fish\"",
+          "source": "11 §8.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "tartare sauce often carries mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "beer is a sulphite source",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"Tartare\" is mayonnaise-based",
+          "source": "11 §5.1"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"fish\"",
+          "source": "11 §8.1"
+        }
+      }
+    },
+    {
+      "name": "עוף ברוטב יין",
+      "description": "Rosemary",
+      "options": [],
+      "labels": {
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"יין\" (wine) is a sulphite source",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Dear customers",
+      "description": "",
+      "options": [],
+      "labels": {}
+    },
+    {
+      "name": "𝐁𝐞𝐞𝐟 steak",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "grilled steak is often finished with butter",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"steak\" in mathematical-bold letters",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"steak\" in mathematical-bold letters",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Goldstar",
+      "description": "",
+      "options": [],
+      "labels": {
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a lager is brewed from barley malt",
+          "source": "11 §7.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "beer is a sulphite source",
+          "source": "11 §15.2"
+        }
+      }
+    },
+    {
+      "name": "Diet coke",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "soft drink; cross-contact not assessed",
+          "source": "11 §3"
+        }
+      }
+    },
+    {
+      "name": "Cheeseburger",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"Cheese\" in the name",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"Cheese\" in the name",
+          "source": "12 §1.5"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "a burger is normally served in a bun",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "a burger is normally served in a bun",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "a burger bun can carry a sesame topping",
+          "source": "11 §11.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"burger\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"burger\"",
+          "source": "12 §2.2"
+        }
+      }
+    }
+  ]
+}

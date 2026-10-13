@@ -1,0 +1,928 @@
+{
+  "_fixture_note": "synthetic Yemenite bakery written for the corpus from 12 §1.1, 1.3-1.6 (ג׳חנון, מלאווח, כובאנה and their accompaniments); labels are unreviewed desk research; Hebrew",
+  "language": "he",
+  "dishes": [
+    {
+      "name": "מלאווח",
+      "description": "מלאווח פריך מבצק עלים, מוגש עם ביצה קשה, רסק עגבניות וסחוג",
+      "options": [
+        {
+          "name": "תוספות",
+          "values": [
+            "ביצה קשה",
+            "רסק עגבניות",
+            "סחוג",
+            "טחינה"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "the dough is made with butter or margarine; the menu seldom says which",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "the dough is made with butter or margarine; the menu seldom says which",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"ביצה קשה\"",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"מלאווח\" is a wheat-dough pastry",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"מלאווח\" is a wheat-dough pastry",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"טחינה\" is the usual side",
+          "source": "12 §1.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"ביצה קשה\"",
+          "source": "12 §1.6"
+        },
+        "vegetarian": {
+          "label": "free",
+          "evidence": "dough, egg and tomato; no meat or fish named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "ג׳חנון",
+      "description": "ג׳חנון מסורתי בבישול איטי, מוגש עם ביצה קשה, עגבנייה מגוררת וחילבה",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "milk": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "traditionally clarified butter, today often margarine; the menu does not say which",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "traditionally clarified butter, today often margarine; the menu does not say which",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"ביצה קשה\"",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ג׳חנון\" is white-flour dough",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ג׳חנון\" is white-flour dough",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "jachnun is commonly served with tahini-based sides",
+          "source": "12 §1.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"חילבה\" is fenugreek",
+          "source": "12 §1.3"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"ביצה קשה\"",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "כובאנה",
+      "description": "לחם שמרים מתפחים שנאפה לילה שלם, עם עגבנייה מגוררת וסחוג",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "kubaneh recipes use butter, samneh or margarine",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "kubaneh recipes use butter, samneh or margarine",
+          "source": "12 §1.5"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"כובאנה\" is a wheat-dough bread",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"כובאנה\" is a wheat-dough bread",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "animal-derived: kubaneh recipes use butter, samneh or margarine",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "קובנה בחמאה",
+      "description": "קובנה אפויה בחמאה ובשמן, עם ביצה קשה",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חמאה\" (butter)",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"ביצה קשה\"",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"קובנה\" (a variant spelling of כובאנה)",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"קובנה\" (a variant spelling of כובאנה)",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"חמאה\" (butter)",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "ג׳חנון פרווה",
+      "description": "ג׳חנון שנאפה במרגרינה, ללא חמאה",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"פרווה\" / \"ללא חמאה\": pareve does not clear a milk allergy",
+          "source": "12 §2.1"
+        },
+        "lactose": {
+          "label": "free",
+          "evidence": "no butter, cream or milk named; this is a lactose-intolerance reading only",
+          "source": "12 §2.1"
+        },
+        "soy": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"מרגרינה\" (margarine) commonly contains soy",
+          "source": "12 §1.11"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ג׳חנון\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ג׳חנון\"",
+          "source": "12 §1.4"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "soy is a legume: \"מרגרינה\" (margarine) commonly contains soy",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "animal-derived: \"פרווה\" / \"ללא חמאה\": pareve does not clear a milk allergy",
+          "source": "12 §2.1"
+        }
+      }
+    },
+    {
+      "name": "בורקס גבינה",
+      "description": "בצק עלים במילוי גבינה בולגרית וצפתית, מצופה בביצה ושומשום",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גבינה בולגרית וצפתית\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גבינה בולגרית וצפתית\"",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"בביצה\" (egg wash)",
+          "source": "12 §1.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בצק עלים\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בצק עלים\"",
+          "source": "12 §1.4"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"שומשום\"",
+          "source": "12 §1.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"גבינה בולגרית וצפתית\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "בורקס תפוחי אדמה",
+      "description": "בצק עלים במילוי פירה תפוחי אדמה ובצל",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "even potato bourekas may contain cheese or butter",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "even potato bourekas may contain cheese or butter",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "bourekas are normally egg-washed",
+          "source": "12 §1.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בצק עלים\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בצק עלים\"",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "bourekas are topped with sesame",
+          "source": "12 §6.2"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: even potato bourekas may contain cheese or butter",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "סמבוסק גבינה",
+      "description": "סמבוסק מטוגן במילוי גבינה ובזיליקום, עם סחוג",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גבינה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גבינה\"",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "the dough or seal may be egg-bound",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"סמבוסק\" is a wheat-dough pastry",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"סמבוסק\" is a wheat-dough pastry",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"גבינה\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "חילבה",
+      "description": "מטבל חילבה ביתי עם שום, פטרוזיליה ולימון",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "free",
+          "evidence": "a dip of fenugreek, garlic and parsley; cross-contact not assessed",
+          "source": "11 §7"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חילבה\" is fenugreek",
+          "source": "12 §1.3"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only plant ingredients named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "סחוג",
+      "description": "סחוג אדום חריף ביתי",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "milk": {
+          "label": "free",
+          "evidence": "a chili and tomato relish; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "a chili and tomato relish; cross-contact not assessed",
+          "source": "11 §5"
+        }
+      }
+    },
+    {
+      "name": "טחינה גולמית",
+      "description": "צלוחית טחינה",
+      "options": [],
+      "labels": {
+        "sesame": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"טחינה\"",
+          "source": "12 §1.1"
+        }
+      }
+    },
+    {
+      "name": "ביצה קשה",
+      "description": "ביצה קשה מבושלת",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ביצה\"",
+          "source": "11 §5.1"
+        },
+        "sesame": {
+          "label": "free",
+          "evidence": "a boiled egg; cross-contact not assessed",
+          "source": "11 §11"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"ביצה\"",
+          "source": "11 §5.1"
+        }
+      }
+    },
+    {
+      "name": "עגבנייה מגוררת",
+      "description": "",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "free",
+          "evidence": "grated tomato; cross-contact not assessed",
+          "source": "11 §5"
+        },
+        "sesame": {
+          "label": "free",
+          "evidence": "grated tomato; cross-contact not assessed",
+          "source": "11 §11"
+        }
+      }
+    },
+    {
+      "name": "מרק עוף תימני",
+      "description": "מרק עוף ביתי עם סלרי, גזר, כוסברה וחילבה",
+      "options": [],
+      "labels": {
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "celery": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"סלרי\"",
+          "source": "12 §1.9"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"חילבה\"",
+          "source": "12 §1.3"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "מרק קובה",
+      "description": "קובה סולת במרק ירקות חם",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"קובה סולת\" (semolina shells)",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"קובה סולת\" (semolina shells)",
+          "source": "12 §1.4"
+        },
+        "celery": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "vegetable soup is made with celery or stock",
+          "source": "12 §1.9"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קובה\" is filled with minced meat",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קובה\" is filled with minced meat",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "עוגת שמרים",
+      "description": "עוגת שמרים עם צימוקים ואגוזי מלך",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"אגוזי מלך\" (walnuts)",
+          "source": "12 §1.2"
+        },
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "baked goods commonly contain butter or milk",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "baked goods commonly contain butter or milk",
+          "source": "11 §4.2"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "cakes are baked with eggs",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"עוגת שמרים\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"עוגת שמרים\"",
+          "source": "12 §1.4"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"צימוקים\" (raisins)",
+          "source": "12 §1.10"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: baked goods commonly contain butter or milk",
+          "source": "11 §3.2"
+        }
+      }
+    },
+    {
+      "name": "עוגיות שומשום",
+      "description": "עוגיות חמאה בציפוי שומשום",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חמאה\" (butter)",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חמאה\" (butter)",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "cookie dough is commonly egg-bound",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a butter cookie is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a butter cookie is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"שומשום\"",
+          "source": "12 §1.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"חמאה\" (butter)",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "פיתה טרייה מהתנור",
+      "description": "",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיתה\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיתה\"",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"פיתה\" can carry a sesame topping",
+          "source": "12 §1.1"
+        }
+      }
+    },
+    {
+      "name": "ממרח גבינה",
+      "description": "גבינה לבנה עם עשבי תיבול ושמן זית",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גבינה לבנה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "fresh white cheese",
+          "source": "11 §4.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"גבינה לבנה\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "תה נענע",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "tea and mint; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "tea and mint; cross-contact not assessed",
+          "source": "11 §5"
+        }
+      }
+    },
+    {
+      "name": "קפה תימני",
+      "description": "קפה שחור עם תערובת תבלינים",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "free",
+          "evidence": "coffee and spices; cross-contact not assessed",
+          "source": "11 §1"
+        },
+        "milk": {
+          "label": "free",
+          "evidence": "black coffee; no milk named; cross-contact not assessed",
+          "source": "11 §3"
+        }
+      }
+    },
+    {
+      "name": "ג'חנון קלאסי",
+      "description": "ג'חנון בבישול ארוך עם ביצה קשה, עגבנייה מגוררת וסחוג",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "butter or margarine; the menu does not say which",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "butter or margarine; the menu does not say which",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"ביצה קשה\"",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ג'חנון\" (ASCII apostrophe) is white-flour dough",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ג'חנון\" (ASCII apostrophe) is white-flour dough",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"ביצה קשה\"",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "מלווח עם טחינא",
+      "description": "מלווח פריך מוגש עם טחינא, ביצה קשה ועגבנייה",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "butter or margarine; the menu does not say which",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "butter or margarine; the menu does not say which",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"ביצה קשה\"",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"מלווח\" (a spelling of מלאווח) is a wheat-dough pastry",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"מלווח\" (a spelling of מלאווח) is a wheat-dough pastry",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"טחינא\" is a spelling of טחינה",
+          "source": "12 §1.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"ביצה קשה\"",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "עוגיות שומשומין",
+      "description": "עוגיות חמאה עם שומשומין",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חמאה\" (butter)",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חמאה\" (butter)",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "cookie dough is commonly egg-bound",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a butter cookie is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a butter cookie is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"שומשומין\" is a spelling of שומשום",
+          "source": "12 §1.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"חמאה\" (butter)",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "פירות יבשים",
+      "description": "משמש מיובש וצימוקים, משומרים בגופרית דו חמצנית (E220)",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "dried apricots and raisins; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "sulphites": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גופרית דו חמצנית\" and \"E220\" are sulphur dioxide",
+          "source": "11 §15.1"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,1150 @@
+{
+  "_fixture_note": "synthetic American diner with a shared fryer written for the corpus from 11 §1.2, §7.4, §9.4 and 12 §5; labels are unreviewed desk research; English",
+  "language": "en",
+  "dishes": [
+    {
+      "name": "Buttermilk Fried Chicken",
+      "description": "Three pieces, buttermilk-brined and hand-breaded, cooked in the same fryer as our fries and onion rings",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"buttermilk-brined\"",
+          "source": "12 §5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"buttermilk-brined\"",
+          "source": "12 §5"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "breaded coatings are usually egg-bound",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"hand-breaded\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"hand-breaded\"",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Chicken\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Chicken\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Classic Cheeseburger",
+      "description": "Beef patty, American cheese, pickles, ketchup and mustard on a sesame seed bun",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"American cheese\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"American cheese\"",
+          "source": "11 §4.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"bun\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"bun\"",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"sesame seed bun\"",
+          "source": "11 §11.1"
+        },
+        "mustard": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"mustard\"",
+          "source": "11 §13.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"pickles\" and ready-made mustard",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Beef patty\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Beef patty\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Bacon Cheeseburger",
+      "description": "Beef patty, bacon, cheddar, lettuce and tomato on a brioche bun",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"cheddar\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "brioche is an enriched bread",
+          "source": "11 §4.2"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"brioche bun\" is an enriched bread made with eggs",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"brioche bun\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"brioche bun\"",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "a burger bun can carry a sesame topping",
+          "source": "11 §11.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Beef patty\" and \"bacon\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Beef patty\" and \"bacon\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "BLT",
+      "description": "Bacon, lettuce and tomato with mayo on toasted white bread",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"mayo\"",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"toasted white bread\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"toasted white bread\"",
+          "source": "11 §7.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise often carries mustard",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Bacon\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Bacon\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Club Sandwich",
+      "description": "Turkey, bacon, fried egg, lettuce, tomato and mayo on toasted bread",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"fried egg\" and \"mayo\"",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"toasted bread\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"toasted bread\"",
+          "source": "11 §7.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise and aioli sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Turkey\" and \"bacon\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Turkey\" and \"bacon\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Philly Cheesesteak",
+      "description": "Sliced ribeye, onions, peppers and provolone on a hoagie roll",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"provolone\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"provolone\"",
+          "source": "11 §4.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"hoagie roll\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"hoagie roll\"",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "rolls can carry sesame seeds",
+          "source": "11 §11.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"ribeye\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"ribeye\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Fish & Chips",
+      "description": "Beer-battered cod with fries, tartar sauce and malt vinegar",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"tartar sauce\" is mayonnaise-based",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Beer-battered\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"malt vinegar\" and beer batter",
+          "source": "11 §7.1"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"cod\"",
+          "source": "11 §8.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "tartar sauce often carries mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "beer and vinegar are sulphite sources",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"tartar sauce\" is mayonnaise-based",
+          "source": "11 §5.1"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"cod\"",
+          "source": "11 §8.1"
+        }
+      }
+    },
+    {
+      "name": "Shrimp Basket",
+      "description": "Breaded popcorn shrimp with fries, fried in the same oil as our breaded chicken and shrimp, and cocktail sauce",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "the text says the oil is shared with buttermilk chicken",
+          "source": "12 §5"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "breaded coatings are usually egg-bound",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Breaded\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Breaded\"",
+          "source": "11 §7.1"
+        },
+        "crustaceans": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"shrimp\"",
+          "source": "11 §9.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "prawns are a sulphite source",
+          "source": "11 §9.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"shrimp\"",
+          "source": "11 §9.1"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"shrimp\"",
+          "source": "11 §9.1"
+        }
+      }
+    },
+    {
+      "name": "Mac & Cheese",
+      "description": "Elbow pasta baked in cheddar cream sauce with a breadcrumb top",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"cheddar cream sauce\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "cream sauce",
+          "source": "11 §4.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"pasta\" and \"breadcrumb\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"pasta\" and \"breadcrumb\"",
+          "source": "11 §7.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "no celery ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §12"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"cheddar cream sauce\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Chicken Noodle Soup",
+      "description": "Chicken broth, egg noodles, carrots and celery",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"egg noodles\"",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"noodles\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"noodles\"",
+          "source": "11 §7.1"
+        },
+        "celery": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"celery\"",
+          "source": "11 §12.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Chicken\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Chicken\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "New England Clam Chowder",
+      "description": "Clams, potato and cream with oyster crackers",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"cream\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"cream\"",
+          "source": "11 §4.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"oyster crackers\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"oyster crackers\"",
+          "source": "11 §7.1"
+        },
+        "molluscs": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Clams\"",
+          "source": "11 §10.1"
+        },
+        "celery": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "chowder bases and stocks are celery vectors",
+          "source": "11 §12.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"cream\"",
+          "source": "11 §3.1"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"Clams\"",
+          "source": "11 §10.1"
+        }
+      }
+    },
+    {
+      "name": "Pancake Stack",
+      "description": "Three buttermilk pancakes with butter and maple syrup",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"buttermilk\" and \"butter\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"buttermilk\"",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "pancake batter normally contains egg",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"pancakes\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"pancakes\"",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"buttermilk\" and \"butter\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Fluffy Western Omelette",
+      "description": "Three eggs whisked with a splash of pancake batter, ham, peppers and cheddar, with home fries and toast",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"cheddar\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"cheddar\"",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"eggs\"",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "hidden",
+          "evidence": "\"pancake batter\" is added to the eggs",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "hidden",
+          "evidence": "\"pancake batter\" is added to the eggs",
+          "source": "11 §7.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"ham\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"ham\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Eggs Benedict",
+      "description": "Poached eggs and Canadian bacon on an English muffin with hollandaise",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "hollandaise is made with butter",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "hollandaise is made with butter",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Poached eggs\" and \"hollandaise\"",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"English muffin\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"English muffin\"",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Canadian bacon\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Canadian bacon\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Caesar Salad",
+      "description": "Romaine, parmesan, croutons and Caesar dressing",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"parmesan\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "parmesan is a hard cheese",
+          "source": "11 §4.3"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "Caesar dressing is made with egg",
+          "source": "12 §5"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"croutons\"",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"croutons\"",
+          "source": "11 §7.2"
+        },
+        "fish": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "Caesar dressing often carries anchovy",
+          "source": "11 §8.2"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "Caesar dressing lists mustard",
+          "source": "12 §5"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"parmesan\"",
+          "source": "11 §3.1"
+        },
+        "vegetarian": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "fish/shellfish: Caesar dressing often carries anchovy",
+          "source": "11 §8.2"
+        }
+      }
+    },
+    {
+      "name": "Cobb Salad",
+      "description": "Chicken, bacon, avocado, blue cheese, hard-boiled egg and ranch dressing",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"blue cheese\" and ranch",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"blue cheese\" and ranch",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"hard-boiled egg\"",
+          "source": "11 §5.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "salad dressings are a documented mustard source",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Chicken\" and \"bacon\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Chicken\" and \"bacon\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Texas Chili",
+      "description": "Beef and kidney bean chili with cheddar and sour cream",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "peanut butter is used to thicken chili",
+          "source": "11 §1.2"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"cheddar\" and \"sour cream\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"cheddar\" and \"sour cream\"",
+          "source": "11 §4.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"kidney bean\"",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Beef\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Beef\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Onion Rings",
+      "description": "Beer-battered rings, cooked in the same fryer as our fish and chicken",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "the text says the oil is shared with buttermilk chicken",
+          "source": "12 §5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "the text says the oil is shared with buttermilk chicken",
+          "source": "12 §5"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Beer-battered\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Beer-battered\"",
+          "source": "11 §7.1"
+        },
+        "fish": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "the text says the oil is shared with fish",
+          "source": "11 §8.4"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "beer is a sulphite source",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: the text says the oil is shared with buttermilk chicken",
+          "source": "12 §5"
+        },
+        "vegetarian": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "fish/shellfish: the text says the oil is shared with fish",
+          "source": "11 §8.4"
+        }
+      }
+    },
+    {
+      "name": "French Fries",
+      "description": "Hand-cut fries, fried in the same oil as our breaded chicken and shrimp",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "the text says the oil is shared with buttermilk chicken",
+          "source": "12 §5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "the text says the oil is shared with buttermilk chicken",
+          "source": "12 §5"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "the text says the oil is shared with breaded foods",
+          "source": "11 §7.4"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "the text says the oil is shared with breaded foods",
+          "source": "11 §7.4"
+        },
+        "crustaceans": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "the text says the oil is shared with shrimp",
+          "source": "11 §9.4"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "no celery ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §12"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: the text says the oil is shared with buttermilk chicken",
+          "source": "12 §5"
+        },
+        "vegetarian": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "fish/shellfish: the text says the oil is shared with shrimp",
+          "source": "11 §9.4"
+        }
+      }
+    },
+    {
+      "name": "Coleslaw",
+      "description": "Cabbage and carrot in a creamy mayo dressing",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"mayo\"",
+          "source": "11 §5.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise dressings often carry mustard",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"mayo\"",
+          "source": "11 §5.1"
+        }
+      }
+    },
+    {
+      "name": "Warm Apple Pie",
+      "description": "Apple pie a la mode",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"a la mode\" means with ice cream",
+          "source": "11 §4.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "ice cream",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "pastry is often glazed with egg wash",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "pie crust",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "pie crust",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"a la mode\" means with ice cream",
+          "source": "11 §4.1"
+        }
+      }
+    },
+    {
+      "name": "Chocolate Milkshake",
+      "description": "Ice cream, whole milk and chocolate syrup",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Ice cream\" and \"whole milk\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"whole milk\"",
+          "source": "11 §4.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"Ice cream\" and \"whole milk\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Peanut Butter Pie",
+      "description": "Creamy peanut butter filling in a chocolate cookie crust",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"peanut butter\"",
+          "source": "11 §1.1"
+        },
+        "milk": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "a creamy filling is usually made with cream cheese or cream",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "a creamy filling is usually made with cream cheese or cream",
+          "source": "11 §4.2"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "baked pies are commonly egg-bound",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"cookie crust\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"cookie crust\"",
+          "source": "11 §7.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "peanuts is a legume: \"peanut butter\"",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "animal-derived: a creamy filling is usually made with cream cheese or cream",
+          "source": "11 §3.2"
+        }
+      }
+    },
+    {
+      "name": "Iced Tea",
+      "description": "",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "free",
+          "evidence": "tea and ice; cross-contact not assessed",
+          "source": "11 §1"
+        },
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "milk": {
+          "label": "free",
+          "evidence": "tea and ice; cross-contact not assessed",
+          "source": "11 §3"
+        }
+      }
+    },
+    {
+      "name": "Coffee",
+      "description": "Bottomless refills",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "free",
+          "evidence": "black coffee; cross-contact not assessed",
+          "source": "11 §5"
+        },
+        "wheat": {
+          "label": "free",
+          "evidence": "black coffee; cross-contact not assessed",
+          "source": "11 §7"
+        }
+      }
+    }
+  ]
+}
