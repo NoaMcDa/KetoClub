@@ -1,0 +1,846 @@
+{
+  "_fixture_note": "synthetic Israeli seafood grill written for the corpus from 11 §8-10 and 12 §1.7; labels are unreviewed desk research; Hebrew",
+  "language": "he",
+  "dishes": [
+    {
+      "name": "דניס בגריל",
+      "description": "דניס שלם בגריל עם שמן זית, לימון ועשבי תיבול",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "grilled fish with olive oil, lemon and herbs; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"דניס\" (sea bream)",
+          "source": "12 §1.7"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"דניס\" (sea bream)",
+          "source": "12 §1.7"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"דניס\" (sea bream)",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "פילה סלמון בגלייז",
+      "description": "פילה סלמון בתנור בגלייז סויה־דבש וסומסום",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"סויה\"",
+          "source": "12 §1.11"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy sauce is brewed with wheat",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy sauce is brewed with wheat",
+          "source": "12 §1.4"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"סלמון\"",
+          "source": "12 §1.7"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"סומסום\" (a spelling of שומשום)",
+          "source": "12 §1.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"סויה\"",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"דבש\" (honey) is not vegan",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"סלמון\"",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "לברק בחמאת לימון",
+      "description": "פילה לברק צרוב ברוטב חמאה ולימון",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"חמאה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"לברק\" (sea bass)",
+          "source": "12 §1.7"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"חמאה\"",
+          "source": "12 §1.5"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"לברק\" (sea bass)",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "סרדינים בגריל",
+      "description": "סרדינים טריים בגריל עם פטרוזיליה ולימון",
+      "options": [],
+      "labels": {
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"סרדינים\"",
+          "source": "11 §8.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"סרדינים\"",
+          "source": "11 §8.1"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"סרדינים\"",
+          "source": "11 §8.1"
+        }
+      }
+    },
+    {
+      "name": "פיש אנד צ׳יפס",
+      "description": "דג פריך בציפוי בירה עם צ׳יפס ורוטב טרטר",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"טרטר\" is mayonnaise-based",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"בציפוי בירה\": beer batter is wheat flour",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "beer is brewed from barley malt",
+          "source": "11 §7.1"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"דג\"",
+          "source": "12 §1.7"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "tartar sauce often carries mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "beer is a sulphite source",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"טרטר\" is mayonnaise-based",
+          "source": "12 §1.6"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"דג\"",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "שרימפס בשום ויין",
+      "description": "שרימפס מוקפצים בשום, חמאה ויין לבן",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"חמאה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
+        },
+        "crustaceans": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"שרימפס\"",
+          "source": "12 §1.7"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"יין לבן\" and prawns are both sulphite sources",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"חמאה\"",
+          "source": "12 §1.5"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"שרימפס\"",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "קלמרי מטוגן",
+      "description": "טבעות קלמרי בציפוי קמח, מוגש עם איולי ולימון",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי\"",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קמח\" (flour)",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קמח\" (flour)",
+          "source": "12 §1.4"
+        },
+        "molluscs": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קלמרי\" (squid)",
+          "source": "12 §1.7"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "no celery ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §12"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "aioli often carries mustard",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"איולי\"",
+          "source": "12 §1.6"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"קלמרי\" (squid)",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "מולים ביין לבן",
+      "description": "מולים מאודים ברוטב יין לבן, שום ופטרוזיליה",
+      "options": [],
+      "labels": {
+        "molluscs": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"מולים\" (mussels)",
+          "source": "12 §1.7"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"יין לבן\"",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"מולים\" (mussels)",
+          "source": "12 §1.7"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"מולים\" (mussels)",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "פירות ים בשמנת",
+      "description": "פירות ים ברוטב שמנת על ספגטי",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"שמנת\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"שמנת\"",
+          "source": "12 §1.5"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ספגטי\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ספגטי\"",
+          "source": "12 §1.4"
+        },
+        "fish": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "seafood sauces use fish stock",
+          "source": "11 §9.2"
+        },
+        "crustaceans": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"פירות ים\" means shellfish",
+          "source": "12 §1.7"
+        },
+        "molluscs": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"פירות ים\" means shellfish",
+          "source": "12 §1.7"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"שמנת\"",
+          "source": "12 §1.5"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"פירות ים\" means shellfish",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "פאייה פירות ים",
+      "description": "אורז ספרדי עם שרימפס, קלמרי, מולים ופפריקה מעושנת",
+      "options": [],
+      "labels": {
+        "fish": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "paella rice is cooked in fish stock",
+          "source": "11 §9.2"
+        },
+        "crustaceans": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"שרימפס\"",
+          "source": "12 §1.7"
+        },
+        "molluscs": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קלמרי\" and \"מולים\"",
+          "source": "12 §1.7"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "prawns are a sulphite source",
+          "source": "11 §9.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"שרימפס\"",
+          "source": "12 §1.7"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"שרימפס\"",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "חריימה",
+      "description": "דג חריף ברוטב עגבניות ופלפלים בסגנון טריפולי",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"חריימה\" is fish in red sauce",
+          "source": "12 §1.7"
+        },
+        "crustaceans": {
+          "label": "may_contain",
+          "role": "unknown",
+          "evidence": "a seafood version of חריימה exists",
+          "source": "12 §1.7"
+        },
+        "molluscs": {
+          "label": "may_contain",
+          "role": "unknown",
+          "evidence": "a seafood version of חריימה exists",
+          "source": "12 §1.7"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"חריימה\" is fish in red sauce",
+          "source": "12 §1.7"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"חריימה\" is fish in red sauce",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "קציצות דג",
+      "description": "קציצות דג לבן ברוטב עגבניות חריף",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "patties are bound with egg",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "fish cakes are bound with bread or flour",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "fish cakes are bound with bread or flour",
+          "source": "12 §1.4"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"דג\"",
+          "source": "12 §1.7"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"דג\"",
+          "source": "12 §1.7"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"דג\"",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "גפילטע פיש",
+      "description": "כדורי דג מסורתיים בציר ירקות עם חזרת",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "gefilte fish is bound with egg",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "gefilte fish is bound with matzo meal",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "gefilte fish is bound with matzo meal",
+          "source": "12 §1.4"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"דג\"",
+          "source": "12 §1.7"
+        },
+        "celery": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "\"ציר ירקות\" is a vegetable broth",
+          "source": "12 §1.9"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"דג\"",
+          "source": "12 §1.7"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"דג\"",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "מרק דגים",
+      "description": "מרק דגים חם עם ירקות שורש ועשבי תיבול",
+      "options": [],
+      "labels": {
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"דגים\"",
+          "source": "12 §1.7"
+        },
+        "celery": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "soups and stocks are celery vectors",
+          "source": "12 §1.9"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"דגים\"",
+          "source": "12 §1.7"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"דגים\"",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "סלט יווני",
+      "description": "עגבנייה, מלפפון, זיתים, בצל וגבינה בולגרית",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינה בולגרית\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "brined fresh cheese",
+          "source": "11 §4.1"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "a vegetable and cheese salad; cross-contact not assessed",
+          "source": "11 §8"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "no celery ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §12"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"גבינה בולגרית\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "סלט קיסר שרימפס",
+      "description": "חסה, שרימפס, קרוטונים, פרמזן ורוטב קיסר",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"פרמזן\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "parmesan is a hard cheese",
+          "source": "11 §4.3"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "Caesar dressing is made with egg",
+          "source": "12 §5"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"קרוטונים\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"קרוטונים\"",
+          "source": "12 §1.4"
+        },
+        "fish": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "\"רוטב קיסר\" often carries anchovy",
+          "source": "12 §1.7"
+        },
+        "crustaceans": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"שרימפס\"",
+          "source": "12 §1.7"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "Caesar dressing lists mustard",
+          "source": "12 §5"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "prawns are a sulphite source",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"פרמזן\"",
+          "source": "12 §1.5"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"שרימפס\"",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "צ׳יפס",
+      "description": "צ׳יפס מטוגן בשמן נפרד מהדגים",
+      "options": [],
+      "labels": {
+        "fish": {
+          "label": "free",
+          "evidence": "the text says the chips are fried in separate oil; cross-contact not assessed",
+          "source": "11 §8.4"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "chips from pre-cut potato may be sulphite-treated",
+          "source": "11 §15.2"
+        }
+      }
+    },
+    {
+      "name": "מבחר סלטים",
+      "description": "חומוס, טחינה, סלט חצילים, סלק וכרוב",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "the eggplant and cabbage salads may come in mayonnaise",
+          "source": "12 §1.6"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"טחינה\" and \"חומוס\"",
+          "source": "12 §1.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חומוס\"",
+          "source": "12 §1.3"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "animal-derived: the eggplant and cabbage salads may come in mayonnaise",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "לחם מהתנור",
+      "description": "",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחם\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחם\"",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "bread can carry a seed topping",
+          "source": "11 §11.2"
+        }
+      }
+    },
+    {
+      "name": "מלבי",
+      "description": "מלבי חלב עם סירופ ורדים, שקדים ופיסטוק",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"שקדים\" and \"פיסטוק\"",
+          "source": "12 §1.2"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חלב\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חלב\"",
+          "source": "11 §4.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"חלב\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "יין לבן (כוס)",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "a glass of wine; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "wine is a sulphite source",
+          "source": "11 §15.2"
+        }
+      }
+    }
+  ]
+}

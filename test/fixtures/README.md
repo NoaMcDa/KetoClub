@@ -161,3 +161,7 @@ from.
 ## Keto-only baseline (`keto_baseline/`)
 
 Hand-edited outputs `test/architecture/keto_unchanged_test.dart` compares the keto-only app against, with no regeneration switch on purpose; see `keto_baseline/README.md`.
+
+## Allergen safety corpus (`allergens/`)
+
+Labelled menus for measuring engine recall per restriction (ALG-10, issue #352): over half Hebrew, a `contains` / `may_contain` / `free` label per restriction per dish, each with evidence and a citation of a section of the desk-research documents 11 and 12. **The labels are unreviewed desk research**, not clinical truth. Five menus are copies of fixtures above and of the golden hand-built menus; twelve are synthetic. `allergens/README.md` has the schema, the label rules and how to add a menu; `test/utils/allergens/corpus_shape_test.dart` checks the shape. No test replays an engine over it yet.
