@@ -953,7 +953,7 @@ no physical device has exercised it (`HANDOFF.md`).
 |---|---|---|---|
 | `InstallIdStore` | `shared_preferences` | a random 32-hex-character anonymous install id (D12), generated on first use, never in a constructor | until the app's storage is cleared |
 | `MenuCache` | `hive` | `venueRef → {menu, analysis, fetchedAt, engine}`; the analysis also records the options it was made under (net-carb limit, dietary constraints; issue #57) | 24 h for the menu; analysis kept as long as the menu it was computed from, and reused by `MenuController` only for an unchanged menu, an AI result, consent still given and matching options |
-| `SettingsStore` | `shared_preferences` | UI language, filter defaults, consent flag, last venue, appearance, net-carb limit (2–25 g, default 6), dietary toggles (seed-oil free, dairy-free, carnivore only; all off by default, a missing key reads as off) | until cleared |
+| `SettingsStore` | `shared_preferences` | UI language, filter defaults, consent flag, last venue, appearance, net-carb limit (2–25 g, default 6), dietary toggles (seed-oil free, dairy-free, carnivore only; all off by default, a missing key reads as off), the Banto restriction profile (`dietaryProfile`, written only when non-empty; a missing or unreadable value reads as empty; D26) | until cleared |
 | `VisitHistoryStore` | `hive` (`menu_history` box) | one `VisitEntry` per `VenueRef` opened on this device (D23): the name and city it was shown under, first and last opened, open count, and the dish count, score and green/yellow counts it last had | until the row is removed or Settings clears saved menus |
 
 The install id is unlinkable to a person (D8 stays true in spirit) and is sent
@@ -3051,6 +3051,75 @@ vocabulary that pins the matcher before the groups are filled;
 `backend/app/keto/allergens.py` replays it, and its packaged copy is pinned
 byte-equal. Nothing consults the matcher yet (ALG-04 will); no keto golden
 changed.
+
+**The dietary profile and the flagged "My restrictions" section (ALG-02a,
+#344).** `lib/models/dietary_profile.dart` holds the profile: a
+`DietaryProfile` of `ProfileEntry`s, one per `RestrictionId`, in the order
+added, each with at most five free-text exceptions of at most 60 code points
+(trimmed, de-duplicated). It has no severity field, and "does it hold a strict
+entry" is the `hasStrictEntry` extension in
+`lib/utils/dietary_profile_strictness.dart`, which reads the kind from the
+taxonomy, because a model may not import `utils/` and storing the kind on the
+entry would copy the taxonomy. `AppSettings.profile` keeps it in
+`SettingsStore` (§6.4) under the JSON key `dietaryProfile`, read tolerantly
+(absent, not a list, unknown ids and repeats are dropped or read as empty,
+never invalidating the record) and **written only when non-empty**, so a
+keto-only install's stored settings and `const AppSettings().toJson()` (pinned
+by `keto_unchanged_test`) are byte-identical; `AppSettings.toString` prints
+only the entry count. `settings_store.dart` is the one allowlisted file in
+`no_profile_on_the_wire_test`: storage on the device is where C1 puts the
+profile, and the file builds no request. `SettingsController` gains
+`addRestriction`, `removeRestriction` and `setExceptions`. With `bantoMode`
+on, `SettingsScreen` shows a "My restrictions" section between Appearance and
+"Your keto rules": the helper-tool sentence, one row per entry (the name in
+the UI language, its kind, a remove button) or an empty state, and "Add
+restriction", which opens `RestrictionPickerSheet` (the taxonomy grouped by
+kind, strict kinds first, each with the official allergen lists that name it;
+keto and added ids left out; the app sheet width). Keto stays the existing
+toggles, and nothing reads the profile for classification yet
+(`ClassificationOptions` is unchanged; Wave 2 does that).
+
+**The Wave 2 contract (W2-0, #345, #346).** `lib/models/concern.dart` holds
+the wire types the allergen engine will fill: `Concern {restrictionId,
+source, certainty, tier, matchedText?, waiterQuestion?}` and
+`ExtractedIngredient {name, certainty, role}`, over `ConcernSource` (name,
+description, option, hidden, model), `Certainty` (stated, likely, suspected:
+the vocabulary's `TriggerCertainty` names, which a model may not import, so a
+trigger converts by name and a test pins the two equal), `EvidenceTier`
+(declared, stated, inferred, suspected, confirmed, denied; ALG-06) and
+`ComponentRole` (base, protein, side, sauce, garnish, option, unknown). Each
+reads tolerantly: an unknown enum name fails the entry and the list drops it,
+except an unknown role, which reads as `unknown` so an ingredient is never
+lost over it. `AnalysedDish` gains `ingredients` and `concerns` (absent →
+empty, written only when non-empty) and `ClassificationOptions` and
+`AnalysisOptionsSnapshot` gain `restrictionsRequested` (the snapshot key
+written only when true, part of `matches`); `fromSettings` leaves it false and
+nothing produces a concern yet. `backend/app/keto/models.py` mirrors all of
+it, omitting the same keys through a `model_serializer`. Per C3 there is no
+`schemaVersion` bump, and no golden or keto baseline changed.
+
+**The profile-only chef card (ALG-08a, #350).** With `bantoMode` on and a
+non-empty profile, the "My restrictions" section gains a "Show my chef card"
+button that pushes `ChefCardScreen`: a full-screen page that mirrors the Waiter
+Card's shell (brightness raised through `ScreenBrightness` while open, the
+numbered large-type lines and Copy button of `WaiterScriptWidget`, a pinned
+Done) and adds a Hebrew/English toggle, starting in the app's language, and
+Share as text through `MenuSharer`. `SettingsScreen` takes `screenBrightness`
+and `menuSharer` for it; `generateRoute` passes the app's. Its sentences come
+from `ChefCardText.compose` (`lib/utils/allergens/chef_card_templates.dart`),
+pure and in the language of the card, not the UI's, so like the waiter
+templates they live in Dart (§6.3's exception, §12) and only the chrome (title,
+button, empty message, toggle accessibility label) is in ARB: an intro line,
+one line per entry by kind (an allergen "please check every ingredient,
+including sauces, oils and garnishes", celiac its own gluten and cross-contact
+sentence, every flexible kind "please tell me which dishes contain it", the
+entry's exceptions appended to its line) and a closing line that asks the
+kitchen to confirm cross-contact precautions when the profile holds a strict
+entry. The card states what the person is and asks; it never says "safe" or
+"בטוח" (a table test pins every restriction in both languages), and no
+severity exists to vary it. The card needs no menu and sends nothing anywhere
+(C1). The per-dish card with a dish's name, modification and questions, and the
+cross-contact closing line driven by ALG-07 signals, are ALG-08b.
 
 ---
 

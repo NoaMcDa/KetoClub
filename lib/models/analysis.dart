@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 
@@ -200,6 +201,8 @@ final class AnalysedDish {
     this.modification,
     this.netCarbsEstimate,
     this.hiddenCarbs = const <HiddenCarb>[],
+    this.ingredients = const <ExtractedIngredient>[],
+    this.concerns = const <Concern>[],
   });
 
   /// Reads a verdict written by [toJson].
@@ -209,7 +212,10 @@ final class AnalysedDish {
   /// non-modifiable verdict that carries one — and never throws. An
   /// absent or null `hiddenCarbs` reads as empty (a dish cached before
   /// issue #213 has none); a malformed entry in the list is dropped
-  /// silently (architecture.md §9.4).
+  /// silently (architecture.md §9.4). `ingredients` and `concerns` (D26
+  /// W2-0) are read the same way: absent, null or not a list reads as
+  /// empty, and an entry [ExtractedIngredient.tryFromJson] or
+  /// [Concern.tryFromJson] rejects is dropped.
   static AnalysedDish? tryFrom(Map<String, Object?> json) {
     final dishId = json['dishId'];
     final name = json['name'];
@@ -250,7 +256,29 @@ final class AnalysedDish {
       modification: modification,
       netCarbsEstimate: netCarbsEstimate,
       hiddenCarbs: hiddenCarbs,
+      ingredients: _tolerantList(
+        json['ingredients'],
+        ExtractedIngredient.tryFromJson,
+      ),
+      concerns: _tolerantList(json['concerns'], Concern.tryFromJson),
     );
+  }
+
+  /// Each map in [raw] that [read] accepts, in order; empty when [raw] is
+  /// not a list. Never throws.
+  static List<T> _tolerantList<T>(
+    Object? raw,
+    T? Function(Map<String, Object?> json) read,
+  ) {
+    final kept = <T>[];
+    if (raw is! List<Object?>) return kept;
+    for (final entry in raw) {
+      if (entry is Map<String, Object?>) {
+        final value = read(entry);
+        if (value != null) kept.add(value);
+      }
+    }
+    return kept;
   }
 
   /// Links back to the dish this verdict is about ([Dish.id] in the
@@ -283,7 +311,23 @@ final class AnalysedDish {
   /// was demoted to yellow by the parser.
   final List<HiddenCarb> hiddenCarbs;
 
+  /// The ingredients a model read or inferred in the dish, whatever
+  /// anyone's profile (Banto; ALG-03, D26 C1). Empty when nothing
+  /// extracted them, which today is always. Callers must not mutate the
+  /// list passed to the constructor.
+  final List<ExtractedIngredient> ingredients;
+
+  /// The restrictions the dish may hold, for every taxonomy id found
+  /// (Banto; ALG-04, ALG-06, D26 C1). Empty when nothing looked for them,
+  /// which today is always. Callers must not mutate the list passed to
+  /// the constructor.
+  final List<Concern> concerns;
+
   /// Writes a form [tryFrom] can read back.
+  ///
+  /// `ingredients` and `concerns` are written only when non-empty (D26
+  /// C3), so a keto analysis's JSON — every golden and every cached entry
+  /// — is byte-identical to the one written before they existed.
   Map<String, Object?> toJson() => <String, Object?>{
     'dishId': dishId,
     'name': name,
@@ -292,6 +336,10 @@ final class AnalysedDish {
     'modification': modification,
     'netCarbsEstimate': netCarbsEstimate,
     'hiddenCarbs': hiddenCarbs.map((h) => h.toJson()).toList(),
+    if (ingredients.isNotEmpty)
+      'ingredients': ingredients.map((i) => i.toJson()).toList(),
+    if (concerns.isNotEmpty)
+      'concerns': concerns.map((c) => c.toJson()).toList(),
   };
 
   @override
@@ -303,7 +351,9 @@ final class AnalysedDish {
       other.why == why &&
       other.modification == modification &&
       other.netCarbsEstimate == netCarbsEstimate &&
-      _listEquals(other.hiddenCarbs, hiddenCarbs);
+      _listEquals(other.hiddenCarbs, hiddenCarbs) &&
+      _listEquals(other.ingredients, ingredients) &&
+      _listEquals(other.concerns, concerns);
 
   @override
   int get hashCode => Object.hash(
@@ -314,6 +364,8 @@ final class AnalysedDish {
     modification,
     netCarbsEstimate,
     Object.hashAll(hiddenCarbs),
+    Object.hashAll(ingredients),
+    Object.hashAll(concerns),
   );
 
   @override
@@ -452,18 +504,21 @@ AnalysisEngine? _engineFrom(Map<String, Object?> json) {
 /// (architecture.md §5); `ClassificationOptions.snapshot` builds one.
 @immutable
 final class AnalysisOptionsSnapshot {
-  /// Creates a snapshot of a [netCarbLimitGrams] limit and
-  /// [dietaryConstraints].
+  /// Creates a snapshot of a [netCarbLimitGrams] limit,
+  /// [dietaryConstraints] and whether [restrictionsRequested].
   const new({
     required this.netCarbLimitGrams,
     this.dietaryConstraints = const <String>[],
+    this.restrictionsRequested = false,
   });
 
   /// Reads a snapshot written by [toJson].
   ///
   /// Returns null for any shape mismatch and never throws. An absent
   /// `dietaryConstraints` reads as none, so a snapshot written before
-  /// issue #56 fills that list still decodes.
+  /// issue #56 fills that list still decodes. `restrictionsRequested`
+  /// (D26 W2-0) is read tolerantly: anything but `true` reads as false,
+  /// so every snapshot written before it existed still decodes.
   static AnalysisOptionsSnapshot? tryFrom(Map<String, Object?> json) {
     final rawLimit = json['netCarbLimitGrams'];
     if (rawLimit is! int) return null;
@@ -479,6 +534,7 @@ final class AnalysisOptionsSnapshot {
     return AnalysisOptionsSnapshot(
       netCarbLimitGrams: rawLimit,
       dietaryConstraints: constraints,
+      restrictionsRequested: json['restrictionsRequested'] == true,
     );
   }
 
@@ -489,26 +545,42 @@ final class AnalysisOptionsSnapshot {
   /// must not mutate the list passed to the constructor.
   final List<String> dietaryConstraints;
 
+  /// Whether the analysis was asked for ingredients and restriction
+  /// concerns as well as keto verdicts (Banto; D26 C2): the mirror of
+  /// `ClassificationOptions.restrictionsRequested`. Part of [==], so a
+  /// cached analysis made without it is retired when it changes (C3).
+  final bool restrictionsRequested;
+
   /// Writes a form [tryFrom] can read back.
+  ///
+  /// `restrictionsRequested` is written only when true (D26 C2), so a
+  /// keto snapshot's JSON is byte-identical to the one written before it
+  /// existed.
   Map<String, Object?> toJson() => <String, Object?>{
     'netCarbLimitGrams': netCarbLimitGrams,
     'dietaryConstraints': dietaryConstraints,
+    if (restrictionsRequested) 'restrictionsRequested': true,
   };
 
   @override
   bool operator ==(Object other) =>
       other is AnalysisOptionsSnapshot &&
       other.netCarbLimitGrams == netCarbLimitGrams &&
-      _listEquals(other.dietaryConstraints, dietaryConstraints);
+      _listEquals(other.dietaryConstraints, dietaryConstraints) &&
+      other.restrictionsRequested == restrictionsRequested;
 
   @override
-  int get hashCode =>
-      Object.hash(netCarbLimitGrams, Object.hashAll(dietaryConstraints));
+  int get hashCode => Object.hash(
+    netCarbLimitGrams,
+    Object.hashAll(dietaryConstraints),
+    restrictionsRequested,
+  );
 
   @override
   String toString() =>
       'AnalysisOptionsSnapshot(limit: ${netCarbLimitGrams}g, '
-      'constraints: $dietaryConstraints)';
+      'constraints: $dietaryConstraints, '
+      'restrictions: $restrictionsRequested)';
 }
 
 /// The result of running a [Menu] through the classifier

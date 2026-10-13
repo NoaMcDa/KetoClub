@@ -518,6 +518,66 @@ abstract class AppLocalizations {
   /// **'Each rule you turn on applies from the next menu you open.'**
   String get settingsKetoRulesBody;
 
+  /// Banto (ALG-02a): the Settings section listing the user's dietary restrictions.
+  ///
+  /// In en, this message translates to:
+  /// **'My restrictions'**
+  String get settingsRestrictions;
+
+  /// No description provided for @settingsRestrictionsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You have not added a restriction yet.'**
+  String get settingsRestrictionsEmpty;
+
+  /// No description provided for @settingsRestrictionsAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add restriction'**
+  String get settingsRestrictionsAdd;
+
+  /// Tooltip and screen-reader label of a restriction row's remove button.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name}'**
+  String settingsRestrictionsRemove(String name);
+
+  /// No description provided for @restrictionKindAllergy.
+  ///
+  /// In en, this message translates to:
+  /// **'Allergy'**
+  String get restrictionKindAllergy;
+
+  /// The kind label of celiac disease (the gluten restriction).
+  ///
+  /// In en, this message translates to:
+  /// **'Autoimmune'**
+  String get restrictionKindAutoimmune;
+
+  /// No description provided for @restrictionKindIntolerance.
+  ///
+  /// In en, this message translates to:
+  /// **'Intolerance'**
+  String get restrictionKindIntolerance;
+
+  /// No description provided for @restrictionKindDiet.
+  ///
+  /// In en, this message translates to:
+  /// **'Diet'**
+  String get restrictionKindDiet;
+
+  /// One line under a restriction in the picker: which official allergen-labelling lists name it.
+  ///
+  /// In en, this message translates to:
+  /// **'{lists, select, usEu{On the US and EU allergen lists} us{On the US allergen list} eu{On the EU allergen list} other{Not on any official allergen list}}'**
+  String restrictionJurisdictionHint(String lists);
+
+  /// No description provided for @restrictionPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a restriction'**
+  String get restrictionPickerTitle;
+
   /// No description provided for @settingsSeedOilFree.
   ///
   /// In en, this message translates to:
@@ -2221,6 +2281,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your restriction profile stays on this device. When AI analysis is on, only the menu text and the keto settings are sent — never which restrictions you have.'**
   String get whatLeavesDeviceBanto;
+
+  /// Banto (ALG-08a): title of the full-screen chef card built from the dietary profile alone.
+  ///
+  /// In en, this message translates to:
+  /// **'Your chef card'**
+  String get chefCardTitle;
+
+  /// Banto (ALG-08a): the Settings button that opens the chef card.
+  ///
+  /// In en, this message translates to:
+  /// **'Show my chef card'**
+  String get chefCardShowButton;
+
+  /// Banto (ALG-08a): shown on the chef card page when the dietary profile is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a restriction in Settings and your chef card appears here.'**
+  String get chefCardEmpty;
+
+  /// Banto (ALG-08a): button that shares the chef card as text.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get chefCardShare;
+
+  /// Banto (ALG-08a): accessibility label of the Hebrew/English toggle on the chef card; the card text itself is in the chosen language.
+  ///
+  /// In en, this message translates to:
+  /// **'Card language'**
+  String get chefCardLanguageLabel;
 }
 
 class _AppLocalizationsDelegate

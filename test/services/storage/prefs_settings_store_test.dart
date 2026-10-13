@@ -1,6 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/dietary_profile.dart';
+import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -482,6 +484,133 @@ void main() {
       // Assert
       expect(result.lastFilter, isNull);
       expect(result.languageTag, equals('he'));
+    });
+  });
+
+  group('PrefsSettingsStore dietary profile (ALG-02a, issue #344)', () {
+    test('an install that stored settings before the profile existed reads '
+        'an empty profile and keeps every other field', () async {
+      // Arrange: no "dietaryProfile" key at all.
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        'flutter.ketoclub_settings':
+            '{"languageTag":"he","filter":"greenOnly",'
+            '"estimationConsentGiven":true,"lastVenue":null,'
+            '"seedOilFree":true}',
+      });
+      final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
+
+      // Act
+      final result = await store.read();
+
+      // Assert
+      expect(result.profile, DietaryProfile.empty);
+      expect(result.languageTag, 'he');
+      expect(result.seedOilFree, isTrue);
+    });
+
+    test(
+      'a malformed profile reads as empty without losing the record',
+      () async {
+        // Arrange
+        SharedPreferences.setMockInitialValues(<String, Object>{
+          'flutter.ketoclub_settings':
+              '{"languageTag":"en","filter":"all",'
+              '"estimationConsentGiven":false,"lastVenue":null,'
+              '"dietaryProfile":"sesame"}',
+        });
+        final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
+
+        // Act
+        final result = await store.read();
+
+        // Assert
+        expect(result.profile, DietaryProfile.empty);
+        expect(result.estimationConsentGiven, isFalse);
+      },
+    );
+
+    test('a stored profile drops an unknown id and keeps the rest', () async {
+      // Arrange
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        'flutter.ketoclub_settings':
+            '{"languageTag":null,"filter":"all",'
+            '"estimationConsentGiven":true,"lastVenue":null,'
+            '"dietaryProfile":[{"id":"buckwheat"},'
+            '{"id":"sesame","exceptions":["tahini dressing"]}]}',
+      });
+      final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
+
+      // Act
+      final result = await store.read();
+
+      // Assert
+      expect(
+        result.profile,
+        DietaryProfile.empty.withEntry(
+          RestrictionId.sesame,
+          exceptions: <String>['tahini dressing'],
+        ),
+      );
+    });
+
+    test('the default settings write no dietaryProfile key', () async {
+      // Arrange
+      final store = _buildStore();
+
+      // Act
+      await store.write(const AppSettings());
+      final prefs = await SharedPreferences.getInstance();
+
+      // Assert
+      expect(prefs.getString('ketoclub_settings'), isNot(contains('dietary')));
+    });
+
+    test('a non-empty profile is written under dietaryProfile', () async {
+      // Arrange
+      final store = _buildStore();
+      final settings = AppSettings(
+        profile: DietaryProfile.empty.withEntry(RestrictionId.peanuts),
+      );
+
+      // Act
+      await store.write(settings);
+      final prefs = await SharedPreferences.getInstance();
+
+      // Assert
+      expect(
+        prefs.getString('ketoclub_settings'),
+        contains('"dietaryProfile":[{"id":"peanuts","exceptions":[]}]'),
+      );
+    });
+
+    test('AppSettings.toString counts the entries and never names them', () {
+      // Arrange
+      final settings = AppSettings(
+        profile: DietaryProfile.empty
+            .withEntry(RestrictionId.sesame)
+            .withEntry(RestrictionId.milk),
+      );
+
+      // Act
+      final text = settings.toString();
+
+      // Assert
+      expect(text, contains('profile: 2 entries'));
+      expect(text, isNot(contains('sesame')));
+    });
+
+    test('copyWith replaces the profile and keeps it when omitted', () {
+      // Arrange
+      final profile = DietaryProfile.empty.withEntry(RestrictionId.soy);
+      final settings = const AppSettings().copyWith(profile: profile);
+
+      // Act
+      final kept = settings.copyWith(languageTag: 'he');
+
+      // Assert
+      expect(settings.profile, profile);
+      expect(kept.profile, profile);
+      expect(kept, isNot(const AppSettings(languageTag: 'he')));
     });
   });
 }

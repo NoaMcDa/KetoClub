@@ -98,6 +98,26 @@
   "settingsNetCarbLimitIncrease": "Raise the net carb limit",
   "settingsKetoRules": "Your keto rules",
   "settingsKetoRulesBody": "Each rule you turn on applies from the next menu you open.",
+  "settingsRestrictions": "My restrictions",
+  "@settingsRestrictions": { "description": "Banto (ALG-02a): the Settings section listing the user's dietary restrictions." },
+  "settingsRestrictionsEmpty": "You have not added a restriction yet.",
+  "settingsRestrictionsAdd": "Add restriction",
+  "settingsRestrictionsRemove": "Remove {name}",
+  "@settingsRestrictionsRemove": {
+    "description": "Tooltip and screen-reader label of a restriction row's remove button.",
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "restrictionKindAllergy": "Allergy",
+  "restrictionKindAutoimmune": "Autoimmune",
+  "@restrictionKindAutoimmune": { "description": "The kind label of celiac disease (the gluten restriction)." },
+  "restrictionKindIntolerance": "Intolerance",
+  "restrictionKindDiet": "Diet",
+  "restrictionJurisdictionHint": "{lists, select, usEu{On the US and EU allergen lists} us{On the US allergen list} eu{On the EU allergen list} other{Not on any official allergen list}}",
+  "@restrictionJurisdictionHint": {
+    "description": "One line under a restriction in the picker: which official allergen-labelling lists name it.",
+    "placeholders": { "lists": { "type": "String" } }
+  },
+  "restrictionPickerTitle": "Add a restriction",
   "settingsSeedOilFree": "Strict seed-oil free",
   "settingsSeedOilFreeHint": "Flags canola, sunflower and soybean oil in fried dishes.",
   "settingsDairyFree": "Dairy-free keto",
@@ -607,5 +627,16 @@
   "helperToolTitle": "A helper, not a guarantee",
   "@helperToolTitle": { "description": "Heading that sits above the helper-tool sentence." },
   "whatLeavesDeviceBanto": "Your restriction profile stays on this device. When AI analysis is on, only the menu text and the keto settings are sent — never which restrictions you have.",
-  "@whatLeavesDeviceBanto": { "description": "Plain statement of what leaves the device once restriction profiles exist; the profile never does." }
+  "@whatLeavesDeviceBanto": { "description": "Plain statement of what leaves the device once restriction profiles exist; the profile never does." },
+
+  "chefCardTitle": "Your chef card",
+  "@chefCardTitle": { "description": "Banto (ALG-08a): title of the full-screen chef card built from the dietary profile alone." },
+  "chefCardShowButton": "Show my chef card",
+  "@chefCardShowButton": { "description": "Banto (ALG-08a): the Settings button that opens the chef card." },
+  "chefCardEmpty": "Add a restriction in Settings and your chef card appears here.",
+  "@chefCardEmpty": { "description": "Banto (ALG-08a): shown on the chef card page when the dietary profile is empty." },
+  "chefCardShare": "Share",
+  "@chefCardShare": { "description": "Banto (ALG-08a): button that shares the chef card as text." },
+  "chefCardLanguageLabel": "Card language",
+  "@chefCardLanguageLabel": { "description": "Banto (ALG-08a): accessibility label of the Hebrew/English toggle on the chef card; the card text itself is in the chosen language." }
 }
