@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/menu_question.dart';
@@ -18,6 +19,7 @@ import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
+import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 import 'package:ketoclub/utils/venue_route.dart';
@@ -172,6 +174,10 @@ final class MenuController extends ChangeNotifier {
   /// The upload [open] last started, or an already-complete future when
   /// none has been; see [lastUpload].
   Future<void> _lastUpload = Future<void>.value();
+
+  /// The dietary profile the settings held when options were last built
+  /// ([_optionsFrom]); empty until then. Read by [evaluatedRows] only.
+  DietaryProfile _profile = DietaryProfile.empty;
 
   @override
   void dispose() {
@@ -544,6 +550,25 @@ final class MenuController extends ChangeNotifier {
   /// The sort key a dish with no page takes in [_byPage]: after every
   /// real page.
   static const int _unknownPageSortKey = 1 << 30;
+
+  /// Every analysed row of [visibleRows] with its on-device evaluation
+  /// for the settings' dietary profile (Banto, ALG-04b;
+  /// [ProfileEvaluator.evaluate]): the concerns that matter to the
+  /// profile and a [DishState]. A row with no analysis is left out. The
+  /// profile is the one recorded when the menu was last classified; it
+  /// never leaves the device (D26 C1). Nothing renders it yet (ALG-05),
+  /// and no other getter reads it.
+  List<({DishRow row, EvaluatedDish evaluated})> get evaluatedRows {
+    final profile = _profile;
+    return <({DishRow row, EvaluatedDish evaluated})>[
+      for (final row in visibleRows)
+        if (row.analysis case final analysed?)
+          (
+            row: row,
+            evaluated: ProfileEvaluator.evaluate(analysed, row.dish, profile),
+          ),
+    ];
+  }
 
   /// The categories that still have at least one row in [visibleRows], in
   /// menu order (issue #51's category jump) — the same order
@@ -1037,14 +1062,20 @@ final class MenuController extends ChangeNotifier {
   /// net-carb limit (issue #57), and the dietary constraints the three
   /// "Your keto rules" toggles switch on (issue #56), in the fixed order
   /// [ClassificationOptions.dietaryConstraintsFor] gives them.
-  ClassificationOptions _optionsFrom(AppSettings settings) =>
-      ClassificationOptions.fromSettings(
-        settings,
-        // The engine that picks up these options reports itself here, so
-        // [phase] can name it (issue #65). An observer only: it takes no
-        // part in [ClassificationOptions.matches] or equality.
-        onEngineStarted: _onEngineStarted,
-      );
+  ///
+  /// Also records [AppSettings.profile] for [evaluatedRows] (Banto,
+  /// ALG-04b): every path that classifies reads the settings here, so the
+  /// rows are evaluated against the profile the analysis was asked under.
+  ClassificationOptions _optionsFrom(AppSettings settings) {
+    _profile = settings.profile;
+    return ClassificationOptions.fromSettings(
+      settings,
+      // The engine that picks up these options reports itself here, so
+      // [phase] can name it (issue #65). An observer only: it takes no
+      // part in [ClassificationOptions.matches] or equality.
+      onEngineStarted: _onEngineStarted,
+    );
+  }
 
   /// [analysis], the one that arrived with the fetch of [menu], when
   /// [_reusableAnalysis] would reuse it had it been cached; else null.

@@ -7,9 +7,16 @@
 library;
 
 import 'package:flutter/foundation.dart';
+import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/utils/allergens/allergen_matcher.dart';
+import 'package:ketoclub/utils/allergens/vocabulary.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
+import 'package:ketoclub/utils/trigger_patterns.dart';
+
+export 'package:ketoclub/utils/trigger_patterns.dart';
 
 /// A compiled non-keto-base trigger: its dictionary key (for guard and
 /// label lookups) and the pattern that finds it in normalised text.
@@ -24,15 +31,6 @@ typedef _CompiledModifier = ({String key, RegExp pattern, String sentence});
 /// carb-only-dish rule blanks out to see what else a dish name says.
 typedef _Occurrence = ({int start, int end, String key, String sentence});
 
-/// Hebrew letters, including final forms — they are ordinary codepoints
-/// inside this range, not appended ones (`vocabulary_spec.md` "regex
-/// shape").
-const String _heLetters = 'א-ת';
-
-/// Grammatical prefix particles (ב/ה/ו/כ/ל/מ/ש) that may sit directly
-/// before a Hebrew trigger with no space, e.g. `הפסטה`, `בפסטה`.
-const String _hePrefixes = 'בהוכלמש';
-
 /// The entries where the permissive prefix lookbehind is unsafe: folded
 /// `חלה` also spells "began" (a common verb form), and `שמרים` with a מ
 /// prefix is `משמרים` ("preservatives", as in "ללא חומרים משמרים"), and
@@ -41,50 +39,6 @@ const String _hePrefixes = 'בהוכלמש';
 /// [hebrewTriggerPattern]'s `allowPrefix`. Applied to both
 /// [_compileBasesHe] and [_compileCarbHe].
 const Set<String> _noPrefixHebrewTriggers = <String>{'חלה', 'שמרים', 'הפוך'};
-
-/// Builds a Hebrew trigger pattern for one already-normalised trigger.
-///
-/// Public so `utils/dish_kind.dart` (D21) matches category headings and
-/// dish names with the same boundary rule as the classifier; there is one
-/// Hebrew word-boundary in this codebase. Permissive on the left when
-/// [allowPrefix] is true (ב/ה/ו/כ/ל/מ/ש are grammatical particles, so
-/// `הפסטה` and `בפסטה` must match), strict on the right always (a suffix
-/// means a different word, so folded `לחמ` must not match inside
-/// `לחמנייה`).
-///
-/// [allowInflection] appends an optional Hebrew plural/construct suffix.
-/// It is safe only on consonant-final stems and is not turned on by any
-/// entry in `constants.dart` today, because every inflected form that
-/// vocabulary needs is already its own explicit dictionary key; the
-/// parameter exists so a future trigger can opt in without changing this
-/// function's shape.
-///
-/// **Dart's `\b` is ASCII-only** — `RegExp(r'\bפסטה\b')` matches nothing
-/// at all, with or without `unicode: true`, because a Hebrew letter is a
-/// non-word character to the regex engine, so no `\b` boundary ever
-/// exists beside one. This function's lookaround, built on the Hebrew
-/// letter range directly, is the fix.
-RegExp hebrewTriggerPattern(
-  String normalisedTrigger, {
-  bool allowInflection = false,
-  bool allowPrefix = true,
-}) {
-  final prefix = allowPrefix ? '[$_hePrefixes]{0,2}' : '';
-  final inflection = allowInflection ? '(?:ימ|ות|יות|י|ית)?' : '';
-  return RegExp(
-    '(?<![$_heLetters])$prefix'
-    '${RegExp.escape(normalisedTrigger)}$inflection'
-    '(?![$_heLetters])',
-  );
-}
-
-/// Builds a Latin trigger pattern with a plain, case-insensitive word
-/// boundary, for one already-normalised trigger. Never loosened to a
-/// substring match: `toasted almonds` and `Sacramento tomato salad` would
-/// turn red if it were. Public for the same reason as
-/// [hebrewTriggerPattern].
-RegExp latinTriggerPattern(String normalisedTrigger) =>
-    RegExp('\\b${RegExp.escape(normalisedTrigger)}\\b', caseSensitive: false);
 
 /// Compiles [nonKetoBasesEn], normalising each key at compile time so a
 /// human-readable, correctly-spelled `constants.dart` still matches
@@ -404,6 +358,81 @@ bool _listEquals<T>(List<T> a, List<T> b) {
   return true;
 }
 
+/// The Hebrew maqaf, U+05BE. [AllergenMatcher] reads it as a space; the
+/// removal check here does the same, so "ללא־שומשום" is a removal value
+/// for the allergen pass as it is for [AllergenMatcher.findInDish].
+const String _maqaf = '־';
+
+/// [Certainty] by name from a matcher hit's [TriggerCertainty]; the two
+/// enums share their names (a test in `concern_test.dart` pins it).
+Certainty _certaintyOf(TriggerCertainty certainty) =>
+    Certainty.values.byName(certainty.name);
+
+/// How much stronger [a] is than [b]: positive when [a] is the surer one
+/// (stated > likely > suspected).
+int _compareCertainty(Certainty a, Certainty b) => b.index.compareTo(a.index);
+
+/// The slice of [raw] that produced the span [start]-[end] of
+/// `AllergenMatcher.matchText(raw)` (ALG-04b): the menu's own spelling,
+/// case, points and prefix letters, which the UI shows and the waiter
+/// sentence names.
+///
+/// The match text of a prefix of [raw] is a prefix of the match text of
+/// [raw] (every normalising step is local; leading and trailing non-letter
+/// runs are trimmed, never moved), and its length never shrinks as the
+/// prefix grows, so each end is found by a binary search for the shortest
+/// raw prefix whose match text reaches it. A start that lands on the low
+/// half of a surrogate pair steps back over the high half.
+String _rawSlice(String raw, int start, int end) {
+  int shortestPrefixReaching(int length) {
+    var low = 0;
+    var high = raw.length;
+    while (low < high) {
+      final mid = (low + high) ~/ 2;
+      if (AllergenMatcher.matchText(raw.substring(0, mid)).length >= length) {
+        high = mid;
+      } else {
+        low = mid + 1;
+      }
+    }
+    return low;
+  }
+
+  var rawStart = shortestPrefixReaching(start + 1) - 1;
+  if (rawStart > 0 &&
+      _isLowSurrogate(raw.codeUnitAt(rawStart)) &&
+      _isHighSurrogate(raw.codeUnitAt(rawStart - 1))) {
+    rawStart--;
+  }
+  final rawEnd = shortestPrefixReaching(end);
+  if (rawStart < 0 || rawEnd <= rawStart) {
+    // Unreachable for a span the matcher reported; the normalised slice
+    // is the honest fallback.
+    return AllergenMatcher.matchText(raw).substring(start, end);
+  }
+  return raw.substring(rawStart, rawEnd);
+}
+
+/// Whether [unit] is the high (leading) half of a UTF-16 surrogate pair.
+bool _isHighSurrogate(int unit) => unit >= 0xD800 && unit <= 0xDBFF;
+
+/// Whether [unit] is the low (trailing) half of a UTF-16 surrogate pair.
+bool _isLowSurrogate(int unit) => unit >= 0xDC00 && unit <= 0xDFFF;
+
+/// One [Concern] per allergen hit in [raw], found where [source] says.
+Iterable<Concern> _findingsIn(String raw, ConcernSource source) sync* {
+  for (final hit in AllergenMatcher.find(raw)) {
+    final lowered = hit.hidden || hit.guarded;
+    yield Concern(
+      restrictionId: hit.id,
+      source: hit.hidden ? ConcernSource.hidden : source,
+      certainty: _certaintyOf(hit.certainty),
+      tier: lowered ? EvidenceTier.inferred : EvidenceTier.stated,
+      matchedText: _rawSlice(raw, hit.start, hit.end),
+    );
+  }
+}
+
 /// Runs the bilingual heuristic vocabulary over one dish's text
 /// (`vocabulary_spec.md`; architecture.md §6.2).
 abstract final class ClassificationRules {
@@ -627,4 +656,51 @@ abstract final class ClassificationRules {
     TextNormaliser.normalise(rawText),
     [(_plantEn, _noGuards), (_plantHe, _noGuards)],
   );
+
+  /// Every allergen and diet trigger in [dish], one [Concern] per matcher
+  /// hit (ALG-04b), whatever anyone's profile (D26 C1): the name's hits,
+  /// then the description's, then each non-removal option value's, in the
+  /// matcher's order within each. Option group names are not read, and a
+  /// removal value ("No sesame", "ללא־שומשום") is skipped exactly as
+  /// [TextNormaliser.dishRulesText] skips it.
+  ///
+  /// Each part is matched on its own, so a [Concern.matchedText] is a
+  /// slice of that part as the menu printed it ("Tahini", "בטחינה"). The
+  /// source is [ConcernSource.hidden] for a hidden-list trigger, wherever
+  /// it sat, and the part's otherwise; the certainty is the hit's; the
+  /// tier is [EvidenceTier.stated] for a direct, unguarded trigger and
+  /// [EvidenceTier.inferred] for a hidden or a guarded one. The on-device
+  /// `ProfileEvaluator` reads this list whole, so a weaker finding in the
+  /// name is never hidden behind a stronger one in an option. Pure; never
+  /// throws.
+  static List<Concern> allergenFindings(Dish dish) => <Concern>[
+    ..._findingsIn(dish.name, ConcernSource.name),
+    ..._findingsIn(dish.description, ConcernSource.description),
+    for (final option in dish.options)
+      for (final value in option.values)
+        if (!TextNormaliser.isRemovalOptionValue(value.replaceAll(_maqaf, ' ')))
+          ..._findingsIn(value, ConcernSource.option),
+  ];
+
+  /// [allergenFindings] reduced to one [Concern] per restriction (ALG-04b),
+  /// in taxonomy order: the surest finding (stated > likely > suspected)
+  /// with its own source, tier and text, the earliest at a tie. What the
+  /// heuristic classifier attaches to a dish when
+  /// `ClassificationOptions.restrictionsRequested` is true, and what the
+  /// golden `allergen_concerns.json` pins against the Python twin
+  /// (`backend/app/keto/rules.py`). Pure; never throws.
+  static List<Concern> allergenConcerns(Dish dish) {
+    final best = <RestrictionId, Concern>{};
+    for (final finding in allergenFindings(dish)) {
+      final kept = best[finding.restrictionId];
+      if (kept == null ||
+          _compareCertainty(finding.certainty, kept.certainty) > 0) {
+        best[finding.restrictionId] = finding;
+      }
+    }
+    final ids = best.keys.toList()..sort((a, b) => a.index.compareTo(b.index));
+    return List<Concern>.unmodifiable(<Concern>[
+      for (final id in ids) best[id]!,
+    ]);
+  }
 }

@@ -3125,6 +3125,45 @@ offsets index the match text, which equals the normalised text wherever
 there is no maqaf. `allergens.json` gains `termGuards`, each hit's `guarded`
 and each case's `matchText`; no keto golden changed.
 
+**Rules concerns and the on-device `ProfileEvaluator` (ALG-04b, related to
+#346).** `ClassificationRules.allergenFindings(dish)` runs `AllergenMatcher.find`
+over the name, the description and each non-removal option value on its own
+(group names are not read; a maqaf-joined removal value is still a removal)
+and returns one `Concern` per hit, profile-independent (C1): source `hidden`
+for a hidden-list trigger (a new `AllergenHit.hidden` flag, kept out of
+`allergens.json` so that golden did not change) and the part's otherwise,
+the hit's certainty, tier `stated` for a direct unguarded trigger and
+`inferred` for a hidden or guarded one, and `matchedText` the menu's own
+slice ("TAHINI", "בַּטְּחִינָה"), recovered by binary search because the match
+text of a raw prefix is a prefix of the whole. `allergenConcerns` keeps one per
+restriction, the surest and the earliest at a tie, in taxonomy order; the
+heuristic classifier attaches it to every dish only when
+`restrictionsRequested`, so keto output is byte-identical, and
+`backend/app/keto/rules.py`/`heuristic.py` do the same, replayed through a new
+golden, `allergen_concerns.json` (the hand-written dishes, six labelled corpus
+menus and the three golden menus classified with the flag on). To keep the
+import graph acyclic the two trigger patterns moved to
+`utils/trigger_patterns.dart`, which `classification_rules.dart` re-exports.
+`utils/allergens/profile_evaluator.dart` is device-only: `ProfileEvaluator.evaluate(analysed,
+dish, profile)` unions the rule findings (always recomputed from the dish),
+the analysis's own concerns and concerns read from its `ingredients` (source
+`model`, the weaker of the two certainties, the role carried); keeps the
+profile's ids, never keto, dropping a concern whose matched text holds one of
+its entry's exceptions as whole words; and derives `DishState`, worst first:
+a stated/likely concern on a part that cannot be left off (base, protein,
+unknown role, name, description, hidden source), or `nonKeto` with keto in
+the profile → `avoid`; a suspected concern on a strict entry → `ask`; a
+stated/likely concern only on removable parts (side, sauce, garnish,
+option), or `modifiable` with keto in the profile → `fitsWithChange`, with
+keto's script and then "Ask for it without X" / "לבקש את המנה בלי X" in the
+menu's language (§6.3's exception); else `fits`. A flexible entry's suspected
+concern is listed and moves nothing; an empty profile holds keto and is the
+identity of today's verdicts; the wire verdict is never rewritten. The state
+is computed from every finding, so a removable stated mention cannot mask a
+likely one in the name. `MenuController.evaluatedRows` pairs each analysed
+visible row with its evaluation for the profile recorded when the menu was
+last classified; nothing renders it yet (ALG-05).
+
 ---
 
 ## 15. Testing strategy

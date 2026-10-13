@@ -30,9 +30,8 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/allergens/vocabulary.dart';
-import 'package:ketoclub/utils/classification_rules.dart'
-    show hebrewTriggerPattern, latinTriggerPattern;
 import 'package:ketoclub/utils/text_normaliser.dart';
+import 'package:ketoclub/utils/trigger_patterns.dart';
 
 /// One trigger the matcher found.
 @immutable
@@ -45,6 +44,7 @@ final class AllergenHit {
     required this.start,
     required this.end,
     this.guarded = false,
+    this.hidden = false,
   });
 
   /// The restriction the trigger belongs to.
@@ -75,6 +75,14 @@ final class AllergenHit {
   /// removes a hit.
   final bool guarded;
 
+  /// Whether the trigger came from a hidden list
+  /// ([RestrictionVocabulary.hiddenEn]/[RestrictionVocabulary.hiddenHe]:
+  /// "soy sauce" for wheat) rather than a direct one (ALG-04b). A guarded
+  /// hit keeps it, so `ClassificationRules.allergenConcerns` can tell a
+  /// lowered direct trigger from a hidden one. Not in `allergens.json`;
+  /// the golden `allergen_concerns.json` pins it.
+  final bool hidden;
+
   @override
   bool operator ==(Object other) =>
       other is AllergenHit &&
@@ -83,15 +91,17 @@ final class AllergenHit {
       other.certainty == certainty &&
       other.start == start &&
       other.end == end &&
-      other.guarded == guarded;
+      other.guarded == guarded &&
+      other.hidden == hidden;
 
   @override
-  int get hashCode => Object.hash(id, term, certainty, start, end, guarded);
+  int get hashCode =>
+      Object.hash(id, term, certainty, start, end, guarded, hidden);
 
   @override
   String toString() =>
       'AllergenHit(${id.name}, $term, ${certainty.name}, $start-$end'
-      '${guarded ? ', guarded' : ''})';
+      '${guarded ? ', guarded' : ''}${hidden ? ', hidden' : ''})';
 }
 
 /// One guard phrase, normalised and split into its words.
@@ -102,14 +112,15 @@ typedef _Phrase = List<String>;
 typedef _TriggerGuards = ({List<_Phrase> before, List<_Phrase> after});
 
 /// One compiled trigger: its term as written, its pattern, its certainty,
-/// its guards and whether it is Hebrew (whose guards may carry prefix
-/// letters).
+/// its guards, whether it is Hebrew (whose guards may carry prefix
+/// letters) and whether it came from a hidden list.
 typedef _CompiledTrigger = ({
   String term,
   RegExp pattern,
   TriggerCertainty certainty,
   _TriggerGuards guards,
   bool hebrew,
+  bool hidden,
 });
 
 /// One restriction's compiled vocabulary, with its taxonomy position for
@@ -161,7 +172,7 @@ List<_CompiledRestriction> _compile(
     final noPrefix = entry.noPrefixHe.toSet();
     final triggers = <_CompiledTrigger>[];
 
-    void latin(String term, TriggerCertainty certainty) {
+    void latin(String term, TriggerCertainty certainty, {bool hidden = false}) {
       final normalised = TextNormaliser.normalise(term);
       if (normalised.isEmpty) return;
       triggers.add((
@@ -170,10 +181,15 @@ List<_CompiledRestriction> _compile(
         certainty: certainty,
         guards: _guardsFor(entry, term, hebrew: false),
         hebrew: false,
+        hidden: hidden,
       ));
     }
 
-    void hebrew(String term, TriggerCertainty certainty) {
+    void hebrew(
+      String term,
+      TriggerCertainty certainty, {
+      bool hidden = false,
+    }) {
       final normalised = TextNormaliser.normalise(term);
       if (normalised.isEmpty) return;
       triggers.add((
@@ -185,6 +201,7 @@ List<_CompiledRestriction> _compile(
         certainty: certainty,
         guards: _guardsFor(entry, term, hebrew: true),
         hebrew: true,
+        hidden: hidden,
       ));
     }
 
@@ -195,10 +212,10 @@ List<_CompiledRestriction> _compile(
       hebrew(term, TriggerCertainty.stated);
     }
     for (final trigger in entry.hiddenEn) {
-      latin(trigger.term, trigger.certainty);
+      latin(trigger.term, trigger.certainty, hidden: true);
     }
     for (final trigger in entry.hiddenHe) {
-      hebrew(trigger.term, trigger.certainty);
+      hebrew(trigger.term, trigger.certainty, hidden: true);
     }
 
     compiled.add((id: restriction.id, order: order, triggers: triggers));
@@ -310,6 +327,7 @@ List<AllergenHit> _findIn(
             start: match.start,
             end: match.end,
             guarded: guarded,
+            hidden: trigger.hidden,
           ),
           order: restriction.order,
           sequence: found.length,
