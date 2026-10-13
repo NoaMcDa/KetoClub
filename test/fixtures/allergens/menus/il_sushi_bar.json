@@ -1,0 +1,872 @@
+{
+  "_fixture_note": "synthetic Israeli sushi bar written for the corpus from 11 §6, §7.2, §8 and 12 §1.4, §1.7, §1.11, §5; labels are unreviewed desk research; Hebrew",
+  "language": "he",
+  "dishes": [
+    {
+      "name": "סושי סלמון (8 יח׳)",
+      "description": "אורז, סלמון טרי ואצות נורי, מוגש עם רוטב סויה, וואסבי וג׳ינג׳ר",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב סויה\"",
+          "source": "12 §1.11"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב סויה\": soy sauce is brewed with wheat",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב סויה\": soy sauce is brewed with wheat",
+          "source": "12 §1.4"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"סלמון\"",
+          "source": "12 §1.7"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "sushi rice is seasoned with vinegar",
+          "source": "11 §15.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"רוטב סויה\"",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"סלמון\"",
+          "source": "12 §1.7"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"סלמון\"",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "סושי טונה (8 יח׳)",
+      "description": "אורז, טונה טרייה ואצות נורי, מוגש עם רוטב סויה, וואסבי וג׳ינג׳ר",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב סויה\"",
+          "source": "12 §1.11"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב סויה\": soy sauce is brewed with wheat",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב סויה\": soy sauce is brewed with wheat",
+          "source": "12 §1.4"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"טונה\"",
+          "source": "12 §1.7"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "sushi rice is seasoned with vinegar",
+          "source": "11 §15.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"רוטב סויה\"",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"טונה\"",
+          "source": "12 §1.7"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"טונה\"",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "רול קליפורניה",
+      "description": "סורימי, אבוקדו, מלפפון ואורז, שומשום מבחוץ",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "surimi commonly contains egg white",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "surimi is bound with wheat starch",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "surimi is bound with wheat starch",
+          "source": "11 §7.2"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"סורימי\" (imitation crab)",
+          "source": "11 §8.1"
+        },
+        "crustaceans": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "\"סורימי\" (surimi) may carry crab extract",
+          "source": "11 §9.2"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"שומשום\"",
+          "source": "12 §1.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"סורימי\" (imitation crab)",
+          "source": "11 §8.1"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"סורימי\" (imitation crab)",
+          "source": "11 §8.1"
+        }
+      }
+    },
+    {
+      "name": "רול ספייסי טונה",
+      "description": "טונה חריפה עם מיונז ספייסי וטמפורה פלייקס, שומשום ורוטב סויה",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"מיונז ספייסי\"",
+          "source": "12 §1.6"
+        },
+        "soy": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב סויה\"",
+          "source": "12 §1.11"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"טמפורה פלייקס\" (tempura flakes)",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"טמפורה פלייקס\" (tempura flakes)",
+          "source": "11 §7.1"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"טונה\"",
+          "source": "12 §1.7"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"שומשום\"",
+          "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise and aioli sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"רוטב סויה\"",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"מיונז ספייסי\"",
+          "source": "12 §1.6"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"טונה\"",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "רול טמפורה שרימפס",
+      "description": "שרימפס בטמפורה, אבוקדו, איולי ספייסי ורוטב אונאגי",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי\"",
+          "source": "12 §1.6"
+        },
+        "soy": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"אונאגי\" (unagi sauce) is a soy-sauce glaze",
+          "source": "11 §6.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"טמפורה\" batter",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"טמפורה\" batter",
+          "source": "11 §7.1"
+        },
+        "crustaceans": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"שרימפס\"",
+          "source": "12 §1.7"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "sesame is common in sushi rolls",
+          "source": "12 §5"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise and aioli sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "prawns are a sulphite source",
+          "source": "11 §15.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"אונאגי\" (unagi sauce) is a soy-sauce glaze",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"איולי\"",
+          "source": "12 §1.6"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"שרימפס\"",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "אינסייד אאוט אבוקדו",
+      "description": "אבוקדו, מלפפון וגזר בשומשום, מוגש עם רוטב סויה, וואסבי וג׳ינג׳ר",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב סויה\"",
+          "source": "12 §1.11"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב סויה\": soy sauce is brewed with wheat",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב סויה\": soy sauce is brewed with wheat",
+          "source": "12 §1.4"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "avocado, cucumber and carrot only; cross-contact not assessed",
+          "source": "11 §8"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"שומשום\"",
+          "source": "12 §1.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "sushi rice is seasoned with vinegar",
+          "source": "11 §15.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"רוטב סויה\"",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only plant ingredients named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "ספייסי סלמון קראנץ׳",
+      "description": "סלמון חריף, מיונז, פירורי פאנקו ושומשום",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"מיונז\"",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"פאנקו\" breadcrumbs",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"פאנקו\" breadcrumbs",
+          "source": "11 §7.1"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"סלמון\"",
+          "source": "12 §1.7"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"שומשום\"",
+          "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise and aioli sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"מיונז\"",
+          "source": "12 §1.6"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"סלמון\"",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "סשימי סלמון",
+      "description": "שש פרוסות סלמון טרי על מצע צנון, וואסבי וג׳ינג׳ר",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "free",
+          "evidence": "raw salmon on radish; cross-contact not assessed",
+          "source": "11 §5"
+        },
+        "soy": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "sashimi is customarily served with soy sauce",
+          "source": "12 §5"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "sashimi is customarily served with soy sauce, which is brewed with wheat",
+          "source": "12 §5"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "sashimi is customarily served with soy sauce, which is brewed with wheat",
+          "source": "12 §5"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"סלמון\"",
+          "source": "12 §1.7"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "no celery ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §12"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "soy is a legume: sashimi is customarily served with soy sauce",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"סלמון\"",
+          "source": "12 §1.7"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"סלמון\"",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "סשימי טונה",
+      "description": "שש פרוסות טונה טרייה, וואסבי וג׳ינג׳ר",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "raw tuna with wasabi and ginger; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "soy": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "sashimi is customarily served with soy sauce",
+          "source": "12 §5"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "sashimi is customarily served with soy sauce, which is brewed with wheat",
+          "source": "12 §5"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "sashimi is customarily served with soy sauce, which is brewed with wheat",
+          "source": "12 §5"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"טונה\"",
+          "source": "12 §1.7"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "soy is a legume: sashimi is customarily served with soy sauce",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"טונה\"",
+          "source": "12 §1.7"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"טונה\"",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "אדממה",
+      "description": "שעועית סויה מאודה עם מלח ים",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"סויה\" and \"אדממה\"",
+          "source": "12 §1.11"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "soybeans are legumes",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only plant ingredients named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "מרק מיסו",
+      "description": "מרק מיסו עם טופו, אצות ובצל ירוק",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"מיסו\" and \"טופו\"",
+          "source": "12 §1.11"
+        },
+        "fish": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "miso soup is usually made with a bonito (dashi) stock",
+          "source": "11 §8.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "miso and tofu are soy",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: miso soup is usually made with a bonito (dashi) stock",
+          "source": "11 §8.1"
+        },
+        "vegetarian": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "fish/shellfish: miso soup is usually made with a bonito (dashi) stock",
+          "source": "11 §8.1"
+        }
+      }
+    },
+    {
+      "name": "גיוזה ירקות",
+      "description": "כיסוני בצק ממולאים בירקות ומוקפצים, עם רוטב פונזו",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "free",
+          "evidence": "no peanut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §1"
+        },
+        "soy": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"פונזו\" is a soy-sauce dip",
+          "source": "12 §1.11"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"כיסוני בצק\" (dumplings)",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"כיסוני בצק\" (dumplings)",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "sesame oil is common in Asian-style dishes",
+          "source": "12 §5"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"פונזו\" is a soy-sauce dip",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "אודון מוקפץ",
+      "description": "אטריות אודון מוקפצות עם ירקות וטריאקי",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"טריאקי\"",
+          "source": "12 §1.11"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"אטריות אודון\": udon is wheat noodles",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"אטריות אודון\": udon is wheat noodles",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "sesame oil is common in Asian-style dishes",
+          "source": "12 §5"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"טריאקי\"",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "אורז מטוגן עם ביצה",
+      "description": "אורז מוקפץ עם ביצה, ירקות ורוטב סויה",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ביצה\"",
+          "source": "11 §5.1"
+        },
+        "soy": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב סויה\"",
+          "source": "12 §1.11"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב סויה\": soy sauce is brewed with wheat",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב סויה\": soy sauce is brewed with wheat",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "sesame oil is common in fried rice",
+          "source": "11 §11.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"רוטב סויה\"",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"ביצה\"",
+          "source": "11 §5.1"
+        }
+      }
+    },
+    {
+      "name": "סלט וואקמה",
+      "description": "סלט אצות עם שומשום קלוי ורוטב שומשום",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "sesame dressings in Asian salads often contain soy sauce",
+          "source": "11 §6.2"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"שומשום קלוי\" and \"רוטב שומשום\"",
+          "source": "12 §1.1"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy is a legume: sesame dressings in Asian salads often contain soy sauce",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "טמפורה ירקות",
+      "description": "ירקות בציפוי טמפורה פריך עם רוטב טנצוי",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "tempura batter often carries egg",
+          "source": "12 §5"
+        },
+        "soy": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"טנצוי\" dip is a soy-sauce dip",
+          "source": "11 §6.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"טמפורה\" batter",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"טמפורה\" batter",
+          "source": "11 §7.1"
+        },
+        "fish": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "tentsuyu dip is made with dashi (bonito) stock",
+          "source": "11 §8.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"טנצוי\" dip is a soy-sauce dip",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "animal-derived: tempura batter often carries egg",
+          "source": "12 §5"
+        },
+        "vegetarian": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "fish/shellfish: tentsuyu dip is made with dashi (bonito) stock",
+          "source": "11 §8.1"
+        }
+      }
+    },
+    {
+      "name": "מוצ׳י גלידה",
+      "description": "כדורי אורז דביק במילוי גלידה",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גלידה\" (ice cream)",
+          "source": "11 §4.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "ice cream",
+          "source": "11 §4.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"גלידה\" (ice cream)",
+          "source": "11 §4.1"
+        }
+      }
+    },
+    {
+      "name": "בירה אסאהי",
+      "description": "",
+      "options": [],
+      "labels": {
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "beer is brewed from barley malt",
+          "source": "11 §7.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "beer is a sulphite source",
+          "source": "11 §15.2"
+        }
+      }
+    },
+    {
+      "name": "סאקה חם",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "rice wine; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "rice wine; cross-contact not assessed",
+          "source": "11 §5"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,971 @@
+{
+  "_fixture_note": "synthetic Israeli cafe with pastries and lattes written for the corpus from 11 §3, §7.5 and 12 §1.1-1.6; labels are unreviewed desk research; Hebrew",
+  "language": "he",
+  "dishes": [
+    {
+      "name": "קרואסון חמאה",
+      "description": "קרואסון פריך אפוי במקום",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חמאה\" (butter)",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "pastry is glazed with egg wash",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a croissant is a wheat pastry",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a croissant is a wheat pastry",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"חמאה\" (butter)",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "קרואסון שוקולד",
+      "description": "קרואסון במילוי שוקולד מריר",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "laminated pastry uses butter",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "laminated pastry uses butter",
+          "source": "11 §4.2"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "pastry is glazed with egg wash",
+          "source": "11 §5.2"
+        },
+        "soy": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "chocolate commonly contains soy lecithin",
+          "source": "11 §6.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a croissant is a wheat pastry",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a croissant is a wheat pastry",
+          "source": "12 §1.4"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "soy is a legume: chocolate commonly contains soy lecithin",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "animal-derived: laminated pastry uses butter",
+          "source": "11 §3.2"
+        }
+      }
+    },
+    {
+      "name": "קרואסון שקדים",
+      "description": "קרואסון במילוי קרם שקדים ועם פתיתי שקדים",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"שקדים\"",
+          "source": "12 §1.2"
+        },
+        "milk": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "laminated pastry uses butter",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "laminated pastry uses butter",
+          "source": "11 §4.2"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "almond cream is egg-bound",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a croissant is a wheat pastry",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a croissant is a wheat pastry",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "animal-derived: laminated pastry uses butter",
+          "source": "11 §3.2"
+        }
+      }
+    },
+    {
+      "name": "דניש גבינה",
+      "description": "דניש שמרים עם קרם גבינה ופירורי סוכר",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"קרם גבינה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"קרם גבינה\"",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "pastry is glazed with egg wash",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"דניש\" is a wheat pastry",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"דניש\" is a wheat pastry",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"קרם גבינה\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "רוגלך אגוזים",
+      "description": "רוגלך בצק שמרים במילוי אגוזי מלך וקינמון",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"אגוזי מלך\"",
+          "source": "12 §1.2"
+        },
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "baked goods commonly contain milk or butter",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "baked goods commonly contain milk or butter",
+          "source": "11 §4.2"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "yeast pastry is egg-glazed",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a yeast-dough pastry",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a yeast-dough pastry",
+          "source": "12 §1.4"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: baked goods commonly contain milk or butter",
+          "source": "11 §3.2"
+        }
+      }
+    },
+    {
+      "name": "עוגת גבינה אפויה",
+      "description": "עוגת גבינה על בסיס ביסקוויט",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גבינה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גבינה\"",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "baked cheesecake is egg-bound",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ביסקוויט\" base",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ביסקוויט\" base",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"גבינה\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "עוגת שוקולד ללא קמח",
+      "description": "עוגת שוקולד מריר וביצים, ללא קמח",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "cakes and chocolate commonly contain butter or milk",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "cakes and chocolate commonly contain butter or milk",
+          "source": "11 §4.2"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ביצים\"",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "guard: 'ללא קמח' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §7.3"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "guard: 'ללא קמח' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §7.3"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"ביצים\"",
+          "source": "11 §5.1"
+        }
+      }
+    },
+    {
+      "name": "טוסט אבוקדו וביצה עלומה",
+      "description": "לחם מחמצת, אבוקדו, ביצה עלומה וגרגירי שומשום",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"ביצה עלומה\" (poached egg)",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחם מחמצת\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחם מחמצת\"",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"שומשום\"",
+          "source": "12 §1.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"ביצה עלומה\" (poached egg)",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "כריך אבוקדו וזעתר",
+      "description": "לחם כוסמין עם אבוקדו, זעתר ושמן זית",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "free",
+          "evidence": "bread, avocado and za'atar; cross-contact not assessed",
+          "source": "11 §5"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"כוסמין\" (spelt) is wheat",
+          "source": "11 §7.5"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"כוסמין\" (spelt) is wheat",
+          "source": "11 §7.5"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"זעתר\" (za'atar) blends usually contain sesame",
+          "source": "11 §11.1"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only plant ingredients named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "טוסט גבינה צהובה",
+      "description": "לחם אחיד וגבינה צהובה נמסה",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינה צהובה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינה צהובה\" melted young: not a hard aged cheese",
+          "source": "11 §4.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחם\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחם\"",
+          "source": "12 §1.4"
+        },
+        "molluscs": {
+          "label": "free",
+          "evidence": "no mollusc ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §10"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"גבינה צהובה\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "כריך טונה",
+      "description": "טונה, מיונז, חמוצים וביצה קשה על בגט",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "canned tuna can contain casein",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "canned tuna can contain casein",
+          "source": "11 §4.2"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"מיונז\" and \"ביצה קשה\"",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בגט\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בגט\"",
+          "source": "12 §1.4"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"טונה\"",
+          "source": "12 §1.7"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise often carries mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חמוצים\"",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"מיונז\" and \"ביצה קשה\"",
+          "source": "12 §1.6"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"טונה\"",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "סלט קפרזה",
+      "description": "עגבניות, מוצרלה, בזיליקום וחמאת פסטו",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
+        "treeNuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"pesto\" is made with pine nuts (or walnuts)",
+          "source": "11 §2.1"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"מוצרלה\" and \"חמאת פסטו\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "fresh mozzarella",
+          "source": "11 §4.1"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"מוצרלה\" and \"חמאת פסטו\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "סלט וולדורף",
+      "description": "סלרי, תפוחים, אגוזי מלך וצימוקים ברוטב מיונז",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"אגוזי מלך\"",
+          "source": "12 §1.2"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"מיונז\"",
+          "source": "12 §1.6"
+        },
+        "celery": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"סלרי\"",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise dressings often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"צימוקים\"",
+          "source": "12 §1.10"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"מיונז\"",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "ביצים בנדיקט",
+      "description": "ביצים עלומות על מאפין אנגלי עם רוטב הולנדייז",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "hollandaise is made with butter",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "hollandaise is made with butter",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ביצים\" and \"הולנדייז\"",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"מאפין אנגלי\" (English muffin)",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"מאפין אנגלי\" (English muffin)",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: hollandaise is made with butter",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "גרנולה ויוגורט",
+      "description": "יוגורט עם גרנולה, פירות יער ודבש",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "granola is a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
+        "treeNuts": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "granola commonly contains nuts",
+          "source": "11 §2.2"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"יוגורט\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "live-culture yogurt is tolerated by many",
+          "source": "11 §4.3"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "granola oats are not labelled gluten-free",
+          "source": "11 §7.5"
+        },
+        "lupin": {
+          "label": "free",
+          "evidence": "no lupin ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §14"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "peanuts is a legume: granola is a documented peanut hiding place",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"דבש\" (honey) is not vegan",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "פנקייק בננה",
+      "description": "פנקייק עם בננה, סירופ מייפל וחמאה",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"חמאה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"חמאה\"",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "pancake batter normally contains egg",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פנקייק\" (pancake) batter",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פנקייק\" (pancake) batter",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"חמאה\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "הפוך",
+      "description": "אספרסו וחלב מוקצף",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חלב\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חלב\"",
+          "source": "11 §4.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"חלב\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "הפוך שיבולת שועל",
+      "description": "אספרסו ומשקה שיבולת שועל",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "guard: 'שיבולת שועל' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §3.3"
+        },
+        "lactose": {
+          "label": "free",
+          "evidence": "an oat drink contains no lactose",
+          "source": "11 §4.3"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "oats not labelled gluten-free are a cross-contact trigger",
+          "source": "11 §7.5"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only plant ingredients named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "אייס קפה שקדים",
+      "description": "אספרסו, קרח וחלב שקדים",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חלב שקדים\" (almond milk)",
+          "source": "11 §2.1"
+        },
+        "milk": {
+          "label": "free",
+          "evidence": "almond milk is not dairy; cross-contact not assessed",
+          "source": "11 §3.3"
+        }
+      }
+    },
+    {
+      "name": "שוקו חם",
+      "description": "חלב חם וקקאו",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חלב\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חלב\"",
+          "source": "11 §4.1"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"חלב\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "עוגיית חמאת בוטנים",
+      "description": "עוגיית חמאת בוטנים עם שבבי שוקולד",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בוטנים\"",
+          "source": "12 §1.2"
+        },
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "cookies commonly contain butter",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "cookies commonly contain butter",
+          "source": "11 §4.2"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "cookie dough is egg-bound",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a cookie is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a cookie is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "peanuts is a legume: \"בוטנים\"",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: cookies commonly contain butter",
+          "source": "11 §3.2"
+        }
+      }
+    },
+    {
+      "name": "חטיף במבה במילוי נוגט",
+      "description": "חטיף במבה במילוי קרם נוגט",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"במבה\" is 54% ground peanuts",
+          "source": "12 §1.2"
+        },
+        "treeNuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "nougat filling lists hazelnuts (אגוזי לוז)",
+          "source": "12 §1.2"
+        },
+        "soy": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "the manufacturer lists soy in every Bamba variant",
+          "source": "12 §1.2"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "the manufacturer lists sesame in the filled Bamba",
+          "source": "12 §1.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "soy is a legume: the manufacturer lists soy in every Bamba variant",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "מיץ תפוזים סחוט",
+      "description": "תפוזים סחוטים במקום",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "squeezed oranges; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "squeezed oranges; cross-contact not assessed",
+          "source": "11 §5"
+        }
+      }
+    },
+    {
+      "name": "תה צמחים",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "herbal tea; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "wheat": {
+          "label": "free",
+          "evidence": "herbal tea; cross-contact not assessed",
+          "source": "11 §7"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,600 @@
+{
+  "_fixture_note": "hand-built in tool/golden/golden_corpus.dart (goldenEnglishMenu), dish texts copied; labels are unreviewed desk research; English",
+  "language": "en",
+  "dishes": [
+    {
+      "name": "Caesar salad",
+      "description": "Romaine, croutons",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "Caesar dressing lists milk (Parmesan)",
+          "source": "12 §5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "Caesar dressing lists milk (Parmesan)",
+          "source": "12 §5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "Caesar dressing is made with egg",
+          "source": "12 §5"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"croutons\" are toasted bread",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"croutons\" are toasted bread",
+          "source": "11 §7.2"
+        },
+        "fish": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "Caesar dressing often carries anchovy",
+          "source": "11 §8.2"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "Caesar dressing lists mustard",
+          "source": "12 §5"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: Caesar dressing is made with egg",
+          "source": "12 §5"
+        },
+        "vegetarian": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "fish/shellfish: Caesar dressing often carries anchovy",
+          "source": "11 §8.2"
+        }
+      }
+    },
+    {
+      "name": "Halloumi",
+      "description": "Grilled, with honey",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Halloumi\" is cheese",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "halloumi is a fresh-style cheese; no source documents it as low in lactose",
+          "source": "11 §4.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"honey\" is not vegan",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "free",
+          "evidence": "cheese and honey; no meat or fish named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Calamari",
+      "description": "Deep-fried, aioli",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"aioli\" is mayonnaise-based",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "\"Deep-fried\" calamari is normally floured or battered",
+          "source": "11 §7.4"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "\"Deep-fried\" calamari is normally floured or battered",
+          "source": "11 §7.4"
+        },
+        "molluscs": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Calamari\" is squid",
+          "source": "11 §10.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "aioli often carries mustard",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"aioli\" is mayonnaise-based",
+          "source": "11 §5.1"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"Calamari\" is squid",
+          "source": "11 §10.1"
+        }
+      }
+    },
+    {
+      "name": "Bread basket",
+      "description": "",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "baked goods commonly contain soy",
+          "source": "11 §6.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Bread\" is wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Bread\" is wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "seeds are often hidden in bread dough",
+          "source": "11 §11.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "soy is a legume: baked goods commonly contain soy",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "Entrecôte 300g",
+      "description": "Served with butter-infused potato purée",
+      "options": [
+        {
+          "name": "Choice of side",
+          "values": [
+            "Potato purée",
+            "Green salad",
+            "Pasta"
+          ]
+        },
+        {
+          "name": "Changes",
+          "values": [
+            "No butter"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"butter-infused\" potato purée",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"Pasta\" can be chosen as the side",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"Pasta\" can be chosen as the side",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "entrecôte (beef)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "entrecôte (beef)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Grilled salmon",
+      "description": "Lemon, dill",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "grilled salmon with lemon and dill; no dairy named; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"salmon\" is fish",
+          "source": "11 §8.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"salmon\" is fish",
+          "source": "11 §8.1"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"salmon\" is fish",
+          "source": "11 §8.1"
+        }
+      }
+    },
+    {
+      "name": "Spaghetti carbonara",
+      "description": "Cream, bacon",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"Cream\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"Cream\"",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"carbonara\" is an egg sauce",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Spaghetti\" is wheat pasta",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Spaghetti\" is wheat pasta",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"bacon\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"bacon\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Beef burger",
+      "description": "Brioche bun, cheddar, fries",
+      "options": [
+        {
+          "name": "Changes",
+          "values": [
+            "No onions",
+            "Without the bun"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"cheddar\" is cheese",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "brioche is an enriched bread",
+          "source": "11 §4.2"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"brioche bun\" is an enriched bread made with eggs",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Brioche bun\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Brioche bun\"",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "a burger bun can carry a sesame topping",
+          "source": "11 §11.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "fries from processed potato may be sulphite-treated",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Beef burger\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Beef burger\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Chicken curry",
+      "description": "Coconut cream",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "curries are a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
+        "treeNuts": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "curry pastes and sauces are a documented tree-nut hiding place (coconut itself is not a tree nut, 11 §2.5)",
+          "source": "11 §2.2"
+        },
+        "milk": {
+          "label": "free",
+          "evidence": "coconut cream is not a dairy product; cross-contact not assessed",
+          "source": "11 §3.3"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "curries are a documented mustard source",
+          "source": "11 §13.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: curries are a documented peanut hiding place",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"chicken\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"chicken\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Steak & eggs",
+      "description": "Black pepper",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "restaurants often finish grilled steak with butter",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "restaurants often finish grilled steak with butter",
+          "source": "11 §4.2"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"eggs\"",
+          "source": "11 §5.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Steak\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Steak\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "French fries",
+      "description": "",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "free",
+          "evidence": "plain fries; no egg named; cross-contact not assessed",
+          "source": "11 §5"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "fries from pre-cut potato may be sulphite-treated",
+          "source": "11 §15.2"
+        }
+      }
+    },
+    {
+      "name": "BBQ sauce",
+      "description": "",
+      "options": [],
+      "labels": {
+        "fish": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "barbecue sauce often contains Worcestershire (anchovy)",
+          "source": "11 §8.2"
+        },
+        "sesame": {
+          "label": "free",
+          "evidence": "barbecue sauce; no sesame named; cross-contact not assessed",
+          "source": "11 §11"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "ketchup and barbecue sauce are made with vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: barbecue sauce often contains Worcestershire (anchovy)",
+          "source": "11 §8.2"
+        },
+        "vegetarian": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "fish/shellfish: barbecue sauce often contains Worcestershire (anchovy)",
+          "source": "11 §8.2"
+        }
+      }
+    },
+    {
+      "name": "Coca-Cola",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "soft drink; cross-contact not assessed",
+          "source": "11 §3"
+        }
+      }
+    },
+    {
+      "name": "Coke Zero",
+      "description": "",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "free",
+          "evidence": "soft drink; cross-contact not assessed",
+          "source": "11 §5"
+        }
+      }
+    },
+    {
+      "name": "Latte",
+      "description": "Whole milk",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Whole milk\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Whole milk\"",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "espresso and milk; cross-contact not assessed",
+          "source": "11 §5"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"Whole milk\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Espresso",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "black coffee, no milk named; cross-contact not assessed",
+          "source": "11 §3"
+        }
+      }
+    },
+    {
+      "name": "We close at 22:00",
+      "description": "",
+      "options": [],
+      "labels": {}
+    }
+  ]
+}
