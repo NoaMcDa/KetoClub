@@ -2281,6 +2281,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your restriction profile stays on this device. When AI analysis is on, only the menu text and the keto settings are sent — never which restrictions you have.'**
   String get whatLeavesDeviceBanto;
+
+  /// Banto (ALG-08a): title of the full-screen chef card built from the dietary profile alone.
+  ///
+  /// In en, this message translates to:
+  /// **'Your chef card'**
+  String get chefCardTitle;
+
+  /// Banto (ALG-08a): the Settings button that opens the chef card.
+  ///
+  /// In en, this message translates to:
+  /// **'Show my chef card'**
+  String get chefCardShowButton;
+
+  /// Banto (ALG-08a): shown on the chef card page when the dietary profile is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a restriction in Settings and your chef card appears here.'**
+  String get chefCardEmpty;
+
+  /// Banto (ALG-08a): button that shares the chef card as text.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get chefCardShare;
+
+  /// Banto (ALG-08a): accessibility label of the Hebrew/English toggle on the chef card; the card text itself is in the chosen language.
+  ///
+  /// In en, this message translates to:
+  /// **'Card language'**
+  String get chefCardLanguageLabel;
 }
 
 class _AppLocalizationsDelegate

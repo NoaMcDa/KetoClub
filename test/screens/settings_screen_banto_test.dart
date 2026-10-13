@@ -11,11 +11,13 @@ import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_he.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/screens/chef_card_screen.dart';
 import 'package:ketoclub/screens/settings_screen.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 import 'package:ketoclub/state/theme_mode_controller.dart';
+import 'package:ketoclub/utils/allergens/chef_card_templates.dart';
 import 'package:ketoclub/widgets/restriction_picker_sheet.dart';
 import 'package:provider/provider.dart';
 
@@ -117,9 +119,87 @@ void main() {
       expect(find.text('Sesame'), findsNothing);
       expect(find.byKey(restrictionRowKey(RestrictionId.sesame)), findsNothing);
     });
+
+    testWidgets('has no chef card button, even with a stored profile', (
+      tester,
+    ) async {
+      // Arrange
+      final store = FakeSettingsStore(
+        initial: AppSettings(
+          profile: DietaryProfile.empty.withEntry(RestrictionId.sesame),
+        ),
+      );
+
+      // Act
+      await _pump(tester, store, bantoMode: false);
+
+      // Assert
+      expect(find.byKey(restrictionsChefCardKey), findsNothing);
+      expect(find.text(_en.chefCardShowButton), findsNothing);
+    });
   });
 
   group('SettingsScreen with bantoMode: true', () {
+    testWidgets('has no chef card button while the profile is empty', (
+      tester,
+    ) async {
+      // Act
+      await _pump(tester, FakeSettingsStore(), bantoMode: true);
+
+      // Assert
+      expect(find.byKey(restrictionsChefCardKey), findsNothing);
+      expect(find.text(_en.chefCardShowButton), findsNothing);
+    });
+
+    testWidgets('the chef card button opens the card for the stored '
+        'profile', (tester) async {
+      // Arrange
+      final store = FakeSettingsStore(
+        initial: AppSettings(
+          profile: DietaryProfile.empty.withEntry(RestrictionId.sesame),
+        ),
+      );
+      await _pump(tester, store, bantoMode: true);
+      final button = find.byKey(restrictionsChefCardKey);
+      await tester.ensureVisible(button);
+      await tester.pumpAndSettle();
+      expect(find.text(_en.chefCardShowButton), findsOneWidget);
+
+      // Act
+      await tester.tap(button);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byType(ChefCardScreen), findsOneWidget);
+      final line = ChefCardText.compose(
+        DietaryProfile.empty.withEntry(RestrictionId.sesame),
+        hebrew: false,
+      )[1];
+      expect(find.text(line), findsOneWidget);
+    });
+
+    testWidgets('removing the last restriction removes the button', (
+      tester,
+    ) async {
+      // Arrange
+      final store = FakeSettingsStore(
+        initial: AppSettings(
+          profile: DietaryProfile.empty.withEntry(RestrictionId.sesame),
+        ),
+      );
+      await _pump(tester, store, bantoMode: true);
+      final remove = find.byKey(restrictionRemoveKey(RestrictionId.sesame));
+      await tester.ensureVisible(remove);
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(remove);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byKey(restrictionsChefCardKey), findsNothing);
+    });
+
     testWidgets('shows the section between appearance and the keto rules, '
         'with the helper sentence and the empty state', (tester) async {
       // Act
