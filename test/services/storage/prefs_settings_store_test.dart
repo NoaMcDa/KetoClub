@@ -487,6 +487,44 @@ void main() {
     });
   });
 
+  group('onboardingSeen (ALG-02b, issue #344)', () {
+    test('is written only when true, so a keto record is unchanged', () {
+      final unset = const AppSettings().toJson();
+      final set = const AppSettings(onboardingSeen: true).toJson();
+
+      expect(unset.containsKey('restrictionOnboardingSeen'), isFalse);
+      expect(set['restrictionOnboardingSeen'], isTrue);
+    });
+
+    test('round-trips through toJson and tryFrom', () {
+      const settings = AppSettings(onboardingSeen: true);
+
+      expect(AppSettings.tryFrom(settings.toJson()), equals(settings));
+    });
+
+    test('a missing or non-boolean value reads as not seen', () {
+      final base = const AppSettings().toJson();
+
+      expect(AppSettings.tryFrom(base)!.onboardingSeen, isFalse);
+      expect(
+        AppSettings.tryFrom(<String, Object?>{
+          ...base,
+          'restrictionOnboardingSeen': 'yes',
+        })!.onboardingSeen,
+        isFalse,
+      );
+    });
+
+    test('survives a write and a read through the store', () async {
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
+
+      await store.write(const AppSettings(onboardingSeen: true));
+
+      expect((await store.read()).onboardingSeen, isTrue);
+    });
+  });
+
   group('PrefsSettingsStore dietary profile (ALG-02a, issue #344)', () {
     test('an install that stored settings before the profile existed reads '
         'an empty profile and keeps every other field', () async {

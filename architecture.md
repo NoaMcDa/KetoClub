@@ -3079,6 +3079,25 @@ keto and added ids left out; the app sheet width). Keto stays the existing
 toggles, and nothing reads the profile for classification yet
 (`ClassificationOptions` is unchanged; Wave 2 does that).
 
+ALG-02b (#344) adds the profile's two other surfaces, both behind `bantoMode`.
+`AppSettings.onboardingSeen` (JSON key `restrictionOnboardingSeen`, **written
+only when true**, so the keto record stays byte-identical) records that the
+first-run "What do you avoid?" screen was completed or skipped.
+`RestrictionOnboardingGate` wraps the `/` route: with the flag off it returns
+its child at once and builds no controller; with it on it reads the settings
+once and shows `RestrictionOnboardingScreen` (the taxonomy as chips grouped by
+kind, no severity question, the helper-tool sentence, "Continue" which saves
+the picks in tap order, "Skip" which saves none, both marking it seen) only
+when it was not seen and the profile is still empty, so a user who added
+restrictions in Settings first is never asked. Deep links to a venue skip it.
+On the menu screen `MenuFiltersRow` takes an optional `summary` line kept
+visible under the disclosure row; with the flag on and a non-empty profile
+`ProfileSummaryLine` fills it with "Checking for: sesame, lactose" in the UI
+language, naming restrictions only and never calling a menu safe. Tapping it
+opens Settings and `MenuController.refreshProfile` re-reads the profile on
+return. `MenuController.profile` is read from the device's settings in `open`
+and goes nowhere else.
+
 ---
 
 ## 15. Testing strategy

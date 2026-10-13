@@ -374,6 +374,20 @@ void main() {
       expect(count, 2);
     });
 
+    test('markOnboardingSeen persists the flag once and touches nothing '
+        'else (ALG-02b)', () async {
+      await controller.load();
+      expect(controller.onboardingSeen, isFalse);
+
+      await controller.markOnboardingSeen();
+      final writes = settings.writeCallCount;
+      await controller.markOnboardingSeen();
+
+      expect(controller.onboardingSeen, isTrue);
+      expect(settings.writeCallCount, writes);
+      expect(await settings.read(), const AppSettings(onboardingSeen: true));
+    });
+
     group('acknowledgeDisclosure / declineDisclosure (D16, issue #167)', () {
       test('acknowledgeDisclosure persists disclosureSeen as true without '
           'changing consentGiven', () async {

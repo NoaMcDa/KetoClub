@@ -627,5 +627,15 @@
   "helperToolTitle": "A helper, not a guarantee",
   "@helperToolTitle": { "description": "Heading that sits above the helper-tool sentence." },
   "whatLeavesDeviceBanto": "Your restriction profile stays on this device. When AI analysis is on, only the menu text and the keto settings are sent — never which restrictions you have.",
-  "@whatLeavesDeviceBanto": { "description": "Plain statement of what leaves the device once restriction profiles exist; the profile never does." }
+  "@whatLeavesDeviceBanto": { "description": "Plain statement of what leaves the device once restriction profiles exist; the profile never does." },
+  "restrictionOnboardingTitle": "What do you avoid?",
+  "@restrictionOnboardingTitle": { "description": "Banto (ALG-02b): heading of the first-run screen where the user picks their restrictions." },
+  "restrictionOnboardingBody": "Pick everything that applies. You can change this any time in Settings. Skip it to use keto only.",
+  "restrictionOnboardingContinue": "Continue",
+  "restrictionOnboardingSkip": "Skip",
+  "menuProfileSummary": "Checking for: {names}",
+  "@menuProfileSummary": {
+    "description": "Banto (ALG-02b): the menu screen's one-line summary of the restrictions the menu is read against. Tapping it opens Settings.",
+    "placeholders": { "names": { "type": "String" } }
+  }
 }

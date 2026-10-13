@@ -1436,4 +1436,22 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get whatLeavesDeviceBanto =>
       'פרופיל ההגבלות שלך נשאר במכשיר. כשניתוח AI פועל, נשלחים רק טקסט התפריט והגדרות הקטו — לעולם לא אילו הגבלות יש לך.';
+
+  @override
+  String get restrictionOnboardingTitle => 'ממה אתם נמנעים?';
+
+  @override
+  String get restrictionOnboardingBody =>
+      'בחרו כל מה שרלוונטי. אפשר לשנות זאת בכל עת בהגדרות. דלגו כדי להשתמש בקטו בלבד.';
+
+  @override
+  String get restrictionOnboardingContinue => 'המשך';
+
+  @override
+  String get restrictionOnboardingSkip => 'דלגו';
+
+  @override
+  String menuProfileSummary(String names) {
+    return 'בודקים עבור: $names';
+  }
 }

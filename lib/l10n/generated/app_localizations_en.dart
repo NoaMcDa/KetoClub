@@ -1430,4 +1430,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get whatLeavesDeviceBanto =>
       'Your restriction profile stays on this device. When AI analysis is on, only the menu text and the keto settings are sent — never which restrictions you have.';
+
+  @override
+  String get restrictionOnboardingTitle => 'What do you avoid?';
+
+  @override
+  String get restrictionOnboardingBody =>
+      'Pick everything that applies. You can change this any time in Settings. Skip it to use keto only.';
+
+  @override
+  String get restrictionOnboardingContinue => 'Continue';
+
+  @override
+  String get restrictionOnboardingSkip => 'Skip';
+
+  @override
+  String menuProfileSummary(String names) {
+    return 'Checking for: $names';
+  }
 }
