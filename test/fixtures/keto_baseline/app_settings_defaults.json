@@ -1,0 +1,13 @@
+{
+  "carnivoreOnly": false,
+  "dairyFree": false,
+  "disclosureSeen": false,
+  "estimationConsentGiven": true,
+  "filter": "all",
+  "languageTag": null,
+  "lastFilter": null,
+  "lastVenue": null,
+  "netCarbLimitGrams": 6,
+  "seedOilFree": false,
+  "themeMode": "system"
+}

@@ -1,0 +1,8 @@
+{
+  "dietaryConstraints": [
+    "Strict seed-oil free: the user avoids industrial seed oils (canola, rapeseed, soybean, sunflower, corn, cottonseed and generic vegetable oil). A dish that is fried, deep-fried or cooked in one of them is modifiable, with a modification asking for it to be cooked in olive oil, butter or tallow instead, unless it is already nonKeto.",
+    "Dairy-free keto: the user eats no dairy. A dish containing cheese, cream, butter, milk or yogurt is modifiable, with a modification asking for it without the dairy component, unless it is already nonKeto.",
+    "Carnivore only: the user eats only animal foods (meat, fish, seafood, eggs and animal fats). A dish that includes any vegetable, salad, fruit, legume, herb garnish or other plant is modifiable, with a modification asking for only the meat, fish or eggs, with no plants, unless it is already nonKeto."
+  ],
+  "netCarbLimitGrams": 2
+}

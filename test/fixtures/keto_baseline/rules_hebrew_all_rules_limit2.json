@@ -1,0 +1,162 @@
+{
+  "dishes": [
+    {
+      "dishId": "h1",
+      "hiddenCarbs": [],
+      "modification": "אפשר בבקשה להגיש רק את הבשר, הדג או הביצים, בלי ירקות, סלט או צמחים אחרים בצלחת?",
+      "name": "סָלָט יְרָקוֹת",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "המנה מתאימה לקטו, אבל לא לאחד הכללים שהפעלתם בהגדרות. בקשו את השינוי שמופיע כאן."
+    },
+    {
+      "dishId": "h2",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "חומוס",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "המנה מבוססת על חומוס, ואי אפשר להפוך אותה לקטוגנית."
+    },
+    {
+      "dishId": "h3",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "פיתה רגילה",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "המנה מבוססת על פיתה, ואי אפשר להפוך אותה לקטוגנית."
+    },
+    {
+      "dishId": "h4",
+      "hiddenCarbs": [],
+      "modification": "אפשר בבקשה להוציא את הסלק מהמנה?",
+      "name": "סלק צלוי",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+    },
+    {
+      "dishId": "h5",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "שניצל",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "המנה מבוססת על שניצל, ואי אפשר להפוך אותה לקטוגנית."
+    },
+    {
+      "dishId": "h6",
+      "hiddenCarbs": [],
+      "modification": "אפשר בבקשה להחליף את פירה תפוחי האדמה בעלים ירוקים או בסלט?\nאפשר בבקשה להחליף את תפוחי האדמה בסלט ירוק או בירקות מאודים?\nאפשר בבקשה בלי האורז, ועם כפול ירקות או סלט במקום?\nאפשר בבקשה להגיש רק את הבשר, הדג או הביצים, בלי ירקות, סלט או צמחים אחרים בצלחת?",
+      "name": "אנטריקוט",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+    },
+    {
+      "dishId": "h7",
+      "hiddenCarbs": [],
+      "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להכין את המנה בלי מוצרי חלב: בלי גבינה, שמנת, חמאה, חלב או יוגורט?",
+      "name": "המבורגר",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+    },
+    {
+      "dishId": "h8",
+      "hiddenCarbs": [],
+      "modification": "אפשר בבקשה להגיש רק את הבשר, הדג או הביצים, בלי ירקות, סלט או צמחים אחרים בצלחת?",
+      "name": "המבורגר עטוף בחסה",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "המנה מתאימה לקטו, אבל לא לאחד הכללים שהפעלתם בהגדרות. בקשו את השינוי שמופיע כאן."
+    },
+    {
+      "dishId": "h9",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "פסטה ברוטב שמנת",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "המנה מבוססת על פסטה, ואי אפשר להפוך אותה לקטוגנית."
+    },
+    {
+      "dishId": "h10",
+      "hiddenCarbs": [],
+      "modification": "אפשר בבקשה להכין את המנה בשמן זית, בחמאה או בשומן בקר, בלי שמן קנולה, סויה, חמניות או כל שמן זרעים אחר?",
+      "name": "דג מטוגן",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "המנה מתאימה לקטו, אבל לא לאחד הכללים שהפעלתם בהגדרות. בקשו את השינוי שמופיע כאן."
+    },
+    {
+      "dishId": "h11",
+      "hiddenCarbs": [],
+      "modification": "אפשר בבקשה להכין את המנה בלי מוצרי חלב: בלי גבינה, שמנת, חמאה, חלב או יוגורט?",
+      "name": "סלמון",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "המנה מתאימה לקטו, אבל לא לאחד הכללים שהפעלתם בהגדרות. בקשו את השינוי שמופיע כאן."
+    },
+    {
+      "dishId": "h12",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "קוקה קולה",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "המנה מבוססת על קוקה קולה, ואי אפשר להפוך אותה לקטוגנית."
+    },
+    {
+      "dishId": "h13",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "קוקה קולה זירו",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+    },
+    {
+      "dishId": "h14",
+      "hiddenCarbs": [],
+      "modification": "אפשר בבקשה קפה הפוך עם חלב שקדים ללא סוכר, בלי תוספת סירופ?",
+      "name": "הפוך גדול",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+    },
+    {
+      "dishId": "h15",
+      "hiddenCarbs": [],
+      "modification": "אפשר בבקשה להגיש רק את הבשר, הדג או הביצים, בלי ירקות, סלט או צמחים אחרים בצלחת?",
+      "name": "טחינה",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "המנה מתאימה לקטו, אבל לא לאחד הכללים שהפעלתם בהגדרות. בקשו את השינוי שמופיע כאן."
+    },
+    {
+      "dishId": "h16",
+      "hiddenCarbs": [],
+      "modification": "אפשר בבקשה בלי קטשופ? אפשר מיונז או טחינה במקום.",
+      "name": "קטשופ",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+    }
+  ],
+  "engine": {
+    "kind": "rules",
+    "reason": "notConfigured"
+  },
+  "options": {
+    "dietaryConstraints": [
+      "Strict seed-oil free: the user avoids industrial seed oils (canola, rapeseed, soybean, sunflower, corn, cottonseed and generic vegetable oil). A dish that is fried, deep-fried or cooked in one of them is modifiable, with a modification asking for it to be cooked in olive oil, butter or tallow instead, unless it is already nonKeto.",
+      "Dairy-free keto: the user eats no dairy. A dish containing cheese, cream, butter, milk or yogurt is modifiable, with a modification asking for it without the dairy component, unless it is already nonKeto.",
+      "Carnivore only: the user eats only animal foods (meat, fish, seafood, eggs and animal fats). A dish that includes any vegetable, salad, fruit, legume, herb garnish or other plant is modifiable, with a modification asking for only the meat, fish or eggs, with no plants, unless it is already nonKeto."
+    ],
+    "netCarbLimitGrams": 2
+  },
+  "schemaVersion": 0,
+  "unclassified": []
+}

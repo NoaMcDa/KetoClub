@@ -157,3 +157,7 @@ percent-encoded in `windows-1255` (`%FA%F4%F8%E9%E8`), which is not UTF-8;
 `WebsiteMenuLocator.menuText` reads. Replace or supplement them with real,
 redacted pages once a machine can fetch some, and record which sites they came
 from.
+
+## Keto-only baseline (`keto_baseline/`)
+
+Hand-edited outputs `test/architecture/keto_unchanged_test.dart` compares the keto-only app against, with no regeneration switch on purpose; see `keto_baseline/README.md`.
