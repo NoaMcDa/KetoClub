@@ -24,21 +24,34 @@ library;
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/vocabulary_types.dart';
 
+/// Peanut's direct English triggers. Public because `legumes`
+/// (vocab_plants_additives.dart) spreads them: a peanut is a legume.
+const List<String> peanutDirectEn = <String>[
+  'peanut',
+  'peanuts',
+  'groundnut',
+  'groundnuts',
+  'monkey nut',
+  'monkey nuts',
+  'arachis',
+  'bamba',
+];
+
+/// Peanut's direct Hebrew triggers; see [peanutDirectEn].
+const List<String> peanutDirectHe = <String>[
+  'בוטנים',
+  'בוטן',
+  'אגוזי אדמה',
+  'אגוז אדמה',
+  'במבה',
+];
+
 /// Nuts and seeds: one entry per restriction this group owns.
 const Map<RestrictionId, RestrictionVocabulary> nutsSeedsVocabulary =
     <RestrictionId, RestrictionVocabulary>{
       RestrictionId.peanuts: RestrictionVocabulary(
-        directEn: <String>[
-          'peanut',
-          'peanuts',
-          'groundnut',
-          'groundnuts',
-          'monkey nut',
-          'monkey nuts',
-          'arachis',
-          'bamba',
-        ],
-        directHe: <String>['בוטנים', 'בוטן', 'אגוזי אדמה', 'אגוז אדמה', 'במבה'],
+        directEn: peanutDirectEn,
+        directHe: peanutDirectHe,
         hiddenEn: <HiddenTrigger>[
           // Satay, and the Asian dishes and sauces FARE and Anaphylaxis UK name
           // as common hiding places.
