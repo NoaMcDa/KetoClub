@@ -300,7 +300,7 @@ def _phrases(phrases: Sequence[str]) -> tuple[_Phrase, ...]:
     dropped."""
     return tuple(
         tuple(normalised.split(" "))
-        for normalised in (normalise(phrase) for phrase in phrases)
+        for normalised in (match_text(phrase) for phrase in phrases)
         if normalised
     )
 
@@ -315,7 +315,7 @@ def _compile_trigger(
 ) -> _CompiledTrigger | None:
     """``term`` compiled with its guards (the restriction's, then the
     term's own), or None when it normalises to nothing."""
-    normalised = normalise(term)
+    normalised = match_text(term)
     if not normalised:
         return None
     pattern = (
@@ -375,9 +375,26 @@ def _compile(
     return tuple(compiled)
 
 
-@cache
+_COMPILED: dict[int, tuple[Mapping[str, RestrictionVocabulary], tuple[_CompiledRestriction, ...]]] = {}
+"""Dart ``_compiledCache``: every vocabulary compiled so far, keyed on the
+mapping's identity (the mapping is kept alive beside its compiled form, so
+an id is never reused while it is cached)."""
+
+
+def _compiled(
+    vocabulary: Mapping[str, RestrictionVocabulary],
+) -> tuple[_CompiledRestriction, ...]:
+    """``vocabulary`` compiled once per mapping instance."""
+    entry = _COMPILED.get(id(vocabulary))
+    if entry is not None and entry[0] is vocabulary:
+        return entry[1]
+    compiled = _compile(vocabulary)
+    _COMPILED[id(vocabulary)] = (vocabulary, compiled)
+    return compiled
+
+
 def _registry() -> tuple[_CompiledRestriction, ...]:
-    return _compile(allergens().vocabulary)
+    return _compiled(allergens().vocabulary)
 
 
 _HEBREW_BEFORE_PREFIX: Final = re.compile(r"[בהוכלמש]{1,2}")
@@ -516,7 +533,7 @@ def find_with(
     raw_text: str, vocabulary: Mapping[str, RestrictionVocabulary]
 ) -> list[AllergenHit]:
     """``AllergenMatcher.findWith``: :func:`find` over ``vocabulary``."""
-    return _find_in(match_text(raw_text), _compile(vocabulary))
+    return _find_in(match_text(raw_text), _compiled(vocabulary))
 
 
 def find_in_dish_with(
@@ -524,7 +541,7 @@ def find_in_dish_with(
 ) -> list[AllergenHit]:
     """``AllergenMatcher.findInDishWith``: :func:`find_in_dish` over
     ``vocabulary``."""
-    return _find_in(dish_match_text(dish), _compile(vocabulary))
+    return _find_in(dish_match_text(dish), _compiled(vocabulary))
 
 
 def find(raw_text: str) -> list[AllergenHit]:

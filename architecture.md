@@ -3079,6 +3079,80 @@ keto and added ids left out; the app sheet width). Keto stays the existing
 toggles, and nothing reads the profile for classification yet
 (`ClassificationOptions` is unchanged; Wave 2 does that).
 
+**The Wave 2 contract (W2-0, #345, #346).** `lib/models/concern.dart` holds
+the wire types the allergen engine will fill: `Concern {restrictionId,
+source, certainty, tier, matchedText?, waiterQuestion?}` and
+`ExtractedIngredient {name, certainty, role}`, over `ConcernSource` (name,
+description, option, hidden, model), `Certainty` (stated, likely, suspected:
+the vocabulary's `TriggerCertainty` names, which a model may not import, so a
+trigger converts by name and a test pins the two equal), `EvidenceTier`
+(declared, stated, inferred, suspected, confirmed, denied; ALG-06) and
+`ComponentRole` (base, protein, side, sauce, garnish, option, unknown). Each
+reads tolerantly: an unknown enum name fails the entry and the list drops it,
+except an unknown role, which reads as `unknown` so an ingredient is never
+lost over it. `AnalysedDish` gains `ingredients` and `concerns` (absent →
+empty, written only when non-empty) and `ClassificationOptions` and
+`AnalysisOptionsSnapshot` gain `restrictionsRequested` (the snapshot key
+written only when true, part of `matches`); `fromSettings` leaves it false and
+nothing produces a concern yet. `backend/app/keto/models.py` mirrors all of
+it, omitting the same keys through a `model_serializer`. Per C3 there is no
+`schemaVersion` bump, and no golden or keto baseline changed.
+
+**The profile-only chef card (ALG-08a, #350).** With `bantoMode` on and a
+non-empty profile, the "My restrictions" section gains a "Show my chef card"
+button that pushes `ChefCardScreen`: a full-screen page that mirrors the Waiter
+Card's shell (brightness raised through `ScreenBrightness` while open, the
+numbered large-type lines and Copy button of `WaiterScriptWidget`, a pinned
+Done) and adds a Hebrew/English toggle, starting in the app's language, and
+Share as text through `MenuSharer`. `SettingsScreen` takes `screenBrightness`
+and `menuSharer` for it; `generateRoute` passes the app's. Its sentences come
+from `ChefCardText.compose` (`lib/utils/allergens/chef_card_templates.dart`),
+pure and in the language of the card, not the UI's, so like the waiter
+templates they live in Dart (§6.3's exception, §12) and only the chrome (title,
+button, empty message, toggle accessibility label) is in ARB: an intro line,
+one line per entry by kind (an allergen "please check every ingredient,
+including sauces, oils and garnishes", celiac its own gluten and cross-contact
+sentence, every flexible kind "please tell me which dishes contain it", the
+entry's exceptions appended to its line) and a closing line that asks the
+kitchen to confirm cross-contact precautions when the profile holds a strict
+entry. The card states what the person is and asks; it never says "safe" or
+"בטוח" (a table test pins every restriction in both languages), and no
+severity exists to vary it. The card needs no menu and sends nothing anywhere
+(C1). The per-dish card with a dish's name, modification and questions, and the
+cross-contact closing line driven by ALG-07 signals, are ALG-08b.
+
+**Kitchen cross-contact signals, the pure part (ALG-07, #349).**
+`KitchenSignals.of(menu)` in `lib/utils/allergens/kitchen_signals.dart`
+(twin: `backend/app/keto/kitchen_signals.py`) is a rules-only pass over a
+whole menu, never a dish, that reports what the menu reveals about its
+kitchen as `KitchenSignal`s in `KitchenSignalKind` order: `fryer`, `wok`,
+`sharedGrill`, `bakery`, `nuts`, `sesame`. Each carries the restrictions it
+threatens (taxonomy order), up to three dish names as evidence and one
+standard question for the staff in both languages. The questions live in Dart
+beside the term lists (the §6.3 exception, as the waiter templates do), are
+questions and never assurances, and pass the banned-words list. A dish shows
+a kind when its own rules text or its category heading does; the term lists
+compile as the keto vocabulary does (`latinTriggerPattern`,
+`hebrewTriggerPattern`, `isGuarded`), with guards for "stir fried", "pan
+fried", "air fried" and "fried rice" (a wok dish, not a fryer one),
+"chocolate chips" and plant-based burgers. The nuts, sesame and seafood facts
+come from `AllergenMatcher` (any certainty), never from a list of this file.
+`sharedGrill` needs a grilled meat dish and a grilled fish dish. The mapping
+is a fryer to wheat and gluten plus fish, crustaceans or molluscs when a fried
+dish names that seafood, a wok to peanuts, soy, wheat, gluten, crustaceans,
+molluscs and sesame, a shared grill to the seafood three, a bakery to milk,
+eggs, wheat, gluten and sesame, nuts to peanuts and tree nuts, sesame to
+sesame; wheat is added beside gluten wherever flour is the cause, because a
+wheat allergy shares the cause with celiac disease. A signal is a menu-level
+fact beside the per-dish answer: it changes no verdict, and nothing consults
+it yet (the notice, the demotion of green dishes for strict entries and the
+keto-only no-op are ALG-07's later part). A new golden, `kitchen_signals.json`,
+carries the term lists, guards, threat table and questions and the signals of
+every golden menu, the allergen corpus menus and menus built for each rule,
+all under a small nuts, sesame and seafood vocabulary of its own
+(`tool/golden/kitchen_signals_corpus.dart`) so it does not move when the group
+vocabulary files are filled; no other golden changed.
+
 **The matcher's guards lower, sit beside their term, and read the maqaf
 (ALG-04a, related to #346).** Three allergen-only rules replace the keto guard
 window inside `AllergenMatcher`, and its Python twin follows them. **A guard
@@ -3103,8 +3177,17 @@ U+05BE reads as a space** before the matcher normalises
 deletes it as a Hebrew point and glues "חמאת־בוטנים" into one word; the
 normaliser itself is untouched, the replacement is length-preserving, and
 offsets index the match text, which equals the normalised text wherever
-there is no maqaf. `allergens.json` gains `termGuards`, each hit's `guarded`
-and each case's `matchText`; no keto golden changed.
+there is no maqaf; terms and guard phrases are read the same way, so a term
+written with a maqaf ("סויה־דבש") still matches. The filled group vocabularies
+follow the rules: compound guards moved into `termGuards` (the plant bases on
+the dairy words, the flours that are not wheat on `flour`/`קמח`, coffee,
+cocoa and jelly on `bean`, apple on `crab`, mushroom on `oyster`), and phrases
+the old window reached from two words away are listed whole ("dairy free",
+"peanut free" and the like after a term, "no added", "ללא גלוטן", "ללא
+מוצרי" before one). `KitchenSignals` counts only unguarded hits: an
+"almond-free" dish is no evidence that the kitchen handles nuts.
+`allergens.json` gains `termGuards`, each hit's `guarded` and each case's
+`matchText`; no keto golden changed.
 
 ---
 

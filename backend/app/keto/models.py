@@ -3,7 +3,8 @@
 Each class here is the Python twin of one Dart model in ``lib/models/``:
 ``menu.dart`` (``Menu``, ``MenuCategory``, ``Dish``, ``DishOption``),
 ``analysis.dart`` (``MenuAnalysed``, ``AnalysedDish``, ``HiddenCarb``,
-``LlmEngine``/``RulesEngine``, ``AnalysisOptionsSnapshot``) and
+``LlmEngine``/``RulesEngine``, ``AnalysisOptionsSnapshot``), ``concern.dart``
+(``Concern``, ``ExtractedIngredient``; Banto, D26 W2-0) and
 ``venue.dart`` (``VenueRef``, ``Venue``). The contract is that
 ``to_json(Model.model_validate(x)) == x`` for every ``x`` a Dart ``toJson``
 wrote, down to key order and ``json.dumps`` bytes:
@@ -11,11 +12,15 @@ wrote, down to key order and ``json.dumps`` bytes:
 * **Field order is key order.** Fields are declared in the order the Dart
   ``toJson`` map literal writes them, and pydantic dumps in declaration
   order. Reordering a field here is a wire change.
-* **No key is ever omitted.** Every Dart ``toJson`` in these files writes
-  every key, null or not (``Dish.imageUrl``/``page``, ``Menu.venueName``,
-  ``AnalysedDish.modification``/``netCarbsEstimate``,
+* **No key is omitted, with three exceptions.** Every Dart ``toJson`` in
+  these files writes every key, null or not (``Dish.imageUrl``/``page``,
+  ``Menu.venueName``, ``AnalysedDish.modification``/``netCarbsEstimate``,
   ``MenuAnalysed.options``, every optional ``Venue`` field), so ``to_json``
-  never passes ``exclude_none``.
+  never passes ``exclude_none``. The exceptions are Banto's (D26 C2, C3):
+  ``AnalysedDish.ingredients`` and ``concerns`` are written only when
+  non-empty and ``AnalysisOptionsSnapshot.restrictionsRequested`` only when
+  true, by a ``model_serializer`` on each model, so a keto analysis is the
+  same bytes it was before they existed.
 * **Doubles stay doubles.** Dart fields typed ``double`` (``Dish.price``,
   ``AnalysedDish.netCarbsEstimate``, ``Venue.latitude``/``longitude``/
   ``platformRating``) are ``float`` here: an incoming ``5`` is read as
@@ -36,12 +41,15 @@ wrote, down to key order and ``json.dumps`` bytes:
 Reading mirrors each Dart ``tryFrom``: the same fields are required, the
 same are non-empty, and the same few are read tolerantly (a missing or
 malformed ``Dish.imageUrl``/``page`` reads as null, a missing
-``hiddenCarbs`` as empty with malformed entries dropped, a missing or
-non-int ``schemaVersion`` as 0). Types are strict, as Dart's ``is`` checks
-are: ``"5"`` is not a number and ``true`` is not an int. The one deliberate
-difference is ``extra="forbid"``: a Dart ``tryFrom`` ignores unknown keys,
-but on this wire an unknown key means the two sides have drifted, and that
-should fail loudly here rather than be dropped.
+``hiddenCarbs``, ``ingredients`` or ``concerns`` as empty with malformed
+entries dropped, a missing or non-true ``restrictionsRequested`` as false, a
+missing or non-int ``schemaVersion`` as 0). Types are strict, as Dart's
+``is`` checks are: ``"5"`` is not a number and ``true`` is not an int. The one
+deliberate difference is ``extra="forbid"``: a Dart ``tryFrom`` ignores
+unknown keys, but on this wire an unknown key means the two sides have
+drifted, and that should fail loudly here rather than be dropped. Inside the
+tolerant lists that difference drops the entry, as any other malformed entry
+is dropped.
 
 Python names are snake_case; the camelCase JSON names come from the
 ``to_camel`` alias generator rather than a per-field ``alias=``, because a
@@ -52,15 +60,17 @@ work at runtime.
 """
 
 from datetime import datetime
-from typing import Annotated, Any, Final, Literal
+from typing import Annotated, Any, Final, Literal, get_args
 
 from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    SerializerFunctionWrapHandler,
     StrictInt,
     ValidationError,
     field_validator,
+    model_serializer,
     model_validator,
 )
 from pydantic.alias_generators import to_camel
@@ -107,8 +117,53 @@ MenuSourceName = Literal["wolt", "tenbis", "tabit", "ontopo", "scan", "website"]
 Verdict = Literal["orderAsIs", "modifiable", "nonKeto"]
 """The Dart ``DishVerdict`` names."""
 
-Certainty = Literal["suspected", "likely"]
+HiddenCarbCertainty = Literal["suspected", "likely"]
 """The Dart ``HiddenCarbCertainty`` names."""
+
+RestrictionIdName = Literal[
+    "peanuts",
+    "treeNuts",
+    "milk",
+    "lactose",
+    "eggs",
+    "soy",
+    "wheat",
+    "gluten",
+    "fish",
+    "crustaceans",
+    "molluscs",
+    "sesame",
+    "celery",
+    "mustard",
+    "lupin",
+    "sulphites",
+    "legumes",
+    "vegan",
+    "vegetarian",
+    "keto",
+]
+"""The Dart ``RestrictionId`` names; a test pins them to the taxonomy in
+``allergens.json`` (this module may not import ``app.keto.allergens``, which
+imports it)."""
+
+ConcernSource = Literal["name", "description", "option", "hidden", "model"]
+"""The Dart ``ConcernSource`` names."""
+
+Certainty = Literal["stated", "likely", "suspected"]
+"""The Dart ``Certainty`` names, the vocabulary's ``TriggerCertainty``
+names too."""
+
+EvidenceTier = Literal[
+    "declared", "stated", "inferred", "suspected", "confirmed", "denied"
+]
+"""The Dart ``EvidenceTier`` names."""
+
+ComponentRole = Literal[
+    "base", "protein", "side", "sauce", "garnish", "option", "unknown"
+]
+"""The Dart ``ComponentRole`` names."""
+
+_COMPONENT_ROLES: Final = frozenset(get_args(ComponentRole))
 
 FailureReason = Literal[
     "notConfigured",
@@ -240,7 +295,7 @@ class HiddenCarb(WireModel):
     """
 
     source: str
-    certainty: Certainty
+    certainty: HiddenCarbCertainty
     waiter_question: str
 
     @field_validator("source", "waiter_question")
@@ -253,14 +308,94 @@ class HiddenCarb(WireModel):
         return value
 
 
+def _optional_text(value: object) -> object:
+    """``value`` when it is a non-empty string, else None: Dart's
+    ``_optionalText``."""
+    return value if isinstance(value, str) and value else None
+
+
+class Concern(WireModel):
+    """Dart ``Concern``: ``{restrictionId, source, certainty, tier,
+    matchedText, waiterQuestion}`` (Banto; D26 W2-0).
+
+    The four enum names are required and must be known (an unknown one fails
+    the entry, which the list holding it drops). ``matched_text`` and
+    ``waiter_question`` read anything but a non-empty string as null and are
+    always written, null included.
+    """
+
+    restriction_id: RestrictionIdName
+    source: ConcernSource
+    certainty: Certainty
+    tier: EvidenceTier
+    matched_text: str | None = None
+    waiter_question: str | None = None
+
+    @field_validator("matched_text", "waiter_question", mode="before")
+    @classmethod
+    def _tolerant_text(cls, value: object) -> object:
+        return _optional_text(value)
+
+
+class ExtractedIngredient(WireModel):
+    """Dart ``ExtractedIngredient``: ``{name, certainty, role}`` (Banto; D26
+    W2-0).
+
+    ``name`` must be non-blank by Dart's ``trim`` and ``certainty`` known; an
+    absent or unknown ``role`` reads as ``unknown``, so an ingredient is never
+    dropped over its role.
+    """
+
+    name: str
+    certainty: Certainty
+    role: ComponentRole = "unknown"
+
+    @field_validator("name")
+    @classmethod
+    def _not_blank(cls, value: str) -> str:
+        if not dart_trim(value):
+            raise ValueError("must not be blank")
+        return value
+
+    @field_validator("role", mode="before")
+    @classmethod
+    def _tolerant_role(cls, value: object) -> object:
+        return (
+            value
+            if isinstance(value, str) and value in _COMPONENT_ROLES
+            else ("unknown")
+        )
+
+
+def _tolerant_entries[T: BaseModel](model: type[T], value: object) -> list[T]:
+    """Each entry of ``value`` that ``model`` accepts, in order; empty when
+    ``value`` is not a list. Dart's ``tryFrom`` list reading (§9.4)."""
+    if not isinstance(value, list):
+        return []
+    kept: list[T] = []
+    for entry in value:
+        if isinstance(entry, model):
+            kept.append(entry)
+            continue
+        if not isinstance(entry, dict):
+            continue
+        try:
+            kept.append(model.model_validate(entry))
+        except ValidationError:
+            continue
+    return kept
+
+
 class AnalysedDish(WireModel):
     """Dart ``AnalysedDish``: ``{dishId, name, verdict, why, modification,
-    netCarbsEstimate, hiddenCarbs}``.
+    netCarbsEstimate, hiddenCarbs, ingredients, concerns}``.
 
     ``modification`` is a non-empty string exactly when ``verdict`` is
     ``modifiable`` and null otherwise, the invariant Dart's ``tryFrom``
-    enforces. ``hidden_carbs`` reads absent, null or non-list as empty and
-    drops each malformed entry silently, as Dart does (§9.4).
+    enforces. ``hidden_carbs``, ``ingredients`` and ``concerns`` read absent,
+    null or non-list as empty and drop each malformed entry silently, as Dart
+    does (§9.4). ``ingredients`` and ``concerns`` are written only when
+    non-empty (D26 C3).
     """
 
     dish_id: NonEmptyStr
@@ -270,24 +405,34 @@ class AnalysedDish(WireModel):
     modification: str | None = None
     net_carbs_estimate: float | None = None
     hidden_carbs: list[HiddenCarb] = Field(default_factory=list)
+    ingredients: list[ExtractedIngredient] = Field(default_factory=list)
+    concerns: list[Concern] = Field(default_factory=list)
 
     @field_validator("hidden_carbs", mode="before")
     @classmethod
     def _tolerant_hidden_carbs(cls, value: object) -> list[HiddenCarb]:
-        if not isinstance(value, list):
-            return []
-        kept: list[HiddenCarb] = []
-        for entry in value:
-            if isinstance(entry, HiddenCarb):
-                kept.append(entry)
-                continue
-            if not isinstance(entry, dict):
-                continue
-            try:
-                kept.append(HiddenCarb.model_validate(entry))
-            except ValidationError:
-                continue
-        return kept
+        return _tolerant_entries(HiddenCarb, value)
+
+    @field_validator("ingredients", mode="before")
+    @classmethod
+    def _tolerant_ingredients(cls, value: object) -> list[ExtractedIngredient]:
+        return _tolerant_entries(ExtractedIngredient, value)
+
+    @field_validator("concerns", mode="before")
+    @classmethod
+    def _tolerant_concerns(cls, value: object) -> list[Concern]:
+        return _tolerant_entries(Concern, value)
+
+    @model_serializer(mode="wrap")
+    def _omit_empty_banto_lists(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, Any]:
+        data: dict[str, Any] = handler(self)
+        if not self.ingredients:
+            data.pop("ingredients", None)
+        if not self.concerns:
+            data.pop("concerns", None)
+        return data
 
     @model_validator(mode="after")
     def _modification_matches_verdict(self) -> "AnalysedDish":
@@ -319,16 +464,34 @@ AnalysisEngine = Annotated[LlmEngine | RulesEngine, Field(discriminator="kind")]
 
 class AnalysisOptionsSnapshot(WireModel):
     """Dart ``AnalysisOptionsSnapshot``: ``{netCarbLimitGrams,
-    dietaryConstraints}``. An absent or null ``dietaryConstraints`` reads as
-    empty."""
+    dietaryConstraints, restrictionsRequested}``. An absent or null
+    ``dietaryConstraints`` reads as empty. ``restrictionsRequested`` (Banto;
+    D26 C2) reads anything but ``true`` as false and is written only when
+    true."""
 
     net_carb_limit_grams: StrictInt
     dietary_constraints: list[str] = Field(default_factory=list)
+    restrictions_requested: bool = False
 
     @field_validator("dietary_constraints", mode="before")
     @classmethod
     def _null_constraints_are_none(cls, value: object) -> object:
         return [] if value is None else value
+
+    @field_validator("restrictions_requested", mode="before")
+    @classmethod
+    def _only_true_is_true(cls, value: object) -> object:
+        return value is True
+
+    @model_serializer(mode="wrap")
+    def _omit_false_restrictions(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, Any]:
+        data: dict[str, Any] = handler(self)
+        if not self.restrictions_requested:
+            data.pop("restrictionsRequested", None)
+            data.pop("restrictions_requested", None)
+        return data
 
 
 class MenuAnalysed(WireModel):

@@ -1,0 +1,600 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/utils/allergens/allergen_matcher.dart';
+import 'package:ketoclub/utils/allergens/vocabulary.dart';
+import 'package:ketoclub/utils/text_normaliser.dart';
+
+const RestrictionId _vegan = RestrictionId.vegan;
+const RestrictionId _veg = RestrictionId.vegetarian;
+
+/// The hits [AllergenMatcher.find] reports for [id] in [text], each as
+/// `term:certainty`. Filtered by id so the other groups' vocabularies
+/// (filled by their own pull requests) cannot change these tests.
+List<String> _hits(String text, RestrictionId id) => <String>[
+  for (final hit in AllergenMatcher.find(text))
+    if (hit.id == id)
+      '${hit.term}:${hit.certainty.name}${hit.guarded ? ':guarded' : ''}',
+];
+
+/// What one text does to the two diets: `vegan` and `vegetarian` are the
+/// `term:certainty` entries each must report; a null list means "reports
+/// nothing at all". When `lowered`, every hit of both diets is guarded
+/// and there is at least one (a guard lowers, never cancels; ALG-04a).
+typedef _Case = ({
+  String text,
+  List<String>? vegan,
+  List<String>? vegetarian,
+  bool lowered,
+  String why,
+});
+
+_Case _case(
+  String text, {
+  List<String>? vegan,
+  List<String>? vegetarian,
+  String why = '',
+}) => (
+  text: text,
+  vegan: vegan,
+  vegetarian: vegetarian,
+  lowered: false,
+  why: why,
+);
+
+/// A text the restaurant declares free of the diets' triggers: every hit
+/// is lowered to suspected, none is dropped.
+_Case _lowered(String text, {String why = ''}) =>
+    (text: text, vegan: null, vegetarian: null, lowered: true, why: why);
+
+/// Whether [hits] (as [_hits] writes them) are all guarded.
+bool _allGuarded(List<String> hits) =>
+    hits.every((hit) => hit.endsWith(':guarded'));
+
+void _run(List<_Case> cases) {
+  for (final c in cases) {
+    test('"${c.text}" ${c.why}', () {
+      if (c.lowered) {
+        final vegan = _hits(c.text, _vegan);
+        final vegetarian = _hits(c.text, _veg);
+        expect(<String>[...vegan, ...vegetarian], isNotEmpty);
+        expect(_allGuarded(vegan), isTrue, reason: '$vegan');
+        expect(_allGuarded(vegetarian), isTrue, reason: '$vegetarian');
+        return;
+      }
+      for (final (id, expected) in <(RestrictionId, List<String>?)>[
+        (_vegan, c.vegan),
+        (_veg, c.vegetarian),
+      ]) {
+        // Act
+        final hits = _hits(c.text, id);
+
+        // Assert
+        if (expected == null) {
+          expect(hits, isEmpty, reason: id.name);
+        } else {
+          for (final entry in expected) {
+            expect(hits, contains(entry), reason: id.name);
+          }
+        }
+      }
+    });
+  }
+}
+
+void main() {
+  group('meat and fish: both diets', () {
+    _run(<_Case>[
+      _case(
+        'Chicken schnitzel',
+        vegan: <String>['chicken:stated'],
+        vegetarian: <String>['chicken:stated'],
+      ),
+      _case(
+        'Beef burger',
+        vegan: <String>['beef:stated'],
+        vegetarian: <String>['beef:stated'],
+      ),
+      _case(
+        'Roast lamb and pork belly',
+        vegan: <String>['lamb:stated', 'pork:stated'],
+        vegetarian: <String>['lamb:stated', 'pork:stated'],
+      ),
+      _case(
+        'Bacon and ham',
+        vegan: <String>['bacon:stated', 'ham:stated'],
+        vegetarian: <String>['bacon:stated', 'ham:stated'],
+      ),
+      _case(
+        'Grilled salmon',
+        vegan: <String>['salmon:stated'],
+        vegetarian: <String>['salmon:stated'],
+      ),
+      _case(
+        'Fish and chips',
+        vegan: <String>['fish:stated'],
+        vegetarian: <String>['fish:stated'],
+      ),
+      _case(
+        'Shrimp tempura',
+        vegan: <String>['shrimp:stated'],
+        vegetarian: <String>['shrimp:stated'],
+      ),
+      _case(
+        'Grilled squid',
+        vegan: <String>['squid:stated'],
+        vegetarian: <String>['squid:stated'],
+      ),
+      _case(
+        'Ribeye 350g',
+        vegan: <String>['ribeye:stated'],
+        vegetarian: <String>['ribeye:stated'],
+      ),
+      _case(
+        'Pan-seared filet mignon',
+        vegan: <String>['filet mignon:stated'],
+        vegetarian: <String>['filet mignon:stated'],
+      ),
+      _case(
+        'Philly cheesesteak',
+        vegan: <String>['cheesesteak:stated'],
+        vegetarian: <String>['cheesesteak:stated'],
+      ),
+      _case(
+        'Roasted bone marrow',
+        vegan: <String>['bone marrow:stated'],
+        vegetarian: <String>['bone marrow:stated'],
+      ),
+      _case(
+        'Chow mein with oyster sauce',
+        vegan: <String>['oyster:stated'],
+        vegetarian: <String>['oyster:stated'],
+        why: 'the singular names a mollusc too',
+      ),
+      _case(
+        'Cheeseburger',
+        vegan: <String>['cheeseburger:stated'],
+        vegetarian: <String>['cheeseburger:stated'],
+      ),
+      _case(
+        'Blue cheese burger with a dry-aged patty',
+        vegan: <String>['burger:suspected', 'patty:suspected'],
+        vegetarian: <String>['burger:suspected', 'patty:suspected'],
+      ),
+      _case(
+        'ספגטי קרבונרה עם פנצ׳טה',
+        vegan: <String>["פנצ'טה:stated"],
+        vegetarian: <String>["פנצ'טה:stated"],
+      ),
+      _case(
+        'אנטריקוט עם פירה',
+        vegan: <String>['אנטריקוט:stated'],
+        vegetarian: <String>['אנטריקוט:stated'],
+      ),
+      _case(
+        'שניצל בציפוי פירורי לחם',
+        vegan: <String>['שניצל:likely'],
+        vegetarian: <String>['שניצל:likely'],
+      ),
+      _case(
+        'המבורגר עטוף בחסה',
+        vegan: <String>['המבורגר:likely'],
+        vegetarian: <String>['המבורגר:likely'],
+      ),
+      _case(
+        'דניס בגריל ולברק צרוב',
+        vegan: <String>['דניס:stated', 'לברק:stated'],
+        vegetarian: <String>['דניס:stated', 'לברק:stated'],
+      ),
+      _case(
+        'סרדינים טריים בגריל',
+        vegan: <String>['סרדינים:stated'],
+        vegetarian: <String>['סרדינים:stated'],
+      ),
+      _case(
+        'רול קליפורניה עם סורימי',
+        vegan: <String>['סורימי:stated'],
+        vegetarian: <String>['סורימי:stated'],
+      ),
+      _case(
+        'ארוחת צ׳יקן ונאגטס',
+        vegan: <String>["צ'יקן:stated", 'נאגטס:stated'],
+        vegetarian: <String>["צ'יקן:stated", 'נאגטס:stated'],
+      ),
+      _case(
+        'Panna cotta with berries',
+        vegan: <String>['panna cotta:likely'],
+        vegetarian: <String>['panna cotta:likely'],
+        why: 'sets with gelatin',
+      ),
+      _case(
+        'Gelatin dessert',
+        vegan: <String>['gelatin:stated'],
+        vegetarian: <String>['gelatin:stated'],
+      ),
+      _case(
+        "ג'לטין בטעם תות",
+        vegan: <String>["ג'לטין:stated"],
+        vegetarian: <String>["ג'לטין:stated"],
+      ),
+      _case(
+        'Caesar dressing with worcestershire',
+        vegan: <String>['worcestershire:suspected'],
+        vegetarian: <String>[
+          'worcestershire:suspected',
+          'caesar dressing:suspected',
+        ],
+      ),
+      _case(
+        'שניצל עוף בפירורי לחם',
+        vegan: <String>['עוף:stated'],
+        vegetarian: <String>['עוף:stated'],
+      ),
+      _case(
+        'המבורגר בקר 200 גרם',
+        vegan: <String>['בקר:stated'],
+        vegetarian: <String>['בקר:stated'],
+      ),
+      _case(
+        'כבש ועוף על האש',
+        vegan: <String>['כבש:stated', 'ועוף:stated'],
+        vegetarian: <String>['כבש:stated', 'ועוף:stated'],
+        why: 'ו before עוף is "and", a listed form',
+      ),
+      _case(
+        'פילה סלמון בתנור',
+        vegan: <String>['סלמון:stated'],
+        vegetarian: <String>['סלמון:stated'],
+      ),
+      _case(
+        'דג של היום',
+        vegan: <String>['דג:stated'],
+        vegetarian: <String>['דג:stated'],
+      ),
+      _case(
+        'שרימפס בשום',
+        vegan: <String>['שרימפס:stated'],
+        vegetarian: <String>['שרימפס:stated'],
+      ),
+      _case(
+        'צלי בשר עם ירקות',
+        vegan: <String>['בשר:stated'],
+        vegetarian: <String>['בשר:stated'],
+      ),
+      _case(
+        'הבשר טרי ובשר טחון',
+        vegan: <String>['הבשר:stated', 'ובשר:stated'],
+        vegetarian: <String>['הבשר:stated', 'ובשר:stated'],
+        why: 'prefixed forms of בשר are terms of their own',
+      ),
+      _case(
+        'מנה בשרית',
+        vegan: <String>['בשרית:likely'],
+        vegetarian: <String>['בשרית:likely'],
+        why: 'is the kosher meat sense',
+      ),
+      _case(
+        'בשרי',
+        vegan: <String>['בשרי:likely'],
+        vegetarian: <String>['בשרי:likely'],
+        why: 'means the dish contains meat (12 §2.1)',
+      ),
+    ]);
+  });
+
+  group('dairy, eggs and honey: vegan only', () {
+    _run(<_Case>[
+      _case(
+        'Cheese omelette',
+        vegan: <String>['cheese:stated', 'omelette:stated'],
+      ),
+      _case('Fried egg on toast', vegan: <String>['egg:stated']),
+      _case('Honey glazed carrots', vegan: <String>['honey:stated']),
+      _case('Honey mustard dressing', vegan: <String>['honey:stated']),
+      _case(
+        'Vegetarian lasagne with ricotta',
+        vegan: <String>['ricotta:stated'],
+        why: 'vegetarian is not a vegan guard',
+      ),
+      _case('Strawberry yoghurt', vegan: <String>['yoghurt:stated']),
+      _case('Whey protein shake', vegan: <String>['whey:stated']),
+      _case('Garlic mayonnaise', vegan: <String>['mayonnaise:likely']),
+      _case('Carbonara', vegan: <String>['carbonara:likely']),
+      _case('Lemon meringue pie', vegan: <String>['meringue:likely']),
+      _case(
+        'Warm milk and butter',
+        vegan: <String>['milk:likely', 'butter:likely'],
+      ),
+      _case('Fresh cream', vegan: <String>['cream:likely']),
+      _case(
+        'Mozzarella and feta',
+        vegan: <String>['mozzarella:stated', 'feta:stated'],
+      ),
+      _case('Vanilla ice cream', vegan: <String>['ice cream:stated']),
+      _case('Iced latte', vegan: <String>['latte:likely']),
+      _case(
+        'Gnocchi in gorgonzola sauce',
+        vegan: <String>['gorgonzola:stated'],
+      ),
+      _case('הפוך קר', vegan: <String>['הפוך:likely']),
+      _case('גלידת וניל', vegan: <String>['גלידת:likely']),
+      _case('מוצ׳י במילוי גלידה', vegan: <String>['גלידה:likely']),
+      _case('טירמיסו עם מסקרפונה', vegan: <String>['מסקרפונה:stated']),
+      _case('ניוקי ברוטב גורגונזולה', vegan: <String>['גורגונזולה:stated']),
+      _case('גבינת קשיו מותססת', vegan: <String>['גבינת:likely']),
+      _case('בורקס גבינה', vegan: <String>['גבינה:stated']),
+      _case('גבינת עיזים', vegan: <String>['גבינת:likely']),
+      _case('שקשוקה עם ביצים', vegan: <String>['ביצים:stated']),
+      _case('ביצת עין', vegan: <String>['ביצת:stated']),
+      _case('חביתה', vegan: <String>['חביתה:stated']),
+      _case('לאבנה וזיתים', vegan: <String>['לאבנה:stated']),
+      _case('פסטה ברוטב שמנת', vegan: <String>['שמנת:likely']),
+      _case('קפה עם חלב', vegan: <String>['חלב:likely']),
+      _case('חמאה ולחם', vegan: <String>['חמאה:likely']),
+      _case('סלט עם דבש ופטה', vegan: <String>['דבש:stated', 'פטה:stated']),
+      _case('מנה חלבית', vegan: <String>['חלבית:likely']),
+      _case(
+        'חלבי',
+        vegan: <String>['חלבי:likely'],
+        why: 'is dairy for the vegan and meat-free for the vegetarian',
+      ),
+      _case('איולי שום', vegan: <String>['איולי:likely']),
+      _case('מיונז ביתי', vegan: <String>['מיונז:likely']),
+    ]);
+  });
+
+  group("guards: the restaurant's own declaration", () {
+    _run(<_Case>[
+      _lowered('Vegan cheese'),
+      _lowered('Vegan chicken nuggets'),
+      _lowered('Plant-based burger'),
+      _lowered('Plant based sausage'),
+      _lowered('Dairy free cheese'),
+      _lowered('Chicken alternative'),
+      _lowered('Meat substitute'),
+      _lowered('Imitation bacon'),
+      _lowered('No cheese, no egg'),
+      _lowered('Without meat'),
+      _lowered('Eggless mayonnaise'),
+      _lowered('גבינה טבעונית'),
+      _lowered('נקניקיות טבעוניות'),
+      _case(
+        'שניצל עוף טבעוני',
+        vegan: <String>['שניצל:likely', 'עוף:suspected:guarded'],
+        vegetarian: <String>['שניצל:likely', 'עוף:suspected:guarded'],
+        why: 'the guard reaches only the word beside it',
+      ),
+      _lowered('בשר צמחי'),
+      _lowered('חלב צמחי'),
+      _lowered('שמנת על בסיס צמחי'),
+      _lowered('תחליף גבינה'),
+      _lowered('עוגה ללא ביצים וללא חמאה'),
+      _lowered('סלט בלי גבינה ובלי ביצה'),
+      _lowered('ללא ביצים'),
+      _lowered('בלי בשר'),
+    ]);
+
+    test('a vegetarian declaration lowers the vegetarian hit only', () {
+      expect(_hits('Vegetarian sausage', _veg), <String>[
+        'sausage:suspected:guarded',
+      ]);
+      expect(_hits('Vegetarian sausage', _vegan), contains('sausage:stated'));
+    });
+
+    test('a vegan declaration lowers both diets', () {
+      for (final text in <String>['Vegan sausage', 'נקניק טבעוני']) {
+        for (final id in <RestrictionId>[_veg, _vegan]) {
+          final hits = _hits(text, id);
+          expect(hits, isNotEmpty, reason: text);
+          expect(_allGuarded(hits), isTrue, reason: '$text: $hits');
+        }
+      }
+    });
+
+    test('the declaration must sit beside the trigger', () {
+      expect(
+        _hits('Vegan burger with cheese', _vegan),
+        contains('cheese:stated'),
+      );
+      expect(
+        _hits('המבורגר טבעוני עם גבינה', _vegan),
+        contains('גבינה:stated'),
+      );
+    });
+
+    test('a plant adjective is not a guard: it would hide shrimp', () {
+      for (final text in <String>[
+        'Coconut shrimp',
+        'Almond chicken',
+        'Peanut chicken',
+        'Oat crusted salmon',
+      ]) {
+        expect(_hits(text, _veg), isNotEmpty, reason: text);
+        expect(_hits(text, _vegan), isNotEmpty, reason: text);
+      }
+    });
+
+    test('plant milk and butter read as likely, never stated', () {
+      expect(_hits('Oat milk with granola', _vegan), <String>['milk:likely']);
+      expect(_hits('Peanut butter', _vegan), <String>['butter:likely']);
+      expect(_hits('Coconut cream', _vegan), <String>['cream:likely']);
+      expect(_hits('חלב שקדים', _vegan), <String>['חלב:likely']);
+    });
+
+    test('the plant emoji is dropped by the normaliser', () {
+      // The 🌱 declaration cannot be a guard phrase: it normalises to
+      // nothing, so it never appears in the text the matcher reads.
+      expect(TextNormaliser.normalise('🌱'), isEmpty);
+      expect(TextNormaliser.normalise('🌱 vegan'), 'vegan');
+      expect(_hits('Burger 🌱 with cheese', _vegan), contains('cheese:stated'));
+    });
+  });
+
+  group('words that look like a trigger and are not', () {
+    _run(<_Case>[
+      _case('חלבון איכותי', why: 'protein is not חלב (milk)'),
+      _case('חלבה בטחינה', why: 'halva is not חלב'),
+      _case('לבקר במסעדה', why: 'to visit is not בקר'),
+      _case('הזמנה ממבקר', why: 'a visitor is not בקר'),
+      _case('מעוף הציפור', why: 'flight is not עוף'),
+      _case('לעוף גבוה', why: 'to fly is not עוף'),
+      _case('לבשר חדשות', why: 'to announce is not בשר'),
+      _case('מבשר טוב', why: 'a herald is not בשר'),
+      _case('מכבש כבישים', why: 'a press is not כבש'),
+      _case('להפוך את הסדר', why: 'to flip is not a latte'),
+      _case('Eggplant salad', why: 'eggplant is not egg'),
+      _case('Chickpea stew', why: 'chickpea is not chicken'),
+      _case('Butternut squash', why: 'butternut is not butter'),
+    ]);
+  });
+
+  group('every term, in its own sentence', () {
+    for (final id in <RestrictionId>[_vegan, _veg]) {
+      final vocabulary = allergenVocabulary[id]!;
+      group(id.name, () {
+        test('has triggers, guards and sources in both languages', () {
+          expect(vocabulary.directEn, isNotEmpty);
+          expect(vocabulary.directHe, isNotEmpty);
+          expect(vocabulary.hiddenEn, isNotEmpty);
+          expect(vocabulary.hiddenHe, isNotEmpty);
+          expect(vocabulary.sources, isNotEmpty);
+          expect(vocabulary.guards.beforeEn, contains('vegan'));
+          expect(vocabulary.guards.afterHe, contains('טבעוני'));
+          expect(
+            vocabulary.noPrefixHe,
+            containsAll(<String>['בשר', 'עוף', 'בקר', 'כבש']),
+          );
+        });
+
+        test('every direct English term is found, stated', () {
+          for (final term in vocabulary.directEn) {
+            for (final text in <String>[
+              term,
+              'Served with $term on the side',
+              'Served with ${term.toUpperCase()} on the side',
+            ]) {
+              expect(_hits(text, id), contains('$term:stated'), reason: text);
+            }
+          }
+        });
+
+        test('every direct Hebrew term is found, stated, with prefixes', () {
+          final noPrefix = vocabulary.noPrefixHe.toSet();
+          for (final term in vocabulary.directHe) {
+            expect(_hits(term, id), contains('$term:stated'), reason: term);
+            expect(
+              _hits('מוגש עם $term בצד', id),
+              contains('$term:stated'),
+              reason: term,
+            );
+            if (noPrefix.contains(term)) continue;
+            for (final text in <String>['ה$term', 'וב$term']) {
+              expect(
+                _hits('מוגש עם $text בצד', id),
+                contains('$term:stated'),
+                reason: text,
+              );
+            }
+          }
+        });
+
+        test('every hidden term is found with its own certainty', () {
+          for (final trigger in vocabulary.hiddenEn) {
+            expect(
+              _hits('Served with ${trigger.term} on the side', id),
+              contains('${trigger.term}:${trigger.certainty.name}'),
+              reason: trigger.term,
+            );
+          }
+          for (final trigger in vocabulary.hiddenHe) {
+            expect(
+              _hits('מוגש עם ${trigger.term} בצד', id),
+              contains('${trigger.term}:${trigger.certainty.name}'),
+              reason: trigger.term,
+            );
+          }
+        });
+
+        test('a no-prefix Hebrew term is not found behind a prefix', () {
+          for (final term in vocabulary.noPrefixHe) {
+            for (final text in <String>['מוגש עם ל$term בצד', 'מ$term']) {
+              expect(
+                _hits(text, id).where((hit) => hit.startsWith('$term:')),
+                isEmpty,
+                reason: text,
+              );
+            }
+          }
+        });
+
+        test('every guard word lowers a trigger beside it', () {
+          final guards = vocabulary.guards;
+          for (final text in <String>[
+            for (final word in guards.beforeEn) '$word chicken',
+            for (final word in guards.afterEn) 'chicken $word',
+            for (final word in guards.beforeHe) '$word עוף',
+            for (final word in guards.afterHe) 'עוף $word',
+          ]) {
+            final hits = _hits(text, id);
+            expect(hits, isNotEmpty, reason: text);
+            expect(_allGuarded(hits), isTrue, reason: '$text: $hits');
+          }
+        });
+      });
+    }
+  });
+
+  group('the two diets relate as the corpus expects', () {
+    String key(String term) => TextNormaliser.normalise(term);
+
+    Set<String> terms(RestrictionId id) {
+      final vocabulary = allergenVocabulary[id]!;
+      return <String>{
+        for (final term in vocabulary.directEn) key(term),
+        for (final term in vocabulary.directHe) key(term),
+        for (final trigger in vocabulary.hiddenEn) key(trigger.term),
+        for (final trigger in vocabulary.hiddenHe) key(trigger.term),
+      };
+    }
+
+    test('every vegetarian trigger is a vegan trigger too', () {
+      expect(terms(_vegan).containsAll(terms(_veg)), isTrue);
+    });
+
+    test('dairy, eggs and honey are vegan triggers and not vegetarian', () {
+      for (final text in <String>[
+        'milk',
+        'cheese',
+        'egg',
+        'honey',
+        'butter',
+        'חלב',
+        'גבינה',
+        'ביצה',
+        'דבש',
+        'חמאה',
+        'חלבי',
+      ]) {
+        expect(_hits(text, _vegan), isNotEmpty, reason: text);
+        expect(_hits(text, _veg), isEmpty, reason: text);
+      }
+    });
+
+    test('vegan covers the fish, crustacean and mollusc words', () {
+      for (final text in <String>[
+        'tuna',
+        'crab',
+        'mussels',
+        'טונה',
+        'סרטנים',
+        'מולים',
+      ]) {
+        expect(_hits(text, _vegan), isNotEmpty, reason: text);
+        expect(_hits(text, _veg), isNotEmpty, reason: text);
+      }
+    });
+
+    test('keto stays empty: its vocabulary lives in constants.dart', () {
+      expect(allergenVocabulary[RestrictionId.keto]!.isEmpty, isTrue);
+    });
+  });
+}
