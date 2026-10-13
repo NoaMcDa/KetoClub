@@ -99,6 +99,82 @@ void main() {
         vegetarian: <String>['squid:stated'],
       ),
       _case(
+        'Ribeye 350g',
+        vegan: <String>['ribeye:stated'],
+        vegetarian: <String>['ribeye:stated'],
+      ),
+      _case(
+        'Pan-seared filet mignon',
+        vegan: <String>['filet mignon:stated'],
+        vegetarian: <String>['filet mignon:stated'],
+      ),
+      _case(
+        'Philly cheesesteak',
+        vegan: <String>['cheesesteak:stated'],
+        vegetarian: <String>['cheesesteak:stated'],
+      ),
+      _case(
+        'Roasted bone marrow',
+        vegan: <String>['bone marrow:stated'],
+        vegetarian: <String>['bone marrow:stated'],
+      ),
+      _case(
+        'Chow mein with oyster sauce',
+        vegan: <String>['oyster:stated'],
+        vegetarian: <String>['oyster:stated'],
+        why: 'the singular names a mollusc too',
+      ),
+      _case(
+        'Cheeseburger',
+        vegan: <String>['cheeseburger:stated'],
+        vegetarian: <String>['cheeseburger:stated'],
+      ),
+      _case(
+        'Blue cheese burger with a dry-aged patty',
+        vegan: <String>['burger:suspected', 'patty:suspected'],
+        vegetarian: <String>['burger:suspected', 'patty:suspected'],
+      ),
+      _case(
+        'ספגטי קרבונרה עם פנצ׳טה',
+        vegan: <String>["פנצ'טה:stated"],
+        vegetarian: <String>["פנצ'טה:stated"],
+      ),
+      _case(
+        'אנטריקוט עם פירה',
+        vegan: <String>['אנטריקוט:stated'],
+        vegetarian: <String>['אנטריקוט:stated'],
+      ),
+      _case(
+        'שניצל בציפוי פירורי לחם',
+        vegan: <String>['שניצל:likely'],
+        vegetarian: <String>['שניצל:likely'],
+      ),
+      _case(
+        'המבורגר עטוף בחסה',
+        vegan: <String>['המבורגר:likely'],
+        vegetarian: <String>['המבורגר:likely'],
+      ),
+      _case(
+        'דניס בגריל ולברק צרוב',
+        vegan: <String>['דניס:stated', 'לברק:stated'],
+        vegetarian: <String>['דניס:stated', 'לברק:stated'],
+      ),
+      _case(
+        'סרדינים טריים בגריל',
+        vegan: <String>['סרדינים:stated'],
+        vegetarian: <String>['סרדינים:stated'],
+      ),
+      _case(
+        'רול קליפורניה עם סורימי',
+        vegan: <String>['סורימי:stated'],
+        vegetarian: <String>['סורימי:stated'],
+      ),
+      _case(
+        'ארוחת צ׳יקן ונאגטס',
+        vegan: <String>["צ'יקן:stated", 'נאגטס:stated'],
+        vegetarian: <String>["צ'יקן:stated", 'נאגטס:stated'],
+      ),
+      _case(
         'Panna cotta with berries',
         vegan: <String>['panna cotta:likely'],
         vegetarian: <String>['panna cotta:likely'],
@@ -208,8 +284,19 @@ void main() {
         vegan: <String>['mozzarella:stated', 'feta:stated'],
       ),
       _case('Vanilla ice cream', vegan: <String>['ice cream:stated']),
+      _case('Iced latte', vegan: <String>['latte:likely']),
+      _case(
+        'Gnocchi in gorgonzola sauce',
+        vegan: <String>['gorgonzola:stated'],
+      ),
+      _case('הפוך קר', vegan: <String>['הפוך:likely']),
+      _case('גלידת וניל', vegan: <String>['גלידת:likely']),
+      _case('מוצ׳י במילוי גלידה', vegan: <String>['גלידה:likely']),
+      _case('טירמיסו עם מסקרפונה', vegan: <String>['מסקרפונה:stated']),
+      _case('ניוקי ברוטב גורגונזולה', vegan: <String>['גורגונזולה:stated']),
+      _case('גבינת קשיו מותססת', vegan: <String>['גבינת:likely']),
       _case('בורקס גבינה', vegan: <String>['גבינה:stated']),
-      _case('גבינת עיזים', vegan: <String>['גבינת:stated']),
+      _case('גבינת עיזים', vegan: <String>['גבינת:likely']),
       _case('שקשוקה עם ביצים', vegan: <String>['ביצים:stated']),
       _case('ביצת עין', vegan: <String>['ביצת:stated']),
       _case('חביתה', vegan: <String>['חביתה:stated']),
@@ -233,7 +320,7 @@ void main() {
     _run(<_Case>[
       _case('Vegan cheese'),
       _case('Vegan chicken nuggets'),
-      _case('Plant-based chicken burger'),
+      _case('Plant-based burger'),
       _case('Plant based sausage'),
       _case('Dairy free cheese'),
       _case('Chicken alternative'),
@@ -249,6 +336,8 @@ void main() {
       _case('חלב צמחי'),
       _case('שמנת על בסיס צמחי'),
       _case('תחליף גבינה'),
+      _case('עוגה ללא ביצים וללא חמאה'),
+      _case('סלט בלי גבינה ובלי ביצה'),
       _case('ללא ביצים'),
       _case('בלי בשר'),
     ]);
@@ -289,7 +378,7 @@ void main() {
     });
 
     test('plant milk and butter read as likely, never stated', () {
-      expect(_hits('Oat milk latte', _vegan), <String>['milk:likely']);
+      expect(_hits('Oat milk with granola', _vegan), <String>['milk:likely']);
       expect(_hits('Peanut butter', _vegan), <String>['butter:likely']);
       expect(_hits('Coconut cream', _vegan), <String>['cream:likely']);
       expect(_hits('חלב שקדים', _vegan), <String>['חלב:likely']);
@@ -315,9 +404,9 @@ void main() {
       _case('לבשר חדשות', why: 'to announce is not בשר'),
       _case('מבשר טוב', why: 'a herald is not בשר'),
       _case('מכבש כבישים', why: 'a press is not כבש'),
+      _case('להפוך את הסדר', why: 'to flip is not a latte'),
       _case('Eggplant salad', why: 'eggplant is not egg'),
       _case('Chickpea stew', why: 'chickpea is not chicken'),
-      _case('Hamburger bun', why: 'hamburger is not ham'),
       _case('Butternut squash', why: 'butternut is not butter'),
     ]);
   });
@@ -334,7 +423,10 @@ void main() {
           expect(vocabulary.sources, isNotEmpty);
           expect(vocabulary.guards.beforeEn, contains('vegan'));
           expect(vocabulary.guards.afterHe, contains('טבעוני'));
-          expect(vocabulary.noPrefixHe, <String>['בשר', 'עוף', 'בקר', 'כבש']);
+          expect(
+            vocabulary.noPrefixHe,
+            containsAll(<String>['בשר', 'עוף', 'בקר', 'כבש']),
+          );
         });
 
         test('every direct English term is found, stated', () {

@@ -21,7 +21,14 @@
 /// `מיסו` and `ליצירת` does not contain `ציר`; `פול` is listed without a
 /// prefix because `כפול` ("double") would otherwise read as a fava bean,
 /// and its genuine prefixed forms are terms of their own; `יין` likewise
-/// ("wine" against `מיין`, "sorts").
+/// ("wine" against `מיין`, "sorts"). The normaliser deletes the Hebrew
+/// maqaf (it lies in the niqqud range), so a compound written with one
+/// ("סויה־דבש") is listed as a term of its own.
+///
+/// `legumes` carries every direct term of `soy`, `peanuts` and `lupin`
+/// and every hidden source of `soy`, because a peanut, a soybean and a
+/// lupin are legumes (the corpus invariant `legumes >= max(peanuts, soy,
+/// lupin)`).
 library;
 
 import 'package:ketoclub/models/restriction.dart';
@@ -69,6 +76,235 @@ const List<String> _soyDirectHe = <String>[
   'חלב סויה',
   'חלבון סויה',
   'קמח סויה',
+  'סויה־דבש',
+];
+
+/// Soy's hidden English sources, shared with `legumes`.
+const List<HiddenTrigger> _soyHiddenEn = <HiddenTrigger>[
+  HiddenTrigger(
+    term: 'teriyaki',
+    certainty: TriggerCertainty.likely,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'hoisin',
+    certainty: TriggerCertainty.likely,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'ponzu',
+    certainty: TriggerCertainty.likely,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'unagi',
+    certainty: TriggerCertainty.likely,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'tentsuyu',
+    certainty: TriggerCertainty.likely,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'lecithin',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'E322',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'margarine',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'vegetable protein',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'hydrolyzed vegetable protein',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'hydrolysed vegetable protein',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'hydrolyzed plant protein',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'vegetable broth',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'sushi',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'sashimi',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'vegan sausage',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'vegan sausages',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'vegan burger',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'vegan nuggets',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'vegan schnitzel',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'vegan meat',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'plant based meat',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'plant based burger',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'meat alternative',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'meat substitute',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+];
+
+/// Soy's hidden Hebrew sources, shared with `legumes`.
+const List<HiddenTrigger> _soyHiddenHe = <HiddenTrigger>[
+  HiddenTrigger(
+    term: 'טריאקי',
+    certainty: TriggerCertainty.likely,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'הויסין',
+    certainty: TriggerCertainty.likely,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'פונזו',
+    certainty: TriggerCertainty.likely,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'אונאגי',
+    certainty: TriggerCertainty.likely,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'טנצוי',
+    certainty: TriggerCertainty.likely,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'במבה',
+    certainty: TriggerCertainty.likely,
+    source: '12 §1.2',
+  ),
+  HiddenTrigger(
+    term: 'לציטין',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'מרגרינה',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'חלבון צמחי',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'סושי',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'סשימי',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'נקניקיות טבעוניות',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'נקניק טבעוני',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'שניצל טבעוני',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'שניצל תירס',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'קציצות טבעוניות',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'המבורגר טבעוני',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'בשר טבעוני',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'תחליף בשר',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §1.11',
+  ),
 ];
 
 /// Peanut's direct English triggers: a peanut is a legume, so `legumes`
@@ -111,191 +347,20 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
       RestrictionId.soy: RestrictionVocabulary(
         directEn: <String>[..._soyDirectEn],
         directHe: <String>[..._soyDirectHe],
-        hiddenEn: <HiddenTrigger>[
-          HiddenTrigger(
-            term: 'teriyaki',
-            certainty: TriggerCertainty.likely,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'hoisin',
-            certainty: TriggerCertainty.likely,
-            source: '11 §6.2',
-          ),
-          HiddenTrigger(
-            term: 'ponzu',
-            certainty: TriggerCertainty.likely,
-            source: '11 §6.2',
-          ),
-          HiddenTrigger(
-            term: 'lecithin',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'E322',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'margarine',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'vegetable protein',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §6.2',
-          ),
-          HiddenTrigger(
-            term: 'hydrolyzed vegetable protein',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §6.2',
-          ),
-          HiddenTrigger(
-            term: 'hydrolysed vegetable protein',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §6.2',
-          ),
-          HiddenTrigger(
-            term: 'hydrolyzed plant protein',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §6.2',
-          ),
-          HiddenTrigger(
-            term: 'vegetable broth',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §6.2',
-          ),
-          HiddenTrigger(
-            term: 'vegan sausage',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'vegan sausages',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'vegan burger',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'vegan nuggets',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'vegan schnitzel',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'vegan meat',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'plant based meat',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'plant based burger',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'meat alternative',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'meat substitute',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-        ],
-        hiddenHe: <HiddenTrigger>[
-          HiddenTrigger(
-            term: 'טריאקי',
-            certainty: TriggerCertainty.likely,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'הויסין',
-            certainty: TriggerCertainty.likely,
-            source: '11 §6.2',
-          ),
-          HiddenTrigger(
-            term: 'פונזו',
-            certainty: TriggerCertainty.likely,
-            source: '11 §6.2',
-          ),
-          HiddenTrigger(
-            term: 'לציטין',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'מרגרינה',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'חלבון צמחי',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'נקניקיות טבעוניות',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'נקניק טבעוני',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'שניצל טבעוני',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'שניצל תירס',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'קציצות טבעוניות',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'המבורגר טבעוני',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'בשר טבעוני',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-          HiddenTrigger(
-            term: 'תחליף בשר',
-            certainty: TriggerCertainty.suspected,
-            source: '12 §1.11',
-          ),
-        ],
+        hiddenEn: <HiddenTrigger>[..._soyHiddenEn],
+        hiddenHe: <HiddenTrigger>[..._soyHiddenHe],
         guards: AllergenGuards(
           beforeEn: <String>['no', 'without'],
           afterEn: <String>['free'],
-          beforeHe: <String>['ללא', 'בלי', 'נטול', 'נטולת'],
+          beforeHe: <String>['ללא', 'וללא', 'בלי', 'ובלי', 'נטול', 'נטולת'],
         ),
-        sources: <String>['11 §6.1', '11 §6.2', '11 §6.3', '12 §1.11'],
+        sources: <String>[
+          '11 §6.1',
+          '11 §6.2',
+          '11 §6.3',
+          '12 §1.11',
+          '12 §1.2',
+        ],
       ),
       RestrictionId.celery: RestrictionVocabulary(
         directEn: <String>[
@@ -341,7 +406,22 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
             source: '11 §12.2',
           ),
           HiddenTrigger(
+            term: 'soup',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §12.2',
+          ),
+          HiddenTrigger(
+            term: 'soups',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §12.2',
+          ),
+          HiddenTrigger(
             term: 'soup base',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §12.2',
+          ),
+          HiddenTrigger(
+            term: 'stew',
             certainty: TriggerCertainty.suspected,
             source: '11 §12.2',
           ),
@@ -354,6 +434,21 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
             term: 'gravy',
             certainty: TriggerCertainty.suspected,
             source: '11 §12.2',
+          ),
+          HiddenTrigger(
+            term: 'risotto',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §12.2',
+          ),
+          HiddenTrigger(
+            term: 'bolognese',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §12.1',
+          ),
+          HiddenTrigger(
+            term: 'ragu',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §12.1',
           ),
           HiddenTrigger(
             term: 'waldorf',
@@ -379,6 +474,11 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
         hiddenHe: <HiddenTrigger>[
           HiddenTrigger(
             term: 'ציר',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §1.9',
+          ),
+          HiddenTrigger(
+            term: 'מרק',
             certainty: TriggerCertainty.suspected,
             source: '12 §1.9',
           ),
@@ -413,6 +513,21 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
             source: '12 §1.9',
           ),
           HiddenTrigger(
+            term: 'ריזוטו',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §12.2',
+          ),
+          HiddenTrigger(
+            term: 'בולונז',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §12.1',
+          ),
+          HiddenTrigger(
+            term: 'ראגו',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §12.1',
+          ),
+          HiddenTrigger(
             term: 'וולדורף',
             certainty: TriggerCertainty.likely,
             source: '12 §1.9',
@@ -421,7 +536,7 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
         guards: AllergenGuards(
           beforeEn: <String>['no', 'without'],
           afterEn: <String>['free'],
-          beforeHe: <String>['ללא', 'בלי', 'נטול', 'נטולת'],
+          beforeHe: <String>['ללא', 'וללא', 'בלי', 'ובלי', 'נטול', 'נטולת'],
         ),
         sources: <String>['11 §12.1', '11 §12.2', '11 §12.3', '12 §1.9'],
       ),
@@ -447,6 +562,7 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
           "חרדל דיז'ון",
           "דיז'ון",
           'חרדל דבש',
+          'חרדל־דבש',
           'זרעי חרדל',
           'אבקת חרדל',
           'עלי חרדל',
@@ -509,6 +625,11 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
           ),
           HiddenTrigger(
             term: 'caesar dressing',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §1.8',
+          ),
+          HiddenTrigger(
+            term: 'caesar salad',
             certainty: TriggerCertainty.suspected,
             source: '12 §1.8',
           ),
@@ -610,6 +731,11 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
             source: '11 §13.2',
           ),
           HiddenTrigger(
+            term: 'סלט קיסר',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §1.8',
+          ),
+          HiddenTrigger(
             term: 'רוטב קיסר',
             certainty: TriggerCertainty.suspected,
             source: '12 §1.8',
@@ -628,7 +754,7 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
         guards: AllergenGuards(
           beforeEn: <String>['no', 'without'],
           afterEn: <String>['free'],
-          beforeHe: <String>['ללא', 'בלי', 'נטול', 'נטולת'],
+          beforeHe: <String>['ללא', 'וללא', 'בלי', 'ובלי', 'נטול', 'נטולת'],
         ),
         sources: <String>['11 §13.1', '11 §13.2', '11 §13.3', '12 §1.8'],
       ),
@@ -756,6 +882,11 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
             source: '11 §15.2',
           ),
           HiddenTrigger(
+            term: 'currants',
+            certainty: TriggerCertainty.likely,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
             term: 'sultanas',
             certainty: TriggerCertainty.likely,
             source: '11 §15.2',
@@ -816,12 +947,72 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
             source: '11 §15.2',
           ),
           HiddenTrigger(
+            term: 'fruit juice',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'fruit juices',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'cordial',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'guacamole',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'soft drink',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'soft drinks',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
             term: 'beer',
             certainty: TriggerCertainty.suspected,
             source: '11 §15.2',
           ),
           HiddenTrigger(
             term: 'cider',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'mustard',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'salad dressing',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'sausage',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'sausages',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'burger',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'burgers',
             certainty: TriggerCertainty.suspected,
             source: '11 §15.2',
           ),
@@ -918,6 +1109,21 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
             source: '12 §1.10',
           ),
           HiddenTrigger(
+            term: 'מיץ פירות',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'גוואקמולי',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'גואקמולי',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
             term: 'בירה',
             certainty: TriggerCertainty.suspected,
             source: '11 §15.2',
@@ -937,11 +1143,31 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
             certainty: TriggerCertainty.suspected,
             source: '11 §15.2',
           ),
+          HiddenTrigger(
+            term: 'חרדל',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'נקניק',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'נקניקיות',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'המבורגר',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
         ],
         guards: AllergenGuards(
           beforeEn: <String>['no', 'without'],
           afterEn: <String>['free'],
-          beforeHe: <String>['ללא', 'בלי', 'נטול', 'נטולת'],
+          beforeHe: <String>['ללא', 'וללא', 'בלי', 'ובלי', 'נטול', 'נטולת'],
         ),
         noPrefixHe: <String>['יין'],
         sources: <String>['11 §15.1', '11 §15.2', '11 §15.3', '12 §1.10'],
@@ -1023,11 +1249,7 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
           'חילבה',
         ],
         hiddenEn: <HiddenTrigger>[
-          HiddenTrigger(
-            term: 'vegetable protein',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §16.3',
-          ),
+          ..._soyHiddenEn,
           HiddenTrigger(
             term: 'veggie burger',
             certainty: TriggerCertainty.suspected,
@@ -1035,31 +1257,6 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
           ),
           HiddenTrigger(
             term: 'veggie burgers',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §16.2',
-          ),
-          HiddenTrigger(
-            term: 'vegan burger',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §16.2',
-          ),
-          HiddenTrigger(
-            term: 'vegan sausage',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §16.2',
-          ),
-          HiddenTrigger(
-            term: 'vegan sausages',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §16.2',
-          ),
-          HiddenTrigger(
-            term: 'plant based burger',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §16.2',
-          ),
-          HiddenTrigger(
-            term: 'plant based meat',
             certainty: TriggerCertainty.suspected,
             source: '11 §16.2',
           ),
@@ -1090,41 +1287,7 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
           ),
         ],
         hiddenHe: <HiddenTrigger>[
-          HiddenTrigger(
-            term: 'חלבון צמחי',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §16.3',
-          ),
-          HiddenTrigger(
-            term: 'המבורגר טבעוני',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §16.2',
-          ),
-          HiddenTrigger(
-            term: 'נקניקיות טבעוניות',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §16.2',
-          ),
-          HiddenTrigger(
-            term: 'שניצל טבעוני',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §16.2',
-          ),
-          HiddenTrigger(
-            term: 'קציצות טבעוניות',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §16.2',
-          ),
-          HiddenTrigger(
-            term: 'בשר טבעוני',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §16.2',
-          ),
-          HiddenTrigger(
-            term: 'תחליף בשר',
-            certainty: TriggerCertainty.suspected,
-            source: '11 §16.2',
-          ),
+          ..._soyHiddenHe,
           HiddenTrigger(
             term: 'סביח',
             certainty: TriggerCertainty.suspected,
@@ -1142,7 +1305,7 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
             'jelly',
           ],
           afterEn: <String>['free'],
-          beforeHe: <String>['ללא', 'בלי', 'נטול', 'נטולת'],
+          beforeHe: <String>['ללא', 'וללא', 'בלי', 'ובלי', 'נטול', 'נטולת'],
         ),
         noPrefixHe: <String>['פול'],
         sources: <String>[

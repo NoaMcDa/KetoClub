@@ -106,6 +106,23 @@ void main() {
       _hit('נקניקיות טבעוניות', RestrictionId.soy, <String>[
         'נקניקיות טבעוניות:suspected',
       ]),
+      _hit('פילה סלמון בגלייז סויה־דבש וסומסום', RestrictionId.soy, <String>[
+        'סויה־דבש:stated',
+      ], why: 'with a maqaf, which the normaliser deletes'),
+      _hit('רול טמפורה שרימפס ורוטב אונאגי', RestrictionId.soy, <String>[
+        'אונאגי:likely',
+      ]),
+      _hit('ירקות בטמפורה עם רוטב טנצוי', RestrictionId.soy, <String>[
+        'טנצוי:likely',
+      ]),
+      _hit('חטיף במבה במילוי נוגט', RestrictionId.soy, <String>[
+        'במבה:likely',
+      ], why: 'Bamba lists soy (12 §1.2)'),
+      _hit('Peking duck with hoisin sauce', RestrictionId.soy, <String>[
+        'hoisin:likely',
+      ]),
+      _hit('סושי סלמון', RestrictionId.soy, <String>['סושי:suspected']),
+      _miss('בלי גלוטן וללא סויה', RestrictionId.soy, why: 'ו before ללא'),
       _miss('Soy-free dressing', RestrictionId.soy, why: 'is guarded'),
       _miss('Made with no soy', RestrictionId.soy, why: 'is guarded'),
       _miss('Tofu soy free', RestrictionId.soy, lacks: <String>['soy']),
@@ -154,7 +171,13 @@ void main() {
         'ציר:suspected',
       ], why: 'with the Hebrew prefix ב'),
       _hit('אבקת מרק', RestrictionId.celery, <String>['אבקת מרק:suspected']),
-      _miss('Celery-free soup', RestrictionId.celery, why: 'is guarded'),
+      _hit('מרק דגים', RestrictionId.celery, <String>['מרק:suspected']),
+      _hit('Tomato soup', RestrictionId.celery, <String>['soup:suspected']),
+      _hit('ספגטי בולונז', RestrictionId.celery, <String>['בולונז:suspected']),
+      _hit('Mushroom risotto', RestrictionId.celery, <String>[
+        'risotto:suspected',
+      ]),
+      _miss('Celery-free sauce', RestrictionId.celery, why: 'is guarded'),
       _miss('No celery please', RestrictionId.celery, why: 'is guarded'),
       _miss('ללא סלרי', RestrictionId.celery, why: 'is guarded'),
       _miss('ליצירת מופת', RestrictionId.celery, why: 'is not ציר (stock)'),
@@ -209,6 +232,13 @@ void main() {
         'מלפפונים חמוצים:suspected',
         'חמוצים:suspected',
       ]),
+      _hit('סלק צלוי בחרדל־דבש', RestrictionId.mustard, <String>[
+        'חרדל־דבש:stated',
+      ], why: 'with a maqaf, which the normaliser deletes'),
+      _hit('Caesar salad', RestrictionId.mustard, <String>[
+        'caesar salad:suspected',
+      ]),
+      _hit('סלט קיסר', RestrictionId.mustard, <String>['סלט קיסר:suspected']),
       _miss(
         'Mustard-free dressing',
         RestrictionId.mustard,
@@ -298,6 +328,18 @@ void main() {
         'שרימפס:suspected',
       ]),
       _hit('סולפיטים', RestrictionId.sulphites, <String>['סולפיטים:stated']),
+      _hit('Hot cross bun with currants', RestrictionId.sulphites, <String>[
+        'currants:likely',
+      ]),
+      _hit('חרדל דיז׳ון', RestrictionId.sulphites, <String>[
+        'חרדל:suspected',
+      ], why: 'ready-made mustard (11 §15.2)'),
+      _hit('Grilled sausages', RestrictionId.sulphites, <String>[
+        'sausages:suspected',
+      ]),
+      _hit('סלט עם גוואקמולי', RestrictionId.sulphites, <String>[
+        'גוואקמולי:suspected',
+      ]),
       _miss(
         'Sulphite-free wine',
         RestrictionId.sulphites,
@@ -378,6 +420,25 @@ void main() {
       _hit('חומוס ופול', RestrictionId.legumes, <String>['ופול:stated']),
       _hit('חומוס הפול', RestrictionId.legumes, <String>['הפול:stated']),
       _hit('מנה של בפול', RestrictionId.legumes, <String>['בפול:stated']),
+      _hit('גיוזה ירקות ברוטב פונזו', RestrictionId.legumes, <String>[
+        'פונזו:likely',
+      ], why: 'soy is a legume'),
+      _hit('אודון מוקפץ עם טריאקי', RestrictionId.legumes, <String>[
+        'טריאקי:likely',
+      ]),
+      _hit('רול עם רוטב אונאגי', RestrictionId.legumes, <String>[
+        'אונאגי:likely',
+      ]),
+      _hit('חטיף במבה', RestrictionId.legumes, <String>['במבה:likely']),
+      _hit('Peking duck with hoisin sauce', RestrictionId.legumes, <String>[
+        'hoisin:likely',
+      ]),
+      _hit('פילה סלמון בגלייז סויה־דבש', RestrictionId.legumes, <String>[
+        'סויה־דבש:stated',
+      ]),
+      _hit('Fried in margarine', RestrictionId.legumes, <String>[
+        'margarine:suspected',
+      ], why: 'every hidden soy source is a legume source'),
       _miss('אספרסו כפול', RestrictionId.legumes, why: 'is "double", not פול'),
       _miss('שניצל כפול', RestrictionId.legumes),
       _miss('Coffee beans', RestrictionId.legumes, why: 'are not a legume'),
