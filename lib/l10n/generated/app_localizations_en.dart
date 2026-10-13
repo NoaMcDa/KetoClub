@@ -1430,4 +1430,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get whatLeavesDeviceBanto =>
       'Your restriction profile stays on this device. When AI analysis is on, only the menu text and the keto settings are sent — never which restrictions you have.';
+
+  @override
+  String get chefCardTitle => 'Your chef card';
+
+  @override
+  String get chefCardShowButton => 'Show my chef card';
+
+  @override
+  String get chefCardEmpty =>
+      'Add a restriction in Settings and your chef card appears here.';
+
+  @override
+  String get chefCardShare => 'Share';
+
+  @override
+  String get chefCardLanguageLabel => 'Card language';
 }
