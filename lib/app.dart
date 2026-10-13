@@ -269,6 +269,8 @@ Route<void>? generateRoute(
             appInfo: dependencies.appInfo,
             externalLinkOpener: dependencies.externalLinkOpener,
             backendConfigured: dependencies.backendConfigured,
+            screenBrightness: dependencies.screenBrightness,
+            menuSharer: dependencies.menuSharer,
           ),
         ),
       ),

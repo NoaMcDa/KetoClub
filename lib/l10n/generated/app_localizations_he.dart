@@ -1438,6 +1438,21 @@ class AppLocalizationsHe extends AppLocalizations {
       'פרופיל ההגבלות שלך נשאר במכשיר. כשניתוח AI פועל, נשלחים רק טקסט התפריט והגדרות הקטו — לעולם לא אילו הגבלות יש לך.';
 
   @override
+  String get chefCardTitle => 'כרטיס השף שלך';
+
+  @override
+  String get chefCardShowButton => 'הצגת כרטיס השף שלי';
+
+  @override
+  String get chefCardEmpty => 'הוסיפו הגבלה בהגדרות וכרטיס השף יופיע כאן.';
+
+  @override
+  String get chefCardShare => 'שיתוף';
+
+  @override
+  String get chefCardLanguageLabel => 'שפת הכרטיס';
+
+  @override
   String get restrictionOnboardingTitle => 'ממה אתם נמנעים?';
 
   @override

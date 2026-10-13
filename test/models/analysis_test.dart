@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/restriction.dart';
 
 void main() {
   group('DishVerdict', () {
@@ -1145,6 +1149,241 @@ void main() {
       })!;
 
       expect(a, isNot(equals(b)));
+    });
+  });
+
+  group('AnalysedDish ingredients and concerns (D26 W2-0)', () {
+    const ketoJson = <String, Object?>{
+      'dishId': 'd1',
+      'name': 'Salad with tahini',
+      'verdict': 'orderAsIs',
+      'why': 'Greens and tahini',
+      'modification': null,
+      'netCarbsEstimate': null,
+      'hiddenCarbs': <Object?>[],
+    };
+    const ingredient = ExtractedIngredient(
+      name: 'tahini',
+      certainty: Certainty.stated,
+      role: ComponentRole.sauce,
+    );
+    const concern = Concern(
+      restrictionId: RestrictionId.sesame,
+      source: ConcernSource.description,
+      certainty: Certainty.stated,
+      tier: EvidenceTier.stated,
+      matchedText: 'tahini',
+    );
+
+    test('default to empty and are not written when empty, so a keto '
+        "dish's JSON is byte-identical to the one written before them", () {
+      // Arrange
+      final dish = AnalysedDish.tryFrom(ketoJson)!;
+
+      // Act
+      final written = dish.toJson();
+
+      // Assert
+      expect(dish.ingredients, isEmpty);
+      expect(dish.concerns, isEmpty);
+      expect(written.containsKey('ingredients'), isFalse);
+      expect(written.containsKey('concerns'), isFalse);
+      expect(jsonEncode(written), equals(jsonEncode(ketoJson)));
+    });
+
+    test('are written when non-empty and round-trip to an equal dish', () {
+      // Arrange
+      const dish = AnalysedDish(
+        dishId: 'd1',
+        name: 'Salad with tahini',
+        verdict: DishVerdict.orderAsIs,
+        why: 'Greens and tahini',
+        ingredients: [ingredient],
+        concerns: [concern],
+      );
+
+      // Act
+      final written = dish.toJson();
+      final result = AnalysedDish.tryFrom(
+        jsonDecode(jsonEncode(written)) as Map<String, Object?>,
+      );
+
+      // Assert
+      expect(written.keys.toList().sublist(7), ['ingredients', 'concerns']);
+      expect(result, equals(dish));
+      expect(result?.hashCode, equals(dish.hashCode));
+    });
+
+    test('write only the non-empty one of the two', () {
+      // Arrange
+      const dish = AnalysedDish(
+        dishId: 'd1',
+        name: 'Salad with tahini',
+        verdict: DishVerdict.orderAsIs,
+        why: 'Greens and tahini',
+        concerns: [concern],
+      );
+
+      // Act
+      final written = dish.toJson();
+
+      // Assert
+      expect(written.containsKey('ingredients'), isFalse);
+      expect(written.containsKey('concerns'), isTrue);
+    });
+
+    test('read a null or non-list value as empty', () {
+      for (final raw in <Object?>[null, 'tahini', 3, <String, Object?>{}]) {
+        // Act
+        final dish = AnalysedDish.tryFrom(<String, Object?>{
+          ...ketoJson,
+          'ingredients': raw,
+          'concerns': raw,
+        });
+
+        // Assert
+        expect(dish, isNotNull, reason: '$raw');
+        expect(dish?.ingredients, isEmpty, reason: '$raw');
+        expect(dish?.concerns, isEmpty, reason: '$raw');
+      }
+    });
+
+    test('drop each malformed or unknown entry and keep the rest', () {
+      // Act
+      final dish = AnalysedDish.tryFrom(<String, Object?>{
+        ...ketoJson,
+        'ingredients': <Object?>[
+          'tahini',
+          <String, Object?>{'name': 'tahini', 'certainty': 'certain'},
+          ingredient.toJson(),
+        ],
+        'concerns': <Object?>[
+          7,
+          <String, Object?>{...concern.toJson(), 'restrictionId': 'kiwi'},
+          concern.toJson(),
+        ],
+      });
+
+      // Assert
+      expect(dish?.ingredients, [ingredient]);
+      expect(dish?.concerns, [concern]);
+    });
+
+    test('== and hashCode account for both lists', () {
+      // Arrange
+      const plain = AnalysedDish(
+        dishId: 'd1',
+        name: 'Salad',
+        verdict: DishVerdict.orderAsIs,
+        why: 'Greens',
+      );
+      const withIngredient = AnalysedDish(
+        dishId: 'd1',
+        name: 'Salad',
+        verdict: DishVerdict.orderAsIs,
+        why: 'Greens',
+        ingredients: [ingredient],
+      );
+      const withConcern = AnalysedDish(
+        dishId: 'd1',
+        name: 'Salad',
+        verdict: DishVerdict.orderAsIs,
+        why: 'Greens',
+        concerns: [concern],
+      );
+
+      // Assert
+      expect(plain, isNot(equals(withIngredient)));
+      expect(plain, isNot(equals(withConcern)));
+      expect(withIngredient, isNot(equals(withConcern)));
+      expect(
+        withConcern,
+        equals(
+          const AnalysedDish(
+            dishId: 'd1',
+            name: 'Salad',
+            verdict: DishVerdict.orderAsIs,
+            why: 'Greens',
+            concerns: [concern],
+          ),
+        ),
+      );
+    });
+  });
+
+  group('AnalysisOptionsSnapshot.restrictionsRequested (D26 W2-0)', () {
+    test('defaults to false and is not written when false, so a keto '
+        "snapshot's JSON is byte-identical to the one written before it", () {
+      // Arrange
+      const snapshot = AnalysisOptionsSnapshot(
+        netCarbLimitGrams: 6,
+        dietaryConstraints: ['dairy-free'],
+      );
+
+      // Act
+      final written = snapshot.toJson();
+
+      // Assert
+      expect(snapshot.restrictionsRequested, isFalse);
+      expect(
+        jsonEncode(written),
+        equals('{"netCarbLimitGrams":6,"dietaryConstraints":["dairy-free"]}'),
+      );
+    });
+
+    test('is written as true when true and round-trips', () {
+      // Arrange
+      const snapshot = AnalysisOptionsSnapshot(
+        netCarbLimitGrams: 6,
+        restrictionsRequested: true,
+      );
+
+      // Act
+      final written = snapshot.toJson();
+      final result = AnalysisOptionsSnapshot.tryFrom(written);
+
+      // Assert
+      expect(written['restrictionsRequested'], isTrue);
+      expect(result, equals(snapshot));
+    });
+
+    test('reads an absent or non-true value as false', () {
+      for (final raw in <Object?>[null, false, 'true', 1]) {
+        // Act
+        final result = AnalysisOptionsSnapshot.tryFrom(<String, Object?>{
+          'netCarbLimitGrams': 6,
+          'restrictionsRequested': raw,
+        });
+
+        // Assert
+        expect(
+          result,
+          equals(const AnalysisOptionsSnapshot(netCarbLimitGrams: 6)),
+          reason: '$raw',
+        );
+      }
+    });
+
+    test('== and hashCode account for it', () {
+      // Arrange
+      const off = AnalysisOptionsSnapshot(netCarbLimitGrams: 6);
+      const on = AnalysisOptionsSnapshot(
+        netCarbLimitGrams: 6,
+        restrictionsRequested: true,
+      );
+
+      // Assert
+      expect(off, isNot(equals(on)));
+      expect(
+        on.hashCode,
+        equals(
+          const AnalysisOptionsSnapshot(
+            netCarbLimitGrams: 6,
+            restrictionsRequested: true,
+          ).hashCode,
+        ),
+      );
+      expect(on.toString(), contains('restrictions: true'));
     });
   });
 }
