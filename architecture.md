@@ -3098,6 +3098,61 @@ nothing produces a concern yet. `backend/app/keto/models.py` mirrors all of
 it, omitting the same keys through a `model_serializer`. Per C3 there is no
 `schemaVersion` bump, and no golden or keto baseline changed.
 
+**The profile-only chef card (ALG-08a, #350).** With `bantoMode` on and a
+non-empty profile, the "My restrictions" section gains a "Show my chef card"
+button that pushes `ChefCardScreen`: a full-screen page that mirrors the Waiter
+Card's shell (brightness raised through `ScreenBrightness` while open, the
+numbered large-type lines and Copy button of `WaiterScriptWidget`, a pinned
+Done) and adds a Hebrew/English toggle, starting in the app's language, and
+Share as text through `MenuSharer`. `SettingsScreen` takes `screenBrightness`
+and `menuSharer` for it; `generateRoute` passes the app's. Its sentences come
+from `ChefCardText.compose` (`lib/utils/allergens/chef_card_templates.dart`),
+pure and in the language of the card, not the UI's, so like the waiter
+templates they live in Dart (§6.3's exception, §12) and only the chrome (title,
+button, empty message, toggle accessibility label) is in ARB: an intro line,
+one line per entry by kind (an allergen "please check every ingredient,
+including sauces, oils and garnishes", celiac its own gluten and cross-contact
+sentence, every flexible kind "please tell me which dishes contain it", the
+entry's exceptions appended to its line) and a closing line that asks the
+kitchen to confirm cross-contact precautions when the profile holds a strict
+entry. The card states what the person is and asks; it never says "safe" or
+"בטוח" (a table test pins every restriction in both languages), and no
+severity exists to vary it. The card needs no menu and sends nothing anywhere
+(C1). The per-dish card with a dish's name, modification and questions, and the
+cross-contact closing line driven by ALG-07 signals, are ALG-08b.
+
+**Kitchen cross-contact signals, the pure part (ALG-07, #349).**
+`KitchenSignals.of(menu)` in `lib/utils/allergens/kitchen_signals.dart`
+(twin: `backend/app/keto/kitchen_signals.py`) is a rules-only pass over a
+whole menu, never a dish, that reports what the menu reveals about its
+kitchen as `KitchenSignal`s in `KitchenSignalKind` order: `fryer`, `wok`,
+`sharedGrill`, `bakery`, `nuts`, `sesame`. Each carries the restrictions it
+threatens (taxonomy order), up to three dish names as evidence and one
+standard question for the staff in both languages. The questions live in Dart
+beside the term lists (the §6.3 exception, as the waiter templates do), are
+questions and never assurances, and pass the banned-words list. A dish shows
+a kind when its own rules text or its category heading does; the term lists
+compile as the keto vocabulary does (`latinTriggerPattern`,
+`hebrewTriggerPattern`, `isGuarded`), with guards for "stir fried", "pan
+fried", "air fried" and "fried rice" (a wok dish, not a fryer one),
+"chocolate chips" and plant-based burgers. The nuts, sesame and seafood facts
+come from `AllergenMatcher` (any certainty), never from a list of this file.
+`sharedGrill` needs a grilled meat dish and a grilled fish dish. The mapping
+is a fryer to wheat and gluten plus fish, crustaceans or molluscs when a fried
+dish names that seafood, a wok to peanuts, soy, wheat, gluten, crustaceans,
+molluscs and sesame, a shared grill to the seafood three, a bakery to milk,
+eggs, wheat, gluten and sesame, nuts to peanuts and tree nuts, sesame to
+sesame; wheat is added beside gluten wherever flour is the cause, because a
+wheat allergy shares the cause with celiac disease. A signal is a menu-level
+fact beside the per-dish answer: it changes no verdict, and nothing consults
+it yet (the notice, the demotion of green dishes for strict entries and the
+keto-only no-op are ALG-07's later part). A new golden, `kitchen_signals.json`,
+carries the term lists, guards, threat table and questions and the signals of
+every golden menu, the allergen corpus menus and menus built for each rule,
+all under a small nuts, sesame and seafood vocabulary of its own
+(`tool/golden/kitchen_signals_corpus.dart`) so it does not move when the group
+vocabulary files are filled; no other golden changed.
+
 **The Why sheet (ALG-06, #348).** `lib/widgets/why_sheet.dart` is the "why this
 result" bottom sheet, built and tested on its own and wired into no screen
 yet. `WhySheet` takes a dish name, a list of `Concern` and whether the profile

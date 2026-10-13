@@ -623,6 +623,11 @@
   "helperToolTitle": "כלי עזר, לא הבטחה",
   "whatLeavesDeviceBanto": "פרופיל ההגבלות שלך נשאר במכשיר. כשניתוח AI פועל, נשלחים רק טקסט התפריט והגדרות הקטו — לעולם לא אילו הגבלות יש לך.",
 
+  "chefCardTitle": "כרטיס השף שלך",
+  "chefCardShowButton": "הצגת כרטיס השף שלי",
+  "chefCardEmpty": "הוסיפו הגבלה בהגדרות וכרטיס השף יופיע כאן.",
+  "chefCardShare": "שיתוף",
+  "chefCardLanguageLabel": "שפת הכרטיס",
   "whySheetTitle": "למה התוצאה הזו",
   "whySheetDishName": "{dish}",
   "whyTierDeclared": "הוצהר על ידי הפלטפורמה",
