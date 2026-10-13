@@ -6,6 +6,7 @@ import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/menu_question.dart';
+import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_question_answerer.dart';
@@ -20,7 +21,11 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
+import 'package:ketoclub/utils/classification_rules.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/dietary_profile_strictness.dart';
+import 'package:ketoclub/utils/profile_wording.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/utils/verdict_counts.dart';
@@ -178,6 +183,11 @@ final class MenuController extends ChangeNotifier {
   /// The dietary profile the settings held when options were last built
   /// ([_optionsFrom]); empty until then. Read by [evaluatedRows] only.
   DietaryProfile _profile = DietaryProfile.empty;
+
+  /// Whether the screen that last called [open] shows Banto surfaces
+  /// (architecture.md D26's `bantoMode` convention, taken by [open]);
+  /// false until then, so a controller nobody opened is keto-only.
+  bool _bantoMode = false;
 
   @override
   void dispose() {
@@ -510,7 +520,7 @@ final class MenuController extends ChangeNotifier {
       for (final category in currentMenu.categories) {
         for (final dish in category.dishes) {
           final verdict = analysedById[dish.id];
-          if (!_matchesFilter(verdict)) continue;
+          if (!_matchesFilter(dish.id, verdict)) continue;
           if (!_matchesQuery(dish, normalisedQuery)) continue;
           if (!_matchesBudget(verdict)) continue;
           rows.add(
@@ -556,8 +566,8 @@ final class MenuController extends ChangeNotifier {
   /// [ProfileEvaluator.evaluate]): the concerns that matter to the
   /// profile and a [DishState]. A row with no analysis is left out. The
   /// profile is the one recorded when the menu was last classified; it
-  /// never leaves the device (D26 C1). Nothing renders it yet (ALG-05),
-  /// and no other getter reads it.
+  /// never leaves the device (D26 C1). The menu screen reads the same
+  /// evaluations one dish at a time through [evaluationFor] (ALG-05).
   List<({DishRow row, EvaluatedDish evaluated})> get evaluatedRows {
     final profile = _profile;
     return <({DishRow row, EvaluatedDish evaluated})>[
@@ -569,6 +579,113 @@ final class MenuController extends ChangeNotifier {
           ),
     ];
   }
+
+  /// The dietary profile [open] read from the settings (Banto); empty
+  /// until then. It never leaves the device (D26 C1).
+  DietaryProfile get profile => _profile;
+
+  /// How the menu screen words its verdicts for [profile] (Banto, ALG-05,
+  /// issue #347): [ProfileWording.ketoOnly] unless the screen that opened
+  /// this menu shows Banto surfaces and the profile holds a restriction
+  /// besides keto.
+  ProfileWording get wording =>
+      ProfileWording.of(_profile, bantoMode: _bantoMode);
+
+  /// Whether keto applies to [profile] (an empty profile is keto-only), so
+  /// the header keeps the keto score and the card its net-carb chip.
+  bool get holdsKeto => _profile.holdsKeto;
+
+  /// The on-device evaluation of the dish [dishId] for [profile] (Banto,
+  /// ALG-05), or null when [wording] is keto-only, there is no
+  /// [MenuAnalysed] result, or the analysis did not place that dish.
+  EvaluatedDish? evaluationFor(String dishId) => evaluations[dishId];
+
+  /// [evaluations]' [DishState]s counted over [menu]'s food dishes
+  /// ([VerdictCounts.ofStates]): the four counter tiles and the header
+  /// counts of a profile that [ProfileWording.usesStates].
+  /// [VerdictCounts.zero] otherwise.
+  VerdictCounts get stateCounts {
+    final currentMenu = _menu;
+    if (currentMenu == null || evaluations.isEmpty) return VerdictCounts.zero;
+    return VerdictCounts.ofStates(currentMenu, <String, DishState>{
+      for (final MapEntry(key: id, value: evaluated) in evaluations.entries)
+        id: evaluated.state,
+    });
+  }
+
+  /// Whether the "rules checked" chip belongs beside the AI chip (Banto,
+  /// ALG-05): [wording] uses states, the analysis came from the language
+  /// model, and the on-device rules pass
+  /// ([ClassificationRules.allergenFindings]) found something, on at least
+  /// one analysed dish, about a restriction [profile] holds — the safety
+  /// net visibly applied to a model result.
+  bool get rulesChecked {
+    if (evaluations.isEmpty || engine is! LlmEngine) return false;
+    final currentMenu = _menu;
+    if (currentMenu == null) return false;
+    for (final dish in currentMenu.allDishes) {
+      if (!evaluations.containsKey(dish.id)) continue;
+      for (final concern in ClassificationRules.allergenFindings(dish)) {
+        if (concern.restrictionId != RestrictionId.keto &&
+            _profile.contains(concern.restrictionId)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /// Every analysed dish's evaluation for [profile], keyed by dish id;
+  /// empty unless [wording] uses states and a [MenuAnalysed] result
+  /// exists. Computed once per (menu, analysis, profile), since a build
+  /// reads it once per card, per count and per filter test.
+  Map<String, EvaluatedDish> get evaluations {
+    final currentMenu = _menu;
+    final currentAnalysis = _analysis;
+    if (!wording.usesStates ||
+        currentMenu == null ||
+        currentAnalysis is! MenuAnalysed) {
+      return const <String, EvaluatedDish>{};
+    }
+    final memo = _evaluationsMemo;
+    if (memo != null &&
+        identical(memo.menu, currentMenu) &&
+        identical(memo.analysis, currentAnalysis) &&
+        memo.profile == _profile) {
+      return memo.evaluations;
+    }
+    final analysedById = _analysedById();
+    final evaluations = <String, EvaluatedDish>{
+      for (final dish in currentMenu.allDishes)
+        if (analysedById[dish.id] case final analysed?)
+          dish.id: ProfileEvaluator.evaluate(analysed, dish, _profile),
+    };
+    _evaluationsMemo = (
+      menu: currentMenu,
+      analysis: currentAnalysis,
+      profile: _profile,
+      evaluations: evaluations,
+    );
+    return evaluations;
+  }
+
+  ({
+    Menu menu,
+    MenuAnalysed analysis,
+    DietaryProfile profile,
+    Map<String, EvaluatedDish> evaluations,
+  })?
+  _evaluationsMemo;
+
+  /// The filter a menu opens on when none was last chosen: a profile with
+  /// a strict entry, in state mode, hides only what to avoid
+  /// ([MenuFilter.greenAndYellow], read as "everything but avoid"; file
+  /// 10 §ALG-05), and every other profile keeps [settingsDefault], the
+  /// default the user picked in Settings.
+  MenuFilter _defaultFilter(MenuFilter settingsDefault) =>
+      wording == ProfileWording.strict
+      ? MenuFilter.greenAndYellow
+      : settingsDefault;
 
   /// The categories that still have at least one row in [visibleRows], in
   /// menu order (issue #51's category jump) — the same order
@@ -716,20 +833,32 @@ final class MenuController extends ChangeNotifier {
   /// nothing is uploaded unless a language-model analysis was made on this
   /// device in this open after all (issue #331).
   ///
+  /// **Banto (ALG-05, issue #347).** [bantoMode] is the opening screen's
+  /// own flag (D26's convention). With it on and a dietary profile that
+  /// holds a restriction besides keto ([wording] then
+  /// [ProfileWording.usesStates]), [filter], the counts and [visibleRows]
+  /// speak [DishState]s instead of keto verdicts, and a profile with a
+  /// strict entry opens on [MenuFilter.greenAndYellow] — everything but
+  /// what to avoid — unless a filter was last chosen. With it off, or a
+  /// keto-only profile, nothing here differs from before.
+  ///
   /// Never throws.
   Future<void> open(
     VenueRef ref, {
     bool forceRefresh = false,
     VenueOpenHint? hint,
+    bool bantoMode = BantoMode.enabled,
   }) async {
     _ref = ref;
     _phase = LoadPhase.fetching;
     _pageFilter = null;
+    _bantoMode = bantoMode;
     notifyListeners();
 
     _openRef = ref;
     final appSettings = await _settings.read();
-    _filter = appSettings.lastFilter ?? appSettings.filter;
+    _profile = appSettings.profile;
+    _filter = appSettings.lastFilter ?? _defaultFilter(appSettings.filter);
     _dishNotes = await _notes.readAll(ref);
     final previous = await _history.read(ref);
     if (previous?.name != _historyName || previous?.city != _historyCity) {
@@ -1261,17 +1390,39 @@ final class MenuController extends ChangeNotifier {
     return estimate <= budget;
   }
 
-  /// Whether [verdict] belongs in [visibleRows] under the current
-  /// [filter]. An exhaustive switch with no `default`: adding a
-  /// [MenuFilter] value without updating this function is a compile error
-  /// (architecture.md §10).
-  bool _matchesFilter(AnalysedDish? verdict) => switch (_filter) {
-    MenuFilter.greenOnly => verdict?.verdict == DishVerdict.orderAsIs,
-    MenuFilter.greenAndYellow =>
-      verdict?.verdict == DishVerdict.orderAsIs ||
-          verdict?.verdict == DishVerdict.modifiable,
-    MenuFilter.yellowOnly => verdict?.verdict == DishVerdict.modifiable,
-    MenuFilter.redOnly => verdict?.verdict == DishVerdict.nonKeto,
+  /// Whether the dish [dishId], judged [verdict], belongs in
+  /// [visibleRows] under the current [filter]. An exhaustive switch with no
+  /// `default`: adding a [MenuFilter] value without updating this function
+  /// is a compile error (architecture.md §10).
+  ///
+  /// When [wording] uses states (Banto, ALG-05) the filter reads the
+  /// dish's [DishState] instead ([_matchesStateFilter]); otherwise
+  /// [MenuFilter.askOnly], which has no keto meaning, keeps every dish.
+  bool _matchesFilter(String dishId, AnalysedDish? verdict) {
+    if (wording.usesStates) {
+      return _matchesStateFilter(evaluations[dishId]?.state);
+    }
+    return switch (_filter) {
+      MenuFilter.greenOnly => verdict?.verdict == DishVerdict.orderAsIs,
+      MenuFilter.greenAndYellow =>
+        verdict?.verdict == DishVerdict.orderAsIs ||
+            verdict?.verdict == DishVerdict.modifiable,
+      MenuFilter.yellowOnly => verdict?.verdict == DishVerdict.modifiable,
+      MenuFilter.redOnly => verdict?.verdict == DishVerdict.nonKeto,
+      MenuFilter.all || MenuFilter.askOnly => true,
+    };
+  }
+
+  /// Whether a dish in [state] (null: not placed) passes the current
+  /// [filter] in state mode: green is fits, yellow fits with a change, red
+  /// avoid, [MenuFilter.askOnly] ask, and [MenuFilter.greenAndYellow]
+  /// everything placed but avoid — the strict profile's default.
+  bool _matchesStateFilter(DishState? state) => switch (_filter) {
+    MenuFilter.greenOnly => state == DishState.fits,
+    MenuFilter.greenAndYellow => state != null && state != DishState.avoid,
+    MenuFilter.yellowOnly => state == DishState.fitsWithChange,
+    MenuFilter.askOnly => state == DishState.ask,
+    MenuFilter.redOnly => state == DishState.avoid,
     MenuFilter.all => true,
   };
 }

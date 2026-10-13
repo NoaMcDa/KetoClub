@@ -2413,6 +2413,250 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nothing in the menu text points to your restrictions.'**
   String get whyEmptyFlexible;
+
+  /// Banto (ALG-05): the dish-state pill for a dish that fits a profile with no strict entry. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'Fits'**
+  String get stateFitsBadge;
+
+  /// Banto (ALG-05): the dish-state pill for a dish in which nothing was found, for a profile with an allergy or celiac disease. The wording floor: never 'safe', always 'ask the restaurant'.
+  ///
+  /// In en, this message translates to:
+  /// **'No trigger found — ask the restaurant'**
+  String get stateFitsStrictBadge;
+
+  /// Banto (ALG-05): the dish-state pill for a dish that fits once something removable is left off.
+  ///
+  /// In en, this message translates to:
+  /// **'Fits with a change'**
+  String get stateFitsWithChangeBadge;
+
+  /// Banto (ALG-05): the dish-state pill for a dish that may hide a strict restriction.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask first'**
+  String get stateAskBadge;
+
+  /// Banto (ALG-05): the dish-state pill for a dish that names a restriction in the dish itself.
+  ///
+  /// In en, this message translates to:
+  /// **'Avoid'**
+  String get stateAvoidBadge;
+
+  /// Banto (ALG-05): counter tile label for dishes that fit (no strict entry in the profile).
+  ///
+  /// In en, this message translates to:
+  /// **'Fit'**
+  String get stateFitsTile;
+
+  /// Banto (ALG-05): counter tile label for dishes in which nothing was found, for a strict profile. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'No trigger found'**
+  String get stateFitsStrictTile;
+
+  /// Banto (ALG-05): counter tile label for dishes that fit with a change.
+  ///
+  /// In en, this message translates to:
+  /// **'With a change'**
+  String get stateFitsWithChangeTile;
+
+  /// Banto (ALG-05): counter tile label for dishes to ask the restaurant about.
+  ///
+  /// In en, this message translates to:
+  /// **'To ask'**
+  String get stateAskTile;
+
+  /// Banto (ALG-05): counter tile label for dishes to avoid.
+  ///
+  /// In en, this message translates to:
+  /// **'Avoid'**
+  String get stateAvoidTile;
+
+  /// Banto (ALG-05): legend line for the fits state (no strict entry).
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing in the menu text conflicts with your restrictions.'**
+  String get stateLegendFits;
+
+  /// Banto (ALG-05): legend line for the fits state for a strict profile. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'No trigger for your restrictions was found in the menu text. The menu text is all the app read, so ask the restaurant.'**
+  String get stateLegendFitsStrict;
+
+  /// Banto (ALG-05): legend line for the fits-with-a-change state.
+  ///
+  /// In en, this message translates to:
+  /// **'Fits once something that can be left off is left off. The waiter line says what to ask for.'**
+  String get stateLegendFitsWithChange;
+
+  /// Banto (ALG-05): legend line for the ask state.
+  ///
+  /// In en, this message translates to:
+  /// **'Something in the dish may hide one of your restrictions. Ask the restaurant before ordering.'**
+  String get stateLegendAsk;
+
+  /// Banto (ALG-05): legend line for the avoid state.
+  ///
+  /// In en, this message translates to:
+  /// **'One of your restrictions is named in the dish itself, or keto, when it is in your profile, rules it out.'**
+  String get stateLegendAvoid;
+
+  /// Banto (ALG-05): legend note that the four counters count food only (D21).
+  ///
+  /// In en, this message translates to:
+  /// **'The counters cover food only. Drinks, sauces and extras are still checked and listed, but are not counted.'**
+  String get stateLegendFoodOnly;
+
+  /// Banto (ALG-05): the 'Showing' label for the fits filter (no strict entry).
+  ///
+  /// In en, this message translates to:
+  /// **'Showing dishes that fit'**
+  String get menuShowingFits;
+
+  /// Banto (ALG-05): the 'Showing' label for the fits filter, strict profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing dishes with no trigger found'**
+  String get menuShowingFitsStrict;
+
+  /// Banto (ALG-05): the 'Showing' label for the fits-with-a-change filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing dishes that fit with a change'**
+  String get menuShowingFitsWithChange;
+
+  /// Banto (ALG-05): the 'Showing' label for the ask filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing dishes to ask about'**
+  String get menuShowingAsk;
+
+  /// Banto (ALG-05): the 'Showing' label for the avoid filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing what to avoid'**
+  String get menuShowingAvoid;
+
+  /// Banto (ALG-05): the 'Showing' label for the default filter of a strict profile (fits, fits with a change and ask; avoid hidden).
+  ///
+  /// In en, this message translates to:
+  /// **'Showing everything except what to avoid'**
+  String get menuShowingNotAvoid;
+
+  /// Banto (ALG-05): the menu header's counts in place of the keto score, for a profile without keto and without a strict entry.
+  ///
+  /// In en, this message translates to:
+  /// **'{fits} fit · {change} with a change · {ask} to ask'**
+  String headerStateCounts(int fits, int change, int ask);
+
+  /// Banto (ALG-05): the menu header's counts in place of the keto score, for a profile with a strict entry. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'{fits} no trigger found · {change} with a change · {ask} to ask'**
+  String headerStateCountsStrict(int fits, int change, int ask);
+
+  /// Banto (ALG-05): where a concern was found, on the dish card's concern line.
+  ///
+  /// In en, this message translates to:
+  /// **'in the name'**
+  String get concernSourceName;
+
+  /// Banto (ALG-05): concern source on the dish card.
+  ///
+  /// In en, this message translates to:
+  /// **'in the description'**
+  String get concernSourceDescription;
+
+  /// Banto (ALG-05): concern source on the dish card (an option value); followed by the option text when known.
+  ///
+  /// In en, this message translates to:
+  /// **'option'**
+  String get concernSourceOption;
+
+  /// Banto (ALG-05): concern source on the dish card (a hidden source, e.g. soy sauce); followed by the text when known.
+  ///
+  /// In en, this message translates to:
+  /// **'hidden'**
+  String get concernSourceHidden;
+
+  /// Banto (ALG-05): concern source on the dish card (an ingredient the AI read); followed by the ingredient when known.
+  ///
+  /// In en, this message translates to:
+  /// **'read by the AI'**
+  String get concernSourceModel;
+
+  /// Banto (ALG-05): a concern source followed by the menu text it matched.
+  ///
+  /// In en, this message translates to:
+  /// **'{source}: {text}'**
+  String concernSourceWithText(String source, String text);
+
+  /// Banto (ALG-05): a concern's certainty in words, never a number.
+  ///
+  /// In en, this message translates to:
+  /// **'stated'**
+  String get concernCertaintyStated;
+
+  /// Banto (ALG-05): a concern's certainty in words.
+  ///
+  /// In en, this message translates to:
+  /// **'likely'**
+  String get concernCertaintyLikely;
+
+  /// Banto (ALG-05): a concern's certainty in words.
+  ///
+  /// In en, this message translates to:
+  /// **'suspected — ask'**
+  String get concernCertaintySuspected;
+
+  /// Banto (ALG-05): screen-reader label of one concern line on the dish card.
+  ///
+  /// In en, this message translates to:
+  /// **'{restriction}: {source}, {certainty}'**
+  String concernLineSemanticLabel(
+    String restriction,
+    String source,
+    String certainty,
+  );
+
+  /// Banto (ALG-05/06): the dish-card button that opens the Why sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Why?'**
+  String get dishCardWhy;
+
+  /// Banto (ALG-05/06): screen-reader label of the Why button.
+  ///
+  /// In en, this message translates to:
+  /// **'Why this result for {dish}'**
+  String dishCardWhySemanticLabel(String dish);
+
+  /// Banto (ALG-05): the dish card's waiter row for a dish in the ask state.
+  ///
+  /// In en, this message translates to:
+  /// **'What to ask the waiter'**
+  String get dishCardAskQuestion;
+
+  /// Banto (ALG-05): second engine chip, shown beside the AI chip when the on-device rules also checked the menu for the profile and found something.
+  ///
+  /// In en, this message translates to:
+  /// **'Rules checked'**
+  String get engineChipRulesChecked;
+
+  /// Banto (ALG-05): screen-reader label of the rules-checked chip.
+  ///
+  /// In en, this message translates to:
+  /// **'The app\'s own rules also checked this menu for your restrictions'**
+  String get engineChipRulesCheckedSemanticLabel;
+
+  /// Banto (ALG-05): the words after a concern's restriction chip on the dish card: where it was found, then how sure.
+  ///
+  /// In en, this message translates to:
+  /// **'{source} · {certainty}'**
+  String concernLineText(String source, String certainty);
 }
 
 class _AppLocalizationsDelegate

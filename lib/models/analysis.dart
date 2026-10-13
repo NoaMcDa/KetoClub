@@ -174,7 +174,12 @@ enum MenuFilter {
   yellowOnly,
 
   /// Only [DishVerdict.nonKeto] dishes — the menu screen's "Skip" tile.
-  redOnly;
+  redOnly,
+
+  /// Banto (ALG-05, issue #347): only the dishes whose on-device state is
+  /// "ask the restaurant" — the fourth counter tile. It has no keto
+  /// meaning: a keto-only menu screen treats it as [all].
+  askOnly;
 
   /// The filter whose [name] equals [wire], or null when none does.
   ///

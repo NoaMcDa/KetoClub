@@ -1509,4 +1509,146 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get whyEmptyFlexible =>
       'שום דבר בטקסט התפריט לא מצביע על ההגבלות שלך.';
+
+  @override
+  String get stateFitsBadge => 'מתאימה';
+
+  @override
+  String get stateFitsStrictBadge => 'לא נמצא חשש — לשאול את המסעדה';
+
+  @override
+  String get stateFitsWithChangeBadge => 'מתאימה עם שינוי';
+
+  @override
+  String get stateAskBadge => 'לשאול קודם';
+
+  @override
+  String get stateAvoidBadge => 'להימנע';
+
+  @override
+  String get stateFitsTile => 'מתאימות';
+
+  @override
+  String get stateFitsStrictTile => 'לא נמצא חשש';
+
+  @override
+  String get stateFitsWithChangeTile => 'עם שינוי';
+
+  @override
+  String get stateAskTile => 'לשאול';
+
+  @override
+  String get stateAvoidTile => 'להימנע';
+
+  @override
+  String get stateLegendFits => 'שום דבר בטקסט התפריט לא סותר את ההגבלות שלך.';
+
+  @override
+  String get stateLegendFitsStrict =>
+      'בטקסט התפריט לא נמצא חשש להגבלות שלך. האפליקציה קראה רק את הטקסט, אז לשאול את המסעדה.';
+
+  @override
+  String get stateLegendFitsWithChange =>
+      'מתאימה אם מוותרים על משהו שאפשר להוריד. שורת המלצר אומרת מה לבקש.';
+
+  @override
+  String get stateLegendAsk =>
+      'משהו במנה עלול להסתיר אחת מההגבלות שלך. לשאול את המסעדה לפני שמזמינים.';
+
+  @override
+  String get stateLegendAvoid =>
+      'אחת ההגבלות שלך מופיעה במנה עצמה, או שהמנה לא קטו כשקטו בפרופיל שלך.';
+
+  @override
+  String get stateLegendFoodOnly =>
+      'המונים סופרים רק אוכל. משקאות, רטבים ותוספות עדיין נבדקים ומוצגים, אבל לא נספרים.';
+
+  @override
+  String get menuShowingFits => 'מוצגות מנות שמתאימות';
+
+  @override
+  String get menuShowingFitsStrict => 'מוצגות מנות שלא נמצא בהן חשש';
+
+  @override
+  String get menuShowingFitsWithChange => 'מוצגות מנות שמתאימות עם שינוי';
+
+  @override
+  String get menuShowingAsk => 'מוצגות מנות שכדאי לשאול עליהן';
+
+  @override
+  String get menuShowingAvoid => 'מוצג ממה להימנע';
+
+  @override
+  String get menuShowingNotAvoid => 'מוצג הכול חוץ ממה שכדאי להימנע ממנו';
+
+  @override
+  String headerStateCounts(int fits, int change, int ask) {
+    return '$fits מתאימות · $change עם שינוי · $ask לשאול';
+  }
+
+  @override
+  String headerStateCountsStrict(int fits, int change, int ask) {
+    return '$fits בלי חשש שנמצא · $change עם שינוי · $ask לשאול';
+  }
+
+  @override
+  String get concernSourceName => 'בשם המנה';
+
+  @override
+  String get concernSourceDescription => 'בתיאור';
+
+  @override
+  String get concernSourceOption => 'תוספת לבחירה';
+
+  @override
+  String get concernSourceHidden => 'רכיב נסתר';
+
+  @override
+  String get concernSourceModel => 'לפי ה-AI';
+
+  @override
+  String concernSourceWithText(String source, String text) {
+    return '$source: $text';
+  }
+
+  @override
+  String get concernCertaintyStated => 'כתוב במפורש';
+
+  @override
+  String get concernCertaintyLikely => 'סביר';
+
+  @override
+  String get concernCertaintySuspected => 'חשד — לשאול';
+
+  @override
+  String concernLineSemanticLabel(
+    String restriction,
+    String source,
+    String certainty,
+  ) {
+    return '$restriction: $source, $certainty';
+  }
+
+  @override
+  String get dishCardWhy => 'למה?';
+
+  @override
+  String dishCardWhySemanticLabel(String dish) {
+    return 'למה זו התוצאה עבור $dish';
+  }
+
+  @override
+  String get dishCardAskQuestion => 'מה לשאול את המלצר';
+
+  @override
+  String get engineChipRulesChecked => 'נבדק גם בכללים';
+
+  @override
+  String get engineChipRulesCheckedSemanticLabel =>
+      'גם הכללים של האפליקציה בדקו את התפריט לפי ההגבלות שלך';
+
+  @override
+  String concernLineText(String source, String certainty) {
+    return '$source · $certainty';
+  }
 }

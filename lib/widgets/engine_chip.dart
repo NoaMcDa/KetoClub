@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
 
 /// Which engine produced a menu analysis: the AI model, or the on-device
 /// rules fallback (architecture.md §6.2, §6.6).
@@ -91,6 +92,53 @@ class EngineChip extends StatelessWidget {
                 style: TextStyle(color: color, fontWeight: FontWeight.w600),
               ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The second engine chip (Banto, ALG-05, issue #347): "Rules checked",
+/// shown beside [EngineChip]'s AI chip when the on-device rules pass also
+/// read a model result for the profile and found something
+/// (`MenuController.rulesChecked`), so the user sees the safety net was
+/// applied: the model proposes, the rules dispose (file 10, principle 2).
+///
+/// Builds nothing with [bantoMode] off.
+class RulesCheckedChip extends StatelessWidget {
+  /// Creates the chip.
+  const new({this.bantoMode = BantoMode.enabled, super.key});
+
+  /// Whether this build shows Banto surfaces (D26's convention).
+  final bool bantoMode;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!bantoMode) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context)!;
+    final color = Theme.of(context).colorScheme.onSurfaceVariant;
+    return Semantics(
+      label: l10n.engineChipRulesCheckedSemanticLabel,
+      excludeSemantics: true,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: color),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.rule, size: 14, color: color),
+              const SizedBox(width: 6),
+              Text(
+                l10n.engineChipRulesChecked,
+                style: TextStyle(color: color, fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -3233,6 +3233,43 @@ likely one in the name. `MenuController.evaluatedRows` pairs each analysed
 visible row with its evaluation for the profile recorded when the menu was
 last classified; nothing renders it yet (ALG-05).
 
+**The four-state menu screen and the Why sheet on the card (ALG-05, #347).**
+`ProfileWording` (`utils/profile_wording.dart`) is `ketoOnly` unless the
+screen's `bantoMode` is on and the profile holds a restriction besides keto,
+then `strict` with an allergen or celiac entry and `flexible` otherwise.
+`MenuController.open` takes `bantoMode` and records it with the profile;
+with a wording that uses states, `evaluations` (memoised per menu, analysis
+and profile) feed the dish cards, `stateCounts` (`VerdictCounts.ofStates`,
+food only, with a new `ask` field defaulting to 0, so keto counts and their
+equality and `toString` are unchanged), the filter and the share text,
+while the keto counts and score stay on the wire verdicts. `MenuFilter`
+gains `askOnly` (a keto screen reads it as `all`); in state mode
+`greenOnly`/`yellowOnly`/`redOnly` mean fits/with a change/avoid and
+`greenAndYellow` means "everything but avoid", which is the strict
+profile's opening filter unless one was last chosen. Every word comes from
+`widgets/verdict_copy.dart`: keto-only returns today's ARB strings
+verbatim (now also pinned through `keto_unchanged_test`'s `bantoMode`
+seams), a strict "fits" reads "No trigger found — ask the restaurant", the
+state legend ends on `helperToolSentence`, the header shows "N fit · M
+with a change · K to ask" instead of the keto score unless keto is in the
+profile, and a test sweeps every state, wording, filter and locale for
+"safe"/"בטוח". The share headings and a fallback "Does this dish contain
+X?" question follow the menu's language and so live in Dart
+(`MenuShareText.stateHeading`, `VerdictCopy.askQuestionFor`; §6.3's
+exception); the shared text names no restriction and copies no question.
+`StateBadge` pairs an icon and a word per state, ask drawn outlined in a
+new orange `VerdictColors.ask` tone (tokens `lightAsk*`/`darkAsk*`, every
+text pair pinned by `contrast_test`). In state mode `DishCard` lists one
+line per concern (the restriction from the taxonomy in the dish's own
+language, where it was found and how sure in words), a "Why?" button that
+opens `showWhySheet`, and one waiter row with the evaluator's change or
+the question to ask; the net-carb chip and hidden-carb flags stay only
+while keto is in the profile, as on the Waiter Card. The tiles become four,
+and a "Rules checked" chip sits beside the AI chip when the rules pass
+found something for the profile in a model result. `KetoClubApp` and
+`generateRoute` take `bantoMode` for the menu and Settings screens, so a
+flow test pumps Banto with no define.
+
 ---
 
 ## 15. Testing strategy

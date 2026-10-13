@@ -1503,4 +1503,148 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get whyEmptyFlexible =>
       'Nothing in the menu text points to your restrictions.';
+
+  @override
+  String get stateFitsBadge => 'Fits';
+
+  @override
+  String get stateFitsStrictBadge => 'No trigger found — ask the restaurant';
+
+  @override
+  String get stateFitsWithChangeBadge => 'Fits with a change';
+
+  @override
+  String get stateAskBadge => 'Ask first';
+
+  @override
+  String get stateAvoidBadge => 'Avoid';
+
+  @override
+  String get stateFitsTile => 'Fit';
+
+  @override
+  String get stateFitsStrictTile => 'No trigger found';
+
+  @override
+  String get stateFitsWithChangeTile => 'With a change';
+
+  @override
+  String get stateAskTile => 'To ask';
+
+  @override
+  String get stateAvoidTile => 'Avoid';
+
+  @override
+  String get stateLegendFits =>
+      'Nothing in the menu text conflicts with your restrictions.';
+
+  @override
+  String get stateLegendFitsStrict =>
+      'No trigger for your restrictions was found in the menu text. The menu text is all the app read, so ask the restaurant.';
+
+  @override
+  String get stateLegendFitsWithChange =>
+      'Fits once something that can be left off is left off. The waiter line says what to ask for.';
+
+  @override
+  String get stateLegendAsk =>
+      'Something in the dish may hide one of your restrictions. Ask the restaurant before ordering.';
+
+  @override
+  String get stateLegendAvoid =>
+      'One of your restrictions is named in the dish itself, or keto, when it is in your profile, rules it out.';
+
+  @override
+  String get stateLegendFoodOnly =>
+      'The counters cover food only. Drinks, sauces and extras are still checked and listed, but are not counted.';
+
+  @override
+  String get menuShowingFits => 'Showing dishes that fit';
+
+  @override
+  String get menuShowingFitsStrict => 'Showing dishes with no trigger found';
+
+  @override
+  String get menuShowingFitsWithChange =>
+      'Showing dishes that fit with a change';
+
+  @override
+  String get menuShowingAsk => 'Showing dishes to ask about';
+
+  @override
+  String get menuShowingAvoid => 'Showing what to avoid';
+
+  @override
+  String get menuShowingNotAvoid => 'Showing everything except what to avoid';
+
+  @override
+  String headerStateCounts(int fits, int change, int ask) {
+    return '$fits fit · $change with a change · $ask to ask';
+  }
+
+  @override
+  String headerStateCountsStrict(int fits, int change, int ask) {
+    return '$fits no trigger found · $change with a change · $ask to ask';
+  }
+
+  @override
+  String get concernSourceName => 'in the name';
+
+  @override
+  String get concernSourceDescription => 'in the description';
+
+  @override
+  String get concernSourceOption => 'option';
+
+  @override
+  String get concernSourceHidden => 'hidden';
+
+  @override
+  String get concernSourceModel => 'read by the AI';
+
+  @override
+  String concernSourceWithText(String source, String text) {
+    return '$source: $text';
+  }
+
+  @override
+  String get concernCertaintyStated => 'stated';
+
+  @override
+  String get concernCertaintyLikely => 'likely';
+
+  @override
+  String get concernCertaintySuspected => 'suspected — ask';
+
+  @override
+  String concernLineSemanticLabel(
+    String restriction,
+    String source,
+    String certainty,
+  ) {
+    return '$restriction: $source, $certainty';
+  }
+
+  @override
+  String get dishCardWhy => 'Why?';
+
+  @override
+  String dishCardWhySemanticLabel(String dish) {
+    return 'Why this result for $dish';
+  }
+
+  @override
+  String get dishCardAskQuestion => 'What to ask the waiter';
+
+  @override
+  String get engineChipRulesChecked => 'Rules checked';
+
+  @override
+  String get engineChipRulesCheckedSemanticLabel =>
+      'The app\'s own rules also checked this menu for your restrictions';
+
+  @override
+  String concernLineText(String source, String certainty) {
+    return '$source · $certainty';
+  }
 }

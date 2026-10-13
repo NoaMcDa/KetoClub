@@ -7,6 +7,7 @@ library;
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/dish_kind.dart';
 import 'package:ketoclub/utils/keto_score.dart';
 
@@ -18,11 +19,13 @@ import 'package:ketoclub/utils/keto_score.dart';
 final class VerdictCounts {
   /// Creates counts from the four numbers; [hiddenCarbYellow] is the part
   /// of [yellow] demoted from green by a hidden-carb flag (issue #213).
+  /// [ask] is Banto's fourth count and stays 0 for every keto count.
   const new({
     required this.green,
     required this.yellow,
     required this.hiddenCarbYellow,
     required this.red,
+    this.ask = 0,
   }) : assert(hiddenCarbYellow <= yellow, 'hidden-carb yellows are yellows');
 
   /// The food-only counts of [analysis] over [menu].
@@ -55,6 +58,43 @@ final class VerdictCounts {
     );
   }
 
+  /// The food-only counts of Banto's on-device states (ALG-05, issue
+  /// #347) over [menu]: [green] counts [DishState.fits], [yellow]
+  /// [DishState.fitsWithChange], [ask] [DishState.ask] and [red]
+  /// [DishState.avoid], keyed by dish id in [states]. The same food-only
+  /// rule as [VerdictCounts.of] (D21). [hiddenCarbYellow] is 0: a state is
+  /// not a keto verdict, and [score] over these counts is never shown (the
+  /// header shows the keto score from [VerdictCounts.of] instead).
+  // ignore: unnecessary_type_name_in_constructor
+  factory VerdictCounts.ofStates(Menu menu, Map<String, DishState> states) {
+    final kinds = dishKindsOf(menu);
+    var green = 0;
+    var yellow = 0;
+    var ask = 0;
+    var red = 0;
+    for (final MapEntry(key: dishId, value: state) in states.entries) {
+      final kind = kinds[dishId] ?? DishKind.food;
+      if (!kind.countsTowardScore) continue;
+      switch (state) {
+        case DishState.fits:
+          green++;
+        case DishState.fitsWithChange:
+          yellow++;
+        case DishState.ask:
+          ask++;
+        case DishState.avoid:
+          red++;
+      }
+    }
+    return VerdictCounts(
+      green: green,
+      yellow: yellow,
+      hiddenCarbYellow: 0,
+      red: red,
+      ask: ask,
+    );
+  }
+
   /// No dish placed at all: every count zero, [score] null.
   static const VerdictCounts zero = VerdictCounts(
     green: 0,
@@ -75,11 +115,15 @@ final class VerdictCounts {
   /// Food dishes placed [DishVerdict.nonKeto].
   final int red;
 
+  /// Food dishes whose Banto state is [DishState.ask]; always 0 for the
+  /// keto counts of [VerdictCounts.of].
+  final int ask;
+
   /// The yellows that are not hidden-carb demotions.
   int get otherYellow => yellow - hiddenCarbYellow;
 
   /// Every placed food dish.
-  int get total => green + yellow + red;
+  int get total => green + yellow + red + ask;
 
   /// [ketoScore] over these counts: null when no food dish was placed.
   double? get score => ketoScore(
@@ -95,13 +139,15 @@ final class VerdictCounts {
       other.green == green &&
       other.yellow == yellow &&
       other.hiddenCarbYellow == hiddenCarbYellow &&
-      other.red == red;
+      other.red == red &&
+      other.ask == ask;
 
   @override
-  int get hashCode => Object.hash(green, yellow, hiddenCarbYellow, red);
+  int get hashCode => Object.hash(green, yellow, hiddenCarbYellow, red, ask);
 
   @override
   String toString() =>
       'VerdictCounts(green: $green, yellow: $yellow, '
-      'hiddenCarbYellow: $hiddenCarbYellow, red: $red)';
+      'hiddenCarbYellow: $hiddenCarbYellow, red: $red'
+      '${ask == 0 ? '' : ', ask: $ask'})';
 }

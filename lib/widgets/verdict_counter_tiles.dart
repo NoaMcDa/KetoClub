@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
+import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
+import 'package:ketoclub/utils/profile_wording.dart';
 import 'package:ketoclub/widgets/focus_ring.dart';
+import 'package:ketoclub/widgets/verdict_copy.dart';
 
 /// The three verdict counters that double as the menu filter (issue #29):
 /// *"The three counters under the venue name are the filter — tap one"*
@@ -16,6 +20,13 @@ import 'package:ketoclub/widgets/focus_ring.dart';
 /// each tile carries its own count as the loudest element, which a
 /// segmented control's shared label style cannot do, and the artboard
 /// shows independent tinted cards rather than one joined control.
+///
+/// **Banto (ALG-05, issue #347).** With [bantoMode] on and a [wording] that
+/// [ProfileWording.usesStates], there are four tiles — fits, with a change,
+/// ask ([MenuFilter.askOnly], [askCount]) and avoid — counting
+/// `MenuController.stateCounts` and worded by [VerdictCopy.tile]; the
+/// three counts then mean states, not keto verdicts. Otherwise the three
+/// tiles are exactly as before.
 class VerdictCounterTiles extends StatelessWidget {
   /// Creates tiles for [greenCount], [yellowCount] and [redCount]. Which
   /// tile reads as active is derived from [filter]; a tap reports the
@@ -26,6 +37,9 @@ class VerdictCounterTiles extends StatelessWidget {
     required this.redCount,
     required this.filter,
     required this.onFilterChanged,
+    this.askCount = 0,
+    this.wording = ProfileWording.ketoOnly,
+    this.bantoMode = BantoMode.enabled,
     super.key,
   });
 
@@ -50,10 +64,22 @@ class VerdictCounterTiles extends StatelessWidget {
   /// it was the active tile being tapped again.
   final ValueChanged<MenuFilter> onFilterChanged;
 
+  /// How many dishes are in [DishState.ask]; read only in state mode.
+  final int askCount;
+
+  /// How the profile asks for the states to be worded.
+  final ProfileWording wording;
+
+  /// Whether this build shows Banto surfaces (D26's convention).
+  final bool bantoMode;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final verdictColors = VerdictColors.of(context);
+    if (bantoMode && wording.usesStates) {
+      return _stateTiles(l10n, verdictColors);
+    }
     return Row(
       children: [
         Expanded(
@@ -101,6 +127,50 @@ class VerdictCounterTiles extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+extension on VerdictCounterTiles {
+  /// The four state tiles, stretched to one height so a label that wraps
+  /// ("No trigger found") does not leave its neighbours short.
+  Widget _stateTiles(AppLocalizations l10n, VerdictColors verdictColors) {
+    Widget tile(DishState state, int count, MenuFilter own, IconData icon) =>
+        Expanded(
+          child: _Tile(
+            count: count,
+            label: VerdictCopy.tile(l10n, state, wording),
+            icon: icon,
+            tone: verdictColors.forState(state),
+            active: filter == own,
+            onTap: () => onFilterChanged(filter == own ? MenuFilter.all : own),
+          ),
+        );
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          tile(
+            DishState.fits,
+            greenCount,
+            MenuFilter.greenOnly,
+            wording == ProfileWording.strict
+                ? Icons.check_circle_outline
+                : Icons.check_circle,
+          ),
+          const SizedBox(width: 6),
+          tile(
+            DishState.fitsWithChange,
+            yellowCount,
+            MenuFilter.yellowOnly,
+            Icons.edit_note,
+          ),
+          const SizedBox(width: 6),
+          tile(DishState.ask, askCount, MenuFilter.askOnly, Icons.help_outline),
+          const SizedBox(width: 6),
+          tile(DishState.avoid, redCount, MenuFilter.redOnly, Icons.cancel),
+        ],
+      ),
     );
   }
 }
