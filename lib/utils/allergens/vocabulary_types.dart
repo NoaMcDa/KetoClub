@@ -69,18 +69,29 @@ final class HiddenTrigger {
   String toString() => 'HiddenTrigger($term, ${certainty.name})';
 }
 
-/// The guard phrases of one restriction: a guard within two words of a
-/// trigger cancels that trigger's hit, with the window semantics the keto
-/// guards use (`ClassificationRules.isGuarded`).
+/// The guard phrases of one restriction, or of one of its terms
+/// ([RestrictionVocabulary.termGuards]).
 ///
-/// A guard is written relative to the trigger it cancels, because the
-/// window excludes the trigger itself: "sesame-free" is `afterEn: ['free']`
-/// (normalised "sesame free"), "no sesame" is `beforeEn: ['no']`, "ללא
-/// שומשום" is `beforeHe: ['ללא']`, "חלב סויה" is `afterHe: ['סויה']`.
-/// The direction matters: `beforeEn: ['free']` would also cancel "free
-/// range eggs". English guards apply to the English triggers, Hebrew
+/// **A guard lowers, never cancels** (doc 11 §0; ALG-04a): a trigger with
+/// a guard directly beside it is still reported, as
+/// [TriggerCertainty.suspected] and marked guarded, because a menu phrase
+/// is never proof that an allergen is absent ("almond milk" may be steamed
+/// with dairy milk; a "nut-free" pesto may hold pine nuts).
+///
+/// A guard counts only in the slot **adjacent** to its trigger: a
+/// `before` phrase must end on the word just before the matched span, an
+/// `after` phrase must start on the word just after it. So "no sesame or
+/// tahini" lowers sesame and leaves tahini stated. A guard is written
+/// relative to the trigger it lowers: "sesame-free" is `afterEn:
+/// ['free']` (normalised "sesame free"), "no sesame" is `beforeEn:
+/// ['no']`, "ללא שומשום" is `beforeHe: ['ללא']`, "חלב סויה" is `afterHe:
+/// ['סויה']`. The direction matters: `beforeEn: ['free']` would also lower
+/// "free range eggs". English guards apply to the English triggers, Hebrew
 /// guards to the Hebrew ones; each phrase is normalised before it is
-/// compared, and a multi-word phrase must be adjacent inside the window.
+/// compared, and every word of a multi-word phrase must be adjacent. A
+/// Hebrew guard's first word may carry grammatical prefix letters: up to
+/// two of בהוכלמש before the trigger ("וללא טחינה"), only the article ה
+/// after it ("חלב השקדים"; "חלב וסויה" is milk *and* soy, not soy milk).
 @immutable
 final class AllergenGuards {
   /// Creates a guard set. Every list defaults to empty.
@@ -91,20 +102,20 @@ final class AllergenGuards {
     this.afterHe = const <String>[],
   });
 
-  /// English phrases that cancel an English trigger from up to two words
+  /// English phrases that lower an English trigger from the words just
   /// before it.
   final List<String> beforeEn;
 
-  /// English phrases that cancel an English trigger from up to two words
+  /// English phrases that lower an English trigger from the words just
   /// after it.
   final List<String> afterEn;
 
-  /// Hebrew phrases that cancel a Hebrew trigger from up to two words
-  /// before it.
+  /// Hebrew phrases that lower a Hebrew trigger from the words just before
+  /// it.
   final List<String> beforeHe;
 
-  /// Hebrew phrases that cancel a Hebrew trigger from up to two words
-  /// after it.
+  /// Hebrew phrases that lower a Hebrew trigger from the words just after
+  /// it.
   final List<String> afterHe;
 }
 
@@ -126,6 +137,7 @@ final class RestrictionVocabulary {
     this.hiddenEn = const <HiddenTrigger>[],
     this.hiddenHe = const <HiddenTrigger>[],
     this.guards = const AllergenGuards(),
+    this.termGuards = const <String, AllergenGuards>{},
     this.noPrefixHe = const <String>[],
     this.sources = const <String>[],
   });
@@ -147,8 +159,18 @@ final class RestrictionVocabulary {
   /// Hebrew hidden-source triggers, each with its own certainty.
   final List<HiddenTrigger> hiddenHe;
 
-  /// Phrases that cancel a trigger beside them.
+  /// Phrases that lower any of this restriction's triggers beside them.
   final AllergenGuards guards;
+
+  /// Phrases that lower one term only, keyed by the term as written in a
+  /// trigger list, applied on top of [guards]: the compounds that name
+  /// another food ("rice flour" is not wheat flour, "almond milk" not
+  /// dairy milk, "oyster mushroom" not an oyster, "crab apple" not a
+  /// crab). The guard is the other word of the compound, so `'flour':
+  /// AllergenGuards(beforeEn: ['rice'])` lowers wheat's "flour" in "rice
+  /// flour" and nothing else. A compound that names an allergen of its own
+  /// is still a trigger of that one ("almond milk" is tree nuts, stated).
+  final Map<String, AllergenGuards> termGuards;
 
   /// Hebrew terms, from [directHe] or [hiddenHe] and spelled the same,
   /// compiled with no permissive prefix, because a prefix letter turns

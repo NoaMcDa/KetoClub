@@ -19,10 +19,12 @@ from app.keto.allergens import (
     AllergenHit,
     RestrictionVocabulary,
     allergens,
+    dish_match_text,
     find,
     find_in_dish,
     find_in_dish_with,
     find_with,
+    match_text,
     parse_allergens,
     parse_restriction_vocabularies,
 )
@@ -84,6 +86,7 @@ def _record(hits: list[AllergenHit]) -> list[dict[str, Any]]:
             "certainty": hit.certainty,
             "start": hit.start,
             "end": hit.end,
+            "guarded": hit.guarded,
         }
         for hit in hits
     ]
@@ -219,7 +222,9 @@ def test_the_fixture_vocabulary_loads_every_field() -> None:
     assert wheat.hidden_en[0].term == "soy sauce"
     assert wheat.hidden_en[0].certainty == "likely"
     assert wheat.guards.before_en == ("gluten free",)
+    assert wheat.term_guards["flour"].before_en == ("rice",)
     assert _FIXTURE["sesame"].sources == ("11 §11", "12 §1.1")
+    assert _FIXTURE["sesame"].term_guards == {}
 
 
 # --- the matcher, replayed ------------------------------------------------------
@@ -232,6 +237,7 @@ def _text_ids(cases: list[dict[str, Any]]) -> list[str]:
 @pytest.mark.parametrize("case", _CASES["texts"], ids=_text_ids(_CASES["texts"]))
 def test_every_registry_text_replays(case: dict[str, Any]) -> None:
     assert normalise(case["text"]) == case["normalised"]
+    assert match_text(case["text"]) == case["matchText"]
     assert _record(find(case["text"])) == case["hits"]
 
 
@@ -239,6 +245,7 @@ def test_every_registry_text_replays(case: dict[str, Any]) -> None:
 def test_every_registry_dish_replays(case: dict[str, Any]) -> None:
     dish = _dish(case["dish"])
     assert dish_rules_text(dish) == case["rulesText"]
+    assert dish_match_text(dish) == case["matchText"]
     assert _record(find_in_dish(dish)) == case["hits"]
 
 
@@ -247,6 +254,7 @@ def test_every_registry_dish_replays(case: dict[str, Any]) -> None:
 )
 def test_every_fixture_text_replays(case: dict[str, Any]) -> None:
     assert normalise(case["text"]) == case["normalised"]
+    assert match_text(case["text"]) == case["matchText"]
     assert _record(find_with(case["text"], _FIXTURE)) == case["hits"]
 
 
@@ -254,11 +262,21 @@ def test_every_fixture_text_replays(case: dict[str, Any]) -> None:
 def test_every_fixture_dish_replays(case: dict[str, Any]) -> None:
     dish = _dish(case["dish"])
     assert dish_rules_text(dish) == case["rulesText"]
+    assert dish_match_text(dish) == case["matchText"]
     assert _record(find_in_dish_with(dish, _FIXTURE)) == case["hits"]
 
 
 def test_the_fixture_cases_find_something() -> None:
     assert sum(len(case["hits"]) for case in _FIXTURE_CASES["texts"]) > 0
+
+
+def test_the_fixture_cases_hold_guarded_hits_and_maqaf_texts() -> None:
+    hits = [hit for case in _FIXTURE_CASES["texts"] for hit in case["hits"]]
+    assert any(hit["guarded"] for hit in hits)
+    assert all(hit["certainty"] == "suspected" for hit in hits if hit["guarded"])
+    assert any(
+        case["matchText"] != case["normalised"] for case in _FIXTURE_CASES["texts"]
+    )
 
 
 # --- the matcher, directly ------------------------------------------------------
@@ -270,11 +288,96 @@ _SESAME = RestrictionVocabulary(
 )
 
 
-def test_a_guard_cancels_a_hit_in_its_own_language_only() -> None:
+def _found(text: str, vocab: dict[str, RestrictionVocabulary]) -> list[str]:
+    return [
+        f"{hit.id}:{hit.term}:{hit.certainty}{':guarded' if hit.guarded else ''}"
+        for hit in find_with(text, vocab)
+    ]
+
+
+def test_a_guard_lowers_a_hit_in_its_own_language_only() -> None:
     vocab = {"sesame": _SESAME}
-    assert find_with("sesame-free bun", vocab) == []
-    assert find_with("חומוס ללא טחינה", vocab) == []
-    assert [hit.term for hit in find_with("טחינה free", vocab)] == ["טחינה"]
+    assert _found("sesame-free bun", vocab) == ["sesame:sesame:suspected:guarded"]
+    assert _found("חומוס ללא טחינה", vocab) == ["sesame:טחינה:suspected:guarded"]
+    assert _found("טחינה free", vocab) == ["sesame:טחינה:stated"]
+
+
+_ADJACENT = {
+    "sesame": RestrictionVocabulary(
+        direct_en=("sesame", "tahini"),
+        direct_he=("שומשום", "טחינה"),
+        guards=AllergenGuards(
+            before_en=("no",), after_en=("free",), before_he=("ללא",)
+        ),
+    ),
+    "milk": RestrictionVocabulary(
+        direct_en=("milk",),
+        direct_he=("חלב",),
+        guards=AllergenGuards(before_en=("dairy free",), after_he=("שקדים",)),
+        term_guards={"milk": AllergenGuards(before_en=("coconut",))},
+    ),
+    "treeNuts": RestrictionVocabulary(direct_en=("almond milk",)),
+    "wheat": RestrictionVocabulary(
+        direct_en=("flour",),
+        term_guards={"flour": AllergenGuards(before_en=("rice",))},
+    ),
+    "peanuts": RestrictionVocabulary(direct_he=("חמאת בוטנים",)),
+}
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        # A guard lowers, never cancels.
+        ("Hummus, no tahini", ["sesame:tahini:suspected:guarded"]),
+        ("dairy-free milk", ["milk:milk:suspected:guarded"]),
+        # Only the adjacent slot counts.
+        (
+            "no sesame or tahini",
+            ["sesame:sesame:suspected:guarded", "sesame:tahini:stated"],
+        ),
+        ("no big tahini", ["sesame:tahini:stated"]),
+        ("tahini big free", ["sesame:tahini:stated"]),
+        (
+            "sesame free tahini",
+            ["sesame:sesame:suspected:guarded", "sesame:tahini:stated"],
+        ),
+        ("dairy big free milk", ["milk:milk:stated"]),
+        # Hebrew prefix letters on the guard.
+        ("חומוס וללא טחינה", ["sesame:טחינה:suspected:guarded"]),
+        ("חומוס אללא טחינה", ["sesame:טחינה:stated"]),
+        ("חלב השקדים", ["milk:חלב:suspected:guarded"]),
+        ("חלב ושקדים", ["milk:חלב:stated"]),
+        # Per-term guards.
+        ("rice flour bun", ["wheat:flour:suspected:guarded"]),
+        ("coconut milk", ["milk:milk:suspected:guarded"]),
+        (
+            "almond milk",
+            ["treeNuts:almond milk:stated", "milk:milk:stated"],
+        ),
+        # The maqaf joins words.
+        ("חמאת־בוטנים", ["peanuts:חמאת בוטנים:stated"]),
+        ("טחינה־ללא", ["sesame:טחינה:stated"]),
+    ],
+)
+def test_the_alg_04a_rules(text: str, expected: list[str]) -> None:
+    assert _found(text, _ADJACENT) == expected
+
+
+def test_a_term_guard_applies_to_its_own_term_only() -> None:
+    vocab = {
+        "milk": RestrictionVocabulary(
+            direct_en=("milk", "cream"),
+            term_guards={"milk": AllergenGuards(before_en=("coconut",))},
+        )
+    }
+    assert _found("coconut cream", vocab) == ["milk:cream:stated"]
+
+
+def test_the_maqaf_is_a_space_only_for_the_allergen_matcher() -> None:
+    assert normalise("חמאת־בוטנים") == "חמאתבוטנימ"
+    assert match_text("חמאת־בוטנים") == "חמאת בוטנימ"
+    assert len(match_text("a־b")) == len("a b")
 
 
 def test_offsets_are_utf16_units_of_the_normalised_text() -> None:
@@ -290,6 +393,18 @@ def test_a_vocabulary_without_the_id_or_with_an_empty_term_finds_nothing() -> No
     assert find_with("sesame", {}) == []
     assert find_with("!!", {"mustard": RestrictionVocabulary(direct_en=("!!",))}) == []
     assert find_with("", {"sesame": _SESAME}) == []
+
+
+def test_find_in_dish_reads_a_maqaf_as_a_space() -> None:
+    dish = Dish(
+        id="d",
+        name="טוסט",
+        price=10,
+        options=[DishOption(name="שינויים", values=["ללא־טחינה", "שומשום"])],
+    )
+    hits = find_in_dish_with(dish, {"sesame": _SESAME})
+    assert hits == []
+    assert dish_match_text(dish) == "טוסט שינויימ שומשומ"
 
 
 def test_find_in_dish_skips_a_removal_value() -> None:

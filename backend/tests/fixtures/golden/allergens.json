@@ -35,6 +35,7 @@
             {
               "certainty": "stated",
               "end": 31,
+              "guarded": false,
               "id": "milk",
               "start": 19,
               "term": "cream cheese"
@@ -42,11 +43,13 @@
             {
               "certainty": "stated",
               "end": 46,
+              "guarded": false,
               "id": "sesame",
               "start": 40,
               "term": "sesame"
             }
           ],
+          "matchText": "bagel toasted with cream cheese topping sesame poppy seed changes",
           "rulesText": "bagel toasted with cream cheese topping sesame poppy seed changes"
         },
         {
@@ -77,11 +80,13 @@
             {
               "certainty": "stated",
               "end": 51,
+              "guarded": false,
               "id": "sesame",
               "start": 45,
               "term": "tahini"
             }
           ],
+          "matchText": "falafel plate falafel hummus and salad sauce tahini amba remove",
           "rulesText": "falafel plate falafel hummus and salad sauce tahini amba remove"
         },
         {
@@ -113,6 +118,7 @@
             {
               "certainty": "stated",
               "end": 20,
+              "guarded": false,
               "id": "eggs",
               "start": 16,
               "term": "ביצה"
@@ -120,6 +126,7 @@
             {
               "certainty": "stated",
               "end": 30,
+              "guarded": false,
               "id": "sesame",
               "start": 25,
               "term": "טחינה"
@@ -127,11 +134,13 @@
             {
               "certainty": "stated",
               "end": 51,
+              "guarded": false,
               "id": "wheat",
               "start": 47,
               "term": "פיתה"
             }
           ],
+          "matchText": "סביח חציל מטוגנ ביצה קשה טחינה ועמבה בחירת לחמ פיתה לאפה שינויימ",
           "rulesText": "סביח חציל מטוגנ ביצה קשה טחינה ועמבה בחירת לחמ פיתה לאפה שינויימ"
         },
         {
@@ -156,6 +165,7 @@
             {
               "certainty": "likely",
               "end": 32,
+              "guarded": false,
               "id": "fish",
               "start": 22,
               "term": "רוטב קיסר"
@@ -163,12 +173,212 @@
             {
               "certainty": "stated",
               "end": 51,
+              "guarded": false,
               "id": "fish",
               "start": 45,
               "term": "אנשובי"
             }
           ],
+          "matchText": "סלט קיסר חסה קרוטונימ ורוטב קיסר תוספת פרמזנ אנשובי",
           "rulesText": "סלט קיסר חסה קרוטונימ ורוטב קיסר תוספת פרמזנ אנשובי"
+        },
+        {
+          "dish": {
+            "description": "עם חמאת־בוטנים",
+            "id": "d",
+            "imageUrl": null,
+            "name": "טוסט",
+            "options": [
+              {
+                "name": "שינויים",
+                "values": [
+                  "ללא־שומשום"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 19,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 8,
+              "term": "חמאת בוטנים"
+            },
+            {
+              "certainty": "stated",
+              "end": 19,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 13,
+              "term": "בוטנים"
+            }
+          ],
+          "matchText": "טוסט עמ חמאת בוטנימ שינויימ",
+          "rulesText": "טוסט עמ חמאתבוטנימ שינויימ ללאשומשומ"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "Plate",
+            "options": [
+              {
+                "name": "Extras",
+                "values": [
+                  "peanut"
+                ]
+              },
+              {
+                "name": "Changes",
+                "values": [
+                  "No peanut"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 19,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 13,
+              "term": "peanut"
+            }
+          ],
+          "matchText": "plate extras peanut changes",
+          "rulesText": "plate extras peanut changes"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "צלחת",
+            "options": [
+              {
+                "name": "תוספות",
+                "values": [
+                  "בוטנים"
+                ]
+              },
+              {
+                "name": "שינויים",
+                "values": [
+                  "ללא בוטנים"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 12,
+              "term": "בוטנים"
+            }
+          ],
+          "matchText": "צלחת תוספות בוטנימ שינויימ",
+          "rulesText": "צלחת תוספות בוטנימ שינויימ"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "Plate",
+            "options": [
+              {
+                "name": "Extras",
+                "values": [
+                  "almond milk"
+                ]
+              },
+              {
+                "name": "Changes",
+                "values": [
+                  "No almond milk"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 24,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 13,
+              "term": "almond milk"
+            },
+            {
+              "certainty": "suspected",
+              "end": 24,
+              "guarded": true,
+              "id": "milk",
+              "start": 20,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 24,
+              "guarded": false,
+              "id": "lactose",
+              "start": 20,
+              "term": "milk"
+            }
+          ],
+          "matchText": "plate extras almond milk changes",
+          "rulesText": "plate extras almond milk changes"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "צלחת",
+            "options": [
+              {
+                "name": "תוספות",
+                "values": [
+                  "שקדים"
+                ]
+              },
+              {
+                "name": "שינויים",
+                "values": [
+                  "ללא שקדים"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 17,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 12,
+              "term": "שקדים"
+            }
+          ],
+          "matchText": "צלחת תוספות שקדימ שינויימ",
+          "rulesText": "צלחת תוספות שקדימ שינויימ"
         },
         {
           "dish": {
@@ -197,6 +407,7 @@
             {
               "certainty": "stated",
               "end": 17,
+              "guarded": false,
               "id": "milk",
               "start": 13,
               "term": "milk"
@@ -204,11 +415,13 @@
             {
               "certainty": "stated",
               "end": 17,
+              "guarded": false,
               "id": "lactose",
               "start": 13,
               "term": "milk"
             }
           ],
+          "matchText": "plate extras milk changes",
           "rulesText": "plate extras milk changes"
         },
         {
@@ -238,6 +451,7 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "milk",
               "start": 12,
               "term": "חלב"
@@ -245,11 +459,13 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "lactose",
               "start": 12,
               "term": "חלב"
             }
           ],
+          "matchText": "צלחת תוספות חלב שינויימ",
           "rulesText": "צלחת תוספות חלב שינויימ"
         },
         {
@@ -279,6 +495,7 @@
             {
               "certainty": "stated",
               "end": 17,
+              "guarded": false,
               "id": "milk",
               "start": 13,
               "term": "milk"
@@ -286,11 +503,13 @@
             {
               "certainty": "stated",
               "end": 17,
+              "guarded": false,
               "id": "lactose",
               "start": 13,
               "term": "milk"
             }
           ],
+          "matchText": "plate extras milk changes",
           "rulesText": "plate extras milk changes"
         },
         {
@@ -320,6 +539,7 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "milk",
               "start": 12,
               "term": "חלב"
@@ -327,11 +547,13 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "lactose",
               "start": 12,
               "term": "חלב"
             }
           ],
+          "matchText": "צלחת תוספות חלב שינויימ",
           "rulesText": "צלחת תוספות חלב שינויימ"
         },
         {
@@ -361,11 +583,13 @@
             {
               "certainty": "stated",
               "end": 17,
+              "guarded": false,
               "id": "eggs",
               "start": 13,
               "term": "eggs"
             }
           ],
+          "matchText": "plate extras eggs changes",
           "rulesText": "plate extras eggs changes"
         },
         {
@@ -395,11 +619,13 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "eggs",
               "start": 12,
               "term": "ביצה"
             }
           ],
+          "matchText": "צלחת תוספות ביצה שינויימ",
           "rulesText": "צלחת תוספות ביצה שינויימ"
         },
         {
@@ -429,11 +655,13 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "soy",
               "start": 13,
               "term": "soy"
             }
           ],
+          "matchText": "plate extras soy changes",
           "rulesText": "plate extras soy changes"
         },
         {
@@ -463,11 +691,13 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "soy",
               "start": 12,
               "term": "סויה"
             }
           ],
+          "matchText": "צלחת תוספות סויה שינויימ",
           "rulesText": "צלחת תוספות סויה שינויימ"
         },
         {
@@ -497,11 +727,13 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "wheat",
               "start": 13,
               "term": "bun"
             }
           ],
+          "matchText": "plate extras bun changes",
           "rulesText": "plate extras bun changes"
         },
         {
@@ -531,11 +763,13 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "wheat",
               "start": 12,
               "term": "חיטה"
             }
           ],
+          "matchText": "צלחת תוספות חיטה שינויימ",
           "rulesText": "צלחת תוספות חיטה שינויימ"
         },
         {
@@ -565,11 +799,13 @@
             {
               "certainty": "stated",
               "end": 22,
+              "guarded": false,
               "id": "fish",
               "start": 13,
               "term": "anchovies"
             }
           ],
+          "matchText": "plate extras anchovies changes",
           "rulesText": "plate extras anchovies changes"
         },
         {
@@ -599,12 +835,86 @@
             {
               "certainty": "stated",
               "end": 17,
+              "guarded": false,
               "id": "fish",
               "start": 12,
               "term": "סלמון"
             }
           ],
+          "matchText": "צלחת תוספות סלמונ שינויימ",
           "rulesText": "צלחת תוספות סלמונ שינויימ"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "Plate",
+            "options": [
+              {
+                "name": "Extras",
+                "values": [
+                  "crab"
+                ]
+              },
+              {
+                "name": "Changes",
+                "values": [
+                  "No crab"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 17,
+              "guarded": false,
+              "id": "crustaceans",
+              "start": 13,
+              "term": "crab"
+            }
+          ],
+          "matchText": "plate extras crab changes",
+          "rulesText": "plate extras crab changes"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "Plate",
+            "options": [
+              {
+                "name": "Extras",
+                "values": [
+                  "oyster"
+                ]
+              },
+              {
+                "name": "Changes",
+                "values": [
+                  "No oyster"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 19,
+              "guarded": false,
+              "id": "molluscs",
+              "start": 13,
+              "term": "oyster"
+            }
+          ],
+          "matchText": "plate extras oyster changes",
+          "rulesText": "plate extras oyster changes"
         },
         {
           "dish": {
@@ -633,11 +943,13 @@
             {
               "certainty": "stated",
               "end": 19,
+              "guarded": false,
               "id": "sesame",
               "start": 13,
               "term": "sesame"
             }
           ],
+          "matchText": "plate extras sesame changes",
           "rulesText": "plate extras sesame changes"
         },
         {
@@ -667,11 +979,13 @@
             {
               "certainty": "stated",
               "end": 18,
+              "guarded": false,
               "id": "sesame",
               "start": 12,
               "term": "שומשום"
             }
           ],
+          "matchText": "צלחת תוספות שומשומ שינויימ",
           "rulesText": "צלחת תוספות שומשומ שינויימ"
         },
         {
@@ -701,11 +1015,13 @@
             {
               "certainty": "stated",
               "end": 19,
+              "guarded": false,
               "id": "celery",
               "start": 13,
               "term": "celery"
             }
           ],
+          "matchText": "plate extras celery changes",
           "rulesText": "plate extras celery changes"
         },
         {
@@ -735,11 +1051,13 @@
             {
               "certainty": "stated",
               "end": 22,
+              "guarded": false,
               "id": "legumes",
               "start": 13,
               "term": "chickpeas"
             }
           ],
+          "matchText": "plate extras chickpeas changes",
           "rulesText": "plate extras chickpeas changes"
         },
         {
@@ -769,11 +1087,13 @@
             {
               "certainty": "stated",
               "end": 17,
+              "guarded": false,
               "id": "legumes",
               "start": 12,
               "term": "חומוס"
             }
           ],
+          "matchText": "צלחת תוספות חומוס שינויימ",
           "rulesText": "צלחת תוספות חומוס שינויימ"
         }
       ],
@@ -783,6 +1103,7 @@
             {
               "certainty": "stated",
               "end": 6,
+              "guarded": false,
               "id": "sesame",
               "start": 0,
               "term": "sesame"
@@ -790,11 +1111,13 @@
             {
               "certainty": "stated",
               "end": 30,
+              "guarded": false,
               "id": "milk",
               "start": 18,
               "term": "cream cheese"
             }
           ],
+          "matchText": "sesame bagel with cream cheese",
           "normalised": "sesame bagel with cream cheese",
           "text": "Sesame bagel with cream cheese"
         },
@@ -803,31 +1126,46 @@
             {
               "certainty": "stated",
               "end": 18,
+              "guarded": false,
               "id": "sesame",
               "start": 12,
               "term": "tahini"
             }
           ],
+          "matchText": "hummus with tahini olive oil and paprika",
           "normalised": "hummus with tahini olive oil and paprika",
           "text": "Hummus with tahini, olive oil and paprika"
         },
         {
-          "hits": [],
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 33,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 27,
+              "term": "peanut"
+            }
+          ],
+          "matchText": "satay chicken skewers with peanut sauce",
           "normalised": "satay chicken skewers with peanut sauce",
           "text": "Satay chicken skewers with peanut sauce"
         },
         {
           "hits": [],
+          "matchText": "pad thai with crushed peanuts",
           "normalised": "pad thai with crushed peanuts",
           "text": "Pad thai with crushed peanuts"
         },
         {
           "hits": [],
+          "matchText": "basil pesto pasta with pine nuts",
           "normalised": "basil pesto pasta with pine nuts",
           "text": "Basil pesto pasta with pine nuts"
         },
         {
           "hits": [],
+          "matchText": "almond croissant",
           "normalised": "almond croissant",
           "text": "Almond croissant"
         },
@@ -836,6 +1174,7 @@
             {
               "certainty": "likely",
               "end": 6,
+              "guarded": false,
               "id": "fish",
               "start": 0,
               "term": "Caesar"
@@ -843,11 +1182,13 @@
             {
               "certainty": "stated",
               "end": 27,
+              "guarded": false,
               "id": "fish",
               "start": 18,
               "term": "anchovies"
             }
           ],
+          "matchText": "caesar salad with anchovies and parmesan",
           "normalised": "caesar salad with anchovies and parmesan",
           "text": "Caesar salad with anchovies and parmesan"
         },
@@ -856,6 +1197,7 @@
             {
               "certainty": "stated",
               "end": 23,
+              "guarded": false,
               "id": "soy",
               "start": 20,
               "term": "soy"
@@ -863,16 +1205,19 @@
             {
               "certainty": "likely",
               "end": 29,
+              "guarded": false,
               "id": "wheat",
               "start": 20,
               "term": "soy sauce"
             }
           ],
+          "matchText": "shrimp tempura with soy sauce",
           "normalised": "shrimp tempura with soy sauce",
           "text": "Shrimp tempura with soy sauce"
         },
         {
           "hits": [],
+          "matchText": "grilled squid with lemon",
           "normalised": "grilled squid with lemon",
           "text": "Grilled squid with lemon"
         },
@@ -881,11 +1226,13 @@
             {
               "certainty": "suspected",
               "end": 21,
+              "guarded": false,
               "id": "sulphites",
               "start": 11,
               "term": "white wine"
             }
           ],
+          "matchText": "mussels in white wine and garlic",
           "normalised": "mussels in white wine and garlic",
           "text": "Mussels in white wine and garlic"
         },
@@ -894,6 +1241,7 @@
             {
               "certainty": "stated",
               "end": 4,
+              "guarded": false,
               "id": "fish",
               "start": 0,
               "term": "tuna"
@@ -901,11 +1249,13 @@
             {
               "certainty": "stated",
               "end": 24,
+              "guarded": false,
               "id": "sesame",
               "start": 18,
               "term": "sesame"
             }
           ],
+          "matchText": "tuna tartare with sesame oil",
           "normalised": "tuna tartare with sesame oil",
           "text": "Tuna tartare with sesame oil"
         },
@@ -914,6 +1264,7 @@
             {
               "certainty": "stated",
               "end": 14,
+              "guarded": false,
               "id": "eggs",
               "start": 10,
               "term": "eggs"
@@ -921,29 +1272,51 @@
             {
               "certainty": "stated",
               "end": 33,
+              "guarded": false,
               "id": "wheat",
               "start": 28,
               "term": "toast"
             }
           ],
+          "matchText": "scrambled eggs on sourdough toast",
           "normalised": "scrambled eggs on sourdough toast",
           "text": "Scrambled eggs on sourdough toast"
         },
         {
           "hits": [
             {
+              "certainty": "suspected",
+              "end": 32,
+              "guarded": true,
+              "id": "milk",
+              "start": 28,
+              "term": "milk"
+            },
+            {
               "certainty": "stated",
               "end": 32,
+              "guarded": false,
               "id": "lactose",
               "start": 28,
               "term": "milk"
             }
           ],
+          "matchText": "lactose free latte with oat milk",
           "normalised": "lactose free latte with oat milk",
           "text": "Lactose-free latte with oat milk"
         },
         {
-          "hits": [],
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 15,
+              "guarded": true,
+              "id": "wheat",
+              "start": 12,
+              "term": "bun"
+            }
+          ],
+          "matchText": "gluten free bun with honey mustard",
           "normalised": "gluten free bun with honey mustard",
           "text": "Gluten-free bun with honey mustard"
         },
@@ -952,6 +1325,7 @@
             {
               "certainty": "stated",
               "end": 6,
+              "guarded": false,
               "id": "celery",
               "start": 0,
               "term": "celery"
@@ -959,21 +1333,34 @@
             {
               "certainty": "suspected",
               "end": 30,
+              "guarded": false,
               "id": "celery",
               "start": 15,
               "term": "vegetable stock"
             }
           ],
+          "matchText": "celery soup on vegetable stock",
           "normalised": "celery soup on vegetable stock",
           "text": "Celery soup on vegetable stock"
         },
         {
-          "hits": [],
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "wheat",
+              "start": 6,
+              "term": "flour"
+            }
+          ],
+          "matchText": "lupin flour flatbread",
           "normalised": "lupin flour flatbread",
           "text": "Lupin flour flatbread"
         },
         {
           "hits": [],
+          "matchText": "dried apricots contains sulphites",
           "normalised": "dried apricots contains sulphites",
           "text": "Dried apricots (contains sulphites)"
         },
@@ -982,6 +1369,7 @@
             {
               "certainty": "stated",
               "end": 22,
+              "guarded": false,
               "id": "legumes",
               "start": 13,
               "term": "chickpeas"
@@ -989,21 +1377,25 @@
             {
               "certainty": "stated",
               "end": 37,
+              "guarded": false,
               "id": "legumes",
               "start": 27,
               "term": "fava beans"
             }
           ],
+          "matchText": "falafel with chickpeas and fava beans",
           "normalised": "falafel with chickpeas and fava beans",
           "text": "Falafel with chickpeas and fava beans"
         },
         {
           "hits": [],
+          "matchText": "vegan burger dairy free cheese",
           "normalised": "vegan burger dairy free cheese",
           "text": "Vegan burger, dairy-free cheese"
         },
         {
           "hits": [],
+          "matchText": "vegetarian lasagne with ricotta",
           "normalised": "vegetarian lasagne with ricotta",
           "text": "Vegetarian lasagne with ricotta"
         },
@@ -1012,11 +1404,13 @@
             {
               "certainty": "stated",
               "end": 18,
+              "guarded": false,
               "id": "sesame",
               "start": 13,
               "term": "טחינה"
             }
           ],
+          "matchText": "סלט ירקות עמ טחינה",
           "normalised": "סלט ירקות עמ טחינה",
           "text": "סלט ירקות עם טחינה"
         },
@@ -1025,6 +1419,7 @@
             {
               "certainty": "stated",
               "end": 5,
+              "guarded": false,
               "id": "legumes",
               "start": 0,
               "term": "חומוס"
@@ -1032,11 +1427,13 @@
             {
               "certainty": "stated",
               "end": 14,
+              "guarded": false,
               "id": "sesame",
               "start": 9,
               "term": "טחינה"
             }
           ],
+          "matchText": "חומוס עמ טחינה וגרגירימ",
           "normalised": "חומוס עמ טחינה וגרגירימ",
           "text": "חומוס עם טחינה וגרגירים"
         },
@@ -1045,6 +1442,7 @@
             {
               "certainty": "stated",
               "end": 11,
+              "guarded": false,
               "id": "milk",
               "start": 6,
               "term": "גבינה"
@@ -1052,11 +1450,13 @@
             {
               "certainty": "stated",
               "end": 21,
+              "guarded": false,
               "id": "sesame",
               "start": 15,
               "term": "שומשום"
             }
           ],
+          "matchText": "בורקס גבינה עמ שומשומ",
           "normalised": "בורקס גבינה עמ שומשומ",
           "text": "בורקס גבינה עם שומשום"
         },
@@ -1065,11 +1465,13 @@
             {
               "certainty": "stated",
               "end": 13,
+              "guarded": false,
               "id": "eggs",
               "start": 9,
               "term": "ביצה"
             }
           ],
+          "matchText": "גחנונ עמ ביצה קשה ורסק עגבניות",
           "normalised": "גחנונ עמ ביצה קשה ורסק עגבניות",
           "text": "ג'חנון עם ביצה קשה ורסק עגבניות"
         },
@@ -1078,11 +1480,13 @@
             {
               "certainty": "likely",
               "end": 21,
+              "guarded": false,
               "id": "wheat",
               "start": 10,
               "term": "פירורי לחם"
             }
           ],
+          "matchText": "שניצל עופ בפירורי לחמ",
           "normalised": "שניצל עופ בפירורי לחמ",
           "text": "שניצל עוף בפירורי לחם"
         },
@@ -1091,6 +1495,7 @@
             {
               "certainty": "stated",
               "end": 5,
+              "guarded": false,
               "id": "fish",
               "start": 0,
               "term": "סלמון"
@@ -1098,6 +1503,7 @@
             {
               "certainty": "likely",
               "end": 16,
+              "guarded": false,
               "id": "wheat",
               "start": 6,
               "term": "רוטב סויה"
@@ -1105,21 +1511,25 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "soy",
               "start": 12,
               "term": "סויה"
             }
           ],
+          "matchText": "סלמונ ברוטב סויה ודבש",
           "normalised": "סלמונ ברוטב סויה ודבש",
           "text": "סלמון ברוטב סויה ודבש"
         },
         {
           "hits": [],
+          "matchText": "פסטה ברוטב שמנת ופטריות",
           "normalised": "פסטה ברוטב שמנת ופטריות",
           "text": "פסטה ברוטב שמנת ופטריות"
         },
         {
           "hits": [],
+          "matchText": "חלבה עמ פיסטוקימ",
           "normalised": "חלבה עמ פיסטוקימ",
           "text": "חלבה עם פיסטוקים"
         },
@@ -1128,6 +1538,7 @@
             {
               "certainty": "stated",
               "end": 5,
+              "guarded": false,
               "id": "legumes",
               "start": 0,
               "term": "פלאפל"
@@ -1135,16 +1546,19 @@
             {
               "certainty": "stated",
               "end": 11,
+              "guarded": false,
               "id": "wheat",
               "start": 6,
               "term": "פיתה"
             }
           ],
+          "matchText": "פלאפל בפיתה עמ עמבה",
           "normalised": "פלאפל בפיתה עמ עמבה",
           "text": "פלאפל בפיתה עם עמבה"
         },
         {
           "hits": [],
+          "matchText": "שקשוקה עמ גבינת פטה",
           "normalised": "שקשוקה עמ גבינת פטה",
           "text": "שקשוקה עם גבינת פטה"
         },
@@ -1153,29 +1567,50 @@
             {
               "certainty": "stated",
               "end": 9,
+              "guarded": false,
               "id": "legumes",
               "start": 4,
               "term": "עדשים"
             }
           ],
+          "matchText": "מרק עדשימ כתומות",
           "normalised": "מרק עדשימ כתומות",
           "text": "מרק עדשים כתומות"
         },
         {
           "hits": [
             {
+              "certainty": "suspected",
+              "end": 15,
+              "guarded": true,
+              "id": "milk",
+              "start": 12,
+              "term": "חלב"
+            },
+            {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "lactose",
               "start": 12,
               "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 21,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 16,
+              "term": "שקדים"
             }
           ],
+          "matchText": "קפה הפוכ על חלב שקדימ",
           "normalised": "קפה הפוכ על חלב שקדימ",
           "text": "קפה הפוך על חלב שקדים"
         },
         {
           "hits": [],
+          "matchText": "לחמניה ללא גלוטנ",
           "normalised": "לחמניה ללא גלוטנ",
           "text": "לחמניה ללא גלוטן"
         },
@@ -1184,19 +1619,1054 @@
             {
               "certainty": "stated",
               "end": 5,
+              "guarded": false,
               "id": "legumes",
               "start": 0,
               "term": "חומוס"
+            },
+            {
+              "certainty": "suspected",
+              "end": 15,
+              "guarded": true,
+              "id": "sesame",
+              "start": 10,
+              "term": "טחינה"
             }
           ],
+          "matchText": "חומוס ללא טחינה",
           "normalised": "חומוס ללא טחינה",
           "text": "חומוס ללא טחינה"
         },
         {
           "hits": [
             {
+              "certainty": "suspected",
+              "end": 16,
+              "guarded": true,
+              "id": "sesame",
+              "start": 10,
+              "term": "sesame"
+            },
+            {
+              "certainty": "stated",
+              "end": 26,
+              "guarded": false,
+              "id": "sesame",
+              "start": 20,
+              "term": "tahini"
+            }
+          ],
+          "matchText": "hummus no sesame or tahini",
+          "normalised": "hummus no sesame or tahini",
+          "text": "Hummus, no sesame or tahini"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 6,
+              "guarded": true,
+              "id": "sesame",
+              "start": 0,
+              "term": "sesame"
+            },
+            {
+              "certainty": "stated",
+              "end": 18,
+              "guarded": false,
+              "id": "sesame",
+              "start": 12,
+              "term": "tahini"
+            }
+          ],
+          "matchText": "sesame free tahini",
+          "normalised": "sesame free tahini",
+          "text": "Sesame-free tahini"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 3,
+              "guarded": false,
+              "id": "wheat",
+              "start": 0,
+              "term": "bun"
+            },
+            {
+              "certainty": "suspected",
+              "end": 24,
+              "guarded": true,
+              "id": "wheat",
+              "start": 19,
+              "term": "flour"
+            }
+          ],
+          "matchText": "bun made with rice flour",
+          "normalised": "bun made with rice flour",
+          "text": "Bun made with rice flour"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 5,
+              "guarded": false,
+              "id": "wheat",
+              "start": 0,
+              "term": "toast"
+            },
+            {
+              "certainty": "suspected",
+              "end": 21,
+              "guarded": true,
+              "id": "wheat",
+              "start": 16,
+              "term": "flour"
+            },
+            {
+              "certainty": "stated",
+              "end": 37,
+              "guarded": false,
+              "id": "wheat",
+              "start": 32,
+              "term": "flour"
+            }
+          ],
+          "matchText": "toast with rice flour and wheat flour",
+          "normalised": "toast with rice flour and wheat flour",
+          "text": "Toast with rice flour and wheat flour"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 27,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 16,
+              "term": "almond milk"
+            },
+            {
+              "certainty": "suspected",
+              "end": 27,
+              "guarded": true,
+              "id": "milk",
+              "start": 23,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 27,
+              "guarded": false,
+              "id": "lactose",
+              "start": 23,
+              "term": "milk"
+            }
+          ],
+          "matchText": "flat white with almond milk",
+          "normalised": "flat white with almond milk",
+          "text": "Flat white with almond milk"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 12,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 0,
+              "term": "coconut milk"
+            },
+            {
+              "certainty": "suspected",
+              "end": 12,
+              "guarded": true,
+              "id": "milk",
+              "start": 8,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 12,
+              "guarded": false,
+              "id": "lactose",
+              "start": 8,
+              "term": "milk"
+            }
+          ],
+          "matchText": "coconut milk curry",
+          "normalised": "coconut milk curry",
+          "text": "Coconut milk curry"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 6,
+              "guarded": true,
+              "id": "molluscs",
+              "start": 0,
+              "term": "oyster"
+            }
+          ],
+          "matchText": "oyster mushroom risotto",
+          "normalised": "oyster mushroom risotto",
+          "text": "Oyster mushroom risotto"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 4,
+              "guarded": true,
+              "id": "crustaceans",
+              "start": 0,
+              "term": "crab"
+            }
+          ],
+          "matchText": "crab apple jelly",
+          "normalised": "crab apple jelly",
+          "text": "Crab apple jelly"
+        },
+        {
+          "hits": [
+            {
               "certainty": "stated",
               "end": 4,
+              "guarded": false,
+              "id": "crustaceans",
+              "start": 0,
+              "term": "crab"
+            }
+          ],
+          "matchText": "crab cakes",
+          "normalised": "crab cakes",
+          "text": "Crab cakes"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 0,
+              "term": "חמאת בוטנים"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 5,
+              "term": "בוטנים"
+            }
+          ],
+          "matchText": "חמאת בוטנימ",
+          "normalised": "חמאתבוטנימ",
+          "text": "חמאת־בוטנים"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 4,
+              "guarded": false,
+              "id": "wheat",
+              "start": 0,
+              "term": "פיתה"
+            },
+            {
+              "certainty": "stated",
+              "end": 19,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 8,
+              "term": "חמאת בוטנים"
+            },
+            {
+              "certainty": "stated",
+              "end": 19,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 13,
+              "term": "בוטנים"
+            }
+          ],
+          "matchText": "פיתה עמ חמאת בוטנימ",
+          "normalised": "פיתה עמ חמאתבוטנימ",
+          "text": "פיתה עם חמאת־בוטנים"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 10,
+              "guarded": true,
+              "id": "milk",
+              "start": 7,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 10,
+              "guarded": false,
+              "id": "lactose",
+              "start": 7,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 16,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 11,
+              "term": "שקדים"
+            }
+          ],
+          "matchText": "קפה עמ חלב שקדימ",
+          "normalised": "קפה עמ חלבשקדימ",
+          "text": "קפה עם חלב־שקדים"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 10,
+              "guarded": true,
+              "id": "milk",
+              "start": 7,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 10,
+              "guarded": false,
+              "id": "lactose",
+              "start": 7,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 17,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 11,
+              "term": "שקדים"
+            }
+          ],
+          "matchText": "קפה עמ חלב השקדימ",
+          "normalised": "קפה עמ חלב השקדימ",
+          "text": "קפה עם חלב השקדים"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 10,
+              "guarded": false,
+              "id": "milk",
+              "start": 7,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 10,
+              "guarded": false,
+              "id": "lactose",
+              "start": 7,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 17,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 11,
+              "term": "שקדים"
+            }
+          ],
+          "matchText": "קפה עמ חלב ושקדימ",
+          "normalised": "קפה עמ חלב ושקדימ",
+          "text": "קפה עם חלב ושקדים"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 5,
+              "guarded": false,
+              "id": "legumes",
+              "start": 0,
+              "term": "חומוס"
+            },
+            {
+              "certainty": "suspected",
+              "end": 16,
+              "guarded": true,
+              "id": "sesame",
+              "start": 11,
+              "term": "טחינה"
+            }
+          ],
+          "matchText": "חומוס וללא טחינה",
+          "normalised": "חומוס וללא טחינה",
+          "text": "חומוס וללא טחינה"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 19,
+              "guarded": false,
+              "id": "sesame",
+              "start": 14,
+              "term": "טחינה"
+            }
+          ],
+          "matchText": "ללא גלוטנ ועמ טחינה",
+          "normalised": "ללא גלוטנ ועמ טחינה",
+          "text": "ללא גלוטן ועם טחינה"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 6,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 0,
+              "term": "peanut"
+            }
+          ],
+          "matchText": "peanut",
+          "normalised": "peanut",
+          "text": "peanut"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 12,
+              "term": "peanut"
+            }
+          ],
+          "matchText": "served with peanut on the side",
+          "normalised": "served with peanut on the side",
+          "text": "Served with peanut on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 12,
+              "term": "peanut"
+            }
+          ],
+          "matchText": "served with peanut on the side",
+          "normalised": "served with peanut on the side",
+          "text": "Served with PEANUT on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 6,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 0,
+              "term": "peanut"
+            },
+            {
+              "certainty": "stated",
+              "end": 13,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 0,
+              "term": "peanut butter"
+            }
+          ],
+          "matchText": "peanut butter",
+          "normalised": "peanut butter",
+          "text": "peanut butter"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 12,
+              "term": "peanut"
+            },
+            {
+              "certainty": "stated",
+              "end": 25,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 12,
+              "term": "peanut butter"
+            }
+          ],
+          "matchText": "served with peanut butter on the side",
+          "normalised": "served with peanut butter on the side",
+          "text": "Served with peanut butter on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 12,
+              "term": "peanut"
+            },
+            {
+              "certainty": "stated",
+              "end": 25,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 12,
+              "term": "peanut butter"
+            }
+          ],
+          "matchText": "served with peanut butter on the side",
+          "normalised": "served with peanut butter on the side",
+          "text": "Served with PEANUT BUTTER on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 6,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 0,
+              "term": "בוטנים"
+            }
+          ],
+          "matchText": "בוטנימ",
+          "normalised": "בוטנימ",
+          "text": "בוטנים"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 14,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 8,
+              "term": "בוטנים"
+            }
+          ],
+          "matchText": "מוגש עמ בוטנימ בצד",
+          "normalised": "מוגש עמ בוטנימ בצד",
+          "text": "מוגש עם בוטנים בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 8,
+              "term": "בוטנים"
+            }
+          ],
+          "matchText": "מוגש עמ הבוטנימ בצד",
+          "normalised": "מוגש עמ הבוטנימ בצד",
+          "text": "מוגש עם הבוטנים בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 8,
+              "term": "בוטנים"
+            }
+          ],
+          "matchText": "מוגש עמ ובבוטנימ בצד",
+          "normalised": "מוגש עמ ובבוטנימ בצד",
+          "text": "מוגש עם ובבוטנים בצד"
+        },
+        {
+          "hits": [],
+          "matchText": "מוגש עמ ושהבוטנימ בצד",
+          "normalised": "מוגש עמ ושהבוטנימ בצד",
+          "text": "מוגש עם ושהבוטנים בצד"
+        },
+        {
+          "hits": [],
+          "matchText": "מוגש עמ בוטנימי בצד",
+          "normalised": "מוגש עמ בוטנימי בצד",
+          "text": "מוגש עם בוטניםי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 0,
+              "term": "חמאת בוטנים"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 5,
+              "term": "בוטנים"
+            }
+          ],
+          "matchText": "חמאת בוטנימ",
+          "normalised": "חמאת בוטנימ",
+          "text": "חמאת בוטנים"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 19,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 8,
+              "term": "חמאת בוטנים"
+            },
+            {
+              "certainty": "stated",
+              "end": 19,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 13,
+              "term": "בוטנים"
+            }
+          ],
+          "matchText": "מוגש עמ חמאת בוטנימ בצד",
+          "normalised": "מוגש עמ חמאת בוטנימ בצד",
+          "text": "מוגש עם חמאת בוטנים בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 20,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 8,
+              "term": "חמאת בוטנים"
+            },
+            {
+              "certainty": "stated",
+              "end": 20,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 14,
+              "term": "בוטנים"
+            }
+          ],
+          "matchText": "מוגש עמ החמאת בוטנימ בצד",
+          "normalised": "מוגש עמ החמאת בוטנימ בצד",
+          "text": "מוגש עם החמאת בוטנים בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 21,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 8,
+              "term": "חמאת בוטנים"
+            },
+            {
+              "certainty": "stated",
+              "end": 21,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 15,
+              "term": "בוטנים"
+            }
+          ],
+          "matchText": "מוגש עמ ובחמאת בוטנימ בצד",
+          "normalised": "מוגש עמ ובחמאת בוטנימ בצד",
+          "text": "מוגש עם ובחמאת בוטנים בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 22,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 16,
+              "term": "בוטנים"
+            }
+          ],
+          "matchText": "מוגש עמ ושהחמאת בוטנימ בצד",
+          "normalised": "מוגש עמ ושהחמאת בוטנימ בצד",
+          "text": "מוגש עם ושהחמאת בוטנים בצד"
+        },
+        {
+          "hits": [],
+          "matchText": "מוגש עמ חמאת בוטנימי בצד",
+          "normalised": "מוגש עמ חמאת בוטנימי בצד",
+          "text": "מוגש עם חמאת בוטניםי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 18,
+              "guarded": true,
+              "id": "peanuts",
+              "start": 12,
+              "term": "peanut"
+            }
+          ],
+          "matchText": "served with peanut free on the side",
+          "normalised": "served with peanut free on the side",
+          "text": "Served with peanut free on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 18,
+              "guarded": true,
+              "id": "peanuts",
+              "start": 12,
+              "term": "peanut"
+            }
+          ],
+          "matchText": "served with peanut free on the side",
+          "normalised": "served with peanut free on the side",
+          "text": "Served with peanut-free on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 12,
+              "term": "peanut"
+            }
+          ],
+          "matchText": "served with peanut big free on the side",
+          "normalised": "served with peanut big free on the side",
+          "text": "Served with peanut big free on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 12,
+              "term": "peanut"
+            }
+          ],
+          "matchText": "served with peanut big fat free on the side",
+          "normalised": "served with peanut big fat free on the side",
+          "text": "Served with peanut big fat free on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 23,
+              "guarded": false,
+              "id": "peanuts",
+              "start": 17,
+              "term": "peanut"
+            }
+          ],
+          "matchText": "served with free peanut on the side",
+          "normalised": "served with free peanut on the side",
+          "text": "Served with free peanut on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 0,
+              "term": "almond milk"
+            },
+            {
+              "certainty": "suspected",
+              "end": 11,
+              "guarded": true,
+              "id": "milk",
+              "start": 7,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "lactose",
+              "start": 7,
+              "term": "milk"
+            }
+          ],
+          "matchText": "almond milk",
+          "normalised": "almond milk",
+          "text": "almond milk"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 23,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 12,
+              "term": "almond milk"
+            },
+            {
+              "certainty": "suspected",
+              "end": 23,
+              "guarded": true,
+              "id": "milk",
+              "start": 19,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 23,
+              "guarded": false,
+              "id": "lactose",
+              "start": 19,
+              "term": "milk"
+            }
+          ],
+          "matchText": "served with almond milk on the side",
+          "normalised": "served with almond milk on the side",
+          "text": "Served with almond milk on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 23,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 12,
+              "term": "almond milk"
+            },
+            {
+              "certainty": "suspected",
+              "end": 23,
+              "guarded": true,
+              "id": "milk",
+              "start": 19,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 23,
+              "guarded": false,
+              "id": "lactose",
+              "start": 19,
+              "term": "milk"
+            }
+          ],
+          "matchText": "served with almond milk on the side",
+          "normalised": "served with almond milk on the side",
+          "text": "Served with ALMOND MILK on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 12,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 0,
+              "term": "coconut milk"
+            },
+            {
+              "certainty": "suspected",
+              "end": 12,
+              "guarded": true,
+              "id": "milk",
+              "start": 8,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 12,
+              "guarded": false,
+              "id": "lactose",
+              "start": 8,
+              "term": "milk"
+            }
+          ],
+          "matchText": "coconut milk",
+          "normalised": "coconut milk",
+          "text": "coconut milk"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 24,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 12,
+              "term": "coconut milk"
+            },
+            {
+              "certainty": "suspected",
+              "end": 24,
+              "guarded": true,
+              "id": "milk",
+              "start": 20,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 24,
+              "guarded": false,
+              "id": "lactose",
+              "start": 20,
+              "term": "milk"
+            }
+          ],
+          "matchText": "served with coconut milk on the side",
+          "normalised": "served with coconut milk on the side",
+          "text": "Served with coconut milk on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 24,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 12,
+              "term": "coconut milk"
+            },
+            {
+              "certainty": "suspected",
+              "end": 24,
+              "guarded": true,
+              "id": "milk",
+              "start": 20,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 24,
+              "guarded": false,
+              "id": "lactose",
+              "start": 20,
+              "term": "milk"
+            }
+          ],
+          "matchText": "served with coconut milk on the side",
+          "normalised": "served with coconut milk on the side",
+          "text": "Served with COCONUT MILK on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 5,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 0,
+              "term": "שקדים"
+            }
+          ],
+          "matchText": "שקדימ",
+          "normalised": "שקדימ",
+          "text": "שקדים"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 13,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 8,
+              "term": "שקדים"
+            }
+          ],
+          "matchText": "מוגש עמ שקדימ בצד",
+          "normalised": "מוגש עמ שקדימ בצד",
+          "text": "מוגש עם שקדים בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 14,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 8,
+              "term": "שקדים"
+            }
+          ],
+          "matchText": "מוגש עמ השקדימ בצד",
+          "normalised": "מוגש עמ השקדימ בצד",
+          "text": "מוגש עם השקדים בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 8,
+              "term": "שקדים"
+            }
+          ],
+          "matchText": "מוגש עמ ובשקדימ בצד",
+          "normalised": "מוגש עמ ובשקדימ בצד",
+          "text": "מוגש עם ובשקדים בצד"
+        },
+        {
+          "hits": [],
+          "matchText": "מוגש עמ ושהשקדימ בצד",
+          "normalised": "מוגש עמ ושהשקדימ בצד",
+          "text": "מוגש עם ושהשקדים בצד"
+        },
+        {
+          "hits": [],
+          "matchText": "מוגש עמ שקדימי בצד",
+          "normalised": "מוגש עמ שקדימי בצד",
+          "text": "מוגש עם שקדיםי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 4,
+              "guarded": false,
               "id": "milk",
               "start": 0,
               "term": "milk"
@@ -1204,11 +2674,13 @@
             {
               "certainty": "stated",
               "end": 4,
+              "guarded": false,
               "id": "lactose",
               "start": 0,
               "term": "milk"
             }
           ],
+          "matchText": "milk",
           "normalised": "milk",
           "text": "milk"
         },
@@ -1217,6 +2689,7 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "milk",
               "start": 12,
               "term": "milk"
@@ -1224,11 +2697,13 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "lactose",
               "start": 12,
               "term": "milk"
             }
           ],
+          "matchText": "served with milk on the side",
           "normalised": "served with milk on the side",
           "text": "Served with milk on the side"
         },
@@ -1237,6 +2712,7 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "milk",
               "start": 12,
               "term": "milk"
@@ -1244,11 +2720,13 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "lactose",
               "start": 12,
               "term": "milk"
             }
           ],
+          "matchText": "served with milk on the side",
           "normalised": "served with milk on the side",
           "text": "Served with MILK on the side"
         },
@@ -1257,11 +2735,13 @@
             {
               "certainty": "stated",
               "end": 12,
+              "guarded": false,
               "id": "milk",
               "start": 0,
               "term": "cream cheese"
             }
           ],
+          "matchText": "cream cheese",
           "normalised": "cream cheese",
           "text": "cream cheese"
         },
@@ -1270,11 +2750,13 @@
             {
               "certainty": "stated",
               "end": 24,
+              "guarded": false,
               "id": "milk",
               "start": 12,
               "term": "cream cheese"
             }
           ],
+          "matchText": "served with cream cheese on the side",
           "normalised": "served with cream cheese on the side",
           "text": "Served with cream cheese on the side"
         },
@@ -1283,11 +2765,13 @@
             {
               "certainty": "stated",
               "end": 24,
+              "guarded": false,
               "id": "milk",
               "start": 12,
               "term": "cream cheese"
             }
           ],
+          "matchText": "served with cream cheese on the side",
           "normalised": "served with cream cheese on the side",
           "text": "Served with CREAM CHEESE on the side"
         },
@@ -1296,11 +2780,13 @@
             {
               "certainty": "stated",
               "end": 13,
+              "guarded": false,
               "id": "milk",
               "start": 0,
               "term": "crème fraîche"
             }
           ],
+          "matchText": "creme fraiche",
           "normalised": "creme fraiche",
           "text": "crème fraîche"
         },
@@ -1309,11 +2795,13 @@
             {
               "certainty": "stated",
               "end": 25,
+              "guarded": false,
               "id": "milk",
               "start": 12,
               "term": "crème fraîche"
             }
           ],
+          "matchText": "served with creme fraiche on the side",
           "normalised": "served with creme fraiche on the side",
           "text": "Served with crème fraîche on the side"
         },
@@ -1322,11 +2810,13 @@
             {
               "certainty": "stated",
               "end": 25,
+              "guarded": false,
               "id": "milk",
               "start": 12,
               "term": "crème fraîche"
             }
           ],
+          "matchText": "served with creme fraiche on the side",
           "normalised": "served with creme fraiche on the side",
           "text": "Served with CRÈME FRAÎCHE on the side"
         },
@@ -1335,6 +2825,7 @@
             {
               "certainty": "stated",
               "end": 3,
+              "guarded": false,
               "id": "milk",
               "start": 0,
               "term": "חלב"
@@ -1342,11 +2833,13 @@
             {
               "certainty": "stated",
               "end": 3,
+              "guarded": false,
               "id": "lactose",
               "start": 0,
               "term": "חלב"
             }
           ],
+          "matchText": "חלב",
           "normalised": "חלב",
           "text": "חלב"
         },
@@ -1355,6 +2848,7 @@
             {
               "certainty": "stated",
               "end": 11,
+              "guarded": false,
               "id": "milk",
               "start": 8,
               "term": "חלב"
@@ -1362,11 +2856,13 @@
             {
               "certainty": "stated",
               "end": 11,
+              "guarded": false,
               "id": "lactose",
               "start": 8,
               "term": "חלב"
             }
           ],
+          "matchText": "מוגש עמ חלב בצד",
           "normalised": "מוגש עמ חלב בצד",
           "text": "מוגש עם חלב בצד"
         },
@@ -1375,6 +2871,7 @@
             {
               "certainty": "stated",
               "end": 12,
+              "guarded": false,
               "id": "milk",
               "start": 8,
               "term": "חלב"
@@ -1382,11 +2879,13 @@
             {
               "certainty": "stated",
               "end": 12,
+              "guarded": false,
               "id": "lactose",
               "start": 8,
               "term": "חלב"
             }
           ],
+          "matchText": "מוגש עמ החלב בצד",
           "normalised": "מוגש עמ החלב בצד",
           "text": "מוגש עם החלב בצד"
         },
@@ -1395,6 +2894,7 @@
             {
               "certainty": "stated",
               "end": 13,
+              "guarded": false,
               "id": "milk",
               "start": 8,
               "term": "חלב"
@@ -1402,21 +2902,25 @@
             {
               "certainty": "stated",
               "end": 13,
+              "guarded": false,
               "id": "lactose",
               "start": 8,
               "term": "חלב"
             }
           ],
+          "matchText": "מוגש עמ ובחלב בצד",
           "normalised": "מוגש עמ ובחלב בצד",
           "text": "מוגש עם ובחלב בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ושהחלב בצד",
           "normalised": "מוגש עמ ושהחלב בצד",
           "text": "מוגש עם ושהחלב בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ חלבי בצד",
           "normalised": "מוגש עמ חלבי בצד",
           "text": "מוגש עם חלבי בצד"
         },
@@ -1425,11 +2929,13 @@
             {
               "certainty": "stated",
               "end": 5,
+              "guarded": false,
               "id": "milk",
               "start": 0,
               "term": "גבינה"
             }
           ],
+          "matchText": "גבינה",
           "normalised": "גבינה",
           "text": "גבינה"
         },
@@ -1438,11 +2944,13 @@
             {
               "certainty": "stated",
               "end": 13,
+              "guarded": false,
               "id": "milk",
               "start": 8,
               "term": "גבינה"
             }
           ],
+          "matchText": "מוגש עמ גבינה בצד",
           "normalised": "מוגש עמ גבינה בצד",
           "text": "מוגש עם גבינה בצד"
         },
@@ -1451,11 +2959,13 @@
             {
               "certainty": "stated",
               "end": 14,
+              "guarded": false,
               "id": "milk",
               "start": 8,
               "term": "גבינה"
             }
           ],
+          "matchText": "מוגש עמ הגבינה בצד",
           "normalised": "מוגש עמ הגבינה בצד",
           "text": "מוגש עם הגבינה בצד"
         },
@@ -1464,34 +2974,48 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "milk",
               "start": 8,
               "term": "גבינה"
             }
           ],
+          "matchText": "מוגש עמ ובגבינה בצד",
           "normalised": "מוגש עמ ובגבינה בצד",
           "text": "מוגש עם ובגבינה בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ושהגבינה בצד",
           "normalised": "מוגש עמ ושהגבינה בצד",
           "text": "מוגש עם ושהגבינה בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ גבינהי בצד",
           "normalised": "מוגש עמ גבינהי בצד",
           "text": "מוגש עם גבינהי בצד"
         },
         {
           "hits": [
             {
+              "certainty": "suspected",
+              "end": 20,
+              "guarded": true,
+              "id": "milk",
+              "start": 16,
+              "term": "milk"
+            },
+            {
               "certainty": "stated",
               "end": 20,
+              "guarded": false,
               "id": "lactose",
               "start": 16,
               "term": "milk"
             }
           ],
+          "matchText": "served with oat milk on the side",
           "normalised": "served with oat milk on the side",
           "text": "Served with oat milk on the side"
         },
@@ -1499,7 +3023,31 @@
           "hits": [
             {
               "certainty": "stated",
+              "end": 24,
+              "guarded": false,
+              "id": "milk",
+              "start": 20,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 24,
+              "guarded": false,
+              "id": "lactose",
+              "start": 20,
+              "term": "milk"
+            }
+          ],
+          "matchText": "served with oat big milk on the side",
+          "normalised": "served with oat big milk on the side",
+          "text": "Served with oat big milk on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
               "end": 28,
+              "guarded": false,
               "id": "milk",
               "start": 24,
               "term": "milk"
@@ -1507,11 +3055,13 @@
             {
               "certainty": "stated",
               "end": 28,
+              "guarded": false,
               "id": "lactose",
               "start": 24,
               "term": "milk"
             }
           ],
+          "matchText": "served with oat big fat milk on the side",
           "normalised": "served with oat big fat milk on the side",
           "text": "Served with oat big fat milk on the side"
         },
@@ -1520,6 +3070,7 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "milk",
               "start": 12,
               "term": "milk"
@@ -1527,11 +3078,13 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "lactose",
               "start": 12,
               "term": "milk"
             }
           ],
+          "matchText": "served with milk oat on the side",
           "normalised": "served with milk oat on the side",
           "text": "Served with milk oat on the side"
         },
@@ -1539,20 +3092,31 @@
           "hits": [
             {
               "certainty": "stated",
-              "end": 23,
+              "end": 27,
+              "guarded": false,
+              "id": "milk",
+              "start": 23,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 27,
+              "guarded": false,
               "id": "lactose",
-              "start": 19,
+              "start": 23,
               "term": "milk"
             }
           ],
-          "normalised": "served with almond milk on the side",
-          "text": "Served with almond milk on the side"
+          "matchText": "served with almond big milk on the side",
+          "normalised": "served with almond big milk on the side",
+          "text": "Served with almond big milk on the side"
         },
         {
           "hits": [
             {
               "certainty": "stated",
               "end": 31,
+              "guarded": false,
               "id": "milk",
               "start": 27,
               "term": "milk"
@@ -1560,11 +3124,13 @@
             {
               "certainty": "stated",
               "end": 31,
+              "guarded": false,
               "id": "lactose",
               "start": 27,
               "term": "milk"
             }
           ],
+          "matchText": "served with almond big fat milk on the side",
           "normalised": "served with almond big fat milk on the side",
           "text": "Served with almond big fat milk on the side"
         },
@@ -1573,6 +3139,7 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "milk",
               "start": 12,
               "term": "milk"
@@ -1580,24 +3147,36 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "lactose",
               "start": 12,
               "term": "milk"
             }
           ],
+          "matchText": "served with milk almond on the side",
           "normalised": "served with milk almond on the side",
           "text": "Served with milk almond on the side"
         },
         {
           "hits": [
             {
+              "certainty": "suspected",
+              "end": 27,
+              "guarded": true,
+              "id": "milk",
+              "start": 23,
+              "term": "milk"
+            },
+            {
               "certainty": "stated",
               "end": 27,
+              "guarded": false,
               "id": "lactose",
               "start": 23,
               "term": "milk"
             }
           ],
+          "matchText": "served with dairy free milk on the side",
           "normalised": "served with dairy free milk on the side",
           "text": "Served with dairy free milk on the side"
         },
@@ -1605,7 +3184,31 @@
           "hits": [
             {
               "certainty": "stated",
+              "end": 31,
+              "guarded": false,
+              "id": "milk",
+              "start": 27,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 31,
+              "guarded": false,
+              "id": "lactose",
+              "start": 27,
+              "term": "milk"
+            }
+          ],
+          "matchText": "served with dairy free big milk on the side",
+          "normalised": "served with dairy free big milk on the side",
+          "text": "Served with dairy free big milk on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
               "end": 35,
+              "guarded": false,
               "id": "milk",
               "start": 31,
               "term": "milk"
@@ -1613,11 +3216,13 @@
             {
               "certainty": "stated",
               "end": 35,
+              "guarded": false,
               "id": "lactose",
               "start": 31,
               "term": "milk"
             }
           ],
+          "matchText": "served with dairy free big fat milk on the side",
           "normalised": "served with dairy free big fat milk on the side",
           "text": "Served with dairy free big fat milk on the side"
         },
@@ -1626,6 +3231,7 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "milk",
               "start": 12,
               "term": "milk"
@@ -1633,32 +3239,22 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "lactose",
               "start": 12,
               "term": "milk"
             }
           ],
+          "matchText": "served with milk dairy free on the side",
           "normalised": "served with milk dairy free on the side",
           "text": "Served with milk dairy free on the side"
         },
         {
           "hits": [
             {
-              "certainty": "stated",
+              "certainty": "suspected",
               "end": 11,
-              "id": "lactose",
-              "start": 8,
-              "term": "חלב"
-            }
-          ],
-          "normalised": "מוגש עמ חלב שקדימ בצד",
-          "text": "מוגש עם חלב שקדים בצד"
-        },
-        {
-          "hits": [
-            {
-              "certainty": "stated",
-              "end": 11,
+              "guarded": true,
               "id": "milk",
               "start": 8,
               "term": "חלב"
@@ -1666,11 +3262,176 @@
             {
               "certainty": "stated",
               "end": 11,
+              "guarded": false,
               "id": "lactose",
               "start": 8,
               "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 17,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 12,
+              "term": "שקדים"
             }
           ],
+          "matchText": "מוגש עמ חלב שקדימ בצד",
+          "normalised": "מוגש עמ חלב שקדימ בצד",
+          "text": "מוגש עם חלב שקדים בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 11,
+              "guarded": true,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 17,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 12,
+              "term": "שקדים"
+            }
+          ],
+          "matchText": "מוגש עמ חלב שקדימ בצד",
+          "normalised": "מוגש עמ חלבשקדימ בצד",
+          "text": "מוגש עם חלב־שקדים בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 11,
+              "guarded": true,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 18,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 12,
+              "term": "שקדים"
+            }
+          ],
+          "matchText": "מוגש עמ חלב השקדימ בצד",
+          "normalised": "מוגש עמ חלב השקדימ בצד",
+          "text": "מוגש עם חלב השקדים בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 18,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 12,
+              "term": "שקדים"
+            }
+          ],
+          "matchText": "מוגש עמ חלב ושקדימ בצד",
+          "normalised": "מוגש עמ חלב ושקדימ בצד",
+          "text": "מוגש עם חלב ושקדים בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 22,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 17,
+              "term": "שקדים"
+            }
+          ],
+          "matchText": "מוגש עמ חלב גדול שקדימ בצד",
+          "normalised": "מוגש עמ חלב גדול שקדימ בצד",
+          "text": "מוגש עם חלב גדול שקדים בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 26,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 21,
+              "term": "שקדים"
+            }
+          ],
+          "matchText": "מוגש עמ חלב גדול שמנ שקדימ בצד",
           "normalised": "מוגש עמ חלב גדול שמנ שקדימ בצד",
           "text": "מוגש עם חלב גדול שמן שקדים בצד"
         },
@@ -1678,7 +3439,16 @@
           "hits": [
             {
               "certainty": "stated",
+              "end": 13,
+              "guarded": false,
+              "id": "treeNuts",
+              "start": 8,
+              "term": "שקדים"
+            },
+            {
+              "certainty": "stated",
               "end": 17,
+              "guarded": false,
               "id": "milk",
               "start": 14,
               "term": "חלב"
@@ -1686,19 +3456,30 @@
             {
               "certainty": "stated",
               "end": 17,
+              "guarded": false,
               "id": "lactose",
               "start": 14,
               "term": "חלב"
             }
           ],
+          "matchText": "מוגש עמ שקדימ חלב בצד",
           "normalised": "מוגש עמ שקדימ חלב בצד",
           "text": "מוגש עם שקדים חלב בצד"
         },
         {
           "hits": [
             {
+              "certainty": "suspected",
+              "end": 11,
+              "guarded": true,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
               "certainty": "stated",
               "end": 11,
+              "guarded": false,
               "id": "lactose",
               "start": 8,
               "term": "חלב"
@@ -1706,19 +3487,22 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "soy",
               "start": 12,
               "term": "סויה"
             }
           ],
+          "matchText": "מוגש עמ חלב סויה בצד",
           "normalised": "מוגש עמ חלב סויה בצד",
           "text": "מוגש עם חלב סויה בצד"
         },
         {
           "hits": [
             {
-              "certainty": "stated",
+              "certainty": "suspected",
               "end": 11,
+              "guarded": true,
               "id": "milk",
               "start": 8,
               "term": "חלב"
@@ -1726,6 +3510,131 @@
             {
               "certainty": "stated",
               "end": 11,
+              "guarded": false,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 16,
+              "guarded": false,
+              "id": "soy",
+              "start": 12,
+              "term": "סויה"
+            }
+          ],
+          "matchText": "מוגש עמ חלב סויה בצד",
+          "normalised": "מוגש עמ חלבסויה בצד",
+          "text": "מוגש עם חלב־סויה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 11,
+              "guarded": true,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 17,
+              "guarded": false,
+              "id": "soy",
+              "start": 12,
+              "term": "סויה"
+            }
+          ],
+          "matchText": "מוגש עמ חלב הסויה בצד",
+          "normalised": "מוגש עמ חלב הסויה בצד",
+          "text": "מוגש עם חלב הסויה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 17,
+              "guarded": false,
+              "id": "soy",
+              "start": 12,
+              "term": "סויה"
+            }
+          ],
+          "matchText": "מוגש עמ חלב וסויה בצד",
+          "normalised": "מוגש עמ חלב וסויה בצד",
+          "text": "מוגש עם חלב וסויה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 21,
+              "guarded": false,
+              "id": "soy",
+              "start": 17,
+              "term": "סויה"
+            }
+          ],
+          "matchText": "מוגש עמ חלב גדול סויה בצד",
+          "normalised": "מוגש עמ חלב גדול סויה בצד",
+          "text": "מוגש עם חלב גדול סויה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
               "id": "lactose",
               "start": 8,
               "term": "חלב"
@@ -1733,11 +3642,13 @@
             {
               "certainty": "stated",
               "end": 25,
+              "guarded": false,
               "id": "soy",
               "start": 21,
               "term": "סויה"
             }
           ],
+          "matchText": "מוגש עמ חלב גדול שמנ סויה בצד",
           "normalised": "מוגש עמ חלב גדול שמנ סויה בצד",
           "text": "מוגש עם חלב גדול שמן סויה בצד"
         },
@@ -1746,6 +3657,7 @@
             {
               "certainty": "stated",
               "end": 12,
+              "guarded": false,
               "id": "soy",
               "start": 8,
               "term": "סויה"
@@ -1753,6 +3665,7 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "milk",
               "start": 13,
               "term": "חלב"
@@ -1760,11 +3673,13 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "lactose",
               "start": 13,
               "term": "חלב"
             }
           ],
+          "matchText": "מוגש עמ סויה חלב בצד",
           "normalised": "מוגש עמ סויה חלב בצד",
           "text": "מוגש עם סויה חלב בצד"
         },
@@ -1772,12 +3687,91 @@
           "hits": [
             {
               "certainty": "stated",
-              "end": 29,
+              "end": 28,
+              "guarded": false,
               "id": "milk",
+              "start": 24,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 28,
+              "guarded": false,
+              "id": "lactose",
+              "start": 24,
+              "term": "milk"
+            }
+          ],
+          "matchText": "served with coconut big milk on the side",
+          "normalised": "served with coconut big milk on the side",
+          "text": "Served with coconut big milk on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 11,
+              "guarded": true,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            }
+          ],
+          "matchText": "מוגש עמ חלב קוקוס בצד",
+          "normalised": "מוגש עמ חלב קוקוס בצד",
+          "text": "מוגש עם חלב קוקוס בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            }
+          ],
+          "matchText": "מוגש עמ חלב גדול קוקוס בצד",
+          "normalised": "מוגש עמ חלב גדול קוקוס בצד",
+          "text": "מוגש עם חלב גדול קוקוס בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 29,
+              "guarded": false,
+              "id": "milk",
+              "start": 25,
+              "term": "milk"
+            },
+            {
+              "certainty": "suspected",
+              "end": 29,
+              "guarded": true,
+              "id": "lactose",
               "start": 25,
               "term": "milk"
             }
           ],
+          "matchText": "served with lactose free milk on the side",
           "normalised": "served with lactose free milk on the side",
           "text": "Served with lactose free milk on the side"
         },
@@ -1785,7 +3779,31 @@
           "hits": [
             {
               "certainty": "stated",
+              "end": 33,
+              "guarded": false,
+              "id": "milk",
+              "start": 29,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 33,
+              "guarded": false,
+              "id": "lactose",
+              "start": 29,
+              "term": "milk"
+            }
+          ],
+          "matchText": "served with lactose free big milk on the side",
+          "normalised": "served with lactose free big milk on the side",
+          "text": "Served with lactose free big milk on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
               "end": 37,
+              "guarded": false,
               "id": "milk",
               "start": 33,
               "term": "milk"
@@ -1793,11 +3811,13 @@
             {
               "certainty": "stated",
               "end": 37,
+              "guarded": false,
               "id": "lactose",
               "start": 33,
               "term": "milk"
             }
           ],
+          "matchText": "served with lactose free big fat milk on the side",
           "normalised": "served with lactose free big fat milk on the side",
           "text": "Served with lactose free big fat milk on the side"
         },
@@ -1806,6 +3826,7 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "milk",
               "start": 12,
               "term": "milk"
@@ -1813,11 +3834,13 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "lactose",
               "start": 12,
               "term": "milk"
             }
           ],
+          "matchText": "served with milk lactose free on the side",
           "normalised": "served with milk lactose free on the side",
           "text": "Served with milk lactose free on the side"
         },
@@ -1826,11 +3849,21 @@
             {
               "certainty": "stated",
               "end": 11,
+              "guarded": false,
               "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "suspected",
+              "end": 11,
+              "guarded": true,
+              "id": "lactose",
               "start": 8,
               "term": "חלב"
             }
           ],
+          "matchText": "מוגש עמ חלב ללא לקטוז בצד",
           "normalised": "מוגש עמ חלב ללא לקטוז בצד",
           "text": "מוגש עם חלב ללא לקטוז בצד"
         },
@@ -1839,6 +3872,53 @@
             {
               "certainty": "stated",
               "end": 11,
+              "guarded": false,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "suspected",
+              "end": 11,
+              "guarded": true,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            }
+          ],
+          "matchText": "מוגש עמ חלב ללא לקטוז בצד",
+          "normalised": "מוגש עמ חלבללא לקטוז בצד",
+          "text": "מוגש עם חלב־ללא לקטוז בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "suspected",
+              "end": 11,
+              "guarded": true,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            }
+          ],
+          "matchText": "מוגש עמ חלב הללא לקטוז בצד",
+          "normalised": "מוגש עמ חלב הללא לקטוז בצד",
+          "text": "מוגש עם חלב הללא לקטוז בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
               "id": "milk",
               "start": 8,
               "term": "חלב"
@@ -1846,11 +3926,59 @@
             {
               "certainty": "stated",
               "end": 11,
+              "guarded": false,
               "id": "lactose",
               "start": 8,
               "term": "חלב"
             }
           ],
+          "matchText": "מוגש עמ חלב וללא לקטוז בצד",
+          "normalised": "מוגש עמ חלב וללא לקטוז בצד",
+          "text": "מוגש עם חלב וללא לקטוז בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            }
+          ],
+          "matchText": "מוגש עמ חלב גדול ללא לקטוז בצד",
+          "normalised": "מוגש עמ חלב גדול ללא לקטוז בצד",
+          "text": "מוגש עם חלב גדול ללא לקטוז בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "guarded": false,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            }
+          ],
+          "matchText": "מוגש עמ חלב גדול שמנ ללא לקטוז בצד",
           "normalised": "מוגש עמ חלב גדול שמנ ללא לקטוז בצד",
           "text": "מוגש עם חלב גדול שמן ללא לקטוז בצד"
         },
@@ -1859,6 +3987,7 @@
             {
               "certainty": "stated",
               "end": 21,
+              "guarded": false,
               "id": "milk",
               "start": 18,
               "term": "חלב"
@@ -1866,11 +3995,13 @@
             {
               "certainty": "stated",
               "end": 21,
+              "guarded": false,
               "id": "lactose",
               "start": 18,
               "term": "חלב"
             }
           ],
+          "matchText": "מוגש עמ ללא לקטוז חלב בצד",
           "normalised": "מוגש עמ ללא לקטוז חלב בצד",
           "text": "מוגש עם ללא לקטוז חלב בצד"
         },
@@ -1879,11 +4010,13 @@
             {
               "certainty": "stated",
               "end": 4,
+              "guarded": false,
               "id": "eggs",
               "start": 0,
               "term": "eggs"
             }
           ],
+          "matchText": "eggs",
           "normalised": "eggs",
           "text": "eggs"
         },
@@ -1892,11 +4025,13 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "eggs",
               "start": 12,
               "term": "eggs"
             }
           ],
+          "matchText": "served with eggs on the side",
           "normalised": "served with eggs on the side",
           "text": "Served with eggs on the side"
         },
@@ -1905,11 +4040,13 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "eggs",
               "start": 12,
               "term": "eggs"
             }
           ],
+          "matchText": "served with eggs on the side",
           "normalised": "served with eggs on the side",
           "text": "Served with EGGS on the side"
         },
@@ -1918,11 +4055,13 @@
             {
               "certainty": "stated",
               "end": 4,
+              "guarded": false,
               "id": "eggs",
               "start": 0,
               "term": "ביצה"
             }
           ],
+          "matchText": "ביצה",
           "normalised": "ביצה",
           "text": "ביצה"
         },
@@ -1931,11 +4070,13 @@
             {
               "certainty": "stated",
               "end": 12,
+              "guarded": false,
               "id": "eggs",
               "start": 8,
               "term": "ביצה"
             }
           ],
+          "matchText": "מוגש עמ ביצה בצד",
           "normalised": "מוגש עמ ביצה בצד",
           "text": "מוגש עם ביצה בצד"
         },
@@ -1944,11 +4085,13 @@
             {
               "certainty": "stated",
               "end": 13,
+              "guarded": false,
               "id": "eggs",
               "start": 8,
               "term": "ביצה"
             }
           ],
+          "matchText": "מוגש עמ הביצה בצד",
           "normalised": "מוגש עמ הביצה בצד",
           "text": "מוגש עם הביצה בצד"
         },
@@ -1957,31 +4100,55 @@
             {
               "certainty": "stated",
               "end": 14,
+              "guarded": false,
               "id": "eggs",
               "start": 8,
               "term": "ביצה"
             }
           ],
+          "matchText": "מוגש עמ ובביצה בצד",
           "normalised": "מוגש עמ ובביצה בצד",
           "text": "מוגש עם ובביצה בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ושהביצה בצד",
           "normalised": "מוגש עמ ושהביצה בצד",
           "text": "מוגש עם ושהביצה בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ביצהי בצד",
           "normalised": "מוגש עמ ביצהי בצד",
           "text": "מוגש עם ביצהי בצד"
         },
         {
-          "hits": [],
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 16,
+              "guarded": true,
+              "id": "eggs",
+              "start": 12,
+              "term": "eggs"
+            }
+          ],
+          "matchText": "served with eggs free on the side",
           "normalised": "served with eggs free on the side",
           "text": "Served with eggs free on the side"
         },
         {
-          "hits": [],
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 16,
+              "guarded": true,
+              "id": "eggs",
+              "start": 12,
+              "term": "eggs"
+            }
+          ],
+          "matchText": "served with eggs free on the side",
           "normalised": "served with eggs free on the side",
           "text": "Served with eggs-free on the side"
         },
@@ -1990,11 +4157,28 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "eggs",
               "start": 12,
               "term": "eggs"
             }
           ],
+          "matchText": "served with eggs big free on the side",
+          "normalised": "served with eggs big free on the side",
+          "text": "Served with eggs big free on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "guarded": false,
+              "id": "eggs",
+              "start": 12,
+              "term": "eggs"
+            }
+          ],
+          "matchText": "served with eggs big fat free on the side",
           "normalised": "served with eggs big fat free on the side",
           "text": "Served with eggs big fat free on the side"
         },
@@ -2003,11 +4187,13 @@
             {
               "certainty": "stated",
               "end": 21,
+              "guarded": false,
               "id": "eggs",
               "start": 17,
               "term": "eggs"
             }
           ],
+          "matchText": "served with free eggs on the side",
           "normalised": "served with free eggs on the side",
           "text": "Served with free eggs on the side"
         },
@@ -2016,11 +4202,13 @@
             {
               "certainty": "stated",
               "end": 3,
+              "guarded": false,
               "id": "soy",
               "start": 0,
               "term": "soy"
             }
           ],
+          "matchText": "soy",
           "normalised": "soy",
           "text": "soy"
         },
@@ -2029,11 +4217,13 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "soy",
               "start": 12,
               "term": "soy"
             }
           ],
+          "matchText": "served with soy on the side",
           "normalised": "served with soy on the side",
           "text": "Served with soy on the side"
         },
@@ -2042,11 +4232,13 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "soy",
               "start": 12,
               "term": "soy"
             }
           ],
+          "matchText": "served with soy on the side",
           "normalised": "served with soy on the side",
           "text": "Served with SOY on the side"
         },
@@ -2055,11 +4247,13 @@
             {
               "certainty": "stated",
               "end": 4,
+              "guarded": false,
               "id": "soy",
               "start": 0,
               "term": "סויה"
             }
           ],
+          "matchText": "סויה",
           "normalised": "סויה",
           "text": "סויה"
         },
@@ -2068,11 +4262,13 @@
             {
               "certainty": "stated",
               "end": 12,
+              "guarded": false,
               "id": "soy",
               "start": 8,
               "term": "סויה"
             }
           ],
+          "matchText": "מוגש עמ סויה בצד",
           "normalised": "מוגש עמ סויה בצד",
           "text": "מוגש עם סויה בצד"
         },
@@ -2081,11 +4277,13 @@
             {
               "certainty": "stated",
               "end": 13,
+              "guarded": false,
               "id": "soy",
               "start": 8,
               "term": "סויה"
             }
           ],
+          "matchText": "מוגש עמ הסויה בצד",
           "normalised": "מוגש עמ הסויה בצד",
           "text": "מוגש עם הסויה בצד"
         },
@@ -2094,21 +4292,25 @@
             {
               "certainty": "stated",
               "end": 14,
+              "guarded": false,
               "id": "soy",
               "start": 8,
               "term": "סויה"
             }
           ],
+          "matchText": "מוגש עמ ובסויה בצד",
           "normalised": "מוגש עמ ובסויה בצד",
           "text": "מוגש עם ובסויה בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ושהסויה בצד",
           "normalised": "מוגש עמ ושהסויה בצד",
           "text": "מוגש עם ושהסויה בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ סויהי בצד",
           "normalised": "מוגש עמ סויהי בצד",
           "text": "מוגש עם סויהי בצד"
         },
@@ -2117,11 +4319,13 @@
             {
               "certainty": "stated",
               "end": 3,
+              "guarded": false,
               "id": "wheat",
               "start": 0,
               "term": "bun"
             }
           ],
+          "matchText": "bun",
           "normalised": "bun",
           "text": "bun"
         },
@@ -2130,11 +4334,13 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "wheat",
               "start": 12,
               "term": "bun"
             }
           ],
+          "matchText": "served with bun on the side",
           "normalised": "served with bun on the side",
           "text": "Served with bun on the side"
         },
@@ -2143,11 +4349,13 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "wheat",
               "start": 12,
               "term": "bun"
             }
           ],
+          "matchText": "served with bun on the side",
           "normalised": "served with bun on the side",
           "text": "Served with BUN on the side"
         },
@@ -2156,11 +4364,13 @@
             {
               "certainty": "stated",
               "end": 5,
+              "guarded": false,
               "id": "wheat",
               "start": 0,
               "term": "toast"
             }
           ],
+          "matchText": "toast",
           "normalised": "toast",
           "text": "toast"
         },
@@ -2169,11 +4379,13 @@
             {
               "certainty": "stated",
               "end": 17,
+              "guarded": false,
               "id": "wheat",
               "start": 12,
               "term": "toast"
             }
           ],
+          "matchText": "served with toast on the side",
           "normalised": "served with toast on the side",
           "text": "Served with toast on the side"
         },
@@ -2182,11 +4394,13 @@
             {
               "certainty": "stated",
               "end": 17,
+              "guarded": false,
               "id": "wheat",
               "start": 12,
               "term": "toast"
             }
           ],
+          "matchText": "served with toast on the side",
           "normalised": "served with toast on the side",
           "text": "Served with TOAST on the side"
         },
@@ -2194,7 +4408,53 @@
           "hits": [
             {
               "certainty": "stated",
+              "end": 5,
+              "guarded": false,
+              "id": "wheat",
+              "start": 0,
+              "term": "flour"
+            }
+          ],
+          "matchText": "flour",
+          "normalised": "flour",
+          "text": "flour"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 17,
+              "guarded": false,
+              "id": "wheat",
+              "start": 12,
+              "term": "flour"
+            }
+          ],
+          "matchText": "served with flour on the side",
+          "normalised": "served with flour on the side",
+          "text": "Served with flour on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 17,
+              "guarded": false,
+              "id": "wheat",
+              "start": 12,
+              "term": "flour"
+            }
+          ],
+          "matchText": "served with flour on the side",
+          "normalised": "served with flour on the side",
+          "text": "Served with FLOUR on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
               "end": 3,
+              "guarded": false,
               "id": "soy",
               "start": 0,
               "term": "soy"
@@ -2202,11 +4462,13 @@
             {
               "certainty": "likely",
               "end": 9,
+              "guarded": false,
               "id": "wheat",
               "start": 0,
               "term": "soy sauce"
             }
           ],
+          "matchText": "soy sauce",
           "normalised": "soy sauce",
           "text": "soy sauce"
         },
@@ -2215,6 +4477,7 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "soy",
               "start": 12,
               "term": "soy"
@@ -2222,11 +4485,13 @@
             {
               "certainty": "likely",
               "end": 21,
+              "guarded": false,
               "id": "wheat",
               "start": 12,
               "term": "soy sauce"
             }
           ],
+          "matchText": "served with soy sauce on the side",
           "normalised": "served with soy sauce on the side",
           "text": "Served with soy sauce on the side"
         },
@@ -2235,6 +4500,7 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "soy",
               "start": 12,
               "term": "soy"
@@ -2242,11 +4508,13 @@
             {
               "certainty": "likely",
               "end": 21,
+              "guarded": false,
               "id": "wheat",
               "start": 12,
               "term": "soy sauce"
             }
           ],
+          "matchText": "served with soy sauce on the side",
           "normalised": "served with soy sauce on the side",
           "text": "Served with SOY SAUCE on the side"
         },
@@ -2255,11 +4523,13 @@
             {
               "certainty": "stated",
               "end": 4,
+              "guarded": false,
               "id": "wheat",
               "start": 0,
               "term": "חיטה"
             }
           ],
+          "matchText": "חיטה",
           "normalised": "חיטה",
           "text": "חיטה"
         },
@@ -2268,31 +4538,37 @@
             {
               "certainty": "stated",
               "end": 12,
+              "guarded": false,
               "id": "wheat",
               "start": 8,
               "term": "חיטה"
             }
           ],
+          "matchText": "מוגש עמ חיטה בצד",
           "normalised": "מוגש עמ חיטה בצד",
           "text": "מוגש עם חיטה בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ החיטה בצד",
           "normalised": "מוגש עמ החיטה בצד",
           "text": "מוגש עם החיטה בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ובחיטה בצד",
           "normalised": "מוגש עמ ובחיטה בצד",
           "text": "מוגש עם ובחיטה בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ושהחיטה בצד",
           "normalised": "מוגש עמ ושהחיטה בצד",
           "text": "מוגש עם ושהחיטה בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ חיטהי בצד",
           "normalised": "מוגש עמ חיטהי בצד",
           "text": "מוגש עם חיטהי בצד"
         },
@@ -2301,11 +4577,13 @@
             {
               "certainty": "stated",
               "end": 4,
+              "guarded": false,
               "id": "wheat",
               "start": 0,
               "term": "פיתה"
             }
           ],
+          "matchText": "פיתה",
           "normalised": "פיתה",
           "text": "פיתה"
         },
@@ -2314,11 +4592,13 @@
             {
               "certainty": "stated",
               "end": 12,
+              "guarded": false,
               "id": "wheat",
               "start": 8,
               "term": "פיתה"
             }
           ],
+          "matchText": "מוגש עמ פיתה בצד",
           "normalised": "מוגש עמ פיתה בצד",
           "text": "מוגש עם פיתה בצד"
         },
@@ -2327,11 +4607,13 @@
             {
               "certainty": "stated",
               "end": 13,
+              "guarded": false,
               "id": "wheat",
               "start": 8,
               "term": "פיתה"
             }
           ],
+          "matchText": "מוגש עמ הפיתה בצד",
           "normalised": "מוגש עמ הפיתה בצד",
           "text": "מוגש עם הפיתה בצד"
         },
@@ -2340,21 +4622,25 @@
             {
               "certainty": "stated",
               "end": 14,
+              "guarded": false,
               "id": "wheat",
               "start": 8,
               "term": "פיתה"
             }
           ],
+          "matchText": "מוגש עמ ובפיתה בצד",
           "normalised": "מוגש עמ ובפיתה בצד",
           "text": "מוגש עם ובפיתה בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ושהפיתה בצד",
           "normalised": "מוגש עמ ושהפיתה בצד",
           "text": "מוגש עם ושהפיתה בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ פיתהי בצד",
           "normalised": "מוגש עמ פיתהי בצד",
           "text": "מוגש עם פיתהי בצד"
         },
@@ -2363,6 +4649,7 @@
             {
               "certainty": "likely",
               "end": 9,
+              "guarded": false,
               "id": "wheat",
               "start": 0,
               "term": "רוטב סויה"
@@ -2370,11 +4657,13 @@
             {
               "certainty": "stated",
               "end": 9,
+              "guarded": false,
               "id": "soy",
               "start": 5,
               "term": "סויה"
             }
           ],
+          "matchText": "רוטב סויה",
           "normalised": "רוטב סויה",
           "text": "רוטב סויה"
         },
@@ -2383,6 +4672,7 @@
             {
               "certainty": "likely",
               "end": 17,
+              "guarded": false,
               "id": "wheat",
               "start": 8,
               "term": "רוטב סויה"
@@ -2390,11 +4680,13 @@
             {
               "certainty": "stated",
               "end": 17,
+              "guarded": false,
               "id": "soy",
               "start": 13,
               "term": "סויה"
             }
           ],
+          "matchText": "מוגש עמ רוטב סויה בצד",
           "normalised": "מוגש עמ רוטב סויה בצד",
           "text": "מוגש עם רוטב סויה בצד"
         },
@@ -2403,6 +4695,7 @@
             {
               "certainty": "likely",
               "end": 18,
+              "guarded": false,
               "id": "wheat",
               "start": 8,
               "term": "רוטב סויה"
@@ -2410,11 +4703,13 @@
             {
               "certainty": "stated",
               "end": 18,
+              "guarded": false,
               "id": "soy",
               "start": 14,
               "term": "סויה"
             }
           ],
+          "matchText": "מוגש עמ הרוטב סויה בצד",
           "normalised": "מוגש עמ הרוטב סויה בצד",
           "text": "מוגש עם הרוטב סויה בצד"
         },
@@ -2423,6 +4718,7 @@
             {
               "certainty": "likely",
               "end": 19,
+              "guarded": false,
               "id": "wheat",
               "start": 8,
               "term": "רוטב סויה"
@@ -2430,11 +4726,13 @@
             {
               "certainty": "stated",
               "end": 19,
+              "guarded": false,
               "id": "soy",
               "start": 15,
               "term": "סויה"
             }
           ],
+          "matchText": "מוגש עמ וברוטב סויה בצד",
           "normalised": "מוגש עמ וברוטב סויה בצד",
           "text": "מוגש עם וברוטב סויה בצד"
         },
@@ -2443,16 +4741,19 @@
             {
               "certainty": "stated",
               "end": 20,
+              "guarded": false,
               "id": "soy",
               "start": 16,
               "term": "סויה"
             }
           ],
+          "matchText": "מוגש עמ ושהרוטב סויה בצד",
           "normalised": "מוגש עמ ושהרוטב סויה בצד",
           "text": "מוגש עם ושהרוטב סויה בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ רוטב סויהי בצד",
           "normalised": "מוגש עמ רוטב סויהי בצד",
           "text": "מוגש עם רוטב סויהי בצד"
         },
@@ -2461,11 +4762,13 @@
             {
               "certainty": "likely",
               "end": 10,
+              "guarded": false,
               "id": "wheat",
               "start": 0,
               "term": "פירורי לחם"
             }
           ],
+          "matchText": "פירורי לחמ",
           "normalised": "פירורי לחמ",
           "text": "פירורי לחם"
         },
@@ -2474,11 +4777,13 @@
             {
               "certainty": "likely",
               "end": 18,
+              "guarded": false,
               "id": "wheat",
               "start": 8,
               "term": "פירורי לחם"
             }
           ],
+          "matchText": "מוגש עמ פירורי לחמ בצד",
           "normalised": "מוגש עמ פירורי לחמ בצד",
           "text": "מוגש עם פירורי לחם בצד"
         },
@@ -2487,11 +4792,13 @@
             {
               "certainty": "likely",
               "end": 19,
+              "guarded": false,
               "id": "wheat",
               "start": 8,
               "term": "פירורי לחם"
             }
           ],
+          "matchText": "מוגש עמ הפירורי לחמ בצד",
           "normalised": "מוגש עמ הפירורי לחמ בצד",
           "text": "מוגש עם הפירורי לחם בצד"
         },
@@ -2500,26 +4807,40 @@
             {
               "certainty": "likely",
               "end": 20,
+              "guarded": false,
               "id": "wheat",
               "start": 8,
               "term": "פירורי לחם"
             }
           ],
+          "matchText": "מוגש עמ ובפירורי לחמ בצד",
           "normalised": "מוגש עמ ובפירורי לחמ בצד",
           "text": "מוגש עם ובפירורי לחם בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ושהפירורי לחמ בצד",
           "normalised": "מוגש עמ ושהפירורי לחמ בצד",
           "text": "מוגש עם ושהפירורי לחם בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ פירורי לחמי בצד",
           "normalised": "מוגש עמ פירורי לחמי בצד",
           "text": "מוגש עם פירורי לחםי בצד"
         },
         {
-          "hits": [],
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 27,
+              "guarded": true,
+              "id": "wheat",
+              "start": 24,
+              "term": "bun"
+            }
+          ],
+          "matchText": "served with gluten free bun on the side",
           "normalised": "served with gluten free bun on the side",
           "text": "Served with gluten free bun on the side"
         },
@@ -2527,12 +4848,29 @@
           "hits": [
             {
               "certainty": "stated",
+              "end": 31,
+              "guarded": false,
+              "id": "wheat",
+              "start": 28,
+              "term": "bun"
+            }
+          ],
+          "matchText": "served with gluten free big bun on the side",
+          "normalised": "served with gluten free big bun on the side",
+          "text": "Served with gluten free big bun on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
               "end": 35,
+              "guarded": false,
               "id": "wheat",
               "start": 32,
               "term": "bun"
             }
           ],
+          "matchText": "served with gluten free big fat bun on the side",
           "normalised": "served with gluten free big fat bun on the side",
           "text": "Served with gluten free big fat bun on the side"
         },
@@ -2541,29 +4879,103 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "wheat",
               "start": 12,
               "term": "bun"
             }
           ],
+          "matchText": "served with bun gluten free on the side",
           "normalised": "served with bun gluten free on the side",
           "text": "Served with bun gluten free on the side"
         },
         {
-          "hits": [],
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 12,
+              "guarded": true,
+              "id": "wheat",
+              "start": 8,
+              "term": "חיטה"
+            }
+          ],
+          "matchText": "מוגש עמ חיטה ללא גלוטנ בצד",
           "normalised": "מוגש עמ חיטה ללא גלוטנ בצד",
           "text": "מוגש עם חיטה ללא גלוטן בצד"
         },
         {
           "hits": [
             {
-              "certainty": "stated",
+              "certainty": "suspected",
               "end": 12,
+              "guarded": true,
               "id": "wheat",
               "start": 8,
               "term": "חיטה"
             }
           ],
+          "matchText": "מוגש עמ חיטה ללא גלוטנ בצד",
+          "normalised": "מוגש עמ חיטהללא גלוטנ בצד",
+          "text": "מוגש עם חיטה־ללא גלוטן בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 12,
+              "guarded": true,
+              "id": "wheat",
+              "start": 8,
+              "term": "חיטה"
+            }
+          ],
+          "matchText": "מוגש עמ חיטה הללא גלוטנ בצד",
+          "normalised": "מוגש עמ חיטה הללא גלוטנ בצד",
+          "text": "מוגש עם חיטה הללא גלוטן בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 12,
+              "guarded": false,
+              "id": "wheat",
+              "start": 8,
+              "term": "חיטה"
+            }
+          ],
+          "matchText": "מוגש עמ חיטה וללא גלוטנ בצד",
+          "normalised": "מוגש עמ חיטה וללא גלוטנ בצד",
+          "text": "מוגש עם חיטה וללא גלוטן בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 12,
+              "guarded": false,
+              "id": "wheat",
+              "start": 8,
+              "term": "חיטה"
+            }
+          ],
+          "matchText": "מוגש עמ חיטה גדול ללא גלוטנ בצד",
+          "normalised": "מוגש עמ חיטה גדול ללא גלוטנ בצד",
+          "text": "מוגש עם חיטה גדול ללא גלוטן בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 12,
+              "guarded": false,
+              "id": "wheat",
+              "start": 8,
+              "term": "חיטה"
+            }
+          ],
+          "matchText": "מוגש עמ חיטה גדול שמנ ללא גלוטנ בצד",
           "normalised": "מוגש עמ חיטה גדול שמנ ללא גלוטנ בצד",
           "text": "מוגש עם חיטה גדול שמן ללא גלוטן בצד"
         },
@@ -2572,24 +4984,58 @@
             {
               "certainty": "stated",
               "end": 22,
+              "guarded": false,
               "id": "wheat",
               "start": 18,
               "term": "חיטה"
             }
           ],
+          "matchText": "מוגש עמ ללא גלוטנ חיטה בצד",
           "normalised": "מוגש עמ ללא גלוטנ חיטה בצד",
           "text": "מוגש עם ללא גלוטן חיטה בצד"
         },
         {
           "hits": [
             {
+              "certainty": "suspected",
+              "end": 22,
+              "guarded": true,
+              "id": "wheat",
+              "start": 17,
+              "term": "flour"
+            }
+          ],
+          "matchText": "served with rice flour on the side",
+          "normalised": "served with rice flour on the side",
+          "text": "Served with rice flour on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 26,
+              "guarded": false,
+              "id": "wheat",
+              "start": 21,
+              "term": "flour"
+            }
+          ],
+          "matchText": "served with rice big flour on the side",
+          "normalised": "served with rice big flour on the side",
+          "text": "Served with rice big flour on the side"
+        },
+        {
+          "hits": [
+            {
               "certainty": "stated",
               "end": 9,
+              "guarded": false,
               "id": "fish",
               "start": 0,
               "term": "anchovies"
             }
           ],
+          "matchText": "anchovies",
           "normalised": "anchovies",
           "text": "anchovies"
         },
@@ -2598,11 +5044,13 @@
             {
               "certainty": "stated",
               "end": 21,
+              "guarded": false,
               "id": "fish",
               "start": 12,
               "term": "anchovies"
             }
           ],
+          "matchText": "served with anchovies on the side",
           "normalised": "served with anchovies on the side",
           "text": "Served with anchovies on the side"
         },
@@ -2611,11 +5059,13 @@
             {
               "certainty": "stated",
               "end": 21,
+              "guarded": false,
               "id": "fish",
               "start": 12,
               "term": "anchovies"
             }
           ],
+          "matchText": "served with anchovies on the side",
           "normalised": "served with anchovies on the side",
           "text": "Served with ANCHOVIES on the side"
         },
@@ -2624,11 +5074,13 @@
             {
               "certainty": "stated",
               "end": 4,
+              "guarded": false,
               "id": "fish",
               "start": 0,
               "term": "tuna"
             }
           ],
+          "matchText": "tuna",
           "normalised": "tuna",
           "text": "tuna"
         },
@@ -2637,11 +5089,13 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "fish",
               "start": 12,
               "term": "tuna"
             }
           ],
+          "matchText": "served with tuna on the side",
           "normalised": "served with tuna on the side",
           "text": "Served with tuna on the side"
         },
@@ -2650,11 +5104,13 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "fish",
               "start": 12,
               "term": "tuna"
             }
           ],
+          "matchText": "served with tuna on the side",
           "normalised": "served with tuna on the side",
           "text": "Served with TUNA on the side"
         },
@@ -2663,11 +5119,13 @@
             {
               "certainty": "likely",
               "end": 6,
+              "guarded": false,
               "id": "fish",
               "start": 0,
               "term": "Caesar"
             }
           ],
+          "matchText": "caesar",
           "normalised": "caesar",
           "text": "Caesar"
         },
@@ -2676,11 +5134,13 @@
             {
               "certainty": "likely",
               "end": 18,
+              "guarded": false,
               "id": "fish",
               "start": 12,
               "term": "Caesar"
             }
           ],
+          "matchText": "served with caesar on the side",
           "normalised": "served with caesar on the side",
           "text": "Served with Caesar on the side"
         },
@@ -2689,11 +5149,13 @@
             {
               "certainty": "likely",
               "end": 18,
+              "guarded": false,
               "id": "fish",
               "start": 12,
               "term": "Caesar"
             }
           ],
+          "matchText": "served with caesar on the side",
           "normalised": "served with caesar on the side",
           "text": "Served with CAESAR on the side"
         },
@@ -2702,11 +5164,13 @@
             {
               "certainty": "stated",
               "end": 5,
+              "guarded": false,
               "id": "fish",
               "start": 0,
               "term": "סלמון"
             }
           ],
+          "matchText": "סלמונ",
           "normalised": "סלמונ",
           "text": "סלמון"
         },
@@ -2715,11 +5179,13 @@
             {
               "certainty": "stated",
               "end": 13,
+              "guarded": false,
               "id": "fish",
               "start": 8,
               "term": "סלמון"
             }
           ],
+          "matchText": "מוגש עמ סלמונ בצד",
           "normalised": "מוגש עמ סלמונ בצד",
           "text": "מוגש עם סלמון בצד"
         },
@@ -2728,11 +5194,13 @@
             {
               "certainty": "stated",
               "end": 14,
+              "guarded": false,
               "id": "fish",
               "start": 8,
               "term": "סלמון"
             }
           ],
+          "matchText": "מוגש עמ הסלמונ בצד",
           "normalised": "מוגש עמ הסלמונ בצד",
           "text": "מוגש עם הסלמון בצד"
         },
@@ -2741,21 +5209,25 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "fish",
               "start": 8,
               "term": "סלמון"
             }
           ],
+          "matchText": "מוגש עמ ובסלמונ בצד",
           "normalised": "מוגש עמ ובסלמונ בצד",
           "text": "מוגש עם ובסלמון בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ושהסלמונ בצד",
           "normalised": "מוגש עמ ושהסלמונ בצד",
           "text": "מוגש עם ושהסלמון בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ סלמוני בצד",
           "normalised": "מוגש עמ סלמוני בצד",
           "text": "מוגש עם סלמוןי בצד"
         },
@@ -2764,11 +5236,13 @@
             {
               "certainty": "stated",
               "end": 6,
+              "guarded": false,
               "id": "fish",
               "start": 0,
               "term": "אנשובי"
             }
           ],
+          "matchText": "אנשובי",
           "normalised": "אנשובי",
           "text": "אנשובי"
         },
@@ -2777,11 +5251,13 @@
             {
               "certainty": "stated",
               "end": 14,
+              "guarded": false,
               "id": "fish",
               "start": 8,
               "term": "אנשובי"
             }
           ],
+          "matchText": "מוגש עמ אנשובי בצד",
           "normalised": "מוגש עמ אנשובי בצד",
           "text": "מוגש עם אנשובי בצד"
         },
@@ -2790,11 +5266,13 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "fish",
               "start": 8,
               "term": "אנשובי"
             }
           ],
+          "matchText": "מוגש עמ האנשובי בצד",
           "normalised": "מוגש עמ האנשובי בצד",
           "text": "מוגש עם האנשובי בצד"
         },
@@ -2803,21 +5281,25 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "fish",
               "start": 8,
               "term": "אנשובי"
             }
           ],
+          "matchText": "מוגש עמ ובאנשובי בצד",
           "normalised": "מוגש עמ ובאנשובי בצד",
           "text": "מוגש עם ובאנשובי בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ושהאנשובי בצד",
           "normalised": "מוגש עמ ושהאנשובי בצד",
           "text": "מוגש עם ושהאנשובי בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ אנשוביי בצד",
           "normalised": "מוגש עמ אנשוביי בצד",
           "text": "מוגש עם אנשוביי בצד"
         },
@@ -2826,11 +5308,13 @@
             {
               "certainty": "likely",
               "end": 9,
+              "guarded": false,
               "id": "fish",
               "start": 0,
               "term": "רוטב קיסר"
             }
           ],
+          "matchText": "רוטב קיסר",
           "normalised": "רוטב קיסר",
           "text": "רוטב קיסר"
         },
@@ -2839,11 +5323,13 @@
             {
               "certainty": "likely",
               "end": 17,
+              "guarded": false,
               "id": "fish",
               "start": 8,
               "term": "רוטב קיסר"
             }
           ],
+          "matchText": "מוגש עמ רוטב קיסר בצד",
           "normalised": "מוגש עמ רוטב קיסר בצד",
           "text": "מוגש עם רוטב קיסר בצד"
         },
@@ -2852,11 +5338,13 @@
             {
               "certainty": "likely",
               "end": 18,
+              "guarded": false,
               "id": "fish",
               "start": 8,
               "term": "רוטב קיסר"
             }
           ],
+          "matchText": "מוגש עמ הרוטב קיסר בצד",
           "normalised": "מוגש עמ הרוטב קיסר בצד",
           "text": "מוגש עם הרוטב קיסר בצד"
         },
@@ -2865,21 +5353,25 @@
             {
               "certainty": "likely",
               "end": 19,
+              "guarded": false,
               "id": "fish",
               "start": 8,
               "term": "רוטב קיסר"
             }
           ],
+          "matchText": "מוגש עמ וברוטב קיסר בצד",
           "normalised": "מוגש עמ וברוטב קיסר בצד",
           "text": "מוגש עם וברוטב קיסר בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ושהרוטב קיסר בצד",
           "normalised": "מוגש עמ ושהרוטב קיסר בצד",
           "text": "מוגש עם ושהרוטב קיסר בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ רוטב קיסרי בצד",
           "normalised": "מוגש עמ רוטב קיסרי בצד",
           "text": "מוגש עם רוטב קיסרי בצד"
         },
@@ -2887,12 +5379,164 @@
           "hits": [
             {
               "certainty": "stated",
+              "end": 4,
+              "guarded": false,
+              "id": "crustaceans",
+              "start": 0,
+              "term": "crab"
+            }
+          ],
+          "matchText": "crab",
+          "normalised": "crab",
+          "text": "crab"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "guarded": false,
+              "id": "crustaceans",
+              "start": 12,
+              "term": "crab"
+            }
+          ],
+          "matchText": "served with crab on the side",
+          "normalised": "served with crab on the side",
+          "text": "Served with crab on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "guarded": false,
+              "id": "crustaceans",
+              "start": 12,
+              "term": "crab"
+            }
+          ],
+          "matchText": "served with crab on the side",
+          "normalised": "served with crab on the side",
+          "text": "Served with CRAB on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 16,
+              "guarded": true,
+              "id": "crustaceans",
+              "start": 12,
+              "term": "crab"
+            }
+          ],
+          "matchText": "served with crab apple on the side",
+          "normalised": "served with crab apple on the side",
+          "text": "Served with crab apple on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "guarded": false,
+              "id": "crustaceans",
+              "start": 12,
+              "term": "crab"
+            }
+          ],
+          "matchText": "served with crab big apple on the side",
+          "normalised": "served with crab big apple on the side",
+          "text": "Served with crab big apple on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
               "end": 6,
+              "guarded": false,
+              "id": "molluscs",
+              "start": 0,
+              "term": "oyster"
+            }
+          ],
+          "matchText": "oyster",
+          "normalised": "oyster",
+          "text": "oyster"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "guarded": false,
+              "id": "molluscs",
+              "start": 12,
+              "term": "oyster"
+            }
+          ],
+          "matchText": "served with oyster on the side",
+          "normalised": "served with oyster on the side",
+          "text": "Served with oyster on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "guarded": false,
+              "id": "molluscs",
+              "start": 12,
+              "term": "oyster"
+            }
+          ],
+          "matchText": "served with oyster on the side",
+          "normalised": "served with oyster on the side",
+          "text": "Served with OYSTER on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 18,
+              "guarded": true,
+              "id": "molluscs",
+              "start": 12,
+              "term": "oyster"
+            }
+          ],
+          "matchText": "served with oyster mushroom on the side",
+          "normalised": "served with oyster mushroom on the side",
+          "text": "Served with oyster mushroom on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "guarded": false,
+              "id": "molluscs",
+              "start": 12,
+              "term": "oyster"
+            }
+          ],
+          "matchText": "served with oyster big mushroom on the side",
+          "normalised": "served with oyster big mushroom on the side",
+          "text": "Served with oyster big mushroom on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 6,
+              "guarded": false,
               "id": "sesame",
               "start": 0,
               "term": "sesame"
             }
           ],
+          "matchText": "sesame",
           "normalised": "sesame",
           "text": "sesame"
         },
@@ -2901,11 +5545,13 @@
             {
               "certainty": "stated",
               "end": 18,
+              "guarded": false,
               "id": "sesame",
               "start": 12,
               "term": "sesame"
             }
           ],
+          "matchText": "served with sesame on the side",
           "normalised": "served with sesame on the side",
           "text": "Served with sesame on the side"
         },
@@ -2914,11 +5560,13 @@
             {
               "certainty": "stated",
               "end": 18,
+              "guarded": false,
               "id": "sesame",
               "start": 12,
               "term": "sesame"
             }
           ],
+          "matchText": "served with sesame on the side",
           "normalised": "served with sesame on the side",
           "text": "Served with SESAME on the side"
         },
@@ -2927,11 +5575,13 @@
             {
               "certainty": "stated",
               "end": 6,
+              "guarded": false,
               "id": "sesame",
               "start": 0,
               "term": "tahini"
             }
           ],
+          "matchText": "tahini",
           "normalised": "tahini",
           "text": "tahini"
         },
@@ -2940,11 +5590,13 @@
             {
               "certainty": "stated",
               "end": 18,
+              "guarded": false,
               "id": "sesame",
               "start": 12,
               "term": "tahini"
             }
           ],
+          "matchText": "served with tahini on the side",
           "normalised": "served with tahini on the side",
           "text": "Served with tahini on the side"
         },
@@ -2953,11 +5605,13 @@
             {
               "certainty": "stated",
               "end": 18,
+              "guarded": false,
               "id": "sesame",
               "start": 12,
               "term": "tahini"
             }
           ],
+          "matchText": "served with tahini on the side",
           "normalised": "served with tahini on the side",
           "text": "Served with TAHINI on the side"
         },
@@ -2966,11 +5620,13 @@
             {
               "certainty": "stated",
               "end": 6,
+              "guarded": false,
               "id": "sesame",
               "start": 0,
               "term": "שומשום"
             }
           ],
+          "matchText": "שומשומ",
           "normalised": "שומשומ",
           "text": "שומשום"
         },
@@ -2979,11 +5635,13 @@
             {
               "certainty": "stated",
               "end": 14,
+              "guarded": false,
               "id": "sesame",
               "start": 8,
               "term": "שומשום"
             }
           ],
+          "matchText": "מוגש עמ שומשומ בצד",
           "normalised": "מוגש עמ שומשומ בצד",
           "text": "מוגש עם שומשום בצד"
         },
@@ -2992,11 +5650,13 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "sesame",
               "start": 8,
               "term": "שומשום"
             }
           ],
+          "matchText": "מוגש עמ השומשומ בצד",
           "normalised": "מוגש עמ השומשומ בצד",
           "text": "מוגש עם השומשום בצד"
         },
@@ -3005,21 +5665,25 @@
             {
               "certainty": "stated",
               "end": 16,
+              "guarded": false,
               "id": "sesame",
               "start": 8,
               "term": "שומשום"
             }
           ],
+          "matchText": "מוגש עמ ובשומשומ בצד",
           "normalised": "מוגש עמ ובשומשומ בצד",
           "text": "מוגש עם ובשומשום בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ושהשומשומ בצד",
           "normalised": "מוגש עמ ושהשומשומ בצד",
           "text": "מוגש עם ושהשומשום בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ שומשומי בצד",
           "normalised": "מוגש עמ שומשומי בצד",
           "text": "מוגש עם שומשוםי בצד"
         },
@@ -3028,11 +5692,13 @@
             {
               "certainty": "stated",
               "end": 5,
+              "guarded": false,
               "id": "sesame",
               "start": 0,
               "term": "טחינה"
             }
           ],
+          "matchText": "טחינה",
           "normalised": "טחינה",
           "text": "טחינה"
         },
@@ -3041,11 +5707,13 @@
             {
               "certainty": "stated",
               "end": 13,
+              "guarded": false,
               "id": "sesame",
               "start": 8,
               "term": "טחינה"
             }
           ],
+          "matchText": "מוגש עמ טחינה בצד",
           "normalised": "מוגש עמ טחינה בצד",
           "text": "מוגש עם טחינה בצד"
         },
@@ -3054,11 +5722,13 @@
             {
               "certainty": "stated",
               "end": 14,
+              "guarded": false,
               "id": "sesame",
               "start": 8,
               "term": "טחינה"
             }
           ],
+          "matchText": "מוגש עמ הטחינה בצד",
           "normalised": "מוגש עמ הטחינה בצד",
           "text": "מוגש עם הטחינה בצד"
         },
@@ -3067,26 +5737,40 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "sesame",
               "start": 8,
               "term": "טחינה"
             }
           ],
+          "matchText": "מוגש עמ ובטחינה בצד",
           "normalised": "מוגש עמ ובטחינה בצד",
           "text": "מוגש עם ובטחינה בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ושהטחינה בצד",
           "normalised": "מוגש עמ ושהטחינה בצד",
           "text": "מוגש עם ושהטחינה בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ טחינהי בצד",
           "normalised": "מוגש עמ טחינהי בצד",
           "text": "מוגש עם טחינהי בצד"
         },
         {
-          "hits": [],
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 21,
+              "guarded": true,
+              "id": "sesame",
+              "start": 15,
+              "term": "sesame"
+            }
+          ],
+          "matchText": "served with no sesame on the side",
           "normalised": "served with no sesame on the side",
           "text": "Served with no sesame on the side"
         },
@@ -3094,12 +5778,29 @@
           "hits": [
             {
               "certainty": "stated",
+              "end": 25,
+              "guarded": false,
+              "id": "sesame",
+              "start": 19,
+              "term": "sesame"
+            }
+          ],
+          "matchText": "served with no big sesame on the side",
+          "normalised": "served with no big sesame on the side",
+          "text": "Served with no big sesame on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
               "end": 29,
+              "guarded": false,
               "id": "sesame",
               "start": 23,
               "term": "sesame"
             }
           ],
+          "matchText": "served with no big fat sesame on the side",
           "normalised": "served with no big fat sesame on the side",
           "text": "Served with no big fat sesame on the side"
         },
@@ -3108,16 +5809,28 @@
             {
               "certainty": "stated",
               "end": 18,
+              "guarded": false,
               "id": "sesame",
               "start": 12,
               "term": "sesame"
             }
           ],
+          "matchText": "served with sesame no on the side",
           "normalised": "served with sesame no on the side",
           "text": "Served with sesame no on the side"
         },
         {
-          "hits": [],
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 26,
+              "guarded": true,
+              "id": "sesame",
+              "start": 20,
+              "term": "sesame"
+            }
+          ],
+          "matchText": "served with without sesame on the side",
           "normalised": "served with without sesame on the side",
           "text": "Served with without sesame on the side"
         },
@@ -3125,12 +5838,29 @@
           "hits": [
             {
               "certainty": "stated",
+              "end": 30,
+              "guarded": false,
+              "id": "sesame",
+              "start": 24,
+              "term": "sesame"
+            }
+          ],
+          "matchText": "served with without big sesame on the side",
+          "normalised": "served with without big sesame on the side",
+          "text": "Served with without big sesame on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
               "end": 34,
+              "guarded": false,
               "id": "sesame",
               "start": 28,
               "term": "sesame"
             }
           ],
+          "matchText": "served with without big fat sesame on the side",
           "normalised": "served with without big fat sesame on the side",
           "text": "Served with without big fat sesame on the side"
         },
@@ -3139,21 +5869,43 @@
             {
               "certainty": "stated",
               "end": 18,
+              "guarded": false,
               "id": "sesame",
               "start": 12,
               "term": "sesame"
             }
           ],
+          "matchText": "served with sesame without on the side",
           "normalised": "served with sesame without on the side",
           "text": "Served with sesame without on the side"
         },
         {
-          "hits": [],
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 18,
+              "guarded": true,
+              "id": "sesame",
+              "start": 12,
+              "term": "sesame"
+            }
+          ],
+          "matchText": "served with sesame free on the side",
           "normalised": "served with sesame free on the side",
           "text": "Served with sesame free on the side"
         },
         {
-          "hits": [],
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 18,
+              "guarded": true,
+              "id": "sesame",
+              "start": 12,
+              "term": "sesame"
+            }
+          ],
+          "matchText": "served with sesame free on the side",
           "normalised": "served with sesame free on the side",
           "text": "Served with sesame-free on the side"
         },
@@ -3162,11 +5914,28 @@
             {
               "certainty": "stated",
               "end": 18,
+              "guarded": false,
               "id": "sesame",
               "start": 12,
               "term": "sesame"
             }
           ],
+          "matchText": "served with sesame big free on the side",
+          "normalised": "served with sesame big free on the side",
+          "text": "Served with sesame big free on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "guarded": false,
+              "id": "sesame",
+              "start": 12,
+              "term": "sesame"
+            }
+          ],
+          "matchText": "served with sesame big fat free on the side",
           "normalised": "served with sesame big fat free on the side",
           "text": "Served with sesame big fat free on the side"
         },
@@ -3175,29 +5944,73 @@
             {
               "certainty": "stated",
               "end": 23,
+              "guarded": false,
               "id": "sesame",
               "start": 17,
               "term": "sesame"
             }
           ],
+          "matchText": "served with free sesame on the side",
           "normalised": "served with free sesame on the side",
           "text": "Served with free sesame on the side"
         },
         {
-          "hits": [],
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 18,
+              "guarded": true,
+              "id": "sesame",
+              "start": 12,
+              "term": "שומשום"
+            }
+          ],
+          "matchText": "מוגש עמ ללא שומשומ בצד",
           "normalised": "מוגש עמ ללא שומשומ בצד",
           "text": "מוגש עם ללא שומשום בצד"
         },
         {
           "hits": [
             {
+              "certainty": "suspected",
+              "end": 19,
+              "guarded": true,
+              "id": "sesame",
+              "start": 13,
+              "term": "שומשום"
+            }
+          ],
+          "matchText": "מוגש עמ וללא שומשומ בצד",
+          "normalised": "מוגש עמ וללא שומשומ בצד",
+          "text": "מוגש עם וללא שומשום בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 23,
+              "guarded": false,
+              "id": "sesame",
+              "start": 17,
+              "term": "שומשום"
+            }
+          ],
+          "matchText": "מוגש עמ ללא גדול שומשומ בצד",
+          "normalised": "מוגש עמ ללא גדול שומשומ בצד",
+          "text": "מוגש עם ללא גדול שומשום בצד"
+        },
+        {
+          "hits": [
+            {
               "certainty": "stated",
               "end": 27,
+              "guarded": false,
               "id": "sesame",
               "start": 21,
               "term": "שומשום"
             }
           ],
+          "matchText": "מוגש עמ ללא גדול שמנ שומשומ בצד",
           "normalised": "מוגש עמ ללא גדול שמנ שומשומ בצד",
           "text": "מוגש עם ללא גדול שמן שומשום בצד"
         },
@@ -3206,29 +6019,73 @@
             {
               "certainty": "stated",
               "end": 14,
+              "guarded": false,
               "id": "sesame",
               "start": 8,
               "term": "שומשום"
             }
           ],
+          "matchText": "מוגש עמ שומשומ ללא בצד",
           "normalised": "מוגש עמ שומשומ ללא בצד",
           "text": "מוגש עם שומשום ללא בצד"
         },
         {
-          "hits": [],
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 18,
+              "guarded": true,
+              "id": "sesame",
+              "start": 12,
+              "term": "שומשום"
+            }
+          ],
+          "matchText": "מוגש עמ בלי שומשומ בצד",
           "normalised": "מוגש עמ בלי שומשומ בצד",
           "text": "מוגש עם בלי שומשום בצד"
         },
         {
           "hits": [
             {
+              "certainty": "suspected",
+              "end": 19,
+              "guarded": true,
+              "id": "sesame",
+              "start": 13,
+              "term": "שומשום"
+            }
+          ],
+          "matchText": "מוגש עמ ובלי שומשומ בצד",
+          "normalised": "מוגש עמ ובלי שומשומ בצד",
+          "text": "מוגש עם ובלי שומשום בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 23,
+              "guarded": false,
+              "id": "sesame",
+              "start": 17,
+              "term": "שומשום"
+            }
+          ],
+          "matchText": "מוגש עמ בלי גדול שומשומ בצד",
+          "normalised": "מוגש עמ בלי גדול שומשומ בצד",
+          "text": "מוגש עם בלי גדול שומשום בצד"
+        },
+        {
+          "hits": [
+            {
               "certainty": "stated",
               "end": 27,
+              "guarded": false,
               "id": "sesame",
               "start": 21,
               "term": "שומשום"
             }
           ],
+          "matchText": "מוגש עמ בלי גדול שמנ שומשומ בצד",
           "normalised": "מוגש עמ בלי גדול שמנ שומשומ בצד",
           "text": "מוגש עם בלי גדול שמן שומשום בצד"
         },
@@ -3237,11 +6094,13 @@
             {
               "certainty": "stated",
               "end": 14,
+              "guarded": false,
               "id": "sesame",
               "start": 8,
               "term": "שומשום"
             }
           ],
+          "matchText": "מוגש עמ שומשומ בלי בצד",
           "normalised": "מוגש עמ שומשומ בלי בצד",
           "text": "מוגש עם שומשום בלי בצד"
         },
@@ -3250,11 +6109,13 @@
             {
               "certainty": "stated",
               "end": 6,
+              "guarded": false,
               "id": "celery",
               "start": 0,
               "term": "celery"
             }
           ],
+          "matchText": "celery",
           "normalised": "celery",
           "text": "celery"
         },
@@ -3263,11 +6124,13 @@
             {
               "certainty": "stated",
               "end": 18,
+              "guarded": false,
               "id": "celery",
               "start": 12,
               "term": "celery"
             }
           ],
+          "matchText": "served with celery on the side",
           "normalised": "served with celery on the side",
           "text": "Served with celery on the side"
         },
@@ -3276,11 +6139,13 @@
             {
               "certainty": "stated",
               "end": 18,
+              "guarded": false,
               "id": "celery",
               "start": 12,
               "term": "celery"
             }
           ],
+          "matchText": "served with celery on the side",
           "normalised": "served with celery on the side",
           "text": "Served with CELERY on the side"
         },
@@ -3289,11 +6154,13 @@
             {
               "certainty": "suspected",
               "end": 15,
+              "guarded": false,
               "id": "celery",
               "start": 0,
               "term": "vegetable stock"
             }
           ],
+          "matchText": "vegetable stock",
           "normalised": "vegetable stock",
           "text": "vegetable stock"
         },
@@ -3302,11 +6169,13 @@
             {
               "certainty": "suspected",
               "end": 27,
+              "guarded": false,
               "id": "celery",
               "start": 12,
               "term": "vegetable stock"
             }
           ],
+          "matchText": "served with vegetable stock on the side",
           "normalised": "served with vegetable stock on the side",
           "text": "Served with vegetable stock on the side"
         },
@@ -3315,11 +6184,13 @@
             {
               "certainty": "suspected",
               "end": 27,
+              "guarded": false,
               "id": "celery",
               "start": 12,
               "term": "vegetable stock"
             }
           ],
+          "matchText": "served with vegetable stock on the side",
           "normalised": "served with vegetable stock on the side",
           "text": "Served with VEGETABLE STOCK on the side"
         },
@@ -3328,11 +6199,13 @@
             {
               "certainty": "suspected",
               "end": 10,
+              "guarded": false,
               "id": "sulphites",
               "start": 0,
               "term": "white wine"
             }
           ],
+          "matchText": "white wine",
           "normalised": "white wine",
           "text": "white wine"
         },
@@ -3341,11 +6214,13 @@
             {
               "certainty": "suspected",
               "end": 22,
+              "guarded": false,
               "id": "sulphites",
               "start": 12,
               "term": "white wine"
             }
           ],
+          "matchText": "served with white wine on the side",
           "normalised": "served with white wine on the side",
           "text": "Served with white wine on the side"
         },
@@ -3354,11 +6229,13 @@
             {
               "certainty": "suspected",
               "end": 22,
+              "guarded": false,
               "id": "sulphites",
               "start": 12,
               "term": "white wine"
             }
           ],
+          "matchText": "served with white wine on the side",
           "normalised": "served with white wine on the side",
           "text": "Served with WHITE WINE on the side"
         },
@@ -3367,11 +6244,13 @@
             {
               "certainty": "stated",
               "end": 9,
+              "guarded": false,
               "id": "legumes",
               "start": 0,
               "term": "chickpeas"
             }
           ],
+          "matchText": "chickpeas",
           "normalised": "chickpeas",
           "text": "chickpeas"
         },
@@ -3380,11 +6259,13 @@
             {
               "certainty": "stated",
               "end": 21,
+              "guarded": false,
               "id": "legumes",
               "start": 12,
               "term": "chickpeas"
             }
           ],
+          "matchText": "served with chickpeas on the side",
           "normalised": "served with chickpeas on the side",
           "text": "Served with chickpeas on the side"
         },
@@ -3393,11 +6274,13 @@
             {
               "certainty": "stated",
               "end": 21,
+              "guarded": false,
               "id": "legumes",
               "start": 12,
               "term": "chickpeas"
             }
           ],
+          "matchText": "served with chickpeas on the side",
           "normalised": "served with chickpeas on the side",
           "text": "Served with CHICKPEAS on the side"
         },
@@ -3406,11 +6289,13 @@
             {
               "certainty": "stated",
               "end": 10,
+              "guarded": false,
               "id": "legumes",
               "start": 0,
               "term": "fava beans"
             }
           ],
+          "matchText": "fava beans",
           "normalised": "fava beans",
           "text": "fava beans"
         },
@@ -3419,11 +6304,13 @@
             {
               "certainty": "stated",
               "end": 22,
+              "guarded": false,
               "id": "legumes",
               "start": 12,
               "term": "fava beans"
             }
           ],
+          "matchText": "served with fava beans on the side",
           "normalised": "served with fava beans on the side",
           "text": "Served with fava beans on the side"
         },
@@ -3432,11 +6319,13 @@
             {
               "certainty": "stated",
               "end": 22,
+              "guarded": false,
               "id": "legumes",
               "start": 12,
               "term": "fava beans"
             }
           ],
+          "matchText": "served with fava beans on the side",
           "normalised": "served with fava beans on the side",
           "text": "Served with FAVA BEANS on the side"
         },
@@ -3445,11 +6334,13 @@
             {
               "certainty": "stated",
               "end": 5,
+              "guarded": false,
               "id": "legumes",
               "start": 0,
               "term": "חומוס"
             }
           ],
+          "matchText": "חומוס",
           "normalised": "חומוס",
           "text": "חומוס"
         },
@@ -3458,11 +6349,13 @@
             {
               "certainty": "stated",
               "end": 13,
+              "guarded": false,
               "id": "legumes",
               "start": 8,
               "term": "חומוס"
             }
           ],
+          "matchText": "מוגש עמ חומוס בצד",
           "normalised": "מוגש עמ חומוס בצד",
           "text": "מוגש עם חומוס בצד"
         },
@@ -3471,11 +6364,13 @@
             {
               "certainty": "stated",
               "end": 14,
+              "guarded": false,
               "id": "legumes",
               "start": 8,
               "term": "חומוס"
             }
           ],
+          "matchText": "מוגש עמ החומוס בצד",
           "normalised": "מוגש עמ החומוס בצד",
           "text": "מוגש עם החומוס בצד"
         },
@@ -3484,21 +6379,25 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "legumes",
               "start": 8,
               "term": "חומוס"
             }
           ],
+          "matchText": "מוגש עמ ובחומוס בצד",
           "normalised": "מוגש עמ ובחומוס בצד",
           "text": "מוגש עם ובחומוס בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ושהחומוס בצד",
           "normalised": "מוגש עמ ושהחומוס בצד",
           "text": "מוגש עם ושהחומוס בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ חומוסי בצד",
           "normalised": "מוגש עמ חומוסי בצד",
           "text": "מוגש עם חומוסי בצד"
         },
@@ -3507,11 +6406,13 @@
             {
               "certainty": "stated",
               "end": 5,
+              "guarded": false,
               "id": "legumes",
               "start": 0,
               "term": "עדשים"
             }
           ],
+          "matchText": "עדשימ",
           "normalised": "עדשימ",
           "text": "עדשים"
         },
@@ -3520,11 +6421,13 @@
             {
               "certainty": "stated",
               "end": 13,
+              "guarded": false,
               "id": "legumes",
               "start": 8,
               "term": "עדשים"
             }
           ],
+          "matchText": "מוגש עמ עדשימ בצד",
           "normalised": "מוגש עמ עדשימ בצד",
           "text": "מוגש עם עדשים בצד"
         },
@@ -3533,11 +6436,13 @@
             {
               "certainty": "stated",
               "end": 14,
+              "guarded": false,
               "id": "legumes",
               "start": 8,
               "term": "עדשים"
             }
           ],
+          "matchText": "מוגש עמ העדשימ בצד",
           "normalised": "מוגש עמ העדשימ בצד",
           "text": "מוגש עם העדשים בצד"
         },
@@ -3546,21 +6451,25 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "legumes",
               "start": 8,
               "term": "עדשים"
             }
           ],
+          "matchText": "מוגש עמ ובעדשימ בצד",
           "normalised": "מוגש עמ ובעדשימ בצד",
           "text": "מוגש עם ובעדשים בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ושהעדשימ בצד",
           "normalised": "מוגש עמ ושהעדשימ בצד",
           "text": "מוגש עם ושהעדשים בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ עדשימי בצד",
           "normalised": "מוגש עמ עדשימי בצד",
           "text": "מוגש עם עדשיםי בצד"
         },
@@ -3569,11 +6478,13 @@
             {
               "certainty": "stated",
               "end": 5,
+              "guarded": false,
               "id": "legumes",
               "start": 0,
               "term": "פלאפל"
             }
           ],
+          "matchText": "פלאפל",
           "normalised": "פלאפל",
           "text": "פלאפל"
         },
@@ -3582,11 +6493,13 @@
             {
               "certainty": "stated",
               "end": 13,
+              "guarded": false,
               "id": "legumes",
               "start": 8,
               "term": "פלאפל"
             }
           ],
+          "matchText": "מוגש עמ פלאפל בצד",
           "normalised": "מוגש עמ פלאפל בצד",
           "text": "מוגש עם פלאפל בצד"
         },
@@ -3595,11 +6508,13 @@
             {
               "certainty": "stated",
               "end": 14,
+              "guarded": false,
               "id": "legumes",
               "start": 8,
               "term": "פלאפל"
             }
           ],
+          "matchText": "מוגש עמ הפלאפל בצד",
           "normalised": "מוגש עמ הפלאפל בצד",
           "text": "מוגש עם הפלאפל בצד"
         },
@@ -3608,21 +6523,25 @@
             {
               "certainty": "stated",
               "end": 15,
+              "guarded": false,
               "id": "legumes",
               "start": 8,
               "term": "פלאפל"
             }
           ],
+          "matchText": "מוגש עמ ובפלאפל בצד",
           "normalised": "מוגש עמ ובפלאפל בצד",
           "text": "מוגש עם ובפלאפל בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ ושהפלאפל בצד",
           "normalised": "מוגש עמ ושהפלאפל בצד",
           "text": "מוגש עם ושהפלאפל בצד"
         },
         {
           "hits": [],
+          "matchText": "מוגש עמ פלאפלי בצד",
           "normalised": "מוגש עמ פלאפלי בצד",
           "text": "מוגש עם פלאפלי בצד"
         }
@@ -3657,7 +6576,40 @@
         "noPrefixHe": [],
         "sources": [
           "11 §12"
-        ]
+        ],
+        "termGuards": {}
+      },
+      "crustaceans": {
+        "directEn": [
+          {
+            "normalised": "crab",
+            "pattern": "\\bcrab\\b",
+            "term": "crab"
+          }
+        ],
+        "directHe": [],
+        "guards": {
+          "afterEn": [],
+          "afterHe": [],
+          "beforeEn": [],
+          "beforeHe": []
+        },
+        "hiddenEn": [],
+        "hiddenHe": [],
+        "noPrefixHe": [],
+        "sources": [
+          "11 §9"
+        ],
+        "termGuards": {
+          "crab": {
+            "afterEn": [
+              "apple"
+            ],
+            "afterHe": [],
+            "beforeEn": [],
+            "beforeHe": []
+          }
+        }
       },
       "eggs": {
         "directEn": [
@@ -3687,7 +6639,8 @@
         "noPrefixHe": [],
         "sources": [
           "11 §5"
-        ]
+        ],
+        "termGuards": {}
       },
       "fish": {
         "directEn": [
@@ -3741,7 +6694,8 @@
         "noPrefixHe": [],
         "sources": [
           "11 §8"
-        ]
+        ],
+        "termGuards": {}
       },
       "lactose": {
         "directEn": [
@@ -3773,7 +6727,8 @@
         "noPrefixHe": [],
         "sources": [
           "11 §4"
-        ]
+        ],
+        "termGuards": {}
       },
       "legumes": {
         "directEn": [
@@ -3817,7 +6772,8 @@
         "sources": [
           "11 §16",
           "12 §1.3"
-        ]
+        ],
+        "termGuards": {}
       },
       "milk": {
         "directEn": [
@@ -3867,7 +6823,98 @@
         "noPrefixHe": [],
         "sources": [
           "11 §3"
-        ]
+        ],
+        "termGuards": {
+          "milk": {
+            "afterEn": [],
+            "afterHe": [],
+            "beforeEn": [
+              "coconut"
+            ],
+            "beforeHe": []
+          },
+          "חלב": {
+            "afterEn": [],
+            "afterHe": [
+              "קוקוס"
+            ],
+            "beforeEn": [],
+            "beforeHe": []
+          }
+        }
+      },
+      "molluscs": {
+        "directEn": [
+          {
+            "normalised": "oyster",
+            "pattern": "\\boyster\\b",
+            "term": "oyster"
+          }
+        ],
+        "directHe": [],
+        "guards": {
+          "afterEn": [],
+          "afterHe": [],
+          "beforeEn": [],
+          "beforeHe": []
+        },
+        "hiddenEn": [],
+        "hiddenHe": [],
+        "noPrefixHe": [],
+        "sources": [
+          "11 §10"
+        ],
+        "termGuards": {
+          "oyster": {
+            "afterEn": [
+              "mushroom"
+            ],
+            "afterHe": [],
+            "beforeEn": [],
+            "beforeHe": []
+          }
+        }
+      },
+      "peanuts": {
+        "directEn": [
+          {
+            "normalised": "peanut",
+            "pattern": "\\bpeanut\\b",
+            "term": "peanut"
+          },
+          {
+            "normalised": "peanut butter",
+            "pattern": "\\bpeanut butter\\b",
+            "term": "peanut butter"
+          }
+        ],
+        "directHe": [
+          {
+            "normalised": "בוטנימ",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}בוטנימ(?![א-ת])",
+            "term": "בוטנים"
+          },
+          {
+            "normalised": "חמאת בוטנימ",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}חמאת בוטנימ(?![א-ת])",
+            "term": "חמאת בוטנים"
+          }
+        ],
+        "guards": {
+          "afterEn": [
+            "free"
+          ],
+          "afterHe": [],
+          "beforeEn": [],
+          "beforeHe": []
+        },
+        "hiddenEn": [],
+        "hiddenHe": [],
+        "noPrefixHe": [],
+        "sources": [
+          "11 §1"
+        ],
+        "termGuards": {}
       },
       "sesame": {
         "directEn": [
@@ -3914,7 +6961,8 @@
         "sources": [
           "11 §11",
           "12 §1.1"
-        ]
+        ],
+        "termGuards": {}
       },
       "soy": {
         "directEn": [
@@ -3942,7 +6990,8 @@
         "noPrefixHe": [],
         "sources": [
           "11 §6"
-        ]
+        ],
+        "termGuards": {}
       },
       "sulphites": {
         "directEn": [],
@@ -3966,7 +7015,42 @@
         "noPrefixHe": [],
         "sources": [
           "11 §15"
-        ]
+        ],
+        "termGuards": {}
+      },
+      "treeNuts": {
+        "directEn": [
+          {
+            "normalised": "almond milk",
+            "pattern": "\\balmond milk\\b",
+            "term": "almond milk"
+          },
+          {
+            "normalised": "coconut milk",
+            "pattern": "\\bcoconut milk\\b",
+            "term": "coconut milk"
+          }
+        ],
+        "directHe": [
+          {
+            "normalised": "שקדימ",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}שקדימ(?![א-ת])",
+            "term": "שקדים"
+          }
+        ],
+        "guards": {
+          "afterEn": [],
+          "afterHe": [],
+          "beforeEn": [],
+          "beforeHe": []
+        },
+        "hiddenEn": [],
+        "hiddenHe": [],
+        "noPrefixHe": [],
+        "sources": [
+          "11 §2"
+        ],
+        "termGuards": {}
       },
       "wheat": {
         "directEn": [
@@ -3979,6 +7063,11 @@
             "normalised": "toast",
             "pattern": "\\btoast\\b",
             "term": "toast"
+          },
+          {
+            "normalised": "flour",
+            "pattern": "\\bflour\\b",
+            "term": "flour"
           }
         ],
         "directHe": [
@@ -4033,7 +7122,17 @@
         ],
         "sources": [
           "11 §7"
-        ]
+        ],
+        "termGuards": {
+          "flour": {
+            "afterEn": [],
+            "afterHe": [],
+            "beforeEn": [
+              "rice"
+            ],
+            "beforeHe": []
+          }
+        }
       }
     }
   },
@@ -4099,6 +7198,7 @@
           "price": 10.0
         },
         "hits": [],
+        "matchText": "bagel toasted with cream cheese topping sesame poppy seed changes",
         "rulesText": "bagel toasted with cream cheese topping sesame poppy seed changes"
       },
       {
@@ -4126,6 +7226,7 @@
           "price": 10.0
         },
         "hits": [],
+        "matchText": "falafel plate falafel hummus and salad sauce tahini amba remove",
         "rulesText": "falafel plate falafel hummus and salad sauce tahini amba remove"
       },
       {
@@ -4154,6 +7255,7 @@
           "price": 10.0
         },
         "hits": [],
+        "matchText": "סביח חציל מטוגנ ביצה קשה טחינה ועמבה בחירת לחמ פיתה לאפה שינויימ",
         "rulesText": "סביח חציל מטוגנ ביצה קשה טחינה ועמבה בחירת לחמ פיתה לאפה שינויימ"
       },
       {
@@ -4175,179 +7277,331 @@
           "price": 10.0
         },
         "hits": [],
+        "matchText": "סלט קיסר חסה קרוטונימ ורוטב קיסר תוספת פרמזנ אנשובי",
         "rulesText": "סלט קיסר חסה קרוטונימ ורוטב קיסר תוספת פרמזנ אנשובי"
+      },
+      {
+        "dish": {
+          "description": "עם חמאת־בוטנים",
+          "id": "d",
+          "imageUrl": null,
+          "name": "טוסט",
+          "options": [
+            {
+              "name": "שינויים",
+              "values": [
+                "ללא־שומשום"
+              ]
+            }
+          ],
+          "page": null,
+          "price": 10.0
+        },
+        "hits": [],
+        "matchText": "טוסט עמ חמאת בוטנימ שינויימ",
+        "rulesText": "טוסט עמ חמאתבוטנימ שינויימ ללאשומשומ"
       }
     ],
     "texts": [
       {
         "hits": [],
+        "matchText": "sesame bagel with cream cheese",
         "normalised": "sesame bagel with cream cheese",
         "text": "Sesame bagel with cream cheese"
       },
       {
         "hits": [],
+        "matchText": "hummus with tahini olive oil and paprika",
         "normalised": "hummus with tahini olive oil and paprika",
         "text": "Hummus with tahini, olive oil and paprika"
       },
       {
         "hits": [],
+        "matchText": "satay chicken skewers with peanut sauce",
         "normalised": "satay chicken skewers with peanut sauce",
         "text": "Satay chicken skewers with peanut sauce"
       },
       {
         "hits": [],
+        "matchText": "pad thai with crushed peanuts",
         "normalised": "pad thai with crushed peanuts",
         "text": "Pad thai with crushed peanuts"
       },
       {
         "hits": [],
+        "matchText": "basil pesto pasta with pine nuts",
         "normalised": "basil pesto pasta with pine nuts",
         "text": "Basil pesto pasta with pine nuts"
       },
       {
         "hits": [],
+        "matchText": "almond croissant",
         "normalised": "almond croissant",
         "text": "Almond croissant"
       },
       {
         "hits": [],
+        "matchText": "caesar salad with anchovies and parmesan",
         "normalised": "caesar salad with anchovies and parmesan",
         "text": "Caesar salad with anchovies and parmesan"
       },
       {
         "hits": [],
+        "matchText": "shrimp tempura with soy sauce",
         "normalised": "shrimp tempura with soy sauce",
         "text": "Shrimp tempura with soy sauce"
       },
       {
         "hits": [],
+        "matchText": "grilled squid with lemon",
         "normalised": "grilled squid with lemon",
         "text": "Grilled squid with lemon"
       },
       {
         "hits": [],
+        "matchText": "mussels in white wine and garlic",
         "normalised": "mussels in white wine and garlic",
         "text": "Mussels in white wine and garlic"
       },
       {
         "hits": [],
+        "matchText": "tuna tartare with sesame oil",
         "normalised": "tuna tartare with sesame oil",
         "text": "Tuna tartare with sesame oil"
       },
       {
         "hits": [],
+        "matchText": "scrambled eggs on sourdough toast",
         "normalised": "scrambled eggs on sourdough toast",
         "text": "Scrambled eggs on sourdough toast"
       },
       {
         "hits": [],
+        "matchText": "lactose free latte with oat milk",
         "normalised": "lactose free latte with oat milk",
         "text": "Lactose-free latte with oat milk"
       },
       {
         "hits": [],
+        "matchText": "gluten free bun with honey mustard",
         "normalised": "gluten free bun with honey mustard",
         "text": "Gluten-free bun with honey mustard"
       },
       {
         "hits": [],
+        "matchText": "celery soup on vegetable stock",
         "normalised": "celery soup on vegetable stock",
         "text": "Celery soup on vegetable stock"
       },
       {
         "hits": [],
+        "matchText": "lupin flour flatbread",
         "normalised": "lupin flour flatbread",
         "text": "Lupin flour flatbread"
       },
       {
         "hits": [],
+        "matchText": "dried apricots contains sulphites",
         "normalised": "dried apricots contains sulphites",
         "text": "Dried apricots (contains sulphites)"
       },
       {
         "hits": [],
+        "matchText": "falafel with chickpeas and fava beans",
         "normalised": "falafel with chickpeas and fava beans",
         "text": "Falafel with chickpeas and fava beans"
       },
       {
         "hits": [],
+        "matchText": "vegan burger dairy free cheese",
         "normalised": "vegan burger dairy free cheese",
         "text": "Vegan burger, dairy-free cheese"
       },
       {
         "hits": [],
+        "matchText": "vegetarian lasagne with ricotta",
         "normalised": "vegetarian lasagne with ricotta",
         "text": "Vegetarian lasagne with ricotta"
       },
       {
         "hits": [],
+        "matchText": "סלט ירקות עמ טחינה",
         "normalised": "סלט ירקות עמ טחינה",
         "text": "סלט ירקות עם טחינה"
       },
       {
         "hits": [],
+        "matchText": "חומוס עמ טחינה וגרגירימ",
         "normalised": "חומוס עמ טחינה וגרגירימ",
         "text": "חומוס עם טחינה וגרגירים"
       },
       {
         "hits": [],
+        "matchText": "בורקס גבינה עמ שומשומ",
         "normalised": "בורקס גבינה עמ שומשומ",
         "text": "בורקס גבינה עם שומשום"
       },
       {
         "hits": [],
+        "matchText": "גחנונ עמ ביצה קשה ורסק עגבניות",
         "normalised": "גחנונ עמ ביצה קשה ורסק עגבניות",
         "text": "ג'חנון עם ביצה קשה ורסק עגבניות"
       },
       {
         "hits": [],
+        "matchText": "שניצל עופ בפירורי לחמ",
         "normalised": "שניצל עופ בפירורי לחמ",
         "text": "שניצל עוף בפירורי לחם"
       },
       {
         "hits": [],
+        "matchText": "סלמונ ברוטב סויה ודבש",
         "normalised": "סלמונ ברוטב סויה ודבש",
         "text": "סלמון ברוטב סויה ודבש"
       },
       {
         "hits": [],
+        "matchText": "פסטה ברוטב שמנת ופטריות",
         "normalised": "פסטה ברוטב שמנת ופטריות",
         "text": "פסטה ברוטב שמנת ופטריות"
       },
       {
         "hits": [],
+        "matchText": "חלבה עמ פיסטוקימ",
         "normalised": "חלבה עמ פיסטוקימ",
         "text": "חלבה עם פיסטוקים"
       },
       {
         "hits": [],
+        "matchText": "פלאפל בפיתה עמ עמבה",
         "normalised": "פלאפל בפיתה עמ עמבה",
         "text": "פלאפל בפיתה עם עמבה"
       },
       {
         "hits": [],
+        "matchText": "שקשוקה עמ גבינת פטה",
         "normalised": "שקשוקה עמ גבינת פטה",
         "text": "שקשוקה עם גבינת פטה"
       },
       {
         "hits": [],
+        "matchText": "מרק עדשימ כתומות",
         "normalised": "מרק עדשימ כתומות",
         "text": "מרק עדשים כתומות"
       },
       {
         "hits": [],
+        "matchText": "קפה הפוכ על חלב שקדימ",
         "normalised": "קפה הפוכ על חלב שקדימ",
         "text": "קפה הפוך על חלב שקדים"
       },
       {
         "hits": [],
+        "matchText": "לחמניה ללא גלוטנ",
         "normalised": "לחמניה ללא גלוטנ",
         "text": "לחמניה ללא גלוטן"
       },
       {
         "hits": [],
+        "matchText": "חומוס ללא טחינה",
         "normalised": "חומוס ללא טחינה",
         "text": "חומוס ללא טחינה"
+      },
+      {
+        "hits": [],
+        "matchText": "hummus no sesame or tahini",
+        "normalised": "hummus no sesame or tahini",
+        "text": "Hummus, no sesame or tahini"
+      },
+      {
+        "hits": [],
+        "matchText": "sesame free tahini",
+        "normalised": "sesame free tahini",
+        "text": "Sesame-free tahini"
+      },
+      {
+        "hits": [],
+        "matchText": "bun made with rice flour",
+        "normalised": "bun made with rice flour",
+        "text": "Bun made with rice flour"
+      },
+      {
+        "hits": [],
+        "matchText": "toast with rice flour and wheat flour",
+        "normalised": "toast with rice flour and wheat flour",
+        "text": "Toast with rice flour and wheat flour"
+      },
+      {
+        "hits": [],
+        "matchText": "flat white with almond milk",
+        "normalised": "flat white with almond milk",
+        "text": "Flat white with almond milk"
+      },
+      {
+        "hits": [],
+        "matchText": "coconut milk curry",
+        "normalised": "coconut milk curry",
+        "text": "Coconut milk curry"
+      },
+      {
+        "hits": [],
+        "matchText": "oyster mushroom risotto",
+        "normalised": "oyster mushroom risotto",
+        "text": "Oyster mushroom risotto"
+      },
+      {
+        "hits": [],
+        "matchText": "crab apple jelly",
+        "normalised": "crab apple jelly",
+        "text": "Crab apple jelly"
+      },
+      {
+        "hits": [],
+        "matchText": "crab cakes",
+        "normalised": "crab cakes",
+        "text": "Crab cakes"
+      },
+      {
+        "hits": [],
+        "matchText": "חמאת בוטנימ",
+        "normalised": "חמאתבוטנימ",
+        "text": "חמאת־בוטנים"
+      },
+      {
+        "hits": [],
+        "matchText": "פיתה עמ חמאת בוטנימ",
+        "normalised": "פיתה עמ חמאתבוטנימ",
+        "text": "פיתה עם חמאת־בוטנים"
+      },
+      {
+        "hits": [],
+        "matchText": "קפה עמ חלב שקדימ",
+        "normalised": "קפה עמ חלבשקדימ",
+        "text": "קפה עם חלב־שקדים"
+      },
+      {
+        "hits": [],
+        "matchText": "קפה עמ חלב השקדימ",
+        "normalised": "קפה עמ חלב השקדימ",
+        "text": "קפה עם חלב השקדים"
+      },
+      {
+        "hits": [],
+        "matchText": "קפה עמ חלב ושקדימ",
+        "normalised": "קפה עמ חלב ושקדימ",
+        "text": "קפה עם חלב ושקדים"
+      },
+      {
+        "hits": [],
+        "matchText": "חומוס וללא טחינה",
+        "normalised": "חומוס וללא טחינה",
+        "text": "חומוס וללא טחינה"
+      },
+      {
+        "hits": [],
+        "matchText": "ללא גלוטנ ועמ טחינה",
+        "normalised": "ללא גלוטנ ועמ טחינה",
+        "text": "ללא גלוטן ועם טחינה"
       }
     ]
   },
@@ -4646,7 +7900,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "crustaceans": {
       "directEn": [],
@@ -4660,7 +7915,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "eggs": {
       "directEn": [],
@@ -4674,7 +7930,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "fish": {
       "directEn": [],
@@ -4688,7 +7945,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "gluten": {
       "directEn": [],
@@ -4702,7 +7960,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "keto": {
       "directEn": [],
@@ -4716,7 +7975,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "lactose": {
       "directEn": [],
@@ -4730,7 +7990,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "legumes": {
       "directEn": [],
@@ -4744,7 +8005,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "lupin": {
       "directEn": [],
@@ -4758,7 +8020,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "milk": {
       "directEn": [],
@@ -4772,7 +8035,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "molluscs": {
       "directEn": [],
@@ -4786,7 +8050,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "mustard": {
       "directEn": [],
@@ -4800,7 +8065,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "peanuts": {
       "directEn": [],
@@ -4814,7 +8080,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "sesame": {
       "directEn": [],
@@ -4828,7 +8095,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "soy": {
       "directEn": [],
@@ -4842,7 +8110,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "sulphites": {
       "directEn": [],
@@ -4856,7 +8125,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "treeNuts": {
       "directEn": [],
@@ -4870,7 +8140,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "vegan": {
       "directEn": [],
@@ -4884,7 +8155,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "vegetarian": {
       "directEn": [],
@@ -4898,7 +8170,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "wheat": {
       "directEn": [],
@@ -4912,7 +8185,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     }
   }
 }

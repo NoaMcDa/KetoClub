@@ -1313,8 +1313,17 @@ Map<String, Object?> _allergenHidden(
   'source': trigger.source,
 };
 
+/// An [AllergenGuards] as `{beforeEn, afterEn, beforeHe, afterHe}`.
+Map<String, Object?> _allergenGuards(AllergenGuards guards) =>
+    <String, Object?>{
+      'beforeEn': guards.beforeEn,
+      'afterEn': guards.afterEn,
+      'beforeHe': guards.beforeHe,
+      'afterHe': guards.afterHe,
+    };
+
 /// One restriction's vocabulary as `{directEn, directHe, hiddenEn,
-/// hiddenHe, guards, noPrefixHe, sources}`.
+/// hiddenHe, guards, termGuards, noPrefixHe, sources}`.
 Map<String, Object?> _allergenEntry(RestrictionVocabulary entry) {
   final noPrefix = entry.noPrefixHe.toSet();
   return <String, Object?>{
@@ -1334,11 +1343,10 @@ Map<String, Object?> _allergenEntry(RestrictionVocabulary entry) {
       for (final trigger in entry.hiddenHe)
         _allergenHidden(trigger, hebrew: true, noPrefix: noPrefix),
     ],
-    'guards': <String, Object?>{
-      'beforeEn': entry.guards.beforeEn,
-      'afterEn': entry.guards.afterEn,
-      'beforeHe': entry.guards.beforeHe,
-      'afterHe': entry.guards.afterHe,
+    'guards': _allergenGuards(entry.guards),
+    'termGuards': <String, Object?>{
+      for (final MapEntry(key: term, value: guards) in entry.termGuards.entries)
+        term: _allergenGuards(guards),
     },
     'noPrefixHe': entry.noPrefixHe,
     'sources': entry.sources,
@@ -1360,12 +1368,15 @@ Map<String, Object?> _allergenHit(AllergenHit hit) => <String, Object?>{
   'certainty': hit.certainty.name,
   'start': hit.start,
   'end': hit.end,
+  'guarded': hit.guarded,
 };
 
 /// Every term of [vocabulary] in the corpus frames: bare, framed, and (in
 /// Hebrew) with one, two and three prefix letters and a suffix; then every
-/// guard phrase beside the restriction's first term of its language, in
-/// the window, pushed out of it by a filler, and on the wrong side.
+/// guard phrase beside the restriction's first term of its language:
+/// adjacent, one word away, pushed out by a filler, on the wrong side, and
+/// (in Hebrew) with a prefix letter on the guard; then every term guard
+/// beside its own term, adjacent and one word away.
 List<String> _allergenGeneratedTexts(
   Map<RestrictionId, RestrictionVocabulary> vocabulary,
 ) {
@@ -1402,6 +1413,7 @@ List<String> _allergenGeneratedTexts(
       for (final word in guards.beforeEn) {
         texts.addAll(<String>[
           en('$word $term'),
+          en('$word $allergenGuardGapEn $term'),
           en('$word $allergenGuardFillerEn $term'),
           en('$term $word'),
         ]);
@@ -1410,6 +1422,7 @@ List<String> _allergenGeneratedTexts(
         texts.addAll(<String>[
           en('$term $word'),
           en('$term-$word'),
+          en('$term $allergenGuardGapEn $word'),
           en('$term $allergenGuardFillerEn $word'),
           en('$word $term'),
         ]);
@@ -1420,6 +1433,8 @@ List<String> _allergenGeneratedTexts(
       for (final word in guards.beforeHe) {
         texts.addAll(<String>[
           he('$word $term'),
+          he('ו$word $term'),
+          he('$word $allergenGuardGapHe $term'),
           he('$word $allergenGuardFillerHe $term'),
           he('$term $word'),
         ]);
@@ -1427,9 +1442,24 @@ List<String> _allergenGeneratedTexts(
       for (final word in guards.afterHe) {
         texts.addAll(<String>[
           he('$term $word'),
+          he('$term־$word'),
+          he('$term ה$word'),
+          he('$term ו$word'),
+          he('$term $allergenGuardGapHe $word'),
           he('$term $allergenGuardFillerHe $word'),
           he('$word $term'),
         ]);
+      }
+    }
+    for (final MapEntry(key: term, value: own) in entry.termGuards.entries) {
+      final isHebrew = hebrew.contains(term);
+      final frame = isHebrew ? he : en;
+      final gap = isHebrew ? allergenGuardGapHe : allergenGuardGapEn;
+      for (final word in isHebrew ? own.beforeHe : own.beforeEn) {
+        texts.addAll(<String>[frame('$word $term'), frame('$word $gap $term')]);
+      }
+      for (final word in isHebrew ? own.afterHe : own.afterEn) {
+        texts.addAll(<String>[frame('$term $word'), frame('$term $gap $word')]);
       }
     }
   }
@@ -1479,6 +1509,7 @@ Map<String, Object?> _allergenCases(
       <String, Object?>{
         'text': text,
         'normalised': TextNormaliser.normalise(text),
+        'matchText': AllergenMatcher.matchText(text),
         'hits': <Object?>[
           for (final hit in AllergenMatcher.findWith(text, vocabulary))
             _allergenHit(hit),
@@ -1490,6 +1521,7 @@ Map<String, Object?> _allergenCases(
       <String, Object?>{
         'dish': dish.toJson(),
         'rulesText': TextNormaliser.dishRulesText(dish),
+        'matchText': AllergenMatcher.dishMatchText(dish),
         'hits': <Object?>[
           for (final hit in AllergenMatcher.findInDishWith(dish, vocabulary))
             _allergenHit(hit),
