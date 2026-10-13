@@ -1,0 +1,773 @@
+{
+  "_fixture_note": "synthetic steakhouse with Worcestershire and blue-cheese sauces written for the corpus from 11 §3, §5, §8.2; labels are unreviewed desk research; English",
+  "language": "en",
+  "dishes": [
+    {
+      "name": "Ribeye 350g",
+      "description": "Dry-aged ribeye finished with garlic-herb butter",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"butter\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"ribeye\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"ribeye\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Filet Mignon",
+      "description": "Pan-seared filet with red wine reduction and béarnaise",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "béarnaise is made with butter",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "béarnaise is made with butter",
+          "source": "11 §3.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"béarnaise\" is an egg-yolk and butter sauce",
+          "source": "11 §5.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"red wine\"",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"filet\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"filet\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "NY Strip with Worcestershire Glaze",
+      "description": "Strip steak glazed with a house Worcestershire reduction",
+      "options": [],
+      "labels": {
+        "fish": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"Worcestershire\" contains anchovy",
+          "source": "11 §8.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Strip steak\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Strip steak\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Blue Cheese Burger",
+      "description": "Dry-aged patty, blue cheese, caramelised onion and a brioche bun",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"blue cheese\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "brioche is an enriched bread",
+          "source": "11 §4.2"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "brioche is enriched with egg",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"brioche bun\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"brioche bun\"",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"patty\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"patty\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Wedge Salad",
+      "description": "Iceberg, bacon, tomato and blue cheese dressing",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"blue cheese dressing\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"blue cheese dressing\"",
+          "source": "11 §3.1"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "creamy dressings are often mayonnaise-based",
+          "source": "11 §5.2"
+        },
+        "sesame": {
+          "label": "free",
+          "evidence": "no sesame ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §11"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "salad dressings are a documented mustard source",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"bacon\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"bacon\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Caesar Salad",
+      "description": "Romaine, parmesan, croutons and Caesar dressing",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"parmesan\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "parmesan is a hard cheese",
+          "source": "11 §4.3"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "Caesar dressing is egg-based",
+          "source": "12 §5"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"croutons\"",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"croutons\"",
+          "source": "11 §7.2"
+        },
+        "fish": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "Caesar dressing often carries anchovy",
+          "source": "11 §8.2"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "Caesar dressing lists mustard",
+          "source": "12 §5"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"parmesan\"",
+          "source": "11 §3.1"
+        },
+        "vegetarian": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "fish/shellfish: Caesar dressing often carries anchovy",
+          "source": "11 §8.2"
+        }
+      }
+    },
+    {
+      "name": "Shrimp Cocktail",
+      "description": "Chilled jumbo shrimp with horseradish cocktail sauce",
+      "options": [],
+      "labels": {
+        "crustaceans": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"shrimp\"",
+          "source": "11 §9.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "prawns are a sulphite source",
+          "source": "11 §9.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"shrimp\"",
+          "source": "11 §9.1"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"shrimp\"",
+          "source": "11 §9.1"
+        }
+      }
+    },
+    {
+      "name": "Oysters Rockefeller",
+      "description": "Baked oysters with spinach, butter, breadcrumbs and Pernod",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"butter\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"butter\"",
+          "source": "11 §3.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"breadcrumbs\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"breadcrumbs\"",
+          "source": "11 §7.1"
+        },
+        "molluscs": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"oysters\"",
+          "source": "11 §10.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"butter\"",
+          "source": "11 §3.1"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"oysters\"",
+          "source": "11 §10.1"
+        }
+      }
+    },
+    {
+      "name": "French Onion Soup",
+      "description": "Beef broth, caramelised onion and sherry, with a crouton and Gruyère",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"Gruyère\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "Gruyère is a hard aged cheese",
+          "source": "11 §4.3"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"crouton\"",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"crouton\"",
+          "source": "11 §7.2"
+        },
+        "celery": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "stocks and soups are celery vectors",
+          "source": "11 §12.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"sherry\" is wine",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Beef broth\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Beef broth\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Creamed Spinach",
+      "description": "Spinach in a cream sauce with nutmeg",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "\"nutmeg\" is not a tree nut",
+          "source": "11 §2.5"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"cream sauce\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"cream sauce\"",
+          "source": "11 §4.1"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "cream sauces are often thickened with a flour roux",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "cream sauces are often thickened with a flour roux",
+          "source": "11 §7.2"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "no celery ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §12"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"cream sauce\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Truffle Mac & Cheese",
+      "description": "Cavatappi pasta in a three-cheese sauce with truffle",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"three-cheese sauce\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "a cheese sauce",
+          "source": "11 §4.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"pasta\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"pasta\"",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"three-cheese sauce\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Whipped Potatoes",
+      "description": "Whipped potatoes with butter and cream",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"butter and cream\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"cream\"",
+          "source": "11 §4.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"butter and cream\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Loaded Baked Potato",
+      "description": "Sour cream, chives and bacon bits",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"sour cream\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"sour cream\"",
+          "source": "11 §4.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"bacon bits\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"bacon bits\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Grilled Asparagus",
+      "description": "Olive oil, lemon and sea salt",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "asparagus, olive oil, lemon and salt",
+          "source": "11 §3"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only plant ingredients named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Peppercorn Sauce",
+      "description": "Brandy cream sauce with green peppercorns",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"cream sauce\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"cream\"",
+          "source": "11 §4.1"
+        },
+        "sesame": {
+          "label": "free",
+          "evidence": "no sesame ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §11"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"cream sauce\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Chimichurri",
+      "description": "Parsley, garlic, red wine vinegar and olive oil",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "herb and oil sauce",
+          "source": "11 §3"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "herb and oil sauce",
+          "source": "11 §5"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"red wine vinegar\"",
+          "source": "11 §15.2"
+        }
+      }
+    },
+    {
+      "name": "House Steak Sauce",
+      "description": "Tomato, raisin and Worcestershire steak sauce",
+      "options": [],
+      "labels": {
+        "fish": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"Worcestershire\" contains anchovy",
+          "source": "11 §8.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"raisin\": dried fruit is a sulphite source",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"Worcestershire\" contains anchovy",
+          "source": "11 §8.1"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "fish/shellfish: \"Worcestershire\" contains anchovy",
+          "source": "11 §8.1"
+        }
+      }
+    },
+    {
+      "name": "Roasted Bone Marrow",
+      "description": "Marrow bones with parsley salad and grilled sourdough",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"sourdough\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"sourdough\"",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Marrow bones\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Marrow bones\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Crème Brûlée",
+      "description": "Vanilla custard with caramelised sugar",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"custard\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a cream custard",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"custard\"",
+          "source": "11 §5.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"custard\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Pecan Pie",
+      "description": "Pecan pie with whipped cream",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Pecan\"",
+          "source": "11 §2.1"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"whipped cream\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"whipped cream\"",
+          "source": "11 §3.1"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "pecan pie filling is egg-set",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "pie crust",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "pie crust",
+          "source": "11 §7.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "no celery ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §12"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"whipped cream\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Red Wine (glass)",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "a glass of wine",
+          "source": "11 §3"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "wine is a sulphite source",
+          "source": "11 §15.2"
+        }
+      }
+    }
+  ]
+}

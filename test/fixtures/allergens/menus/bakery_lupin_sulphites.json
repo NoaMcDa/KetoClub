@@ -1,0 +1,905 @@
+{
+  "_fixture_note": "synthetic bakery with lupin flour and sulphite-treated dried fruit written for the corpus from 11 §14, §15 and §7.3; labels are unreviewed desk research; English",
+  "language": "en",
+  "dishes": [
+    {
+      "name": "Seeded Lupin Loaf",
+      "description": "Seeded loaf made with lupin flour, rye and wheat flour",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"wheat flour\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"rye\" and \"wheat flour\"",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"seeded\" loaves usually carry sesame",
+          "source": "11 §11.2"
+        },
+        "lupin": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"lupin flour\"",
+          "source": "11 §14.1"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "lupin is a legume",
+          "source": "11 §14.5"
+        }
+      }
+    },
+    {
+      "name": "Gluten-Free Seeded Bread",
+      "description": "Gluten-free loaf with lupin flour, sunflower and sesame seeds, baked in our shared oven",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "\"shared oven\" with wheat loaves",
+          "source": "11 §7.4"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "\"gluten-free\" claim but \"shared oven\" with wheat loaves",
+          "source": "11 §7.3"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"sesame seeds\"",
+          "source": "11 §11.1"
+        },
+        "lupin": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"lupin flour\"",
+          "source": "11 §14.1"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "lupin is a legume",
+          "source": "11 §14.5"
+        }
+      }
+    },
+    {
+      "name": "Gluten-Free Pizza Slice",
+      "description": "Gluten-free base, tomato and mozzarella",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"mozzarella\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "fresh mozzarella",
+          "source": "11 §4.1"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "a gluten-free pizza from a wheat-flour bakery is a documented risk",
+          "source": "11 §7.3"
+        },
+        "lupin": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "gluten-free bases are a documented lupin flour carrier",
+          "source": "11 §14.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"mozzarella\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Plain Croissant",
+      "description": "All-butter croissant",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "free",
+          "evidence": "no peanut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §1"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"butter\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "pastry is glazed with egg wash",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a croissant is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a croissant is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "lupin": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "pastries are a documented undeclared lupin carrier",
+          "source": "11 §14.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"butter\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Almond Croissant",
+      "description": "Croissant filled with almond cream and topped with flaked almonds",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"almond\"",
+          "source": "11 §2.1"
+        },
+        "milk": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "laminated pastry uses butter",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "laminated pastry uses butter",
+          "source": "11 §3.2"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "almond cream is egg-bound",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a croissant is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a croissant is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "animal-derived: laminated pastry uses butter",
+          "source": "11 §3.2"
+        }
+      }
+    },
+    {
+      "name": "Part-baked Dinner Rolls",
+      "description": "Part-baked rolls finished in-house",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "baked goods commonly contain soy",
+          "source": "11 §6.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"rolls\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"rolls\"",
+          "source": "11 §7.1"
+        },
+        "lupin": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "part-baked bread rolls are a documented lupin carrier",
+          "source": "11 §14.2"
+        }
+      }
+    },
+    {
+      "name": "Fruit & Nut Loaf",
+      "description": "Wholemeal loaf with dried apricots, raisins, figs and walnuts",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"walnuts\"",
+          "source": "11 §2.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Wholemeal\" loaf",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Wholemeal\" loaf",
+          "source": "11 §7.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"dried apricots\" and \"raisins\" are the highest sulphite carriers",
+          "source": "11 §15.2"
+        }
+      }
+    },
+    {
+      "name": "Apricot Danish",
+      "description": "Danish pastry with custard and dried apricot preserved with E220",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"custard\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"custard\"",
+          "source": "11 §3.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"custard\"",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a danish is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a danish is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "sulphites": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"E220\" is sulphur dioxide",
+          "source": "11 §15.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"custard\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Raisin Scone",
+      "description": "Buttermilk scone with raisins and clotted cream",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Buttermilk\" and \"clotted cream\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Buttermilk\"",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "scone dough is often egg-glazed",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a scone is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a scone is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"raisins\" are dried fruit",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"Buttermilk\" and \"clotted cream\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Hot Cross Bun",
+      "description": "Spiced bun with currants and candied peel",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "enriched buns commonly contain milk",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "enriched buns commonly contain milk",
+          "source": "11 §3.2"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "enriched buns commonly contain egg",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a bun is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a bun is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"currants\" and \"candied peel\" are sulphite carriers",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "animal-derived: enriched buns commonly contain milk",
+          "source": "11 §3.2"
+        }
+      }
+    },
+    {
+      "name": "Carrot Walnut Cake",
+      "description": "Spiced carrot cake with walnuts and cream cheese frosting",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"walnuts\"",
+          "source": "11 §2.1"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"cream cheese frosting\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "cream cheese",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "cakes are baked with eggs",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a cake is made with flour",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a cake is made with flour",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"cream cheese frosting\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Lemon Drizzle Loaf",
+      "description": "Lemon loaf cake with sugar glaze",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "cakes commonly contain butter or milk",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "cakes commonly contain butter or milk",
+          "source": "11 §3.2"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "cakes are baked with eggs",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a cake is made with flour",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a cake is made with flour",
+          "source": "11 §7.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: cakes commonly contain butter or milk",
+          "source": "11 §3.2"
+        }
+      }
+    },
+    {
+      "name": "Flourless Almond Cake",
+      "description": "Flourless cake of ground almonds, eggs and orange",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ground almonds\"",
+          "source": "11 §2.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"eggs\"",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "free",
+          "evidence": "\"Flourless\" states that no flour is used",
+          "source": "11 §7.3"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"eggs\"",
+          "source": "11 §5.1"
+        }
+      }
+    },
+    {
+      "name": "Cheese Scone",
+      "description": "Cheddar scone with a pinch of mustard powder",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"Cheddar\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "cheddar is a hard aged cheese",
+          "source": "11 §4.3"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a scone is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a scone is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "no celery ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §12"
+        },
+        "mustard": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"mustard powder\"",
+          "source": "11 §13.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"Cheddar\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Quiche Lorraine",
+      "description": "Shortcrust pastry with bacon, egg custard and cheese",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"cheese\" and \"custard\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"cheese\" and \"custard\"",
+          "source": "11 §3.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"egg custard\"",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"pastry\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"pastry\"",
+          "source": "11 §7.1"
+        },
+        "lupin": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "pastry cases are a documented undeclared lupin carrier",
+          "source": "11 §14.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"bacon\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"bacon\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Sausage Roll",
+      "description": "Pork sausage in puff pastry with an egg wash",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "sausages can contain casein",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "sausages can contain casein",
+          "source": "11 §3.2"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"egg wash\"",
+          "source": "11 §5.2"
+        },
+        "soy": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "sausages and processed meats commonly contain soy",
+          "source": "11 §6.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"puff pastry\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"puff pastry\"",
+          "source": "11 §7.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "sausages are a sulphite source",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Pork sausage\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Pork sausage\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Ham & Cheddar Baguette",
+      "description": "Ham, cheddar, butter and mustard on a baguette",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"cheddar\" and \"butter\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"cheddar\" and \"butter\"",
+          "source": "11 §3.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"baguette\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"baguette\"",
+          "source": "11 §7.1"
+        },
+        "mustard": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"mustard\"",
+          "source": "11 §13.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "processed meat and mustard are sulphite sources",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Ham\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Ham\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Vegan Brownie",
+      "description": "Dark chocolate brownie with ground almonds, no dairy and no eggs",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ground almonds\"",
+          "source": "11 §2.1"
+        },
+        "milk": {
+          "label": "free",
+          "evidence": "\"no dairy\" is stated",
+          "source": "11 §3.3"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "\"no eggs\" is stated",
+          "source": "11 §5.3"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a brownie is made with flour",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a brownie is made with flour",
+          "source": "11 §7.1"
+        }
+      }
+    },
+    {
+      "name": "Oat Flapjack",
+      "description": "Rolled oats, golden syrup and butter",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "free",
+          "evidence": "no peanut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §1"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"butter\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "oats not labelled gluten-free are a cross-contact trigger",
+          "source": "11 §7.5"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"butter\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Flat White",
+      "description": "Double espresso with steamed milk",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"steamed milk\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"milk\"",
+          "source": "11 §4.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"steamed milk\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Americano",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "espresso and hot water",
+          "source": "11 §3"
+        },
+        "wheat": {
+          "label": "free",
+          "evidence": "espresso and hot water",
+          "source": "11 §7"
+        }
+      }
+    },
+    {
+      "name": "Fresh Orange Juice",
+      "description": "Squeezed to order",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "squeezed oranges",
+          "source": "11 §3"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "squeezed oranges",
+          "source": "11 §5"
+        }
+      }
+    }
+  ]
+}

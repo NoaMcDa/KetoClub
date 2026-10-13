@@ -1,0 +1,459 @@
+{
+  "_fixture_note": "hand-built in tool/golden/golden_corpus.dart (goldenHebrewMenu), dish texts copied (nikud, maqaf, geresh); labels are unreviewed desk research; Hebrew",
+  "language": "he",
+  "dishes": [
+    {
+      "name": "סָלָט יְרָקוֹת",
+      "description": "עגבניה, מלפפון, בצל",
+      "options": [],
+      "labels": {
+        "sesame": {
+          "label": "free",
+          "evidence": "a plain vegetable salad (nikud spelling)",
+          "source": "11 §11"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only vegetables named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "חומוס",
+      "description": "עם פיתה",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"פיתה\" is wheat bread",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"פיתה\" is wheat bread",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חומוס\" is made with tahini",
+          "source": "12 §1.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חומוס\" is chickpeas",
+          "source": "12 §1.3"
+        }
+      }
+    },
+    {
+      "name": "פיתה רגילה",
+      "description": "",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיתה\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיתה\"",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"פיתה\" can carry a sesame topping",
+          "source": "12 §1.1"
+        }
+      }
+    },
+    {
+      "name": "סלק צלוי",
+      "description": "בחרדל־דבש",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "roast beetroot in mustard and honey",
+          "source": "11 §3"
+        },
+        "mustard": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"חרדל\" with a maqaf",
+          "source": "12 §1.8"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"דבש\" (honey) is not vegan",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "שניצל",
+      "description": "בציפוי פירורי לחם, עם צ׳יפס",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "schnitzel coating is normally egg-bound",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"פירורי לחם\" (breadcrumbs)",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"פירורי לחם\" (breadcrumbs)",
+          "source": "11 §7.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "chips from pre-cut potato may be sulphite-treated",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"שניצל\" (schnitzel)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"שניצל\" (schnitzel)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "אנטריקוט",
+      "description": "עם פירה תפו\"א",
+      "options": [
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "פירה",
+            "סלט ירוק",
+            "אורז"
+          ]
+        },
+        {
+          "name": "שינויים",
+          "values": [
+            "ללא בצל"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "\"פירה\" (mashed potato) is commonly made with butter or milk",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "\"פירה\" (mashed potato) is commonly made with butter or milk",
+          "source": "11 §3.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"אנטריקוט\" (entrecôte)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"אנטריקוט\" (entrecôte)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "המבורגר",
+      "description": "בלחמניית מחמצת, גבינה",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינה\" (cheese)",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינה\" (cheese)",
+          "source": "12 §1.5"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמניית מחמצת\" (sourdough bun)",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמניית מחמצת\" (sourdough bun)",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמניה\" can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"המבורגר\" (burger)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"המבורגר\" (burger)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "המבורגר עטוף בחסה",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "no cheese or butter named",
+          "source": "11 §3"
+        },
+        "sesame": {
+          "label": "free",
+          "evidence": "a lettuce-wrapped burger has no bun to carry seeds",
+          "source": "11 §11"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"המבורגר\" (burger)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"המבורגר\" (burger)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "פסטה ברוטב שמנת",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"שמנת\" (cream)",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"שמנת\" (cream)",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "fresh pasta usually contains egg",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פסטה\" (pasta)",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פסטה\" (pasta)",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"שמנת\" (cream)",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "דג מטוגן",
+      "description": "בשמן קנולה",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "fried fish is commonly floured or battered",
+          "source": "11 §8.4"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "fried fish is commonly floured or battered",
+          "source": "11 §8.4"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"דג\" (fish)",
+          "source": "12 §1.7"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"דג\" (fish)",
+          "source": "12 §1.7"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"דג\" (fish)",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "סלמון",
+      "description": "עם חמאת שום",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"חמאת שום\" (garlic butter)",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"סלמון\" (salmon)",
+          "source": "12 §1.7"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"חמאת שום\" (garlic butter)",
+          "source": "12 §1.5"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"סלמון\" (salmon)",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "קוקה קולה",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "soft drink",
+          "source": "11 §3"
+        }
+      }
+    },
+    {
+      "name": "קוקה קולה זירו",
+      "description": "",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "free",
+          "evidence": "soft drink",
+          "source": "11 §5"
+        }
+      }
+    },
+    {
+      "name": "הפוך גדול",
+      "description": "חלב שקדים",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חלב שקדים\" (almond milk)",
+          "source": "11 §2.1"
+        },
+        "milk": {
+          "label": "free",
+          "evidence": "\"חלב שקדים\" is a nut milk, not dairy",
+          "source": "11 §3.3"
+        },
+        "lactose": {
+          "label": "free",
+          "evidence": "almond milk contains no lactose",
+          "source": "11 §4.3"
+        }
+      }
+    },
+    {
+      "name": "טחינה",
+      "description": "",
+      "options": [],
+      "labels": {
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"טחינה\" is ground sesame",
+          "source": "12 §1.1"
+        }
+      }
+    },
+    {
+      "name": "קטשופ",
+      "description": "",
+      "options": [],
+      "labels": {
+        "sesame": {
+          "label": "free",
+          "evidence": "ketchup; no sesame named",
+          "source": "11 §11"
+        }
+      }
+    }
+  ]
+}

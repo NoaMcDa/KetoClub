@@ -1,0 +1,844 @@
+{
+  "_fixture_note": "synthetic Israeli hummus-and-falafel place written for the corpus from 12 §1.1-1.6; labels are unreviewed desk research; Hebrew",
+  "language": "he",
+  "dishes": [
+    {
+      "name": "חומוס מסבחה",
+      "description": "חומוס חם עם גרגרי חומוס שלמים, שמן זית ופפריקה",
+      "options": [
+        {
+          "name": "תוספת",
+          "values": [
+            "פיתה",
+            "לאפה",
+            "ללא לחם"
+          ]
+        }
+      ],
+      "labels": {
+        "eggs": {
+          "label": "free",
+          "evidence": "chickpeas, olive oil and paprika only",
+          "source": "11 §5"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"פיתה\" / \"לאפה\" can be chosen",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"פיתה\" / \"לאפה\" can be chosen",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חומוס\" is made with tahini even when the menu says only chickpeas",
+          "source": "12 §1.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גרגרי חומוס\" (chickpeas)",
+          "source": "12 §1.3"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only plant ingredients named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "חומוס פול",
+      "description": "חומוס עם פול מדמס, טחינה וביצה קשה",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"ביצה קשה\" (hard-boiled egg)",
+          "source": "12 §1.6"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"טחינה\" and \"חומוס\"",
+          "source": "12 §1.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חומוס\" and \"פול מדמס\" (fava beans)",
+          "source": "12 §1.3"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"ביצה קשה\" (hard-boiled egg)",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "חומוס בשר",
+      "description": "חומוס עם בשר טחון, צנוברים וטחינה",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"צנוברים\" (pine nuts) are listed as tree nuts by FARE and FSANZ",
+          "source": "12 §1.2"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"טחינה\" and \"חומוס\"",
+          "source": "12 §1.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חומוס\" is chickpeas",
+          "source": "12 §1.3"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"בשר טחון\" (minced meat)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"בשר טחון\" (minced meat)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "פלאפל במנה",
+      "description": "חמישה כדורי פלאפל טריים עם סלט, חמוצים וטחינה",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "falafel, salad, pickles and tahini",
+          "source": "11 §3"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"טחינה\"; sesame is also in many falafel batters",
+          "source": "12 §1.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חמוצים\" (pickles)",
+          "source": "11 §15.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פלאפל\" is chickpea (or fava) balls",
+          "source": "12 §1.3"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only plant ingredients named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "פלאפל בפיתה",
+      "description": "פיתה עם פלאפל, חומוס, סלט ישראלי, חמוצים, עמבה וטחינה",
+      "options": [
+        {
+          "name": "תוספות",
+          "values": [
+            "צ׳יפס",
+            "חצילים",
+            "כרוב סגול"
+          ]
+        }
+      ],
+      "labels": {
+        "eggs": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"חצילים\" can come in mayonnaise",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיתה\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיתה\"",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"טחינה\" and \"חומוס\"",
+          "source": "12 §1.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חמוצים\" (pickles)",
+          "source": "11 §15.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"פלאפל\" and \"חומוס\"",
+          "source": "12 §1.3"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "animal-derived: option \"חצילים\" can come in mayonnaise",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "פלאפל בלאפה",
+      "description": "לאפה עם פלאפל, סלט, חמוצים, טחינה ועמבה",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לאפה\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לאפה\"",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"טחינה\"",
+          "source": "12 §1.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חמוצים\" (pickles)",
+          "source": "11 §15.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"פלאפל\"",
+          "source": "12 §1.3"
+        }
+      }
+    },
+    {
+      "name": "סביח",
+      "description": "פיתה, חציל מטוגן, ביצה קשה, טחינה, עמבה וסלט ירקות",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"ביצה קשה\" is a standard sabich component",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיתה\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיתה\"",
+          "source": "12 §1.4"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"טחינה\"",
+          "source": "12 §1.1"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "sabich is often served with hummus or chickpeas in the pita",
+          "source": "12 §1.3"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"ביצה קשה\" is a standard sabich component",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "סלט חצילים בטחינה",
+      "description": "חציל שרוף, טחינה גולמית, פטרוזיליה ושום",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "free",
+          "evidence": "the tahini version, not the mayonnaise one",
+          "source": "12 §1.1"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"טחינה גולמית\"",
+          "source": "12 §1.1"
+        }
+      }
+    },
+    {
+      "name": "סלט חצילים במיונז",
+      "description": "חציל שרוף, מיונז, מיץ לימון, שום וחרדל",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"מיונז\"",
+          "source": "12 §1.6"
+        },
+        "sesame": {
+          "label": "free",
+          "evidence": "the mayonnaise version; no tahini named",
+          "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"חרדל\"",
+          "source": "12 §1.8"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"מיונז\"",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "סלט כרוב",
+      "description": "כרוב לבן וגזר במיונז",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"במיונז\"",
+          "source": "12 §1.6"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise dressings often carry mustard",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"במיונז\"",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "סלט ישראלי",
+      "description": "עגבנייה, מלפפון, בצל, פטרוזיליה, שמן זית ולימון",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "a plain chopped salad",
+          "source": "11 §3"
+        },
+        "sesame": {
+          "label": "free",
+          "evidence": "a plain chopped salad",
+          "source": "11 §11"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "no celery ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §12"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only vegetables named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "שקשוקה",
+      "description": "ביצים ברוטב עגבניות חריף, מוגשת עם פיתה",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"שקשוקה\" is eggs in tomato sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"פיתה\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"פיתה\"",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"שקשוקה\" is eggs in tomato sauce",
+          "source": "12 §1.6"
+        },
+        "vegetarian": {
+          "label": "free",
+          "evidence": "eggs, tomato and pita; no meat or fish named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "מג׳דרה",
+      "description": "אורז ועדשים עם בצל מטוגן, מוגש עם יוגורט",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"יוגורט\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "live-culture yogurt is tolerated by many",
+          "source": "11 §4.3"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"עדשים\" (lentils)",
+          "source": "12 §1.3"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "animal-derived: \"יוגורט\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "מרק עדשים",
+      "description": "מרק עדשים כתומות עם כמון ולימון",
+      "options": [],
+      "labels": {
+        "celery": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "soups are made with stock or a celery base",
+          "source": "12 §1.9"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"עדשים\"",
+          "source": "12 §1.3"
+        }
+      }
+    },
+    {
+      "name": "חריימה",
+      "description": "דג בצלי חריף ברוטב עגבניות ופלפל חריף",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"חריימה\" is fish in red sauce",
+          "source": "12 §1.7"
+        },
+        "crustaceans": {
+          "label": "may_contain",
+          "role": "unknown",
+          "evidence": "some חריימה versions are shrimp-and-calamari; the name does not say which",
+          "source": "12 §1.7"
+        },
+        "molluscs": {
+          "label": "may_contain",
+          "role": "unknown",
+          "evidence": "some חריימה versions are shrimp-and-calamari; the name does not say which",
+          "source": "12 §1.7"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"חריימה\" is fish in red sauce",
+          "source": "12 §1.7"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"חריימה\" is fish in red sauce",
+          "source": "12 §1.7"
+        }
+      }
+    },
+    {
+      "name": "קובה בורגול",
+      "description": "קובה ממולאת בשר טחון בקליפת בורגול, במרק עגבניות",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בורגול\" is cracked wheat",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בורגול\" is cracked wheat",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"בשר טחון\" (minced meat)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"בשר טחון\" (minced meat)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "שניצל בפיתה",
+      "description": "שניצל עוף בציפוי פירורי לחם עם חומוס, חסה, עגבנייה ומיונז",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"מיונז\"",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"פירורי לחם\" and \"פיתה\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"פירורי לחם\" and \"פיתה\"",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"חומוס\" is made with tahini",
+          "source": "12 §1.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"חומוס\"",
+          "source": "12 §1.3"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "קבב בלאפה",
+      "description": "קבב כבש ובקר, סלט טחינה, בצל ופטרוזיליה בלאפה",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לאפה\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לאפה\"",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"סלט טחינה\"",
+          "source": "12 §1.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קבב כבש ובקר\" (lamb and beef kebab)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קבב כבש ובקר\" (lamb and beef kebab)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "מרק עוף",
+      "description": "מרק עוף ביתי עם ירקות ופתיתים",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"פתיתים\" are usually toasted wheat pasta, but a rice version exists",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"פתיתים\" are usually toasted wheat pasta, but a rice version exists",
+          "source": "12 §1.4"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "celery": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "chicken soup is made with celery in the stock",
+          "source": "12 §1.9"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "קוסקוס מרוקאי",
+      "description": "קוסקוס עם ירקות, גרגירי חומוס וצימוקים",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"קוסקוס\" is wheat semolina",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"קוסקוס\" is wheat semolina",
+          "source": "12 §1.4"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"צימוקים\" (raisins): dried fruit is a sulphite source",
+          "source": "12 §1.10"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גרגירי חומוס\"",
+          "source": "12 §1.3"
+        }
+      }
+    },
+    {
+      "name": "תורמוס כבוש",
+      "description": "תורמוס כבוש עם לימון ופלפל חריף",
+      "options": [],
+      "labels": {
+        "lupin": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"תורמוס\" is lupin",
+          "source": "11 §14.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "pickling brine often uses vinegar",
+          "source": "11 §15.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"תורמוס\" is a legume",
+          "source": "12 §1.3"
+        }
+      }
+    },
+    {
+      "name": "טחינה ביתית",
+      "description": "תוספת טחינה גולמית",
+      "options": [],
+      "labels": {
+        "sesame": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"טחינה\"",
+          "source": "12 §1.1"
+        }
+      }
+    },
+    {
+      "name": "חלבה",
+      "description": "חלבה בטעם פיסטוק לקינוח",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"פיסטוק\" (pistachio)",
+          "source": "12 §1.2"
+        },
+        "milk": {
+          "label": "free",
+          "evidence": "חלבה is halva (sesame), not a milk product despite the spelling",
+          "source": "12 §1.1"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חלבה\" is a sesame confection",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "no celery ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §12"
+        }
+      }
+    },
+    {
+      "name": "אורז לבן",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "plain rice",
+          "source": "11 §3"
+        },
+        "sesame": {
+          "label": "free",
+          "evidence": "plain rice",
+          "source": "11 §11"
+        }
+      }
+    },
+    {
+      "name": "צ׳יפס",
+      "description": "",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "free",
+          "evidence": "plain chips",
+          "source": "11 §5"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "chips from pre-cut potato may be sulphite-treated",
+          "source": "11 §15.2"
+        }
+      }
+    },
+    {
+      "name": "לימונדה עם נענע",
+      "description": "לימון סחוט, נענע וסוכר",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "lemon, mint and sugar",
+          "source": "11 §3"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only plant ingredients named",
+          "source": "12 §2.2"
+        }
+      }
+    }
+  ]
+}
