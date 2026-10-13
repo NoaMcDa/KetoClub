@@ -44,11 +44,11 @@ import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from functools import cache
-from typing import Final, Literal
+from typing import Final, Literal, cast
 
 from app.keto.allergens import allergens, find, match_text
 from app.keto.dart_text import DART_WHITESPACE, utf16_len, utf16_slice
-from app.keto.models import Concern, ConcernSource, Dish
+from app.keto.models import Certainty, Concern, ConcernSource, Dish, RestrictionIdName
 from app.keto.normaliser import (
     contains_hebrew,
     dish_core_text,
@@ -518,9 +518,9 @@ def _findings_in(raw: str, source: ConcernSource) -> list[Concern]:
     """Dart ``_findingsIn``: one concern per allergen hit in ``raw``."""
     return [
         Concern(
-            restriction_id=hit.id,
+            restriction_id=cast(RestrictionIdName, hit.id),
             source="hidden" if hit.hidden else source,
-            certainty=hit.certainty,
+            certainty=cast(Certainty, hit.certainty),
             tier="inferred" if hit.hidden or hit.guarded else "stated",
             matched_text=_raw_slice(raw, hit.start, hit.end),
         )
