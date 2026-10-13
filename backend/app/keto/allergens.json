@@ -1,0 +1,4918 @@
+{
+  "certainties": [
+    "stated",
+    "likely",
+    "suspected"
+  ],
+  "fixture": {
+    "cases": {
+      "dishes": [
+        {
+          "dish": {
+            "description": "Toasted, with cream cheese",
+            "id": "d",
+            "imageUrl": null,
+            "name": "Bagel",
+            "options": [
+              {
+                "name": "Topping",
+                "values": [
+                  "Sesame",
+                  "Poppy seed"
+                ]
+              },
+              {
+                "name": "Changes",
+                "values": [
+                  "No cream cheese"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 31,
+              "id": "milk",
+              "start": 19,
+              "term": "cream cheese"
+            },
+            {
+              "certainty": "stated",
+              "end": 46,
+              "id": "sesame",
+              "start": 40,
+              "term": "sesame"
+            }
+          ],
+          "rulesText": "bagel toasted with cream cheese topping sesame poppy seed changes"
+        },
+        {
+          "dish": {
+            "description": "Falafel, hummus and salad",
+            "id": "d",
+            "imageUrl": null,
+            "name": "Falafel plate",
+            "options": [
+              {
+                "name": "Sauce",
+                "values": [
+                  "Tahini",
+                  "Amba"
+                ]
+              },
+              {
+                "name": "Remove",
+                "values": [
+                  "Without tahini"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 51,
+              "id": "sesame",
+              "start": 45,
+              "term": "tahini"
+            }
+          ],
+          "rulesText": "falafel plate falafel hummus and salad sauce tahini amba remove"
+        },
+        {
+          "dish": {
+            "description": "חציל מטוגן, ביצה קשה, טחינה ועמבה",
+            "id": "d",
+            "imageUrl": null,
+            "name": "סביח",
+            "options": [
+              {
+                "name": "בחירת לחם",
+                "values": [
+                  "פיתה",
+                  "לאפה"
+                ]
+              },
+              {
+                "name": "שינויים",
+                "values": [
+                  "ללא טחינה",
+                  "בלי ביצה"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 20,
+              "id": "eggs",
+              "start": 16,
+              "term": "ביצה"
+            },
+            {
+              "certainty": "stated",
+              "end": 30,
+              "id": "sesame",
+              "start": 25,
+              "term": "טחינה"
+            },
+            {
+              "certainty": "stated",
+              "end": 51,
+              "id": "wheat",
+              "start": 47,
+              "term": "פיתה"
+            }
+          ],
+          "rulesText": "סביח חציל מטוגנ ביצה קשה טחינה ועמבה בחירת לחמ פיתה לאפה שינויימ"
+        },
+        {
+          "dish": {
+            "description": "חסה, קרוטונים ורוטב קיסר",
+            "id": "d",
+            "imageUrl": null,
+            "name": "סלט קיסר",
+            "options": [
+              {
+                "name": "תוספת",
+                "values": [
+                  "פרמזן",
+                  "אנשובי"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 32,
+              "id": "fish",
+              "start": 22,
+              "term": "רוטב קיסר"
+            },
+            {
+              "certainty": "stated",
+              "end": 51,
+              "id": "fish",
+              "start": 45,
+              "term": "אנשובי"
+            }
+          ],
+          "rulesText": "סלט קיסר חסה קרוטונימ ורוטב קיסר תוספת פרמזנ אנשובי"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "Plate",
+            "options": [
+              {
+                "name": "Extras",
+                "values": [
+                  "milk"
+                ]
+              },
+              {
+                "name": "Changes",
+                "values": [
+                  "No milk"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 17,
+              "id": "milk",
+              "start": 13,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 17,
+              "id": "lactose",
+              "start": 13,
+              "term": "milk"
+            }
+          ],
+          "rulesText": "plate extras milk changes"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "צלחת",
+            "options": [
+              {
+                "name": "תוספות",
+                "values": [
+                  "חלב"
+                ]
+              },
+              {
+                "name": "שינויים",
+                "values": [
+                  "ללא חלב"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "milk",
+              "start": 12,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "lactose",
+              "start": 12,
+              "term": "חלב"
+            }
+          ],
+          "rulesText": "צלחת תוספות חלב שינויימ"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "Plate",
+            "options": [
+              {
+                "name": "Extras",
+                "values": [
+                  "milk"
+                ]
+              },
+              {
+                "name": "Changes",
+                "values": [
+                  "No milk"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 17,
+              "id": "milk",
+              "start": 13,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 17,
+              "id": "lactose",
+              "start": 13,
+              "term": "milk"
+            }
+          ],
+          "rulesText": "plate extras milk changes"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "צלחת",
+            "options": [
+              {
+                "name": "תוספות",
+                "values": [
+                  "חלב"
+                ]
+              },
+              {
+                "name": "שינויים",
+                "values": [
+                  "ללא חלב"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "milk",
+              "start": 12,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "lactose",
+              "start": 12,
+              "term": "חלב"
+            }
+          ],
+          "rulesText": "צלחת תוספות חלב שינויימ"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "Plate",
+            "options": [
+              {
+                "name": "Extras",
+                "values": [
+                  "eggs"
+                ]
+              },
+              {
+                "name": "Changes",
+                "values": [
+                  "No eggs"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 17,
+              "id": "eggs",
+              "start": 13,
+              "term": "eggs"
+            }
+          ],
+          "rulesText": "plate extras eggs changes"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "צלחת",
+            "options": [
+              {
+                "name": "תוספות",
+                "values": [
+                  "ביצה"
+                ]
+              },
+              {
+                "name": "שינויים",
+                "values": [
+                  "ללא ביצה"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "eggs",
+              "start": 12,
+              "term": "ביצה"
+            }
+          ],
+          "rulesText": "צלחת תוספות ביצה שינויימ"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "Plate",
+            "options": [
+              {
+                "name": "Extras",
+                "values": [
+                  "soy"
+                ]
+              },
+              {
+                "name": "Changes",
+                "values": [
+                  "No soy"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "soy",
+              "start": 13,
+              "term": "soy"
+            }
+          ],
+          "rulesText": "plate extras soy changes"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "צלחת",
+            "options": [
+              {
+                "name": "תוספות",
+                "values": [
+                  "סויה"
+                ]
+              },
+              {
+                "name": "שינויים",
+                "values": [
+                  "ללא סויה"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "soy",
+              "start": 12,
+              "term": "סויה"
+            }
+          ],
+          "rulesText": "צלחת תוספות סויה שינויימ"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "Plate",
+            "options": [
+              {
+                "name": "Extras",
+                "values": [
+                  "bun"
+                ]
+              },
+              {
+                "name": "Changes",
+                "values": [
+                  "No bun"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "wheat",
+              "start": 13,
+              "term": "bun"
+            }
+          ],
+          "rulesText": "plate extras bun changes"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "צלחת",
+            "options": [
+              {
+                "name": "תוספות",
+                "values": [
+                  "חיטה"
+                ]
+              },
+              {
+                "name": "שינויים",
+                "values": [
+                  "ללא חיטה"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "wheat",
+              "start": 12,
+              "term": "חיטה"
+            }
+          ],
+          "rulesText": "צלחת תוספות חיטה שינויימ"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "Plate",
+            "options": [
+              {
+                "name": "Extras",
+                "values": [
+                  "anchovies"
+                ]
+              },
+              {
+                "name": "Changes",
+                "values": [
+                  "No anchovies"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 22,
+              "id": "fish",
+              "start": 13,
+              "term": "anchovies"
+            }
+          ],
+          "rulesText": "plate extras anchovies changes"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "צלחת",
+            "options": [
+              {
+                "name": "תוספות",
+                "values": [
+                  "סלמון"
+                ]
+              },
+              {
+                "name": "שינויים",
+                "values": [
+                  "ללא סלמון"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 17,
+              "id": "fish",
+              "start": 12,
+              "term": "סלמון"
+            }
+          ],
+          "rulesText": "צלחת תוספות סלמונ שינויימ"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "Plate",
+            "options": [
+              {
+                "name": "Extras",
+                "values": [
+                  "sesame"
+                ]
+              },
+              {
+                "name": "Changes",
+                "values": [
+                  "No sesame"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 19,
+              "id": "sesame",
+              "start": 13,
+              "term": "sesame"
+            }
+          ],
+          "rulesText": "plate extras sesame changes"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "צלחת",
+            "options": [
+              {
+                "name": "תוספות",
+                "values": [
+                  "שומשום"
+                ]
+              },
+              {
+                "name": "שינויים",
+                "values": [
+                  "ללא שומשום"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "id": "sesame",
+              "start": 12,
+              "term": "שומשום"
+            }
+          ],
+          "rulesText": "צלחת תוספות שומשומ שינויימ"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "Plate",
+            "options": [
+              {
+                "name": "Extras",
+                "values": [
+                  "celery"
+                ]
+              },
+              {
+                "name": "Changes",
+                "values": [
+                  "No celery"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 19,
+              "id": "celery",
+              "start": 13,
+              "term": "celery"
+            }
+          ],
+          "rulesText": "plate extras celery changes"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "Plate",
+            "options": [
+              {
+                "name": "Extras",
+                "values": [
+                  "chickpeas"
+                ]
+              },
+              {
+                "name": "Changes",
+                "values": [
+                  "No chickpeas"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 22,
+              "id": "legumes",
+              "start": 13,
+              "term": "chickpeas"
+            }
+          ],
+          "rulesText": "plate extras chickpeas changes"
+        },
+        {
+          "dish": {
+            "description": "",
+            "id": "d",
+            "imageUrl": null,
+            "name": "צלחת",
+            "options": [
+              {
+                "name": "תוספות",
+                "values": [
+                  "חומוס"
+                ]
+              },
+              {
+                "name": "שינויים",
+                "values": [
+                  "ללא חומוס"
+                ]
+              }
+            ],
+            "page": null,
+            "price": 10.0
+          },
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 17,
+              "id": "legumes",
+              "start": 12,
+              "term": "חומוס"
+            }
+          ],
+          "rulesText": "צלחת תוספות חומוס שינויימ"
+        }
+      ],
+      "texts": [
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 6,
+              "id": "sesame",
+              "start": 0,
+              "term": "sesame"
+            },
+            {
+              "certainty": "stated",
+              "end": 30,
+              "id": "milk",
+              "start": 18,
+              "term": "cream cheese"
+            }
+          ],
+          "normalised": "sesame bagel with cream cheese",
+          "text": "Sesame bagel with cream cheese"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "id": "sesame",
+              "start": 12,
+              "term": "tahini"
+            }
+          ],
+          "normalised": "hummus with tahini olive oil and paprika",
+          "text": "Hummus with tahini, olive oil and paprika"
+        },
+        {
+          "hits": [],
+          "normalised": "satay chicken skewers with peanut sauce",
+          "text": "Satay chicken skewers with peanut sauce"
+        },
+        {
+          "hits": [],
+          "normalised": "pad thai with crushed peanuts",
+          "text": "Pad thai with crushed peanuts"
+        },
+        {
+          "hits": [],
+          "normalised": "basil pesto pasta with pine nuts",
+          "text": "Basil pesto pasta with pine nuts"
+        },
+        {
+          "hits": [],
+          "normalised": "almond croissant",
+          "text": "Almond croissant"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 6,
+              "id": "fish",
+              "start": 0,
+              "term": "Caesar"
+            },
+            {
+              "certainty": "stated",
+              "end": 27,
+              "id": "fish",
+              "start": 18,
+              "term": "anchovies"
+            }
+          ],
+          "normalised": "caesar salad with anchovies and parmesan",
+          "text": "Caesar salad with anchovies and parmesan"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 23,
+              "id": "soy",
+              "start": 20,
+              "term": "soy"
+            },
+            {
+              "certainty": "likely",
+              "end": 29,
+              "id": "wheat",
+              "start": 20,
+              "term": "soy sauce"
+            }
+          ],
+          "normalised": "shrimp tempura with soy sauce",
+          "text": "Shrimp tempura with soy sauce"
+        },
+        {
+          "hits": [],
+          "normalised": "grilled squid with lemon",
+          "text": "Grilled squid with lemon"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 21,
+              "id": "sulphites",
+              "start": 11,
+              "term": "white wine"
+            }
+          ],
+          "normalised": "mussels in white wine and garlic",
+          "text": "Mussels in white wine and garlic"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 4,
+              "id": "fish",
+              "start": 0,
+              "term": "tuna"
+            },
+            {
+              "certainty": "stated",
+              "end": 24,
+              "id": "sesame",
+              "start": 18,
+              "term": "sesame"
+            }
+          ],
+          "normalised": "tuna tartare with sesame oil",
+          "text": "Tuna tartare with sesame oil"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 14,
+              "id": "eggs",
+              "start": 10,
+              "term": "eggs"
+            },
+            {
+              "certainty": "stated",
+              "end": 33,
+              "id": "wheat",
+              "start": 28,
+              "term": "toast"
+            }
+          ],
+          "normalised": "scrambled eggs on sourdough toast",
+          "text": "Scrambled eggs on sourdough toast"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 32,
+              "id": "lactose",
+              "start": 28,
+              "term": "milk"
+            }
+          ],
+          "normalised": "lactose free latte with oat milk",
+          "text": "Lactose-free latte with oat milk"
+        },
+        {
+          "hits": [],
+          "normalised": "gluten free bun with honey mustard",
+          "text": "Gluten-free bun with honey mustard"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 6,
+              "id": "celery",
+              "start": 0,
+              "term": "celery"
+            },
+            {
+              "certainty": "suspected",
+              "end": 30,
+              "id": "celery",
+              "start": 15,
+              "term": "vegetable stock"
+            }
+          ],
+          "normalised": "celery soup on vegetable stock",
+          "text": "Celery soup on vegetable stock"
+        },
+        {
+          "hits": [],
+          "normalised": "lupin flour flatbread",
+          "text": "Lupin flour flatbread"
+        },
+        {
+          "hits": [],
+          "normalised": "dried apricots contains sulphites",
+          "text": "Dried apricots (contains sulphites)"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 22,
+              "id": "legumes",
+              "start": 13,
+              "term": "chickpeas"
+            },
+            {
+              "certainty": "stated",
+              "end": 37,
+              "id": "legumes",
+              "start": 27,
+              "term": "fava beans"
+            }
+          ],
+          "normalised": "falafel with chickpeas and fava beans",
+          "text": "Falafel with chickpeas and fava beans"
+        },
+        {
+          "hits": [],
+          "normalised": "vegan burger dairy free cheese",
+          "text": "Vegan burger, dairy-free cheese"
+        },
+        {
+          "hits": [],
+          "normalised": "vegetarian lasagne with ricotta",
+          "text": "Vegetarian lasagne with ricotta"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "id": "sesame",
+              "start": 13,
+              "term": "טחינה"
+            }
+          ],
+          "normalised": "סלט ירקות עמ טחינה",
+          "text": "סלט ירקות עם טחינה"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 5,
+              "id": "legumes",
+              "start": 0,
+              "term": "חומוס"
+            },
+            {
+              "certainty": "stated",
+              "end": 14,
+              "id": "sesame",
+              "start": 9,
+              "term": "טחינה"
+            }
+          ],
+          "normalised": "חומוס עמ טחינה וגרגירימ",
+          "text": "חומוס עם טחינה וגרגירים"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "id": "milk",
+              "start": 6,
+              "term": "גבינה"
+            },
+            {
+              "certainty": "stated",
+              "end": 21,
+              "id": "sesame",
+              "start": 15,
+              "term": "שומשום"
+            }
+          ],
+          "normalised": "בורקס גבינה עמ שומשומ",
+          "text": "בורקס גבינה עם שומשום"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 13,
+              "id": "eggs",
+              "start": 9,
+              "term": "ביצה"
+            }
+          ],
+          "normalised": "גחנונ עמ ביצה קשה ורסק עגבניות",
+          "text": "ג'חנון עם ביצה קשה ורסק עגבניות"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 21,
+              "id": "wheat",
+              "start": 10,
+              "term": "פירורי לחם"
+            }
+          ],
+          "normalised": "שניצל עופ בפירורי לחמ",
+          "text": "שניצל עוף בפירורי לחם"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 5,
+              "id": "fish",
+              "start": 0,
+              "term": "סלמון"
+            },
+            {
+              "certainty": "likely",
+              "end": 16,
+              "id": "wheat",
+              "start": 6,
+              "term": "רוטב סויה"
+            },
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "soy",
+              "start": 12,
+              "term": "סויה"
+            }
+          ],
+          "normalised": "סלמונ ברוטב סויה ודבש",
+          "text": "סלמון ברוטב סויה ודבש"
+        },
+        {
+          "hits": [],
+          "normalised": "פסטה ברוטב שמנת ופטריות",
+          "text": "פסטה ברוטב שמנת ופטריות"
+        },
+        {
+          "hits": [],
+          "normalised": "חלבה עמ פיסטוקימ",
+          "text": "חלבה עם פיסטוקים"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 5,
+              "id": "legumes",
+              "start": 0,
+              "term": "פלאפל"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "id": "wheat",
+              "start": 6,
+              "term": "פיתה"
+            }
+          ],
+          "normalised": "פלאפל בפיתה עמ עמבה",
+          "text": "פלאפל בפיתה עם עמבה"
+        },
+        {
+          "hits": [],
+          "normalised": "שקשוקה עמ גבינת פטה",
+          "text": "שקשוקה עם גבינת פטה"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 9,
+              "id": "legumes",
+              "start": 4,
+              "term": "עדשים"
+            }
+          ],
+          "normalised": "מרק עדשימ כתומות",
+          "text": "מרק עדשים כתומות"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "lactose",
+              "start": 12,
+              "term": "חלב"
+            }
+          ],
+          "normalised": "קפה הפוכ על חלב שקדימ",
+          "text": "קפה הפוך על חלב שקדים"
+        },
+        {
+          "hits": [],
+          "normalised": "לחמניה ללא גלוטנ",
+          "text": "לחמניה ללא גלוטן"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 5,
+              "id": "legumes",
+              "start": 0,
+              "term": "חומוס"
+            }
+          ],
+          "normalised": "חומוס ללא טחינה",
+          "text": "חומוס ללא טחינה"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 4,
+              "id": "milk",
+              "start": 0,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 4,
+              "id": "lactose",
+              "start": 0,
+              "term": "milk"
+            }
+          ],
+          "normalised": "milk",
+          "text": "milk"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "milk",
+              "start": 12,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "lactose",
+              "start": 12,
+              "term": "milk"
+            }
+          ],
+          "normalised": "served with milk on the side",
+          "text": "Served with milk on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "milk",
+              "start": 12,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "lactose",
+              "start": 12,
+              "term": "milk"
+            }
+          ],
+          "normalised": "served with milk on the side",
+          "text": "Served with MILK on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 12,
+              "id": "milk",
+              "start": 0,
+              "term": "cream cheese"
+            }
+          ],
+          "normalised": "cream cheese",
+          "text": "cream cheese"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 24,
+              "id": "milk",
+              "start": 12,
+              "term": "cream cheese"
+            }
+          ],
+          "normalised": "served with cream cheese on the side",
+          "text": "Served with cream cheese on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 24,
+              "id": "milk",
+              "start": 12,
+              "term": "cream cheese"
+            }
+          ],
+          "normalised": "served with cream cheese on the side",
+          "text": "Served with CREAM CHEESE on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 13,
+              "id": "milk",
+              "start": 0,
+              "term": "crème fraîche"
+            }
+          ],
+          "normalised": "creme fraiche",
+          "text": "crème fraîche"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 25,
+              "id": "milk",
+              "start": 12,
+              "term": "crème fraîche"
+            }
+          ],
+          "normalised": "served with creme fraiche on the side",
+          "text": "Served with crème fraîche on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 25,
+              "id": "milk",
+              "start": 12,
+              "term": "crème fraîche"
+            }
+          ],
+          "normalised": "served with creme fraiche on the side",
+          "text": "Served with CRÈME FRAÎCHE on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 3,
+              "id": "milk",
+              "start": 0,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 3,
+              "id": "lactose",
+              "start": 0,
+              "term": "חלב"
+            }
+          ],
+          "normalised": "חלב",
+          "text": "חלב"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            }
+          ],
+          "normalised": "מוגש עמ חלב בצד",
+          "text": "מוגש עם חלב בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 12,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 12,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            }
+          ],
+          "normalised": "מוגש עמ החלב בצד",
+          "text": "מוגש עם החלב בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 13,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 13,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            }
+          ],
+          "normalised": "מוגש עמ ובחלב בצד",
+          "text": "מוגש עם ובחלב בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ושהחלב בצד",
+          "text": "מוגש עם ושהחלב בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ חלבי בצד",
+          "text": "מוגש עם חלבי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 5,
+              "id": "milk",
+              "start": 0,
+              "term": "גבינה"
+            }
+          ],
+          "normalised": "גבינה",
+          "text": "גבינה"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 13,
+              "id": "milk",
+              "start": 8,
+              "term": "גבינה"
+            }
+          ],
+          "normalised": "מוגש עמ גבינה בצד",
+          "text": "מוגש עם גבינה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 14,
+              "id": "milk",
+              "start": 8,
+              "term": "גבינה"
+            }
+          ],
+          "normalised": "מוגש עמ הגבינה בצד",
+          "text": "מוגש עם הגבינה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "milk",
+              "start": 8,
+              "term": "גבינה"
+            }
+          ],
+          "normalised": "מוגש עמ ובגבינה בצד",
+          "text": "מוגש עם ובגבינה בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ושהגבינה בצד",
+          "text": "מוגש עם ושהגבינה בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ גבינהי בצד",
+          "text": "מוגש עם גבינהי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 20,
+              "id": "lactose",
+              "start": 16,
+              "term": "milk"
+            }
+          ],
+          "normalised": "served with oat milk on the side",
+          "text": "Served with oat milk on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 28,
+              "id": "milk",
+              "start": 24,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 28,
+              "id": "lactose",
+              "start": 24,
+              "term": "milk"
+            }
+          ],
+          "normalised": "served with oat big fat milk on the side",
+          "text": "Served with oat big fat milk on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "milk",
+              "start": 12,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "lactose",
+              "start": 12,
+              "term": "milk"
+            }
+          ],
+          "normalised": "served with milk oat on the side",
+          "text": "Served with milk oat on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 23,
+              "id": "lactose",
+              "start": 19,
+              "term": "milk"
+            }
+          ],
+          "normalised": "served with almond milk on the side",
+          "text": "Served with almond milk on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 31,
+              "id": "milk",
+              "start": 27,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 31,
+              "id": "lactose",
+              "start": 27,
+              "term": "milk"
+            }
+          ],
+          "normalised": "served with almond big fat milk on the side",
+          "text": "Served with almond big fat milk on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "milk",
+              "start": 12,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "lactose",
+              "start": 12,
+              "term": "milk"
+            }
+          ],
+          "normalised": "served with milk almond on the side",
+          "text": "Served with milk almond on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 27,
+              "id": "lactose",
+              "start": 23,
+              "term": "milk"
+            }
+          ],
+          "normalised": "served with dairy free milk on the side",
+          "text": "Served with dairy free milk on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 35,
+              "id": "milk",
+              "start": 31,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 35,
+              "id": "lactose",
+              "start": 31,
+              "term": "milk"
+            }
+          ],
+          "normalised": "served with dairy free big fat milk on the side",
+          "text": "Served with dairy free big fat milk on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "milk",
+              "start": 12,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "lactose",
+              "start": 12,
+              "term": "milk"
+            }
+          ],
+          "normalised": "served with milk dairy free on the side",
+          "text": "Served with milk dairy free on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            }
+          ],
+          "normalised": "מוגש עמ חלב שקדימ בצד",
+          "text": "מוגש עם חלב שקדים בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            }
+          ],
+          "normalised": "מוגש עמ חלב גדול שמנ שקדימ בצד",
+          "text": "מוגש עם חלב גדול שמן שקדים בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 17,
+              "id": "milk",
+              "start": 14,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 17,
+              "id": "lactose",
+              "start": 14,
+              "term": "חלב"
+            }
+          ],
+          "normalised": "מוגש עמ שקדימ חלב בצד",
+          "text": "מוגש עם שקדים חלב בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "soy",
+              "start": 12,
+              "term": "סויה"
+            }
+          ],
+          "normalised": "מוגש עמ חלב סויה בצד",
+          "text": "מוגש עם חלב סויה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 25,
+              "id": "soy",
+              "start": 21,
+              "term": "סויה"
+            }
+          ],
+          "normalised": "מוגש עמ חלב גדול שמנ סויה בצד",
+          "text": "מוגש עם חלב גדול שמן סויה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 12,
+              "id": "soy",
+              "start": 8,
+              "term": "סויה"
+            },
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "milk",
+              "start": 13,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "lactose",
+              "start": 13,
+              "term": "חלב"
+            }
+          ],
+          "normalised": "מוגש עמ סויה חלב בצד",
+          "text": "מוגש עם סויה חלב בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 29,
+              "id": "milk",
+              "start": 25,
+              "term": "milk"
+            }
+          ],
+          "normalised": "served with lactose free milk on the side",
+          "text": "Served with lactose free milk on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 37,
+              "id": "milk",
+              "start": 33,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 37,
+              "id": "lactose",
+              "start": 33,
+              "term": "milk"
+            }
+          ],
+          "normalised": "served with lactose free big fat milk on the side",
+          "text": "Served with lactose free big fat milk on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "milk",
+              "start": 12,
+              "term": "milk"
+            },
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "lactose",
+              "start": 12,
+              "term": "milk"
+            }
+          ],
+          "normalised": "served with milk lactose free on the side",
+          "text": "Served with milk lactose free on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            }
+          ],
+          "normalised": "מוגש עמ חלב ללא לקטוז בצד",
+          "text": "מוגש עם חלב ללא לקטוז בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 11,
+              "id": "milk",
+              "start": 8,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 11,
+              "id": "lactose",
+              "start": 8,
+              "term": "חלב"
+            }
+          ],
+          "normalised": "מוגש עמ חלב גדול שמנ ללא לקטוז בצד",
+          "text": "מוגש עם חלב גדול שמן ללא לקטוז בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 21,
+              "id": "milk",
+              "start": 18,
+              "term": "חלב"
+            },
+            {
+              "certainty": "stated",
+              "end": 21,
+              "id": "lactose",
+              "start": 18,
+              "term": "חלב"
+            }
+          ],
+          "normalised": "מוגש עמ ללא לקטוז חלב בצד",
+          "text": "מוגש עם ללא לקטוז חלב בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 4,
+              "id": "eggs",
+              "start": 0,
+              "term": "eggs"
+            }
+          ],
+          "normalised": "eggs",
+          "text": "eggs"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "eggs",
+              "start": 12,
+              "term": "eggs"
+            }
+          ],
+          "normalised": "served with eggs on the side",
+          "text": "Served with eggs on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "eggs",
+              "start": 12,
+              "term": "eggs"
+            }
+          ],
+          "normalised": "served with eggs on the side",
+          "text": "Served with EGGS on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 4,
+              "id": "eggs",
+              "start": 0,
+              "term": "ביצה"
+            }
+          ],
+          "normalised": "ביצה",
+          "text": "ביצה"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 12,
+              "id": "eggs",
+              "start": 8,
+              "term": "ביצה"
+            }
+          ],
+          "normalised": "מוגש עמ ביצה בצד",
+          "text": "מוגש עם ביצה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 13,
+              "id": "eggs",
+              "start": 8,
+              "term": "ביצה"
+            }
+          ],
+          "normalised": "מוגש עמ הביצה בצד",
+          "text": "מוגש עם הביצה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 14,
+              "id": "eggs",
+              "start": 8,
+              "term": "ביצה"
+            }
+          ],
+          "normalised": "מוגש עמ ובביצה בצד",
+          "text": "מוגש עם ובביצה בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ושהביצה בצד",
+          "text": "מוגש עם ושהביצה בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ביצהי בצד",
+          "text": "מוגש עם ביצהי בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "served with eggs free on the side",
+          "text": "Served with eggs free on the side"
+        },
+        {
+          "hits": [],
+          "normalised": "served with eggs free on the side",
+          "text": "Served with eggs-free on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "eggs",
+              "start": 12,
+              "term": "eggs"
+            }
+          ],
+          "normalised": "served with eggs big fat free on the side",
+          "text": "Served with eggs big fat free on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 21,
+              "id": "eggs",
+              "start": 17,
+              "term": "eggs"
+            }
+          ],
+          "normalised": "served with free eggs on the side",
+          "text": "Served with free eggs on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 3,
+              "id": "soy",
+              "start": 0,
+              "term": "soy"
+            }
+          ],
+          "normalised": "soy",
+          "text": "soy"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "soy",
+              "start": 12,
+              "term": "soy"
+            }
+          ],
+          "normalised": "served with soy on the side",
+          "text": "Served with soy on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "soy",
+              "start": 12,
+              "term": "soy"
+            }
+          ],
+          "normalised": "served with soy on the side",
+          "text": "Served with SOY on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 4,
+              "id": "soy",
+              "start": 0,
+              "term": "סויה"
+            }
+          ],
+          "normalised": "סויה",
+          "text": "סויה"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 12,
+              "id": "soy",
+              "start": 8,
+              "term": "סויה"
+            }
+          ],
+          "normalised": "מוגש עמ סויה בצד",
+          "text": "מוגש עם סויה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 13,
+              "id": "soy",
+              "start": 8,
+              "term": "סויה"
+            }
+          ],
+          "normalised": "מוגש עמ הסויה בצד",
+          "text": "מוגש עם הסויה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 14,
+              "id": "soy",
+              "start": 8,
+              "term": "סויה"
+            }
+          ],
+          "normalised": "מוגש עמ ובסויה בצד",
+          "text": "מוגש עם ובסויה בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ושהסויה בצד",
+          "text": "מוגש עם ושהסויה בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ סויהי בצד",
+          "text": "מוגש עם סויהי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 3,
+              "id": "wheat",
+              "start": 0,
+              "term": "bun"
+            }
+          ],
+          "normalised": "bun",
+          "text": "bun"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "wheat",
+              "start": 12,
+              "term": "bun"
+            }
+          ],
+          "normalised": "served with bun on the side",
+          "text": "Served with bun on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "wheat",
+              "start": 12,
+              "term": "bun"
+            }
+          ],
+          "normalised": "served with bun on the side",
+          "text": "Served with BUN on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 5,
+              "id": "wheat",
+              "start": 0,
+              "term": "toast"
+            }
+          ],
+          "normalised": "toast",
+          "text": "toast"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 17,
+              "id": "wheat",
+              "start": 12,
+              "term": "toast"
+            }
+          ],
+          "normalised": "served with toast on the side",
+          "text": "Served with toast on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 17,
+              "id": "wheat",
+              "start": 12,
+              "term": "toast"
+            }
+          ],
+          "normalised": "served with toast on the side",
+          "text": "Served with TOAST on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 3,
+              "id": "soy",
+              "start": 0,
+              "term": "soy"
+            },
+            {
+              "certainty": "likely",
+              "end": 9,
+              "id": "wheat",
+              "start": 0,
+              "term": "soy sauce"
+            }
+          ],
+          "normalised": "soy sauce",
+          "text": "soy sauce"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "soy",
+              "start": 12,
+              "term": "soy"
+            },
+            {
+              "certainty": "likely",
+              "end": 21,
+              "id": "wheat",
+              "start": 12,
+              "term": "soy sauce"
+            }
+          ],
+          "normalised": "served with soy sauce on the side",
+          "text": "Served with soy sauce on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "soy",
+              "start": 12,
+              "term": "soy"
+            },
+            {
+              "certainty": "likely",
+              "end": 21,
+              "id": "wheat",
+              "start": 12,
+              "term": "soy sauce"
+            }
+          ],
+          "normalised": "served with soy sauce on the side",
+          "text": "Served with SOY SAUCE on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 4,
+              "id": "wheat",
+              "start": 0,
+              "term": "חיטה"
+            }
+          ],
+          "normalised": "חיטה",
+          "text": "חיטה"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 12,
+              "id": "wheat",
+              "start": 8,
+              "term": "חיטה"
+            }
+          ],
+          "normalised": "מוגש עמ חיטה בצד",
+          "text": "מוגש עם חיטה בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ החיטה בצד",
+          "text": "מוגש עם החיטה בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ובחיטה בצד",
+          "text": "מוגש עם ובחיטה בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ושהחיטה בצד",
+          "text": "מוגש עם ושהחיטה בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ חיטהי בצד",
+          "text": "מוגש עם חיטהי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 4,
+              "id": "wheat",
+              "start": 0,
+              "term": "פיתה"
+            }
+          ],
+          "normalised": "פיתה",
+          "text": "פיתה"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 12,
+              "id": "wheat",
+              "start": 8,
+              "term": "פיתה"
+            }
+          ],
+          "normalised": "מוגש עמ פיתה בצד",
+          "text": "מוגש עם פיתה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 13,
+              "id": "wheat",
+              "start": 8,
+              "term": "פיתה"
+            }
+          ],
+          "normalised": "מוגש עמ הפיתה בצד",
+          "text": "מוגש עם הפיתה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 14,
+              "id": "wheat",
+              "start": 8,
+              "term": "פיתה"
+            }
+          ],
+          "normalised": "מוגש עמ ובפיתה בצד",
+          "text": "מוגש עם ובפיתה בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ושהפיתה בצד",
+          "text": "מוגש עם ושהפיתה בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ פיתהי בצד",
+          "text": "מוגש עם פיתהי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 9,
+              "id": "wheat",
+              "start": 0,
+              "term": "רוטב סויה"
+            },
+            {
+              "certainty": "stated",
+              "end": 9,
+              "id": "soy",
+              "start": 5,
+              "term": "סויה"
+            }
+          ],
+          "normalised": "רוטב סויה",
+          "text": "רוטב סויה"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 17,
+              "id": "wheat",
+              "start": 8,
+              "term": "רוטב סויה"
+            },
+            {
+              "certainty": "stated",
+              "end": 17,
+              "id": "soy",
+              "start": 13,
+              "term": "סויה"
+            }
+          ],
+          "normalised": "מוגש עמ רוטב סויה בצד",
+          "text": "מוגש עם רוטב סויה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 18,
+              "id": "wheat",
+              "start": 8,
+              "term": "רוטב סויה"
+            },
+            {
+              "certainty": "stated",
+              "end": 18,
+              "id": "soy",
+              "start": 14,
+              "term": "סויה"
+            }
+          ],
+          "normalised": "מוגש עמ הרוטב סויה בצד",
+          "text": "מוגש עם הרוטב סויה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 19,
+              "id": "wheat",
+              "start": 8,
+              "term": "רוטב סויה"
+            },
+            {
+              "certainty": "stated",
+              "end": 19,
+              "id": "soy",
+              "start": 15,
+              "term": "סויה"
+            }
+          ],
+          "normalised": "מוגש עמ וברוטב סויה בצד",
+          "text": "מוגש עם וברוטב סויה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 20,
+              "id": "soy",
+              "start": 16,
+              "term": "סויה"
+            }
+          ],
+          "normalised": "מוגש עמ ושהרוטב סויה בצד",
+          "text": "מוגש עם ושהרוטב סויה בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ רוטב סויהי בצד",
+          "text": "מוגש עם רוטב סויהי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 10,
+              "id": "wheat",
+              "start": 0,
+              "term": "פירורי לחם"
+            }
+          ],
+          "normalised": "פירורי לחמ",
+          "text": "פירורי לחם"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 18,
+              "id": "wheat",
+              "start": 8,
+              "term": "פירורי לחם"
+            }
+          ],
+          "normalised": "מוגש עמ פירורי לחמ בצד",
+          "text": "מוגש עם פירורי לחם בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 19,
+              "id": "wheat",
+              "start": 8,
+              "term": "פירורי לחם"
+            }
+          ],
+          "normalised": "מוגש עמ הפירורי לחמ בצד",
+          "text": "מוגש עם הפירורי לחם בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 20,
+              "id": "wheat",
+              "start": 8,
+              "term": "פירורי לחם"
+            }
+          ],
+          "normalised": "מוגש עמ ובפירורי לחמ בצד",
+          "text": "מוגש עם ובפירורי לחם בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ושהפירורי לחמ בצד",
+          "text": "מוגש עם ושהפירורי לחם בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ פירורי לחמי בצד",
+          "text": "מוגש עם פירורי לחםי בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "served with gluten free bun on the side",
+          "text": "Served with gluten free bun on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 35,
+              "id": "wheat",
+              "start": 32,
+              "term": "bun"
+            }
+          ],
+          "normalised": "served with gluten free big fat bun on the side",
+          "text": "Served with gluten free big fat bun on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "wheat",
+              "start": 12,
+              "term": "bun"
+            }
+          ],
+          "normalised": "served with bun gluten free on the side",
+          "text": "Served with bun gluten free on the side"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ חיטה ללא גלוטנ בצד",
+          "text": "מוגש עם חיטה ללא גלוטן בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 12,
+              "id": "wheat",
+              "start": 8,
+              "term": "חיטה"
+            }
+          ],
+          "normalised": "מוגש עמ חיטה גדול שמנ ללא גלוטנ בצד",
+          "text": "מוגש עם חיטה גדול שמן ללא גלוטן בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 22,
+              "id": "wheat",
+              "start": 18,
+              "term": "חיטה"
+            }
+          ],
+          "normalised": "מוגש עמ ללא גלוטנ חיטה בצד",
+          "text": "מוגש עם ללא גלוטן חיטה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 9,
+              "id": "fish",
+              "start": 0,
+              "term": "anchovies"
+            }
+          ],
+          "normalised": "anchovies",
+          "text": "anchovies"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 21,
+              "id": "fish",
+              "start": 12,
+              "term": "anchovies"
+            }
+          ],
+          "normalised": "served with anchovies on the side",
+          "text": "Served with anchovies on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 21,
+              "id": "fish",
+              "start": 12,
+              "term": "anchovies"
+            }
+          ],
+          "normalised": "served with anchovies on the side",
+          "text": "Served with ANCHOVIES on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 4,
+              "id": "fish",
+              "start": 0,
+              "term": "tuna"
+            }
+          ],
+          "normalised": "tuna",
+          "text": "tuna"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "fish",
+              "start": 12,
+              "term": "tuna"
+            }
+          ],
+          "normalised": "served with tuna on the side",
+          "text": "Served with tuna on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "fish",
+              "start": 12,
+              "term": "tuna"
+            }
+          ],
+          "normalised": "served with tuna on the side",
+          "text": "Served with TUNA on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 6,
+              "id": "fish",
+              "start": 0,
+              "term": "Caesar"
+            }
+          ],
+          "normalised": "caesar",
+          "text": "Caesar"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 18,
+              "id": "fish",
+              "start": 12,
+              "term": "Caesar"
+            }
+          ],
+          "normalised": "served with caesar on the side",
+          "text": "Served with Caesar on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 18,
+              "id": "fish",
+              "start": 12,
+              "term": "Caesar"
+            }
+          ],
+          "normalised": "served with caesar on the side",
+          "text": "Served with CAESAR on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 5,
+              "id": "fish",
+              "start": 0,
+              "term": "סלמון"
+            }
+          ],
+          "normalised": "סלמונ",
+          "text": "סלמון"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 13,
+              "id": "fish",
+              "start": 8,
+              "term": "סלמון"
+            }
+          ],
+          "normalised": "מוגש עמ סלמונ בצד",
+          "text": "מוגש עם סלמון בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 14,
+              "id": "fish",
+              "start": 8,
+              "term": "סלמון"
+            }
+          ],
+          "normalised": "מוגש עמ הסלמונ בצד",
+          "text": "מוגש עם הסלמון בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "fish",
+              "start": 8,
+              "term": "סלמון"
+            }
+          ],
+          "normalised": "מוגש עמ ובסלמונ בצד",
+          "text": "מוגש עם ובסלמון בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ושהסלמונ בצד",
+          "text": "מוגש עם ושהסלמון בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ סלמוני בצד",
+          "text": "מוגש עם סלמוןי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 6,
+              "id": "fish",
+              "start": 0,
+              "term": "אנשובי"
+            }
+          ],
+          "normalised": "אנשובי",
+          "text": "אנשובי"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 14,
+              "id": "fish",
+              "start": 8,
+              "term": "אנשובי"
+            }
+          ],
+          "normalised": "מוגש עמ אנשובי בצד",
+          "text": "מוגש עם אנשובי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "fish",
+              "start": 8,
+              "term": "אנשובי"
+            }
+          ],
+          "normalised": "מוגש עמ האנשובי בצד",
+          "text": "מוגש עם האנשובי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "fish",
+              "start": 8,
+              "term": "אנשובי"
+            }
+          ],
+          "normalised": "מוגש עמ ובאנשובי בצד",
+          "text": "מוגש עם ובאנשובי בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ושהאנשובי בצד",
+          "text": "מוגש עם ושהאנשובי בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ אנשוביי בצד",
+          "text": "מוגש עם אנשוביי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 9,
+              "id": "fish",
+              "start": 0,
+              "term": "רוטב קיסר"
+            }
+          ],
+          "normalised": "רוטב קיסר",
+          "text": "רוטב קיסר"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 17,
+              "id": "fish",
+              "start": 8,
+              "term": "רוטב קיסר"
+            }
+          ],
+          "normalised": "מוגש עמ רוטב קיסר בצד",
+          "text": "מוגש עם רוטב קיסר בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 18,
+              "id": "fish",
+              "start": 8,
+              "term": "רוטב קיסר"
+            }
+          ],
+          "normalised": "מוגש עמ הרוטב קיסר בצד",
+          "text": "מוגש עם הרוטב קיסר בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "likely",
+              "end": 19,
+              "id": "fish",
+              "start": 8,
+              "term": "רוטב קיסר"
+            }
+          ],
+          "normalised": "מוגש עמ וברוטב קיסר בצד",
+          "text": "מוגש עם וברוטב קיסר בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ושהרוטב קיסר בצד",
+          "text": "מוגש עם ושהרוטב קיסר בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ רוטב קיסרי בצד",
+          "text": "מוגש עם רוטב קיסרי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 6,
+              "id": "sesame",
+              "start": 0,
+              "term": "sesame"
+            }
+          ],
+          "normalised": "sesame",
+          "text": "sesame"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "id": "sesame",
+              "start": 12,
+              "term": "sesame"
+            }
+          ],
+          "normalised": "served with sesame on the side",
+          "text": "Served with sesame on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "id": "sesame",
+              "start": 12,
+              "term": "sesame"
+            }
+          ],
+          "normalised": "served with sesame on the side",
+          "text": "Served with SESAME on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 6,
+              "id": "sesame",
+              "start": 0,
+              "term": "tahini"
+            }
+          ],
+          "normalised": "tahini",
+          "text": "tahini"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "id": "sesame",
+              "start": 12,
+              "term": "tahini"
+            }
+          ],
+          "normalised": "served with tahini on the side",
+          "text": "Served with tahini on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "id": "sesame",
+              "start": 12,
+              "term": "tahini"
+            }
+          ],
+          "normalised": "served with tahini on the side",
+          "text": "Served with TAHINI on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 6,
+              "id": "sesame",
+              "start": 0,
+              "term": "שומשום"
+            }
+          ],
+          "normalised": "שומשומ",
+          "text": "שומשום"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 14,
+              "id": "sesame",
+              "start": 8,
+              "term": "שומשום"
+            }
+          ],
+          "normalised": "מוגש עמ שומשומ בצד",
+          "text": "מוגש עם שומשום בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "sesame",
+              "start": 8,
+              "term": "שומשום"
+            }
+          ],
+          "normalised": "מוגש עמ השומשומ בצד",
+          "text": "מוגש עם השומשום בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 16,
+              "id": "sesame",
+              "start": 8,
+              "term": "שומשום"
+            }
+          ],
+          "normalised": "מוגש עמ ובשומשומ בצד",
+          "text": "מוגש עם ובשומשום בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ושהשומשומ בצד",
+          "text": "מוגש עם ושהשומשום בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ שומשומי בצד",
+          "text": "מוגש עם שומשוםי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 5,
+              "id": "sesame",
+              "start": 0,
+              "term": "טחינה"
+            }
+          ],
+          "normalised": "טחינה",
+          "text": "טחינה"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 13,
+              "id": "sesame",
+              "start": 8,
+              "term": "טחינה"
+            }
+          ],
+          "normalised": "מוגש עמ טחינה בצד",
+          "text": "מוגש עם טחינה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 14,
+              "id": "sesame",
+              "start": 8,
+              "term": "טחינה"
+            }
+          ],
+          "normalised": "מוגש עמ הטחינה בצד",
+          "text": "מוגש עם הטחינה בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "sesame",
+              "start": 8,
+              "term": "טחינה"
+            }
+          ],
+          "normalised": "מוגש עמ ובטחינה בצד",
+          "text": "מוגש עם ובטחינה בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ושהטחינה בצד",
+          "text": "מוגש עם ושהטחינה בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ טחינהי בצד",
+          "text": "מוגש עם טחינהי בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "served with no sesame on the side",
+          "text": "Served with no sesame on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 29,
+              "id": "sesame",
+              "start": 23,
+              "term": "sesame"
+            }
+          ],
+          "normalised": "served with no big fat sesame on the side",
+          "text": "Served with no big fat sesame on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "id": "sesame",
+              "start": 12,
+              "term": "sesame"
+            }
+          ],
+          "normalised": "served with sesame no on the side",
+          "text": "Served with sesame no on the side"
+        },
+        {
+          "hits": [],
+          "normalised": "served with without sesame on the side",
+          "text": "Served with without sesame on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 34,
+              "id": "sesame",
+              "start": 28,
+              "term": "sesame"
+            }
+          ],
+          "normalised": "served with without big fat sesame on the side",
+          "text": "Served with without big fat sesame on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "id": "sesame",
+              "start": 12,
+              "term": "sesame"
+            }
+          ],
+          "normalised": "served with sesame without on the side",
+          "text": "Served with sesame without on the side"
+        },
+        {
+          "hits": [],
+          "normalised": "served with sesame free on the side",
+          "text": "Served with sesame free on the side"
+        },
+        {
+          "hits": [],
+          "normalised": "served with sesame free on the side",
+          "text": "Served with sesame-free on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "id": "sesame",
+              "start": 12,
+              "term": "sesame"
+            }
+          ],
+          "normalised": "served with sesame big fat free on the side",
+          "text": "Served with sesame big fat free on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 23,
+              "id": "sesame",
+              "start": 17,
+              "term": "sesame"
+            }
+          ],
+          "normalised": "served with free sesame on the side",
+          "text": "Served with free sesame on the side"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ללא שומשומ בצד",
+          "text": "מוגש עם ללא שומשום בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 27,
+              "id": "sesame",
+              "start": 21,
+              "term": "שומשום"
+            }
+          ],
+          "normalised": "מוגש עמ ללא גדול שמנ שומשומ בצד",
+          "text": "מוגש עם ללא גדול שמן שומשום בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 14,
+              "id": "sesame",
+              "start": 8,
+              "term": "שומשום"
+            }
+          ],
+          "normalised": "מוגש עמ שומשומ ללא בצד",
+          "text": "מוגש עם שומשום ללא בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ בלי שומשומ בצד",
+          "text": "מוגש עם בלי שומשום בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 27,
+              "id": "sesame",
+              "start": 21,
+              "term": "שומשום"
+            }
+          ],
+          "normalised": "מוגש עמ בלי גדול שמנ שומשומ בצד",
+          "text": "מוגש עם בלי גדול שמן שומשום בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 14,
+              "id": "sesame",
+              "start": 8,
+              "term": "שומשום"
+            }
+          ],
+          "normalised": "מוגש עמ שומשומ בלי בצד",
+          "text": "מוגש עם שומשום בלי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 6,
+              "id": "celery",
+              "start": 0,
+              "term": "celery"
+            }
+          ],
+          "normalised": "celery",
+          "text": "celery"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "id": "celery",
+              "start": 12,
+              "term": "celery"
+            }
+          ],
+          "normalised": "served with celery on the side",
+          "text": "Served with celery on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 18,
+              "id": "celery",
+              "start": 12,
+              "term": "celery"
+            }
+          ],
+          "normalised": "served with celery on the side",
+          "text": "Served with CELERY on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 15,
+              "id": "celery",
+              "start": 0,
+              "term": "vegetable stock"
+            }
+          ],
+          "normalised": "vegetable stock",
+          "text": "vegetable stock"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 27,
+              "id": "celery",
+              "start": 12,
+              "term": "vegetable stock"
+            }
+          ],
+          "normalised": "served with vegetable stock on the side",
+          "text": "Served with vegetable stock on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 27,
+              "id": "celery",
+              "start": 12,
+              "term": "vegetable stock"
+            }
+          ],
+          "normalised": "served with vegetable stock on the side",
+          "text": "Served with VEGETABLE STOCK on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 10,
+              "id": "sulphites",
+              "start": 0,
+              "term": "white wine"
+            }
+          ],
+          "normalised": "white wine",
+          "text": "white wine"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 22,
+              "id": "sulphites",
+              "start": 12,
+              "term": "white wine"
+            }
+          ],
+          "normalised": "served with white wine on the side",
+          "text": "Served with white wine on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "suspected",
+              "end": 22,
+              "id": "sulphites",
+              "start": 12,
+              "term": "white wine"
+            }
+          ],
+          "normalised": "served with white wine on the side",
+          "text": "Served with WHITE WINE on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 9,
+              "id": "legumes",
+              "start": 0,
+              "term": "chickpeas"
+            }
+          ],
+          "normalised": "chickpeas",
+          "text": "chickpeas"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 21,
+              "id": "legumes",
+              "start": 12,
+              "term": "chickpeas"
+            }
+          ],
+          "normalised": "served with chickpeas on the side",
+          "text": "Served with chickpeas on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 21,
+              "id": "legumes",
+              "start": 12,
+              "term": "chickpeas"
+            }
+          ],
+          "normalised": "served with chickpeas on the side",
+          "text": "Served with CHICKPEAS on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 10,
+              "id": "legumes",
+              "start": 0,
+              "term": "fava beans"
+            }
+          ],
+          "normalised": "fava beans",
+          "text": "fava beans"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 22,
+              "id": "legumes",
+              "start": 12,
+              "term": "fava beans"
+            }
+          ],
+          "normalised": "served with fava beans on the side",
+          "text": "Served with fava beans on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 22,
+              "id": "legumes",
+              "start": 12,
+              "term": "fava beans"
+            }
+          ],
+          "normalised": "served with fava beans on the side",
+          "text": "Served with FAVA BEANS on the side"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 5,
+              "id": "legumes",
+              "start": 0,
+              "term": "חומוס"
+            }
+          ],
+          "normalised": "חומוס",
+          "text": "חומוס"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 13,
+              "id": "legumes",
+              "start": 8,
+              "term": "חומוס"
+            }
+          ],
+          "normalised": "מוגש עמ חומוס בצד",
+          "text": "מוגש עם חומוס בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 14,
+              "id": "legumes",
+              "start": 8,
+              "term": "חומוס"
+            }
+          ],
+          "normalised": "מוגש עמ החומוס בצד",
+          "text": "מוגש עם החומוס בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "legumes",
+              "start": 8,
+              "term": "חומוס"
+            }
+          ],
+          "normalised": "מוגש עמ ובחומוס בצד",
+          "text": "מוגש עם ובחומוס בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ושהחומוס בצד",
+          "text": "מוגש עם ושהחומוס בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ חומוסי בצד",
+          "text": "מוגש עם חומוסי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 5,
+              "id": "legumes",
+              "start": 0,
+              "term": "עדשים"
+            }
+          ],
+          "normalised": "עדשימ",
+          "text": "עדשים"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 13,
+              "id": "legumes",
+              "start": 8,
+              "term": "עדשים"
+            }
+          ],
+          "normalised": "מוגש עמ עדשימ בצד",
+          "text": "מוגש עם עדשים בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 14,
+              "id": "legumes",
+              "start": 8,
+              "term": "עדשים"
+            }
+          ],
+          "normalised": "מוגש עמ העדשימ בצד",
+          "text": "מוגש עם העדשים בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "legumes",
+              "start": 8,
+              "term": "עדשים"
+            }
+          ],
+          "normalised": "מוגש עמ ובעדשימ בצד",
+          "text": "מוגש עם ובעדשים בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ושהעדשימ בצד",
+          "text": "מוגש עם ושהעדשים בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ עדשימי בצד",
+          "text": "מוגש עם עדשיםי בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 5,
+              "id": "legumes",
+              "start": 0,
+              "term": "פלאפל"
+            }
+          ],
+          "normalised": "פלאפל",
+          "text": "פלאפל"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 13,
+              "id": "legumes",
+              "start": 8,
+              "term": "פלאפל"
+            }
+          ],
+          "normalised": "מוגש עמ פלאפל בצד",
+          "text": "מוגש עם פלאפל בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 14,
+              "id": "legumes",
+              "start": 8,
+              "term": "פלאפל"
+            }
+          ],
+          "normalised": "מוגש עמ הפלאפל בצד",
+          "text": "מוגש עם הפלאפל בצד"
+        },
+        {
+          "hits": [
+            {
+              "certainty": "stated",
+              "end": 15,
+              "id": "legumes",
+              "start": 8,
+              "term": "פלאפל"
+            }
+          ],
+          "normalised": "מוגש עמ ובפלאפל בצד",
+          "text": "מוגש עם ובפלאפל בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ ושהפלאפל בצד",
+          "text": "מוגש עם ושהפלאפל בצד"
+        },
+        {
+          "hits": [],
+          "normalised": "מוגש עמ פלאפלי בצד",
+          "text": "מוגש עם פלאפלי בצד"
+        }
+      ]
+    },
+    "vocabulary": {
+      "celery": {
+        "directEn": [
+          {
+            "normalised": "celery",
+            "pattern": "\\bcelery\\b",
+            "term": "celery"
+          }
+        ],
+        "directHe": [],
+        "guards": {
+          "afterEn": [],
+          "afterHe": [],
+          "beforeEn": [],
+          "beforeHe": []
+        },
+        "hiddenEn": [
+          {
+            "certainty": "suspected",
+            "normalised": "vegetable stock",
+            "pattern": "\\bvegetable stock\\b",
+            "source": "11 §12.2",
+            "term": "vegetable stock"
+          }
+        ],
+        "hiddenHe": [],
+        "noPrefixHe": [],
+        "sources": [
+          "11 §12"
+        ]
+      },
+      "eggs": {
+        "directEn": [
+          {
+            "normalised": "eggs",
+            "pattern": "\\beggs\\b",
+            "term": "eggs"
+          }
+        ],
+        "directHe": [
+          {
+            "normalised": "ביצה",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}ביצה(?![א-ת])",
+            "term": "ביצה"
+          }
+        ],
+        "guards": {
+          "afterEn": [
+            "free"
+          ],
+          "afterHe": [],
+          "beforeEn": [],
+          "beforeHe": []
+        },
+        "hiddenEn": [],
+        "hiddenHe": [],
+        "noPrefixHe": [],
+        "sources": [
+          "11 §5"
+        ]
+      },
+      "fish": {
+        "directEn": [
+          {
+            "normalised": "anchovies",
+            "pattern": "\\banchovies\\b",
+            "term": "anchovies"
+          },
+          {
+            "normalised": "tuna",
+            "pattern": "\\btuna\\b",
+            "term": "tuna"
+          }
+        ],
+        "directHe": [
+          {
+            "normalised": "סלמונ",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}סלמונ(?![א-ת])",
+            "term": "סלמון"
+          },
+          {
+            "normalised": "אנשובי",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}אנשובי(?![א-ת])",
+            "term": "אנשובי"
+          }
+        ],
+        "guards": {
+          "afterEn": [],
+          "afterHe": [],
+          "beforeEn": [],
+          "beforeHe": []
+        },
+        "hiddenEn": [
+          {
+            "certainty": "likely",
+            "normalised": "caesar",
+            "pattern": "\\bcaesar\\b",
+            "source": "11 §8.2",
+            "term": "Caesar"
+          }
+        ],
+        "hiddenHe": [
+          {
+            "certainty": "likely",
+            "normalised": "רוטב קיסר",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}רוטב קיסר(?![א-ת])",
+            "source": "11 §8.2",
+            "term": "רוטב קיסר"
+          }
+        ],
+        "noPrefixHe": [],
+        "sources": [
+          "11 §8"
+        ]
+      },
+      "lactose": {
+        "directEn": [
+          {
+            "normalised": "milk",
+            "pattern": "\\bmilk\\b",
+            "term": "milk"
+          }
+        ],
+        "directHe": [
+          {
+            "normalised": "חלב",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}חלב(?![א-ת])",
+            "term": "חלב"
+          }
+        ],
+        "guards": {
+          "afterEn": [],
+          "afterHe": [
+            "ללא לקטוז"
+          ],
+          "beforeEn": [
+            "lactose free"
+          ],
+          "beforeHe": []
+        },
+        "hiddenEn": [],
+        "hiddenHe": [],
+        "noPrefixHe": [],
+        "sources": [
+          "11 §4"
+        ]
+      },
+      "legumes": {
+        "directEn": [
+          {
+            "normalised": "chickpeas",
+            "pattern": "\\bchickpeas\\b",
+            "term": "chickpeas"
+          },
+          {
+            "normalised": "fava beans",
+            "pattern": "\\bfava beans\\b",
+            "term": "fava beans"
+          }
+        ],
+        "directHe": [
+          {
+            "normalised": "חומוס",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}חומוס(?![א-ת])",
+            "term": "חומוס"
+          },
+          {
+            "normalised": "עדשימ",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}עדשימ(?![א-ת])",
+            "term": "עדשים"
+          },
+          {
+            "normalised": "פלאפל",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}פלאפל(?![א-ת])",
+            "term": "פלאפל"
+          }
+        ],
+        "guards": {
+          "afterEn": [],
+          "afterHe": [],
+          "beforeEn": [],
+          "beforeHe": []
+        },
+        "hiddenEn": [],
+        "hiddenHe": [],
+        "noPrefixHe": [],
+        "sources": [
+          "11 §16",
+          "12 §1.3"
+        ]
+      },
+      "milk": {
+        "directEn": [
+          {
+            "normalised": "milk",
+            "pattern": "\\bmilk\\b",
+            "term": "milk"
+          },
+          {
+            "normalised": "cream cheese",
+            "pattern": "\\bcream cheese\\b",
+            "term": "cream cheese"
+          },
+          {
+            "normalised": "creme fraiche",
+            "pattern": "\\bcreme fraiche\\b",
+            "term": "crème fraîche"
+          }
+        ],
+        "directHe": [
+          {
+            "normalised": "חלב",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}חלב(?![א-ת])",
+            "term": "חלב"
+          },
+          {
+            "normalised": "גבינה",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}גבינה(?![א-ת])",
+            "term": "גבינה"
+          }
+        ],
+        "guards": {
+          "afterEn": [],
+          "afterHe": [
+            "שקדים",
+            "סויה"
+          ],
+          "beforeEn": [
+            "oat",
+            "almond",
+            "dairy free"
+          ],
+          "beforeHe": []
+        },
+        "hiddenEn": [],
+        "hiddenHe": [],
+        "noPrefixHe": [],
+        "sources": [
+          "11 §3"
+        ]
+      },
+      "sesame": {
+        "directEn": [
+          {
+            "normalised": "sesame",
+            "pattern": "\\bsesame\\b",
+            "term": "sesame"
+          },
+          {
+            "normalised": "tahini",
+            "pattern": "\\btahini\\b",
+            "term": "tahini"
+          }
+        ],
+        "directHe": [
+          {
+            "normalised": "שומשומ",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}שומשומ(?![א-ת])",
+            "term": "שומשום"
+          },
+          {
+            "normalised": "טחינה",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}טחינה(?![א-ת])",
+            "term": "טחינה"
+          }
+        ],
+        "guards": {
+          "afterEn": [
+            "free"
+          ],
+          "afterHe": [],
+          "beforeEn": [
+            "no",
+            "without"
+          ],
+          "beforeHe": [
+            "ללא",
+            "בלי"
+          ]
+        },
+        "hiddenEn": [],
+        "hiddenHe": [],
+        "noPrefixHe": [],
+        "sources": [
+          "11 §11",
+          "12 §1.1"
+        ]
+      },
+      "soy": {
+        "directEn": [
+          {
+            "normalised": "soy",
+            "pattern": "\\bsoy\\b",
+            "term": "soy"
+          }
+        ],
+        "directHe": [
+          {
+            "normalised": "סויה",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}סויה(?![א-ת])",
+            "term": "סויה"
+          }
+        ],
+        "guards": {
+          "afterEn": [],
+          "afterHe": [],
+          "beforeEn": [],
+          "beforeHe": []
+        },
+        "hiddenEn": [],
+        "hiddenHe": [],
+        "noPrefixHe": [],
+        "sources": [
+          "11 §6"
+        ]
+      },
+      "sulphites": {
+        "directEn": [],
+        "directHe": [],
+        "guards": {
+          "afterEn": [],
+          "afterHe": [],
+          "beforeEn": [],
+          "beforeHe": []
+        },
+        "hiddenEn": [
+          {
+            "certainty": "suspected",
+            "normalised": "white wine",
+            "pattern": "\\bwhite wine\\b",
+            "source": "11 §15.2",
+            "term": "white wine"
+          }
+        ],
+        "hiddenHe": [],
+        "noPrefixHe": [],
+        "sources": [
+          "11 §15"
+        ]
+      },
+      "wheat": {
+        "directEn": [
+          {
+            "normalised": "bun",
+            "pattern": "\\bbun\\b",
+            "term": "bun"
+          },
+          {
+            "normalised": "toast",
+            "pattern": "\\btoast\\b",
+            "term": "toast"
+          }
+        ],
+        "directHe": [
+          {
+            "normalised": "חיטה",
+            "pattern": "(?<![א-ת])חיטה(?![א-ת])",
+            "term": "חיטה"
+          },
+          {
+            "normalised": "פיתה",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}פיתה(?![א-ת])",
+            "term": "פיתה"
+          }
+        ],
+        "guards": {
+          "afterEn": [],
+          "afterHe": [
+            "ללא גלוטן"
+          ],
+          "beforeEn": [
+            "gluten free"
+          ],
+          "beforeHe": []
+        },
+        "hiddenEn": [
+          {
+            "certainty": "likely",
+            "normalised": "soy sauce",
+            "pattern": "\\bsoy sauce\\b",
+            "source": "11 §7.2",
+            "term": "soy sauce"
+          }
+        ],
+        "hiddenHe": [
+          {
+            "certainty": "likely",
+            "normalised": "רוטב סויה",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}רוטב סויה(?![א-ת])",
+            "source": "11 §7.2",
+            "term": "רוטב סויה"
+          },
+          {
+            "certainty": "likely",
+            "normalised": "פירורי לחמ",
+            "pattern": "(?<![א-ת])[בהוכלמש]{0,2}פירורי לחמ(?![א-ת])",
+            "source": "12 §1.4",
+            "term": "פירורי לחם"
+          }
+        ],
+        "noPrefixHe": [
+          "חיטה"
+        ],
+        "sources": [
+          "11 §7"
+        ]
+      }
+    }
+  },
+  "jurisdictions": [
+    "us",
+    "eu",
+    "uk",
+    "ca",
+    "anz",
+    "jp",
+    "il"
+  ],
+  "kinds": [
+    {
+      "isStrict": true,
+      "name": "allergen"
+    },
+    {
+      "isStrict": false,
+      "name": "intolerance"
+    },
+    {
+      "isStrict": true,
+      "name": "autoimmune"
+    },
+    {
+      "isStrict": false,
+      "name": "lifestyle"
+    },
+    {
+      "isStrict": false,
+      "name": "religiousComponent"
+    },
+    {
+      "isStrict": false,
+      "name": "keto"
+    }
+  ],
+  "matcherCases": {
+    "dishes": [
+      {
+        "dish": {
+          "description": "Toasted, with cream cheese",
+          "id": "d",
+          "imageUrl": null,
+          "name": "Bagel",
+          "options": [
+            {
+              "name": "Topping",
+              "values": [
+                "Sesame",
+                "Poppy seed"
+              ]
+            },
+            {
+              "name": "Changes",
+              "values": [
+                "No cream cheese"
+              ]
+            }
+          ],
+          "page": null,
+          "price": 10.0
+        },
+        "hits": [],
+        "rulesText": "bagel toasted with cream cheese topping sesame poppy seed changes"
+      },
+      {
+        "dish": {
+          "description": "Falafel, hummus and salad",
+          "id": "d",
+          "imageUrl": null,
+          "name": "Falafel plate",
+          "options": [
+            {
+              "name": "Sauce",
+              "values": [
+                "Tahini",
+                "Amba"
+              ]
+            },
+            {
+              "name": "Remove",
+              "values": [
+                "Without tahini"
+              ]
+            }
+          ],
+          "page": null,
+          "price": 10.0
+        },
+        "hits": [],
+        "rulesText": "falafel plate falafel hummus and salad sauce tahini amba remove"
+      },
+      {
+        "dish": {
+          "description": "חציל מטוגן, ביצה קשה, טחינה ועמבה",
+          "id": "d",
+          "imageUrl": null,
+          "name": "סביח",
+          "options": [
+            {
+              "name": "בחירת לחם",
+              "values": [
+                "פיתה",
+                "לאפה"
+              ]
+            },
+            {
+              "name": "שינויים",
+              "values": [
+                "ללא טחינה",
+                "בלי ביצה"
+              ]
+            }
+          ],
+          "page": null,
+          "price": 10.0
+        },
+        "hits": [],
+        "rulesText": "סביח חציל מטוגנ ביצה קשה טחינה ועמבה בחירת לחמ פיתה לאפה שינויימ"
+      },
+      {
+        "dish": {
+          "description": "חסה, קרוטונים ורוטב קיסר",
+          "id": "d",
+          "imageUrl": null,
+          "name": "סלט קיסר",
+          "options": [
+            {
+              "name": "תוספת",
+              "values": [
+                "פרמזן",
+                "אנשובי"
+              ]
+            }
+          ],
+          "page": null,
+          "price": 10.0
+        },
+        "hits": [],
+        "rulesText": "סלט קיסר חסה קרוטונימ ורוטב קיסר תוספת פרמזנ אנשובי"
+      }
+    ],
+    "texts": [
+      {
+        "hits": [],
+        "normalised": "sesame bagel with cream cheese",
+        "text": "Sesame bagel with cream cheese"
+      },
+      {
+        "hits": [],
+        "normalised": "hummus with tahini olive oil and paprika",
+        "text": "Hummus with tahini, olive oil and paprika"
+      },
+      {
+        "hits": [],
+        "normalised": "satay chicken skewers with peanut sauce",
+        "text": "Satay chicken skewers with peanut sauce"
+      },
+      {
+        "hits": [],
+        "normalised": "pad thai with crushed peanuts",
+        "text": "Pad thai with crushed peanuts"
+      },
+      {
+        "hits": [],
+        "normalised": "basil pesto pasta with pine nuts",
+        "text": "Basil pesto pasta with pine nuts"
+      },
+      {
+        "hits": [],
+        "normalised": "almond croissant",
+        "text": "Almond croissant"
+      },
+      {
+        "hits": [],
+        "normalised": "caesar salad with anchovies and parmesan",
+        "text": "Caesar salad with anchovies and parmesan"
+      },
+      {
+        "hits": [],
+        "normalised": "shrimp tempura with soy sauce",
+        "text": "Shrimp tempura with soy sauce"
+      },
+      {
+        "hits": [],
+        "normalised": "grilled squid with lemon",
+        "text": "Grilled squid with lemon"
+      },
+      {
+        "hits": [],
+        "normalised": "mussels in white wine and garlic",
+        "text": "Mussels in white wine and garlic"
+      },
+      {
+        "hits": [],
+        "normalised": "tuna tartare with sesame oil",
+        "text": "Tuna tartare with sesame oil"
+      },
+      {
+        "hits": [],
+        "normalised": "scrambled eggs on sourdough toast",
+        "text": "Scrambled eggs on sourdough toast"
+      },
+      {
+        "hits": [],
+        "normalised": "lactose free latte with oat milk",
+        "text": "Lactose-free latte with oat milk"
+      },
+      {
+        "hits": [],
+        "normalised": "gluten free bun with honey mustard",
+        "text": "Gluten-free bun with honey mustard"
+      },
+      {
+        "hits": [],
+        "normalised": "celery soup on vegetable stock",
+        "text": "Celery soup on vegetable stock"
+      },
+      {
+        "hits": [],
+        "normalised": "lupin flour flatbread",
+        "text": "Lupin flour flatbread"
+      },
+      {
+        "hits": [],
+        "normalised": "dried apricots contains sulphites",
+        "text": "Dried apricots (contains sulphites)"
+      },
+      {
+        "hits": [],
+        "normalised": "falafel with chickpeas and fava beans",
+        "text": "Falafel with chickpeas and fava beans"
+      },
+      {
+        "hits": [],
+        "normalised": "vegan burger dairy free cheese",
+        "text": "Vegan burger, dairy-free cheese"
+      },
+      {
+        "hits": [],
+        "normalised": "vegetarian lasagne with ricotta",
+        "text": "Vegetarian lasagne with ricotta"
+      },
+      {
+        "hits": [],
+        "normalised": "סלט ירקות עמ טחינה",
+        "text": "סלט ירקות עם טחינה"
+      },
+      {
+        "hits": [],
+        "normalised": "חומוס עמ טחינה וגרגירימ",
+        "text": "חומוס עם טחינה וגרגירים"
+      },
+      {
+        "hits": [],
+        "normalised": "בורקס גבינה עמ שומשומ",
+        "text": "בורקס גבינה עם שומשום"
+      },
+      {
+        "hits": [],
+        "normalised": "גחנונ עמ ביצה קשה ורסק עגבניות",
+        "text": "ג'חנון עם ביצה קשה ורסק עגבניות"
+      },
+      {
+        "hits": [],
+        "normalised": "שניצל עופ בפירורי לחמ",
+        "text": "שניצל עוף בפירורי לחם"
+      },
+      {
+        "hits": [],
+        "normalised": "סלמונ ברוטב סויה ודבש",
+        "text": "סלמון ברוטב סויה ודבש"
+      },
+      {
+        "hits": [],
+        "normalised": "פסטה ברוטב שמנת ופטריות",
+        "text": "פסטה ברוטב שמנת ופטריות"
+      },
+      {
+        "hits": [],
+        "normalised": "חלבה עמ פיסטוקימ",
+        "text": "חלבה עם פיסטוקים"
+      },
+      {
+        "hits": [],
+        "normalised": "פלאפל בפיתה עמ עמבה",
+        "text": "פלאפל בפיתה עם עמבה"
+      },
+      {
+        "hits": [],
+        "normalised": "שקשוקה עמ גבינת פטה",
+        "text": "שקשוקה עם גבינת פטה"
+      },
+      {
+        "hits": [],
+        "normalised": "מרק עדשימ כתומות",
+        "text": "מרק עדשים כתומות"
+      },
+      {
+        "hits": [],
+        "normalised": "קפה הפוכ על חלב שקדימ",
+        "text": "קפה הפוך על חלב שקדים"
+      },
+      {
+        "hits": [],
+        "normalised": "לחמניה ללא גלוטנ",
+        "text": "לחמניה ללא גלוטן"
+      },
+      {
+        "hits": [],
+        "normalised": "חומוס ללא טחינה",
+        "text": "חומוס ללא טחינה"
+      }
+    ]
+  },
+  "taxonomy": [
+    {
+      "id": "peanuts",
+      "isStrict": true,
+      "jurisdictions": [
+        "us",
+        "eu",
+        "uk",
+        "ca",
+        "anz",
+        "jp",
+        "il"
+      ],
+      "kind": "allergen",
+      "nameEn": "Peanuts",
+      "nameHe": "בוטנים",
+      "source": "11 §1"
+    },
+    {
+      "id": "treeNuts",
+      "isStrict": true,
+      "jurisdictions": [
+        "us",
+        "eu",
+        "uk",
+        "ca",
+        "anz",
+        "jp",
+        "il"
+      ],
+      "kind": "allergen",
+      "nameEn": "Tree nuts",
+      "nameHe": "אגוזי עץ",
+      "source": "11 §2"
+    },
+    {
+      "id": "milk",
+      "isStrict": true,
+      "jurisdictions": [
+        "us",
+        "eu",
+        "uk",
+        "ca",
+        "anz",
+        "jp",
+        "il"
+      ],
+      "kind": "allergen",
+      "nameEn": "Milk",
+      "nameHe": "חלב",
+      "source": "11 §3"
+    },
+    {
+      "id": "lactose",
+      "isStrict": false,
+      "jurisdictions": [],
+      "kind": "intolerance",
+      "nameEn": "Lactose",
+      "nameHe": "לקטוז",
+      "source": "11 §4"
+    },
+    {
+      "id": "eggs",
+      "isStrict": true,
+      "jurisdictions": [
+        "us",
+        "eu",
+        "uk",
+        "ca",
+        "anz",
+        "jp",
+        "il"
+      ],
+      "kind": "allergen",
+      "nameEn": "Eggs",
+      "nameHe": "ביצים",
+      "source": "11 §5"
+    },
+    {
+      "id": "soy",
+      "isStrict": true,
+      "jurisdictions": [
+        "us",
+        "eu",
+        "uk",
+        "ca",
+        "anz",
+        "il"
+      ],
+      "kind": "allergen",
+      "nameEn": "Soy",
+      "nameHe": "סויה",
+      "source": "11 §6"
+    },
+    {
+      "id": "wheat",
+      "isStrict": true,
+      "jurisdictions": [
+        "us",
+        "eu",
+        "uk",
+        "ca",
+        "anz",
+        "jp",
+        "il"
+      ],
+      "kind": "allergen",
+      "nameEn": "Wheat",
+      "nameHe": "חיטה",
+      "source": "11 §7"
+    },
+    {
+      "id": "gluten",
+      "isStrict": true,
+      "jurisdictions": [
+        "eu",
+        "uk",
+        "ca",
+        "il"
+      ],
+      "kind": "autoimmune",
+      "nameEn": "Gluten",
+      "nameHe": "גלוטן",
+      "source": "11 §7"
+    },
+    {
+      "id": "fish",
+      "isStrict": true,
+      "jurisdictions": [
+        "us",
+        "eu",
+        "uk",
+        "ca",
+        "anz",
+        "il"
+      ],
+      "kind": "allergen",
+      "nameEn": "Fish",
+      "nameHe": "דגים",
+      "source": "11 §8"
+    },
+    {
+      "id": "crustaceans",
+      "isStrict": true,
+      "jurisdictions": [
+        "us",
+        "eu",
+        "uk",
+        "ca",
+        "anz",
+        "jp",
+        "il"
+      ],
+      "kind": "allergen",
+      "nameEn": "Crustaceans",
+      "nameHe": "סרטנאים",
+      "source": "11 §9"
+    },
+    {
+      "id": "molluscs",
+      "isStrict": true,
+      "jurisdictions": [
+        "eu",
+        "uk",
+        "ca",
+        "anz",
+        "il"
+      ],
+      "kind": "allergen",
+      "nameEn": "Molluscs",
+      "nameHe": "רכיכות",
+      "source": "11 §10"
+    },
+    {
+      "id": "sesame",
+      "isStrict": true,
+      "jurisdictions": [
+        "us",
+        "eu",
+        "uk",
+        "ca",
+        "anz",
+        "il"
+      ],
+      "kind": "allergen",
+      "nameEn": "Sesame",
+      "nameHe": "שומשום",
+      "source": "11 §11"
+    },
+    {
+      "id": "celery",
+      "isStrict": true,
+      "jurisdictions": [
+        "eu",
+        "uk",
+        "il"
+      ],
+      "kind": "allergen",
+      "nameEn": "Celery",
+      "nameHe": "סלרי",
+      "source": "11 §12"
+    },
+    {
+      "id": "mustard",
+      "isStrict": true,
+      "jurisdictions": [
+        "eu",
+        "uk",
+        "ca",
+        "il"
+      ],
+      "kind": "allergen",
+      "nameEn": "Mustard",
+      "nameHe": "חרדל",
+      "source": "11 §13"
+    },
+    {
+      "id": "lupin",
+      "isStrict": true,
+      "jurisdictions": [
+        "eu",
+        "uk",
+        "anz",
+        "il"
+      ],
+      "kind": "allergen",
+      "nameEn": "Lupin",
+      "nameHe": "לופין",
+      "source": "11 §14"
+    },
+    {
+      "id": "sulphites",
+      "isStrict": true,
+      "jurisdictions": [
+        "eu",
+        "uk",
+        "ca",
+        "anz",
+        "il"
+      ],
+      "kind": "allergen",
+      "nameEn": "Sulphites",
+      "nameHe": "סולפיטים",
+      "source": "11 §15"
+    },
+    {
+      "id": "legumes",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Legumes",
+      "nameHe": "קטניות",
+      "source": "11 §16"
+    },
+    {
+      "id": "vegan",
+      "isStrict": false,
+      "jurisdictions": [],
+      "kind": "lifestyle",
+      "nameEn": "Vegan",
+      "nameHe": "טבעוני",
+      "source": "12 §2.2"
+    },
+    {
+      "id": "vegetarian",
+      "isStrict": false,
+      "jurisdictions": [],
+      "kind": "lifestyle",
+      "nameEn": "Vegetarian",
+      "nameHe": "צמחוני",
+      "source": "12 §2.2"
+    },
+    {
+      "id": "keto",
+      "isStrict": false,
+      "jurisdictions": [],
+      "kind": "keto",
+      "nameEn": "Keto",
+      "nameHe": "קטו",
+      "source": "10 §ALG-01"
+    }
+  ],
+  "vocabulary": {
+    "celery": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "crustaceans": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "eggs": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "fish": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "gluten": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "keto": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "lactose": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "legumes": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "lupin": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "milk": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "molluscs": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "mustard": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "peanuts": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "sesame": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "soy": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "sulphites": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "treeNuts": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "vegan": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "vegetarian": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    },
+    "wheat": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": []
+    }
+  }
+}

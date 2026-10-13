@@ -22,6 +22,7 @@ import 'dart:io';
 
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_analysis_prompt.dart';
@@ -37,6 +38,9 @@ import 'package:ketoclub/services/menu/website/website_menu_locator.dart';
 import 'package:ketoclub/services/menu/wolt/wolt_menu_mapper.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/venue/wolt/wolt_venue_mapper.dart';
+import 'package:ketoclub/utils/allergens/allergen_matcher.dart';
+import 'package:ketoclub/utils/allergens/taxonomy.dart';
+import 'package:ketoclub/utils/allergens/vocabulary.dart';
 import 'package:ketoclub/utils/classification_rules.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/dish_kind.dart';
@@ -45,6 +49,7 @@ import 'package:ketoclub/utils/keto_score.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 import 'package:ketoclub/utils/verdict_counts.dart';
 
+import 'allergen_corpus.dart';
 import 'golden_corpus.dart';
 
 /// Where the golden files live, relative to the repository root.
@@ -66,6 +71,7 @@ const List<String> goldenFileNames = <String>[
   'wolt_venues.json',
   'dish_kind.json',
   'score.json',
+  'allergens.json',
 ];
 
 /// [document] in the corpus's canonical form: two-space indentation, every
@@ -104,6 +110,7 @@ Future<Map<String, Object?>> buildGoldens() async {
     'wolt_venues.json': _woltVenues(),
     'dish_kind.json': _dishKinds(inputs),
     'score.json': await _scores(inputs),
+    'allergens.json': _allergens(),
   };
 }
 
@@ -1264,3 +1271,287 @@ Future<Map<String, Object?>> _scores(_Inputs inputs) async {
     ],
   };
 }
+
+// ---------------------------------------------------------------------------
+// allergens.json (Banto; ALG-01, issue #343)
+// ---------------------------------------------------------------------------
+
+/// One vocabulary term with its normalised form and the source of the
+/// pattern the matcher compiles for it (null when it normalises to
+/// nothing, which the matcher skips).
+Map<String, Object?> _allergenTerm(
+  String term, {
+  required bool hebrew,
+  required Set<String> noPrefix,
+}) {
+  final normalised = TextNormaliser.normalise(term);
+  if (normalised.isEmpty) {
+    return <String, Object?>{
+      'term': term,
+      'normalised': normalised,
+      'pattern': null,
+    };
+  }
+  final pattern = hebrew
+      ? hebrewTriggerPattern(normalised, allowPrefix: !noPrefix.contains(term))
+      : latinTriggerPattern(normalised);
+  return <String, Object?>{
+    'term': term,
+    'normalised': normalised,
+    'pattern': pattern.pattern,
+  };
+}
+
+/// A [HiddenTrigger] as [_allergenTerm] plus its certainty and source.
+Map<String, Object?> _allergenHidden(
+  HiddenTrigger trigger, {
+  required bool hebrew,
+  required Set<String> noPrefix,
+}) => <String, Object?>{
+  ..._allergenTerm(trigger.term, hebrew: hebrew, noPrefix: noPrefix),
+  'certainty': trigger.certainty.name,
+  'source': trigger.source,
+};
+
+/// One restriction's vocabulary as `{directEn, directHe, hiddenEn,
+/// hiddenHe, guards, noPrefixHe, sources}`.
+Map<String, Object?> _allergenEntry(RestrictionVocabulary entry) {
+  final noPrefix = entry.noPrefixHe.toSet();
+  return <String, Object?>{
+    'directEn': <Object?>[
+      for (final term in entry.directEn)
+        _allergenTerm(term, hebrew: false, noPrefix: noPrefix),
+    ],
+    'directHe': <Object?>[
+      for (final term in entry.directHe)
+        _allergenTerm(term, hebrew: true, noPrefix: noPrefix),
+    ],
+    'hiddenEn': <Object?>[
+      for (final trigger in entry.hiddenEn)
+        _allergenHidden(trigger, hebrew: false, noPrefix: noPrefix),
+    ],
+    'hiddenHe': <Object?>[
+      for (final trigger in entry.hiddenHe)
+        _allergenHidden(trigger, hebrew: true, noPrefix: noPrefix),
+    ],
+    'guards': <String, Object?>{
+      'beforeEn': entry.guards.beforeEn,
+      'afterEn': entry.guards.afterEn,
+      'beforeHe': entry.guards.beforeHe,
+      'afterHe': entry.guards.afterHe,
+    },
+    'noPrefixHe': entry.noPrefixHe,
+    'sources': entry.sources,
+  };
+}
+
+/// A vocabulary registry as `{id: entry}`.
+Map<String, Object?> _allergenVocabulary(
+  Map<RestrictionId, RestrictionVocabulary> vocabulary,
+) => <String, Object?>{
+  for (final MapEntry(key: id, value: entry) in vocabulary.entries)
+    id.name: _allergenEntry(entry),
+};
+
+/// An [AllergenHit] with every field.
+Map<String, Object?> _allergenHit(AllergenHit hit) => <String, Object?>{
+  'id': hit.id.name,
+  'term': hit.term,
+  'certainty': hit.certainty.name,
+  'start': hit.start,
+  'end': hit.end,
+};
+
+/// Every term of [vocabulary] in the corpus frames: bare, framed, and (in
+/// Hebrew) with one, two and three prefix letters and a suffix; then every
+/// guard phrase beside the restriction's first term of its language, in
+/// the window, pushed out of it by a filler, and on the wrong side.
+List<String> _allergenGeneratedTexts(
+  Map<RestrictionId, RestrictionVocabulary> vocabulary,
+) {
+  String en(String text) => allergenContextEn.replaceAll('{t}', text);
+  String he(String text) => allergenContextHe.replaceAll('{t}', text);
+  final texts = <String>[];
+  for (final restriction in restrictionTaxonomy) {
+    final entry = vocabulary[restriction.id];
+    if (entry == null) continue;
+    final english = <String>[
+      ...entry.directEn,
+      for (final trigger in entry.hiddenEn) trigger.term,
+    ];
+    final hebrew = <String>[
+      ...entry.directHe,
+      for (final trigger in entry.hiddenHe) trigger.term,
+    ];
+    for (final term in english) {
+      texts.addAll(<String>[term, en(term), en(term.toUpperCase())]);
+    }
+    for (final term in hebrew) {
+      texts.addAll(<String>[
+        term,
+        he(term),
+        he('ה$term'),
+        he('וב$term'),
+        he('ושה$term'),
+        he('$termי'),
+      ]);
+    }
+    final guards = entry.guards;
+    if (english.isNotEmpty) {
+      final term = english.first;
+      for (final word in guards.beforeEn) {
+        texts.addAll(<String>[
+          en('$word $term'),
+          en('$word $allergenGuardFillerEn $term'),
+          en('$term $word'),
+        ]);
+      }
+      for (final word in guards.afterEn) {
+        texts.addAll(<String>[
+          en('$term $word'),
+          en('$term-$word'),
+          en('$term $allergenGuardFillerEn $word'),
+          en('$word $term'),
+        ]);
+      }
+    }
+    if (hebrew.isNotEmpty) {
+      final term = hebrew.first;
+      for (final word in guards.beforeHe) {
+        texts.addAll(<String>[
+          he('$word $term'),
+          he('$word $allergenGuardFillerHe $term'),
+          he('$term $word'),
+        ]);
+      }
+      for (final word in guards.afterHe) {
+        texts.addAll(<String>[
+          he('$term $word'),
+          he('$term $allergenGuardFillerHe $word'),
+          he('$word $term'),
+        ]);
+      }
+    }
+  }
+  return texts;
+}
+
+/// One dish per restriction and language: its first direct term as an
+/// option value (read) beside a removal value naming it (skipped).
+List<Dish> _allergenGeneratedDishes(
+  Map<RestrictionId, RestrictionVocabulary> vocabulary,
+) => <Dish>[
+  for (final restriction in restrictionTaxonomy)
+    if (vocabulary[restriction.id] case final entry?) ...<Dish>[
+      if (entry.directEn.isNotEmpty)
+        allergenDish(
+          'Plate',
+          options: <DishOption>[
+            DishOption(name: 'Extras', values: <String>[entry.directEn.first]),
+            DishOption(
+              name: 'Changes',
+              values: <String>['No ${entry.directEn.first}'],
+            ),
+          ],
+        ),
+      if (entry.directHe.isNotEmpty)
+        allergenDish(
+          'צלחת',
+          options: <DishOption>[
+            DishOption(name: 'תוספות', values: <String>[entry.directHe.first]),
+            DishOption(
+              name: 'שינויים',
+              values: <String>['ללא ${entry.directHe.first}'],
+            ),
+          ],
+        ),
+    ],
+];
+
+/// The matcher's hits over [texts] and [dishes] with [vocabulary].
+Map<String, Object?> _allergenCases(
+  Map<RestrictionId, RestrictionVocabulary> vocabulary,
+  List<String> texts,
+  List<Dish> dishes,
+) => <String, Object?>{
+  'texts': <Object?>[
+    for (final text in _unique(texts))
+      <String, Object?>{
+        'text': text,
+        'normalised': TextNormaliser.normalise(text),
+        'hits': <Object?>[
+          for (final hit in AllergenMatcher.findWith(text, vocabulary))
+            _allergenHit(hit),
+        ],
+      },
+  ],
+  'dishes': <Object?>[
+    for (final dish in dishes)
+      <String, Object?>{
+        'dish': dish.toJson(),
+        'rulesText': TextNormaliser.dishRulesText(dish),
+        'hits': <Object?>[
+          for (final hit in AllergenMatcher.findInDishWith(dish, vocabulary))
+            _allergenHit(hit),
+        ],
+      },
+  ],
+};
+
+/// The taxonomy, the registry, the matcher's hits over the registry
+/// (`matcherCases`), and the same over [allergenFixtureVocabulary]
+/// (`fixture`), which pins the matcher before the groups are filled.
+Map<String, Object?> _allergens() => <String, Object?>{
+  'taxonomy': <Object?>[
+    for (final restriction in restrictionTaxonomy)
+      <String, Object?>{
+        'id': restriction.id.name,
+        'kind': restriction.kind.name,
+        'isStrict': restriction.isStrict,
+        'jurisdictions': <String>[
+          for (final jurisdiction in Jurisdiction.values)
+            if (restriction.jurisdictions.contains(jurisdiction))
+              jurisdiction.name,
+        ],
+        'nameEn': restriction.nameEn,
+        'nameHe': restriction.nameHe,
+        'source': restriction.source,
+      },
+  ],
+  'kinds': <Object?>[
+    for (final kind in RestrictionKind.values)
+      <String, Object?>{'name': kind.name, 'isStrict': kind.isStrict},
+  ],
+  'jurisdictions': <String>[
+    for (final jurisdiction in Jurisdiction.values) jurisdiction.name,
+  ],
+  'certainties': <String>[
+    for (final certainty in TriggerCertainty.values) certainty.name,
+  ],
+  'vocabulary': _allergenVocabulary(allergenVocabulary),
+  'matcherCases': _allergenCases(
+    allergenVocabulary,
+    <String>[
+      ...allergenMatcherTexts,
+      ..._allergenGeneratedTexts(allergenVocabulary),
+    ],
+    <Dish>[
+      ...allergenMatcherDishes,
+      ..._allergenGeneratedDishes(allergenVocabulary),
+    ],
+  ),
+  'fixture': <String, Object?>{
+    'vocabulary': _allergenVocabulary(allergenFixtureVocabulary),
+    'cases': _allergenCases(
+      allergenFixtureVocabulary,
+      <String>[
+        ...allergenMatcherTexts,
+        ..._allergenGeneratedTexts(allergenFixtureVocabulary),
+      ],
+      <Dish>[
+        ...allergenMatcherDishes,
+        ..._allergenGeneratedDishes(allergenFixtureVocabulary),
+      ],
+    ),
+  },
+};

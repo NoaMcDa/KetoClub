@@ -237,6 +237,14 @@ def _is_guarded(haystack: str, start: int, end: int, guard: GuardWords | None) -
     return False
 
 
+def is_guarded(haystack: str, start: int, end: int, guard: GuardWords | None) -> bool:
+    """``ClassificationRules.isGuarded``: whether ``guard`` cancels the match
+    spanning ``start``-``end`` (code-point offsets, ``end`` exclusive) in the
+    normalised ``haystack``, with the D-V1 two-word window. Public for the
+    allergen matcher (:mod:`app.keto.allergens`), as the Dart one is."""
+    return _is_guarded(haystack, start, end, guard)
+
+
 # --- scans ----------------------------------------------------------------------
 
 
