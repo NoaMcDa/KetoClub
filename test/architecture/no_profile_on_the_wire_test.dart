@@ -12,6 +12,11 @@
 //
 // A legitimate future exception must be an explicit entry in [_allowed], with
 // the file, the token and the reason. Never loosen [_tokens] instead.
+//
+// The one such exception so far is settings_store.dart (ALG-02a, #344):
+// storage on the device is where C1 says the profile lives, and the file
+// writes only to shared_preferences. Every other service — the HTTP
+// clients, the classifiers, the logger — still cannot name it.
 
 import 'dart:io';
 
@@ -36,6 +41,17 @@ const _allowed = <String, Map<String, String>>{
     'severity':
         'Two doc comments describe a log level as its "severity"; the file '
         'has no profile data and no code mentions the word.',
+  },
+  'services/storage/settings_store.dart': {
+    'DietaryProfile':
+        'AppSettings holds the profile so it is stored on the device '
+        '(ALG-02a, issue #344). The file only reads and writes '
+        'shared_preferences; it builds no request body and logs nothing, '
+        'and AppSettings.toString prints a count, never the restrictions.',
+    'dietaryProfile':
+        'The shared_preferences JSON key the profile is stored under, '
+        'written only when the profile is non-empty (ALG-02a). On-device '
+        'storage, the place C1 says the profile lives.',
   },
 };
 

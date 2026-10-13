@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/services/platform/app_info.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -10,8 +11,11 @@ import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 import 'package:ketoclub/state/theme_mode_controller.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
+import 'package:ketoclub/utils/allergens/taxonomy.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/content_width.dart';
+import 'package:ketoclub/widgets/restriction_picker_sheet.dart';
 import 'package:provider/provider.dart';
 
 /// Scopes a test's finder to the language section's segmented control, so
@@ -73,6 +77,21 @@ const Key aboutPrivacyKey = Key('settingsAboutPrivacy');
 /// The About section's "Report a problem" row (issue #258).
 const Key aboutReportKey = Key('settingsAboutReport');
 
+/// The "My restrictions" section's "Add restriction" button (Banto,
+/// ALG-02a, issue #344), shown only when `bantoMode` is on.
+const Key restrictionsAddKey = Key('settingsRestrictionsAdd');
+
+/// The "My restrictions" section's empty-state line.
+const Key restrictionsEmptyKey = Key('settingsRestrictionsEmpty');
+
+/// The row of [id] in the "My restrictions" section.
+Key restrictionRowKey(RestrictionId id) =>
+    ValueKey<String>('settingsRestrictionRow_${id.name}');
+
+/// The remove button of [id]'s row in the "My restrictions" section.
+Key restrictionRemoveKey(RestrictionId id) =>
+    ValueKey<String>('settingsRestrictionRemove_${id.name}');
+
 /// Where "Report a problem" sends the user: the repository's issue tracker.
 final Uri reportProblemUri = Uri.parse(
   'https://github.com/NoaMcDa/KetoClub/issues',
@@ -86,6 +105,10 @@ final Uri reportProblemUri = Uri.parse(
 /// (architecture.md §6.6, §11, §12, §13, D17), and last an "About" group
 /// (issue #258): the app version, the open-source licences, the privacy
 /// text and where to report a problem.
+///
+/// With [bantoMode] on (architecture.md D26) a "My restrictions" section
+/// sits between the appearance and "Your keto rules" (ALG-02a, issue #344);
+/// with it off — every KetoClub build — the screen is unchanged.
 ///
 /// Reads its [SettingsController] from `provider` and calls
 /// [SettingsController.load] once, after the first frame, the same way
@@ -110,6 +133,7 @@ class SettingsScreen extends StatefulWidget {
     required this.appInfo,
     required this.externalLinkOpener,
     this.backendConfigured = false,
+    this.bantoMode = BantoMode.enabled,
     super.key,
   });
 
@@ -123,6 +147,11 @@ class SettingsScreen extends StatefulWidget {
   /// a phone, where it picks between the direct and via-backend consent
   /// text and the key section's note (issue #331).
   final bool backendConfigured;
+
+  /// Whether the Banto surfaces show (architecture.md D26): today, the
+  /// "My restrictions" section. Defaults to the build's flag; a test
+  /// passes either value with no `--dart-define`.
+  final bool bantoMode;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -197,6 +226,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 20),
               _appearanceSection(context, l10n, controller),
               const SizedBox(height: 20),
+              if (widget.bantoMode) ...[
+                _restrictionsSection(context, l10n, controller),
+                const SizedBox(height: 20),
+              ],
               _ketoRulesSection(context, l10n, controller),
               const SizedBox(height: 20),
               _netCarbLimitSection(context, l10n, controller),
@@ -592,6 +625,111 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ],
     );
+  }
+
+  /// The "My restrictions" section (Banto, ALG-02a, issue #344), built only
+  /// when [SettingsScreen.bantoMode] is on: the helper-tool sentence, one
+  /// row per restriction in the profile — its name in the UI language, its
+  /// kind and a remove button — or a one-line empty state, and an "Add
+  /// restriction" button that opens the [RestrictionPickerSheet].
+  ///
+  /// Keto is not listed here: it stays the "Your keto rules" toggles below.
+  /// There is no severity control; a restriction is in the profile or not.
+  Widget _restrictionsSection(
+    BuildContext context,
+    AppLocalizations l10n,
+    SettingsController controller,
+  ) {
+    final busy = controller.isBusy;
+    final locale = Localizations.localeOf(context);
+    final entries = controller.profile.entries;
+    final added = <RestrictionId>{
+      for (final entry in entries) entry.restrictionId,
+    };
+    final canAdd = availableRestrictions(added).isNotEmpty;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionLabel(l10n.settingsRestrictions),
+        _SettingsGroup(
+          children: [
+            _GroupNote(l10n.helperToolSentence),
+            if (entries.isEmpty)
+              Padding(
+                key: restrictionsEmptyKey,
+                padding: const EdgeInsetsDirectional.fromSTEB(16, 10, 16, 4),
+                child: Text(
+                  l10n.settingsRestrictionsEmpty,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+            for (final entry in entries)
+              _restrictionRow(
+                context,
+                l10n,
+                controller,
+                restrictionFor(entry.restrictionId),
+                locale,
+              ),
+            if (canAdd)
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(8, 4, 8, 4),
+                child: Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: TextButton.icon(
+                    key: restrictionsAddKey,
+                    icon: const Icon(Icons.add),
+                    label: Text(l10n.settingsRestrictionsAdd),
+                    onPressed: busy
+                        ? null
+                        : () => unawaited(_pickRestriction(context, added)),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// One row of the "My restrictions" section: [restriction]'s name in
+  /// [locale]'s language, its kind under it, and a remove button.
+  Widget _restrictionRow(
+    BuildContext context,
+    AppLocalizations l10n,
+    SettingsController controller,
+    Restriction restriction,
+    Locale locale,
+  ) {
+    final name = restrictionDisplayName(restriction, locale);
+    return ListTile(
+      key: restrictionRowKey(restriction.id),
+      title: Text(name),
+      subtitle: Text(restrictionKindLabel(l10n, restriction.kind)),
+      trailing: IconButton(
+        key: restrictionRemoveKey(restriction.id),
+        icon: const Icon(Icons.close),
+        tooltip: l10n.settingsRestrictionsRemove(name),
+        onPressed: controller.isBusy
+            ? null
+            : () => unawaited(controller.removeRestriction(restriction.id)),
+      ),
+    );
+  }
+
+  /// Opens the picker, leaving out [added], and adds what the user picks.
+  /// Dismissing the sheet adds nothing.
+  Future<void> _pickRestriction(
+    BuildContext context,
+    Set<RestrictionId> added,
+  ) async {
+    final controller = context.read<SettingsController>();
+    final picked = await showRestrictionPickerSheet(
+      context: context,
+      added: added,
+    );
+    if (picked == null || !mounted) return;
+    await controller.addRestriction(picked);
   }
 
   /// The "Your keto rules" section (issue #56, `.design/Settings.dc.html`):
