@@ -1,0 +1,4652 @@
+{
+  "_fixture_note": "copied from test/fixtures/wolt_hamosad_menu.json (a real recording of a Tel Aviv burger venue on Wolt, 56 items, drinks and sauces included); labels are unreviewed desk research; Hebrew",
+  "language": "he",
+  "dishes": [
+    {
+      "name": "ארוחת צ׳יקן אמריקה",
+      "description": "שף אביב סולימני\nצ'יקן קריספי אמריקאי בציפוי תערובת קורנפלקס ופאנקו בלחמנייה רכה עם מיונז, קולסלואו, רוטב באפלו פיקנטי וחמוצים של המוסד \nמוגש עם תוספת לבחירה",
+      "options": [
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא מיונז",
+            "ללא קולסלואו",
+            "ללא חמוצים",
+            "ללא רוטב באפלו"
+          ]
+        },
+        {
+          "name": "תוספות בתשלום",
+          "values": [
+            "צ׳דר אנגלי"
+          ]
+        },
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "צ'יפס ",
+            "צ׳יפס פרמז׳ן כמהין"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"צ׳דר\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"צ׳דר\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"מיונז\" is egg-based",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise often carries mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חמוצים\": pickled foods and vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"צ'יקן קריספי\" (fried chicken)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"צ'יקן קריספי\" (fried chicken)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "נאגטס, תוספת ושתייה",
+      "description": "6 יחידות נאגטס פריכים | מוגש עם תוספת ושתייה לבחירה",
+      "options": [
+        {
+          "name": "ארוחת נאגטס",
+          "values": [
+            "נאגטס - 6 יחידות"
+          ]
+        },
+        {
+          "name": "תוספת בצד",
+          "values": [
+            "צ׳יפס"
+          ]
+        },
+        {
+          "name": "בחרו שתייה",
+          "values": [
+            "קולה",
+            "קולה זירו",
+            "ספרייט",
+            "ספרייט זירו",
+            "ענבים",
+            "מים מינרלים",
+            "סודה",
+            "בירה שחורה"
+          ]
+        }
+      ],
+      "labels": {
+        "eggs": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "breaded coatings are usually egg-bound",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"נאגטס\" are breaded and the breading is wheat",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "breaded nuggets: the breading is wheat",
+          "source": "11 §7.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "drink option \"ענבים\" (grape juice)",
+          "source": "12 §1.10"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"נאגטס\" (chicken nuggets)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"נאגטס\" (chicken nuggets)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "סודה",
+      "description": "0,25",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "milk": {
+          "label": "free",
+          "evidence": "soft drink or water; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "soft drink or water; cross-contact not assessed",
+          "source": "11 §5"
+        }
+      }
+    },
+    {
+      "name": "המבורגר טראמפ",
+      "description": "שף דן יושע\nקציצת בקר עסיסית שנטחנת כל בוקר מנתחים מובחרים, בלחמנייה רכה עם חסה אמריקאית, עגבנייה, איולי וויסקי תוצרת הבית, ביצת עין, אווז צלוי וטבעת בצל קריספית בטמפורה\n*ביצת עין עשויה במשלוחים\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים - טראמפ",
+          "values": [
+            "ללא חסה",
+            "ללא עגבנייה",
+            "ללא טבעת בצל",
+            "ללא אווז",
+            "ללא איולי וויסקי",
+            "ללא ביצת עין"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "גאודה",
+            "צ׳דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי "
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"גאודה\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"גאודה\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי וויסקי\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"איולי וויסקי\": mayonnaise-style sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "\u202bארוחת צ'יזבורגר טבעוני 🌱",
+      "description": "\u202bקציצה ביונד מיט בלחמנייה רכה עם חסה אייסברג, עגבנייה, בצל סגול, גבינת צ'דר טבעונית ומיונז טבעוני\nמוגש עם תוספת לבחירה",
+      "options": [
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים - המבורגר טבעוני",
+          "values": [
+            "ללא חסה",
+            "ללא עגבנייה",
+            "ללא בצל סגול",
+            "ללא מיונז טבעוני",
+            "ללא גבינה טבעונית",
+            "צ'דר במקום גבינה טבעונית"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "ביצת עין",
+            "\u202bחלפיניו מוחמץ 🌶",
+            "ריבת בצל",
+            "גאודה",
+            "צ'דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי ",
+            "ריבת שרי"
+          ]
+        },
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "צ'יפס ",
+            "צ׳יפס פרמז׳ן כמהין"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"גבינת צ'דר טבעונית\": a vegan substitute; טבעוני does not clear a milk allergy",
+          "source": "12 §2.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"גבינת צ'דר טבעונית\": a vegan substitute; טבעוני does not clear a milk allergy",
+          "source": "12 §2.1"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"ביצת עין\" (fried egg) can be added",
+          "source": "11 §5.1"
+        },
+        "soy": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "the note says \"חלבון אפונה וסויה\" (pea and soy protein)",
+          "source": "12 §1.11"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"חרדל\" (mustard) can be added",
+          "source": "11 §13.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "pea protein patty (\"חלבון אפונה\")",
+          "source": "11 §16.2"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "animal-derived: option \"ביצת עין\" (fried egg) can be added",
+          "source": "11 §5.1"
+        }
+      }
+    },
+    {
+      "name": "סאן מיגל",
+      "description": "0,33",
+      "options": [],
+      "labels": {
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "lager beer is brewed from barley malt",
+          "source": "11 §7.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "beer is a sulphite source",
+          "source": "11 §15.2"
+        }
+      }
+    },
+    {
+      "name": "בירה שחורה",
+      "description": "0,33",
+      "options": [],
+      "labels": {
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בירה שחורה\" (dark beer) is brewed from malted barley",
+          "source": "11 §7.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "beer is a sulphite source",
+          "source": "11 §15.2"
+        }
+      }
+    },
+    {
+      "name": "ספרייט",
+      "description": "0,33",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "soft drink or water; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "soft drink or water; cross-contact not assessed",
+          "source": "11 §5"
+        }
+      }
+    },
+    {
+      "name": "קוקה קולה",
+      "description": "0,33",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "soft drink or water; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "soft drink or water; cross-contact not assessed",
+          "source": "11 §5"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        }
+      }
+    },
+    {
+      "name": "\u202bצ'יזבורגר טבעוני 🌱",
+      "description": "\u202bקציצה ביונד מיט בלחמנייה רכה עם חסה אייסברג, עגבנייה, בצל סגול, גבינת צ'דר טבעונית ומיונז טבעוני \n*חלבון אפונה וסויה",
+      "options": [
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים - המבורגר טבעוני",
+          "values": [
+            "ללא חסה",
+            "ללא עגבנייה",
+            "ללא בצל סגול",
+            "ללא מיונז טבעוני",
+            "ללא גבינה טבעונית",
+            "צ'דר במקום גבינה טבעונית"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "ביצת עין",
+            "\u202bחלפיניו מוחמץ 🌶",
+            "ריבת בצל",
+            "גאודה",
+            "צ'דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי ",
+            "ריבת שרי"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"גבינת צ'דר טבעונית\": a vegan substitute; טבעוני does not clear a milk allergy Note: 'חלבון' (protein) contains the letters of 'חלב' (milk) but is not milk.",
+          "source": "12 §2.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"גבינת צ'דר טבעונית\": a vegan substitute; טבעוני does not clear a milk allergy",
+          "source": "12 §2.1"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"ביצת עין\" (fried egg) can be added",
+          "source": "11 §5.1"
+        },
+        "soy": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "the note says \"חלבון אפונה וסויה\" (pea and soy protein)",
+          "source": "12 §1.11"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"חרדל\" (mustard) can be added",
+          "source": "11 §13.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "pea protein patty (\"חלבון אפונה\")",
+          "source": "11 §16.2"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "animal-derived: option \"ביצת עין\" (fried egg) can be added",
+          "source": "11 §5.1"
+        }
+      }
+    },
+    {
+      "name": "פוטטוס",
+      "description": "קרעי תפוח אדמה גורמנדין מטוגנים עם מלח סלרי",
+      "options": [
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "potato wedges with celery salt; no dairy named; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"קיט רטבים\" (ketchup and mayonnaise kit) can be added",
+          "source": "12 §1.6"
+        },
+        "celery": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"מלח סלרי\" (celery salt)",
+          "source": "11 §12.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"חרדל\" (mustard) can be added",
+          "source": "11 §13.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "animal-derived: option \"קיט רטבים\" (ketchup and mayonnaise kit) can be added",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "צ'יפס",
+      "description": "קריספי צ'יפס של המוסד",
+      "options": [
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "peanuts": {
+          "label": "free",
+          "evidence": "no peanut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §1"
+        },
+        "milk": {
+          "label": "free",
+          "evidence": "plain fries; no dairy named; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"קיט רטבים\" (ketchup and mayonnaise kit) can be added",
+          "source": "12 §1.6"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"חרדל\" (mustard) can be added",
+          "source": "11 §13.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "chips from pre-cut potato may be sulphite-treated",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "animal-derived: option \"קיט רטבים\" (ketchup and mayonnaise kit) can be added",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "ארוחת המבורגר טראמפ",
+      "description": "שף דן יושע\nקציצת בקר 200 גר' שנטחנת כל בוקר מנתחים מובחרים, בלחמנייה רכה עם חסה אמריקאית, עגבנייה, איולי וויסקי תוצרת הבית, ביצת עין, אווז צלוי וטבעת בצל קריספית בטמפורה\nמוגש עם תוספת לבחירה\n*ביצת עין עשויה במשלוחים\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים - טראמפ",
+          "values": [
+            "ללא חסה",
+            "ללא עגבנייה",
+            "ללא טבעת בצל",
+            "ללא אווז",
+            "ללא איולי וויסקי",
+            "ללא ביצת עין"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "גאודה",
+            "צ׳דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי "
+          ]
+        },
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "צ'יפס ",
+            "צ׳יפס פרמז׳ן כמהין"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"גאודה\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"גאודה\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי וויסקי\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"איולי וויסקי\": mayonnaise-style sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "אל צ'אפו 🌶",
+      "description": "שף עילי בקר\nקציצת בקר עסיסית שנטחנת כל בוקר מנתחים מובחרים בלחמנייה רכה עם ארוגולה, צ'דר אנגלי, חמאת טבסקו, איולי פלפלים הבנרו, חלפניו מוחמץ, סלסת עגבניות\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא צ'דר",
+            "ללא ארוגולה",
+            "ללא נאצ'וס",
+            "ללא חלפיניו מוחמץ",
+            "ללא סלסת עגבניות",
+            "ללא איולי פלפלים"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "גאודה",
+            "צ׳דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי "
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"צ'דר אנגלי\" is cheese",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"צ'דר אנגלי\" is a hard, aged cheese: only traces of lactose",
+          "source": "11 §4.3"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי פלפלים הבנרו\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"איולי פלפלים הבנרו\": mayonnaise-style sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חלפניו מוחמץ\": pickled foods and vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "המבורגר של יושע",
+      "description": "שף דן יושע\nקציצת בקר עסיסית שנטחנת כל בוקר מנתחים מובחרים ומושרת בחמאה, בלחמנייה רכה עם חסה, תבשיל כרישה בשמנת, רוטב יין וגבינת קממבר\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא חסה"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "גאודה",
+            "צ׳דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי "
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "patty \"מושרת בחמאה\" (soaked in butter)",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "cream and a soft cheese",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"קיט רטבים\" (ketchup and mayonnaise kit) can be added",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"חרדל\" (mustard) can be added",
+          "source": "11 §13.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"רוטב יין\": wine is a common sulphite source",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "קוקה קולה זירו",
+      "description": "0,33",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "soft drink or water; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "soft drink or water; cross-contact not assessed",
+          "source": "11 §5"
+        }
+      }
+    },
+    {
+      "name": "פרסקה סאן מיגל",
+      "description": "0,33",
+      "options": [],
+      "labels": {
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "lager beer is brewed from barley malt",
+          "source": "11 §7.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "beer is a sulphite source",
+          "source": "11 §15.2"
+        }
+      }
+    },
+    {
+      "name": "ארוחת \u202bאל צ'אפו 🌶",
+      "description": "שף עילי בקר קציצת בקר 200 גר' שנטחנת כל בוקר מנתחים מובחרים בלחמנייה רכה עם ארוגולה, צ'דר אנגלי, חמאת טבסקו, איולי פלפלים הבנרו, חלפניו מוחמץ, סלסת עגבניות \nמוגש עם תוספת לבחירה\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא צ'דר",
+            "ללא ארוגולה",
+            "ללא נאצ'וס",
+            "ללא חלפיניו מוחמץ",
+            "ללא סלסת עגבניות",
+            "ללא איולי פלפלים"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "גאודה",
+            "צ׳דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי "
+          ]
+        },
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "צ'יפס ",
+            "צ׳יפס פרמז׳ן כמהין"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"צ'דר אנגלי\" is cheese",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"צ'דר אנגלי\" is a hard, aged cheese: only traces of lactose",
+          "source": "11 §4.3"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי פלפלים הבנרו\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"איולי פלפלים הבנרו\": mayonnaise-style sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חלפניו מוחמץ\": pickled foods and vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "ספרייט זירו",
+      "description": "0,33",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "soft drink or water; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "soft drink or water; cross-contact not assessed",
+          "source": "11 §5"
+        }
+      }
+    },
+    {
+      "name": "מים מינרליים",
+      "description": "0,33",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "soft drink or water; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "soft drink or water; cross-contact not assessed",
+          "source": "11 §5"
+        }
+      }
+    },
+    {
+      "name": "ארוחת המבורגר של יושע",
+      "description": "שף דן יושע\nקציצת בקר 200 גר׳ שנטחנת כל בוקר מנתחים מובחרים ומושרת בחמאה, בלחמנייה רכה עם חסה, תבשיל כרישה בשמנת, רוטב יין וגבינת קממבר\nמוגש עם תוספת לבחירה\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא חסה"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "גאודה",
+            "צ׳דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי "
+          ]
+        },
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "צ'יפס ",
+            "צ׳יפס פרמז׳ן כמהין"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "peanuts": {
+          "label": "free",
+          "evidence": "no peanut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §1"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "patty \"מושרת בחמאה\" (soaked in butter)",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "cream and a soft cheese",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"קיט רטבים\" (ketchup and mayonnaise kit) can be added",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"חרדל\" (mustard) can be added",
+          "source": "11 §13.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"רוטב יין\": wine is a common sulphite source",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "חרדל",
+      "description": "\u202b30 מ\"ל",
+      "options": [],
+      "labels": {
+        "mustard": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"חרדל\" is mustard",
+          "source": "11 §13.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "ready-made mustard is a sulphite source",
+          "source": "11 §15.2"
+        }
+      }
+    },
+    {
+      "name": "הצ'יקן של אמיל",
+      "description": "קריספי צ'יקן עם תבלינים סודיים בלחמנייה רכה עם חסה, נענע, עגבנייה ואיולי שום לימון\nשף יוצר: אמיל פרקסי\nהמנה חלבית",
+      "options": [
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא איולי שום לימון ",
+            "ללא חסה",
+            "ללא נענע",
+            "ללא עגבנייה"
+          ]
+        },
+        {
+          "name": "תוספות בתשלום",
+          "values": [
+            "צ׳דר אנגלי"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "unknown",
+          "evidence": "\"המנה חלבית\": the dish is declared dairy; ask",
+          "source": "12 §2.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "unknown",
+          "evidence": "\"המנה חלבית\": the dish is declared dairy; ask",
+          "source": "12 §2.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי שום לימון\" is mayonnaise-based",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"חרדל\" (mustard) can be added",
+          "source": "11 §13.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"צ'יקן\" (chicken)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"צ'יקן\" (chicken)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "ארוחת הצ'יקן של אמיל",
+      "description": "שף אמיל פרקסי\nקריספי צ'יקן עם תבלינים סודיים בלחמנייה רכה עם חסה, נענע, עגבנייה ואיולי שום לימון\nמוגש עם תוספת לבחירה\nהמנה חלבית",
+      "options": [
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא איולי שום לימון ",
+            "ללא חסה",
+            "ללא נענע",
+            "ללא עגבנייה"
+          ]
+        },
+        {
+          "name": "תוספות בתשלום",
+          "values": [
+            "צ׳דר אנגלי"
+          ]
+        },
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "צ'יפס ",
+            "צ׳יפס פרמז׳ן כמהין"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "milk": {
+          "label": "may_contain",
+          "role": "unknown",
+          "evidence": "\"המנה חלבית\": the dish is declared dairy; ask",
+          "source": "12 §2.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "unknown",
+          "evidence": "\"המנה חלבית\": the dish is declared dairy; ask",
+          "source": "12 §2.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי שום לימון\" is mayonnaise-based",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"חרדל\" (mustard) can be added",
+          "source": "11 §13.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"צ'יקן\" (chicken)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"צ'יקן\" (chicken)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "איולי בזיליקום (הירוק)",
+      "description": "\u202b30 מ\"ל",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי\" is mayonnaise-based",
+          "source": "12 §1.6"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "aioli often carries mustard",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"איולי\" is mayonnaise-based",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "רוטב ברביקיו",
+      "description": "\u202b30 מ\"ל",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "barbecue sauce; no dairy named; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "fish": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "barbecue sauce often contains Worcestershire (anchovy)",
+          "source": "11 §8.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "ketchup and barbecue sauce are made with vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: barbecue sauce often contains Worcestershire (anchovy)",
+          "source": "11 §8.2"
+        },
+        "vegetarian": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "fish/shellfish: barbecue sauce often contains Worcestershire (anchovy)",
+          "source": "11 §8.2"
+        }
+      }
+    },
+    {
+      "name": "איולי שיפקה",
+      "description": "\u202b30 מ\"ל",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי\" is mayonnaise-based",
+          "source": "12 §1.6"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "aioli often carries mustard",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"איולי\" is mayonnaise-based",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "\u202bמיונז טבעוני 🌱",
+      "description": "30 מ\"ל",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"מיונז טבעוני\": a vegan substitute product; טבעוני does not clear a milk allergy",
+          "source": "12 §2.1"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "guard: 'מיונז טבעוני' (11 §0): a guard lowers certainty but never clears a strict restriction",
+          "source": "11 §5.3"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise and aioli sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "declared vegan; egg/milk kept may_contain only for the allergy (11 §0, 12 §2.2)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "איולי שום לימון",
+      "description": "\u202b30 מ\"ל",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי\" is mayonnaise-based",
+          "source": "12 §1.6"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "aioli often carries mustard",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"איולי\" is mayonnaise-based",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "\u202bארוחת ארץ הפלאות",
+      "description": "שף יפתח קורן\nקציצת בקר שנטחנת כל בוקר מנתחים מובחרים, בלחמנייה רכה עם אורוגולה, איולי פירות יער, גבינת בושה וריבת בצל\nמוגש עם תוספת לבחירה\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא ארוגולה"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "גאודה",
+            "צ׳דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי "
+          ]
+        },
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "צ'יפס ",
+            "צ׳יפס פרמז׳ן כמהין"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "peanuts": {
+          "label": "free",
+          "evidence": "no peanut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §1"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינת בושה\" is cheese",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינת בושה\" is a soft or fresh cheese",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי פירות יער\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"איולי פירות יער\": mayonnaise-style sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "ארץ הפלאות",
+      "description": "שף יפתח קורן\nקציצת בקר עסיסית שנטחנת כל בוקר מנתחים מובחרים, בלחמנייה רכה עם אורוגולה, איולי פירות יער, גבינת בושה וריבת בצל\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא ארוגולה"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "גאודה",
+            "צ׳דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי "
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינת בושה\" is cheese",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינת בושה\" is a soft or fresh cheese",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי פירות יער\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"איולי פירות יער\": mayonnaise-style sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "\u202bקידבורגר | WD",
+      "description": "קציצת בקר 130 גר׳ עשויה היטב בלחמנייה רכה עם חסה, אלף האיים,  עגבנייה ומלפפון חמוץ\nלא ניתן לשנות את מידת העשייה\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים - בורגר",
+          "values": [
+            "ללא שינויים",
+            "יבש | ללא ירקות ללא רטבים",
+            "עם שינויים"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא מלפפון חמוץ",
+            "ללא חסה",
+            "ללא אלף האיים",
+            "ללא עגבנייה"
+          ]
+        },
+        {
+          "name": "תוספות בתשלום",
+          "values": [
+            "צ׳דר אנגלי"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"צ׳דר\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"צ׳דר\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב אלף האיים\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "Thousand Island is a mayonnaise-style dressing; dressings often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"מלפפון חמוץ\": pickled foods and vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "\u202bארוחת קידבורגר | WD",
+      "description": "קציצת בקר 130 גר׳ עשויה היטב בלחמנייה רכה עם חסה, אלף האיים, עגבנייה ומלפפון חמוץ\nמוגש עם תוספת לבחירה\nלא ניתן לשנות את מידת העשייה\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים - בורגר",
+          "values": [
+            "ללא שינויים",
+            "יבש | ללא ירקות ללא רטבים",
+            "עם שינויים"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא מלפפון חמוץ",
+            "ללא חסה",
+            "ללא אלף האיים",
+            "ללא עגבנייה"
+          ]
+        },
+        {
+          "name": "תוספות בתשלום",
+          "values": [
+            "צ׳דר אנגלי"
+          ]
+        },
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "צ'יפס ",
+            "צ׳יפס פרמז׳ן כמהין"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "milk": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"צ׳דר\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"צ׳דר\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב אלף האיים\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "Thousand Island is a mayonnaise-style dressing; dressings often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"מלפפון חמוץ\": pickled foods and vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "פריגת ענבים - בקבוק זכוכית",
+      "description": "0,33",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "juice; no dairy named; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"ענבים\": grape juice is a listed sulphite carrier",
+          "source": "12 §1.10"
+        }
+      }
+    },
+    {
+      "name": "פריגת תפוזים - בקבוק זכוכית",
+      "description": "0,33",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "juice; no dairy named; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "juice; no egg named; cross-contact not assessed",
+          "source": "11 §5"
+        }
+      }
+    },
+    {
+      "name": "המבורגר דיל",
+      "description": "המבורגר בקר 200 גר׳ בלחמנייה עם חסה אמריקאית, עגבנייה, בצל סגול, חמוצים שלנו ורוטב אלף האיים\nמוגש עם תוספת על ההמבורגר, תוספת בצד ושתייה לבחירה\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא חסה",
+            "ללא עגבנייה",
+            "ללא בצל סגול",
+            "ללא מלפפון חמוץ",
+            "ללא אלף האיים"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות בתשלום",
+          "values": [
+            "שום קונפי ",
+            "ביצת עין",
+            "\u202bחלפיניו מוחמץ 🌶",
+            "ריבת בצל",
+            "גאודה",
+            "צ'דר ",
+            "גבינת בושה",
+            "ריבת שרי"
+          ]
+        },
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "צ'יפס ",
+            "צ׳יפס פרמז׳ן כמהין"
+          ]
+        },
+        {
+          "name": "בחרו שתייה",
+          "values": [
+            "קוקה קולה",
+            "קוקה קולה זירו",
+            "ספרייט",
+            "ספרייט זירו",
+            "מים מינרליים",
+            "סודה",
+            "פריגת ענבים",
+            "פריגת תפוזים"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"גאודה\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"גאודה\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב אלף האיים\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "Thousand Island is a mayonnaise-style dressing; dressings often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חמוצים בכבישה\": pickled foods and vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "כנפיים | 8 יח׳",
+      "description": "כנפי עוף פריכות ברוטב מתקתק סודי \nשף יוצר : יפתח קורן",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"רוטב מתקתק סודי\": sweet wing glazes commonly contain soy sauce",
+          "source": "11 §6.2"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "\"כנפי עוף פריכות\": crispy wings are usually floured",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "\"כנפי עוף פריכות\": crispy wings are usually floured",
+          "source": "11 §7.2"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "a secret sauce may carry mustard",
+          "source": "11 §13.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"רוטב מתקתק סודי\": sweet wing glazes commonly contain soy sauce",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"כנפי עוף\" (chicken wings)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"כנפי עוף\" (chicken wings)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "המבורגר, תוספת ושתייה",
+      "description": "קציצת בקר 200 גר' שנטחנת כל בוקר מנתחים מובחרים  בלחמנייה רכה עם רוטב איולי תוצרת הבית, חסה אמריקאית, חמוצים בכבישה שלנו, עגבנייה ובצל סגול\nמוגש עם תוספת ושתייה לבחירה \n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים - בורגר",
+          "values": [
+            "ללא שינויים",
+            "יבש | ללא ירקות ללא רטבים",
+            "עם שינויים"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא חסה",
+            "ללא עגבנייה",
+            "ללא בצל סגול",
+            "ללא מלפפון חמוץ",
+            "ללא אלף האיים"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "גאודה",
+            "צ׳דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי "
+          ]
+        },
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "צ'יפס ",
+            "צ׳יפס פרמז׳ן כמהין"
+          ]
+        },
+        {
+          "name": "בחרו שתייה",
+          "values": [
+            "קוקה קולה",
+            "קוקה קולה זירו",
+            "ספרייט",
+            "ספרייט זירו",
+            "מים מינרליים",
+            "סודה",
+            "פריגת ענבים",
+            "פריגת תפוזים"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"גאודה\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"גאודה\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי הבית\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"איולי הבית\": mayonnaise-style sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חמוצים בכבישה\": pickled foods and vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "קיט רטבים",
+      "description": "\u202b3 יח׳ קטשופ ו-3 יח׳ מיונז",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "free",
+          "evidence": "no peanut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"מיונז\" (mayonnaise) is egg-based",
+          "source": "11 §5.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise often carries mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "ketchup and barbecue sauce are made with vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"מיונז\" (mayonnaise) is egg-based",
+          "source": "11 §5.1"
+        }
+      }
+    },
+    {
+      "name": "צ'יפס פרמז'ן כמהין",
+      "description": "קריספי צ'יפס מוקפץ בשמן כמהין פלפל שחור ופרמז'ן",
+      "options": [
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"פרמז'ן\" is parmesan cheese",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "parmesan is a hard cheese: very low in lactose",
+          "source": "11 §4.3"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"קיט רטבים\" (ketchup and mayonnaise kit) can be added",
+          "source": "12 §1.6"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"חרדל\" (mustard) can be added",
+          "source": "11 §13.1"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "chips from pre-cut potato may be sulphite-treated",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"פרמז'ן\" is parmesan cheese",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "נאגסט",
+      "description": "הנאגטס שלנו",
+      "options": [
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "eggs": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "breaded coatings are usually egg-bound",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"נאגטס\" are breaded and the breading is wheat",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"נאגטס\" are breaded and the breading is wheat",
+          "source": "11 §7.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"חרדל\" (mustard) can be added",
+          "source": "11 §13.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"נאגטס\" (chicken nuggets)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"נאגטס\" (chicken nuggets)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "ארוחת המבורגר",
+      "description": "קציצת בקר עסיסית שנטחנת כל בוקר מנתחים מובחרים בלחמנייה רכה עם רוטב אלף האיים תוצרת הבית, חסה אמריקאית, חמוצים בכבישה שלנו, עגבנייה ובצל סגול\nמוגש עם תוספת לבחירה\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים - בורגר",
+          "values": [
+            "ללא שינויים",
+            "יבש | ללא ירקות ללא רטבים",
+            "עם שינויים"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים - בורגר",
+          "values": [
+            "ללא אלף האיים",
+            "ללא חסה",
+            "ללא עגבנייה",
+            "ללא בצל סגול",
+            "ללא חמוצים"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "גאודה",
+            "צ׳דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי "
+          ]
+        },
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "צ'יפס ",
+            "צ׳יפס פרמז׳ן כמהין"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "milk": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"גאודה\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"גאודה\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"רוטב אלף האיים\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "Thousand Island is a mayonnaise-style dressing; dressings often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חמוצים בכבישה\": pickled foods and vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "צ'יקן אמריקה",
+      "description": "שף אביב סולימני\nצ'יקן קריספי אמריקאי בציפוי תערובת קורנפלקס ופאנקו בלחמנייה רכה עם מיונז, קולסלואו, רוטב באפלו פיקנטי וחמוצים של המוסד",
+      "options": [
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא מיונז",
+            "ללא קולסלואו",
+            "ללא חמוצים",
+            "ללא רוטב באפלו"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "buffalo sauce is traditionally finished with butter",
+          "source": "11 §3.2"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"מיונז\" is egg-based",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise often carries mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חמוצים\": pickled foods and vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"צ'יקן קריספי\" (fried chicken)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"צ'יקן קריספי\" (fried chicken)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "צ׳יקן אמריקה, תוספת ושתייה",
+      "description": "שף אביב סולימני\nצ'יקן קריספי אמריקאי בציפוי תערובת קורנפלקס ופאנקו בלחמנייה רכה עם מיונז, קולסלואו, רוטב באפלו פיקנטי וחמוצים של המוסד \nמוגש עם תוספת ושתייה לבחירה",
+      "options": [
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא מיונז",
+            "ללא קולסלואו",
+            "ללא חמוצים",
+            "ללא רוטב באפלו"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות בתשלום",
+          "values": [
+            "צ׳דר אנגלי"
+          ]
+        },
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "צ'יפס ",
+            "צ׳יפס פרמז׳ן כמהין"
+          ]
+        },
+        {
+          "name": "בחרו שתייה",
+          "values": [
+            "קוקה קולה",
+            "קולה זירו",
+            "ספרייט",
+            "ספרייט זירו",
+            "מים מינרליים",
+            "סודה",
+            "פריגת ענבים"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"צ׳דר\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"צ׳דר\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"מיונז\" is egg-based",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise often carries mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חמוצים\": pickled foods and vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"צ'יקן קריספי\" (fried chicken)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"צ'יקן קריספי\" (fried chicken)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "💙",
+      "description": "\u202bקציצת הבקר שלנו מיוצרת מדי יום במקום, מבלנד מוקפד של בקר הולשטיין מקומי מובחר, ליצירת איזון מושלם בין עסיסיות וטעם עשיר.  הקציצה נעשית במתכון סודי אשר לא ניתן לשינוי ומכילה בצל מטוגן.\n\nהתפריט שלנו מורכב מהמבורגרים, שכל אחד מהם הוא יצירה של שף אחר עם חתימה קולינרית ייחודית ודיוק עד הביס המושלם. לכן, חלק מהמנות מוגשות כפי שהן ללא שינויים כדי לשמור על החוויה מושלמת.  \n\nכל מנה מגיעה עם 2 שקיות קטשופ ו-2 שקיות מיונז במידה ותרצו עוד רטבים מוזמנים להוסיף קיט רטבים 💙 \n\nאנחנו עושים את מירב המאמצים לשמור על מידת העשייה שבחרתם אך לא תמיד זה מתאפשר במשלוח 🙏",
+      "options": [],
+      "labels": {
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        }
+      }
+    },
+    {
+      "name": "המבורגר האיטלקי, תוספת ושתייה",
+      "description": "קציצת בקר 200 גר' שנטחנת כל בוקר מנתחים מובחרים בלחמנייה רכה עם מיונז, אורוגולה, ריבת שרי, גבינת מוצרלה וחמאת פסטו שף יוצר : אביב סולימני\nמוגש עם תוספת ושתייה לבחירה\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא מיונז",
+            "ללא אורגולה",
+            "ללא ריבת",
+            "ללא גבינת מוצרלה",
+            "ללא חמאת פסטו"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "גאודה",
+            "צ׳דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי "
+          ]
+        },
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "צ'יפס ",
+            "צ׳יפס פרמז׳ן כמהין"
+          ]
+        },
+        {
+          "name": "בחרו שתייה",
+          "values": [
+            "קוקה קולה",
+            "קוקה קולה זירו",
+            "ספרייט",
+            "ספרייט זירו",
+            "מים מינרליים",
+            "סודה",
+            "פריגת ענבים",
+            "פריגת תפוזים"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "איולי בזיליקום (הירוק)"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "peanuts": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
+        "treeNuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"pesto\" is made with pine nuts (or walnuts)",
+          "source": "11 §2.1"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינת מוצרלה\" is cheese",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינת מוצרלה\" is a soft or fresh cheese",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"מיונז\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"מיונז\": mayonnaise-style sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "drink option \"ענבים\" (grape juice)",
+          "source": "12 §1.10"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "המבורגר",
+      "description": "קציצת בקר עסיסית שנטחנת כל בוקר מנתחים מובחרים בלחמנייה רכה עם רוטב איולי הבית, חסה אמריקאית, חמוצים בכבישה שלנו, עגבנייה ובצל סגול\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים - בורגר",
+          "values": [
+            "ללא שינויים",
+            "יבש | ללא ירקות ללא רטבים",
+            "עם שינויים"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים - בורגר",
+          "values": [
+            "ללא אלף האיים",
+            "ללא חסה",
+            "ללא עגבנייה",
+            "ללא בצל סגול",
+            "ללא חמוצים"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "גאודה",
+            "צ׳דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי "
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"גאודה\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"גאודה\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי הבית\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"איולי הבית\": mayonnaise-style sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חמוצים בכבישה\": pickled foods and vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "המבורגר האיטלקי",
+      "description": "קציצת בקר עסיסית  שנטחנת כל בוקר מנתחים מובחרים בלחמנייה רכה עם מיונז, אורוגולה, ריבת שרי, גבינת מוצרלה וחמאת פסטו\nשף יוצר : אביב סולימני\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "גאודה",
+            "צ׳דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי "
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "peanuts": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
+        "treeNuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"pesto\" is made with pine nuts (or walnuts)",
+          "source": "11 §2.1"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינת מוצרלה\" is cheese",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינת מוצרלה\" is a soft or fresh cheese",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"מיונז\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"מיונז\": mayonnaise-style sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "ארוחת המבורגר האיטלקי",
+      "description": "קציצת בקר 200 גר' שנטחנת כל בוקר מנתחים מובחרים בלחמנייה רכה עם מיונז, אורוגולה, ריבת שרי, גבינת מוצרלה וחמאת פסטו\nמוגש עם תוספת לבחירה\nשף יוצר: אביב סולימני\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "גאודה",
+            "צ׳דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי "
+          ]
+        },
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "צ'יפס ",
+            "צ׳יפס פרמז׳ן כמהין"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "peanuts": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
+        "treeNuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"pesto\" is made with pine nuts (or walnuts)",
+          "source": "11 §2.1"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינת מוצרלה\" is cheese",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינת מוצרלה\" is a soft or fresh cheese",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"מיונז\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"מיונז\": mayonnaise-style sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: pesto and nut sauces are a documented peanut hiding place",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "באפלו ווינגס | 8 יח' 🌶",
+      "description": "כנפי עוף ברוטב באפלו סודי 🌶\nשף יוצר: אביב סולימאני",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "buffalo sauce is traditionally finished with butter",
+          "source": "11 §3.2"
+        },
+        "sesame": {
+          "label": "free",
+          "evidence": "wings in buffalo sauce; no sesame named; cross-contact not assessed",
+          "source": "11 §11"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"כנפי עוף\" (chicken wings)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"כנפי עוף\" (chicken wings)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "טבעוני, תוספת ושתייה",
+      "description": "\u202bקציצה ביונד מיט בלחמנייה רכה עם חסה אייסברג, עגבנייה, בצל סגול, גבינת צ'דר טבעונית | מוגש עם תוספת לבחירה",
+      "options": [
+        {
+          "name": "המבורגר טבעוני",
+          "values": [
+            "צ׳יזבורגר טבעוני "
+          ]
+        },
+        {
+          "name": "שינויים אפשריים - המבורגר טבעוני",
+          "values": [
+            "ללא איולי הבית",
+            "ללא חסה",
+            "ללא עגבניה",
+            "ללא בצל סגול",
+            "ללא גבינה טבעונית"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "ביצת עין",
+            "\u202bחלפיניו מוחמץ 🌶",
+            "ריבת בצל",
+            "גאודה",
+            "צ'דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי ",
+            "ריבת שרי"
+          ]
+        },
+        {
+          "name": "תוספת בצד",
+          "values": [
+            "צ׳יפס"
+          ]
+        },
+        {
+          "name": "בחרו שתייה",
+          "values": [
+            "קולה",
+            "קולה זירו",
+            "ספרייט",
+            "ספרייט זירו",
+            "ענבים",
+            "מים מינרלים",
+            "סודה",
+            "בירה שחורה"
+          ]
+        }
+      ],
+      "labels": {
+        "peanuts": {
+          "label": "free",
+          "evidence": "no peanut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §1"
+        },
+        "milk": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"גבינה טבעונית\": a vegan substitute; טבעוני does not clear a milk allergy",
+          "source": "12 §2.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"גבינה טבעונית\": a vegan substitute; טבעוני does not clear a milk allergy",
+          "source": "12 §2.1"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "the option \"ללא איולי הבית\" implies a house aioli on this burger",
+          "source": "12 §1.6"
+        },
+        "soy": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "vegan burger patty is a pea and soy protein product (the same venue states \"חלבון אפונה וסויה\")",
+          "source": "12 §1.11"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "soft bun",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "soft bun",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mayonnaise and aioli sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "drink option \"ענבים\" (grape juice)",
+          "source": "12 §1.10"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "plant-protein patty (pea)",
+          "source": "11 §16.2"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "animal-derived: the option \"ללא איולי הבית\" implies a house aioli on this burger",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "ארוחת צ׳יזבורגר המוסד",
+      "description": "קציצת בקר עסיסית שנטחנת כל בוקר מנתחים מובחרים בלחמנייה רכה עם איולי הבית, ארוגולה, חמוצים שלנו, גבינת צ'דר אנגלי, בצל מקורמל וטוויל גבינת גאודה הולנדית .\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם. \nמוגש עם תוספת לבחירה",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא איולי הבית",
+            "ללא ארוגולה",
+            "ללא חמוצים",
+            "ללא בצל מקורמל"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "צ'יפס ",
+            "צ׳יפס פרמז׳ן כמהין"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "גאודה",
+            "צ׳דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי "
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינת צ'דר אנגלי\" is cheese",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"גבינת צ'דר אנגלי\" is a hard, aged cheese: only traces of lactose",
+          "source": "11 §4.3"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי הבית\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"איולי הבית\": mayonnaise-style sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חמוצים\": pickled foods and vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "סמאשבורגר",
+      "description": "קציצת סמאשש כפולה שנטחנות כל בוקר מנתחים מובחרים בלחמנייה עם אורוגולה, מיונז, צ'דר אנגלי, חמוצים שלנו, בצל צרוב וריבת הוואי מנגו צ'ילי 🌶️ פיקנטי",
+      "options": [
+        {
+          "name": "שינויים אפשריים |  גבינת צ׳דר",
+          "values": [
+            "ללא גבינת צ׳דר"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא מיונז",
+            "ללא אורגולה",
+            "ללא חמוצים"
+          ]
+        },
+        {
+          "name": "\u202bללא מארז רטבים? ♻️",
+          "values": [
+            "\u202bללא מארז רטבים ♻️"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"צ'דר אנגלי\" is cheese",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"צ'דר אנגלי\" is a hard, aged cheese: only traces of lactose",
+          "source": "11 §4.3"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"מיונז\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"מיונז\": mayonnaise-style sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חמוצים\": pickled foods and vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "צ׳יזבורגר המוסד",
+      "description": "קציצת בקר עסיסית שנטחנת כל בוקר מנתחים מובחרים בלחמנייה רכה עם איולי הבית, ארוגולה, חמוצים שלנו, גבינת צ'דר אנגלי, בצל מקורמל וטוויל גבינת גאודה הולנדית .\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם.",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה ",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא איולי הבית",
+            "ללא ארוגולה",
+            "ללא חמוצים",
+            "ללא בצל מקורמל"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספות להמבורגר",
+          "values": [
+            "ריבת שרי",
+            "ריבת בצל",
+            "שום קונפי",
+            "ביצת עין",
+            "גבינת צ׳דר אנגלי",
+            "גבינת גאודה",
+            "גבינת בושה",
+            "גבינת ברי",
+            "אווז צלוי",
+            "בייקון טלה",
+            "אונטריב ברביקיו",
+            "לחמניה ללא גלוטן",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי"
+          ]
+        },
+        {
+          "name": "ללא קיט רטבים",
+          "values": [
+            "ללא קיט רטבים"
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "איולי בזיליקום (הירוק)"
+          ]
+        }
+      ],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "no tree nut ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §2"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינת צ'דר אנגלי\" is cheese",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"גבינת צ'דר אנגלי\" is a hard, aged cheese: only traces of lactose",
+          "source": "11 §4.3"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי הבית\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"איולי הבית\": mayonnaise-style sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חמוצים\": pickled foods and vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "צ׳יזבורגר המוסד,  תוספת ושתייה",
+      "description": "קציצת בקר עסיסית שנטחנת כל בוקר מנתחים מובחרים בלחמנייה רכה עם איולי הבית, ארוגולה, חמוצים שלנו, גבינת צ'דר אנגלי, בצל מקורמל וטוויל גבינת גאודה הולנדית .\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם. \nמוגש עם תוספת ושתייה לבחירה",
+      "options": [
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "בחרו סוג לחמניה",
+          "values": [
+            "לחמניה רגילה",
+            "\u202bלחמנייה ללא גלוטן 🌾"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים",
+          "values": [
+            "ללא איולי הבית",
+            "ללא ארוגולה",
+            "ללא חמוצים",
+            "ללא בצל מקורמל"
+          ]
+        },
+        {
+          "name": "\u202bתרצו דאבל קציצה?",
+          "values": [
+            "\u202bלא, תודה!",
+            "\u202bדאבל קציצה | 200 גר׳"
+          ]
+        },
+        {
+          "name": "תוספת לבחירה",
+          "values": [
+            "צ'יפס ",
+            "צ׳יפס פרמז׳ן כמהין"
+          ]
+        },
+        {
+          "name": "תוספות על ההמבורגר",
+          "values": [
+            "שום קונפי ",
+            "גאודה",
+            "צ׳דר ",
+            "גבינת בושה",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי "
+          ]
+        },
+        {
+          "name": "רטבים בתוספת תשלום",
+          "values": [
+            "קיט רטבים",
+            "חרדל",
+            "מיונז טבעוני"
+          ]
+        },
+        {
+          "name": "בחרו שתייה",
+          "values": [
+            "קולה",
+            "קולה זירו",
+            "ספרייט",
+            "ספרייט זירו",
+            "ענבים",
+            "מים מינרלים",
+            "סודה",
+            "בירה שחורה"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גבינת צ'דר אנגלי\" is cheese",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"גבינת צ'דר אנגלי\" is a hard, aged cheese: only traces of lactose",
+          "source": "11 §4.3"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי הבית\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"איולי הבית\": mayonnaise-style sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "\"חמוצים\": pickled foods and vinegar",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "המבורגר טראמפ, תוספת ושתייה",
+      "description": "שף דן יושע\nקציצת בקר 200 גר' שנטחנת כל בוקר מנתחים מובחרים, בלחמנייה רכה עם חסה אמריקאית, עגבנייה, איולי וויסקי תוצרת הבית, ביצת עין, אווז צלוי וטבעת בצל קריספית בטמפורה\nמוגש עם תוספת ושתייה לבחירה\n*ביצת עין עשויה במשלוחים\n\n100% בשר בקר ישראלי מובחר מפרות הולשטיין, בלנד נתחים טריים ומיושנים שנטחנים במקום ליצירת קציצה עסיסית, עמוקה ומדויקת בטעם",
+      "options": [
+        {
+          "name": "המבורגר טראמפ",
+          "values": [
+            "המבורגר טראמפ"
+          ]
+        },
+        {
+          "name": "בחרו מידת עשייה",
+          "values": [
+            "M",
+            "MW-W",
+            "WD"
+          ]
+        },
+        {
+          "name": "שינויים אפשריים - טראמפ",
+          "values": [
+            "ללא חסה",
+            "ללא עגבנייה",
+            "ללא טבעת בצל",
+            "ללא אווז",
+            "ללא איולי וויסקי",
+            "ללא ביצת עין"
+          ]
+        },
+        {
+          "name": "תרצו טבעת בצל?",
+          "values": [
+            "כן, עם טבעת בצל",
+            "ללא טבעת בצל"
+          ]
+        },
+        {
+          "name": "תוספות להמבורגר",
+          "values": [
+            "ריבת שרי",
+            "ריבת בצל",
+            "שום קונפי",
+            "חלפיניו",
+            "ביצת עין",
+            "גבינת צ׳דר אנגלי",
+            "גבינת גאודה",
+            "גבינת בושה",
+            "גבינת ברי",
+            "לחמניה ללא גלוטן",
+            "אקסטרה גאודה הולנדית",
+            "אקסטרה צ׳דר אנגלי"
+          ]
+        },
+        {
+          "name": "תוספת בצד",
+          "values": [
+            "צ׳יפס"
+          ]
+        },
+        {
+          "name": "בחרו שתייה",
+          "values": [
+            "קולה",
+            "קולה זירו",
+            "ספרייט",
+            "ספרייט זירו",
+            "ענבים",
+            "מים מינרלים",
+            "סודה",
+            "בירה שחורה"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"גאודה\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "option \"גאודה\": a cheese can be added",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"איולי וויסקי\" is a mayonnaise-based sauce",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחמנייה רכה\" (soft bun) is a wheat bread",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחמנייה\": a bun can carry a sesame topping",
+          "source": "12 §1.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "\"ליצירת\" contains the letters ציר (stock) but means \"to create\"; no stock or celery is named; cross-contact not assessed",
+          "source": "12 §1.9"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"איולי וויסקי\": mayonnaise-style sauces often carry mustard",
+          "source": "11 §13.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "drink option \"ענבים\" (grape juice)",
+          "source": "12 §1.10"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קציצת בקר\" (beef patty)",
+          "source": "12 §2.2"
+        }
+      }
+    }
+  ]
+}

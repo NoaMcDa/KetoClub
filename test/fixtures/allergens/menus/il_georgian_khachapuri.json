@@ -1,0 +1,607 @@
+{
+  "_fixture_note": "synthetic Georgian khachapuri place written for the corpus from 12 §1.2, §1.4, §1.5; labels are unreviewed desk research; Hebrew",
+  "language": "he",
+  "dishes": [
+    {
+      "name": "חצ׳פורי אג׳ארולי",
+      "description": "בצק בצורת סירה במילוי גבינת סולוגוני ומוצרלה, חלמון וחמאה",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גבינת סולוגוני ומוצרלה\" and \"חמאה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "soft fresh cheeses",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"חלמון\" (egg yolk)",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בצק\" (dough)",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בצק\" (dough)",
+          "source": "12 §1.4"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"גבינת סולוגוני ומוצרלה\" and \"חמאה\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "חצ׳פורי אימרולי",
+      "description": "בצק עגול במילוי גבינה לבנה וגבינה מלוחה",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גבינה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "fresh white and brined cheeses",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "enriched dough is often egg-glazed",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בצק\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בצק\"",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"גבינה\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "חצ׳פורי מגרולי",
+      "description": "חצ׳פורי עם גבינה בפנים ומעל, וביצה עין",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גבינה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גבינה\"",
+          "source": "12 §1.5"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"ביצה עין\" (fried egg)",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חצ׳פורי\" dough",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חצ׳פורי\" dough",
+          "source": "12 §1.4"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "dough, cheese and egg; cross-contact not assessed",
+          "source": "11 §8"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"גבינה\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "לוביאני",
+      "description": "לחם במילוי שעועית אדומה, בצל ותבלינים",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "filled breads are often brushed with butter",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "filled breads are often brushed with butter",
+          "source": "11 §4.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחם\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"לחם\"",
+          "source": "12 §1.4"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"שעועית\" (beans)",
+          "source": "12 §1.3"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "animal-derived: filled breads are often brushed with butter",
+          "source": "11 §3.2"
+        }
+      }
+    },
+    {
+      "name": "חינקלי (5 יח׳)",
+      "description": "כיסוני בצק ממולאים בבשר בקר וכבש ובמרק, פלפל שחור",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "dumpling dough is commonly egg-bound",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"כיסוני בצק\" (dumplings)",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"כיסוני בצק\" (dumplings)",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "free",
+          "evidence": "no sesame ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §11"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"בשר בקר וכבש\" (beef and lamb)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"בשר בקר וכבש\" (beef and lamb)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "חרצ׳ו",
+      "description": "מרק בקר חריף עם אורז, אגוזי מלך וכוסברה",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"אגוזי מלך\" (walnuts)",
+          "source": "12 §1.2"
+        },
+        "celery": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "soups and stocks are celery vectors",
+          "source": "12 §1.9"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"בקר\" (beef)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"בקר\" (beef)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "סאציבי",
+      "description": "עוף ברוטב אגוזי מלך, שום וכוסברה",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"אגוזי מלך\"",
+          "source": "12 §1.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "באדריג׳ני נוהוני",
+      "description": "חציל ממולא בממרח אגוזי מלך ורימונים",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"אגוזי מלך\"",
+          "source": "12 §1.2"
+        },
+        "milk": {
+          "label": "free",
+          "evidence": "eggplant, walnut paste and pomegranate; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only plant ingredients named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "פחאלי",
+      "description": "ממרח תרד וסלק עם אגוזים ושום",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "a bare \"אגוזים\" leaves the peanut status unknown; ask",
+          "source": "12 §1.2"
+        },
+        "treeNuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"אגוזים\" on an Israeli menu usually means tree nuts",
+          "source": "12 §1.2"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: a bare \"אגוזים\" leaves the peanut status unknown; ask",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "שישליק בקר",
+      "description": "שיפודי בקר בגריל עם בצל סגול וסומק",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "grilled steak is often finished with butter",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "grilled beef with onion and sumac; cross-contact not assessed",
+          "source": "11 §5"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"בקר\" (beef)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"בקר\" (beef)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "מצוואדי כבש",
+      "description": "שיפודי כבש בגריל על קרשי עץ",
+      "options": [],
+      "labels": {
+        "sesame": {
+          "label": "free",
+          "evidence": "grilled lamb skewers; cross-contact not assessed",
+          "source": "11 §11"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"כבש\" (lamb)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"כבש\" (lamb)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "קבב ג׳ורג׳י",
+      "description": "קבב כבש עם בצל וכוסברה ולחם לאבש",
+      "options": [],
+      "labels": {
+        "wheat": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"לאבש\" (lavash bread)",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"לאבש\" (lavash bread)",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קבב כבש\" (lamb kebab)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"קבב כבש\" (lamb kebab)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "פטריות בקרם",
+      "description": "פטריות מוקפצות ברוטב שמנת וחמאה",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"שמנת\" and \"חמאה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "cream",
+          "source": "11 §4.1"
+        },
+        "sesame": {
+          "label": "free",
+          "evidence": "no sesame ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §11"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"שמנת\" and \"חמאה\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "סלט ג׳ורג׳י",
+      "description": "עגבנייה, מלפפון, בצל סגול ואגוזי מלך ברוטב שמן חמניות",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"אגוזי מלך\"",
+          "source": "12 §1.2"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only plant ingredients named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "טבקה",
+      "description": "עוף שלם מוקפץ בחמאה, שום ותבלינים",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"חמאה\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "גבינת סולוגוני בגריל",
+      "description": "גבינה מותכת בגריל עם נענע",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גבינת סולוגוני\"",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a fresh brined cheese",
+          "source": "11 §4.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"גבינת סולוגוני\"",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "פירה תפוחי אדמה",
+      "description": "פירה חם עם עשבי תיבול",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "mashed potato is commonly made with butter or milk",
+          "source": "11 §3.2"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "mashed potato is commonly made with butter or milk",
+          "source": "11 §4.2"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "no fish ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §8"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "animal-derived: mashed potato is commonly made with butter or milk",
+          "source": "11 §3.2"
+        }
+      }
+    },
+    {
+      "name": "יין אדום גאורגי (כוס)",
+      "description": "",
+      "options": [],
+      "labels": {
+        "sulphites": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "wine is a sulphite source",
+          "source": "11 §15.2"
+        }
+      }
+    },
+    {
+      "name": "לימונדה טרחון",
+      "description": "לימון, טרחון וסוכר",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "lemon, tarragon and sugar; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only plant ingredients named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "יין לבן גאורגי (מכיל סולפיטים)",
+      "description": "",
+      "options": [],
+      "labels": {
+        "sulphites": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"סולפיטים\" named in the dish",
+          "source": "11 §15.1"
+        }
+      }
+    }
+  ]
+}

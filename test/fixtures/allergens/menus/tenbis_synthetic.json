@@ -1,0 +1,175 @@
+{
+  "_fixture_note": "synthetic 10bis payload copied from test/fixtures/tenbis_synthetic_menu.json (the duplicate listing is dropped); labels are unreviewed desk research; English with two Hebrew dishes",
+  "language": "mixed",
+  "dishes": [
+    {
+      "name": "Entrecôte 300g",
+      "description": "Served with butter-infused potato purée",
+      "options": [
+        {
+          "name": "Choice of Side",
+          "values": [
+            "Potato Purée",
+            "Green Salad"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"butter-infused\" potato purée",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "butter is tolerated by many but is lactose-bearing",
+          "source": "11 §4.3"
+        },
+        "sesame": {
+          "label": "free",
+          "evidence": "steak with a potato purée or salad side; cross-contact not assessed",
+          "source": "11 §11"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "entrecôte (beef)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "entrecôte (beef)",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Grilled Halloumi Salad",
+      "description": "",
+      "options": [
+        {
+          "name": "Add Extras",
+          "values": [
+            "Extra Halloumi",
+            "Olives"
+          ]
+        }
+      ],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Halloumi\" is cheese",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "halloumi is a fresh-style cheese; no source documents it as low in lactose",
+          "source": "11 §4.1"
+        },
+        "eggs": {
+          "label": "free",
+          "evidence": "a salad of grilled cheese; no egg named; cross-contact not assessed",
+          "source": "11 §5"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"Halloumi\" is cheese",
+          "source": "12 §1.5"
+        },
+        "vegetarian": {
+          "label": "free",
+          "evidence": "cheese salad with olives; no meat or fish named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Bread Basket (complimentary)",
+      "description": "On the house",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "baked goods commonly contain soy flour or lecithin",
+          "source": "11 §6.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Bread Basket\" is wheat bread",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Bread Basket\" is wheat bread",
+          "source": "11 §7.1"
+        },
+        "fish": {
+          "label": "free",
+          "evidence": "bread; no fish named; cross-contact not assessed",
+          "source": "11 §8"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "bakery bread may be seeded or cross-contacted",
+          "source": "11 §11.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "soy is a legume: baked goods commonly contain soy flour or lecithin",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "סלט ירקות",
+      "description": "עגבניות, מלפפון, שמנים",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "a plain vegetable salad; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "sesame": {
+          "label": "free",
+          "evidence": "a plain vegetable salad (עגבניות, מלפפון); cross-contact not assessed",
+          "source": "11 §11"
+        },
+        "vegan": {
+          "label": "free",
+          "evidence": "only vegetables named",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Baby Gem with Tahini",
+      "description": "",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "free",
+          "evidence": "baby gem lettuce with tahini; no dairy named; cross-contact not assessed",
+          "source": "11 §3"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"Tahini\" is ground sesame",
+          "source": "12 §1.1"
+        }
+      }
+    }
+  ]
+}

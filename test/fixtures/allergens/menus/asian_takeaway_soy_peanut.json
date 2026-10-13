@@ -1,0 +1,1093 @@
+{
+  "_fixture_note": "synthetic Thai and Chinese takeaway with soy and peanut sauces written for the corpus from 11 §1.2, §6.2, §10.2 and 12 §5; labels are unreviewed desk research; English",
+  "language": "en",
+  "dishes": [
+    {
+      "name": "Pad Thai",
+      "description": "Rice noodles stir-fried with egg, tofu, bean sprouts and crushed peanuts, seasoned with fish sauce",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"crushed peanuts\"",
+          "source": "11 §1.1"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"egg\"",
+          "source": "11 §5.1"
+        },
+        "soy": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"tofu\"",
+          "source": "11 §6.1"
+        },
+        "fish": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"fish sauce\"",
+          "source": "11 §8.1"
+        },
+        "crustaceans": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "dried shrimp or shrimp paste is a common seasoning",
+          "source": "11 §9.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "sesame oil is common in pad thai",
+          "source": "12 §5"
+        },
+        "lupin": {
+          "label": "free",
+          "evidence": "no lupin ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §14"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"tofu\" is soy",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"egg\"",
+          "source": "11 §5.1"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "fish/shellfish: \"fish sauce\"",
+          "source": "11 §8.1"
+        }
+      }
+    },
+    {
+      "name": "Chicken Satay",
+      "description": "Grilled chicken skewers with peanut sauce and cucumber relish",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"peanut sauce\"",
+          "source": "11 §1.1"
+        },
+        "soy": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "satay marinades commonly use soy sauce",
+          "source": "11 §6.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: \"peanut sauce\"",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"chicken\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"chicken\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Green Curry",
+      "description": "Chicken, Thai aubergine and basil in green curry paste and coconut milk",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "curries are a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
+        "treeNuts": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "curry pastes and sauces are a documented tree-nut hiding place (coconut itself is not a tree nut, 11 §2.5)",
+          "source": "11 §2.2"
+        },
+        "milk": {
+          "label": "free",
+          "evidence": "\"coconut milk\" is not dairy; cross-contact not assessed",
+          "source": "11 §3.3"
+        },
+        "fish": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "curry paste commonly contains shrimp paste or fish sauce",
+          "source": "11 §8.1"
+        },
+        "crustaceans": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "curry paste commonly contains shrimp paste",
+          "source": "11 §9.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mustard seed is used in curry pastes",
+          "source": "12 §1.8"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: curries are a documented peanut hiding place",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Chicken\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Chicken\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Massaman Curry",
+      "description": "Beef, potato and onion with roasted peanuts in massaman curry",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"roasted peanuts\"",
+          "source": "11 §1.1"
+        },
+        "treeNuts": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "curry pastes and sauces are a documented tree-nut hiding place (coconut itself is not a tree nut, 11 §2.5)",
+          "source": "11 §2.2"
+        },
+        "fish": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "curry paste commonly contains fish sauce or shrimp paste",
+          "source": "11 §8.2"
+        },
+        "crustaceans": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "curry paste commonly contains shrimp paste",
+          "source": "11 §9.1"
+        },
+        "mustard": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "mustard seed is used in curry pastes",
+          "source": "12 §1.8"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "peanuts is a legume: \"roasted peanuts\"",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Beef\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Beef\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Tom Yum Goong",
+      "description": "Hot and sour soup with prawns, mushroom and lemongrass, finished with fish sauce",
+      "options": [],
+      "labels": {
+        "fish": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"fish sauce\"",
+          "source": "11 §8.1"
+        },
+        "crustaceans": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"prawns\"",
+          "source": "11 §9.1"
+        },
+        "molluscs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "seafood soups are often finished with oyster sauce",
+          "source": "11 §10.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "prawns are a sulphite source",
+          "source": "11 §15.2"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"fish sauce\"",
+          "source": "11 §8.1"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "fish/shellfish: \"fish sauce\"",
+          "source": "11 §8.1"
+        }
+      }
+    },
+    {
+      "name": "Vegetable Spring Rolls",
+      "description": "Crispy rolls of glass noodle and cabbage with sweet chili sauce",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "egg rolls and fried rolls are a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "roll wrappers commonly contain egg",
+          "source": "11 §5.2"
+        },
+        "soy": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "fillings are commonly seasoned with soy sauce",
+          "source": "11 §6.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "spring roll wrappers are wheat",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "spring roll wrappers are wheat",
+          "source": "11 §7.1"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "no celery ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §12"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy is a legume: fillings are commonly seasoned with soy sauce",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "animal-derived: roll wrappers commonly contain egg",
+          "source": "11 §5.2"
+        }
+      }
+    },
+    {
+      "name": "Pork Egg Rolls",
+      "description": "Pork and cabbage egg rolls with plum sauce",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "egg rolls are a documented peanut hiding place",
+          "source": "11 §1.2"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"egg rolls\"",
+          "source": "11 §5.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "egg roll wrappers are wheat",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "egg roll wrappers are wheat",
+          "source": "11 §7.1"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "peanuts is a legume: egg rolls are a documented peanut hiding place",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Pork\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Pork\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Kung Pao Chicken",
+      "description": "Chicken with roasted peanuts, dried chili, soy sauce and rice vinegar",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"roasted peanuts\"",
+          "source": "11 §1.1"
+        },
+        "soy": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"soy sauce\"",
+          "source": "11 §6.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy sauce is brewed with wheat",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy sauce is brewed with wheat",
+          "source": "11 §7.2"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "sesame oil is common in Chinese stir-fry oils",
+          "source": "11 §11.2"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"rice vinegar\"",
+          "source": "11 §15.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"soy sauce\"",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Chicken\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Chicken\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "General Tso's Chicken",
+      "description": "Crispy battered chicken in a sweet soy glaze",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "batters are commonly egg-bound",
+          "source": "11 §5.2"
+        },
+        "soy": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"soy glaze\"",
+          "source": "11 §6.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"battered\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"battered\"",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "garnish",
+          "evidence": "sesame chicken styles use sesame seeds and oil",
+          "source": "12 §5"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"soy glaze\"",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"chicken\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"chicken\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Sesame Chicken",
+      "description": "Fried chicken tossed in sesame seeds and a sweet soy sauce",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"soy sauce\"",
+          "source": "11 §6.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy sauce is brewed with wheat",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy sauce is brewed with wheat",
+          "source": "11 §7.2"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"sesame seeds\"",
+          "source": "11 §11.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"soy sauce\"",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"chicken\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"chicken\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Beef with Broccoli",
+      "description": "Sliced beef and broccoli in oyster sauce",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "stir-fry sauces commonly contain soy sauce",
+          "source": "11 §6.2"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy-sauce-based glazes carry wheat",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy-sauce-based glazes carry wheat",
+          "source": "11 §7.2"
+        },
+        "molluscs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"oyster sauce\"",
+          "source": "11 §10.1"
+        },
+        "mustard": {
+          "label": "free",
+          "evidence": "no mustard ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §13"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy is a legume: stir-fry sauces commonly contain soy sauce",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"beef\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"beef\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Chow Mein",
+      "description": "Wheat noodles with cabbage, carrot and oyster sauce",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "many Chinese noodles are egg noodles",
+          "source": "12 §5"
+        },
+        "soy": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "noodle sauces commonly contain soy sauce",
+          "source": "11 §6.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Wheat noodles\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Wheat noodles\"",
+          "source": "11 §7.1"
+        },
+        "molluscs": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"oyster sauce\"",
+          "source": "11 §10.1"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy is a legume: noodle sauces commonly contain soy sauce",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "animal-derived: \"oyster sauce\"",
+          "source": "11 §10.1"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "fish/shellfish: \"oyster sauce\"",
+          "source": "11 §10.1"
+        }
+      }
+    },
+    {
+      "name": "Egg Fried Rice",
+      "description": "Rice stir-fried with egg, peas, carrot and soy sauce",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"egg\"",
+          "source": "11 §5.1"
+        },
+        "soy": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"soy sauce\"",
+          "source": "11 §6.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy sauce is brewed with wheat",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy sauce is brewed with wheat",
+          "source": "11 §7.2"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "sesame oil is common in fried rice",
+          "source": "11 §11.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"peas\"",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"egg\"",
+          "source": "11 §5.1"
+        }
+      }
+    },
+    {
+      "name": "Mapo Tofu",
+      "description": "Silken tofu in a spicy bean sauce with minced pork",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"tofu\"",
+          "source": "11 §6.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "tofu is soy",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"minced pork\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"minced pork\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Peking Duck Pancakes",
+      "description": "Roast duck with hoisin sauce, spring onion and steamed wheat pancakes",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"hoisin sauce\" contains soy",
+          "source": "12 §5"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"wheat pancakes\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"wheat pancakes\"",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"hoisin sauce\" contains sesame",
+          "source": "12 §5"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"hoisin sauce\" contains soy",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"duck\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"duck\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Garlic Prawns",
+      "description": "King prawns in a garlic and chili sauce with steamed greens",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "stir-fry sauces commonly contain soy sauce",
+          "source": "11 §6.2"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy-based stir-fry sauce carries wheat",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy-based stir-fry sauce carries wheat",
+          "source": "11 §7.2"
+        },
+        "crustaceans": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"prawns\"",
+          "source": "11 §9.1"
+        },
+        "molluscs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "oyster sauce is common in prawn and garlic stir-fry sauces",
+          "source": "11 §10.2"
+        },
+        "lupin": {
+          "label": "free",
+          "evidence": "no lupin ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §14"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "protein",
+          "evidence": "prawns are a sulphite source",
+          "source": "11 §9.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy is a legume: stir-fry sauces commonly contain soy sauce",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "animal-derived: \"prawns\"",
+          "source": "11 §9.1"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "fish/shellfish: \"prawns\"",
+          "source": "11 §9.1"
+        }
+      }
+    },
+    {
+      "name": "Pork Dumplings",
+      "description": "Steamed pork dumplings with a soy and black vinegar dip",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"soy\"",
+          "source": "11 §6.1"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"dumplings\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"dumplings\"",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "dumpling dips often carry sesame oil",
+          "source": "12 §5"
+        },
+        "sulphites": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"vinegar\"",
+          "source": "11 §15.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "soy is a legume: \"soy\"",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"pork\"",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"pork\"",
+          "source": "12 §2.2"
+        }
+      }
+    },
+    {
+      "name": "Garlic Vegetable Stir-fry",
+      "description": "Seasonal vegetables in garlic sauce with steamed rice",
+      "options": [],
+      "labels": {
+        "soy": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "stir-fry sauces commonly contain soy sauce",
+          "source": "11 §6.2"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy-based stir-fry sauce carries wheat",
+          "source": "11 §7.2"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy-based stir-fry sauce carries wheat",
+          "source": "11 §7.2"
+        },
+        "molluscs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "oyster sauce is common in Chinese stir-fries",
+          "source": "11 §10.2"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "sesame oil is common in Chinese stir-fry oils",
+          "source": "11 §11.2"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "soy is a legume: stir-fry sauces commonly contain soy sauce",
+          "source": "11 §16.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: oyster sauce is common in Chinese stir-fries",
+          "source": "11 §10.2"
+        },
+        "vegetarian": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "fish/shellfish: oyster sauce is common in Chinese stir-fries",
+          "source": "11 §10.2"
+        }
+      }
+    },
+    {
+      "name": "Cold Sesame Noodles",
+      "description": "Cold wheat noodles in a peanut and sesame sauce",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"peanut\"",
+          "source": "11 §1.1"
+        },
+        "soy": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "sesame-peanut sauces commonly contain soy sauce",
+          "source": "11 §6.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"wheat noodles\"",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"wheat noodles\"",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"sesame\"",
+          "source": "11 §11.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "peanuts is a legume: \"peanut\"",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "Steamed Jasmine Rice",
+      "description": "",
+      "options": [],
+      "labels": {
+        "peanuts": {
+          "label": "free",
+          "evidence": "plain rice; cross-contact not assessed",
+          "source": "11 §1"
+        },
+        "soy": {
+          "label": "free",
+          "evidence": "plain rice; cross-contact not assessed",
+          "source": "11 §6"
+        }
+      }
+    },
+    {
+      "name": "Mango Sticky Rice",
+      "description": "Sweet rice with coconut cream and fresh mango",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "coconut is not a tree nut; cross-contact not assessed",
+          "source": "11 §2.5"
+        },
+        "milk": {
+          "label": "free",
+          "evidence": "\"coconut cream\" is not dairy; cross-contact not assessed",
+          "source": "11 §3.3"
+        },
+        "celery": {
+          "label": "free",
+          "evidence": "no celery ingredient named in the dish text; kitchen cross-contact is not assessed",
+          "source": "11 §12"
+        }
+      }
+    },
+    {
+      "name": "Thai Iced Tea",
+      "description": "Black tea with spices and sweetened condensed milk",
+      "options": [],
+      "labels": {
+        "milk": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"condensed milk\"",
+          "source": "11 §3.1"
+        },
+        "lactose": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"condensed milk\"",
+          "source": "11 §4.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "animal-derived: \"condensed milk\"",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Fortune Cookies",
+      "description": "Two cookies",
+      "options": [],
+      "labels": {
+        "eggs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "fortune cookie batter commonly contains egg white",
+          "source": "11 §5.2"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a cookie is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "a cookie is a wheat pastry",
+          "source": "11 §7.1"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "some recipes use sesame",
+          "source": "11 §11.2"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: fortune cookie batter commonly contains egg white",
+          "source": "11 §5.2"
+        }
+      }
+    }
+  ]
+}
