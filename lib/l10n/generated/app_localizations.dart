@@ -2203,6 +2203,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Gemini rejected your API key. Check it in Settings, then try asking again.'**
   String get menuQuestionFailedApiKeyRejected;
+
+  /// The one-sentence helper-tool statement: what the app does and does not do. Shown wherever a restriction result appears (consumed by later Banto work).
+  ///
+  /// In en, this message translates to:
+  /// **'This app reads menus to help you choose. It cannot see the kitchen, verify a recipe or promise accuracy. Always ask the restaurant.'**
+  String get helperToolSentence;
+
+  /// Heading that sits above the helper-tool sentence.
+  ///
+  /// In en, this message translates to:
+  /// **'A helper, not a guarantee'**
+  String get helperToolTitle;
+
+  /// Plain statement of what leaves the device once restriction profiles exist; the profile never does.
+  ///
+  /// In en, this message translates to:
+  /// **'Your restriction profile stays on this device. When AI analysis is on, only the menu text and the keto settings are sent — never which restrictions you have.'**
+  String get whatLeavesDeviceBanto;
 }
 
 class _AppLocalizationsDelegate

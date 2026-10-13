@@ -1,0 +1,158 @@
+{
+  "dishes": [
+    {
+      "dishId": "h1",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "סָלָט יְרָקוֹת",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+    },
+    {
+      "dishId": "h2",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "חומוס",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "המנה מבוססת על חומוס, ואי אפשר להפוך אותה לקטוגנית."
+    },
+    {
+      "dishId": "h3",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "פיתה רגילה",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "המנה מבוססת על פיתה, ואי אפשר להפוך אותה לקטוגנית."
+    },
+    {
+      "dishId": "h4",
+      "hiddenCarbs": [],
+      "modification": "אפשר בבקשה להוציא את הסלק מהמנה?",
+      "name": "סלק צלוי",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+    },
+    {
+      "dishId": "h5",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "שניצל",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "המנה מבוססת על שניצל, ואי אפשר להפוך אותה לקטוגנית."
+    },
+    {
+      "dishId": "h6",
+      "hiddenCarbs": [],
+      "modification": "אפשר בבקשה להחליף את פירה תפוחי האדמה בעלים ירוקים או בסלט?\nאפשר בבקשה להחליף את תפוחי האדמה בסלט ירוק או בירקות מאודים?\nאפשר בבקשה בלי האורז, ועם כפול ירקות או סלט במקום?",
+      "name": "אנטריקוט",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+    },
+    {
+      "dishId": "h7",
+      "hiddenCarbs": [],
+      "modification": "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?",
+      "name": "המבורגר",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+    },
+    {
+      "dishId": "h8",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "המבורגר עטוף בחסה",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+    },
+    {
+      "dishId": "h9",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "פסטה ברוטב שמנת",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "המנה מבוססת על פסטה, ואי אפשר להפוך אותה לקטוגנית."
+    },
+    {
+      "dishId": "h10",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "דג מטוגן",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+    },
+    {
+      "dishId": "h11",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "סלמון",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+    },
+    {
+      "dishId": "h12",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "קוקה קולה",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "המנה מבוססת על קוקה קולה, ואי אפשר להפוך אותה לקטוגנית."
+    },
+    {
+      "dishId": "h13",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "קוקה קולה זירו",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+    },
+    {
+      "dishId": "h14",
+      "hiddenCarbs": [],
+      "modification": "אפשר בבקשה קפה הפוך עם חלב שקדים ללא סוכר, בלי תוספת סירופ?",
+      "name": "הפוך גדול",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+    },
+    {
+      "dishId": "h15",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "טחינה",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+    },
+    {
+      "dishId": "h16",
+      "hiddenCarbs": [],
+      "modification": "אפשר בבקשה בלי קטשופ? אפשר מיונז או טחינה במקום.",
+      "name": "קטשופ",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+    }
+  ],
+  "engine": {
+    "kind": "rules",
+    "reason": "notConfigured"
+  },
+  "options": {
+    "dietaryConstraints": [],
+    "netCarbLimitGrams": 6
+  },
+  "schemaVersion": 0,
+  "unclassified": []
+}

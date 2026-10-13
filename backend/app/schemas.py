@@ -7,6 +7,7 @@ from typing import Annotated, Any, Final, Literal, get_args
 
 from pydantic import (
     BaseModel,
+    ConfigDict,
     Field,
     PrivateAttr,
     StrictInt,
@@ -217,6 +218,34 @@ PlatformId = Annotated[
 ]
 
 
+MENU_UPLOAD_PROFILE_KEYS: Final[frozenset[str]] = frozenset(
+    {"profile", "dietaryProfile", "restrictions", "restrictionIds", "severity"}
+)
+"""Keys a stored menu may never carry, at any depth (Banto C1).
+
+The restriction profile stays on the device, so ``POST /v1/menus`` refuses a
+body that names one rather than silently ignoring it and storing the rest.
+"""
+
+
+def _profile_key_path(value: object, path: str = "") -> str | None:
+    """The dotted path of the first profile key inside ``value``, if any."""
+    if isinstance(value, dict):
+        for key, child in value.items():
+            here = f"{path}.{key}" if path else str(key)
+            if key in MENU_UPLOAD_PROFILE_KEYS:
+                return here
+            found = _profile_key_path(child, here)
+            if found is not None:
+                return found
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            found = _profile_key_path(child, f"{path}[{index}]")
+            if found is not None:
+                return found
+    return None
+
+
 class MenuUploadRequest(BaseModel):
     """Request body for ``POST /v1/menus`` (#310): one menu a user opened.
 
@@ -230,7 +259,13 @@ class MenuUploadRequest(BaseModel):
     top-level numeric ``score`` in it is the only value the backend reads
     out of it. A null ``venue_name``, ``city`` or ``analysis`` never erases
     what an earlier upload stored.
+
+    Unknown top-level fields are a 422 (``extra="forbid"``), and so is a
+    restriction-profile key anywhere inside ``menu`` or ``analysis``: the
+    profile never leaves the device (Banto C1).
     """
+
+    model_config = ConfigDict(extra="forbid")
 
     source: MenuStoreSource
     platform_id: PlatformId
@@ -238,6 +273,15 @@ class MenuUploadRequest(BaseModel):
     city: str | None = Field(default=None, max_length=200)
     menu: dict[str, Any]
     analysis: dict[str, Any] | None = None
+
+    @field_validator("menu", "analysis")
+    @classmethod
+    def _carries_no_profile(cls, value: dict[str, Any] | None) -> dict[str, Any] | None:
+        """Refuse a restriction-profile key anywhere inside the opaque blobs."""
+        found = _profile_key_path(value)
+        if found is not None:
+            raise ValueError(f"{found}: a restriction profile never leaves the device")
+        return value
 
 
 class MenuStoredResponse(BaseModel):

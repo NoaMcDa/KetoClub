@@ -1378,4 +1378,15 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get menuQuestionFailedApiKeyRejected =>
       'Gemini rejected your API key. Check it in Settings, then try asking again.';
+
+  @override
+  String get helperToolSentence =>
+      'This app reads menus to help you choose. It cannot see the kitchen, verify a recipe or promise accuracy. Always ask the restaurant.';
+
+  @override
+  String get helperToolTitle => 'A helper, not a guarantee';
+
+  @override
+  String get whatLeavesDeviceBanto =>
+      'Your restriction profile stays on this device. When AI analysis is on, only the menu text and the keto settings are sent — never which restrictions you have.';
 }

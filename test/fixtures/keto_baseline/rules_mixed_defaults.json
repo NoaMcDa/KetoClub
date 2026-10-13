@@ -1,0 +1,158 @@
+{
+  "dishes": [
+    {
+      "dishId": "x1",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "שימו לב: המטבח נסגר ב-22:00",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+    },
+    {
+      "dishId": "x2",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "קרואסון חמאה",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "המנה מבוססת על קרואסון, ואי אפשר להפוך אותה לקטוגנית."
+    },
+    {
+      "dishId": "x3",
+      "hiddenCarbs": [],
+      "modification": "אפשר בבקשה קפה הפוך עם חלב שקדים ללא סוכר, בלי תוספת סירופ?\nאפשר בבקשה קפה הפוך קר עם חלב שקדים ללא סוכר, בלי תוספת סירופ?",
+      "name": "הפוך קר",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+    },
+    {
+      "dishId": "x4",
+      "hiddenCarbs": [],
+      "modification": "Please make it with black coffee or unsweetened almond milk, no added sugar.",
+      "name": "Iced latte",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+    },
+    {
+      "dishId": "x5",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Cinnamon danish",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "Built on danish, which cannot be made keto."
+    },
+    {
+      "dishId": "x6",
+      "hiddenCarbs": [],
+      "modification": "Please serve the burger without the bun, wrapped in lettuce, and swap the fries for a green salad or a fried egg.\nאפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?\nאפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?",
+      "name": "Beef Burger בלחמנייה",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "בסיס המנה מתאים לקטו, אבל מוגש איתה רכיב עתיר פחמימות. בקשו את השינוי שמופיע כאן."
+    },
+    {
+      "dishId": "x7",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "פיצה pizza 4 גבינות",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "המנה מבוססת על פיצה, ואי אפשר להפוך אותה לקטוגנית."
+    },
+    {
+      "dishId": "x8",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Cauliflower rice bowl",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+    },
+    {
+      "dishId": "x9",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Beer-battered fish",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "Built on beer, which cannot be made keto."
+    },
+    {
+      "dishId": "x10",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "עוף ברוטב יין",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
+    },
+    {
+      "dishId": "x11",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Dear customers",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    },
+    {
+      "dishId": "x12",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "𝐁𝐞𝐞𝐟 steak",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    },
+    {
+      "dishId": "x2",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "קרואסון חמאה",
+      "netCarbsEstimate": null,
+      "verdict": "nonKeto",
+      "why": "המנה מבוססת על קרואסון, ואי אפשר להפוך אותה לקטוגנית."
+    },
+    {
+      "dishId": "x13",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Goldstar",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    },
+    {
+      "dishId": "x14",
+      "hiddenCarbs": [],
+      "modification": null,
+      "name": "Diet coke",
+      "netCarbsEstimate": null,
+      "verdict": "orderAsIs",
+      "why": "Nothing starchy, sweet or breaded turned up in this dish. Order it as printed."
+    },
+    {
+      "dishId": "x15",
+      "hiddenCarbs": [],
+      "modification": "Please serve the burger without the bun, wrapped in lettuce, and swap the fries for a green salad or a fried egg.",
+      "name": "Cheeseburger",
+      "netCarbsEstimate": null,
+      "verdict": "modifiable",
+      "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
+    }
+  ],
+  "engine": {
+    "kind": "rules",
+    "reason": "notConfigured"
+  },
+  "options": {
+    "dietaryConstraints": [],
+    "netCarbLimitGrams": 6
+  },
+  "schemaVersion": 0,
+  "unclassified": []
+}

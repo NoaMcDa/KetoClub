@@ -1385,4 +1385,15 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get menuQuestionFailedApiKeyRejected =>
       'Gemini דחתה את מפתח ה‑API שלכם. בדקו אותו בהגדרות ונסו לשאול שוב.';
+
+  @override
+  String get helperToolSentence =>
+      'האפליקציה קוראת תפריטים כדי לעזור לך לבחור. היא לא רואה את המטבח, לא מאמתת מתכון ולא מבטיחה דיוק. תמיד לשאול את המסעדה.';
+
+  @override
+  String get helperToolTitle => 'כלי עזר, לא הבטחה';
+
+  @override
+  String get whatLeavesDeviceBanto =>
+      'פרופיל ההגבלות שלך נשאר במכשיר. כשניתוח AI פועל, נשלחים רק טקסט התפריט והגדרות הקטו — לעולם לא אילו הגבלות יש לך.';
 }
