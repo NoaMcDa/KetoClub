@@ -98,6 +98,26 @@
   "settingsNetCarbLimitIncrease": "העלאת מגבלת הפחמימות נטו",
   "settingsKetoRules": "כללי הקטו שלכם",
   "settingsKetoRulesBody": "כל כלל שתפעילו יחול החל מהתפריט הבא שתפתחו.",
+  "settingsRestrictions": "ההגבלות שלי",
+  "@settingsRestrictions": { "description": "Banto (ALG-02a): the Settings section listing the user's dietary restrictions." },
+  "settingsRestrictionsEmpty": "עדיין לא הוספתם הגבלה.",
+  "settingsRestrictionsAdd": "הוספת הגבלה",
+  "settingsRestrictionsRemove": "הסרת {name}",
+  "@settingsRestrictionsRemove": {
+    "description": "Tooltip and screen-reader label of a restriction row's remove button.",
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "restrictionKindAllergy": "אלרגיה",
+  "restrictionKindAutoimmune": "מחלה אוטואימונית",
+  "@restrictionKindAutoimmune": { "description": "The kind label of celiac disease (the gluten restriction)." },
+  "restrictionKindIntolerance": "אי-סבילות",
+  "restrictionKindDiet": "אורח תזונה",
+  "restrictionJurisdictionHint": "{lists, select, usEu{ברשימות האלרגנים של ארה״ב והאיחוד האירופי} us{ברשימת האלרגנים של ארה״ב} eu{ברשימת האלרגנים של האיחוד האירופי} other{לא מופיע באף רשימת אלרגנים רשמית}}",
+  "@restrictionJurisdictionHint": {
+    "description": "One line under a restriction in the picker: which official allergen-labelling lists name it.",
+    "placeholders": { "lists": { "type": "String" } }
+  },
+  "restrictionPickerTitle": "בחירת הגבלה",
   "settingsSeedOilFree": "ללא שמני זרעים, בהקפדה",
   "settingsSeedOilFreeHint": "מסמן שמן קנולה, חמניות וסויה במנות מטוגנות.",
   "settingsDairyFree": "קטו ללא מוצרי חלב",

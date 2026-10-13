@@ -243,6 +243,46 @@ class AppLocalizationsHe extends AppLocalizations {
       'כל כלל שתפעילו יחול החל מהתפריט הבא שתפתחו.';
 
   @override
+  String get settingsRestrictions => 'ההגבלות שלי';
+
+  @override
+  String get settingsRestrictionsEmpty => 'עדיין לא הוספתם הגבלה.';
+
+  @override
+  String get settingsRestrictionsAdd => 'הוספת הגבלה';
+
+  @override
+  String settingsRestrictionsRemove(String name) {
+    return 'הסרת $name';
+  }
+
+  @override
+  String get restrictionKindAllergy => 'אלרגיה';
+
+  @override
+  String get restrictionKindAutoimmune => 'מחלה אוטואימונית';
+
+  @override
+  String get restrictionKindIntolerance => 'אי-סבילות';
+
+  @override
+  String get restrictionKindDiet => 'אורח תזונה';
+
+  @override
+  String restrictionJurisdictionHint(String lists) {
+    String _temp0 = intl.Intl.selectLogic(lists, {
+      'usEu': 'ברשימות האלרגנים של ארה״ב והאיחוד האירופי',
+      'us': 'ברשימת האלרגנים של ארה״ב',
+      'eu': 'ברשימת האלרגנים של האיחוד האירופי',
+      'other': 'לא מופיע באף רשימת אלרגנים רשמית',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get restrictionPickerTitle => 'בחירת הגבלה';
+
+  @override
   String get settingsSeedOilFree => 'ללא שמני זרעים, בהקפדה';
 
   @override
