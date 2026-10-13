@@ -627,5 +627,22 @@
   "chefCardShowButton": "הצגת כרטיס השף שלי",
   "chefCardEmpty": "הוסיפו הגבלה בהגדרות וכרטיס השף יופיע כאן.",
   "chefCardShare": "שיתוף",
-  "chefCardLanguageLabel": "שפת הכרטיס"
+  "chefCardLanguageLabel": "שפת הכרטיס",
+  "whySheetTitle": "למה התוצאה הזו",
+  "whySheetDishName": "{dish}",
+  "whyTierDeclared": "הוצהר על ידי הפלטפורמה",
+  "whyTierStated": "כתוב בתפריט",
+  "whyTierInferred": "משוער ממתכון אופייני",
+  "whyTierSuspected": "חשד \u2014 כדאי לשאול",
+  "whyTierConfirmed": "אושר על ידך",
+  "whyTierDenied": "נשלל על ידך",
+  "whySourceName": "נמצא בשם המנה",
+  "whySourceDescription": "נמצא בתיאור המנה",
+  "whySourceOption": "נמצא באחת האפשרויות",
+  "whySourceHidden": "מקור נסתר שהטקסט רומז עליו",
+  "whySourceModel": "נקרא על ידי הבינה המלאכותית, לא מופיע בטקסט התפריט",
+  "whyMatchedText": "נמצא: \u201c{text}\u201d",
+  "whyWaiterQuestionLabel": "לשאול את המלצר",
+  "whyEmptyStrict": "שום דבר בטקסט התפריט לא מצביע על ההגבלות שלך. עדיין כדאי לשאול את המסעדה.",
+  "whyEmptyFlexible": "שום דבר בטקסט התפריט לא מצביע על ההגבלות שלך."
 }

@@ -3153,6 +3153,20 @@ all under a small nuts, sesame and seafood vocabulary of its own
 (`tool/golden/kitchen_signals_corpus.dart`) so it does not move when the group
 vocabulary files are filled; no other golden changed.
 
+**The Why sheet (ALG-06, #348).** `lib/widgets/why_sheet.dart` is the "why this
+result" bottom sheet, built and tested on its own and wired into no screen
+yet. `WhySheet` takes a dish name, a list of `Concern` and whether the profile
+is strict, and shows one row per concern: the restriction's name in the UI
+language, the evidence tier as a phrase (declared by the platform, stated on
+the menu, inferred from a typical recipe, suspected (please ask), confirmed by
+you, ruled out by you), where it was found, the matched text quoted and the
+waiter question. Confidence is words, never a number or a percentage. An empty
+list says nothing in the menu text points to the profile, adding "still ask the
+restaurant" for a strict profile, and never says the dish is fine; the footer
+is `helperToolSentence`. `showWhySheet` opens it through `showKetoClubSheet`
+(560 px cap) and, like the widget, does nothing with `bantoMode` off. The
+strings are new ARB keys (`why*`), so the banned-words test covers them.
+
 ---
 
 ## 15. Testing strategy
