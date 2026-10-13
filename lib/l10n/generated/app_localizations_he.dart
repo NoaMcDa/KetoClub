@@ -1453,6 +1453,64 @@ class AppLocalizationsHe extends AppLocalizations {
   String get chefCardLanguageLabel => 'שפת הכרטיס';
 
   @override
+  String get whySheetTitle => 'למה התוצאה הזו';
+
+  @override
+  String whySheetDishName(String dish) {
+    return '$dish';
+  }
+
+  @override
+  String get whyTierDeclared => 'הוצהר על ידי הפלטפורמה';
+
+  @override
+  String get whyTierStated => 'כתוב בתפריט';
+
+  @override
+  String get whyTierInferred => 'משוער ממתכון אופייני';
+
+  @override
+  String get whyTierSuspected => 'חשד — כדאי לשאול';
+
+  @override
+  String get whyTierConfirmed => 'אושר על ידך';
+
+  @override
+  String get whyTierDenied => 'נשלל על ידך';
+
+  @override
+  String get whySourceName => 'נמצא בשם המנה';
+
+  @override
+  String get whySourceDescription => 'נמצא בתיאור המנה';
+
+  @override
+  String get whySourceOption => 'נמצא באחת האפשרויות';
+
+  @override
+  String get whySourceHidden => 'מקור נסתר שהטקסט רומז עליו';
+
+  @override
+  String get whySourceModel =>
+      'נקרא על ידי הבינה המלאכותית, לא מופיע בטקסט התפריט';
+
+  @override
+  String whyMatchedText(String text) {
+    return 'נמצא: “$text”';
+  }
+
+  @override
+  String get whyWaiterQuestionLabel => 'לשאול את המלצר';
+
+  @override
+  String get whyEmptyStrict =>
+      'שום דבר בטקסט התפריט לא מצביע על ההגבלות שלך. עדיין כדאי לשאול את המסעדה.';
+
+  @override
+  String get whyEmptyFlexible =>
+      'שום דבר בטקסט התפריט לא מצביע על ההגבלות שלך.';
+
+  @override
   String get restrictionOnboardingTitle => 'ממה אתם נמנעים?';
 
   @override
