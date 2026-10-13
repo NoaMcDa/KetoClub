@@ -180,8 +180,9 @@ final class MenuController extends ChangeNotifier {
   /// none has been; see [lastUpload].
   Future<void> _lastUpload = Future<void>.value();
 
-  /// The dietary profile the settings held when options were last built
-  /// ([_optionsFrom]); empty until then. Read by [evaluatedRows] only.
+  /// The dietary profile the settings held at [open], when options were
+  /// last built ([_optionsFrom]) or at the last [refreshProfile]; empty
+  /// until then. It never leaves the device (D26 C1).
   DietaryProfile _profile = DietaryProfile.empty;
 
   /// Whether the screen that last called [open] shows Banto surfaces
@@ -311,6 +312,21 @@ final class MenuController extends ChangeNotifier {
   /// can show it while the menu loads; refreshed once [open] has recorded
   /// the visit. Null before [open] and for a venue never named.
   String? get historyName => _historyName;
+
+  /// The user's restriction profile as of [open] or the last
+  /// [refreshProfile] (Banto, ALG-02b, issue #344), for the Filters row's
+  /// summary. Read from the settings on this device only.
+  DietaryProfile get profile => _profile;
+
+  /// Re-reads [profile] from the settings, for when the user comes back
+  /// from editing it in Settings. Notifies only when it changed. Never
+  /// throws.
+  Future<void> refreshProfile() async {
+    final next = (await _settings.read()).profile;
+    if (next == _profile) return;
+    _profile = next;
+    notifyListeners();
+  }
 
   /// The city the visit history remembers for the open venue (issue #307),
   /// read and refreshed exactly as [historyName]; null when none is known.
@@ -579,10 +595,6 @@ final class MenuController extends ChangeNotifier {
           ),
     ];
   }
-
-  /// The dietary profile [open] read from the settings (Banto); empty
-  /// until then. It never leaves the device (D26 C1).
-  DietaryProfile get profile => _profile;
 
   /// How the menu screen words its verdicts for [profile] (Banto, ALG-05,
   /// issue #347): [ProfileWording.ketoOnly] unless the screen that opened

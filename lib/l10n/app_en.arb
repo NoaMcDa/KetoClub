@@ -628,7 +628,6 @@
   "@helperToolTitle": { "description": "Heading that sits above the helper-tool sentence." },
   "whatLeavesDeviceBanto": "Your restriction profile stays on this device. When AI analysis is on, only the menu text and the keto settings are sent — never which restrictions you have.",
   "@whatLeavesDeviceBanto": { "description": "Plain statement of what leaves the device once restriction profiles exist; the profile never does." },
-
   "chefCardTitle": "Your chef card",
   "@chefCardTitle": { "description": "Banto (ALG-08a): title of the full-screen chef card built from the dietary profile alone." },
   "chefCardShowButton": "Show my chef card",
@@ -660,6 +659,16 @@
   "whyWaiterQuestionLabel": "Ask the waiter",
   "whyEmptyStrict": "Nothing in the menu text points to your restrictions. Still ask the restaurant.",
   "whyEmptyFlexible": "Nothing in the menu text points to your restrictions.",
+  "restrictionOnboardingTitle": "What do you avoid?",
+  "@restrictionOnboardingTitle": { "description": "Banto (ALG-02b): heading of the first-run screen where the user picks their restrictions." },
+  "restrictionOnboardingBody": "Pick everything that applies. You can change this any time in Settings. Skip it to use keto only.",
+  "restrictionOnboardingContinue": "Continue",
+  "restrictionOnboardingSkip": "Skip",
+  "menuProfileSummary": "Checking for: {names}",
+  "@menuProfileSummary": {
+    "description": "Banto (ALG-02b): the menu screen's one-line summary of the restrictions the menu is read against. Tapping it opens Settings.",
+    "placeholders": { "names": { "type": "String" } }
+  },
   "stateFitsBadge": "Fits",
   "@stateFitsBadge": {"description": "Banto (ALG-05): the dish-state pill for a dish that fits a profile with no strict entry. Never 'safe'."},
   "stateFitsStrictBadge": "No trigger found — ask the restaurant",

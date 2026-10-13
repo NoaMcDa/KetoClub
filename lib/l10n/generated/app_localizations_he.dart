@@ -1511,6 +1511,24 @@ class AppLocalizationsHe extends AppLocalizations {
       'שום דבר בטקסט התפריט לא מצביע על ההגבלות שלך.';
 
   @override
+  String get restrictionOnboardingTitle => 'ממה אתם נמנעים?';
+
+  @override
+  String get restrictionOnboardingBody =>
+      'בחרו כל מה שרלוונטי. אפשר לשנות זאת בכל עת בהגדרות. דלגו כדי להשתמש בקטו בלבד.';
+
+  @override
+  String get restrictionOnboardingContinue => 'המשך';
+
+  @override
+  String get restrictionOnboardingSkip => 'דלגו';
+
+  @override
+  String menuProfileSummary(String names) {
+    return 'בודקים עבור: $names';
+  }
+
+  @override
   String get stateFitsBadge => 'מתאימה';
 
   @override

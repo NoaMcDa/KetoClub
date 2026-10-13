@@ -43,6 +43,7 @@ import 'package:ketoclub/widgets/menu_question_sheet.dart';
 import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
+import 'package:ketoclub/widgets/profile_summary_line.dart';
 import 'package:ketoclub/widgets/rename_menu_dialog.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/scanned_page_chips.dart';
@@ -165,10 +166,6 @@ class MenuScreen extends StatefulWidget {
     super.key,
   });
 
-  /// Whether this build shows Banto surfaces (D26's convention); passed
-  /// to [MenuController.open], which records it for the open menu.
-  final bool bantoMode;
-
   /// Which venue, on which platform, to load a menu for.
   final VenueRef ref;
 
@@ -205,6 +202,12 @@ class MenuScreen extends StatefulWidget {
   /// otherwise — a pasted menu, a scan from an earlier run, or null — the
   /// header reads as a pasted menu, as it did before scanning existed.
   final ScannedPagesRegistry? scannedPages;
+
+  /// Whether Banto surfaces are on (architecture.md D26). With it, the
+  /// Filters row names the restrictions in the user's profile, and it is
+  /// passed to [MenuController.open], which records it for the open menu
+  /// (ALG-05); without it, or with an empty profile, nothing is added.
+  final bool bantoMode;
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -798,6 +801,12 @@ class _MenuScreenState extends State<MenuScreen> {
     return MenuFiltersRow(
       expanded: _filtersExpanded,
       activeCount: activeCount,
+      summary: widget.bantoMode && !controller.profile.isEmpty
+          ? ProfileSummaryLine(
+              profile: controller.profile,
+              onTap: () => unawaited(_editProfile(context, controller)),
+            )
+          : null,
       onToggle: () {
         if (_filtersExpanded) FocusScope.of(context).unfocus();
         setState(() => _filtersExpanded = !_filtersExpanded);
@@ -815,6 +824,16 @@ class _MenuScreenState extends State<MenuScreen> {
         ],
       ),
     );
+  }
+
+  /// Opens Settings, where the restrictions are edited, and re-reads the
+  /// profile when the user comes back so the summary follows the edit.
+  Future<void> _editProfile(
+    BuildContext context,
+    MenuController controller,
+  ) async {
+    await Navigator.pushNamed<void>(context, '/settings');
+    await controller.refreshProfile();
   }
 
   /// Wraps [child] — the loaded-menu [ListView], empty or not — in a

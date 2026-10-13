@@ -111,6 +111,10 @@ final class SettingsController extends ChangeNotifier {
   /// this device only (contract decision C1).
   DietaryProfile get profile => _appSettings.profile;
 
+  /// Whether the first-run restriction onboarding has been completed or
+  /// skipped (Banto, ALG-02b, issue #344).
+  bool get onboardingSeen => _appSettings.onboardingSeen;
+
   /// How many menus are currently cached (issue #61's Settings section). A
   /// count of entries, never a byte figure —
   /// [MenuRepository.cachedMenuCount]'s own doc comment explains why.
@@ -285,6 +289,14 @@ final class SettingsController extends ChangeNotifier {
   Future<void> declineDisclosure() => _update(
     _appSettings.copyWith(estimationConsentGiven: false, disclosureSeen: true),
   );
+
+  /// Records that the first-run restriction onboarding has been completed
+  /// or skipped (ALG-02b), so it is never shown twice. Touches nothing but
+  /// that flag; a no-op, with no write, when it is already set.
+  Future<void> markOnboardingSeen() async {
+    if (onboardingSeen) return;
+    await _update(_appSettings.copyWith(onboardingSeen: true));
+  }
 
   /// Adds [id] to the profile, last, with no exceptions (issue #344).
   ///

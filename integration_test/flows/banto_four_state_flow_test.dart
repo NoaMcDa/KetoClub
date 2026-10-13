@@ -1,11 +1,11 @@
 // Flow test (FLOW_TEST_CONVENTIONS.md; Banto, ALG-05, issue #347): a
-// profile with peanuts and sesame, added through Settings' "My
-// restrictions", turns the menu screen into four states. The menu opens on
+// profile with peanuts and sesame, picked on the first-run onboarding
+// (ALG-02b), turns the menu screen into four states. The menu opens on
 // everything but what to avoid, so the tahini salad (sesame named in the
 // dish) is hidden until the Avoid tile is tapped; the nut cake (אגוזים:
 // peanuts suspected) is to ask about; and the shared text never says
-// "safe" or "בטוח". The effect spans Settings, Explore and the menu, which
-// is why this is a flow and not a widget test.
+// "safe" or "בטוח". The effect spans the onboarding, Explore and the menu,
+// which is why this is a flow and not a widget test.
 //
 // The whole app is pumped with `bantoMode: true`, so it runs under
 // `flutter test` with no `--dart-define`. The classifier answers every
@@ -22,10 +22,9 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/models/venue.dart';
-import 'package:ketoclub/screens/settings_screen.dart';
+import 'package:ketoclub/screens/restriction_onboarding_screen.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
-import 'package:ketoclub/widgets/restriction_picker_sheet.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 
@@ -118,28 +117,16 @@ Finder _pill(String label) => find.descendant(
   matching: find.text(label.toUpperCase()),
 );
 
-/// Adds [id] through Settings' "My restrictions" section.
-Future<void> _addRestriction(WidgetTester tester, RestrictionId id) async {
+/// Picks [id] on the first-run onboarding.
+Future<void> _pick(WidgetTester tester, RestrictionId id) async {
+  final chip = find.byKey(restrictionOnboardingChipKey(id));
   await tester.scrollUntilVisible(
-    find.byKey(restrictionsAddKey),
+    chip,
     200,
     scrollable: find.byType(Scrollable).first,
   );
   await tester.pumpAndSettle();
-  await tapAndSettle(tester, find.byKey(restrictionsAddKey));
-  final option = find.byKey(restrictionOptionKey(id));
-  await tester.scrollUntilVisible(
-    option,
-    200,
-    scrollable: find
-        .descendant(
-          of: find.byType(RestrictionPickerSheet),
-          matching: find.byType(Scrollable),
-        )
-        .first,
-  );
-  await tester.pumpAndSettle();
-  await tapAndSettle(tester, option);
+  await tapAndSettle(tester, chip);
 }
 
 void main() {
@@ -157,13 +144,17 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Act: add peanuts and sesame in Settings.
-      await tapAndSettle(tester, navDestination(_en.navSettings));
-      await _addRestriction(tester, RestrictionId.peanuts);
-      await _addRestriction(tester, RestrictionId.sesame);
+      // Act: pick peanuts and sesame on the first-run onboarding.
+      await _pick(tester, RestrictionId.peanuts);
+      await _pick(tester, RestrictionId.sesame);
+      await tester.scrollUntilVisible(
+        find.byKey(restrictionOnboardingContinueKey),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tapAndSettle(tester, find.byKey(restrictionOnboardingContinueKey));
 
-      // Act: back to Explore, paste the link and open the venue.
-      await tapAndSettle(tester, navDestination(_en.navExplore));
+      // Act: on Explore, paste the link and open the venue.
       await enterText(tester, _woltUrl);
       await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
 
