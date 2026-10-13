@@ -597,5 +597,9 @@
   "menuQuestionFailedBackendUnreachable": "לא ניתן היה להתחבר לשרת של קטוקלאב. נסו לשאול שוב.",
   "menuQuestionFailedConsentWithheld": "אשרו ניתוח בינה מלאכותית בהגדרות כדי לשאול שאלות על תפריט.",
   "menuQuestionFailedApiKeyMissing": "הוסיפו את מפתח ה‑Gemini API שלכם בהגדרות כדי לשאול שאלות על תפריט.",
-  "menuQuestionFailedApiKeyRejected": "Gemini דחתה את מפתח ה‑API שלכם. בדקו אותו בהגדרות ונסו לשאול שוב."
+  "menuQuestionFailedApiKeyRejected": "Gemini דחתה את מפתח ה‑API שלכם. בדקו אותו בהגדרות ונסו לשאול שוב.",
+
+  "helperToolSentence": "האפליקציה קוראת תפריטים כדי לעזור לך לבחור. היא לא רואה את המטבח, לא מאמתת מתכון ולא מבטיחה דיוק. תמיד לשאול את המסעדה.",
+  "helperToolTitle": "כלי עזר, לא הבטחה",
+  "whatLeavesDeviceBanto": "פרופיל ההגבלות שלך נשאר במכשיר. כשניתוח AI פועל, נשלחים רק טקסט התפריט והגדרות הקטו — לעולם לא אילו הגבלות יש לך."
 }
