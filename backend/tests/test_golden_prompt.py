@@ -83,6 +83,42 @@ def test_the_schemas_and_name_match_the_golden() -> None:
     assert SCHEMA_NAME == _RAW["schemaName"]
     assert _canonical(response_schema()) == _canonical(_RAW["schema"])
     assert _canonical(vision_response_schema()) == _canonical(_RAW["visionSchema"])
+    assert _canonical(response_schema(extract=True)) == _canonical(
+        _RAW["extractSchema"]
+    )
+    assert _canonical(vision_response_schema(extract=True)) == _canonical(
+        _RAW["extractVisionSchema"]
+    )
+
+
+def test_the_extracting_schemas_keep_the_required_order() -> None:
+    # ``required`` is a list: canonical JSON keeps its order, so it is
+    # compared as the golden lists it (ALG-03).
+    text = response_schema(extract=True)["properties"]["dishes"]["items"]
+    vision = vision_response_schema(extract=True)["properties"]["dishes"]["items"]
+    golden_text = _RAW["extractSchema"]["properties"]["dishes"]["items"]
+    golden_vision = _RAW["extractVisionSchema"]["properties"]["dishes"]["items"]
+    assert text["required"] == golden_text["required"]
+    assert vision["required"] == golden_vision["required"]
+    assert text["required"][-1] == "ingredients"
+    assert vision["required"][-2:] == ["page", "description"]
+
+
+def test_the_corpus_has_extracting_entries_and_keto_ones_without_it() -> None:
+    extracting = [e for e in _ENTRIES if e["name"].endswith("/restrictions")]
+    assert extracting
+    for entry in extracting:
+        assert entry["options"]["restrictionsRequested"] is True
+        keto = next(
+            e
+            for e in _ENTRIES
+            if e["name"] == entry["name"].replace("/restrictions", "/defaults")
+        )
+        assert entry["systemPrompt"].startswith(keto["systemPrompt"] + "\n\n")
+    for entry in _ENTRIES:
+        if entry not in extracting:
+            assert "restrictionsRequested" not in entry["options"]
+            assert '"ingredients"' not in entry["systemPrompt"]
 
 
 def test_the_response_schema_is_the_checked_in_schema_file() -> None:

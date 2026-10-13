@@ -33,13 +33,16 @@ import json
 import math
 import re
 from dataclasses import dataclass
-from typing import Any, Final, Literal, TypeGuard
+from typing import Any, Final, Literal, TypeGuard, get_args
 
 from app.keto.dart_text import dart_trim, utf16_len, utf16_slice, utf16_units
 from app.keto.fingerprint import scan_ref
 from app.keto.models import (
     AnalysedDish,
+    Certainty,
+    ComponentRole,
     Dish,
+    ExtractedIngredient,
     HiddenCarb,
     LlmEngine,
     Menu,
@@ -48,7 +51,7 @@ from app.keto.models import (
     RulesEngine,
     VenueRef,
 )
-from app.keto.normaliser import contains_hebrew, normalise, words
+from app.keto.normaliser import contains_hebrew, dish_rules_text, normalise, words
 from app.keto.vocabulary import vocabulary
 
 SCHEMA_VERSION: Final[int] = vocabulary().caps.parser_schema_version
@@ -59,6 +62,17 @@ ParseFailureReason = Literal["badResponse", "noDishesFound"]
 
 _VERDICTS: Final = frozenset({"orderAsIs", "modifiable", "nonKeto"})
 _CERTAINTIES: Final = frozenset({"suspected", "likely"})
+_INGREDIENT_CERTAINTIES: Final = frozenset(get_args(Certainty))
+_COMPONENT_ROLES: Final = frozenset(get_args(ComponentRole))
+
+MAX_INGREDIENTS_PER_DISH: Final = 40
+"""Dart ``maxIngredientsPerDish`` (ALG-03)."""
+
+MAX_INGREDIENT_NAME_LENGTH: Final = 100
+"""Dart ``maxIngredientNameLength``, in UTF-16 code units (ALG-03)."""
+
+MAX_TRANSCRIBED_DESCRIPTION_LENGTH: Final = 1000
+"""Dart ``maxTranscribedDescriptionLength``, in UTF-16 code units."""
 
 _JS_WHITESPACE: Final = "\t\n\u000b\u000c\r    -     　﻿"
 """JavaScript's ``\\s`` (which Dart's ``RegExp`` uses): unlike Python's, it
@@ -193,17 +207,76 @@ def _parse_hidden_carbs(raw: object) -> list[HiddenCarb]:
     return result
 
 
+def _parse_ingredients(raw: object, dish: Dish) -> list[ExtractedIngredient]:
+    """Dart ``_parseIngredients`` (ALG-03): well-formed entries only, a
+    missing or unknown role read as ``unknown``, an ingredient whose
+    normalised name is not a substring of ``dish``'s rules text capped at
+    ``suspected``, the first of names that normalise alike, at most
+    :data:`MAX_INGREDIENTS_PER_DISH`. The name is Dart-trimmed before its
+    length is checked."""
+    if not isinstance(raw, list):
+        return []
+    dish_text = dish_rules_text(dish)
+    seen: set[str] = set()
+    result: list[ExtractedIngredient] = []
+    for entry in raw:
+        if len(result) >= MAX_INGREDIENTS_PER_DISH:
+            break
+        if not isinstance(entry, dict):
+            continue
+        raw_name = entry.get("name")
+        if not isinstance(raw_name, str):
+            continue
+        name = dart_trim(raw_name)
+        if not name or utf16_len(name) > MAX_INGREDIENT_NAME_LENGTH:
+            continue
+        certainty = entry.get("certainty")
+        if not isinstance(certainty, str) or certainty not in _INGREDIENT_CERTAINTIES:
+            continue
+        raw_role = entry.get("role")
+        role = (
+            raw_role
+            if isinstance(raw_role, str) and raw_role in _COMPONENT_ROLES
+            else "unknown"
+        )
+        normalised = normalise(name)
+        key = normalised or name
+        if key in seen:
+            continue
+        seen.add(key)
+        supported = bool(normalised) and normalised in dish_text
+        result.append(
+            ExtractedIngredient.model_construct(
+                name=name,
+                certainty=certainty if supported else "suspected",
+                role=role,
+            )
+        )
+    return result
+
+
+def extraction_missing(dish: Dish, analysed: AnalysedDish, *, extract: bool) -> bool:
+    """Dart ``MenuResponseParser.extractionMissing`` (ALG-03): with
+    extraction requested, a dish with a description whose verdict kept no
+    ingredient. Computed, never stored; the verdict stands and the rules
+    pass is that dish's only source of concerns."""
+    return extract and not analysed.ingredients and dart_trim(dish.description) != ""
+
+
 def _judge(
     raw_dish: dict[str, Any],
     matched: Dish,
     *,
     net_carb_limit_grams: int,
+    extract: bool,
     dishes: list[AnalysedDish],
     unclassified: list[str],
 ) -> None:
     """Dart ``_judge``: rules 4-6, #57's net-carb post-rule and #213's
     hidden-carb rule; places ``raw_dish`` under ``matched``'s id and name or
-    demotes ``matched``'s name to ``unclassified``."""
+    demotes ``matched``'s name to ``unclassified``. With ``extract`` the
+    placed dish carries :func:`_parse_ingredients` of its ``ingredients``,
+    whatever its verdict."""
     caps = vocabulary().caps
     verdict = raw_dish.get("verdict")
     if not isinstance(verdict, str) or verdict not in _VERDICTS:
@@ -270,6 +343,12 @@ def _judge(
                 else None
             ),
             hidden_carbs=[] if final_verdict == "nonKeto" else hidden_carbs,
+            ingredients=(
+                _parse_ingredients(raw_dish.get("ingredients"), matched)
+                if extract
+                else []
+            ),
+            concerns=[],
         )
     )
 
@@ -318,9 +397,14 @@ def parse(
     engine: Engine,
     net_carb_limit_grams: int,
     analysed_at: str,
+    extract: bool = False,
 ) -> ParseResult:
     """``MenuResponseParser.parse``: ``body``, the raw reply, against
     ``source``, the menu it was computed from (§9.4 rules 1-8).
+
+    With ``extract`` (ALG-03) each placed dish carries its ingredients;
+    without it ``ingredients`` is never read. A model-sent ``concerns`` is
+    never read (D26 C1).
 
     ``analysed_at`` is the Dart ``toIso8601String()`` text, kept verbatim.
     The analysis carries no ``options`` snapshot: as in Dart, the caller
@@ -353,6 +437,7 @@ def parse(
             raw_dish,
             matched,
             net_carb_limit_grams=net_carb_limit_grams,
+            extract=extract,
             dishes=dishes,
             unclassified=unclassified,
         )
@@ -385,6 +470,7 @@ def parse_scanned(
     analysed_at: str,
     net_carb_limit_grams: int,
     page_count: int | None,
+    extract: bool = False,
 ) -> ScannedParseResult:
     """``MenuResponseParser.parseScanned``: a vision reply read as both the
     transcribed menu and its analysis.
@@ -396,6 +482,11 @@ def parse_scanned(
     :func:`_page`, in one ``scanned`` category named in Hebrew when any dish
     name holds Hebrew. The menu is addressed ``scan/<fingerprint>`` and
     fetched at ``analysed_at``; the analysis carries no ``options``.
+
+    With ``extract`` (ALG-03) a dish's description is its element's string
+    ``description``, Dart-trimmed and cut at
+    :data:`MAX_TRANSCRIBED_DESCRIPTION_LENGTH` like ``why``, and each placed
+    dish carries its ingredients.
     """
     raw_dishes = _dishes_of(body)
     if raw_dishes is None:
@@ -417,10 +508,16 @@ def parse_scanned(
         if key in seen_names:
             continue
         seen_names.add(key)
+        raw_description = raw_dish.get("description")
+        description = (
+            _truncated(dart_trim(raw_description), MAX_TRANSCRIBED_DESCRIPTION_LENGTH)
+            if extract and isinstance(raw_description, str)
+            else ""
+        )
         dish = Dish.model_construct(
             id=f"{scanned.scanned_dish_id_prefix}{len(transcribed) + 1}",
             name=name,
-            description="",
+            description=description,
             price=0.0,
             options=[],
             image_url=None,
@@ -431,6 +528,7 @@ def parse_scanned(
             raw_dish,
             dish,
             net_carb_limit_grams=net_carb_limit_grams,
+            extract=extract,
             dishes=dishes,
             unclassified=unclassified,
         )

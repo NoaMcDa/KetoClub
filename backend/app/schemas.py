@@ -10,6 +10,7 @@ from pydantic import (
     ConfigDict,
     Field,
     PrivateAttr,
+    StrictBool,
     StrictInt,
     StringConstraints,
     field_validator,
@@ -360,12 +361,19 @@ class ClassificationOptionsBody(WireModel):
     those known fragments is refused** (422, by ``_known_fragments_only``),
     as is one given twice: free text here would reach the system prompt
     under the server's own key.
+
+    ``restrictionsRequested`` (Banto; ALG-03, D26 C2) is a strict bool,
+    false when absent: true asks for the profile-independent ingredient
+    extraction. It is the only Banto key accepted; the profile itself, or
+    any restriction id, is an unknown key and refused (``extra="forbid"``,
+    C1).
     """
 
     net_carb_limit_grams: Annotated[StrictInt, Field(ge=1, le=50)]
     dietary_constraints: list[DietaryConstraint] = Field(
         default_factory=list, max_length=MAX_DIETARY_CONSTRAINTS
     )
+    restrictions_requested: StrictBool = False
 
     @field_validator("dietary_constraints")
     @classmethod
@@ -384,6 +392,7 @@ class ClassificationOptionsBody(WireModel):
         return AnalysisOptionsSnapshot(
             net_carb_limit_grams=self.net_carb_limit_grams,
             dietary_constraints=list(self.dietary_constraints),
+            restrictions_requested=self.restrictions_requested,
         )
 
 

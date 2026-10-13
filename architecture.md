@@ -3098,6 +3098,41 @@ nothing produces a concern yet. `backend/app/keto/models.py` mirrors all of
 it, omitting the same keys through a `model_serializer`. Per C3 there is no
 `schemaVersion` bump, and no golden or keto baseline changed.
 
+**Ingredient extraction: prompt, schema and parser (ALG-03, #345).**
+`ClassificationOptions.fromSettings(settings, {bantoMode})` sets
+`restrictionsRequested` when the flag is on and the profile holds an entry
+other than keto (`DietaryProfile.hasNonKetoEntry`, a model getter, because a
+service may not name the profile's types); the quick score and the Scan tab
+build their own options and stay keto-only. Only then does `systemPrompt`
+append a last, profile-independent extraction section (each dish's
+`ingredients` as `{name, certainty, role}`, hidden sources a standard recipe
+implies, honest certainty, the menu's own language, never a new dish; no
+restriction is named), `visionSystemPrompt` add a paragraph asking for each
+dish's printed `description`, `responseSchema(extract:)` add `ingredients`
+last in `required`, and `visionResponseSchema(extract:)` add `ingredients`
+and, after `page`, a nullable `description`; with the flag off all four are
+byte for byte today's, which `keto_unchanged_test`'s banto layer pins through
+`fromSettings` with an empty and a keto-only profile. There is no `concerns`
+property: concerns are computed on the device (C1). `MenuResponseParser`
+reads `ingredients` only with `extract`: an entry with a non-string, blank or
+over-100-unit name or an unknown certainty is dropped, an unknown role reads as
+`unknown`, names that normalise alike keep the first, at most 40 are kept, and
+an ingredient whose normalised name is not a substring of the dish's
+`dishRulesText` (removal options skipped) is kept but capped at `suspected`;
+`parseScanned` keeps the description (trimmed, cut at 1000 units), which
+enters the scan's fingerprint. A described dish whose extraction came back
+empty keeps its keto verdict and an empty list; `extractionMissing` computes
+that mark rather than storing it or demoting the dish, so ALG-04's rules pass
+is its only source of concerns. The backend clients send
+`restrictionsRequested: true` (`restrictionsRequested=true` on the venue
+route) only when true; `ClassificationOptionsBody` accepts that strict bool
+and still forbids every other key, the services pass it to the same prompt,
+schema and parser (`backend/app/keto/prompt.py`, `parser.py`), and the
+analysis-cache key gains a `|restrictions` part only when it is true. The
+goldens gain a `restrictions` option set in `prompt.json`, the two extracting
+schemas and `extractText`/`extractScanned` in `parser.json`, replayed by
+Python; no existing entry changed and `schemaVersion` stays 1.
+
 ---
 
 ## 15. Testing strategy

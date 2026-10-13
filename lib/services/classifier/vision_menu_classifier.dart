@@ -74,7 +74,9 @@ final class VisionMenuClassifier implements ScannedMenuClassifier {
         options: options,
       ),
       userPrompt: MenuAnalysisPrompt.visionUserPrompt(pageCount),
-      responseSchema: MenuAnalysisPrompt.visionResponseSchema(),
+      responseSchema: MenuAnalysisPrompt.visionResponseSchema(
+        extract: options.restrictionsRequested,
+      ),
       schemaName: MenuAnalysisPrompt.schemaName,
       images: <ChatImagePart>[
         for (final page in scan.pages)
@@ -90,6 +92,7 @@ final class VisionMenuClassifier implements ScannedMenuClassifier {
           engine: LlmEngine(model: model),
           netCarbLimitGrams: options.netCarbLimitGrams,
           pageCount: pageCount,
+          extract: options.restrictionsRequested,
         );
         return switch (parsed) {
           ScannedMenuRead(:final menu, :final analysis) => ScannedMenuRead(

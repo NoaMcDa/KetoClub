@@ -12,6 +12,7 @@
 library;
 
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/utils/constants.dart';
@@ -38,6 +39,39 @@ const String _dietaryConstraintsPreamble =
     'violates one is not orderAsIs even if it otherwise would be — mark '
     'it modifiable or nonKeto, whichever fits:';
 
+/// The profile-independent ingredient extraction (Banto; ALG-03, D26 C1,
+/// C2), appended as the last section of the system prompt only when
+/// [ClassificationOptions.restrictionsRequested] is true.
+///
+/// It names no restriction and no profile: the same extraction serves
+/// every profile, and the device evaluates the profile against it (C1).
+/// The keto sections before it are untouched.
+const String _extractionSection =
+    'Separately from the keto verdict, for every dish also fill '
+    '"ingredients": each ingredient the dish\'s text states, or that a '
+    'standard recipe for the dish implies, as an object with "name", '
+    '"certainty" and "role". Include the hidden sources a standard recipe '
+    'carries even when the text does not name them: tahini in sabich, '
+    'butter in a cream sauce, flour and egg in a schnitzel coating, soy '
+    'sauce in a stir-fry. Set "certainty" to "stated" only when the '
+    'dish\'s own text names the ingredient, to "likely" when a standard '
+    'recipe for the dish almost always holds it, and to "suspected" when '
+    'it only sometimes does or you are guessing; be honest, never raise a '
+    'certainty to sound sure. Set "role" to the part of the dish the '
+    'ingredient belongs to: "base", "protein", "side", "sauce", "garnish", '
+    '"option" (part of a choice the diner makes) or "unknown". Name each '
+    "ingredient in the menu's own language, as the text names it. List "
+    'ingredients whatever the verdict, an empty list only for a dish with '
+    'nothing to list, and never add a dish that is not in the menu.';
+
+/// What a vision request with extraction asks beyond [_extractionSection]
+/// (ALG-03): the dish's printed description, which holds most of what an
+/// ingredient list is read from and which a keto scan does not transcribe.
+const String _visionDescriptionSection =
+    'For each dish also set "description" to the description printed with '
+    "it, exactly as printed and in the menu's own language — never "
+    'translate it — or null when none is printed.';
+
 /// Builds the system prompt, user prompt, and strict JSON schema
 /// `LlmMenuClassifier` sends to the model through `LlmChatClient`
 /// (architecture.md §9.1, §9.2, §9.3).
@@ -58,6 +92,10 @@ abstract final class MenuAnalysisPrompt {
   /// and [carnivoreOnlyPromptFragment] there, in that order; with every
   /// toggle off the list is empty and no section is written, so the
   /// prompt is byte-for-byte the default one.
+  ///
+  /// When [ClassificationOptions.restrictionsRequested] is true (D26 C2,
+  /// ALG-03) the profile-independent extraction section follows last,
+  /// after a blank line; otherwise the prompt is byte for byte today's.
   ///
   /// The three verdicts and the keto rules are never restated or
   /// paraphrased here: they are read from `constants.dart` so the model
@@ -86,6 +124,12 @@ abstract final class MenuAnalysisPrompt {
         buffer.write('- ${constraints[i]}');
       }
     }
+    if (options.restrictionsRequested) {
+      buffer
+        ..writeln()
+        ..writeln()
+        ..write(_extractionSection);
+    }
     return buffer.toString();
   }
 
@@ -94,10 +138,21 @@ abstract final class MenuAnalysisPrompt {
   /// [visionPreamble] for [pageCount], a blank line, then [systemPrompt]
   /// for [options] byte for byte, so the verdict definitions, keto rules,
   /// output rules and dietary constraints are the text path's own.
+  ///
+  /// With [ClassificationOptions.restrictionsRequested] (ALG-03) the text
+  /// path's extraction section is in that prompt, and a blank line and
+  /// one more paragraph follow it, asking for each dish's printed
+  /// `description`; without it the prompt is byte for byte today's.
   static String visionSystemPrompt({
     required int pageCount,
     ClassificationOptions options = const ClassificationOptions(),
-  }) => '${visionPreamble(pageCount)}\n\n${systemPrompt(options: options)}';
+  }) {
+    final prompt =
+        '${visionPreamble(pageCount)}\n\n${systemPrompt(options: options)}';
+    return options.restrictionsRequested
+        ? '$prompt\n\n$_visionDescriptionSection'
+        : prompt;
+  }
 
   /// What a vision request asks beyond the text path: read the pages,
   /// transcribe every dish name as printed, number the dishes in reading
@@ -194,7 +249,18 @@ abstract final class MenuAnalysisPrompt {
   /// section names as the remaining suspect if a real request still
   /// fails. Do not add a `description` property back without also
   /// raising that budget on the server.
-  static Map<String, Object?> responseSchema() => <String, Object?>{
+  ///
+  /// With [extract] (ALG-03, D26 C2: true exactly when
+  /// [ClassificationOptions.restrictionsRequested] is) the dish object
+  /// gains an eighth property, `ingredients`, listed last in `required`:
+  /// an array of strict `{name, certainty, role}` objects, `certainty`
+  /// over [Certainty]'s names and `role` over [ComponentRole]'s. Without
+  /// it the schema is byte for byte the seven-property one, so a keto
+  /// request is unchanged. There is no `concerns` property: concerns are
+  /// computed on the device, never taken from the model (C1).
+  static Map<String, Object?> responseSchema({
+    bool extract = false,
+  }) => <String, Object?>{
     'type': 'object',
     'additionalProperties': false,
     'required': const <String>['dishes'],
@@ -204,7 +270,7 @@ abstract final class MenuAnalysisPrompt {
         'items': <String, Object?>{
           'type': 'object',
           'additionalProperties': false,
-          'required': const <String>[
+          'required': <String>[
             'id',
             'name',
             'verdict',
@@ -212,6 +278,7 @@ abstract final class MenuAnalysisPrompt {
             'modification',
             'net_carbs_estimate',
             'hidden_carbs',
+            if (extract) 'ingredients',
           ],
           'properties': <String, Object?>{
             'id': const <String, Object?>{'type': 'string'},
@@ -251,7 +318,30 @@ abstract final class MenuAnalysisPrompt {
                 },
               },
             },
+            if (extract) 'ingredients': _ingredientsSchema(),
           },
+        },
+      },
+    },
+  };
+
+  /// The `ingredients` property of an extracting schema (ALG-03): an
+  /// array of strict objects with three required properties.
+  static Map<String, Object?> _ingredientsSchema() => <String, Object?>{
+    'type': 'array',
+    'items': <String, Object?>{
+      'type': 'object',
+      'additionalProperties': false,
+      'required': const <String>['name', 'certainty', 'role'],
+      'properties': <String, Object?>{
+        'name': const <String, Object?>{'type': 'string'},
+        'certainty': <String, Object?>{
+          'type': 'string',
+          'enum': Certainty.values.map((c) => c.name).toList(),
+        },
+        'role': <String, Object?>{
+          'type': 'string',
+          'enum': ComponentRole.values.map((r) => r.name).toList(),
         },
       },
     },
@@ -266,8 +356,14 @@ abstract final class MenuAnalysisPrompt {
   ///
   /// The text path keeps [responseSchema] unchanged: a platform menu has
   /// no pages.
-  static Map<String, Object?> visionResponseSchema() {
-    final schema = responseSchema();
+  ///
+  /// With [extract] (ALG-03) it is built on `responseSchema(extract:
+  /// true)`, so it has `ingredients`, and after `page` it gains
+  /// `description`, typed `["string", "null"]`: the description printed
+  /// with the dish, which `MenuResponseParser.parseScanned` keeps as
+  /// [Dish.description]. Without it the schema is byte for byte today's.
+  static Map<String, Object?> visionResponseSchema({bool extract = false}) {
+    final schema = responseSchema(extract: extract);
     final properties = schema['properties']! as Map<String, Object?>;
     final dishes = properties['dishes']! as Map<String, Object?>;
     final item = dishes['items']! as Map<String, Object?>;
@@ -281,12 +377,20 @@ abstract final class MenuAnalysisPrompt {
           ...dishes,
           'items': <String, Object?>{
             ...item,
-            'required': <String>[...required, 'page'],
+            'required': <String>[
+              ...required,
+              'page',
+              if (extract) 'description',
+            ],
             'properties': <String, Object?>{
               ...dishProperties,
               'page': const <String, Object?>{
                 'type': <String>['integer', 'null'],
               },
+              if (extract)
+                'description': const <String, Object?>{
+                  'type': <String>['string', 'null'],
+                },
             },
           },
         },

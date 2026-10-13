@@ -215,6 +215,16 @@ final Map<String, ClassificationOptions> _optionSets =
       ),
     };
 
+/// The option sets the prompt golden runs under: [_optionSets] plus
+/// `restrictions` (Banto; ALG-03, D26 C2), which asks for the
+/// profile-independent ingredient extraction. Only the prompt carries it:
+/// the heuristic does not read the flag.
+final Map<String, ClassificationOptions> _promptOptionSets =
+    <String, ClassificationOptions>{
+      ..._optionSets,
+      'restrictions': const ClassificationOptions(restrictionsRequested: true),
+    };
+
 /// A [GuardWords] record as `{before, after}`.
 Map<String, Object?> _guard(GuardWords guard) => <String, Object?>{
   'before': guard.before,
@@ -784,10 +794,12 @@ Map<String, Object?> _prompt(_Inputs inputs) => <String, Object?>{
   'schemaName': MenuAnalysisPrompt.schemaName,
   'schema': MenuAnalysisPrompt.responseSchema(),
   'visionSchema': MenuAnalysisPrompt.visionResponseSchema(),
+  'extractSchema': MenuAnalysisPrompt.responseSchema(extract: true),
+  'extractVisionSchema': MenuAnalysisPrompt.visionResponseSchema(extract: true),
   'entries': <Object?>[
     for (final MapEntry(key: menuName, value: menu) in inputs.menus.entries)
       for (final MapEntry(key: optionsName, value: options)
-          in _optionSets.entries)
+          in _promptOptionSets.entries)
         <String, Object?>{
           'name': '$menuName/$optionsName',
           'menu': menu.toJson(),
@@ -876,6 +888,75 @@ Map<String, Object?> _scannedEntry(
   ),
 };
 
+/// The ids of the dishes in [menu] whose verdict in [analysis] is missing
+/// its extraction ([MenuResponseParser.extractionMissing]).
+List<String> _extractionMissing(Menu menu, MenuAnalysed analysis) {
+  final byId = <String, Dish>{for (final dish in menu.allDishes) dish.id: dish};
+  return <String>[
+    for (final verdict in analysis.dishes)
+      if (MenuResponseParser.extractionMissing(
+        byId[verdict.dishId]!,
+        verdict,
+        extract: true,
+      ))
+        verdict.dishId,
+  ];
+}
+
+/// A text reply parsed with extraction requested (ALG-03), with the ids
+/// whose extraction is missing.
+Map<String, Object?> _extractTextEntry(ReplyCase reply) {
+  final source = reply.source!;
+  final result = MenuResponseParser.parse(
+    reply.body,
+    source: source,
+    analysedAt: goldenNow,
+    engine: _engine,
+    netCarbLimitGrams: reply.limit,
+    extract: true,
+  );
+  return <String, Object?>{
+    'name': reply.name,
+    'reply': reply.body,
+    'sourceMenu': source.toJson(),
+    'netCarbLimitGrams': reply.limit,
+    'result': _textResult(result),
+    'extractionMissing': switch (result) {
+      final MenuAnalysed analysed => _extractionMissing(source, analysed),
+      MenuAnalysisFailed() => const <String>[],
+    },
+  };
+}
+
+/// A scanned reply parsed with extraction requested (ALG-03), with the
+/// ids whose extraction is missing.
+Map<String, Object?> _extractScannedEntry(
+  ({String name, String body, int? pageCount, int limit}) reply,
+) {
+  final result = MenuResponseParser.parseScanned(
+    reply.body,
+    analysedAt: goldenNow,
+    engine: _engine,
+    netCarbLimitGrams: reply.limit,
+    pageCount: reply.pageCount,
+    extract: true,
+  );
+  return <String, Object?>{
+    'name': reply.name,
+    'reply': reply.body,
+    'pageCount': reply.pageCount,
+    'netCarbLimitGrams': reply.limit,
+    'result': _scannedResult(result),
+    'extractionMissing': switch (result) {
+      ScannedMenuRead(:final menu, :final analysis) => _extractionMissing(
+        menu,
+        analysis,
+      ),
+      ScannedMenuFailed() => const <String>[],
+    },
+  };
+}
+
 Map<String, Object?> _parser() {
   final fixtureNames = parserFixtureSources.keys.toList()..sort();
   return <String, Object?>{
@@ -936,6 +1017,22 @@ Map<String, Object?> _parser() {
         ),
       for (final reply in handScannedReplies())
         _scannedEntry(reply.name, reply.body, reply.pageCount, reply.limit),
+    ],
+    // ALG-03: replies parsed with extraction requested. The keto lists
+    // above are parsed without it and are unchanged.
+    'extractText': <Object?>[
+      for (final reply in handExtractionTextReplies()) _extractTextEntry(reply),
+      // A keto fixture read with extraction requested: no ingredients sent.
+      _extractTextEntry((
+        name: 'llm_fenced_valid.json@extract',
+        body: _read('test/fixtures/llm_fenced_valid.json'),
+        source: parserFixtureSources['llm_fenced_valid.json'],
+        limit: defaultNetCarbLimitGrams,
+      )),
+    ],
+    'extractScanned': <Object?>[
+      for (final reply in handExtractionScannedReplies())
+        _extractScannedEntry(reply),
     ],
   };
 }
