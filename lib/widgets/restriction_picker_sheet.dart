@@ -7,7 +7,7 @@ import 'package:ketoclub/widgets/app_sheet.dart';
 /// The kinds the picker groups by, in display order: the strict kinds
 /// first. [RestrictionKind.keto] is absent on purpose — keto stays the
 /// existing "Your keto rules" toggles.
-const List<RestrictionKind> _kindOrder = <RestrictionKind>[
+const List<RestrictionKind> restrictionKindOrder = <RestrictionKind>[
   RestrictionKind.allergen,
   RestrictionKind.autoimmune,
   RestrictionKind.intolerance,
@@ -121,7 +121,7 @@ class RestrictionPickerSheet extends StatelessWidget {
                 style: theme.textTheme.titleMedium,
               ),
             ),
-            for (final kind in _kindOrder)
+            for (final kind in restrictionKindOrder)
               ..._group(context, l10n, locale, kind, available),
           ],
         ),
