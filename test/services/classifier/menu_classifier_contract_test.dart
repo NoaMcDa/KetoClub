@@ -167,4 +167,53 @@ void main() {
       );
     });
   });
+
+  group('ClassificationOptions.restrictionsRequested (D26 W2-0)', () {
+    test('defaults to false, and fromSettings leaves it false', () {
+      expect(const ClassificationOptions().restrictionsRequested, isFalse);
+      expect(
+        ClassificationOptions.fromSettings(const AppSettings())
+            .restrictionsRequested,
+        isFalse,
+      );
+    });
+
+    test('takes part in equality, hashCode and toString', () {
+      const off = ClassificationOptions();
+      const on = ClassificationOptions(restrictionsRequested: true);
+      expect(on, isNot(equals(off)));
+      expect(
+        on,
+        equals(const ClassificationOptions(restrictionsRequested: true)),
+      );
+      expect(
+        on.hashCode,
+        const ClassificationOptions(restrictionsRequested: true).hashCode,
+      );
+      expect(on.toString(), contains('restrictions: true'));
+    });
+
+    test('snapshot records it, and a keto snapshot is unchanged', () {
+      expect(
+        const ClassificationOptions(restrictionsRequested: true)
+            .snapshot
+            .restrictionsRequested,
+        isTrue,
+      );
+      expect(const ClassificationOptions().snapshot.toJson().keys, [
+        'netCarbLimitGrams',
+        'dietaryConstraints',
+      ]);
+    });
+
+    test('a cached analysis made without it is retired when it turns on, '
+        'and the other way round', () {
+      const off = ClassificationOptions();
+      const on = ClassificationOptions(restrictionsRequested: true);
+      expect(on.matches(off.snapshot), isFalse);
+      expect(on.matches(null), isFalse);
+      expect(off.matches(on.snapshot), isFalse);
+      expect(on.matches(on.snapshot), isTrue);
+    });
+  });
 }

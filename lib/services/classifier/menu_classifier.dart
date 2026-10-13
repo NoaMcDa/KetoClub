@@ -50,6 +50,7 @@ final class ClassificationOptions {
     this.estimationConsentGiven = false,
     this.dietaryConstraints = const <String>[],
     this.netCarbLimitGrams = defaultNetCarbLimitGrams,
+    this.restrictionsRequested = false,
     this.onEngineStarted,
   });
 
@@ -141,11 +142,23 @@ final class ClassificationOptions {
   /// `MenuResponseParser` to the model's own `net_carbs_estimate`.
   final int netCarbLimitGrams;
 
+  /// Whether the analysis should also extract ingredients and find
+  /// restriction concerns (Banto; D26 C2): true only with the Banto flag
+  /// on and a profile holding a non-keto entry. Nothing reads it yet, and
+  /// [ClassificationOptions.fromSettings] always leaves it false; Wave 2
+  /// adds the extraction prompt and schema behind it.
+  ///
+  /// It changes what an analysis holds, so [snapshot] records it and
+  /// [matches] compares it: a cached analysis made without it is retired
+  /// when it turns on (D26 C3).
+  final bool restrictionsRequested;
+
   /// The options that shape a verdict, as the models-layer value a cached
   /// [MenuAnalysed] records (issue #57).
   AnalysisOptionsSnapshot get snapshot => AnalysisOptionsSnapshot(
     netCarbLimitGrams: netCarbLimitGrams,
     dietaryConstraints: dietaryConstraints,
+    restrictionsRequested: restrictionsRequested,
   );
 
   /// Whether an analysis recorded under [recorded] answered the same
@@ -162,19 +175,22 @@ final class ClassificationOptions {
       other is ClassificationOptions &&
       other.estimationConsentGiven == estimationConsentGiven &&
       _listEquals(other.dietaryConstraints, dietaryConstraints) &&
-      other.netCarbLimitGrams == netCarbLimitGrams;
+      other.netCarbLimitGrams == netCarbLimitGrams &&
+      other.restrictionsRequested == restrictionsRequested;
 
   @override
   int get hashCode => Object.hash(
     estimationConsentGiven,
     Object.hashAll(dietaryConstraints),
     netCarbLimitGrams,
+    restrictionsRequested,
   );
 
   @override
   String toString() =>
       'ClassificationOptions(consent: $estimationConsentGiven, '
-      'constraints: $dietaryConstraints, limit: ${netCarbLimitGrams}g)';
+      'constraints: $dietaryConstraints, limit: ${netCarbLimitGrams}g, '
+      'restrictions: $restrictionsRequested)';
 }
 
 /// Classifies a menu's dishes by keto-compatibility (architecture.md
