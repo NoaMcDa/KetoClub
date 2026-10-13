@@ -78,6 +78,15 @@ const Set<String> _languageValues = <String>{'he', 'en', 'mixed'};
 /// `11 §11` or `12 §1.1`.
 final RegExp _sourcePattern = RegExp(r'^1[12] §\d+(\.\d+)?$');
 
+/// Words by which a restaurant declares a dish vegan or egg-free, matched
+/// against the dish text in lower case.
+const List<String> _veganDeclarations = <String>[
+  'טבעוני',
+  'vegan',
+  'צמחוני',
+  'ללא ביצה',
+];
+
 /// A Hebrew letter, the heuristic that makes a dish a Hebrew dish.
 final RegExp _hebrewLetter = RegExp('[א-ת]');
 
@@ -269,9 +278,11 @@ List<String> _labelProblems(String where, String id, Object? value) {
 /// The families are: gluten covers wheat (and takes its role); legumes
 /// cover peanut, soy and lupin; milk covers lactose; vegetarian covers
 /// fish, crustaceans and molluscs; vegan covers eggs, fish, crustaceans,
-/// molluscs, vegetarian and milk. The one exception: an explicit vegan
-/// `free` beside a milk `may_contain` that is a substitute-product caveat
-/// (12 §2.1) or a guard.
+/// molluscs, vegetarian and milk. The exceptions, all for the flexible
+/// diet labels: an egg or milk label whose evidence starts with `guard:`,
+/// an explicit vegan `free` beside the restaurant's own vegan declaration
+/// (`_veganDeclarations` in the dish text), and a substitute-product milk
+/// `may_contain` (12 §2.1) beside an explicit vegan `free`.
 List<String> _consistencyProblems(String menu, int index, _Json dish) {
   final where = '$menu dish #$index (${dish['name']})';
   final problems = <String>[];
@@ -295,19 +306,40 @@ List<String> _consistencyProblems(String menu, int index, _Json dish) {
     problems.add('$where: vegetarian must be at least fish and shellfish');
   }
   final vegan = l('vegan');
-  final milk = l('milk');
-  final exempt =
-      vegan != null &&
-      vegan['label'] == 'free' &&
-      milk != null &&
-      milk['label'] == 'may_contain' &&
-      (milk['source'] == '12 §2.1' ||
-          (milk['evidence']! as String).startsWith('guard:'));
+  final veganFree = vegan != null && vegan['label'] == 'free';
+  final text = [
+    dish['name'],
+    dish['description'],
+    for (final option in (dish['options']! as List<Object?>).cast<_Json>())
+      ...(option['values']! as List<Object?>),
+  ].join(' ').toLowerCase();
+  final declared = _veganDeclarations.any(text.contains);
+  // A strict allergen label that only a guard lowered, or one kept for the
+  // allergy beside a restaurant's own vegan declaration, does not pull a
+  // flexible diet label up: the declaration is the evidence a vegan user
+  // wants.
+  bool excluded(String id) {
+    final label = l(id);
+    if (label == null) {
+      return false;
+    }
+    if ((label['evidence']! as String).startsWith('guard:')) {
+      return true;
+    }
+    if (veganFree && declared) {
+      return true;
+    }
+    return veganFree &&
+        id == 'milk' &&
+        label['label'] == 'may_contain' &&
+        label['source'] == '12 §2.1';
+  }
+
   final needed = [
-    r('eggs'),
+    if (!excluded('eggs')) r('eggs'),
     fishes,
     r('vegetarian'),
-    if (!exempt) r('milk'),
+    if (!excluded('milk')) r('milk'),
   ].reduce(max);
   if (r('vegan') < needed) {
     problems.add('$where: vegan must cover animal ingredients and milk');

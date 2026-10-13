@@ -188,9 +188,15 @@ free or absent 0, `may_contain` 1, `contains` 2:
 - `milk` is at least `lactose`.
 - `vegetarian` is at least `fish`, `crustaceans` and `molluscs`.
 - `vegan` is at least `eggs`, `fish`, `crustaceans`, `molluscs`, `vegetarian`
-  and `milk`. The one exception is an explicit `vegan: free` beside a
-  `milk: may_contain` that is a substitute-product caveat (12 §2.1) or a
-  plant-milk guard, because טבעוני never clears a milk allergy but is still vegan.
+  and `milk`, **except** that a strict allergen label does not pull `vegan` or
+  `vegetarian` up when it only reflects a guard (`evidence` starting `guard:`)
+  or the allergy caveat beside the restaurant's own vegan declaration (טבעוני,
+  vegan, צמחוני, ללא ביצה in the dish text) on an explicit `vegan: free`. Eggs
+  and milk are strict allergens, so a guard only lowers them to `may_contain`
+  (11 §0); vegan and vegetarian are flexible restrictions, where the restaurant's
+  declaration is the evidence the user wants, so a dish declared vegan stays
+  `vegan: free`. Substitute-product milk (12 §2.1) beside an explicit
+  `vegan: free` is exempt in the same way.
 
 ### Matcher traps and spelling variants
 
