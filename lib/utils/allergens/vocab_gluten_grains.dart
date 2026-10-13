@@ -831,8 +831,9 @@ const List<HiddenTrigger> _glutenHiddenHe = <HiddenTrigger>[
   ),
 ];
 
-/// English lupin triggers (11 §14.1).
-const List<String> _lupinEn = <String>[
+/// English lupin triggers (11 §14.1). Public because `legumes`
+/// (vocab_plants_additives.dart) spreads them: lupin is a legume.
+const List<String> lupinDirectEn = <String>[
   'lupin',
   'lupine',
   'lupins',
@@ -841,8 +842,8 @@ const List<String> _lupinEn = <String>[
   'altramuces',
 ];
 
-/// Hebrew lupin triggers (11 §14.1, 12 §1.3).
-const List<String> _lupinHe = <String>['תורמוס', 'לופין'];
+/// Hebrew lupin triggers (11 §14.1, 12 §1.3); see [lupinDirectEn].
+const List<String> lupinDirectHe = <String>['תורמוס', 'לופין'];
 
 /// Gluten-free bakery, where lupin flour is a common substitute
 /// (11 §14.2, §14.5).
@@ -1065,8 +1066,8 @@ const Map<RestrictionId, RestrictionVocabulary> glutenGrainsVocabulary =
         sources: <String>['11 §7.1', '11 §7.3', '11 §7.5', '12 §1.4'],
       ),
       RestrictionId.lupin: RestrictionVocabulary(
-        directEn: _lupinEn,
-        directHe: _lupinHe,
+        directEn: lupinDirectEn,
+        directHe: lupinDirectHe,
         hiddenEn: _lupinHiddenEn,
         hiddenHe: _lupinHiddenHe,
         guards: AllergenGuards(
