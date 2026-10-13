@@ -12,7 +12,8 @@ today's app). They are **outputs**, not recorded platform payloads.
 | `vision_system_prompt_defaults_2_pages.txt` | `visionSystemPrompt(pageCount: 2)` with default options |
 | `response_schema.json`, `vision_response_schema.json` | the two reply schemas |
 | `options_snapshot_*.json` | `ClassificationOptions.snapshot.toJson()`, the cache-key material |
-| `app_settings_defaults.json` | `const AppSettings().toJson()` |
+| `app_settings_defaults.json` | `const AppSettings().toJson()`, and the same with `copyWith(profile: DietaryProfile.empty)` (no `dietaryProfile` key) |
+| `document_title.txt` | `documentTitle(null)`, whose `app` defaults to `BantoMode.appName`, in a build without `BANTO_MODE` |
 | `rules_<menu>_<options>.json` | `HeuristicMenuClassifier` over the golden corpus's hand-built menus, without `analysedAt` |
 | `copy_en.json`, `copy_he.json` | the verdict, tile and legend copy |
 | `share_text_*.txt` | `MenuShareText.build` over the English and Hebrew golden menus |

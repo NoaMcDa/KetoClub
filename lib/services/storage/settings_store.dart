@@ -11,6 +11,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,8 +52,9 @@ enum AppThemeMode {
 /// filter default, AI-estimation consent, the last venue opened, the
 /// appearance (issue #58), the net-carb limit (issue #57), the
 /// last-used filter (issue #55), the three "Your keto rules"
-/// toggles (issue #56), and whether the first-launch AI disclosure
-/// banner has been seen (D16, issue #167).
+/// toggles (issue #56), whether the first-launch AI disclosure
+/// banner has been seen (D16, issue #167), and the restriction profile
+/// (Banto, ALG-02a, issue #344).
 @immutable
 final class AppSettings {
   /// Creates settings. Every field defaults to the "nothing set yet"
@@ -77,6 +79,7 @@ final class AppSettings {
     this.carnivoreOnly = false,
     this.lastFilter,
     this.disclosureSeen = false,
+    this.profile = DietaryProfile.empty,
   });
 
   /// Reads settings written by [toJson].
@@ -105,6 +108,10 @@ final class AppSettings {
   /// [themeMode] and [netCarbLimitGrams]: a missing key, or one whose
   /// value [MenuFilter.tryParse] does not recognise, decodes to null —
   /// "no last-used filter yet" — rather than invalidating the record.
+  ///
+  /// [profile] (issue #344) follows the same rule: a missing key reads as
+  /// [DietaryProfile.empty], and [DietaryProfile.tryFrom] drops what it
+  /// cannot read rather than invalidating the record.
   static AppSettings? tryFrom(Map<String, Object?> json) {
     final rawLanguageTag = json['languageTag'];
     if (rawLanguageTag != null && rawLanguageTag is! String) return null;
@@ -154,8 +161,15 @@ final class AppSettings {
       carnivoreOnly: json['carnivoreOnly'] == true,
       lastFilter: lastFilter,
       disclosureSeen: json['disclosureSeen'] == true,
+      profile: DietaryProfile.tryFrom(json[_profileKey]),
     );
   }
+
+  /// The JSON key [profile] is stored under. [toJson] writes it only for a
+  /// non-empty profile, so a keto-only install's stored record — and
+  /// `const AppSettings().toJson()`, which `keto_unchanged_test` pins — is
+  /// byte-identical to before the profile existed.
+  static const String _profileKey = 'dietaryProfile';
 
   /// The UI language, as a BCP-47 tag such as `"he"`. Null means "follow
   /// the device locale".
@@ -211,6 +225,12 @@ final class AppSettings {
   /// `lib/widgets/consent_disclosure_banner.dart`.
   final bool disclosureSeen;
 
+  /// The restrictions the user chose (Banto, ALG-02a, issue #344);
+  /// [DietaryProfile.empty] until they choose one. Kept on the device only
+  /// (contract decision C1): this store writes it to `shared_preferences`
+  /// and nothing else; no request body is built here.
+  final DietaryProfile profile;
+
   /// Returns a copy with the given fields replaced.
   ///
   /// Omitting [languageTag], [lastVenue] or [lastFilter] leaves the
@@ -233,6 +253,7 @@ final class AppSettings {
     bool? carnivoreOnly,
     Object? lastFilter = _unset,
     bool? disclosureSeen,
+    DietaryProfile? profile,
   }) => AppSettings(
     languageTag: identical(languageTag, _unset)
         ? this.languageTag
@@ -252,9 +273,11 @@ final class AppSettings {
         ? this.lastFilter
         : lastFilter as MenuFilter?,
     disclosureSeen: disclosureSeen ?? this.disclosureSeen,
+    profile: profile ?? this.profile,
   );
 
-  /// Writes a form [tryFrom] can read back.
+  /// Writes a form [tryFrom] can read back. [profile] is written only
+  /// when it is not empty; see [_profileKey].
   Map<String, Object?> toJson() => <String, Object?>{
     'languageTag': languageTag,
     'filter': filter.name,
@@ -267,6 +290,7 @@ final class AppSettings {
     'carnivoreOnly': carnivoreOnly,
     'lastFilter': lastFilter?.name,
     'disclosureSeen': disclosureSeen,
+    if (!profile.isEmpty) _profileKey: profile.toJson(),
   };
 
   @override
@@ -282,7 +306,8 @@ final class AppSettings {
       other.dairyFree == dairyFree &&
       other.carnivoreOnly == carnivoreOnly &&
       other.lastFilter == lastFilter &&
-      other.disclosureSeen == disclosureSeen;
+      other.disclosureSeen == disclosureSeen &&
+      other.profile == profile;
 
   @override
   int get hashCode => Object.hash(
@@ -297,6 +322,7 @@ final class AppSettings {
     carnivoreOnly,
     lastFilter,
     disclosureSeen,
+    profile,
   );
 
   @override
@@ -306,7 +332,10 @@ final class AppSettings {
       'netCarbLimit: ${netCarbLimitGrams}g, lastFilter: $lastFilter, '
       'seedOilFree: $seedOilFree, dairyFree: $dairyFree, '
       'carnivoreOnly: $carnivoreOnly, '
-      'disclosureSeen: $disclosureSeen)';
+      'disclosureSeen: $disclosureSeen, '
+      // A count, never the restrictions themselves, so a logged settings
+      // value cannot carry the profile (contract decision C1).
+      'profile: ${profile.entries.length} entries)';
 }
 
 /// On-device storage for [AppSettings] (architecture.md §6.4). Backed by

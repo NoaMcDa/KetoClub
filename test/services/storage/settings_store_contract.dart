@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/dietary_profile.dart';
+import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 
@@ -122,6 +124,36 @@ void runSettingsStoreContract(String name, SettingsStore Function() build) {
       await store.write(const AppSettings(languageTag: 'en'));
 
       expect((await store.read()).languageTag, equals('en'));
+    });
+
+    test(
+      'write then read round-trips a dietary profile (issue #344)',
+      () async {
+        final store = build();
+        final settings = AppSettings(
+          languageTag: 'he',
+          profile: DietaryProfile.empty
+              .withEntry(RestrictionId.sesame)
+              .withEntry(RestrictionId.lactose, exceptions: <String>['butter']),
+        );
+
+        await store.write(settings);
+
+        expect(await store.read(), equals(settings));
+      },
+    );
+
+    test('writing an empty profile after a full one clears it', () async {
+      final store = build();
+
+      await store.write(
+        AppSettings(
+          profile: DietaryProfile.empty.withEntry(RestrictionId.fish),
+        ),
+      );
+      await store.write(const AppSettings());
+
+      expect((await store.read()).profile, DietaryProfile.empty);
     });
 
     test('read never throws', () async {

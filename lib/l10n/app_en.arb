@@ -98,6 +98,26 @@
   "settingsNetCarbLimitIncrease": "Raise the net carb limit",
   "settingsKetoRules": "Your keto rules",
   "settingsKetoRulesBody": "Each rule you turn on applies from the next menu you open.",
+  "settingsRestrictions": "My restrictions",
+  "@settingsRestrictions": { "description": "Banto (ALG-02a): the Settings section listing the user's dietary restrictions." },
+  "settingsRestrictionsEmpty": "You have not added a restriction yet.",
+  "settingsRestrictionsAdd": "Add restriction",
+  "settingsRestrictionsRemove": "Remove {name}",
+  "@settingsRestrictionsRemove": {
+    "description": "Tooltip and screen-reader label of a restriction row's remove button.",
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "restrictionKindAllergy": "Allergy",
+  "restrictionKindAutoimmune": "Autoimmune",
+  "@restrictionKindAutoimmune": { "description": "The kind label of celiac disease (the gluten restriction)." },
+  "restrictionKindIntolerance": "Intolerance",
+  "restrictionKindDiet": "Diet",
+  "restrictionJurisdictionHint": "{lists, select, usEu{On the US and EU allergen lists} us{On the US allergen list} eu{On the EU allergen list} other{Not on any official allergen list}}",
+  "@restrictionJurisdictionHint": {
+    "description": "One line under a restriction in the picker: which official allergen-labelling lists name it.",
+    "placeholders": { "lists": { "type": "String" } }
+  },
+  "restrictionPickerTitle": "Add a restriction",
   "settingsSeedOilFree": "Strict seed-oil free",
   "settingsSeedOilFreeHint": "Flags canola, sunflower and soybean oil in fried dishes.",
   "settingsDairyFree": "Dairy-free keto",
