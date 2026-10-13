@@ -140,6 +140,56 @@ void main() {
   runMenuClassifierContract('LlmMenuClassifier', _buildContractClassifier);
 
   group('LlmMenuClassifier', () {
+    test('with restrictionsRequested, asks for and reads ingredients '
+        '(ALG-03)', () async {
+      // Arrange
+      final reply = jsonEncode(<String, Object?>{
+        'dishes': <Object?>[
+          <String, Object?>{
+            'id': 'dish-1',
+            'name': 'Salmon',
+            'verdict': 'orderAsIs',
+            'why': 'Fish.',
+            'modification': null,
+            'net_carbs_estimate': null,
+            'hidden_carbs': <Object?>[],
+            'ingredients': <Object?>[
+              <String, Object?>{
+                'name': 'salmon',
+                'certainty': 'stated',
+                'role': 'protein',
+              },
+            ],
+          },
+        ],
+      });
+      final client = FakeLlmChatClient()
+        ..fallback = ChatCompleted(content: reply, model: 'm');
+      final classifier = LlmMenuClassifier(
+        client,
+        FakeClock(DateTime.utc(2026)),
+      );
+      final menu = _menuOf([_dishNamed('dish-1', 'Salmon')]);
+      const options = ClassificationOptions(restrictionsRequested: true);
+
+      // Act
+      final result = await classifier.classify(menu, options: options);
+
+      // Assert
+      final recorded = client.requests.single;
+      expect(
+        recorded.systemPrompt,
+        MenuAnalysisPrompt.systemPrompt(options: options),
+      );
+      expect(
+        recorded.responseSchema,
+        MenuAnalysisPrompt.responseSchema(extract: true),
+      );
+      final analysed = result as MenuAnalysed;
+      expect(analysed.dishes.single.ingredients.single.name, 'salmon');
+      expect(analysed.options!.restrictionsRequested, isTrue);
+    });
+
     test(
       'classify given a successful reply returns the parsed dishes',
       () async {

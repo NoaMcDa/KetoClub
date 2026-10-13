@@ -138,6 +138,12 @@ final class DietaryProfile {
   /// Whether no restriction is chosen.
   bool get isEmpty => entries.isEmpty;
 
+  /// Whether the profile holds a restriction other than keto: what turns
+  /// ingredient extraction on (`ClassificationOptions.fromSettings`, D26
+  /// C2). Keto alone is today's app, so it asks for nothing more.
+  bool get hasNonKetoEntry =>
+      entries.any((entry) => entry.restrictionId != RestrictionId.keto);
+
   /// Whether [id] is in the profile.
   bool contains(RestrictionId id) => entryFor(id) != null;
 

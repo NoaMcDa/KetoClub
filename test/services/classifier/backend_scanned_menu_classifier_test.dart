@@ -287,6 +287,35 @@ void main() {
       );
     });
 
+    test('the options carry restrictionsRequested only when true '
+        '(ALG-03)', () async {
+      // Arrange
+      final requests = <http.Request>[];
+      final classifier = _recording(requests);
+
+      // Act
+      await classifier.classify(
+        _twoPages,
+        options: const ClassificationOptions(restrictionsRequested: true),
+      );
+      await classifier.classify(_twoPages, options: _steered);
+
+      // Assert
+      final bodies = [
+        for (final request in requests)
+          jsonDecode(request.body) as Map<String, Object?>,
+      ];
+      expect(
+        bodies.first['options'],
+        equals(<String, Object?>{
+          'netCarbLimitGrams': defaultNetCarbLimitGrams,
+          'dietaryConstraints': <Object?>[],
+          'restrictionsRequested': true,
+        }),
+      );
+      expect(bodies.last['options'], isNot(contains('restrictionsRequested')));
+    });
+
     test('sends the install id and JSON content type, never '
         'Authorization', () async {
       // Arrange
