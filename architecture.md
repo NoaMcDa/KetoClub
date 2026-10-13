@@ -1757,6 +1757,13 @@ should not reach a log or a widget, even with no bearer token left to leak.
   it fails or passes the parser like any other.
 - **No secrets in the repo.** `.gitignore` already excludes `.env*`; there is nothing
   to put in one.
+- **Banto (C1): the restriction profile never leaves the device, not even as ids.**
+  Only the menu text and the keto settings are ever sent. Two tests pin it:
+  `test/architecture/no_profile_on_the_wire_test.dart` (no file under
+  `lib/services/` can name a restriction id, a dietary profile or a severity) and
+  `backend/tests/test_menus_profile_rejected.py` (`POST /v1/menus` answers 422 to a
+  body that carries one). The product is a helper tool that makes no accuracy or
+  medical claim; see `docs/TERMS_NOTES.md`.
 
 ---
 

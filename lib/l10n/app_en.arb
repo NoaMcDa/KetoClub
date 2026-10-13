@@ -600,5 +600,12 @@
   "menuQuestionFailedBackendUnreachable": "KetoClub's server could not be reached. Try asking again.",
   "menuQuestionFailedConsentWithheld": "Allow AI analysis in Settings to ask questions about a menu.",
   "menuQuestionFailedApiKeyMissing": "Add your Gemini API key in Settings to ask questions about a menu.",
-  "menuQuestionFailedApiKeyRejected": "Gemini rejected your API key. Check it in Settings, then try asking again."
+  "menuQuestionFailedApiKeyRejected": "Gemini rejected your API key. Check it in Settings, then try asking again.",
+
+  "helperToolSentence": "This app reads menus to help you choose. It cannot see the kitchen, verify a recipe or promise accuracy. Always ask the restaurant.",
+  "@helperToolSentence": { "description": "The one-sentence helper-tool statement: what the app does and does not do. Shown wherever a restriction result appears (consumed by later Banto work)." },
+  "helperToolTitle": "A helper, not a guarantee",
+  "@helperToolTitle": { "description": "Heading that sits above the helper-tool sentence." },
+  "whatLeavesDeviceBanto": "Your restriction profile stays on this device. When AI analysis is on, only the menu text and the keto settings are sent — never which restrictions you have.",
+  "@whatLeavesDeviceBanto": { "description": "Plain statement of what leaves the device once restriction profiles exist; the profile never does." }
 }
