@@ -748,5 +748,15 @@
   "engineChipRulesCheckedSemanticLabel": "The app's own rules also checked this menu for your restrictions",
   "@engineChipRulesCheckedSemanticLabel": {"description": "Banto (ALG-05): screen-reader label of the rules-checked chip."},
   "concernLineText": "{source} · {certainty}",
-  "@concernLineText": {"description": "Banto (ALG-05): the words after a concern's restriction chip on the dish card: where it was found, then how sure.", "placeholders": {"source": {"type": "String"}, "certainty": {"type": "String"}}}
+  "@concernLineText": {"description": "Banto (ALG-05): the words after a concern's restriction chip on the dish card: where it was found, then how sure.", "placeholders": {"source": {"type": "String"}, "certainty": {"type": "String"}}},
+  "waiterCardChefCard": "Chef card",
+  "@waiterCardChefCard": {"description": "Banto (ALG-08b): the Waiter Card action that opens the chef card for this dish."},
+  "menuAllergyNoteAction": "Copy allergy note",
+  "@menuAllergyNoteAction": {"description": "Banto (ALG-15): the menu overflow entry that copies a short allergy note, in the menu's language, for a delivery app's note box."},
+  "menuAllergyNoteCopied": "Allergy note copied",
+  "@menuAllergyNoteCopied": {"description": "Banto (ALG-15): the snack bar shown once the allergy note is on the clipboard."},
+  "menuAllergyNoteShare": "Share",
+  "@menuAllergyNoteShare": {"description": "Banto (ALG-15): the snack bar action that shares the allergy note as text."},
+  "menuAllergyNoteSubject": "Allergy note",
+  "@menuAllergyNoteSubject": {"description": "Banto (ALG-15): the subject line of a shared allergy note, where the platform shows one."}
 }

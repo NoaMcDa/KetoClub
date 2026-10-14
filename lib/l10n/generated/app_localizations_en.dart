@@ -1665,4 +1665,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String concernLineText(String source, String certainty) {
     return '$source · $certainty';
   }
+
+  @override
+  String get waiterCardChefCard => 'Chef card';
+
+  @override
+  String get menuAllergyNoteAction => 'Copy allergy note';
+
+  @override
+  String get menuAllergyNoteCopied => 'Allergy note copied';
+
+  @override
+  String get menuAllergyNoteShare => 'Share';
+
+  @override
+  String get menuAllergyNoteSubject => 'Allergy note';
 }

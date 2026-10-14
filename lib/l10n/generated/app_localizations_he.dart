@@ -1669,4 +1669,19 @@ class AppLocalizationsHe extends AppLocalizations {
   String concernLineText(String source, String certainty) {
     return '$source · $certainty';
   }
+
+  @override
+  String get waiterCardChefCard => 'כרטיס שף';
+
+  @override
+  String get menuAllergyNoteAction => 'העתקת הערת אלרגיה';
+
+  @override
+  String get menuAllergyNoteCopied => 'הערת האלרגיה הועתקה';
+
+  @override
+  String get menuAllergyNoteShare => 'שיתוף';
+
+  @override
+  String get menuAllergyNoteSubject => 'הערת אלרגיה';
 }

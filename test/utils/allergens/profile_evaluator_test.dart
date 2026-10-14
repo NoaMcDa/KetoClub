@@ -801,4 +801,81 @@ void main() {
       expect(result.modification, "לבקש את המנה בלי 'גבינת'");
     });
   });
+
+  group('ProfileEvaluator — every concern carries a question (ALG-08b)', () {
+    test('in the language of a Hebrew dish', () {
+      // Act
+      final result = ProfileEvaluator.evaluate(
+        _green('סלט עם טחינה'),
+        _dish('סלט עם טחינה'),
+        _profile(<RestrictionId>[RestrictionId.sesame]),
+      );
+
+      // Assert
+      expect(
+        result.concerns.single.waiterQuestion,
+        'אפשר להכין את המנה בלי שומשום?',
+      );
+    });
+
+    test('in the language asked for, whatever the dish', () {
+      // Act
+      final result = ProfileEvaluator.evaluate(
+        _green('סלט עם טחינה'),
+        _dish('סלט עם טחינה'),
+        _profile(<RestrictionId>[RestrictionId.sesame]),
+        hebrew: false,
+      );
+
+      // Assert
+      expect(
+        result.concerns.single.waiterQuestion,
+        'Can this be made without sesame?',
+      );
+    });
+
+    test("the model's own question is kept", () {
+      // Arrange
+      const concern = Concern(
+        restrictionId: RestrictionId.peanuts,
+        source: ConcernSource.model,
+        certainty: Certainty.suspected,
+        tier: EvidenceTier.suspected,
+        waiterQuestion: 'Is the satay sauce made with peanuts?',
+      );
+
+      // Act
+      final result = ProfileEvaluator.evaluate(
+        _green('Plate', concerns: const <Concern>[concern]),
+        _plain,
+        _profile(<RestrictionId>[RestrictionId.peanuts]),
+      );
+
+      // Assert
+      expect(
+        result.concerns.single.waiterQuestion,
+        'Is the satay sauce made with peanuts?',
+      );
+    });
+
+    test('no question says safe', () {
+      final result = ProfileEvaluator.evaluate(
+        _green('Satay with tahini and soy sauce'),
+        _dish('Satay with tahini and soy sauce'),
+        _profile(<RestrictionId>[
+          RestrictionId.sesame,
+          RestrictionId.soy,
+          RestrictionId.wheat,
+          RestrictionId.peanuts,
+        ]),
+      );
+      expect(result.concerns, isNotEmpty);
+      for (final concern in result.concerns) {
+        final question = concern.waiterQuestion!;
+        for (final banned in _banned) {
+          expect(question, isNot(contains(banned)), reason: question);
+        }
+      }
+    });
+  });
 }

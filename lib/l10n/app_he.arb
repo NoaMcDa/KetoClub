@@ -688,5 +688,10 @@
   "dishCardAskQuestion": "מה לשאול את המלצר",
   "engineChipRulesChecked": "נבדק גם בכללים",
   "engineChipRulesCheckedSemanticLabel": "גם הכללים של האפליקציה בדקו את התפריט לפי ההגבלות שלך",
-  "concernLineText": "{source} · {certainty}"
+  "concernLineText": "{source} · {certainty}",
+  "waiterCardChefCard": "כרטיס שף",
+  "menuAllergyNoteAction": "העתקת הערת אלרגיה",
+  "menuAllergyNoteCopied": "הערת האלרגיה הועתקה",
+  "menuAllergyNoteShare": "שיתוף",
+  "menuAllergyNoteSubject": "הערת אלרגיה"
 }

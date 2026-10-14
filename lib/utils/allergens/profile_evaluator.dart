@@ -29,6 +29,7 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/allergen_matcher.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
+import 'package:ketoclub/utils/allergens/waiter_questions.dart';
 import 'package:ketoclub/utils/classification_rules.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 
@@ -189,6 +190,9 @@ abstract final class ProfileEvaluator {
   ///    [DishState.fits]. A suspected concern on a flexible restriction is
   ///    listed but moves nothing.
   ///
+  /// Every kept concern carries a waiter question in the same language
+  /// ([WaiterQuestions.fill], ALG-08b): the model's own when it wrote one.
+  ///
   /// An empty profile holds keto: it is the keto-only user of today's
   /// app, and the result is the identity mapping of the wire verdict.
   static EvaluatedDish evaluate(
@@ -246,7 +250,10 @@ abstract final class ProfileEvaluator {
     }
     return EvaluatedDish(
       dish: analysed,
-      concerns: _onePerRestriction(evidence),
+      concerns: WaiterQuestions.fill(
+        _onePerRestriction(evidence),
+        hebrew: isHebrew,
+      ),
       state: state,
       modification: state == DishState.avoid ? null : change,
     );
