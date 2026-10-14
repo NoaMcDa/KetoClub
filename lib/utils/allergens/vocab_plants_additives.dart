@@ -87,6 +87,17 @@ const List<String> _soyDirectHe = <String>[
 
 /// Soy's hidden English sources, shared with `legumes`.
 const List<HiddenTrigger> _soyHiddenEn = <HiddenTrigger>[
+  // Beyond Meat is made of pea and soy protein (12 §1.11, 11 §16.2).
+  HiddenTrigger(
+    term: 'beyond meat',
+    certainty: TriggerCertainty.likely,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'beyond burger',
+    certainty: TriggerCertainty.likely,
+    source: '12 §1.11',
+  ),
   HiddenTrigger(
     term: 'teriyaki',
     certainty: TriggerCertainty.likely,
@@ -216,6 +227,16 @@ const List<HiddenTrigger> _soyHiddenEn = <HiddenTrigger>[
 
 /// Soy's hidden Hebrew sources, shared with `legumes`.
 const List<HiddenTrigger> _soyHiddenHe = <HiddenTrigger>[
+  HiddenTrigger(
+    term: 'ביונד מיט',
+    certainty: TriggerCertainty.likely,
+    source: '12 §1.11',
+  ),
+  HiddenTrigger(
+    term: 'ביונד בורגר',
+    certainty: TriggerCertainty.likely,
+    source: '12 §1.11',
+  ),
   HiddenTrigger(
     term: 'טריאקי',
     certainty: TriggerCertainty.likely,
@@ -613,7 +634,7 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
           ),
           HiddenTrigger(
             term: 'vinaigrette',
-            certainty: TriggerCertainty.suspected,
+            certainty: TriggerCertainty.likely,
             source: '11 §13.2',
           ),
           HiddenTrigger(
@@ -705,7 +726,7 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
           ),
           HiddenTrigger(
             term: 'ויניגרט',
-            certainty: TriggerCertainty.suspected,
+            certainty: TriggerCertainty.likely,
             source: '12 §1.8',
           ),
           HiddenTrigger(

@@ -160,6 +160,17 @@ void main() {
       ('בחלה טרייה', _wheat, 'בחלה', _stated),
       ('חיטה מלאה', _wheat, 'חיטה', _stated),
       ('מחיטה מלאה', _wheat, 'מחיטה', _stated),
+      ('Sliced ribeye on a hoagie roll', _wheat, 'hoagie', _stated),
+      ('Sliced ribeye on a hoagie roll', _gluten, 'hoagie', _stated),
+      ('Cheese khachapuri', _wheat, 'khachapuri', _stated),
+      ('פוקאצ׳ה שום', _wheat, 'פוקאצ׳ה', _stated),
+      ("פוקאצ'ה שום", _gluten, 'פוקאצ׳ה', _stated),
+      ('חצ׳פורי מגרולי', _wheat, 'חצ׳פורי', _stated),
+      ("חצ'פורי עם ביצה", _gluten, 'חצ׳פורי', _stated),
+      ('בחצ׳פורי', _wheat, 'חצ׳פורי', _stated),
+      ('מסקרפונה וביסקוויטים', _wheat, 'ביסקוויטים', _stated),
+      ('מסקרפונה וביסקוויטים', _gluten, 'ביסקוויטים', _stated),
+      ('ביסקוויט שוקולד', _wheat, 'ביסקוויט', _stated),
       ('Barley soup', _gluten, 'barley', _stated),
       ('Rye bread', _gluten, 'rye', _stated),
       ('Malt vinegar', _gluten, 'malt', _stated),
@@ -222,6 +233,28 @@ void main() {
       ('Beer batter onion rings', _wheat, 'beer batter', _likely),
       ('Beer batter onion rings', _gluten, 'beer batter', _likely),
       ('Plain flour dusting', _wheat, 'flour', _likely),
+      ('Pork and cabbage egg rolls', _wheat, 'egg rolls', _likely),
+      ('Pork and cabbage egg rolls', _gluten, 'egg rolls', _likely),
+      ('Crispy egg roll', _wheat, 'egg roll', _likely),
+      ('Part-baked dinner rolls', _wheat, 'rolls', _likely),
+      ('Part-baked dinner rolls', _gluten, 'rolls', _likely),
+      ('Lobster roll', _wheat, 'roll', _likely),
+      ('Lobster roll', _gluten, 'roll', _likely),
+      ('Wholemeal loaf with figs', _wheat, 'loaf', _likely),
+      ('Wholemeal loaf with figs', _gluten, 'wholemeal', _likely),
+      ('Meat loaf', _wheat, 'loaf', _likely),
+      ('Two crusty loaves', _wheat, 'loaves', _likely),
+      ('Chowder with oyster crackers', _wheat, 'crackers', _likely),
+      ('Chowder with oyster crackers', _gluten, 'crackers', _likely),
+      ('Water cracker', _wheat, 'cracker', _likely),
+      ('Warm apple pie', _wheat, 'pie', _likely),
+      ('Warm apple pie', _gluten, 'pie', _likely),
+      ('Pecan pies', _wheat, 'pies', _likely),
+      ('פאי תפוחים', _wheat, 'פאי', _likely),
+      ('פנה פסטו', _wheat, 'פנה', _likely),
+      ('פנה פסטו', _gluten, 'פנה', _likely),
+      ('פילה בגלייז סויה־דבש', _wheat, 'גלייז סויה', _likely),
+      ('פילה בגלייז סויה־דבש', _gluten, 'גלייז סויה', _likely),
       ('Floured potatoes', _wheat, 'floured', _suspected),
       ('Floured potatoes', _gluten, 'floured', _suspected),
       ('Vegetable stock cube', _gluten, 'stock cube', _suspected),
@@ -233,6 +266,13 @@ void main() {
       ('Rolled oats', _gluten, 'oats', _suspected),
       ('Oat milk latte', _gluten, 'oat', _suspected),
       ('Granola bowl', _gluten, 'granola', _suspected),
+      ('Goldstar', _gluten, 'goldstar', _likely),
+      ('A pint of Goldstar', _gluten, 'goldstar', _likely),
+      ('San Miguel', _gluten, 'san miguel', _likely),
+      ('גולדסטאר', _gluten, 'גולדסטאר', _likely),
+      ('בקבוק גולדסטאר', _gluten, 'גולדסטאר', _likely),
+      ('סאן מיגל', _gluten, 'סאן מיגל', _likely),
+      ('פרסקה סאן מיגל', _gluten, 'סאן מיגל', _likely),
       ('רוטב סויה ושומשום', _wheat, 'רוטב סויה', _likely),
       ('רוטב סויה ושומשום', _gluten, 'רוטב סויה', _likely),
       ('עוף בטריאקי', _wheat, 'טריאקי', _likely),
@@ -260,6 +300,84 @@ void main() {
         expect(_certaintyOf(text, id, term), certainty);
       });
     }
+
+    test('a beer brand is gluten, not wheat', () {
+      expect(_hits('Goldstar', _wheat), isEmpty);
+      expect(_hits('סאן מיגל', _wheat), isEmpty);
+    });
+
+    test('plain soy is not wheat, only the soy glaze is', () {
+      expect(_hits('סלמון בסויה', _wheat), isEmpty);
+      expect(_hits('סלמון בסויה', _gluten), isEmpty);
+      expect(_hits('Soy glazed salmon', _wheat), isEmpty);
+    });
+
+    test('a roll is bread unless a guard names another food', () {
+      for (final id in <RestrictionId>[_wheat, _gluten]) {
+        for (final text in <String>[
+          'Spring roll',
+          'Spring rolls',
+          'Sushi roll',
+          'California roll',
+          'Salmon avocado roll',
+          'Summer rolls',
+          'Rice paper rolls',
+          'Vietnamese roll',
+          'Lettuce rolls',
+          'Cabbage rolls',
+        ]) {
+          final hits = _hits(
+            text,
+            id,
+          ).where((hit) => hit.term == 'roll' || hit.term == 'rolls');
+          expect(_lowered(hits.toList()), isTrue, reason: '$text: $hits');
+        }
+        expect(_certaintyOf('Egg rolls', id, 'egg rolls'), _likely);
+        expect(_certaintyOf('Bread rolls', id, 'rolls'), _likely);
+        expect(_certaintyOf('Cinnamon roll', id, 'roll'), _likely);
+        expect(_certaintyOf('Roll with butter', id, 'roll'), _likely);
+      }
+    });
+
+    test('rock and roll and rolled are no bread', () {
+      expect(_hits('Rock and roll burger', _wheat).map((h) => h.term), <String>[
+        'roll',
+        'burger',
+      ]);
+      expect(_hits('Rolled lamb', _wheat), isEmpty);
+      expect(_hits('Enrolled', _wheat), isEmpty);
+    });
+
+    test('rice, seaweed and seed crackers are lowered, never dropped', () {
+      for (final text in <String>[
+        'Rice crackers',
+        'Seaweed crackers',
+        'Cassava crackers',
+        'Almond crackers',
+        'Seed crackers',
+      ]) {
+        final hits = _hits(text, _wheat).where((hit) => hit.term == 'crackers');
+        expect(_lowered(hits.toList()), isTrue, reason: '$text: $hits');
+      }
+      expect(_certaintyOf('Cheese crackers', _wheat, 'crackers'), _likely);
+    });
+
+    test('gluten-free rolls and crackers are lowered by the global guard', () {
+      expect(_lowered(_hits('Gluten-free rolls', _wheat)), isTrue);
+      expect(
+        _hits('Gluten free crackers', _gluten).where((h) => !h.guarded),
+        isEmpty,
+      );
+    });
+
+    test('penne (פנה) is a whole word: no prefix letter, no longer word', () {
+      expect(_certaintyOf('עם פנה', _wheat, 'פנה'), _likely);
+      expect(_certaintyOf('הפנה אותי', _wheat, 'פנה'), isNull);
+      expect(_certaintyOf('בפנה', _wheat, 'פנה'), isNull);
+      expect(_certaintyOf('פנים', _wheat, 'פנה'), isNull);
+      expect(_certaintyOf('פינה', _wheat, 'פנה'), isNull);
+      expect(_certaintyOf('פנהו', _wheat, 'פנה'), isNull);
+    });
 
     test('oats, beer and "wheat free" are not wheat', () {
       expect(_hits('Rolled oats', _wheat), isEmpty);

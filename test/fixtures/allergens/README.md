@@ -2,10 +2,16 @@
 
 Labelled menus for measuring how well the engine finds what a person with a
 restriction must avoid. This folder is the **measuring stick** (ALG-10, issue
-#352, `Related to`): a later test replays every dish through the engine and
-reports recall per restriction. Nothing in this PR runs the engine; the only
-test here, `test/utils/allergens/corpus_shape_test.dart`, checks the shape of
-the files.
+#352): `test/utils/allergens/corpus_recall_test.dart` replays every dish
+through the rules engine and holds the recall gate, its Python twin
+`backend/tests/test_allergen_corpus_recall.py` does the same, and
+`backend/tools/allergen_eval.py` is the person-run model evaluation
+(`docs/ALLERGEN_EVAL.md`). `test/utils/allergens/corpus_shape_test.dart`
+checks the shape of the files. `known_misses.json` is the reviewed list of
+labels the rules do not find yet: each entry has a reason and the vocabulary
+addition that would close it, a miss not on the list fails the gate, and an
+entry that no longer misses fails it too, so the list can only shrink. Do not
+edit a label to make the gate pass.
 
 ## The labels are unreviewed desk research
 

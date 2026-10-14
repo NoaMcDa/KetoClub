@@ -3301,6 +3301,52 @@ visible row with its evaluation for the profile recorded when the menu was
 last classified; nothing renders it yet (ALG-05).
 
 
+
+**The rules-recall gate over the corpus (ALG-10, closes #352).**
+`test/utils/allergens/corpus_recall_test.dart` replays every dish of
+`test/fixtures/allergens/menus/` through `ClassificationRules.allergenConcerns`
+(no model, no network) and holds one rule per strict restriction (every id
+whose `RestrictionKind` is `allergen` or `autoimmune`): a `contains` label
+needs a concern of at least `likely` certainty and a `may_contain` label one
+of at least `suspected`. A concern on a `free` or unlabelled dish is printed
+as a false-positive count and never fails. Its twin,
+`backend/tests/test_allergen_corpus_recall.py`, runs the same corpus through
+`app.keto.rules.allergen_concerns` and must agree, and both print the same
+per-restriction table so the denominator travels with every figure. The
+vocabulary does not close every label yet, and the gate is not weakened and no
+label is edited to pass it: the misses that remain are listed one by one, with
+a reason and the vocabulary addition that would close it, in
+`test/fixtures/allergens/known_misses.json`, which both twins read. A miss not
+on the list fails the build, and so does a listed entry that no longer misses
+(delete it), so the list can only shrink; it is the visible debt, counted in
+every run. The labels are still unreviewed desk research, so a recall figure
+is a question for the labels as much as for the engine until a clinical
+reviewer reads them. The person-run half, `backend/tools/allergen_eval.py`
+(like `vision_smoke.py`, #88, imported by no gate), sends each corpus menu
+through the extraction request with the backend's own model client and
+reports recall per restriction for the model alone, the rules alone and the
+merge of the two, splicing the result into `docs/ALLERGEN_EVAL.md`, which
+says "not yet run" until a person with a key has run it. Its scoring
+functions are pure and unit-tested offline, and a model's ingredient list is
+scored through the same matcher the on-device evaluator uses, cut to the
+weaker of the two certainties.
+
+The first vocabulary pass over the recall gate (#343, #352) closed 34 of its
+35 `contains` misses, leaving the allowlist at 142 entries from 176 and
+`contains` recall at 99.9% (825 of 826) from 95.8% (791 of 826); wheat, gluten,
+soy, eggs, mustard and legumes reached 100%, sesame 97.6%. `may_contain`
+recall did not move (359 of 500, 71.8%), and the gate's false-positive counts
+did not move either. Most of it is hidden sources at `likely`: egg rolls, bread
+rolls, loaves, wholemeal, crackers, hoagie, Israeli beer brands, `פנה`
+(penne, compiled with no prefix letter), the compound `גלייז סויה` (plain
+`סויה` stays soy only) and Beyond Meat (soy and legumes), plus `pie`, `hoisin`
+(sesame), `tartare` and `vinaigrette` raised from `suspected`. The dish names
+khachapuri, focaccia (`פוקאצ׳ה`), biscuits and hoagie join the direct lists,
+`stated`, beside their English siblings. A bare `roll` is bread unless a
+term guard names another food (sushi, spring, rice paper, lettuce and the
+fish of a sushi menu), which lowers it to `suspected`, never drops it. The
+one `contains` miss left is the filled Bamba's sesame, a label question.
+
 **The Why sheet (ALG-06, #348).** `lib/widgets/why_sheet.dart` is the "why this
 result" bottom sheet, built and tested on its own and wired into no screen
 yet. `WhySheet` takes a dish name, a list of `Concern` and whether the profile

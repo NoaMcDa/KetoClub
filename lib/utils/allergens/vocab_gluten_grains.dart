@@ -65,6 +65,9 @@ const List<String> _wheatFoodsEn = <String>[
   'brioche',
   'ciabatta',
   'focaccia',
+  'khachapuri',
+  'hoagie',
+  'hoagies',
   'sourdough',
   'challah',
   'toast',
@@ -259,6 +262,8 @@ const List<String> _wheatFoodsHe = <String>[
   'סמבוסקים',
   "לחמג'ון",
   "פוקצ'ה",
+  'פוקאצ׳ה',
+  'חצ׳פורי',
   'בצק',
   'בצק עלים',
   'פילו',
@@ -291,6 +296,8 @@ const List<String> _wheatFoodsHe = <String>[
   'דונאט',
   'קרקר',
   'קרקרים',
+  'ביסקוויט',
+  'ביסקוויטים',
   'פירורי לחם',
   'פאנקו',
   'בלילה',
@@ -358,6 +365,51 @@ const List<HiddenTrigger> _wheatHiddenEn = <HiddenTrigger>[
     term: 'flour',
     certainty: TriggerCertainty.likely,
     source: '12 §1.4',
+  ),
+  HiddenTrigger(
+    term: 'egg roll',
+    certainty: TriggerCertainty.likely,
+    source: '11 §7.1',
+  ),
+  HiddenTrigger(
+    term: 'egg rolls',
+    certainty: TriggerCertainty.likely,
+    source: '11 §7.1',
+  ),
+  HiddenTrigger(
+    term: 'roll',
+    certainty: TriggerCertainty.likely,
+    source: '11 §7.1',
+  ),
+  HiddenTrigger(
+    term: 'rolls',
+    certainty: TriggerCertainty.likely,
+    source: '11 §7.1',
+  ),
+  HiddenTrigger(
+    term: 'loaf',
+    certainty: TriggerCertainty.likely,
+    source: '11 §7.1',
+  ),
+  HiddenTrigger(
+    term: 'loaves',
+    certainty: TriggerCertainty.likely,
+    source: '11 §7.1',
+  ),
+  HiddenTrigger(
+    term: 'wholemeal',
+    certainty: TriggerCertainty.likely,
+    source: '11 §7.1',
+  ),
+  HiddenTrigger(
+    term: 'cracker',
+    certainty: TriggerCertainty.likely,
+    source: '11 §7.1',
+  ),
+  HiddenTrigger(
+    term: 'crackers',
+    certainty: TriggerCertainty.likely,
+    source: '11 §7.1',
   ),
   HiddenTrigger(
     term: 'floured',
@@ -496,12 +548,12 @@ const List<HiddenTrigger> _wheatHiddenEn = <HiddenTrigger>[
   ),
   HiddenTrigger(
     term: 'pie',
-    certainty: TriggerCertainty.suspected,
+    certainty: TriggerCertainty.likely,
     source: '11 §7.1',
   ),
   HiddenTrigger(
     term: 'pies',
-    certainty: TriggerCertainty.suspected,
+    certainty: TriggerCertainty.likely,
     source: '11 §7.1',
   ),
   HiddenTrigger(
@@ -581,6 +633,16 @@ const List<HiddenTrigger> _wheatHiddenHe = <HiddenTrigger>[
   ),
   HiddenTrigger(
     term: 'קמח',
+    certainty: TriggerCertainty.likely,
+    source: '12 §1.4',
+  ),
+  HiddenTrigger(
+    term: 'גלייז סויה',
+    certainty: TriggerCertainty.likely,
+    source: '12 §1.4',
+  ),
+  HiddenTrigger(
+    term: 'פנה',
     certainty: TriggerCertainty.likely,
     source: '12 §1.4',
   ),
@@ -696,7 +758,7 @@ const List<HiddenTrigger> _wheatHiddenHe = <HiddenTrigger>[
   ),
   HiddenTrigger(
     term: 'פאי',
-    certainty: TriggerCertainty.suspected,
+    certainty: TriggerCertainty.likely,
     source: '11 §7.1',
   ),
   HiddenTrigger(
@@ -761,6 +823,16 @@ const List<String> _glutenGrainsHe = <String>[
 /// "gluten free" (11 §7.5).
 const List<HiddenTrigger> _glutenHiddenEn = <HiddenTrigger>[
   HiddenTrigger(
+    term: 'goldstar',
+    certainty: TriggerCertainty.likely,
+    source: '11 §7.1',
+  ),
+  HiddenTrigger(
+    term: 'san miguel',
+    certainty: TriggerCertainty.likely,
+    source: '11 §7.1',
+  ),
+  HiddenTrigger(
     term: 'wheat free',
     certainty: TriggerCertainty.suspected,
     source: '11 §7.5',
@@ -799,6 +871,16 @@ const List<HiddenTrigger> _glutenHiddenEn = <HiddenTrigger>[
 
 /// Hebrew hidden sources of gluten that are not wheat.
 const List<HiddenTrigger> _glutenHiddenHe = <HiddenTrigger>[
+  HiddenTrigger(
+    term: 'גולדסטאר',
+    certainty: TriggerCertainty.likely,
+    source: '11 §7.1',
+  ),
+  HiddenTrigger(
+    term: 'סאן מיגל',
+    certainty: TriggerCertainty.likely,
+    source: '11 §7.1',
+  ),
   HiddenTrigger(
     term: 'ללא חיטה',
     certainty: TriggerCertainty.suspected,
@@ -1032,10 +1114,60 @@ const List<String> _otherFloursHe = <String>[
   'תפוחי אדמה',
 ];
 
-/// The term guards of wheat and gluten: the flours that are not wheat.
-const Map<String, AllergenGuards> _flourGuards = <String, AllergenGuards>{
+/// The words before `roll` that make it another food: a sushi or rice-paper
+/// roll, a lettuce or cabbage roll, a nori roll (ALG-04a). `spring` is here
+/// deliberately: a spring roll is wrapped in wheat, but a rice-paper one is
+/// not, so it is lowered to `suspected`, never dropped. `egg roll` is a
+/// trigger of its own and stays `likely`.
+const List<String> _notBreadRollsEn = <String>[
+  'sushi',
+  'maki',
+  'hand',
+  'summer',
+  'fresh',
+  'vietnamese',
+  'rice paper',
+  'spring',
+  'lettuce',
+  'cabbage',
+  'nori',
+  'california',
+  'philly',
+  'dragon',
+  'rainbow',
+  'spider',
+  'salmon',
+  'tuna',
+  'avocado',
+  'cucumber',
+  'shrimp',
+  'eel',
+  'crab',
+  'veggie',
+  'vegetable',
+];
+
+/// The words before `cracker(s)` that make them another food: rice, seaweed,
+/// cassava, almond or seed crackers are not wheat (ALG-04a).
+const List<String> _notWheatCrackersEn = <String>[
+  'rice',
+  'seaweed',
+  'cassava',
+  'almond',
+  'seed',
+  'seeds',
+  'flax',
+];
+
+/// The term guards of wheat and gluten: the flours that are not wheat, the
+/// rolls that are not bread and the crackers that are not wheat.
+const Map<String, AllergenGuards> _wheatTermGuards = <String, AllergenGuards>{
   'flour': AllergenGuards(beforeEn: _otherFloursEn),
   'קמח': AllergenGuards(afterHe: _otherFloursHe),
+  'roll': AllergenGuards(beforeEn: _notBreadRollsEn),
+  'rolls': AllergenGuards(beforeEn: _notBreadRollsEn),
+  'cracker': AllergenGuards(beforeEn: _notWheatCrackersEn),
+  'crackers': AllergenGuards(beforeEn: _notWheatCrackersEn),
 };
 
 /// The restriction-wide guards are only the negations and the gluten-free
@@ -1083,8 +1215,8 @@ const Map<RestrictionId, RestrictionVocabulary> glutenGrainsVocabulary =
             'gf',
           ],
         ),
-        termGuards: _flourGuards,
-        noPrefixHe: <String>['חיטה', 'חלה', 'חלות'],
+        termGuards: _wheatTermGuards,
+        noPrefixHe: <String>['חיטה', 'חלה', 'חלות', 'פנה'],
         sources: <String>['11 §7.1', '11 §7.3', '12 §1.4'],
       ),
       RestrictionId.gluten: RestrictionVocabulary(
@@ -1112,8 +1244,8 @@ const Map<RestrictionId, RestrictionVocabulary> glutenGrainsVocabulary =
           ],
           afterHe: <String>['ללא גלוטן', 'נטול גלוטן', 'בלי גלוטן', 'gf'],
         ),
-        termGuards: _flourGuards,
-        noPrefixHe: <String>['חיטה', 'חלה', 'חלות', 'בירה'],
+        termGuards: _wheatTermGuards,
+        noPrefixHe: <String>['חיטה', 'חלה', 'חלות', 'בירה', 'פנה'],
         sources: <String>['11 §7.1', '11 §7.3', '11 §7.5', '12 §1.4'],
       ),
       RestrictionId.lupin: RestrictionVocabulary(
