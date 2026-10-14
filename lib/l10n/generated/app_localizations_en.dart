@@ -1665,4 +1665,144 @@ class AppLocalizationsEn extends AppLocalizations {
   String concernLineText(String source, String certainty) {
     return '$source · $certainty';
   }
+
+  @override
+  String get settingsProfiles => 'People on this device';
+
+  @override
+  String get settingsProfilesNote =>
+      'Add the people you eat with and check a menu for any of you together. Each profile is health data and stays on this device.';
+
+  @override
+  String get profileDefaultName => 'Me';
+
+  @override
+  String get profileKetoOnly => 'Keto only';
+
+  @override
+  String get settingsProfilesAdd => 'Add person';
+
+  @override
+  String get settingsProfilesImport => 'Import a profile';
+
+  @override
+  String get profileNameAddTitle => 'Add a person';
+
+  @override
+  String get profileNameRenameTitle => 'Rename profile';
+
+  @override
+  String get profileNameLabel => 'Name';
+
+  @override
+  String get profileNameSave => 'Save';
+
+  @override
+  String get profileEditorRename => 'Rename';
+
+  @override
+  String get profileEditorExport => 'Share this profile';
+
+  @override
+  String get profileEditorDelete => 'Delete this profile';
+
+  @override
+  String profileDeleteTitle(String name) {
+    return 'Delete $name\'s profile?';
+  }
+
+  @override
+  String get profileDeleteBody =>
+      'Their restrictions are removed from this device.';
+
+  @override
+  String get profileDeleteConfirm => 'Delete';
+
+  @override
+  String get profileExportTitle => 'Share health data?';
+
+  @override
+  String profileExportBody(String name) {
+    return 'This profile lists $name\'s dietary restrictions, which are health data. It leaves this device only as the text you send, so share it only with people you trust.';
+  }
+
+  @override
+  String get profileExportConfirm => 'Share';
+
+  @override
+  String get profileExportCopied =>
+      'Profile copied. Paste it on the other device.';
+
+  @override
+  String get profileImportTitle => 'Import a profile';
+
+  @override
+  String get profileImportBody =>
+      'A shared profile is health data: someone\'s dietary restrictions. Nothing is saved until you choose to save it, and then only on this device.';
+
+  @override
+  String get profileImportField => 'Paste the shared profile';
+
+  @override
+  String get profileImportRead => 'Read profile';
+
+  @override
+  String get profileImportInvalid => 'This text is not a shared profile.';
+
+  @override
+  String get profileImportAsk => 'Save this profile on this device?';
+
+  @override
+  String get profileImportSave => 'Save on this device';
+
+  @override
+  String get profileImportFull =>
+      'This device already holds as many profiles as it can.';
+
+  @override
+  String get profileEditorRestrictions => 'Restrictions';
+
+  @override
+  String get groupCombineTitle => 'Check this menu for';
+
+  @override
+  String get groupCombineApply => 'Apply';
+
+  @override
+  String get groupCombineChefCard => 'Chef card for these people';
+
+  @override
+  String get groupCombineManage => 'Manage people in Settings';
+
+  @override
+  String groupFitsEveryone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dishes fit everyone',
+      one: '1 dish fits everyone',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String groupFitsEveryoneStrict(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dishes with no trigger found for anyone',
+      one: '1 dish with no trigger found for anyone',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String groupBreakdownEntry(String name, String state) {
+    return '$name: $state';
+  }
+
+  @override
+  String groupBreakdownSemanticLabel(String breakdown) {
+    return 'For each person: $breakdown';
+  }
 }

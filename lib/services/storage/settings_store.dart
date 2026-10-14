@@ -12,6 +12,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
+import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -54,8 +55,9 @@ enum AppThemeMode {
 /// last-used filter (issue #55), the three "Your keto rules"
 /// toggles (issue #56), whether the first-launch AI disclosure
 /// banner has been seen (D16, issue #167), the restriction profile
-/// (Banto, ALG-02a, issue #344) and whether the first-run restriction
-/// onboarding has been seen (ALG-02b).
+/// (Banto, ALG-02a, issue #344), whether the first-run restriction
+/// onboarding has been seen (ALG-02b), and the other people's profiles and
+/// which of them a menu is read for (ALG-12, issue #354).
 @immutable
 final class AppSettings {
   /// Creates settings. Every field defaults to the "nothing set yet"
@@ -82,7 +84,16 @@ final class AppSettings {
     this.disclosureSeen = false,
     this.profile = DietaryProfile.empty,
     this.onboardingSeen = false,
+    this.primaryProfileName = '',
+    this.otherProfiles = const <NamedProfile>[],
+    this.activeProfileIds = defaultActiveProfileIds,
   });
+
+  /// The profiles a menu is read for until the user combines others: the
+  /// device owner's own.
+  static const List<String> defaultActiveProfileIds = <String>[
+    NamedProfile.primaryId,
+  ];
 
   /// Reads settings written by [toJson].
   ///
@@ -114,6 +125,16 @@ final class AppSettings {
   /// [profile] (issue #344) follows the same rule: a missing key reads as
   /// [DietaryProfile.empty], and [DietaryProfile.tryFrom] drops what it
   /// cannot read rather than invalidating the record.
+  ///
+  /// The group profiles (ALG-12, issue #354) follow it too. An install
+  /// from before them has only [profile], which reads as the one primary
+  /// profile, named "Me" by the UI: that is the whole migration. A
+  /// non-string [primaryProfileName] reads as empty; an [otherProfiles]
+  /// item [NamedProfile.tryFrom] cannot read, that repeats an id or takes
+  /// the primary one is dropped, and the list is cut to
+  /// [NamedProfile.maxProfiles] in all; an [activeProfileIds] id that
+  /// names no profile, or repeats, is dropped, and an empty result reads as
+  /// [defaultActiveProfileIds].
   static AppSettings? tryFrom(Map<String, Object?> json) {
     final rawLanguageTag = json['languageTag'];
     if (rawLanguageTag != null && rawLanguageTag is! String) return null;
@@ -148,6 +169,7 @@ final class AppSettings {
     final lastFilter = rawLastFilter is String
         ? MenuFilter.tryParse(rawLastFilter)
         : null;
+    final others = _readOthers(json[_otherProfilesKey]);
     return AppSettings(
       languageTag: rawLanguageTag is String ? rawLanguageTag : null,
       filter: filter,
@@ -165,8 +187,62 @@ final class AppSettings {
       disclosureSeen: json['disclosureSeen'] == true,
       profile: DietaryProfile.tryFrom(json[_profileKey]),
       onboardingSeen: json[_onboardingSeenKey] == true,
+      primaryProfileName: _readName(json[_primaryNameKey]),
+      otherProfiles: others,
+      activeProfileIds: _readActive(json[_activeProfilesKey], others),
     );
   }
+
+  /// [raw] as a name, or empty when it is not a string.
+  static String _readName(Object? raw) =>
+      raw is String ? NamedProfile.normaliseName(raw) : '';
+
+  /// The other profiles stored under [_otherProfilesKey]; see [tryFrom].
+  static List<NamedProfile> _readOthers(Object? raw) {
+    if (raw is! List<Object?>) return const <NamedProfile>[];
+    final seen = <String>{NamedProfile.primaryId};
+    final others = <NamedProfile>[];
+    for (final item in raw) {
+      if (others.length == NamedProfile.maxProfiles - 1) break;
+      final named = NamedProfile.tryFrom(item);
+      if (named == null || !seen.add(named.id)) continue;
+      others.add(named);
+    }
+    return List<NamedProfile>.unmodifiable(others);
+  }
+
+  /// The active ids stored under [_activeProfilesKey], kept only when they
+  /// name the primary profile or one of [others]; see [tryFrom].
+  static List<String> _readActive(Object? raw, List<NamedProfile> others) {
+    if (raw is! List<Object?>) return defaultActiveProfileIds;
+    final known = <String>{
+      NamedProfile.primaryId,
+      for (final other in others) other.id,
+    };
+    final active = <String>[];
+    for (final id in raw.whereType<String>()) {
+      if (known.contains(id) && !active.contains(id)) active.add(id);
+    }
+    return active.isEmpty
+        ? defaultActiveProfileIds
+        : List<String>.unmodifiable(active);
+  }
+
+  /// The JSON key [primaryProfileName] is stored under, written only when
+  /// the user renamed their own profile. With [_otherProfilesKey] and
+  /// [_activeProfilesKey], none is written while the device holds the one
+  /// default profile, so that user's stored record is what it was before
+  /// group profiles existed (ALG-12), and a keto user's stays
+  /// byte-identical.
+  static const String _primaryNameKey = 'profileName';
+
+  /// The JSON key [otherProfiles] is stored under, written only when there
+  /// is one.
+  static const String _otherProfilesKey = 'groupProfiles';
+
+  /// The JSON key [activeProfileIds] is stored under, written only when it
+  /// differs from [defaultActiveProfileIds].
+  static const String _activeProfilesKey = 'activeProfiles';
 
   /// The JSON key [onboardingSeen] is stored under. [toJson] writes it only
   /// when it is true, for the same reason as [_profileKey]: a keto build
@@ -245,6 +321,49 @@ final class AppSettings {
   /// A missing or non-boolean value reads as false.
   final bool onboardingSeen;
 
+  /// The name the user gave their own profile (ALG-12, issue #354); empty
+  /// until they rename it, which the UI shows as "Me" in its language.
+  final String primaryProfileName;
+
+  /// Everyone else's profiles on this device, in the order they were added
+  /// (ALG-12, issue #354); none until the user adds a person. Kept on the
+  /// device only, like [profile].
+  final List<NamedProfile> otherProfiles;
+
+  /// The ids of the profiles a menu is read for, in the order they were
+  /// combined (ALG-12): the primary profile alone by default. Read through
+  /// [activeProfiles], which drops an id that names no profile.
+  final List<String> activeProfileIds;
+
+  /// Every profile on the device: the user's own ([profile], under
+  /// [primaryProfileName]) first, then [otherProfiles].
+  List<NamedProfile> get profiles => <NamedProfile>[
+    NamedProfile(
+      id: NamedProfile.primaryId,
+      name: primaryProfileName,
+      profile: profile,
+    ),
+    ...otherProfiles,
+  ];
+
+  /// The profiles a menu is read for, in [profiles]' order; the primary
+  /// profile alone when [activeProfileIds] names none that exists, so it is
+  /// never empty.
+  List<NamedProfile> get activeProfiles {
+    final all = profiles;
+    final active = <NamedProfile>[
+      for (final named in all)
+        if (activeProfileIds.contains(named.id)) named,
+    ];
+    return active.isEmpty ? <NamedProfile>[all.first] : active;
+  }
+
+  /// Whether any profile a menu is read for holds a restriction besides
+  /// keto: what turns ingredient extraction on (D26 C2). With the one
+  /// default profile, exactly `profile.hasNonKetoEntry`.
+  bool get activeHasNonKetoEntry =>
+      activeProfiles.any((named) => named.profile.hasNonKetoEntry);
+
   /// Returns a copy with the given fields replaced.
   ///
   /// Omitting [languageTag], [lastVenue] or [lastFilter] leaves the
@@ -269,6 +388,9 @@ final class AppSettings {
     bool? disclosureSeen,
     DietaryProfile? profile,
     bool? onboardingSeen,
+    String? primaryProfileName,
+    List<NamedProfile>? otherProfiles,
+    List<String>? activeProfileIds,
   }) => AppSettings(
     languageTag: identical(languageTag, _unset)
         ? this.languageTag
@@ -290,11 +412,16 @@ final class AppSettings {
     disclosureSeen: disclosureSeen ?? this.disclosureSeen,
     profile: profile ?? this.profile,
     onboardingSeen: onboardingSeen ?? this.onboardingSeen,
+    primaryProfileName: primaryProfileName ?? this.primaryProfileName,
+    otherProfiles: otherProfiles ?? this.otherProfiles,
+    activeProfileIds: activeProfileIds ?? this.activeProfileIds,
   );
 
   /// Writes a form [tryFrom] can read back. [profile] is written only
   /// when it is not empty, and [onboardingSeen] only when it is true; see
-  /// [_profileKey] and [_onboardingSeenKey].
+  /// [_profileKey] and [_onboardingSeenKey]. The group profile fields are
+  /// written only when they differ from their defaults; see
+  /// [_primaryNameKey].
   Map<String, Object?> toJson() => <String, Object?>{
     'languageTag': languageTag,
     'filter': filter.name,
@@ -309,6 +436,13 @@ final class AppSettings {
     'disclosureSeen': disclosureSeen,
     if (!profile.isEmpty) _profileKey: profile.toJson(),
     if (onboardingSeen) _onboardingSeenKey: true,
+    if (primaryProfileName.isNotEmpty) _primaryNameKey: primaryProfileName,
+    if (otherProfiles.isNotEmpty)
+      _otherProfilesKey: <Map<String, Object?>>[
+        for (final other in otherProfiles) other.toJson(),
+      ],
+    if (!listEquals(activeProfileIds, defaultActiveProfileIds))
+      _activeProfilesKey: activeProfileIds,
   };
 
   @override
@@ -326,7 +460,10 @@ final class AppSettings {
       other.lastFilter == lastFilter &&
       other.disclosureSeen == disclosureSeen &&
       other.profile == profile &&
-      other.onboardingSeen == onboardingSeen;
+      other.onboardingSeen == onboardingSeen &&
+      other.primaryProfileName == primaryProfileName &&
+      listEquals(other.otherProfiles, otherProfiles) &&
+      listEquals(other.activeProfileIds, activeProfileIds);
 
   @override
   int get hashCode => Object.hash(
@@ -343,6 +480,9 @@ final class AppSettings {
     disclosureSeen,
     profile,
     onboardingSeen,
+    primaryProfileName,
+    Object.hashAll(otherProfiles),
+    Object.hashAll(activeProfileIds),
   );
 
   @override
@@ -356,7 +496,10 @@ final class AppSettings {
       // A count, never the restrictions themselves, so a logged settings
       // value cannot carry the profile (contract decision C1).
       'profile: ${profile.entries.length} entries, '
-      'onboardingSeen: $onboardingSeen)';
+      'onboardingSeen: $onboardingSeen, '
+      // Counts again, never names (C1).
+      'otherProfiles: ${otherProfiles.length}, '
+      'active: ${activeProfileIds.length})';
 }
 
 /// On-device storage for [AppSettings] (architecture.md §6.4). Backed by

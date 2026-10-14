@@ -6,6 +6,7 @@ import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/menu_question.dart';
+import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
@@ -20,6 +21,7 @@ import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
+import 'package:ketoclub/utils/allergens/group_evaluator.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/classification_rules.dart';
@@ -185,6 +187,14 @@ final class MenuController extends ChangeNotifier {
   /// by [profile] and [evaluatedRows].
   DietaryProfile _profile = DietaryProfile.empty;
 
+  /// The profiles the menu is read for (ALG-12, issue #354), recorded with
+  /// [_profile], which is their union ([GroupEvaluator.union]); empty
+  /// until the settings are first read.
+  List<NamedProfile> _people = const <NamedProfile>[];
+
+  /// Every profile on the device, recorded with [_people].
+  List<NamedProfile> _allProfiles = const <NamedProfile>[];
+
   /// Whether the screen that last called [open] shows Banto surfaces
   /// (architecture.md D26's `bantoMode` convention, taken by [open]);
   /// false until then, so a controller nobody opened is keto-only.
@@ -321,12 +331,79 @@ final class MenuController extends ChangeNotifier {
   /// Re-reads [profile] from the settings, for when the user comes back
   /// from editing it in Settings. Notifies only when it changed. Never
   /// throws.
+  ///
+  /// Re-reads the group profiles with it (ALG-12), so a person added,
+  /// renamed or edited in Settings shows when the user comes back.
   Future<void> refreshProfile() async {
-    final next = (await _settings.read()).profile;
-    if (next == _profile) return;
-    _profile = next;
+    final settings = await _settings.read();
+    // Every profile, the user's own first, and who is combined: [_profile]
+    // is derived from these, so it changed only if they did.
+    if (listEquals(settings.activeProfiles, _people) &&
+        listEquals(settings.profiles, _allProfiles)) {
+      return;
+    }
+    _applyPeople(settings);
     notifyListeners();
   }
+
+  /// The profiles the menu is read for (ALG-12, issue #354), in the
+  /// settings' order; the user's own alone unless others were combined.
+  List<NamedProfile> get people => _people;
+
+  /// Every profile on the device (ALG-12), for the combine sheet.
+  List<NamedProfile> get allProfiles => _allProfiles;
+
+  /// Whether more than one profile is combined for this menu (ALG-12):
+  /// what puts a per-person breakdown on each card.
+  bool get isGroup => _people.length > 1;
+
+  /// Combines the profiles [ids] for menus from now on (ALG-12): saves
+  /// the choice in the settings, then re-evaluates this menu on the
+  /// device for it. Unknown ids are dropped and an empty choice is
+  /// ignored. Never re-classifies: the analysis is per menu, the
+  /// evaluation per person. Never throws.
+  Future<void> setActiveProfiles(Iterable<String> ids) async {
+    final settings = await _settings.read();
+    final wanted = ids.toSet();
+    final next = <String>[
+      for (final named in settings.profiles)
+        if (wanted.contains(named.id)) named.id,
+    ];
+    if (next.isEmpty) return;
+    final updated = settings.copyWith(
+      activeProfileIds: List<String>.unmodifiable(next),
+    );
+    await _settings.write(updated);
+    _applyPeople(updated);
+    notifyListeners();
+  }
+
+  /// Each person's own evaluation of the dish [dishId] when [isGroup]
+  /// (ALG-12), in [people]' order, for the card's breakdown; null for one
+  /// person, or wherever [evaluationFor] is null.
+  List<PersonEvaluation>? breakdownFor(String dishId) {
+    // A non-empty [evaluations] has just refreshed the memo for this menu,
+    // analysis and group.
+    if (!isGroup || !evaluations.containsKey(dishId)) return null;
+    return _evaluationsMemo?.groups[dishId]?.people;
+  }
+
+  /// Records [settings]' active profiles in [_people], every profile in
+  /// [_allProfiles], and their union in [_profile].
+  void _applyPeople(AppSettings settings) {
+    _people = settings.activeProfiles;
+    _allProfiles = settings.profiles;
+    _profile = GroupEvaluator.union(<DietaryProfile>[
+      for (final named in _people) named.profile,
+    ]);
+  }
+
+  /// [analysed] evaluated for [people]: [ProfileEvaluator.evaluate] for
+  /// one profile, the strictest across them for a group
+  /// ([GroupEvaluator.evaluate]).
+  EvaluatedDish _evaluate(AnalysedDish analysed, Dish dish) => isGroup
+      ? GroupEvaluator.evaluate(analysed, dish, _people).combined
+      : ProfileEvaluator.evaluate(analysed, dish, _profile);
 
   /// The city the visit history remembers for the open venue (issue #307),
   /// read and refreshed exactly as [historyName]; null when none is known.
@@ -585,14 +662,10 @@ final class MenuController extends ChangeNotifier {
   /// never leaves the device (D26 C1). The menu screen reads the same
   /// evaluations one dish at a time through [evaluationFor] (ALG-05).
   List<({DishRow row, EvaluatedDish evaluated})> get evaluatedRows {
-    final profile = _profile;
     return <({DishRow row, EvaluatedDish evaluated})>[
       for (final row in visibleRows)
         if (row.analysis case final analysed?)
-          (
-            row: row,
-            evaluated: ProfileEvaluator.evaluate(analysed, row.dish, profile),
-          ),
+          (row: row, evaluated: _evaluate(analysed, row.dish)),
     ];
   }
 
@@ -663,20 +736,31 @@ final class MenuController extends ChangeNotifier {
     if (memo != null &&
         identical(memo.menu, currentMenu) &&
         identical(memo.analysis, currentAnalysis) &&
-        memo.profile == _profile) {
+        memo.profile == _profile &&
+        listEquals(memo.people, _people)) {
       return memo.evaluations;
     }
     final analysedById = _analysedById();
+    final groups = <String, GroupEvaluation>{
+      if (isGroup)
+        for (final dish in currentMenu.allDishes)
+          if (analysedById[dish.id] case final analysed?)
+            dish.id: GroupEvaluator.evaluate(analysed, dish, _people),
+    };
     final evaluations = <String, EvaluatedDish>{
       for (final dish in currentMenu.allDishes)
         if (analysedById[dish.id] case final analysed?)
-          dish.id: ProfileEvaluator.evaluate(analysed, dish, _profile),
+          dish.id:
+              groups[dish.id]?.combined ??
+              ProfileEvaluator.evaluate(analysed, dish, _profile),
     };
     _evaluationsMemo = (
       menu: currentMenu,
       analysis: currentAnalysis,
       profile: _profile,
+      people: _people,
       evaluations: evaluations,
+      groups: groups,
     );
     return evaluations;
   }
@@ -685,7 +769,9 @@ final class MenuController extends ChangeNotifier {
     Menu menu,
     MenuAnalysed analysis,
     DietaryProfile profile,
+    List<NamedProfile> people,
     Map<String, EvaluatedDish> evaluations,
+    Map<String, GroupEvaluation> groups,
   })?
   _evaluationsMemo;
 
@@ -869,7 +955,7 @@ final class MenuController extends ChangeNotifier {
 
     _openRef = ref;
     final appSettings = await _settings.read();
-    _profile = appSettings.profile;
+    _applyPeople(appSettings);
     _filter = appSettings.lastFilter ?? _defaultFilter(appSettings.filter);
     _dishNotes = await _notes.readAll(ref);
     final previous = await _history.read(ref);
@@ -1206,9 +1292,10 @@ final class MenuController extends ChangeNotifier {
   ///
   /// Also records [AppSettings.profile] for [evaluatedRows] (Banto,
   /// ALG-04b): every path that classifies reads the settings here, so the
-  /// rows are evaluated against the profile the analysis was asked under.
+  /// rows are evaluated against the profile the analysis was asked under
+  /// — every combined profile, for a group (ALG-12).
   ClassificationOptions _optionsFrom(AppSettings settings) {
-    _profile = settings.profile;
+    _applyPeople(settings);
     return ClassificationOptions.fromSettings(
       settings,
       // The engine that picks up these options reports itself here, so

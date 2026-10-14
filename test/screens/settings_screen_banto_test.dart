@@ -331,7 +331,10 @@ void main() {
       final remove = tester.getCenter(
         find.byKey(restrictionRemoveKey(RestrictionId.sesame)),
       );
-      final name = tester.getCenter(find.text('שומשום'));
+      // Scoped to the row: the people group (ALG-12) names it too.
+      final name = tester.getCenter(
+        find.descendant(of: row, matching: find.text('שומשום')),
+      );
       expect(remove.dx, lessThan(name.dx));
       expect(tester.takeException(), isNull);
     });

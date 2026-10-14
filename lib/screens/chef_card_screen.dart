@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
+import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/utils/allergens/chef_card_templates.dart';
+import 'package:ketoclub/utils/allergens/group_chef_card.dart';
+import 'package:ketoclub/widgets/group_chef_card_view.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
 
 /// The full-screen chef card built from the dietary profile alone (Banto,
@@ -27,6 +30,7 @@ class ChefCardScreen extends StatefulWidget {
   /// Creates the card for [profile].
   const new({
     required this.profile,
+    this.people = const <NamedProfile>[],
     this.screenBrightness = const NoOpScreenBrightness(),
     this.menuSharer,
     super.key,
@@ -34,6 +38,11 @@ class ChefCardScreen extends StatefulWidget {
 
   /// The restrictions the card states.
   final DietaryProfile profile;
+
+  /// With more than one person, the card is theirs instead of [profile]'s:
+  /// one section per person under their name (ALG-12, issue #354;
+  /// [GroupChefCardText]).
+  final List<NamedProfile> people;
 
   /// Raised while the card is open, restored when it closes.
   final ScreenBrightness screenBrightness;
@@ -85,7 +94,12 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
     final theme = Theme.of(context);
     final hebrew = _hebrew;
     final lines = ChefCardText.compose(widget.profile, hebrew: hebrew);
-    final text = ChefCardText.asText(lines);
+    final group = widget.people.length > 1
+        ? GroupChefCardText.compose(widget.people, hebrew: hebrew)
+        : null;
+    final text = group == null
+        ? ChefCardText.asText(lines)
+        : GroupChefCardText.asText(group);
     final sharer = widget.menuSharer;
     return Scaffold(
       body: SafeArea(
@@ -143,7 +157,19 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
                       ),
                     ),
                     const SizedBox(height: 22),
-                    if (lines.isEmpty)
+                    if (group != null)
+                      GroupChefCardView(
+                        card: group,
+                        trailingAction: sharer == null
+                            ? null
+                            : OutlinedButton.icon(
+                                key: chefCardShareKey,
+                                onPressed: () => unawaited(_share(l10n, text)),
+                                icon: const Icon(Icons.ios_share),
+                                label: Text(l10n.chefCardShare),
+                              ),
+                      )
+                    else if (lines.isEmpty)
                       Text(
                         l10n.chefCardEmpty,
                         key: chefCardEmptyKey,

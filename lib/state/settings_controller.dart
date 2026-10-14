@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
+import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
@@ -326,6 +327,154 @@ final class SettingsController extends ChangeNotifier {
       ),
     );
   }
+
+  /// Every profile on this device, the user's own first (Banto, ALG-12,
+  /// issue #354).
+  List<NamedProfile> get profiles => _appSettings.profiles;
+
+  /// The profile [id], or null when there is none.
+  NamedProfile? profileById(String id) {
+    for (final named in profiles) {
+      if (named.id == id) return named;
+    }
+    return null;
+  }
+
+  /// The profiles a menu is read for (ALG-12); the user's own alone until
+  /// others are combined.
+  List<NamedProfile> get activeProfiles => _appSettings.activeProfiles;
+
+  /// Whether another profile can be added: fewer than
+  /// [NamedProfile.maxProfiles] are kept.
+  bool get canAddProfile => profiles.length < NamedProfile.maxProfiles;
+
+  /// Adds a person called [name] holding [profile], last, and answers the
+  /// new id (ALG-12). A no-op answering null, with no write, when the name
+  /// is blank or [canAddProfile] is false. The new person is not combined
+  /// into menus until the user selects them.
+  ///
+  /// Ids are `p1`, `p2`, … — the first number no profile uses — so the
+  /// same steps always give the same id, with no clock and no randomness.
+  Future<String?> addProfile(
+    String name, {
+    DietaryProfile profile = DietaryProfile.empty,
+  }) async {
+    final normalised = NamedProfile.normaliseName(name);
+    if (normalised.isEmpty || !canAddProfile) return null;
+    final used = <String>{for (final named in profiles) named.id};
+    var n = 1;
+    while (used.contains('p$n')) {
+      n++;
+    }
+    final id = 'p$n';
+    await _update(
+      _appSettings.copyWith(
+        otherProfiles: List<NamedProfile>.unmodifiable(<NamedProfile>[
+          ..._appSettings.otherProfiles,
+          NamedProfile(id: id, name: normalised, profile: profile),
+        ]),
+      ),
+    );
+    return id;
+  }
+
+  /// Renames [id] to [name], normalised ([NamedProfile.normaliseName]). A
+  /// blank name is refused for another person and, for the user's own
+  /// profile, restores the default "Me". A no-op for an unknown [id].
+  Future<void> renameProfile(String id, String name) async {
+    final normalised = NamedProfile.normaliseName(name);
+    if (id == NamedProfile.primaryId) {
+      if (normalised == _appSettings.primaryProfileName) return;
+      await _update(_appSettings.copyWith(primaryProfileName: normalised));
+      return;
+    }
+    if (normalised.isEmpty) return;
+    await _replaceOther(id, (named) => named.copyWith(name: normalised));
+  }
+
+  /// Removes the person [id] and their restrictions from this device, and
+  /// from the profiles menus are read for (ALG-12). The user's own profile
+  /// cannot be deleted; a no-op for it and for an unknown [id].
+  Future<void> deleteProfile(String id) async {
+    if (id == NamedProfile.primaryId || profileById(id) == null) return;
+    final active = <String>[
+      for (final activeId in _appSettings.activeProfileIds)
+        if (activeId != id) activeId,
+    ];
+    await _update(
+      _appSettings.copyWith(
+        otherProfiles: List<NamedProfile>.unmodifiable(<NamedProfile>[
+          for (final named in _appSettings.otherProfiles)
+            if (named.id != id) named,
+        ]),
+        activeProfileIds: active.isEmpty
+            ? AppSettings.defaultActiveProfileIds
+            : List<String>.unmodifiable(active),
+      ),
+    );
+  }
+
+  /// Adds [restriction] to the profile [id] (ALG-12); for the user's own,
+  /// exactly [addRestriction]. A no-op when it is already held.
+  Future<void> addRestrictionTo(String id, RestrictionId restriction) async {
+    if (id == NamedProfile.primaryId) {
+      await addRestriction(restriction);
+      return;
+    }
+    final named = profileById(id);
+    if (named == null || named.profile.contains(restriction)) return;
+    await _replaceOther(
+      id,
+      (named) => named.copyWith(profile: named.profile.withEntry(restriction)),
+    );
+  }
+
+  /// Removes [restriction] from the profile [id] (ALG-12); for the user's
+  /// own, exactly [removeRestriction]. A no-op when it is not held.
+  Future<void> removeRestrictionFrom(
+    String id,
+    RestrictionId restriction,
+  ) async {
+    if (id == NamedProfile.primaryId) {
+      await removeRestriction(restriction);
+      return;
+    }
+    final named = profileById(id);
+    if (named == null || !named.profile.contains(restriction)) return;
+    await _replaceOther(
+      id,
+      (named) =>
+          named.copyWith(profile: named.profile.withoutEntry(restriction)),
+    );
+  }
+
+  /// Sets which profiles menus are read for to [ids], in [profiles]'
+  /// order (ALG-12). Unknown ids are dropped; an empty result is refused,
+  /// since a menu is always read for someone.
+  Future<void> setActiveProfiles(Iterable<String> ids) async {
+    final wanted = ids.toSet();
+    final next = <String>[
+      for (final named in profiles)
+        if (wanted.contains(named.id)) named.id,
+    ];
+    if (next.isEmpty) return;
+    await _update(
+      _appSettings.copyWith(activeProfileIds: List<String>.unmodifiable(next)),
+    );
+  }
+
+  /// Replaces the other person [id] with what [change] makes of it.
+  Future<void> _replaceOther(
+    String id,
+    NamedProfile Function(NamedProfile named) change,
+  ) => _update(
+    _appSettings.copyWith(
+      otherProfiles: List<NamedProfile>.unmodifiable(<NamedProfile>[
+        for (final named in _appSettings.otherProfiles)
+          if (named.id == id) change(named) else named,
+      ]),
+    ),
+  );
 
   /// Replaces the held settings with [next] and persists them, marking
   /// [isBusy] around the write exactly as every other setter here does.

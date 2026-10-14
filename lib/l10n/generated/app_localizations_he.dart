@@ -1669,4 +1669,142 @@ class AppLocalizationsHe extends AppLocalizations {
   String concernLineText(String source, String certainty) {
     return '$source · $certainty';
   }
+
+  @override
+  String get settingsProfiles => 'אנשים במכשיר הזה';
+
+  @override
+  String get settingsProfilesNote =>
+      'אפשר להוסיף את מי שאוכלים איתו ולבדוק תפריט לכמה אנשים יחד. כל פרופיל הוא מידע רפואי ונשמר רק במכשיר הזה.';
+
+  @override
+  String get profileDefaultName => 'אני';
+
+  @override
+  String get profileKetoOnly => 'קטו בלבד';
+
+  @override
+  String get settingsProfilesAdd => 'הוספת אדם';
+
+  @override
+  String get settingsProfilesImport => 'ייבוא פרופיל';
+
+  @override
+  String get profileNameAddTitle => 'הוספת אדם';
+
+  @override
+  String get profileNameRenameTitle => 'שינוי שם הפרופיל';
+
+  @override
+  String get profileNameLabel => 'שם';
+
+  @override
+  String get profileNameSave => 'שמירה';
+
+  @override
+  String get profileEditorRename => 'שינוי שם';
+
+  @override
+  String get profileEditorExport => 'שיתוף הפרופיל';
+
+  @override
+  String get profileEditorDelete => 'מחיקת הפרופיל';
+
+  @override
+  String profileDeleteTitle(String name) {
+    return 'למחוק את הפרופיל של $name?';
+  }
+
+  @override
+  String get profileDeleteBody => 'ההגבלות שבפרופיל יימחקו מהמכשיר הזה.';
+
+  @override
+  String get profileDeleteConfirm => 'מחיקה';
+
+  @override
+  String get profileExportTitle => 'לשתף מידע רפואי?';
+
+  @override
+  String profileExportBody(String name) {
+    return 'הפרופיל הזה מפרט את הגבלות התזונה של $name, וזה מידע רפואי. הוא יוצא מהמכשיר רק כטקסט שתשלחו, אז כדאי לשתף אותו רק עם מי שסומכים עליו.';
+  }
+
+  @override
+  String get profileExportConfirm => 'שיתוף';
+
+  @override
+  String get profileExportCopied =>
+      'הפרופיל הועתק. אפשר להדביק אותו במכשיר השני.';
+
+  @override
+  String get profileImportTitle => 'ייבוא פרופיל';
+
+  @override
+  String get profileImportBody =>
+      'פרופיל משותף הוא מידע רפואי: הגבלות התזונה של מישהו. שום דבר לא נשמר עד שבוחרים לשמור, ואז רק במכשיר הזה.';
+
+  @override
+  String get profileImportField => 'הדביקו את הפרופיל ששותף';
+
+  @override
+  String get profileImportRead => 'קריאת הפרופיל';
+
+  @override
+  String get profileImportInvalid => 'הטקסט הזה אינו פרופיל משותף.';
+
+  @override
+  String get profileImportAsk => 'לשמור את הפרופיל הזה במכשיר?';
+
+  @override
+  String get profileImportSave => 'שמירה במכשיר';
+
+  @override
+  String get profileImportFull => 'במכשיר כבר שמורים כל הפרופילים האפשריים.';
+
+  @override
+  String get profileEditorRestrictions => 'הגבלות';
+
+  @override
+  String get groupCombineTitle => 'לבדוק את התפריט עבור';
+
+  @override
+  String get groupCombineApply => 'החלה';
+
+  @override
+  String get groupCombineChefCard => 'כרטיס שף לאנשים האלה';
+
+  @override
+  String get groupCombineManage => 'ניהול האנשים בהגדרות';
+
+  @override
+  String groupFitsEveryone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count מנות מתאימות לכולם',
+      one: 'מנה אחת מתאימה לכולם',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String groupFitsEveryoneStrict(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count מנות שלא נמצא בהן חשש לאף אחד',
+      one: 'מנה אחת שלא נמצא בה חשש לאף אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String groupBreakdownEntry(String name, String state) {
+    return '$name: $state';
+  }
+
+  @override
+  String groupBreakdownSemanticLabel(String breakdown) {
+    return 'לכל אחד: $breakdown';
+  }
 }

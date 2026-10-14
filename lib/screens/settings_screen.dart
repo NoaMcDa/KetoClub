@@ -5,6 +5,7 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/screens/chef_card_screen.dart';
+import 'package:ketoclub/screens/settings_profiles_section.dart';
 import 'package:ketoclub/services/platform/app_info.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
@@ -245,6 +246,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 20),
               if (widget.bantoMode) ...[
                 _restrictionsSection(context, l10n, controller),
+                const SizedBox(height: 20),
+                _profilesSection(l10n),
                 const SizedBox(height: 20),
               ],
               _ketoRulesSection(context, l10n, controller),
@@ -729,6 +732,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ],
     );
   }
+
+  /// The "People on this device" section (Banto, ALG-12, issue #354),
+  /// built only when [SettingsScreen.bantoMode] is on: the health-data
+  /// note, then [SettingsProfilesList]'s rows.
+  Widget _profilesSection(AppLocalizations l10n) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _SectionLabel(l10n.settingsProfiles),
+      _SettingsGroup(
+        children: [
+          _GroupNote(l10n.settingsProfilesNote),
+          SettingsProfilesList(
+            screenBrightness: widget.screenBrightness,
+            menuSharer: widget.menuSharer,
+          ),
+        ],
+      ),
+    ],
+  );
 
   /// One row of the "My restrictions" section: [restriction]'s name in
   /// [locale]'s language, its kind under it, and a remove button.
