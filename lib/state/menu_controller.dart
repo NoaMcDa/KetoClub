@@ -20,6 +20,7 @@ import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
+import 'package:ketoclub/utils/allergens/kitchen_reach.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/classification_rules.dart';
@@ -584,17 +585,42 @@ final class MenuController extends ChangeNotifier {
   /// profile is the one recorded when the menu was last classified; it
   /// never leaves the device (D26 C1). The menu screen reads the same
   /// evaluations one dish at a time through [evaluationFor] (ALG-05).
+  /// With Banto on, [kitchen]'s cross-contact is applied to each
+  /// ([applyKitchenSignals], ALG-07).
   List<({DishRow row, EvaluatedDish evaluated})> get evaluatedRows {
     final profile = _profile;
+    final reach = _bantoMode ? kitchen : KitchenReach.empty;
     return <({DishRow row, EvaluatedDish evaluated})>[
       for (final row in visibleRows)
         if (row.analysis case final analysed?)
           (
             row: row,
-            evaluated: ProfileEvaluator.evaluate(analysed, row.dish, profile),
+            evaluated: applyKitchenSignals(
+              ProfileEvaluator.evaluate(analysed, row.dish, profile),
+              row.dish,
+              profile,
+              reach,
+            ),
           ),
     ];
   }
+
+  /// The kitchen [menu] reveals (Banto, ALG-07, issue #349): its
+  /// kitchen signals and the dishes each reaches ([KitchenReach.of]),
+  /// read once per menu.
+  /// [KitchenReach.empty] before a menu is loaded. Read only by Banto
+  /// surfaces, so a keto build never runs the pass.
+  KitchenReach get kitchen {
+    final currentMenu = _menu;
+    if (currentMenu == null) return KitchenReach.empty;
+    final memo = _kitchenMemo;
+    if (memo != null && identical(memo.menu, currentMenu)) return memo.reach;
+    final reach = KitchenReach.of(currentMenu);
+    _kitchenMemo = (menu: currentMenu, reach: reach);
+    return reach;
+  }
+
+  ({Menu menu, KitchenReach reach})? _kitchenMemo;
 
   /// How the menu screen words its verdicts for [profile] (Banto, ALG-05,
   /// issue #347): [ProfileWording.ketoOnly] unless the screen that opened
@@ -650,7 +676,8 @@ final class MenuController extends ChangeNotifier {
   /// Every analysed dish's evaluation for [profile], keyed by dish id;
   /// empty unless [wording] uses states and a [MenuAnalysed] result
   /// exists. Computed once per (menu, analysis, profile), since a build
-  /// reads it once per card, per count and per filter test.
+  /// reads it once per card, per count and per filter test. Each carries
+  /// [kitchen]'s cross-contact ([applyKitchenSignals], ALG-07).
   Map<String, EvaluatedDish> get evaluations {
     final currentMenu = _menu;
     final currentAnalysis = _analysis;
@@ -667,10 +694,16 @@ final class MenuController extends ChangeNotifier {
       return memo.evaluations;
     }
     final analysedById = _analysedById();
+    final reach = kitchen;
     final evaluations = <String, EvaluatedDish>{
       for (final dish in currentMenu.allDishes)
         if (analysedById[dish.id] case final analysed?)
-          dish.id: ProfileEvaluator.evaluate(analysed, dish, _profile),
+          dish.id: applyKitchenSignals(
+            ProfileEvaluator.evaluate(analysed, dish, _profile),
+            dish,
+            _profile,
+            reach,
+          ),
     };
     _evaluationsMemo = (
       menu: currentMenu,

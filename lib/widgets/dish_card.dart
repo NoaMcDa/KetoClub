@@ -14,6 +14,7 @@ import 'package:ketoclub/utils/price_format.dart';
 import 'package:ketoclub/utils/profile_wording.dart';
 import 'package:ketoclub/widgets/content_direction.dart';
 import 'package:ketoclub/widgets/focus_ring.dart';
+import 'package:ketoclub/widgets/kitchen_notice.dart';
 import 'package:ketoclub/widgets/net_carbs_chip.dart';
 import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
@@ -491,10 +492,18 @@ String concernSourceLabel(AppLocalizations l10n, Concern concern) {
     ConcernSource.option => l10n.concernSourceOption,
     ConcernSource.hidden => l10n.concernSourceHidden,
     ConcernSource.model => l10n.concernSourceModel,
+    ConcernSource.kitchen => l10n.concernSourceKitchen,
   };
+  // A kitchen concern's matched text is the signal's kind, not menu
+  // text: it reads "kitchen: a fryer" in the UI language (ALG-07).
+  if (kitchenKindOf(concern) case final kind?) {
+    return l10n.concernSourceWithText(source, kitchenKindNoun(l10n, kind));
+  }
   final text = concern.matchedText;
   final quoted = switch (concern.source) {
-    ConcernSource.name || ConcernSource.description => false,
+    ConcernSource.name ||
+    ConcernSource.description ||
+    ConcernSource.kitchen => false,
     ConcernSource.option ||
     ConcernSource.hidden ||
     ConcernSource.model => text != null && text.trim().isNotEmpty,

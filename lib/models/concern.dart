@@ -47,7 +47,14 @@ enum ConcernSource {
   hidden,
 
   /// In the model's ingredient extraction, not in the dish text.
-  model;
+  model,
+
+  /// Not in the dish at all: in the kitchen the menu reveals (ALG-07,
+  /// `utils/allergens/kitchen_reach.dart`). Made on the device only, so
+  /// it is written nowhere unless a kitchen concern is; its
+  /// [Concern.matchedText] holds the kitchen signal kind's name ("fryer"),
+  /// not menu text.
+  kitchen;
 
   /// The source whose [name] equals [wire], or null when none does.
   static ConcernSource? tryParse(String wire) =>

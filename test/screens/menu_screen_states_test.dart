@@ -167,8 +167,10 @@ void main() {
         // Assert
         expect(find.byType(KetoScoreBadge), findsNothing);
         expect(find.byKey(menuHeaderCountsKey), findsOneWidget);
+        // The menu names tahini and nuts, so the kitchen signals make the
+        // steak one to ask too (ALG-07).
         expect(
-          find.text(l10n.headerStateCountsStrict(1, 0, 1)),
+          find.text(l10n.headerStateCountsStrict(0, 0, 2)),
           findsOneWidget,
         );
         expect(find.text(l10n.stateAskTile.toUpperCase()), findsOneWidget);
