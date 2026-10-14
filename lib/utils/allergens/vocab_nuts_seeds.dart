@@ -878,7 +878,7 @@ nutsSeedsVocabulary = <RestrictionId, RestrictionVocabulary>{
       // Sesame oil and paste in Asian-style dishes (12 §5).
       HiddenTrigger(
         term: 'hoisin',
-        certainty: TriggerCertainty.suspected,
+        certainty: TriggerCertainty.likely,
         source: '12 §5',
       ),
       HiddenTrigger(

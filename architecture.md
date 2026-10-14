@@ -3331,6 +3331,22 @@ functions are pure and unit-tested offline, and a model's ingredient list is
 scored through the same matcher the on-device evaluator uses, cut to the
 weaker of the two certainties.
 
+The first vocabulary pass over the recall gate (#343, #352) closed 34 of its
+35 `contains` misses, leaving the allowlist at 142 entries from 176 and
+`contains` recall at 99.9% (825 of 826) from 95.8% (791 of 826); wheat, gluten,
+soy, eggs, mustard and legumes reached 100%, sesame 97.6%. `may_contain`
+recall did not move (359 of 500, 71.8%), and the gate's false-positive counts
+did not move either. Most of it is hidden sources at `likely`: egg rolls, bread
+rolls, loaves, wholemeal, crackers, hoagie, Israeli beer brands, `פנה`
+(penne, compiled with no prefix letter), the compound `גלייז סויה` (plain
+`סויה` stays soy only) and Beyond Meat (soy and legumes), plus `pie`, `hoisin`
+(sesame), `tartare` and `vinaigrette` raised from `suspected`. The dish names
+khachapuri, focaccia (`פוקאצ׳ה`), biscuits and hoagie join the direct lists,
+`stated`, beside their English siblings. A bare `roll` is bread unless a
+term guard names another food (sushi, spring, rice paper, lettuce and the
+fish of a sushi menu), which lowers it to `suspected`, never drops it. The
+one `contains` miss left is the filled Bamba's sesame, a label question.
+
 ---
 
 ## 15. Testing strategy
