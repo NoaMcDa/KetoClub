@@ -347,6 +347,54 @@ void main() {
     });
   });
 
+  group('restrictionsRequested (ALG-03, D26 C2)', () {
+    test('adds restrictionsRequested=true to the venue URL only when '
+        'true', () {
+      // Act
+      final keto = BackendMenuAdapter.venueMenuUri(
+        _base,
+        _woltRef,
+        const ClassificationOptions(),
+      );
+      final extracting = BackendMenuAdapter.venueMenuUri(
+        _base,
+        _woltRef,
+        const ClassificationOptions(restrictionsRequested: true),
+      );
+
+      // Assert
+      expect(keto.queryParameters, isNot(contains('restrictionsRequested')));
+      expect(extracting.queryParameters['restrictionsRequested'], 'true');
+      expect(extracting.toString(), '$keto&restrictionsRequested=true');
+    });
+
+    test('adds restrictionsRequested: true to the website options only '
+        'when true', () async {
+      // Arrange
+      final requests = <http.Request>[];
+      final adapter = _adapter(
+        client: _answering(
+          _okBody(_menu(_websiteRef), venueRoute: false),
+          200,
+          requests,
+        ),
+        source: MenuSource.website,
+        options: const ClassificationOptions(restrictionsRequested: true),
+      );
+
+      // Act
+      await adapter.fetch(_websiteRef);
+
+      // Assert
+      final body = jsonDecode(requests.single.body) as Map<String, Object?>;
+      expect(body['options'], <String, Object?>{
+        'netCarbLimitGrams': defaultNetCarbLimitGrams,
+        'dietaryConstraints': <Object?>[],
+        'restrictionsRequested': true,
+      });
+    });
+  });
+
   group('website route request', () {
     test('POSTs the URL and the options as camelCase JSON', () async {
       final requests = <http.Request>[];

@@ -18,7 +18,8 @@ const List<RestrictionId> _ids = <RestrictionId>[
 /// (filled by their own pull requests) cannot change these tests.
 List<String> _hits(String text, RestrictionId id) => <String>[
   for (final hit in AllergenMatcher.find(text))
-    if (hit.id == id) '${hit.term}:${hit.certainty.name}',
+    if (hit.id == id)
+      '${hit.term}:${hit.certainty.name}${hit.guarded ? ':guarded' : ''}',
 ];
 
 /// One expectation: `text` reports every entry of `has` for `id` and none
@@ -28,6 +29,7 @@ typedef _Case = ({
   RestrictionId id,
   List<String> has,
   List<String> lacks,
+  bool guarded,
   String why,
 });
 
@@ -36,14 +38,44 @@ _Case _hit(
   RestrictionId id,
   List<String> has, {
   String why = '',
-}) => (text: text, id: id, has: has, lacks: const <String>[], why: why);
+}) => (
+  text: text,
+  id: id,
+  has: has,
+  lacks: const <String>[],
+  guarded: false,
+  why: why,
+);
+
+/// A text whose every hit of `id` a guard lowered to suspected (ALG-04a):
+/// it reports `has` and nothing unguarded.
+_Case _lowered(
+  String text,
+  RestrictionId id,
+  List<String> has, {
+  String why = '',
+}) => (
+  text: text,
+  id: id,
+  has: has,
+  lacks: const <String>[],
+  guarded: true,
+  why: why,
+);
 
 _Case _miss(
   String text,
   RestrictionId id, {
   List<String> lacks = const <String>[],
   String why = '',
-}) => (text: text, id: id, has: const <String>[], lacks: lacks, why: why);
+}) => (
+  text: text,
+  id: id,
+  has: const <String>[],
+  lacks: lacks,
+  guarded: false,
+  why: why,
+);
 
 void _run(List<_Case> cases) {
   for (final c in cases) {
@@ -56,6 +88,9 @@ void _run(List<_Case> cases) {
         expect(hits, contains(expected));
       }
       if (c.has.isEmpty && c.lacks.isEmpty) expect(hits, isEmpty);
+      if (c.guarded) {
+        expect(hits.every((hit) => hit.endsWith(':guarded')), isTrue);
+      }
       for (final term in c.lacks) {
         expect(hits.where((hit) => hit.startsWith('$term:')), isEmpty);
       }
@@ -122,12 +157,24 @@ void main() {
         'hoisin:likely',
       ]),
       _hit('סושי סלמון', RestrictionId.soy, <String>['סושי:suspected']),
-      _miss('בלי גלוטן וללא סויה', RestrictionId.soy, why: 'ו before ללא'),
-      _miss('Soy-free dressing', RestrictionId.soy, why: 'is guarded'),
-      _miss('Made with no soy', RestrictionId.soy, why: 'is guarded'),
-      _miss('Tofu soy free', RestrictionId.soy, lacks: <String>['soy']),
-      _miss('ללא סויה', RestrictionId.soy, why: 'is guarded'),
-      _miss('נטול סויה', RestrictionId.soy, why: 'is guarded'),
+      _lowered('בלי גלוטן וללא סויה', RestrictionId.soy, <String>[
+        'סויה:suspected:guarded',
+      ], why: 'ו before ללא'),
+      _lowered('Soy-free dressing', RestrictionId.soy, <String>[
+        'soy:suspected:guarded',
+      ], why: 'is lowered'),
+      _lowered('Made with no soy', RestrictionId.soy, <String>[
+        'soy:suspected:guarded',
+      ], why: 'is lowered'),
+      _hit('Tofu soy free', RestrictionId.soy, <String>[
+        'soy:suspected:guarded',
+      ]),
+      _lowered('ללא סויה', RestrictionId.soy, <String>[
+        'סויה:suspected:guarded',
+      ], why: 'is lowered'),
+      _lowered('נטול סויה', RestrictionId.soy, <String>[
+        'סויה:suspected:guarded',
+      ], why: 'is lowered'),
       _miss('טירמיסו', RestrictionId.soy, why: 'is not miso (tiramisu)'),
       _miss('עוגת טירמיסו קלאסית', RestrictionId.soy),
       _miss('Tiramisu', RestrictionId.soy),
@@ -177,9 +224,15 @@ void main() {
       _hit('Mushroom risotto', RestrictionId.celery, <String>[
         'risotto:suspected',
       ]),
-      _miss('Celery-free sauce', RestrictionId.celery, why: 'is guarded'),
-      _miss('No celery please', RestrictionId.celery, why: 'is guarded'),
-      _miss('ללא סלרי', RestrictionId.celery, why: 'is guarded'),
+      _lowered('Celery-free sauce', RestrictionId.celery, <String>[
+        'celery:suspected:guarded',
+      ], why: 'is lowered'),
+      _lowered('No celery please', RestrictionId.celery, <String>[
+        'celery:suspected:guarded',
+      ], why: 'is lowered'),
+      _lowered('ללא סלרי', RestrictionId.celery, <String>[
+        'סלרי:suspected:guarded',
+      ], why: 'is lowered'),
       _miss('ליצירת מופת', RestrictionId.celery, why: 'is not ציר (stock)'),
       _miss('יצירת אמנות', RestrictionId.celery),
       _miss('Stockholm', RestrictionId.celery, why: 'is another word'),
@@ -239,19 +292,21 @@ void main() {
         'caesar salad:suspected',
       ]),
       _hit('סלט קיסר', RestrictionId.mustard, <String>['סלט קיסר:suspected']),
-      _miss(
-        'Mustard-free dressing',
-        RestrictionId.mustard,
-        lacks: <String>['mustard'],
-      ),
-      _miss('No mustard', RestrictionId.mustard, why: 'is guarded'),
-      _miss(
-        'Without mustard',
-        RestrictionId.mustard,
-        lacks: <String>['mustard'],
-      ),
-      _miss('ללא חרדל', RestrictionId.mustard, why: 'is guarded'),
-      _miss('בלי חרדל', RestrictionId.mustard, why: 'is guarded'),
+      _hit('Mustard-free dressing', RestrictionId.mustard, <String>[
+        'mustard:suspected:guarded',
+      ]),
+      _lowered('No mustard', RestrictionId.mustard, <String>[
+        'mustard:suspected:guarded',
+      ], why: 'is lowered'),
+      _hit('Without mustard', RestrictionId.mustard, <String>[
+        'mustard:suspected:guarded',
+      ]),
+      _lowered('ללא חרדל', RestrictionId.mustard, <String>[
+        'חרדל:suspected:guarded',
+      ], why: 'is lowered'),
+      _lowered('בלי חרדל', RestrictionId.mustard, <String>[
+        'חרדל:suspected:guarded',
+      ], why: 'is lowered'),
     ]);
   });
 
@@ -340,14 +395,18 @@ void main() {
       _hit('סלט עם גוואקמולי', RestrictionId.sulphites, <String>[
         'גוואקמולי:suspected',
       ]),
-      _miss(
-        'Sulphite-free wine',
-        RestrictionId.sulphites,
-        lacks: <String>['sulphite'],
-      ),
-      _miss('No added sulphites', RestrictionId.sulphites, why: 'is guarded'),
-      _miss('ללא סולפיטים', RestrictionId.sulphites, why: 'is guarded'),
-      _miss('ללא תוספת סולפיטים', RestrictionId.sulphites),
+      _hit('Sulphite-free wine', RestrictionId.sulphites, <String>[
+        'sulphite:suspected:guarded',
+      ]),
+      _lowered('No added sulphites', RestrictionId.sulphites, <String>[
+        'sulphites:suspected:guarded',
+      ], why: 'is lowered'),
+      _lowered('ללא סולפיטים', RestrictionId.sulphites, <String>[
+        'סולפיטים:suspected:guarded',
+      ], why: 'is lowered'),
+      _lowered('ללא תוספת סולפיטים', RestrictionId.sulphites, <String>[
+        'סולפיטים:suspected:guarded',
+      ]),
       _miss('הזמנה ממיין', RestrictionId.sulphites, why: 'is not wine'),
       _miss('Winery tour', RestrictionId.sulphites, why: 'is another word'),
     ]);
@@ -443,19 +502,33 @@ void main() {
       ], why: 'every hidden soy source is a legume source'),
       _miss('אספרסו כפול', RestrictionId.legumes, why: 'is "double", not פול'),
       _miss('שניצל כפול', RestrictionId.legumes),
-      _miss('Coffee beans', RestrictionId.legumes, why: 'are not a legume'),
-      _miss('Vanilla bean ice cream', RestrictionId.legumes),
-      _miss('Cocoa beans', RestrictionId.legumes),
-      _miss('Legume-free', RestrictionId.legumes, why: 'is guarded'),
-      _miss('No legumes', RestrictionId.legumes, why: 'is guarded'),
-      _miss('ללא קטניות', RestrictionId.legumes, why: 'is guarded'),
+      _lowered('Coffee beans', RestrictionId.legumes, <String>[
+        'beans:suspected:guarded',
+      ], why: 'are lowered, as no legume'),
+      _lowered('Vanilla bean ice cream', RestrictionId.legumes, <String>[
+        'bean:suspected:guarded',
+      ]),
+      _lowered('Cocoa beans', RestrictionId.legumes, <String>[
+        'beans:suspected:guarded',
+      ]),
+      _lowered('Legume-free', RestrictionId.legumes, <String>[
+        'legume:suspected:guarded',
+      ], why: 'is lowered'),
+      _lowered('No legumes', RestrictionId.legumes, <String>[
+        'legumes:suspected:guarded',
+      ], why: 'is lowered'),
+      _lowered('ללא קטניות', RestrictionId.legumes, <String>[
+        'קטניות:suspected:guarded',
+      ], why: 'is lowered'),
       _miss(
         'Chickpea',
         RestrictionId.legumes,
         lacks: <String>['pea'],
         why: 'is not the word "pea"',
       ),
-      _miss('Pea-free', RestrictionId.legumes, lacks: <String>['pea']),
+      _hit('Pea-free', RestrictionId.legumes, <String>[
+        'pea:suspected:guarded',
+      ]),
     ]);
   });
 
@@ -542,34 +615,35 @@ void main() {
           }
         });
 
-        test('the guard words cancel a trigger beside them', () {
+        test('the guard words lower a trigger beside them', () {
           final guards = vocabulary.guards;
           final term = vocabulary.directEn.first;
           final he = vocabulary.directHe.first;
-          for (final word in guards.beforeEn) {
+          void lowered(String text, String trigger) {
             expect(
-              _hits('$word $term', id).where((h) => h.startsWith('$term:')),
-              isEmpty,
-              reason: '$word $term',
+              _hits(text, id).where((h) => h.startsWith('$trigger:')),
+              everyElement('$trigger:suspected:guarded'),
+              reason: text,
             );
+            expect(
+              _hits(text, id).where((h) => h.startsWith('$trigger:')),
+              isNotEmpty,
+              reason: text,
+            );
+          }
+
+          for (final word in guards.beforeEn) {
+            lowered('$word $term', term);
           }
           for (final word in guards.afterEn) {
-            expect(
-              _hits('$term $word', id).where((h) => h.startsWith('$term:')),
-              isEmpty,
-              reason: '$term $word',
-            );
+            lowered('$term $word', term);
           }
           for (final word in guards.beforeHe) {
-            expect(
-              _hits('$word $he', id).where((h) => h.startsWith('$he:')),
-              isEmpty,
-              reason: '$word $he',
-            );
+            lowered('$word $he', he);
           }
         });
 
-        test('a guard three words away no longer cancels', () {
+        test('a guard three words away no longer lowers', () {
           final term = vocabulary.directEn.first;
           expect(_hits('no big fat $term', id), contains('$term:stated'));
         });

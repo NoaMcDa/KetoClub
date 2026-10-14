@@ -552,8 +552,14 @@ typedef _Flags = ({
   Set<RestrictionId> seafood,
 });
 
+/// The flags of [haystack], with [hits] the matcher found in it. A guarded
+/// hit ("almond-free") is no evidence that the kitchen handles the
+/// allergen, so only unguarded hits count (ALG-04a).
 _Flags _flagsOf(String haystack, List<AllergenHit> hits) {
-  final ids = <RestrictionId>{for (final hit in hits) hit.id};
+  final ids = <RestrictionId>{
+    for (final hit in hits)
+      if (!hit.guarded) hit.id,
+  };
   return (
     fried: _any(haystack, _fried),
     wok: _any(haystack, _wok),

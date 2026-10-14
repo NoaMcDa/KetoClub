@@ -11,11 +11,13 @@ const List<RestrictionId> _ids = <RestrictionId>[
 ];
 
 /// One expectation: what `id` finds in `text` — its strongest certainty,
-/// or null when it finds nothing.
+/// or null when it finds nothing — and, when `guarded`, that every hit is
+/// guarded (a guard lowers a hit to suspected, never cancels it; ALG-04a).
 typedef _Case = ({
   RestrictionId id,
   String text,
   TriggerCertainty? certainty,
+  bool guarded,
   String why,
 });
 
@@ -37,21 +39,36 @@ TriggerCertainty? _strongest(RestrictionId id, String text) {
   return best;
 }
 
+/// Whether every hit of `id` in `text` is guarded (and there is one).
+bool _allGuarded(RestrictionId id, String text) {
+  final hits = AllergenMatcher.find(text).where((hit) => hit.id == id);
+  return hits.isNotEmpty && hits.every((hit) => hit.guarded);
+}
+
 _Case _case(
   RestrictionId id,
   String text,
   TriggerCertainty? certainty,
   String why,
-) => (id: id, text: text, certainty: certainty, why: why);
+) => (id: id, text: text, certainty: certainty, guarded: false, why: why);
+
+/// A text whose every hit of `id` a guard lowered to suspected.
+_Case _guard(RestrictionId id, String text, String why) =>
+    (id: id, text: text, certainty: _suspected, guarded: true, why: why);
 
 void _expectAll(List<_Case> cases) {
-  for (final c in cases) {
-    expect(
-      _strongest(c.id, c.text),
-      c.certainty,
-      reason: '${c.id.name}: "${c.text}" (${c.why})',
-    );
-  }
+  final wrong = <String>[
+    for (final c in cases)
+      if (_strongest(c.id, c.text) != c.certainty ||
+          (c.guarded && !_allGuarded(c.id, c.text)))
+        <String>[
+          '${c.id.name}: "${c.text}" (${c.why}): expected',
+          '${c.certainty?.name}${c.guarded ? ' guarded' : ''}, found',
+          '${_strongest(c.id, c.text)?.name}',
+          if (_allGuarded(c.id, c.text)) 'guarded',
+        ].join(' '),
+  ];
+  expect(wrong, isEmpty);
 }
 
 void main() {
@@ -187,16 +204,16 @@ void main() {
       ]);
     });
 
-    test('guards cancel the hit', () {
+    test('guards lower the hit', () {
       _expectAll(<_Case>[
-        _case(id, 'Peanut-free brownie', null, 'peanut-free'),
-        _case(id, 'No peanuts, no problem', null, 'no peanuts'),
-        _case(id, 'Satay without peanuts', null, 'without'),
-        _case(id, 'Pad thai (peanut free)', null, 'after the trigger'),
-        _case(id, 'Satay, peanut free', null, 'a hidden trigger too'),
-        _case(id, 'ללא בוטנים', null, 'Hebrew ללא'),
-        _case(id, 'עוגה ובלי בוטנים', null, 'Hebrew ובלי'),
-        _case(id, 'סאטה ללא בוטנים', null, 'a hidden Hebrew trigger'),
+        _guard(id, 'Peanut-free brownie', 'peanut-free'),
+        _guard(id, 'No peanuts, no problem', 'no peanuts'),
+        _guard(id, 'Satay without peanuts', 'without'),
+        _guard(id, 'Pad thai (peanut free)', 'after the trigger'),
+        _guard(id, 'Satay, peanut free', 'a hidden trigger too'),
+        _guard(id, 'ללא בוטנים', 'Hebrew ללא'),
+        _guard(id, 'עוגה ובלי בוטנים', 'Hebrew ובלי'),
+        _guard(id, 'סאטה ללא בוטנים', 'a hidden Hebrew trigger'),
         _case(
           id,
           'Free range chicken satay',
@@ -210,7 +227,7 @@ void main() {
       _expectAll(<_Case>[
         _case(id, 'Nut-free pesto', _suspected, 'pesto is still asked about'),
         _case(id, 'Nut free peanut brittle', _stated, 'peanut stands'),
-        _case(id, 'Peanut free pesto', null, 'peanut free clears it'),
+        _guard(id, 'Peanut free pesto', 'peanut free lowers it'),
       ]);
     });
 
@@ -308,17 +325,17 @@ void main() {
       ]);
     });
 
-    test('guards cancel the hit', () {
+    test('guards lower the hit', () {
       _expectAll(<_Case>[
-        _case(id, 'Nut-free pesto', null, 'nut-free'),
-        _case(id, 'Pesto (nut free)', null, 'after the trigger'),
-        _case(id, 'No nuts', null, 'no nuts'),
-        _case(id, 'Salad without almonds', null, 'without'),
-        _case(id, 'Pesto without nuts', null, 'a hidden trigger too'),
-        _case(id, 'Almond free', null, 'after-guard free'),
-        _case(id, 'ללא אגוזים', null, 'Hebrew ללא'),
-        _case(id, 'פסטו ללא אגוזים', null, 'a hidden Hebrew trigger'),
-        _case(id, 'עוגה ובלי שקדים', null, 'Hebrew ובלי'),
+        _guard(id, 'Nut-free pesto', 'nut-free'),
+        _guard(id, 'Pesto (nut free)', 'after the trigger'),
+        _guard(id, 'No nuts', 'no nuts'),
+        _guard(id, 'Salad without almonds', 'without'),
+        _guard(id, 'Pesto without nuts', 'a hidden trigger too'),
+        _guard(id, 'Almond free', 'after-guard free'),
+        _guard(id, 'ללא אגוזים', 'Hebrew ללא'),
+        _guard(id, 'פסטו ללא אגוזים', 'a hidden Hebrew trigger'),
+        _guard(id, 'עוגה ובלי שקדים', 'Hebrew ובלי'),
       ]);
     });
 
@@ -409,17 +426,17 @@ void main() {
       ]);
     });
 
-    test('guards cancel the hit', () {
+    test('guards lower the hit', () {
       _expectAll(<_Case>[
-        _case(id, 'Sesame-free bun', null, 'sesame-free'),
-        _case(id, 'Hummus, no tahini', null, 'no tahini'),
-        _case(id, 'Hummus without sesame', null, 'without sesame'),
-        _case(id, 'Tahini free hummus', null, 'tahini free'),
-        _case(id, 'Bun (sesame free)', null, 'after the trigger'),
-        _case(id, 'ללא שומשום', null, 'Hebrew ללא'),
-        _case(id, 'חומוס ללא טחינה', null, 'a hidden Hebrew trigger'),
-        _case(id, 'פלאפל בלי טחינה', null, 'Hebrew בלי'),
-        _case(id, 'סלט וללא טחינה', null, 'Hebrew וללא'),
+        _guard(id, 'Sesame-free bun', 'sesame-free'),
+        _guard(id, 'Hummus, no tahini', 'no tahini'),
+        _guard(id, 'Hummus without sesame', 'without sesame'),
+        _guard(id, 'Tahini free hummus', 'tahini free'),
+        _guard(id, 'Bun (sesame free)', 'after the trigger'),
+        _guard(id, 'ללא שומשום', 'Hebrew ללא'),
+        _guard(id, 'חומוס ללא טחינה', 'a hidden Hebrew trigger'),
+        _guard(id, 'פלאפל בלי טחינה', 'Hebrew בלי'),
+        _guard(id, 'סלט וללא טחינה', 'Hebrew וללא'),
         _case(id, 'Plain hummus', _likely, 'no guard'),
       ]);
     });

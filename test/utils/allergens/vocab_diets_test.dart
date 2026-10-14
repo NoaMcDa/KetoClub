@@ -12,16 +12,19 @@ const RestrictionId _veg = RestrictionId.vegetarian;
 /// (filled by their own pull requests) cannot change these tests.
 List<String> _hits(String text, RestrictionId id) => <String>[
   for (final hit in AllergenMatcher.find(text))
-    if (hit.id == id) '${hit.term}:${hit.certainty.name}',
+    if (hit.id == id)
+      '${hit.term}:${hit.certainty.name}${hit.guarded ? ':guarded' : ''}',
 ];
 
 /// What one text does to the two diets: `vegan` and `vegetarian` are the
 /// `term:certainty` entries each must report; a null list means "reports
-/// nothing at all".
+/// nothing at all". When `lowered`, every hit of both diets is guarded
+/// and there is at least one (a guard lowers, never cancels; ALG-04a).
 typedef _Case = ({
   String text,
   List<String>? vegan,
   List<String>? vegetarian,
+  bool lowered,
   String why,
 });
 
@@ -30,11 +33,34 @@ _Case _case(
   List<String>? vegan,
   List<String>? vegetarian,
   String why = '',
-}) => (text: text, vegan: vegan, vegetarian: vegetarian, why: why);
+}) => (
+  text: text,
+  vegan: vegan,
+  vegetarian: vegetarian,
+  lowered: false,
+  why: why,
+);
+
+/// A text the restaurant declares free of the diets' triggers: every hit
+/// is lowered to suspected, none is dropped.
+_Case _lowered(String text, {String why = ''}) =>
+    (text: text, vegan: null, vegetarian: null, lowered: true, why: why);
+
+/// Whether [hits] (as [_hits] writes them) are all guarded.
+bool _allGuarded(List<String> hits) =>
+    hits.every((hit) => hit.endsWith(':guarded'));
 
 void _run(List<_Case> cases) {
   for (final c in cases) {
     test('"${c.text}" ${c.why}', () {
+      if (c.lowered) {
+        final vegan = _hits(c.text, _vegan);
+        final vegetarian = _hits(c.text, _veg);
+        expect(<String>[...vegan, ...vegetarian], isNotEmpty);
+        expect(_allGuarded(vegan), isTrue, reason: '$vegan');
+        expect(_allGuarded(vegetarian), isTrue, reason: '$vegetarian');
+        return;
+      }
       for (final (id, expected) in <(RestrictionId, List<String>?)>[
         (_vegan, c.vegan),
         (_veg, c.vegetarian),
@@ -318,39 +344,49 @@ void main() {
 
   group("guards: the restaurant's own declaration", () {
     _run(<_Case>[
-      _case('Vegan cheese'),
-      _case('Vegan chicken nuggets'),
-      _case('Plant-based burger'),
-      _case('Plant based sausage'),
-      _case('Dairy free cheese'),
-      _case('Chicken alternative'),
-      _case('Meat substitute'),
-      _case('Imitation bacon'),
-      _case('No cheese, no egg'),
-      _case('Without meat'),
-      _case('Eggless mayonnaise'),
-      _case('גבינה טבעונית'),
-      _case('נקניקיות טבעוניות'),
-      _case('שניצל עוף טבעוני'),
-      _case('בשר צמחי'),
-      _case('חלב צמחי'),
-      _case('שמנת על בסיס צמחי'),
-      _case('תחליף גבינה'),
-      _case('עוגה ללא ביצים וללא חמאה'),
-      _case('סלט בלי גבינה ובלי ביצה'),
-      _case('ללא ביצים'),
-      _case('בלי בשר'),
+      _lowered('Vegan cheese'),
+      _lowered('Vegan chicken nuggets'),
+      _lowered('Plant-based burger'),
+      _lowered('Plant based sausage'),
+      _lowered('Dairy free cheese'),
+      _lowered('Chicken alternative'),
+      _lowered('Meat substitute'),
+      _lowered('Imitation bacon'),
+      _lowered('No cheese, no egg'),
+      _lowered('Without meat'),
+      _lowered('Eggless mayonnaise'),
+      _lowered('גבינה טבעונית'),
+      _lowered('נקניקיות טבעוניות'),
+      _case(
+        'שניצל עוף טבעוני',
+        vegan: <String>['שניצל:likely', 'עוף:suspected:guarded'],
+        vegetarian: <String>['שניצל:likely', 'עוף:suspected:guarded'],
+        why: 'the guard reaches only the word beside it',
+      ),
+      _lowered('בשר צמחי'),
+      _lowered('חלב צמחי'),
+      _lowered('שמנת על בסיס צמחי'),
+      _lowered('תחליף גבינה'),
+      _lowered('עוגה ללא ביצים וללא חמאה'),
+      _lowered('סלט בלי גבינה ובלי ביצה'),
+      _lowered('ללא ביצים'),
+      _lowered('בלי בשר'),
     ]);
 
-    test('a vegetarian declaration cancels the vegetarian hit only', () {
-      expect(_hits('Vegetarian sausage', _veg), isEmpty);
+    test('a vegetarian declaration lowers the vegetarian hit only', () {
+      expect(_hits('Vegetarian sausage', _veg), <String>[
+        'sausage:suspected:guarded',
+      ]);
       expect(_hits('Vegetarian sausage', _vegan), contains('sausage:stated'));
     });
 
-    test('a vegan declaration cancels both diets', () {
+    test('a vegan declaration lowers both diets', () {
       for (final text in <String>['Vegan sausage', 'נקניק טבעוני']) {
-        expect(_hits(text, _veg), isEmpty, reason: text);
-        expect(_hits(text, _vegan), isEmpty, reason: text);
+        for (final id in <RestrictionId>[_veg, _vegan]) {
+          final hits = _hits(text, id);
+          expect(hits, isNotEmpty, reason: text);
+          expect(_allGuarded(hits), isTrue, reason: '$text: $hits');
+        }
       }
     });
 
@@ -490,19 +526,17 @@ void main() {
           }
         });
 
-        test('every guard word cancels a trigger beside it', () {
+        test('every guard word lowers a trigger beside it', () {
           final guards = vocabulary.guards;
-          for (final word in guards.beforeEn) {
-            expect(_hits('$word chicken', id), isEmpty, reason: word);
-          }
-          for (final word in guards.afterEn) {
-            expect(_hits('chicken $word', id), isEmpty, reason: word);
-          }
-          for (final word in guards.beforeHe) {
-            expect(_hits('$word עוף', id), isEmpty, reason: word);
-          }
-          for (final word in guards.afterHe) {
-            expect(_hits('עוף $word', id), isEmpty, reason: word);
+          for (final text in <String>[
+            for (final word in guards.beforeEn) '$word chicken',
+            for (final word in guards.afterEn) 'chicken $word',
+            for (final word in guards.beforeHe) '$word עוף',
+            for (final word in guards.afterHe) 'עוף $word',
+          ]) {
+            final hits = _hits(text, id);
+            expect(hits, isNotEmpty, reason: text);
+            expect(_allGuarded(hits), isTrue, reason: '$text: $hits');
           }
         });
       });

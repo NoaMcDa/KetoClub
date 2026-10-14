@@ -90,6 +90,10 @@ MenuAnalysisFailureReason backendFailureReasonFrom(Object? decoded) {
 /// The `options` object of a D25 analysis request: `{netCarbLimitGrams,
 /// dietaryConstraints}`, the verdict-shaping half of [options] and so
 /// exactly the snapshot the server echoes back on the analysis.
+///
+/// `restrictionsRequested: true` is added only when the options ask for
+/// ingredient extraction (ALG-03, D26 C2), as the snapshot writes it; a
+/// keto body is unchanged, and the profile itself is never sent (C1).
 Map<String, Object?> backendOptionsJson(ClassificationOptions options) =>
     options.snapshot.toJson();
 

@@ -414,7 +414,10 @@ const List<HiddenTrigger> _molluscsHiddenHe = <HiddenTrigger>[
 ///
 /// Guards are the negations, "vegan" and "free", plus the one guard the
 /// documentation names for shellfish: a kosher menu serves none (12 §2.2).
-/// "Vegetarian" is not a guard: it would cancel "vegetarian and fish
+/// A guard lowers a hit to `suspected` from the slot beside its term and
+/// never cancels it (ALG-04a); "crab apple" and "oyster mushroom" are term
+/// guards on the words they disarm.
+/// "Vegetarian" is not a guard: it would lower "vegetarian and fish
 /// options", and anchovy is routinely overlooked as "not meat" (11 §8.3).
 const Map<RestrictionId, RestrictionVocabulary> seaVocabulary =
     <RestrictionId, RestrictionVocabulary>{
@@ -445,10 +448,14 @@ const Map<RestrictionId, RestrictionVocabulary> seaVocabulary =
             'vegan',
             'kosher',
           ],
-          afterEn: <String>['free', 'kosher', 'apple', 'apples'],
+          afterEn: <String>['free', 'kosher'],
           beforeHe: <String>['ללא', 'בלי', 'נטול', 'כשר', 'כשרה'],
           afterHe: <String>['כשר', 'כשרה', 'כשרים', 'טבעוני', 'טבעונית'],
         ),
+        termGuards: <String, AllergenGuards>{
+          'crab': AllergenGuards(afterEn: <String>['apple', 'apples']),
+          'crabs': AllergenGuards(afterEn: <String>['apple', 'apples']),
+        },
         sources: <String>['11 §9.1', '11 §9.3', '12 §1.7', '12 §2.2'],
       ),
       RestrictionId.molluscs: RestrictionVocabulary(
@@ -465,10 +472,14 @@ const Map<RestrictionId, RestrictionVocabulary> seaVocabulary =
             'vegan',
             'kosher',
           ],
-          afterEn: <String>['free', 'kosher', 'mushroom', 'mushrooms'],
+          afterEn: <String>['free', 'kosher'],
           beforeHe: <String>['ללא', 'בלי', 'נטול', 'כשר', 'כשרה'],
           afterHe: <String>['כשר', 'כשרה', 'כשרים', 'טבעוני', 'טבעונית'],
         ),
+        termGuards: <String, AllergenGuards>{
+          'oyster': AllergenGuards(afterEn: <String>['mushroom', 'mushrooms']),
+          'oysters': AllergenGuards(afterEn: <String>['mushroom', 'mushrooms']),
+        },
         sources: <String>['11 §10.1', '11 §10.3', '12 §1.7', '12 §2.2'],
       ),
     };

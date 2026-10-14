@@ -1877,3 +1877,186 @@ const List<WebsiteCase> websiteInlineCases = <WebsiteCase>[
     baseUrl: websiteHome,
   ),
 ];
+
+// ---------------------------------------------------------------------------
+// Ingredient extraction (Banto; ALG-03, D26 C2)
+// ---------------------------------------------------------------------------
+
+/// The source menu of the extraction replies: dishes with a description,
+/// an option group holding a removal value, a Hebrew dish and one with no
+/// description at all.
+final Menu parserExtractionMenu = parserMenu(<Dish>[
+  const Dish(
+    id: 'dish-sabich',
+    name: 'Sabich',
+    description: 'Fried eggplant, egg and amba in pita',
+    price: 10,
+    options: <DishOption>[
+      DishOption(name: 'Extras', values: <String>['Tahini', 'No sesame']),
+    ],
+  ),
+  const Dish(
+    id: 'dish-schnitzel',
+    name: 'שניצל',
+    description: 'עוף בציפוי פירורי לחם עם הטחינה',
+    price: 10,
+    options: <DishOption>[],
+  ),
+  const Dish(
+    id: 'dish-salad',
+    name: 'Green Salad',
+    description: 'Lettuce, cucumber, lemon dressing',
+    price: 10,
+    options: <DishOption>[],
+  ),
+  parserDish('dish-water', 'Water'),
+]);
+
+/// One `ingredients` entry for the extraction replies.
+Map<String, Object?> ingredient(
+  Object? name, {
+  Object? certainty = 'stated',
+  Object? role = 'base',
+}) => <String, Object?>{'name': name, 'certainty': certainty, 'role': role};
+
+/// [element] with `ingredients` (and any [extra] keys) added.
+Map<String, Object?> withIngredients(
+  Map<String, Object?> element,
+  Object? ingredients, {
+  Map<String, Object?> extra = const <String, Object?>{},
+}) => <String, Object?>{...element, 'ingredients': ingredients, ...extra};
+
+/// Hand-written text replies parsed with extraction requested: the
+/// support cap, unknown enums, blanks, length and count caps, dedupe,
+/// a model `concerns` ignored, a red dish keeping its ingredients and a
+/// described dish with none (extraction missing).
+List<ReplyCase> handExtractionTextReplies() {
+  ReplyCase c(String name, String body) =>
+      (name: name, body: body, source: parserExtractionMenu, limit: 6);
+  Map<String, Object?> sabich() => replyDish(
+    id: 'dish-sabich',
+    name: 'Sabich',
+    verdict: 'nonKeto',
+    why: 'Pita is bread.',
+  );
+  return <ReplyCase>[
+    c(
+      'hand_extract_support_cap',
+      replyBody(<Object?>[
+        withIngredients(sabich(), <Object?>[
+          ingredient('  Eggplant  ', role: 'protein'),
+          ingredient('egg', certainty: 'likely', role: 'protein'),
+          ingredient('Tahini', role: 'option'),
+          ingredient('sesame', role: 'sauce'),
+          ingredient('flour', certainty: 'likely'),
+          ingredient('pita', certainty: 'suspected'),
+          ingredient('🌶', role: 'garnish'),
+        ]),
+        withIngredients(
+          replyDish(
+            id: 'dish-schnitzel',
+            name: 'שניצל',
+            verdict: 'nonKeto',
+            why: 'מצופה בפירורי לחם.',
+          ),
+          <Object?>[
+            ingredient('טחינה', role: 'sauce'),
+            ingredient('עוף', role: 'protein'),
+            ingredient('קמח', certainty: 'likely'),
+          ],
+        ),
+      ]),
+    ),
+    c(
+      'hand_extract_filtered_entries',
+      replyBody(<Object?>[
+        withIngredients(sabich(), <Object?>[
+          'not a map',
+          ingredient(null),
+          ingredient(3),
+          ingredient('   '),
+          ingredient('x' * 101),
+          ingredient('y' * 100),
+          ingredient('egg', certainty: 'Stated'),
+          ingredient('egg', certainty: null),
+          ingredient('Egg', role: 'topping'),
+          ingredient('EGG!', certainty: 'likely'),
+          <String, Object?>{'name': 'amba', 'certainty': 'stated'},
+        ]),
+      ]),
+    ),
+    c(
+      'hand_extract_count_cap',
+      replyBody(<Object?>[
+        withIngredients(sabich(), <Object?>[
+          for (var i = 0; i < 45; i++) ingredient('item $i'),
+        ]),
+      ]),
+    ),
+    c(
+      'hand_extract_concerns_ignored_and_missing',
+      replyBody(<Object?>[
+        withIngredients(
+          replyDish(
+            id: 'dish-salad',
+            name: 'Green Salad',
+            why: 'Leaves and a lemon dressing.',
+          ),
+          const <Object?>[],
+          extra: <String, Object?>{
+            'concerns': <Object?>[
+              <String, Object?>{
+                'restrictionId': 'sesame',
+                'source': 'model',
+                'certainty': 'stated',
+                'tier': 'stated',
+              },
+            ],
+          },
+        ),
+        withIngredients(
+          replyDish(id: 'dish-water', name: 'Water', why: 'No carbs.'),
+          'not a list',
+        ),
+        // No `ingredients` key at all: missing on a described dish.
+        sabich(),
+      ]),
+    ),
+  ];
+}
+
+/// Hand-written scanned replies parsed with extraction requested: the
+/// transcribed description (trimmed, capped, null and non-string read as
+/// empty) and ingredients judged against it.
+List<({String name, String body, int? pageCount, int limit})>
+handExtractionScannedReplies() {
+  Map<String, Object?> d(
+    String name,
+    Object? description,
+    Object? ingredients,
+  ) => withIngredients(
+    replyDish(id: 'ignored', name: name, page: 1, withPage: true),
+    ingredients,
+    extra: <String, Object?>{'description': description},
+  );
+  return <({String name, String body, int? pageCount, int limit})>[
+    (
+      name: 'hand_extract_scanned_descriptions',
+      body: replyBody(<Object?>[
+        d('Sabich', '  Fried eggplant and tahini  ', <Object?>[
+          ingredient('tahini', role: 'sauce'),
+          ingredient('egg', role: 'protein'),
+        ]),
+        d('Steak', null, const <Object?>[]),
+        d('Salmon', 42, const <Object?>[]),
+        d('Soup', 'd' * 1001, const <Object?>[]),
+        <String, Object?>{
+          ...replyDish(id: 'ignored', name: 'Cod'),
+          'description': 'Battered',
+        },
+      ]),
+      pageCount: 1,
+      limit: 6,
+    ),
+  ];
+}

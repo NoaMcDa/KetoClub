@@ -204,7 +204,7 @@ def test_the_fixture_vocabulary_has_terms_to_check() -> None:
 def test_every_term_normalises_and_compiles_as_dart_did(
     section: str, rid: str, term: dict[str, Any], hebrew: bool, no_prefix: list[str]
 ) -> None:
-    normalised = normalise(term["term"])
+    normalised = match_text(term["term"])
     assert normalised == term["normalised"]
     if not normalised:
         assert term["pattern"] is None

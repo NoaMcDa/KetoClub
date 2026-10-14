@@ -22,10 +22,16 @@ import 'package:ketoclub/services/storage/install_id_store.dart';
 ///   `GET {base}/v1/venue-menus/{source}/{platformId}?classify=true`, the
 ///   options travelling as `netCarbLimitGrams` and one repeated
 ///   `constraints` parameter per dietary prompt fragment (repeated, never
-///   comma-joined, because a fragment contains commas).
+///   comma-joined, because a fragment contains commas), plus
+///   `restrictionsRequested=true` only when the options ask for ingredient
+///   extraction (ALG-03, D26 C2).
 /// - [MenuSource.website] is read with `POST {base}/v1/website-menu`,
-///   `{url, options: {netCarbLimitGrams, dietaryConstraints}}`; the ref's
-///   `platformId` is the URL.
+///   `{url, options: {netCarbLimitGrams, dietaryConstraints}}`, with
+///   `restrictionsRequested: true` in the options only when it is true;
+///   the ref's `platformId` is the URL.
+///
+/// Only that flag ever travels: the restriction profile itself never
+/// leaves the device (D26 C1).
 ///
 /// **The analysis is a hint, never trusted blindly.** It rides on
 /// [MenuFetched.analysis] only when it was made under the options
@@ -198,7 +204,9 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
   /// The `GET` URL for [ref] under [base], asking for an analysis under
   /// [options]: `{base}/v1/venue-menus/{source}/{platformId}` with the
   /// platform id percent-encoded as one path segment, then `classify`,
-  /// `netCarbLimitGrams` and one `constraints` per dietary constraint.
+  /// `netCarbLimitGrams`, one `constraints` per dietary constraint and,
+  /// only when [ClassificationOptions.restrictionsRequested] is true,
+  /// `restrictionsRequested=true` (ALG-03), so a keto URL is unchanged.
   static Uri venueMenuUri(
     Uri base,
     VenueRef ref,
@@ -213,6 +221,7 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
         'netCarbLimitGrams': '${options.netCarbLimitGrams}',
         if (options.dietaryConstraints.isNotEmpty)
           'constraints': options.dietaryConstraints,
+        if (options.restrictionsRequested) 'restrictionsRequested': 'true',
       },
     );
   }
@@ -310,6 +319,7 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
       <String, Object?>{
         'netCarbLimitGrams': options.netCarbLimitGrams,
         'dietaryConstraints': options.dietaryConstraints,
+        if (options.restrictionsRequested) 'restrictionsRequested': true,
       };
 
   static bool _isWebUrl(String raw) {

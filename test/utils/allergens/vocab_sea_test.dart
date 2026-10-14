@@ -22,6 +22,12 @@ List<AllergenHit> _hits(String text, RestrictionId id) =>
         .where((hit) => hit.id == id)
         .toList(growable: false);
 
+/// Whether [hits] are all lowered by a guard, and there is one (a guard
+/// lowers a hit to suspected, never cancels it; ALG-04a).
+bool _lowered(List<AllergenHit> hits) =>
+    hits.isNotEmpty &&
+    hits.every((hit) => hit.guarded && hit.certainty == _suspected);
+
 /// The certainty of [id]'s hit on [term] in [text], or null.
 TriggerCertainty? _certaintyOf(String text, RestrictionId id, String term) {
   for (final hit in _hits(text, id)) {
@@ -245,7 +251,7 @@ void main() {
   });
 
   group('guards', () {
-    const gone = <(String, RestrictionId, String)>[
+    const lowered = <(String, RestrictionId, String)>[
       ('Fish-free batter', _fish, 'fish'),
       ('No fish', _fish, 'fish'),
       ('Cooked without anchovy', _fish, 'anchovy'),
@@ -272,19 +278,20 @@ void main() {
       ('Calamari-free', _moll, 'calamari'),
       ('Crab apple jelly', _crust, 'crab'),
     ];
-    for (final (text, id, term) in gone) {
-      test('$text: ${id.name} loses "$term"', () {
-        expect(_certaintyOf(text, id, term), isNull);
+    for (final (text, id, term) in lowered) {
+      test('$text: ${id.name} lowers "$term"', () {
+        final hits = _hits(text, id).where((hit) => hit.term == term);
+        expect(_lowered(hits.toList()), isTrue, reason: '$hits');
       });
     }
 
-    test('kosher clears shellfish but never fish', () {
+    test('kosher lowers shellfish but never fish', () {
       expect(_certaintyOf('Kosher salmon', _fish, 'salmon'), _stated);
       expect(_certaintyOf('סלמון כשר', _fish, 'סלמון'), _stated);
       expect(_certaintyOf('Kosher fish and chips', _fish, 'fish'), _stated);
-      expect(_hits('Kosher shrimp', _crust), isEmpty);
-      expect(_hits('שרימפס כשר', _crust), isEmpty);
-      expect(_hits('קלמרי כשר', _moll), isEmpty);
+      expect(_lowered(_hits('Kosher shrimp', _crust)), isTrue);
+      expect(_lowered(_hits('שרימפס כשר', _crust)), isTrue);
+      expect(_lowered(_hits('קלמרי כשר', _moll)), isTrue);
     });
 
     test('vegetarian is a weak guard: Worcestershire still hits', () {
@@ -320,16 +327,12 @@ void main() {
 
   group('confusions produce no hit', () {
     const texts = <(String, RestrictionId)>[
-      ('Oyster mushroom salad', _moll),
-      ('King oyster mushrooms', _moll),
       ('פטריות צדפה בגריל', _moll),
       ('פטריית צדפה', _moll),
-      ('Crab apple chutney', _crust),
       ('Crabapple jelly', _crust),
       ('Jellyfish salad', _fish),
       ('Starfish cookie', _fish),
       ('Selfish', _fish),
-      ('Fish-free', _fish),
       ('Crayfish bisque', _fish),
       ('Swordfish steak', _crust),
       ('Salmon fillet', _crust),
@@ -341,6 +344,19 @@ void main() {
     for (final (text, id) in texts) {
       test('"$text" has no ${id.name} hit', () {
         expect(_hits(text, id), isEmpty);
+      });
+    }
+
+    // A compound a term guard disarms, or a guarded word, is lowered and
+    // never dropped (ALG-04a).
+    for (final (text, id) in const <(String, RestrictionId)>[
+      ('Oyster mushroom salad', _moll),
+      ('King oyster mushrooms', _moll),
+      ('Crab apple chutney', _crust),
+      ('Fish-free', _fish),
+    ]) {
+      test('"$text" has its ${id.name} hit lowered', () {
+        expect(_lowered(_hits(text, id)), isTrue);
       });
     }
 

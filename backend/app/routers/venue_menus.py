@@ -91,13 +91,16 @@ def _query_error(loc: tuple[str, ...], msg: str) -> RequestValidationError:
 
 
 def _options(
-    net_carb_limit_grams: int, constraints: list[str]
+    net_carb_limit_grams: int,
+    constraints: list[str],
+    restrictions_requested: bool = False,
 ) -> ClassificationOptionsBody:
     """The query's options under the body rule, or FastAPI's 422."""
     try:
         return ClassificationOptionsBody(
             net_carb_limit_grams=net_carb_limit_grams,
             dietary_constraints=constraints,
+            restrictions_requested=restrictions_requested,
         )
     except ValidationError as error:
         raise RequestValidationError(
@@ -215,6 +218,9 @@ async def read_venue_menu(
         int, Query(alias="netCarbLimitGrams", ge=1, le=50)
     ] = 6,
     constraints: Annotated[list[str] | None, Query()] = None,
+    restrictions_requested: Annotated[
+        bool, Query(alias="restrictionsRequested")
+    ] = False,
 ) -> VenueMenuResponse:
     """The venue's menu, and its analysis when ``classify`` is true.
 
@@ -222,10 +228,13 @@ async def read_venue_menu(
     there are none; at most ``MAX_DIETARY_CONSTRAINTS``, each a known
     fragment given once (422 otherwise), checked even when ``classify`` is
     false so a malformed request never depends on the cache.
+    ``restrictionsRequested=true`` asks for the profile-independent
+    ingredient extraction too (ALG-03, D26 C2); the app sends it only when
+    true.
     """
     if _ID_PATTERNS[source].fullmatch(platform_id) is None:
         raise _query_error(("path", "platform_id"), "not a platform id for this source")
-    options = _options(net_carb_limit_grams, constraints or [])
+    options = _options(net_carb_limit_grams, constraints or [], restrictions_requested)
 
     upstream = await _fetch(request, source, platform_id)
     response.headers["X-KetoClub-Cache"] = "hit" if upstream.from_cache else "miss"

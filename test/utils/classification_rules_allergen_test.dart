@@ -196,11 +196,14 @@ void main() {
           concern.restrictionId,
       ];
 
-      // Assert: taxonomy order, one each.
+      // Assert: taxonomy order, one each. A peanut is also a legume, and
+      // the peanut and egg make the dish not vegan.
       expect(ids, <RestrictionId>[
         RestrictionId.peanuts,
         RestrictionId.eggs,
         RestrictionId.sesame,
+        RestrictionId.legumes,
+        RestrictionId.vegan,
       ]);
     });
   });
@@ -261,7 +264,15 @@ void main() {
       // Assert
       expect(sources.first, (RestrictionId.sesame, ConcernSource.hidden));
       expect(sources, contains((RestrictionId.sesame, ConcernSource.name)));
-      expect(sources.last, (RestrictionId.eggs, ConcernSource.option));
+      // The option's egg comes last; it also reads as not vegan.
+      expect(sources, contains((RestrictionId.eggs, ConcernSource.option)));
+      expect(sources.last.$2, ConcernSource.option);
+      expect(
+        sources.indexOf((RestrictionId.eggs, ConcernSource.option)),
+        greaterThan(
+          sources.indexOf((RestrictionId.sesame, ConcernSource.name)),
+        ),
+      );
     });
 
     test('the result is unmodifiable', () {

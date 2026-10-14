@@ -26,6 +26,7 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_analysis_prompt.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
@@ -282,6 +283,21 @@ typedef _BantoSeam = ({
 /// the define shows, and the settings record with an explicitly empty
 /// dietary profile, which must store exactly what a keto-only install
 /// stored before the profile existed.
+/// The options [fromSettings][ClassificationOptions.fromSettings] builds
+/// with a keto-only profile (none, or keto alone), the way the menu
+/// screen builds them (ALG-03, D26 C2).
+ClassificationOptions _ketoOnlyOptions({
+  required bool bantoMode,
+  required bool withKetoEntry,
+}) => ClassificationOptions.fromSettings(
+  const AppSettings().copyWith(
+    profile: withKetoEntry
+        ? DietaryProfile.empty.withEntry(RestrictionId.keto)
+        : DietaryProfile.empty,
+  ),
+  bantoMode: bantoMode,
+);
+
 final List<_BantoSeam> _bantoSeams = <_BantoSeam>[
   (
     fixture: 'document_title.txt',
@@ -296,6 +312,63 @@ final List<_BantoSeam> _bantoSeams = <_BantoSeam>[
       const AppSettings().copyWith(profile: DietaryProfile.empty).toJson(),
     ),
   ),
+  // ALG-03 (#345): a keto-only profile — empty, or keto alone — asks for
+  // no extraction, so the prompt, both schemas and the cache-key snapshot
+  // the menu screen builds through fromSettings are today's.
+  for (final withKetoEntry in <bool>[false, true]) ...<_BantoSeam>[
+    (
+      fixture: 'system_prompt_defaults.txt',
+      build: ({required bool bantoMode}) => MenuAnalysisPrompt.systemPrompt(
+        options: _ketoOnlyOptions(
+          bantoMode: bantoMode,
+          withKetoEntry: withKetoEntry,
+        ),
+      ),
+    ),
+    (
+      fixture: 'vision_system_prompt_defaults_2_pages.txt',
+      build: ({required bool bantoMode}) =>
+          MenuAnalysisPrompt.visionSystemPrompt(
+            pageCount: 2,
+            options: _ketoOnlyOptions(
+              bantoMode: bantoMode,
+              withKetoEntry: withKetoEntry,
+            ),
+          ),
+    ),
+    (
+      fixture: 'response_schema.json',
+      build: ({required bool bantoMode}) => _canonicalJson(
+        MenuAnalysisPrompt.responseSchema(
+          extract: _ketoOnlyOptions(
+            bantoMode: bantoMode,
+            withKetoEntry: withKetoEntry,
+          ).restrictionsRequested,
+        ),
+      ),
+    ),
+    (
+      fixture: 'vision_response_schema.json',
+      build: ({required bool bantoMode}) => _canonicalJson(
+        MenuAnalysisPrompt.visionResponseSchema(
+          extract: _ketoOnlyOptions(
+            bantoMode: bantoMode,
+            withKetoEntry: withKetoEntry,
+          ).restrictionsRequested,
+        ),
+      ),
+    ),
+    (
+      fixture: 'options_snapshot_defaults.json',
+      build: ({required bool bantoMode}) => _canonicalJson(
+        _ketoOnlyOptions(
+          bantoMode: bantoMode,
+          withKetoEntry: withKetoEntry,
+        ).snapshot.toJson(),
+      ),
+    ),
+  ],
+
   // The four-state menu screen (ALG-05, issue #347): with a keto-only
   // profile its pill, tile and share words are today's, verbatim.
   (
@@ -556,6 +629,15 @@ void main() {
       expect(_bantoSeams.map((seam) => seam.fixture), <String>[
         'document_title.txt',
         'app_settings_defaults.json',
+        // ALG-03: an empty profile, then keto alone.
+        for (var i = 0; i < 2; i++) ...<String>[
+          'system_prompt_defaults.txt',
+          'vision_system_prompt_defaults_2_pages.txt',
+          'response_schema.json',
+          'vision_response_schema.json',
+          'options_snapshot_defaults.json',
+        ],
+
         'copy_en.json',
         'copy_he.json',
         'share_text_english.txt',

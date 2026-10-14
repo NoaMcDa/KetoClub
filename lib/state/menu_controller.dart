@@ -180,9 +180,9 @@ final class MenuController extends ChangeNotifier {
   /// none has been; see [lastUpload].
   Future<void> _lastUpload = Future<void>.value();
 
-  /// The dietary profile the settings held at [open], when options were
-  /// last built ([_optionsFrom]) or at the last [refreshProfile]; empty
-  /// until then. It never leaves the device (D26 C1).
+  /// The dietary profile the settings held at [open], [refreshProfile] or
+  /// when options were last built ([_optionsFrom]); empty until then. Read
+  /// by [profile] and [evaluatedRows].
   DietaryProfile _profile = DietaryProfile.empty;
 
   /// Whether the screen that last called [open] shows Banto surfaces
