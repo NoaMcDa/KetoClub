@@ -638,5 +638,53 @@ void main() {
         'AllergenHit(sesame, tahini, suspected, 3-9, guarded)',
       );
     });
+
+    test('hidden is part of equality, defaults to false and is marked', () {
+      // Arrange
+      const hidden = AllergenHit(
+        id: RestrictionId.sesame,
+        term: 'hummus',
+        certainty: TriggerCertainty.likely,
+        start: 3,
+        end: 9,
+        hidden: true,
+      );
+
+      // Assert
+      expect(hit.hidden, isFalse);
+      expect(
+        hidden,
+        isNot(
+          const AllergenHit(
+            id: RestrictionId.sesame,
+            term: 'hummus',
+            certainty: TriggerCertainty.likely,
+            start: 3,
+            end: 9,
+          ),
+        ),
+      );
+      expect(
+        hidden.toString(),
+        'AllergenHit(sesame, hummus, likely, 3-9, hidden)',
+      );
+    });
+
+    test('the matcher marks a hidden-list trigger hidden, guarded or not '
+        '(ALG-04b)', () {
+      // Act
+      final direct = AllergenMatcher.find('tahini');
+      final hidden = AllergenMatcher.find('hummus');
+      final guarded = AllergenMatcher.find('sesame-free');
+
+      // Assert
+      expect(direct.single.hidden, isFalse);
+      expect(
+        hidden.where((h) => h.id == RestrictionId.sesame).single.hidden,
+        isTrue,
+      );
+      expect(guarded.single.hidden, isFalse);
+      expect(guarded.single.guarded, isTrue);
+    });
   });
 }

@@ -5,6 +5,10 @@ The Python twin of ``lib/utils/classification_rules.dart``. :func:`match`,
 three ``mentions_*`` checks run the bilingual vocabulary
 (:mod:`app.keto.vocabulary`) over normalised dish text exactly as the Dart
 ``ClassificationRules`` does; the golden ``rules.json`` pins every result.
+:func:`allergen_findings` and :func:`allergen_concerns` (Banto; ALG-04b) run
+the allergen matcher (:mod:`app.keto.allergens`) over a dish's name,
+description and non-removal option values; the golden
+``allergen_concerns.json`` pins them.
 
 Behaviour the port keeps from Dart:
 
@@ -40,10 +44,11 @@ import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from functools import cache
-from typing import Final, Literal
+from typing import Final, Literal, cast
 
-from app.keto.dart_text import DART_WHITESPACE
-from app.keto.models import Dish
+from app.keto.allergens import allergens, find, match_text
+from app.keto.dart_text import DART_WHITESPACE, utf16_len, utf16_slice
+from app.keto.models import Certainty, Concern, ConcernSource, Dish, RestrictionIdName
 from app.keto.normaliser import (
     contains_hebrew,
     dish_core_text,
@@ -470,3 +475,89 @@ def mentions_plant(raw_text: str) -> bool:
     return _any_unguarded_match(
         normalise(raw_text), [(en, _NO_GUARDS), (he, _NO_GUARDS)]
     )
+
+
+# --- the allergen pass (Banto; ALG-04b) ------------------------------------------
+
+_MAQAF: Final = "־"
+"""The Hebrew maqaf; the removal check reads it as a space, as the matcher
+does."""
+
+_CERTAINTY_RANK: Final[Mapping[str, int]] = {"stated": 0, "likely": 1, "suspected": 2}
+"""Dart ``Certainty.index``: lower is surer."""
+
+
+def _raw_slice(raw: str, start: int, end: int) -> str:
+    """Dart ``_rawSlice``: the slice of ``raw`` that produced the UTF-16 span
+    ``start``-``end`` of :func:`app.keto.allergens.match_text` of ``raw``.
+
+    The match text of a prefix of ``raw`` is a prefix of the whole one and
+    never shrinks as the prefix grows, so each end is a binary search for
+    the shortest raw prefix (in code points, where Dart searches code units
+    and steps back over a split surrogate pair) whose match text reaches it.
+    """
+
+    def shortest_prefix_reaching(length: int) -> int:
+        low, high = 0, len(raw)
+        while low < high:
+            mid = (low + high) // 2
+            if utf16_len(match_text(raw[:mid])) >= length:
+                high = mid
+            else:
+                low = mid + 1
+        return low
+
+    raw_start = shortest_prefix_reaching(start + 1) - 1
+    raw_end = shortest_prefix_reaching(end)
+    if raw_start < 0 or raw_end <= raw_start:
+        return utf16_slice(match_text(raw), start, end)
+    return raw[raw_start:raw_end]
+
+
+def _findings_in(raw: str, source: ConcernSource) -> list[Concern]:
+    """Dart ``_findingsIn``: one concern per allergen hit in ``raw``."""
+    return [
+        Concern(
+            restriction_id=cast(RestrictionIdName, hit.id),
+            source="hidden" if hit.hidden else source,
+            certainty=cast(Certainty, hit.certainty),
+            tier="inferred" if hit.hidden or hit.guarded else "stated",
+            matched_text=_raw_slice(raw, hit.start, hit.end),
+        )
+        for hit in find(raw)
+    ]
+
+
+def allergen_findings(dish: Dish) -> list[Concern]:
+    """``ClassificationRules.allergenFindings``: one concern per allergen hit
+    in the dish's name, then description, then each non-removal option value
+    (a maqaf read as a space for the removal check), each part matched on
+    its own; option group names are not read."""
+    findings = [
+        *_findings_in(dish.name, "name"),
+        *_findings_in(dish.description, "description"),
+    ]
+    for option in dish.options:
+        for value in option.values:
+            if is_removal_option_value(value.replace(_MAQAF, " ")):
+                continue
+            findings.extend(_findings_in(value, "option"))
+    return findings
+
+
+def allergen_concerns(dish: Dish) -> list[Concern]:
+    """``ClassificationRules.allergenConcerns``: :func:`allergen_findings`
+    reduced to one concern per restriction, in taxonomy order, keeping the
+    surest finding (stated > likely > suspected), the earliest at a tie."""
+    best: dict[str, Concern] = {}
+    for finding in allergen_findings(dish):
+        kept = best.get(finding.restriction_id)
+        if (
+            kept is None
+            or _CERTAINTY_RANK[finding.certainty] < _CERTAINTY_RANK[kept.certainty]
+        ):
+            best[finding.restriction_id] = finding
+    order = {
+        restriction.id: index for index, restriction in enumerate(allergens().taxonomy)
+    }
+    return [best[rid] for rid in sorted(best, key=order.__getitem__)]

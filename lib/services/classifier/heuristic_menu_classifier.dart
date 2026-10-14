@@ -10,6 +10,7 @@ library;
 
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
@@ -24,7 +25,10 @@ import 'package:ketoclub/utils/text_normaliser.dart';
 /// steer a verdict here: [ClassificationOptions.seedOilFree],
 /// [ClassificationOptions.dairyFree] and
 /// [ClassificationOptions.carnivoreOnly] each switch on one extra rule
-/// (see [_dietarySentences]). Consent is not a rules concern. Nor is
+/// (see [_dietarySentences]), and
+/// [ClassificationOptions.restrictionsRequested] attaches
+/// [ClassificationRules.allergenConcerns] to every dish (Banto, ALG-04b)
+/// without touching its verdict. Consent is not a rules concern. Nor is
 /// [ClassificationOptions.netCarbLimitGrams] (issue #57): the vocabulary is
 /// keyword-based and never estimates grams, so there is no numeric green
 /// threshold here for the limit to move; it reaches the LLM's prompt and
@@ -91,6 +95,12 @@ final class HeuristicMenuClassifier implements MenuClassifier {
     // read by an English-UI user still gets a Hebrew script.
     final isHebrew = TextNormaliser.containsHebrew(text);
     final match = ClassificationRules.matchDish(dish);
+    // Banto (ALG-04b): every restriction's triggers, profile-independent
+    // (D26 C1), only when the call asked for them, so a keto-only analysis
+    // is byte-identical to one made before the allergen pass existed.
+    final concerns = options.restrictionsRequested
+        ? ClassificationRules.allergenConcerns(dish)
+        : const <Concern>[];
 
     if (match.isNonKeto) {
       final template = isHebrew ? redWhyHe : redWhyEn;
@@ -99,6 +109,7 @@ final class HeuristicMenuClassifier implements MenuClassifier {
         name: dish.name,
         verdict: DishVerdict.nonKeto,
         why: template.replaceAll('{base}', match.baseLabel ?? ''),
+        concerns: concerns,
       );
     }
 
@@ -116,6 +127,7 @@ final class HeuristicMenuClassifier implements MenuClassifier {
         verdict: DishVerdict.modifiable,
         why: why,
         modification: _joinInstructions([...match.instructions, ...dietary]),
+        concerns: concerns,
       );
     }
 
@@ -124,6 +136,7 @@ final class HeuristicMenuClassifier implements MenuClassifier {
       name: dish.name,
       verdict: DishVerdict.orderAsIs,
       why: isHebrew ? greenWhyHe : greenWhyEn,
+      concerns: concerns,
     );
   }
 

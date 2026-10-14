@@ -5,6 +5,7 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/utils/classification_rules.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 import '../../fakes/fake_clock.dart';
@@ -843,5 +844,52 @@ void main() {
         );
       },
     );
+  });
+
+  group('HeuristicMenuClassifier — allergen concerns (Banto, ALG-04b)', () {
+    /// A menu whose three dishes are green, yellow and red for keto and
+    /// each names an allergen.
+    final menu = _menuOf(<Dish>[
+      _dishNamed('green', 'Egg omelette with almonds'),
+      _dishNamed('yellow', 'Steak with fries and tahini'),
+      _dishNamed('red', 'Pasta with peanuts'),
+    ]);
+
+    test('attaches no concern unless restrictions are requested', () async {
+      // Act
+      final result = await _classify(menu);
+
+      // Assert
+      for (final dish in result.dishes) {
+        expect(dish.concerns, isEmpty);
+        expect(dish.toJson().containsKey('concerns'), isFalse);
+      }
+    });
+
+    test('attaches the rules concerns to every dish when requested, '
+        'verdicts unchanged', () async {
+      // Arrange
+      final classifier = HeuristicMenuClassifier(
+        clock: FakeClock(DateTime.utc(2026)),
+      );
+      final plain = await _classify(menu);
+
+      // Act
+      final result = await classifier.classify(
+        menu,
+        options: const ClassificationOptions(restrictionsRequested: true),
+      ) as MenuAnalysed;
+
+      // Assert
+      for (final (index, dish) in result.dishes.indexed) {
+        final source = menu.allDishes.elementAt(index);
+        expect(dish.concerns, ClassificationRules.allergenConcerns(source));
+        expect(dish.concerns, isNotEmpty);
+        expect(dish.verdict, plain.dishes[index].verdict);
+        expect(dish.why, plain.dishes[index].why);
+        expect(dish.modification, plain.dishes[index].modification);
+      }
+      expect(result.options?.restrictionsRequested, isTrue);
+    });
   });
 }

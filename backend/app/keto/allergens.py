@@ -162,7 +162,9 @@ class Allergens:
 class AllergenHit:
     """Dart ``AllergenHit``. ``start``/``end`` are UTF-16 code units of the
     text the matcher read (:func:`match_text` or :func:`dish_match_text`);
-    ``end`` is exclusive. ``guarded`` hits are always ``suspected``."""
+    ``end`` is exclusive. ``guarded`` hits are always ``suspected``.
+    ``hidden`` is set when the trigger came from a hidden list (ALG-04b); it
+    is not in ``allergens.json``, and ``allergen_concerns.json`` pins it."""
 
     id: str
     term: str
@@ -170,6 +172,7 @@ class AllergenHit:
     start: int
     end: int
     guarded: bool = False
+    hidden: bool = False
 
 
 # --- parsing --------------------------------------------------------------------
@@ -286,6 +289,7 @@ class _CompiledTrigger:
     before: tuple[_Phrase, ...]
     after: tuple[_Phrase, ...]
     hebrew: bool
+    hidden: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -312,6 +316,7 @@ def _compile_trigger(
     *,
     hebrew: bool,
     no_prefix: frozenset[str],
+    hidden: bool = False,
 ) -> _CompiledTrigger | None:
     """``term`` compiled with its guards (the restriction's, then the
     term's own), or None when it normalises to nothing."""
@@ -331,7 +336,7 @@ def _compile_trigger(
     else:
         before = _phrases((*glob.before_en, *own.before_en))
         after = _phrases((*glob.after_en, *own.after_en))
-    return _CompiledTrigger(term, pattern, certainty, before, after, hebrew)
+    return _CompiledTrigger(term, pattern, certainty, before, after, hebrew, hidden)
 
 
 def _compile(
@@ -354,13 +359,23 @@ def _compile(
             ),
             *(
                 _compile_trigger(
-                    t.term, t.certainty, entry, hebrew=False, no_prefix=no_prefix
+                    t.term,
+                    t.certainty,
+                    entry,
+                    hebrew=False,
+                    no_prefix=no_prefix,
+                    hidden=True,
                 )
                 for t in entry.hidden_en
             ),
             *(
                 _compile_trigger(
-                    t.term, t.certainty, entry, hebrew=True, no_prefix=no_prefix
+                    t.term,
+                    t.certainty,
+                    entry,
+                    hebrew=True,
+                    no_prefix=no_prefix,
+                    hidden=True,
                 )
                 for t in entry.hidden_he
             ),
@@ -458,7 +473,7 @@ def _find_in(
 ) -> list[AllergenHit]:
     if not haystack:
         return []
-    found: list[tuple[int, int, int, str, str, str, int, bool]] = []
+    found: list[tuple[int, int, int, str, str, str, int, bool, bool]] = []
     for restriction in compiled:
         for trigger in restriction.triggers:
             for match in trigger.pattern.finditer(haystack):
@@ -475,6 +490,7 @@ def _find_in(
                         "suspected" if guarded else trigger.certainty,
                         match.end(),
                         guarded,
+                        trigger.hidden,
                     )
                 )
     found.sort(key=lambda item: (item[0], item[1], item[2]))
@@ -486,8 +502,9 @@ def _find_in(
             start=utf16_len(haystack[:start]),
             end=utf16_len(haystack[:end]),
             guarded=guarded,
+            hidden=hidden,
         )
-        for start, _, _, hit_id, term, certainty, end, guarded in found
+        for start, _, _, hit_id, term, certainty, end, guarded, hidden in found
     ]
 
 

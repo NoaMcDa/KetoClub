@@ -75,6 +75,7 @@ const List<String> goldenFileNames = <String>[
   'score.json',
   'allergens.json',
   'kitchen_signals.json',
+  'allergen_concerns.json',
 ];
 
 /// [document] in the corpus's canonical form: two-space indentation, every
@@ -115,6 +116,7 @@ Future<Map<String, Object?>> buildGoldens() async {
     'score.json': await _scores(inputs),
     'allergens.json': _allergens(),
     'kitchen_signals.json': _kitchenSignals(inputs),
+    'allergen_concerns.json': await _allergenConcerns(),
   };
 }
 
@@ -1462,7 +1464,9 @@ Map<String, Object?> _allergenVocabulary(
     id.name: _allergenEntry(entry),
 };
 
-/// An [AllergenHit] with every field.
+/// An [AllergenHit] with every field but [AllergenHit.hidden], which
+/// `allergen_concerns.json` pins as a concern's `hidden` source (ALG-04b),
+/// so this file did not change when the field was added.
 Map<String, Object?> _allergenHit(AllergenHit hit) => <String, Object?>{
   'id': hit.id.name,
   'term': hit.term,
@@ -1764,5 +1768,86 @@ Map<String, Object?> _kitchenSignals(_Inputs inputs) {
           ],
         },
     ],
+  };
+}
+
+// ---------------------------------------------------------------------------
+// allergen_concerns.json (Banto; ALG-04b, related to #346)
+// ---------------------------------------------------------------------------
+
+/// The dishes of one labelled corpus menu, `test/fixtures/allergens/menus/`
+/// [file], as [allergenDish] builds them (the labels are not read).
+List<Dish> _allergenCorpusDishes(String file) {
+  final raw = _readJson('test/fixtures/allergens/menus/$file');
+  return <Dish>[
+    for (final dish
+        in (raw['dishes']! as List<Object?>).cast<Map<String, Object?>>())
+      allergenDish(
+        dish['name']! as String,
+        description: dish['description']! as String,
+        options: <DishOption>[
+          for (final option
+              in (dish['options']! as List<Object?>)
+                  .cast<Map<String, Object?>>())
+            DishOption(
+              name: option['name']! as String,
+              values: (option['values']! as List<Object?>).cast<String>(),
+            ),
+        ],
+      ),
+  ];
+}
+
+/// [ClassificationRules.allergenFindings] and
+/// [ClassificationRules.allergenConcerns] over the hand-written allergen
+/// dishes and a sample of the labelled corpus (`dishes`), and the
+/// heuristic classifier over the three golden menus with
+/// `restrictionsRequested` on (`heuristic`), which attaches the concerns.
+/// No keto golden carries `restrictionsRequested`, so none changes.
+Future<Map<String, Object?>> _allergenConcerns() async {
+  final named = <(String, Dish)>[
+    for (final (index, dish) in allergenMatcherDishes.indexed)
+      ('matcher/$index', dish),
+    for (final (index, dish) in allergenConcernDishes.indexed)
+      ('concern/$index', dish),
+    for (final file in allergenConcernMenuFiles)
+      for (final (index, dish) in _allergenCorpusDishes(file).indexed)
+        ('${file.replaceAll('.json', '')}/$index', dish),
+  ];
+  const classifier = HeuristicMenuClassifier(clock: _GoldenClock());
+  const options = ClassificationOptions(restrictionsRequested: true);
+  final menus = <String, Menu>{
+    'english': goldenEnglishMenu,
+    'hebrew': goldenHebrewMenu,
+    'mixed': goldenMixedMenu,
+  };
+  final heuristic = <Object?>[];
+  for (final MapEntry(key: name, value: menu) in menus.entries) {
+    final analysis =
+        await classifier.classify(menu, options: options) as MenuAnalysed;
+    heuristic.add(<String, Object?>{
+      'name': name,
+      'menu': menu.toJson(),
+      'options': options.snapshot.toJson(),
+      'analysis': analysis.toJson(),
+    });
+  }
+  return <String, Object?>{
+    'dishes': <Object?>[
+      for (final (name, dish) in named)
+        <String, Object?>{
+          'name': name,
+          'dish': dish.toJson(),
+          'findings': <Object?>[
+            for (final concern in ClassificationRules.allergenFindings(dish))
+              concern.toJson(),
+          ],
+          'concerns': <Object?>[
+            for (final concern in ClassificationRules.allergenConcerns(dish))
+              concern.toJson(),
+          ],
+        },
+    ],
+    'heuristic': heuristic,
   };
 }

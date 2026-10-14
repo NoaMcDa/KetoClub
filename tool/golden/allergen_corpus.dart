@@ -302,3 +302,48 @@ const Map<RestrictionId, RestrictionVocabulary> allergenFixtureVocabulary =
         sources: <String>['11 §16', '12 §1.3'],
       ),
     };
+
+/// The labelled corpus menus (`test/fixtures/allergens/menus/`) whose
+/// every dish `allergen_concerns.json` runs through
+/// `ClassificationRules.allergenConcerns` (ALG-04b): a sample across
+/// English, Hebrew and mixed menus, hidden sources and options.
+const List<String> allergenConcernMenuFiles = <String>[
+  'asian_takeaway_soy_peanut.json',
+  'golden_mixed.json',
+  'il_cafe_pastries.json',
+  'il_hummus_falafel.json',
+  'il_sushi_bar.json',
+  'us_diner_shared_fryer.json',
+];
+
+/// Hand-written dishes for `allergen_concerns.json` (ALG-04b): the
+/// matched text kept as printed (case, points, a prefix letter, a quote
+/// mark, a maqaf, a character outside the BMP before the term), a hidden
+/// trigger in an option, a guarded and a stated finding of one
+/// restriction in different parts, a removal value with a maqaf, and a
+/// dish with nothing in it.
+final List<Dish> allergenConcernDishes = <Dish>[
+  allergenDish(
+    'TAHINI Bowl',
+    description: 'Sesame-free dressing, with peanuts',
+    options: const <DishOption>[
+      DishOption(name: 'Extras', values: <String>['Soy sauce', 'No egg']),
+    ],
+  ),
+  allergenDish(
+    'סָלָט בַּטְּחִינָה',
+    description: 'עם חמאת־בוטנים',
+    options: const <DishOption>[
+      DishOption(name: 'שינויים', values: <String>['ללא־שומשום', 'ביצה']),
+    ],
+  ),
+  allergenDish('🥜 Peanut "satay" skewers', description: "Chef's milk-free"),
+  allergenDish(
+    'Grilled fish',
+    description: 'Lemon and olive oil',
+    options: const <DishOption>[
+      DishOption(name: 'Side', values: <String>['Salad', 'Bread']),
+    ],
+  ),
+  allergenDish('Water'),
+];

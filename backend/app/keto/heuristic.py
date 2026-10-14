@@ -19,6 +19,10 @@ whole :class:`~app.keto.models.MenuAnalysed` it returns.
   ``dietaryConstraints``") and run in the fixed order seed-oil, dairy,
   carnivore. ``netCarbLimitGrams`` changes nothing here: the vocabulary
   never estimates grams.
+* **Allergen concerns** (Banto; ALG-04b): when the snapshot's
+  ``restrictionsRequested`` is true, every dish carries
+  :func:`app.keto.rules.allergen_concerns`, whatever its verdict; otherwise
+  none, so a keto analysis is byte-identical.
 * The engine is ``rules`` with reason ``notConfigured`` (the router
   re-stamps the real reason), ``unclassified`` is always empty, the options
   snapshot is recorded as given, and ``schemaVersion`` keeps its default.
@@ -37,6 +41,7 @@ from app.keto.models import (
 )
 from app.keto.normaliser import contains_hebrew, dish_rules_text
 from app.keto.rules import (
+    allergen_concerns,
     match_dish,
     mentions_dairy,
     mentions_plant,
@@ -67,6 +72,9 @@ def _analyse(dish: Dish, options: AnalysisOptionsSnapshot) -> AnalysedDish:
     text = dish_rules_text(dish)
     is_hebrew = contains_hebrew(text)
     found = match_dish(dish)
+    # Banto (ALG-04b): attached only when asked for, so a keto-only analysis
+    # serialises exactly as before (``concerns`` is omitted when empty).
+    concerns = allergen_concerns(dish) if options.restrictions_requested else []
 
     if found.is_non_keto:
         template = templates.red_why_he if is_hebrew else templates.red_why_en
@@ -75,6 +83,7 @@ def _analyse(dish: Dish, options: AnalysisOptionsSnapshot) -> AnalysedDish:
             name=dish.name,
             verdict="nonKeto",
             why=template.replace("{base}", found.base_label or ""),
+            concerns=concerns,
         )
 
     dietary = _dietary_sentences(text, options, is_hebrew=is_hebrew)
@@ -93,6 +102,7 @@ def _analyse(dish: Dish, options: AnalysisOptionsSnapshot) -> AnalysedDish:
             verdict="modifiable",
             why=why,
             modification="\n".join([*found.instructions, *dietary]),
+            concerns=concerns,
         )
 
     return AnalysedDish(
@@ -100,6 +110,7 @@ def _analyse(dish: Dish, options: AnalysisOptionsSnapshot) -> AnalysedDish:
         name=dish.name,
         verdict="orderAsIs",
         why=templates.green_why_he if is_hebrew else templates.green_why_en,
+        concerns=concerns,
     )
 
 
