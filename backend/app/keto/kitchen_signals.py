@@ -449,7 +449,9 @@ class _Flags:
 
 
 def _flags_of(haystack: str, hits: Sequence[AllergenHit]) -> _Flags:
-    ids = {hit.id for hit in hits}
+    # A guarded hit ("almond-free") is no evidence that the kitchen handles
+    # the allergen, so only unguarded hits count (ALG-04a).
+    ids = {hit.id for hit in hits if not hit.guarded}
     return _Flags(
         fried=_any(haystack, _fried()),
         wok=_any(haystack, _wok()),

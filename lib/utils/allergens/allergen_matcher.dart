@@ -22,7 +22,8 @@
 /// - **The maqaf joins words.** The Hebrew hyphen U+05BE becomes a space
 ///   before the text is normalised ("חמאת־בוטנים" reads as two words),
 ///   where [TextNormaliser.normalise] deletes it as a Hebrew point; see
-///   [AllergenMatcher.matchText].
+///   [AllergenMatcher.matchText]. Terms and guard phrases are read the same
+///   way, so a term written with a maqaf ("סויה־דבש") still matches.
 library;
 
 import 'package:flutter/foundation.dart';
@@ -135,7 +136,7 @@ typedef _CompiledRestriction = ({
 /// to nothing is dropped (it would sit beside every trigger).
 List<_Phrase> _phrases(Iterable<String> phrases) => <_Phrase>[
   for (final phrase in phrases)
-    if (TextNormaliser.normalise(phrase) case final normalised
+    if (AllergenMatcher.matchText(phrase) case final normalised
         when normalised.isNotEmpty)
       normalised.split(' '),
 ];
@@ -173,7 +174,7 @@ List<_CompiledRestriction> _compile(
     final triggers = <_CompiledTrigger>[];
 
     void latin(String term, TriggerCertainty certainty, {bool hidden = false}) {
-      final normalised = TextNormaliser.normalise(term);
+      final normalised = AllergenMatcher.matchText(term);
       if (normalised.isEmpty) return;
       triggers.add((
         term: term,
@@ -190,7 +191,7 @@ List<_CompiledRestriction> _compile(
       TriggerCertainty certainty, {
       bool hidden = false,
     }) {
-      final normalised = TextNormaliser.normalise(term);
+      final normalised = AllergenMatcher.matchText(term);
       if (normalised.isEmpty) return;
       triggers.add((
         term: term,
@@ -295,9 +296,21 @@ bool _isAdjacentGuarded(
   return false;
 }
 
-/// [allergenVocabulary], compiled on first use (a top-level `final`
-/// initialises lazily).
-final List<_CompiledRestriction> _registry = _compile(allergenVocabulary);
+/// Every vocabulary map compiled so far, keyed on the map instance: a
+/// vocabulary is compiled once, however many texts it reads (thousands
+/// of patterns per registry). Keyed on identity, so an equal but distinct
+/// map compiles on its own; the vocabularies are `const`, so a map never
+/// changes after it is compiled.
+final Expando<List<_CompiledRestriction>> _compiledCache =
+    Expando<List<_CompiledRestriction>>('compiled allergen vocabulary');
+
+/// [vocabulary], compiled on first use and cached ([_compiledCache]).
+List<_CompiledRestriction> _compiled(
+  Map<RestrictionId, RestrictionVocabulary> vocabulary,
+) => _compiledCache[vocabulary] ??= _compile(vocabulary);
+
+/// [allergenVocabulary], compiled on first use.
+List<_CompiledRestriction> get _registry => _compiled(allergenVocabulary);
 
 /// Every hit of [compiled] in the normalised [haystack], guarded or not,
 /// ordered
@@ -406,17 +419,17 @@ abstract final class AllergenMatcher {
       _findIn(dishMatchText(dish), _registry);
 
   /// [find] over [vocabulary] instead of [allergenVocabulary], compiled
-  /// on every call: for the tests and the golden exporter, which pin the
-  /// matcher's behaviour with a vocabulary of their own rather than the
-  /// group files. Production code calls [find].
+  /// once per map instance: for the tests and the golden exporter, which
+  /// pin the matcher's behaviour with a vocabulary of their own rather than
+  /// the group files. Production code calls [find].
   static List<AllergenHit> findWith(
     String rawText,
     Map<RestrictionId, RestrictionVocabulary> vocabulary,
-  ) => _findIn(matchText(rawText), _compile(vocabulary));
+  ) => _findIn(matchText(rawText), _compiled(vocabulary));
 
   /// [findInDish] over [vocabulary]; see [findWith].
   static List<AllergenHit> findInDishWith(
     Dish dish,
     Map<RestrictionId, RestrictionVocabulary> vocabulary,
-  ) => _findIn(dishMatchText(dish), _compile(vocabulary));
+  ) => _findIn(dishMatchText(dish), _compiled(vocabulary));
 }

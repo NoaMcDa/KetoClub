@@ -11,6 +11,7 @@ library;
 import 'dart:convert';
 
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
@@ -24,6 +25,19 @@ final RegExp _fencedJson = RegExp(
   r'^```(?:json)?\s*\n?([\s\S]*?)\n?```$',
   caseSensitive: false,
 );
+
+/// The most ingredients kept for one dish (ALG-03); later entries are
+/// dropped. A sanity bound against a runaway reply, not a recipe size.
+const int maxIngredientsPerDish = 40;
+
+/// The longest ingredient name kept, in UTF-16 code units (ALG-03). A
+/// longer name is dropped, as an over-length hidden-carb flag is: it is
+/// not an ingredient name.
+const int maxIngredientNameLength = 100;
+
+/// The longest transcribed description a scan keeps, in UTF-16 code
+/// units (ALG-03). Longer text is truncated, never rejected, as `why` is.
+const int maxTranscribedDescriptionLength = 1000;
 
 /// Parses the model's reply against the menu it was computed from
 /// (architecture.md §9.4).
@@ -86,12 +100,21 @@ abstract final class MenuResponseParser {
   ///    something unclassified is a placed (empty) [MenuAnalysed] —
   ///    "the model saw the dishes and could place none" is a result to
   ///    show, not a failure to retry.
+  ///
+  /// With [extract] (ALG-03; the caller passes
+  /// `ClassificationOptions.restrictionsRequested`) each placed dish also
+  /// carries the ingredients [_parseIngredients] keeps from its
+  /// `ingredients`. Without it `ingredients` is never read, so a keto
+  /// analysis is today's whatever the model sent. A model-sent `concerns`
+  /// is never read either way: concerns are computed on the device (D26
+  /// C1). See [extractionMissing] for a dish whose extraction is missing.
   static MenuAnalysis parse(
     String body, {
     required Menu source,
     required DateTime analysedAt,
     required AnalysisEngine engine,
     int netCarbLimitGrams = defaultNetCarbLimitGrams,
+    bool extract = false,
   }) {
     final decoded = _decode(body);
     if (decoded == null) return _badResponse();
@@ -109,6 +132,7 @@ abstract final class MenuResponseParser {
         rawDish,
         source: source,
         netCarbLimitGrams: netCarbLimitGrams,
+        extract: extract,
         placedSourceIds: placedSourceIds,
         dishes: dishes,
         unclassified: unclassified,
@@ -185,6 +209,15 @@ abstract final class MenuResponseParser {
   /// of range, or any value when [pageCount] is null — leaves the page
   /// null. A bad page is never a rejection: the dish keeps its verdict.
   ///
+  /// With [extract] (ALG-03) each transcribed [Dish.description] is the
+  /// element's `description` when it is a string — trimmed, and cut at
+  /// [maxTranscribedDescriptionLength] like `why` — and empty otherwise,
+  /// and each placed dish carries its ingredients as [parse] reads them,
+  /// against that transcription. The description is dish text, so it
+  /// enters the menu's fingerprint: an extracting scan of the same pages
+  /// is a different entry from a keto one. Without [extract] neither key
+  /// is read and the transcription is today's.
+  ///
   /// Static, pure, and never throws, like [parse].
   static ScannedMenuResult parseScanned(
     String body, {
@@ -192,6 +225,7 @@ abstract final class MenuResponseParser {
     required AnalysisEngine engine,
     int netCarbLimitGrams = defaultNetCarbLimitGrams,
     int? pageCount,
+    bool extract = false,
   }) {
     final decoded = _decode(body);
     if (decoded == null) return _scannedBadResponse();
@@ -215,10 +249,13 @@ abstract final class MenuResponseParser {
       // text is then its own key, so two such names still dedupe exactly.
       if (!seenNames.add(normalised.isEmpty ? name : normalised)) continue;
 
+      final rawDescription = rawDish['description'];
       final dish = Dish(
         id: '$scannedDishIdPrefix${transcribed.length + 1}',
         name: name,
-        description: '',
+        description: extract && rawDescription is String
+            ? _truncated(rawDescription.trim(), maxTranscribedDescriptionLength)
+            : '',
         price: 0,
         options: const <DishOption>[],
         page: _page(rawDish['page'], pageCount),
@@ -228,6 +265,7 @@ abstract final class MenuResponseParser {
         rawDish,
         dish,
         netCarbLimitGrams: netCarbLimitGrams,
+        extract: extract,
         dishes: dishes,
         unclassified: unclassified,
       );
@@ -277,6 +315,29 @@ abstract final class MenuResponseParser {
       ),
     );
   }
+
+  /// Whether [analysed], the verdict on [dish] from an analysis made with
+  /// extraction requested ([extract]), is missing its extraction (ALG-03):
+  /// [dish] has a description, so it has text an ingredient list is read
+  /// from, yet no ingredient was kept — the model sent none, or none
+  /// survived [_parseIngredients]. Always false without [extract].
+  ///
+  /// **The mark is computed, never stored**, like a dish's kind (D21).
+  /// Demoting the dish to [MenuAnalysed.unclassified], the way §9.4 marks
+  /// any other per-dish failure, would throw away a valid keto verdict
+  /// over a missing half that keto never asked for. So the verdict stands,
+  /// `ingredients` stays empty, and the rules pass (ALG-04), which reads
+  /// every dish's own text whatever the model sent, is that dish's only
+  /// source of concerns — the epic's "rules-only concerns" for a dish
+  /// whose extraction is missing.
+  static bool extractionMissing(
+    Dish dish,
+    AnalysedDish analysed, {
+    required bool extract,
+  }) =>
+      extract &&
+      analysed.ingredients.isEmpty &&
+      dish.description.trim().isNotEmpty;
 
   /// The 1-based page [raw] names, when it is an integral number from 1
   /// to [pageCount]; null otherwise, and always null when [pageCount] is
@@ -328,6 +389,7 @@ abstract final class MenuResponseParser {
     Object? rawDish, {
     required Menu source,
     required int netCarbLimitGrams,
+    required bool extract,
     required Set<String> placedSourceIds,
     required List<AnalysedDish> dishes,
     required List<String> unclassified,
@@ -353,6 +415,7 @@ abstract final class MenuResponseParser {
       rawDish,
       matched,
       netCarbLimitGrams: netCarbLimitGrams,
+      extract: extract,
       dishes: dishes,
       unclassified: unclassified,
     );
@@ -363,11 +426,14 @@ abstract final class MenuResponseParser {
   /// resolved to [matched]: places it onto [dishes] under [matched]'s own
   /// id and name, or demotes [matched]'s name onto [unclassified]. Shared
   /// verbatim by [parse] and [parseScanned] — only how an element finds
-  /// its dish differs between the two.
+  /// its dish differs between the two. With [extract] the placed dish
+  /// also carries [_parseIngredients] of its `ingredients`, whatever its
+  /// verdict: the extraction is independent of keto (ALG-03).
   static void _judge(
     Map<String, Object?> rawDish,
     Dish matched, {
     required int netCarbLimitGrams,
+    required bool extract,
     required List<AnalysedDish> dishes,
     required List<String> unclassified,
   }) {
@@ -461,8 +527,66 @@ abstract final class MenuResponseParser {
         hiddenCarbs: finalVerdict == DishVerdict.nonKeto
             ? const <HiddenCarb>[]
             : hiddenCarbs,
+        ingredients: extract
+            ? _parseIngredients(rawDish['ingredients'], matched)
+            : const <ExtractedIngredient>[],
       ),
     );
+  }
+
+  /// Parses a reply element's raw `ingredients` array against [dish], the
+  /// dish it was placed on (ALG-03, in the §9.4 spirit). Never throws.
+  ///
+  /// - An entry that is not an object, whose `name` is not a string, is
+  ///   blank after trimming or is over [maxIngredientNameLength] once
+  ///   trimmed, or whose `certainty` is not one of [Certainty]'s names, is
+  ///   dropped.
+  /// - A `role` that is missing or not one of [ComponentRole]'s names
+  ///   reads as [ComponentRole.unknown], as [ExtractedIngredient.tryFromJson]
+  ///   reads it: an ingredient is never lost over its role, since losing
+  ///   one could hide an allergen.
+  /// - **An ingredient the dish text does not support is kept but capped
+  ///   at [Certainty.suspected].** Supported means the normalised name is
+  ///   a substring of the dish's [TextNormaliser.dishRulesText] — its name,
+  ///   description and every option except a removal ("No sesame"). A
+  ///   substring rather than a whole word, so a Hebrew particle
+  ///   ("הטחינה") still supports "טחינה"; a name that normalises to
+  ///   nothing is never supported.
+  /// - Of entries whose names normalise alike, the first is kept (the
+  ///   trimmed name is its own key when it normalises to nothing).
+  /// - At most [maxIngredientsPerDish] are kept.
+  static List<ExtractedIngredient> _parseIngredients(Object? raw, Dish dish) {
+    if (raw is! List<Object?>) return const <ExtractedIngredient>[];
+    final dishText = TextNormaliser.dishRulesText(dish);
+    final seen = <String>{};
+    final result = <ExtractedIngredient>[];
+    for (final entry in raw) {
+      if (result.length >= maxIngredientsPerDish) break;
+      if (entry is! Map<String, Object?>) continue;
+      final rawName = entry['name'];
+      if (rawName is! String) continue;
+      final name = rawName.trim();
+      if (name.isEmpty || name.length > maxIngredientNameLength) continue;
+      final rawCertainty = entry['certainty'];
+      if (rawCertainty is! String) continue;
+      final certainty = Certainty.tryParse(rawCertainty);
+      if (certainty == null) continue;
+      final rawRole = entry['role'];
+      final role =
+          (rawRole is String ? ComponentRole.tryParse(rawRole) : null) ??
+          ComponentRole.unknown;
+      final normalised = TextNormaliser.normalise(name);
+      if (!seen.add(normalised.isEmpty ? name : normalised)) continue;
+      final supported = normalised.isNotEmpty && dishText.contains(normalised);
+      result.add(
+        ExtractedIngredient(
+          name: name,
+          certainty: supported ? certainty : Certainty.suspected,
+          role: role,
+        ),
+      );
+    }
+    return result;
   }
 
   /// Parses the raw `hidden_carbs` array from a reply element (issue

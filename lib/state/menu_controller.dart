@@ -175,8 +175,9 @@ final class MenuController extends ChangeNotifier {
   /// none has been; see [lastUpload].
   Future<void> _lastUpload = Future<void>.value();
 
-  /// The dietary profile the settings held when options were last built
-  /// ([_optionsFrom]); empty until then. Read by [evaluatedRows] only.
+  /// The dietary profile the settings held at [open], [refreshProfile] or
+  /// when options were last built ([_optionsFrom]); empty until then. Read
+  /// by [profile] and [evaluatedRows].
   DietaryProfile _profile = DietaryProfile.empty;
 
   @override
@@ -301,6 +302,21 @@ final class MenuController extends ChangeNotifier {
   /// can show it while the menu loads; refreshed once [open] has recorded
   /// the visit. Null before [open] and for a venue never named.
   String? get historyName => _historyName;
+
+  /// The user's restriction profile as of [open] or the last
+  /// [refreshProfile] (Banto, ALG-02b, issue #344), for the Filters row's
+  /// summary. Read from the settings on this device only.
+  DietaryProfile get profile => _profile;
+
+  /// Re-reads [profile] from the settings, for when the user comes back
+  /// from editing it in Settings. Notifies only when it changed. Never
+  /// throws.
+  Future<void> refreshProfile() async {
+    final next = (await _settings.read()).profile;
+    if (next == _profile) return;
+    _profile = next;
+    notifyListeners();
+  }
 
   /// The city the visit history remembers for the open venue (issue #307),
   /// read and refreshed exactly as [historyName]; null when none is known.
@@ -730,6 +746,7 @@ final class MenuController extends ChangeNotifier {
     _openRef = ref;
     final appSettings = await _settings.read();
     _filter = appSettings.lastFilter ?? appSettings.filter;
+    _profile = appSettings.profile;
     _dishNotes = await _notes.readAll(ref);
     final previous = await _history.read(ref);
     if (previous?.name != _historyName || previous?.city != _historyCity) {

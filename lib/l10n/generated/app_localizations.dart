@@ -2413,6 +2413,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nothing in the menu text points to your restrictions.'**
   String get whyEmptyFlexible;
+
+  /// Banto (ALG-02b): heading of the first-run screen where the user picks their restrictions.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you avoid?'**
+  String get restrictionOnboardingTitle;
+
+  /// No description provided for @restrictionOnboardingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick everything that applies. You can change this any time in Settings. Skip it to use keto only.'**
+  String get restrictionOnboardingBody;
+
+  /// No description provided for @restrictionOnboardingContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get restrictionOnboardingContinue;
+
+  /// No description provided for @restrictionOnboardingSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get restrictionOnboardingSkip;
+
+  /// Banto (ALG-02b): the menu screen's one-line summary of the restrictions the menu is read against. Tapping it opens Settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking for: {names}'**
+  String menuProfileSummary(String names);
 }
 
 class _AppLocalizationsDelegate

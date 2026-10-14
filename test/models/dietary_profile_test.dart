@@ -303,5 +303,26 @@ void main() {
       // Assert
       expect(profile.toString(), 'DietaryProfile(milk (except ghee), fish)');
     });
+
+    // (ids, hasNonKetoEntry)
+    const nonKetoTable = <(List<RestrictionId>, bool)>[
+      (<RestrictionId>[], false),
+      (<RestrictionId>[RestrictionId.keto], false),
+      (<RestrictionId>[RestrictionId.vegan], true),
+      (<RestrictionId>[RestrictionId.keto, RestrictionId.sesame], true),
+    ];
+    for (final (ids, expected) in nonKetoTable) {
+      test('hasNonKetoEntry is $expected for '
+          '${ids.map((id) => id.name).toList()}', () {
+        // Arrange
+        var profile = DietaryProfile.empty;
+        for (final id in ids) {
+          profile = profile.withEntry(id);
+        }
+
+        // Assert
+        expect(profile.hasNonKetoEntry, expected);
+      });
+    }
   });
 }

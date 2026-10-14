@@ -8231,7 +8231,7 @@
     {
       "concerns": [
         {
-          "certainty": "suspected",
+          "certainty": "likely",
           "matchedText": "הפוך",
           "restrictionId": "milk",
           "source": "hidden",
@@ -8239,7 +8239,7 @@
           "waiterQuestion": null
         },
         {
-          "certainty": "suspected",
+          "certainty": "likely",
           "matchedText": "הפוך",
           "restrictionId": "lactose",
           "source": "hidden",
@@ -8274,7 +8274,7 @@
       },
       "findings": [
         {
-          "certainty": "suspected",
+          "certainty": "likely",
           "matchedText": "הפוך",
           "restrictionId": "milk",
           "source": "hidden",
@@ -8282,7 +8282,7 @@
           "waiterQuestion": null
         },
         {
-          "certainty": "suspected",
+          "certainty": "likely",
           "matchedText": "הפוך",
           "restrictionId": "lactose",
           "source": "hidden",

@@ -53,8 +53,9 @@ enum AppThemeMode {
 /// appearance (issue #58), the net-carb limit (issue #57), the
 /// last-used filter (issue #55), the three "Your keto rules"
 /// toggles (issue #56), whether the first-launch AI disclosure
-/// banner has been seen (D16, issue #167), and the restriction profile
-/// (Banto, ALG-02a, issue #344).
+/// banner has been seen (D16, issue #167), the restriction profile
+/// (Banto, ALG-02a, issue #344) and whether the first-run restriction
+/// onboarding has been seen (ALG-02b).
 @immutable
 final class AppSettings {
   /// Creates settings. Every field defaults to the "nothing set yet"
@@ -80,6 +81,7 @@ final class AppSettings {
     this.lastFilter,
     this.disclosureSeen = false,
     this.profile = DietaryProfile.empty,
+    this.onboardingSeen = false,
   });
 
   /// Reads settings written by [toJson].
@@ -162,8 +164,14 @@ final class AppSettings {
       lastFilter: lastFilter,
       disclosureSeen: json['disclosureSeen'] == true,
       profile: DietaryProfile.tryFrom(json[_profileKey]),
+      onboardingSeen: json[_onboardingSeenKey] == true,
     );
   }
+
+  /// The JSON key [onboardingSeen] is stored under. [toJson] writes it only
+  /// when it is true, for the same reason as [_profileKey]: a keto build
+  /// never sets it, so its stored record stays byte-identical.
+  static const String _onboardingSeenKey = 'restrictionOnboardingSeen';
 
   /// The JSON key [profile] is stored under. [toJson] writes it only for a
   /// non-empty profile, so a keto-only install's stored record — and
@@ -231,6 +239,12 @@ final class AppSettings {
   /// and nothing else; no request body is built here.
   final DietaryProfile profile;
 
+  /// Whether the first-run "What do you avoid?" onboarding (Banto,
+  /// ALG-02b, issue #344) has been completed or skipped. False until then,
+  /// and only ever set in a Banto build, so a keto install never writes it.
+  /// A missing or non-boolean value reads as false.
+  final bool onboardingSeen;
+
   /// Returns a copy with the given fields replaced.
   ///
   /// Omitting [languageTag], [lastVenue] or [lastFilter] leaves the
@@ -254,6 +268,7 @@ final class AppSettings {
     Object? lastFilter = _unset,
     bool? disclosureSeen,
     DietaryProfile? profile,
+    bool? onboardingSeen,
   }) => AppSettings(
     languageTag: identical(languageTag, _unset)
         ? this.languageTag
@@ -274,10 +289,12 @@ final class AppSettings {
         : lastFilter as MenuFilter?,
     disclosureSeen: disclosureSeen ?? this.disclosureSeen,
     profile: profile ?? this.profile,
+    onboardingSeen: onboardingSeen ?? this.onboardingSeen,
   );
 
   /// Writes a form [tryFrom] can read back. [profile] is written only
-  /// when it is not empty; see [_profileKey].
+  /// when it is not empty, and [onboardingSeen] only when it is true; see
+  /// [_profileKey] and [_onboardingSeenKey].
   Map<String, Object?> toJson() => <String, Object?>{
     'languageTag': languageTag,
     'filter': filter.name,
@@ -291,6 +308,7 @@ final class AppSettings {
     'lastFilter': lastFilter?.name,
     'disclosureSeen': disclosureSeen,
     if (!profile.isEmpty) _profileKey: profile.toJson(),
+    if (onboardingSeen) _onboardingSeenKey: true,
   };
 
   @override
@@ -307,7 +325,8 @@ final class AppSettings {
       other.carnivoreOnly == carnivoreOnly &&
       other.lastFilter == lastFilter &&
       other.disclosureSeen == disclosureSeen &&
-      other.profile == profile;
+      other.profile == profile &&
+      other.onboardingSeen == onboardingSeen;
 
   @override
   int get hashCode => Object.hash(
@@ -323,6 +342,7 @@ final class AppSettings {
     lastFilter,
     disclosureSeen,
     profile,
+    onboardingSeen,
   );
 
   @override
@@ -335,7 +355,8 @@ final class AppSettings {
       'disclosureSeen: $disclosureSeen, '
       // A count, never the restrictions themselves, so a logged settings
       // value cannot carry the profile (contract decision C1).
-      'profile: ${profile.entries.length} entries)';
+      'profile: ${profile.entries.length} entries, '
+      'onboardingSeen: $onboardingSeen)';
 }
 
 /// On-device storage for [AppSettings] (architecture.md §6.4). Backed by

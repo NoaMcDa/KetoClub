@@ -1503,4 +1503,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get whyEmptyFlexible =>
       'Nothing in the menu text points to your restrictions.';
+
+  @override
+  String get restrictionOnboardingTitle => 'What do you avoid?';
+
+  @override
+  String get restrictionOnboardingBody =>
+      'Pick everything that applies. You can change this any time in Settings. Skip it to use keto only.';
+
+  @override
+  String get restrictionOnboardingContinue => 'Continue';
+
+  @override
+  String get restrictionOnboardingSkip => 'Skip';
+
+  @override
+  String menuProfileSummary(String names) {
+    return 'Checking for: $names';
+  }
 }

@@ -556,6 +556,25 @@ void main() {
     });
   });
 
+  group('backendOptionsJson (ALG-03, D26 C2)', () {
+    test('carries restrictionsRequested only when true, never a '
+        'profile', () {
+      // Act
+      final keto = backendOptionsJson(const ClassificationOptions());
+      final extracting = backendOptionsJson(
+        const ClassificationOptions(restrictionsRequested: true),
+      );
+
+      // Assert
+      expect(keto.keys, <String>['netCarbLimitGrams', 'dietaryConstraints']);
+      expect(extracting, <String, Object?>{
+        'netCarbLimitGrams': defaultNetCarbLimitGrams,
+        'dietaryConstraints': <String>[],
+        'restrictionsRequested': true,
+      });
+    });
+  });
+
   group('the shared wire helpers', () {
     test('backendRouteUri joins with or without a trailing slash', () {
       expect(

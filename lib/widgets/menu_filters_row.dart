@@ -25,6 +25,7 @@ class MenuFiltersRow extends StatelessWidget {
     required this.onToggle,
     required this.child,
     this.activeCount = 0,
+    this.summary,
     super.key,
   });
 
@@ -37,6 +38,13 @@ class MenuFiltersRow extends StatelessWidget {
   /// How many of the controls inside [child] are narrowing the list right
   /// now — a typed search, a set budget. Zero shows the bare label.
   final int activeCount;
+
+  /// A line kept visible under the disclosure row whether or not it is
+  /// expanded, or null for none. The Banto build puts the restriction
+  /// profile summary here (ALG-02b) so the user always sees what the
+  /// verdicts were read against; it is null otherwise, and nothing is
+  /// laid out for it.
+  final Widget? summary;
 
   /// The controls behind the disclosure.
   final Widget child;
@@ -91,6 +99,7 @@ class MenuFiltersRow extends StatelessWidget {
             ),
           ),
         ),
+        ?summary,
         Visibility(
           visible: expanded,
           maintainState: true,

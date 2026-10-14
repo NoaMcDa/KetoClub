@@ -15,15 +15,58 @@
 /// Milk and lactose share most triggers and differ in their guards (11 §4.3,
 /// 12 §2.1): "lactose free", a hard aged cheese and "פרווה" clear lactose and
 /// never milk. A vegan substitute is a `suspected` milk trigger of its own
-/// (12 §2.1), so the guard that cancels its dairy word never leaves it
-/// silent. A guard cancels the hit (`ClassificationRules.isGuarded`) within a
-/// window of two words, and cancels every trigger in that window, so "almond
-/// croissant" loses its croissant; the common cases are listed as terms of
-/// their own.
+/// (12 §2.1), so the guard that lowers its dairy word never leaves it
+/// alone. A guard lowers the hit to `suspected`, never cancels it, and only
+/// from the slot adjacent to its term (ALG-04a): "almond croissant" keeps
+/// its croissant. The plant bases that turn a dairy word into another food
+/// ("coconut milk", "peanut butter", "חלב שקדים") are term guards on the
+/// dairy words, not restriction-wide guards.
 library;
 
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/vocabulary_types.dart';
+
+/// The plant bases that make a dairy word another food when they name it
+/// ("coconut milk", "oat cream", "cashew cheese"): term guards on the dairy
+/// words, never restriction-wide, so "cocoa milk" stays milk (ALG-04a).
+const List<String> _plantBasesEn = <String>[
+  'coconut',
+  'almond',
+  'oat',
+  'soy',
+  'soya',
+  'cashew',
+  'nut',
+];
+
+/// [_plantBasesEn] plus the nut and plant fats that make "butter" another
+/// food ("peanut butter", "cocoa butter", "shea butter").
+const List<String> _otherButtersEn = <String>[
+  ..._plantBasesEn,
+  'peanut',
+  'cocoa',
+  'cacao',
+  'shea',
+];
+
+/// The Hebrew plant bases, after the dairy word in a construct phrase
+/// ("חלב שקדים", "שמנת קוקוס", "גבינת קשיו").
+const List<String> _plantBasesHe = <String>[
+  'שקדים',
+  'סויה',
+  'קוקוס',
+  'שיבולת שועל',
+  'קשיו',
+];
+
+/// [_plantBasesHe] plus the nut and plant fats after "חמאת" ("חמאת
+/// בוטנים", "חמאת קקאו", "חמאת שיאה").
+const List<String> _otherButtersHe = <String>[
+  ..._plantBasesHe,
+  'בוטנים',
+  'קקאו',
+  'שיאה',
+];
 
 /// Dairy and eggs: one entry per restriction this group owns.
 const Map<RestrictionId, RestrictionVocabulary>
@@ -1111,22 +1154,16 @@ dairyEggsVocabulary = <RestrictionId, RestrictionVocabulary>{
         'dairy free',
         'milk free',
         'free from',
-        'free ice',
-        'free whipped',
-        'coconut',
-        'almond',
-        'oat',
-        'soy',
-        'soya',
-        'cashew',
-        'nut',
-        'peanut',
-        'cocoa',
-        'cacao',
-        'shea',
       ],
-      afterEn: <String>['free', 'of tartar', 'thistle'],
-      beforeHe: <String>['ללא', 'בלי', 'וללא', 'ובלי'],
+      afterEn: <String>['free', 'dairy free', 'milk free'],
+      beforeHe: <String>[
+        'ללא',
+        'בלי',
+        'וללא',
+        'ובלי',
+        'ללא מוצרי',
+        'בלי מוצרי',
+      ],
       afterHe: <String>[
         'טבעוני',
         'טבעונית',
@@ -1136,16 +1173,31 @@ dairyEggsVocabulary = <RestrictionId, RestrictionVocabulary>{
         'בלי חלב',
         'ללא מוצרי',
         'בלי מוצרי',
-        'שקדים',
-        'סויה',
-        'קוקוס',
-        'שיבולת שועל',
-        'קשיו',
-        'בוטנים',
-        'קקאו',
-        'שיאה',
       ],
     ),
+    termGuards: <String, AllergenGuards>{
+      'milk': AllergenGuards(
+        beforeEn: _plantBasesEn,
+        afterEn: <String>['thistle'],
+      ),
+      'milkshake': AllergenGuards(beforeEn: _plantBasesEn),
+      'milkshakes': AllergenGuards(beforeEn: _plantBasesEn),
+      'cream': AllergenGuards(
+        beforeEn: <String>[..._plantBasesEn, 'free ice', 'free whipped'],
+        afterEn: <String>['of tartar'],
+      ),
+      'creamer': AllergenGuards(beforeEn: _plantBasesEn),
+      'cheese': AllergenGuards(beforeEn: _plantBasesEn),
+      'cheeses': AllergenGuards(beforeEn: _plantBasesEn),
+      'yogurt': AllergenGuards(beforeEn: _plantBasesEn),
+      'yoghurt': AllergenGuards(beforeEn: _plantBasesEn),
+      'butter': AllergenGuards(beforeEn: _otherButtersEn),
+      'חלב': AllergenGuards(afterHe: _plantBasesHe),
+      'שמנת': AllergenGuards(afterHe: _plantBasesHe),
+      'גבינת': AllergenGuards(afterHe: _plantBasesHe),
+      'יוגורט': AllergenGuards(afterHe: _plantBasesHe),
+      'חמאת': AllergenGuards(afterHe: _otherButtersHe),
+    },
     noPrefixHe: <String>['הפוך'],
     sources: <String>['11 §3.1', '11 §3.3', '11 §3.5', '12 §1.5', '12 §2.1'],
   ),
@@ -2219,22 +2271,17 @@ dairyEggsVocabulary = <RestrictionId, RestrictionVocabulary>{
         'plant based',
         'dairy free',
         'free from',
-        'free ice',
-        'free whipped',
-        'coconut',
-        'almond',
-        'oat',
-        'soy',
-        'soya',
-        'cashew',
-        'nut',
-        'peanut',
-        'cocoa',
-        'cacao',
-        'shea',
       ],
-      afterEn: <String>['free', 'aged', 'of tartar', 'thistle'],
-      beforeHe: <String>['ללא', 'בלי', 'וללא', 'ובלי', 'דל'],
+      afterEn: <String>['free', 'aged', 'lactose free', 'dairy free'],
+      beforeHe: <String>[
+        'ללא',
+        'בלי',
+        'וללא',
+        'ובלי',
+        'דל',
+        'ללא מוצרי',
+        'בלי מוצרי',
+      ],
       afterHe: <String>[
         'טבעוני',
         'טבעונית',
@@ -2252,16 +2299,30 @@ dairyEggsVocabulary = <RestrictionId, RestrictionVocabulary>{
         'אמנטל',
         'ללא מוצרי',
         'בלי מוצרי',
-        'שקדים',
-        'סויה',
-        'קוקוס',
-        'שיבולת שועל',
-        'קשיו',
-        'בוטנים',
-        'קקאו',
-        'שיאה',
       ],
     ),
+    termGuards: <String, AllergenGuards>{
+      'milk': AllergenGuards(
+        beforeEn: _plantBasesEn,
+        afterEn: <String>['thistle'],
+      ),
+      'milkshake': AllergenGuards(beforeEn: _plantBasesEn),
+      'milkshakes': AllergenGuards(beforeEn: _plantBasesEn),
+      'cream': AllergenGuards(
+        beforeEn: <String>[..._plantBasesEn, 'free ice', 'free whipped'],
+        afterEn: <String>['of tartar'],
+      ),
+      'cheese': AllergenGuards(beforeEn: _plantBasesEn),
+      'cheeses': AllergenGuards(beforeEn: _plantBasesEn),
+      'yogurt': AllergenGuards(beforeEn: _plantBasesEn),
+      'yoghurt': AllergenGuards(beforeEn: _plantBasesEn),
+      'butter': AllergenGuards(beforeEn: _otherButtersEn),
+      'חלב': AllergenGuards(afterHe: _plantBasesHe),
+      'שמנת': AllergenGuards(afterHe: _plantBasesHe),
+      'גבינת': AllergenGuards(afterHe: _plantBasesHe),
+      'יוגורט': AllergenGuards(afterHe: _plantBasesHe),
+      'חמאת': AllergenGuards(afterHe: _otherButtersHe),
+    },
     noPrefixHe: <String>['הפוך'],
     sources: <String>['11 §4.1', '11 §4.3', '11 §4.5', '12 §1.5', '12 §2.2'],
   ),
@@ -2997,7 +3058,7 @@ dairyEggsVocabulary = <RestrictionId, RestrictionVocabulary>{
         'egg free',
         'free from',
       ],
-      afterEn: <String>['free'],
+      afterEn: <String>['free', 'egg free'],
       beforeHe: <String>['ללא', 'בלי', 'וללא', 'ובלי'],
       afterHe: <String>[
         'טבעוני',
