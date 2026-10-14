@@ -49,10 +49,18 @@ import 'package:provider/provider.dart';
 /// post-frame load.
 class KetoClubApp extends StatefulWidget {
   /// Creates the app on top of [dependencies].
-  const new({required this.dependencies, super.key});
+  const new({
+    required this.dependencies,
+    this.bantoMode = BantoMode.enabled,
+    super.key,
+  });
 
   /// The service interfaces the screens and controllers are built on.
   final AppDependencies dependencies;
+
+  /// Whether this build shows Banto surfaces (D26's convention), passed to
+  /// [generateRoute]; a flow test turns it on with no `--dart-define`.
+  final bool bantoMode;
 
   @override
   State<KetoClubApp> createState() => _KetoClubAppState();
@@ -138,8 +146,11 @@ class _KetoClubAppState extends State<KetoClubApp> {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: AppLocalizations.supportedLocales,
-          onGenerateRoute: (settings) =>
-              generateRoute(settings, widget.dependencies),
+          onGenerateRoute: (settings) => generateRoute(
+            settings,
+            widget.dependencies,
+            bantoMode: widget.bantoMode,
+          ),
         ),
       ),
     );
@@ -175,6 +186,9 @@ class _KetoClubAppState extends State<KetoClubApp> {
 ///
 /// Public and separately tested, because a silently unmatched route would
 /// present as a blank screen.
+///
+/// [bantoMode] reaches the two screens with Banto surfaces, Settings and
+/// the menu (D26's convention).
 Route<void>? generateRoute(
   RouteSettings settings,
   AppDependencies dependencies, {
@@ -271,6 +285,7 @@ Route<void>? generateRoute(
             backendConfigured: dependencies.backendConfigured,
             screenBrightness: dependencies.screenBrightness,
             menuSharer: dependencies.menuSharer,
+            bantoMode: bantoMode,
           ),
         ),
       ),

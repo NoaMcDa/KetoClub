@@ -23,3 +23,18 @@ extension DietaryProfileStrictness on DietaryProfile {
   bool get hasStrictEntry =>
       entries.any((entry) => restrictionFor(entry.restrictionId).isStrict);
 }
+
+/// What a [DietaryProfile] asks of the menu screen (Banto, ALG-05, issue
+/// #347): whether it holds a restriction besides keto, and whether keto
+/// applies.
+extension DietaryProfileScope on DietaryProfile {
+  /// Whether any entry is a restriction other than keto. A profile without
+  /// one is the keto-only user of today's app, whose screens do not change.
+  bool get hasNonKetoEntry =>
+      entries.any((entry) => entry.restrictionId != RestrictionId.keto);
+
+  /// Whether keto applies: an empty profile is keto-only, as
+  /// `ProfileEvaluator.evaluate` reads it, and otherwise keto applies only
+  /// when it is an entry.
+  bool get holdsKeto => isEmpty || contains(RestrictionId.keto);
+}

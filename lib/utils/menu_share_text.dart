@@ -6,7 +6,9 @@ library;
 
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/profile_wording.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 
 /// Builds a plain-text, human-readable summary of a classified menu's safe
@@ -41,12 +43,35 @@ abstract final class MenuShareText {
   /// and the waiter script already are ([TextNormaliser.containsHebrew]
   /// over [TextNormaliser.dishSearchText]), applied here across every dish
   /// [menu] carries rather than one dish at a time; see [_menuIsHebrew].
+  ///
+  /// **Banto (ALG-05, issue #347).** With a [wording] that
+  /// [ProfileWording.usesStates] and the dishes' [evaluations] (by dish
+  /// id), the groups are the on-device states instead: the dishes that fit
+  /// (for a strict profile headed "No trigger found — ask the restaurant",
+  /// never "safe"), those that fit with a change, each followed by the
+  /// evaluator's change, and those to ask the restaurant about; a dish to
+  /// avoid is left out, and a strict profile's text ends with a line
+  /// saying only the menu text was read. The headings are [stateHeading]
+  /// and [stateFooter], in the menu's language. The profile itself is
+  /// never written: no restriction is named, and no question is copied.
+  /// A keto-only [wording] (the default) is the text above, byte for byte.
   static String build({
     required String venueName,
     required Menu menu,
     required MenuAnalysed analysis,
+    ProfileWording wording = ProfileWording.ketoOnly,
+    Map<String, EvaluatedDish> evaluations = const <String, EvaluatedDish>{},
   }) {
     final isHebrew = _menuIsHebrew(menu);
+    if (wording.usesStates) {
+      return _stateText(
+        venueName: venueName,
+        analysis: analysis,
+        evaluations: evaluations,
+        wording: wording,
+        isHebrew: isHebrew,
+      );
+    }
     final green = <AnalysedDish>[
       for (final dish in analysis.dishes)
         if (dish.verdict == DishVerdict.orderAsIs) dish,
@@ -68,6 +93,85 @@ abstract final class MenuShareText {
         ..add('')
         ..add(isHebrew ? shareYellowHeadingHe : shareYellowHeadingEn)
         ..addAll(yellow.expand(_yellowLines));
+    }
+    return lines.join('\n');
+  }
+
+  /// The heading over [state]'s dishes in the shared text for [wording],
+  /// in the menu's language ([hebrew]); null for [DishState.avoid], which
+  /// is never shared. Keto-only reads today's green and yellow headings.
+  /// Dart, not ARB, because it follows the menu's language (§6.3, §12).
+  static String? stateHeading(
+    DishState state,
+    ProfileWording wording, {
+    required bool hebrew,
+  }) => switch (state) {
+    DishState.fits => switch (wording) {
+      ProfileWording.ketoOnly =>
+        hebrew ? shareGreenHeadingHe : shareGreenHeadingEn,
+      ProfileWording.flexible =>
+        hebrew ? shareFitsHeadingHe : shareFitsHeadingEn,
+      ProfileWording.strict =>
+        hebrew ? shareFitsStrictHeadingHe : shareFitsStrictHeadingEn,
+    },
+    DishState.fitsWithChange =>
+      wording == ProfileWording.ketoOnly
+          ? (hebrew ? shareYellowHeadingHe : shareYellowHeadingEn)
+          : (hebrew
+                ? shareFitsWithChangeHeadingHe
+                : shareFitsWithChangeHeadingEn),
+    DishState.ask => hebrew ? shareAskHeadingHe : shareAskHeadingEn,
+    DishState.avoid => null,
+  };
+
+  /// The shared text's closing line for [wording]: only a strict profile
+  /// has one, saying only the menu text was read.
+  static String? stateFooter(ProfileWording wording, {required bool hebrew}) =>
+      wording == ProfileWording.strict
+      ? (hebrew ? shareStrictFooterHe : shareStrictFooterEn)
+      : null;
+
+  /// The state-mode text; see [build].
+  static String _stateText({
+    required String venueName,
+    required MenuAnalysed analysis,
+    required Map<String, EvaluatedDish> evaluations,
+    required ProfileWording wording,
+    required bool isHebrew,
+  }) {
+    List<EvaluatedDish> inState(DishState state) => <EvaluatedDish>[
+      for (final dish in analysis.dishes)
+        if (evaluations[dish.dishId] case final evaluated?
+            when evaluated.state == state)
+          evaluated,
+    ];
+    final lines = <String>[venueName];
+    for (final state in <DishState>[
+      DishState.fits,
+      DishState.fitsWithChange,
+      DishState.ask,
+    ]) {
+      final dishes = inState(state);
+      final heading = stateHeading(state, wording, hebrew: isHebrew);
+      if (dishes.isEmpty || heading == null) continue;
+      lines
+        ..add('')
+        ..add(heading);
+      for (final evaluated in dishes) {
+        lines.add('- ${evaluated.dish.name}');
+        final change = evaluated.modification;
+        if (state == DishState.fitsWithChange &&
+            change != null &&
+            change.isNotEmpty) {
+          lines.add('  ${change.replaceAll('\n', '\n  ')}');
+        }
+      }
+    }
+    final footer = stateFooter(wording, hebrew: isHebrew);
+    if (footer != null) {
+      lines
+        ..add('')
+        ..add(footer);
     }
     return lines.join('\n');
   }
@@ -104,3 +208,36 @@ abstract final class MenuShareText {
     return TextNormaliser.containsHebrew(buffer.toString());
   }
 }
+
+/// The share heading over the dishes that fit, for a strict profile, in
+/// English: never "safe" (file 09 §3.6).
+const String shareFitsStrictHeadingEn =
+    'No trigger found — ask the restaurant:';
+
+/// [shareFitsStrictHeadingEn] in Hebrew.
+const String shareFitsStrictHeadingHe = 'לא נמצא חשש — לשאול את המסעדה:';
+
+/// The share heading over the dishes that fit, for a flexible profile.
+const String shareFitsHeadingEn = 'Fits:';
+
+/// [shareFitsHeadingEn] in Hebrew.
+const String shareFitsHeadingHe = 'מתאימות:';
+
+/// The share heading over the dishes that fit with a change.
+const String shareFitsWithChangeHeadingEn = 'With a change:';
+
+/// [shareFitsWithChangeHeadingEn] in Hebrew.
+const String shareFitsWithChangeHeadingHe = 'עם שינוי:';
+
+/// The share heading over the dishes to ask about.
+const String shareAskHeadingEn = 'Ask the restaurant first:';
+
+/// [shareAskHeadingEn] in Hebrew.
+const String shareAskHeadingHe = 'לשאול את המסעדה קודם:';
+
+/// The closing line of a strict profile's share text.
+const String shareStrictFooterEn =
+    'Read from the menu text only. Ask the restaurant.';
+
+/// [shareStrictFooterEn] in Hebrew.
+const String shareStrictFooterHe = 'נקרא מטקסט התפריט בלבד. לשאול את המסעדה.';

@@ -32,10 +32,13 @@ import 'package:ketoclub/services/classifier/menu_analysis_prompt.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/keto_score.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
+import 'package:ketoclub/utils/profile_wording.dart';
 import 'package:ketoclub/utils/verdict_counts.dart';
 import 'package:ketoclub/widgets/route_title.dart';
+import 'package:ketoclub/widgets/verdict_copy.dart';
 
 import '../../tool/golden/golden_corpus.dart';
 import '../fakes/fake_clock.dart';
@@ -203,6 +206,67 @@ Map<String, String> _copyFor(Locale locale) {
   return byKey;
 }
 
+/// The verdict copy of [locale] as the four-state menu screen words it
+/// (ALG-05, issue #347) for a keto-only profile in a Banto build, by the
+/// same ARB keys as [_copyFor]: the pill and tile words come from
+/// [VerdictCopy], the legend keys are the keto legend's own.
+Map<String, String> _bantoCopyFor(Locale locale, {required bool bantoMode}) {
+  final l10n = lookupAppLocalizations(locale);
+  final wording = ProfileWording.of(DietaryProfile.empty, bantoMode: bantoMode);
+  return <String, String>{
+    'verdictOrderAsIs': VerdictCopy.badge(l10n, DishState.fits, wording),
+    'verdictModifiable': VerdictCopy.badge(
+      l10n,
+      DishState.fitsWithChange,
+      wording,
+    ),
+    'verdictNonKeto': VerdictCopy.badge(l10n, DishState.avoid, wording),
+    'tileGreenLabel': VerdictCopy.tile(l10n, DishState.fits, wording),
+    'tileYellowLabel': VerdictCopy.tile(
+      l10n,
+      DishState.fitsWithChange,
+      wording,
+    ),
+    'tileRedLabel': VerdictCopy.tile(l10n, DishState.avoid, wording),
+    'legendToggle': l10n.legendToggle,
+    'legendHide': l10n.legendHide,
+    'legendNote': l10n.legendNote,
+    'legendEngines': l10n.legendEngines,
+    'legendFoodOnly': l10n.legendFoodOnly,
+    'legendBudget': l10n.legendBudget,
+  };
+}
+
+/// The rules analyses the share-text seams read, by menu name; filled
+/// once by the `with bantoMode: true` group's `setUpAll`, since a seam's
+/// build is synchronous and the rule engine is not.
+final Map<String, MenuAnalysed> _seamAnalyses = <String, MenuAnalysed>{};
+
+/// The share text of [menu] (named [name] in [_seamAnalyses]) through the
+/// four-state seam (ALG-05): the wording a Banto build gives an empty
+/// profile, and that profile's evaluation of every dish.
+String _bantoShareText(String name, Menu menu, {required bool bantoMode}) {
+  final analysis = _seamAnalyses[name]!;
+  final dishes = <String, Dish>{
+    for (final dish in menu.allDishes) dish.id: dish,
+  };
+  return MenuShareText.build(
+    venueName: menu.venueName ?? '',
+    menu: menu,
+    analysis: analysis,
+    wording: ProfileWording.of(DietaryProfile.empty, bantoMode: bantoMode),
+    evaluations: <String, EvaluatedDish>{
+      for (final analysed in analysis.dishes)
+        if (dishes[analysed.dishId] case final dish?)
+          analysed.dishId: ProfileEvaluator.evaluate(
+            analysed,
+            dish,
+            DietaryProfile.empty,
+          ),
+    },
+  );
+}
+
 /// A seam that takes a `bantoMode` parameter, paired with the keto-only
 /// fixture it must still produce with `bantoMode: true`.
 typedef _BantoSeam = ({
@@ -304,6 +368,29 @@ final List<_BantoSeam> _bantoSeams = <_BantoSeam>[
       ),
     ),
   ],
+
+  // The four-state menu screen (ALG-05, issue #347): with a keto-only
+  // profile its pill, tile and share words are today's, verbatim.
+  (
+    fixture: 'copy_en.json',
+    build: ({required bool bantoMode}) =>
+        _canonicalJson(_bantoCopyFor(const Locale('en'), bantoMode: bantoMode)),
+  ),
+  (
+    fixture: 'copy_he.json',
+    build: ({required bool bantoMode}) =>
+        _canonicalJson(_bantoCopyFor(const Locale('he'), bantoMode: bantoMode)),
+  ),
+  (
+    fixture: 'share_text_english.txt',
+    build: ({required bool bantoMode}) =>
+        _bantoShareText('english', goldenEnglishMenu, bantoMode: bantoMode),
+  ),
+  (
+    fixture: 'share_text_hebrew.txt',
+    build: ({required bool bantoMode}) =>
+        _bantoShareText('hebrew', goldenHebrewMenu, bantoMode: bantoMode),
+  ),
 ];
 
 void main() {
@@ -526,6 +613,17 @@ void main() {
   });
 
   group('with bantoMode: true', () {
+    setUpAll(() async {
+      _seamAnalyses['english'] = await _rulesAnalysis(
+        goldenEnglishMenu,
+        _defaults,
+      );
+      _seamAnalyses['hebrew'] = await _rulesAnalysis(
+        goldenHebrewMenu,
+        _defaults,
+      );
+    });
+
     test('lists its seams', () {
       // Assert: a seam dropped by accident would otherwise pass silently.
       expect(_bantoSeams.map((seam) => seam.fixture), <String>[
@@ -539,6 +637,11 @@ void main() {
           'vision_response_schema.json',
           'options_snapshot_defaults.json',
         ],
+
+        'copy_en.json',
+        'copy_he.json',
+        'share_text_english.txt',
+        'share_text_hebrew.txt',
       ]);
     });
 

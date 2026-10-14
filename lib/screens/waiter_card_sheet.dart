@@ -34,11 +34,22 @@ class WaiterCardSheet extends StatefulWidget {
   const new({
     required this.row,
     this.screenBrightness = const NoOpScreenBrightness(),
+    this.script,
+    this.showKetoDetails = true,
     super.key,
   });
 
   /// The dish this card shows.
   final DishRow row;
+
+  /// The waiter line to show in place of the analysis's own
+  /// modification, or null to show that modification (Banto, ALG-05: the
+  /// on-device evaluator's change, or the question to ask the kitchen).
+  final String? script;
+
+  /// Whether the keto extras — the hidden-carb flags and the net-carb
+  /// estimate — are shown. False for a Banto profile without keto.
+  final bool showKetoDetails;
 
   /// Raised for as long as this card is on screen, restored once it
   /// closes (architecture.md §6.3). A no-op on platforms with no
@@ -69,9 +80,13 @@ class _WaiterCardSheetState extends State<WaiterCardSheet> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final row = widget.row;
-    final script = row.analysis?.modification;
-    final netCarbsEstimate = row.analysis?.netCarbsEstimate;
-    final hiddenCarbs = row.analysis?.hiddenCarbs ?? const [];
+    final script = widget.script ?? row.analysis?.modification;
+    final netCarbsEstimate = widget.showKetoDetails
+        ? row.analysis?.netCarbsEstimate
+        : null;
+    final hiddenCarbs = widget.showKetoDetails
+        ? (row.analysis?.hiddenCarbs ?? const <HiddenCarb>[])
+        : const <HiddenCarb>[];
     return SafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

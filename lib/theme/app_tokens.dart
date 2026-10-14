@@ -234,6 +234,38 @@ abstract final class AppTokens {
   /// and hue.
   static const Color darkRedInk = Color(0xFFFF968A);
 
+  // The "ask" tone (Banto, ALG-05, issue #347): a fourth verdict-like
+  // tone for a dish whose answer is "ask the restaurant". Not on the
+  // artboard, which predates it: an orange between amber (hue ~74) and
+  // red (hue ~27), so it reads as neither "with a change" nor "avoid", and
+  // drawn outlined (tint fill, rail border, ink text) so its shape differs
+  // from the filled amber pill too. Every text pair is pinned by
+  // `test/theme/contrast_test.dart`.
+
+  /// Light "ask" base colour: the rail and the outlined pill's border.
+  static const Color lightAsk = Color(0xFFD9772B);
+
+  /// Light "ask" tint: the outlined pill's fill and an active tile.
+  static const Color lightAskTint = Color(0xFFFDEBDD);
+
+  /// Light "ask" ink: text and icons drawn on [lightAskTint] or the page.
+  static const Color lightAskInk = Color(0xFF8A3F0A);
+
+  /// Light "ask" on-colour: text drawn on [lightAsk].
+  static const Color lightAskOn = Color(0xFF2A1406);
+
+  /// Dark "ask" base colour.
+  static const Color darkAsk = Color(0xFFF0904A);
+
+  /// Dark "ask" tint.
+  static const Color darkAskTint = Color(0xFF43260F);
+
+  /// Dark "ask" ink.
+  static const Color darkAskInk = Color(0xFFFFC08F);
+
+  /// Dark "ask" on-colour: text drawn on [darkAsk].
+  static const Color darkAskOn = Color(0xFF1C0D04);
+
   // `--line` / `--line2` are alpha-over-ink in the snippet, not their own
   // hex; expose the alphas so `AppTheme` can compute `ink.withValues(...)`
   // rather than hard-coding a second colour that could drift from `ink`.

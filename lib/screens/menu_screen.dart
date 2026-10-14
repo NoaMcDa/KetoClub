@@ -21,9 +21,11 @@ import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/theme/app_typography.dart';
+import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
+import 'package:ketoclub/utils/profile_wording.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/app_notice.dart';
@@ -48,6 +50,7 @@ import 'package:ketoclub/widgets/scanned_page_chips.dart';
 import 'package:ketoclub/widgets/scanned_page_header.dart';
 import 'package:ketoclub/widgets/scanned_pages_sheet.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
+import 'package:ketoclub/widgets/verdict_copy.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
 
@@ -115,6 +118,10 @@ String _definitionTextFrom(String line) {
   return dashIndex == -1 ? line.trim() : line.substring(dashIndex + 1).trim();
 }
 
+/// The key of the header's state counts line (Banto, ALG-05), shown in
+/// place of the keto score for a profile without keto.
+const Key menuHeaderCountsKey = ValueKey<String>('menuHeaderCounts');
+
 /// The classified menu screen: a header naming the venue and its keto
 /// score, the persistent "{platform} · {age}" source line, the three
 /// verdict counter tiles that double as the filter, a collapsed Filters
@@ -133,6 +140,18 @@ String _definitionTextFrom(String line) {
 /// analysis banners on this screen ("Allow AI analysis in Settings…")
 /// name Settings as the way out, so it must be reachable from here
 /// without first going back.
+///
+/// **Banto (ALG-05, issue #347).** With [bantoMode] on and a dietary
+/// profile holding a restriction besides keto
+/// ([MenuController.wording] then [ProfileWording.usesStates]), every
+/// verdict surface speaks the on-device [DishState]s: four counter tiles
+/// that filter by state (a strict profile opening on everything but
+/// avoid), "N fit · M with a change · K to ask" in the header unless keto
+/// is in the profile, the legend's four definitions and the helper-tool
+/// sentence, the dish cards' concern lines and Why sheet, a "Rules
+/// checked" chip beside the AI chip, and the shared text — all worded by
+/// [VerdictCopy]. A keto-only profile, or [bantoMode] off, renders exactly
+/// what it did before.
 class MenuScreen extends StatefulWidget {
   /// Creates a screen that loads and classifies the menu for [ref].
   const new({
@@ -185,8 +204,9 @@ class MenuScreen extends StatefulWidget {
   final ScannedPagesRegistry? scannedPages;
 
   /// Whether Banto surfaces are on (architecture.md D26). With it, the
-  /// Filters row names the restrictions in the user's profile; without it,
-  /// or with an empty profile, nothing is added to the row.
+  /// Filters row names the restrictions in the user's profile, and it is
+  /// passed to [MenuController.open], which records it for the open menu
+  /// (ALG-05); without it, or with an empty profile, nothing is added.
   final bool bantoMode;
 
   @override
@@ -275,7 +295,11 @@ class _MenuScreenState extends State<MenuScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       unawaited(
-        context.read<MenuController>().open(widget.ref, hint: widget.hint),
+        context.read<MenuController>().open(
+          widget.ref,
+          hint: widget.hint,
+          bantoMode: widget.bantoMode,
+        ),
       );
     });
   }
@@ -291,13 +315,17 @@ class _MenuScreenState extends State<MenuScreen> {
     // Any green or yellow dish, drinks included: the counts are food only
     // (D21), but a card of safe drinks is still worth sharing.
     final analysis = controller.analysis;
-    final canShare =
-        analysis is MenuAnalysed &&
-        analysis.dishes.any(
-          (dish) =>
-              dish.verdict == DishVerdict.orderAsIs ||
-              dish.verdict == DishVerdict.modifiable,
-        );
+    // In state mode, any dish that is not to be avoided (Banto, ALG-05).
+    final canShare = controller.wording.usesStates
+        ? controller.evaluations.values.any(
+            (evaluated) => evaluated.state != DishState.avoid,
+          )
+        : analysis is MenuAnalysed &&
+              analysis.dishes.any(
+                (dish) =>
+                    dish.verdict == DishVerdict.orderAsIs ||
+                    dish.verdict == DishVerdict.modifiable,
+              );
     return Scaffold(
       appBar: AppBar(
         // The venue name, once the body header has scrolled under the bar
@@ -433,6 +461,8 @@ class _MenuScreenState extends State<MenuScreen> {
       venueName: _displayName(controller, AppLocalizations.of(context)!),
       menu: menu,
       analysis: analysis,
+      wording: controller.wording,
+      evaluations: controller.evaluations,
     );
     await widget.menuSharer.shareText(text);
   }
@@ -614,13 +644,25 @@ class _MenuScreenState extends State<MenuScreen> {
       const SizedBox(height: 4),
       if (analysed) ...[
         const SizedBox(height: 8),
-        VerdictCounterTiles(
-          greenCount: controller.greenCount,
-          yellowCount: controller.yellowCount,
-          redCount: controller.redCount,
-          filter: controller.filter,
-          onFilterChanged: controller.setFilter,
-        ),
+        if (controller.wording.usesStates)
+          VerdictCounterTiles(
+            greenCount: controller.stateCounts.green,
+            yellowCount: controller.stateCounts.yellow,
+            askCount: controller.stateCounts.ask,
+            redCount: controller.stateCounts.red,
+            filter: controller.filter,
+            onFilterChanged: controller.setFilter,
+            wording: controller.wording,
+            bantoMode: widget.bantoMode,
+          )
+        else
+          VerdictCounterTiles(
+            greenCount: controller.greenCount,
+            yellowCount: controller.yellowCount,
+            redCount: controller.redCount,
+            filter: controller.filter,
+            onFilterChanged: controller.setFilter,
+          ),
         const SizedBox(height: 10),
       ],
       // A scan read from several pages is filtered by page right under
@@ -670,7 +712,16 @@ class _MenuScreenState extends State<MenuScreen> {
         if (controller.engine is LlmEngine) ...[
           Align(
             alignment: AlignmentDirectional.centerStart,
-            child: EngineChip(engine: controller.engine!),
+            child: controller.rulesChecked
+                ? Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    children: [
+                      EngineChip(engine: controller.engine!),
+                      RulesCheckedChip(bantoMode: widget.bantoMode),
+                    ],
+                  )
+                : EngineChip(engine: controller.engine!),
           ),
           const SizedBox(height: 12),
         ],
@@ -768,7 +819,7 @@ class _MenuScreenState extends State<MenuScreen> {
           CarbBudgetField(isBudgetAvailable: controller.isBudgetAvailable),
           if (analysed) ...[
             const SizedBox(height: 4),
-            _legend(context, l10n, controller.netCarbLimitGrams),
+            _legend(context, l10n, controller),
           ],
         ],
       ),
@@ -882,14 +933,40 @@ class _MenuScreenState extends State<MenuScreen> {
             ),
           ),
         ),
-        KetoScoreBadge(score: controller.ketoScoreOutOfTen),
+        // The keto score stays only while keto is in the profile (file
+        // 09 §5); otherwise the counts line below replaces it.
+        if (!controller.wording.usesStates || controller.holdsKeto)
+          KetoScoreBadge(score: controller.ketoScoreOutOfTen),
       ],
     );
+    final counts =
+        controller.wording.usesStates &&
+            !controller.holdsKeto &&
+            controller.analysis is MenuAnalysed
+        ? Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              VerdictCopy.headerCounts(
+                l10n,
+                controller.stateCounts,
+                controller.wording,
+              ),
+              key: menuHeaderCountsKey,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          )
+        : null;
     final pages = _scannedPages;
-    if (pages == null) return titleRow;
+    if (pages == null && counts == null) return titleRow;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [titleRow, _scannedSourceRow(context, l10n, pages)],
+      children: [
+        titleRow,
+        ?counts,
+        if (pages != null) _scannedSourceRow(context, l10n, pages),
+      ],
     );
   }
 
@@ -1062,14 +1139,16 @@ class _MenuScreenState extends State<MenuScreen> {
   /// `.design/Main.dc.html`'s `showing` map. An exhaustive switch with no
   /// `default`: adding a [MenuFilter] value without updating this
   /// function is a compile error (architecture.md §10).
+  ///
+  /// Worded by [VerdictCopy.showing], which keeps today's labels for a
+  /// keto-only profile and words the states for a Banto one (ALG-05).
   String _showingLabel(AppLocalizations l10n, MenuController controller) =>
-      switch (controller.filter) {
-        MenuFilter.greenOnly => l10n.menuShowingGreen,
-        MenuFilter.yellowOnly => l10n.menuShowingYellow,
-        MenuFilter.redOnly => l10n.menuShowingRed,
-        MenuFilter.greenAndYellow => l10n.menuShowingGreenAndYellow,
-        MenuFilter.all => l10n.menuShowingAll(controller.totalDishCount),
-      };
+      VerdictCopy.showing(
+        l10n,
+        controller.filter,
+        controller.wording,
+        total: controller.totalDishCount,
+      );
 
   /// The verdict legend (issue #17): a toggle, and — once expanded — the
   /// same three verdict definitions the system prompt sends
@@ -1078,13 +1157,14 @@ class _MenuScreenState extends State<MenuScreen> {
   /// screen's final report for why this reads that constant directly
   /// rather than a re-translated copy of it.
   ///
-  /// [netCarbLimitGrams] is the limit the shown analysis was made under
-  /// (issue #57), so the green definition states the same figure the
-  /// model was given.
+  /// The net-carb limit is the one the shown analysis was made under
+  /// ([MenuController.netCarbLimitGrams], issue #57), so the green
+  /// definition states the same figure the model was given. A Banto
+  /// profile's legend is [_stateLegendBody] instead (ALG-05).
   Widget _legend(
     BuildContext context,
     AppLocalizations l10n,
-    int netCarbLimitGrams,
+    MenuController controller,
   ) {
     final theme = Theme.of(context);
     return Column(
@@ -1111,7 +1191,10 @@ class _MenuScreenState extends State<MenuScreen> {
             ),
           ),
         ),
-        if (_legendExpanded) _legendBody(context, l10n, netCarbLimitGrams),
+        if (_legendExpanded && controller.wording.usesStates)
+          _stateLegendBody(context, l10n, controller)
+        else if (_legendExpanded)
+          _legendBody(context, l10n, controller.netCarbLimitGrams),
       ],
     );
   }
@@ -1162,6 +1245,50 @@ class _MenuScreenState extends State<MenuScreen> {
           Text(l10n.legendFoodOnly, style: bodyStyle),
           const SizedBox(height: 6),
           Text(l10n.legendBudget, style: bodyStyle),
+        ],
+      ),
+    );
+  }
+
+  /// The expanded legend for a Banto profile (ALG-05): one line per
+  /// state, worded by [VerdictCopy.legendDefinition], then
+  /// [VerdictCopy.legendNotes] — which end on the helper-tool sentence,
+  /// so every menu's legend carries it — and the carb-budget note while
+  /// keto is in the profile.
+  Widget _stateLegendBody(
+    BuildContext context,
+    AppLocalizations l10n,
+    MenuController controller,
+  ) {
+    final wording = controller.wording;
+    final bodyStyle = Theme.of(context).textTheme.bodySmall;
+    return Padding(
+      padding: const EdgeInsets.only(top: 2, bottom: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final state in DishState.values)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: RichText(
+                text: TextSpan(
+                  style: bodyStyle,
+                  children: [
+                    TextSpan(
+                      text: '${VerdictCopy.badge(l10n, state, wording)}: ',
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    TextSpan(
+                      text: VerdictCopy.legendDefinition(l10n, state, wording),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          for (final note in <String>[
+            ...VerdictCopy.legendNotes(l10n),
+            if (controller.holdsKeto) l10n.legendBudget,
+          ]) ...[Text(note, style: bodyStyle), const SizedBox(height: 6)],
         ],
       ),
     );
@@ -1310,6 +1437,12 @@ class _MenuScreenState extends State<MenuScreen> {
             onShowScript: (shown) => unawaited(_openWaiterCard(shown)),
             note: controller.noteFor(row.dish.id),
             onEditNote: (edited) => unawaited(_openNoteEditor(edited)),
+            // Banto (ALG-05): null, and so today's card, unless the
+            // profile holds a restriction besides keto.
+            evaluated: controller.evaluationFor(row.dish.id),
+            wording: controller.wording,
+            holdsKeto: controller.holdsKeto,
+            bantoMode: widget.bantoMode,
             // A pasted menu has no prices, and a website's are unverified
             // (D18, D19): neither shows one.
             showPrice:
@@ -1462,12 +1595,24 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   /// Opens the full-screen [WaiterCardSheet] for [row] as a modal.
+  ///
+  /// For a Banto dish (ALG-05) the card shows the same waiter line the
+  /// dish card does ([VerdictCopy.waiterLine]) and the keto extras only
+  /// while keto is in the profile.
   Future<void> _openWaiterCard(DishRow row) {
+    final controller = context.read<MenuController>();
+    final evaluated = controller.evaluationFor(row.dish.id);
     return showKetoClubSheet<void>(
       context: context,
       showDragHandle: true,
-      builder: (_) =>
-          WaiterCardSheet(row: row, screenBrightness: widget.screenBrightness),
+      builder: (_) => WaiterCardSheet(
+        row: row,
+        screenBrightness: widget.screenBrightness,
+        script: evaluated == null
+            ? null
+            : VerdictCopy.waiterLine(evaluated, row.dish),
+        showKetoDetails: evaluated == null || controller.holdsKeto,
+      ),
     );
   }
 

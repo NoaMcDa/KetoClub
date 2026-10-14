@@ -3,6 +3,9 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
+import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
+import 'package:ketoclub/utils/profile_wording.dart';
+import 'package:ketoclub/widgets/verdict_copy.dart';
 
 /// One dish verdict, shown as an icon **and** a colour together
 /// (architecture.md §6.6), styled as the artboard's `.pill` — uppercase,
@@ -104,6 +107,86 @@ _BadgeSpec _specFor(DishVerdict verdict, AppLocalizations l10n) =>
         label: l10n.verdictNonKeto,
       ),
     };
+
+/// The key of a [StateBadge]'s outlined border, present only for
+/// [DishState.ask], so a test can tell the outlined pill from a filled one.
+const Key stateBadgeOutlineKey = ValueKey<String>('stateBadgeOutline');
+
+/// One dish's Banto state (ALG-05, issue #347), the four-state sibling of
+/// [StatusBadge]: an icon **and** a word in every state, so colour is never
+/// the only signal, worded by [VerdictCopy.badge] for [wording].
+///
+/// Fits and fits-with-a-change are filled like the green and amber verdict
+/// pills; ask is *outlined* (tint fill, orange border, ink text) and avoid
+/// is red's quiet tint pill, so the four differ in shape as well as colour.
+/// The label may wrap to a second line rather than shrink: a strict
+/// profile's "No trigger found — ask the restaurant" is a sentence, not a
+/// tag.
+class StateBadge extends StatelessWidget {
+  /// Creates a badge for [state], worded for [wording].
+  const new({required this.state, required this.wording, super.key});
+
+  /// The state this badge shows.
+  final DishState state;
+
+  /// How the profile asks for the state to be worded.
+  final ProfileWording wording;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final tone = VerdictColors.of(context).forState(state);
+    final label = VerdictCopy.badge(l10n, state, wording);
+    final (icon, foreground) = switch (state) {
+      DishState.fits => (
+        wording == ProfileWording.strict
+            ? Icons.check_circle_outline
+            : Icons.check_circle,
+        tone.on,
+      ),
+      DishState.fitsWithChange => (Icons.edit_note, tone.on),
+      DishState.ask => (Icons.help_outline, tone.ink),
+      DishState.avoid => (Icons.cancel, tone.ink),
+    };
+    final outlined = state == DishState.ask;
+    return Semantics(
+      label: l10n.pillSemanticLabel(label),
+      excludeSemantics: true,
+      child: DecoratedBox(
+        key: outlined ? stateBadgeOutlineKey : null,
+        decoration: BoxDecoration(
+          color: tone.pill,
+          borderRadius: BorderRadius.circular(8),
+          border: outlined ? Border.all(color: tone.rail, width: 1.5) : null,
+        ),
+        child: Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(7, 4, 9, 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 12, color: foreground),
+              const SizedBox(width: 5),
+              Flexible(
+                child: Text(
+                  label.toUpperCase(),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: foreground,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 10,
+                    letterSpacing: 0.7,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 /// The neutral "Not classified" pill for a dish the classifier saw but
 /// could not place (issue #244). Same shape and type as [StatusBadge], but

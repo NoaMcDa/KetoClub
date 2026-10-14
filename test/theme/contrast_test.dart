@@ -123,6 +123,19 @@ List<_Pair> _carbChipPairs(VerdictColors colors, Color surface) => [
   _Pair('red carb chip ink/tint', colors.red.ink, colors.red.tint),
 ];
 
+/// Banto's "ask" tone (ALG-05, issue #347), drawn outlined: the state
+/// pill's `ink` on its `pill` (the tint), the active tile's and the concern
+/// line's `ink` on the tint, `ink` on the page and on a card surface, and
+/// `on` on the saturated rail should anything draw text there.
+List<_Pair> _askPairs(VerdictColors colors, Color background, Color surface) =>
+    [
+      _Pair('ask ink/pill', colors.ask.ink, colors.ask.pill),
+      _Pair('ask ink/tint', colors.ask.ink, colors.ask.tint),
+      _Pair('ask ink/bg', colors.ask.ink, background),
+      _Pair('ask ink/surface', colors.ask.ink, surface),
+      _Pair('ask on/rail', colors.ask.on, colors.ask.rail),
+    ];
+
 void main() {
   group('relative luminance and contrast ratio (self-test)', () {
     test('identical colours have a ratio of 1.0', () {
@@ -154,6 +167,7 @@ void main() {
       ..._removeIconPairs(colors, AppTokens.lightSurface),
       ..._warningNoticePairs(colors),
       ..._carbChipPairs(colors, AppTokens.lightSurface),
+      ..._askPairs(colors, background, AppTokens.lightSurface),
     ]);
 
     test('ink1, ink2 and ink3 all clear AA on the background', () {
@@ -192,6 +206,7 @@ void main() {
       ..._removeIconPairs(colors, AppTokens.darkSurface),
       ..._warningNoticePairs(colors),
       ..._carbChipPairs(colors, AppTokens.darkSurface),
+      ..._askPairs(colors, background, AppTokens.darkSurface),
     ]);
 
     test('ink1, ink2 and ink3 all clear AA on the background', () {

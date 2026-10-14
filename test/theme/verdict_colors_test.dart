@@ -118,6 +118,7 @@ void main() {
         green: light.green,
         amber: light.amber,
         red: light.red,
+        ask: light.ask,
       );
 
       // Assert

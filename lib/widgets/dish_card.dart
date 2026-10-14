@@ -1,16 +1,25 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
+import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
+import 'package:ketoclub/utils/allergens/taxonomy.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/price_format.dart';
+import 'package:ketoclub/utils/profile_wording.dart';
 import 'package:ketoclub/widgets/content_direction.dart';
 import 'package:ketoclub/widgets/focus_ring.dart';
 import 'package:ketoclub/widgets/net_carbs_chip.dart';
 import 'package:ketoclub/widgets/photo_tile.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
+import 'package:ketoclub/widgets/verdict_copy.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
+import 'package:ketoclub/widgets/why_sheet.dart';
 import 'package:provider/provider.dart';
 
 /// One menu row: the dish, its price, and its verdict once analysed
@@ -26,6 +35,16 @@ import 'package:provider/provider.dart';
 /// neither; a row whose
 /// [DishRow.analysis] is null shows no verdict claim and no script,
 /// because none has been made yet.
+///
+/// **Banto (ALG-05, issue #347).** With [bantoMode] on, an [evaluated]
+/// dish and a [wording] that [ProfileWording.usesStates], the card speaks
+/// the dish's [DishState] instead of its keto verdict: a [StateBadge], the
+/// state's colours, one line per concern under the dish (the restriction
+/// named in the dish's own language, where it was found and how sure, in
+/// words), a "Why?" button that opens [showWhySheet], and the one waiter
+/// row carrying [VerdictCopy.waiterLine]. The net-carb chip and the
+/// hidden-carb flags stay only while [holdsKeto]. Otherwise the card is
+/// exactly as before.
 class DishCard extends StatefulWidget {
   /// Creates a card for [row], formatting its price for [localeTag] and
   /// calling [onShowScript] with [row] when the user asks to open the
@@ -38,6 +57,10 @@ class DishCard extends StatefulWidget {
     this.onEditNote,
     this.showPrice = true,
     this.unclassified = false,
+    this.evaluated,
+    this.wording = ProfileWording.ketoOnly,
+    this.holdsKeto = true,
+    this.bantoMode = BantoMode.enabled,
     super.key,
   });
 
@@ -74,6 +97,25 @@ class DishCard extends StatefulWidget {
   /// analysis means the menu has not been analysed yet.
   final bool unclassified;
 
+  /// The dish's on-device evaluation for the profile (Banto, ALG-05), or
+  /// null for a keto-only screen.
+  final EvaluatedDish? evaluated;
+
+  /// How the profile asks for the state to be worded; keto-only renders
+  /// the card exactly as before.
+  final ProfileWording wording;
+
+  /// Whether keto is in the profile, so the net-carb chip and the
+  /// hidden-carb flags still apply. Read only in state mode.
+  final bool holdsKeto;
+
+  /// Whether this build shows Banto surfaces (D26's convention).
+  final bool bantoMode;
+
+  /// Whether this card renders [evaluated]'s state rather than the keto
+  /// verdict.
+  bool get _stateMode => bantoMode && wording.usesStates && evaluated != null;
+
   @override
   State<DishCard> createState() => _DishCardState();
 }
@@ -94,10 +136,20 @@ class _DishCardState extends State<DishCard> {
     final dish = row.dish;
     final analysis = row.analysis;
     final verdict = analysis?.verdict;
-    final tone = verdict == null
+    final evaluated = widget._stateMode ? widget.evaluated : null;
+    final state = evaluated?.state;
+    final tone = state != null
+        ? VerdictColors.of(context).forState(state)
+        : verdict == null
         ? null
         : VerdictColors.of(context).forVerdict(verdict);
     final isModifiable = verdict == DishVerdict.modifiable;
+    // In state mode the one waiter row carries the evaluator's change or
+    // the question to ask; the keto script row is not shown.
+    final stateLine = evaluated == null
+        ? null
+        : VerdictCopy.waiterLine(evaluated, dish);
+    final showKeto = evaluated == null || widget.holdsKeto;
     // AnalysedDish's own doc comment guarantees `modification` is set
     // exactly when `verdict` is modifiable, and `tryFrom` enforces that on
     // every value that came from the cache or the LLM parser — but the
@@ -115,7 +167,9 @@ class _DishCardState extends State<DishCard> {
     final neutralSurfaces = NeutralSurfaces.of(context);
     final ambient = Directionality.of(context);
 
-    final cardEdge = _cardEdge(theme, neutralSurfaces, verdict, tone);
+    final cardEdge = state != null
+        ? _stateCardEdge(theme, neutralSurfaces, state, tone!)
+        : _cardEdge(theme, neutralSurfaces, verdict, tone);
     final hasNote =
         widget.onEditNote != null &&
         widget.note != null &&
@@ -144,7 +198,10 @@ class _DishCardState extends State<DishCard> {
                   : WrapAlignment.end,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                if (analysis != null) StatusBadge(verdict: analysis.verdict),
+                if (state != null)
+                  StateBadge(state: state, wording: widget.wording)
+                else if (analysis != null)
+                  StatusBadge(verdict: analysis.verdict),
                 if (showAddNote)
                   _AddNoteButton(onPressed: () => widget.onEditNote!(row)),
               ],
@@ -197,7 +254,7 @@ class _DishCardState extends State<DishCard> {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-            if (netCarbs != null && tone != null && verdict != null)
+            if (netCarbs != null && tone != null && verdict != null && showKeto)
               NetCarbsChip(
                 label: _netCarbsLabel(l10n, netCarbs, leavesGrams),
                 semanticLabel: l10n.netCarbsChipSemanticLabel(
@@ -227,7 +284,42 @@ class _DishCardState extends State<DishCard> {
             const SizedBox(height: 8),
             _NoteRow(note: widget.note!, onTap: () => widget.onEditNote!(row)),
           ],
-          if (isModifiable && tone != null) ...[
+          if (evaluated != null) ...[
+            const SizedBox(height: 8),
+            _ConcernsBlock(
+              evaluated: evaluated,
+              hebrew: VerdictCopy.dishIsHebrew(dish),
+              dishName: dish.name,
+              strictProfile: widget.wording == ProfileWording.strict,
+              bantoMode: widget.bantoMode,
+            ),
+          ],
+          if (evaluated != null && stateLine != null && tone != null) ...[
+            const SizedBox(height: 8),
+            _ScriptDisclosure(
+              expanded: _scriptExpanded,
+              tone: tone,
+              label: state == DishState.ask
+                  ? l10n.dishCardAskQuestion
+                  : l10n.dishCardAskWaiter,
+              onTap: () => setState(() => _scriptExpanded = !_scriptExpanded),
+            ),
+            if (_scriptExpanded) ...[
+              const SizedBox(height: 8),
+              WaiterScriptWidget(
+                script: stateLine,
+                trailingAction: _FullScreenAction(
+                  dishName: dish.name,
+                  onPressed: () => widget.onShowScript(row),
+                ),
+              ),
+              if (showKeto && analysis!.hiddenCarbs.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                _HiddenCarbsRow(hiddenCarbs: analysis.hiddenCarbs, tone: tone),
+              ],
+            ],
+          ],
+          if (evaluated == null && isModifiable && tone != null) ...[
             const SizedBox(height: 8),
             _ScriptDisclosure(
               expanded: _scriptExpanded,
@@ -266,7 +358,9 @@ class _DishCardState extends State<DishCard> {
       borderRadius: BorderRadius.circular(15),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: _cardBackground(theme, neutralSurfaces, verdict, tone),
+          color: state != null
+              ? _stateCardBackground(theme, neutralSurfaces, state, tone!)
+              : _cardBackground(theme, neutralSurfaces, verdict, tone),
           border: Border.all(color: cardEdge),
         ),
         child: tone == null
@@ -329,6 +423,206 @@ Color _cardEdge(
   DishVerdict.nonKeto => neutralSurfaces.line2,
 };
 
+/// The card background for a Banto [state] (ALG-05): fits takes green's
+/// tint, as an order-as-is dish does; fits with a change and ask the plain
+/// card colour; avoid red's quieter second surface.
+Color _stateCardBackground(
+  ThemeData theme,
+  NeutralSurfaces neutralSurfaces,
+  DishState state,
+  VerdictTone tone,
+) => switch (state) {
+  DishState.fits => tone.tint,
+  DishState.fitsWithChange || DishState.ask => theme.cardColor,
+  DishState.avoid => neutralSurfaces.surface2,
+};
+
+/// The card edge for a Banto [state]: ask is outlined in its own orange,
+/// the shape signal its pill carries too; the rest follow [_cardEdge].
+Color _stateCardEdge(
+  ThemeData theme,
+  NeutralSurfaces neutralSurfaces,
+  DishState state,
+  VerdictTone tone,
+) => switch (state) {
+  DishState.fits => tone.tint,
+  DishState.fitsWithChange => theme.dividerColor,
+  DishState.ask => tone.rail,
+  DishState.avoid => neutralSurfaces.line2,
+};
+
+/// The key of the concern line at [index] on a dish card (ALG-05).
+Key dishConcernKey(int index) => ValueKey<String>('dishConcern_$index');
+
+/// The key of a dish card's "Why?" button (ALG-05).
+const Key dishWhyKey = ValueKey<String>('dishWhy');
+
+/// Where [concern] was found, in words of the UI language, with the menu
+/// text it matched when that text is not already the dish's own name or
+/// description: "option: bread", "hidden: soy sauce".
+String concernSourceLabel(AppLocalizations l10n, Concern concern) {
+  final source = switch (concern.source) {
+    ConcernSource.name => l10n.concernSourceName,
+    ConcernSource.description => l10n.concernSourceDescription,
+    ConcernSource.option => l10n.concernSourceOption,
+    ConcernSource.hidden => l10n.concernSourceHidden,
+    ConcernSource.model => l10n.concernSourceModel,
+  };
+  final text = concern.matchedText;
+  final quoted = switch (concern.source) {
+    ConcernSource.name || ConcernSource.description => false,
+    ConcernSource.option ||
+    ConcernSource.hidden ||
+    ConcernSource.model => text != null && text.trim().isNotEmpty,
+  };
+  return quoted ? l10n.concernSourceWithText(source, text!) : source;
+}
+
+/// How sure [certainty] is, in words, never a number (ALG-06).
+String concernCertaintyLabel(AppLocalizations l10n, Certainty certainty) =>
+    switch (certainty) {
+      Certainty.stated => l10n.concernCertaintyStated,
+      Certainty.likely => l10n.concernCertaintyLikely,
+      Certainty.suspected => l10n.concernCertaintySuspected,
+    };
+
+/// The concern lines under a Banto dish (ALG-05) and the "Why?" button
+/// that opens the Why sheet (ALG-06).
+///
+/// A plain [Column], not a lazy list: a dish has a handful of concerns.
+class _ConcernsBlock extends StatelessWidget {
+  const new({
+    required this.evaluated,
+    required this.hebrew,
+    required this.dishName,
+    required this.strictProfile,
+    required this.bantoMode,
+  });
+
+  /// The dish's evaluation, whose [EvaluatedDish.concerns] are listed.
+  final EvaluatedDish evaluated;
+
+  /// Whether the dish's own text is Hebrew, the language the restriction
+  /// names are shown in.
+  final bool hebrew;
+
+  /// The dish's name, for the Why sheet and the button's label.
+  final String dishName;
+
+  /// Whether the profile holds a strict entry, for the Why sheet.
+  final bool strictProfile;
+
+  /// Passed through to [showWhySheet].
+  final bool bantoMode;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final concerns = evaluated.concerns;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var i = 0; i < concerns.length; i++)
+          Padding(
+            key: dishConcernKey(i),
+            padding: const EdgeInsets.only(bottom: 6),
+            child: _ConcernLine(concern: concerns[i], hebrew: hebrew),
+          ),
+        Semantics(
+          button: true,
+          label: l10n.dishCardWhySemanticLabel(dishName),
+          excludeSemantics: true,
+          onTap: () => _openWhy(context),
+          child: TextButton.icon(
+            key: dishWhyKey,
+            style: TextButton.styleFrom(
+              visualDensity: VisualDensity.compact,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              minimumSize: const Size(48, 36),
+            ),
+            onPressed: () => _openWhy(context),
+            icon: const Icon(Icons.info_outline, size: 16),
+            label: Text(l10n.dishCardWhy),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _openWhy(BuildContext context) => unawaited(
+    showWhySheet(
+      context,
+      dishName: dishName,
+      concerns: evaluated.concerns,
+      strictProfile: strictProfile,
+      bantoMode: bantoMode,
+    ),
+  );
+}
+
+/// One concern: a restriction chip named in the dish's language and
+/// coloured by its kind (strict red, flexible amber), then where it was
+/// found and how sure, in words.
+class _ConcernLine extends StatelessWidget {
+  const new({required this.concern, required this.hebrew});
+
+  /// The concern this line shows.
+  final Concern concern;
+
+  /// Whether the dish's text is Hebrew, the restriction name's language.
+  final bool hebrew;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colors = VerdictColors.of(context);
+    final strict = restrictionFor(concern.restrictionId).isStrict;
+    final chipTone = strict ? colors.red : colors.amber;
+    final name = VerdictCopy.restrictionName(
+      concern.restrictionId,
+      hebrew: hebrew,
+    );
+    final source = concernSourceLabel(l10n, concern);
+    final certainty = concernCertaintyLabel(l10n, concern.certainty);
+    return Semantics(
+      label: l10n.concernLineSemanticLabel(name, source, certainty),
+      excludeSemantics: true,
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 4,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: chipTone.tint,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              child: Text(
+                name,
+                // Read beside the dish's own name, in its language.
+                textDirection: hebrew ? TextDirection.rtl : TextDirection.ltr,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: chipTone.ink,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+          Text(
+            l10n.concernLineText(source, certainty),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// The net-carb chip's visible text: "~3g net carbs (estimate)", with a
 /// " · leaves 5g" suffix when a budget is active ([leavesGrams] non-null).
 String _netCarbsLabel(
@@ -349,13 +643,22 @@ String _netCarbsLabel(
 /// `expanded` flag, so a screen reader announces the disclosure state
 /// without a second, hand-written phrase for it.
 class _ScriptDisclosure extends StatelessWidget {
-  const new({required this.expanded, required this.tone, required this.onTap});
+  const new({
+    required this.expanded,
+    required this.tone,
+    required this.onTap,
+    this.label,
+  });
 
   /// Whether the script panel below this row is currently shown.
   final bool expanded;
 
-  /// This dish's verdict tone; always amber, since this row only ever
-  /// appears for a [DishVerdict.modifiable] dish.
+  /// The collapsed row's text; null for the keto row's "Ask your waiter".
+  /// Banto's ask state passes "What to ask the waiter" (ALG-05).
+  final String? label;
+
+  /// This dish's tone: amber for a [DishVerdict.modifiable] dish, and in
+  /// Banto's state mode amber or the "ask" orange.
   final VerdictTone tone;
 
   /// Called when the row is tapped, to toggle [expanded].
@@ -364,7 +667,9 @@ class _ScriptDisclosure extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final label = expanded ? l10n.dishCardHideScript : l10n.dishCardAskWaiter;
+    final label = expanded
+        ? l10n.dishCardHideScript
+        : (this.label ?? l10n.dishCardAskWaiter);
     return Semantics(
       button: true,
       expanded: expanded,

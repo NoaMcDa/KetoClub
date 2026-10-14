@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/theme/app_tokens.dart';
+import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 
 /// The five colours one verdict needs, read off the artboard's own
 /// `verdictStyles` table (`.design/Main.dc.html` around line 178).
@@ -103,8 +104,10 @@ final class VerdictTone {
   int get hashCode => Object.hash(rail, pill, tint, ink, on);
 }
 
-/// A [ThemeExtension] carrying the three verdict palettes (architecture.md
-/// §6.6): green ("order as-is"), amber ("modify") and red ("not keto").
+/// A [ThemeExtension] carrying the verdict palettes (architecture.md
+/// §6.6): green ("order as-is"), amber ("modify") and red ("not keto"),
+/// plus Banto's [ask] ("ask the restaurant", ALG-05, issue #347), which no
+/// keto verdict ever uses.
 ///
 /// Registered on both [ThemeData.extensions] in `app_theme.dart`. Widgets
 /// read it through [VerdictColors.of], never by constructing their own
@@ -112,7 +115,12 @@ final class VerdictTone {
 @immutable
 final class VerdictColors extends ThemeExtension<VerdictColors> {
   /// Creates a set of verdict palettes.
-  const new({required this.green, required this.amber, required this.red});
+  const new({
+    required this.green,
+    required this.amber,
+    required this.red,
+    required this.ask,
+  });
 
   /// The light-mode palette, built straight from [AppTokens] — see the
   /// class doc comment for how the artboard's roles map onto [VerdictTone].
@@ -149,6 +157,14 @@ final class VerdictColors extends ThemeExtension<VerdictColors> {
         ink: AppTokens.lightRedInk,
         on: AppTokens.lightRedOn,
       ),
+      // Outlined, like red: the pill is the tint, so its text is the ink.
+      ask: VerdictTone(
+        rail: AppTokens.lightAsk,
+        pill: AppTokens.lightAskTint,
+        tint: AppTokens.lightAskTint,
+        ink: AppTokens.lightAskInk,
+        on: AppTokens.lightAskOn,
+      ),
     );
   }
 
@@ -178,6 +194,13 @@ final class VerdictColors extends ThemeExtension<VerdictColors> {
         ink: AppTokens.darkRedInk,
         on: AppTokens.darkRedOn,
       ),
+      ask: VerdictTone(
+        rail: AppTokens.darkAsk,
+        pill: AppTokens.darkAskTint,
+        tint: AppTokens.darkAskTint,
+        ink: AppTokens.darkAskInk,
+        on: AppTokens.darkAskOn,
+      ),
     );
   }
 
@@ -190,6 +213,10 @@ final class VerdictColors extends ThemeExtension<VerdictColors> {
   /// The "not keto" tone.
   final VerdictTone red;
 
+  /// The "ask the restaurant" tone (Banto, ALG-05): an orange drawn
+  /// outlined, its [VerdictTone.pill] the tint and its border the rail.
+  final VerdictTone ask;
+
   /// The tone for [verdict]. An exhaustive switch with no `default`: adding
   /// a [DishVerdict] value without updating this function is a compile
   /// error (architecture.md §10).
@@ -197,6 +224,16 @@ final class VerdictColors extends ThemeExtension<VerdictColors> {
     DishVerdict.orderAsIs => green,
     DishVerdict.modifiable => amber,
     DishVerdict.nonKeto => red,
+  };
+
+  /// The tone for a Banto [DishState] (ALG-05, issue #347): fits is
+  /// green, fits with a change amber, ask the outlined [ask] orange and
+  /// avoid red. An exhaustive switch with no `default`.
+  VerdictTone forState(DishState state) => switch (state) {
+    DishState.fits => green,
+    DishState.fitsWithChange => amber,
+    DishState.ask => ask,
+    DishState.avoid => red,
   };
 
   /// Reads the [VerdictColors] registered on the ambient [Theme].
@@ -223,11 +260,13 @@ final class VerdictColors extends ThemeExtension<VerdictColors> {
     VerdictTone? green,
     VerdictTone? amber,
     VerdictTone? red,
+    VerdictTone? ask,
   }) {
     return VerdictColors(
       green: green ?? this.green,
       amber: amber ?? this.amber,
       red: red ?? this.red,
+      ask: ask ?? this.ask,
     );
   }
 
@@ -238,6 +277,7 @@ final class VerdictColors extends ThemeExtension<VerdictColors> {
       green: VerdictTone.lerp(green, other.green, t),
       amber: VerdictTone.lerp(amber, other.amber, t),
       red: VerdictTone.lerp(red, other.red, t),
+      ask: VerdictTone.lerp(ask, other.ask, t),
     );
   }
 
@@ -246,8 +286,9 @@ final class VerdictColors extends ThemeExtension<VerdictColors> {
       other is VerdictColors &&
       other.green == green &&
       other.amber == amber &&
-      other.red == red;
+      other.red == red &&
+      other.ask == ask;
 
   @override
-  int get hashCode => Object.hash(green, amber, red);
+  int get hashCode => Object.hash(green, amber, red, ask);
 }

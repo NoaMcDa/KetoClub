@@ -3347,6 +3347,141 @@ term guard names another food (sushi, spring, rice paper, lettuce and the
 fish of a sushi menu), which lowers it to `suspected`, never drops it. The
 one `contains` miss left is the filled Bamba's sesame, a label question.
 
+**The Why sheet (ALG-06, #348).** `lib/widgets/why_sheet.dart` is the "why this
+result" bottom sheet, built and tested on its own and wired into no screen
+yet. `WhySheet` takes a dish name, a list of `Concern` and whether the profile
+is strict, and shows one row per concern: the restriction's name in the UI
+language, the evidence tier as a phrase (declared by the platform, stated on
+the menu, inferred from a typical recipe, suspected (please ask), confirmed by
+you, ruled out by you), where it was found, the matched text quoted and the
+waiter question. Confidence is words, never a number or a percentage. An empty
+list says nothing in the menu text points to the profile, adding "still ask the
+restaurant" for a strict profile, and never says the dish is fine; the footer
+is `helperToolSentence`. `showWhySheet` opens it through `showKetoClubSheet`
+(560 px cap) and, like the widget, does nothing with `bantoMode` off. The
+strings are new ARB keys (`why*`), so the banned-words test covers them.
+
+ALG-02b (#344) adds the profile's two other surfaces, both behind `bantoMode`.
+`AppSettings.onboardingSeen` (JSON key `restrictionOnboardingSeen`, **written
+only when true**, so the keto record stays byte-identical) records that the
+first-run "What do you avoid?" screen was completed or skipped.
+`RestrictionOnboardingGate` wraps the `/` route: with the flag off it returns
+its child at once and builds no controller; with it on it reads the settings
+once and shows `RestrictionOnboardingScreen` (the taxonomy as chips grouped by
+kind, no severity question, the helper-tool sentence, "Continue" which saves
+the picks in tap order, "Skip" which saves none, both marking it seen) only
+when it was not seen and the profile is still empty, so a user who added
+restrictions in Settings first is never asked. Deep links to a venue skip it.
+On the menu screen `MenuFiltersRow` takes an optional `summary` line kept
+visible under the disclosure row; with the flag on and a non-empty profile
+`ProfileSummaryLine` fills it with "Checking for: sesame, lactose" in the UI
+language, naming restrictions only and never calling a menu safe. Tapping it
+opens Settings and `MenuController.refreshProfile` re-reads the profile on
+return. `MenuController.profile` is read from the device's settings in `open`
+and goes nowhere else.
+**The matcher's guards lower, sit beside their term, and read the maqaf
+(ALG-04a, related to #346).** Three allergen-only rules replace the keto guard
+window inside `AllergenMatcher`, and its Python twin follows them. **A guard
+lowers, never cancels** (file 11 §0): a guarded trigger ("peanut-free", "oat
+milk" beside dairy milk) is still a hit, `suspected` with a new
+`AllergenHit.guarded` flag (in equality, `toString` and the golden), because
+the app never tells an allergic person something is absent on a heuristic.
+**A guard counts only in the slot adjacent to its term**: a `before` phrase
+must end on the word just before the match and an `after` phrase start on
+the word just after it, so "no sesame or tahini" lowers sesame and leaves
+tahini stated; a Hebrew guard's first word may carry one or two prefix
+letters before its term ("וללא טחינה") but only the article ה after it ("חלב
+השקדים"; "חלב וסויה" is milk *and* soy). `ClassificationRules.isGuarded` and
+its two-word window are unchanged and keto's alone. **Per-term guards**,
+`RestrictionVocabulary.termGuards` (term as written → `AllergenGuards`,
+default empty), add to the restriction's guards for that one term, for the
+compounds that name another food: rice flour, coconut/almond/oat/soy milk,
+oyster mushroom, crab apple; a compound that names an allergen of its own
+stays a stated trigger of it ("almond milk" is tree nuts). **The maqaf
+U+05BE reads as a space** before the matcher normalises
+(`AllergenMatcher.matchText`, `dishMatchText`), where `TextNormaliser`
+deletes it as a Hebrew point and glues "חמאת־בוטנים" into one word; the
+normaliser itself is untouched, the replacement is length-preserving, and
+offsets index the match text, which equals the normalised text wherever
+there is no maqaf. `allergens.json` gains `termGuards`, each hit's `guarded`
+and each case's `matchText`; no keto golden changed.
+
+**Rules concerns and the on-device `ProfileEvaluator` (ALG-04b, related to
+#346).** `ClassificationRules.allergenFindings(dish)` runs `AllergenMatcher.find`
+over the name, the description and each non-removal option value on its own
+(group names are not read; a maqaf-joined removal value is still a removal)
+and returns one `Concern` per hit, profile-independent (C1): source `hidden`
+for a hidden-list trigger (a new `AllergenHit.hidden` flag, kept out of
+`allergens.json` so that golden did not change) and the part's otherwise,
+the hit's certainty, tier `stated` for a direct unguarded trigger and
+`inferred` for a hidden or guarded one, and `matchedText` the menu's own
+slice ("TAHINI", "בַּטְּחִינָה"), recovered by binary search because the match
+text of a raw prefix is a prefix of the whole. `allergenConcerns` keeps one per
+restriction, the surest and the earliest at a tie, in taxonomy order; the
+heuristic classifier attaches it to every dish only when
+`restrictionsRequested`, so keto output is byte-identical, and
+`backend/app/keto/rules.py`/`heuristic.py` do the same, replayed through a new
+golden, `allergen_concerns.json` (the hand-written dishes, six labelled corpus
+menus and the three golden menus classified with the flag on). To keep the
+import graph acyclic the two trigger patterns moved to
+`utils/trigger_patterns.dart`, which `classification_rules.dart` re-exports.
+`utils/allergens/profile_evaluator.dart` is device-only: `ProfileEvaluator.evaluate(analysed,
+dish, profile)` unions the rule findings (always recomputed from the dish),
+the analysis's own concerns and concerns read from its `ingredients` (source
+`model`, the weaker of the two certainties, the role carried); keeps the
+profile's ids, never keto, dropping a concern whose matched text holds one of
+its entry's exceptions as whole words; and derives `DishState`, worst first:
+a stated/likely concern on a part that cannot be left off (base, protein,
+unknown role, name, description, hidden source), or `nonKeto` with keto in
+the profile → `avoid`; a suspected concern on a strict entry → `ask`; a
+stated/likely concern only on removable parts (side, sauce, garnish,
+option), or `modifiable` with keto in the profile → `fitsWithChange`, with
+keto's script and then "Ask for it without X" / "לבקש את המנה בלי X" in the
+menu's language (§6.3's exception); else `fits`. A flexible entry's suspected
+concern is listed and moves nothing; an empty profile holds keto and is the
+identity of today's verdicts; the wire verdict is never rewritten. The state
+is computed from every finding, so a removable stated mention cannot mask a
+likely one in the name. `MenuController.evaluatedRows` pairs each analysed
+visible row with its evaluation for the profile recorded when the menu was
+last classified; nothing renders it yet (ALG-05).
+
+**The four-state menu screen and the Why sheet on the card (ALG-05, #347).**
+`ProfileWording` (`utils/profile_wording.dart`) is `ketoOnly` unless the
+screen's `bantoMode` is on and the profile holds a restriction besides keto,
+then `strict` with an allergen or celiac entry and `flexible` otherwise.
+`MenuController.open` takes `bantoMode` and records it with the profile;
+with a wording that uses states, `evaluations` (memoised per menu, analysis
+and profile) feed the dish cards, `stateCounts` (`VerdictCounts.ofStates`,
+food only, with a new `ask` field defaulting to 0, so keto counts and their
+equality and `toString` are unchanged), the filter and the share text,
+while the keto counts and score stay on the wire verdicts. `MenuFilter`
+gains `askOnly` (a keto screen reads it as `all`); in state mode
+`greenOnly`/`yellowOnly`/`redOnly` mean fits/with a change/avoid and
+`greenAndYellow` means "everything but avoid", which is the strict
+profile's opening filter unless one was last chosen. Every word comes from
+`widgets/verdict_copy.dart`: keto-only returns today's ARB strings
+verbatim (now also pinned through `keto_unchanged_test`'s `bantoMode`
+seams), a strict "fits" reads "No trigger found — ask the restaurant", the
+state legend ends on `helperToolSentence`, the header shows "N fit · M
+with a change · K to ask" instead of the keto score unless keto is in the
+profile, and a test sweeps every state, wording, filter and locale for
+"safe"/"בטוח". The share headings and a fallback "Does this dish contain
+X?" question follow the menu's language and so live in Dart
+(`MenuShareText.stateHeading`, `VerdictCopy.askQuestionFor`; §6.3's
+exception); the shared text names no restriction and copies no question.
+`StateBadge` pairs an icon and a word per state, ask drawn outlined in a
+new orange `VerdictColors.ask` tone (tokens `lightAsk*`/`darkAsk*`, every
+text pair pinned by `contrast_test`). In state mode `DishCard` lists one
+line per concern (the restriction from the taxonomy in the dish's own
+language, where it was found and how sure in words), a "Why?" button that
+opens `showWhySheet`, and one waiter row with the evaluator's change or
+the question to ask; the net-carb chip and hidden-carb flags stay only
+while keto is in the profile, as on the Waiter Card. The tiles become four,
+and a "Rules checked" chip sits beside the AI chip when the rules pass
+found something for the profile in a model result. `KetoClubApp` and
+`generateRoute` take `bantoMode` for the menu and Settings screens, so a
+flow test pumps Banto with no define.
+
 ---
 
 ## 15. Testing strategy
