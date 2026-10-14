@@ -57,20 +57,6 @@
    "reason": "hidden source: legumes mirrors its members: found once the soy, peanut and lupin hidden triggers listed in this table are added with the same terms ('pesto', 'granola', 'curry', 'pastry', gluten-free base) (11 §16.1)"
   },
   {
-   "id": "wheat",
-   "menu": "asian_takeaway_soy_peanut.json",
-   "dish": "Pork Egg Rolls",
-   "label": "contains",
-   "reason": "term gap: add 'egg roll' as a wheat and gluten trigger at likely (11 §7.1)"
-  },
-  {
-   "id": "gluten",
-   "menu": "asian_takeaway_soy_peanut.json",
-   "dish": "Pork Egg Rolls",
-   "label": "contains",
-   "reason": "term gap: add 'egg roll' as a wheat and gluten trigger at likely (11 §7.1)"
-  },
-  {
    "id": "legumes",
    "menu": "asian_takeaway_soy_peanut.json",
    "dish": "Pork Egg Rolls",
@@ -132,13 +118,6 @@
    "dish": "Chow Mein",
    "label": "may_contain",
    "reason": "hidden source: legumes mirrors its members: found once the soy, peanut and lupin hidden triggers listed in this table are added with the same terms ('pesto', 'granola', 'curry', 'pastry', gluten-free base) (11 §16.1)"
-  },
-  {
-   "id": "sesame",
-   "menu": "asian_takeaway_soy_peanut.json",
-   "dish": "Peking Duck Pancakes",
-   "label": "contains",
-   "reason": "certainty gap: raise 'hoisin' to sesame likely; it matches at suspected today (12 §5)"
   },
   {
    "id": "soy",
@@ -260,20 +239,6 @@
    "reason": "hidden source: add 'satay', 'stir-fry', 'garlic sauce', 'oyster sauce', 'chow mein', 'spring roll', 'sausage', bread classes and sweet wing glazes as soy hidden triggers at suspected (11 §6.2)"
   },
   {
-   "id": "wheat",
-   "menu": "bakery_lupin_sulphites.json",
-   "dish": "Part-baked Dinner Rolls",
-   "label": "contains",
-   "reason": "term gap: add the bread nouns 'roll' and 'rolls' as wheat and gluten triggers at likely (11 §7.1)"
-  },
-  {
-   "id": "gluten",
-   "menu": "bakery_lupin_sulphites.json",
-   "dish": "Part-baked Dinner Rolls",
-   "label": "contains",
-   "reason": "term gap: add the bread nouns 'roll' and 'rolls' as wheat and gluten triggers at likely (11 §7.1)"
-  },
-  {
    "id": "lupin",
    "menu": "bakery_lupin_sulphites.json",
    "dish": "Part-baked Dinner Rolls",
@@ -286,20 +251,6 @@
    "dish": "Part-baked Dinner Rolls",
    "label": "may_contain",
    "reason": "hidden source: legumes mirrors its members: found once the soy, peanut and lupin hidden triggers listed in this table are added with the same terms ('pesto', 'granola', 'curry', 'pastry', gluten-free base) (11 §16.1)"
-  },
-  {
-   "id": "wheat",
-   "menu": "bakery_lupin_sulphites.json",
-   "dish": "Fruit & Nut Loaf",
-   "label": "contains",
-   "reason": "term gap: add 'loaf' and 'wholemeal' as wheat and gluten triggers at likely (11 §7.1)"
-  },
-  {
-   "id": "gluten",
-   "menu": "bakery_lupin_sulphites.json",
-   "dish": "Fruit & Nut Loaf",
-   "label": "contains",
-   "reason": "term gap: add 'loaf' and 'wholemeal' as wheat and gluten triggers at likely (11 §7.1)"
   },
   {
    "id": "milk",
@@ -442,25 +393,11 @@
    "reason": "hidden source: add 'mayonnaise', 'aioli', 'tartar', 'ranch', 'coleslaw', 'dressing' and pickled (כבוש) as mustard hidden triggers at suspected (11 §13.2); expect false positives on every dressing"
   },
   {
-   "id": "eggs",
-   "menu": "golden_mixed.json",
-   "dish": "Beer-battered fish",
-   "label": "contains",
-   "reason": "certainty gap: raise 'tartare' to eggs likely; it matches at suspected today (11 §5.1)"
-  },
-  {
    "id": "mustard",
    "menu": "golden_mixed.json",
    "dish": "Beer-battered fish",
    "label": "may_contain",
    "reason": "hidden source: add 'mayonnaise', 'aioli', 'tartar', 'ranch', 'coleslaw', 'dressing' and pickled (כבוש) as mustard hidden triggers at suspected (11 §13.2); expect false positives on every dressing"
-  },
-  {
-   "id": "gluten",
-   "menu": "golden_mixed.json",
-   "dish": "Goldstar",
-   "label": "contains",
-   "reason": "term gap: add the Israeli beer brand 'Goldstar' (and Hebrew 'גולדסטאר') as a gluten trigger at likely (11 §7.1)"
   },
   {
    "id": "sulphites",
@@ -547,20 +484,6 @@
    "reason": "hidden source: add egg-bound dish classes as eggs hidden triggers at suspected: spring-roll wrappers, enriched buns, fresh pasta ('פסטה', 'פטוצ׳יני'), yeast pastry ('רוגלך'), cookies, filled dough ('חינקלי', 'סמבוסק', 'חצ׳פורי אימרולי'), creamy dressings (11 §5.2); expect false positives on every pastry and pasta"
   },
   {
-   "id": "wheat",
-   "menu": "il_georgian_khachapuri.json",
-   "dish": "חצ׳פורי מגרולי",
-   "label": "contains",
-   "reason": "term gap: add 'חצ׳פורי' (khachapuri) as a wheat and gluten trigger at likely (12 §1.4)"
-  },
-  {
-   "id": "gluten",
-   "menu": "il_georgian_khachapuri.json",
-   "dish": "חצ׳פורי מגרולי",
-   "label": "contains",
-   "reason": "term gap: add 'חצ׳פורי' (khachapuri) as a wheat and gluten trigger at likely (12 §1.4)"
-  },
-  {
    "id": "milk",
    "menu": "il_georgian_khachapuri.json",
    "dish": "לוביאני",
@@ -624,20 +547,6 @@
    "reason": "hidden source: add egg-bound dish classes as eggs hidden triggers at suspected: spring-roll wrappers, enriched buns, fresh pasta ('פסטה', 'פטוצ׳יני'), yeast pastry ('רוגלך'), cookies, filled dough ('חינקלי', 'סמבוסק', 'חצ׳פורי אימרולי'), creamy dressings (11 §5.2); expect false positives on every pastry and pasta"
   },
   {
-   "id": "wheat",
-   "menu": "il_pizza_pasta.json",
-   "dish": "פנה פסטו",
-   "label": "contains",
-   "reason": "term gap: add 'פנה' (penne) as a wheat and gluten trigger at likely, with strict word boundaries (12 §1.4)"
-  },
-  {
-   "id": "gluten",
-   "menu": "il_pizza_pasta.json",
-   "dish": "פנה פסטו",
-   "label": "contains",
-   "reason": "term gap: add 'פנה' (penne) as a wheat and gluten trigger at likely, with strict word boundaries (12 §1.4)"
-  },
-  {
    "id": "legumes",
    "menu": "il_pizza_pasta.json",
    "dish": "פנה פסטו",
@@ -659,13 +568,6 @@
    "reason": "hidden source: add 'stir-fry', 'garlic sauce', 'oyster sauce', 'risotto', 'cream sauce', fried fish and 'crispy wings' as wheat and gluten hidden triggers at suspected (11 §7.2)"
   },
   {
-   "id": "mustard",
-   "menu": "il_pizza_pasta.json",
-   "dish": "סלט רוקט",
-   "label": "contains",
-   "reason": "certainty gap: raise 'ויניגרט' to mustard likely; it matches at suspected today (12 §1.8)"
-  },
-  {
    "id": "sulphites",
    "menu": "il_pizza_pasta.json",
    "dish": "סלט רוקט",
@@ -673,53 +575,11 @@
    "reason": "hidden source: add 'ketchup' / 'קטשופ', 'bbq' / 'ברביקיו', 'vinaigrette', pickled (כבוש), sushi rice and beer brands as sulphites hidden triggers at suspected (11 §15.2)"
   },
   {
-   "id": "wheat",
-   "menu": "il_pizza_pasta.json",
-   "dish": "פוקאצ׳ה שום",
-   "label": "contains",
-   "reason": "term gap: add 'פוקאצ׳ה' (focaccia) as a wheat and gluten trigger at likely (12 §1.4)"
-  },
-  {
-   "id": "gluten",
-   "menu": "il_pizza_pasta.json",
-   "dish": "פוקאצ׳ה שום",
-   "label": "contains",
-   "reason": "term gap: add 'פוקאצ׳ה' (focaccia) as a wheat and gluten trigger at likely (12 §1.4)"
-  },
-  {
    "id": "sesame",
    "menu": "il_pizza_pasta.json",
    "dish": "פוקאצ׳ה שום",
    "label": "may_contain",
    "reason": "hidden source: add bread classes ('bread', 'לחם', 'roll', 'bun'), 'stir-fry', 'fried rice' and 'fortune cookie' as sesame hidden triggers at suspected (11 §11.2)"
-  },
-  {
-   "id": "wheat",
-   "menu": "il_pizza_pasta.json",
-   "dish": "טירמיסו",
-   "label": "contains",
-   "reason": "term gap: add 'ביסקוויט' and 'ביסקוויטים' (biscuits) as wheat and gluten triggers at likely (11 §7.1)"
-  },
-  {
-   "id": "gluten",
-   "menu": "il_pizza_pasta.json",
-   "dish": "טירמיסו",
-   "label": "contains",
-   "reason": "term gap: add 'ביסקוויט' and 'ביסקוויטים' (biscuits) as wheat and gluten triggers at likely (11 §7.1)"
-  },
-  {
-   "id": "wheat",
-   "menu": "il_seafood_grill.json",
-   "dish": "פילה סלמון בגלייז",
-   "label": "contains",
-   "reason": "term gap: add the compound 'גלייז סויה' (soy glaze) as a wheat and gluten trigger at likely; plain 'סויה' stays soy only (12 §1.4)"
-  },
-  {
-   "id": "gluten",
-   "menu": "il_seafood_grill.json",
-   "dish": "פילה סלמון בגלייז",
-   "label": "contains",
-   "reason": "term gap: add the compound 'גלייז סויה' (soy glaze) as a wheat and gluten trigger at likely; plain 'סויה' stays soy only (12 §1.4)"
   },
   {
    "id": "mustard",
@@ -932,20 +792,6 @@
    "reason": "hidden source: legumes mirrors its members: found once the soy, peanut and lupin hidden triggers listed in this table are added with the same terms ('pesto', 'granola', 'curry', 'pastry', gluten-free base) (11 §16.1)"
   },
   {
-   "id": "wheat",
-   "menu": "us_diner_shared_fryer.json",
-   "dish": "Philly Cheesesteak",
-   "label": "contains",
-   "reason": "term gap: add 'hoagie' as a wheat and gluten trigger at likely (11 §7.1)"
-  },
-  {
-   "id": "gluten",
-   "menu": "us_diner_shared_fryer.json",
-   "dish": "Philly Cheesesteak",
-   "label": "contains",
-   "reason": "term gap: add 'hoagie' as a wheat and gluten trigger at likely (11 §7.1)"
-  },
-  {
    "id": "sesame",
    "menu": "us_diner_shared_fryer.json",
    "dish": "Philly Cheesesteak",
@@ -965,20 +811,6 @@
    "dish": "Shrimp Basket",
    "label": "may_contain",
    "reason": "cross-contact: a shared-fryer statement belongs to the kitchen signals (ALG-07), not the dish matcher; no vocabulary addition (12 §5)"
-  },
-  {
-   "id": "wheat",
-   "menu": "us_diner_shared_fryer.json",
-   "dish": "New England Clam Chowder",
-   "label": "contains",
-   "reason": "term gap: add 'crackers' and 'oyster crackers' as wheat and gluten triggers at likely (11 §7.1)"
-  },
-  {
-   "id": "gluten",
-   "menu": "us_diner_shared_fryer.json",
-   "dish": "New England Clam Chowder",
-   "label": "contains",
-   "reason": "term gap: add 'crackers' and 'oyster crackers' as wheat and gluten triggers at likely (11 §7.1)"
   },
   {
    "id": "celery",
@@ -1014,20 +846,6 @@
    "dish": "French Fries",
    "label": "may_contain",
    "reason": "cross-contact: a shared-fryer statement belongs to the kitchen signals (ALG-07), not the dish matcher; no vocabulary addition (12 §5)"
-  },
-  {
-   "id": "wheat",
-   "menu": "us_diner_shared_fryer.json",
-   "dish": "Warm Apple Pie",
-   "label": "contains",
-   "reason": "certainty gap: raise 'pie' (a sweet pie has a crust) to wheat and gluten likely; it matches at suspected today (11 §7.1)"
-  },
-  {
-   "id": "gluten",
-   "menu": "us_diner_shared_fryer.json",
-   "dish": "Warm Apple Pie",
-   "label": "contains",
-   "reason": "certainty gap: raise 'pie' (a sweet pie has a crust) to wheat and gluten likely; it matches at suspected today (11 §7.1)"
   },
   {
    "id": "eggs",
@@ -1072,53 +890,11 @@
    "reason": "hidden source: add 'sashimi' / 'סשימי' and 'baked potato' as wheat and gluten hidden triggers at suspected, soy sauce being customary (12 §5)"
   },
   {
-   "id": "wheat",
-   "menu": "us_steakhouse.json",
-   "dish": "Pecan Pie",
-   "label": "contains",
-   "reason": "certainty gap: raise 'pie' (a sweet pie has a crust) to wheat and gluten likely; it matches at suspected today (11 §7.1)"
-  },
-  {
-   "id": "gluten",
-   "menu": "us_steakhouse.json",
-   "dish": "Pecan Pie",
-   "label": "contains",
-   "reason": "certainty gap: raise 'pie' (a sweet pie has a crust) to wheat and gluten likely; it matches at suspected today (11 §7.1)"
-  },
-  {
-   "id": "soy",
-   "menu": "wolt_hamosad.json",
-   "dish": "‫ארוחת צ'יזבורגר טבעוני 🌱",
-   "label": "contains",
-   "reason": "term gap: add the brand 'ביונד מיט' (Beyond Meat) as a soy trigger and a legumes (pea) trigger at likely (12 §1.11, 11 §16.2); the labels also cite a pea-and-soy protein note that is not in the dish text"
-  },
-  {
-   "id": "legumes",
-   "menu": "wolt_hamosad.json",
-   "dish": "‫ארוחת צ'יזבורגר טבעוני 🌱",
-   "label": "contains",
-   "reason": "term gap: add the brand 'ביונד מיט' (Beyond Meat) as a soy trigger and a legumes (pea) trigger at likely (12 §1.11, 11 §16.2); the labels also cite a pea-and-soy protein note that is not in the dish text"
-  },
-  {
-   "id": "gluten",
-   "menu": "wolt_hamosad.json",
-   "dish": "סאן מיגל",
-   "label": "contains",
-   "reason": "term gap: add the beer brand 'סאן מיגל' (San Miguel, also 'פרסקה סאן מיגל') as a gluten trigger at likely (11 §7.1)"
-  },
-  {
    "id": "sulphites",
    "menu": "wolt_hamosad.json",
    "dish": "סאן מיגל",
    "label": "may_contain",
    "reason": "hidden source: add 'ketchup' / 'קטשופ', 'bbq' / 'ברביקיו', 'vinaigrette', pickled (כבוש), sushi rice and beer brands as sulphites hidden triggers at suspected (11 §15.2)"
-  },
-  {
-   "id": "gluten",
-   "menu": "wolt_hamosad.json",
-   "dish": "פרסקה סאן מיגל",
-   "label": "contains",
-   "reason": "term gap: add the beer brand 'סאן מיגל' (San Miguel, also 'פרסקה סאן מיגל') as a gluten trigger at likely (11 §7.1)"
   },
   {
    "id": "sulphites",
@@ -1212,25 +988,11 @@
    "reason": "hidden source: legumes mirrors its members: found once the soy, peanut and lupin hidden triggers listed in this table are added with the same terms ('pesto', 'granola', 'curry', 'pastry', gluten-free base) (11 §16.1)"
   },
   {
-   "id": "soy",
-   "menu": "wolt_hamosad.json",
-   "dish": "טבעוני, תוספת ושתייה",
-   "label": "contains",
-   "reason": "term gap: add the brand 'ביונד מיט' (Beyond Meat) as a soy trigger and a legumes (pea) trigger at likely (12 §1.11, 11 §16.2); the labels also cite a pea-and-soy protein note that is not in the dish text"
-  },
-  {
    "id": "mustard",
    "menu": "wolt_hamosad.json",
    "dish": "טבעוני, תוספת ושתייה",
    "label": "may_contain",
    "reason": "hidden source: add 'mayonnaise', 'aioli', 'tartar', 'ranch', 'coleslaw', 'dressing' and pickled (כבוש) as mustard hidden triggers at suspected (11 §13.2); expect false positives on every dressing"
-  },
-  {
-   "id": "legumes",
-   "menu": "wolt_hamosad.json",
-   "dish": "טבעוני, תוספת ושתייה",
-   "label": "contains",
-   "reason": "term gap: add the brand 'ביונד מיט' (Beyond Meat) as a soy trigger and a legumes (pea) trigger at likely (12 §1.11, 11 §16.2); the labels also cite a pea-and-soy protein note that is not in the dish text"
   }
  ]
 }

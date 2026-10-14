@@ -407,6 +407,7 @@ void main() {
         _case(id, "Za'atar flatbread", _likely, "za'atar"),
         _case(id, 'Jerusalem bagel', _likely, 'Jerusalem bagel'),
         _case(id, 'Falafel plate', _suspected, 'falafel'),
+        _case(id, 'Duck with hoisin sauce', _likely, 'hoisin is sesame'),
         _case(id, 'Burger on a bun', _suspected, 'bun'),
         _case(id, 'Seeded loaf', _suspected, 'seeds in dough'),
         _case(id, 'Vegetable stir fry', _suspected, 'stir-fry oil'),

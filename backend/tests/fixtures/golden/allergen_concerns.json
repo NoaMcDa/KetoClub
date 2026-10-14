@@ -2254,6 +2254,38 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "Rolls",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Rolls",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "rolls",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "rolls",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "noodle",
           "restrictionId": "wheat",
@@ -2296,6 +2328,22 @@
           "restrictionId": "eggs",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Egg Rolls",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Egg Rolls",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -2358,11 +2406,43 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "Egg Rolls",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Egg Rolls",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Egg",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Rolls",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Rolls",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -2398,11 +2478,43 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "egg rolls",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "egg rolls",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "egg",
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "rolls",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "rolls",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -3499,7 +3611,7 @@
           "waiterQuestion": null
         },
         {
-          "certainty": "suspected",
+          "certainty": "likely",
           "matchedText": "hoisin",
           "restrictionId": "sesame",
           "source": "hidden",
@@ -3638,7 +3750,7 @@
           "waiterQuestion": null
         },
         {
-          "certainty": "suspected",
+          "certainty": "likely",
           "matchedText": "hoisin",
           "restrictionId": "sesame",
           "source": "hidden",
@@ -5125,8 +5237,8 @@
     {
       "concerns": [
         {
-          "certainty": "suspected",
-          "matchedText": "battered",
+          "certainty": "likely",
+          "matchedText": "Tartare",
           "restrictionId": "eggs",
           "source": "hidden",
           "tier": "inferred",
@@ -5256,7 +5368,7 @@
           "waiterQuestion": null
         },
         {
-          "certainty": "suspected",
+          "certainty": "likely",
           "matchedText": "Tartare",
           "restrictionId": "eggs",
           "source": "hidden",
@@ -5409,7 +5521,16 @@
       "name": "golden_mixed/11"
     },
     {
-      "concerns": [],
+      "concerns": [
+        {
+          "certainty": "likely",
+          "matchedText": "Goldstar",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        }
+      ],
       "dish": {
         "description": "",
         "id": "d",
@@ -5419,7 +5540,16 @@
         "page": null,
         "price": 10.0
       },
-      "findings": [],
+      "findings": [
+        {
+          "certainty": "likely",
+          "matchedText": "Goldstar",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        }
+      ],
       "name": "golden_mixed/12"
     },
     {
@@ -6583,6 +6713,22 @@
           "restrictionId": "vegan",
           "source": "description",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "ביסקוויט",
+          "restrictionId": "wheat",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "ביסקוויט",
+          "restrictionId": "gluten",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         }
       ],
@@ -15084,6 +15230,22 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "hoagie",
+          "restrictionId": "wheat",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "hoagie",
+          "restrictionId": "gluten",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "Cheesesteak",
           "restrictionId": "vegan",
           "source": "name",
@@ -15187,6 +15349,38 @@
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "hoagie",
+          "restrictionId": "wheat",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "hoagie",
+          "restrictionId": "gluten",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "roll",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "roll",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -15995,6 +16189,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "crackers",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "crackers",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Clam",
           "restrictionId": "molluscs",
@@ -16131,6 +16341,22 @@
           "restrictionId": "vegetarian",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "crackers",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "crackers",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -17707,7 +17933,7 @@
           "waiterQuestion": null
         },
         {
-          "certainty": "suspected",
+          "certainty": "likely",
           "matchedText": "Pie",
           "restrictionId": "wheat",
           "source": "hidden",
@@ -17715,7 +17941,7 @@
           "waiterQuestion": null
         },
         {
-          "certainty": "suspected",
+          "certainty": "likely",
           "matchedText": "Pie",
           "restrictionId": "gluten",
           "source": "hidden",
@@ -17742,7 +17968,7 @@
           "waiterQuestion": null
         },
         {
-          "certainty": "suspected",
+          "certainty": "likely",
           "matchedText": "Pie",
           "restrictionId": "wheat",
           "source": "hidden",
@@ -17750,7 +17976,7 @@
           "waiterQuestion": null
         },
         {
-          "certainty": "suspected",
+          "certainty": "likely",
           "matchedText": "Pie",
           "restrictionId": "gluten",
           "source": "hidden",
@@ -17766,7 +17992,7 @@
           "waiterQuestion": null
         },
         {
-          "certainty": "suspected",
+          "certainty": "likely",
           "matchedText": "pie",
           "restrictionId": "wheat",
           "source": "hidden",
@@ -17774,7 +18000,7 @@
           "waiterQuestion": null
         },
         {
-          "certainty": "suspected",
+          "certainty": "likely",
           "matchedText": "pie",
           "restrictionId": "gluten",
           "source": "hidden",
@@ -18078,7 +18304,7 @@
           "waiterQuestion": null
         },
         {
-          "certainty": "suspected",
+          "certainty": "likely",
           "matchedText": "Pie",
           "restrictionId": "wheat",
           "source": "hidden",
@@ -18086,7 +18312,7 @@
           "waiterQuestion": null
         },
         {
-          "certainty": "suspected",
+          "certainty": "likely",
           "matchedText": "Pie",
           "restrictionId": "gluten",
           "source": "hidden",
@@ -20263,8 +20489,8 @@
           {
             "concerns": [
               {
-                "certainty": "suspected",
-                "matchedText": "battered",
+                "certainty": "likely",
+                "matchedText": "Tartare",
                 "restrictionId": "eggs",
                 "source": "hidden",
                 "tier": "inferred",
@@ -20466,6 +20692,16 @@
             "why": "המנה מבוססת על קרואסון, ואי אפשר להפוך אותה לקטוגנית."
           },
           {
+            "concerns": [
+              {
+                "certainty": "likely",
+                "matchedText": "Goldstar",
+                "restrictionId": "gluten",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              }
+            ],
             "dishId": "x13",
             "hiddenCarbs": [],
             "modification": null,

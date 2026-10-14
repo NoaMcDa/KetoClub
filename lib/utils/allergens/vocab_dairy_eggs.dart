@@ -2727,7 +2727,7 @@ dairyEggsVocabulary = <RestrictionId, RestrictionVocabulary>{
       ),
       HiddenTrigger(
         term: 'tartare',
-        certainty: TriggerCertainty.suspected,
+        certainty: TriggerCertainty.likely,
         source: '11 §5.2',
       ),
       HiddenTrigger(
@@ -2946,7 +2946,7 @@ dairyEggsVocabulary = <RestrictionId, RestrictionVocabulary>{
       ),
       HiddenTrigger(
         term: 'טרטר',
-        certainty: TriggerCertainty.suspected,
+        certainty: TriggerCertainty.likely,
         source: '11 §5.2',
       ),
       HiddenTrigger(

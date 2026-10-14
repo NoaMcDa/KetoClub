@@ -113,6 +113,22 @@ void main() {
         'teriyaki:likely',
       ], why: 'is a likely hidden source'),
       _hit('Hoisin duck', RestrictionId.soy, <String>['hoisin:likely']),
+      _hit('Beyond Meat burger', RestrictionId.soy, <String>[
+        'beyond meat:likely',
+      ], why: 'a pea-and-soy brand'),
+      _hit('The Beyond Burger', RestrictionId.soy, <String>[
+        'beyond burger:likely',
+      ]),
+      _miss('Fields beyond the village', RestrictionId.soy, why: 'is no brand'),
+      _hit('המבורגר ביונד מיט', RestrictionId.soy, <String>[
+        'ביונד מיט:likely',
+      ]),
+      _hit('קציצה בביונד מיט', RestrictionId.soy, <String>[
+        'ביונד מיט:likely',
+      ], why: 'with a prefix letter'),
+      _hit('ביונד בורגר טבעוני', RestrictionId.soy, <String>[
+        'ביונד בורגר:likely',
+      ]),
       _hit('Chocolate with soy lecithin', RestrictionId.soy, <String>[
         'soy:stated',
         'lecithin:suspected',
@@ -244,7 +260,7 @@ void main() {
       _hit('Mustard sauce', RestrictionId.mustard, <String>['mustard:stated']),
       _hit('Dijon vinaigrette', RestrictionId.mustard, <String>[
         'dijon:stated',
-        'vinaigrette:suspected',
+        'vinaigrette:likely',
       ]),
       _hit('Honey-mustard glaze', RestrictionId.mustard, <String>[
         'honey mustard:stated',
@@ -278,9 +294,7 @@ void main() {
       _hit('סלט חצילים במיונז', RestrictionId.mustard, <String>[
         'מיונז:suspected',
       ]),
-      _hit('ויניגרט לימון', RestrictionId.mustard, <String>[
-        'ויניגרט:suspected',
-      ]),
+      _hit('ויניגרט לימון', RestrictionId.mustard, <String>['ויניגרט:likely']),
       _hit('מלפפונים חמוצים', RestrictionId.mustard, <String>[
         'מלפפונים חמוצים:suspected',
         'חמוצים:suspected',
@@ -493,6 +507,12 @@ void main() {
       ], why: 'a direct peanut term, so a direct legume term'),
       _hit('Peking duck with hoisin sauce', RestrictionId.legumes, <String>[
         'hoisin:likely',
+      ]),
+      _hit('Beyond Meat burger', RestrictionId.legumes, <String>[
+        'beyond meat:likely',
+      ], why: 'pea protein, so a legume'),
+      _hit('קציצה ביונד מיט בלחמנייה', RestrictionId.legumes, <String>[
+        'ביונד מיט:likely',
       ]),
       _hit('פילה סלמון בגלייז סויה־דבש', RestrictionId.legumes, <String>[
         'סויה־דבש:stated',
