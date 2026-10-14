@@ -3515,9 +3515,14 @@ reach is `KitchenSignals.scopeOf`, which reuses the signal term lists and
 needs no golden or Python twin: a fryer reaches the fried dishes, a shared
 grill the grilled ones and a bakery the bread, pastry and pizza dishes (each
 by the dish's rules text or its heading, as `of` reads them), a wok every dish
-of a section that holds a wok dish or is headed by one, and nuts and sesame
-the whole menu; `KitchenReach.of` then drops drinks and notices
-(`dishKindsOf`, D21), which share no fryer or counter. `strictThreats(profile)`
+of a section that holds a wok dish or is headed by one; nuts and sesame reach
+no dish. Their only honest reach would be the whole menu, and on an Israeli
+menu (tahini everywhere) that made every dish "ask" and "fits" disappear, so
+by the coordinator's decision (reversible, pending the owner) they are named
+in the notice with their staff question and demote nothing. `KitchenReach.of`
+then drops drinks and notices (`dishKindsOf`, D21), which share no fryer or
+counter, from the reach and from each signal's evidence, so a placeholder line
+("💙") is never shown as a fried dish. `strictThreats(profile)`
 keeps the signals that threaten a **strict** entry (an allergen or celiac
 disease): cross-contact is a trace, which an intolerance or a diet does not
 turn on, so a signal that threatens only flexible entries is not shown at all
@@ -3534,8 +3539,7 @@ first kind in `KitchenSignalKind` order speaks when several reach one entry.
 A dish with a change, to ask or to avoid is left as it is, flexible entries are
 never touched, the wire verdict never moves, and a keto-only profile holds no
 strict entry, so nothing changes for it (and `evaluations` is empty for it
-anyway). On an Israeli menu that names tahini this makes every prepared dish
-"ask" for a sesame allergy, which is the epic's point. With `bantoMode` on,
+anyway). With `bantoMode` on,
 `KitchenNotice` (`widgets/kitchen_notice.dart`) sits among the menu screen's
 notices: one `AppNotice.info` line, "This kitchen has a fryer and a bakery —
 ask about cross-contact" in the UI language, whose "Show questions" action
@@ -3545,8 +3549,7 @@ matters for, the dishes that show it and its question in the menu's language,
 a kitchen concern as "kitchen: a fryer" and the Why sheet as "This kitchen has
 a fryer — ask about cross-contact", with no "Matched" line; the new strings
 are `kitchen*`, `concernSourceKitchen` and `whySourceKitchen*` ARB keys, swept
-for "safe"/"בטוח". The ALG-05 tests whose menu names tahini and nuts now
-expect those dishes to be "ask".
+for "safe"/"בטוח".
 
 ---
 

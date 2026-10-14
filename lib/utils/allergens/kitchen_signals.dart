@@ -656,8 +656,12 @@ abstract final class KitchenSignals {
   /// * [KitchenSignalKind.sharedGrill]: the grilled dishes, by the dish's
   ///   text or its heading.
   /// * [KitchenSignalKind.bakery]: the bread, pastry and pizza dishes.
-  /// * [KitchenSignalKind.nuts] and [KitchenSignalKind.sesame]: every dish
-  ///   of the menu, because nothing on a menu says where the jar sits.
+  /// * [KitchenSignalKind.nuts] and [KitchenSignalKind.sesame]: no dish.
+  ///   Nothing on a menu says where the jar sits, so their only honest
+  ///   reach is the whole menu, and on an Israeli menu (tahini everywhere)
+  ///   that would make every dish "ask" and "fits" disappear. They stay in
+  ///   the kitchen notice, with their staff question, and demote nothing
+  ///   (the coordinator's decision, reversible).
   ///
   /// Every kind has an entry, whether or not [of] reports it; a caller
   /// reads only the kinds [of] did report. Pure; never throws.
@@ -666,7 +670,6 @@ abstract final class KitchenSignals {
     final wok = <String>{};
     final grill = <String>{};
     final bakery = <String>{};
-    final all = <String>{};
     for (final category in menu.categories) {
       final heading = TextNormaliser.normalise(category.name);
       final headingFried = _any(heading, _fried);
@@ -675,7 +678,6 @@ abstract final class KitchenSignals {
       var wokSection = _any(heading, _wok);
       for (final dish in category.dishes) {
         final text = TextNormaliser.dishRulesText(dish);
-        all.add(dish.id);
         if (headingFried || _any(text, _fried)) fryer.add(dish.id);
         if (headingGrill || _any(text, _grill)) grill.add(dish.id);
         if (headingBakery || _any(text, _bakery)) bakery.add(dish.id);
@@ -690,8 +692,8 @@ abstract final class KitchenSignals {
       KitchenSignalKind.wok: wok,
       KitchenSignalKind.sharedGrill: grill,
       KitchenSignalKind.bakery: bakery,
-      KitchenSignalKind.nuts: all,
-      KitchenSignalKind.sesame: all,
+      KitchenSignalKind.nuts: const <String>{},
+      KitchenSignalKind.sesame: const <String>{},
     };
   }
 

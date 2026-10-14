@@ -173,11 +173,9 @@ void main() {
       expect(controller.holdsKeto, isFalse);
       expect(controller.evaluationFor('salad')?.state, DishState.avoid);
       expect(controller.evaluationFor('cake')?.state, DishState.ask);
-      // Keto is not in the profile, so nothing rules the pasta out; but
-      // the menu names tahini and nuts, and those kitchen signals reach
-      // every dish of a strict profile (ALG-07), so it is one to ask.
-      expect(controller.evaluationFor('pasta')?.state, DishState.ask);
-      expect(controller.evaluationFor('steak')?.state, DishState.ask);
+      // Keto is not in the profile, so the pasta fits.
+      expect(controller.evaluationFor('pasta')?.state, DishState.fits);
+      expect(controller.evaluationFor('steak')?.state, DishState.fits);
     });
 
     test('a strict profile opens on everything but avoid', () async {
@@ -224,12 +222,10 @@ void main() {
       // Act / Assert
       await controller.setFilter(MenuFilter.redOnly);
       expect(_ids(controller), <String>['salad']);
-      // The tahini and nut kitchen signals turn the pasta and the steak
-      // from "fits" to "ask" (ALG-07).
       await controller.setFilter(MenuFilter.askOnly);
-      expect(_ids(controller), <String>['cake', 'pasta', 'steak']);
+      expect(_ids(controller), <String>['cake']);
       await controller.setFilter(MenuFilter.greenOnly);
-      expect(_ids(controller), isEmpty);
+      expect(_ids(controller), <String>['pasta', 'steak']);
       await controller.setFilter(MenuFilter.yellowOnly);
       expect(_ids(controller), isEmpty);
       await controller.setFilter(MenuFilter.all);
@@ -246,13 +242,12 @@ void main() {
       // Assert
       expect(
         controller.stateCounts,
-        // The pasta and the steak are "ask" through the kitchen (ALG-07).
         const VerdictCounts(
-          green: 0,
+          green: 2,
           yellow: 0,
           hiddenCarbYellow: 0,
           red: 1,
-          ask: 3,
+          ask: 1,
         ),
       );
       expect(controller.greenCount, 3);

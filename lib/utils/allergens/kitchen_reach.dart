@@ -7,7 +7,9 @@
 /// the menu's language. [KitchenReach.strictThreats] lists the signals
 /// that threaten a strict entry of a profile, the ones the menu screen's
 /// kitchen notice shows, and [applyKitchenSignals] demotes a dish that
-/// fits to "ask" when one of them reaches it.
+/// fits to "ask" when one of them reaches it (a fryer, a shared grill, a
+/// bakery or a wok; nuts and sesame are named in the notice and demote
+/// nothing, see [KitchenSignals.scopeOf]).
 ///
 /// Only strict entries (an allergen or celiac disease; [RestrictionKind
 /// .isStrict]) are touched: cross-contact is a trace, which matters to an
@@ -44,15 +46,34 @@ final class KitchenReach {
   ///
   /// The scope leaves out drinks and notices ([dishKindsOf], D21): a can
   /// of cola or a "dear customers" line shares no fryer, wok, grill or
-  /// counter, while a side or a sauce (an extra) does.
+  /// counter, while a side or a sauce (an extra) does. So does each
+  /// signal's evidence, which the kitchen notice shows as "Seen in": a
+  /// name is kept only when a food or extra dish carries it, so a
+  /// placeholder entry ("💙") is never named as a fried dish.
   factory of(Menu menu) {
-    final signals = KitchenSignals.of(menu);
-    if (signals.isEmpty) return empty;
+    final found = KitchenSignals.of(menu);
+    if (found.isEmpty) return empty;
     final kinds = dishKindsOf(menu);
     bool prepared(String id) => switch (kinds[id]) {
       DishKind.drink || DishKind.notice => false,
       DishKind.food || DishKind.extra || null => true,
     };
+    final preparedNames = <String>{
+      for (final dish in menu.allDishes)
+        if (prepared(dish.id)) dish.name,
+    };
+    final signals = List<KitchenSignal>.unmodifiable(<KitchenSignal>[
+      for (final signal in found)
+        KitchenSignal(
+          kind: signal.kind,
+          threatens: signal.threatens,
+          evidence: List<String>.unmodifiable(
+            signal.evidence.where(preparedNames.contains),
+          ),
+          questionEn: signal.questionEn,
+          questionHe: signal.questionHe,
+        ),
+    ]);
     final buffer = StringBuffer();
     for (final dish in menu.allDishes) {
       buffer
@@ -78,7 +99,8 @@ final class KitchenReach {
     hebrew: false,
   );
 
-  /// The signals the menu shows, in [KitchenSignalKind] order.
+  /// The signals the menu shows, in [KitchenSignalKind] order, their
+  /// evidence limited to food and extra dishes.
   final List<KitchenSignal> signals;
 
   /// The ids of the dishes each kind reaches.

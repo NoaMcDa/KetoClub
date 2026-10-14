@@ -57,7 +57,7 @@ final Menu _menu = Menu(
     MenuCategory(
       id: 'drinks',
       name: 'Drinks',
-      dishes: <Dish>[_dish('cola', 'Cola')],
+      dishes: <Dish>[_dish('cola', 'Cola'), _dish('shake', 'Cookie shake')],
     ),
   ],
 );
@@ -131,14 +131,14 @@ void main() {
       expect(kinds, KitchenSignalKind.values);
     });
 
-    final all = <String>{for (final dish in _menu.allDishes) dish.id};
     for (final (kind, expected) in <(KitchenSignalKind, Set<String>)>[
       (KitchenSignalKind.fryer, {'fries', 'friedBread'}),
       (KitchenSignalKind.wok, {'padThai', 'greens'}),
       (KitchenSignalKind.sharedGrill, {'steak', 'salmon'}),
-      (KitchenSignalKind.bakery, {'bread', 'friedBread', 'cake'}),
-      (KitchenSignalKind.nuts, all),
-      (KitchenSignalKind.sesame, all),
+      (KitchenSignalKind.bakery, {'bread', 'friedBread', 'cake', 'shake'}),
+      // Nuts and sesame are named in the notice and demote nothing.
+      (KitchenSignalKind.nuts, <String>{}),
+      (KitchenSignalKind.sesame, <String>{}),
     ]) {
       test('${kind.name} reaches $expected', () {
         // Act
@@ -185,7 +185,40 @@ void main() {
       for (final kind in KitchenSignalKind.values) {
         expect(_reach.reaches(kind, 'cola'), isFalse, reason: kind.name);
       }
-      expect(_reach.reaches(KitchenSignalKind.sesame, 'salad'), isTrue);
+      expect(_reach.reaches(KitchenSignalKind.bakery, 'shake'), isFalse);
+      expect(_reach.reaches(KitchenSignalKind.bakery, 'bread'), isTrue);
+    });
+
+    test('names only food and extras as evidence', () {
+      // Arrange: the only flour on the menu is in a drink.
+      final menu = Menu(
+        venueRef: _ref,
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: <MenuCategory>[
+          MenuCategory(
+            id: 'c1',
+            name: 'Mains',
+            dishes: <Dish>[_dish('a', 'Fried chicken')],
+          ),
+          MenuCategory(
+            id: 'c2',
+            name: 'Drinks',
+            dishes: <Dish>[_dish('b', 'Cookie shake')],
+          ),
+        ],
+      );
+
+      // Act
+      final reach = KitchenReach.of(menu);
+
+      // Assert: the signal stays, its "Seen in" loses the drink.
+      final bakery = reach.signals.firstWhere(
+        (signal) => signal.kind == KitchenSignalKind.bakery,
+      );
+      expect(KitchenSignals.of(menu).last.evidence, <String>['Cookie shake']);
+      expect(bakery.evidence, isEmpty);
+      expect(reach.signals.first.evidence, <String>['Fried chicken']);
     });
 
     test('reads the menu language', () {
@@ -327,35 +360,36 @@ void main() {
             ],
           ),
           (
-            'sesame: the whole menu',
+            'sesame: the sesame signal demotes nothing',
             [RestrictionId.sesame],
             'salad',
+            DishState.fits,
+            [],
+          ),
+          (
+            'peanuts: the nuts signal demotes nothing',
+            [RestrictionId.peanuts],
+            'fries',
+            DishState.fits,
+            [],
+          ),
+          (
+            'sesame: bread from the bakery',
+            [RestrictionId.sesame],
+            'bread',
             DishState.ask,
             [
               _kitchen(
                 RestrictionId.sesame,
-                KitchenSignalKind.sesame,
-                _questionEn(KitchenSignalKind.sesame),
+                KitchenSignalKind.bakery,
+                _questionEn(KitchenSignalKind.bakery),
               ),
             ],
           ),
           (
-            'peanuts: the whole menu',
-            [RestrictionId.peanuts],
-            'fries',
-            DishState.ask,
-            [
-              _kitchen(
-                RestrictionId.peanuts,
-                KitchenSignalKind.nuts,
-                _questionEn(KitchenSignalKind.nuts),
-              ),
-            ],
-          ),
-          (
-            'sesame: never a drink',
+            'sesame: never a drink, though it names a cookie',
             [RestrictionId.sesame],
-            'cola',
+            'shake',
             DishState.fits,
             [],
           ),

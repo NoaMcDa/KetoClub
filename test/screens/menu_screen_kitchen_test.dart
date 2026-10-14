@@ -52,6 +52,10 @@ final DietaryProfile _sesame = DietaryProfile.empty.withEntry(
   RestrictionId.sesame,
 );
 
+final DietaryProfile _celiac = DietaryProfile.empty.withEntry(
+  RestrictionId.gluten,
+);
+
 /// A controller whose model answers every dish of the fixture "order as
 /// is", over settings holding [profile].
 MenuController _controller(DietaryProfile profile) {
@@ -155,23 +159,69 @@ void main() {
     });
   }
 
-  testWidgets('the chips become one to ask; the cola is untouched', (
-    tester,
-  ) async {
+  testWidgets('sesame demotes nothing: the chips still fit', (tester) async {
     // Arrange
     final controller = _controller(_sesame);
 
     // Act
     await _pump(tester, controller, bantoMode: true);
 
-    // Assert
+    // Assert: the sesame signal is named in the notice only.
     final chips = controller.evaluationFor(_chipsId)!;
-    expect(chips.state, DishState.ask);
-    expect(chips.concerns.single.source, ConcernSource.kitchen);
-    expect(chips.concerns.single.restrictionId, RestrictionId.sesame);
-    expect(chips.dish.verdict, DishVerdict.orderAsIs);
+    expect(chips.state, DishState.fits);
+    expect(chips.concerns, isEmpty);
+  });
+
+  testWidgets('celiac: fried dishes share the fryer, the cola is untouched', (
+    tester,
+  ) async {
+    // Arrange
+    final controller = _controller(_celiac);
+
+    // Act
+    await _pump(tester, controller, bantoMode: true);
+
+    // Assert: every kitchen concern is the fryer's, on a dish now "ask"
+    // whose wire verdict did not move. (The plain chips carry a hidden
+    // gluten concern of their own, so they were "ask" already.)
+    final demoted = <EvaluatedDish>[
+      for (final evaluated in controller.evaluations.values)
+        if (evaluated.concerns.any(
+          (concern) => concern.source == ConcernSource.kitchen,
+        ))
+          evaluated,
+    ];
+    expect(demoted, isNotEmpty);
+    for (final evaluated in demoted) {
+      expect(evaluated.state, DishState.ask);
+      expect(evaluated.dish.verdict, DishVerdict.orderAsIs);
+      final kitchen = evaluated.concerns.singleWhere(
+        (concern) => concern.source == ConcernSource.kitchen,
+      );
+      expect(kitchen.restrictionId, RestrictionId.gluten);
+      expect(kitchen.matchedText, KitchenSignalKind.fryer.name);
+    }
     expect(controller.evaluationFor(_colaId)!.state, DishState.fits);
-    expect(controller.stateCounts.green, 0);
+  });
+
+  testWidgets('the fryer row never names the placeholder entry', (
+    tester,
+  ) async {
+    // Arrange
+    final l10n = await _pump(tester, _controller(_celiac), bantoMode: true);
+
+    // Act
+    await tester.tap(find.text(l10n.kitchenNoticeShow));
+    await tester.pumpAndSettle();
+
+    // Assert: the recorded menu's "💙" notice line shows a fryer to the
+    // pure pass, but is not a dish.
+    final seenIn = find.descendant(
+      of: find.byKey(kitchenNoticeRowKey(KitchenSignalKind.fryer)),
+      matching: find.textContaining('Seen in:'),
+    );
+    expect(seenIn, findsOneWidget);
+    expect(tester.widget<Text>(seenIn).data, isNot(contains('💙')));
   });
 
   testWidgets('a keto-only profile sees no notice and no demotion', (
