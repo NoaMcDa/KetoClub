@@ -4798,6 +4798,9 @@
           {
             "dishes": [
               {
+                "declaredTags": [
+                  "kosher"
+                ],
                 "description": "On the house",
                 "id": "1003",
                 "imageUrl": null,

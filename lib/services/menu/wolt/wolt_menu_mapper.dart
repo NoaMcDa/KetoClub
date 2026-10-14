@@ -53,6 +53,14 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 ///   String, and null for anything else — no `images`, an empty list, a
 ///   first entry that is not a map, or a `url` that is absent, the wrong
 ///   type or empty. A bad photo is never grounds to fail the whole fetch.
+/// - `dietary_preferences` becomes [Dish.declaredTags] (Banto, ALG-09):
+///   each entry that is a non-blank string is kept as written, and an
+///   entry that is a map contributes its `id`, else its `name`, when that
+///   is a non-blank string; repeats and anything else are dropped, and an
+///   absent or non-list field is no tags. Every item of the one recorded
+///   payload carries an empty list, so the entry shape is inferred, and a
+///   malformed list never fails the fetch. The item `tags` (UI badges
+///   such as "Popular") are not dietary and are read nowhere.
 /// - **Disabled items** (a non-null `disabled_info`, e.g. sold out today)
 ///   are kept. A dish's keto verdict does not depend on whether it can be
 ///   ordered this minute, and a menu that silently loses dishes between
@@ -214,8 +222,33 @@ abstract final class WoltMenuMapper {
       // A missing or malformed image is never a mapping failure; see
       // the class doc comment.
       imageUrl: _tryReadImageUrl(raw['images']),
+      // Read tolerantly, like the image; see the class doc comment.
+      declaredTags: _readDietaryPreferences(raw['dietary_preferences']),
     );
   }
+
+  /// An item's `dietary_preferences` as raw tags: a non-blank string as
+  /// written, a map's non-blank `id` or else `name`, first occurrence
+  /// kept. Empty for anything that is not a list. Never fails the mapping.
+  static List<String> _readDietaryPreferences(Object? raw) {
+    if (raw is! List<Object?>) return const <String>[];
+    final tags = <String>[];
+    for (final entry in raw) {
+      final tag = switch (entry) {
+        final String text => text,
+        final Map<String, Object?> map =>
+          _nonBlank(map['id']) ?? _nonBlank(map['name']),
+        _ => null,
+      };
+      if (tag == null || tag.trim().isEmpty || tags.contains(tag)) continue;
+      tags.add(tag);
+    }
+    return List<String>.unmodifiable(tags);
+  }
+
+  /// [raw] when it is a string that is not blank, else null.
+  static String? _nonBlank(Object? raw) =>
+      raw is String && raw.trim().isNotEmpty ? raw : null;
 
   /// The first entry of an item's `images` list's `url`, or null when
   /// there is no usable one. Never fails the mapping.

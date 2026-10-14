@@ -591,7 +591,12 @@ final class MenuController extends ChangeNotifier {
         if (row.analysis case final analysed?)
           (
             row: row,
-            evaluated: ProfileEvaluator.evaluate(analysed, row.dish, profile),
+            evaluated: ProfileEvaluator.evaluate(
+              analysed,
+              row.dish,
+              profile,
+              heading: row.category,
+            ),
           ),
     ];
   }
@@ -667,10 +672,18 @@ final class MenuController extends ChangeNotifier {
       return memo.evaluations;
     }
     final analysedById = _analysedById();
+    // The heading goes in too: a restaurant often declares "ללא גלוטן"
+    // or "טבעוני" once, on the section, not on each dish (ALG-09).
     final evaluations = <String, EvaluatedDish>{
-      for (final dish in currentMenu.allDishes)
-        if (analysedById[dish.id] case final analysed?)
-          dish.id: ProfileEvaluator.evaluate(analysed, dish, _profile),
+      for (final category in currentMenu.categories)
+        for (final dish in category.dishes)
+          if (analysedById[dish.id] case final analysed?)
+            dish.id: ProfileEvaluator.evaluate(
+              analysed,
+              dish,
+              _profile,
+              heading: category.name,
+            ),
     };
     _evaluationsMemo = (
       menu: currentMenu,

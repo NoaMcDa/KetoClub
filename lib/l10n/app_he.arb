@@ -688,5 +688,8 @@
   "dishCardAskQuestion": "מה לשאול את המלצר",
   "engineChipRulesChecked": "נבדק גם בכללים",
   "engineChipRulesCheckedSemanticLabel": "גם הכללים של האפליקציה בדקו את התפריט לפי ההגבלות שלך",
-  "concernLineText": "{source} · {certainty}"
+  "concernLineText": "{source} · {certainty}",
+  "whyTierDeclaredRestaurant": "הוצהר על ידי המסעדה",
+  "whyDeclaredAbsent": "מסומן \u201c{text}\u201d \u2014 זה מפחית את החשש אבל לא שולל אותו",
+  "dishCardDeclaredKosher": "כשר לפי הצהרת הפלטפורמה"
 }
