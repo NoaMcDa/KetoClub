@@ -6,6 +6,7 @@ import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
 import 'package:ketoclub/widgets/content_direction.dart';
+import 'package:ketoclub/widgets/kitchen_notice.dart';
 import 'package:ketoclub/widgets/restriction_picker_sheet.dart';
 
 /// The key of the concern row at [index], so a test can find one row
@@ -52,7 +53,18 @@ String whySourcePhrase(AppLocalizations l10n, ConcernSource source) =>
       ConcernSource.option => l10n.whySourceOption,
       ConcernSource.hidden => l10n.whySourceHidden,
       ConcernSource.model => l10n.whySourceModel,
+      ConcernSource.kitchen => l10n.whySourceKitchenGeneric,
     };
+
+/// The line saying where [concern] was found: [whySourcePhrase], except
+/// that a kitchen concern (ALG-07) names its kitchen, "This kitchen has a
+/// fryer — ask about cross-contact".
+String whyConcernSourcePhrase(AppLocalizations l10n, Concern concern) {
+  if (kitchenKindOf(concern) case final kind?) {
+    return l10n.whySourceKitchen(kitchenKindNoun(l10n, kind));
+  }
+  return whySourcePhrase(l10n, concern.source);
+}
 
 /// Opens the [WhySheet] for [dishName] as a modal bottom sheet capped at
 /// the app's sheet width ([showKetoClubSheet]).
@@ -225,7 +237,11 @@ class _ConcernRow extends StatelessWidget {
     final muted = theme.textTheme.bodySmall?.copyWith(
       color: theme.colorScheme.onSurfaceVariant,
     );
-    final matched = concern.matchedText;
+    // A kitchen concern's matched text is its kind's name, which
+    // [whyConcernSourcePhrase] already puts into words (ALG-07).
+    final matched = concern.source == ConcernSource.kitchen
+        ? null
+        : concern.matchedText;
     final question = concern.waiterQuestion;
 
     return Semantics(
@@ -249,7 +265,7 @@ class _ConcernRow extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 2),
-          Text(whySourcePhrase(l10n, concern.source), style: muted),
+          Text(whyConcernSourcePhrase(l10n, concern), style: muted),
           if (matched != null) ...[
             const SizedBox(height: 4),
             Text(

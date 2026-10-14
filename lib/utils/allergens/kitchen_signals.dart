@@ -645,6 +645,58 @@ abstract final class KitchenSignals {
   static List<KitchenSignal> of(Menu menu) =>
       _read(menu, AllergenMatcher.find, AllergenMatcher.findInDish);
 
+  /// Which of [menu]'s dishes each kind reaches, by dish id, for the
+  /// strict-entry demotion (ALG-07; `kitchen_reach.dart`). Device-only:
+  /// no golden or Python twin carries it.
+  ///
+  /// * [KitchenSignalKind.fryer]: the fried dishes, read exactly as [of]
+  ///   reads them (the dish's rules text or its category heading).
+  /// * [KitchenSignalKind.wok]: every dish of a category that holds a wok
+  ///   dish or whose heading names the wok: the wok's own section.
+  /// * [KitchenSignalKind.sharedGrill]: the grilled dishes, by the dish's
+  ///   text or its heading.
+  /// * [KitchenSignalKind.bakery]: the bread, pastry and pizza dishes.
+  /// * [KitchenSignalKind.nuts] and [KitchenSignalKind.sesame]: no dish.
+  ///   Nothing on a menu says where the jar sits, so their only honest
+  ///   reach is the whole menu, and on an Israeli menu (tahini everywhere)
+  ///   that would make every dish "ask" and "fits" disappear. They stay in
+  ///   the kitchen notice, with their staff question, and demote nothing
+  ///   (the coordinator's decision, reversible).
+  ///
+  /// Every kind has an entry, whether or not [of] reports it; a caller
+  /// reads only the kinds [of] did report. Pure; never throws.
+  static Map<KitchenSignalKind, Set<String>> scopeOf(Menu menu) {
+    final fryer = <String>{};
+    final wok = <String>{};
+    final grill = <String>{};
+    final bakery = <String>{};
+    for (final category in menu.categories) {
+      final heading = TextNormaliser.normalise(category.name);
+      final headingFried = _any(heading, _fried);
+      final headingGrill = _any(heading, _grill);
+      final headingBakery = _any(heading, _bakery);
+      var wokSection = _any(heading, _wok);
+      for (final dish in category.dishes) {
+        final text = TextNormaliser.dishRulesText(dish);
+        if (headingFried || _any(text, _fried)) fryer.add(dish.id);
+        if (headingGrill || _any(text, _grill)) grill.add(dish.id);
+        if (headingBakery || _any(text, _bakery)) bakery.add(dish.id);
+        if (!wokSection && _any(text, _wok)) wokSection = true;
+      }
+      if (wokSection) {
+        wok.addAll(<String>[for (final dish in category.dishes) dish.id]);
+      }
+    }
+    return <KitchenSignalKind, Set<String>>{
+      KitchenSignalKind.fryer: fryer,
+      KitchenSignalKind.wok: wok,
+      KitchenSignalKind.sharedGrill: grill,
+      KitchenSignalKind.bakery: bakery,
+      KitchenSignalKind.nuts: const <String>{},
+      KitchenSignalKind.sesame: const <String>{},
+    };
+  }
+
   /// [of] over [vocabulary] instead of [allergenVocabulary]: for the tests
   /// and the golden exporter, which pin this pass with a vocabulary of
   /// their own rather than the group files. Production code calls [of].

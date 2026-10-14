@@ -147,8 +147,9 @@ RestrictionIdName = Literal[
 ``allergens.json`` (this module may not import ``app.keto.allergens``, which
 imports it)."""
 
-ConcernSource = Literal["name", "description", "option", "hidden", "model"]
-"""The Dart ``ConcernSource`` names."""
+ConcernSource = Literal["name", "description", "option", "hidden", "model", "kitchen"]
+"""The Dart ``ConcernSource`` names. ``kitchen`` (ALG-07) is made on the device
+only; the server never emits it, and reads it like any other name."""
 
 Certainty = Literal["stated", "likely", "suspected"]
 """The Dart ``Certainty`` names, the vocabulary's ``TriggerCertainty``

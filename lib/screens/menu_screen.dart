@@ -41,6 +41,7 @@ import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/fetch_failure_action.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
+import 'package:ketoclub/widgets/kitchen_notice.dart';
 import 'package:ketoclub/widgets/menu_filters_row.dart';
 import 'package:ketoclub/widgets/menu_question_sheet.dart';
 import 'package:ketoclub/widgets/menu_search_field.dart';
@@ -751,6 +752,14 @@ class _MenuScreenState extends State<MenuScreen> {
     final notices = <Widget>[
       AnalysisProgressRow(phase: controller.phase),
       ...banners,
+      // What the menu reveals about its kitchen, for a strict profile
+      // (Banto, ALG-07); a keto build never reads the kitchen.
+      if (widget.bantoMode)
+        KitchenNotice(
+          kitchen: controller.kitchen,
+          profile: controller.profile,
+          bantoMode: widget.bantoMode,
+        ),
       if (controller.engine != null) ...[
         RulesReasonBanner(
           engine: controller.engine!,

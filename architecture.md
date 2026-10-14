@@ -3582,6 +3582,50 @@ Translating the card for a menu in neither Hebrew nor English (through the
 menu-question path, #214) is deferred: the language test is Hebrew or not,
 so such a menu gets English.
 
+**The kitchen notice and the strict-entry demotion (ALG-07, closes #349).**
+`KitchenReach.of(menu)` (`utils/allergens/kitchen_reach.dart`, device-only,
+memoised per menu as `MenuController.kitchen`) holds the menu's
+`KitchenSignals`, the dishes each kind reaches and the menu's language. The
+reach is `KitchenSignals.scopeOf`, which reuses the signal term lists and
+needs no golden or Python twin: a fryer reaches the fried dishes, a shared
+grill the grilled ones and a bakery the bread, pastry and pizza dishes (each
+by the dish's rules text or its heading, as `of` reads them), a wok every dish
+of a section that holds a wok dish or is headed by one; nuts and sesame reach
+no dish. Their only honest reach would be the whole menu, and on an Israeli
+menu (tahini everywhere) that made every dish "ask" and "fits" disappear, so
+by the coordinator's decision (reversible, pending the owner) they are named
+in the notice with their staff question and demote nothing. `KitchenReach.of`
+then drops drinks and notices (`dishKindsOf`, D21), which share no fryer or
+counter, from the reach and from each signal's evidence, so a placeholder line
+("💙") is never shown as a fried dish. `strictThreats(profile)`
+keeps the signals that threaten a **strict** entry (an allergen or celiac
+disease): cross-contact is a trace, which an intolerance or a diet does not
+turn on, so a signal that threatens only flexible entries is not shown at all
+(today every threatened id is strict anyway). `applyKitchenSignals`, an
+isolated step after `ProfileEvaluator.evaluate` in both
+`MenuController.evaluations` and (with `bantoMode`) `evaluatedRows`, turns a
+`fits` dish that such a signal reaches into `ask`, adding for each threatened
+strict entry it has no concern for a `Concern` with the new
+`ConcernSource.kitchen` (made on the device only, so written nowhere unless
+one is; `backend/app/keto/models.py`'s `ConcernSource` gains the name),
+certainty `suspected`, tier `inferred`, the kind's name as `matchedText` and
+the signal's staff question in the dish's language as `waiterQuestion`; the
+first kind in `KitchenSignalKind` order speaks when several reach one entry.
+A dish with a change, to ask or to avoid is left as it is, flexible entries are
+never touched, the wire verdict never moves, and a keto-only profile holds no
+strict entry, so nothing changes for it (and `evaluations` is empty for it
+anyway). With `bantoMode` on,
+`KitchenNotice` (`widgets/kitchen_notice.dart`) sits among the menu screen's
+notices: one `AppNotice.info` line, "This kitchen has a fryer and a bakery —
+ask about cross-contact" in the UI language, whose "Show questions" action
+expands one row per threatening signal (its name, the strict entries it
+matters for, the dishes that show it and its question in the menu's language,
+`KitchenSignals`' Dart text per §6.3, with a Copy button). The dish card reads
+a kitchen concern as "kitchen: a fryer" and the Why sheet as "This kitchen has
+a fryer — ask about cross-contact", with no "Matched" line; the new strings
+are `kitchen*`, `concernSourceKitchen` and `whySourceKitchen*` ARB keys, swept
+for "safe"/"בטוח".
+
 ---
 
 ## 15. Testing strategy
