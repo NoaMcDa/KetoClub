@@ -1665,4 +1665,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String concernLineText(String source, String certainty) {
     return '$source · $certainty';
   }
+
+  @override
+  String get whyTierDeclaredRestaurant => 'Declared by the restaurant';
+
+  @override
+  String whyDeclaredAbsent(String text) {
+    return 'Marked “$text” — this lowers the finding but never rules it out';
+  }
+
+  @override
+  String get dishCardDeclaredKosher => 'Declared kosher by the platform';
 }

@@ -2,6 +2,7 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
+import 'package:ketoclub/utils/allergens/declarations.dart';
 
 /// Normalises a 10bis `Restaurants/{id}/Menu` payload into a [Menu]
 /// (architecture.md §6.1, §18.1, issue #45).
@@ -89,9 +90,13 @@ import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 ///   every later category: first category wins, mirroring
 ///   `WoltMenuMapper`'s duplicate-id rule and for the same reason
 ///   (architecture.md §9.4 rules 3, 7).
-/// - `kosher` and any other per-dish field (calories, allergens, a
-///   dish number distinct from `dishId`, and so on) are read nowhere:
-///   they are not part of [Dish].
+/// - `kosher: true` becomes the one declared tag
+///   [kosherDeclaredTag] in [Dish.declaredTags] (Banto, ALG-09): the
+///   platform's own statement, shown attributed to it and never as the
+///   app's. `false`, absent or anything but the boolean `true` is no tag.
+///   Every other per-dish field (calories, allergens, a dish number
+///   distinct from `dishId`, and so on) is read nowhere: it is not part
+///   of [Dish].
 /// - `currency` has never been observed in a 10bis payload
 ///   (`menu_api_research` §3.2 says nothing about one), so it is read
 ///   tolerantly at the top level and defaults to `'ILS'` — 10bis is an
@@ -243,6 +248,9 @@ abstract final class TenBisMenuMapper {
       // A missing or malformed image is never a mapping failure; see
       // the class doc comment.
       imageUrl: rawImage is String && rawImage.isNotEmpty ? rawImage : null,
+      declaredTags: raw['kosher'] == true
+          ? const <String>[kosherDeclaredTag]
+          : const <String>[],
     );
   }
 

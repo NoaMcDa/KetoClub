@@ -2687,6 +2687,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{source} · {certainty}'**
   String concernLineText(String source, String certainty);
+
+  /// Banto (ALG-09): the Why sheet's tier phrase for a concern lowered by the restaurant's own words (the dish text or its section heading), as opposed to whyTierDeclared, a platform tag.
+  ///
+  /// In en, this message translates to:
+  /// **'Declared by the restaurant'**
+  String get whyTierDeclaredRestaurant;
+
+  /// Banto (ALG-09): under a concern lowered by a declaration such as gluten-free or vegan, quoting the declaration. Never says the dish is free of it.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked “{text}” — this lowers the finding but never rules it out'**
+  String whyDeclaredAbsent(String text);
+
+  /// Banto (ALG-09): dish-card chip when the delivery platform flags the dish kosher. Always attributed to the platform, never a statement by the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Declared kosher by the platform'**
+  String get dishCardDeclaredKosher;
 }
 
 class _AppLocalizationsDelegate
