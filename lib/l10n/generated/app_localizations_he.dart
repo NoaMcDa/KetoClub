@@ -1671,6 +1671,17 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get whyTierDeclaredRestaurant => 'הוצהר על ידי המסעדה';
+
+  @override
+  String whyDeclaredAbsent(String text) {
+    return 'מסומן “$text” — זה מפחית את החשש אבל לא שולל אותו';
+  }
+
+  @override
+  String get dishCardDeclaredKosher => 'כשר לפי הצהרת הפלטפורמה';
+
+  @override
   String get waiterCardChefCard => 'כרטיס שף';
 
   @override

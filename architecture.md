@@ -3507,6 +3507,42 @@ direction, and the "Why?" button draws the keyboard `FocusRing` of #264. `tool/v
 single-page-app fallback the path URLs of #226 need. The keto build's menu
 renders the same before and after.
 
+**Recorded decision: platform and restaurant declarations as evidence
+(ALG-09, closes #351).** `Dish.declaredTags` holds the platform's own dietary
+labels, raw: Wolt's item `dietary_preferences` (a string as written, a map's
+`id` or else `name`) and `kosher` for a 10bis dish with `kosher: true`; it is
+read tolerantly and written only when non-empty, so per the `Dish` trap and
+C3 there is no `schemaVersion` bump and the Hive cache carries it as is.
+`backend/app/keto/models.py` and both Python mappers follow; the only golden
+bytes that moved are the input menus holding the synthetic 10bis dish `1003`.
+The one recorded Wolt payload has an empty `dietary_preferences` on all 56
+items but four items saying "טבעוני" (three with 🌱) in their names
+(`test/fixtures/README.md`), so the feature's main path is text: the pure
+`utils/allergens/declarations.dart` (twin `app/keto/declarations.py`, golden
+`declarations.json`) reads tags, the dish's name and description, and its
+category heading (the D21 precedent) through one table of six absence rules
+(vegan, vegetarian, gluten-free, dairy-free, lactose-free, egg-free; terms
+compiled as the keto vocabulary is, 🌱 and 🌾 matched on the raw text) into
+`Declaration {rule, restrictionIds, polarity, source, matchedText}`. A
+negation or an offer within two words ("לא", "ניתן לקבל", "לפי בקשה",
+"בתוספת", "option", "available", "can be made") makes a phrase no
+declaration, since withholding a lowering is the safe direction.
+Gluten-free speaks for gluten only, never wheat, and "parve" is not read as
+dairy-free. `ProfileEvaluator.evaluate` takes the dish's `heading` (passed by
+`MenuController`) and, in one step after the profile filter
+(`_applyDeclarations`), lowers every concern about a declared-absent
+restriction by one step, once per restriction, to tier `declared`: never
+below `suspected` and never removed for a strict entry (file 09), while a
+flexible entry's suspected concern is cleared; a declaration with no concern
+adds nothing, and `present` (reserved for ALG-16's matrix) changes nothing.
+`EvaluatedDish.declarations` keeps the ones applied, and the Why sheet says
+"declared by the platform" or "declared by the restaurant" and quotes the
+declaration as lowering, never ruling out, the finding. Declarations stay on
+the device (C1): neither the server nor the heuristic reads them. With
+`bantoMode` and a profile that uses states, a dish whose platform flags it
+kosher shows "declared kosher by the platform" beside its price, the only
+kosher statement the app makes and never its own.
+
 **Waiter questions, the per-dish chef card and the allergy note (ALG-08b,
 closes #350; ALG-15, closes #357).** Every concern an evaluation keeps now
 carries a waiter question: `ProfileEvaluator.evaluate` passes its kept

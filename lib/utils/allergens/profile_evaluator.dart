@@ -28,6 +28,7 @@ import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/allergen_matcher.dart';
+import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/allergens/waiter_questions.dart';
 import 'package:ketoclub/utils/classification_rules.dart';
@@ -109,6 +110,7 @@ final class EvaluatedDish {
     required this.concerns,
     required this.state,
     this.modification,
+    this.declarations = const <Declaration>[],
   });
 
   /// The analysed dish, wire verdict untouched.
@@ -127,17 +129,28 @@ final class EvaluatedDish {
   /// always null for [DishState.avoid].
   final String? modification;
 
+  /// The declarations that lowered or cleared one of the profile's
+  /// concerns (ALG-09), in the order read: what the Why sheet quotes for a
+  /// concern at [EvidenceTier.declared]. Empty when none applied.
+  final List<Declaration> declarations;
+
   @override
   bool operator ==(Object other) =>
       other is EvaluatedDish &&
       other.dish == dish &&
       listEquals(other.concerns, concerns) &&
       other.state == state &&
-      other.modification == modification;
+      other.modification == modification &&
+      listEquals(other.declarations, declarations);
 
   @override
-  int get hashCode =>
-      Object.hash(dish, Object.hashAll(concerns), state, modification);
+  int get hashCode => Object.hash(
+    dish,
+    Object.hashAll(concerns),
+    state,
+    modification,
+    Object.hashAll(declarations),
+  );
 
   @override
   String toString() =>
@@ -190,6 +203,9 @@ abstract final class ProfileEvaluator {
   ///    [DishState.fits]. A suspected concern on a flexible restriction is
   ///    listed but moves nothing.
   ///
+  /// Between 2 and 3, **declarations** (ALG-09; [Declarations.of] over
+  /// the dish's declared tags, its own text and its category [heading])
+  /// lower the concerns they declare absent: see [_applyDeclarations].
   /// Every kept concern carries a waiter question in the same language
   /// ([WaiterQuestions.fill], ALG-08b): the model's own when it wrote one.
   ///
@@ -200,16 +216,17 @@ abstract final class ProfileEvaluator {
     Dish dish,
     DietaryProfile profile, {
     bool? hebrew,
+    String? heading,
   }) {
     final hasKeto = profile.isEmpty || profile.contains(RestrictionId.keto);
     final isHebrew =
         hebrew ??
         TextNormaliser.containsHebrew(TextNormaliser.dishRulesText(dish));
 
-    final evidence = <_Evidence>[
+    final (:evidence, :declarations) = _applyDeclarations(<_Evidence>[
       for (final evidence in _evidence(analysed, dish))
         if (_applies(evidence.concern, profile)) evidence,
-    ];
+    ], Declarations.of(dish, heading: heading));
 
     var avoid = hasKeto && analysed.verdict == DishVerdict.nonKeto;
     var ask = false;
@@ -256,6 +273,74 @@ abstract final class ProfileEvaluator {
       ),
       state: state,
       modification: state == DishState.avoid ? null : change,
+      declarations: declarations,
+    );
+  }
+
+  /// [evidence] after the dish's [declarations] (ALG-09; file 09: a
+  /// declaration never clears a strict entry). For each restriction some
+  /// [DeclarationPolarity.absent] declaration names, every concern about
+  /// it is lowered by one step, once however many declarations name it
+  /// (stated → likely → suspected) and moved to [EvidenceTier.declared];
+  /// a suspected concern stays suspected for a strict entry and is
+  /// cleared for a flexible one. A declaration with no matching concern
+  /// adds nothing, and a [DeclarationPolarity.present] one changes
+  /// nothing here (the matcher already reads a "contains" phrase).
+  /// Returns the lowered evidence and the declarations that touched it.
+  static ({List<_Evidence> evidence, List<Declaration> declarations})
+  _applyDeclarations(List<_Evidence> evidence, List<Declaration> declarations) {
+    final absent = <RestrictionId>{
+      for (final declaration in declarations)
+        if (declaration.polarity == DeclarationPolarity.absent)
+          ...declaration.restrictionIds,
+    };
+    final touched = <RestrictionId>{
+      for (final item in evidence)
+        if (absent.contains(item.concern.restrictionId))
+          item.concern.restrictionId,
+    };
+    if (touched.isEmpty) {
+      return (evidence: evidence, declarations: const <Declaration>[]);
+    }
+    final lowered = <_Evidence>[];
+    for (final item in evidence) {
+      final concern = item.concern;
+      if (!touched.contains(concern.restrictionId)) {
+        lowered.add(item);
+        continue;
+      }
+      final strict = restrictionFor(concern.restrictionId).isStrict;
+      final Certainty certainty;
+      switch (concern.certainty) {
+        case Certainty.stated:
+          certainty = Certainty.likely;
+        case Certainty.likely:
+          certainty = Certainty.suspected;
+        case Certainty.suspected:
+          if (!strict) continue;
+          certainty = Certainty.suspected;
+      }
+      lowered.add((
+        concern: Concern(
+          restrictionId: concern.restrictionId,
+          source: concern.source,
+          certainty: certainty,
+          tier: EvidenceTier.declared,
+          matchedText: concern.matchedText,
+          waiterQuestion: concern.waiterQuestion,
+        ),
+        removable: item.removable,
+        item: item.item,
+      ));
+    }
+    return (
+      evidence: lowered,
+      declarations: List<Declaration>.unmodifiable(<Declaration>[
+        for (final declaration in declarations)
+          if (declaration.polarity == DeclarationPolarity.absent &&
+              declaration.restrictionIds.any(touched.contains))
+            declaration,
+      ]),
     );
   }
 

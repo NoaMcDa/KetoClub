@@ -10,13 +10,17 @@ The payload is three flat sibling collections, ``categories``, ``items`` and
 currency is ``ILS`` unless a non-empty top-level ``currency`` says otherwise;
 a category's ``item_ids`` come first, then its (recursive) subcategories'; an
 unknown ``item_id`` or ``option_id`` is skipped; the first category to claim
-a dish id keeps it; ``venueName`` is always null.
+a dish id keeps it; ``venueName`` is always null. An item's
+``dietary_preferences`` become ``declaredTags`` (ALG-09): non-blank strings as
+written, a map's non-blank ``id`` or else ``name``, repeats dropped, never a
+mapping failure.
 """
 
 from typing import Any
 
 from pydantic import ValidationError
 
+from app.keto.dart_text import dart_trim
 from app.keto.models import Dish, DishOption, Menu, MenuCategory, VenueRef
 from app.platforms._dart import is_num
 
@@ -151,7 +155,32 @@ def _try_build_item(raw: object, option_groups: dict[str, DishOption]) -> Dish |
         price=raw_price / 100,
         options=options,
         image_url=_try_read_image_url(raw.get("images")),
+        declared_tags=_read_dietary_preferences(raw.get("dietary_preferences")),
     )
+
+
+def _read_dietary_preferences(raw: object) -> list[str]:
+    """Dart ``_readDietaryPreferences``: the item's declared tags, raw."""
+    if not isinstance(raw, list):
+        return []
+    tags: list[str] = []
+    for entry in raw:
+        tag: object = None
+        if isinstance(entry, str):
+            tag = entry
+        elif isinstance(entry, dict):
+            tag = _non_blank(entry.get("id"))
+            if tag is None:
+                tag = _non_blank(entry.get("name"))
+        if not isinstance(tag, str) or not dart_trim(tag) or tag in tags:
+            continue
+        tags.append(tag)
+    return tags
+
+
+def _non_blank(raw: object) -> str | None:
+    """``raw`` when it is a string that is not blank (Dart ``trim``)."""
+    return raw if isinstance(raw, str) and dart_trim(raw) else None
 
 
 def _try_read_image_url(raw_images: object) -> str | None:
