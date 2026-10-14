@@ -7,13 +7,15 @@ raising: any shape the mapper does not know answers ``None``.
 The payload is nested (``categoriesList`` -> ``dishList`` -> ``dishOptionsList``).
 A category id is derived from its name (``cat_<slug>``); a ``dishId`` is a
 non-empty string or a number written as Dart's ``toString`` writes it
-(``12.0`` stays ``"12.0"``); prices are already in shekels.
+(``12.0`` stays ``"12.0"``); prices are already in shekels. ``kosher: true``
+(the boolean, nothing else) becomes the one declared tag ``kosher`` (ALG-09).
 """
 
 import re
 
 from pydantic import ValidationError
 
+from app.keto.declarations import KOSHER_DECLARED_TAG
 from app.keto.models import Dish, DishOption, Menu, MenuCategory, VenueRef
 from app.platforms._dart import dart_num_to_string, dart_string_hash, is_num
 
@@ -125,6 +127,7 @@ def _try_build_dish(raw: object) -> Dish | None:
         price=float(raw_price),
         options=options,
         image_url=raw_image if isinstance(raw_image, str) and raw_image else None,
+        declared_tags=[KOSHER_DECLARED_TAG] if raw.get("kosher") is True else [],
     )
 
 

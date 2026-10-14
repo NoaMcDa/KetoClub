@@ -14,6 +14,8 @@ What the real payload does **not** exercise, so `wolt_menu_mapper_test.dart` bui
 
 `wolt_fixture_shape_test.dart` also pins this file's counts (12/56/48, no top-level `currency`, every listed `item_id` present), so a re-record that quietly loses half the menu fails loudly until those numbers are updated on purpose.
 
+**Declared dietary data (Banto, ALG-09, #351).** Every one of the 56 items carries `"dietary_preferences": []`, so this recording holds no platform-declared tag at all, and the shape of a non-empty entry is inferred (`WoltMenuMapper` keeps a string as written, a map's `id` or else `name`, and never fails on anything else; `declared_tags_mappers_test.dart` and `backend/tests/test_declared_tags.py` build the cases inline). No other item key is dietary: `tags` holds UI badges (five items carry `{"id": "popular", ...}`), `product_hierarchy_tags` is `["ALCOHOL", "BEER"]` on two items, `restrictions` is the alcohol age limit on the same two, and `compliance_info.badges` at the top level is empty. What the venue *does* declare is restaurant-written text: four items say "טבעוני" (three of them with 🌱) in their names, which is the shape file 12 §4.4 predicted and the one `lib/utils/allergens/declarations.dart` reads (the `declarations.json` golden replays this menu). Whether any Israeli venue fills `dietary_preferences` is still unobserved; this environment cannot reach `consumer-api.wolt.com`, so recording one is ALG-09's open first task. Re-record a venue that shows 🌱 or 🌾 tags on wolt.com (`tool/record_wolt_fixture.sh <slug>`) and check the field before trusting the mapping table with a real tag spelling.
+
 ### `wolt_malformed_menu.json` — synthetic
 
 A plausible 2xx body of the wrong shape (an error envelope with none of `categories`/`items`), used to exercise the `platformChanged` path in `wolt_menu_mapper_test.dart`. It says so in its own `_fixture_note`.
@@ -84,6 +86,16 @@ level, inside a category, and inside a dish.
 (an error envelope with no `categoriesList`), used to exercise the
 `platformChanged` path in `tenbis_menu_mapper_test.dart`.
 
+The `kosher` flags are synthetic too (dish `1001` is `false`, `1003` is
+`true`, the rest have none). Since ALG-09 (#351) `TenBisMenuMapper` turns
+`kosher: true` into the declared tag `kosher`, so `1003` is the one dish
+the golden menus carry a `declaredTags` key on and the one a Banto card
+shows "declared kosher by the platform" for. Whether real 10bis dishes
+carry the flag, and under that name, is part of what #44 must check;
+file 12 §4.4 found 10bis's visible dietary labels ("ללא גלוטן", "טבעוני")
+as free text in headings and item names, which the declarations table
+reads instead.
+
 **Neither file has ever been a real 10bis response, and neither proves
 anything about what 10bis's real API actually returns.** Issue #44
 tracks recording one — through the backend's 10bis proxy route
@@ -106,7 +118,7 @@ Before committing the result: skim it for anything worth redacting,
 check whether `TenBisMenuMapper`'s assumed field names
 (`categoriesList`, `categoryName`, `dishList`, `dishId`, `dishName`,
 `dishDescription`, `price`, `dishOptionsList`, `dishImageUrl`,
-`restaurantName`) match the real payload — if they do not, this is the
+`kosher`, `restaurantName`) match the real payload — if they do not, this is the
 schema-drift signal architecture.md §15 asks for, and the mapper (and
 its tests) need updating to match before the fixture replaces the
 synthetic one — and re-check that the fixture still exercises every

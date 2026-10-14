@@ -7,6 +7,7 @@ import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
+import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
@@ -44,8 +45,9 @@ import 'package:provider/provider.dart';
 /// named in the dish's own language, where it was found and how sure, in
 /// words), a "Why?" button that opens [showWhySheet], and the one waiter
 /// row carrying [VerdictCopy.waiterLine]. The net-carb chip and the
-/// hidden-carb flags stay only while [holdsKeto]. Otherwise the card is
-/// exactly as before.
+/// hidden-carb flags stay only while [holdsKeto]. A dish the platform
+/// flags kosher shows "declared kosher by the platform" beside the price
+/// (ALG-09). Otherwise the card is exactly as before.
 class DishCard extends StatefulWidget {
   /// Creates a card for [row], formatting its price for [localeTag] and
   /// calling [onShowScript] with [row] when the user asks to open the
@@ -283,6 +285,12 @@ class _DishCardState extends State<DishCard> {
                 tone: tone,
                 background: netCarbsChipBackground(theme, verdict, tone),
               ),
+            // Banto only, and only where the card speaks for a profile, so
+            // a keto-only screen is unchanged (ALG-09).
+            if (widget.bantoMode &&
+                widget.wording.usesStates &&
+                Declarations.declaresKosher(dish))
+              const _DeclaredKosherChip(),
           ],
         ),
       ],
@@ -482,6 +490,37 @@ const Key dishWhyKey = ValueKey<String>('dishWhy');
 /// "add a note" icon (ALG-05).
 const Key dishStateHeaderKey = ValueKey<String>('dishStateHeader');
 
+/// The key of the "declared kosher by the platform" chip (ALG-09).
+const Key dishDeclaredKosherKey = ValueKey<String>('dishDeclaredKosher');
+
+/// The one kosher statement the app makes (Banto, ALG-09): the platform's
+/// own flag, attributed to it in words, never a claim by the app.
+class _DeclaredKosherChip extends StatelessWidget {
+  const new();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    return DecoratedBox(
+      key: dishDeclaredKosherKey,
+      decoration: BoxDecoration(
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+        child: Text(
+          l10n.dishCardDeclaredKosher,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// Where [concern] was found, in words of the UI language, with the menu
 /// text it matched when that text is not already the dish's own name or
 /// description: "option: bread", "hidden: soy sauce".
@@ -598,6 +637,7 @@ class _ConcernsBlock extends StatelessWidget {
       dishName: dishName,
       concerns: evaluated.concerns,
       strictProfile: strictProfile,
+      declarations: evaluated.declarations,
       bantoMode: bantoMode,
     ),
   );

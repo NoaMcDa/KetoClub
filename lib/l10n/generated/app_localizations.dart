@@ -2688,6 +2688,54 @@ abstract class AppLocalizations {
   /// **'{source} · {certainty}'**
   String concernLineText(String source, String certainty);
 
+  /// Banto (ALG-09): the Why sheet's tier phrase for a concern lowered by the restaurant's own words (the dish text or its section heading), as opposed to whyTierDeclared, a platform tag.
+  ///
+  /// In en, this message translates to:
+  /// **'Declared by the restaurant'**
+  String get whyTierDeclaredRestaurant;
+
+  /// Banto (ALG-09): under a concern lowered by a declaration such as gluten-free or vegan, quoting the declaration. Never says the dish is free of it.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked “{text}” — this lowers the finding but never rules it out'**
+  String whyDeclaredAbsent(String text);
+
+  /// Banto (ALG-09): dish-card chip when the delivery platform flags the dish kosher. Always attributed to the platform, never a statement by the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Declared kosher by the platform'**
+  String get dishCardDeclaredKosher;
+
+  /// Banto (ALG-08b): the Waiter Card action that opens the chef card for this dish.
+  ///
+  /// In en, this message translates to:
+  /// **'Chef card'**
+  String get waiterCardChefCard;
+
+  /// Banto (ALG-15): the menu overflow entry that copies a short allergy note, in the menu's language, for a delivery app's note box.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy allergy note'**
+  String get menuAllergyNoteAction;
+
+  /// Banto (ALG-15): the snack bar shown once the allergy note is on the clipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Allergy note copied'**
+  String get menuAllergyNoteCopied;
+
+  /// Banto (ALG-15): the snack bar action that shares the allergy note as text.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get menuAllergyNoteShare;
+
+  /// Banto (ALG-15): the subject line of a shared allergy note, where the platform shows one.
+  ///
+  /// In en, this message translates to:
+  /// **'Allergy note'**
+  String get menuAllergyNoteSubject;
+
   /// Banto (ALG-07): the kitchen notice's collapsed line; {things} is a list of kitchenKind* nouns joined by kitchenListSeparator and kitchenListAnd. Never says safe.
   ///
   /// In en, this message translates to:
