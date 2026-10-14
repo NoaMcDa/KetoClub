@@ -61,6 +61,10 @@ headless Chromium ──▶ build/web (static, :8080) ──▶ backend (:8000) 
    python3 -m http.server 8080 --directory build/web
    ```
 
+   A build with the path URLs of issue #226 needs
+   `python3 tool/visual_audit/serve_spa.py build/web 8080` instead, and
+   `HASH=1` for the driver only when shooting an older build (§5).
+
 4. **The driver** — `tool/visual_audit/shoot.py` (Python Playwright) opens
    each screen in a fresh browser context at 390×844 @2x with
    `color_scheme` light/dark and locale `en-US`/`he-IL` (the app follows the
@@ -223,3 +227,97 @@ only.
 - `artboard_discovery_{light,dark}`, `artboard_menu_{light,dark}`,
   `artboard_menu_dark_dark`, `artboard_waiter_card_{light,dark}`,
   `artboard_settings_{light,dark}`
+
+## 5. Banto four-state menu (ALG-05)
+
+The four-state menu screen (#381, `architecture.md` D26) rendered for the
+first time, with the visual pass of issue #347. Screenshots are again not
+committed; the pull request describes each in words.
+
+### How it was rendered
+
+The recipe of §1, with three additions to the harness:
+
+- **Path URLs.** Since issue #226 the web build uses path URLs, which the
+  driver's `/#/venue/...` links and `python3 -m http.server` (a 404 on any
+  deep path) no longer reach: the old recipe opened every deep link on
+  Explore. `tool/visual_audit/serve_spa.py <build> <port>` serves a build
+  with the single-page-app fallback, and `shoot.py` opens plain paths
+  (`HASH=1` keeps the old links for an older build).
+- **The golden English menu.** `stub_upstream.py` serves
+  `tool/golden/golden_corpus.dart`'s `goldenEnglishMenu` ("Golden Bistro")
+  as a Wolt assortment at the slug `golden-bistro`, beside the recorded
+  Hebrew fixture at `hamosad`.
+- **A seeded profile.** `shoot.py http://localhost:8080 banto` (never part
+  of the default run) writes the settings record, today's defaults plus a
+  sesame + lactose profile with the onboarding marked seen, into the
+  browser's `shared_preferences` store before the app starts, then shoots
+  both menus at 390×844 and 1280×800, the Why sheet of a dish with nothing
+  found and of one with concerns, an opened waiter row, and the first-run
+  onboarding screen (no seed) before and after picking two chips.
+  `keto-pair` shoots the same two menus with no profile, against a build
+  without the define.
+
+```bash
+flutter build web --release --no-web-resources-cdn \
+  --dart-define=KETOCLUB_BACKEND_URL=http://localhost:8000 \
+  --dart-define=BANTO_MODE=true -o build/web-banto
+python3 tool/visual_audit/serve_spa.py build/web-banto 8080
+OUTDIR=build/visual-audit python3 tool/visual_audit/shoot.py http://localhost:8080 banto
+```
+
+Rules engine only (the backend has no model key), so every menu is a rules
+result for a strict profile (sesame is an allergen; lactose an
+intolerance). The hamosad fixture reads 7 "no trigger found", 0 with a
+change, 15 to ask and 15 to avoid; the golden menu 9, 0, 0 and 3.
+
+### Findings
+
+Status as in §2. Every fix sits in a path that runs only in state mode (a
+Banto build with a profile holding a restriction besides keto).
+
+| # | Where | Before | Status |
+|---|---|---|---|
+| B1 | Dish card, strict "fits" | the pill is a sentence ("No trigger found — ask the restaurant") that fills the line, so the header's `Wrap` dropped the "add a note" icon onto a line of its own under it, on every such card | **Fixed** — in state mode the pill and the icon share a `Row`, the pill wrapping its own text; the keto header keeps its `Wrap` |
+| B2 | Dish card semantics | the "Why?" button, the concern lines and the state waiter row had no node of their own, so they merged into the card's: the web build exposed the whole card as one button labelled with the verdict, the dish, every concern and "Why this result for…", whose tap opened the Why sheet. The driver could not find the Why button at all | **Fixed** — each is a semantics `container`; the keto waiter row keeps today's tree |
+| B3 | The AI and "Rules checked" chips | not reachable on web (no model). At 320px and 1.6× text, the AI chip overflowed by 145px in Hebrew and "Rules checked" by 77px | **Fixed** — the pair scales down to the width (`FittedBox`) and wraps a chip to its own line |
+| B4 | Why sheet, a Hebrew dish in the English UI | the dish name and the waiter question were laid out in the UI's direction, at the left edge, against audit M8's rule for menu content | **Fixed** — `contentDirection` for both, as on the card |
+| B5 | "Why?" button, keyboard focus | Material's faint focus tint, the only control on the card without the #264 ring | **Fixed** — wrapped in `FocusRing` |
+| B6 | Copy (owner's decision) | Hebrew strict tile "לא נמצא חשש", header "N בלי חשש שנמצא · …"; change sentence "Ask for it without tahini" | **Fixed** — tile "ללא חשש", header "N ללא חשש · M עם שינוי · K לשאול"; the card's pill keeps "לא נמצא חשש — לשאול את המסעדה"; the change sentence quotes the menu's own words, `לבקש את המנה בלי 'גבינת שמנת'` (`ProfileEvaluator.quotedItem`) |
+| B7 | Tiles, English strict | "NO TRIGGER FOUND" wraps to three lines at 390px and in the 1280px side pane, so the four tiles are about 20px taller than the keto three | **Left** — the four stay one height (`IntrinsicHeight`, now pinned by a test) and the English wording is the owner's; Hebrew "ללא חשש" fits on one line |
+| B8 | A notice item ("לקוחות יקרים", ₪0) | carries a state pill and a "Why?" button | **Left** — the keto screen gives it a verdict pill too; a notice card is a kind question (D21), not a four-state one |
+| B9 | Keto AI chip at 320px and 1.6× text | the keto screen's lone AI chip overflows the same way as B3 | **Left** — keto rendering is out of this change's reach; worth its own issue |
+| B10 | "With a change" | neither menu produced one under this profile on the rules engine (a stated lactose option sat on a dish sesame made "ask") | **Left** — the quoted sentence is pinned by `profile_evaluator_test` instead |
+| B11 | Venue name | the slug ("hamosad", "golden-bistro") | **Left** — M1, a deep link |
+
+Checked and found right: RTL mirroring (the rail, the pill and the note
+icon swap sides, the side pane sits at the right in Hebrew at 1280px), the
+four tiles at one height in both languages, the "ask" card's orange
+outline and pill in dark mode (its pairs are pinned by `contrast_test`),
+concern chips naming the restriction in the dish's language and wrapping
+inside the card at 390px, the tiles' focus ring, the
+two-pane layout at 1280px (tiles, counts, Filters, profile summary and
+category chips in the side pane; notices and dishes beside it), and the
+onboarding screen in both languages and themes.
+
+### Keto check
+
+The keto build (no define) shot the same two menus before and after this
+change. Every pair matches apart from the "N minutes ago" source line and,
+on the hamosad fixture, an emoji the browser's fallback font had or had not
+finished loading (a chip's width and a 2px shift below it); a second run of
+the unchanged build differs from the first in the same places, so neither
+is this change. The keto screen reads as §2 describes: three tiles, the
+keto score, keto pills, the rules banner.
+
+### Screenshots
+
+`before/` (the Banto build at the start of the pass) and `after/` (the
+fixed build), `<scheme>_<lang>` as in §4:
+
+- `banto_menu_{fixture,golden}_390_…`, `…_390_scrolled{,2,3,4}_…`,
+  `banto_menu_{fixture,golden}_1280_…`, `…_1280_scrolled_…`
+- `banto_why_{fixture,golden}_…` (nothing found), `banto_why_concerns_fixture_…`,
+  `banto_line_open_fixture_…`
+- `banto_onboarding_…`, `banto_onboarding_picked_…`, `banto_onboarding_bottom_…`
+- `keto_menu_…` (the keto pair), `banto_focus_tile_dark_he`

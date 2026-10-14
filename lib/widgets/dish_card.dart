@@ -187,7 +187,29 @@ class _DishCardState extends State<DishCard> {
         // The "add a note" icon sits at the corner of this header, opposite
         // the badge, only while there is no note (issue #240); once a note
         // exists the full-width note row below replaces it.
-        if (analysis != null || showAddNote) ...[
+        if (state != null) ...[
+          // Banto's state pill can be a sentence ("No trigger found — ask
+          // the restaurant") that fills the line, which in the keto Wrap
+          // below pushed the note icon onto a line of its own (ALG-05's
+          // visual pass, finding B1). A Row keeps the icon at the corner
+          // and lets the pill wrap its own text instead.
+          Row(
+            key: dishStateHeaderKey,
+            children: [
+              Expanded(
+                child: Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: StateBadge(state: state, wording: widget.wording),
+                ),
+              ),
+              if (showAddNote) ...[
+                const SizedBox(width: 4),
+                _AddNoteButton(onPressed: () => widget.onEditNote!(row)),
+              ],
+            ],
+          ),
+          const SizedBox(height: 6),
+        ] else if (analysis != null || showAddNote) ...[
           // A Wrap, not a Row: at a large text scale the badge and the
           // 36px icon can outgrow one line together.
           SizedBox(
@@ -198,10 +220,7 @@ class _DishCardState extends State<DishCard> {
                   : WrapAlignment.end,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                if (state != null)
-                  StateBadge(state: state, wording: widget.wording)
-                else if (analysis != null)
-                  StatusBadge(verdict: analysis.verdict),
+                if (analysis != null) StatusBadge(verdict: analysis.verdict),
                 if (showAddNote)
                   _AddNoteButton(onPressed: () => widget.onEditNote!(row)),
               ],
@@ -299,6 +318,7 @@ class _DishCardState extends State<DishCard> {
             _ScriptDisclosure(
               expanded: _scriptExpanded,
               tone: tone,
+              ownNode: true,
               label: state == DishState.ask
                   ? l10n.dishCardAskQuestion
                   : l10n.dishCardAskWaiter,
@@ -457,6 +477,10 @@ Key dishConcernKey(int index) => ValueKey<String>('dishConcern_$index');
 /// The key of a dish card's "Why?" button (ALG-05).
 const Key dishWhyKey = ValueKey<String>('dishWhy');
 
+/// The key of the row holding a Banto dish card's state pill and its
+/// "add a note" icon (ALG-05).
+const Key dishStateHeaderKey = ValueKey<String>('dishStateHeader');
+
 /// Where [concern] was found, in words of the UI language, with the menu
 /// text it matched when that text is not already the dish's own name or
 /// description: "option: bread", "hidden: soy sauce".
@@ -528,21 +552,31 @@ class _ConcernsBlock extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 6),
             child: _ConcernLine(concern: concerns[i], hebrew: hebrew),
           ),
+        // A node of its own (container): without it the button's flag and
+        // tap merged into the card's node, so the web build announced the
+        // whole card as one "Why?" button (ALG-05's visual pass, B2).
         Semantics(
+          container: true,
           button: true,
           label: l10n.dishCardWhySemanticLabel(dishName),
           excludeSemantics: true,
           onTap: () => _openWhy(context),
-          child: TextButton.icon(
-            key: dishWhyKey,
-            style: TextButton.styleFrom(
-              visualDensity: VisualDensity.compact,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              minimumSize: const Size(48, 36),
+          // The keyboard ring the tiles and the waiter row draw (#264):
+          // a TextButton's own focus tint is faint on a tinted card
+          // (ALG-05's visual pass, B5).
+          child: FocusRing(
+            borderRadius: BorderRadius.circular(18),
+            child: TextButton.icon(
+              key: dishWhyKey,
+              style: TextButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                minimumSize: const Size(48, 36),
+              ),
+              onPressed: () => _openWhy(context),
+              icon: const Icon(Icons.info_outline, size: 16),
+              label: Text(l10n.dishCardWhy),
             ),
-            onPressed: () => _openWhy(context),
-            icon: const Icon(Icons.info_outline, size: 16),
-            label: Text(l10n.dishCardWhy),
           ),
         ),
       ],
@@ -586,6 +620,7 @@ class _ConcernLine extends StatelessWidget {
     final source = concernSourceLabel(l10n, concern);
     final certainty = concernCertaintyLabel(l10n, concern.certainty);
     return Semantics(
+      container: true,
       label: l10n.concernLineSemanticLabel(name, source, certainty),
       excludeSemantics: true,
       child: Wrap(
@@ -648,6 +683,7 @@ class _ScriptDisclosure extends StatelessWidget {
     required this.tone,
     required this.onTap,
     this.label,
+    this.ownNode = false,
   });
 
   /// Whether the script panel below this row is currently shown.
@@ -664,6 +700,11 @@ class _ScriptDisclosure extends StatelessWidget {
   /// Called when the row is tapped, to toggle [expanded].
   final VoidCallback onTap;
 
+  /// Whether the row is a semantics node of its own. Banto's state row
+  /// passes true (ALG-05's visual pass, B2), so the card is not announced
+  /// as one button; the keto row keeps today's tree.
+  final bool ownNode;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -671,6 +712,7 @@ class _ScriptDisclosure extends StatelessWidget {
         ? l10n.dishCardHideScript
         : (this.label ?? l10n.dishCardAskWaiter);
     return Semantics(
+      container: ownNode,
       button: true,
       expanded: expanded,
       label: label,

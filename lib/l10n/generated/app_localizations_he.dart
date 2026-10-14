@@ -1547,7 +1547,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get stateFitsTile => 'מתאימות';
 
   @override
-  String get stateFitsStrictTile => 'לא נמצא חשש';
+  String get stateFitsStrictTile => 'ללא חשש';
 
   @override
   String get stateFitsWithChangeTile => 'עם שינוי';
@@ -1606,7 +1606,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String headerStateCountsStrict(int fits, int change, int ask) {
-    return '$fits בלי חשש שנמצא · $change עם שינוי · $ask לשאול';
+    return '$fits ללא חשש · $change עם שינוי · $ask לשאול';
   }
 
   @override

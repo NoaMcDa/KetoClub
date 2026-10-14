@@ -716,9 +716,13 @@ class _MenuScreenState extends State<MenuScreen> {
                 ? Wrap(
                     spacing: 8,
                     runSpacing: 6,
+                    // Each chip on its own line when the two do not fit,
+                    // and scaled down rather than overflowing when one
+                    // alone outgrows a narrow screen at a large text size
+                    // (Banto only; ALG-05's visual pass, finding B3).
                     children: [
-                      EngineChip(engine: controller.engine!),
-                      RulesCheckedChip(bantoMode: widget.bantoMode),
+                      _fitChip(EngineChip(engine: controller.engine!)),
+                      _fitChip(RulesCheckedChip(bantoMode: widget.bantoMode)),
                     ],
                   )
                 : EngineChip(engine: controller.engine!),
@@ -784,6 +788,14 @@ class _MenuScreenState extends State<MenuScreen> {
       ],
     );
   }
+
+  /// [chip] scaled down to the width its [Wrap] offers, never past it
+  /// (Banto's AI + "Rules checked" pair, ALG-05).
+  Widget _fitChip(Widget chip) => FittedBox(
+    fit: BoxFit.scaleDown,
+    alignment: AlignmentDirectional.centerStart,
+    child: chip,
+  );
 
   /// The collapsible Filters row (issue #234) holding the search field,
   /// the carb budget and — once there is a verdict to explain — the

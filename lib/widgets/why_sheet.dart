@@ -4,6 +4,7 @@ import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
+import 'package:ketoclub/widgets/content_direction.dart';
 import 'package:ketoclub/widgets/restriction_picker_sheet.dart';
 
 /// The key of the concern row at [index], so a test can find one row
@@ -15,6 +16,9 @@ const Key whyEmptyKey = ValueKey<String>('whyEmpty');
 
 /// The key of the helper-tool footer.
 const Key whyFooterKey = ValueKey<String>('whyFooter');
+
+/// The key of the sheet's dish-name line (ALG-05's visual pass).
+const Key whyDishNameKey = ValueKey<String>('whyDishName');
 
 /// The short phrase saying how [tier] is known, in words and never in a
 /// number: an invented percentage is what ALG-06 rules out.
@@ -119,8 +123,16 @@ class WhySheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
+            // Menu content, in its own direction (audit M8; ALG-05's
+            // visual pass, B4): a Hebrew dish in the English UI reads from
+            // the right, as on its card.
             Text(
               l10n.whySheetDishName(dishName),
+              key: whyDishNameKey,
+              textDirection: contentDirection(
+                dishName,
+                Directionality.of(context),
+              ),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -197,7 +209,17 @@ class _ConcernRow extends StatelessWidget {
           if (question != null) ...[
             const SizedBox(height: 8),
             Text(l10n.whyWaiterQuestionLabel, style: muted),
-            Text(question, style: theme.textTheme.bodyMedium),
+            SizedBox(
+              width: double.infinity,
+              child: Text(
+                question,
+                textDirection: contentDirection(
+                  question,
+                  Directionality.of(context),
+                ),
+                style: theme.textTheme.bodyMedium,
+              ),
+            ),
           ],
         ],
       ),

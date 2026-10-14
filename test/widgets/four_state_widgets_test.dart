@@ -366,7 +366,7 @@ void main() {
         for (final count in <String>['1', '2', '3', '4']) {
           expect(find.text(count), findsOneWidget);
         }
-        final label = tag == 'en' ? 'NO TRIGGER FOUND' : 'לא נמצא חשש';
+        final label = tag == 'en' ? 'NO TRIGGER FOUND' : 'ללא חשש';
         expect(find.text(label), findsOneWidget);
         expect(find.text(tag == 'en' ? 'TO ASK' : 'לשאול'), findsOneWidget);
       });

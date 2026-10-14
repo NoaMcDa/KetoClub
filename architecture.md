@@ -3482,6 +3482,31 @@ found something for the profile in a model result. `KetoClubApp` and
 `generateRoute` take `bantoMode` for the menu and Settings screens, so a
 flow test pumps Banto with no define.
 
+**The four-state menu's visual pass and the owner's copy (ALG-05, closes
+#347).** Two copy decisions of the owner: a strict profile's Hebrew "fits"
+is "ללא חשש" on the tile and in the header ("N ללא חשש · M עם שינוי · K
+לשאול"), while the card's pill keeps "לא נמצא חשש — לשאול את המסעדה" and
+English is unchanged; and the evaluator's change sentence quotes the menu's
+own words, "Ask for it without '{item}'" / "לבקש את המנה בלי '{item}'"
+(straight single quotes), where the item is the matched slice
+(`ProfileEvaluator.quotedItem`, device-only, so no golden or Python twin
+moves) run through the next word when the slice ends in a construct form's
+ת ("גבינת שמנת"), at most three words and never past a comma, a full stop,
+`|`, a line break or the field's end; an item another item already quotes
+as whole words is not asked for twice. The pass rendered the Banto web
+build with a sesame + lactose profile against the audit's stubs
+(`docs/VISUAL_AUDIT.md`, "Banto four-state menu", which lists every finding)
+and fixed five things, all inside state-mode paths: the strict pill and the
+"add a note" icon share one row (the keto header `Wrap` dropped the icon to
+a line of its own), the "Why?" button, each concern line and the state
+waiter row are semantics nodes of their own (merged, they made the whole
+card one button that opened the Why sheet), the AI and "Rules checked" chips
+scale down rather than overflow at a narrow width and large text, and the
+Why sheet lays the dish name and the waiter question out in their own
+direction, and the "Why?" button draws the keyboard `FocusRing` of #264. `tool/visual_audit/serve_spa.py` gives the driver the
+single-page-app fallback the path URLs of #226 need. The keto build's menu
+renders the same before and after.
+
 ---
 
 ## 15. Testing strategy
