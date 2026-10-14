@@ -1680,4 +1680,19 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get dishCardDeclaredKosher => 'כשר לפי הצהרת הפלטפורמה';
+
+  @override
+  String get waiterCardChefCard => 'כרטיס שף';
+
+  @override
+  String get menuAllergyNoteAction => 'העתקת הערת אלרגיה';
+
+  @override
+  String get menuAllergyNoteCopied => 'הערת האלרגיה הועתקה';
+
+  @override
+  String get menuAllergyNoteShare => 'שיתוף';
+
+  @override
+  String get menuAllergyNoteSubject => 'הערת אלרגיה';
 }

@@ -3543,6 +3543,45 @@ the device (C1): neither the server nor the heuristic reads them. With
 kosher shows "declared kosher by the platform" beside its price, the only
 kosher statement the app makes and never its own.
 
+**Waiter questions, the per-dish chef card and the allergy note (ALG-08b,
+closes #350; ALG-15, closes #357).** Every concern an evaluation keeps now
+carries a waiter question: `ProfileEvaluator.evaluate` passes its kept
+concerns once through `WaiterQuestions.fill` (`utils/allergens/
+waiter_questions.dart`), which keeps a question the model wrote and fills
+the rest from Dart templates per source and certainty in the dish's language
+(§6.3's exception, as the "without" sentence): an option → "Can this be
+served without '{item}', so there is no X in it?", stated in the dish →
+"Can this be made without X?", a model ingredient → "Is there '{item}' in
+this dish, and does it contain X?", a hidden source or a likely or
+suspected finding → "The menu says '{item}': does it contain X?", and with
+nothing worth quoting (no text, over 40 characters, or the restriction's
+own name, as a guarded "ללא שומשום" leaves) the general question. X is
+`WaiterQuestions.subject`, the thing avoided (vegan reads "animal
+products", vegetarian "meat, poultry or fish"); `VerdictCopy.askQuestionFor`
+uses it too. It is device-only, after the profile chose: the wire, the
+Python twin and the goldens do not move (C1). The dish card still shows one
+question, now the asking concern's own; the Waiter Card shows the change
+and every question (`VerdictCopy.waiterCardScript`; an option's question is
+dropped when the change already asks for it) and a "Chef card" action that
+pushes `ChefCardScreen` for the dish with no brightness of its own (the
+Waiter Card under it keeps it raised). The dish card
+(`ChefCardText.composeForDish`) reads the introduction, the profile's strict
+lines (every line for a profile with none), "The dish I would like:" and the
+name as printed, the change, every question, and the cross-contact closing
+only when a `KitchenSignals.of(menu)` signal threatens a strict entry, else
+thanks; it opens in the menu's language and the toggle re-evaluates the
+dish in the other. The menu overflow's "Copy allergy note" (Banto and a
+profile with more than keto; every source, scans included) copies
+`ChefCardText.allergyNote` in the menu's language
+(`MenuShareText.menuIsHebrew`, now public) and a snack bar's Share sends it:
+one paragraph of allergens, celiac disease and the flexible entries with a
+"check every ingredient … no cross-contact" or "leave them out" closing, no
+severity word (the epic's "אלרגיה חמורה" example is dropped per D-b), and
+under 280 characters by dropping the flexible sentence, never an allergen.
+Translating the card for a menu in neither Hebrew nor English (through the
+menu-question path, #214) is deferred: the language test is Hebrew or not,
+so such a menu gets English.
+
 ---
 
 ## 15. Testing strategy

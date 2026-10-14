@@ -42,7 +42,7 @@ abstract final class MenuShareText {
   /// (architecture.md §12) — detected the same way the heuristic engine
   /// and the waiter script already are ([TextNormaliser.containsHebrew]
   /// over [TextNormaliser.dishSearchText]), applied here across every dish
-  /// [menu] carries rather than one dish at a time; see [_menuIsHebrew].
+  /// [menu] carries rather than one dish at a time; see [menuIsHebrew].
   ///
   /// **Banto (ALG-05, issue #347).** With a [wording] that
   /// [ProfileWording.usesStates] and the dishes' [evaluations] (by dish
@@ -62,7 +62,7 @@ abstract final class MenuShareText {
     ProfileWording wording = ProfileWording.ketoOnly,
     Map<String, EvaluatedDish> evaluations = const <String, EvaluatedDish>{},
   }) {
-    final isHebrew = _menuIsHebrew(menu);
+    final isHebrew = menuIsHebrew(menu);
     if (wording.usesStates) {
       return _stateText(
         venueName: venueName,
@@ -198,7 +198,7 @@ abstract final class MenuShareText {
   /// the same test `HeuristicMenuClassifier` runs per dish to pick a
   /// waiter-script language, run once here over the whole menu instead of
   /// once per dish.
-  static bool _menuIsHebrew(Menu menu) {
+  static bool menuIsHebrew(Menu menu) {
     final buffer = StringBuffer();
     for (final dish in menu.allDishes) {
       buffer

@@ -30,6 +30,7 @@ import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/allergen_matcher.dart';
 import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
+import 'package:ketoclub/utils/allergens/waiter_questions.dart';
 import 'package:ketoclub/utils/classification_rules.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 
@@ -205,6 +206,8 @@ abstract final class ProfileEvaluator {
   /// Between 2 and 3, **declarations** (ALG-09; [Declarations.of] over
   /// the dish's declared tags, its own text and its category [heading])
   /// lower the concerns they declare absent: see [_applyDeclarations].
+  /// Every kept concern carries a waiter question in the same language
+  /// ([WaiterQuestions.fill], ALG-08b): the model's own when it wrote one.
   ///
   /// An empty profile holds keto: it is the keto-only user of today's
   /// app, and the result is the identity mapping of the wire verdict.
@@ -264,7 +267,10 @@ abstract final class ProfileEvaluator {
     }
     return EvaluatedDish(
       dish: analysed,
-      concerns: _onePerRestriction(evidence),
+      concerns: WaiterQuestions.fill(
+        _onePerRestriction(evidence),
+        hebrew: isHebrew,
+      ),
       state: state,
       modification: state == DishState.avoid ? null : change,
       declarations: declarations,

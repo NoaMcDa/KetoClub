@@ -36,8 +36,14 @@ class WaiterCardSheet extends StatefulWidget {
     this.screenBrightness = const NoOpScreenBrightness(),
     this.script,
     this.showKetoDetails = true,
+    this.chefCard,
     super.key,
   });
+
+  /// Builds the chef card for this dish (Banto, ALG-08b, issue #350), or
+  /// null to leave the "Chef card" action out. The action pushes it as a
+  /// full-screen page above this card.
+  final WidgetBuilder? chefCard;
 
   /// The dish this card shows.
   final DishRow row;
@@ -59,6 +65,10 @@ class WaiterCardSheet extends StatefulWidget {
   @override
   State<WaiterCardSheet> createState() => _WaiterCardSheetState();
 }
+
+/// The Waiter Card's "Chef card" action (ALG-08b), public so a test can
+/// tap it.
+const Key waiterCardChefCardKey = Key('waiterCardChefCard');
 
 class _WaiterCardSheetState extends State<WaiterCardSheet> {
   @override
@@ -143,6 +153,20 @@ class _WaiterCardSheetState extends State<WaiterCardSheet> {
                         child: WaiterScriptWidget(
                           script: script,
                           prominent: true,
+                        ),
+                      ),
+                    ),
+                  ],
+                  if (widget.chefCard case final chefCard?) ...[
+                    const SizedBox(height: 14),
+                    Align(
+                      alignment: AlignmentDirectional.centerEnd,
+                      child: OutlinedButton.icon(
+                        key: waiterCardChefCardKey,
+                        icon: const Icon(Icons.restaurant_menu),
+                        label: Text(l10n.waiterCardChefCard),
+                        onPressed: () => Navigator.of(context).push<void>(
+                          MaterialPageRoute<void>(builder: chefCard),
                         ),
                       ),
                     ),

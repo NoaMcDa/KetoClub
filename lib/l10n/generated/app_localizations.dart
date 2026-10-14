@@ -2705,6 +2705,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Declared kosher by the platform'**
   String get dishCardDeclaredKosher;
+
+  /// Banto (ALG-08b): the Waiter Card action that opens the chef card for this dish.
+  ///
+  /// In en, this message translates to:
+  /// **'Chef card'**
+  String get waiterCardChefCard;
+
+  /// Banto (ALG-15): the menu overflow entry that copies a short allergy note, in the menu's language, for a delivery app's note box.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy allergy note'**
+  String get menuAllergyNoteAction;
+
+  /// Banto (ALG-15): the snack bar shown once the allergy note is on the clipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Allergy note copied'**
+  String get menuAllergyNoteCopied;
+
+  /// Banto (ALG-15): the snack bar action that shares the allergy note as text.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get menuAllergyNoteShare;
+
+  /// Banto (ALG-15): the subject line of a shared allergy note, where the platform shows one.
+  ///
+  /// In en, this message translates to:
+  /// **'Allergy note'**
+  String get menuAllergyNoteSubject;
 }
 
 class _AppLocalizationsDelegate
