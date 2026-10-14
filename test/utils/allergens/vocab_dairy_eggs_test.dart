@@ -11,11 +11,13 @@ const List<RestrictionId> _ids = <RestrictionId>[
 ];
 
 /// One expectation: what `id` finds in `text` — its strongest certainty,
-/// or null when it finds nothing.
+/// or null when it finds nothing — and, when `guarded`, that every hit is
+/// guarded (a guard lowers a hit to suspected, never cancels it; ALG-04a).
 typedef _Case = ({
   RestrictionId id,
   String text,
   TriggerCertainty? certainty,
+  bool guarded,
   String why,
 });
 
@@ -37,21 +39,36 @@ TriggerCertainty? _strongest(RestrictionId id, String text) {
   return best;
 }
 
+/// Whether every hit of `id` in `text` is guarded (and there is one).
+bool _allGuarded(RestrictionId id, String text) {
+  final hits = AllergenMatcher.find(text).where((hit) => hit.id == id);
+  return hits.isNotEmpty && hits.every((hit) => hit.guarded);
+}
+
 _Case _case(
   RestrictionId id,
   String text,
   TriggerCertainty? certainty,
   String why,
-) => (id: id, text: text, certainty: certainty, why: why);
+) => (id: id, text: text, certainty: certainty, guarded: false, why: why);
+
+/// A text whose every hit of `id` a guard lowered to suspected.
+_Case _guard(RestrictionId id, String text, String why) =>
+    (id: id, text: text, certainty: _suspected, guarded: true, why: why);
 
 void _expectAll(List<_Case> cases) {
-  for (final c in cases) {
-    expect(
-      _strongest(c.id, c.text),
-      c.certainty,
-      reason: '${c.id.name}: "${c.text}" (${c.why})',
-    );
-  }
+  final wrong = <String>[
+    for (final c in cases)
+      if (_strongest(c.id, c.text) != c.certainty ||
+          (c.guarded && !_allGuarded(c.id, c.text)))
+        <String>[
+          '${c.id.name}: "${c.text}" (${c.why}): expected',
+          '${c.certainty?.name}${c.guarded ? ' guarded' : ''}, found',
+          '${_strongest(c.id, c.text)?.name}',
+          if (_allGuarded(c.id, c.text)) 'guarded',
+        ].join(' '),
+  ];
+  expect(wrong, isEmpty);
 }
 
 void main() {
@@ -218,31 +235,31 @@ void main() {
       ]);
     });
 
-    test('plant milks and other butters find nothing', () {
+    test('plant milks and other butters are lowered, never dropped', () {
       _expectAll(<_Case>[
-        _case(id, 'Coconut milk curry', null, 'coconut milk'),
-        _case(id, 'Almond milk latte', null, 'almond milk'),
-        _case(id, 'Oat milk', null, 'oat milk'),
-        _case(id, 'Soy milk', null, 'soy milk'),
-        _case(id, 'Cashew cheese', null, 'cashew cheese'),
-        _case(id, 'Coconut cream', null, 'coconut cream'),
-        _case(id, 'Coconut yogurt', null, 'coconut yogurt'),
-        _case(id, 'Peanut butter', null, 'peanut butter'),
-        _case(id, 'Almond butter', null, 'almond butter'),
-        _case(id, 'Cocoa butter', null, 'cocoa butter'),
-        _case(id, 'Cream of tartar', null, 'cream of tartar'),
-        _case(id, 'Milk thistle tea', null, 'milk thistle'),
+        _guard(id, 'Coconut milk curry', 'coconut milk'),
+        _case(id, 'Almond milk latte', _likely, 'the latte is still asked'),
+        _guard(id, 'Oat milk', 'oat milk'),
+        _guard(id, 'Soy milk', 'soy milk'),
+        _guard(id, 'Cashew cheese', 'cashew cheese'),
+        _guard(id, 'Coconut cream', 'coconut cream'),
+        _guard(id, 'Coconut yogurt', 'coconut yogurt'),
+        _guard(id, 'Peanut butter', 'peanut butter'),
+        _guard(id, 'Almond butter', 'almond butter'),
+        _guard(id, 'Cocoa butter', 'cocoa butter'),
+        _guard(id, 'Cream of tartar', 'cream of tartar'),
+        _guard(id, 'Milk thistle tea', 'milk thistle'),
         _case(id, 'Butternut squash', null, 'butternut is one word'),
         _case(id, 'Eggplant', null, 'eggplant'),
-        _case(id, 'חלב שקדים', null, 'almond milk'),
-        _case(id, 'חלב שיבולת שועל', null, 'oat milk'),
-        _case(id, 'חלב קוקוס', null, 'coconut milk'),
-        _case(id, 'חלב סויה', null, 'soy milk'),
-        _case(id, 'שמנת קוקוס', null, 'coconut cream'),
-        _case(id, 'חמאת בוטנים', null, 'peanut butter'),
-        _case(id, 'חמאת קקאו', null, 'cocoa butter'),
-        _case(id, 'חמאת שקדים', null, 'almond butter'),
-        _case(id, 'גבינת קשיו', null, 'cashew cheese'),
+        _guard(id, 'חלב שקדים', 'almond milk'),
+        _guard(id, 'חלב שיבולת שועל', 'oat milk'),
+        _guard(id, 'חלב קוקוס', 'coconut milk'),
+        _guard(id, 'חלב סויה', 'soy milk'),
+        _guard(id, 'שמנת קוקוס', 'coconut cream'),
+        _guard(id, 'חמאת בוטנים', 'peanut butter'),
+        _guard(id, 'חמאת קקאו', 'cocoa butter'),
+        _guard(id, 'חמאת שקדים', 'almond butter'),
+        _guard(id, 'גבינת קשיו', 'cashew cheese'),
         _case(id, 'חלבון', null, 'protein is not milk'),
         _case(id, 'חלבה', null, 'halva is sesame'),
         _case(id, 'חלבונים', null, 'protein, plural'),
@@ -251,27 +268,27 @@ void main() {
 
     test('peanut butter is peanut and not milk', () {
       _expectAll(<_Case>[
-        _case(id, 'חמאת בוטנים', null, 'not milk'),
+        _guard(id, 'חמאת בוטנים', 'not milk'),
         _case(RestrictionId.peanuts, 'חמאת בוטנים', _stated, 'peanut'),
         _case(id, 'Peanut butter cookies', _suspected, 'cookies still asked'),
         _case(RestrictionId.peanuts, 'Peanut butter', _stated, 'peanut'),
       ]);
     });
 
-    test('guards cancel the hit', () {
+    test('guards lower the hit', () {
       _expectAll(<_Case>[
-        _case(id, 'Dairy-free cheese', null, 'dairy-free'),
-        _case(id, 'Dairy-free ice cream', null, 'dairy-free ice cream'),
-        _case(id, 'Cheese (dairy free)', null, 'after the trigger'),
-        _case(id, 'Milk free', null, 'milk free'),
-        _case(id, 'No butter', null, 'no'),
-        _case(id, 'Burger without cheese', null, 'without'),
+        _guard(id, 'Dairy-free cheese', 'dairy-free'),
+        _guard(id, 'Dairy-free ice cream', 'dairy-free ice cream'),
+        _guard(id, 'Cheese (dairy free)', 'after the trigger'),
+        _guard(id, 'Milk free', 'milk free'),
+        _guard(id, 'No butter', 'no'),
+        _guard(id, 'Burger without cheese', 'without'),
         _case(id, 'Vegan cheese', _suspected, 'a substitute is still asked'),
         _case(id, 'Vegan butter', _suspected, 'a substitute is still asked'),
-        _case(id, 'ללא חלב', null, 'Hebrew ללא'),
-        _case(id, 'עוגה ללא חלב', null, 'a hidden Hebrew trigger'),
-        _case(id, 'עוגה בלי מוצרי חלב', null, 'without dairy products'),
-        _case(id, 'פסטה וללא גבינה', null, 'Hebrew וללא'),
+        _guard(id, 'ללא חלב', 'Hebrew ללא'),
+        _guard(id, 'עוגה ללא חלב', 'a hidden Hebrew trigger'),
+        _guard(id, 'עוגה בלי מוצרי חלב', 'without dairy products'),
+        _guard(id, 'פסטה וללא גבינה', 'Hebrew וללא'),
         _case(id, 'גבינה טבעונית', _suspected, 'a substitute is still asked'),
         _case(id, 'שמנת צמחית', _suspected, 'a plant cream is still asked'),
       ]);
@@ -286,7 +303,7 @@ void main() {
         _case(id, 'גבינה ללא לקטוז', _stated, 'Hebrew lactose-free cheese'),
         _case(id, 'שמנת פרווה', _stated, 'pareve cream'),
         _case(id, 'גבינה פרווה', _stated, 'pareve cheese'),
-        _case(id, 'ללא לקטוז', null, 'the word lactose alone is cancelled'),
+        _guard(id, 'ללא לקטוז', 'the word lactose alone is lowered'),
       ]);
     });
 
@@ -356,46 +373,46 @@ void main() {
       ]);
     });
 
-    test('lactose-free clears lactose', () {
+    test('lactose-free lowers lactose', () {
       _expectAll(<_Case>[
-        _case(id, 'Lactose-free milk', null, 'lactose-free milk'),
-        _case(id, 'Lactose free yogurt', null, 'lactose-free yogurt'),
+        _guard(id, 'Lactose-free milk', 'lactose-free milk'),
+        _guard(id, 'Lactose free yogurt', 'lactose-free yogurt'),
         _case(id, 'Latte with lactose free milk', _likely, 'the latte stays'),
         _case(id, 'Low lactose cream', _stated, 'the word lactose stays'),
-        _case(id, 'Cheese, lactose free', null, 'after the trigger'),
-        _case(id, 'חלב ללא לקטוז', null, 'Hebrew lactose-free milk'),
-        _case(id, 'גבינה ללא לקטוז', null, 'Hebrew lactose-free cheese'),
-        _case(id, 'חלב דל לקטוז', null, 'Hebrew low-lactose milk'),
-        _case(id, 'ללא לקטוז', null, 'the word lactose alone is cancelled'),
+        _guard(id, 'Cheese, lactose free', 'after the trigger'),
+        _guard(id, 'חלב ללא לקטוז', 'Hebrew lactose-free milk'),
+        _guard(id, 'גבינה ללא לקטוז', 'Hebrew lactose-free cheese'),
+        _guard(id, 'חלב דל לקטוז', 'Hebrew low-lactose milk'),
+        _guard(id, 'ללא לקטוז', 'the word lactose alone is lowered'),
       ]);
     });
 
     test('hard aged cheese lowers lactose to a question', () {
       _expectAll(<_Case>[
-        _case(id, 'Parmesan cheese', _suspected, 'cheese is cancelled'),
-        _case(id, 'Aged cheese', _suspected, 'cheese is cancelled'),
-        _case(id, 'Mature cheddar', null, 'mature lowers a cheddar to nothing'),
+        _case(id, 'Parmesan cheese', _suspected, 'cheese is lowered'),
+        _case(id, 'Aged cheese', _suspected, 'cheese is lowered'),
+        _guard(id, 'Mature cheddar', 'mature lowers a cheddar'),
         _case(id, 'Gruyere cheese', _suspected, 'gruyere is a hard cheese'),
         _case(id, 'גבינת פרמזן', _suspected, 'Hebrew construct form'),
         _case(id, 'Soft cheese', _stated, 'soft cheese stays stated'),
       ]);
     });
 
-    test('plant milks, vegan and pareve clear lactose', () {
+    test('plant milks, vegan and pareve lower lactose', () {
       _expectAll(<_Case>[
-        _case(id, 'Oat milk', null, 'oat milk'),
-        _case(id, 'Almond milk', null, 'almond milk'),
-        _case(id, 'Soy milk', null, 'soy milk'),
-        _case(id, 'Coconut milk', null, 'coconut milk'),
-        _case(id, 'Vegan cheese', null, 'vegan'),
-        _case(id, 'Dairy-free ice cream', null, 'dairy-free'),
-        _case(id, 'Peanut butter', null, 'peanut butter'),
-        _case(id, 'Cream of tartar', null, 'cream of tartar'),
-        _case(id, 'חלב שקדים', null, 'almond milk'),
-        _case(id, 'חלב שיבולת שועל', null, 'oat milk'),
-        _case(id, 'עוגה פרווה', null, 'pareve'),
-        _case(id, 'גבינה טבעונית', null, 'vegan'),
-        _case(id, 'חמאת בוטנים', null, 'peanut butter'),
+        _guard(id, 'Oat milk', 'oat milk'),
+        _guard(id, 'Almond milk', 'almond milk'),
+        _guard(id, 'Soy milk', 'soy milk'),
+        _guard(id, 'Coconut milk', 'coconut milk'),
+        _guard(id, 'Vegan cheese', 'vegan'),
+        _guard(id, 'Dairy-free ice cream', 'dairy-free'),
+        _guard(id, 'Peanut butter', 'peanut butter'),
+        _guard(id, 'Cream of tartar', 'cream of tartar'),
+        _guard(id, 'חלב שקדים', 'almond milk'),
+        _guard(id, 'חלב שיבולת שועל', 'oat milk'),
+        _guard(id, 'עוגה פרווה', 'pareve'),
+        _guard(id, 'גבינה טבעונית', 'vegan'),
+        _guard(id, 'חמאת בוטנים', 'peanut butter'),
         _case(id, 'חלבון', null, 'protein is not milk'),
         _case(id, 'חלבה', null, 'halva is sesame'),
       ]);
@@ -420,7 +437,15 @@ void main() {
 
       // Assert
       expect(milk, <TriggerCertainty?>[_stated, _stated, _stated, _suspected]);
-      expect(lactose, <TriggerCertainty?>[null, null, null, null]);
+      expect(lactose, <TriggerCertainty?>[
+        _suspected,
+        _suspected,
+        _suspected,
+        _suspected,
+      ]);
+      for (final text in phrases) {
+        expect(_allGuarded(RestrictionId.lactose, text), isTrue, reason: text);
+      }
     });
   });
 
@@ -502,22 +527,22 @@ void main() {
       ]);
     });
 
-    test('guards cancel the hit', () {
+    test('guards lower the hit', () {
       _expectAll(<_Case>[
-        _case(id, 'Egg-free mayo', null, 'egg-free'),
-        _case(id, 'Mayo (egg free)', null, 'after the trigger'),
-        _case(id, 'Vegan mayo', null, 'vegan'),
-        _case(id, 'Eggless brownie', null, 'eggless'),
-        _case(id, 'Plant based egg', null, 'plant based'),
-        _case(id, 'No eggs', null, 'no'),
-        _case(id, 'Salad without egg', null, 'without'),
-        _case(id, 'ללא ביצים', null, 'Hebrew ללא'),
-        _case(id, 'עוגה בלי ביצים', null, 'Hebrew בלי'),
-        _case(id, 'סלט וללא ביצים', null, 'Hebrew וללא'),
-        _case(id, 'עוגה ללא ביצים', null, 'a hidden Hebrew trigger'),
-        _case(id, 'מיונז טבעוני', null, 'vegan mayo'),
-        _case(id, 'מיונז צמחי', null, 'plant mayo'),
-        _case(id, 'Eggs, free range chicken', null, 'a free after the trigger'),
+        _guard(id, 'Egg-free mayo', 'egg-free'),
+        _guard(id, 'Mayo (egg free)', 'after the trigger'),
+        _guard(id, 'Vegan mayo', 'vegan'),
+        _guard(id, 'Eggless brownie', 'eggless'),
+        _guard(id, 'Plant based egg', 'plant based'),
+        _guard(id, 'No eggs', 'no'),
+        _guard(id, 'Salad without egg', 'without'),
+        _guard(id, 'ללא ביצים', 'Hebrew ללא'),
+        _guard(id, 'עוגה בלי ביצים', 'Hebrew בלי'),
+        _guard(id, 'סלט וללא ביצים', 'Hebrew וללא'),
+        _guard(id, 'עוגה ללא ביצים', 'a hidden Hebrew trigger'),
+        _guard(id, 'מיונז טבעוני', 'vegan mayo'),
+        _guard(id, 'מיונז צמחי', 'plant mayo'),
+        _guard(id, 'Eggs, free range chicken', 'a free after the trigger'),
       ]);
     });
 

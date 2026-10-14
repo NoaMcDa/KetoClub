@@ -22,6 +22,12 @@ List<AllergenHit> _hits(String text, RestrictionId id) =>
         .where((hit) => hit.id == id)
         .toList(growable: false);
 
+/// Whether [hits] are all lowered by a guard, and there is one (a guard
+/// lowers a hit to suspected, never cancels it; ALG-04a).
+bool _lowered(List<AllergenHit> hits) =>
+    hits.isNotEmpty &&
+    hits.every((hit) => hit.guarded && hit.certainty == _suspected);
+
 /// The certainty of [id]'s hit on [term] in [text], or null.
 TriggerCertainty? _certaintyOf(String text, RestrictionId id, String term) {
   for (final hit in _hits(text, id)) {
@@ -257,11 +263,14 @@ void main() {
 
     test('oats, beer and "wheat free" are not wheat', () {
       expect(_hits('Rolled oats', _wheat), isEmpty);
-      expect(_hits('Wheat-free brownie', _wheat), isEmpty);
-      expect(_hits('Wheat-free brownie', _gluten).map((h) => h.term), <String>[
-        'wheat free',
-        'brownie',
-      ]);
+      expect(_lowered(_hits('Wheat-free brownie', _wheat)), isTrue);
+      expect(
+        _hits(
+          'Wheat-free brownie',
+          _gluten,
+        ).map((h) => '${h.term}${h.guarded ? ':guarded' : ''}'),
+        <String>['wheat:guarded', 'wheat free', 'brownie'],
+      );
     });
   });
 
@@ -301,8 +310,17 @@ void main() {
       ('ללא לופין', _lupin),
     ];
     for (final (text, id) in gone) {
-      test('$text: ${id.name} has no hit for the guarded trigger', () {
-        final remaining = _hits(text, id).map((hit) => hit.term).toList();
+      test('$text: ${id.name} has the guarded trigger only lowered', () {
+        final hits = _hits(text, id);
+        expect(hits.where((hit) => hit.guarded), isNotEmpty);
+        expect(
+          hits.where((hit) => hit.guarded).map((hit) => hit.certainty),
+          everyElement(_suspected),
+        );
+        final remaining = <String>[
+          for (final hit in hits)
+            if (!hit.guarded) hit.term,
+        ];
         final guarded = <String>{
           'bun',
           'pasta',
@@ -332,20 +350,36 @@ void main() {
       });
     }
 
+    test('a flour that is not wheat is lowered, never dropped', () {
+      for (final id in <RestrictionId>[_wheat, _gluten]) {
+        for (final (text, term) in <(String, String)>[
+          ('Rice flour pancakes', 'flour'),
+          ('Chickpea flour batter', 'flour'),
+          ('עוגה מקמח אורז', 'קמח'),
+          ('קמח תפוחי אדמה', 'קמח'),
+        ]) {
+          final hits = _hits(text, id).where((hit) => hit.term == term);
+          expect(_lowered(hits.toList()), isTrue, reason: '$text: $hits');
+        }
+        expect(_certaintyOf('Oat flour', id, 'flour'), _likely);
+        expect(_certaintyOf('Rice and flour', id, 'flour'), _likely);
+      }
+    });
+
     test('a guard never makes wheat-free read as gluten-free', () {
       expect(_certaintyOf('Wheat-free', _gluten, 'wheat free'), _suspected);
-      expect(_hits('Wheat-free', _wheat), isEmpty);
-      expect(_hits('נטול חיטה', _wheat), isEmpty);
+      expect(_lowered(_hits('Wheat-free', _wheat)), isTrue);
+      expect(_lowered(_hits('נטול חיטה', _wheat)), isTrue);
       expect(_certaintyOf('נטול חיטה', _gluten, 'נטול חיטה'), _suspected);
     });
 
-    test('wheat free and gluten free together clear both ids', () {
-      expect(_hits('Gluten free, wheat free bread', _wheat), isEmpty);
-      expect(_hits('Gluten free bread', _gluten), isEmpty);
+    test('wheat free and gluten free together lower both ids', () {
+      expect(_lowered(_hits('Gluten free, wheat free bread', _wheat)), isTrue);
+      expect(_lowered(_hits('Gluten free bread', _gluten)), isTrue);
     });
 
-    test('gluten-free bakery still raises lupin, even as it clears gluten', () {
-      expect(_hits('Gluten-free bun', _gluten), isEmpty);
+    test('gluten-free bakery still raises lupin, even as it lowers gluten', () {
+      expect(_lowered(_hits('Gluten-free bun', _gluten)), isTrue);
       expect(
         _certaintyOf('Gluten-free bun', _lupin, 'gluten free bun'),
         _suspected,

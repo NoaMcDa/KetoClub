@@ -15,15 +15,19 @@
 /// it, and its certainty says how often.
 ///
 /// Matcher facts the lists are written around (`allergen_matcher.dart`):
-/// a guard counts only within two words of the trigger; the Hebrew
+/// a guard lowers a hit to `suspected` (never cancels it) and counts only
+/// in the slot beside its term (ALG-04a), so "no added" is a guard phrase
+/// of its own; a coffee, cocoa or jelly bean is a term guard on "bean";
+/// the Hebrew
 /// boundary (`hebrewTriggerPattern`) allows a one-or-two-letter prefix on
 /// the left and no suffix on the right, so `טירמיסו` does not contain
 /// `מיסו` and `ליצירת` does not contain `ציר`; `פול` is listed without a
 /// prefix because `כפול` ("double") would otherwise read as a fava bean,
 /// and its genuine prefixed forms are terms of their own; `יין` likewise
-/// ("wine" against `מיין`, "sorts"). The normaliser deletes the Hebrew
-/// maqaf (it lies in the niqqud range), so a compound written with one
-/// ("סויה־דבש") is listed as a term of its own.
+/// ("wine" against `מיין`, "sorts"). The keto normaliser deletes the
+/// Hebrew maqaf (it lies in the niqqud range), but the allergen matcher
+/// reads it as a space in the text and in every term (ALG-04a), so a
+/// compound written with one ("סויה־דבש") matches the spaced spelling.
 ///
 /// `legumes` carries every direct term of `soy`, `peanuts` and `lupin`
 /// and every hidden source of `soy`, because a peanut, a soybean and a
@@ -319,6 +323,16 @@ const List<String> _peanutLupinExtraEn = <String>[
   'lupini beans',
   'lupin flour',
   'lupin protein',
+];
+
+/// The words that make "bean" another food: a coffee, vanilla or cocoa
+/// bean, a jelly bean.
+const List<String> _notLegumeBeansEn = <String>[
+  'coffee',
+  'vanilla',
+  'cocoa',
+  'cacao',
+  'jelly',
 ];
 
 /// Plants and additives: one entry per restriction this group owns.
@@ -1154,9 +1168,18 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
           ),
         ],
         guards: AllergenGuards(
-          beforeEn: <String>['no', 'without'],
+          beforeEn: <String>['no', 'without', 'no added', 'without added'],
           afterEn: <String>['free'],
-          beforeHe: <String>['ללא', 'וללא', 'בלי', 'ובלי', 'נטול', 'נטולת'],
+          beforeHe: <String>[
+            'ללא',
+            'וללא',
+            'בלי',
+            'ובלי',
+            'נטול',
+            'נטולת',
+            'ללא תוספת',
+            'בלי תוספת',
+          ],
         ),
         noPrefixHe: <String>['יין'],
         sources: <String>['11 §15.1', '11 §15.2', '11 §15.3', '12 §1.10'],
@@ -1285,18 +1308,16 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
           ),
         ],
         guards: AllergenGuards(
-          beforeEn: <String>[
-            'no',
-            'without',
-            'coffee',
-            'vanilla',
-            'cocoa',
-            'cacao',
-            'jelly',
-          ],
+          beforeEn: <String>['no', 'without'],
           afterEn: <String>['free'],
           beforeHe: <String>['ללא', 'וללא', 'בלי', 'ובלי', 'נטול', 'נטולת'],
         ),
+        // A coffee, vanilla or cocoa bean and a jelly bean are no legume
+        // (ALG-04a): term guards on "bean", not restriction-wide.
+        termGuards: <String, AllergenGuards>{
+          'bean': AllergenGuards(beforeEn: _notLegumeBeansEn),
+          'beans': AllergenGuards(beforeEn: _notLegumeBeansEn),
+        },
         noPrefixHe: <String>['פול'],
         sources: <String>[
           '11 §16.1',

@@ -14,13 +14,14 @@
 /// safety claim, and the terms favour the clear case over every plant
 /// look-alike. The vocabulary is **one list per restriction**, and a guard
 /// applies to every trigger of that restriction, so a plant adjective
-/// ("oat", "coconut", "almond") is not a guard here: it would also cancel
+/// ("oat", "coconut", "almond") is not a guard here: it would also lower
 /// "coconut shrimp" and "almond chicken". The words that are ambiguous in
 /// that way (milk, butter, cream, and their Hebrew twins) are therefore
 /// listed `likely` rather than stated. Only the restaurant's own
 /// declaration (vegan, plant based, טבעוני, צמחוני ...) and the word "no"
-/// cancel a hit. The plant emoji is not a guard: `TextNormaliser.normalise`
-/// deletes it, so a phrase made of it normalises to nothing.
+/// lower a hit to `suspected`; no guard cancels one (ALG-04a). The plant
+/// emoji is not a guard: `TextNormaliser.normalise` deletes it, so a
+/// phrase made of it normalises to nothing.
 ///
 /// `keto` stays empty for good: its vocabulary lives in
 /// `lib/utils/constants.dart` and the rule engine.

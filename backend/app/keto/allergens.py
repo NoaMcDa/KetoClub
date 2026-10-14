@@ -10,8 +10,8 @@ vocabulary registry; a test asserts the two files are identical.
 :func:`allergens` parses the file once (cached) into frozen dataclasses.
 :func:`find` and :func:`find_in_dish` run every restriction's vocabulary over
 a text or a dish exactly as the Dart ``AllergenMatcher`` does, and report
-every unguarded trigger for every restriction, whatever anyone's profile
-(C1). There are no severity levels: a restriction is strict when its kind is
+every trigger for every restriction, whatever anyone's profile (C1). There
+are no severity levels: a restriction is strict when its kind is
 ``allergen`` or ``autoimmune`` (:attr:`Restriction.is_strict`).
 
 Behaviour the port keeps from Dart:
@@ -22,9 +22,19 @@ Behaviour the port keeps from Dart:
   (``re.ASCII`` word boundary), Hebrew ones with
   :func:`hebrew_trigger_pattern`, with no permissive prefix when the term,
   as written, is in ``noPrefixHe``.
-* **Guards.** English guards apply to English triggers and Hebrew guards to
-  Hebrew ones, through :func:`app.keto.rules.is_guarded`, the same two-word
-  window the keto guards use.
+* **Maqaf (ALG-04a).** The Hebrew maqaf U+05BE becomes a space before the
+  text is normalised (:func:`match_text`, :func:`dish_match_text`): the
+  normaliser deletes it as a Hebrew point, which glues "חמאת־בוטנים" into
+  one word. Length-preserving; the keto normaliser is untouched.
+* **Guards (ALG-04a).** A guard lowers, never cancels: a guarded trigger is
+  reported as ``suspected`` with ``guarded`` set. English guards apply to
+  English triggers and Hebrew guards to Hebrew ones; a trigger's guards are
+  its restriction's plus its own ``termGuards``. A guard counts only in the
+  slot adjacent to the match (:func:`_is_adjacent_guarded`), never in the
+  keto engine's two-word window (:func:`app.keto.rules.is_guarded`, which
+  this module no longer calls). A Hebrew guard's first word may carry one or
+  two prefix letters ``בהוכלמש`` before the trigger, and only ``ה`` after
+  it.
 * **Order.** Hits sort by start, then the restriction's taxonomy position,
   then the order they were found in (direct English, direct Hebrew, hidden
   English, hidden Hebrew, each as listed; a trigger's matches left to right).
@@ -37,7 +47,7 @@ Behaviour the port keeps from Dart:
 import json
 import re
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import cache
 from pathlib import Path
 from types import MappingProxyType
@@ -47,8 +57,6 @@ from app.keto.dart_text import utf16_len
 from app.keto.models import Dish
 from app.keto.normaliser import dish_rules_text, normalise
 from app.keto.patterns import hebrew_trigger_pattern, latin_trigger_pattern
-from app.keto.rules import is_guarded
-from app.keto.vocabulary import GuardWords
 
 ALLERGENS_PATH: Final = Path(__file__).with_name("allergens.json")
 """The packaged copy of the golden ``allergens.json``."""
@@ -114,8 +122,8 @@ class HiddenTrigger:
 
 @dataclass(frozen=True, slots=True)
 class AllergenGuards:
-    """Dart ``AllergenGuards``: phrases that cancel a trigger from up to two
-    words before or after it, per language."""
+    """Dart ``AllergenGuards``: phrases that lower a trigger from the words
+    just before or just after it, per language."""
 
     before_en: tuple[str, ...] = ()
     after_en: tuple[str, ...] = ()
@@ -132,6 +140,9 @@ class RestrictionVocabulary:
     hidden_en: tuple[HiddenTrigger, ...] = ()
     hidden_he: tuple[HiddenTrigger, ...] = ()
     guards: AllergenGuards = AllergenGuards()
+    term_guards: Mapping[str, AllergenGuards] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
     no_prefix_he: tuple[str, ...] = ()
     sources: tuple[str, ...] = ()
 
@@ -150,13 +161,15 @@ class Allergens:
 @dataclass(frozen=True, slots=True)
 class AllergenHit:
     """Dart ``AllergenHit``. ``start``/``end`` are UTF-16 code units of the
-    normalised text the matcher read; ``end`` is exclusive."""
+    text the matcher read (:func:`match_text` or :func:`dish_match_text`);
+    ``end`` is exclusive. ``guarded`` hits are always ``suspected``."""
 
     id: str
     term: str
     certainty: str
     start: int
     end: int
+    guarded: bool = False
 
 
 # --- parsing --------------------------------------------------------------------
@@ -182,22 +195,33 @@ def _hidden(value: Any, where: str) -> tuple[HiddenTrigger, ...]:
     return tuple(triggers)
 
 
+def _guards(value: Any, where: str) -> AllergenGuards:
+    guards = _obj(value, where)
+    return AllergenGuards(
+        before_en=_strs(guards["beforeEn"], f"{where}.beforeEn"),
+        after_en=_strs(guards["afterEn"], f"{where}.afterEn"),
+        before_he=_strs(guards["beforeHe"], f"{where}.beforeHe"),
+        after_he=_strs(guards["afterHe"], f"{where}.afterHe"),
+    )
+
+
 def parse_restriction_vocabularies(raw: Any) -> Mapping[str, RestrictionVocabulary]:
     """A registry as the exporter writes one, ``{id: entry}``, typed."""
     registry: dict[str, RestrictionVocabulary] = {}
     for key, value in _obj(raw, "vocabulary").items():
         entry = _obj(value, key)
-        guards = _obj(entry["guards"], f"{key}.guards")
+        term_guards = _obj(entry["termGuards"], f"{key}.termGuards")
         registry[key] = RestrictionVocabulary(
             direct_en=_terms(entry["directEn"], f"{key}.directEn"),
             direct_he=_terms(entry["directHe"], f"{key}.directHe"),
             hidden_en=_hidden(entry["hiddenEn"], f"{key}.hiddenEn"),
             hidden_he=_hidden(entry["hiddenHe"], f"{key}.hiddenHe"),
-            guards=AllergenGuards(
-                before_en=_strs(guards["beforeEn"], f"{key}.beforeEn"),
-                after_en=_strs(guards["afterEn"], f"{key}.afterEn"),
-                before_he=_strs(guards["beforeHe"], f"{key}.beforeHe"),
-                after_he=_strs(guards["afterHe"], f"{key}.afterHe"),
+            guards=_guards(entry["guards"], f"{key}.guards"),
+            term_guards=MappingProxyType(
+                {
+                    term: _guards(guards, f"{key}.termGuards.{term}")
+                    for term, guards in term_guards.items()
+                }
             ),
             no_prefix_he=_strs(entry["noPrefixHe"], f"{key}.noPrefixHe"),
             sources=_strs(entry["sources"], f"{key}.sources"),
@@ -248,7 +272,10 @@ def allergens() -> Allergens:
     return parse_allergens(json.loads(ALLERGENS_PATH.read_text(encoding="utf-8")))
 
 
-# --- the matcher ----------------------------------------------------------------
+# --- the matcher ---------------------------------------------------------------
+
+_Phrase = tuple[str, ...]
+"""One guard phrase, normalised and split into its words."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -256,6 +283,8 @@ class _CompiledTrigger:
     term: str
     pattern: re.Pattern[str]
     certainty: str
+    before: tuple[_Phrase, ...]
+    after: tuple[_Phrase, ...]
     hebrew: bool
 
 
@@ -264,15 +293,29 @@ class _CompiledRestriction:
     id: str
     order: int
     triggers: tuple[_CompiledTrigger, ...]
-    guard_en: GuardWords
-    guard_he: GuardWords
+
+
+def _phrases(phrases: Sequence[str]) -> tuple[_Phrase, ...]:
+    """``phrases`` normalised and split; one that normalises to nothing is
+    dropped."""
+    return tuple(
+        tuple(normalised.split(" "))
+        for normalised in (match_text(phrase) for phrase in phrases)
+        if normalised
+    )
 
 
 def _compile_trigger(
-    term: str, certainty: str, *, hebrew: bool, no_prefix: frozenset[str]
+    term: str,
+    certainty: str,
+    entry: RestrictionVocabulary,
+    *,
+    hebrew: bool,
+    no_prefix: frozenset[str],
 ) -> _CompiledTrigger | None:
-    """``term`` compiled, or None when it normalises to nothing."""
-    normalised = normalise(term)
+    """``term`` compiled with its guards (the restriction's, then the
+    term's own), or None when it normalises to nothing."""
+    normalised = match_text(term)
     if not normalised:
         return None
     pattern = (
@@ -280,7 +323,15 @@ def _compile_trigger(
         if hebrew
         else latin_trigger_pattern(normalised)
     )
-    return _CompiledTrigger(term, pattern, certainty, hebrew)
+    own = entry.term_guards.get(term, AllergenGuards())
+    glob = entry.guards
+    if hebrew:
+        before = _phrases((*glob.before_he, *own.before_he))
+        after = _phrases((*glob.after_he, *own.after_he))
+    else:
+        before = _phrases((*glob.before_en, *own.before_en))
+        after = _phrases((*glob.after_en, *own.after_en))
+    return _CompiledTrigger(term, pattern, certainty, before, after, hebrew)
 
 
 def _compile(
@@ -294,38 +345,112 @@ def _compile(
         no_prefix = frozenset(entry.no_prefix_he)
         candidates = (
             *(
-                _compile_trigger(t, "stated", hebrew=False, no_prefix=no_prefix)
+                _compile_trigger(t, "stated", entry, hebrew=False, no_prefix=no_prefix)
                 for t in entry.direct_en
             ),
             *(
-                _compile_trigger(t, "stated", hebrew=True, no_prefix=no_prefix)
+                _compile_trigger(t, "stated", entry, hebrew=True, no_prefix=no_prefix)
                 for t in entry.direct_he
             ),
             *(
-                _compile_trigger(t.term, t.certainty, hebrew=False, no_prefix=no_prefix)
+                _compile_trigger(
+                    t.term, t.certainty, entry, hebrew=False, no_prefix=no_prefix
+                )
                 for t in entry.hidden_en
             ),
             *(
-                _compile_trigger(t.term, t.certainty, hebrew=True, no_prefix=no_prefix)
+                _compile_trigger(
+                    t.term, t.certainty, entry, hebrew=True, no_prefix=no_prefix
+                )
                 for t in entry.hidden_he
             ),
         )
-        guards = entry.guards
         compiled.append(
             _CompiledRestriction(
                 id=restriction.id,
                 order=order,
                 triggers=tuple(t for t in candidates if t is not None),
-                guard_en=GuardWords(before=guards.before_en, after=guards.after_en),
-                guard_he=GuardWords(before=guards.before_he, after=guards.after_he),
             )
         )
     return tuple(compiled)
 
 
-@cache
+_COMPILED: dict[
+    int, tuple[Mapping[str, RestrictionVocabulary], tuple[_CompiledRestriction, ...]]
+] = {}
+"""Dart ``_compiledCache``: every vocabulary compiled so far, keyed on the
+mapping's identity (the mapping is kept alive beside its compiled form, so
+an id is never reused while it is cached)."""
+
+
+def _compiled(
+    vocabulary: Mapping[str, RestrictionVocabulary],
+) -> tuple[_CompiledRestriction, ...]:
+    """``vocabulary`` compiled once per mapping instance."""
+    entry = _COMPILED.get(id(vocabulary))
+    if entry is not None and entry[0] is vocabulary:
+        return entry[1]
+    compiled = _compile(vocabulary)
+    _COMPILED[id(vocabulary)] = (vocabulary, compiled)
+    return compiled
+
+
 def _registry() -> tuple[_CompiledRestriction, ...]:
-    return _compile(allergens().vocabulary)
+    return _compiled(allergens().vocabulary)
+
+
+_HEBREW_BEFORE_PREFIX: Final = re.compile(r"[בהוכלמש]{1,2}")
+"""Dart ``_hebrewBeforePrefix``: one or two grammatical prefix letters a
+Hebrew guard's first word may carry before its trigger (``fullmatch``)."""
+
+_HEBREW_AFTER_PREFIX: Final = re.compile(r"ה")
+"""Dart ``_hebrewAfterPrefix``: only the article ה after a trigger."""
+
+
+def _is_phrase(
+    words: Sequence[str], phrase: _Phrase, prefix: re.Pattern[str] | None
+) -> bool:
+    """Dart ``_isPhrase``: ``words`` is ``phrase`` word for word, the first
+    word allowed a prefix that ``prefix`` fully matches."""
+    for index, guard in enumerate(phrase):
+        word = words[index]
+        if word == guard:
+            continue
+        if index > 0 or prefix is None or not word.endswith(guard):
+            return False
+        if prefix.fullmatch(word[: len(word) - len(guard)]) is None:
+            return False
+    return True
+
+
+def _is_adjacent_guarded(
+    haystack: str, start: int, end: int, trigger: _CompiledTrigger
+) -> bool:
+    """Dart ``_isAdjacentGuarded``: a ``before`` phrase ends on the word just
+    before ``start``, or an ``after`` phrase starts on the word just after
+    ``end`` (code-point offsets). The haystack is normalised, so its only
+    whitespace is single ASCII spaces."""
+    if trigger.before:
+        before_text = haystack[:start].rstrip(" ")
+        if before_text:
+            words = before_text.split(" ")
+            prefix = _HEBREW_BEFORE_PREFIX if trigger.hebrew else None
+            for phrase in trigger.before:
+                if len(phrase) <= len(words) and _is_phrase(
+                    words[len(words) - len(phrase) :], phrase, prefix
+                ):
+                    return True
+    if trigger.after:
+        after_text = haystack[end:].lstrip(" ")
+        if after_text:
+            words = after_text.split(" ")
+            prefix = _HEBREW_AFTER_PREFIX if trigger.hebrew else None
+            for phrase in trigger.after:
+                if len(phrase) <= len(words) and _is_phrase(
+                    words[: len(phrase)], phrase, prefix
+                ):
+                    return True
+    return False
 
 
 def _find_in(
@@ -333,13 +458,13 @@ def _find_in(
 ) -> list[AllergenHit]:
     if not haystack:
         return []
-    found: list[tuple[int, int, int, str, str, str, int]] = []
+    found: list[tuple[int, int, int, str, str, str, int, bool]] = []
     for restriction in compiled:
         for trigger in restriction.triggers:
-            guard = restriction.guard_he if trigger.hebrew else restriction.guard_en
             for match in trigger.pattern.finditer(haystack):
-                if is_guarded(haystack, match.start(), match.end(), guard):
-                    continue
+                guarded = _is_adjacent_guarded(
+                    haystack, match.start(), match.end(), trigger
+                )
                 found.append(
                     (
                         match.start(),
@@ -347,8 +472,9 @@ def _find_in(
                         len(found),
                         restriction.id,
                         trigger.term,
-                        trigger.certainty,
+                        "suspected" if guarded else trigger.certainty,
                         match.end(),
+                        guarded,
                     )
                 )
     found.sort(key=lambda item: (item[0], item[1], item[2]))
@@ -359,16 +485,57 @@ def _find_in(
             certainty=certainty,
             start=utf16_len(haystack[:start]),
             end=utf16_len(haystack[:end]),
+            guarded=guarded,
         )
-        for start, _, _, hit_id, term, certainty, end in found
+        for start, _, _, hit_id, term, certainty, end, guarded in found
     ]
+
+
+_MAQAF: Final = "\u05be"
+"""The Hebrew maqaf, a hyphen that joins two words."""
+
+
+def _space_maqaf(raw: str) -> str:
+    return raw.replace(_MAQAF, " ")
+
+
+def _space_maqaf_in_dish(dish: Dish) -> Dish:
+    """``dish`` with every maqaf in its name, description, option names and
+    option values a space (not validated again: the shape is unchanged)."""
+    return dish.model_copy(
+        update={
+            "name": _space_maqaf(dish.name),
+            "description": _space_maqaf(dish.description),
+            "options": [
+                option.model_copy(
+                    update={
+                        "name": _space_maqaf(option.name),
+                        "values": [_space_maqaf(value) for value in option.values],
+                    }
+                )
+                for option in dish.options
+            ],
+        }
+    )
+
+
+def match_text(raw_text: str) -> str:
+    """``AllergenMatcher.matchText``: ``raw_text`` with every maqaf a space,
+    normalised; what :func:`find` reads and its offsets index."""
+    return normalise(_space_maqaf(raw_text))
+
+
+def dish_match_text(dish: Dish) -> str:
+    """``AllergenMatcher.dishMatchText``: :func:`dish_rules_text` of ``dish``
+    with every maqaf a space; what :func:`find_in_dish` reads."""
+    return dish_rules_text(_space_maqaf_in_dish(dish))
 
 
 def find_with(
     raw_text: str, vocabulary: Mapping[str, RestrictionVocabulary]
 ) -> list[AllergenHit]:
     """``AllergenMatcher.findWith``: :func:`find` over ``vocabulary``."""
-    return _find_in(normalise(raw_text), _compile(vocabulary))
+    return _find_in(match_text(raw_text), _compiled(vocabulary))
 
 
 def find_in_dish_with(
@@ -376,17 +543,18 @@ def find_in_dish_with(
 ) -> list[AllergenHit]:
     """``AllergenMatcher.findInDishWith``: :func:`find_in_dish` over
     ``vocabulary``."""
-    return _find_in(dish_rules_text(dish), _compile(vocabulary))
+    return _find_in(dish_match_text(dish), _compiled(vocabulary))
 
 
 def find(raw_text: str) -> list[AllergenHit]:
-    """``AllergenMatcher.find``: every unguarded trigger in ``raw_text``, both
-    languages, for every restriction. Offsets index ``normalise(raw_text)``."""
-    return _find_in(normalise(raw_text), _registry())
+    """``AllergenMatcher.find``: every trigger in ``raw_text``, both
+    languages, for every restriction, a guarded one lowered. Offsets index
+    :func:`match_text`."""
+    return _find_in(match_text(raw_text), _registry())
 
 
 def find_in_dish(dish: Dish) -> list[AllergenHit]:
-    """``AllergenMatcher.findInDish``: every unguarded trigger in the dish's
-    name, description, option names and non-removal option values. Offsets
-    index :func:`app.keto.normaliser.dish_rules_text`."""
-    return _find_in(dish_rules_text(dish), _registry())
+    """``AllergenMatcher.findInDish``: every trigger in the dish's name,
+    description, option names and non-removal option values. Offsets index
+    :func:`dish_match_text`."""
+    return _find_in(dish_match_text(dish), _registry())

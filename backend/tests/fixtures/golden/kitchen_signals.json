@@ -8252,7 +8252,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "fish": {
       "directEn": [
@@ -8313,7 +8314,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "molluscs": {
       "directEn": [
@@ -8344,7 +8346,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "peanuts": {
       "directEn": [
@@ -8388,7 +8391,8 @@
       "hiddenEn": [],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "sesame": {
       "directEn": [
@@ -8440,7 +8444,8 @@
       ],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     },
     "treeNuts": {
       "directEn": [
@@ -8512,7 +8517,8 @@
       ],
       "hiddenHe": [],
       "noPrefixHe": [],
-      "sources": []
+      "sources": [],
+      "termGuards": {}
     }
   },
   "vocabulary": {
