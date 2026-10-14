@@ -213,6 +213,27 @@ void main() {
         VerdictCopy.headerCounts(en, counts, ProfileWording.flexible),
         '3 fit · 2 with a change · 4 to ask',
       );
+      // The owner's Hebrew wording for a strict profile (ALG-05).
+      expect(
+        VerdictCopy.headerCounts(he, counts, ProfileWording.strict),
+        '3 ללא חשש · 2 עם שינוי · 4 לשאול',
+      );
+    });
+
+    test('the Hebrew strict "fits" words are the owner\'s', () {
+      // The tile says "ללא חשש"; the card's pill keeps the full sentence.
+      expect(
+        VerdictCopy.tile(he, DishState.fits, ProfileWording.strict),
+        'ללא חשש',
+      );
+      expect(
+        VerdictCopy.badge(he, DishState.fits, ProfileWording.strict),
+        'לא נמצא חשש — לשאול את המסעדה',
+      );
+      expect(
+        VerdictCopy.tile(en, DishState.fits, ProfileWording.strict),
+        'No trigger found',
+      );
     });
   });
 

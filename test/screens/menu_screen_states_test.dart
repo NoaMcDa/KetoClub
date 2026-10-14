@@ -17,9 +17,11 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
+import 'package:ketoclub/widgets/dish_card.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
+import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
 import 'package:provider/provider.dart';
 
 import '../fakes/fake_connectivity.dart';
@@ -98,8 +100,10 @@ Future<void> _pump(
   required bool bantoMode,
   Locale locale = const Locale('en'),
   ThemeData? theme,
+  Size size = const Size(390, 2400),
+  double textScale = 1,
 }) async {
-  tester.view.physicalSize = const Size(390, 2400);
+  tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
   await tester.pumpWidget(
@@ -110,6 +114,11 @@ Future<void> _pump(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: locale,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: TextScaler.linear(textScale)),
+          child: child!,
+        ),
         home: ChangeNotifierProvider<MenuController>.value(
           value: controller,
           child: MenuScreen(
@@ -194,6 +203,60 @@ void main() {
       expect(find.text(l10n.helperToolSentence), findsOneWidget);
       expect(find.text(l10n.stateLegendFoodOnly), findsOneWidget);
       expect(find.text(l10n.legendNote), findsNothing);
+    });
+  }
+
+  // The visual pass (docs/VISUAL_AUDIT.md, "Banto four-state menu"): what
+  // the web audit could not reach without a model, pinned here instead.
+  for (final (tag, locale) in <(String, Locale)>[
+    ('en', const Locale('en')),
+    ('he', const Locale('he')),
+  ]) {
+    testWidgets('the AI and "Rules checked" chips wrap, never overflow, at '
+        '320px and large text ($tag)', (tester) async {
+      // Act
+      await _pump(
+        tester,
+        _controller(_strict),
+        bantoMode: true,
+        locale: locale,
+        size: const Size(320, 3200),
+        textScale: 1.6,
+      );
+
+      // Assert: both chips drawn, nothing overflowing.
+      expect(find.byType(EngineChip), findsOneWidget);
+      expect(find.byType(RulesCheckedChip), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      final ai = tester.getRect(find.byType(EngineChip));
+      final rules = tester.getRect(find.byType(RulesCheckedChip));
+      expect(ai.right, lessThanOrEqualTo(320));
+      expect(rules.right, lessThanOrEqualTo(320));
+      expect(rules.left, greaterThanOrEqualTo(0));
+    });
+
+    testWidgets('two panes at 1280px: the side pane sits at the start '
+        '($tag)', (tester) async {
+      // Act
+      await _pump(
+        tester,
+        _controller(_strict),
+        bantoMode: true,
+        locale: locale,
+        size: const Size(1280, 800),
+      );
+
+      // Assert: the tiles and counts in the side pane, the dishes beside
+      // it, mirrored in Hebrew.
+      expect(tester.takeException(), isNull);
+      final tiles = tester.getRect(find.byType(VerdictCounterTiles));
+      final dish = tester.getRect(find.byType(DishCard).first);
+      if (tag == 'he') {
+        expect(tiles.left, greaterThan(dish.right));
+      } else {
+        expect(tiles.right, lessThan(dish.left));
+      }
+      expect(find.byKey(menuHeaderCountsKey), findsOneWidget);
     });
   }
 

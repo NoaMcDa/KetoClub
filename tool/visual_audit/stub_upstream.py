@@ -10,6 +10,8 @@ WOLT_CONSUMER_BASE_URL, TENBIS_BASE_URL); the backend itself is unchanged.
 Routes, at the paths backend/app/services/{wolt,tenbis}.py call:
   GET  /consumer-api/consumer-assortment/v1/venues/slug/hamosad/assortment
                                          the recorded Wolt menu fixture
+  GET  /consumer-api/consumer-assortment/v1/venues/slug/golden-bistro/assortment
+                                         the golden English menu (Banto pass)
   GET  /consumer-api/consumer-assortment/v1/venues/slug/<other>/assortment
                                          a menu mirroring .design/Main.dc.html
   GET  /v1/pages/restaurants             wolt_pages_restaurants
@@ -80,6 +82,66 @@ def _artboard_menu() -> bytes:
     return json.dumps(menu, ensure_ascii=False).encode()
 
 
+# tool/golden/golden_corpus.dart's goldenEnglishMenu ("Golden Bistro"), as a
+# Wolt assortment, for the Banto four-state pass (ALG-05): every keto verdict,
+# options with removal values, drinks and a notice.
+_GOLDEN_OPTIONS = {
+    "side": ("Choice of side", ["Potato purée", "Green salad", "Pasta"]),
+    "changes-butter": ("Changes", ["No butter"]),
+    "changes-burger": ("Changes", ["No onions", "Without the bun"]),
+}
+_GOLDEN_CATEGORIES = [
+    ("starters", "Starters", [
+        ("e1", "Caesar salad", "Romaine, croutons", 1000, []),
+        ("e2", "Halloumi", "Grilled, with honey", 1000, []),
+        ("e3", "Calamari", "Deep-fried, aioli", 1000, []),
+        ("e4", "Bread basket", "", 0, []),
+    ]),
+    ("mains", "Mains", [
+        ("e5", "Entrecôte 300g", "Served with butter-infused potato purée",
+         14200, ["side", "changes-butter"]),
+        ("e6", "Grilled salmon", "Lemon, dill", 1000, []),
+        ("e7", "Spaghetti carbonara", "Cream, bacon", 1000, []),
+        ("e8", "Beef burger", "Brioche bun, cheddar, fries", 1000,
+         ["changes-burger"]),
+        ("e9", "Chicken curry", "Coconut cream", 1000, []),
+        ("e10", "Steak & eggs", "Black pepper", 1000, []),
+    ]),
+    ("sides-sauces", "Sauces & Sides", [
+        ("e11", "French fries", "", 1000, []),
+        ("e12", "BBQ sauce", "", 300, []),
+    ]),
+    ("drinks", "Drinks", [
+        ("e13", "Coca-Cola", "", 1000, []),
+        ("e14", "Coke Zero", "", 1000, []),
+        ("e15", "Latte", "Whole milk", 1000, []),
+        ("e16", "Espresso", "", 1000, []),
+    ]),
+    ("notices", "Please note", [
+        ("e17", "We close at 22:00", "", 0, []),
+    ]),
+]
+
+
+def _golden_menu() -> bytes:
+    items, categories = [], []
+    for cat_id, cat_name, dishes in _GOLDEN_CATEGORIES:
+        categories.append({"id": cat_id, "name": cat_name,
+                           "item_ids": [d[0] for d in dishes],
+                           "subcategories": []})
+        for dish_id, name, description, price, options in dishes:
+            items.append({"id": dish_id, "name": name,
+                          "description": description, "price": price,
+                          "options": [{"option_id": o} for o in options],
+                          "images": []})
+    options = [
+        {"id": key, "name": name, "values": [{"name": v} for v in values]}
+        for key, (name, values) in _GOLDEN_OPTIONS.items()
+    ]
+    menu = {"categories": categories, "items": items, "options": options}
+    return json.dumps(menu, ensure_ascii=False).encode()
+
+
 def _photo(name: str) -> bytes:
     from PIL import Image, ImageDraw
 
@@ -115,6 +177,8 @@ class Handler(BaseHTTPRequestHandler):
             if slug == "hamosad":
                 fixture = FIXTURES / "wolt_hamosad_menu.json"
                 return self._send(fixture.read_bytes())
+            if slug == "golden-bistro":
+                return self._send(_golden_menu())
             return self._send(_artboard_menu())
         if path == "/v1/pages/restaurants":
             fixture = FIXTURES / "wolt_pages_restaurants.json"

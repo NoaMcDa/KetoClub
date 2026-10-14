@@ -33,12 +33,51 @@ import 'package:ketoclub/utils/classification_rules.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 
 /// The English waiter sentence for one removable item; `{item}` is the
-/// item as the menu (or the model) wrote it.
-const String removeItemModificationEn = 'Ask for it without {item}';
+/// item as the menu (or the model) wrote it, quoted in straight single
+/// quotes so the waiter hears the menu's own words (ALG-05).
+const String removeItemModificationEn = "Ask for it without '{item}'";
 
 /// The Hebrew waiter sentence for one removable item; `{item}` as in
 /// [removeItemModificationEn].
-const String removeItemModificationHe = 'לבקש את המנה בלי {item}';
+const String removeItemModificationHe = "לבקש את המנה בלי '{item}'";
+
+/// The most words [ProfileEvaluator.quotedItem] lets an item grow to.
+const int _maxQuotedWords = 3;
+
+/// The Hebrew letter tav, the ending of a construct form ("גבינת").
+const int _tav = 0x05EA;
+
+/// The Hebrew maqaf, which joins a construct form to its noun.
+const int _maqafUnit = 0x05BE;
+
+/// Whether [unit] separates two words of a quoted item: a space, a tab,
+/// a no-break space or the maqaf.
+bool _isWordGap(int unit) =>
+    unit == 0x20 || unit == 0x09 || unit == 0xA0 || unit == _maqafUnit;
+
+/// Whether [unit] ends a quoted item: a comma, a full stop, a vertical
+/// bar or a line break.
+bool _isItemStop(int unit) =>
+    unit == 0x2C ||
+    unit == 0x2E ||
+    unit == 0x7C ||
+    unit == 0x0A ||
+    unit == 0x0D;
+
+/// Whether [unit] is a Hebrew point or cantillation mark (not the maqaf),
+/// which may follow a word's last letter.
+bool _isHebrewMark(int unit) =>
+    unit >= 0x0591 && unit <= 0x05C7 && unit != _maqafUnit;
+
+/// Whether [text]'s last letter, past any Hebrew points, is a tav.
+bool _endsInTav(String text) {
+  for (var i = text.length - 1; i >= 0; i--) {
+    final unit = text.codeUnitAt(i);
+    if (_isHebrewMark(unit)) continue;
+    return unit == _tav;
+  }
+  return false;
+}
 
 /// What a dish is for one profile (ALG-05), derived on the device.
 ///
@@ -190,7 +229,8 @@ abstract final class ProfileEvaluator {
         : removeItemModificationEn;
     final lines = <String>[
       ?ketoChange,
-      for (final item in items) template.replaceAll('{item}', item),
+      for (final item in _withoutCovered(items))
+        template.replaceAll('{item}', item),
     ];
     final change = lines.isEmpty ? null : lines.join('\n');
 
@@ -212,16 +252,50 @@ abstract final class ProfileEvaluator {
     );
   }
 
+  /// The words a "without" sentence quotes for [matched], a slice the
+  /// matcher found in [field], as the menu printed them (ALG-05).
+  ///
+  /// The item is [matched] itself, except when its last word is a Hebrew
+  /// construct form (the slice ends in ת, "גבינת") and [field] continues
+  /// with another word: then it runs through that one word ("גבינת
+  /// שמנת"), as long as the item stays at most three words, and never past
+  /// a comma, a full stop, `|`, a line break or the end of [field]. A
+  /// [matched] that [field] does not contain is returned trimmed. Pure;
+  /// never throws.
+  static String quotedItem(String field, String matched) {
+    final item = matched.trim();
+    final start = item.isEmpty ? -1 : field.indexOf(item);
+    if (start < 0) return item;
+    final words = item.split(RegExp(r'[\s\u05BE]+')).length;
+    if (words >= _maxQuotedWords || !_endsInTav(item)) return item;
+    var cursor = start + item.length;
+    if (cursor >= field.length || !_isWordGap(field.codeUnitAt(cursor))) {
+      return item;
+    }
+    while (cursor < field.length && _isWordGap(field.codeUnitAt(cursor))) {
+      cursor++;
+    }
+    final wordStart = cursor;
+    while (cursor < field.length) {
+      final unit = field.codeUnitAt(cursor);
+      if (_isWordGap(unit) || _isItemStop(unit)) break;
+      cursor++;
+    }
+    if (cursor == wordStart) return item;
+    return field.substring(start, cursor);
+  }
+
   /// Every piece of evidence about [dish], whatever the profile: the rule
   /// engine's findings, the analysis's own concerns, then the concerns
   /// read from its ingredients.
   static List<_Evidence> _evidence(AnalysedDish analysed, Dish dish) {
     _Evidence ofConcern(Concern concern) {
       final removable = concern.source == ConcernSource.option;
+      final matched = concern.matchedText;
       return (
         concern: concern,
         removable: removable,
-        item: removable ? concern.matchedText : null,
+        item: removable && matched != null ? _optionItem(dish, matched) : null,
       );
     }
 
@@ -252,6 +326,31 @@ abstract final class ProfileEvaluator {
           ),
     ];
   }
+
+  /// [matched], an option concern's slice, quoted from the first of
+  /// [dish]'s option values that contains it ([quotedItem]); [matched]
+  /// itself, trimmed, when none does.
+  static String _optionItem(Dish dish, String matched) {
+    for (final option in dish.options) {
+      for (final value in option.values) {
+        if (value.contains(matched)) return quotedItem(value, matched);
+      }
+    }
+    return matched.trim();
+  }
+
+  /// [items] without any item that a longer one already quotes as whole
+  /// words ("שמנת" inside "גבינת שמנת"), in their first order.
+  static List<String> _withoutCovered(List<String> items) => <String>[
+    for (final item in items)
+      if (!items.any(
+        (other) =>
+            other.length > item.length &&
+            RegExp('(^|[\\s\\u05BE])${RegExp.escape(item)}(\$|[\\s\\u05BE])')
+                .hasMatch(other),
+      ))
+        item,
+  ];
 
   /// Whether [concern] is about a restriction [profile] holds, other than
   /// keto, and none of that entry's exceptions covers it.

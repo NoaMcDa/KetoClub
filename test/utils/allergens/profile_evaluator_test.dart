@@ -8,6 +8,7 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
+import 'package:ketoclub/utils/classification_rules.dart';
 
 /// A dish with [name], [description] and [options].
 Dish _dish(
@@ -167,7 +168,7 @@ void main() {
             expect(
               result.modification,
               expected == DishState.fitsWithChange
-                  ? 'Ask for it without $item'
+                  ? "Ask for it without '$item'"
                   : null,
             );
             expect(result.dish.verdict, DishVerdict.orderAsIs);
@@ -222,7 +223,7 @@ void main() {
 
       // Assert
       expect(result.state, DishState.fitsWithChange);
-      expect(result.modification, 'לבקש את המנה בלי ביצה');
+      expect(result.modification, "לבקש את המנה בלי 'ביצה'");
     });
 
     test('a stated term in an option → fitsWithChange, in English', () {
@@ -243,7 +244,7 @@ void main() {
 
       // Assert
       expect(result.state, DishState.fitsWithChange);
-      expect(result.modification, 'Ask for it without Egg');
+      expect(result.modification, "Ask for it without 'Egg'");
     });
 
     test('an explicit language wins over the dish text', () {
@@ -264,7 +265,7 @@ void main() {
       );
 
       // Assert
-      expect(result.modification, 'לבקש את המנה בלי Egg');
+      expect(result.modification, "לבקש את המנה בלי 'Egg'");
     });
 
     test('a guarded term on a strict entry → ask', () {
@@ -343,7 +344,7 @@ void main() {
 
       // Assert
       expect(result.state, DishState.fitsWithChange);
-      expect(result.modification, 'Ask for it without tahini');
+      expect(result.modification, "Ask for it without 'tahini'");
     });
 
     test('the union keeps the surer of a rules and a model finding', () {
@@ -397,7 +398,7 @@ void main() {
       expect(result.concerns.single.certainty, Certainty.likely);
       expect(result.concerns.single.tier, EvidenceTier.inferred);
       expect(result.state, DishState.fitsWithChange);
-      expect(result.modification, 'Ask for it without satay sauce');
+      expect(result.modification, "Ask for it without 'satay sauce'");
     });
   });
 
@@ -481,7 +482,7 @@ void main() {
       // Assert: keto's script first, then the removal.
       expect(red.state, DishState.avoid);
       expect(yellow.state, DishState.fitsWithChange);
-      expect(yellow.modification, 'No fries\nAsk for it without Egg');
+      expect(yellow.modification, "No fries\nAsk for it without 'Egg'");
     });
 
     test('a strict suspected concern outranks a change and keeps it', () {
@@ -502,7 +503,7 @@ void main() {
 
       // Assert
       expect(result.state, DishState.ask);
-      expect(result.modification, 'Ask for it without Egg');
+      expect(result.modification, "Ask for it without 'Egg'");
       expect(result.concerns.map((c) => c.restrictionId), <RestrictionId>[
         RestrictionId.peanuts,
         RestrictionId.eggs,
@@ -689,6 +690,115 @@ void main() {
           ),
         ),
       );
+    });
+  });
+
+  group("ProfileEvaluator.quotedItem — the menu's own words", () {
+    // (field, the matcher's slice, the quoted item)
+    final cases = <(String, String, String)>[
+      ('המבורגר עם גבינת שמנת', 'גבינת', 'גבינת שמנת'),
+      ('סלט עם טחינה', 'טחינה', 'טחינה'),
+      ('with Egg', 'Egg', 'Egg'),
+      ('טוסט עם גבינת', 'גבינת', 'גבינת'),
+      ('טוסט עם גבינת, עגבנייה', 'גבינת', 'גבינת'),
+      ('גבינת. ירקות', 'גבינת', 'גבינת'),
+      ('גבינת | שמנת', 'גבינת', 'גבינת'),
+      ('גבינת\nשמנת', 'גבינת', 'גבינת'),
+      ('גבינת שמנת עם בצל', 'גבינת', 'גבינת שמנת'),
+      ('גבינת שמנת, בצל', 'גבינת', 'גבינת שמנת'),
+      ('חמאת בוטנים קלויים', 'חמאת', 'חמאת בוטנים'),
+      ('רוטב גבינת שמנת', 'רוטב גבינת', 'רוטב גבינת שמנת'),
+      ('אחת שתי גבינת שמנת', 'שתי גבינת שמנת', 'שתי גבינת שמנת'),
+      ('בְּגְבִינַת שמנת', 'בְּגְבִינַת', 'בְּגְבִינַת שמנת'),
+      ('Cheese sauce', 'Cheese', 'Cheese'),
+      ('Tahini', 'tahini', 'tahini'),
+    ];
+    for (final (field, matched, expected) in cases) {
+      test('"$field" quotes "$expected"', () {
+        // Act
+        final item = ProfileEvaluator.quotedItem(field, matched);
+
+        // Assert
+        expect(item, expected);
+      });
+    }
+
+    test("the owner's fields, through the real matcher's slices", () {
+      // Arrange: the slices the rule engine itself reports.
+      String sliceOf(String field, RestrictionId id) =>
+          ClassificationRules.allergenFindings(
+            _dish(
+              'x',
+              options: <DishOption>[
+                DishOption(name: 'o', values: <String>[field]),
+              ],
+            ),
+          ).firstWhere((concern) => concern.restrictionId == id).matchedText!;
+      const cheese = 'המבורגר עם גבינת שמנת';
+      const tahini = 'סלט עם טחינה';
+      const egg = 'with Egg';
+
+      // Act + Assert
+      expect(
+        ProfileEvaluator.quotedItem(
+          cheese,
+          sliceOf(cheese, RestrictionId.lactose),
+        ),
+        'גבינת שמנת',
+      );
+      expect(
+        ProfileEvaluator.quotedItem(
+          tahini,
+          sliceOf(tahini, RestrictionId.sesame),
+        ),
+        'טחינה',
+      );
+      expect(
+        ProfileEvaluator.quotedItem(egg, sliceOf(egg, RestrictionId.eggs)),
+        'Egg',
+      );
+    });
+
+    test('an option with a construct form → one quoted sentence', () {
+      // Arrange: "גבינת" and "שמנת" are both milk; the shorter item is
+      // already inside the longer one and is not asked for twice.
+      final dish = _dish(
+        'המבורגר',
+        options: const <DishOption>[
+          DishOption(name: 'תוספות', values: <String>['המבורגר עם גבינת שמנת']),
+        ],
+      );
+
+      // Act
+      final result = ProfileEvaluator.evaluate(
+        _green('המבורגר'),
+        dish,
+        _profile(<RestrictionId>[RestrictionId.lactose]),
+      );
+
+      // Assert
+      expect(result.state, DishState.fitsWithChange);
+      expect(result.modification, "לבקש את המנה בלי 'גבינת שמנת'");
+    });
+
+    test('a comma stops the item at the construct form', () {
+      // Arrange
+      final dish = _dish(
+        'טוסט',
+        options: const <DishOption>[
+          DishOption(name: 'תוספות', values: <String>['גבינת, עגבנייה']),
+        ],
+      );
+
+      // Act
+      final result = ProfileEvaluator.evaluate(
+        _green('טוסט'),
+        dish,
+        _profile(<RestrictionId>[RestrictionId.lactose]),
+      );
+
+      // Assert
+      expect(result.modification, "לבקש את המנה בלי 'גבינת'");
     });
   });
 }
