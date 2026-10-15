@@ -447,11 +447,13 @@ The long form is in `HANDOFF.md`; these are the ones that bite while writing cod
   trigger found — ask the restaurant" ("ללא חשש" on the tile and header).
   `test/l10n/banned_words_test.dart` and the state-copy sweep fail the build.
   There are no severity levels to vary it.
-- **Banto: a profile never enters a request body (C1).** Only
-  `restrictionsRequested: true` leaves the device — no restriction id,
+- **Banto: a profile never enters a request body (C1).** An analysis
+  request carries only `restrictionsRequested: true` — no restriction id,
   exception or user word. `no_profile_on_the_wire_test` keeps the tokens out
-  of `lib/services/` (only `settings_store.dart` is allowlisted) and the
-  backend answers 422 to a body carrying a profile.
+  of `lib/services/` (allowlisted: `settings_store.dart`, and
+  `confirmation_client.dart`, whose one confirmed fact names a single
+  restriction id, ALG-14) and the backend answers 422 to a body carrying a
+  profile.
 - **Banto: pass the screen's `bantoMode` down.** Gated code takes `bool
   bantoMode = BantoMode.enabled`, which is false under plain `flutter test`;
   anything that builds `ClassificationOptions` must pass the screen's flag

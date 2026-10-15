@@ -13,10 +13,12 @@
 // A legitimate future exception must be an explicit entry in [_allowed], with
 // the file, the token and the reason. Never loosen [_tokens] instead.
 //
-// The one such exception so far is settings_store.dart (ALG-02a, #344):
-// storage on the device is where C1 says the profile lives, and the file
-// writes only to shared_preferences. Every other service — the HTTP
-// clients, the classifiers, the logger — still cannot name it.
+// The exceptions so far are settings_store.dart (ALG-02a, #344): storage on
+// the device is where C1 says the profile lives, and the file writes only to
+// shared_preferences; and confirmation_client.dart (ALG-14, #356), which
+// names ONE restriction id per request as a fact about a dish. Every other
+// service — the HTTP clients, the classifiers, the logger — still cannot name
+// it.
 
 import 'dart:io';
 
@@ -37,6 +39,16 @@ const _tokens = <String>[
 
 /// Lib-relative file -> token -> why that file may contain it.
 const _allowed = <String, Map<String, String>>{
+  'services/community/confirmation_client.dart': {
+    'restrictionId':
+        'ALG-14 (issue #356): one confirmation says what a kitchen told the '
+        'user about ONE restriction in ONE dish, so it carries that '
+        "restriction's taxonomy id as a parameter and as the wire field "
+        '`restrictionId`. It is a fact about the dish, not the profile: the '
+        'client never reads the profile, takes no set of ids and no '
+        'severity, and one request names exactly one id. The backend '
+        'refuses any profile-shaped key (backend/tests/test_confirmations.py).',
+  },
   'services/platform/app_logger.dart': {
     'severity':
         'Two doc comments describe a log level as its "severity"; the file '
