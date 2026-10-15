@@ -31,6 +31,7 @@ import 'package:http/testing.dart';
 import 'package:ketoclub/app.dart';
 import 'package:ketoclub/di.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/dish_confirmation.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/menu_question.dart';
@@ -651,6 +652,7 @@ final class FlowFakeVisitHistoryStore implements VisitHistoryStore {
     double? score,
     int? greenCount,
     int? yellowCount,
+    bool openedStrict = false,
   }) async {
     final now = FlowFakeClock().now();
     final existing = _entries[ref.cacheKey];
@@ -665,6 +667,24 @@ final class FlowFakeVisitHistoryStore implements VisitHistoryStore {
       score: score ?? existing?.score,
       greenCount: greenCount ?? existing?.greenCount,
       yellowCount: yellowCount ?? existing?.yellowCount,
+      openedStrict: openedStrict || (existing?.openedStrict ?? false),
+      confirmations: existing?.confirmations ?? const <DishConfirmation>[],
+      changeConfirmations:
+          existing?.changeConfirmations ?? const <ChangeConfirmation>[],
+    );
+  }
+
+  @override
+  Future<void> setConfirmations(
+    VenueRef ref, {
+    required List<DishConfirmation> confirmations,
+    required List<ChangeConfirmation> changes,
+  }) async {
+    final existing = _entries[ref.cacheKey];
+    if (existing == null) return;
+    _entries[ref.cacheKey] = existing.withConfirmations(
+      confirmations: confirmations,
+      changes: changes,
     );
   }
 
@@ -687,6 +707,9 @@ final class FlowFakeVisitHistoryStore implements VisitHistoryStore {
       score: existing.score,
       greenCount: existing.greenCount,
       yellowCount: existing.yellowCount,
+      openedStrict: existing.openedStrict,
+      confirmations: existing.confirmations,
+      changeConfirmations: existing.changeConfirmations,
     );
   }
 

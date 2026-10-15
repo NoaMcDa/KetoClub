@@ -1468,10 +1468,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get whyTierSuspected => 'Suspected — please ask';
 
   @override
-  String get whyTierConfirmed => 'Confirmed by you';
+  String get whyTierConfirmed => 'Confirmed with the staff';
 
   @override
-  String get whyTierDenied => 'Ruled out by you';
+  String get whyTierDenied => 'The staff said it is not there — still ask';
 
   @override
   String get whySourceName => 'Found in the dish name';
@@ -1975,5 +1975,87 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String whyMatrixAbsent(String row) {
     return 'Listed as free of it, as “$row” — this lowers the finding but never rules it out';
+  }
+
+  @override
+  String get confirmPromptOpen => 'Did you ask the staff?';
+
+  @override
+  String get confirmPromptTitle => 'After your meal';
+
+  @override
+  String get confirmPromptIntro =>
+      'What did the staff tell you? Your answers stay on this device and show on the dish the next time this menu opens. An answer holds for that visit only, so ask each time.';
+
+  @override
+  String confirmPromptQuestion(String restriction, String dish) {
+    return 'Did you ask about $restriction in $dish?';
+  }
+
+  @override
+  String get confirmAnswerPresent => 'Confirmed present';
+
+  @override
+  String get confirmAnswerAbsent => 'Confirmed absent';
+
+  @override
+  String get confirmAnswerNotAsked => 'Didn\'t ask';
+
+  @override
+  String get confirmChangeQuestion => 'They changed the dish as requested';
+
+  @override
+  String get confirmChangeYes => 'Yes';
+
+  @override
+  String get confirmChangeNo => 'No';
+
+  @override
+  String get confirmNoteLabel => 'Note (stays on this device)';
+
+  @override
+  String get confirmSave => 'Save';
+
+  @override
+  String get confirmSaved => 'Saved on this device';
+
+  @override
+  String get confirmNothing =>
+      'Nothing on this menu points to your restrictions, so there is nothing to ask about.';
+
+  @override
+  String get confirmUnavailable =>
+      'This menu is no longer on this device. Open it again to answer.';
+
+  @override
+  String concernConfirmedOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'you confirmed it with the staff, $dateString';
+  }
+
+  @override
+  String concernDeniedOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'the staff said it is not there, $dateString — still ask';
+  }
+
+  @override
+  String whyConfirmedOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'You confirmed with the staff on $dateString';
+  }
+
+  @override
+  String whyDeniedOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'On $dateString the staff told you it is not in the dish. That holds for that visit only, so ask again each time.';
   }
 }

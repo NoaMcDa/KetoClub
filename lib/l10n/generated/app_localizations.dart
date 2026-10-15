@@ -2351,13 +2351,13 @@ abstract class AppLocalizations {
   /// No description provided for @whyTierConfirmed.
   ///
   /// In en, this message translates to:
-  /// **'Confirmed by you'**
+  /// **'Confirmed with the staff'**
   String get whyTierConfirmed;
 
   /// No description provided for @whyTierDenied.
   ///
   /// In en, this message translates to:
-  /// **'Ruled out by you'**
+  /// **'The staff said it is not there — still ask'**
   String get whyTierDenied;
 
   /// No description provided for @whySourceName.
@@ -3185,6 +3185,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Listed as free of it, as “{row}” — this lowers the finding but never rules it out'**
   String whyMatrixAbsent(String row);
+
+  /// Banto (ALG-14): the Recent row action that opens the post-meal prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Did you ask the staff?'**
+  String get confirmPromptOpen;
+
+  /// Banto (ALG-14): title of the post-meal prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'After your meal'**
+  String get confirmPromptTitle;
+
+  /// Banto (ALG-14): the prompt's opening sentence. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'What did the staff tell you? Your answers stay on this device and show on the dish the next time this menu opens. An answer holds for that visit only, so ask each time.'**
+  String get confirmPromptIntro;
+
+  /// Banto (ALG-14): one question per concern on a dish.
+  ///
+  /// In en, this message translates to:
+  /// **'Did you ask about {restriction} in {dish}?'**
+  String confirmPromptQuestion(String restriction, String dish);
+
+  /// Banto (ALG-14): the staff said the restriction is in the dish.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed present'**
+  String get confirmAnswerPresent;
+
+  /// Banto (ALG-14): the staff said the restriction is not in the dish. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed absent'**
+  String get confirmAnswerAbsent;
+
+  /// Banto (ALG-14): the person did not ask; nothing is recorded.
+  ///
+  /// In en, this message translates to:
+  /// **'Didn\'t ask'**
+  String get confirmAnswerNotAsked;
+
+  /// Banto (ALG-14): asked for a dish that carried a change to ask for.
+  ///
+  /// In en, this message translates to:
+  /// **'They changed the dish as requested'**
+  String get confirmChangeQuestion;
+
+  /// Banto (ALG-14): the change was made.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get confirmChangeYes;
+
+  /// Banto (ALG-14): the change was not made.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get confirmChangeNo;
+
+  /// Banto (ALG-14): label of a dish's free-text note in the prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (stays on this device)'**
+  String get confirmNoteLabel;
+
+  /// Banto (ALG-14): saves the prompt's answers.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get confirmSave;
+
+  /// Banto (ALG-14): snack bar after the answers are saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved on this device'**
+  String get confirmSaved;
+
+  /// Banto (ALG-14): the prompt when no dish has a concern. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing on this menu points to your restrictions, so there is nothing to ask about.'**
+  String get confirmNothing;
+
+  /// Banto (ALG-14): the prompt when the cached menu or its analysis is gone.
+  ///
+  /// In en, this message translates to:
+  /// **'This menu is no longer on this device. Open it again to answer.'**
+  String get confirmUnavailable;
+
+  /// Banto (ALG-14): the dish card's words for a concern the staff confirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'you confirmed it with the staff, {date}'**
+  String concernConfirmedOn(DateTime date);
+
+  /// Banto (ALG-14): the dish card's words for a concern the staff denied, which stays to ask about. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'the staff said it is not there, {date} — still ask'**
+  String concernDeniedOn(DateTime date);
+
+  /// Banto (ALG-14): the Why sheet's line for a confirmed concern.
+  ///
+  /// In en, this message translates to:
+  /// **'You confirmed with the staff on {date}'**
+  String whyConfirmedOn(DateTime date);
+
+  /// Banto (ALG-14): the Why sheet's line for a denied concern. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'On {date} the staff told you it is not in the dish. That holds for that visit only, so ask again each time.'**
+  String whyDeniedOn(DateTime date);
 }
 
 class _AppLocalizationsDelegate

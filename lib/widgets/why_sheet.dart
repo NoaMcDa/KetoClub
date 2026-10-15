@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/utils/allergens/confirmations.dart';
 import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
@@ -22,6 +23,31 @@ const Key whyFooterKey = ValueKey<String>('whyFooter');
 
 /// The key of the sheet's dish-name line (ALG-05's visual pass).
 const Key whyDishNameKey = ValueKey<String>('whyDishName');
+
+/// The key of the dated "you confirmed with the staff" line under the
+/// concern row at [index] (ALG-14).
+Key whyConfirmationKey(int index) => ValueKey<String>('whyConfirmation_$index');
+
+/// The dated line for [concern] when the person's own answer moved it to
+/// [EvidenceTier.confirmed] or [EvidenceTier.denied] (ALG-14): "You
+/// confirmed with the staff on 12 May", or that the staff said no on that
+/// day and it holds for that visit only. Null for any other concern, and
+/// for one only a shared count decided (no such count exists yet).
+String? whyConfirmationLine(
+  AppLocalizations l10n,
+  Concern concern,
+  List<ConfirmationEvidence> confirmations,
+) {
+  if (concern.tier != EvidenceTier.confirmed &&
+      concern.tier != EvidenceTier.denied) {
+    return null;
+  }
+  final piece = Confirmations.deciding(concern, confirmations);
+  if (piece == null || piece.shared) return null;
+  return concern.tier == EvidenceTier.confirmed
+      ? l10n.whyConfirmedOn(piece.day)
+      : l10n.whyDeniedOn(piece.day);
+}
 
 /// The short phrase saying how [tier] is known, in words and never in a
 /// number: an invented percentage is what ALG-06 rules out.
@@ -82,6 +108,7 @@ Future<void> showWhySheet(
   required List<Concern> concerns,
   required bool strictProfile,
   List<Declaration> declarations = const <Declaration>[],
+  List<ConfirmationEvidence> confirmations = const <ConfirmationEvidence>[],
   bool bantoMode = BantoMode.enabled,
 }) {
   if (!bantoMode) return Future<void>.value();
@@ -93,6 +120,7 @@ Future<void> showWhySheet(
       concerns: concerns,
       strictProfile: strictProfile,
       declarations: declarations,
+      confirmations: confirmations,
       bantoMode: bantoMode,
     ),
   );
@@ -111,6 +139,10 @@ Future<void> showWhySheet(
 /// who declared it, the platform or the restaurant, and quotes the
 /// declaration with the reminder that it never rules the finding out.
 ///
+/// A concern the person's own staff answer moved (ALG-14) says when:
+/// "You confirmed with the staff on 12 May", or that the staff said no
+/// that day, which holds for that visit only.
+///
 /// With [bantoMode] off the widget builds nothing.
 class WhySheet extends StatelessWidget {
   /// Creates the sheet for [dishName] listing [concerns].
@@ -119,6 +151,7 @@ class WhySheet extends StatelessWidget {
     required this.concerns,
     required this.strictProfile,
     this.declarations = const <Declaration>[],
+    this.confirmations = const <ConfirmationEvidence>[],
     this.bantoMode = BantoMode.enabled,
     super.key,
   });
@@ -136,6 +169,10 @@ class WhySheet extends StatelessWidget {
   /// The declarations that lowered a concern (`EvaluatedDish.declarations`),
   /// quoted under each concern at [EvidenceTier.declared].
   final List<Declaration> declarations;
+
+  /// The staff answers that moved a concern (`EvaluatedDish.confirmations`,
+  /// ALG-14), dated under each concern they answer.
+  final List<ConfirmationEvidence> confirmations;
 
   /// Whether this build shows Banto surfaces; the sheet is empty without.
   final bool bantoMode;
@@ -191,6 +228,12 @@ class WhySheet extends StatelessWidget {
                   key: whyConcernKey(i),
                   concern: concerns[i],
                   declaration: _declarationFor(concerns[i]),
+                  confirmationLine: whyConfirmationLine(
+                    l10n,
+                    concerns[i],
+                    confirmations,
+                  ),
+                  confirmationKey: whyConfirmationKey(i),
                 ),
               ],
             const SizedBox(height: 20),
@@ -223,12 +266,24 @@ class WhySheet extends StatelessWidget {
 /// One concern: the restriction, the tier phrase, the source, the quoted
 /// text and the waiter question.
 class _ConcernRow extends StatelessWidget {
-  const new({required this.concern, this.declaration, super.key});
+  const new({
+    required this.concern,
+    this.declaration,
+    this.confirmationLine,
+    this.confirmationKey,
+    super.key,
+  });
 
   final Concern concern;
 
   /// The declaration that lowered [concern], when one did.
   final Declaration? declaration;
+
+  /// The dated staff-answer line (ALG-14), when one moved [concern].
+  final String? confirmationLine;
+
+  /// The key of [confirmationLine]'s text.
+  final Key? confirmationKey;
 
   @override
   Widget build(BuildContext context) {
@@ -273,6 +328,10 @@ class _ConcernRow extends StatelessWidget {
                 : whyTierPhrase(l10n, concern.tier),
             style: theme.textTheme.labelLarge,
           ),
+          if (confirmationLine case final line?) ...[
+            const SizedBox(height: 2),
+            Text(line, key: confirmationKey, style: theme.textTheme.bodyMedium),
+          ],
           if (declaration case final declared?) ...[
             const SizedBox(height: 2),
             Text(

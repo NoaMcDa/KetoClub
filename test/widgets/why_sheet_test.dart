@@ -66,8 +66,11 @@ void main() {
         'משוער ממתכון אופייני',
       ),
       EvidenceTier.suspected: ('Suspected — please ask', 'חשד — כדאי לשאול'),
-      EvidenceTier.confirmed: ('Confirmed by you', 'אושר על ידך'),
-      EvidenceTier.denied: ('Ruled out by you', 'נשלל על ידך'),
+      EvidenceTier.confirmed: ('Confirmed with the staff', 'אושר מול הצוות'),
+      EvidenceTier.denied: (
+        'The staff said it is not there — still ask',
+        'הצוות אמר שאין — עדיין לשאול',
+      ),
     }.entries) {
       testWidgets('${entry.key.name} reads in English', (tester) async {
         await _pump(tester, [_concern(tier: entry.key)]);

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/allergen_matrix.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
+import 'package:ketoclub/models/dish_confirmation.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/menu_question.dart';
@@ -23,6 +24,7 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/utils/allergens/allergen_matrix.dart';
+import 'package:ketoclub/utils/allergens/confirmations.dart';
 import 'package:ketoclub/utils/allergens/group_evaluator.dart';
 import 'package:ketoclub/utils/allergens/kitchen_reach.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
@@ -180,6 +182,12 @@ final class MenuController extends ChangeNotifier {
   /// The city the visit history holds for the open venue; see
   /// [historyCity].
   String? _historyCity;
+
+  /// What the staff said about the open venue's dishes after an earlier
+  /// meal (Banto, ALG-14, D27), read from its visit history entry in
+  /// [open]; the evaluations carry it ([Confirmations.apply]). Empty for a
+  /// venue with none, and read by nothing in a keto-only menu.
+  List<DishConfirmation> _confirmations = const <DishConfirmation>[];
 
   /// The upload [open] last started, or an already-complete future when
   /// none has been; see [lastUpload].
@@ -418,6 +426,7 @@ final class MenuController extends ChangeNotifier {
           heading: heading,
           kitchen: reach,
           matrix: _matrixEvidenceFor(dish.id),
+          confirmations: Confirmations.forDish(dish.id, _confirmations),
         ).combined
       : applyKitchenSignals(
           ProfileEvaluator.evaluate(
@@ -426,6 +435,7 @@ final class MenuController extends ChangeNotifier {
             _profile,
             heading: heading,
             matrix: _matrixEvidenceFor(dish.id),
+            confirmations: Confirmations.forDish(dish.id, _confirmations),
           ),
           dish,
           _profile,
@@ -836,7 +846,8 @@ final class MenuController extends ChangeNotifier {
         identical(memo.analysis, currentAnalysis) &&
         identical(memo.matrix, matrix) &&
         memo.profile == _profile &&
-        listEquals(memo.people, _people)) {
+        listEquals(memo.people, _people) &&
+        identical(memo.confirmations, _confirmations)) {
       return memo.evaluations;
     }
     final analysedById = _analysedById();
@@ -855,6 +866,7 @@ final class MenuController extends ChangeNotifier {
                 heading: category.name,
                 kitchen: reach,
                 matrix: _matrixEvidenceFor(dish.id),
+                confirmations: Confirmations.forDish(dish.id, _confirmations),
               ),
     };
     final evaluations = <String, EvaluatedDish>{
@@ -870,6 +882,10 @@ final class MenuController extends ChangeNotifier {
                     _profile,
                     heading: category.name,
                     matrix: _matrixEvidenceFor(dish.id),
+                    confirmations: Confirmations.forDish(
+                      dish.id,
+                      _confirmations,
+                    ),
                   ),
                   dish,
                   _profile,
@@ -882,6 +898,7 @@ final class MenuController extends ChangeNotifier {
       matrix: matrix,
       profile: _profile,
       people: _people,
+      confirmations: _confirmations,
       evaluations: evaluations,
       groups: groups,
     );
@@ -894,6 +911,7 @@ final class MenuController extends ChangeNotifier {
     AllergenMatrix? matrix,
     DietaryProfile profile,
     List<NamedProfile> people,
+    List<DishConfirmation> confirmations,
     Map<String, EvaluatedDish> evaluations,
     Map<String, GroupEvaluation> groups,
   })?
@@ -1083,6 +1101,7 @@ final class MenuController extends ChangeNotifier {
     _filter = appSettings.lastFilter ?? _defaultFilter(appSettings.filter);
     _dishNotes = await _notes.readAll(ref);
     final previous = await _history.read(ref);
+    _confirmations = previous?.confirmations ?? const <DishConfirmation>[];
     if (previous?.name != _historyName || previous?.city != _historyCity) {
       _historyName = previous?.name;
       _historyCity = previous?.city;
@@ -1173,6 +1192,9 @@ final class MenuController extends ChangeNotifier {
       score: counts?.score,
       greenCount: counts?.green,
       yellowCount: counts?.yellow,
+      // What puts the post-meal prompt on the Recent row (ALG-14); never
+      // true in a keto build, whose wording is always keto-only.
+      openedStrict: wording == ProfileWording.strict,
     );
     // The store never lets a null erase a recorded value, so what it now
     // holds is what was written, else what it held before.

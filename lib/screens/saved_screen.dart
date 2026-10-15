@@ -5,10 +5,13 @@ import 'package:flutter/semantics.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
+import 'package:ketoclub/state/confirmation_controller.dart';
 import 'package:ketoclub/state/saved_controller.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/venue_route.dart';
+import 'package:ketoclub/widgets/confirmation_sheet.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
@@ -124,9 +127,26 @@ String cacheExpiryLabel(
 /// the first frame, the same way `MenuScreen` and `SettingsScreen` defer
 /// their own loads: a `StatefulWidget` with an `initState` that posts a
 /// callback, so building this screen never itself starts I/O.
+///
+/// **Banto (ALG-14, issue #356).** With [bantoMode] on and
+/// [createConfirmations] given, a row whose menu was opened with a strict
+/// restriction (`VisitEntry.openedStrict`) and is still cached offers "Did
+/// you ask the staff?", which opens the post-meal prompt
+/// ([showConfirmationSheet]). Without it the tab is as before.
 class SavedScreen extends StatefulWidget {
   /// Creates the Saved tab.
-  const new({super.key});
+  const new({
+    this.createConfirmations,
+    this.bantoMode = BantoMode.enabled,
+    super.key,
+  });
+
+  /// Makes the post-meal prompt's controller for a menu (ALG-14); null
+  /// offers no prompt.
+  final ConfirmationController Function(VenueRef ref)? createConfirmations;
+
+  /// Whether this build shows Banto surfaces (D26's convention).
+  final bool bantoMode;
 
   @override
   State<SavedScreen> createState() => _SavedScreenState();
@@ -256,9 +276,37 @@ class _SavedScreenState extends State<SavedScreen> {
           onTogglePin: () => unawaited(
             controller.setPinned(entry.ref, pinned: !entry.isPinned),
           ),
+          onConfirm: _canConfirm(entry)
+              ? () => unawaited(_confirm(context, entry))
+              : null,
         );
       },
     );
+  }
+
+  /// Whether [entry]'s row offers the post-meal prompt (ALG-14): a Banto
+  /// build with a prompt to make, a menu opened with a strict restriction,
+  /// and its cached copy still on the device to ask about.
+  bool _canConfirm(RecentEntry entry) =>
+      widget.bantoMode &&
+      widget.createConfirmations != null &&
+      entry.visit.openedStrict &&
+      entry.isCached;
+
+  /// Opens the post-meal prompt for [entry] and says so when the answers
+  /// were saved.
+  Future<void> _confirm(BuildContext context, RecentEntry entry) async {
+    final create = widget.createConfirmations;
+    if (create == null) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final saved = await showConfirmationSheet(
+      context,
+      create: () => create(entry.ref),
+      bantoMode: widget.bantoMode,
+    );
+    if (!saved) return;
+    messenger.showSnackBar(SnackBar(content: Text(l10n.confirmSaved)));
   }
 
   /// Asks for a new name and city for the scanned menu [entry] and hands
@@ -342,6 +390,7 @@ class _SavedEntryTile extends StatelessWidget {
     required this.onRemove,
     required this.onRename,
     required this.onTogglePin,
+    this.onConfirm,
   });
 
   /// The opened menu this row summarises.
@@ -362,6 +411,10 @@ class _SavedEntryTile extends StatelessWidget {
   /// Called on a tap on the pin toggle, to keep [entry] past its expiry
   /// or stop keeping it.
   final VoidCallback onTogglePin;
+
+  /// Called on a tap on "Did you ask the staff?", to open the post-meal
+  /// prompt (Banto, ALG-14); null shows no such action.
+  final VoidCallback? onConfirm;
 
   @override
   Widget build(BuildContext context) {
@@ -446,6 +499,21 @@ class _SavedEntryTile extends StatelessWidget {
                     spacing: 8,
                     runSpacing: 4,
                     children: counts,
+                  ),
+                ],
+                if (onConfirm case final confirm?) ...[
+                  const SizedBox(height: 4),
+                  Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: TextButton.icon(
+                      style: TextButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                      onPressed: confirm,
+                      icon: const Icon(Icons.fact_check_outlined, size: 18),
+                      label: Text(l10n.confirmPromptOpen),
+                    ),
                   ),
                 ],
               ],

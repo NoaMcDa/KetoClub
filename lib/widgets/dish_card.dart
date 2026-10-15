@@ -7,6 +7,7 @@ import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
+import 'package:ketoclub/utils/allergens/confirmations.dart';
 import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
@@ -573,11 +574,28 @@ String concernCertaintyLabel(AppLocalizations l10n, Certainty certainty) =>
 /// How sure [concern] is, in words: [concernCertaintyLabel], except that a
 /// heads-up restriction's concern ([headsUpRestrictions]: FODMAP,
 /// histamine, small portions; ALG-17) reads "may be high in it — a
-/// heads-up, not a measurement", since no menu states a dose.
-String concernCertaintyText(AppLocalizations l10n, Concern concern) =>
-    headsUpRestrictions.contains(concern.restrictionId)
-    ? l10n.concernCertaintyHeadsUp
-    : concernCertaintyLabel(l10n, concern.certainty);
+/// heads-up, not a measurement", since no menu states a dose, and that a
+/// concern the person's own staff answer moved (ALG-14, among
+/// [confirmations]) reads "you confirmed it with the staff, 12 May" or
+/// "the staff said it is not there, 12 May — still ask".
+String concernCertaintyText(
+  AppLocalizations l10n,
+  Concern concern, {
+  List<ConfirmationEvidence> confirmations = const <ConfirmationEvidence>[],
+}) {
+  if (concern.tier == EvidenceTier.confirmed ||
+      concern.tier == EvidenceTier.denied) {
+    final piece = Confirmations.deciding(concern, confirmations);
+    if (piece != null && !piece.shared) {
+      return concern.tier == EvidenceTier.confirmed
+          ? l10n.concernConfirmedOn(piece.day)
+          : l10n.concernDeniedOn(piece.day);
+    }
+  }
+  return headsUpRestrictions.contains(concern.restrictionId)
+      ? l10n.concernCertaintyHeadsUp
+      : concernCertaintyLabel(l10n, concern.certainty);
+}
 
 /// The concern lines under a Banto dish (ALG-05) and the "Why?" button
 /// that opens the Why sheet (ALG-06).
@@ -619,7 +637,11 @@ class _ConcernsBlock extends StatelessWidget {
           Padding(
             key: dishConcernKey(i),
             padding: const EdgeInsets.only(bottom: 6),
-            child: _ConcernLine(concern: concerns[i], hebrew: hebrew),
+            child: _ConcernLine(
+              concern: concerns[i],
+              hebrew: hebrew,
+              confirmations: evaluated.confirmations,
+            ),
           ),
         // A node of its own (container): without it the button's flag and
         // tap merged into the card's node, so the web build announced the
@@ -659,6 +681,7 @@ class _ConcernsBlock extends StatelessWidget {
       concerns: evaluated.concerns,
       strictProfile: strictProfile,
       declarations: evaluated.declarations,
+      confirmations: evaluated.confirmations,
       bantoMode: bantoMode,
     ),
   );
@@ -668,13 +691,21 @@ class _ConcernsBlock extends StatelessWidget {
 /// coloured by its kind (strict red, flexible amber), then where it was
 /// found and how sure, in words.
 class _ConcernLine extends StatelessWidget {
-  const new({required this.concern, required this.hebrew});
+  const new({
+    required this.concern,
+    required this.hebrew,
+    this.confirmations = const <ConfirmationEvidence>[],
+  });
 
   /// The concern this line shows.
   final Concern concern;
 
   /// Whether the dish's text is Hebrew, the restriction name's language.
   final bool hebrew;
+
+  /// The staff answers that moved the dish's concerns (ALG-14), which
+  /// date this one when it is among them.
+  final List<ConfirmationEvidence> confirmations;
 
   @override
   Widget build(BuildContext context) {
@@ -685,7 +716,11 @@ class _ConcernLine extends StatelessWidget {
     final chipTone = strict ? colors.red : colors.amber;
     final name = VerdictCopy.concernName(concern, hebrew: hebrew);
     final source = concernSourceLabel(l10n, concern);
-    final certainty = concernCertaintyText(l10n, concern);
+    final certainty = concernCertaintyText(
+      l10n,
+      concern,
+      confirmations: confirmations,
+    );
     return Semantics(
       container: true,
       label: l10n.concernLineSemanticLabel(name, source, certainty),
