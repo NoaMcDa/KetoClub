@@ -13,6 +13,8 @@ import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/named_profile.dart';
+import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/models/trip_destination.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -56,8 +58,9 @@ enum AppThemeMode {
 /// toggles (issue #56), whether the first-launch AI disclosure
 /// banner has been seen (D16, issue #167), the restriction profile
 /// (Banto, ALG-02a, issue #344), whether the first-run restriction
-/// onboarding has been seen (ALG-02b), and the other people's profiles and
-/// which of them a menu is read for (ALG-12, issue #354).
+/// onboarding has been seen (ALG-02b), the other people's profiles and
+/// which of them a menu is read for (ALG-12, issue #354), and trip mode's
+/// destination (ALG-13, issue #355).
 @immutable
 final class AppSettings {
   /// Creates settings. Every field defaults to the "nothing set yet"
@@ -87,6 +90,7 @@ final class AppSettings {
     this.primaryProfileName = '',
     this.otherProfiles = const <NamedProfile>[],
     this.activeProfileIds = defaultActiveProfileIds,
+    this.tripDestination,
   });
 
   /// The profiles a menu is read for until the user combines others: the
@@ -135,6 +139,11 @@ final class AppSettings {
   /// [NamedProfile.maxProfiles] in all; an [activeProfileIds] id that
   /// names no profile, or repeats, is dropped, and an empty result reads as
   /// [defaultActiveProfileIds].
+  ///
+  /// [tripDestination] (ALG-13, issue #355) follows the "added later" rule
+  /// too: a missing key, or a value [TripDestination.tryParse] does not
+  /// recognise, reads as null — no trip — rather than invalidating the
+  /// record.
   static AppSettings? tryFrom(Map<String, Object?> json) {
     final rawLanguageTag = json['languageTag'];
     if (rawLanguageTag != null && rawLanguageTag is! String) return null;
@@ -190,6 +199,10 @@ final class AppSettings {
       primaryProfileName: _readName(json[_primaryNameKey]),
       otherProfiles: others,
       activeProfileIds: _readActive(json[_activeProfilesKey], others),
+      tripDestination: switch (json[_tripKey]) {
+        final String wire => TripDestination.tryParse(wire),
+        _ => null,
+      },
     );
   }
 
@@ -243,6 +256,12 @@ final class AppSettings {
   /// The JSON key [activeProfileIds] is stored under, written only when it
   /// differs from [defaultActiveProfileIds].
   static const String _activeProfilesKey = 'activeProfiles';
+
+  /// The JSON key [tripDestination] is stored under (ALG-13), written only
+  /// while a trip is active, so a keto install's stored record — and
+  /// `const AppSettings().toJson()`, which `keto_unchanged_test` pins —
+  /// stays byte-identical.
+  static const String _tripKey = 'tripDestination';
 
   /// The JSON key [onboardingSeen] is stored under. [toJson] writes it only
   /// when it is true, for the same reason as [_profileKey]: a keto build
@@ -335,6 +354,16 @@ final class AppSettings {
   /// [activeProfiles], which drops an id that names no profile.
   final List<String> activeProfileIds;
 
+  /// Where the user is travelling (Banto, ALG-13, issue #355), or null
+  /// when trip mode is off. Sits beside the profile, never inside it, and
+  /// like it stays on the device (contract decision C1): the evaluator
+  /// reads the destination's lexicon on the device and nothing sends it.
+  final TripDestination? tripDestination;
+
+  /// The jurisdiction of [tripDestination], whose allergen law the trip's
+  /// regulation hints read; null when trip mode is off.
+  Jurisdiction? get tripJurisdiction => tripDestination?.jurisdiction;
+
   /// Every profile on the device: the user's own ([profile], under
   /// [primaryProfileName]) first, then [otherProfiles].
   List<NamedProfile> get profiles => <NamedProfile>[
@@ -373,7 +402,8 @@ final class AppSettings {
   /// be told apart. [themeMode] has no such "clear it" meaning — it
   /// always names a real mode — so it uses the ordinary "omit to keep"
   /// default every other non-nullable field here would use, as do
-  /// [netCarbLimitGrams] and the three dietary toggles.
+  /// [netCarbLimitGrams] and the three dietary toggles. [tripDestination]
+  /// takes the sentinel too: passing null switches trip mode off.
   AppSettings copyWith({
     Object? languageTag = _unset,
     MenuFilter? filter,
@@ -391,6 +421,7 @@ final class AppSettings {
     String? primaryProfileName,
     List<NamedProfile>? otherProfiles,
     List<String>? activeProfileIds,
+    Object? tripDestination = _unset,
   }) => AppSettings(
     languageTag: identical(languageTag, _unset)
         ? this.languageTag
@@ -415,13 +446,17 @@ final class AppSettings {
     primaryProfileName: primaryProfileName ?? this.primaryProfileName,
     otherProfiles: otherProfiles ?? this.otherProfiles,
     activeProfileIds: activeProfileIds ?? this.activeProfileIds,
+    tripDestination: identical(tripDestination, _unset)
+        ? this.tripDestination
+        : tripDestination as TripDestination?,
   );
 
   /// Writes a form [tryFrom] can read back. [profile] is written only
   /// when it is not empty, and [onboardingSeen] only when it is true; see
   /// [_profileKey] and [_onboardingSeenKey]. The group profile fields are
   /// written only when they differ from their defaults; see
-  /// [_primaryNameKey].
+  /// [_primaryNameKey]. [tripDestination] is written only while a trip is
+  /// active; see [_tripKey].
   Map<String, Object?> toJson() => <String, Object?>{
     'languageTag': languageTag,
     'filter': filter.name,
@@ -443,6 +478,7 @@ final class AppSettings {
       ],
     if (!listEquals(activeProfileIds, defaultActiveProfileIds))
       _activeProfilesKey: activeProfileIds,
+    if (tripDestination case final trip?) _tripKey: trip.name,
   };
 
   @override
@@ -463,7 +499,8 @@ final class AppSettings {
       other.onboardingSeen == onboardingSeen &&
       other.primaryProfileName == primaryProfileName &&
       listEquals(other.otherProfiles, otherProfiles) &&
-      listEquals(other.activeProfileIds, activeProfileIds);
+      listEquals(other.activeProfileIds, activeProfileIds) &&
+      other.tripDestination == tripDestination;
 
   @override
   int get hashCode => Object.hash(
@@ -483,6 +520,7 @@ final class AppSettings {
     primaryProfileName,
     Object.hashAll(otherProfiles),
     Object.hashAll(activeProfileIds),
+    tripDestination,
   );
 
   @override
@@ -499,7 +537,9 @@ final class AppSettings {
       'onboardingSeen: $onboardingSeen, '
       // Counts again, never names (C1).
       'otherProfiles: ${otherProfiles.length}, '
-      'active: ${activeProfileIds.length})';
+      'active: ${activeProfileIds.length}, '
+      // Whether a trip is on, never where (C1).
+      'trip: ${tripDestination != null})';
 }
 
 /// On-device storage for [AppSettings] (architecture.md §6.4). Backed by

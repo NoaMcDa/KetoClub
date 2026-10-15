@@ -16,6 +16,7 @@ import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/models/trip_destination.dart';
 import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/kitchen_reach.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
@@ -164,7 +165,8 @@ abstract final class GroupEvaluator {
   /// (ALG-07) for that person's profile — so a fryer demotes a dish for
   /// the person whose strict entry it reaches, and the strictest state
   /// carries it. With one person the combined result is exactly that
-  /// person's evaluation. [people] must not be empty.
+  /// person's evaluation. [people] must not be empty. A [trip] (ALG-13)
+  /// reaches every person's evaluation alike.
   static GroupEvaluation evaluate(
     AnalysedDish analysed,
     Dish dish,
@@ -172,6 +174,7 @@ abstract final class GroupEvaluator {
     bool? hebrew,
     String? heading,
     KitchenReach kitchen = KitchenReach.empty,
+    TripDestination? trip,
   }) {
     final results = <PersonEvaluation>[
       for (final person in people)
@@ -184,6 +187,7 @@ abstract final class GroupEvaluator {
               person.profile,
               hebrew: hebrew,
               heading: heading,
+              trip: trip,
             ),
             dish,
             person.profile,

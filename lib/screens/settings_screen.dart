@@ -6,6 +6,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/screens/chef_card_screen.dart';
 import 'package:ketoclub/screens/settings_profiles_section.dart';
+import 'package:ketoclub/screens/settings_trip_section.dart';
 import 'package:ketoclub/services/platform/app_info.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
@@ -256,6 +257,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _restrictionsSection(context, l10n, controller),
                 const SizedBox(height: 20),
                 _profilesSection(l10n),
+                const SizedBox(height: 20),
+                _tripSection(l10n),
                 const SizedBox(height: 20),
               ],
               _ketoRulesSection(context, l10n, controller),
@@ -756,6 +759,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           _GroupNote(l10n.settingsProfilesNote),
           SettingsProfilesList(
+            screenBrightness: widget.screenBrightness,
+            menuSharer: widget.menuSharer,
+          ),
+        ],
+      ),
+    ],
+  );
+
+  /// The "Trip mode" section (Banto, ALG-13, issue #355), built only when
+  /// [SettingsScreen.bantoMode] is on: its note, then [SettingsTripRows].
+  Widget _tripSection(AppLocalizations l10n) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _SectionLabel(l10n.settingsTrip),
+      _SettingsGroup(
+        children: [
+          _GroupNote(l10n.settingsTripNote),
+          SettingsTripRows(
             screenBrightness: widget.screenBrightness,
             menuSharer: widget.menuSharer,
           ),

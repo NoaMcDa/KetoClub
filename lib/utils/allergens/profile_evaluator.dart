@@ -27,10 +27,12 @@ import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/models/trip_destination.dart';
 import 'package:ketoclub/utils/allergens/allergen_matcher.dart';
 import 'package:ketoclub/utils/allergens/custom_terms.dart';
 import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
+import 'package:ketoclub/utils/allergens/trip_lexicon.dart';
 import 'package:ketoclub/utils/allergens/waiter_questions.dart';
 import 'package:ketoclub/utils/classification_rules.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
@@ -218,12 +220,17 @@ abstract final class ProfileEvaluator {
   ///
   /// An empty profile holds keto: it is the keto-only user of today's
   /// app, and the result is the identity mapping of the wire verdict.
+  ///
+  /// With a [trip] (ALG-13), the destination's lexicon is read by the
+  /// same pass as the user's own words ([TripLexicon.withTrip]), every
+  /// term a suspected hidden source; keto is untouched.
   static EvaluatedDish evaluate(
     AnalysedDish analysed,
     Dish dish,
     DietaryProfile profile, {
     bool? hebrew,
     String? heading,
+    TripDestination? trip,
   }) {
     final hasKeto = profile.isEmpty || profile.contains(RestrictionId.keto);
     final isHebrew =
@@ -231,7 +238,12 @@ abstract final class ProfileEvaluator {
         TextNormaliser.containsHebrew(TextNormaliser.dishRulesText(dish));
 
     final (:evidence, :declarations) = _applyDeclarations(<_Evidence>[
-      for (final evidence in _evidence(analysed, dish, profile.customTerms))
+      for (final evidence in _evidence(
+        analysed,
+        dish,
+        profile.customTerms,
+        trip,
+      ))
         if (_applies(evidence.concern, profile)) _headsUp(evidence),
     ], Declarations.of(dish, heading: heading));
 
@@ -470,8 +482,9 @@ abstract final class ProfileEvaluator {
     AnalysedDish analysed,
     Dish dish,
     List<String> customTerms,
+    TripDestination? trip,
   ) {
-    final own = customTermVocabulary(customTerms);
+    final own = TripLexicon.withTrip(customTermVocabulary(customTerms), trip);
     _Evidence ofConcern(Concern concern) {
       final removable = concern.source == ConcernSource.option;
       final matched = concern.matchedText;

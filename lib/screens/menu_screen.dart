@@ -1706,6 +1706,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 dish: row.dish,
                 analysed: evaluated.dish,
                 menu: controller.menu,
+                trip: controller.trip,
                 menuSharer: widget.menuSharer,
               ),
       ),

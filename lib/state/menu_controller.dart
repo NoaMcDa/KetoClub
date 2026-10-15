@@ -8,6 +8,7 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/menu_question.dart';
 import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/models/trip_destination.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_question_answerer.dart';
@@ -201,6 +202,15 @@ final class MenuController extends ChangeNotifier {
   /// false until then, so a controller nobody opened is keto-only.
   bool _bantoMode = false;
 
+  /// Trip mode's destination (ALG-13, issue #355), recorded with
+  /// [_people] when the screen shows Banto surfaces; null otherwise, so a
+  /// keto build never reads a lexicon. Read by the evaluations.
+  TripDestination? _trip;
+
+  /// Trip mode's destination the menu is evaluated under (ALG-13), or null
+  /// when no trip is active or the screen is keto-only.
+  TripDestination? get trip => _trip;
+
   @override
   void dispose() {
     _carbBudget.removeListener(_onBudgetChange);
@@ -340,7 +350,8 @@ final class MenuController extends ChangeNotifier {
     // Every profile, the user's own first, and who is combined: [_profile]
     // is derived from these, so it changed only if they did.
     if (listEquals(settings.activeProfiles, _people) &&
-        listEquals(settings.profiles, _allProfiles)) {
+        listEquals(settings.profiles, _allProfiles) &&
+        _tripFrom(settings) == _trip) {
       return;
     }
     _applyPeople(settings);
@@ -392,12 +403,18 @@ final class MenuController extends ChangeNotifier {
   /// Records [settings]' active profiles in [_people], every profile in
   /// [_allProfiles], and their union in [_profile].
   void _applyPeople(AppSettings settings) {
+    _trip = _tripFrom(settings);
     _people = settings.activeProfiles;
     _allProfiles = settings.profiles;
     _profile = GroupEvaluator.union(<DietaryProfile>[
       for (final named in _people) named.profile,
     ]);
   }
+
+  /// [settings]' trip destination when the screen shows Banto surfaces
+  /// (ALG-13); null otherwise.
+  TripDestination? _tripFrom(AppSettings settings) =>
+      _bantoMode ? settings.tripDestination : null;
 
   /// [analysed] evaluated for [people] under the section [heading] and
   /// the kitchen [reach]: [ProfileEvaluator.evaluate] then
@@ -415,9 +432,16 @@ final class MenuController extends ChangeNotifier {
           _people,
           heading: heading,
           kitchen: reach,
+          trip: _trip,
         ).combined
       : applyKitchenSignals(
-          ProfileEvaluator.evaluate(analysed, dish, _profile, heading: heading),
+          ProfileEvaluator.evaluate(
+            analysed,
+            dish,
+            _profile,
+            heading: heading,
+            trip: _trip,
+          ),
           dish,
           _profile,
           reach,
@@ -784,6 +808,7 @@ final class MenuController extends ChangeNotifier {
         identical(memo.menu, currentMenu) &&
         identical(memo.analysis, currentAnalysis) &&
         memo.profile == _profile &&
+        memo.trip == _trip &&
         listEquals(memo.people, _people)) {
       return memo.evaluations;
     }
@@ -802,6 +827,7 @@ final class MenuController extends ChangeNotifier {
                 _people,
                 heading: category.name,
                 kitchen: reach,
+                trip: _trip,
               ),
     };
     final evaluations = <String, EvaluatedDish>{
@@ -816,6 +842,7 @@ final class MenuController extends ChangeNotifier {
                     dish,
                     _profile,
                     heading: category.name,
+                    trip: _trip,
                   ),
                   dish,
                   _profile,
@@ -826,6 +853,7 @@ final class MenuController extends ChangeNotifier {
       menu: currentMenu,
       analysis: currentAnalysis,
       profile: _profile,
+      trip: _trip,
       people: _people,
       evaluations: evaluations,
       groups: groups,
@@ -837,6 +865,7 @@ final class MenuController extends ChangeNotifier {
     Menu menu,
     MenuAnalysed analysis,
     DietaryProfile profile,
+    TripDestination? trip,
     List<NamedProfile> people,
     Map<String, EvaluatedDish> evaluations,
     Map<String, GroupEvaluation> groups,
