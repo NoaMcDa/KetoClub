@@ -1702,6 +1702,7 @@ class _MenuScreenState extends State<MenuScreen> {
             ? null
             : (_) => ChefCardScreen(
                 profile: controller.profile,
+                people: controller.people,
                 dish: row.dish,
                 analysed: evaluated.dish,
                 menu: controller.menu,
