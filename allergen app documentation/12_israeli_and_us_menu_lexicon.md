@@ -582,6 +582,150 @@ reacts to dairy adds that entry too.
 
 ---
 
+## 8. Trip mode: restaurant duties and local hidden-ingredient lexicons (ALG-13)
+
+**Status: unreviewed desk research — check in a browser before shipping
+wording.** Added on 2026-10-15 for ALG-13 (issue #355) from general
+culinary and regulatory knowledge, with **no page fetched and no source
+read for this section**. Where a fact is already sourced elsewhere in file
+11 or this file, the code cites that section instead of this one; every
+claim below that the code cites as `12 §8.x` needs a reviewer with a
+browser to confirm it (a national allergy charity, the regulator, a
+standard recipe reference) before its wording is final. The lists are
+deliberately short: a trip-mode term is only ever a *suspected* trigger,
+which turns a strict entry's dish into "ask", never into "avoid", and
+never clears anything. Terms are the Latin-script words a menu at the
+destination prints (romanised for Japan: the matcher cannot read kana or
+kanji); `TripLexicon` in `lib/utils/allergens/trip_lexicon.dart` holds
+them with their glosses.
+
+### 8.1 Who must tell you: packaged food versus restaurants
+
+| Jurisdiction | What its list binds | Hint the app shows for a listed allergen | Basis |
+|---|---|---|---|
+| EU (France, Italy, Spain, Germany) | packaged **and** non-prepacked food: a restaurant must be able to say which of the 14 a dish holds | "the restaurant must be able to tell you — still ask" | file 02 "The lists"; file 11 §19.2 |
+| United Kingdom | the same 14, for non-prepacked food too (FSA guidance) | the same | file 02; file 11 §19.2 |
+| Israel | packaged food only, mandatory from 1 Jan 2028; restaurants have no duty | "labelled on packaged food only — ask every time" | §4.2; file 11 §19.3 |
+| United States | packaged food (FALCPA, FASTER Act); restaurant food is outside federal law; California requires chains of 20+ locations to list the nine per dish from 1 July 2026 (file 06 calls it SB 68; §5 above records a California bill as not verified signed — the two need reconciling) | "labelled on packaged food; only large chains in California must list it — ask every time" | file 02; file 06; §5 |
+| Japan | **unverified:** the Food Labeling Act's mandatory allergen labelling (eight items: shrimp, crab, walnut, wheat, buckwheat, egg, milk, peanut) applies to packaged food; restaurants and food made and sold on the spot are understood to be exempt, with voluntary disclosure encouraged. Check the Consumer Affairs Agency's own pages | "labelled on packaged food only — ask every time" | this section |
+| Canada, Australia / New Zealand | not researched (not trip destinations yet) | read as packaged-only, the side that never overstates a duty | this section |
+
+Japan's mandatory list includes **buckwheat**, which has no restriction id
+in the taxonomy (file 02); the briefing tells a buckwheat-allergic user to
+add it as their own word (ALG-17), and lists soba under wheat and gluten
+because most soba is cut with wheat flour.
+
+### 8.2 Japan
+
+| Term | Hides | Why (to confirm) |
+|---|---|---|
+| soba | wheat, gluten (and buckwheat) | buckwheat noodles commonly mixed with wheat flour (*ni-hachi*: about 20% wheat) |
+| yakisoba | wheat, gluten, soy | wheat noodles fried in a Worcestershire-style soy sauce |
+| udon, ramen | wheat, gluten | wheat noodles |
+| miso | soy, gluten | soy paste; *mugi* (barley) miso holds gluten |
+| tempura | wheat, gluten, eggs | wheat-flour batter, often with egg |
+| ponzu | soy, wheat, gluten, fish | citrus soy sauce, usually seasoned with dashi |
+| katsu, tonkatsu | wheat, gluten, eggs | flour, egg and panko coating; the sauce holds wheat and soy |
+| okonomiyaki | wheat, gluten, eggs, fish | wheat-and-egg batter, topped with bonito flakes |
+| takoyaki | wheat, gluten, eggs, molluscs, fish | octopus in wheat batter, topped with bonito |
+| furikake | sesame, fish | rice seasoning of sesame, nori and dried fish |
+| goma, gomadare | sesame | *goma* is sesame; *gomadare* sesame sauce, *goma-ae* sesame-dressed greens |
+| mentaiko | fish | spicy pollock roe |
+| tamagoyaki, tamago | eggs, fish | rolled omelette, often seasoned with dashi |
+| gyoza | wheat, gluten | wheat wrappers |
+
+Shoyu, teriyaki (file 11 §7.2), dashi and katsuobushi (file 11 §8.1) are
+cited to file 11.
+
+### 8.3 France
+
+| Term | Hides | Why (to confirm) |
+|---|---|---|
+| viennoiserie, pain au chocolat | wheat, gluten, lupin, milk, eggs | butter pastry with egg glaze; lupin flour is used in some French doughs (file 11 §14.2 documents lupin in pastry generally) |
+| moutarde, Dijon | mustard | the French word; Dijon mustard is in most vinaigrettes and many sauces |
+| béarnaise | eggs, milk | egg-yolk and butter emulsion |
+| beurre blanc | milk, sulphites | butter sauce reduced with white wine |
+| rémoulade | mustard, eggs | mayonnaise with mustard (céleri rémoulade) |
+| rouille | eggs, wheat, gluten, fish | garlic-saffron sauce thickened with yolk or bread, served with fish soup |
+| financier | tree nuts, milk, eggs, wheat, gluten | almond-flour cake with brown butter |
+| croque monsieur, croque madame | wheat, gluten, milk, eggs | ham-and-cheese toast with béchamel; the madame adds an egg |
+| gratin, dauphinois | milk | baked in cream, milk or cheese |
+
+### 8.4 Italy
+
+| Term | Hides | Why (to confirm) |
+|---|---|---|
+| bagna cauda | fish, milk | warm anchovy-garlic dip, often with butter |
+| tonnato | fish, eggs | tuna-mayonnaise sauce (vitello tonnato) |
+| amaretti, amaretto | tree nuts | almond or apricot-kernel biscuits and liqueur |
+| torrone | tree nuts, eggs | nougat with almonds or hazelnuts and egg white |
+| tiramisù | eggs, milk, wheat, gluten | raw-egg mascarpone cream on savoiardi |
+| fritto misto, frittura | wheat, gluten, fish, crustaceans, molluscs | floured fried seafood, usually from one fryer |
+| salsa verde | fish | herb sauce, often with anchovy |
+| alla milanese, impanato | wheat, gluten, eggs | egg-and-breadcrumb coating |
+
+Pesto, trapanese, mortadella, cannoli, puttanesca and polpette are cited
+to §5; gianduja to file 11 §2.1; carbonara to file 11 §5.2; bottarga to
+file 11 §8.1.
+
+### 8.5 Spain
+
+| Term | Hides | Why (to confirm) |
+|---|---|---|
+| mostaza | mustard | the Spanish word |
+| romesco | tree nuts, wheat, gluten | pepper sauce thickened with almonds or hazelnuts and bread |
+| alioli, allioli | eggs | traditionally garlic and oil, but restaurant versions are usually egg-based |
+| salmorejo | wheat, gluten, eggs | tomato-bread soup topped with egg |
+| gazpacho | wheat, gluten | often thickened with bread |
+| croquetas | wheat, gluten, milk, eggs | béchamel, egg and breadcrumbs |
+| paella | crustaceans, molluscs, fish | rice cooked in stock, often seafood stock |
+| fideuà, fideos | wheat, gluten, crustaceans, molluscs | short wheat noodles cooked like paella |
+| ajoblanco | tree nuts, wheat, gluten | cold almond and bread soup |
+| turrón | tree nuts, eggs | almond nougat with egg white |
+| rebozado, empanado, empanada | wheat, gluten, eggs | battered, breaded, or a wheat-pastry turnover |
+| ensaladilla | eggs, fish | potato salad in mayonnaise, often with tuna |
+
+Altramuces (lupin) is cited to file 11 §14.1.
+
+### 8.6 Germany
+
+| Term | Hides | Why (to confirm) |
+|---|---|---|
+| Senf | mustard | the German word; served with every sausage and in many sauces and dressings |
+| Remoulade | mustard, eggs | mayonnaise sauce with mustard |
+| Rouladen, Roulade, Rinderroulade | mustard | beef rolls spread with mustard |
+| Bratwurst, Wurst | mustard, wheat, gluten | sausages, some with wheat filler (file 11 §7.2 lists sausages), served with mustard |
+| Spätzle, Käsespätzle | eggs, wheat, gluten (milk) | egg noodles; *Käse-* baked with cheese |
+| Knödel, Semmelknödel | wheat, gluten, eggs, milk | bread dumplings bound with egg and milk |
+| Maultaschen | wheat, gluten, eggs | filled pasta |
+| paniert | wheat, gluten, eggs | breaded |
+| Sellerie, Knollensellerie | celery | the German words for celery and celeriac |
+| Suppengrün, Suppengemüse | celery | soup-vegetable bundle that includes celeriac |
+| Bienenstich | tree nuts, milk, eggs, wheat, gluten | yeast cake with almond topping and custard |
+
+Currywurst and Kartoffelsalat are cited to file 11 §13.2 (curry powder,
+potato salad); Brühe to file 11 §12.2; Marzipan to file 11 §2.2;
+Lupinenmehl to file 11 §14.1.
+
+### 8.7 United Kingdom
+
+| Term | Hides | Why (to confirm) |
+|---|---|---|
+| Yorkshire pudding | wheat, gluten, eggs, milk | batter of flour, egg and milk |
+| Scotch egg | eggs, wheat, gluten | egg in sausage meat and breadcrumbs |
+| coronation chicken | eggs, mustard | curried mayonnaise; curry powder may hold mustard (file 11 §13.2) |
+| Bakewell | tree nuts, wheat, gluten, eggs | almond frangipane tart |
+| haggis | gluten (oats), mammal meat | sheep offal with oatmeal |
+| Welsh rarebit | milk, wheat, gluten, mustard, fish | cheese sauce on toast, usually with mustard and Worcestershire sauce |
+| stuffing | wheat, gluten, celery | breadcrumb stuffing, often with celery or stock |
+| ploughman's | milk, wheat, gluten, mustard | cheese, bread and pickle |
+
+Gravy and Marmite are cited to file 11 §12.2, brown sauce to file 11 §7.2
+(malt vinegar), Worcestershire to file 11 §8.2 and piccalilli to file 11
+§13.1.
+
+---
+
 ## Sources
 
 Grades: **[S]** strong (official, clinical, peer-reviewed, manufacturer),

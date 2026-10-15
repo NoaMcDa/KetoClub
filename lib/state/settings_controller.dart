@@ -3,6 +3,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/models/trip_destination.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -509,6 +510,19 @@ final class SettingsController extends ChangeNotifier {
     await _update(
       _appSettings.copyWith(activeProfileIds: List<String>.unmodifiable(next)),
     );
+  }
+
+  /// Where the user is travelling (Banto, ALG-13, issue #355), or null
+  /// when trip mode is off. Kept on this device only, like the profile.
+  TripDestination? get tripDestination => _appSettings.tripDestination;
+
+  /// Starts trip mode for [destination], or switches it off with null
+  /// (ALG-13: one tap). A no-op, with no write, when it is already so.
+  /// Changes nothing about keto and nothing the next request carries: the
+  /// destination's lexicon is read on the device only.
+  Future<void> setTripDestination(TripDestination? destination) async {
+    if (destination == tripDestination) return;
+    await _update(_appSettings.copyWith(tripDestination: destination));
   }
 
   /// Replaces the other person [id] with what [change] makes of it.
