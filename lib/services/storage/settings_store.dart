@@ -87,6 +87,8 @@ final class AppSettings {
     this.primaryProfileName = '',
     this.otherProfiles = const <NamedProfile>[],
     this.activeProfileIds = defaultActiveProfileIds,
+    this.disclosureCopyVersion = 0,
+    this.helperToolSeen = false,
   });
 
   /// The profiles a menu is read for until the user combines others: the
@@ -190,8 +192,13 @@ final class AppSettings {
       primaryProfileName: _readName(json[_primaryNameKey]),
       otherProfiles: others,
       activeProfileIds: _readActive(json[_activeProfilesKey], others),
+      disclosureCopyVersion: _readCopyVersion(json[_disclosureCopyVersionKey]),
+      helperToolSeen: json[_helperToolSeenKey] == true,
     );
   }
+
+  /// [raw] as a disclosure copy version: a non-negative integer, else 0.
+  static int _readCopyVersion(Object? raw) => raw is int && raw > 0 ? raw : 0;
 
   /// [raw] as a name, or empty when it is not a string.
   static String _readName(Object? raw) =>
@@ -248,6 +255,15 @@ final class AppSettings {
   /// when it is true, for the same reason as [_profileKey]: a keto build
   /// never sets it, so its stored record stays byte-identical.
   static const String _onboardingSeenKey = 'restrictionOnboardingSeen';
+
+  /// The JSON key [disclosureCopyVersion] is stored under, written only
+  /// when it is above 0, so a keto build, which never sets it, keeps its
+  /// stored record byte-identical.
+  static const String _disclosureCopyVersionKey = 'disclosureCopyVersion';
+
+  /// The JSON key [helperToolSeen] is stored under, written only when it
+  /// is true, for the same reason.
+  static const String _helperToolSeenKey = 'helperToolSeen';
 
   /// The JSON key [profile] is stored under. [toJson] writes it only for a
   /// non-empty profile, so a keto-only install's stored record — and
@@ -335,6 +351,21 @@ final class AppSettings {
   /// [activeProfiles], which drops an id that names no profile.
   final List<String> activeProfileIds;
 
+  /// The version of the AI-disclosure copy the user last acknowledged
+  /// (Banto, ALG-11, issue #353); 0 for the original keto copy. A Banto
+  /// build whose disclosure says more (what of the profile leaves the
+  /// device) shows the banner once more while this is below its own
+  /// version, so a changed copy is read once. A missing, non-integer or
+  /// negative value reads as 0.
+  final int disclosureCopyVersion;
+
+  /// Whether the helper-tool sheet ("A helper, not a guarantee") has been
+  /// shown (Banto, ALG-11, issue #353): it appears once, when the first
+  /// restriction of any kind is added. The first-run onboarding sets it,
+  /// since that screen carries the same sentence. A missing or non-boolean
+  /// value reads as false.
+  final bool helperToolSeen;
+
   /// Every profile on the device: the user's own ([profile], under
   /// [primaryProfileName]) first, then [otherProfiles].
   List<NamedProfile> get profiles => <NamedProfile>[
@@ -391,6 +422,8 @@ final class AppSettings {
     String? primaryProfileName,
     List<NamedProfile>? otherProfiles,
     List<String>? activeProfileIds,
+    int? disclosureCopyVersion,
+    bool? helperToolSeen,
   }) => AppSettings(
     languageTag: identical(languageTag, _unset)
         ? this.languageTag
@@ -415,13 +448,16 @@ final class AppSettings {
     primaryProfileName: primaryProfileName ?? this.primaryProfileName,
     otherProfiles: otherProfiles ?? this.otherProfiles,
     activeProfileIds: activeProfileIds ?? this.activeProfileIds,
+    disclosureCopyVersion: disclosureCopyVersion ?? this.disclosureCopyVersion,
+    helperToolSeen: helperToolSeen ?? this.helperToolSeen,
   );
 
   /// Writes a form [tryFrom] can read back. [profile] is written only
   /// when it is not empty, and [onboardingSeen] only when it is true; see
   /// [_profileKey] and [_onboardingSeenKey]. The group profile fields are
   /// written only when they differ from their defaults; see
-  /// [_primaryNameKey].
+  /// [_primaryNameKey]. So are [disclosureCopyVersion] and [helperToolSeen]
+  /// (ALG-11).
   Map<String, Object?> toJson() => <String, Object?>{
     'languageTag': languageTag,
     'filter': filter.name,
@@ -443,6 +479,9 @@ final class AppSettings {
       ],
     if (!listEquals(activeProfileIds, defaultActiveProfileIds))
       _activeProfilesKey: activeProfileIds,
+    if (disclosureCopyVersion > 0)
+      _disclosureCopyVersionKey: disclosureCopyVersion,
+    if (helperToolSeen) _helperToolSeenKey: true,
   };
 
   @override
@@ -463,7 +502,9 @@ final class AppSettings {
       other.onboardingSeen == onboardingSeen &&
       other.primaryProfileName == primaryProfileName &&
       listEquals(other.otherProfiles, otherProfiles) &&
-      listEquals(other.activeProfileIds, activeProfileIds);
+      listEquals(other.activeProfileIds, activeProfileIds) &&
+      other.disclosureCopyVersion == disclosureCopyVersion &&
+      other.helperToolSeen == helperToolSeen;
 
   @override
   int get hashCode => Object.hash(
@@ -483,6 +524,8 @@ final class AppSettings {
     primaryProfileName,
     Object.hashAll(otherProfiles),
     Object.hashAll(activeProfileIds),
+    disclosureCopyVersion,
+    helperToolSeen,
   );
 
   @override
@@ -499,7 +542,9 @@ final class AppSettings {
       'onboardingSeen: $onboardingSeen, '
       // Counts again, never names (C1).
       'otherProfiles: ${otherProfiles.length}, '
-      'active: ${activeProfileIds.length})';
+      'active: ${activeProfileIds.length}, '
+      'disclosureCopyVersion: $disclosureCopyVersion, '
+      'helperToolSeen: $helperToolSeen)';
 }
 
 /// On-device storage for [AppSettings] (architecture.md §6.4). Backed by

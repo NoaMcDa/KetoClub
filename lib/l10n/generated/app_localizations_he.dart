@@ -1435,7 +1435,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get whatLeavesDeviceBanto =>
-      'פרופיל ההגבלות שלך נשאר במכשיר. כשניתוח AI פועל, נשלחים רק טקסט התפריט והגדרות הקטו — לעולם לא אילו הגבלות יש לך.';
+      'פרופיל ההגבלות שלך והמילים שהוספת נשארים במכשיר. כשניתוח AI פועל, נשלחים רק טקסט התפריט, הגדרות הקטו ובקשה לפרט את רכיבי כל מנה — לעולם לא אילו הגבלות יש לך.';
 
   @override
   String get chefCardTitle => 'כרטיס השף שלך';
@@ -1944,4 +1944,39 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get concernCertaintyHeadsUp => 'ייתכן שיש בזה הרבה — התראה, לא מדידה';
+
+  @override
+  String get helperToolOk => 'הבנתי';
+
+  @override
+  String get whyCoverageNameOnly => 'בתפריט מופיע רק שם המנה.';
+
+  @override
+  String get whyCoverageDescription => 'בתפריט מופיעים שם המנה ותיאור.';
+
+  @override
+  String get whyCoverageOptions => 'בתפריט מופיעים שם המנה ואפשרויות בחירה.';
+
+  @override
+  String get whyCoverageFull =>
+      'בתפריט מופיעים שם המנה, תיאור ואפשרויות בחירה.';
+
+  @override
+  String get whyCoverageModelAndRules =>
+      'ה-AI פירט את הרכיבים, וגם הכללים קראו את טקסט התפריט.';
+
+  @override
+  String get whyCoverageRulesOnly =>
+      'רק הכללים קראו את טקסט התפריט, בלי רשימת רכיבים מ-AI. לשאול את המסעדה.';
+
+  @override
+  String get glp1TagProteinForward => 'החלבון במרכז';
+
+  @override
+  String get glp1TagSmallPortion => 'מנה קטנה';
+
+  @override
+  String glp1TagSemanticLabel(String tags) {
+    return 'למנות קטנות: $tags';
+  }
 }

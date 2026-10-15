@@ -116,6 +116,10 @@ final class SettingsController extends ChangeNotifier {
   /// skipped (Banto, ALG-02b, issue #344).
   bool get onboardingSeen => _appSettings.onboardingSeen;
 
+  /// Whether the helper-tool sheet has been shown (Banto, ALG-11, issue
+  /// #353); see [AppSettings.helperToolSeen].
+  bool get helperToolSeen => _appSettings.helperToolSeen;
+
   /// How many menus are currently cached (issue #61's Settings section). A
   /// count of entries, never a byte figure —
   /// [MenuRepository.cachedMenuCount]'s own doc comment explains why.
@@ -297,6 +301,13 @@ final class SettingsController extends ChangeNotifier {
   Future<void> markOnboardingSeen() async {
     if (onboardingSeen) return;
     await _update(_appSettings.copyWith(onboardingSeen: true));
+  }
+
+  /// Records that the helper-tool sheet has been shown (ALG-11), so it is
+  /// never shown twice. A no-op, with no write, when it is already set.
+  Future<void> markHelperToolSeen() async {
+    if (helperToolSeen) return;
+    await _update(_appSettings.copyWith(helperToolSeen: true));
   }
 
   /// Adds [id] to the profile, last, with no exceptions (issue #344).

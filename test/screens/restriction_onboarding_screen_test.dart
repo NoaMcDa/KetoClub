@@ -126,6 +126,8 @@ void main() {
 
       final saved = await store.read();
       expect(saved.onboardingSeen, isTrue);
+      // The page carried the helper-tool sentence (ALG-11).
+      expect(saved.helperToolSeen, isTrue);
       expect(saved.profile.entries.map((e) => e.restrictionId), <RestrictionId>[
         RestrictionId.sesame,
         RestrictionId.lactose,
@@ -157,6 +159,7 @@ void main() {
       final saved = await store.read();
       expect(saved.onboardingSeen, isTrue);
       expect(saved.profile, DietaryProfile.empty);
+      expect(saved.helperToolSeen, isFalse);
       expect(find.byKey(_childKey), findsOneWidget);
     });
 

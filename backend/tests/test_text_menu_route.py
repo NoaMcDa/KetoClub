@@ -17,6 +17,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.keto import prompt
 from app.keto.fingerprint import fingerprint_hex
 from app.keto.models import Menu, to_json
 from app.models import StoredMenu
@@ -213,3 +214,50 @@ def test_the_install_id_is_in_no_row_and_no_log_line(
         # /v1/text-menu never writes the shared menu store.
         assert session.scalar(select(func.count()).select_from(StoredMenu)) == 0
     assert json.dumps(dict(gemini.calls.last.request.headers)).count(INSTALL_ID) == 0
+
+
+def test_a_pasted_menu_with_the_flag_extracts_ingredients(
+    app_client: TestClient, gemini: respx.MockRouter
+) -> None:
+    """``restrictionsRequested`` on ``/v1/text-menu`` (ALG-03, D26 C2): the
+    extraction section and schema are sent and the ingredients read back;
+    the profile itself never travels (C1)."""
+    entry = _paste("Grilled salmon\nCaesar salad")
+    menu = Menu.model_validate(entry["menu"])
+    reply = json.loads(all_green_reply(menu))
+    reply["dishes"][0]["ingredients"] = [
+        {"name": "salmon", "certainty": "stated", "role": "protein"}
+    ]
+    route = gemini.post(GEMINI_URL).respond(200, json=gemini_answer(json.dumps(reply)))
+    extracting = {**_OPTIONS, "restrictionsRequested": True}
+
+    response = _post(app_client, entry["text"], extracting)
+
+    assert response.status_code == 200
+    analysis = response.json()["analysis"]
+    assert analysis["options"] == extracting
+    assert analysis["dishes"][0]["ingredients"] == [
+        {"name": "salmon", "certainty": "stated", "role": "protein"}
+    ]
+    sent = json.loads(route.calls.last.request.content)
+    system = sent["system_instruction"]["parts"][0]["text"]
+    assert system.endswith(prompt.EXTRACTION_SECTION)
+    items = sent["generationConfig"]["responseSchema"]["properties"]["dishes"]
+    assert "ingredients" in items["items"]["properties"]
+
+
+def test_a_pasted_menu_refuses_a_profile_in_the_options(
+    app_client: TestClient, gemini: respx.MockRouter
+) -> None:
+    route = gemini.post(GEMINI_URL).respond(500)
+    entry = _paste("Grilled salmon\nCaesar salad")
+
+    response = _post(
+        app_client,
+        entry["text"],
+        {**_OPTIONS, "restrictionsRequested": True, "profile": ["sesame"]},
+    )
+
+    assert response.status_code == 422
+    assert "sesame" not in response.text
+    assert not route.called

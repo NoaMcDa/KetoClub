@@ -1429,7 +1429,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get whatLeavesDeviceBanto =>
-      'Your restriction profile stays on this device. When AI analysis is on, only the menu text and the keto settings are sent — never which restrictions you have.';
+      'Your restriction profile and your own words stay on this device. When AI analysis is on, only the menu text, your keto settings and a request to list each dish\'s ingredients are sent — never which restrictions you have.';
 
   @override
   String get chefCardTitle => 'Your chef card';
@@ -1944,4 +1944,40 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get concernCertaintyHeadsUp =>
       'may be high in it — a heads-up, not a measurement';
+
+  @override
+  String get helperToolOk => 'Got it';
+
+  @override
+  String get whyCoverageNameOnly => 'The menu gives only the dish\'s name.';
+
+  @override
+  String get whyCoverageDescription =>
+      'The menu gives the name and a description.';
+
+  @override
+  String get whyCoverageOptions => 'The menu gives the name and options.';
+
+  @override
+  String get whyCoverageFull =>
+      'The menu gives the name, a description and options.';
+
+  @override
+  String get whyCoverageModelAndRules =>
+      'AI listed its ingredients, and the rules read the menu text too.';
+
+  @override
+  String get whyCoverageRulesOnly =>
+      'Only the rules read the menu text, with no AI ingredient list. Ask the restaurant.';
+
+  @override
+  String get glp1TagProteinForward => 'Protein-forward';
+
+  @override
+  String get glp1TagSmallPortion => 'Small portion';
+
+  @override
+  String glp1TagSemanticLabel(String tags) {
+    return 'For small portions: $tags';
+  }
 }

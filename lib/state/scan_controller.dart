@@ -13,6 +13,7 @@ import 'package:ketoclub/services/platform/scan_budget.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/venue/qr_payload_router.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 /// Why [ScanController.addPages] refused pages (issue #82).
@@ -62,6 +63,11 @@ final class ScanController extends ChangeNotifier {
   /// given, so the menu screen can show them. [scanBudget] fits the pages
   /// into one request before they are sent (issue #298); its default
   /// shrinks nothing, so it only refuses a scan already over budget.
+  ///
+  /// With [bantoMode] on and a profile holding a restriction besides keto,
+  /// the options ask for ingredients and printed descriptions too (D26 C2,
+  /// ALG-03), as the menu screen's do, so the scan's analysis is the one
+  /// that screen reuses rather than re-classifying the menu as text.
   new({
     required this.classifier,
     required this._repository,
@@ -70,6 +76,7 @@ final class ScanController extends ChangeNotifier {
     this._pagesRegistry,
     this.qrScanner = const NoQrScanner(),
     this.scanBudget = const ScanBudget(downscaler: NoImageDownscaler()),
+    this.bantoMode = BantoMode.enabled,
   });
 
   /// Reads and classifies scanned pages in one request (architecture.md
@@ -84,6 +91,9 @@ final class ScanController extends ChangeNotifier {
   /// Fits the pages' images into one request's inline budget before
   /// [analysePages] sends them (issue #298).
   final ScanBudget scanBudget;
+
+  /// Whether this build shows Banto surfaces (D26's convention).
+  final bool bantoMode;
 
   final MenuRepository _repository;
   final Clock _clock;
@@ -313,14 +323,12 @@ final class ScanController extends ChangeNotifier {
     }
     final result = await classifier.classify(
       scan,
-      options: ClassificationOptions(
-        estimationConsentGiven: settings.estimationConsentGiven,
-        netCarbLimitGrams: settings.netCarbLimitGrams,
-        dietaryConstraints: ClassificationOptions.dietaryConstraintsFor(
-          seedOilFree: settings.seedOilFree,
-          dairyFree: settings.dairyFree,
-          carnivoreOnly: settings.carnivoreOnly,
-        ),
+      // The menu screen's own options (consent, the net-carb limit, the
+      // toggles and, in Banto, the ingredient request), so the analysis
+      // stored here is the one [MenuController.open] reuses.
+      options: ClassificationOptions.fromSettings(
+        settings,
+        bantoMode: bantoMode,
       ),
     );
 

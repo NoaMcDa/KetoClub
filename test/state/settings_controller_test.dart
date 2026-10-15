@@ -388,6 +388,20 @@ void main() {
       expect(await settings.read(), const AppSettings(onboardingSeen: true));
     });
 
+    test('markHelperToolSeen persists the flag once and touches nothing '
+        'else (ALG-11)', () async {
+      await controller.load();
+      expect(controller.helperToolSeen, isFalse);
+
+      await controller.markHelperToolSeen();
+      final writes = settings.writeCallCount;
+      await controller.markHelperToolSeen();
+
+      expect(controller.helperToolSeen, isTrue);
+      expect(settings.writeCallCount, writes);
+      expect(await settings.read(), const AppSettings(helperToolSeen: true));
+    });
+
     group('acknowledgeDisclosure / declineDisclosure (D16, issue #167)', () {
       test('acknowledgeDisclosure persists disclosureSeen as true without '
           'changing consentGiven', () async {

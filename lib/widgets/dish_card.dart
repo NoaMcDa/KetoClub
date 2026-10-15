@@ -8,6 +8,7 @@ import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/allergens/declarations.dart';
+import 'package:ketoclub/utils/allergens/glp1_tag.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
@@ -65,6 +66,7 @@ class DishCard extends StatefulWidget {
     this.holdsKeto = true,
     this.bantoMode = BantoMode.enabled,
     this.groupBreakdown,
+    this.smallPortions = false,
     super.key,
   });
 
@@ -120,6 +122,12 @@ class DishCard extends StatefulWidget {
   /// several profiles (ALG-12, issue #354); null for one. Drawn only in
   /// state mode.
   final Widget? groupBreakdown;
+
+  /// Whether the profile holds small portions (GLP-1; ALG-17), which
+  /// adds the "Protein-forward · Small portion" tag ([Glp1Tags]) where it
+  /// applies. A tag only, in state mode: it never changes the state, the
+  /// colours or the order.
+  final bool smallPortions;
 
   /// Whether this card renders [evaluated]'s state rather than the keto
   /// verdict.
@@ -301,6 +309,10 @@ class _DishCardState extends State<DishCard> {
                 widget.wording.usesStates &&
                 Declarations.declaresKosher(dish))
               const _DeclaredKosherChip(),
+            if (evaluated != null && widget.smallPortions)
+              if (Glp1Tags.of(dish, analysis, heading: row.category)
+                  case final tag when !tag.isEmpty)
+                _Glp1TagChip(tag: tag),
           ],
         ),
       ],
@@ -328,6 +340,7 @@ class _DishCardState extends State<DishCard> {
               evaluated: evaluated,
               hebrew: VerdictCopy.dishIsHebrew(dish),
               dishName: dish.name,
+              coverage: WhyCoverage.of(dish, evaluated.dish),
               strictProfile: widget.wording == ProfileWording.strict,
               bantoMode: widget.bantoMode,
             ),
@@ -503,6 +516,9 @@ const Key dishStateHeaderKey = ValueKey<String>('dishStateHeader');
 /// The key of the "declared kosher by the platform" chip (ALG-09).
 const Key dishDeclaredKosherKey = ValueKey<String>('dishDeclaredKosher');
 
+/// The key of the small-portions tag (GLP-1; ALG-17).
+const Key dishGlp1TagKey = ValueKey<String>('dishGlp1Tag');
+
 /// The one kosher statement the app makes (Banto, ALG-09): the platform's
 /// own flag, attributed to it in words, never a claim by the app.
 class _DeclaredKosherChip extends StatelessWidget {
@@ -524,6 +540,46 @@ class _DeclaredKosherChip extends StatelessWidget {
           l10n.dishCardDeclaredKosher,
           style: theme.textTheme.labelSmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The small-portions tag (GLP-1; ALG-17): "Protein-forward · Small
+/// portion", or the half that applies, in the neutral outline the kosher
+/// chip uses, never a verdict colour.
+class _Glp1TagChip extends StatelessWidget {
+  const new({required this.tag});
+
+  /// What the tag says.
+  final Glp1Tag tag;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final text = <String>[
+      if (tag.proteinForward) l10n.glp1TagProteinForward,
+      if (tag.smallPortion) l10n.glp1TagSmallPortion,
+    ].join(' · ');
+    return Semantics(
+      label: l10n.glp1TagSemanticLabel(text),
+      excludeSemantics: true,
+      child: DecoratedBox(
+        key: dishGlp1TagKey,
+        decoration: BoxDecoration(
+          border: Border.all(color: theme.colorScheme.outlineVariant),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+          child: Text(
+            text,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
       ),
@@ -586,6 +642,7 @@ class _ConcernsBlock extends StatelessWidget {
     required this.evaluated,
     required this.hebrew,
     required this.dishName,
+    required this.coverage,
     required this.strictProfile,
     required this.bantoMode,
   });
@@ -599,6 +656,9 @@ class _ConcernsBlock extends StatelessWidget {
 
   /// The dish's name, for the Why sheet and the button's label.
   final String dishName;
+
+  /// What the result was read from, for the Why sheet (ALG-06).
+  final WhyCoverage coverage;
 
   /// Whether the profile holds a strict entry, for the Why sheet.
   final bool strictProfile;
@@ -657,6 +717,7 @@ class _ConcernsBlock extends StatelessWidget {
       concerns: evaluated.concerns,
       strictProfile: strictProfile,
       declarations: evaluated.declarations,
+      coverage: coverage,
       bantoMode: bantoMode,
     ),
   );

@@ -1370,6 +1370,9 @@ final class MenuController extends ChangeNotifier {
       // [phase] can name it (issue #65). An observer only: it takes no
       // part in [ClassificationOptions.matches] or equality.
       onEngineStarted: _onEngineStarted,
+      // The opening screen's flag, as [wording] reads it, so a screen in
+      // Banto asks for ingredients whatever the compile-time define.
+      bantoMode: _bantoMode,
     );
   }
 

@@ -18,8 +18,9 @@ drafting.
   anything and is not a medical device. `test/l10n/banned_words_test.dart`
   keeps that vocabulary out of the in-app copy, in both languages.
 - **The restriction profile never leaves the device**, not even as ids
-  (architecture.md §11, "Banto (C1)"). Only menu text and the keto settings are
-  sent when AI analysis is on (`whatLeavesDeviceBanto`).
+  (architecture.md §11, "Banto (C1)"). Only menu text, the keto settings and a
+  request to list each dish's ingredients are sent when AI analysis is on
+  (`whatLeavesDeviceBanto`).
 
 ## Clauses the terms of use should carry
 

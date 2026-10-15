@@ -621,7 +621,7 @@
 
   "helperToolSentence": "האפליקציה קוראת תפריטים כדי לעזור לך לבחור. היא לא רואה את המטבח, לא מאמתת מתכון ולא מבטיחה דיוק. תמיד לשאול את המסעדה.",
   "helperToolTitle": "כלי עזר, לא הבטחה",
-  "whatLeavesDeviceBanto": "פרופיל ההגבלות שלך נשאר במכשיר. כשניתוח AI פועל, נשלחים רק טקסט התפריט והגדרות הקטו — לעולם לא אילו הגבלות יש לך.",
+  "whatLeavesDeviceBanto": "פרופיל ההגבלות שלך והמילים שהוספת נשארים במכשיר. כשניתוח AI פועל, נשלחים רק טקסט התפריט, הגדרות הקטו ובקשה לפרט את רכיבי כל מנה — לעולם לא אילו הגבלות יש לך.",
   "chefCardTitle": "כרטיס השף שלך",
   "chefCardShowButton": "הצגת כרטיס השף שלי",
   "chefCardEmpty": "הוסיפו הגבלה בהגדרות וכרטיס השף יופיע כאן.",
@@ -765,5 +765,15 @@
   "restrictionOwnField": "מזון שיש להימנע ממנו",
   "restrictionOwnAdd": "הוספה",
   "restrictionOwnRowSubtitle": "משלך · נבדק בקפדנות",
-  "concernCertaintyHeadsUp": "ייתכן שיש בזה הרבה — התראה, לא מדידה"
+  "concernCertaintyHeadsUp": "ייתכן שיש בזה הרבה — התראה, לא מדידה",
+  "helperToolOk": "הבנתי",
+  "whyCoverageNameOnly": "בתפריט מופיע רק שם המנה.",
+  "whyCoverageDescription": "בתפריט מופיעים שם המנה ותיאור.",
+  "whyCoverageOptions": "בתפריט מופיעים שם המנה ואפשרויות בחירה.",
+  "whyCoverageFull": "בתפריט מופיעים שם המנה, תיאור ואפשרויות בחירה.",
+  "whyCoverageModelAndRules": "ה-AI פירט את הרכיבים, וגם הכללים קראו את טקסט התפריט.",
+  "whyCoverageRulesOnly": "רק הכללים קראו את טקסט התפריט, בלי רשימת רכיבים מ-AI. לשאול את המסעדה.",
+  "glp1TagProteinForward": "החלבון במרכז",
+  "glp1TagSmallPortion": "מנה קטנה",
+  "glp1TagSemanticLabel": "למנות קטנות: {tags}"
 }

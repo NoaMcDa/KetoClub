@@ -19,6 +19,7 @@ Future<FakeSettingsStore> _pump(
   FakeSettingsStore? store,
   bool directToGoogle = false,
   bool backendConfigured = false,
+  bool bantoMode = false,
 }) async {
   final backing = store ?? FakeSettingsStore();
   await tester.pumpWidget(
@@ -30,6 +31,7 @@ Future<FakeSettingsStore> _pump(
           settingsStore: backing,
           directToGoogle: directToGoogle,
           backendConfigured: backendConfigured,
+          bantoMode: bantoMode,
         ),
       ),
     ),
@@ -151,6 +153,99 @@ void main() {
       expect(stored.disclosureSeen, isTrue);
       expect(stored.estimationConsentGiven, isFalse);
       expect(find.text(_en.settingsConsentTitle), findsNothing);
+    });
+  });
+
+  group('ConsentDisclosureBanner in Banto (ALG-11, issue #353)', () {
+    testWidgets('adds what of the profile leaves the device to the text', (
+      tester,
+    ) async {
+      // Act
+      await _pump(tester, bantoMode: true);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(
+        find.text('${_en.settingsConsentBody}\n\n${_en.whatLeavesDeviceBanto}'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('shows once more to a user who saw only the keto text, '
+        'then records the copy version', (tester) async {
+      // Arrange
+      final store = FakeSettingsStore(
+        initial: const AppSettings(disclosureSeen: true),
+      );
+
+      // Act
+      await _pump(tester, store: store, bantoMode: true);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.consentDisclosureOk), findsOneWidget);
+
+      // Act
+      await tester.tap(find.text(_en.consentDisclosureOk));
+      await tester.pumpAndSettle();
+
+      // Assert
+      final saved = await store.read();
+      expect(saved.disclosureCopyVersion, bantoDisclosureCopyVersion);
+      expect(saved.estimationConsentGiven, isTrue);
+      expect(find.text(_en.consentDisclosureOk), findsNothing);
+    });
+
+    testWidgets('stays hidden once the Banto copy was acknowledged', (
+      tester,
+    ) async {
+      // Arrange
+      final store = FakeSettingsStore(
+        initial: const AppSettings(
+          disclosureSeen: true,
+          disclosureCopyVersion: bantoDisclosureCopyVersion,
+        ),
+      );
+
+      // Act
+      await _pump(tester, store: store, bantoMode: true);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_en.consentDisclosureOk), findsNothing);
+    });
+
+    testWidgets('"Turn off" records the version too', (tester) async {
+      // Arrange
+      final store = await _pump(tester, bantoMode: true);
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(find.text(_en.consentDisclosureTurnOff));
+      await tester.pumpAndSettle();
+
+      // Assert
+      final saved = await store.read();
+      expect(saved.estimationConsentGiven, isFalse);
+      expect(saved.disclosureSeen, isTrue);
+      expect(saved.disclosureCopyVersion, bantoDisclosureCopyVersion);
+    });
+
+    testWidgets('a keto build ignores the version and never writes it', (
+      tester,
+    ) async {
+      // Arrange
+      final store = await _pump(tester);
+      await tester.pumpAndSettle();
+
+      // Act
+      await tester.tap(find.text(_en.consentDisclosureOk));
+      await tester.pumpAndSettle();
+
+      // Assert
+      final saved = await store.read();
+      expect(saved.disclosureCopyVersion, 0);
+      expect(saved.toJson().containsKey('disclosureCopyVersion'), isFalse);
     });
   });
 }

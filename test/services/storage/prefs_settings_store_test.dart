@@ -525,6 +525,59 @@ void main() {
     });
   });
 
+  group('disclosureCopyVersion and helperToolSeen (ALG-11, issue #353)', () {
+    test('are written only when set, so a keto record is unchanged', () {
+      final unset = const AppSettings().toJson();
+      final set = const AppSettings(
+        disclosureCopyVersion: 1,
+        helperToolSeen: true,
+      ).toJson();
+
+      expect(unset.containsKey('disclosureCopyVersion'), isFalse);
+      expect(unset.containsKey('helperToolSeen'), isFalse);
+      expect(set['disclosureCopyVersion'], 1);
+      expect(set['helperToolSeen'], isTrue);
+    });
+
+    test('round-trip through toJson and tryFrom, and copyWith keeps them', () {
+      const settings = AppSettings(
+        disclosureCopyVersion: 2,
+        helperToolSeen: true,
+      );
+
+      expect(AppSettings.tryFrom(settings.toJson()), equals(settings));
+      expect(
+        settings.copyWith(filter: MenuFilter.redOnly).helperToolSeen,
+        isTrue,
+      );
+      expect(
+        settings.copyWith(disclosureCopyVersion: 3).disclosureCopyVersion,
+        3,
+      );
+      expect(settings, isNot(equals(const AppSettings())));
+      expect(settings.hashCode, isNot(equals(const AppSettings().hashCode)));
+      expect(settings.toString(), contains('disclosureCopyVersion: 2'));
+    });
+
+    test('a missing, negative or non-integer value reads as unset', () {
+      final base = const AppSettings().toJson();
+
+      expect(AppSettings.tryFrom(base)!.disclosureCopyVersion, 0);
+      expect(AppSettings.tryFrom(base)!.helperToolSeen, isFalse);
+      for (final raw in <Object?>[-1, '1', 1.5, null]) {
+        expect(
+          AppSettings.tryFrom(<String, Object?>{
+            ...base,
+            'disclosureCopyVersion': raw,
+            'helperToolSeen': 'yes',
+          }),
+          const AppSettings(),
+          reason: '$raw',
+        );
+      }
+    });
+  });
+
   group('PrefsSettingsStore dietary profile (ALG-02a, issue #344)', () {
     test('an install that stored settings before the profile existed reads '
         'an empty profile and keeps every other field', () async {

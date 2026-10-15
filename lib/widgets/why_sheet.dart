@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/concern.dart';
+import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
@@ -22,6 +24,72 @@ const Key whyFooterKey = ValueKey<String>('whyFooter');
 
 /// The key of the sheet's dish-name line (ALG-05's visual pass).
 const Key whyDishNameKey = ValueKey<String>('whyDishName');
+
+/// The key of the sheet's coverage note (ALG-06).
+const Key whyCoverageKey = ValueKey<String>('whyCoverage');
+
+/// What the result for one dish was read from (Banto, ALG-06, issue #348):
+/// whether the menu gave a description and options, and whether the
+/// model's ingredient list was there beside the rules, which read every
+/// dish's text on the device whatever else ran (ALG-04).
+@immutable
+final class WhyCoverage {
+  /// Creates a coverage note.
+  const new({
+    required this.hasDescription,
+    required this.hasOptions,
+    required this.modelIngredients,
+  });
+
+  /// The coverage of [dish] as [analysed] read it: the model's ingredient
+  /// list counts when it holds at least one ingredient, so a rules
+  /// analysis, a keto-only one and an empty extraction all read as the
+  /// rules alone.
+  factory of(Dish dish, AnalysedDish analysed) => WhyCoverage(
+    hasDescription: dish.description.trim().isNotEmpty,
+    hasOptions: dish.options.any((option) => option.values.isNotEmpty),
+    modelIngredients: analysed.ingredients.isNotEmpty,
+  );
+
+  /// Whether the menu gave the dish a description.
+  final bool hasDescription;
+
+  /// Whether the menu gave the dish options to choose from.
+  final bool hasOptions;
+
+  /// Whether the model listed the dish's ingredients.
+  final bool modelIngredients;
+
+  /// The line saying what the menu gave.
+  String menuLine(AppLocalizations l10n) =>
+      switch ((hasDescription, hasOptions)) {
+        (true, true) => l10n.whyCoverageFull,
+        (true, false) => l10n.whyCoverageDescription,
+        (false, true) => l10n.whyCoverageOptions,
+        (false, false) => l10n.whyCoverageNameOnly,
+      };
+
+  /// The line saying who read it; the rules alone end on "ask the
+  /// restaurant", the strictest wording (ALG-04's rules-only mode).
+  String readerLine(AppLocalizations l10n) => modelIngredients
+      ? l10n.whyCoverageModelAndRules
+      : l10n.whyCoverageRulesOnly;
+
+  @override
+  bool operator ==(Object other) =>
+      other is WhyCoverage &&
+      other.hasDescription == hasDescription &&
+      other.hasOptions == hasOptions &&
+      other.modelIngredients == modelIngredients;
+
+  @override
+  int get hashCode => Object.hash(hasDescription, hasOptions, modelIngredients);
+
+  @override
+  String toString() =>
+      'WhyCoverage(description: $hasDescription, options: $hasOptions, '
+      'model: $modelIngredients)';
+}
 
 /// The short phrase saying how [tier] is known, in words and never in a
 /// number: an invented percentage is what ALG-06 rules out.
@@ -78,6 +146,7 @@ Future<void> showWhySheet(
   required List<Concern> concerns,
   required bool strictProfile,
   List<Declaration> declarations = const <Declaration>[],
+  WhyCoverage? coverage,
   bool bantoMode = BantoMode.enabled,
 }) {
   if (!bantoMode) return Future<void>.value();
@@ -89,6 +158,7 @@ Future<void> showWhySheet(
       concerns: concerns,
       strictProfile: strictProfile,
       declarations: declarations,
+      coverage: coverage,
       bantoMode: bantoMode,
     ),
   );
@@ -107,6 +177,9 @@ Future<void> showWhySheet(
 /// who declared it, the platform or the restaurant, and quotes the
 /// declaration with the reminder that it never rules the finding out.
 ///
+/// A [coverage] note under the dish name says what the menu gave and who
+/// read it, the model and the rules or the rules alone (ALG-06).
+///
 /// With [bantoMode] off the widget builds nothing.
 class WhySheet extends StatelessWidget {
   /// Creates the sheet for [dishName] listing [concerns].
@@ -115,6 +188,7 @@ class WhySheet extends StatelessWidget {
     required this.concerns,
     required this.strictProfile,
     this.declarations = const <Declaration>[],
+    this.coverage,
     this.bantoMode = BantoMode.enabled,
     super.key,
   });
@@ -132,6 +206,9 @@ class WhySheet extends StatelessWidget {
   /// The declarations that lowered a concern (`EvaluatedDish.declarations`),
   /// quoted under each concern at [EvidenceTier.declared].
   final List<Declaration> declarations;
+
+  /// What the dish's result was read from, or null to say nothing.
+  final WhyCoverage? coverage;
 
   /// Whether this build shows Banto surfaces; the sheet is empty without.
   final bool bantoMode;
@@ -173,6 +250,16 @@ class WhySheet extends StatelessWidget {
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
+            if (coverage case final read?) ...[
+              const SizedBox(height: 8),
+              Text(
+                '${read.menuLine(l10n)} ${read.readerLine(l10n)}',
+                key: whyCoverageKey,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
             if (concerns.isEmpty)
               Text(

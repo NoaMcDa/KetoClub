@@ -187,8 +187,8 @@ class _KetoClubAppState extends State<KetoClubApp> {
 /// Public and separately tested, because a silently unmatched route would
 /// present as a blank screen.
 ///
-/// [bantoMode] reaches the two screens with Banto surfaces, Settings and
-/// the menu (D26's convention).
+/// [bantoMode] reaches the screens with Banto surfaces, Explore (its
+/// disclosure banner), Settings and the menu (D26's convention).
 Route<void>? generateRoute(
   RouteSettings settings,
   AppDependencies dependencies, {
@@ -220,6 +220,7 @@ Route<void>? generateRoute(
             settingsStore: dependencies.settingsStore,
             directToGoogle: dependencies.apiKeyStore != null,
             backendConfigured: dependencies.backendConfigured,
+            bantoMode: bantoMode,
           ),
         ),
       ),
@@ -240,6 +241,7 @@ Route<void>? generateRoute(
             pagesRegistry: dependencies.scannedPages,
             qrScanner: dependencies.qrScanner,
             scanBudget: dependencies.scanBudget,
+            bantoMode: bantoMode,
           ),
           child: ScanScreen(
             pagePicker: dependencies.pagePicker,
