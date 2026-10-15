@@ -248,6 +248,27 @@ const List<HiddenTrigger> _fishHiddenEn = <HiddenTrigger>[
     certainty: TriggerCertainty.suspected,
     source: '12 §5',
   ),
+  // Recall-gate additions (issue #352).
+  HiddenTrigger(
+    term: 'curry paste',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §8.1',
+  ),
+  HiddenTrigger(
+    term: 'massaman',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §8.1',
+  ),
+  HiddenTrigger(
+    term: 'tentsuyu',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §8.1',
+  ),
+  HiddenTrigger(
+    term: 'paella',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §9.2',
+  ),
 ];
 
 /// Hebrew hidden sources of fish (11 §8.1, §8.2, 12 §1.7).
@@ -302,6 +323,16 @@ const List<HiddenTrigger> _fishHiddenHe = <HiddenTrigger>[
     certainty: TriggerCertainty.suspected,
     source: '11 §8.2',
   ),
+  HiddenTrigger(
+    term: 'טנצוי',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §8.1',
+  ),
+  HiddenTrigger(
+    term: 'פאייה',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §9.2',
+  ),
 ];
 
 /// English hidden sources of crustaceans (11 §9.1, §9.2).
@@ -351,6 +382,11 @@ const List<HiddenTrigger> _crustaceansHiddenEn = <HiddenTrigger>[
     certainty: TriggerCertainty.suspected,
     source: '11 §9.2',
   ),
+  HiddenTrigger(
+    term: 'massaman',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §9.1',
+  ),
 ];
 
 /// Hebrew hidden sources of crustaceans (12 §1.7).
@@ -394,6 +430,26 @@ const List<HiddenTrigger> _molluscsHiddenEn = <HiddenTrigger>[
     certainty: TriggerCertainty.suspected,
     source: '11 §9.1',
   ),
+  HiddenTrigger(
+    term: 'stir fry sauce',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §10.2',
+  ),
+  HiddenTrigger(
+    term: 'garlic sauce',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §10.2',
+  ),
+  HiddenTrigger(
+    term: 'garlic chili sauce',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §10.2',
+  ),
+  HiddenTrigger(
+    term: 'garlic and chili sauce',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §10.2',
+  ),
 ];
 
 /// Hebrew hidden sources of molluscs (12 §1.7).
@@ -406,6 +462,11 @@ const List<HiddenTrigger> _molluscsHiddenHe = <HiddenTrigger>[
   HiddenTrigger(
     term: 'רוטב xo',
     certainty: TriggerCertainty.likely,
+    source: '12 §1.7',
+  ),
+  HiddenTrigger(
+    term: 'חריימה',
+    certainty: TriggerCertainty.suspected,
     source: '12 §1.7',
   ),
 ];

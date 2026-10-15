@@ -721,6 +721,28 @@ dairyEggsVocabulary = <RestrictionId, RestrictionVocabulary>{
         certainty: TriggerCertainty.suspected,
         source: '12 §2.1',
       ),
+      // Recall-gate additions (issue #352): enriched dough and
+      // substitute products (11 §3.2, 12 §2.1).
+      HiddenTrigger(
+        term: 'hot cross bun',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §3.2',
+      ),
+      HiddenTrigger(
+        term: 'hot cross buns',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §3.2',
+      ),
+      HiddenTrigger(
+        term: 'vegan mayo',
+        certainty: TriggerCertainty.suspected,
+        source: '12 §2.1',
+      ),
+      HiddenTrigger(
+        term: 'vegan mayonnaise',
+        certainty: TriggerCertainty.suspected,
+        source: '12 §2.1',
+      ),
     ],
     hiddenHe: <HiddenTrigger>[
       // "חלבי" is the dairy kosher category: it raises a milk flag (12
@@ -1141,6 +1163,36 @@ dairyEggsVocabulary = <RestrictionId, RestrictionVocabulary>{
       ),
       HiddenTrigger(
         term: 'תחליף גבינה',
+        certainty: TriggerCertainty.suspected,
+        source: '12 §2.1',
+      ),
+      HiddenTrigger(
+        term: 'רוגלך',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §3.2',
+      ),
+      HiddenTrigger(
+        term: 'לוביאני',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §3.2',
+      ),
+      HiddenTrigger(
+        term: 'כריך טונה',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §3.2',
+      ),
+      HiddenTrigger(
+        term: 'סלט טונה',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §3.2',
+      ),
+      HiddenTrigger(
+        term: 'טונה משומרת',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §3.2',
+      ),
+      HiddenTrigger(
+        term: 'מיונז טבעוני',
         certainty: TriggerCertainty.suspected,
         source: '12 §2.1',
       ),
@@ -2777,6 +2829,78 @@ dairyEggsVocabulary = <RestrictionId, RestrictionVocabulary>{
         certainty: TriggerCertainty.suspected,
         source: '11 §5.2',
       ),
+      // Recall-gate additions (issue #352): egg-bound doughs,
+      // wrappers and creamy dressings (11 §5.2).
+      HiddenTrigger(
+        term: 'coleslaw',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'spring roll',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'spring rolls',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'hot cross bun',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'hot cross buns',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'fettuccine',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'fettucine',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'tagliatelle',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'pappardelle',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'khachapuri',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'ranch',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'ranch dressing',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'blue cheese dressing',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'creamy dressing',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
     ],
     hiddenHe: <HiddenTrigger>[
       // Sabich, schnitzel and Israeli sauces and breads (12 §1.6).
@@ -3046,6 +3170,51 @@ dairyEggsVocabulary = <RestrictionId, RestrictionVocabulary>{
         term: 'אורז מטוגן',
         certainty: TriggerCertainty.suspected,
         source: '12 §5',
+      ),
+      HiddenTrigger(
+        term: 'גפילטע פיש',
+        certainty: TriggerCertainty.suspected,
+        source: '12 §1.6',
+      ),
+      HiddenTrigger(
+        term: 'קולסלו',
+        certainty: TriggerCertainty.suspected,
+        source: '12 §1.6',
+      ),
+      HiddenTrigger(
+        term: 'רוגלך',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'פטוצ׳יני',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'טליאטלה',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'חצ׳פורי',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'חינקלי',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'סמבוסק',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
+      ),
+      HiddenTrigger(
+        term: 'עוגיית',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §5.2',
       ),
     ],
     guards: AllergenGuards(

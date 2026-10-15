@@ -454,4 +454,90 @@ void main() {
       ]);
     });
   });
+
+  group('hidden sources added for the recall gate (issue #352)', () {
+    // Peanut: chili, where peanut butter thickens it (11 §1.2). Sesame: bread
+    // classes and Asian dishes (11 §11.2, 12 §1.1, 12 §5).
+    // Each term is suspected, in a plain sentence and behind a Hebrew prefix.
+    const peanutsEn = <String>[
+      'chili con carne',
+      'chilli con carne',
+      'texas chili',
+      'chili dog',
+      'chili cheese',
+    ];
+    const peanutsHe = <String>['צ׳ילי קון קרנה'];
+    const sesameEn = <String>[
+      'bread',
+      'roll',
+      'rolls',
+      'fried rice',
+      'fortune cookie',
+      'fortune cookies',
+      'kung pao',
+      'general tsos',
+      'dumpling',
+      'dumplings',
+      'cheeseburger',
+      'hamburger',
+      'focaccia',
+      'teriyaki',
+      'gyoza',
+      'udon',
+      'tempura roll',
+    ];
+    const sesameHe = <String>[
+      'לחם',
+      'לחמניית',
+      'פוקאצ׳ה',
+      'ג׳חנון',
+      'טריאקי',
+      'גיוזה',
+      'אודון',
+      'רול טמפורה',
+      'אורז מטוגן',
+    ];
+
+    test('peanuts: every English addition is suspected', () {
+      _expectAll(<_Case>[
+        for (final term in peanutsEn)
+          _case(RestrictionId.peanuts, 'Served with $term', _suspected, term),
+      ]);
+    });
+
+    test('peanuts: every Hebrew addition is suspected, with a prefix', () {
+      _expectAll(<_Case>[
+        for (final term in peanutsHe) ...<_Case>[
+          _case(RestrictionId.peanuts, 'מנה עם $term', _suspected, term),
+          _case(
+            RestrictionId.peanuts,
+            'מנה ב$term',
+            _suspected,
+            'prefix ב: $term',
+          ),
+        ],
+      ]);
+    });
+
+    test('sesame: every English addition is suspected', () {
+      _expectAll(<_Case>[
+        for (final term in sesameEn)
+          _case(RestrictionId.sesame, 'Served with $term', _suspected, term),
+      ]);
+    });
+
+    test('sesame: every Hebrew addition is suspected, with a prefix', () {
+      _expectAll(<_Case>[
+        for (final term in sesameHe) ...<_Case>[
+          _case(RestrictionId.sesame, 'מנה עם $term', _suspected, term),
+          _case(
+            RestrictionId.sesame,
+            'מנה ב$term',
+            _suspected,
+            'prefix ב: $term',
+          ),
+        ],
+      ]);
+    });
+  });
 }

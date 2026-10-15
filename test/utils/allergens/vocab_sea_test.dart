@@ -373,4 +373,43 @@ void main() {
       }
     });
   });
+
+  group('hidden sources added for the recall gate (issue #352)', () {
+    // Fish: curry pastes, tentsuyu, paella (11 §8.1, 11 §9.2). Crustaceans:
+    // massaman (11 §9.1). Molluscs: garlic and stir-fry sauces, chraime (11
+    // §10.2, 12 §1.7).
+    // Each term is suspected, in a plain sentence and behind a Hebrew prefix.
+    const cases = <_Hit>[
+      ('Served with curry paste', _fish, 'curry paste', _suspected),
+      ('Served with massaman', _fish, 'massaman', _suspected),
+      ('Served with tentsuyu', _fish, 'tentsuyu', _suspected),
+      ('Served with paella', _fish, 'paella', _suspected),
+      ('מנה עם טנצוי', _fish, 'טנצוי', _suspected),
+      ('מנה בטנצוי', _fish, 'טנצוי', _suspected),
+      ('מנה עם פאייה', _fish, 'פאייה', _suspected),
+      ('מנה בפאייה', _fish, 'פאייה', _suspected),
+      ('Served with massaman', _crust, 'massaman', _suspected),
+      ('Served with stir fry sauce', _moll, 'stir fry sauce', _suspected),
+      ('Served with garlic sauce', _moll, 'garlic sauce', _suspected),
+      (
+        'Served with garlic chili sauce',
+        _moll,
+        'garlic chili sauce',
+        _suspected,
+      ),
+      (
+        'Served with garlic and chili sauce',
+        _moll,
+        'garlic and chili sauce',
+        _suspected,
+      ),
+      ('מנה עם חריימה', _moll, 'חריימה', _suspected),
+      ('מנה בחריימה', _moll, 'חריימה', _suspected),
+    ];
+    for (final (text, id, term, certainty) in cases) {
+      test('$text gives ${id.name} "$term" (${certainty.name})', () {
+        expect(_certaintyOf(text, id, term), certainty);
+      });
+    }
+  });
 }

@@ -566,6 +566,63 @@ const List<HiddenTrigger> _wheatHiddenEn = <HiddenTrigger>[
     certainty: TriggerCertainty.suspected,
     source: '11 §7.1',
   ),
+  // Recall-gate additions (issue #352): sauces with flour or
+  // soy, roux-thickened and floured dishes (11 §7.2).
+  HiddenTrigger(
+    term: 'stir fry',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'oyster sauce',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'cream sauce',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'risotto',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'fried fish',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'baked potato',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'garlic sauce',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'garlic chili sauce',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'garlic and chili sauce',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'deep fried',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.4',
+  ),
+  HiddenTrigger(
+    term: 'sashimi',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §5',
+  ),
 ];
 
 /// Hebrew hidden sources of wheat (11 §7.1, §7.2, 12 §1.4). Shared by
@@ -781,6 +838,31 @@ const List<HiddenTrigger> _wheatHiddenHe = <HiddenTrigger>[
     certainty: TriggerCertainty.suspected,
     source: '11 §7.1',
   ),
+  HiddenTrigger(
+    term: 'רוטב צדפות',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'רוטב שמנת',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'ריזוטו',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'דג מטוגן',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'סשימי',
+    certainty: TriggerCertainty.suspected,
+    source: '12 §5',
+  ),
 ];
 
 /// English gluten cereals beyond wheat, and what is made of them
@@ -927,9 +1009,10 @@ const List<String> lupinDirectEn = <String>[
 /// Hebrew lupin triggers (11 §14.1, 12 §1.3); see [lupinDirectEn].
 const List<String> lupinDirectHe = <String>['תורמוס', 'לופין'];
 
-/// Gluten-free bakery, where lupin flour is a common substitute
-/// (11 §14.2, §14.5).
-const List<HiddenTrigger> _lupinHiddenEn = <HiddenTrigger>[
+/// Gluten-free bakery, where lupin flour is a common substitute, and the
+/// baked goods that carry it (11 §14.2, §14.5). Public because `legumes`
+/// (vocab_plants_additives.dart) spreads them: a lupin is a legume.
+const List<HiddenTrigger> lupinHiddenEn = <HiddenTrigger>[
   HiddenTrigger(
     term: 'gluten free bread',
     certainty: TriggerCertainty.suspected,
@@ -1000,10 +1083,37 @@ const List<HiddenTrigger> _lupinHiddenEn = <HiddenTrigger>[
     certainty: TriggerCertainty.suspected,
     source: '11 §14.2',
   ),
+  // Recall-gate additions (issue #352): the baked goods
+  // Anaphylaxis UK names for lupin flour (11 §14.2).
+  HiddenTrigger(
+    term: 'croissant',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §14.2',
+  ),
+  HiddenTrigger(
+    term: 'croissants',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §14.2',
+  ),
+  HiddenTrigger(
+    term: 'quiche',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §14.2',
+  ),
+  HiddenTrigger(
+    term: 'rolls',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §14.2',
+  ),
+  HiddenTrigger(
+    term: 'gluten free base',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §14.2',
+  ),
 ];
 
-/// Hebrew gluten-free bakery (11 §14.2).
-const List<HiddenTrigger> _lupinHiddenHe = <HiddenTrigger>[
+/// Hebrew gluten-free bakery (11 §14.2); see [lupinHiddenEn].
+const List<HiddenTrigger> lupinHiddenHe = <HiddenTrigger>[
   HiddenTrigger(
     term: 'לחם ללא גלוטן',
     certainty: TriggerCertainty.suspected,
@@ -1081,6 +1191,26 @@ const List<HiddenTrigger> _lupinHiddenHe = <HiddenTrigger>[
   ),
   HiddenTrigger(
     term: 'מאפים נטולי גלוטן',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §14.2',
+  ),
+  HiddenTrigger(
+    term: 'קרואסון',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §14.2',
+  ),
+  HiddenTrigger(
+    term: 'קיש',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §14.2',
+  ),
+  HiddenTrigger(
+    term: 'לחמניות',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §14.2',
+  ),
+  HiddenTrigger(
+    term: 'בסיס ללא גלוטן',
     certainty: TriggerCertainty.suspected,
     source: '11 §14.2',
   ),
@@ -1251,8 +1381,8 @@ const Map<RestrictionId, RestrictionVocabulary> glutenGrainsVocabulary =
       RestrictionId.lupin: RestrictionVocabulary(
         directEn: lupinDirectEn,
         directHe: lupinDirectHe,
-        hiddenEn: _lupinHiddenEn,
-        hiddenHe: _lupinHiddenHe,
+        hiddenEn: lupinHiddenEn,
+        hiddenHe: lupinHiddenHe,
         guards: AllergenGuards(
           beforeEn: <String>['no', 'without', 'free of', 'free from'],
           afterEn: <String>['free', 'lupin free'],

@@ -564,4 +564,94 @@ void main() {
       ]);
     });
   });
+
+  group('hidden sources added for the recall gate (issue #352)', () {
+    // Milk: enriched dough, canned tuna, substitute products (11 §3.2, 12
+    // §2.1). Eggs: egg-bound doughs, wrappers, creamy dressings (11 §5.2, 12
+    // §1.6).
+    // Each term is suspected, in a plain sentence and behind a Hebrew prefix.
+    const milkEn = <String>[
+      'hot cross bun',
+      'hot cross buns',
+      'vegan mayo',
+      'vegan mayonnaise',
+    ];
+    const milkHe = <String>[
+      'רוגלך',
+      'לוביאני',
+      'כריך טונה',
+      'סלט טונה',
+      'טונה משומרת',
+      'מיונז טבעוני',
+    ];
+    const eggsEn = <String>[
+      'coleslaw',
+      'spring roll',
+      'spring rolls',
+      'hot cross bun',
+      'hot cross buns',
+      'fettuccine',
+      'fettucine',
+      'tagliatelle',
+      'pappardelle',
+      'khachapuri',
+      'ranch',
+      'ranch dressing',
+      'blue cheese dressing',
+      'creamy dressing',
+    ];
+    const eggsHe = <String>[
+      'גפילטע פיש',
+      'קולסלו',
+      'רוגלך',
+      'פטוצ׳יני',
+      'טליאטלה',
+      'חצ׳פורי',
+      'חינקלי',
+      'סמבוסק',
+      'עוגיית',
+    ];
+
+    test('milk: every English addition is suspected', () {
+      _expectAll(<_Case>[
+        for (final term in milkEn)
+          _case(RestrictionId.milk, 'Served with $term', _suspected, term),
+      ]);
+    });
+
+    test('milk: every Hebrew addition is suspected, with a prefix', () {
+      _expectAll(<_Case>[
+        for (final term in milkHe) ...<_Case>[
+          _case(RestrictionId.milk, 'מנה עם $term', _suspected, term),
+          _case(
+            RestrictionId.milk,
+            'מנה ב$term',
+            _suspected,
+            'prefix ב: $term',
+          ),
+        ],
+      ]);
+    });
+
+    test('eggs: every English addition is suspected', () {
+      _expectAll(<_Case>[
+        for (final term in eggsEn)
+          _case(RestrictionId.eggs, 'Served with $term', _suspected, term),
+      ]);
+    });
+
+    test('eggs: every Hebrew addition is suspected, with a prefix', () {
+      _expectAll(<_Case>[
+        for (final term in eggsHe) ...<_Case>[
+          _case(RestrictionId.eggs, 'מנה עם $term', _suspected, term),
+          _case(
+            RestrictionId.eggs,
+            'מנה ב$term',
+            _suspected,
+            'prefix ב: $term',
+          ),
+        ],
+      ]);
+    });
+  });
 }

@@ -580,4 +580,61 @@ void main() {
       expect(_hits('סלט ירקות', _lupin), isEmpty);
     });
   });
+
+  group('hidden sources added for the recall gate (issue #352)', () {
+    // Wheat: sauces with flour or soy, roux dishes, deep-fried food (11 §7.2,
+    // 11 §7.4, 12 §5). Lupin: the baked goods Anaphylaxis UK names (11 §14.2).
+    // Each term is suspected, in a plain sentence and behind a Hebrew prefix.
+    const cases = <_Hit>[
+      ('Served with stir fry', _wheat, 'stir fry', _suspected),
+      ('Served with oyster sauce', _wheat, 'oyster sauce', _suspected),
+      ('Served with cream sauce', _wheat, 'cream sauce', _suspected),
+      ('Served with risotto', _wheat, 'risotto', _suspected),
+      ('Served with fried fish', _wheat, 'fried fish', _suspected),
+      ('Served with baked potato', _wheat, 'baked potato', _suspected),
+      ('Served with garlic sauce', _wheat, 'garlic sauce', _suspected),
+      (
+        'Served with garlic chili sauce',
+        _wheat,
+        'garlic chili sauce',
+        _suspected,
+      ),
+      (
+        'Served with garlic and chili sauce',
+        _wheat,
+        'garlic and chili sauce',
+        _suspected,
+      ),
+      ('Served with deep fried', _wheat, 'deep fried', _suspected),
+      ('Served with sashimi', _wheat, 'sashimi', _suspected),
+      ('מנה עם רוטב צדפות', _wheat, 'רוטב צדפות', _suspected),
+      ('מנה ברוטב צדפות', _wheat, 'רוטב צדפות', _suspected),
+      ('מנה עם רוטב שמנת', _wheat, 'רוטב שמנת', _suspected),
+      ('מנה ברוטב שמנת', _wheat, 'רוטב שמנת', _suspected),
+      ('מנה עם ריזוטו', _wheat, 'ריזוטו', _suspected),
+      ('מנה בריזוטו', _wheat, 'ריזוטו', _suspected),
+      ('מנה עם דג מטוגן', _wheat, 'דג מטוגן', _suspected),
+      ('מנה בדג מטוגן', _wheat, 'דג מטוגן', _suspected),
+      ('מנה עם סשימי', _wheat, 'סשימי', _suspected),
+      ('מנה בסשימי', _wheat, 'סשימי', _suspected),
+      ('Served with croissant', _lupin, 'croissant', _suspected),
+      ('Served with croissants', _lupin, 'croissants', _suspected),
+      ('Served with quiche', _lupin, 'quiche', _suspected),
+      ('Served with rolls', _lupin, 'rolls', _suspected),
+      ('Served with gluten free base', _lupin, 'gluten free base', _suspected),
+      ('מנה עם קרואסון', _lupin, 'קרואסון', _suspected),
+      ('מנה בקרואסון', _lupin, 'קרואסון', _suspected),
+      ('מנה עם קיש', _lupin, 'קיש', _suspected),
+      ('מנה בקיש', _lupin, 'קיש', _suspected),
+      ('מנה עם לחמניות', _lupin, 'לחמניות', _suspected),
+      ('מנה בלחמניות', _lupin, 'לחמניות', _suspected),
+      ('מנה עם בסיס ללא גלוטן', _lupin, 'בסיס ללא גלוטן', _suspected),
+      ('מנה בבסיס ללא גלוטן', _lupin, 'בסיס ללא גלוטן', _suspected),
+    ];
+    for (final (text, id, term, certainty) in cases) {
+      test('$text gives ${id.name} "$term" (${certainty.name})', () {
+        expect(_certaintyOf(text, id, term), certainty);
+      });
+    }
+  });
 }
