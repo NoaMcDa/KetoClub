@@ -97,21 +97,33 @@ abstract final class ChefCardText {
     return List<String>.unmodifiable(<String>[
       if (hebrew) _introHe else _introEn,
       for (final entry in headed) _entryLine(entry, hebrew: hebrew),
-      if (name.isNotEmpty)
-        (hebrew ? _dishLineHe : _dishLineEn).replaceAll('{dish}', name),
+      if (name.isNotEmpty) dishLine(name, hebrew: hebrew),
       if (modification != null)
         for (final line in modification.split('\n'))
           if (line.trim().isNotEmpty) line.trim(),
       for (final question in questions)
         if (question.trim().isNotEmpty) question.trim(),
-      switch ((hebrew, crossContact)) {
-        (false, true) => _closingStrictEn,
-        (false, false) => _closingEn,
-        (true, true) => _closingStrictHe,
-        (true, false) => _closingHe,
-      },
+      closingLine(crossContact: crossContact, hebrew: hebrew),
     ]);
   }
+
+  /// "The dish I would like: {dish}" in Hebrew when [hebrew], else
+  /// English, with [dishName] as the menu printed it (a dish card's one
+  /// naming line; also the group dish card's, ALG-12).
+  static String dishLine(String dishName, {required bool hebrew}) =>
+      (hebrew ? _dishLineHe : _dishLineEn).replaceAll('{dish}', dishName);
+
+  /// A dish card's last line: the request to confirm how cross-contact is
+  /// avoided when [crossContact], plain thanks otherwise.
+  static String closingLine({
+    required bool crossContact,
+    required bool hebrew,
+  }) => switch ((hebrew, crossContact)) {
+    (false, true) => _closingStrictEn,
+    (false, false) => _closingEn,
+    (true, true) => _closingStrictHe,
+    (true, false) => _closingHe,
+  };
 
   /// Whether any of [signals] threatens a strict entry of [profile] (an
   /// allergen or celiac disease): the condition for [composeForDish]'s

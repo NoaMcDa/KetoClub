@@ -10,6 +10,8 @@ import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/utils/allergens/chef_card_templates.dart';
 import 'package:ketoclub/utils/allergens/group_chef_card.dart';
+import 'package:ketoclub/utils/allergens/group_evaluator.dart';
+import 'package:ketoclub/utils/allergens/kitchen_reach.dart';
 import 'package:ketoclub/utils/allergens/kitchen_signals.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/widgets/group_chef_card_view.dart';
@@ -24,6 +26,8 @@ import 'package:ketoclub/widgets/waiter_script_widget.dart';
 /// cross-contact line when the [ChefCardScreen.menu]'s kitchen signals
 /// (ALG-07) threaten a strict entry ([ChefCardText.composeForDish]). A
 /// dish card opens in the menu's language; the profile card in the app's.
+/// With several [people] the card has one section per person, and a dish
+/// card holds each person's own questions and change in their section.
 ///
 /// Mirrors the Waiter Card's shell (`WaiterCardSheet`): the screen
 /// brightness is raised for as long as the card is open, the lines are the
@@ -53,12 +57,13 @@ class ChefCardScreen extends StatefulWidget {
   /// The restrictions the card states.
   final DietaryProfile profile;
 
-  /// With more than one person, and no [dish], the card is theirs instead
-  /// of [profile]'s: one section per person under their name (ALG-12,
-  /// issue #354; [GroupChefCardText]). A dish card takes precedence: it is
-  /// built from [profile] alone, which for a group is everyone's
-  /// restrictions combined; one section per person on a dish card is a
-  /// follow-up.
+  /// With more than one person the card is theirs instead of [profile]'s:
+  /// one section per person under their name (ALG-12, issue #354;
+  /// [GroupChefCardText]). With a [dish] and its analysis too, the dish's
+  /// name comes once before the sections, each person's section also holds
+  /// the change and the questions that apply to them for that dish, and
+  /// one closing ends it ([GroupChefCardText.composeForDish]). With one
+  /// person or none, the card is built from [profile] alone.
   final List<NamedProfile> people;
 
   /// The dish the card is about, or null for the profile-only card.
@@ -100,15 +105,32 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
   /// computed once: the menu does not change while the card is open.
   bool _crossContact = false;
 
+  /// What the menu's kitchen reaches, read once for a group dish card.
+  KitchenReach _reach = KitchenReach.empty;
+
+  /// The heading of the menu section holding the dish, for the
+  /// declarations the evaluator reads from it (ALG-09); null when unknown.
+  String? _heading;
+
+  bool get _isGroup => widget.people.length > 1;
+
   @override
   void initState() {
     super.initState();
     final menu = widget.menu;
     if (widget.dish != null && menu != null) {
-      _crossContact = ChefCardText.kitchenThreatensStrict(
-        KitchenSignals.of(menu),
-        widget.profile,
-      );
+      final signals = KitchenSignals.of(menu);
+      _crossContact = _isGroup
+          ? GroupChefCardText.kitchenThreatensStrict(signals, widget.people)
+          : ChefCardText.kitchenThreatensStrict(signals, widget.profile);
+      if (_isGroup) {
+        _reach = KitchenReach.of(menu);
+        for (final category in menu.categories) {
+          if (category.dishes.any((d) => d.id == widget.dish!.id)) {
+            _heading = category.name;
+          }
+        }
+      }
     }
     // Fire-and-forget: ScreenBrightness's contract never throws.
     unawaited(widget.screenBrightness.raise());
@@ -154,6 +176,38 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
     );
   }
 
+  /// The group card for the dish, in Hebrew when [hebrew]: each person is
+  /// evaluated on their own through the pipeline the menu screen uses
+  /// ([GroupEvaluator.evaluate]: the evaluator, then the kitchen), in the
+  /// card's language so the lines follow the toggle.
+  GroupChefCard _groupDishCard({required bool hebrew}) {
+    final dish = widget.dish!;
+    final group = GroupEvaluator.evaluate(
+      widget.analysed!,
+      dish,
+      widget.people,
+      hebrew: hebrew,
+      heading: _heading,
+      kitchen: _reach,
+    );
+    return GroupChefCardText.composeForDish(
+      <PersonDishPart>[
+        for (final result in group.people)
+          (
+            person: result.person,
+            modification: result.evaluated.modification,
+            questions: VerdictCopy.waiterQuestions(
+              result.evaluated,
+              hebrew: hebrew,
+            ),
+          ),
+      ],
+      dishName: dish.name,
+      crossContact: _crossContact,
+      hebrew: hebrew,
+    );
+  }
+
   Future<void> _share(AppLocalizations l10n, String text) async {
     await widget.menuSharer?.shareText(text, subject: l10n.chefCardTitle);
   }
@@ -163,13 +217,16 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final hebrew = _hebrew;
-    final lines = _lines(hebrew: hebrew);
-    // Precedence: the dish card (a dish and its analysis), then the group
-    // card (more than one person), then the profile card.
+    // Precedence: with more than one person the group card, for the dish
+    // when there is a dish and its analysis; otherwise the dish card for
+    // one profile, then the profile card.
     final isDishCard = widget.dish != null && widget.analysed != null;
-    final group = !isDishCard && widget.people.length > 1
-        ? GroupChefCardText.compose(widget.people, hebrew: hebrew)
-        : null;
+    final group = !_isGroup
+        ? null
+        : isDishCard
+        ? _groupDishCard(hebrew: hebrew)
+        : GroupChefCardText.compose(widget.people, hebrew: hebrew);
+    final lines = group == null ? _lines(hebrew: hebrew) : const <String>[];
     final text = group == null
         ? ChefCardText.asText(lines)
         : GroupChefCardText.asText(group);

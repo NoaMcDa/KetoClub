@@ -3667,6 +3667,25 @@ greeting, one closing). `ChefCardScreen` gives the per-dish card (ALG-08b)
 precedence over the group card; a dish card opened in a group is built from
 the union profile, and one section per person on it is a follow-up. Discovery's quick score is untouched.
 
+The per-dish group card is built (the follow-up above, issues #354 and
+#350): with more than one person checked and a dish with its analysis,
+`ChefCardScreen` composes `GroupChefCardText.composeForDish` instead of the
+union profile's card. One greeting; then "The dish we would like: {name}"
+once, so every question below reads after the dish is named; then a section
+per person under their name with their own restriction lines (their strict
+entries, or all of them when they hold none; keto for an empty profile),
+followed by the change and every question that apply to *them* for that
+dish; then one closing, the cross-contact request when a
+kitchen signal threatens a strict entry of anyone and thanks otherwise. A
+person the dish raises nothing for keeps their restriction lines and has no
+question under them, so the kitchen knows they are at the table. The
+per-person results come from `GroupEvaluator.evaluate`, the same pipeline the
+menu screen runs (evaluator with the section heading, then
+`applyKitchenSignals`), re-run in the card's language so the language toggle
+follows; the sentences' pure composer takes plain parts and imports no
+widget. With one person, or none, the dish card is the single-profile one
+as before.
+
 **Extended restrictions: alpha-gal, FODMAP, histamine, small portions and
 the user's own words (ALG-17, closes #359).** `RestrictionId` gains
 `alphaGal` (an allergen: strict), `fodmap` and `histamine` (intolerances),

@@ -9,6 +9,9 @@
 // spans the onboarding, Explore, the menu, the Waiter Card and the chef
 // card, which is why this is a flow and not a widget test.
 //
+// A second flow checks two people (sesame and keto): the dish card then has
+// a section each, with the question under the sesame person's.
+//
 // The whole app is pumped with `bantoMode: true`, so it runs under
 // `flutter test` with no `--dart-define`. The classifier answers every
 // dish green from the language model: the questions are filled on the
@@ -21,13 +24,17 @@ import 'package:ketoclub/app.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/chef_card_screen.dart';
 import 'package:ketoclub/screens/restriction_onboarding_screen.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
+import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/widgets/group_chef_card_view.dart';
 
 import 'flow_support.dart';
 
@@ -203,6 +210,77 @@ void main() {
       for (final text in texts) {
         expect(text, isNot(matches(_safe)), reason: text);
       }
+    });
+
+    testWidgets('two people checked: the dish card has a section each, the '
+        "question under the sesame person's, in Hebrew", (tester) async {
+      // Setup: me with sesame and Dana on keto, both combined.
+      final fakes = FakeAppDependencies();
+      fakes.repository.stub(_ref, MenuFetched(menu: _menu));
+      fakes.classifier.respondWith(_analysis);
+      await fakes.settingsStore.write(
+        AppSettings(
+          profile: DietaryProfile.empty.withEntry(RestrictionId.sesame),
+          otherProfiles: const <NamedProfile>[
+            NamedProfile(id: 'p1', name: 'Dana'),
+          ],
+          activeProfileIds: const <String>[NamedProfile.primaryId, 'p1'],
+        ),
+      );
+      await tester.pumpWidget(
+        KetoClubApp(dependencies: fakes.dependencies, bantoMode: true),
+      );
+      await tester.pumpAndSettle();
+
+      // Act: open the venue, the eggplant salad's Waiter Card, its chef
+      // card.
+      await enterText(tester, _woltUrl);
+      await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
+      await tester.scrollUntilVisible(
+        find.text(_en.dishCardAskQuestion),
+        200,
+        scrollable: _menuList,
+      );
+      await tester.pumpAndSettle();
+      await tapAndSettle(tester, find.text(_en.dishCardAskQuestion));
+      await tester.scrollUntilVisible(
+        find.text(_en.dishCardFullScreen),
+        200,
+        scrollable: _menuList,
+      );
+      await tester.pumpAndSettle();
+      await tapAndSettle(tester, find.text(_en.dishCardFullScreen));
+      await tester.ensureVisible(find.byKey(waiterCardChefCardKey));
+      await tester.pumpAndSettle();
+      await tapAndSettle(tester, find.byKey(waiterCardChefCardKey));
+
+      // Assert: one section per person; the question only under me.
+      final card = find.byType(ChefCardScreen);
+      expect(card, findsOneWidget);
+      Finder inSection(String heading, String text) => find.descendant(
+        of: find.byKey(groupChefCardSectionKey(heading)),
+        matching: find.text(text),
+      );
+      expect(inSection('אני', _sesameLine), findsOneWidget);
+      expect(inSection('אני', _question), findsOneWidget);
+      expect(inSection('Dana', _question), findsNothing);
+      expect(
+        find.descendant(
+          of: card,
+          matching: find.text('המנה שאנחנו רוצים להזמין: סלט חצילים'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: card,
+          matching: find.text(
+            'אשמח שתבררו עם המטבח איך נמנע מגע צולב '
+            '(משטחים, שמן וכלים משותפים). תודה.',
+          ),
+        ),
+        findsOneWidget,
+      );
     });
   });
 }
