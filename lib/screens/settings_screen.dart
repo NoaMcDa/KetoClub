@@ -20,8 +20,13 @@ import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/widgets/content_width.dart';
+import 'package:ketoclub/widgets/helper_tool_sheet.dart';
 import 'package:ketoclub/widgets/restriction_picker_sheet.dart';
 import 'package:provider/provider.dart';
+
+/// The consent section's Banto note on what of the profile leaves the
+/// device (ALG-11, issue #353), present only with `bantoMode` on.
+const Key consentBantoNoteKey = Key('settingsConsentBantoNote');
 
 /// The "Show my chef card" button in the "My restrictions" section (Banto,
 /// ALG-08a, issue #350), present only for a non-empty profile.
@@ -326,7 +331,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               collapsedShape: const Border(),
               leading: const Icon(Icons.privacy_tip_outlined),
               title: Text(l10n.settingsAboutPrivacy),
-              children: [_GroupNote(_consentBody(l10n, controller))],
+              children: [
+                _GroupNote(_consentBody(l10n, controller)),
+                if (widget.bantoMode) _GroupNote(l10n.whatLeavesDeviceBanto),
+              ],
             ),
             ListTile(
               key: aboutReportKey,
@@ -398,7 +406,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 l10n.settingsConsentTitle,
                 style: Theme.of(context).textTheme.titleSmall,
               ),
-              children: [_GroupNote(_consentBody(l10n, controller))],
+              children: [
+                _GroupNote(_consentBody(l10n, controller)),
+                // What of the profile leaves the device: nothing but the
+                // flag that asks for ingredients (D26 C1, ALG-11).
+                if (widget.bantoMode)
+                  _GroupNote(
+                    l10n.whatLeavesDeviceBanto,
+                    key: consentBantoNoteKey,
+                  ),
+              ],
             ),
             CheckboxListTile(
               controlAffinity: ListTileControlAffinity.leading,
@@ -851,6 +868,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } else if (id != null) {
       await controller.addRestriction(id);
     }
+    // The first restriction of any kind brings the helper-tool sheet, once
+    // (ALG-11): marked before it opens, so a swipe away counts as seen.
+    if (controller.helperToolSeen || controller.profile.isEmpty) return;
+    await controller.markHelperToolSeen();
+    if (!context.mounted) return;
+    await showHelperToolSheet(context, bantoMode: widget.bantoMode);
   }
 
   /// The "Your keto rules" section (issue #56, `.design/Settings.dc.html`):
@@ -1192,7 +1215,7 @@ class _SettingsGroup extends StatelessWidget {
 /// A section's explanatory line inside its group, in the artboard's
 /// muted hint style (13px `--ink2`).
 class _GroupNote extends StatelessWidget {
-  const new(this.text);
+  const new(this.text, {super.key});
 
   /// The explanation.
   final String text;

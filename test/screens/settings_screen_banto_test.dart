@@ -18,6 +18,7 @@ import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 import 'package:ketoclub/state/theme_mode_controller.dart';
 import 'package:ketoclub/utils/allergens/chef_card_templates.dart';
+import 'package:ketoclub/widgets/helper_tool_sheet.dart';
 import 'package:ketoclub/widgets/restriction_picker_sheet.dart';
 import 'package:provider/provider.dart';
 
@@ -74,14 +75,29 @@ Future<void> _openPicker(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-/// Opens the picker and taps [id]'s row.
-Future<void> _pick(WidgetTester tester, RestrictionId id) async {
+/// Closes the helper-tool sheet a first restriction brings (ALG-11), when
+/// it is open.
+Future<void> _dismissHelper(WidgetTester tester) async {
+  final ok = find.byKey(helperToolOkKey);
+  if (ok.evaluate().isEmpty) return;
+  await tester.tap(ok);
+  await tester.pumpAndSettle();
+}
+
+/// Opens the picker and taps [id]'s row, closing the helper-tool sheet
+/// unless [keepHelper].
+Future<void> _pick(
+  WidgetTester tester,
+  RestrictionId id, {
+  bool keepHelper = false,
+}) async {
   await _openPicker(tester);
   final option = find.byKey(restrictionOptionKey(id));
   await tester.ensureVisible(option);
   await tester.pumpAndSettle();
   await tester.tap(option);
   await tester.pumpAndSettle();
+  if (!keepHelper) await _dismissHelper(tester);
 }
 
 double _top(WidgetTester tester, Finder finder) => tester.getTopLeft(finder).dy;
@@ -461,6 +477,7 @@ void main() {
       await tester.enterText(field, word);
       await tester.tap(find.byKey(restrictionOwnAddKey));
       await tester.pumpAndSettle();
+      await _dismissHelper(tester);
     }
 
     testWidgets('adding a word shows its own row and stores it', (
@@ -551,6 +568,79 @@ void main() {
       // Assert
       expect(find.text(_he.restrictionOwnTitle), findsOneWidget);
       expect(find.text(_he.restrictionOwnField), findsOneWidget);
+    });
+  });
+
+  group('SettingsScreen helper tool and disclosure (ALG-11)', () {
+    testWidgets('the first restriction brings the helper-tool sheet once', (
+      tester,
+    ) async {
+      // Arrange
+      final store = FakeSettingsStore();
+      await _pump(tester, store, bantoMode: true);
+
+      // Act
+      await _pick(tester, RestrictionId.sesame, keepHelper: true);
+
+      // Assert
+      expect(find.byKey(helperToolSheetKey), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(helperToolSheetKey),
+          matching: find.text(_en.helperToolTitle),
+        ),
+        findsOneWidget,
+      );
+      expect((await store.read()).helperToolSeen, isTrue);
+
+      // Act: close it and add a second restriction.
+      await _dismissHelper(tester);
+      await _pick(tester, RestrictionId.milk, keepHelper: true);
+
+      // Assert: never again, and the sentence heads the section.
+      expect(find.byKey(helperToolSheetKey), findsNothing);
+      expect(find.text(_en.helperToolSentence), findsOneWidget);
+    });
+
+    testWidgets('no sheet when it was already shown', (tester) async {
+      // Arrange
+      final store = FakeSettingsStore(
+        initial: const AppSettings(helperToolSeen: true),
+      );
+      await _pump(tester, store, bantoMode: true);
+
+      // Act
+      await _pick(tester, RestrictionId.sesame, keepHelper: true);
+
+      // Assert
+      expect(find.byKey(helperToolSheetKey), findsNothing);
+    });
+
+    testWidgets('the privacy text says what of the profile leaves the '
+        'device, only with bantoMode on', (tester) async {
+      // Arrange
+      await _pump(tester, FakeSettingsStore(), bantoMode: true);
+
+      // Assert
+      expect(
+        find.byKey(consentBantoNoteKey, skipOffstage: false),
+        findsNothing,
+      );
+      await tester.ensureVisible(find.byKey(consentDisclosureKey));
+      await tester.tap(find.byKey(consentDisclosureKey));
+      await tester.pumpAndSettle();
+      expect(find.byKey(consentBantoNoteKey), findsOneWidget);
+      expect(find.text(_en.whatLeavesDeviceBanto), findsOneWidget);
+
+      // Act
+      await _pump(tester, FakeSettingsStore(), bantoMode: false);
+      await tester.ensureVisible(find.byKey(consentDisclosureKey));
+      await tester.tap(find.byKey(consentDisclosureKey));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byKey(consentBantoNoteKey), findsNothing);
+      expect(find.text(_en.whatLeavesDeviceBanto), findsNothing);
     });
   });
 }

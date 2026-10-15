@@ -10,6 +10,7 @@ import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/consent_disclosure_banner.dart';
@@ -84,6 +85,7 @@ class VenueSearchScreen extends StatefulWidget {
     this.directToGoogle = false,
     this.backendConfigured = false,
     this.autofocusSearch,
+    this.bantoMode = BantoMode.enabled,
     super.key,
   });
 
@@ -121,6 +123,11 @@ class VenueSearchScreen extends StatefulWidget {
   /// not have its keyboard pop up unasked. A test passes an explicit value
   /// to exercise either branch without `kIsWeb`.
   final bool? autofocusSearch;
+
+  /// Whether this build shows Banto surfaces (D26's convention): the
+  /// disclosure banner then says what of the profile leaves the device
+  /// and is shown once more for that copy (ALG-11).
+  final bool bantoMode;
 
   @override
   State<VenueSearchScreen> createState() => _VenueSearchScreenState();
@@ -236,6 +243,7 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
                   settingsStore: widget.settingsStore,
                   directToGoogle: widget.directToGoogle,
                   backendConfigured: widget.backendConfigured,
+                  bantoMode: widget.bantoMode,
                 ),
                 _header(context, l10n, controller),
                 const SizedBox(height: 12),

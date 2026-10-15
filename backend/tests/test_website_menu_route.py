@@ -21,6 +21,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import Settings
+from app.keto import prompt
 from app.keto.models import Menu, to_json
 from app.keto.vocabulary import vocabulary
 from app.main import create_app
@@ -822,3 +823,39 @@ def test_the_options_come_back_on_the_analysis(
 
     assert response.status_code == 200
     assert response.json()["analysis"]["options"] == options
+
+
+def test_a_website_menu_with_the_flag_extracts_ingredients(
+    app_client: TestClient, web: respx.MockRouter
+) -> None:
+    """``restrictionsRequested`` on ``/v1/website-menu`` (ALG-03, D26 C2):
+    the extraction section and schema are sent, the analysis records the
+    flag, and a keto request for the same site is a separate cache entry."""
+    web.get(_HOME).mock(return_value=_html(_page("jsonld_menu.html")))
+    entry = golden_entry("website.json", "jsonld_menu.html")
+    menu = Menu.model_validate(
+        {
+            "venueRef": {"source": "website", "platformId": _SITE},
+            "currency": "ILS",
+            "fetchedAt": "2026-01-01T00:00:00.000Z",
+            "categories": entry["located"]["categories"],
+        }
+    )
+    gemini = web.post(GEMINI_URL).respond(
+        200, json=gemini_answer(all_green_reply(menu))
+    )
+    extracting = {**_OPTIONS, "restrictionsRequested": True}
+
+    keto = _post(app_client)
+    first = _post(app_client, options=extracting)
+
+    assert first.status_code == 200
+    assert keto.headers["X-KetoClub-Cache"] == "miss"
+    assert first.headers["X-KetoClub-Cache"] == "miss"
+    assert gemini.call_count == 2
+    assert first.json()["analysis"]["options"] == extracting
+    sent = json.loads(gemini.calls.last.request.content)
+    system = sent["system_instruction"]["parts"][0]["text"]
+    assert system.endswith(prompt.EXTRACTION_SECTION)
+    items = sent["generationConfig"]["responseSchema"]["properties"]["dishes"]
+    assert "ingredients" in items["items"]["properties"]

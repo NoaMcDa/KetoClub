@@ -158,6 +158,9 @@ class _RestrictionOnboardingScreenState
       for (final id in _chosen) {
         await controller.addRestriction(id);
       }
+      // This screen carries the helper-tool sentence itself, so the sheet
+      // Settings shows on a first restriction is not shown again (ALG-11).
+      if (_chosen.isNotEmpty) await controller.markHelperToolSeen();
     }
     await controller.markOnboardingSeen();
     if (mounted) widget.onFinished();

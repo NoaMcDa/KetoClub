@@ -89,8 +89,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > skipped when the analysis came with the fetch. With no URL the app is exactly
 > the pre-D25 graph. D25 amends D2, D11, D15, D17, D19 and D24.
 >
-> Banto: every new surface sits behind `--dart-define=BANTO_MODE=true`
-> (`lib/utils/banto_mode.dart`); without it the app is KetoClub byte for byte.
+> **Banto (D26, the Allergens epic #342)** turns the keto engine into one for a
+> profile of dietary restrictions. Every new surface sits behind
+> `--dart-define=BANTO_MODE=true` (`lib/utils/banto_mode.dart`); without it the
+> app is KetoClub byte for byte (`keto_unchanged_test`). Built: the taxonomy and
+> bilingual allergen vocabulary with a rules-recall gate (ALG-01, ALG-10), the
+> on-device profile and onboarding (ALG-02), profile-independent ingredient
+> extraction (ALG-03), the rules pass and `ProfileEvaluator` (ALG-04), the
+> four-state menu (fits / with a change / ask / avoid; ALG-05), evidence tiers
+> and the Why sheet (ALG-06), kitchen signals (ALG-07), chef cards and the
+> allergy note (ALG-08, ALG-15), platform declarations (ALG-09), the privacy
+> and helper-tool copy (ALG-11), group profiles (ALG-12) and the extended
+> restrictions (ALG-17). The profile never leaves the device (C1).
 >
 > **Read `architecture.md` first — it is authoritative.** This file and `README.md`
 > predate the code in places; where any of them disagrees with `architecture.md`,
@@ -425,6 +435,30 @@ The long form is in `HANDOFF.md`; these are the ones that bite while writing cod
   the backend would classify every Discovery card on the server.
 - **Serialise test runs when several agents share a worktree:**
   `flock /tmp/ketoclub.lock -c 'flutter test …'`.
+- **Banto: rules outrank the model only for strict entries, and never for
+  keto (D26, ALG-04).** `ProfileEvaluator` recomputes the rule findings from
+  the dish on the device and unions them with the model's extraction: a model
+  result can add or raise a concern, never remove one. Only a strict entry
+  (an allergen, celiac, the user's own words) turns a suspected finding into
+  "ask" or takes a kitchen-signal demotion; a flexible one lists it. The
+  wire's keto verdict stays the model's and is never rewritten.
+- **Banto: no "safe" for a strict entry.** No string says "safe" or "בטוח"
+  for a profile with an allergen or celiac entry; the strongest is "No
+  trigger found — ask the restaurant" ("ללא חשש" on the tile and header).
+  `test/l10n/banned_words_test.dart` and the state-copy sweep fail the build.
+  There are no severity levels to vary it.
+- **Banto: a profile never enters a request body (C1).** An analysis
+  request carries only `restrictionsRequested: true` — no restriction id,
+  exception or user word. `no_profile_on_the_wire_test` keeps the tokens out
+  of `lib/services/` (allowlisted: `settings_store.dart`, and
+  `confirmation_client.dart`, whose one confirmed fact names a single
+  restriction id, ALG-14) and the backend answers 422 to a body carrying a
+  profile.
+- **Banto: pass the screen's `bantoMode` down.** Gated code takes `bool
+  bantoMode = BantoMode.enabled`, which is false under plain `flutter test`;
+  anything that builds `ClassificationOptions` must pass the screen's flag
+  (`MenuController._optionsFrom`, `ScanController`), or a Banto test silently
+  classifies keto-only.
 
 ## Implementation notes — how it actually works
 

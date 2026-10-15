@@ -3,7 +3,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/widgets/app_notice.dart';
+
+/// The version of the Banto build's disclosure copy (ALG-11, issue #353):
+/// the keto text plus what of the restriction profile leaves the device.
+/// A Banto build shows the banner once more to anyone whose
+/// [AppSettings.disclosureCopyVersion] is below it, so a user who
+/// acknowledged the keto text reads the new one once. Raise it whenever
+/// the Banto disclosure copy changes in substance.
+const int bantoDisclosureCopyVersion = 1;
 
 /// The first-launch AI-analysis disclosure banner (D16, issue #167),
 /// shown on Explore only while the [SettingsStore]'s
@@ -29,12 +38,21 @@ import 'package:ketoclub/widgets/app_notice.dart';
 /// text goes straight to Google with the user's own key (D17), on web
 /// through KetoClub's server (D12) — the same choice the Settings
 /// consent section makes from `SettingsController.supportsApiKey`.
+///
+/// With [bantoMode] on (ALG-11) the text adds what of the restriction
+/// profile leaves the device (nothing but the request for ingredients,
+/// D26 C1), and the banner shows while
+/// [AppSettings.disclosureCopyVersion] is below
+/// [bantoDisclosureCopyVersion] even when the keto text was seen; either
+/// button records that version. With it off the banner is exactly the keto
+/// one and never writes the version.
 class ConsentDisclosureBanner extends StatefulWidget {
   /// Creates a banner over [settingsStore].
   const new({
     required this.settingsStore,
     this.directToGoogle = false,
     this.backendConfigured = false,
+    this.bantoMode = BantoMode.enabled,
     super.key,
   });
 
@@ -49,6 +67,9 @@ class ConsentDisclosureBanner extends StatefulWidget {
   /// makes the text say dish text goes to the server first and the user's
   /// own key is only the fallback.
   final bool backendConfigured;
+
+  /// Whether this build shows Banto surfaces (D26's convention).
+  final bool bantoMode;
 
   @override
   State<ConsentDisclosureBanner> createState() =>
@@ -79,12 +100,24 @@ class _ConsentDisclosureBannerState extends State<ConsentDisclosureBanner> {
   }
 
   Future<void> _acknowledge() =>
-      _persist((current) => current.copyWith(disclosureSeen: true));
+      _persist((current) => _seen(current.copyWith(disclosureSeen: true)));
 
   Future<void> _turnOff() => _persist(
-    (current) =>
-        current.copyWith(estimationConsentGiven: false, disclosureSeen: true),
+    (current) => _seen(
+      current.copyWith(estimationConsentGiven: false, disclosureSeen: true),
+    ),
   );
+
+  /// [settings] with the Banto copy version recorded, in a Banto build.
+  AppSettings _seen(AppSettings settings) => widget.bantoMode
+      ? settings.copyWith(disclosureCopyVersion: bantoDisclosureCopyVersion)
+      : settings;
+
+  /// Whether [settings] still owes the user a read of this build's text.
+  bool _unseen(AppSettings settings) =>
+      !settings.disclosureSeen ||
+      (widget.bantoMode &&
+          settings.disclosureCopyVersion < bantoDisclosureCopyVersion);
 
   Future<void> _persist(AppSettings Function(AppSettings) mutation) async {
     final current = _settings;
@@ -100,16 +133,18 @@ class _ConsentDisclosureBannerState extends State<ConsentDisclosureBanner> {
   }
 
   String _message(AppLocalizations l10n) {
-    if (!widget.directToGoogle) return l10n.settingsConsentBody;
-    return widget.backendConfigured
+    final keto = !widget.directToGoogle
+        ? l10n.settingsConsentBody
+        : widget.backendConfigured
         ? l10n.settingsConsentBodyDirectViaBackend
         : l10n.settingsConsentBodyDirect;
+    return widget.bantoMode ? '$keto\n\n${l10n.whatLeavesDeviceBanto}' : keto;
   }
 
   @override
   Widget build(BuildContext context) {
     final settings = _settings;
-    if (settings == null || settings.disclosureSeen) {
+    if (settings == null || !_unseen(settings)) {
       return const SizedBox.shrink();
     }
     final l10n = AppLocalizations.of(context)!;

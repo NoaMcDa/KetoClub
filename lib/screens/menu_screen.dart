@@ -10,6 +10,7 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/chef_card_screen.dart';
@@ -1532,6 +1533,8 @@ class _MenuScreenState extends State<MenuScreen> {
             holdsKeto: controller.holdsKeto,
             bantoMode: widget.bantoMode,
             groupBreakdown: groupBreakdownFor(controller, row.dish.id),
+            // The GLP-1 tag (ALG-17), for a profile holding small portions.
+            smallPortions: controller.profile.contains(RestrictionId.glp1),
             // A pasted menu has no prices, and a website's are unverified
             // (D18, D19): neither shows one.
             showPrice:

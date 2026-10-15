@@ -2279,7 +2279,7 @@ abstract class AppLocalizations {
   /// Plain statement of what leaves the device once restriction profiles exist; the profile never does.
   ///
   /// In en, this message translates to:
-  /// **'Your restriction profile stays on this device. When AI analysis is on, only the menu text and the keto settings are sent — never which restrictions you have.'**
+  /// **'Your restriction profile and your own words stay on this device. When AI analysis is on, only the menu text, your keto settings and a request to list each dish\'s ingredients are sent — never which restrictions you have.'**
   String get whatLeavesDeviceBanto;
 
   /// Banto (ALG-08a): title of the full-screen chef card built from the dietary profile alone.
@@ -3149,6 +3149,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'may be high in it — a heads-up, not a measurement'**
   String get concernCertaintyHeadsUp;
+
+  /// Banto (ALG-11): closes the helper-tool sheet shown once when the first restriction is added.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get helperToolOk;
+
+  /// Banto (ALG-06): the Why sheet's coverage line when the dish has no description and no options.
+  ///
+  /// In en, this message translates to:
+  /// **'The menu gives only the dish\'s name.'**
+  String get whyCoverageNameOnly;
+
+  /// Banto (ALG-06): coverage line, description but no options.
+  ///
+  /// In en, this message translates to:
+  /// **'The menu gives the name and a description.'**
+  String get whyCoverageDescription;
+
+  /// Banto (ALG-06): coverage line, options but no description.
+  ///
+  /// In en, this message translates to:
+  /// **'The menu gives the name and options.'**
+  String get whyCoverageOptions;
+
+  /// Banto (ALG-06): coverage line, description and options.
+  ///
+  /// In en, this message translates to:
+  /// **'The menu gives the name, a description and options.'**
+  String get whyCoverageFull;
+
+  /// Banto (ALG-06): who read the dish when the model's ingredient list is present. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'AI listed its ingredients, and the rules read the menu text too.'**
+  String get whyCoverageModelAndRules;
+
+  /// Banto (ALG-04, ALG-06): who read the dish when no model ingredient list exists; the strictest wording. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the rules read the menu text, with no AI ingredient list. Ask the restaurant.'**
+  String get whyCoverageRulesOnly;
+
+  /// Banto (ALG-17): the GLP-1 tag part for a dish built around its protein. A tag, never a colour, a state or a number.
+  ///
+  /// In en, this message translates to:
+  /// **'Protein-forward'**
+  String get glp1TagProteinForward;
+
+  /// Banto (ALG-17): the GLP-1 tag part for a dish the menu calls small, a starter or a half portion.
+  ///
+  /// In en, this message translates to:
+  /// **'Small portion'**
+  String get glp1TagSmallPortion;
+
+  /// Banto (ALG-17): screen-reader label of the GLP-1 tag.
+  ///
+  /// In en, this message translates to:
+  /// **'For small portions: {tags}'**
+  String glp1TagSemanticLabel(String tags);
 
   /// Banto (ALG-13): heading of the Settings section that sets a travel destination.
   ///

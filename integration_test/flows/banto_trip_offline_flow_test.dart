@@ -199,6 +199,7 @@ void main() {
       fakes.classifier.optionCalls.single,
       ClassificationOptions.fromSettings(
         stored.copyWith(tripDestination: null),
+        bantoMode: true,
       ),
     );
 
