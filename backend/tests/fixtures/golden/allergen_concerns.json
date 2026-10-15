@@ -1101,6 +1101,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "satay",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Peanut",
           "restrictionId": "legumes",
@@ -1160,11 +1168,19 @@
           "waiterQuestion": null
         },
         {
-          "certainty": "stated",
+          "certainty": "suspected",
+          "matchedText": "satay",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
           "matchedText": "satay",
           "restrictionId": "legumes",
-          "source": "name",
-          "tier": "stated",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -1197,6 +1213,14 @@
     {
       "concerns": [
         {
+          "certainty": "suspected",
+          "matchedText": "Bread",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Bread",
           "restrictionId": "wheat",
@@ -1218,6 +1242,22 @@
           "restrictionId": "fish",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Bread",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Bread",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -1280,6 +1320,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "Bread",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Bread",
           "restrictionId": "wheat",
@@ -1293,6 +1341,22 @@
           "restrictionId": "gluten",
           "source": "option",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Bread",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Bread",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -1433,6 +1497,14 @@
           "certainty": "suspected",
           "matchedText": "Pad Thai",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Pad Thai",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -1587,10 +1659,18 @@
           "waiterQuestion": null
         },
         {
-          "certainty": "stated",
+          "certainty": "suspected",
           "matchedText": "Satay",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "peanut",
           "restrictionId": "legumes",
-          "source": "name",
+          "source": "description",
           "tier": "stated",
           "waiterQuestion": null
         },
@@ -1654,11 +1734,19 @@
           "waiterQuestion": null
         },
         {
-          "certainty": "stated",
+          "certainty": "suspected",
+          "matchedText": "Satay",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
           "matchedText": "Satay",
           "restrictionId": "legumes",
-          "source": "name",
-          "tier": "stated",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -1741,6 +1829,14 @@
         {
           "certainty": "suspected",
           "matchedText": "curry paste",
+          "restrictionId": "fish",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "curry paste",
           "restrictionId": "crustaceans",
           "source": "hidden",
           "tier": "inferred",
@@ -1750,6 +1846,14 @@
           "certainty": "suspected",
           "matchedText": "Curry",
           "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Curry",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -1806,6 +1910,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "Curry",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Chicken",
           "restrictionId": "vegan",
@@ -1840,6 +1952,14 @@
         {
           "certainty": "suspected",
           "matchedText": "curry paste",
+          "restrictionId": "fish",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "curry paste",
           "restrictionId": "crustaceans",
           "source": "hidden",
           "tier": "inferred",
@@ -1857,6 +1977,14 @@
           "certainty": "suspected",
           "matchedText": "curry paste",
           "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "curry",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -1902,6 +2030,22 @@
           "certainty": "suspected",
           "matchedText": "Curry",
           "restrictionId": "treeNuts",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Massaman",
+          "restrictionId": "fish",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Massaman",
+          "restrictionId": "crustaceans",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -1959,6 +2103,30 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "Massaman",
+          "restrictionId": "fish",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Massaman",
+          "restrictionId": "crustaceans",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Massaman",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "Curry",
           "restrictionId": "peanuts",
           "source": "hidden",
@@ -1977,6 +2145,14 @@
           "certainty": "suspected",
           "matchedText": "Curry",
           "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Curry",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -2023,6 +2199,30 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "massaman",
+          "restrictionId": "fish",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "massaman",
+          "restrictionId": "crustaceans",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "massaman",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "curry",
           "restrictionId": "peanuts",
           "source": "hidden",
@@ -2041,6 +2241,14 @@
           "certainty": "suspected",
           "matchedText": "curry",
           "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "curry",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -2219,6 +2427,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "Spring Rolls",
+          "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Spring Rolls",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "noodle",
           "restrictionId": "wheat",
@@ -2232,6 +2456,30 @@
           "restrictionId": "gluten",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Rolls",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Rolls",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Spring Rolls",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -2255,6 +2503,38 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "Spring Rolls",
+          "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Spring Rolls",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Spring Rolls",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Rolls",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "Rolls",
           "restrictionId": "wheat",
           "source": "hidden",
@@ -2270,6 +2550,38 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "Rolls",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Rolls",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Rolls",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "rolls",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "rolls",
           "restrictionId": "wheat",
@@ -2281,6 +2593,30 @@
           "certainty": "likely",
           "matchedText": "rolls",
           "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "rolls",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "rolls",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "rolls",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -2308,6 +2644,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "chili sauce",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "name": "asian_takeaway_soy_peanut/5"
@@ -2331,6 +2675,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "Rolls",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "Egg Rolls",
           "restrictionId": "wheat",
@@ -2342,6 +2694,30 @@
           "certainty": "likely",
           "matchedText": "Egg Rolls",
           "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Rolls",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Rolls",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Egg Rolls",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -2422,11 +2798,27 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "Egg Rolls",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Egg",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Rolls",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -2441,6 +2833,30 @@
           "certainty": "likely",
           "matchedText": "Rolls",
           "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Rolls",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Rolls",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Rolls",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -2494,11 +2910,27 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "egg rolls",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "egg",
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "rolls",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -2513,6 +2945,30 @@
           "certainty": "likely",
           "matchedText": "rolls",
           "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "rolls",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "rolls",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "rolls",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -2550,6 +3006,14 @@
           "certainty": "likely",
           "matchedText": "soy sauce",
           "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Kung Pao",
+          "restrictionId": "sesame",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -2601,6 +3065,22 @@
           "certainty": "likely",
           "matchedText": "Kung Pao",
           "restrictionId": "peanuts",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Kung Pao",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Kung Pao",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -2747,6 +3227,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "General Tso's",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "soy",
           "restrictionId": "legumes",
@@ -2781,6 +3269,14 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "suspected",
+          "matchedText": "General Tso's",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
         {
           "certainty": "stated",
           "matchedText": "Chicken",
@@ -3027,11 +3523,43 @@
     {
       "concerns": [
         {
+          "certainty": "suspected",
+          "matchedText": "oyster sauce",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "oyster sauce",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "oyster sauce",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "oyster",
           "restrictionId": "molluscs",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "oyster sauce",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -3094,6 +3622,30 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "oyster sauce",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "oyster sauce",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "oyster sauce",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "oyster",
           "restrictionId": "molluscs",
@@ -3105,6 +3657,14 @@
           "certainty": "likely",
           "matchedText": "oyster sauce",
           "restrictionId": "molluscs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "oyster sauce",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -3139,6 +3699,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "Chow Mein",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Chow Mein",
           "restrictionId": "wheat",
@@ -3160,6 +3728,14 @@
           "restrictionId": "molluscs",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Chow Mein",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -3198,6 +3774,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "Chow Mein",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Chow Mein",
           "restrictionId": "wheat",
@@ -3211,6 +3795,14 @@
           "restrictionId": "gluten",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Chow Mein",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -3243,6 +3835,30 @@
           "restrictionId": "gluten",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "oyster sauce",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "oyster sauce",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "oyster sauce",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -3257,6 +3873,14 @@
           "certainty": "likely",
           "matchedText": "oyster sauce",
           "restrictionId": "molluscs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "oyster sauce",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -3316,7 +3940,7 @@
         },
         {
           "certainty": "suspected",
-          "matchedText": "stir-fried",
+          "matchedText": "Fried Rice",
           "restrictionId": "sesame",
           "source": "hidden",
           "tier": "inferred",
@@ -3369,6 +3993,14 @@
           "certainty": "suspected",
           "matchedText": "Fried Rice",
           "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Fried Rice",
+          "restrictionId": "sesame",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -3835,6 +4467,30 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "garlic and chili sauce",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "garlic and chili sauce",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "garlic and chili sauce",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Prawns",
           "restrictionId": "crustaceans",
@@ -3844,8 +4500,24 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "garlic and chili sauce",
+          "restrictionId": "molluscs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "Prawns",
           "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "garlic and chili sauce",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -3943,8 +4615,56 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "garlic and chili sauce",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "garlic and chili sauce",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "garlic and chili sauce",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "garlic and chili sauce",
+          "restrictionId": "molluscs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "garlic and chili sauce",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "chili sauce",
           "restrictionId": "peanuts",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "chili sauce",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -3976,6 +4696,14 @@
           "restrictionId": "gluten",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Dumplings",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -4054,6 +4782,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "Dumplings",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "pork",
           "restrictionId": "vegan",
@@ -4083,6 +4819,14 @@
           "restrictionId": "gluten",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "dumplings",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -4125,7 +4869,47 @@
         {
           "certainty": "suspected",
           "matchedText": "Stir-fry",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Stir-fry",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Stir-fry",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "garlic sauce",
+          "restrictionId": "molluscs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Stir-fry",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Stir-fry",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -4152,7 +4936,79 @@
         {
           "certainty": "suspected",
           "matchedText": "Stir-fry",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Stir-fry",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Stir-fry",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Stir-fry",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Stir-fry",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "garlic sauce",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "garlic sauce",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "garlic sauce",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "garlic sauce",
+          "restrictionId": "molluscs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "garlic sauce",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -4495,6 +5351,14 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Fortune Cookies",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -4507,6 +5371,14 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "suspected",
+          "matchedText": "Fortune Cookies",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
         {
           "certainty": "suspected",
           "matchedText": "Cookies",
@@ -4647,6 +5519,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "חמאה",
           "restrictionId": "vegan",
@@ -4703,6 +5591,22 @@
           "restrictionId": "gluten",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -4959,6 +5863,14 @@
     {
       "concerns": [
         {
+          "certainty": "suspected",
+          "matchedText": "coleslaw",
+          "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "בלחמנייה",
           "restrictionId": "wheat",
@@ -4978,6 +5890,14 @@
           "certainty": "suspected",
           "matchedText": "בלחמנייה",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "coleslaw",
+          "restrictionId": "mustard",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -5101,6 +6021,22 @@
           "certainty": "suspected",
           "matchedText": "צ׳יפס",
           "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "coleslaw",
+          "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "coleslaw",
+          "restrictionId": "mustard",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -5270,6 +6206,14 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "Tartare",
+          "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "Beer",
           "restrictionId": "sulphites",
           "source": "hidden",
@@ -5371,6 +6315,14 @@
           "certainty": "likely",
           "matchedText": "Tartare",
           "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Tartare",
+          "restrictionId": "mustard",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -5529,6 +6481,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Goldstar",
+          "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -5545,6 +6505,14 @@
           "certainty": "likely",
           "matchedText": "Goldstar",
           "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Goldstar",
+          "restrictionId": "sulphites",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -5596,6 +6564,14 @@
           "certainty": "suspected",
           "matchedText": "Cheeseburger",
           "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Cheeseburger",
+          "restrictionId": "sesame",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -5655,6 +6631,14 @@
           "certainty": "suspected",
           "matchedText": "Cheeseburger",
           "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Cheeseburger",
+          "restrictionId": "sesame",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -5721,6 +6705,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "חמאה",
           "restrictionId": "vegan",
@@ -5780,6 +6780,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "חמאה",
           "restrictionId": "milk",
@@ -5842,6 +6858,22 @@
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "name": "il_cafe_pastries/0"
@@ -5873,6 +6905,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "קרואסון",
           "restrictionId": "wheat",
@@ -5886,6 +6926,22 @@
           "restrictionId": "gluten",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -5941,6 +6997,22 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "שוקולד",
           "restrictionId": "milk",
           "source": "hidden",
@@ -5951,6 +7023,22 @@
           "certainty": "suspected",
           "matchedText": "שוקולד",
           "restrictionId": "lactose",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -5997,6 +7085,22 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "שוקולד",
           "restrictionId": "milk",
           "source": "hidden",
@@ -6007,6 +7111,22 @@
           "certainty": "suspected",
           "matchedText": "שוקולד",
           "restrictionId": "lactose",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -6062,6 +7182,22 @@
           "restrictionId": "gluten",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -6132,6 +7268,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "שקדים",
           "restrictionId": "treeNuts",
@@ -6177,6 +7329,22 @@
           "restrictionId": "gluten",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "lupin",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קרואסון",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -6425,6 +7593,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "רוגלך",
+          "restrictionId": "milk",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "רוגלך",
+          "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "רוגלך",
           "restrictionId": "wheat",
@@ -6439,6 +7623,14 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "אגוזים",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -6451,6 +7643,22 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "suspected",
+          "matchedText": "רוגלך",
+          "restrictionId": "milk",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "רוגלך",
+          "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
         {
           "certainty": "stated",
           "matchedText": "רוגלך",
@@ -6479,6 +7687,30 @@
           "certainty": "likely",
           "matchedText": "אגוזים",
           "restrictionId": "treeNuts",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "אגוזים",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "רוגלך",
+          "restrictionId": "milk",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "רוגלך",
+          "restrictionId": "eggs",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -6761,6 +7993,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "עוגת",
           "restrictionId": "wheat",
@@ -6774,6 +8014,14 @@
           "restrictionId": "gluten",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -6853,6 +8101,22 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "קמח",
           "restrictionId": "wheat",
           "source": "hidden",
@@ -6919,6 +8183,22 @@
           "certainty": "suspected",
           "matchedText": "שוקולד",
           "restrictionId": "lactose",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -7060,6 +8340,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "לחם",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "ביצה",
           "restrictionId": "eggs",
@@ -7164,6 +8452,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "לחם",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "כוסמין",
           "restrictionId": "wheat",
@@ -7222,6 +8518,14 @@
           "restrictionId": "gluten",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "לחם",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -7300,6 +8604,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "לחם",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "וגבינה",
           "restrictionId": "milk",
@@ -7328,6 +8640,14 @@
     },
     {
       "concerns": [
+        {
+          "certainty": "suspected",
+          "matchedText": "כריך טונה",
+          "restrictionId": "milk",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
         {
           "certainty": "stated",
           "matchedText": "מיונז",
@@ -7403,6 +8723,14 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "suspected",
+          "matchedText": "כריך טונה",
+          "restrictionId": "milk",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
         {
           "certainty": "stated",
           "matchedText": "כריך",
@@ -7577,6 +8905,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "פסטו",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "מוצרלה",
           "restrictionId": "vegan",
@@ -7663,6 +8999,14 @@
           "certainty": "likely",
           "matchedText": "פסטו",
           "restrictionId": "lactose",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "פסטו",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -7993,6 +9337,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "גרנולה",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "ויוגורט",
           "restrictionId": "vegan",
@@ -8036,6 +9388,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "גרנולה",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "ויוגורט",
           "restrictionId": "milk",
@@ -8103,6 +9463,14 @@
           "certainty": "suspected",
           "matchedText": "גרנולה",
           "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "גרנולה",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -8657,6 +10025,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "עוגיית",
+          "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "עוגיית",
           "restrictionId": "wheat",
@@ -8692,6 +10076,14 @@
       },
       "findings": [
         {
+          "certainty": "suspected",
+          "matchedText": "עוגיית",
+          "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "עוגיית",
           "restrictionId": "wheat",
@@ -8737,6 +10129,14 @@
           "restrictionId": "legumes",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "עוגיית",
+          "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -8799,6 +10199,22 @@
           "certainty": "suspected",
           "matchedText": "שוקולד",
           "restrictionId": "lactose",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -10509,6 +11925,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "חריימה",
+          "restrictionId": "molluscs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "דג",
           "restrictionId": "vegan",
@@ -10547,6 +11971,14 @@
           "certainty": "suspected",
           "matchedText": "חריימה",
           "restrictionId": "crustaceans",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "חריימה",
+          "restrictionId": "molluscs",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -10941,6 +12373,14 @@
           "restrictionId": "gluten",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "לחם",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -11405,11 +12845,27 @@
     {
       "concerns": [
         {
+          "certainty": "suspected",
+          "matchedText": "כבוש",
+          "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "תורמוס",
           "restrictionId": "lupin",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "כבוש",
+          "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -11448,6 +12904,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "כבוש",
+          "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "כבוש",
+          "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "תורמוס",
           "restrictionId": "lupin",
@@ -11461,6 +12933,22 @@
           "restrictionId": "legumes",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "כבוש",
+          "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "כבוש",
+          "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -11839,6 +13327,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "סושי",
+          "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "רוטב סויה",
           "restrictionId": "legumes",
@@ -11877,6 +13373,14 @@
           "certainty": "suspected",
           "matchedText": "סושי",
           "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "סושי",
+          "restrictionId": "sulphites",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -12023,6 +13527,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "סושי",
+          "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "רוטב סויה",
           "restrictionId": "legumes",
@@ -12061,6 +13573,14 @@
           "certainty": "suspected",
           "matchedText": "סושי",
           "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "סושי",
+          "restrictionId": "sulphites",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -12608,6 +14128,14 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "רול טמפורה",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "איולי",
           "restrictionId": "mustard",
           "source": "hidden",
@@ -12657,6 +14185,14 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "suspected",
+          "matchedText": "רול טמפורה",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
         {
           "certainty": "suspected",
           "matchedText": "טמפורה",
@@ -13111,6 +14647,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "סשימי",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "סשימי",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "סשימי",
           "restrictionId": "fish",
@@ -13157,6 +14709,22 @@
           "certainty": "suspected",
           "matchedText": "סשימי",
           "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "סשימי",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "סשימי",
+          "restrictionId": "gluten",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -13239,6 +14807,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "סשימי",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "סשימי",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "סשימי",
           "restrictionId": "fish",
@@ -13285,6 +14869,22 @@
           "certainty": "suspected",
           "matchedText": "סשימי",
           "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "סשימי",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "סשימי",
+          "restrictionId": "gluten",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -13583,6 +15183,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "גיוזה",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "פונזו",
           "restrictionId": "legumes",
@@ -13601,6 +15209,14 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "suspected",
+          "matchedText": "גיוזה",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
         {
           "certainty": "stated",
           "matchedText": "בצק",
@@ -13663,6 +15279,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "אודון",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "וטריאקי",
           "restrictionId": "legumes",
@@ -13682,6 +15306,14 @@
       },
       "findings": [
         {
+          "certainty": "suspected",
+          "matchedText": "אודון",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "אטריות",
           "restrictionId": "wheat",
@@ -13695,6 +15327,14 @@
           "restrictionId": "gluten",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "אודון",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -13717,6 +15357,14 @@
           "certainty": "likely",
           "matchedText": "וטריאקי",
           "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "וטריאקי",
+          "restrictionId": "sesame",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -13767,6 +15415,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "אורז מטוגן",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "ורוטב סויה",
           "restrictionId": "legumes",
@@ -13797,6 +15453,14 @@
           "certainty": "suspected",
           "matchedText": "אורז מטוגן",
           "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "אורז מטוגן",
+          "restrictionId": "sesame",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -13887,11 +15551,27 @@
     {
       "concerns": [
         {
+          "certainty": "suspected",
+          "matchedText": "וואקמה",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "שומשום",
           "restrictionId": "sesame",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "וואקמה",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -13905,6 +15585,22 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "suspected",
+          "matchedText": "וואקמה",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "וואקמה",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
         {
           "certainty": "stated",
           "matchedText": "שומשום",
@@ -13956,6 +15652,14 @@
           "restrictionId": "gluten",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "טנצוי",
+          "restrictionId": "fish",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -14029,6 +15733,14 @@
           "certainty": "likely",
           "matchedText": "טנצוי",
           "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "טנצוי",
+          "restrictionId": "fish",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -14496,6 +16208,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "Cheeseburger",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Cheeseburger",
           "restrictionId": "vegan",
@@ -14578,6 +16298,14 @@
         {
           "certainty": "suspected",
           "matchedText": "pickles",
+          "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "ketchup",
           "restrictionId": "sulphites",
           "source": "hidden",
           "tier": "inferred",
@@ -14678,7 +16406,7 @@
         },
         {
           "certainty": "suspected",
-          "matchedText": "bun",
+          "matchedText": "Cheeseburger",
           "restrictionId": "sesame",
           "source": "hidden",
           "tier": "inferred",
@@ -14755,6 +16483,14 @@
           "certainty": "suspected",
           "matchedText": "Cheeseburger",
           "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Cheeseburger",
+          "restrictionId": "sesame",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -14933,6 +16669,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "bread",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "bread",
           "restrictionId": "wheat",
@@ -14950,8 +16694,24 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "bread",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "mayo",
           "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "bread",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -15024,6 +16784,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "bread",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "bread",
           "restrictionId": "wheat",
@@ -15038,6 +16806,22 @@
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "bread",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "bread",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "name": "us_diner_shared_fryer/3"
@@ -15050,6 +16834,14 @@
           "restrictionId": "eggs",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "bread",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -15070,8 +16862,24 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "bread",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "mayo",
           "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "bread",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -15192,6 +17000,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "bread",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "bread",
           "restrictionId": "wheat",
@@ -15205,6 +17021,22 @@
           "restrictionId": "gluten",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "bread",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "bread",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -15242,6 +17074,14 @@
           "restrictionId": "gluten",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "roll",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -15382,6 +17222,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "roll",
+          "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "name": "us_diner_shared_fryer/5"
@@ -15418,6 +17266,14 @@
           "restrictionId": "fish",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "tartar sauce",
+          "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -15579,6 +17435,22 @@
           "certainty": "likely",
           "matchedText": "tartar sauce",
           "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "tartar sauce",
+          "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "tartar",
+          "restrictionId": "mustard",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -15976,6 +17848,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "cream sauce",
+          "restrictionId": "wheat",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "cream sauce",
+          "restrictionId": "gluten",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "cream",
           "restrictionId": "vegan",
@@ -16221,6 +18109,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "Chowder",
+          "restrictionId": "celery",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Clam",
           "restrictionId": "vegan",
@@ -16269,6 +18165,14 @@
           "restrictionId": "vegetarian",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Chowder",
+          "restrictionId": "celery",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -17253,6 +19157,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "ranch",
+          "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Chicken",
           "restrictionId": "vegan",
@@ -17350,12 +19262,52 @@
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "ranch",
+          "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "ranch dressing",
+          "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "ranch",
+          "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "ranch dressing",
+          "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "name": "us_diner_shared_fryer/15"
     },
     {
       "concerns": [
+        {
+          "certainty": "suspected",
+          "matchedText": "Texas Chili",
+          "restrictionId": "peanuts",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
         {
           "certainty": "stated",
           "matchedText": "cheddar",
@@ -17407,6 +19359,22 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "suspected",
+          "matchedText": "Texas Chili",
+          "restrictionId": "peanuts",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Texas Chili",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
         {
           "certainty": "stated",
           "matchedText": "Beef",
@@ -17838,7 +19806,7 @@
         },
         {
           "certainty": "suspected",
-          "matchedText": "mayo",
+          "matchedText": "Coleslaw",
           "restrictionId": "mustard",
           "source": "hidden",
           "tier": "inferred",
@@ -17863,6 +19831,22 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "suspected",
+          "matchedText": "Coleslaw",
+          "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Coleslaw",
+          "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
         {
           "certainty": "suspected",
           "matchedText": "creamy",
@@ -18045,6 +20029,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "Chocolate",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Chocolate",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Ice cream",
           "restrictionId": "vegan",
@@ -18080,6 +20080,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "Chocolate",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Chocolate",
+          "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Milkshake",
           "restrictionId": "milk",
@@ -18163,6 +20179,22 @@
           "certainty": "suspected",
           "matchedText": "chocolate",
           "restrictionId": "lactose",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "chocolate",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "chocolate",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -18200,6 +20232,14 @@
           "certainty": "suspected",
           "matchedText": "Pie",
           "restrictionId": "eggs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "chocolate",
+          "restrictionId": "soy",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -18395,6 +20435,22 @@
           "certainty": "suspected",
           "matchedText": "chocolate",
           "restrictionId": "lactose",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "chocolate",
+          "restrictionId": "soy",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "chocolate",
+          "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -18605,6 +20661,22 @@
                 "waiterQuestion": null
               },
               {
+                "certainty": "suspected",
+                "matchedText": "Deep-fried",
+                "restrictionId": "wheat",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "Deep-fried",
+                "restrictionId": "gluten",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
                 "certainty": "stated",
                 "matchedText": "Calamari",
                 "restrictionId": "molluscs",
@@ -18648,6 +20720,14 @@
           {
             "concerns": [
               {
+                "certainty": "suspected",
+                "matchedText": "Bread",
+                "restrictionId": "soy",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
                 "certainty": "stated",
                 "matchedText": "Bread",
                 "restrictionId": "wheat",
@@ -18661,6 +20741,22 @@
                 "restrictionId": "gluten",
                 "source": "name",
                 "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "Bread",
+                "restrictionId": "sesame",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "Bread",
+                "restrictionId": "legumes",
+                "source": "hidden",
+                "tier": "inferred",
                 "waiterQuestion": null
               }
             ],
@@ -18959,6 +21055,14 @@
                 "waiterQuestion": null
               },
               {
+                "certainty": "suspected",
+                "matchedText": "curry",
+                "restrictionId": "legumes",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
                 "certainty": "stated",
                 "matchedText": "Chicken",
                 "restrictionId": "vegan",
@@ -19059,6 +21163,14 @@
                 "certainty": "suspected",
                 "matchedText": "BBQ sauce",
                 "restrictionId": "mustard",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "BBQ sauce",
+                "restrictionId": "sulphites",
                 "source": "hidden",
                 "tier": "inferred",
                 "waiterQuestion": null
@@ -19542,6 +21654,14 @@
               },
               {
                 "certainty": "suspected",
+                "matchedText": "לחם",
+                "restrictionId": "sesame",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
                 "matchedText": "צ׳יפס",
                 "restrictionId": "sulphites",
                 "source": "hidden",
@@ -19648,6 +21768,14 @@
                 "restrictionId": "gluten",
                 "source": "description",
                 "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "בלחמניית",
+                "restrictionId": "sesame",
+                "source": "hidden",
+                "tier": "inferred",
                 "waiterQuestion": null
               },
               {
@@ -19787,6 +21915,22 @@
           },
           {
             "concerns": [
+              {
+                "certainty": "suspected",
+                "matchedText": "דג מטוגן",
+                "restrictionId": "wheat",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "דג מטוגן",
+                "restrictionId": "gluten",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
               {
                 "certainty": "stated",
                 "matchedText": "דג",
@@ -19952,6 +22096,16 @@
             "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
           },
           {
+            "concerns": [
+              {
+                "certainty": "suspected",
+                "matchedText": "קטשופ",
+                "restrictionId": "sulphites",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              }
+            ],
             "dishId": "h16",
             "hiddenCarbs": [],
             "modification": "אפשר בבקשה בלי קטשופ? אפשר מיונז או טחינה במקום.",
@@ -20230,6 +22384,22 @@
                 "waiterQuestion": null
               },
               {
+                "certainty": "suspected",
+                "matchedText": "קרואסון",
+                "restrictionId": "lupin",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "קרואסון",
+                "restrictionId": "legumes",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
                 "certainty": "likely",
                 "matchedText": "חמאה",
                 "restrictionId": "vegan",
@@ -20370,6 +22540,14 @@
           {
             "concerns": [
               {
+                "certainty": "suspected",
+                "matchedText": "coleslaw",
+                "restrictionId": "eggs",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
                 "certainty": "stated",
                 "matchedText": "בלחמנייה",
                 "restrictionId": "wheat",
@@ -20389,6 +22567,14 @@
                 "certainty": "suspected",
                 "matchedText": "בלחמנייה",
                 "restrictionId": "sesame",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "coleslaw",
+                "restrictionId": "mustard",
                 "source": "hidden",
                 "tier": "inferred",
                 "waiterQuestion": null
@@ -20518,6 +22704,14 @@
                 "restrictionId": "fish",
                 "source": "name",
                 "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "Tartare",
+                "restrictionId": "mustard",
+                "source": "hidden",
+                "tier": "inferred",
                 "waiterQuestion": null
               },
               {
@@ -20675,6 +22869,22 @@
                 "waiterQuestion": null
               },
               {
+                "certainty": "suspected",
+                "matchedText": "קרואסון",
+                "restrictionId": "lupin",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "קרואסון",
+                "restrictionId": "legumes",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
                 "certainty": "likely",
                 "matchedText": "חמאה",
                 "restrictionId": "vegan",
@@ -20697,6 +22907,14 @@
                 "certainty": "likely",
                 "matchedText": "Goldstar",
                 "restrictionId": "gluten",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "Goldstar",
+                "restrictionId": "sulphites",
                 "source": "hidden",
                 "tier": "inferred",
                 "waiterQuestion": null
@@ -20749,6 +22967,14 @@
                 "certainty": "suspected",
                 "matchedText": "Cheeseburger",
                 "restrictionId": "gluten",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "Cheeseburger",
+                "restrictionId": "sesame",
                 "source": "hidden",
                 "tier": "inferred",
                 "waiterQuestion": null

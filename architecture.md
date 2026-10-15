@@ -3686,6 +3686,39 @@ follows; the sentences' pure composer takes plain parts and imports no
 widget. With one person, or none, the dish card is the single-profile one
 as before.
 
+**Hidden sources for the `may_contain` misses (#352, #343).** A second
+vocabulary pass over the recall gate added hidden triggers, all
+`suspected` and each citing the section of file 11 or 12 it comes from, to
+close the `may_contain` misses the first pass left: the Asian, baked and
+processed-meat carriers of soy; condiments, sushi rice and beer brands for
+sulphites; creamy dressings, `tartar`, `coleslaw` and pickled (`כבוש`) for
+mustard; egg-bound doughs and wrappers; bread classes and Asian dishes for
+sesame; roux and flour sauces, risotto and deep-fried food for wheat and
+gluten; curry pastes, `massaman`, `tentsuyu` and paella for fish; the garlic
+and stir-fry sauces for molluscs; `חריימה` for molluscs; enriched dough,
+canned tuna and the vegan-mayonnaise substitute for milk; chili con carne
+for peanuts; `chowder` for celery; and croissants, quiche and rolls for
+lupin. `legumes` now carries every hidden source of soy, peanuts and lupin,
+not only soy's (`peanutHiddenEn`/`He` and `lupinHiddenEn`/`He` are public
+for it, the way the direct lists already were), so a term the soy list
+shares with the peanut list lives in the soy restriction's own list to keep
+"no term listed twice" true, and `satay` left the legumes direct extras to
+arrive as peanut's `likely` hidden source. `may_contain` recall went from
+359 of 500 (71.8%) to 484 of 500 (96.8%) and the allowlist from 142 entries
+to 17; `contains` recall is unchanged at 825 of 826. The false-positive
+counts moved little where it matters: on dishes labelled `free` they went
+from 10 to 12 (milk, from `מיונז טבעוני` on two side dishes that list it as
+an add-on sauce), and on unlabelled dishes from 87 to 147, most of it lupin, legumes,
+soy and sesame on bread, bun and pastry dishes. Not added on purpose: a bare
+`פסטה` or `pasta` for eggs (dried pasta is egg-free), `seafood` and
+`פירות ים` for fish (they name crustaceans and molluscs, a decision the sea
+tests pin), a bare `dressing` for mustard, and a bun or `לחמנייה` for soy
+(it would flag every burger). The 17 that remain are the two label
+questions (the filled Bamba's sesame, the tofu scramble's egg), the three
+shared-fryer dishes, which belong to the kitchen signals (ALG-07), the
+secret-sauce wings and the burger whose aioli is only an option to remove,
+and six dishes with no word in their text to match.
+
 ---
 
 ## 15. Testing strategy
