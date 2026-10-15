@@ -5,11 +5,14 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/utils/allergens/chef_card_templates.dart';
+import 'package:ketoclub/utils/allergens/group_chef_card.dart';
 import 'package:ketoclub/utils/allergens/kitchen_signals.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
+import 'package:ketoclub/widgets/group_chef_card_view.dart';
 import 'package:ketoclub/widgets/verdict_copy.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
 
@@ -38,6 +41,7 @@ class ChefCardScreen extends StatefulWidget {
   /// for that dish, whose kitchen [menu] is read for signals.
   const new({
     required this.profile,
+    this.people = const <NamedProfile>[],
     this.screenBrightness = const NoOpScreenBrightness(),
     this.menuSharer,
     this.dish,
@@ -48,6 +52,14 @@ class ChefCardScreen extends StatefulWidget {
 
   /// The restrictions the card states.
   final DietaryProfile profile;
+
+  /// With more than one person, and no [dish], the card is theirs instead
+  /// of [profile]'s: one section per person under their name (ALG-12,
+  /// issue #354; [GroupChefCardText]). A dish card takes precedence: it is
+  /// built from [profile] alone, which for a group is everyone's
+  /// restrictions combined; one section per person on a dish card is a
+  /// follow-up.
+  final List<NamedProfile> people;
 
   /// The dish the card is about, or null for the profile-only card.
   final Dish? dish;
@@ -152,7 +164,15 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
     final theme = Theme.of(context);
     final hebrew = _hebrew;
     final lines = _lines(hebrew: hebrew);
-    final text = ChefCardText.asText(lines);
+    // Precedence: the dish card (a dish and its analysis), then the group
+    // card (more than one person), then the profile card.
+    final isDishCard = widget.dish != null && widget.analysed != null;
+    final group = !isDishCard && widget.people.length > 1
+        ? GroupChefCardText.compose(widget.people, hebrew: hebrew)
+        : null;
+    final text = group == null
+        ? ChefCardText.asText(lines)
+        : GroupChefCardText.asText(group);
     final sharer = widget.menuSharer;
     return Scaffold(
       body: SafeArea(
@@ -210,7 +230,19 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
                       ),
                     ),
                     const SizedBox(height: 22),
-                    if (lines.isEmpty)
+                    if (group != null)
+                      GroupChefCardView(
+                        card: group,
+                        trailingAction: sharer == null
+                            ? null
+                            : OutlinedButton.icon(
+                                key: chefCardShareKey,
+                                onPressed: () => unawaited(_share(l10n, text)),
+                                icon: const Icon(Icons.ios_share),
+                                label: Text(l10n.chefCardShare),
+                              ),
+                      )
+                    else if (lines.isEmpty)
                       Text(
                         l10n.chefCardEmpty,
                         key: chefCardEmptyKey,

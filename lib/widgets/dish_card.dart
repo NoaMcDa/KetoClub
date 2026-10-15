@@ -64,6 +64,7 @@ class DishCard extends StatefulWidget {
     this.wording = ProfileWording.ketoOnly,
     this.holdsKeto = true,
     this.bantoMode = BantoMode.enabled,
+    this.groupBreakdown,
     super.key,
   });
 
@@ -114,6 +115,11 @@ class DishCard extends StatefulWidget {
 
   /// Whether this build shows Banto surfaces (D26's convention).
   final bool bantoMode;
+
+  /// Who the state is whose, under the pill, when the menu is read for
+  /// several profiles (ALG-12, issue #354); null for one. Drawn only in
+  /// state mode.
+  final Widget? groupBreakdown;
 
   /// Whether this card renders [evaluated]'s state rather than the keto
   /// verdict.
@@ -212,6 +218,10 @@ class _DishCardState extends State<DishCard> {
             ],
           ),
           const SizedBox(height: 6),
+          if (widget.groupBreakdown case final breakdown?) ...[
+            breakdown,
+            const SizedBox(height: 6),
+          ],
         ] else if (analysis != null || showAddNote) ...[
           // A Wrap, not a Row: at a large text scale the badge and the
           // 36px icon can outgrow one line together.

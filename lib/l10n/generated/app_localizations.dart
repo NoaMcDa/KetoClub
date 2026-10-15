@@ -2879,6 +2879,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'From the kitchen, not the dish — ask about cross-contact'**
   String get whySourceKitchenGeneric;
+
+  /// Banto (ALG-12): the Settings group listing the named profiles on the device.
+  ///
+  /// In en, this message translates to:
+  /// **'People on this device'**
+  String get settingsProfiles;
+
+  /// Banto (ALG-12): the note under the people group, with the health-data wording.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the people you eat with and check a menu for any of you together. Each profile is health data and stays on this device.'**
+  String get settingsProfilesNote;
+
+  /// Banto (ALG-12): the name of the device owner's own profile until they rename it.
+  ///
+  /// In en, this message translates to:
+  /// **'Me'**
+  String get profileDefaultName;
+
+  /// Banto (ALG-12): the summary of a profile with no restriction, which is read as keto.
+  ///
+  /// In en, this message translates to:
+  /// **'Keto only'**
+  String get profileKetoOnly;
+
+  /// Banto (ALG-12): the button that adds a named profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Add person'**
+  String get settingsProfilesAdd;
+
+  /// Banto (ALG-12): the button that opens the import screen for a shared profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Import a profile'**
+  String get settingsProfilesImport;
+
+  /// Banto (ALG-12): title of the dialog naming a new profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a person'**
+  String get profileNameAddTitle;
+
+  /// Banto (ALG-12): title of the dialog renaming a profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename profile'**
+  String get profileNameRenameTitle;
+
+  /// Banto (ALG-12): label of the profile name field.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get profileNameLabel;
+
+  /// Banto (ALG-12): confirms the profile name dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get profileNameSave;
+
+  /// Banto (ALG-12): the profile editor's rename action.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get profileEditorRename;
+
+  /// Banto (ALG-12): the profile editor's export action.
+  ///
+  /// In en, this message translates to:
+  /// **'Share this profile'**
+  String get profileEditorExport;
+
+  /// Banto (ALG-12): the profile editor's delete action (not offered for the owner's own profile).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this profile'**
+  String get profileEditorDelete;
+
+  /// Banto (ALG-12): title of the delete confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {name}\'s profile?'**
+  String profileDeleteTitle(String name);
+
+  /// Banto (ALG-12): body of the delete confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Their restrictions are removed from this device.'**
+  String get profileDeleteBody;
+
+  /// Banto (ALG-12): confirms deleting a profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get profileDeleteConfirm;
+
+  /// Banto (ALG-12): title of the dialog shown before a profile is exported.
+  ///
+  /// In en, this message translates to:
+  /// **'Share health data?'**
+  String get profileExportTitle;
+
+  /// Banto (ALG-12): body of the export dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'This profile lists {name}\'s dietary restrictions, which are health data. It leaves this device only as the text you send, so share it only with people you trust.'**
+  String profileExportBody(String name);
+
+  /// Banto (ALG-12): confirms exporting a profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get profileExportConfirm;
+
+  /// Banto (ALG-12): shown when the profile was copied because no share sheet is available.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile copied. Paste it on the other device.'**
+  String get profileExportCopied;
+
+  /// Banto (ALG-12): the import screen's title.
+  ///
+  /// In en, this message translates to:
+  /// **'Import a profile'**
+  String get profileImportTitle;
+
+  /// Banto (ALG-12): the import screen's health-data wording.
+  ///
+  /// In en, this message translates to:
+  /// **'A shared profile is health data: someone\'s dietary restrictions. Nothing is saved until you choose to save it, and then only on this device.'**
+  String get profileImportBody;
+
+  /// Banto (ALG-12): label of the import screen's text field.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the shared profile'**
+  String get profileImportField;
+
+  /// Banto (ALG-12): reads the pasted text and shows what it holds.
+  ///
+  /// In en, this message translates to:
+  /// **'Read profile'**
+  String get profileImportRead;
+
+  /// Banto (ALG-12): shown when the pasted text cannot be read as a profile.
+  ///
+  /// In en, this message translates to:
+  /// **'This text is not a shared profile.'**
+  String get profileImportInvalid;
+
+  /// Banto (ALG-12): the question above the import preview.
+  ///
+  /// In en, this message translates to:
+  /// **'Save this profile on this device?'**
+  String get profileImportAsk;
+
+  /// Banto (ALG-12): saves an imported profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Save on this device'**
+  String get profileImportSave;
+
+  /// Banto (ALG-12): shown when no profile can be added.
+  ///
+  /// In en, this message translates to:
+  /// **'This device already holds as many profiles as it can.'**
+  String get profileImportFull;
+
+  /// Banto (ALG-12): the profile editor's restrictions heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Restrictions'**
+  String get profileEditorRestrictions;
+
+  /// Banto (ALG-12): title of the sheet that combines profiles for a menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Check this menu for'**
+  String get groupCombineTitle;
+
+  /// Banto (ALG-12): applies the combined profiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get groupCombineApply;
+
+  /// Banto (ALG-12): opens the chef card with one section per selected person.
+  ///
+  /// In en, this message translates to:
+  /// **'Chef card for these people'**
+  String get groupCombineChefCard;
+
+  /// Banto (ALG-12): opens Settings from the combine sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage people in Settings'**
+  String get groupCombineManage;
+
+  /// Banto (ALG-12): the menu header line for a group with no strict entry. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dish fits everyone} other{{count} dishes fit everyone}}'**
+  String groupFitsEveryone(int count);
+
+  /// Banto (ALG-12): the menu header line for a group with a strict entry. Never 'safe' and never 'fits'.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dish with no trigger found for anyone} other{{count} dishes with no trigger found for anyone}}'**
+  String groupFitsEveryoneStrict(int count);
+
+  /// Banto (ALG-12): one person's result on a dish card's breakdown line.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {state}'**
+  String groupBreakdownEntry(String name, String state);
+
+  /// Banto (ALG-12): screen-reader label of the per-person breakdown line.
+  ///
+  /// In en, this message translates to:
+  /// **'For each person: {breakdown}'**
+  String groupBreakdownSemanticLabel(String breakdown);
 }
 
 class _AppLocalizationsDelegate

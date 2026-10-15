@@ -64,7 +64,8 @@ final class ClassificationOptions {
   /// other's [matches] accepts.
   ///
   /// [restrictionsRequested] is true only with [bantoMode] on and a
-  /// profile holding a restriction other than keto (D26 C2, ALG-03): only
+  /// profile the menu is read for holding a restriction other than keto
+  /// (D26 C2, ALG-03; any of the combined ones, ALG-12): only
   /// then are ingredients extracted. Without the flag, or with a keto-only
   /// or empty profile, the options are exactly today's. Only the flag
   /// leaves here; the profile itself never does (C1).
@@ -80,7 +81,7 @@ final class ClassificationOptions {
       dairyFree: settings.dairyFree,
       carnivoreOnly: settings.carnivoreOnly,
     ),
-    restrictionsRequested: bantoMode && settings.profile.hasNonKetoEntry,
+    restrictionsRequested: bantoMode && settings.activeHasNonKetoEntry,
     onEngineStarted: onEngineStarted,
   );
 

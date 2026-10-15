@@ -953,7 +953,7 @@ no physical device has exercised it (`HANDOFF.md`).
 |---|---|---|---|
 | `InstallIdStore` | `shared_preferences` | a random 32-hex-character anonymous install id (D12), generated on first use, never in a constructor | until the app's storage is cleared |
 | `MenuCache` | `hive` | `venueRef → {menu, analysis, fetchedAt, engine}`; the analysis also records the options it was made under (net-carb limit, dietary constraints; issue #57) | 24 h for the menu; analysis kept as long as the menu it was computed from, and reused by `MenuController` only for an unchanged menu, an AI result, consent still given and matching options |
-| `SettingsStore` | `shared_preferences` | UI language, filter defaults, consent flag, last venue, appearance, net-carb limit (2–25 g, default 6), dietary toggles (seed-oil free, dairy-free, carnivore only; all off by default, a missing key reads as off), the Banto restriction profile (`dietaryProfile`, written only when non-empty; a missing or unreadable value reads as empty; D26) | until cleared |
+| `SettingsStore` | `shared_preferences` | UI language, filter defaults, consent flag, last venue, appearance, net-carb limit (2–25 g, default 6), dietary toggles (seed-oil free, dairy-free, carnivore only; all off by default, a missing key reads as off), the Banto restriction profile (`dietaryProfile`, written only when non-empty; a missing or unreadable value reads as empty; D26) and the other people's profiles and which are combined (`profileName`, `groupProfiles`, `activeProfiles`, each written only when not its default; ALG-12) | until cleared |
 | `VisitHistoryStore` | `hive` (`menu_history` box) | one `VisitEntry` per `VenueRef` opened on this device (D23): the name and city it was shown under, first and last opened, open count, and the dish count, score and green/yellow counts it last had | until the row is removed or Settings clears saved menus |
 
 The install id is unlinkable to a person (D8 stays true in spirit) and is sent
@@ -3625,6 +3625,47 @@ a kitchen concern as "kitchen: a fryer" and the Why sheet as "This kitchen has
 a fryer — ask about cross-contact", with no "Matched" line; the new strings
 are `kitchen*`, `concernSourceKitchen` and `whySourceKitchen*` ARB keys, swept
 for "safe"/"בטוח".
+
+**Group profiles: what fits everyone (ALG-12, #354).** A device holds
+several named profiles (`models/named_profile.dart`, at most 8): the user's
+own is still `AppSettings.profile` under `dietaryProfile`, now also the
+primary `NamedProfile` "me" whose empty name the UI shows as "Me"/"אני",
+which is the whole migration; the others are `otherProfiles`
+(`groupProfiles`), the user's renamed name `primaryProfileName`
+(`profileName`) and the subset a menu is read for `activeProfileIds`
+(`activeProfiles`, default `["me"]`). Each new key is written only when it
+differs from its default and read tolerantly, so a single-profile record
+and a keto record (`keto_unchanged_test`) are byte-identical to before; ids
+are `p1`, `p2`, … (the first unused, no clock). C1 holds: profiles and names
+stay in `shared_preferences`, `toString`s print counts, sharing is JSON the
+user sends themselves (`utils/allergens/profile_transfer.dart`, after a
+dialog naming it health data) and an import is saved only after a screen
+that says so asks, and only the extraction flag leaves the device: it is
+now true when any *active* profile holds a non-keto entry
+(`AppSettings.activeHasNonKetoEntry`). Evaluation stays one analysis per
+menu: `GroupEvaluator` (`utils/allergens/group_evaluator.dart`) runs
+the single-profile pipeline once per active person — `ProfileEvaluator.evaluate`
+with the section heading (ALG-09's declarations), then `applyKitchenSignals`
+with the menu's `KitchenReach` (ALG-07) for that person's profile — and shows
+the strictest state (avoid > ask > fits with a change > fits), every concern
+once (the surest) and each waiter line once; `MenuController` words,
+filters and counts by the union of the active profiles (an entry keeps only
+the exceptions every holder shares, and keto stays when any member holds
+it), so a group with an allergen is strict. With more than one active
+person each dish card carries a breakdown ("Me: Avoid · Dana: Fits", each
+state in its person's own wording, so a strict "fits" still never reads
+"fits") and the header adds "N dishes fit everyone" (strict: "N dishes
+with no trigger found for anyone"). Settings lists the people under "My
+restrictions" (add, rename, edit through the same picker, share, delete;
+the owner's own cannot be deleted, and a profile with no entry reads "Keto
+only", as it is evaluated); the menu's Filters row shows "Checking for: Me,
+Dana" in place of the restriction summary once a second profile exists,
+opening a sheet of checkboxes (at least one stays checked) that saves the
+choice without re-classifying, and a chef card with one section per checked
+person (`GroupChefCardText`: the ALG-08a lines under each name, one
+greeting, one closing). `ChefCardScreen` gives the per-dish card (ALG-08b)
+precedence over the group card; a dish card opened in a group is built from
+the union profile, and one section per person on it is a follow-up. Discovery's quick score is untouched.
 
 ---
 

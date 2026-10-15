@@ -13,6 +13,7 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/chef_card_screen.dart';
+import 'package:ketoclub/screens/menu_group.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
@@ -47,7 +48,6 @@ import 'package:ketoclub/widgets/menu_question_sheet.dart';
 import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
-import 'package:ketoclub/widgets/profile_summary_line.dart';
 import 'package:ketoclub/widgets/rename_menu_dialog.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/scanned_page_chips.dart';
@@ -873,10 +873,15 @@ class _MenuScreenState extends State<MenuScreen> {
     return MenuFiltersRow(
       expanded: _filtersExpanded,
       activeCount: activeCount,
-      summary: widget.bantoMode && !controller.profile.isEmpty
-          ? ProfileSummaryLine(
-              profile: controller.profile,
-              onTap: () => unawaited(_editProfile(context, controller)),
+      // Banto: the restriction summary, or the group combine control when
+      // the device holds several profiles (ALG-12).
+      summary: widget.bantoMode
+          ? menuProfileSummary(
+              context,
+              controller,
+              onEditProfile: () => unawaited(_editProfile(context, controller)),
+              screenBrightness: widget.screenBrightness,
+              menuSharer: widget.menuSharer,
             )
           : null,
       onToggle: () {
@@ -1030,13 +1035,16 @@ class _MenuScreenState extends State<MenuScreen> {
             ),
           )
         : null;
+    // Banto: "N dishes fit everyone" for a group (ALG-12).
+    final groupFits = groupFitsEveryoneLine(context, l10n, controller);
     final pages = _scannedPages;
-    if (pages == null && counts == null) return titleRow;
+    if (pages == null && counts == null && groupFits == null) return titleRow;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         titleRow,
         ?counts,
+        ?groupFits,
         if (pages != null) _scannedSourceRow(context, l10n, pages),
       ],
     );
@@ -1515,6 +1523,7 @@ class _MenuScreenState extends State<MenuScreen> {
             wording: controller.wording,
             holdsKeto: controller.holdsKeto,
             bantoMode: widget.bantoMode,
+            groupBreakdown: groupBreakdownFor(controller, row.dish.id),
             // A pasted menu has no prices, and a website's are unverified
             // (D18, D19): neither shows one.
             showPrice:
