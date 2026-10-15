@@ -224,6 +224,9 @@ final class SavedController extends ChangeNotifier {
     score: visit.score,
     greenCount: visit.greenCount,
     yellowCount: visit.yellowCount,
+    openedStrict: visit.openedStrict,
+    confirmations: visit.confirmations,
+    changeConfirmations: visit.changeConfirmations,
   );
 
   /// [value] trimmed, or null when nothing is left of it.

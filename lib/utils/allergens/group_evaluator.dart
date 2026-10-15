@@ -16,6 +16,7 @@ import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/utils/allergens/confirmations.dart';
 import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/kitchen_reach.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
@@ -163,8 +164,10 @@ abstract final class GroupEvaluator {
   /// (its declarations, ALG-09), then [applyKitchenSignals] with [kitchen]
   /// (ALG-07) for that person's profile — so a fryer demotes a dish for
   /// the person whose strict entry it reaches, and the strictest state
-  /// carries it. With one person the combined result is exactly that
-  /// person's evaluation. [people] must not be empty.
+  /// carries it. What the staff said about the dish ([confirmations],
+  /// ALG-14) is a fact about the dish, so it reaches every person. With
+  /// one person the combined result is exactly that person's evaluation.
+  /// [people] must not be empty.
   static GroupEvaluation evaluate(
     AnalysedDish analysed,
     Dish dish,
@@ -172,6 +175,7 @@ abstract final class GroupEvaluator {
     bool? hebrew,
     String? heading,
     KitchenReach kitchen = KitchenReach.empty,
+    List<ConfirmationEvidence> confirmations = const <ConfirmationEvidence>[],
   }) {
     final results = <PersonEvaluation>[
       for (final person in people)
@@ -184,6 +188,7 @@ abstract final class GroupEvaluator {
               person.profile,
               hebrew: hebrew,
               heading: heading,
+              confirmations: confirmations,
             ),
             dish,
             person.profile,
@@ -202,7 +207,8 @@ abstract final class GroupEvaluator {
   /// Several people's evaluations of one dish as one: the [strictest]
   /// state; every concern, one per restriction in taxonomy order (the
   /// surest, and at a tie the first); every declaration that applied to
-  /// anyone, once (ALG-09); and each waiter line any of them needs, once,
+  /// anyone, once (ALG-09), and so every staff answer (ALG-14); and each
+  /// waiter line any of them needs, once,
   /// in order — none for [DishState.avoid], as the evaluator itself
   /// does. One evaluation is returned as it is. [evaluated] must
   /// not be empty.
@@ -238,9 +244,15 @@ abstract final class GroupEvaluator {
         }
       }
     }
+    final confirmations = <ConfirmationEvidence>[
+      for (final result in evaluated) ...result.confirmations,
+    ];
     return EvaluatedDish(
       dish: evaluated.first.dish,
       declarations: List<Declaration>.unmodifiable(declarations),
+      confirmations: List<ConfirmationEvidence>.unmodifiable(
+        confirmations.toSet(),
+      ),
       concerns: List<Concern>.unmodifiable(
         ProfileEvaluator.inTaxonomyOrder(best.values.toList()),
       ),

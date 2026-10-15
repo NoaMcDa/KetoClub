@@ -16,6 +16,7 @@ import 'package:ketoclub/screens/settings_screen.dart';
 import 'package:ketoclub/screens/venue_search_screen.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
+import 'package:ketoclub/state/confirmation_controller.dart';
 import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/state/saved_controller.dart';
@@ -187,8 +188,8 @@ class _KetoClubAppState extends State<KetoClubApp> {
 /// Public and separately tested, because a silently unmatched route would
 /// present as a blank screen.
 ///
-/// [bantoMode] reaches the two screens with Banto surfaces, Settings and
-/// the menu (D26's convention).
+/// [bantoMode] reaches the screens with Banto surfaces, Settings, the menu
+/// and Recent (D26's convention).
 Route<void>? generateRoute(
   RouteSettings settings,
   AppDependencies dependencies, {
@@ -261,7 +262,19 @@ Route<void>? generateRoute(
             dependencies.menuRepository,
             dependencies.visitHistory,
           ),
-          child: const SavedScreen(),
+          child: SavedScreen(
+            bantoMode: bantoMode,
+            // The post-meal prompt (Banto, ALG-14); offered only with
+            // bantoMode on.
+            createConfirmations: (ref) => ConfirmationController(
+              ref: ref,
+              repository: dependencies.menuRepository,
+              settings: dependencies.settingsStore,
+              history: dependencies.visitHistory,
+              notes: dependencies.notesStore,
+              clock: dependencies.clock,
+            ),
+          ),
         ),
       ),
     );

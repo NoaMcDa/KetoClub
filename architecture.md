@@ -3761,6 +3761,111 @@ gate's strict ids, having no vocabulary to measure. `allergens.json` and
 existing case unchanged), the Python twin's id lists follow, and no keto
 golden moved.
 
+### D27 — Post-meal confirmations, no ratings
+
+*(Banto, the Allergens epic's ALG-14, issue #356. Amends D23's visit
+history; builds on D26's evidence tiers. The device half is recorded
+here; the shared half, the backend table and its route, is added by its
+own pull request at merge.)*
+
+**What changed.** The evidence tiers `confirmed` and `denied` (ALG-06) had
+no source: nothing on the device knew what a kitchen had said. After a
+meal a person can now say, per dish and per concern, what the staff told
+them, and the next time the menu opens the dish shows it. Six decisions:
+
+1. **The prompt lives on the Recent tab, never in a notification.** With
+   `bantoMode` on, `MenuController.open` records `VisitEntry.openedStrict`
+   (written only when true, and never cleared by a later open) when the
+   menu was read under a strict wording (an allergen or celiac disease in
+   the profile). Such a Recent row, while its cached copy is on the
+   device, offers "Did you ask the staff?", which opens
+   `ConfirmationSheet` (`widgets/confirmation_sheet.dart`) over a
+   `ConfirmationController` (`state/confirmation_controller.dart`). It
+   lists every analysed dish the active profiles have a concern about,
+   with the concern exactly as the menu finds it before any answer, and
+   per concern asks "Did you ask about *sesame* in *סלט חצילים*?" —
+   *confirmed present · confirmed absent · didn't ask* — plus "they
+   changed the dish as requested — yes / no" for a dish that carried a
+   change, and a note that is the dish's ordinary `NotesStore` note. No
+   local-notification plugin was added: the epic's "a few hours later"
+   notification is left out.
+2. **The answers are kept with the visit history (D23), on the device.**
+   `VisitEntry.confirmations` holds `DishConfirmation {dishId,
+   restrictionId, polarity (present | absent), day, source?,
+   matchedText?}` and `VisitEntry.changeConfirmations` holds
+   `ChangeConfirmation {dishId, honoured, day}`
+   (`models/dish_confirmation.dart`), keyed by the venue (the entry), the
+   dish id the notes already pair with the venue, the restriction, the
+   polarity and the calendar day — never the time. "Didn't ask" is recorded
+   as nothing. Both lists are read tolerantly (not a list → empty; a
+   malformed answer or a repeat is dropped) and written only when
+   non-empty, so a keto build's history entries are byte for byte as
+   before; there is no `schemaVersion` bump (C3). Today's answers reopen in
+   the prompt and can be corrected; an earlier day's are history and are
+   never rewritten. `VisitHistoryStore.setConfirmations` replaces them and
+   never creates an entry; `recordVisit` and `rename` keep them; Settings'
+   Clear and removing the Recent row delete them with the entry. An entry
+   keeps at most 200 of each, the oldest days dropped first. The store
+   names `DishConfirmation`, never a restriction token, so
+   `no_profile_on_the_wire_test` needed no allowance: like everything in
+   the history, the answers leave the device through nothing (C1).
+3. **One rule, in one helper, called once from the evaluator.**
+   `utils/allergens/confirmations.dart` (device-only, pure, no golden and
+   no Python twin) holds `ConfirmationEvidence` and `Confirmations.apply`,
+   which `ProfileEvaluator.evaluate` calls once, after the declarations
+   step (ALG-09), with the dish's evidence (`Confirmations.forDish`,
+   passed by `MenuController` and through `GroupEvaluator.evaluate` to
+   every person, since an answer is a fact about the dish). **Confirmed
+   present** raises every concern about that restriction to `stated` at
+   tier `confirmed` (a heads-up restriction's certainty stays suspected,
+   ALG-17), and re-adds the concern where it had been found when a later
+   analysis no longer finds it. **Confirmed absent** moves it to tier
+   `denied` at `suspected` — **never lower, and never removed, for any
+   entry**: a strict entry's dish therefore still reads "ask" (file 09: a
+   kitchen's answer holds for one visit, and the app never tells an
+   allergic person something is absent), and a flexible entry's suspected
+   concern is listed and moves nothing, so the Why sheet can still say
+   what the staff said. The person's latest answer decides, present at a
+   tie. `EvaluatedDish.confirmations` keeps the pieces that decided
+   something, and `GroupEvaluator.combine` unions them.
+4. **The date is shown, in words.** The dish card's concern line reads
+   "you confirmed it with the staff, May 12" or "the staff said it is not
+   there, May 12 — still ask" in place of the certainty words, and the Why
+   sheet adds "You confirmed with the staff on May 12" or "On May 12 the
+   staff told you it is not in the dish. That holds for that visit only,
+   so ask again each time" (Hebrew: "אישרת עם הצוות ב־12 במאי"); the date
+   is an ARB `DateTime` placeholder in the UI's locale. Neither says
+   "safe" or "בטוח". The change answer is recorded but not yet shown.
+5. **Ready for shared counts, with no network code.** `ConfirmationEvidence`
+   carries `shared` and `count`, so the same rule can read counts other
+   people shared: a shared piece counts only from
+   `sharedConfirmationThreshold` (3) people, a shared denial lowers one
+   step rather than straight to suspected, a shared present outranks a
+   shared absent, and the person's own answer always outranks any shared
+   count. For the shared store, `DishConfirmation.dishKey` is
+   `dishFingerprint(dishId)`, eight hex digits of 32-bit FNV-1a (the D23
+   hash), which matches the backend's `[A-Za-z0-9._:-]{1,64}`, and
+   `isShareable` is false for the user's own words (`custom`, ALG-17): they
+   are recorded and shown locally and are never uploaded. Nothing uploads
+   yet; the opt-in upload, its own consent and the read-back with
+   `/v1/venue-menus` are the shared half.
+6. **No rating, ever.** An answer is a fact about one dish, one
+   restriction and one day. Nothing on the device, and nothing the shared
+   half adds, sums a venue into a number, a star or a score: that is the
+   whole difference from AllergyEats and Spokin (file 10, Non-goals), and
+   the keto score of §6 is untouched by any answer.
+
+**What it accepts.** A dish id that a platform reassigns orphans its
+answers (they apply to nothing, as a note does); a scan's ids are stable
+because its ref is its content (D23). A confirmed present with no
+recorded source (only possible for a shared piece) is not re-added. The
+prompt asks about the profile as it is now, not as it was at the visit.
+
+**What it costs.** One more interface method on `VisitHistoryStore` and
+one optional `recordVisit` parameter, threaded through four
+implementations; one more optional parameter on the evaluator and the
+group evaluator; one more list on `EvaluatedDish`.
+
 ---
 
 ## 15. Testing strategy

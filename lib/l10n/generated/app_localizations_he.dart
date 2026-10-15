@@ -1944,4 +1944,86 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get concernCertaintyHeadsUp => 'ייתכן שיש בזה הרבה — התראה, לא מדידה';
+
+  @override
+  String get confirmPromptOpen => 'שאלת את הצוות?';
+
+  @override
+  String get confirmPromptTitle => 'אחרי הארוחה';
+
+  @override
+  String get confirmPromptIntro =>
+      'מה הצוות אמר לך? התשובות נשמרות רק במכשיר הזה ויופיעו על המנה בפעם הבאה שהתפריט ייפתח. תשובה נכונה לביקור ההוא בלבד, לכן כדאי לשאול בכל פעם.';
+
+  @override
+  String confirmPromptQuestion(String restriction, String dish) {
+    return 'שאלת על $restriction במנה $dish?';
+  }
+
+  @override
+  String get confirmAnswerPresent => 'אושר שיש';
+
+  @override
+  String get confirmAnswerAbsent => 'אושר שאין';
+
+  @override
+  String get confirmAnswerNotAsked => 'לא שאלתי';
+
+  @override
+  String get confirmChangeQuestion => 'שינו את המנה כפי שביקשתי';
+
+  @override
+  String get confirmChangeYes => 'כן';
+
+  @override
+  String get confirmChangeNo => 'לא';
+
+  @override
+  String get confirmNoteLabel => 'הערה (נשמרת רק במכשיר הזה)';
+
+  @override
+  String get confirmSave => 'שמירה';
+
+  @override
+  String get confirmSaved => 'נשמר במכשיר הזה';
+
+  @override
+  String get confirmNothing =>
+      'שום דבר בתפריט הזה לא מצביע על ההגבלות שלך, לכן אין על מה לשאול.';
+
+  @override
+  String get confirmUnavailable =>
+      'התפריט הזה כבר לא שמור במכשיר. אפשר לפתוח אותו שוב כדי לענות.';
+
+  @override
+  String concernConfirmedOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'אישרת עם הצוות, $dateString';
+  }
+
+  @override
+  String concernDeniedOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'הצוות אמר שאין, $dateString — עדיין לשאול';
+  }
+
+  @override
+  String whyConfirmedOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'אישרת עם הצוות ב־$dateString';
+  }
+
+  @override
+  String whyDeniedOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'ב־$dateString הצוות אמר לך שזה לא במנה. זה נכון לביקור ההוא בלבד, לכן כדאי לשאול שוב בכל פעם.';
+  }
 }

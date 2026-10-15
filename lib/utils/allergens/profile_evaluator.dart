@@ -28,6 +28,7 @@ import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/allergen_matcher.dart';
+import 'package:ketoclub/utils/allergens/confirmations.dart';
 import 'package:ketoclub/utils/allergens/custom_terms.dart';
 import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
@@ -112,6 +113,7 @@ final class EvaluatedDish {
     required this.state,
     this.modification,
     this.declarations = const <Declaration>[],
+    this.confirmations = const <ConfirmationEvidence>[],
   });
 
   /// The analysed dish, wire verdict untouched.
@@ -135,6 +137,11 @@ final class EvaluatedDish {
   /// concern at [EvidenceTier.declared]. Empty when none applied.
   final List<Declaration> declarations;
 
+  /// What the staff said that moved one of the concerns to
+  /// [EvidenceTier.confirmed] or [EvidenceTier.denied] (ALG-14,
+  /// [Confirmations.apply]): what the Why sheet dates. Empty when none.
+  final List<ConfirmationEvidence> confirmations;
+
   @override
   bool operator ==(Object other) =>
       other is EvaluatedDish &&
@@ -142,7 +149,8 @@ final class EvaluatedDish {
       listEquals(other.concerns, concerns) &&
       other.state == state &&
       other.modification == modification &&
-      listEquals(other.declarations, declarations);
+      listEquals(other.declarations, declarations) &&
+      listEquals(other.confirmations, confirmations);
 
   @override
   int get hashCode => Object.hash(
@@ -151,6 +159,7 @@ final class EvaluatedDish {
     state,
     modification,
     Object.hashAll(declarations),
+    Object.hashAll(confirmations),
   );
 
   @override
@@ -216,6 +225,10 @@ abstract final class ProfileEvaluator {
   /// Every kept concern carries a waiter question in the same language
   /// ([WaiterQuestions.fill], ALG-08b): the model's own when it wrote one.
   ///
+  /// After the declarations, what the staff said about this dish
+  /// ([confirmations], ALG-14) re-tiers the concerns it answers
+  /// ([Confirmations.apply]; never below suspected).
+  ///
   /// An empty profile holds keto: it is the keto-only user of today's
   /// app, and the result is the identity mapping of the wire verdict.
   static EvaluatedDish evaluate(
@@ -224,16 +237,32 @@ abstract final class ProfileEvaluator {
     DietaryProfile profile, {
     bool? hebrew,
     String? heading,
+    List<ConfirmationEvidence> confirmations = const <ConfirmationEvidence>[],
   }) {
     final hasKeto = profile.isEmpty || profile.contains(RestrictionId.keto);
     final isHebrew =
         hebrew ??
         TextNormaliser.containsHebrew(TextNormaliser.dishRulesText(dish));
 
-    final (:evidence, :declarations) = _applyDeclarations(<_Evidence>[
+    var (:evidence, :declarations) = _applyDeclarations(<_Evidence>[
       for (final evidence in _evidence(analysed, dish, profile.customTerms))
         if (_applies(evidence.concern, profile)) _headsUp(evidence),
     ], Declarations.of(dish, heading: heading));
+    // ALG-14: what the staff said (utils/allergens/confirmations.dart).
+    final staff = Confirmations.apply(
+      evidence,
+      confirmations,
+      concernOf: (item) => item.concern,
+      withConcern: (item, concern) =>
+          (concern: concern, removable: item.removable, item: item.item),
+      added: (concern) => (
+        concern: concern,
+        removable: concern.source == ConcernSource.option,
+        item: concern.matchedText,
+      ),
+      applies: (concern) => _applies(concern, profile),
+    );
+    evidence = staff.items;
 
     var avoid = hasKeto && analysed.verdict == DishVerdict.nonKeto;
     var ask = false;
@@ -285,6 +314,7 @@ abstract final class ProfileEvaluator {
       state: state,
       modification: state == DishState.avoid ? null : change,
       declarations: declarations,
+      confirmations: staff.applied,
     );
   }
 

@@ -1,3 +1,4 @@
+import 'package:ketoclub/models/dish_confirmation.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/storage/visit_history_store.dart';
@@ -11,6 +12,7 @@ typedef RecordedVisit = ({
   double? score,
   int? greenCount,
   int? yellowCount,
+  bool openedStrict,
 });
 
 /// A [VisitHistoryStore] backed by an in-memory map keyed by
@@ -31,6 +33,9 @@ final class FakeVisitHistoryStore implements VisitHistoryStore {
   /// Every [rename] call, in call order, with its arguments.
   final List<({VenueRef ref, String? name, String? city})> renameCalls =
       <({VenueRef ref, String? name, String? city})>[];
+
+  /// Every [setConfirmations] call's ref, in call order (ALG-14).
+  final List<VenueRef> confirmationCalls = <VenueRef>[];
 
   /// Every ref passed to [remove], in call order.
   final List<VenueRef> removedRefs = <VenueRef>[];
@@ -58,6 +63,7 @@ final class FakeVisitHistoryStore implements VisitHistoryStore {
     double? score,
     int? greenCount,
     int? yellowCount,
+    bool openedStrict = false,
   }) async {
     recordCalls.add((
       ref: ref,
@@ -67,6 +73,7 @@ final class FakeVisitHistoryStore implements VisitHistoryStore {
       score: score,
       greenCount: greenCount,
       yellowCount: yellowCount,
+      openedStrict: openedStrict,
     ));
     final now = clock.now();
     final existing = _entries[ref.cacheKey];
@@ -81,6 +88,25 @@ final class FakeVisitHistoryStore implements VisitHistoryStore {
       score: score ?? existing?.score,
       greenCount: greenCount ?? existing?.greenCount,
       yellowCount: yellowCount ?? existing?.yellowCount,
+      openedStrict: openedStrict || (existing?.openedStrict ?? false),
+      confirmations: existing?.confirmations ?? const <DishConfirmation>[],
+      changeConfirmations:
+          existing?.changeConfirmations ?? const <ChangeConfirmation>[],
+    );
+  }
+
+  @override
+  Future<void> setConfirmations(
+    VenueRef ref, {
+    required List<DishConfirmation> confirmations,
+    required List<ChangeConfirmation> changes,
+  }) async {
+    confirmationCalls.add(ref);
+    final existing = _entries[ref.cacheKey];
+    if (existing == null) return;
+    _entries[ref.cacheKey] = existing.withConfirmations(
+      confirmations: confirmations,
+      changes: changes,
     );
   }
 
@@ -104,6 +130,9 @@ final class FakeVisitHistoryStore implements VisitHistoryStore {
       score: existing.score,
       greenCount: existing.greenCount,
       yellowCount: existing.yellowCount,
+      openedStrict: existing.openedStrict,
+      confirmations: existing.confirmations,
+      changeConfirmations: existing.changeConfirmations,
     );
   }
 

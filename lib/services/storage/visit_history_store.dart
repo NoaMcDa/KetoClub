@@ -15,12 +15,20 @@
 /// an entry here stays until the user removes it or clears the list, so a
 /// menu opened last month is still listed (with its last score) after its
 /// cached copy has gone.
+///
+/// Banto (ALG-14, architecture.md D27) keeps the post-meal answers here
+/// too: what the staff said about a dish (`DishConfirmation`) and whether
+/// the kitchen made a change (`ChangeConfirmation`), written only when
+/// there are some, so a keto build's entries are byte for byte as before.
+/// They name a restriction, and like the rest of the entry they stay on
+/// the device (D26 C1).
 library;
 
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+import 'package:ketoclub/models/dish_confirmation.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 
@@ -40,7 +48,14 @@ final class VisitEntry {
     this.score,
     this.greenCount,
     this.yellowCount,
+    this.openedStrict = false,
+    this.confirmations = const <DishConfirmation>[],
+    this.changeConfirmations = const <ChangeConfirmation>[],
   });
+
+  /// The most [confirmations] (and, separately, [changeConfirmations]) an
+  /// entry keeps; past it the oldest days are dropped first (ALG-14).
+  static const int maxConfirmations = 200;
 
   /// Reads an entry written by [toJson].
   ///
@@ -49,6 +64,12 @@ final class VisitEntry {
   /// 1 (the entry exists, so the menu was opened at least once). Returns
   /// null for any other shape mismatch — a missing or malformed ref or
   /// timestamp, or a field of the wrong type — and never throws.
+  ///
+  /// The post-meal answers (ALG-14, D27) are read more tolerantly still,
+  /// so a bad one never costs the visit: `openedStrict` is true only when
+  /// it is `true`, and a `confirmations` or `changeConfirmations` that is
+  /// not a list reads as empty, a malformed answer in it is dropped, and
+  /// so is a repeat.
   static VisitEntry? tryFrom(Map<String, Object?> json) {
     final rawSource = json['source'];
     final rawId = json['platformId'];
@@ -85,7 +106,30 @@ final class VisitEntry {
       score: (score as num?)?.toDouble(),
       greenCount: green as int?,
       yellowCount: yellow as int?,
+      openedStrict: json['openedStrict'] == true,
+      confirmations: _readList(
+        json['confirmations'],
+        DishConfirmation.tryFromJson,
+      ),
+      changeConfirmations: _readList(
+        json['changeConfirmations'],
+        ChangeConfirmation.tryFromJson,
+      ),
     );
+  }
+
+  /// The records [raw] holds, each read by [read]: malformed ones and
+  /// repeats dropped, at most [maxConfirmations] kept; empty when [raw]
+  /// is not a list.
+  static List<T> _readList<T>(Object? raw, T? Function(Object?) read) {
+    if (raw is! List<Object?>) return List<T>.unmodifiable(<T>[]);
+    final kept = <T>[];
+    for (final item in raw) {
+      final value = read(item);
+      if (value != null && !kept.contains(value)) kept.add(value);
+      if (kept.length == maxConfirmations) break;
+    }
+    return List<T>.unmodifiable(kept);
   }
 
   /// The ISO-8601 timestamp [raw] holds, or null when it holds none.
@@ -122,7 +166,61 @@ final class VisitEntry {
   /// How many dishes the last analysis placed yellow, or null when unknown.
   final int? yellowCount;
 
-  /// Writes a form [tryFrom] can read back. A null field is left out.
+  /// Whether the menu was ever opened with a strict restriction in the
+  /// profile (Banto, ALG-14): what puts the post-meal "Did you ask?"
+  /// prompt on its Recent row. A flag, never the restriction (D26 C1).
+  final bool openedStrict;
+
+  /// What the staff said about the menu's dishes after a meal (ALG-14,
+  /// D27): one answer per dish, restriction, polarity and day. Empty when
+  /// none was recorded.
+  final List<DishConfirmation> confirmations;
+
+  /// Whether the kitchen made the change asked for, per dish and day
+  /// (ALG-14). Empty when none was recorded.
+  final List<ChangeConfirmation> changeConfirmations;
+
+  /// This entry with its post-meal answers replaced by [confirmations] and
+  /// [changes], repeats dropped and each cut to the [maxConfirmations]
+  /// latest days.
+  VisitEntry withConfirmations({
+    required List<DishConfirmation> confirmations,
+    required List<ChangeConfirmation> changes,
+  }) => VisitEntry(
+    ref: ref,
+    name: name,
+    city: city,
+    firstOpenedAt: firstOpenedAt,
+    lastOpenedAt: lastOpenedAt,
+    openCount: openCount,
+    dishCount: dishCount,
+    score: score,
+    greenCount: greenCount,
+    yellowCount: yellowCount,
+    openedStrict: openedStrict,
+    confirmations: _newest(confirmations, (item) => item.day),
+    changeConfirmations: _newest(changes, (item) => item.day),
+  );
+
+  /// [items] without repeats, cut to the [maxConfirmations] whose [day] is
+  /// latest, otherwise in their given order.
+  static List<T> _newest<T>(List<T> items, DateTime Function(T) day) {
+    final unique = <T>[];
+    for (final item in items) {
+      if (!unique.contains(item)) unique.add(item);
+    }
+    if (unique.length <= maxConfirmations) {
+      return List<T>.unmodifiable(unique);
+    }
+    final byDay = List<T>.of(unique)..sort((a, b) => day(b).compareTo(day(a)));
+    final kept = byDay.take(maxConfirmations).toSet();
+    return List<T>.unmodifiable(unique.where(kept.contains));
+  }
+
+  /// Writes a form [tryFrom] can read back. A null field is left out, and
+  /// so are `openedStrict` when false and the post-meal answers when there
+  /// are none (ALG-14), so a keto build's entry is byte for byte what it
+  /// was before them.
   Map<String, Object?> toJson() => <String, Object?>{
     'source': ref.source.name,
     'platformId': ref.platformId,
@@ -135,6 +233,15 @@ final class VisitEntry {
     'score': ?score,
     'greenCount': ?greenCount,
     'yellowCount': ?yellowCount,
+    if (openedStrict) 'openedStrict': true,
+    if (confirmations.isNotEmpty)
+      'confirmations': <Object?>[
+        for (final confirmation in confirmations) confirmation.toJson(),
+      ],
+    if (changeConfirmations.isNotEmpty)
+      'changeConfirmations': <Object?>[
+        for (final change in changeConfirmations) change.toJson(),
+      ],
   };
 
   @override
@@ -149,7 +256,10 @@ final class VisitEntry {
       other.dishCount == dishCount &&
       other.score == score &&
       other.greenCount == greenCount &&
-      other.yellowCount == yellowCount;
+      other.yellowCount == yellowCount &&
+      other.openedStrict == openedStrict &&
+      listEquals(other.confirmations, confirmations) &&
+      listEquals(other.changeConfirmations, changeConfirmations);
 
   @override
   int get hashCode => Object.hash(
@@ -163,6 +273,9 @@ final class VisitEntry {
     score,
     greenCount,
     yellowCount,
+    openedStrict,
+    Object.hashAll(confirmations),
+    Object.hashAll(changeConfirmations),
   );
 
   @override
@@ -197,7 +310,9 @@ abstract interface class VisitHistoryStore {
   /// now and counts one more opening, leaving the first opened time alone.
   /// Each of [name], [city], [dishCount], [score], [greenCount] and
   /// [yellowCount] replaces the recorded value when given and keeps it when
-  /// null: a null never erases what an earlier visit recorded.
+  /// null: a null never erases what an earlier visit recorded. In the same
+  /// way [openedStrict] (ALG-14) sets [VisitEntry.openedStrict] when true
+  /// and keeps it when false, and the post-meal answers are always kept.
   ///
   /// Never throws.
   Future<void> recordVisit(
@@ -208,6 +323,18 @@ abstract interface class VisitHistoryStore {
     double? score,
     int? greenCount,
     int? yellowCount,
+    bool openedStrict = false,
+  });
+
+  /// Replaces the post-meal answers recorded for [ref] (ALG-14, D27) with
+  /// [confirmations] and [changes] ([VisitEntry.withConfirmations]). Does
+  /// nothing when [ref] has no entry, so an answer never creates one.
+  ///
+  /// Never throws.
+  Future<void> setConfirmations(
+    VenueRef ref, {
+    required List<DishConfirmation> confirmations,
+    required List<ChangeConfirmation> changes,
   });
 
   /// Replaces both the name and the city recorded for [ref] with [name] and
@@ -245,6 +372,7 @@ VisitEntry _visitAfterOpening(
   double? score,
   int? greenCount,
   int? yellowCount,
+  bool openedStrict = false,
 }) => VisitEntry(
   ref: ref,
   name: name ?? existing?.name,
@@ -256,6 +384,10 @@ VisitEntry _visitAfterOpening(
   score: score ?? existing?.score,
   greenCount: greenCount ?? existing?.greenCount,
   yellowCount: yellowCount ?? existing?.yellowCount,
+  openedStrict: openedStrict || (existing?.openedStrict ?? false),
+  confirmations: existing?.confirmations ?? const <DishConfirmation>[],
+  changeConfirmations:
+      existing?.changeConfirmations ?? const <ChangeConfirmation>[],
 );
 
 /// [existing] with its name and city replaced by [name] and [city] (see
@@ -275,6 +407,9 @@ VisitEntry _visitRenamed(
   score: existing.score,
   greenCount: existing.greenCount,
   yellowCount: existing.yellowCount,
+  openedStrict: existing.openedStrict,
+  confirmations: existing.confirmations,
+  changeConfirmations: existing.changeConfirmations,
 );
 
 /// A [VisitHistoryStore] in a Hive box of JSON strings, one per
@@ -381,6 +516,7 @@ final class HiveVisitHistoryStore implements VisitHistoryStore {
     double? score,
     int? greenCount,
     int? yellowCount,
+    bool openedStrict = false,
   }) async {
     final box = await _boxOrNull();
     if (box == null) return;
@@ -396,6 +532,26 @@ final class HiveVisitHistoryStore implements VisitHistoryStore {
         score: score,
         greenCount: greenCount,
         yellowCount: yellowCount,
+        openedStrict: openedStrict,
+      ),
+    );
+  }
+
+  @override
+  Future<void> setConfirmations(
+    VenueRef ref, {
+    required List<DishConfirmation> confirmations,
+    required List<ChangeConfirmation> changes,
+  }) async {
+    final box = await _boxOrNull();
+    if (box == null) return;
+    final existing = _get(box, ref);
+    if (existing == null) return;
+    await _put(
+      box,
+      existing.withConfirmations(
+        confirmations: confirmations,
+        changes: changes,
       ),
     );
   }
@@ -463,6 +619,14 @@ final class NoVisitHistoryStore implements VisitHistoryStore {
     double? score,
     int? greenCount,
     int? yellowCount,
+    bool openedStrict = false,
+  }) async {}
+
+  @override
+  Future<void> setConfirmations(
+    VenueRef ref, {
+    required List<DishConfirmation> confirmations,
+    required List<ChangeConfirmation> changes,
   }) async {}
 
   @override
