@@ -23,7 +23,7 @@ Iterable<String> _englishTerms(RestrictionVocabulary vocabulary) => <String>[
 
 void main() {
   group('allergenVocabulary', () {
-    test('the six groups cover every id exactly once', () {
+    test('the group files cover every id exactly once', () {
       // Act
       final owners = <RestrictionId, List<String>>{};
       for (final MapEntry(key: file, value: group)
@@ -40,7 +40,7 @@ void main() {
       }
     });
 
-    test('the registry is the union of the six groups', () {
+    test('the registry is the union of the group files', () {
       // Act
       final union = <RestrictionId, RestrictionVocabulary>{
         for (final group in allergenVocabularyGroups.values) ...group,

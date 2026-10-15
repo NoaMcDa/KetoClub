@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/named_profile.dart';
-import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/widgets/restriction_picker_sheet.dart';
 
 /// What the UI calls [person] (Banto, ALG-12, issue #354): their name, or
@@ -26,9 +25,6 @@ String profileRestrictionsLine(
 ) {
   if (profile.isEmpty) return l10n.profileKetoOnly;
   return profile.entries
-      .map(
-        (entry) =>
-            restrictionDisplayName(restrictionFor(entry.restrictionId), locale),
-      )
+      .map((entry) => profileEntryDisplayName(entry, locale))
       .join(', ');
 }

@@ -325,4 +325,143 @@ void main() {
       });
     }
   });
+
+  group("the user's own restriction (ALG-17)", () {
+    test('withCustomTerm adds the entry last, then appends words', () {
+      // Act
+      final profile = DietaryProfile.empty
+          .withEntry(RestrictionId.sesame)
+          .withCustomTerm('  kiwi ')
+          .withCustomTerm('כוסברה');
+
+      // Assert
+      expect(
+        profile.entries.map((entry) => entry.restrictionId),
+        <RestrictionId>[RestrictionId.sesame, RestrictionId.custom],
+      );
+      expect(profile.customTerms, <String>['kiwi', 'כוסברה']);
+      expect(profile.hasNonKetoEntry, isTrue);
+      expect(profile.hasStrictEntry, isTrue);
+    });
+
+    test('a blank, repeated (any case) or surplus word changes nothing', () {
+      // Arrange
+      var full = DietaryProfile.empty;
+      for (var i = 0; i < ProfileEntry.maxTerms; i++) {
+        full = full.withCustomTerm('word $i');
+      }
+      final one = DietaryProfile.empty.withCustomTerm('kiwi');
+
+      // Assert
+      expect(identical(one.withCustomTerm('   '), one), isTrue);
+      expect(identical(one.withCustomTerm('KIWI'), one), isTrue);
+      expect(identical(full.withCustomTerm('more'), full), isTrue);
+      expect(full.customTerms, hasLength(ProfileEntry.maxTerms));
+    });
+
+    test('a word is cut to its cap in code points', () {
+      final long = 'א' * (ProfileEntry.maxTermLength + 5);
+      expect(
+        DietaryProfile.empty.withCustomTerm(long).customTerms.single.length,
+        ProfileEntry.maxTermLength,
+      );
+    });
+
+    test('withoutCustomTerm removes a word, and the entry with the last', () {
+      // Arrange
+      final profile = DietaryProfile.empty
+          .withCustomTerm('kiwi')
+          .withCustomTerm('coriander');
+
+      // Act
+      final one = profile.withoutCustomTerm('kiwi');
+      final none = one.withoutCustomTerm('coriander');
+
+      // Assert
+      expect(one.customTerms, <String>['coriander']);
+      expect(none, DietaryProfile.empty);
+      expect(identical(profile.withoutCustomTerm('mango'), profile), isTrue);
+    });
+
+    test('round-trips through JSON, writing terms only for the own entry', () {
+      // Arrange
+      final profile = DietaryProfile.empty
+          .withEntry(RestrictionId.milk, exceptions: <String>['butter'])
+          .withCustomTerm('kiwi');
+
+      // Act
+      final json = jsonDecode(jsonEncode(profile.toJson()));
+
+      // Assert
+      expect(json, <Object?>[
+        <String, Object?>{
+          'id': 'milk',
+          'exceptions': <Object?>['butter'],
+        },
+        <String, Object?>{
+          'id': 'custom',
+          'exceptions': <Object?>[],
+          'terms': <Object?>['kiwi'],
+        },
+      ]);
+      expect(DietaryProfile.tryFrom(json), profile);
+    });
+
+    test('tryFrom drops an own entry with no words, and terms elsewhere', () {
+      // Act
+      final profile = DietaryProfile.tryFrom(const <Object?>[
+        <String, Object?>{'id': 'custom', 'terms': <Object?>[]},
+        <String, Object?>{'id': 'custom', 'terms': 'kiwi'},
+        <String, Object?>{
+          'id': 'sesame',
+          'terms': <Object?>['kiwi'],
+        },
+        <String, Object?>{
+          'id': 'custom',
+          'terms': <Object?>[' kiwi ', 3, 'Kiwi', ''],
+        },
+      ]);
+
+      // Assert
+      expect(
+        profile.entries.map((entry) => entry.restrictionId),
+        <RestrictionId>[RestrictionId.sesame, RestrictionId.custom],
+      );
+      expect(profile.entryFor(RestrictionId.sesame)!.terms, isEmpty);
+      expect(profile.customTerms, <String>['kiwi']);
+    });
+
+    test('an install that predates ALG-17 drops the new ids gracefully', () {
+      // A stored id this build does not know is dropped, as before; the
+      // new ids read back by name.
+      final profile = DietaryProfile.tryFrom(const <Object?>[
+        <String, Object?>{'id': 'alphaGal'},
+        <String, Object?>{'id': 'fodmap'},
+        <String, Object?>{'id': 'shellfish'},
+        <String, Object?>{'id': 'glp1'},
+      ]);
+      expect(
+        profile.entries.map((entry) => entry.restrictionId),
+        <RestrictionId>[
+          RestrictionId.alphaGal,
+          RestrictionId.fodmap,
+          RestrictionId.glp1,
+        ],
+      );
+    });
+
+    test('toString counts the words and never prints them', () {
+      final text = DietaryProfile.empty.withCustomTerm('kiwi').toString();
+      expect(text, contains('custom (1 terms)'));
+      expect(text, isNot(contains('kiwi')));
+    });
+
+    test('withEntry gives no words to any other entry', () {
+      final profile = DietaryProfile.empty.withEntry(
+        RestrictionId.sesame,
+        terms: <String>['kiwi'],
+      );
+      expect(profile.entryFor(RestrictionId.sesame)!.terms, isEmpty);
+    });
+  });
 }

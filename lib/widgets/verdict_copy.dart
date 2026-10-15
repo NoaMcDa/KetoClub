@@ -269,6 +269,19 @@ abstract final class VerdictCopy {
     return hebrew ? restriction.nameHe : restriction.nameEn;
   }
 
+  /// The name a concern's chip shows, in the dish's language ([hebrew]):
+  /// [restrictionName], except for the user's own restriction (ALG-17),
+  /// whose chip shows the menu's words that matched ("kiwi"), since its
+  /// name says nothing of which word it was.
+  static String concernName(Concern concern, {required bool hebrew}) {
+    final matched = concern.matchedText?.trim();
+    return concern.restrictionId == RestrictionId.custom &&
+            matched != null &&
+            matched.isNotEmpty
+        ? matched
+        : restrictionName(concern.restrictionId, hebrew: hebrew);
+  }
+
   /// [askQuestionTemplateEn] or [askQuestionTemplateHe] for [id], which
   /// is named as the thing avoided ([WaiterQuestions.subject]: "animal
   /// products" for vegan rather than "vegan").

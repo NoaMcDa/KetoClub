@@ -516,6 +516,72 @@ abstract]**); CDF still advises asking for a dedicated fryer.
 
 ---
 
+## 7. Hebrew menu terms for the extended restrictions (ALG-17)
+
+**Status: desk research, added on 2026-10-15 for ALG-17, not clinical
+review.** These are the Hebrew spellings an Israeli menu uses for the
+foods that file 11 §17 (alpha-gal) and §21–§23 (FODMAP, histamine, GLP-1
+eating) list in English, with the sources cited there. As §20 of file 11
+says of all Hebrew dish vocabulary, they are the app's own lexicon, not
+sourced medical content: no Hebrew clinical page was consulted, and a
+native-speaking dietitian should review them. Spelling variants follow §1
+(geresh and apostrophe read alike; the parser allows the grammatical
+prefixes ב/ה/ו/כ/ל/מ/ש unless a term is listed as taking none).
+
+### 7.1 Alpha-gal — אלפא-גל (mammalian meat)
+
+| Term | Meaning | Use |
+|---|---|---|
+| בקר, עגל, כבש, טלה, חזיר, עז, צבי, ארנב | beef, veal, mutton, lamb, pork, goat, venison, rabbit | direct |
+| אנטריקוט, סינטה, שייטל, פיקניה, אסאדו, ספריבס, אוסובוקו | beef and veal cuts | direct |
+| ג'לטין, שומן חזיר, שומן כבש | gelatin and mammal fat (via חזיר/כבש); tallow is not listed, because its Hebrew חֵלֶב is spelled as milk | direct |
+| לשון, מח עצם, ציר בקר, מרק עצמות | tongue, bone marrow, beef stock, bone broth | direct (ציר בקר via בקר) / likely |
+| בשר | "meat": on an Israeli menu usually beef or lamb, while poultry is עוף | likely; lowered beside עוף/הודו/דג |
+| המבורגר, קבב, עראייס, קציצות, סטייק, קרפצ'יו, פסטרמה, סלמי, נקניקיה, קבנוס, מרגז, בייקון, צ'ולנט, חמין | beef or lamb dishes and cured meats (turkey versions exist: פסטרמה הודו, נקניקיית עוף) | likely; lowered beside עוף/הודו/דג/טונה/סלמון/סלק/כרובית |
+| כבד, כבדים | liver — beef or chicken (כבד עוף) | likely; lowered beside עוף/אווז/ברווז |
+| שווארמה, נקניק, קובה, ציר, שומן | often turkey or chicken in Israel; mixed or unknown fat and stock | suspected |
+| פנקוטה, מרשמלו, ג'לי, סוכריות גומי | gelatin desserts | likely (ג'לי suspected) |
+
+Dairy, which some people with alpha-gal syndrome react to (file 11
+§17.2), is not listed: the Milk restriction carries it, and a person who
+reacts to dairy adds that entry too.
+
+### 7.2 FODMAP — פודמאפ
+
+| Term | Meaning | Use |
+|---|---|---|
+| בצל, בצלים, שאלוט, כרישה, שום (and בשום, ושום, השום, ובשום) | onion, shallot, leek, garlic | direct; שום takes no free prefix, since משום is "because" |
+| חומוס (the chickpea), גרגרי חומוס, עדשים, שעועית, פול | chickpeas, lentils, beans, fava | direct (חומוס the dish: hidden, likely) |
+| תפוח, תפוחים, אגס, אגסים, מנגו, אבטיח, דבש, סילאן, אגבה | apple, pear, mango, watermelon, honey, date syrup, agave | direct; תפוח lowered before אדמה (potato) |
+| חלב, יוגורט, גלידה, ריקוטה, גבינת קוטג' | lactose foods | direct; חלב lowered before שקדים/סויה/שיבולת שועל/קוקוס/אורז |
+| כרובית, פטריות, פטרייה, ארטישוק, אספרגוס, קשיו, פיסטוק, משמש, אפרסק, שזיף, דובדבנים | polyol and fructan foods | direct |
+| פלאפל, מג'דרה, ציר, מרק, רוטב שום, איולי, צזיקי, פסטו, סלסה | hidden onion, garlic, chickpea, lentil | likely / suspected |
+| לחם, פיתה, פסטה, קוסקוס | wheat in a full serving | suspected |
+
+### 7.3 Histamine — היסטמין
+
+| Term | Meaning | Use |
+|---|---|---|
+| פרמזן, פרמג'יאנו, צ'דר, גאודה, אמנטל, רוקפור, גורגונזולה, קממבר, ברי, גבינה מיושנת | aged cheeses | direct |
+| סלמי, פפרוני, פרושוטו, בייקון, פסטרמה, קבנוס, נקניק, צ'וריסו | cured and processed meats | direct |
+| טונה, מקרל, סרדינים, אנשובי, הרינג, דג מעושן, סלמון מעושן | histamine-prone fish | direct |
+| כרוב כבוש, קימצ'י, חמוצים, מלפפון חמוץ, מיסו, טמפה, קומבוצ'ה, קפיר | fermented foods | direct |
+| חומץ, בלסמי, יין, בירה, שמפניה | vinegar and alcohol | direct |
+| רוטב סויה, רוטב דגים, קטשופ, רוטב ווסטרשייר | fermented and vinegar sauces | likely |
+| עגבניה, עגבניות, רסק עגבניות, תרד, חציל, חצילים, אבוקדו, תות, תותים, אננס, שוקולד | histamine-rich or "liberator" foods | suspected |
+
+### 7.4 Small portions (GLP-1) — מנות קטנות
+
+| Term | Meaning | Use |
+|---|---|---|
+| מטוגן, מטוגנת, מטוגנים, מטוגנות, טמפורה, שניצל, צ'יפס | fried | likely |
+| שמנת, רוטב שמנת, קרמי, אלפרדו, קרבונרה | creamy | likely |
+| כפול, כפולה, משולש, ענק, ענקית, מגש, משפחתי, ללא הגבלה | large portions | likely |
+| גדול, גדולה | "large" | suspected |
+| קולה, מוגז, לימונדה, מילקשייק, שייק, ברד, סירופ, קינוח, קינוחים, עוגה, עוגת, גלידה, בראוניז | sugary drinks and desserts | likely |
+
+---
+
 ## Sources
 
 Grades: **[S]** strong (official, clinical, peer-reviewed, manufacturer),

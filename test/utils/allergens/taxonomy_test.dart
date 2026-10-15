@@ -26,8 +26,11 @@ void main() {
       // Arrange
       const flexible = <RestrictionId>{
         RestrictionId.lactose,
+        RestrictionId.fodmap,
+        RestrictionId.histamine,
         RestrictionId.vegan,
         RestrictionId.vegetarian,
+        RestrictionId.glp1,
         RestrictionId.keto,
       };
 
@@ -141,9 +144,15 @@ void main() {
       expect(sesame.jurisdictions, contains(Jurisdiction.eu));
     });
 
-    test('legumes, lactose and the diets are regulated nowhere', () {
+    test('legumes, lactose, the diets and the ALG-17 restrictions are '
+        'regulated nowhere', () {
       for (final id in <RestrictionId>[
         RestrictionId.legumes,
+        RestrictionId.alphaGal,
+        RestrictionId.fodmap,
+        RestrictionId.histamine,
+        RestrictionId.glp1,
+        RestrictionId.custom,
         RestrictionId.lactose,
         RestrictionId.vegan,
         RestrictionId.vegetarian,

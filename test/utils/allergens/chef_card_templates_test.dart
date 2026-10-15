@@ -10,6 +10,7 @@ import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/chef_card_templates.dart';
 import 'package:ketoclub/utils/allergens/kitchen_signals.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
+import 'package:ketoclub/utils/allergens/waiter_questions.dart';
 
 /// English fragments no card line may contain: the claims the app does not
 /// make (mirrors `test/l10n/banned_words_test.dart`) plus "safe".
@@ -250,9 +251,12 @@ void main() {
           }
           // Allergens and celiac name themselves; lifestyle and keto
           // sentences describe the diet instead of echoing its name.
-          if (restriction.kind == RestrictionKind.allergen ||
-              restriction.kind == RestrictionKind.intolerance ||
-              restriction.kind == RestrictionKind.autoimmune) {
+          // The user's own restriction (ALG-17) names their words, which
+          // its own group tests.
+          if (restriction.id != RestrictionId.custom &&
+              (restriction.kind == RestrictionKind.allergen ||
+                  restriction.kind == RestrictionKind.intolerance ||
+                  restriction.kind == RestrictionKind.autoimmune)) {
             expect(
               entryLine.toLowerCase(),
               contains(
@@ -570,13 +574,14 @@ void main() {
         final note = ChefCardText.allergyNote(everything, hebrew: hebrew)!;
 
         // Assert
+        // Each allergen is named as the thing avoided (alpha-gal by its
+        // foods; ALG-17), and the user's own restriction by its words.
         for (final restriction in restrictionTaxonomy) {
           if (restriction.kind != RestrictionKind.allergen) continue;
           expect(
             note,
-            contains(
-              hebrew ? restriction.nameHe : restriction.nameEn.toLowerCase(),
-            ),
+            contains(WaiterQuestions.subject(restriction.id, hebrew: hebrew)),
+            reason: restriction.id.name,
           );
         }
         expect(note, isNot(contains(hebrew ? 'נמנע/ת' : 'avoid')));
@@ -607,5 +612,99 @@ void main() {
         });
       }
     }
+  });
+
+  group('ALG-17 lines', () {
+    test('alpha-gal names its foods and asks for the check', () {
+      final line = ChefCardText.compose(
+        _only(RestrictionId.alphaGal),
+        hebrew: false,
+      )[1];
+      expect(line, contains('beef, lamb, pork, gelatin'));
+      expect(line, contains('please check every ingredient'));
+    });
+
+    test('FODMAP, histamine and small portions ask to be told', () {
+      for (final id in headsUpRestrictions) {
+        for (final hebrew in <bool>[false, true]) {
+          final lines = ChefCardText.compose(_only(id), hebrew: hebrew);
+          expect(
+            lines[1],
+            contains(hebrew ? 'נא לומר לי' : 'please tell me'),
+            reason: '${id.name} $hebrew',
+          );
+          // Only flexible entries: the closing is plain thanks.
+          expect(lines.last, hebrew ? 'תודה.' : 'Thank you.');
+        }
+      }
+    });
+
+    test('small portions names no medicine', () {
+      for (final hebrew in <bool>[false, true]) {
+        final line = ChefCardText.compose(
+          _only(RestrictionId.glp1),
+          hebrew: hebrew,
+        )[1];
+        expect(line, isNot(contains('GLP')));
+      }
+    });
+
+    test('the own restriction lists the words and asks for the check', () {
+      // Arrange
+      final profile = DietaryProfile.empty
+          .withCustomTerm('kiwi')
+          .withCustomTerm('coriander');
+
+      // Act
+      final en = ChefCardText.compose(profile, hebrew: false);
+      final he = ChefCardText.compose(
+        DietaryProfile.empty.withCustomTerm('כוסברה'),
+        hebrew: true,
+      );
+
+      // Assert
+      expect(
+        en[1],
+        'I cannot eat: kiwi, coriander — please check every ingredient, '
+        'including sauces, oils and garnishes.',
+      );
+      expect(en.last, contains('cross-contact'));
+      expect(
+        he[1],
+        'אני לא יכול/ה לאכול: כוסברה — נא לבדוק כל מרכיב, כולל רטבים, '
+        'שמנים וקישוטים.',
+      );
+    });
+
+    test('the allergy note carries the own words, strictly', () {
+      // Arrange
+      final profile = DietaryProfile.empty
+          .withEntry(RestrictionId.sesame)
+          .withCustomTerm('kiwi')
+          .withCustomTerm('pine nuts')
+          .withEntry(RestrictionId.fodmap);
+
+      // Act
+      final note = ChefCardText.allergyNote(profile, hebrew: false)!;
+
+      // Assert
+      expect(
+        note,
+        'I have an allergy to sesame. I also cannot eat kiwi and pine nuts. '
+        'I also avoid onion, garlic and other high-FODMAP foods. Please '
+        'check every ingredient, including sauces, and make sure there is '
+        'no cross-contact in preparation. Thank you.',
+      );
+      _expectInsideFloor(note);
+    });
+
+    test('an own word alone makes a strict note', () {
+      final note = ChefCardText.allergyNote(
+        DietaryProfile.empty.withCustomTerm('קיווי'),
+        hebrew: true,
+      )!;
+      expect(note, startsWith('אני לא יכול/ה לאכול קיווי.'));
+      expect(note, contains('מגע צולב'));
+    });
   });
 }

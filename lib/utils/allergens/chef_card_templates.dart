@@ -130,8 +130,10 @@ abstract final class ChefCardText {
   /// else English. Null when [profile] holds nothing but keto, which a
   /// kitchen note does not carry.
   ///
-  /// The allergens, then celiac disease, then the flexible entries (an
-  /// intolerance or a diet, named as what is left out), and a closing
+  /// The allergens, then celiac disease, then the user's own words
+  /// (ALG-17's free-text restriction, strict: "I cannot eat kiwi"), then
+  /// the flexible entries (an intolerance or a diet, named as what is left
+  /// out), and a closing
   /// sentence: for a profile with a strict entry, "check every
   /// ingredient … confirm there is no cross-contact"; otherwise "please
   /// leave them out". When the note is longer than
@@ -141,8 +143,15 @@ abstract final class ChefCardText {
     final allergens = <RestrictionId>[];
     var celiac = false;
     final flexible = <RestrictionId>[];
+    final ownTerms = <String>[];
+    var ownEntry = false;
     for (final entry in profile.entries) {
       final restriction = restrictionFor(entry.restrictionId);
+      if (restriction.id == RestrictionId.custom) {
+        ownEntry = true;
+        ownTerms.addAll(entry.terms);
+        continue;
+      }
       switch (restriction.kind) {
         case RestrictionKind.allergen:
           allergens.add(restriction.id);
@@ -156,7 +165,7 @@ abstract final class ChefCardText {
           flexible.add(restriction.id);
       }
     }
-    final strict = allergens.isNotEmpty || celiac;
+    final strict = allergens.isNotEmpty || celiac || ownEntry;
     if (!strict && flexible.isEmpty) return null;
 
     String subjects(List<RestrictionId> ids, String prefix) =>
@@ -174,6 +183,19 @@ abstract final class ChefCardText {
         : (hebrew
               ? 'יש לי צליאק ואני לא יכול/ה לאכול גלוטן.'
               : 'I have celiac disease and cannot eat gluten.');
+    final ownList = ownTerms.isEmpty
+        ? WaiterQuestions.subject(RestrictionId.custom, hebrew: hebrew)
+        : _joinList(ownTerms, hebrew: hebrew);
+    final ownSentence = !ownEntry
+        ? null
+        : (hebrew
+                  ? (allergens.isNotEmpty || celiac
+                        ? 'אני גם לא יכול/ה לאכול {list}.'
+                        : 'אני לא יכול/ה לאכול {list}.')
+                  : (allergens.isNotEmpty || celiac
+                        ? 'I also cannot eat {list}.'
+                        : 'I cannot eat {list}.'))
+              .replaceAll('{list}', ownList);
     final flexibleSentence = flexible.isEmpty
         ? null
         : (hebrew
@@ -187,6 +209,7 @@ abstract final class ChefCardText {
     String join({required bool withFlexible}) => <String>[
       ?allergenSentence,
       ?celiacSentence,
+      ?ownSentence,
       if (withFlexible) ?flexibleSentence,
       closing,
     ].join(' ');
@@ -234,7 +257,9 @@ abstract final class ChefCardText {
 
   static String _entryLine(ProfileEntry entry, {required bool hebrew}) {
     final restriction = restrictionFor(entry.restrictionId);
-    final base = hebrew ? _baseHe(restriction) : _baseEn(restriction);
+    final base = restriction.id == RestrictionId.custom
+        ? _ownLine(entry.terms, hebrew: hebrew)
+        : (hebrew ? _baseHe(restriction) : _baseEn(restriction));
     if (entry.exceptions.isEmpty) return base;
     final joined = entry.exceptions.join(', ');
     return hebrew
@@ -242,8 +267,69 @@ abstract final class ChefCardText {
         : '$base I can still have: $joined.';
   }
 
+  /// The strict line of the user's own restriction (ALG-17): their words,
+  /// as they wrote them, and the allergen sentence's "check every
+  /// ingredient". It names no condition: the words may be an allergy or
+  /// something the person cannot eat for another reason, and the card
+  /// says only what to keep out.
+  static String _ownLine(List<String> terms, {required bool hebrew}) {
+    final list = terms.isEmpty
+        ? WaiterQuestions.subject(RestrictionId.custom, hebrew: hebrew)
+        : terms.join(', ');
+    return hebrew
+        ? 'אני לא יכול/ה לאכול: $list — נא לבדוק כל מרכיב, כולל רטבים, '
+              'שמנים וקישוטים.'
+        : 'I cannot eat: $list — please check every ingredient, including '
+              'sauces, oils and garnishes.';
+  }
+
+  /// The ALG-17 restrictions whose line is their own rather than their
+  /// kind's, in English; `{name}` is the restriction's name, lower-cased.
+  /// Alpha-gal names its foods, since nobody orders "alpha-gal"; FODMAP,
+  /// histamine and small portions ask to be told, as every flexible line
+  /// does, and name what they go easy on. Small portions names no medicine:
+  /// the kitchen needs the portion, not the reason.
+  static const Map<RestrictionId, String> _extendedLineEn =
+      <RestrictionId, String>{
+        RestrictionId.alphaGal:
+            'I have an allergy to {name} — beef, lamb, pork, gelatin, lard '
+            'and meat stock — please check every ingredient, including '
+            'sauces, stocks, oils and garnishes.',
+        RestrictionId.fodmap:
+            'I follow a low-FODMAP diet — please tell me which dishes '
+            'contain onion, garlic, wheat, beans or lentils, honey or apple, '
+            'even in a sauce or a stock.',
+        RestrictionId.histamine:
+            'I am sensitive to {name} — please tell me which dishes contain '
+            'aged cheese, smoked or processed meat, fermented foods, '
+            'vinegar, wine or tuna.',
+        RestrictionId.glp1:
+            'I eat small portions — please tell me which dishes come in a '
+            'smaller size, and which are fried, creamy or very sweet.',
+      };
+
+  /// [_extendedLineEn] in Hebrew; `{name}` is the Hebrew name.
+  static const Map<RestrictionId, String> _extendedLineHe =
+      <RestrictionId, String>{
+        RestrictionId.alphaGal:
+            "יש לי אלרגיה ל{name} — בקר, כבש, חזיר, ג'לטין, שומן מן החי וציר "
+            'בשר — נא לבדוק כל מרכיב, כולל רטבים, צירים, שמנים וקישוטים.',
+        RestrictionId.fodmap:
+            'אני בתזונה דלת {name} (FODMAP) — נא לומר לי אילו מנות מכילות '
+            'בצל, שום, חיטה, שעועית או עדשים, דבש או תפוח, גם ברוטב או '
+            'בציר.',
+        RestrictionId.histamine:
+            'אני רגיש/ה ל{name} — נא לומר לי אילו מנות מכילות גבינה '
+            'מיושנת, בשר מעושן או מעובד, מזון מותסס, חומץ, יין או טונה.',
+        RestrictionId.glp1:
+            'אני אוכל/ת מנות קטנות — נא לומר לי אילו מנות אפשר לקבל בגודל '
+            'קטן יותר, ואילו מטוגנות, שמנתיות או מתוקות מאוד.',
+      };
+
   static String _baseEn(Restriction restriction) {
     final name = restriction.nameEn.toLowerCase();
+    final special = _extendedLineEn[restriction.id];
+    if (special != null) return special.replaceAll('{name}', name);
     switch (restriction.kind) {
       case RestrictionKind.allergen:
         return 'I have an allergy to $name — please check every ingredient, '
@@ -280,6 +366,8 @@ abstract final class ChefCardText {
 
   static String _baseHe(Restriction restriction) {
     final name = restriction.nameHe;
+    final special = _extendedLineHe[restriction.id];
+    if (special != null) return special.replaceAll('{name}', name);
     switch (restriction.kind) {
       case RestrictionKind.allergen:
         return 'יש לי אלרגיה ל$name — נא לבדוק כל מרכיב, '

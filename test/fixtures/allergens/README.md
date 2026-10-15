@@ -108,13 +108,18 @@ must not change when a golden does.
 
 ### Restriction ids
 
-Exactly these twenty strings, the names of the `RestrictionId` enum:
+These strings, the names of the `RestrictionId` enum:
 `peanuts`, `treeNuts`, `milk`, `lactose`, `eggs`, `soy`, `wheat`, `gluten`,
 `fish`, `crustaceans`, `molluscs`, `sesame`, `celery`, `mustard`, `lupin`,
-`sulphites`, `legumes`, `vegan`, `vegetarian`, `keto`.
+`sulphites`, `legumes`, `alphaGal`, `fodmap`, `histamine`, `vegan`,
+`vegetarian`, `glp1`, `keto`. The enum's last id, `custom` (the user's own
+words, ALG-17), is never labelled: its vocabulary lives in a profile on a
+device, so the corpus has nothing to measure for it.
 
 `keto` is never labelled. **Strict** restrictions are every id except
-`lactose`, `vegan`, `vegetarian` and `keto`.
+`lactose`, `fodmap`, `histamine`, `vegan`, `vegetarian`, `glp1` and `keto`.
+ALG-17 added five `alphaGal` labels (beef, pork and lamb dishes and a
+cheeseburger); FODMAP, histamine and GLP-1 carry none yet.
 
 ### `label`
 

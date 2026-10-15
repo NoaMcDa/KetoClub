@@ -96,7 +96,9 @@ abstract final class GroupEvaluator {
   /// every profile, first occurrence first, each restriction once.
   ///
   /// An entry keeps only the exceptions every profile holding it shares,
-  /// since one person's exception must not excuse the others. When any
+  /// since one person's exception must not excuse the others; the user's
+  /// own restriction (ALG-17) holds every person's words, in the order
+  /// first met, since each person's word is a restriction of its own. When any
   /// profile holds keto (an empty one does, as everywhere) and the union
   /// holds something else, keto is added last, so the union still says
   /// that keto applies. The union is never evaluated: each person is, on
@@ -122,6 +124,29 @@ abstract final class GroupEvaluator {
         ];
         merged = merged.withEntry(entry.restrictionId, exceptions: shared);
       }
+    }
+    final words = <String>[];
+    final seen = <String>{};
+    for (final profile in profiles) {
+      for (final word in profile.customTerms) {
+        if (seen.add(word.toLowerCase())) words.add(word);
+      }
+    }
+    if (words.isNotEmpty) {
+      // Built directly rather than through `withEntry`, whose cap
+      // (`ProfileEntry.maxTerms`) is one person's: no one's word is cut.
+      merged = DietaryProfile(
+        entries: List<ProfileEntry>.unmodifiable(<ProfileEntry>[
+          for (final entry in merged.entries)
+            if (entry.restrictionId == RestrictionId.custom)
+              ProfileEntry(
+                restrictionId: RestrictionId.custom,
+                terms: List<String>.unmodifiable(words),
+              )
+            else
+              entry,
+        ]),
+      );
     }
     final anyKeto = profiles.any((profile) => profile.holdsKeto);
     if (anyKeto && !merged.isEmpty && !merged.contains(RestrictionId.keto)) {
@@ -184,16 +209,16 @@ abstract final class GroupEvaluator {
   static EvaluatedDish combine(List<EvaluatedDish> evaluated) {
     if (evaluated.length == 1) return evaluated.single;
     final state = strictest(evaluated.map((result) => result.state));
-    final best = <RestrictionId, Concern>{};
+    final best = <String, Concern>{};
     for (final result in evaluated) {
       for (final concern in result.concerns) {
-        final kept = best[concern.restrictionId];
+        final key = ProfileEvaluator.concernKey(concern);
+        final kept = best[key];
         if (kept == null || concern.certainty.index < kept.certainty.index) {
-          best[concern.restrictionId] = concern;
+          best[key] = concern;
         }
       }
     }
-    final ids = best.keys.toList()..sort((a, b) => a.index.compareTo(b.index));
     final lines = <String>[];
     if (state != DishState.avoid) {
       for (final result in evaluated) {
@@ -216,9 +241,9 @@ abstract final class GroupEvaluator {
     return EvaluatedDish(
       dish: evaluated.first.dish,
       declarations: List<Declaration>.unmodifiable(declarations),
-      concerns: List<Concern>.unmodifiable(<Concern>[
-        for (final id in ids) best[id]!,
-      ]),
+      concerns: List<Concern>.unmodifiable(
+        ProfileEvaluator.inTaxonomyOrder(best.values.toList()),
+      ),
       state: state,
       modification: lines.isEmpty ? null : lines.join('\n'),
     );

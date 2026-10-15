@@ -19,6 +19,13 @@
 /// peanuts, crustaceans (shrimp, crab) and tree nuts (walnut) — its soy,
 /// sesame and fish are only recommended, and buckwheat has no id yet.
 ///
+/// ALG-17 adds alpha-gal syndrome (an allergen: strict), FODMAP and
+/// histamine (intolerances: flexible), small portions for GLP-1 eating (a
+/// lifestyle: flexible; the three are [headsUpRestrictions]) and the
+/// user's own free-text restriction, [RestrictionId.custom] (strict, as
+/// file 10 §ALG-17 has it: an allergy by the user's word is an allergy).
+/// None of them is on a labelling list.
+///
 /// The display names are shown beside the dish's own text and read to a
 /// waiter, so like the waiter sentences in `constants.dart` they follow
 /// the menu's language, not the UI locale (architecture.md §12), and live
@@ -203,6 +210,30 @@ const List<Restriction> restrictionTaxonomy = <Restriction>[
     source: '11 §16',
   ),
   Restriction(
+    id: RestrictionId.alphaGal,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Alpha-gal (mammal meat)',
+    nameHe: 'אלפא-גל (בשר יונקים)',
+    source: '11 §17',
+  ),
+  Restriction(
+    id: RestrictionId.fodmap,
+    kind: RestrictionKind.intolerance,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'FODMAP',
+    nameHe: 'פודמאפ',
+    source: '11 §21',
+  ),
+  Restriction(
+    id: RestrictionId.histamine,
+    kind: RestrictionKind.intolerance,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Histamine',
+    nameHe: 'היסטמין',
+    source: '11 §22',
+  ),
+  Restriction(
     id: RestrictionId.vegan,
     kind: RestrictionKind.lifestyle,
     jurisdictions: <Jurisdiction>{},
@@ -219,6 +250,14 @@ const List<Restriction> restrictionTaxonomy = <Restriction>[
     source: '12 §2.2',
   ),
   Restriction(
+    id: RestrictionId.glp1,
+    kind: RestrictionKind.lifestyle,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Small portions (GLP-1)',
+    nameHe: 'מנות קטנות (GLP-1)',
+    source: '11 §23',
+  ),
+  Restriction(
     id: RestrictionId.keto,
     kind: RestrictionKind.keto,
     jurisdictions: <Jurisdiction>{},
@@ -226,7 +265,30 @@ const List<Restriction> restrictionTaxonomy = <Restriction>[
     nameHe: 'קטו',
     source: '10 §ALG-01',
   ),
+  Restriction(
+    id: RestrictionId.custom,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Your own restriction',
+    nameHe: 'הגבלה משלך',
+    source: '10 §ALG-17',
+  ),
 ];
+
+/// The restrictions whose concerns are a **heads-up**, never a verdict
+/// (ALG-17): FODMAP and histamine are dose and preparation sensitivities
+/// (onion in a sauce, an aged cheese grated on top), and GLP-1 eating is a
+/// preference for small, light portions. A menu says nothing of the dose,
+/// so `ProfileEvaluator` lowers every concern of these to `suspected`
+/// ("may be high in …"), which a flexible entry lists and lets move
+/// nothing: none of them ever makes a dish "avoid". The matcher still
+/// reports their triggers as written (C1: extraction does not know who is
+/// asking).
+const Set<RestrictionId> headsUpRestrictions = <RestrictionId>{
+  RestrictionId.fodmap,
+  RestrictionId.histamine,
+  RestrictionId.glp1,
+};
 
 /// The taxonomy entry for [id]. Total: [restrictionTaxonomy] holds one
 /// entry per id, in [RestrictionId] order (a test pins both).

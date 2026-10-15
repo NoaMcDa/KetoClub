@@ -419,9 +419,17 @@ bool _isHighSurrogate(int unit) => unit >= 0xD800 && unit <= 0xDBFF;
 /// Whether [unit] is the low (trailing) half of a UTF-16 surrogate pair.
 bool _isLowSurrogate(int unit) => unit >= 0xDC00 && unit <= 0xDFFF;
 
-/// One [Concern] per allergen hit in [raw], found where [source] says.
-Iterable<Concern> _findingsIn(String raw, ConcernSource source) sync* {
-  for (final hit in AllergenMatcher.find(raw)) {
+/// One [Concern] per allergen hit in [raw], found where [source] says,
+/// over [vocabulary] when given and the registry otherwise.
+Iterable<Concern> _findingsIn(
+  String raw,
+  ConcernSource source,
+  Map<RestrictionId, RestrictionVocabulary>? vocabulary,
+) sync* {
+  final hits = vocabulary == null
+      ? AllergenMatcher.find(raw)
+      : AllergenMatcher.findWith(raw, vocabulary);
+  for (final hit in hits) {
     final lowered = hit.hidden || hit.guarded;
     yield Concern(
       restrictionId: hit.id,
@@ -673,13 +681,20 @@ abstract final class ClassificationRules {
   /// `ProfileEvaluator` reads this list whole, so a weaker finding in the
   /// name is never hidden behind a stronger one in an option. Pure; never
   /// throws.
-  static List<Concern> allergenFindings(Dish dish) => <Concern>[
-    ..._findingsIn(dish.name, ConcernSource.name),
-    ..._findingsIn(dish.description, ConcernSource.description),
+  ///
+  /// [vocabulary] replaces the registry for one call: the on-device
+  /// evaluator reads the user's own words through it (ALG-17,
+  /// `custom_terms.dart`), with the same parts, removal skips and slices.
+  static List<Concern> allergenFindings(
+    Dish dish, {
+    Map<RestrictionId, RestrictionVocabulary>? vocabulary,
+  }) => <Concern>[
+    ..._findingsIn(dish.name, ConcernSource.name, vocabulary),
+    ..._findingsIn(dish.description, ConcernSource.description, vocabulary),
     for (final option in dish.options)
       for (final value in option.values)
         if (!TextNormaliser.isRemovalOptionValue(value.replaceAll(_maqaf, ' ')))
-          ..._findingsIn(value, ConcernSource.option),
+          ..._findingsIn(value, ConcernSource.option, vocabulary),
   ];
 
   /// [allergenFindings] reduced to one [Concern] per restriction (ALG-04b),

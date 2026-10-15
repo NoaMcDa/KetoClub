@@ -315,6 +315,24 @@ final class SettingsController extends ChangeNotifier {
     await _update(_appSettings.copyWith(profile: profile.withoutEntry(id)));
   }
 
+  /// Adds [term], one of the user's own words, to their own restriction
+  /// (ALG-17), adding that entry last when it is absent. A no-op, with no
+  /// write, when [term] is blank, already held (ignoring case) or the entry
+  /// is full ([DietaryProfile.withCustomTerm]).
+  Future<void> addCustomTerm(String term) async {
+    final next = profile.withCustomTerm(term);
+    if (identical(next, profile)) return;
+    await _update(_appSettings.copyWith(profile: next));
+  }
+
+  /// Removes [term] from the user's own restriction, and the entry with its
+  /// last word (ALG-17). A no-op, with no write, when it is not held.
+  Future<void> removeCustomTerm(String term) async {
+    final next = profile.withoutCustomTerm(term);
+    if (identical(next, profile)) return;
+    await _update(_appSettings.copyWith(profile: next));
+  }
+
   /// Replaces the exceptions of [id] with [exceptions], trimmed,
   /// de-duplicated and capped ([ProfileEntry.normaliseExceptions]; issue
   /// #344). A no-op, with no write, when the profile does not hold [id]:
@@ -446,6 +464,36 @@ final class SettingsController extends ChangeNotifier {
       (named) =>
           named.copyWith(profile: named.profile.withoutEntry(restriction)),
     );
+  }
+
+  /// Adds [term] to the own restriction of the profile [id] (ALG-17); for
+  /// the user's own profile, exactly [addCustomTerm]. A no-op when nothing
+  /// would change or [id] is unknown.
+  Future<void> addCustomTermTo(String id, String term) async {
+    if (id == NamedProfile.primaryId) {
+      await addCustomTerm(term);
+      return;
+    }
+    final named = profileById(id);
+    if (named == null) return;
+    final next = named.profile.withCustomTerm(term);
+    if (identical(next, named.profile)) return;
+    await _replaceOther(id, (named) => named.copyWith(profile: next));
+  }
+
+  /// Removes [term] from the own restriction of the profile [id] (ALG-17);
+  /// for the user's own profile, exactly [removeCustomTerm]. A no-op when
+  /// it is not held or [id] is unknown.
+  Future<void> removeCustomTermFrom(String id, String term) async {
+    if (id == NamedProfile.primaryId) {
+      await removeCustomTerm(term);
+      return;
+    }
+    final named = profileById(id);
+    if (named == null) return;
+    final next = named.profile.withoutCustomTerm(term);
+    if (identical(next, named.profile)) return;
+    await _replaceOther(id, (named) => named.copyWith(profile: next));
   }
 
   /// Sets which profiles menus are read for to [ids], in [profiles]'

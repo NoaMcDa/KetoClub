@@ -212,6 +212,45 @@ void main() {
       expect(find.textContaining('net carbs'), findsNothing);
     });
 
+    testWidgets('ALG-17: a heads-up reads "may be high in it", and the own '
+        'restriction names its word', (tester) async {
+      // Act
+      await _pump(
+        tester,
+        _card(
+          _englishDish,
+          DishState.avoid,
+          concerns: const <Concern>[
+            Concern(
+              restrictionId: RestrictionId.fodmap,
+              source: ConcernSource.name,
+              certainty: Certainty.suspected,
+              tier: EvidenceTier.stated,
+              matchedText: 'Nut',
+            ),
+            Concern(
+              restrictionId: RestrictionId.custom,
+              source: ConcernSource.name,
+              certainty: Certainty.stated,
+              tier: EvidenceTier.stated,
+              matchedText: 'cake',
+            ),
+          ],
+        ),
+      );
+
+      // Assert
+      expect(find.text('FODMAP'), findsOneWidget);
+      expect(
+        find.text(
+          'in the name · may be high in it — a heads-up, not a measurement',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('cake'), findsOneWidget);
+      expect(find.text('Your own restriction'), findsNothing);
+    });
+
     testWidgets('the Hebrew UI words the concern line in Hebrew', (
       tester,
     ) async {

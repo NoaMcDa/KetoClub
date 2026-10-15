@@ -368,6 +368,12 @@
           "role": "protein",
           "evidence": "\"בקר\" (beef)",
           "source": "12 §2.2"
+        },
+        "alphaGal": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"בקר\" (beef)",
+          "source": "11 §17.1"
         }
       }
     },
@@ -392,6 +398,12 @@
           "role": "protein",
           "evidence": "\"כבש\" (lamb)",
           "source": "12 §2.2"
+        },
+        "alphaGal": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"כבש\" (lamb)",
+          "source": "11 §17.1"
         }
       }
     },

@@ -3101,6 +3101,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'For each person: {breakdown}'**
   String groupBreakdownSemanticLabel(String breakdown);
+
+  /// Banto (ALG-17): the picker's hint under FODMAP, histamine and small portions, which only ever mark a dish 'may be high in'. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'A heads-up from common guidance, not a measurement'**
+  String get restrictionHeadsUpHint;
+
+  /// Banto (ALG-17): the picker's hint under alpha-gal, whose dairy reaction is individual and carried by the Milk entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Mammal meat and its products. If dairy affects you too, add Milk as well'**
+  String get restrictionAlphaGalHint;
+
+  /// Banto (ALG-17): heading of the picker's free-text restriction field.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your own'**
+  String get restrictionOwnTitle;
+
+  /// Banto (ALG-17): the note above the free-text restriction field. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'Something not on the list, such as kiwi or coriander. Checked on this device only, as strictly as an allergy, by the words the menu prints.'**
+  String get restrictionOwnNote;
+
+  /// Banto (ALG-17): label of the free-text restriction field.
+  ///
+  /// In en, this message translates to:
+  /// **'Food to avoid'**
+  String get restrictionOwnField;
+
+  /// Banto (ALG-17): adds the typed word as the user's own restriction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get restrictionOwnAdd;
+
+  /// Banto (ALG-17): subtitle of a free-text restriction row in Settings and the profile editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Your own · checked strictly'**
+  String get restrictionOwnRowSubtitle;
+
+  /// Banto (ALG-17): the certainty words of a FODMAP, histamine or small-portions concern on the dish card. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'may be high in it — a heads-up, not a measurement'**
+  String get concernCertaintyHeadsUp;
 }
 
 class _AppLocalizationsDelegate

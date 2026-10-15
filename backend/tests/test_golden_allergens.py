@@ -56,9 +56,14 @@ _IDS = [
     "lupin",
     "sulphites",
     "legumes",
+    "alphaGal",
+    "fodmap",
+    "histamine",
     "vegan",
     "vegetarian",
+    "glp1",
     "keto",
+    "custom",
 ]
 
 

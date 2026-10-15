@@ -100,6 +100,14 @@ Key restrictionRowKey(RestrictionId id) =>
 Key restrictionRemoveKey(RestrictionId id) =>
     ValueKey<String>('settingsRestrictionRemove_${id.name}');
 
+/// The row of [term], one of the user's own words (ALG-17), in the "My
+/// restrictions" section.
+Key ownTermRowKey(String term) => ValueKey<String>('settingsOwnTermRow_$term');
+
+/// The remove button of [term]'s row in the "My restrictions" section.
+Key ownTermRemoveKey(String term) =>
+    ValueKey<String>('settingsOwnTermRemove_$term');
+
 /// Where "Report a problem" sends the user: the repository's issue tracker.
 final Uri reportProblemUri = Uri.parse(
   'https://github.com/NoaMcDa/KetoClub/issues',
@@ -666,7 +674,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final added = <RestrictionId>{
       for (final entry in entries) entry.restrictionId,
     };
-    final canAdd = availableRestrictions(added).isNotEmpty;
+    final canAdd = canAddToProfile(controller.profile);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -684,13 +692,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             for (final entry in entries)
-              _restrictionRow(
-                context,
-                l10n,
-                controller,
-                restrictionFor(entry.restrictionId),
-                locale,
-              ),
+              if (entry.restrictionId == RestrictionId.custom)
+                for (final term in entry.terms)
+                  _ownTermRow(l10n, controller, term)
+              else
+                _restrictionRow(
+                  context,
+                  l10n,
+                  controller,
+                  restrictionFor(entry.restrictionId),
+                  locale,
+                ),
             if (canAdd)
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(8, 4, 8, 4),
@@ -777,8 +789,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  /// Opens the picker, leaving out [added], and adds what the user picks.
-  /// Dismissing the sheet adds nothing.
+  /// One of the user's own words (ALG-17) as a row of the "My
+  /// restrictions" section: the word as typed, "Your own · checked
+  /// strictly" under it, and a remove button for that word alone.
+  Widget _ownTermRow(
+    AppLocalizations l10n,
+    SettingsController controller,
+    String term,
+  ) => ListTile(
+    key: ownTermRowKey(term),
+    title: Text(term),
+    subtitle: Text(l10n.restrictionOwnRowSubtitle),
+    trailing: IconButton(
+      key: ownTermRemoveKey(term),
+      icon: const Icon(Icons.close),
+      tooltip: l10n.settingsRestrictionsRemove(term),
+      onPressed: controller.isBusy
+          ? null
+          : () => unawaited(controller.removeCustomTerm(term)),
+    ),
+  );
+
+  /// Opens the picker, leaving out [added], and adds what the user picks:
+  /// a restriction, or one of their own words (ALG-17). Dismissing the
+  /// sheet adds nothing.
   Future<void> _pickRestriction(
     BuildContext context,
     Set<RestrictionId> added,
@@ -789,7 +823,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       added: added,
     );
     if (picked == null || !mounted) return;
-    await controller.addRestriction(picked);
+    final term = picked.term;
+    final id = picked.id;
+    if (term != null) {
+      await controller.addCustomTerm(term);
+    } else if (id != null) {
+      await controller.addRestriction(id);
+    }
   }
 
   /// The "Your keto rules" section (issue #56, `.design/Settings.dc.html`):

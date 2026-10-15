@@ -568,6 +568,15 @@ String concernCertaintyLabel(AppLocalizations l10n, Certainty certainty) =>
       Certainty.suspected => l10n.concernCertaintySuspected,
     };
 
+/// How sure [concern] is, in words: [concernCertaintyLabel], except that a
+/// heads-up restriction's concern ([headsUpRestrictions]: FODMAP,
+/// histamine, small portions; ALG-17) reads "may be high in it — a
+/// heads-up, not a measurement", since no menu states a dose.
+String concernCertaintyText(AppLocalizations l10n, Concern concern) =>
+    headsUpRestrictions.contains(concern.restrictionId)
+    ? l10n.concernCertaintyHeadsUp
+    : concernCertaintyLabel(l10n, concern.certainty);
+
 /// The concern lines under a Banto dish (ALG-05) and the "Why?" button
 /// that opens the Why sheet (ALG-06).
 ///
@@ -672,12 +681,9 @@ class _ConcernLine extends StatelessWidget {
     final colors = VerdictColors.of(context);
     final strict = restrictionFor(concern.restrictionId).isStrict;
     final chipTone = strict ? colors.red : colors.amber;
-    final name = VerdictCopy.restrictionName(
-      concern.restrictionId,
-      hebrew: hebrew,
-    );
+    final name = VerdictCopy.concernName(concern, hebrew: hebrew);
     final source = concernSourceLabel(l10n, concern);
-    final certainty = concernCertaintyLabel(l10n, concern.certainty);
+    final certainty = concernCertaintyText(l10n, concern);
     return Semantics(
       container: true,
       label: l10n.concernLineSemanticLabel(name, source, certainty),

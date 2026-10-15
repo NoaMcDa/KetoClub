@@ -70,14 +70,36 @@ enum RestrictionId {
   /// Legume allergy beyond peanut and soy (chickpea, lentil, pea, fava).
   legumes,
 
+  /// Alpha-gal syndrome: an allergy to mammalian meat and its products
+  /// (beef, lamb, pork, gelatin, lard; dairy for some). ALG-17.
+  alphaGal,
+
+  /// A low-FODMAP diet (IBS): a dose sensitivity, so its concerns are a
+  /// heads-up and never rule a dish out. ALG-17.
+  fodmap,
+
+  /// Histamine intolerance: aged, smoked, pickled and fermented foods, a
+  /// dose sensitivity read as a heads-up like [fodmap]. ALG-17.
+  histamine,
+
   /// A vegan diet.
   vegan,
 
   /// A vegetarian diet.
   vegetarian,
 
+  /// Small portions and lighter food, as people taking a GLP-1 medicine
+  /// often eat: a preference signal read as a heads-up, never a ban.
+  /// ALG-17.
+  glp1,
+
   /// Keto, the diet KetoClub was built for.
-  keto;
+  keto,
+
+  /// The user's own restriction: free-text terms ("kiwi", "כוסברה") kept in
+  /// the profile entry's `terms` and matched literally on the device only
+  /// (ALG-17; D26 C1). Strict: an allergy by the user's word is an allergy.
+  custom;
 
   /// The id whose [name] equals [wire], or null when none does.
   ///
