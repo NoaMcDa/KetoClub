@@ -1,15 +1,18 @@
 """SQLAlchemy ORM models.
 
 ``menu_cache`` (#95), ``chat_cache`` (#103), ``stored_menus`` (#310),
-``analysis_cache`` (#333) and ``allergen_matrices`` (ALG-16, #358) are the
-tables so far. Future issues declare more
+``analysis_cache`` (#333), ``dish_confirmations`` and ``confirmation_voters``
+(ALG-14, #356) and ``allergen_matrices`` (ALG-16, #358) are the tables so
+far. Future issues declare more
 tables here against ``app.db.Base`` — ``venues`` and
 ``ratings``/``dish_feedback`` (#105, #106), ``submissions`` (#107) — so one
 ``Base.metadata.create_all`` call in the lifespan creates every table.
 
 No table holds an install id (D12, #164): the id keys the in-memory rate
 limiter and nothing else. ``stored_menus`` and ``allergen_matrices`` in
-particular are keyed by venue.
+particular are keyed by venue. ``confirmation_voters`` holds a one-way digest
+that cannot be joined back to an install or to a row (see its docstring),
+never the id itself.
 """
 
 from datetime import date, datetime
@@ -24,6 +27,8 @@ __all__ = [
     "AnalysisCache",
     "Base",
     "ChatCache",
+    "ConfirmationVoter",
+    "DishConfirmation",
     "MenuCache",
     "StoredMenu",
 ]
@@ -131,6 +136,65 @@ class AnalysisCache(Base):
     key: Mapped[str] = mapped_column(String(64), primary_key=True)
     analysis_json: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class DishConfirmation(Base):
+    """One community fact about one dish at one venue (ALG-14, #356).
+
+    Keyed by the venue (``source``, ``platform_id``: the ``stored_menus``
+    key), the dish's fingerprint, the restriction id and the polarity
+    (``"present"``: staff confirmed the restriction's ingredient is in the
+    dish, ``"absent"``: staff confirmed it is not). The row is a count and
+    two dates and nothing else: **no install id column, no note column, and
+    nothing profile-shaped** (the D24 rule, Banto C1). ``distinct_count`` is
+    the number of different installs that confirmed this exact fact, which
+    is what the ``>= 3`` threshold and the ``/v1/venue-menus`` counts read;
+    ``submission_count`` counts every accepted post including repeats from
+    an install already counted, and is never served. ``first_on`` and
+    ``last_on`` are UTC calendar dates, deliberately not timestamps, so a
+    row cannot be lined up with a request log by the second.
+    """
+
+    __tablename__ = "dish_confirmations"
+
+    source: Mapped[str] = mapped_column(String(16), primary_key=True)
+    platform_id: Mapped[str] = mapped_column(String(512), primary_key=True)
+    dish_fingerprint: Mapped[str] = mapped_column(String(64), primary_key=True)
+    restriction_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    polarity: Mapped[str] = mapped_column(String(8), primary_key=True)
+    distinct_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    submission_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    first_on: Mapped[date] = mapped_column(Date, nullable=False)
+    last_on: Mapped[date] = mapped_column(Date, nullable=False)
+
+
+class ConfirmationVoter(Base):
+    """The bookkeeping that makes ``distinct_count`` distinct (ALG-14, #356).
+
+    One row per ``(install, confirmed fact)`` that has been counted, holding
+    only ``token``: ``HMAC-SHA256(pepper, install id | venue | dish |
+    restriction | polarity)``. Three properties keep it from being a link
+    between an install and anything:
+
+    * **One-way.** The install id is a 128-bit random value and the digest
+      is keyed with ``Settings.CONFIRMATION_PEPPER``, so a token cannot be
+      turned back into an id, nor checked against a guessed one.
+    * **Per fact.** The digest covers the fact it counts, so the same
+      install has an unrelated token for every dish and venue: tokens
+      cannot be grouped by install, and the table cannot be read as "what
+      this install confirmed".
+    * **Unjoinable.** The table has no foreign key, no timestamp and no
+      other column, so a token cannot be tied to a ``dish_confirmations``
+      row except by someone who already holds the install id, which the
+      backend never keeps.
+
+    A second post from the same install for the same fact recomputes the
+    same token, finds it here and is not counted again.
+    """
+
+    __tablename__ = "confirmation_voters"
+
+    token: Mapped[str] = mapped_column(String(64), primary_key=True)
 
 
 class AllergenMatrix(Base):

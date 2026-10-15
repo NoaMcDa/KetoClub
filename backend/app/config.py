@@ -115,6 +115,22 @@ class Settings(BaseSettings):
     # payloadTooLarge before any parsing.
     MENU_STORE_MAX_BODY_BYTES: int = 1_048_576
 
+    # --- Dish confirmations (ALG-14, #356) --------------------------------------
+    # POST /v1/confirmations: anonymous post-meal facts about a dish, keyed by
+    # venue, dish fingerprint, restriction id and polarity, never by install
+    # id. When false the route is not mounted and /v1/venue-menus never
+    # carries a `confirmations` list.
+    CONFIRMATIONS_ENABLED: bool = True
+    # Per-install limits on POST /v1/confirmations, a bucket of its own: one
+    # meal can yield several confirmations at once, which the shared
+    # RATE_LIMIT_* bucket (5/minute) would refuse.
+    CONFIRMATION_RATE_LIMIT_PER_MINUTE: int = 12
+    CONFIRMATION_RATE_LIMIT_PER_DAY: int = 120
+    # Secret key of the one-way digest that counts distinct confirmers (see
+    # app.models.ConfirmationVoter). Set it to a long random string on any
+    # shared host; changing it later makes every install countable once more.
+    CONFIRMATION_PEPPER: str = ""
+
     # --- Database -------------------------------------------------------------
     DATABASE_URL: str = "sqlite:///./ketoclub.db"
 
