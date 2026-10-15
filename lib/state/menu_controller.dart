@@ -22,6 +22,7 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/utils/allergens/group_evaluator.dart';
+import 'package:ketoclub/utils/allergens/kitchen_reach.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/classification_rules.dart';
@@ -398,12 +399,29 @@ final class MenuController extends ChangeNotifier {
     ]);
   }
 
-  /// [analysed] evaluated for [people]: [ProfileEvaluator.evaluate] for
-  /// one profile, the strictest across them for a group
-  /// ([GroupEvaluator.evaluate]).
-  EvaluatedDish _evaluate(AnalysedDish analysed, Dish dish) => isGroup
-      ? GroupEvaluator.evaluate(analysed, dish, _people).combined
-      : ProfileEvaluator.evaluate(analysed, dish, _profile);
+  /// [analysed] evaluated for [people] under the section [heading] and
+  /// the kitchen [reach]: [ProfileEvaluator.evaluate] then
+  /// [applyKitchenSignals] for one profile, and the same for each person,
+  /// the strictest shown, for a group ([GroupEvaluator.evaluate]).
+  EvaluatedDish _evaluate(
+    AnalysedDish analysed,
+    Dish dish, {
+    required String heading,
+    required KitchenReach reach,
+  }) => isGroup
+      ? GroupEvaluator.evaluate(
+          analysed,
+          dish,
+          _people,
+          heading: heading,
+          kitchen: reach,
+        ).combined
+      : applyKitchenSignals(
+          ProfileEvaluator.evaluate(analysed, dish, _profile, heading: heading),
+          dish,
+          _profile,
+          reach,
+        );
 
   /// The city the visit history remembers for the open venue (issue #307),
   /// read and refreshed exactly as [historyName]; null when none is known.
@@ -661,13 +679,41 @@ final class MenuController extends ChangeNotifier {
   /// profile is the one recorded when the menu was last classified; it
   /// never leaves the device (D26 C1). The menu screen reads the same
   /// evaluations one dish at a time through [evaluationFor] (ALG-05).
+  /// With Banto on, [kitchen]'s cross-contact is applied to each
+  /// ([applyKitchenSignals], ALG-07).
   List<({DishRow row, EvaluatedDish evaluated})> get evaluatedRows {
+    final reach = _bantoMode ? kitchen : KitchenReach.empty;
     return <({DishRow row, EvaluatedDish evaluated})>[
       for (final row in visibleRows)
         if (row.analysis case final analysed?)
-          (row: row, evaluated: _evaluate(analysed, row.dish)),
+          (
+            row: row,
+            evaluated: _evaluate(
+              analysed,
+              row.dish,
+              heading: row.category,
+              reach: reach,
+            ),
+          ),
     ];
   }
+
+  /// The kitchen [menu] reveals (Banto, ALG-07, issue #349): its
+  /// kitchen signals and the dishes each reaches ([KitchenReach.of]),
+  /// read once per menu.
+  /// [KitchenReach.empty] before a menu is loaded. Read only by Banto
+  /// surfaces, so a keto build never runs the pass.
+  KitchenReach get kitchen {
+    final currentMenu = _menu;
+    if (currentMenu == null) return KitchenReach.empty;
+    final memo = _kitchenMemo;
+    if (memo != null && identical(memo.menu, currentMenu)) return memo.reach;
+    final reach = KitchenReach.of(currentMenu);
+    _kitchenMemo = (menu: currentMenu, reach: reach);
+    return reach;
+  }
+
+  ({Menu menu, KitchenReach reach})? _kitchenMemo;
 
   /// How the menu screen words its verdicts for [profile] (Banto, ALG-05,
   /// issue #347): [ProfileWording.ketoOnly] unless the screen that opened
@@ -723,7 +769,8 @@ final class MenuController extends ChangeNotifier {
   /// Every analysed dish's evaluation for [profile], keyed by dish id;
   /// empty unless [wording] uses states and a [MenuAnalysed] result
   /// exists. Computed once per (menu, analysis, profile), since a build
-  /// reads it once per card, per count and per filter test.
+  /// reads it once per card, per count and per filter test. Each carries
+  /// [kitchen]'s cross-contact ([applyKitchenSignals], ALG-07).
   Map<String, EvaluatedDish> get evaluations {
     final currentMenu = _menu;
     final currentAnalysis = _analysis;
@@ -741,18 +788,39 @@ final class MenuController extends ChangeNotifier {
       return memo.evaluations;
     }
     final analysedById = _analysedById();
+    final reach = kitchen;
+    // The heading goes in too: a restaurant often declares "ללא גלוטן"
+    // or "טבעוני" once, on the section, not on each dish (ALG-09).
     final groups = <String, GroupEvaluation>{
       if (isGroup)
-        for (final dish in currentMenu.allDishes)
-          if (analysedById[dish.id] case final analysed?)
-            dish.id: GroupEvaluator.evaluate(analysed, dish, _people),
+        for (final category in currentMenu.categories)
+          for (final dish in category.dishes)
+            if (analysedById[dish.id] case final analysed?)
+              dish.id: GroupEvaluator.evaluate(
+                analysed,
+                dish,
+                _people,
+                heading: category.name,
+                kitchen: reach,
+              ),
     };
     final evaluations = <String, EvaluatedDish>{
-      for (final dish in currentMenu.allDishes)
-        if (analysedById[dish.id] case final analysed?)
-          dish.id:
-              groups[dish.id]?.combined ??
-              ProfileEvaluator.evaluate(analysed, dish, _profile),
+      for (final category in currentMenu.categories)
+        for (final dish in category.dishes)
+          if (analysedById[dish.id] case final analysed?)
+            dish.id:
+                groups[dish.id]?.combined ??
+                applyKitchenSignals(
+                  ProfileEvaluator.evaluate(
+                    analysed,
+                    dish,
+                    _profile,
+                    heading: category.name,
+                  ),
+                  dish,
+                  _profile,
+                  reach,
+                ),
     };
     _evaluationsMemo = (
       menu: currentMenu,

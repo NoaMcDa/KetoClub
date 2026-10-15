@@ -383,6 +383,7 @@ Dish _spaceMaqafInDish(Dish dish) => Dish(
   ],
   imageUrl: dish.imageUrl,
   page: dish.page,
+  declaredTags: dish.declaredTags,
 );
 
 /// Finds allergen and diet triggers in menu text (ALG-01).

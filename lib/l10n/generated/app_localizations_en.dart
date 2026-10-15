@@ -1667,6 +1667,117 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get whyTierDeclaredRestaurant => 'Declared by the restaurant';
+
+  @override
+  String whyDeclaredAbsent(String text) {
+    return 'Marked “$text” — this lowers the finding but never rules it out';
+  }
+
+  @override
+  String get dishCardDeclaredKosher => 'Declared kosher by the platform';
+
+  @override
+  String get waiterCardChefCard => 'Chef card';
+
+  @override
+  String get menuAllergyNoteAction => 'Copy allergy note';
+
+  @override
+  String get menuAllergyNoteCopied => 'Allergy note copied';
+
+  @override
+  String get menuAllergyNoteShare => 'Share';
+
+  @override
+  String get menuAllergyNoteSubject => 'Allergy note';
+
+  @override
+  String kitchenNoticeSummary(String things) {
+    return 'This kitchen has $things — ask about cross-contact';
+  }
+
+  @override
+  String get kitchenListSeparator => ', ';
+
+  @override
+  String kitchenListAnd(String rest, String last) {
+    return '$rest and $last';
+  }
+
+  @override
+  String get kitchenKindFryer => 'a fryer';
+
+  @override
+  String get kitchenKindWok => 'a wok';
+
+  @override
+  String get kitchenKindSharedGrill => 'a shared grill';
+
+  @override
+  String get kitchenKindBakery => 'a bakery';
+
+  @override
+  String get kitchenKindNuts => 'nuts';
+
+  @override
+  String get kitchenKindSesame => 'sesame';
+
+  @override
+  String get kitchenTitleFryer => 'Fryer';
+
+  @override
+  String get kitchenTitleWok => 'Wok';
+
+  @override
+  String get kitchenTitleSharedGrill => 'Shared grill';
+
+  @override
+  String get kitchenTitleBakery => 'Bakery';
+
+  @override
+  String get kitchenTitleNuts => 'Nuts';
+
+  @override
+  String get kitchenTitleSesame => 'Sesame';
+
+  @override
+  String get kitchenNoticeShow => 'Show questions';
+
+  @override
+  String get kitchenNoticeHide => 'Hide questions';
+
+  @override
+  String kitchenNoticeMattersFor(String restrictions) {
+    return 'Matters for: $restrictions';
+  }
+
+  @override
+  String kitchenNoticeSeenIn(String dishes) {
+    return 'Seen in: $dishes';
+  }
+
+  @override
+  String get kitchenNoticeQuestionLabel => 'Ask the staff';
+
+  @override
+  String kitchenNoticeCopyLabel(String thing) {
+    return 'Copy the question about $thing';
+  }
+
+  @override
+  String get concernSourceKitchen => 'kitchen';
+
+  @override
+  String whySourceKitchen(String thing) {
+    return 'This kitchen has $thing — ask about cross-contact';
+  }
+
+  @override
+  String get whySourceKitchenGeneric =>
+      'From the kitchen, not the dish — ask about cross-contact';
+
+  @override
   String get settingsProfiles => 'People on this device';
 
   @override

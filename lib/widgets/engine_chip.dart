@@ -73,25 +73,33 @@ class EngineChip extends StatelessWidget {
     required Color color,
     required List<String> labelParts,
   }) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 14, color: color),
-            const SizedBox(width: 6),
-            for (final part in labelParts)
-              Text(
-                part,
-                style: TextStyle(color: color, fontWeight: FontWeight.w600),
-              ),
-          ],
+    // Scaled down to the width it is offered, never past it: at 320px and
+    // a 1.6x text scale the AI chip ("AI · model") outgrew the screen
+    // (docs/VISUAL_AUDIT.md §5, B9). When the chip fits, which is every
+    // phone width at the default scale, the scale is 1 and nothing moves.
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: AlignmentDirectional.centerStart,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: color),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 14, color: color),
+              const SizedBox(width: 6),
+              for (final part in labelParts)
+                Text(
+                  part,
+                  style: TextStyle(color: color, fontWeight: FontWeight.w600),
+                ),
+            ],
+          ),
         ),
       ),
     );

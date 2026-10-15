@@ -72,6 +72,8 @@ final class Dish {
   /// malformed image must never fail the whole fetch. [page] is the
   /// 1-based page of a scanned menu the dish is printed on, and null for
   /// every platform menu and whenever the page is unknown.
+  /// [declaredTags] are the platform's own dietary labels for the dish,
+  /// kept raw (Banto, ALG-09); empty when it declared none.
   const new({
     required this.id,
     required this.name,
@@ -80,6 +82,7 @@ final class Dish {
     required this.options,
     this.imageUrl,
     this.page,
+    this.declaredTags = const <String>[],
   });
 
   /// Reads a dish written by [toJson].
@@ -90,7 +93,9 @@ final class Dish {
   /// field existed), null, non-String or empty all decode to a null
   /// [imageUrl], never to a failure of the whole entry. `page` is read
   /// the same way: absent, null, non-int or below 1 all decode to a null
-  /// [page].
+  /// [page]. `declaredTags` is read tolerantly too: absent (as in every
+  /// entry cached before the field existed) or not a list reads as empty,
+  /// and an entry that is not a non-blank string is dropped.
   static Dish? tryFrom(Map<String, Object?> json) {
     final id = json['id'];
     final name = json['name'];
@@ -122,7 +127,18 @@ final class Dish {
           ? rawImageUrl
           : null,
       page: rawPage is int && rawPage >= 1 ? rawPage : null,
+      declaredTags: _readDeclaredTags(json['declaredTags']),
     );
+  }
+
+  /// [raw] as a list of declared tags: its non-blank string entries, in
+  /// order; empty for anything that is not a list. Never fails.
+  static List<String> _readDeclaredTags(Object? raw) {
+    if (raw is! List<Object?>) return const <String>[];
+    return List<String>.unmodifiable(<String>[
+      for (final tag in raw)
+        if (tag is String && tag.trim().isNotEmpty) tag,
+    ]);
   }
 
   /// The platform id, stable across refetches.
@@ -155,7 +171,19 @@ final class Dish {
   /// positive integer.
   final int? page;
 
-  /// Writes a form [tryFrom] can read back.
+  /// The dietary labels the platform itself attached to this dish, as it
+  /// wrote them (Banto, ALG-09; architecture.md D26): Wolt's item
+  /// `dietary_preferences`, or `kosher` for a 10bis dish flagged kosher.
+  /// Empty when the platform declared nothing, which is every recorded
+  /// payload so far. A declaration is evidence about the dish, never a
+  /// verdict: `utils/allergens/declarations.dart` reads it.
+  ///
+  /// Callers must not mutate the list passed to the constructor.
+  final List<String> declaredTags;
+
+  /// Writes a form [tryFrom] can read back. `declaredTags` is written
+  /// only when non-empty, so a dish with none is the same JSON it was
+  /// before the field existed.
   Map<String, Object?> toJson() => <String, Object?>{
     'id': id,
     'name': name,
@@ -164,6 +192,7 @@ final class Dish {
     'options': options.map((option) => option.toJson()).toList(),
     'imageUrl': imageUrl,
     'page': page,
+    if (declaredTags.isNotEmpty) 'declaredTags': declaredTags,
   };
 
   @override
@@ -175,7 +204,8 @@ final class Dish {
       other.price == price &&
       _listEquals(other.options, options) &&
       other.imageUrl == imageUrl &&
-      other.page == page;
+      other.page == page &&
+      _listEquals(other.declaredTags, declaredTags);
 
   @override
   int get hashCode => Object.hash(
@@ -186,6 +216,7 @@ final class Dish {
     Object.hashAll(options),
     imageUrl,
     page,
+    Object.hashAll(declaredTags),
   );
 
   @override

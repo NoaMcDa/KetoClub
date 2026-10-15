@@ -3507,6 +3507,125 @@ direction, and the "Why?" button draws the keyboard `FocusRing` of #264. `tool/v
 single-page-app fallback the path URLs of #226 need. The keto build's menu
 renders the same before and after.
 
+**Recorded decision: platform and restaurant declarations as evidence
+(ALG-09, closes #351).** `Dish.declaredTags` holds the platform's own dietary
+labels, raw: Wolt's item `dietary_preferences` (a string as written, a map's
+`id` or else `name`) and `kosher` for a 10bis dish with `kosher: true`; it is
+read tolerantly and written only when non-empty, so per the `Dish` trap and
+C3 there is no `schemaVersion` bump and the Hive cache carries it as is.
+`backend/app/keto/models.py` and both Python mappers follow; the only golden
+bytes that moved are the input menus holding the synthetic 10bis dish `1003`.
+The one recorded Wolt payload has an empty `dietary_preferences` on all 56
+items but four items saying "טבעוני" (three with 🌱) in their names
+(`test/fixtures/README.md`), so the feature's main path is text: the pure
+`utils/allergens/declarations.dart` (twin `app/keto/declarations.py`, golden
+`declarations.json`) reads tags, the dish's name and description, and its
+category heading (the D21 precedent) through one table of six absence rules
+(vegan, vegetarian, gluten-free, dairy-free, lactose-free, egg-free; terms
+compiled as the keto vocabulary is, 🌱 and 🌾 matched on the raw text) into
+`Declaration {rule, restrictionIds, polarity, source, matchedText}`. A
+negation or an offer within two words ("לא", "ניתן לקבל", "לפי בקשה",
+"בתוספת", "option", "available", "can be made") makes a phrase no
+declaration, since withholding a lowering is the safe direction.
+Gluten-free speaks for gluten only, never wheat, and "parve" is not read as
+dairy-free. `ProfileEvaluator.evaluate` takes the dish's `heading` (passed by
+`MenuController`) and, in one step after the profile filter
+(`_applyDeclarations`), lowers every concern about a declared-absent
+restriction by one step, once per restriction, to tier `declared`: never
+below `suspected` and never removed for a strict entry (file 09), while a
+flexible entry's suspected concern is cleared; a declaration with no concern
+adds nothing, and `present` (reserved for ALG-16's matrix) changes nothing.
+`EvaluatedDish.declarations` keeps the ones applied, and the Why sheet says
+"declared by the platform" or "declared by the restaurant" and quotes the
+declaration as lowering, never ruling out, the finding. Declarations stay on
+the device (C1): neither the server nor the heuristic reads them. With
+`bantoMode` and a profile that uses states, a dish whose platform flags it
+kosher shows "declared kosher by the platform" beside its price, the only
+kosher statement the app makes and never its own.
+
+**Waiter questions, the per-dish chef card and the allergy note (ALG-08b,
+closes #350; ALG-15, closes #357).** Every concern an evaluation keeps now
+carries a waiter question: `ProfileEvaluator.evaluate` passes its kept
+concerns once through `WaiterQuestions.fill` (`utils/allergens/
+waiter_questions.dart`), which keeps a question the model wrote and fills
+the rest from Dart templates per source and certainty in the dish's language
+(§6.3's exception, as the "without" sentence): an option → "Can this be
+served without '{item}', so there is no X in it?", stated in the dish →
+"Can this be made without X?", a model ingredient → "Is there '{item}' in
+this dish, and does it contain X?", a hidden source or a likely or
+suspected finding → "The menu says '{item}': does it contain X?", and with
+nothing worth quoting (no text, over 40 characters, or the restriction's
+own name, as a guarded "ללא שומשום" leaves) the general question. X is
+`WaiterQuestions.subject`, the thing avoided (vegan reads "animal
+products", vegetarian "meat, poultry or fish"); `VerdictCopy.askQuestionFor`
+uses it too. It is device-only, after the profile chose: the wire, the
+Python twin and the goldens do not move (C1). The dish card still shows one
+question, now the asking concern's own; the Waiter Card shows the change
+and every question (`VerdictCopy.waiterCardScript`; an option's question is
+dropped when the change already asks for it) and a "Chef card" action that
+pushes `ChefCardScreen` for the dish with no brightness of its own (the
+Waiter Card under it keeps it raised). The dish card
+(`ChefCardText.composeForDish`) reads the introduction, the profile's strict
+lines (every line for a profile with none), "The dish I would like:" and the
+name as printed, the change, every question, and the cross-contact closing
+only when a `KitchenSignals.of(menu)` signal threatens a strict entry, else
+thanks; it opens in the menu's language and the toggle re-evaluates the
+dish in the other. The menu overflow's "Copy allergy note" (Banto and a
+profile with more than keto; every source, scans included) copies
+`ChefCardText.allergyNote` in the menu's language
+(`MenuShareText.menuIsHebrew`, now public) and a snack bar's Share sends it:
+one paragraph of allergens, celiac disease and the flexible entries with a
+"check every ingredient … no cross-contact" or "leave them out" closing, no
+severity word (the epic's "אלרגיה חמורה" example is dropped per D-b), and
+under 280 characters by dropping the flexible sentence, never an allergen.
+Translating the card for a menu in neither Hebrew nor English (through the
+menu-question path, #214) is deferred: the language test is Hebrew or not,
+so such a menu gets English.
+
+**The kitchen notice and the strict-entry demotion (ALG-07, closes #349).**
+`KitchenReach.of(menu)` (`utils/allergens/kitchen_reach.dart`, device-only,
+memoised per menu as `MenuController.kitchen`) holds the menu's
+`KitchenSignals`, the dishes each kind reaches and the menu's language. The
+reach is `KitchenSignals.scopeOf`, which reuses the signal term lists and
+needs no golden or Python twin: a fryer reaches the fried dishes, a shared
+grill the grilled ones and a bakery the bread, pastry and pizza dishes (each
+by the dish's rules text or its heading, as `of` reads them), a wok every dish
+of a section that holds a wok dish or is headed by one; nuts and sesame reach
+no dish. Their only honest reach would be the whole menu, and on an Israeli
+menu (tahini everywhere) that made every dish "ask" and "fits" disappear, so
+by the coordinator's decision (reversible, pending the owner) they are named
+in the notice with their staff question and demote nothing. `KitchenReach.of`
+then drops drinks and notices (`dishKindsOf`, D21), which share no fryer or
+counter, from the reach and from each signal's evidence, so a placeholder line
+("💙") is never shown as a fried dish. `strictThreats(profile)`
+keeps the signals that threaten a **strict** entry (an allergen or celiac
+disease): cross-contact is a trace, which an intolerance or a diet does not
+turn on, so a signal that threatens only flexible entries is not shown at all
+(today every threatened id is strict anyway). `applyKitchenSignals`, an
+isolated step after `ProfileEvaluator.evaluate` in both
+`MenuController.evaluations` and (with `bantoMode`) `evaluatedRows`, turns a
+`fits` dish that such a signal reaches into `ask`, adding for each threatened
+strict entry it has no concern for a `Concern` with the new
+`ConcernSource.kitchen` (made on the device only, so written nowhere unless
+one is; `backend/app/keto/models.py`'s `ConcernSource` gains the name),
+certainty `suspected`, tier `inferred`, the kind's name as `matchedText` and
+the signal's staff question in the dish's language as `waiterQuestion`; the
+first kind in `KitchenSignalKind` order speaks when several reach one entry.
+A dish with a change, to ask or to avoid is left as it is, flexible entries are
+never touched, the wire verdict never moves, and a keto-only profile holds no
+strict entry, so nothing changes for it (and `evaluations` is empty for it
+anyway). With `bantoMode` on,
+`KitchenNotice` (`widgets/kitchen_notice.dart`) sits among the menu screen's
+notices: one `AppNotice.info` line, "This kitchen has a fryer and a bakery —
+ask about cross-contact" in the UI language, whose "Show questions" action
+expands one row per threatening signal (its name, the strict entries it
+matters for, the dishes that show it and its question in the menu's language,
+`KitchenSignals`' Dart text per §6.3, with a Copy button). The dish card reads
+a kitchen concern as "kitchen: a fryer" and the Why sheet as "This kitchen has
+a fryer — ask about cross-contact", with no "Matched" line; the new strings
+are `kitchen*`, `concernSourceKitchen` and `whySourceKitchen*` ARB keys, swept
+for "safe"/"בטוח".
+
 **Group profiles: what fits everyone (ALG-12, #354).** A device holds
 several named profiles (`models/named_profile.dart`, at most 8): the user's
 own is still `AppSettings.profile` under `dietaryProfile`, now also the
@@ -3525,8 +3644,10 @@ that says so asks, and only the extraction flag leaves the device: it is
 now true when any *active* profile holds a non-keto entry
 (`AppSettings.activeHasNonKetoEntry`). Evaluation stays one analysis per
 menu: `GroupEvaluator` (`utils/allergens/group_evaluator.dart`) runs
-`ProfileEvaluator.evaluate` once per active person, unchanged, and shows the
-strictest state (avoid > ask > fits with a change > fits), every concern
+the single-profile pipeline once per active person — `ProfileEvaluator.evaluate`
+with the section heading (ALG-09's declarations), then `applyKitchenSignals`
+with the menu's `KitchenReach` (ALG-07) for that person's profile — and shows
+the strictest state (avoid > ask > fits with a change > fits), every concern
 once (the surest) and each waiter line once; `MenuController` words,
 filters and counts by the union of the active profiles (an entry keeps only
 the exceptions every holder shares, and keto stays when any member holds
@@ -3542,7 +3663,9 @@ Dana" in place of the restriction summary once a second profile exists,
 opening a sheet of checkboxes (at least one stays checked) that saves the
 choice without re-classifying, and a chef card with one section per checked
 person (`GroupChefCardText`: the ALG-08a lines under each name, one
-greeting, one closing). Discovery's quick score is untouched.
+greeting, one closing). `ChefCardScreen` gives the per-dish card (ALG-08b)
+precedence over the group card; a dish card opened in a group is built from
+the union profile, and one section per person on it is a follow-up. Discovery's quick score is untouched.
 
 ---
 

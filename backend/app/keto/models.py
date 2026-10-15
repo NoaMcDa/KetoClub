@@ -12,7 +12,7 @@ wrote, down to key order and ``json.dumps`` bytes:
 * **Field order is key order.** Fields are declared in the order the Dart
   ``toJson`` map literal writes them, and pydantic dumps in declaration
   order. Reordering a field here is a wire change.
-* **No key is omitted, with three exceptions.** Every Dart ``toJson`` in
+* **No key is omitted, with four exceptions.** Every Dart ``toJson`` in
   these files writes every key, null or not (``Dish.imageUrl``/``page``,
   ``Menu.venueName``, ``AnalysedDish.modification``/``netCarbsEstimate``,
   ``MenuAnalysed.options``, every optional ``Venue`` field), so ``to_json``
@@ -20,7 +20,8 @@ wrote, down to key order and ``json.dumps`` bytes:
   ``AnalysedDish.ingredients`` and ``concerns`` are written only when
   non-empty and ``AnalysisOptionsSnapshot.restrictionsRequested`` only when
   true, by a ``model_serializer`` on each model, so a keto analysis is the
-  same bytes it was before they existed.
+  same bytes it was before they existed; ``Dish.declaredTags`` (ALG-09) is
+  written only when non-empty, the same way.
 * **Doubles stay doubles.** Dart fields typed ``double`` (``Dish.price``,
   ``AnalysedDish.netCarbsEstimate``, ``Venue.latitude``/``longitude``/
   ``platformRating``) are ``float`` here: an incoming ``5`` is read as
@@ -146,8 +147,9 @@ RestrictionIdName = Literal[
 ``allergens.json`` (this module may not import ``app.keto.allergens``, which
 imports it)."""
 
-ConcernSource = Literal["name", "description", "option", "hidden", "model"]
-"""The Dart ``ConcernSource`` names."""
+ConcernSource = Literal["name", "description", "option", "hidden", "model", "kitchen"]
+"""The Dart ``ConcernSource`` names. ``kitchen`` (ALG-07) is made on the device
+only; the server never emits it, and reads it like any other name."""
 
 Certainty = Literal["stated", "likely", "suspected"]
 """The Dart ``Certainty`` names, the vocabulary's ``TriggerCertainty``
@@ -218,12 +220,16 @@ class DishOption(WireModel):
 
 
 class Dish(WireModel):
-    """Dart ``Dish``: ``{id, name, description, price, options, imageUrl, page}``.
+    """Dart ``Dish``: ``{id, name, description, price, options, imageUrl, page,
+    declaredTags?}``.
 
     ``description`` is ``""`` (never null) when absent or null. ``image_url``
     and ``page`` are read tolerantly, as Dart does: anything but a non-empty
     string, or an int of at least 1, reads as null. Both are always written,
-    null included.
+    null included. ``declared_tags`` (Banto, ALG-09) is the platform's own
+    dietary labels, kept raw: absent or not a list reads as empty, an entry
+    that is not a non-blank string (Dart ``trim``) is dropped, and the key is
+    written only when non-empty, so a dish with none is the bytes it was.
     """
 
     id: NonEmptyStr
@@ -233,6 +239,7 @@ class Dish(WireModel):
     options: list[DishOption]
     image_url: str | None = None
     page: Annotated[int, Field(ge=1)] | None = None
+    declared_tags: list[str] = Field(default_factory=list)
 
     @field_validator("description", mode="before")
     @classmethod
@@ -250,6 +257,22 @@ class Dish(WireModel):
         if isinstance(value, int) and not isinstance(value, bool) and value >= 1:
             return value
         return None
+
+    @field_validator("declared_tags", mode="before")
+    @classmethod
+    def _tolerant_declared_tags(cls, value: object) -> list[str]:
+        if not isinstance(value, list):
+            return []
+        return [tag for tag in value if isinstance(tag, str) and dart_trim(tag)]
+
+    @model_serializer(mode="wrap")
+    def _omit_empty_declared_tags(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, Any]:
+        data: dict[str, Any] = handler(self)
+        if not self.declared_tags:
+            data.pop("declaredTags", None)
+        return data
 
 
 class MenuCategory(WireModel):

@@ -344,4 +344,147 @@ void main() {
       );
     });
   });
+
+  group('every question (ALG-08b)', () {
+    /// A stated concern on [id] found in [source], with [question].
+    Concern stated(
+      RestrictionId id, {
+      ConcernSource source = ConcernSource.name,
+      String? question,
+    }) => Concern(
+      restrictionId: id,
+      source: source,
+      certainty: Certainty.stated,
+      tier: EvidenceTier.stated,
+      matchedText: 'feta',
+      waiterQuestion: question,
+    );
+
+    test("ask reads the asking concern's question, not the first one's", () {
+      final evaluated = EvaluatedDish(
+        dish: _analysed,
+        concerns: <Concern>[
+          stated(
+            RestrictionId.milk,
+            source: ConcernSource.option,
+            question: 'Without the feta?',
+          ),
+          _suspected(RestrictionId.sesame, question: 'Any sesame oil?'),
+        ],
+        state: DishState.ask,
+      );
+      expect(
+        VerdictCopy.waiterLine(evaluated, _dish('Salad')),
+        'Any sesame oil?',
+      );
+    });
+
+    test('waiterQuestions lists the asking one first, then the rest once', () {
+      final evaluated = EvaluatedDish(
+        dish: _analysed,
+        concerns: <Concern>[
+          stated(RestrictionId.milk, question: 'Without milk?'),
+          _suspected(RestrictionId.sesame, question: 'Any sesame oil?'),
+          _suspected(RestrictionId.peanuts, question: 'Any sesame oil?'),
+          _suspected(RestrictionId.celery),
+        ],
+        state: DishState.ask,
+      );
+      expect(VerdictCopy.waiterQuestions(evaluated, hebrew: false), <String>[
+        'Any sesame oil?',
+        'Without milk?',
+        VerdictCopy.askQuestionFor(RestrictionId.celery, hebrew: false),
+      ]);
+    });
+
+    test('with a change, an option concern asks nothing more', () {
+      final evaluated = EvaluatedDish(
+        dish: _analysed,
+        concerns: <Concern>[
+          stated(
+            RestrictionId.milk,
+            source: ConcernSource.option,
+            question: 'Without the feta?',
+          ),
+        ],
+        state: DishState.fitsWithChange,
+        modification: "Ask for it without 'feta'",
+      );
+      expect(
+        VerdictCopy.waiterCardScript(evaluated, _dish('Salad')),
+        "Ask for it without 'feta'",
+      );
+    });
+
+    test('the Waiter Card reads the change, then every question', () {
+      final evaluated = EvaluatedDish(
+        dish: _analysed,
+        concerns: <Concern>[
+          stated(
+            RestrictionId.milk,
+            source: ConcernSource.option,
+            question: 'Without the feta?',
+          ),
+          _suspected(RestrictionId.sesame, question: 'Any sesame oil?'),
+        ],
+        state: DishState.fitsWithChange,
+        modification: "Ask for it without 'feta'",
+      );
+      expect(
+        VerdictCopy.waiterCardScript(evaluated, _dish('Salad')),
+        "Ask for it without 'feta'\nAny sesame oil?",
+      );
+    });
+
+    test('the Waiter Card reads every question of an ask dish', () {
+      final evaluated = EvaluatedDish(
+        dish: _analysed,
+        concerns: <Concern>[
+          _suspected(RestrictionId.peanuts, question: 'Any peanuts?'),
+          _suspected(RestrictionId.sesame, question: 'Any sesame?'),
+        ],
+        state: DishState.ask,
+      );
+      expect(
+        VerdictCopy.waiterCardScript(evaluated, _dish('Cake')),
+        'Any peanuts?\nAny sesame?',
+      );
+    });
+
+    test('fits with no concern, and avoid, have no Waiter Card script', () {
+      expect(
+        VerdictCopy.waiterCardScript(
+          const EvaluatedDish(
+            dish: _analysed,
+            concerns: <Concern>[],
+            state: DishState.fits,
+          ),
+          _dish('Steak'),
+        ),
+        isNull,
+      );
+      expect(
+        VerdictCopy.waiterCardScript(
+          EvaluatedDish(
+            dish: _analysed,
+            concerns: <Concern>[stated(RestrictionId.sesame)],
+            state: DishState.avoid,
+          ),
+          _dish('Tahini'),
+        ),
+        isNull,
+      );
+    });
+
+    test('a diet is asked about as what it leaves out', () {
+      expect(
+        VerdictCopy.askQuestionFor(RestrictionId.vegan, hebrew: false),
+        contains('animal products'),
+      );
+      expect(
+        VerdictCopy.askQuestionFor(RestrictionId.vegetarian, hebrew: true),
+        contains('בשר, עוף או דגים'),
+      );
+    });
+  });
 }

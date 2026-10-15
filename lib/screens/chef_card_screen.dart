@@ -2,18 +2,28 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
+import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/utils/allergens/chef_card_templates.dart';
 import 'package:ketoclub/utils/allergens/group_chef_card.dart';
+import 'package:ketoclub/utils/allergens/kitchen_signals.dart';
+import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/widgets/group_chef_card_view.dart';
+import 'package:ketoclub/widgets/verdict_copy.dart';
 import 'package:ketoclub/widgets/waiter_script_widget.dart';
 
-/// The full-screen chef card built from the dietary profile alone (Banto,
-/// ALG-08a, issue #350): "show this at any restaurant", for the days when
-/// no menu can be read.
+/// The full-screen chef card (Banto, issue #350): built from the dietary
+/// profile alone (ALG-08a) — "show this at any restaurant", for the days
+/// when no menu can be read — or, given a [ChefCardScreen.dish] and its
+/// analysis, for that one dish (ALG-08b): the profile's strict lines, the
+/// dish's name as printed, its change and every question, and a
+/// cross-contact line when the [ChefCardScreen.menu]'s kitchen signals
+/// (ALG-07) threaten a strict entry ([ChefCardText.composeForDish]). A
+/// dish card opens in the menu's language; the profile card in the app's.
 ///
 /// Mirrors the Waiter Card's shell (`WaiterCardSheet`): the screen
 /// brightness is raised for as long as the card is open, the lines are the
@@ -27,22 +37,39 @@ import 'package:ketoclub/widgets/waiter_script_widget.dart';
 /// The card says what the person is and what to ask. It never says a dish
 /// is safe (the helper-tool sentence below it says why).
 class ChefCardScreen extends StatefulWidget {
-  /// Creates the card for [profile].
+  /// Creates the card for [profile]; with [dish] and [analysed], the card
+  /// for that dish, whose kitchen [menu] is read for signals.
   const new({
     required this.profile,
     this.people = const <NamedProfile>[],
     this.screenBrightness = const NoOpScreenBrightness(),
     this.menuSharer,
+    this.dish,
+    this.analysed,
+    this.menu,
     super.key,
   });
 
   /// The restrictions the card states.
   final DietaryProfile profile;
 
-  /// With more than one person, the card is theirs instead of [profile]'s:
-  /// one section per person under their name (ALG-12, issue #354;
-  /// [GroupChefCardText]).
+  /// With more than one person, and no [dish], the card is theirs instead
+  /// of [profile]'s: one section per person under their name (ALG-12,
+  /// issue #354; [GroupChefCardText]). A dish card takes precedence: it is
+  /// built from [profile] alone, which for a group is everyone's
+  /// restrictions combined; one section per person on a dish card is a
+  /// follow-up.
   final List<NamedProfile> people;
+
+  /// The dish the card is about, or null for the profile-only card.
+  final Dish? dish;
+
+  /// [dish]'s analysis; the card is the profile-only one without it.
+  final AnalysedDish? analysed;
+
+  /// The menu [dish] is on, read once for kitchen signals
+  /// ([KitchenSignals.of]); null reads as no signal.
+  final Menu? menu;
 
   /// Raised while the card is open, restored when it closes.
   final ScreenBrightness screenBrightness;
@@ -65,12 +92,24 @@ const Key chefCardEmptyKey = Key('chefCardEmpty');
 
 class _ChefCardScreenState extends State<ChefCardScreen> {
   /// The user's pick; null until they toggle, so the card follows the
-  /// app's language until then.
+  /// menu's language (a dish card) or the app's (the profile card) until
+  /// then.
   bool? _hebrewChoice;
+
+  /// Whether the menu's kitchen threatens a strict entry of the profile,
+  /// computed once: the menu does not change while the card is open.
+  bool _crossContact = false;
 
   @override
   void initState() {
     super.initState();
+    final menu = widget.menu;
+    if (widget.dish != null && menu != null) {
+      _crossContact = ChefCardText.kitchenThreatensStrict(
+        KitchenSignals.of(menu),
+        widget.profile,
+      );
+    }
     // Fire-and-forget: ScreenBrightness's contract never throws.
     unawaited(widget.screenBrightness.raise());
   }
@@ -81,8 +120,39 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
     super.dispose();
   }
 
-  bool get _hebrew =>
-      _hebrewChoice ?? Localizations.localeOf(context).languageCode == 'he';
+  bool get _hebrew {
+    final dish = widget.dish;
+    return _hebrewChoice ??
+        (dish != null && widget.analysed != null
+            ? VerdictCopy.dishIsHebrew(dish)
+            : Localizations.localeOf(context).languageCode == 'he');
+  }
+
+  /// The card's lines in Hebrew when [hebrew]: the dish card when there is
+  /// a dish and its analysis, re-evaluated in that language so its
+  /// "without" lines and questions follow the toggle; the profile card
+  /// otherwise.
+  List<String> _lines({required bool hebrew}) {
+    final dish = widget.dish;
+    final analysed = widget.analysed;
+    if (dish == null || analysed == null) {
+      return ChefCardText.compose(widget.profile, hebrew: hebrew);
+    }
+    final evaluated = ProfileEvaluator.evaluate(
+      analysed,
+      dish,
+      widget.profile,
+      hebrew: hebrew,
+    );
+    return ChefCardText.composeForDish(
+      widget.profile,
+      dishName: dish.name,
+      modification: evaluated.modification,
+      questions: VerdictCopy.waiterQuestions(evaluated, hebrew: hebrew),
+      crossContact: _crossContact,
+      hebrew: hebrew,
+    );
+  }
 
   Future<void> _share(AppLocalizations l10n, String text) async {
     await widget.menuSharer?.shareText(text, subject: l10n.chefCardTitle);
@@ -93,8 +163,11 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final hebrew = _hebrew;
-    final lines = ChefCardText.compose(widget.profile, hebrew: hebrew);
-    final group = widget.people.length > 1
+    final lines = _lines(hebrew: hebrew);
+    // Precedence: the dish card (a dish and its analysis), then the group
+    // card (more than one person), then the profile card.
+    final isDishCard = widget.dish != null && widget.analysed != null;
+    final group = !isDishCard && widget.people.length > 1
         ? GroupChefCardText.compose(widget.people, hebrew: hebrew)
         : null;
     final text = group == null

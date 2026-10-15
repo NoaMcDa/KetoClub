@@ -27,6 +27,7 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
+import 'package:ketoclub/utils/allergens/waiter_questions.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
 import 'package:ketoclub/utils/profile_wording.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
@@ -173,27 +174,36 @@ abstract final class VerdictCopy {
       MenuShareText.stateFooter(wording, hebrew: hebrew);
 
   /// The question to read to the waiter about [evaluated], in the menu's
-  /// language ([hebrew]): the first concern's own question, else one
-  /// built from the first concern that made the dish an "ask" — a
-  /// suspected one on a strict restriction — or, failing that, the first
-  /// concern. Null when there is no concern at all.
+  /// language ([hebrew]), from the concern that made the dish an "ask" —
+  /// the first suspected one on a strict restriction — or, failing that,
+  /// the first concern: its own question (every evaluated concern carries
+  /// one since ALG-08b, `WaiterQuestions.fill`), else one built for its
+  /// restriction ([askQuestionFor]). Null when there is no concern at all.
   static String? waiterQuestion(
     EvaluatedDish evaluated, {
     required bool hebrew,
   }) {
     final concerns = evaluated.concerns;
-    for (final concern in concerns) {
-      final question = concern.waiterQuestion;
-      if (question != null && question.trim().isNotEmpty) return question;
-    }
     if (concerns.isEmpty) return null;
-    final asking = concerns.firstWhere(
-      (concern) =>
-          concern.certainty == Certainty.suspected &&
-          restrictionFor(concern.restrictionId).isStrict,
-      orElse: () => concerns.first,
-    );
-    return askQuestionFor(asking.restrictionId, hebrew: hebrew);
+    return _questionOf(_asking(concerns), hebrew: hebrew);
+  }
+
+  /// The concern among the non-empty [concerns] that makes a dish an
+  /// "ask": the first suspected one on a strict restriction, else the
+  /// first.
+  static Concern _asking(List<Concern> concerns) => concerns.firstWhere(
+    (concern) =>
+        concern.certainty == Certainty.suspected &&
+        restrictionFor(concern.restrictionId).isStrict,
+    orElse: () => concerns.first,
+  );
+
+  /// [concern]'s own question, else [askQuestionFor]'s for it.
+  static String _questionOf(Concern concern, {required bool hebrew}) {
+    final own = concern.waiterQuestion;
+    return own != null && own.trim().isNotEmpty
+        ? own
+        : askQuestionFor(concern.restrictionId, hebrew: hebrew);
   }
 
   /// The one waiter line a dish card offers for [evaluated], the analysis
@@ -206,6 +216,44 @@ abstract final class VerdictCopy {
         DishState.ask => waiterQuestion(evaluated, hebrew: dishIsHebrew(dish)),
         DishState.fits || DishState.avoid => null,
       };
+
+  /// Every question the concerns of [evaluated] carry, once each, the
+  /// asking concern's first, as [waiterQuestion] chooses it (ALG-08b: the
+  /// dish card shows the first, the Waiter Card and the chef card show
+  /// them all). A concern found in an option is left out when [evaluated]
+  /// has a modification, which already asks for that option to be left
+  /// off. A concern with no question of its own gets [askQuestionFor]'s.
+  static List<String> waiterQuestions(
+    EvaluatedDish evaluated, {
+    required bool hebrew,
+  }) {
+    final changed = evaluated.modification != null;
+    final concerns = <Concern>[
+      for (final concern in evaluated.concerns)
+        if (!changed || concern.source != ConcernSource.option) concern,
+    ];
+    if (concerns.isEmpty) return const <String>[];
+    final questions = <String>[_questionOf(_asking(concerns), hebrew: hebrew)];
+    for (final concern in concerns) {
+      final question = _questionOf(concern, hebrew: hebrew);
+      if (!questions.contains(question)) questions.add(question);
+    }
+    return List<String>.unmodifiable(questions);
+  }
+
+  /// What the full-screen Waiter Card reads for [evaluated], the analysis
+  /// of [dish] (ALG-08b), one line each, in the menu's language: the
+  /// evaluator's modification for a dish that fits with a change, then
+  /// every one of [waiterQuestions]. Null when there is neither.
+  static String? waiterCardScript(EvaluatedDish evaluated, Dish dish) {
+    final hebrew = dishIsHebrew(dish);
+    final lines = <String>[
+      if (evaluated.state == DishState.fitsWithChange) ?evaluated.modification,
+      if (evaluated.state != DishState.avoid)
+        ...waiterQuestions(evaluated, hebrew: hebrew),
+    ];
+    return lines.isEmpty ? null : lines.join('\n');
+  }
 
   /// Whether [dish]'s own text is Hebrew, the language its waiter line and
   /// its restriction names are written in (§12), as the rule engine and
@@ -221,14 +269,12 @@ abstract final class VerdictCopy {
     return hebrew ? restriction.nameHe : restriction.nameEn;
   }
 
-  /// [askQuestionTemplateEn] or [askQuestionTemplateHe] for [id].
-  static String askQuestionFor(RestrictionId id, {required bool hebrew}) {
-    final restriction = restrictionFor(id);
-    return hebrew
-        ? askQuestionTemplateHe.replaceAll('{item}', restriction.nameHe)
-        : askQuestionTemplateEn.replaceAll(
-            '{item}',
-            restriction.nameEn.toLowerCase(),
-          );
-  }
+  /// [askQuestionTemplateEn] or [askQuestionTemplateHe] for [id], which
+  /// is named as the thing avoided ([WaiterQuestions.subject]: "animal
+  /// products" for vegan rather than "vegan").
+  static String askQuestionFor(RestrictionId id, {required bool hebrew}) =>
+      (hebrew ? askQuestionTemplateHe : askQuestionTemplateEn).replaceAll(
+        '{item}',
+        WaiterQuestions.subject(id, hebrew: hebrew),
+      );
 }

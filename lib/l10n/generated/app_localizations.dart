@@ -2688,6 +2688,198 @@ abstract class AppLocalizations {
   /// **'{source} · {certainty}'**
   String concernLineText(String source, String certainty);
 
+  /// Banto (ALG-09): the Why sheet's tier phrase for a concern lowered by the restaurant's own words (the dish text or its section heading), as opposed to whyTierDeclared, a platform tag.
+  ///
+  /// In en, this message translates to:
+  /// **'Declared by the restaurant'**
+  String get whyTierDeclaredRestaurant;
+
+  /// Banto (ALG-09): under a concern lowered by a declaration such as gluten-free or vegan, quoting the declaration. Never says the dish is free of it.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked “{text}” — this lowers the finding but never rules it out'**
+  String whyDeclaredAbsent(String text);
+
+  /// Banto (ALG-09): dish-card chip when the delivery platform flags the dish kosher. Always attributed to the platform, never a statement by the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Declared kosher by the platform'**
+  String get dishCardDeclaredKosher;
+
+  /// Banto (ALG-08b): the Waiter Card action that opens the chef card for this dish.
+  ///
+  /// In en, this message translates to:
+  /// **'Chef card'**
+  String get waiterCardChefCard;
+
+  /// Banto (ALG-15): the menu overflow entry that copies a short allergy note, in the menu's language, for a delivery app's note box.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy allergy note'**
+  String get menuAllergyNoteAction;
+
+  /// Banto (ALG-15): the snack bar shown once the allergy note is on the clipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Allergy note copied'**
+  String get menuAllergyNoteCopied;
+
+  /// Banto (ALG-15): the snack bar action that shares the allergy note as text.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get menuAllergyNoteShare;
+
+  /// Banto (ALG-15): the subject line of a shared allergy note, where the platform shows one.
+  ///
+  /// In en, this message translates to:
+  /// **'Allergy note'**
+  String get menuAllergyNoteSubject;
+
+  /// Banto (ALG-07): the kitchen notice's collapsed line; {things} is a list of kitchenKind* nouns joined by kitchenListSeparator and kitchenListAnd. Never says safe.
+  ///
+  /// In en, this message translates to:
+  /// **'This kitchen has {things} — ask about cross-contact'**
+  String kitchenNoticeSummary(String things);
+
+  /// Banto (ALG-07): separator between items of a list in the kitchen notice, except before the last.
+  ///
+  /// In en, this message translates to:
+  /// **', '**
+  String get kitchenListSeparator;
+
+  /// Banto (ALG-07): joins the last item of a list in the kitchen notice.
+  ///
+  /// In en, this message translates to:
+  /// **'{rest} and {last}'**
+  String kitchenListAnd(String rest, String last);
+
+  /// Banto (ALG-07): kitchen signal noun inside kitchenNoticeSummary and whySourceKitchen.
+  ///
+  /// In en, this message translates to:
+  /// **'a fryer'**
+  String get kitchenKindFryer;
+
+  /// Banto (ALG-07): kitchen signal noun.
+  ///
+  /// In en, this message translates to:
+  /// **'a wok'**
+  String get kitchenKindWok;
+
+  /// Banto (ALG-07): kitchen signal noun (meat and fish on one grill).
+  ///
+  /// In en, this message translates to:
+  /// **'a shared grill'**
+  String get kitchenKindSharedGrill;
+
+  /// Banto (ALG-07): kitchen signal noun (bread, pastry or pizza on the menu).
+  ///
+  /// In en, this message translates to:
+  /// **'a bakery'**
+  String get kitchenKindBakery;
+
+  /// Banto (ALG-07): kitchen signal noun.
+  ///
+  /// In en, this message translates to:
+  /// **'nuts'**
+  String get kitchenKindNuts;
+
+  /// Banto (ALG-07): kitchen signal noun.
+  ///
+  /// In en, this message translates to:
+  /// **'sesame'**
+  String get kitchenKindSesame;
+
+  /// Banto (ALG-07): heading of the fryer row in the expanded kitchen notice.
+  ///
+  /// In en, this message translates to:
+  /// **'Fryer'**
+  String get kitchenTitleFryer;
+
+  /// Banto (ALG-07): heading of the wok row in the expanded kitchen notice.
+  ///
+  /// In en, this message translates to:
+  /// **'Wok'**
+  String get kitchenTitleWok;
+
+  /// Banto (ALG-07): heading of the shared-grill row in the expanded kitchen notice.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared grill'**
+  String get kitchenTitleSharedGrill;
+
+  /// Banto (ALG-07): heading of the bakery row in the expanded kitchen notice.
+  ///
+  /// In en, this message translates to:
+  /// **'Bakery'**
+  String get kitchenTitleBakery;
+
+  /// Banto (ALG-07): heading of the nuts row in the expanded kitchen notice.
+  ///
+  /// In en, this message translates to:
+  /// **'Nuts'**
+  String get kitchenTitleNuts;
+
+  /// Banto (ALG-07): heading of the sesame row in the expanded kitchen notice.
+  ///
+  /// In en, this message translates to:
+  /// **'Sesame'**
+  String get kitchenTitleSesame;
+
+  /// Banto (ALG-07): the action that expands the kitchen notice.
+  ///
+  /// In en, this message translates to:
+  /// **'Show questions'**
+  String get kitchenNoticeShow;
+
+  /// Banto (ALG-07): the action that collapses the kitchen notice.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide questions'**
+  String get kitchenNoticeHide;
+
+  /// Banto (ALG-07): which of the profile's strict restrictions a kitchen signal threatens, named in the UI language.
+  ///
+  /// In en, this message translates to:
+  /// **'Matters for: {restrictions}'**
+  String kitchenNoticeMattersFor(String restrictions);
+
+  /// Banto (ALG-07): the dishes, as the menu prints them, that reveal a kitchen signal.
+  ///
+  /// In en, this message translates to:
+  /// **'Seen in: {dishes}'**
+  String kitchenNoticeSeenIn(String dishes);
+
+  /// Banto (ALG-07): label above a kitchen signal's question, which is shown in the menu's language.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the staff'**
+  String get kitchenNoticeQuestionLabel;
+
+  /// Banto (ALG-07): screen-reader label of a kitchen question's copy button; {thing} is a kitchenKind* noun.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy the question about {thing}'**
+  String kitchenNoticeCopyLabel(String thing);
+
+  /// Banto (ALG-07): concern source on the dish card for a kitchen cross-contact concern; followed by a kitchenKind* noun.
+  ///
+  /// In en, this message translates to:
+  /// **'kitchen'**
+  String get concernSourceKitchen;
+
+  /// Banto (ALG-07): Why sheet line for a kitchen cross-contact concern; {thing} is a kitchenKind* noun. Never says safe.
+  ///
+  /// In en, this message translates to:
+  /// **'This kitchen has {thing} — ask about cross-contact'**
+  String whySourceKitchen(String thing);
+
+  /// Banto (ALG-07): Why sheet line for a kitchen concern whose kind is unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'From the kitchen, not the dish — ask about cross-contact'**
+  String get whySourceKitchenGeneric;
+
   /// Banto (ALG-12): the Settings group listing the named profiles on the device.
   ///
   /// In en, this message translates to:

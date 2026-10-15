@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/concern.dart';
+import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
 import 'package:ketoclub/widgets/content_direction.dart';
+import 'package:ketoclub/widgets/kitchen_notice.dart';
 import 'package:ketoclub/widgets/restriction_picker_sheet.dart';
 
 /// The key of the concern row at [index], so a test can find one row
@@ -32,6 +34,17 @@ String whyTierPhrase(AppLocalizations l10n, EvidenceTier tier) =>
       EvidenceTier.denied => l10n.whyTierDenied,
     };
 
+/// The tier phrase for a concern at [EvidenceTier.declared] that
+/// [declaration] lowered (ALG-09): "declared by the platform" for a
+/// platform tag, "declared by the restaurant" for the dish's own text or
+/// its heading. Without a declaration it is [whyTierPhrase]'s.
+String whyDeclaredTierPhrase(AppLocalizations l10n, Declaration? declaration) =>
+    switch (declaration?.source) {
+      DeclarationSource.dishText ||
+      DeclarationSource.heading => l10n.whyTierDeclaredRestaurant,
+      DeclarationSource.platformTag || null => l10n.whyTierDeclared,
+    };
+
 /// The line saying where on the dish [source] was found.
 String whySourcePhrase(AppLocalizations l10n, ConcernSource source) =>
     switch (source) {
@@ -40,7 +53,18 @@ String whySourcePhrase(AppLocalizations l10n, ConcernSource source) =>
       ConcernSource.option => l10n.whySourceOption,
       ConcernSource.hidden => l10n.whySourceHidden,
       ConcernSource.model => l10n.whySourceModel,
+      ConcernSource.kitchen => l10n.whySourceKitchenGeneric,
     };
+
+/// The line saying where [concern] was found: [whySourcePhrase], except
+/// that a kitchen concern (ALG-07) names its kitchen, "This kitchen has a
+/// fryer — ask about cross-contact".
+String whyConcernSourcePhrase(AppLocalizations l10n, Concern concern) {
+  if (kitchenKindOf(concern) case final kind?) {
+    return l10n.whySourceKitchen(kitchenKindNoun(l10n, kind));
+  }
+  return whySourcePhrase(l10n, concern.source);
+}
 
 /// Opens the [WhySheet] for [dishName] as a modal bottom sheet capped at
 /// the app's sheet width ([showKetoClubSheet]).
@@ -52,6 +76,7 @@ Future<void> showWhySheet(
   required String dishName,
   required List<Concern> concerns,
   required bool strictProfile,
+  List<Declaration> declarations = const <Declaration>[],
   bool bantoMode = BantoMode.enabled,
 }) {
   if (!bantoMode) return Future<void>.value();
@@ -62,6 +87,7 @@ Future<void> showWhySheet(
       dishName: dishName,
       concerns: concerns,
       strictProfile: strictProfile,
+      declarations: declarations,
       bantoMode: bantoMode,
     ),
   );
@@ -76,6 +102,10 @@ Future<void> showWhySheet(
 /// fine: for a [strictProfile] it adds "still ask the restaurant". The
 /// footer is the helper-tool sentence.
 ///
+/// A concern a declaration lowered ([EvidenceTier.declared], ALG-09) says
+/// who declared it, the platform or the restaurant, and quotes the
+/// declaration with the reminder that it never rules the finding out.
+///
 /// With [bantoMode] off the widget builds nothing.
 class WhySheet extends StatelessWidget {
   /// Creates the sheet for [dishName] listing [concerns].
@@ -83,6 +113,7 @@ class WhySheet extends StatelessWidget {
     required this.dishName,
     required this.concerns,
     required this.strictProfile,
+    this.declarations = const <Declaration>[],
     this.bantoMode = BantoMode.enabled,
     super.key,
   });
@@ -96,6 +127,10 @@ class WhySheet extends StatelessWidget {
   /// Whether the profile holds a strict restriction (an allergen or celiac
   /// disease), which adds "still ask the restaurant" to an empty list.
   final bool strictProfile;
+
+  /// The declarations that lowered a concern (`EvaluatedDish.declarations`),
+  /// quoted under each concern at [EvidenceTier.declared].
+  final List<Declaration> declarations;
 
   /// Whether this build shows Banto surfaces; the sheet is empty without.
   final bool bantoMode;
@@ -147,7 +182,11 @@ class WhySheet extends StatelessWidget {
             else
               for (var i = 0; i < concerns.length; i++) ...[
                 if (i > 0) const Divider(height: 24),
-                _ConcernRow(key: whyConcernKey(i), concern: concerns[i]),
+                _ConcernRow(
+                  key: whyConcernKey(i),
+                  concern: concerns[i],
+                  declaration: _declarationFor(concerns[i]),
+                ),
               ],
             const SizedBox(height: 20),
             Text(
@@ -162,14 +201,29 @@ class WhySheet extends StatelessWidget {
       ),
     );
   }
+
+  /// The first of [declarations] that names [concern]'s restriction, when
+  /// the concern is at [EvidenceTier.declared].
+  Declaration? _declarationFor(Concern concern) {
+    if (concern.tier != EvidenceTier.declared) return null;
+    for (final declaration in declarations) {
+      if (declaration.restrictionIds.contains(concern.restrictionId)) {
+        return declaration;
+      }
+    }
+    return null;
+  }
 }
 
 /// One concern: the restriction, the tier phrase, the source, the quoted
 /// text and the waiter question.
 class _ConcernRow extends StatelessWidget {
-  const new({required this.concern, super.key});
+  const new({required this.concern, this.declaration, super.key});
 
   final Concern concern;
+
+  /// The declaration that lowered [concern], when one did.
+  final Declaration? declaration;
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +237,11 @@ class _ConcernRow extends StatelessWidget {
     final muted = theme.textTheme.bodySmall?.copyWith(
       color: theme.colorScheme.onSurfaceVariant,
     );
-    final matched = concern.matchedText;
+    // A kitchen concern's matched text is its kind's name, which
+    // [whyConcernSourcePhrase] already puts into words (ALG-07).
+    final matched = concern.source == ConcernSource.kitchen
+        ? null
+        : concern.matchedText;
     final question = concern.waiterQuestion;
 
     return Semantics(
@@ -194,11 +252,20 @@ class _ConcernRow extends StatelessWidget {
           Text(name, style: theme.textTheme.titleSmall),
           const SizedBox(height: 2),
           Text(
-            whyTierPhrase(l10n, concern.tier),
+            concern.tier == EvidenceTier.declared
+                ? whyDeclaredTierPhrase(l10n, declaration)
+                : whyTierPhrase(l10n, concern.tier),
             style: theme.textTheme.labelLarge,
           ),
+          if (declaration case final declared?) ...[
+            const SizedBox(height: 2),
+            Text(
+              l10n.whyDeclaredAbsent(declared.matchedText),
+              style: theme.textTheme.bodyMedium,
+            ),
+          ],
           const SizedBox(height: 2),
-          Text(whySourcePhrase(l10n, concern.source), style: muted),
+          Text(whyConcernSourcePhrase(l10n, concern), style: muted),
           if (matched != null) ...[
             const SizedBox(height: 4),
             Text(

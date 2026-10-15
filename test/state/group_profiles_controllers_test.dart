@@ -59,13 +59,15 @@ final NamedProfile _dana = NamedProfile(
 );
 
 /// A menu controller over [settings], every dish green from the model.
-MenuController _menuController(FakeSettingsStore settings) {
-  final repository = FakeMenuRepository()..stub(_ref, MenuFetched(menu: _menu));
+MenuController _menuController(FakeSettingsStore settings, {Menu? menu}) {
+  final served = menu ?? _menu;
+  final repository = FakeMenuRepository()
+    ..stub(_ref, MenuFetched(menu: served));
   final classifier = FakeMenuClassifier()
     ..respondWith(
       MenuAnalysed(
         dishes: <AnalysedDish>[
-          for (final dish in _menu.allDishes)
+          for (final dish in served.allDishes)
             AnalysedDish(
               dishId: dish.id,
               name: dish.name,
@@ -291,6 +293,56 @@ void main() {
             .evaluated
             .state,
         DishState.avoid,
+      );
+    });
+
+    test('each person gets the heading and the kitchen pass', () async {
+      // Arrange: fries share a fryer with the fried bread; Me is celiac
+      // and Dana keto.
+      final menu = Menu(
+        venueRef: _ref,
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: <MenuCategory>[
+          MenuCategory(
+            id: 'c1',
+            name: 'Mains',
+            dishes: <Dish>[
+              _dish('fries', 'French fries'),
+              _dish('bread', 'Fried bread'),
+            ],
+          ),
+        ],
+      );
+      final controller = _menuController(
+        FakeSettingsStore(
+          initial: AppSettings(
+            profile: DietaryProfile.empty.withEntry(RestrictionId.gluten),
+            otherProfiles: const <NamedProfile>[
+              NamedProfile(id: 'p1', name: 'Dana'),
+            ],
+            activeProfileIds: const <String>['me', 'p1'],
+            lastFilter: MenuFilter.all,
+          ),
+        ),
+        menu: menu,
+      );
+
+      // Act
+      await controller.open(_ref, bantoMode: true);
+
+      // Assert: the fryer makes the fries an "ask" for Me only.
+      expect(
+        controller.breakdownFor('fries')!.map((person) => person.state),
+        <DishState>[DishState.ask, DishState.fits],
+      );
+      expect(controller.evaluationFor('fries')!.state, DishState.ask);
+      expect(
+        controller.evaluatedRows
+            .firstWhere((row) => row.row.dish.id == 'fries')
+            .evaluated
+            .state,
+        DishState.ask,
       );
     });
 

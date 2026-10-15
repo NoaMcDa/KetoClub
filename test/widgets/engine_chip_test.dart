@@ -118,4 +118,113 @@ void main() {
       expect(find.textContaining(' ('), findsNothing);
     });
   });
+
+  group('EngineChip at a narrow width and a large text scale', () {
+    const aiEngine = LlmEngine(model: 'vendor/long-model-name-1');
+
+    Future<void> pumpAt(
+      WidgetTester tester,
+      Widget chip, {
+      required Size size,
+      required double textScale,
+      required Locale locale,
+    }) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: locale,
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: TextScaler.linear(textScale)),
+            child: child!,
+          ),
+          home: Scaffold(
+            // The menu screen's own shape: a ListView with 20px gutters
+            // and the chip aligned at the start (the keto, lone-chip path).
+            body: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              children: [
+                Align(alignment: AlignmentDirectional.centerStart, child: chip),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    for (final locale in [const Locale('en'), const Locale('he')]) {
+      testWidgets('the AI chip does not overflow at 320px and 1.6x text '
+          '(${locale.languageCode})', (tester) async {
+        await pumpAt(
+          tester,
+          const EngineChip(engine: aiEngine),
+          size: const Size(320, 640),
+          textScale: 1.6,
+          locale: locale,
+        );
+
+        expect(tester.takeException(), isNull);
+        final width = tester.getSize(find.byType(EngineChip)).width;
+        expect(width, lessThanOrEqualTo(320 - 40));
+      });
+
+      testWidgets('the rules chip does not overflow at 320px and 1.6x text '
+          '(${locale.languageCode})', (tester) async {
+        await pumpAt(
+          tester,
+          const EngineChip(
+            engine: RulesEngine(reason: MenuAnalysisFailureReason.offline),
+          ),
+          size: const Size(320, 640),
+          textScale: 1.6,
+          locale: locale,
+        );
+
+        expect(tester.takeException(), isNull);
+      });
+    }
+
+    testWidgets('the AI chip is scaled down, not clipped, when it must be', (
+      tester,
+    ) async {
+      await pumpAt(
+        tester,
+        const EngineChip(engine: aiEngine),
+        size: const Size(320, 640),
+        textScale: 1.6,
+        locale: const Locale('en'),
+      );
+
+      final fitted = tester.renderObject<RenderBox>(find.byType(FittedBox));
+      final inner = tester.getSize(find.byType(DecoratedBox).first);
+      // The chip's natural width is wider than what it was offered, and the
+      // FittedBox shrinks it to fit rather than letting it run off.
+      expect(inner.width, greaterThan(fitted.size.width));
+    });
+
+    testWidgets('at 390px and the default text scale the chip is unscaled', (
+      tester,
+    ) async {
+      await pumpAt(
+        tester,
+        const EngineChip(engine: LlmEngine(model: 'vendor/model-1')),
+        size: const Size(390, 844),
+        textScale: 1,
+        locale: const Locale('en'),
+      );
+
+      // The layout the chip had before the FittedBox: its content's own
+      // size, drawn at scale 1.
+      final fitted = tester.getSize(find.byType(FittedBox));
+      final content = tester.getSize(find.byType(DecoratedBox).first);
+      expect(fitted, content);
+      expect(tester.takeException(), isNull);
+      final transform = tester.widget<FittedBox>(find.byType(FittedBox));
+      expect(transform.fit, BoxFit.scaleDown);
+    });
+  });
 }

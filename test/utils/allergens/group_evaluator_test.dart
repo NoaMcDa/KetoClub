@@ -7,7 +7,9 @@ import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/utils/allergens/group_evaluator.dart';
+import 'package:ketoclub/utils/allergens/kitchen_reach.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 
 /// A dish named [name].
@@ -300,6 +302,138 @@ void main() {
       // Assert
       expect(result.people.first.state, DishState.fitsWithChange);
       expect(result.combined.modification, contains('salad'));
+    });
+  });
+
+  group('GroupEvaluator.evaluate — the single-profile pipeline per person', () {
+    final celiac = _person('a', <RestrictionId>[RestrictionId.gluten]);
+    final keto = _person('b', const <RestrictionId>[]);
+
+    test("a heading's declaration applies to each person (ALG-09)", () {
+      // Arrange: gluten likely in the description, under "ללא גלוטן".
+      const bowl = AnalysedDish(
+        dishId: 'd',
+        name: 'Bowl',
+        verdict: DishVerdict.orderAsIs,
+        why: 'Fits',
+        concerns: <Concern>[
+          Concern(
+            restrictionId: RestrictionId.gluten,
+            source: ConcernSource.description,
+            certainty: Certainty.likely,
+            tier: EvidenceTier.stated,
+            matchedText: 'x',
+          ),
+        ],
+      );
+      final dish = _dish('Bowl');
+
+      // Act
+      final declared = GroupEvaluator.evaluate(bowl, dish, <NamedProfile>[
+        celiac,
+        keto,
+      ], heading: 'ללא גלוטן');
+      final undeclared = GroupEvaluator.evaluate(bowl, dish, <NamedProfile>[
+        celiac,
+        keto,
+      ]);
+
+      // Assert: lowered to suspected for the celiac, so ask, not avoid.
+      expect(undeclared.state, DishState.avoid);
+      expect(declared.state, DishState.ask);
+      expect(declared.people.map((person) => person.state), <DishState>[
+        DishState.ask,
+        DishState.fits,
+      ]);
+      expect(
+        declared.people.first.evaluated,
+        ProfileEvaluator.evaluate(
+          bowl,
+          dish,
+          celiac.profile,
+          heading: 'ללא גלוטן',
+        ),
+      );
+      expect(declared.combined.declarations, isNotEmpty);
+      expect(
+        declared.combined.declarations,
+        declared.people.first.evaluated.declarations,
+      );
+    });
+
+    test('the fryer demotes for the celiac only; ask is shown (ALG-07)', () {
+      // Arrange: fries share the fryer with whatever is fried.
+      const fries = Dish(
+        id: 'fries',
+        name: 'French fries',
+        description: '',
+        price: 10,
+        options: <DishOption>[],
+      );
+      final menu = Menu(
+        venueRef: const VenueRef(source: MenuSource.wolt, platformId: 'v'),
+        currency: 'ILS',
+        fetchedAt: DateTime.utc(2026),
+        categories: const <MenuCategory>[
+          MenuCategory(
+            id: 'mains',
+            name: 'Mains',
+            dishes: <Dish>[
+              fries,
+              Dish(
+                id: 'bread',
+                name: 'Fried bread',
+                description: '',
+                price: 10,
+                options: <DishOption>[],
+              ),
+            ],
+          ),
+        ],
+      );
+      final reach = KitchenReach.of(menu);
+      const analysed = AnalysedDish(
+        dishId: 'fries',
+        name: 'French fries',
+        verdict: DishVerdict.orderAsIs,
+        why: 'Fits',
+      );
+
+      // Act
+      final result = GroupEvaluator.evaluate(
+        analysed,
+        fries,
+        <NamedProfile>[celiac, keto],
+        heading: 'Mains',
+        kitchen: reach,
+      );
+
+      // Assert: each person exactly as the single-profile path has them.
+      for (final person in result.people) {
+        expect(
+          person.evaluated,
+          applyKitchenSignals(
+            ProfileEvaluator.evaluate(
+              analysed,
+              fries,
+              person.person.profile,
+              heading: 'Mains',
+            ),
+            fries,
+            person.person.profile,
+            reach,
+          ),
+        );
+      }
+      expect(result.people.map((person) => person.state), <DishState>[
+        DishState.ask,
+        DishState.fits,
+      ]);
+      expect(result.state, DishState.ask);
+      expect(
+        result.combined.concerns.map((concern) => concern.source),
+        contains(ConcernSource.kitchen),
+      );
     });
   });
 }

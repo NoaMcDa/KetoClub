@@ -16,6 +16,8 @@ import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/utils/allergens/declarations.dart';
+import 'package:ketoclub/utils/allergens/kitchen_reach.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/dietary_profile_strictness.dart';
 
@@ -129,26 +131,38 @@ abstract final class GroupEvaluator {
   }
 
   /// Evaluates [analysed], the analysis of [dish], once for each of
-  /// [people] ([ProfileEvaluator.evaluate], [hebrew] passed through) and
-  /// combines the results ([combine]).
+  /// [people] and combines the results ([combine]).
   ///
-  /// With one person the combined result is exactly that person's
-  /// evaluation. [people] must not be empty.
+  /// Each person goes through exactly the single-profile pipeline:
+  /// [ProfileEvaluator.evaluate] with [hebrew] and the section [heading]
+  /// (its declarations, ALG-09), then [applyKitchenSignals] with [kitchen]
+  /// (ALG-07) for that person's profile — so a fryer demotes a dish for
+  /// the person whose strict entry it reaches, and the strictest state
+  /// carries it. With one person the combined result is exactly that
+  /// person's evaluation. [people] must not be empty.
   static GroupEvaluation evaluate(
     AnalysedDish analysed,
     Dish dish,
     List<NamedProfile> people, {
     bool? hebrew,
+    String? heading,
+    KitchenReach kitchen = KitchenReach.empty,
   }) {
     final results = <PersonEvaluation>[
       for (final person in people)
         PersonEvaluation(
           person: person,
-          evaluated: ProfileEvaluator.evaluate(
-            analysed,
+          evaluated: applyKitchenSignals(
+            ProfileEvaluator.evaluate(
+              analysed,
+              dish,
+              person.profile,
+              hebrew: hebrew,
+              heading: heading,
+            ),
             dish,
             person.profile,
-            hebrew: hebrew,
+            kitchen,
           ),
         ),
     ];
@@ -162,9 +176,10 @@ abstract final class GroupEvaluator {
 
   /// Several people's evaluations of one dish as one: the [strictest]
   /// state; every concern, one per restriction in taxonomy order (the
-  /// surest, and at a tie the first); and each waiter line any of them
-  /// needs, once, in order — none for [DishState.avoid], as the evaluator
-  /// itself does. One evaluation is returned as it is. [evaluated] must
+  /// surest, and at a tie the first); every declaration that applied to
+  /// anyone, once (ALG-09); and each waiter line any of them needs, once,
+  /// in order — none for [DishState.avoid], as the evaluator itself
+  /// does. One evaluation is returned as it is. [evaluated] must
   /// not be empty.
   static EvaluatedDish combine(List<EvaluatedDish> evaluated) {
     if (evaluated.length == 1) return evaluated.single;
@@ -190,8 +205,17 @@ abstract final class GroupEvaluator {
         }
       }
     }
+    final declarations = <Declaration>[];
+    for (final result in evaluated) {
+      for (final declaration in result.declarations) {
+        if (!declarations.contains(declaration)) {
+          declarations.add(declaration);
+        }
+      }
+    }
     return EvaluatedDish(
       dish: evaluated.first.dish,
+      declarations: List<Declaration>.unmodifiable(declarations),
       concerns: List<Concern>.unmodifiable(<Concern>[
         for (final id in ids) best[id]!,
       ]),

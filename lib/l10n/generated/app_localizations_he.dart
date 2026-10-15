@@ -1671,6 +1671,117 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get whyTierDeclaredRestaurant => 'הוצהר על ידי המסעדה';
+
+  @override
+  String whyDeclaredAbsent(String text) {
+    return 'מסומן “$text” — זה מפחית את החשש אבל לא שולל אותו';
+  }
+
+  @override
+  String get dishCardDeclaredKosher => 'כשר לפי הצהרת הפלטפורמה';
+
+  @override
+  String get waiterCardChefCard => 'כרטיס שף';
+
+  @override
+  String get menuAllergyNoteAction => 'העתקת הערת אלרגיה';
+
+  @override
+  String get menuAllergyNoteCopied => 'הערת האלרגיה הועתקה';
+
+  @override
+  String get menuAllergyNoteShare => 'שיתוף';
+
+  @override
+  String get menuAllergyNoteSubject => 'הערת אלרגיה';
+
+  @override
+  String kitchenNoticeSummary(String things) {
+    return 'במטבח הזה יש $things — כדאי לשאול על מגע צולב';
+  }
+
+  @override
+  String get kitchenListSeparator => ', ';
+
+  @override
+  String kitchenListAnd(String rest, String last) {
+    return '$rest ו$last';
+  }
+
+  @override
+  String get kitchenKindFryer => 'מטגנת';
+
+  @override
+  String get kitchenKindWok => 'מחבת ווק';
+
+  @override
+  String get kitchenKindSharedGrill => 'גריל משותף';
+
+  @override
+  String get kitchenKindBakery => 'מאפייה';
+
+  @override
+  String get kitchenKindNuts => 'אגוזים';
+
+  @override
+  String get kitchenKindSesame => 'שומשום';
+
+  @override
+  String get kitchenTitleFryer => 'מטגנת';
+
+  @override
+  String get kitchenTitleWok => 'ווק';
+
+  @override
+  String get kitchenTitleSharedGrill => 'גריל משותף';
+
+  @override
+  String get kitchenTitleBakery => 'מאפייה';
+
+  @override
+  String get kitchenTitleNuts => 'אגוזים';
+
+  @override
+  String get kitchenTitleSesame => 'שומשום';
+
+  @override
+  String get kitchenNoticeShow => 'הצגת השאלות';
+
+  @override
+  String get kitchenNoticeHide => 'הסתרת השאלות';
+
+  @override
+  String kitchenNoticeMattersFor(String restrictions) {
+    return 'רלוונטי עבור: $restrictions';
+  }
+
+  @override
+  String kitchenNoticeSeenIn(String dishes) {
+    return 'לפי המנות: $dishes';
+  }
+
+  @override
+  String get kitchenNoticeQuestionLabel => 'לשאול את הצוות';
+
+  @override
+  String kitchenNoticeCopyLabel(String thing) {
+    return 'העתקת השאלה על $thing';
+  }
+
+  @override
+  String get concernSourceKitchen => 'מטבח';
+
+  @override
+  String whySourceKitchen(String thing) {
+    return 'במטבח הזה יש $thing — כדאי לשאול על מגע צולב';
+  }
+
+  @override
+  String get whySourceKitchenGeneric =>
+      'מהמטבח, לא מהמנה — כדאי לשאול על מגע צולב';
+
+  @override
   String get settingsProfiles => 'אנשים במכשיר הזה';
 
   @override

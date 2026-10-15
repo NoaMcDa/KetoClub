@@ -39,6 +39,7 @@ import 'package:ketoclub/services/menu/wolt/wolt_menu_mapper.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/venue/wolt/wolt_venue_mapper.dart';
 import 'package:ketoclub/utils/allergens/allergen_matcher.dart';
+import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/kitchen_signals.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/allergens/vocabulary.dart';
@@ -51,6 +52,7 @@ import 'package:ketoclub/utils/text_normaliser.dart';
 import 'package:ketoclub/utils/verdict_counts.dart';
 
 import 'allergen_corpus.dart';
+import 'declarations_corpus.dart';
 import 'golden_corpus.dart';
 import 'kitchen_signals_corpus.dart';
 
@@ -76,6 +78,7 @@ const List<String> goldenFileNames = <String>[
   'allergens.json',
   'kitchen_signals.json',
   'allergen_concerns.json',
+  'declarations.json',
 ];
 
 /// [document] in the corpus's canonical form: two-space indentation, every
@@ -117,6 +120,7 @@ Future<Map<String, Object?>> buildGoldens() async {
     'allergens.json': _allergens(),
     'kitchen_signals.json': _kitchenSignals(inputs),
     'allergen_concerns.json': await _allergenConcerns(),
+    'declarations.json': _declarations(inputs),
   };
 }
 
@@ -1849,5 +1853,70 @@ Future<Map<String, Object?>> _allergenConcerns() async {
         },
     ],
     'heuristic': heuristic,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// declarations.json (Banto; ALG-09, issue #351)
+// ---------------------------------------------------------------------------
+
+/// [guards] as the golden writes a guard pair.
+Map<String, Object?> _guardWords(GuardWords guards) => <String, Object?>{
+  'before': guards.before,
+  'after': guards.after,
+};
+
+/// The declaration table (`rules`, `guardsEn`, `guardsHe`, `kosherTags`,
+/// `kosherDeclaredTag`), each hand-built case with the declarations
+/// [Declarations.of] reads and whether the platform declared it kosher
+/// (`cases`), and every golden menu's declarations per dish under its own
+/// heading (`menus`).
+Map<String, Object?> _declarations(_Inputs inputs) {
+  List<Object?> read(Dish dish, String? heading) => <Object?>[
+    for (final declaration in Declarations.of(dish, heading: heading))
+      declaration.toJson(),
+  ];
+  return <String, Object?>{
+    'rules': <Object?>[
+      for (final rule in declarationRules)
+        <String, Object?>{
+          'id': rule.id,
+          'en': rule.en,
+          'he': rule.he,
+          'symbols': rule.symbols,
+          'restrictions': <String>[for (final id in rule.restrictions) id.name],
+          'polarity': rule.polarity.name,
+        },
+    ],
+    'guardsEn': _guardWords(declarationGuardsEn),
+    'guardsHe': _guardWords(declarationGuardsHe),
+    'kosherTags': kosherTags,
+    'kosherDeclaredTag': kosherDeclaredTag,
+    'cases': <Object?>[
+      for (final (:name, :dish, :heading) in declarationCases)
+        <String, Object?>{
+          'name': name,
+          'dish': dish.toJson(),
+          'heading': heading,
+          'declarations': read(dish, heading),
+          'declaresKosher': Declarations.declaresKosher(dish),
+        },
+    ],
+    'menus': <Object?>[
+      for (final MapEntry(key: name, value: menu) in inputs.menus.entries)
+        <String, Object?>{
+          'name': name,
+          'menu': menu.toJson(),
+          'declarations': <String, Object?>{
+            for (final category in menu.categories)
+              for (final dish in category.dishes)
+                dish.id: read(dish, category.name),
+          },
+          'kosher': <String>[
+            for (final dish in menu.allDishes)
+              if (Declarations.declaresKosher(dish)) dish.id,
+          ],
+        },
+    ],
   };
 }

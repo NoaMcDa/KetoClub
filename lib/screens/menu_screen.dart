@@ -4,6 +4,7 @@ import 'dart:async';
 // hidden here so this file's own `MenuController` (state/menu_controller.dart)
 // resolves without ambiguity.
 import 'package:flutter/material.dart' hide MenuController;
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
@@ -11,6 +12,7 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/chef_card_screen.dart';
 import 'package:ketoclub/screens/menu_group.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
@@ -22,6 +24,7 @@ import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/state/menu_controller.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/theme/app_typography.dart';
+import 'package:ketoclub/utils/allergens/chef_card_templates.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/constants.dart';
@@ -39,6 +42,7 @@ import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/fetch_failure_action.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
+import 'package:ketoclub/widgets/kitchen_notice.dart';
 import 'package:ketoclub/widgets/menu_filters_row.dart';
 import 'package:ketoclub/widgets/menu_question_sheet.dart';
 import 'package:ketoclub/widgets/menu_search_field.dart';
@@ -220,6 +224,9 @@ enum _MenuOverflowAction {
 
   /// Names a scanned menu (issue #315).
   rename,
+
+  /// Copies the allergy note for a delivery app (Banto, ALG-15).
+  allergyNote,
 }
 
 class _MenuScreenState extends State<MenuScreen> {
@@ -326,6 +333,16 @@ class _MenuScreenState extends State<MenuScreen> {
                     dish.verdict == DishVerdict.orderAsIs ||
                     dish.verdict == DishVerdict.modifiable,
               );
+    // Banto (ALG-15, issue #357): the profile's allergy note, in the
+    // menu's language, for any loaded menu, scans included; null without
+    // Banto or for a profile with nothing but keto.
+    final loadedMenu = controller.menu;
+    final allergyNote = widget.bantoMode && loadedMenu != null
+        ? ChefCardText.allergyNote(
+            controller.profile,
+            hebrew: MenuShareText.menuIsHebrew(loadedMenu),
+          )
+        : null;
     return Scaffold(
       appBar: AppBar(
         // The venue name, once the body header has scrolled under the bar
@@ -359,13 +376,16 @@ class _MenuScreenState extends State<MenuScreen> {
           // Explore, issue #257) and, for a scanned menu, "Rename" (issue
           // #315), so with neither it is hidden rather than opening an
           // empty menu.
-          if (canShare || controller.canRename)
+          if (canShare || controller.canRename || allergyNote != null)
             PopupMenuButton<_MenuOverflowAction>(
               tooltip: l10n.actionMoreMenuOptions,
               onSelected: (action) => switch (action) {
                 _MenuOverflowAction.share => unawaited(_shareMenu(controller)),
                 _MenuOverflowAction.rename => unawaited(
                   _renameMenu(context, controller),
+                ),
+                _MenuOverflowAction.allergyNote => unawaited(
+                  _copyAllergyNote(allergyNote),
                 ),
               },
               itemBuilder: (context) => [
@@ -378,6 +398,11 @@ class _MenuScreenState extends State<MenuScreen> {
                   PopupMenuItem(
                     value: _MenuOverflowAction.rename,
                     child: Text(l10n.menuRenameAction),
+                  ),
+                if (allergyNote != null)
+                  PopupMenuItem(
+                    value: _MenuOverflowAction.allergyNote,
+                    child: Text(l10n.menuAllergyNoteAction),
                   ),
               ],
             ),
@@ -465,6 +490,33 @@ class _MenuScreenState extends State<MenuScreen> {
       evaluations: controller.evaluations,
     );
     await widget.menuSharer.shareText(text);
+  }
+
+  /// Copies [note], the profile's allergy note (Banto, ALG-15), to the
+  /// clipboard in one tap, then offers a second action, Share, in a snack
+  /// bar, which hands the same text to `widget.menuSharer`.
+  Future<void> _copyAllergyNote(String? note) async {
+    if (note == null) return;
+    await Clipboard.setData(ClipboardData(text: note));
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(l10n.menuAllergyNoteCopied),
+          showCloseIcon: true,
+          action: SnackBarAction(
+            label: l10n.menuAllergyNoteShare,
+            onPressed: () => unawaited(
+              widget.menuSharer.shareText(
+                note,
+                subject: l10n.menuAllergyNoteSubject,
+              ),
+            ),
+          ),
+        ),
+      );
   }
 
   /// The screen body for the controller's current state: loading, a
@@ -700,6 +752,14 @@ class _MenuScreenState extends State<MenuScreen> {
     final notices = <Widget>[
       AnalysisProgressRow(phase: controller.phase),
       ...banners,
+      // What the menu reveals about its kitchen, for a strict profile
+      // (Banto, ALG-07); a keto build never reads the kitchen.
+      if (widget.bantoMode)
+        KitchenNotice(
+          kitchen: controller.kitchen,
+          profile: controller.profile,
+          bantoMode: widget.bantoMode,
+        ),
       if (controller.engine != null) ...[
         RulesReasonBanner(
           engine: controller.engine!,
@@ -1617,9 +1677,11 @@ class _MenuScreenState extends State<MenuScreen> {
 
   /// Opens the full-screen [WaiterCardSheet] for [row] as a modal.
   ///
-  /// For a Banto dish (ALG-05) the card shows the same waiter line the
-  /// dish card does ([VerdictCopy.waiterLine]) and the keto extras only
-  /// while keto is in the profile.
+  /// For a Banto dish (ALG-05) the card shows the dish's change and every
+  /// question its concerns carry ([VerdictCopy.waiterCardScript], ALG-08b;
+  /// the dish card shows the first), a "Chef card" action that opens
+  /// [ChefCardScreen] for the dish, and the keto extras only while keto
+  /// is in the profile.
   Future<void> _openWaiterCard(DishRow row) {
     final controller = context.read<MenuController>();
     final evaluated = controller.evaluationFor(row.dish.id);
@@ -1631,8 +1693,20 @@ class _MenuScreenState extends State<MenuScreen> {
         screenBrightness: widget.screenBrightness,
         script: evaluated == null
             ? null
-            : VerdictCopy.waiterLine(evaluated, row.dish),
+            : VerdictCopy.waiterCardScript(evaluated, row.dish),
         showKetoDetails: evaluated == null || controller.holdsKeto,
+        // Banto (ALG-08b): the chef card for this dish. The Waiter Card
+        // under it keeps the brightness raised, so the chef card gets
+        // none of its own to restore on close.
+        chefCard: evaluated == null
+            ? null
+            : (_) => ChefCardScreen(
+                profile: controller.profile,
+                dish: row.dish,
+                analysed: evaluated.dish,
+                menu: controller.menu,
+                menuSharer: widget.menuSharer,
+              ),
       ),
     );
   }
