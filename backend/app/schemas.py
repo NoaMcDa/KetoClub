@@ -26,6 +26,7 @@ from app.keto.models import (
     WireModel,
 )
 from app.keto.vocabulary import vocabulary
+from app.services.allergen_matrix import AllergenMatrixWire
 from app.services.wolt import WoltLang
 
 
@@ -408,6 +409,11 @@ class VenueMenuResponse(WireModel):
     instant as ``menu.fetchedAt``. ``confirmations`` (ALG-14, #356) lists the
     community's per-dish counts that have reached the threshold, and is
     absent from the body when there are none.
+
+    ``allergenMatrix`` (ALG-16, #358) is the restaurant's allergen matrix
+    for the venue that holds today, when the maintainer entered one; the
+    key is **omitted** when there is none, so every answer without a matrix
+    is the bytes it was before the field existed.
     """
 
     menu: Menu
@@ -418,6 +424,9 @@ class VenueMenuResponse(WireModel):
     # confirmed anything for is the bytes it was before the field existed.
     confirmations: list["ConfirmationCount"] | None = Field(
         default=None, exclude_if=lambda value: not value
+    )
+    allergen_matrix: AllergenMatrixWire | None = Field(
+        default=None, exclude_if=lambda value: value is None
     )
 
     @field_validator("fetched_at")

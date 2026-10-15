@@ -765,5 +765,11 @@
   "restrictionOwnField": "מזון שיש להימנע ממנו",
   "restrictionOwnAdd": "הוספה",
   "restrictionOwnRowSubtitle": "משלך · נבדק בקפדנות",
-  "concernCertaintyHeadsUp": "ייתכן שיש בזה הרבה — התראה, לא מדידה"
+  "concernCertaintyHeadsUp": "ייתכן שיש בזה הרבה — התראה, לא מדידה",
+  "allergenMatrixNotice": "מידע על אלרגנים מהמסעדה, מתאריך {date}",
+  "allergenMatrixUnmatched": "{count, plural, =1{שורה אחת בו לא תואמת אף מנה בתפריט הזה: {rows}} other{{count} שורות בו לא תואמות אף מנה בתפריט הזה: {rows}}}",
+  "concernSourceMatrix": "מידע האלרגנים של המסעדה",
+  "whySourceMatrix": "מופיע במידע האלרגנים של המסעדה עצמה",
+  "whyTierDeclaredMatrix": "הוצהר במידע האלרגנים של המסעדה",
+  "whyMatrixAbsent": "מופיע כנטול ממנו, בשם “{row}” — זה מפחית את החשש אבל לא שולל אותו"
 }

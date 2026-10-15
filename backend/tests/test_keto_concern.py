@@ -66,6 +66,7 @@ def test_the_enum_names_are_pinned_in_dart_order() -> None:
         "hidden",
         "model",
         "kitchen",
+        "matrix",
     )
     assert get_args(Certainty) == ("stated", "likely", "suspected")
     assert get_args(EvidenceTier) == (

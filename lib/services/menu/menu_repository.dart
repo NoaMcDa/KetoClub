@@ -143,29 +143,49 @@ final class CachedMenuRepository implements MenuRepository {
     if (!forceRefresh &&
         cached != null &&
         (_isFresh(cached.menu) || await cache.isPinned(ref))) {
-      return MenuFetched(menu: cached.menu, fromCache: true);
+      return MenuFetched(
+        menu: cached.menu,
+        fromCache: true,
+        allergenMatrix: cached.allergenMatrix,
+      );
     }
 
     final result = await adapter.fetch(ref);
     switch (result) {
-      case MenuFetched(menu: final fetched, :final analysis):
+      case MenuFetched(
+        menu: final fetched,
+        :final analysis,
+        :final allergenMatrix,
+      ):
         // An analysis the adapter made while reading the menu (a website
         // PDF, D19; the backend's complete result, D25) is the freshest
         // there is; otherwise the cached one is kept only if the dish text
         // did not change. It rides on the result too, so the caller knows
-        // it came with this fetch (issue #331).
+        // it came with this fetch (issue #331). The restaurant's allergen
+        // matrix (ALG-16) is whatever this fetch carried: a fresh answer
+        // without one means the venue has none today.
+        final merged = analysis != null
+            ? CachedMenu(menu: fetched, analysis: analysis)
+            : _merge(previous: cached, fetched: fetched);
         await cache.write(
-          analysis != null
-              ? CachedMenu(menu: fetched, analysis: analysis)
-              : _merge(previous: cached, fetched: fetched),
+          CachedMenu(
+            menu: merged.menu,
+            analysis: merged.analysis,
+            allergenMatrix: allergenMatrix,
+          ),
         );
-        return MenuFetched(menu: fetched, analysis: analysis);
+        return MenuFetched(
+          menu: fetched,
+          analysis: analysis,
+          allergenMatrix: allergenMatrix,
+        );
       case MenuFetchFailed(:final reason):
         if (cached != null) {
           return MenuFetched(
             menu: cached.menu,
             fromCache: true,
             staleReason: reason,
+            allergenMatrix: cached.allergenMatrix,
           );
         }
         return result;
@@ -195,7 +215,13 @@ final class CachedMenuRepository implements MenuRepository {
   Future<void> saveAnalysis(VenueRef ref, MenuAnalysis analysis) async {
     final entry = await cache.read(ref);
     if (entry == null) return;
-    await cache.write(CachedMenu(menu: entry.menu, analysis: analysis));
+    await cache.write(
+      CachedMenu(
+        menu: entry.menu,
+        analysis: analysis,
+        allergenMatrix: entry.allergenMatrix,
+      ),
+    );
   }
 
   @override

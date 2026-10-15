@@ -2,15 +2,17 @@
 
 ``menu_cache`` (#95), ``chat_cache`` (#103), ``stored_menus`` (#310),
 ``analysis_cache`` (#333), ``dish_confirmations`` and ``confirmation_voters``
-(ALG-14, #356) are the tables so far. Future issues declare more
+(ALG-14, #356) and ``allergen_matrices`` (ALG-16, #358) are the tables so
+far. Future issues declare more
 tables here against ``app.db.Base`` — ``venues`` and
 ``ratings``/``dish_feedback`` (#105, #106), ``submissions`` (#107) — so one
 ``Base.metadata.create_all`` call in the lifespan creates every table.
 
 No table holds an install id (D12, #164): the id keys the in-memory rate
-limiter and nothing else. ``stored_menus`` in particular is keyed by venue.
-``confirmation_voters`` holds a one-way digest that cannot be joined back to
-an install or to a row (see its docstring), never the id itself.
+limiter and nothing else. ``stored_menus`` and ``allergen_matrices`` in
+particular are keyed by venue. ``confirmation_voters`` holds a one-way digest
+that cannot be joined back to an install or to a row (see its docstring),
+never the id itself.
 """
 
 from datetime import date, datetime
@@ -21,6 +23,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.db import Base
 
 __all__ = [
+    "AllergenMatrix",
     "AnalysisCache",
     "Base",
     "ChatCache",
@@ -192,3 +195,37 @@ class ConfirmationVoter(Base):
     __tablename__ = "confirmation_voters"
 
     token: Mapped[str] = mapped_column(String(64), primary_key=True)
+
+
+class AllergenMatrix(Base):
+    """A restaurant's allergen matrix for one venue and date (ALG-16, #358).
+
+    Keyed by ``(source, platform_id, valid_from)``: the venue keying of
+    ``stored_menus`` (a platform and its own id for the venue) plus the day
+    the matrix starts to hold, so a venue keeps its successive matrices and
+    importing one again for the same day replaces it. ``valid_until`` is the
+    last day it holds, or null for "until replaced"; ``GET
+    /v1/venue-menus`` answers the one with the latest ``valid_from`` that
+    holds today (``app.services.allergen_matrix.current``).
+
+    ``rows_json`` is the matrix itself, the wire form's ``rows``: one entry
+    per dish by printed name (and aliases), each allergen column of the EU 14
+    as ``contains``, ``may_contain`` or ``free``, a blank cell left out.
+    ``matrix_source`` says where the restaurant's information was read
+    (``restaurant``, ``printed``, ``website``) and ``entered_by`` who typed
+    it in; ``entered_by`` is for the maintainer's audit and never leaves
+    the server. Written only by the maintainer CLI
+    (``tools/allergen_matrix.py``): there is no write route and no account.
+    There is no install-id column, as for every table here.
+    """
+
+    __tablename__ = "allergen_matrices"
+
+    source: Mapped[str] = mapped_column(String(16), primary_key=True)
+    platform_id: Mapped[str] = mapped_column(String(512), primary_key=True)
+    valid_from: Mapped[date] = mapped_column(Date, primary_key=True)
+    valid_until: Mapped[date | None] = mapped_column(Date, nullable=True)
+    matrix_source: Mapped[str] = mapped_column(String(32), nullable=False)
+    entered_by: Mapped[str] = mapped_column(String(200), nullable=False)
+    rows_json: Mapped[str] = mapped_column(Text, nullable=False)
+    entered_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)

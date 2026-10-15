@@ -3149,6 +3149,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'may be high in it — a heads-up, not a measurement'**
   String get concernCertaintyHeadsUp;
+
+  /// Banto (ALG-16): the menu screen's notice when the restaurant's own allergen matrix is on file; {date} is the day it holds from, formatted for the UI locale. A fact, never a badge or a rating, and never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'Allergen information from the restaurant, dated {date}'**
+  String allergenMatrixNotice(String date);
+
+  /// Banto (ALG-16): under the allergen-information notice, the matrix rows the app could not pair with exactly one dish by name, listed as the restaurant printed them. They are applied to nothing, never guessed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 line of it matches no dish on this menu: {rows}} other{{count} lines of it match no dish on this menu: {rows}}}'**
+  String allergenMatrixUnmatched(int count, String rows);
+
+  /// Banto (ALG-16): concern source on the dish card for a concern the restaurant's own allergen matrix declares (contains or may contain).
+  ///
+  /// In en, this message translates to:
+  /// **'restaurant\'s allergen information'**
+  String get concernSourceMatrix;
+
+  /// Banto (ALG-16): Why sheet line for a concern the restaurant's allergen matrix declares.
+  ///
+  /// In en, this message translates to:
+  /// **'Listed in the restaurant\'s own allergen information'**
+  String get whySourceMatrix;
+
+  /// Banto (ALG-16): the Why sheet's tier phrase for a concern the restaurant's allergen matrix declares or lowered.
+  ///
+  /// In en, this message translates to:
+  /// **'Declared in the restaurant\'s allergen information'**
+  String get whyTierDeclaredMatrix;
+
+  /// Banto (ALG-16): under a concern lowered by a 'free' cell of the restaurant's allergen matrix; {row} is the matrix row's dish name as the restaurant printed it. Never says the dish is free of it.
+  ///
+  /// In en, this message translates to:
+  /// **'Listed as free of it, as “{row}” — this lowers the finding but never rules it out'**
+  String whyMatrixAbsent(String row);
 }
 
 class _AppLocalizationsDelegate

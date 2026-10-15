@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:ketoclub/models/allergen_matrix.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
@@ -26,6 +27,7 @@ final class MenuFetched extends MenuFetchResult {
     this.fromCache = false,
     this.staleReason,
     this.analysis,
+    this.allergenMatrix,
   });
 
   /// The menu, fresh or cached.
@@ -50,16 +52,24 @@ final class MenuFetched extends MenuFetchResult {
   /// a cached menu included.
   final MenuAnalysed? analysis;
 
+  /// The restaurant's allergen matrix for the venue (Banto, ALG-16), when
+  /// KetoClub's backend answered with one beside the menu
+  /// (`allergenMatrix` on its venue-menu route), or the one cached with
+  /// a menu served from the cache. Null for every other fetch.
+  final AllergenMatrix? allergenMatrix;
+
   @override
   bool operator ==(Object other) =>
       other is MenuFetched &&
       other.menu == menu &&
       other.fromCache == fromCache &&
       other.staleReason == staleReason &&
-      other.analysis == analysis;
+      other.analysis == analysis &&
+      other.allergenMatrix == allergenMatrix;
 
   @override
-  int get hashCode => Object.hash(menu, fromCache, staleReason, analysis);
+  int get hashCode =>
+      Object.hash(menu, fromCache, staleReason, analysis, allergenMatrix);
 
   @override
   String toString() =>

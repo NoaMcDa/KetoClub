@@ -3794,6 +3794,58 @@ The Dart `ConfirmationClient` (`lib/services/community/confirmation_client.dart`
 is the one file naming `/v1/confirmations`; `no_profile_on_the_wire_test.dart`
 allows `restrictionId` there alone, with the reason. Nothing consumes it yet.
 
+**Restaurant allergen matrices, the first slice, and the "no rating" rule
+(ALG-16, related to #358).** A matrix is a restaurant's own table of what
+each dish contains, may contain or is free of: rows are dishes by printed
+name (plus up to five aliases), columns the EU 14 by taxonomy id (sesame is
+one of them; "cereals containing gluten" is `gluten`, never `wheat`), cells
+`contains`, `may_contain`, `free` or blank, with `source` (`restaurant`,
+`printed`, `website`), `enteredBy` and `validFrom`/`validUntil`; the JSON and
+CSV forms are in `backend/README.md`. The backend keeps it in a new table,
+`allergen_matrices`, beside D24's `stored_menus` and keyed the same way, by
+venue (`source`, `platform_id`) plus `valid_from`, with no install-id column,
+and returns the one that holds today (UTC, the latest `validFrom` wins) on
+`GET /v1/venue-menus` as an optional `allergenMatrix` key that is omitted
+when there is none, so no golden and no existing answer moved; `enteredBy`
+never leaves the server and nothing near the read touches the install id.
+Intake is manual for now: the maintainer's `backend/tools/allergen_matrix.py`
+(`template`, `import` of a `.json` or a `.csv` with flags, `list`, `remove`)
+validates a whole document before writing and refuses two rows whose names
+normalise alike. There is no write route and no account. With `bantoMode`,
+`BackendMenuAdapter` reads the key tolerantly (`models/allergen_matrix.dart`:
+absent or unreadable is none, an unknown cell is dropped) onto
+`MenuFetched.allergenMatrix`; the menu cache keeps it beside the menu (written
+only when present, so other entries are byte-identical) and a fresh answer
+replaces it. **Matching is on the device only** (`utils/allergens/
+allergen_matrix.dart`, no Python twin, no golden): a row speaks for a dish
+when one of its names normalises exactly (`TextNormaliser.normalise`, the
+key §9.4 dedups names by) to the dish's name; §9.4 rule 3's shared-word test
+is how the parser rejects inventions and is far too loose to say whose
+allergens a dish has. A row naming no dish, or only a dish another row also
+names, is listed in `AllergenMatrixMatch.unmatched` and applied to nothing:
+never guessed. A matched row's `contains` cell is a stated concern and its
+`may_contain` a suspected one, both the new device-only
+`ConcernSource.matrix` at tier `declared` on a part that cannot be left off
+(so avoid, and ask for a strict entry), and its `free` cells are one absent
+`Declaration` (the new `DeclarationSource.allergenMatrix`, the row's name as
+the matched text) that `ProfileEvaluator.evaluate`'s one new parameter,
+`matrix`, hands to ALG-09's `_applyDeclarations`: one step lower, never below
+`suspected` and never removed for a strict entry, and every EU 14 column is
+strict. `MenuController` applies the matrix only while it holds on the
+menu's `fetchedAt` day, to single and group evaluations alike. The menu
+screen's `AllergenMatrixNotice` says "Allergen information from the
+restaurant, dated 1 Oct 2026" and lists the unmatched rows as printed; the
+dish card reads "restaurant's allergen information" and the Why sheet
+"Declared in the restaurant's allergen information". **The "no rating"
+rule:** a matrix, and anything a restaurant later supplies or pays for, is
+evidence about dishes and a dated fact about where it came from, never a
+badge, a rank, a score or a rating of the venue; no restaurant can buy a
+rating, a placement or a better state, and no copy for it says "verified"
+or "safe" (file 07's B2B rule). Out of this slice: reading a photographed
+printed matrix through the vision path, user-submitted matrix photos held
+as `suspected`, the restaurant-facing upload page, and the per-dish chef
+card's re-evaluation, which does not yet take the matrix.
+
 ---
 
 ## 15. Testing strategy

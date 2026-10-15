@@ -28,6 +28,7 @@ import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/allergen_matcher.dart';
+import 'package:ketoclub/utils/allergens/allergen_matrix.dart';
 import 'package:ketoclub/utils/allergens/custom_terms.dart';
 import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
@@ -216,6 +217,12 @@ abstract final class ProfileEvaluator {
   /// Every kept concern carries a waiter question in the same language
   /// ([WaiterQuestions.fill], ALG-08b): the model's own when it wrote one.
   ///
+  /// [matrix] is what the restaurant's allergen matrix says about the
+  /// dish (ALG-16, `allergen_matrix.dart`): its concerns join the evidence
+  /// as parts that cannot be left off, and its absences join the
+  /// declarations, so a declared absence never takes a strict entry below
+  /// `suspected`.
+  ///
   /// An empty profile holds keto: it is the keto-only user of today's
   /// app, and the result is the identity mapping of the wire verdict.
   static EvaluatedDish evaluate(
@@ -224,16 +231,21 @@ abstract final class ProfileEvaluator {
     DietaryProfile profile, {
     bool? hebrew,
     String? heading,
+    MatrixEvidence matrix = MatrixEvidence.none,
   }) {
     final hasKeto = profile.isEmpty || profile.contains(RestrictionId.keto);
     final isHebrew =
         hebrew ??
         TextNormaliser.containsHebrew(TextNormaliser.dishRulesText(dish));
 
-    final (:evidence, :declarations) = _applyDeclarations(<_Evidence>[
-      for (final evidence in _evidence(analysed, dish, profile.customTerms))
-        if (_applies(evidence.concern, profile)) _headsUp(evidence),
-    ], Declarations.of(dish, heading: heading));
+    final (:evidence, :declarations) = _applyDeclarations(
+      <_Evidence>[
+        for (final evidence in _evidence(analysed, dish, profile.customTerms))
+          if (_applies(evidence.concern, profile)) _headsUp(evidence),
+        ..._fixedEvidence(matrix.concerns.where((c) => _applies(c, profile))),
+      ],
+      [...Declarations.of(dish, heading: heading), ...matrix.absences],
+    );
 
     var avoid = hasKeto && analysed.verdict == DishVerdict.nonKeto;
     var ask = false;
@@ -287,6 +299,13 @@ abstract final class ProfileEvaluator {
       declarations: declarations,
     );
   }
+
+  /// [concerns] as evidence on parts of the dish that cannot be left off:
+  /// what a restaurant's allergen matrix declares (ALG-16).
+  static Iterable<_Evidence> _fixedEvidence(Iterable<Concern> concerns) =>
+      concerns.map(
+        (concern) => (concern: concern, removable: false, item: null),
+      );
 
   /// [evidence] after the dish's [declarations] (ALG-09; file 09: a
   /// declaration never clears a strict entry). For each restriction some
