@@ -31,6 +31,7 @@ Routes shipped so far:
 | `POST /v1/website/fetch` | #181 | **yes** | **yes** (`WEBSITE_RATE_LIMIT_PER_MINUTE`, and per host) | One restaurant page or PDF for the web build, fetched politely (D19), see below |
 | `POST /v1/menus` | #310 | **yes** (rate limiting only) | **yes** (`RATE_LIMIT_*`, shared with `/v1/chat`) | Stores one opened menu in the anonymous shared store, see below |
 | `GET /v1/menus/{source}/{platform_id}` | #310 | no | no | Reads one stored menu back, see below |
+| `POST /v1/confirmations` | #356 | **yes** (rate limiting and distinct counting, never stored) | **yes** (`CONFIRMATION_RATE_LIMIT_*`, a bucket of its own) | One anonymous post-meal fact about a dish (ALG-14), see below |
 | `POST /v1/classify` | #333 | **yes** | **yes** (`ANALYSIS_RATE_LIMIT_*`, only for a Gemini call) | A complete analysis of a menu the client holds (D25), see below |
 | `GET /v1/venue-menus/{source}/{platform_id}` | #333 | **yes** | **yes** (`ANALYSIS_RATE_LIMIT_*`, only for a Gemini call) | One Wolt or 10bis menu, mapped and optionally analysed (D25), see below |
 | `POST /v1/text-menu` | #333 | **yes** | **yes** (`ANALYSIS_RATE_LIMIT_*`, only for a Gemini call) | A pasted menu, read and analysed (D18, D25), see below |
@@ -568,6 +569,74 @@ curl -sS localhost:8000/v1/menus \
 curl -sS localhost:8000/v1/menus/wolt/hamosad
 ```
 
+## Dish confirmations (ALG-14, #356)
+
+After a meal a user may tell KetoClub what the kitchen confirmed about a
+dish: "there is sesame in it" (`present`) or "there is none" (`absent`). One
+row per `(venue, dish fingerprint, restriction id, polarity)` in the
+`dish_confirmations` table holds a count and a first and last **date** (UTC
+calendar days, not timestamps). **There is no install id column, no note
+column and nothing profile-shaped** (the D24 rule, Banto C1); a venue is never
+summed into a rating.
+
+`POST /v1/confirmations` body (exactly these four fields):
+
+| Field | Type | Notes |
+|---|---|---|
+| `venue` | `{source, platform_id}` | The `POST /v1/menus` key, so a confirmation lines up with `stored_menus`; `platformId` is read too. `source` is one of the six menu sources |
+| `dishFingerprint` | string, 1-64 of `A-Za-z0-9._:-` | An opaque token naming the dish, never prose, so a note cannot ride in it |
+| `restrictionId` | string | An id of the shipped taxonomy (`app/keto/allergens.json`), `custom` excluded: its meaning is the user's own words |
+| `polarity` | `"present"` or `"absent"` | |
+
+**422** (no quota spent) for any `installId`/`install_id`, any `note`/`notes`
+and any restriction-profile key (`profile`, `dietaryProfile`, `restrictions`,
+`restrictionIds`, `severity`) at any depth, for any unknown field, an unknown
+`restrictionId`, a fingerprint that is not a token and a bad `source` or
+`polarity`; the message names the key and never echoes a value. A new
+confirmation answers **201** `{"counted": true}`; a repeat of a fact this
+install already confirmed answers **200** `{"counted": false}`.
+
+**The install id is never stored beside content.** `X-KetoClub-Install-Id` is
+required for two things only: the per-install rate limit (its own
+`CONFIRMATION_RATE_LIMIT_PER_MINUTE`/`_PER_DAY` bucket, in memory) and
+**distinct counting**. The route turns the id into a one-way token,
+`HMAC-SHA256(CONFIRMATION_PEPPER, install id | venue | dish | restriction |
+polarity)`, deletes the id, and the service stores only that token in
+`confirmation_voters`, a one-column table with no timestamp and no foreign
+key. The token covers the fact it counts, so one install has an unrelated
+token for every fact: tokens cannot be grouped by install, and nothing links
+one to a `dish_confirmations` row without the install id, which is not kept.
+A second post of the same fact from the same install finds its token and is
+counted as a repeat (`submission_count` only). Set `CONFIRMATION_PEPPER` to a
+long random string on any shared host; changing it later makes every install
+countable once more.
+
+**Counts are served by `GET /v1/venue-menus`**, as an optional
+`confirmations` list `[{dishFingerprint, restrictionId, present, absent,
+first, last}]` (dates as `YYYY-MM-DD`). A polarity is included only when its
+own row has **at least 3 distinct confirmations**; the other polarity reads 0
+until it has 3 too, and an entry with neither is not listed. When the list
+would be empty **the key is omitted entirely**, so a venue nobody has
+confirmed anything for is the same bytes as before. A failing lookup never
+fails the menu.
+
+| Status | `reason` | When |
+|---|---|---|
+| 400 | `badResponse` | Missing or malformed install id, or an inbound `Authorization` header |
+| 404 | (FastAPI's own) | `CONFIRMATIONS_ENABLED=false`: the router is not mounted |
+| 413 | `payloadTooLarge` | Body over 4 KiB |
+| 422 | (FastAPI's `detail`) | See above |
+| 429 | `rateLimited` | Over the install's confirmation limits |
+
+```bash
+curl -sS localhost:8000/v1/confirmations \
+  -H 'Content-Type: application/json' \
+  -H 'X-KetoClub-Install-Id: 0123456789abcdef0123456789abcdef' \
+  -d '{"venue":{"source":"wolt","platform_id":"hamosad"},
+       "dishFingerprint":"a1b2c3d4","restrictionId":"sesame","polarity":"present"}'
+# {"counted":true}
+```
+
 ## Running locally
 
 ```bash
@@ -618,6 +687,9 @@ that need them (`/v1/chat`, and `/v1/admin/*` in a later issue). See
 | `RATE_LIMIT_PER_MINUTE`, `RATE_LIMIT_PER_DAY` | `5`, `40` | Per install id on `/v1/chat` and `POST /v1/menus` (one shared bucket), in memory |
 | `MENU_STORE_ENABLED` | `true` | `false` → the menu store's router is not mounted and both `/v1/menus` routes answer 404 (#310) |
 | `MENU_STORE_MAX_BODY_BYTES` | `1048576` | Largest `POST /v1/menus` body (1 MiB); over it → 413 `payloadTooLarge` |
+| `CONFIRMATIONS_ENABLED` | `true` | `false` → `POST /v1/confirmations` is not mounted (404) and `/v1/venue-menus` never carries `confirmations` (ALG-14, #356) |
+| `CONFIRMATION_RATE_LIMIT_PER_MINUTE`, `CONFIRMATION_RATE_LIMIT_PER_DAY` | `12`, `120` | Per install id on `POST /v1/confirmations`, a bucket of its own, in memory |
+| `CONFIRMATION_PEPPER` | empty | Secret key of the one-way voter token that counts distinct confirmers; set it on any shared host |
 | `WOLT_BASE_URL` | `https://restaurant-api.wolt.com` | Upstream host for the by-name discovery route (the menu proxy left it in #168); never taken from a request |
 | `TENBIS_BASE_URL` | `https://www.10bis.co.il` | Upstream host for the 10bis proxy; never taken from a request |
 | `WOLT_CONSUMER_BASE_URL` | `https://consumer-api.wolt.com` | Upstream host for the Wolt menu proxy (#168) and the nearby-venue discovery route; never taken from a request |

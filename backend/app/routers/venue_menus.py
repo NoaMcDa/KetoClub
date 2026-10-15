@@ -19,6 +19,12 @@ empty analysis bucket keeps the menu and answers the rules stamped
 ``analysis: null``. With ``classify=false`` nothing is analysed and no
 bucket is spent: the proxy itself has none.
 
+The response also carries ``confirmations`` (ALG-14, #356): the community's
+per-dish counts for this venue, only for facts with at least three distinct
+confirmations, and no key at all when there are none. They are read with or
+without ``classify``, never fail the read, and are skipped when
+``CONFIRMATIONS_ENABLED`` is false.
+
 A returned analysis is also written to the shared menu store
 (``stored_menus``, D24) when it is enabled: the menu and the analysis
 without its ``options``, keyed by venue, never by install id.
@@ -46,8 +52,13 @@ from app.errors import BackendError
 from app.keto.models import LlmEngine, Menu, MenuAnalysed, VenueRef, to_json
 from app.platforms.tenbis_menu import map_tenbis_menu
 from app.platforms.wolt_menu import map_wolt_menu
-from app.schemas import ClassificationOptionsBody, ErrorResponse, VenueMenuResponse
-from app.services import menu_store
+from app.schemas import (
+    ClassificationOptionsBody,
+    ConfirmationCount,
+    ErrorResponse,
+    VenueMenuResponse,
+)
+from app.services import confirmations, menu_store
 from app.services.auth import reject_authorization
 from app.services.classify import ClassifyContext, classify, dart_now
 from app.services.install_id import require_install_id
@@ -199,6 +210,41 @@ async def _store(request: Request, menu: Menu, analysis: MenuAnalysed) -> None:
         logger.warning("venue_menus store failed source=%s", menu.venue_ref.source)
 
 
+async def _confirmations(
+    request: Request, ref: VenueRef
+) -> list[ConfirmationCount] | None:
+    """The venue's shown community counts, or None when there are none.
+
+    A failure is logged and swallowed: they are extra evidence beside the
+    menu, never a reason to refuse it.
+    """
+    if not request.app.state.settings.CONFIRMATIONS_ENABLED:
+        return None
+    try:
+        shown = await run_in_threadpool(
+            confirmations.visible_for,
+            request.app.state.engine,
+            ref.source,
+            ref.platform_id,
+        )
+    except Exception:  # noqa: BLE001 - extra evidence must not fail the read
+        logger.warning("venue_menus confirmations failed source=%s", ref.source)
+        return None
+    if not shown:
+        return None
+    return [
+        ConfirmationCount(
+            dish_fingerprint=entry.dish_fingerprint,
+            restriction_id=entry.restriction_id,
+            present=entry.present,
+            absent=entry.absent,
+            first=entry.first,
+            last=entry.last,
+        )
+        for entry in shown
+    ]
+
+
 @router.get(
     "/venue-menus/{source}/{platform_id}",
     response_model=VenueMenuResponse,
@@ -264,4 +310,5 @@ async def read_venue_menu(
         analysis=analysis,
         from_cache=upstream.from_cache,
         fetched_at=fetched_at,
+        confirmations=await _confirmations(request, ref),
     )

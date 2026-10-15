@@ -2,7 +2,7 @@
 
 import base64
 import binascii
-from datetime import datetime
+from datetime import date, datetime
 from typing import Annotated, Any, Final, Literal, get_args
 
 from pydantic import (
@@ -17,6 +17,7 @@ from pydantic import (
     model_validator,
 )
 
+from app.keto.allergens import allergens
 from app.keto.models import (
     AnalysisOptionsSnapshot,
     Menu,
@@ -404,13 +405,20 @@ class VenueMenuResponse(WireModel):
     ``fromCache`` says whether the menu came from the server's platform
     cache rather than a fresh upstream fetch, and ``fetchedAt`` (ISO-8601,
     as Dart writes it) is when that upstream fetch happened: the same
-    instant as ``menu.fetchedAt``.
+    instant as ``menu.fetchedAt``. ``confirmations`` (ALG-14, #356) lists the
+    community's per-dish counts that have reached the threshold, and is
+    absent from the body when there are none.
     """
 
     menu: Menu
     analysis: MenuAnalysed | None
     from_cache: bool
     fetched_at: str
+    # Written only when non-empty (ALG-14, #356), so a venue nobody has
+    # confirmed anything for is the bytes it was before the field existed.
+    confirmations: list["ConfirmationCount"] | None = Field(
+        default=None, exclude_if=lambda value: not value
+    )
 
     @field_validator("fetched_at")
     @classmethod
@@ -542,3 +550,119 @@ class VenuesResponse(WireModel):
     the venues in Wolt's order (the client sorts nearest-first)."""
 
     venues: list[Venue]
+
+
+# --- ALG-14: post-meal community confirmations (#356) --------------------------
+
+CONFIRMATION_FINGERPRINT_PATTERN: Final = r"^[A-Za-z0-9._:\-]{1,64}$"
+"""A dish fingerprint is an opaque token, never prose: letters, digits and
+``._:-``, at most 64 characters. The charset is a privacy rule as much as a
+format one: a free-text note cannot ride in the field (the D24 rule)."""
+
+ConfirmationPolarity = Literal["present", "absent"]
+"""``present``: the kitchen confirmed the restriction's ingredient is in the
+dish. ``absent``: the kitchen confirmed it is not."""
+
+CONFIRMATION_REFUSED_KEYS: Final[frozenset[str]] = frozenset(
+    {"installid", "note", "notes"} | {key.lower() for key in MENU_UPLOAD_PROFILE_KEYS}
+)
+"""Body keys refused at any depth, compared lower-cased with ``_`` removed.
+
+A confirmation names no sender (``installId``), carries no prose (``note``,
+``notes``: a note stays on the device, ALG-14) and nothing profile-shaped
+(Banto C1: one restriction id about a dish, never a set of the user's). Such
+a key is a client bug, so it is a 422 rather than a silent drop.
+"""
+
+
+def _refused_key_path(value: object, path: str = "") -> str | None:
+    """The dotted path of the first refused key inside ``value``, if any."""
+    if isinstance(value, dict):
+        for key, child in value.items():
+            here = f"{path}.{key}" if path else str(key)
+            if str(key).lower().replace("_", "") in CONFIRMATION_REFUSED_KEYS:
+                return here
+            found = _refused_key_path(child, here)
+            if found is not None:
+                return found
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            found = _refused_key_path(child, f"{path}[{index}]")
+            if found is not None:
+                return found
+    return None
+
+
+class ConfirmationVenue(WireModel):
+    """The venue a confirmation is about: ``{source, platform_id}``, the
+    ``POST /v1/menus`` key. ``platformId`` is read too (the wire models'
+    casing), so a client may send either spelling."""
+
+    source: MenuStoreSource
+    platform_id: PlatformId
+
+
+class ConfirmationRequest(WireModel):
+    """``POST /v1/confirmations``: one fact a kitchen confirmed about a dish.
+
+    ``{venue, dishFingerprint, restrictionId, polarity}`` and nothing else:
+    unknown fields are a 422, and so are ``installId``/``install_id``,
+    ``note``/``notes`` and any restriction-profile key, named in the message
+    and never echoed. ``restrictionId`` must be an id of the taxonomy the
+    backend ships (``app.keto.allergens``) other than ``custom``, whose
+    meaning is the user's own words and so is no shared fact.
+    """
+
+    venue: ConfirmationVenue
+    dish_fingerprint: Annotated[
+        str, StringConstraints(pattern=CONFIRMATION_FINGERPRINT_PATTERN)
+    ]
+    restriction_id: Annotated[str, Field(min_length=1, max_length=64)]
+    polarity: ConfirmationPolarity
+
+    @model_validator(mode="before")
+    @classmethod
+    def _refuses_sender_notes_and_profile(cls, data: object) -> object:
+        found = _refused_key_path(data)
+        if found is not None:
+            raise ValueError(
+                f"{found}: a confirmation carries no install id, note or profile"
+            )
+        return data
+
+    @field_validator("restriction_id")
+    @classmethod
+    def _is_a_taxonomy_id(cls, value: str) -> str:
+        known = {entry.id for entry in allergens().taxonomy} - {"custom"}
+        if value not in known:
+            raise ValueError("restrictionId is not a known restriction id")
+        return value
+
+
+class ConfirmationRecordedResponse(WireModel):
+    """A successful ``POST /v1/confirmations``: 201 with ``counted: true``
+    when this install's confirmation of the fact was new, 200 with
+    ``counted: false`` when it had already been counted. It says nothing of
+    anyone else's confirmations."""
+
+    counted: bool
+
+
+class ConfirmationCount(WireModel):
+    """One ``confirmations`` entry of ``GET /v1/venue-menus``.
+
+    ``present`` and ``absent`` are distinct-confirmation counts, each shown
+    only when its own row has reached the threshold (otherwise 0, so a
+    sub-threshold count never leaks beside a shown one); ``first`` and
+    ``last`` are UTC dates over the rows shown.
+    """
+
+    dish_fingerprint: str
+    restriction_id: str
+    present: int
+    absent: int
+    first: date
+    last: date
+
+
+VenueMenuResponse.model_rebuild()
