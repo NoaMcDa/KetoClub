@@ -293,3 +293,40 @@ const Set<RestrictionId> headsUpRestrictions = <RestrictionId>{
 /// The taxonomy entry for [id]. Total: [restrictionTaxonomy] holds one
 /// entry per id, in [RestrictionId] order (a test pins both).
 Restriction restrictionFor(RestrictionId id) => restrictionTaxonomy[id.index];
+
+/// What a jurisdiction's allergen list binds (ALG-13, trip mode): food sold
+/// packaged, or also the food a restaurant serves. [Restriction.jurisdictions]
+/// says which lists name a restriction; this says whether naming it there
+/// obliges a restaurant to tell a diner anything.
+enum ListScope {
+  /// The list binds non-prepacked food too: a restaurant must be able to
+  /// tell a diner which of the listed allergens a dish holds. The EU's
+  /// Regulation 1169/2011 and the UK's rules (file 02, "The lists"; file
+  /// 11 §19.2).
+  restaurants,
+
+  /// The list binds packaged food only, and a restaurant owes a diner
+  /// nothing: Israel's 2028 rule (file 12 §4.2; file 11 §19.3) and Japan's
+  /// labelling law, which exempts food service (file 12 §8.1).
+  packagedFood,
+
+  /// The list binds packaged food (the FASTER Act), and only some chains
+  /// must list allergens per dish: California's SB 68, chains with 20 or
+  /// more locations, from 1 July 2026 (file 02; file 06; file 12 §8.1).
+  packagedFoodAndLargeChains,
+}
+
+/// Each jurisdiction's [ListScope]. Canada and Australia / New Zealand are
+/// not trip destinations yet and their restaurant rules were not
+/// researched, so they read as [ListScope.packagedFood]: the hint that
+/// follows is "ask every time", the side that never overstates a duty.
+const Map<Jurisdiction, ListScope> jurisdictionListScope =
+    <Jurisdiction, ListScope>{
+      Jurisdiction.us: ListScope.packagedFoodAndLargeChains,
+      Jurisdiction.eu: ListScope.restaurants,
+      Jurisdiction.uk: ListScope.restaurants,
+      Jurisdiction.ca: ListScope.packagedFood,
+      Jurisdiction.anz: ListScope.packagedFood,
+      Jurisdiction.jp: ListScope.packagedFood,
+      Jurisdiction.il: ListScope.packagedFood,
+    };

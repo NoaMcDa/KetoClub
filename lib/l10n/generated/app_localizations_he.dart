@@ -1946,6 +1946,109 @@ class AppLocalizationsHe extends AppLocalizations {
   String get concernCertaintyHeadsUp => 'ייתכן שיש בזה הרבה — התראה, לא מדידה';
 
   @override
+  String get settingsTrip => 'מצב טיול';
+
+  @override
+  String get settingsTripNote =>
+      'נוסעים? בחרו יעד: תראו מה מסעדות שם חייבות לומר לכם ואילו מנות מקומיות מסתירות את ההגבלות שלכם. הקטו לא משתנה, והיעד נשמר רק במכשיר הזה.';
+
+  @override
+  String get settingsTripPick => 'בחירת יעד';
+
+  @override
+  String settingsTripActive(String country) {
+    return 'טיול ל$country';
+  }
+
+  @override
+  String get settingsTripBriefing =>
+      'לפני היציאה: מה לשאול, ואיפה ההגבלות שלכם מסתתרות';
+
+  @override
+  String get settingsTripChange => 'החלפת יעד';
+
+  @override
+  String get settingsTripOff => 'כיבוי מצב טיול';
+
+  @override
+  String get tripPickerTitle => 'לאן נוסעים?';
+
+  @override
+  String get tripCountryIsrael => 'ישראל';
+
+  @override
+  String get tripCountryUnitedStates => 'ארצות הברית';
+
+  @override
+  String get tripCountryUnitedKingdom => 'בריטניה';
+
+  @override
+  String get tripCountryFrance => 'צרפת';
+
+  @override
+  String get tripCountryItaly => 'איטליה';
+
+  @override
+  String get tripCountrySpain => 'ספרד';
+
+  @override
+  String get tripCountryGermany => 'גרמניה';
+
+  @override
+  String get tripCountryJapan => 'יפן';
+
+  @override
+  String tripBriefingTitle(String country) {
+    return 'לפני היציאה: $country';
+  }
+
+  @override
+  String get tripBriefingRulesSection => 'מה מסעדות שם חייבות לומר לכם';
+
+  @override
+  String get tripBriefingRulesEmpty =>
+      'אף אחת מההגבלות שלכם אינה אלרגיה או צליאק, ולכן אף חוק אלרגנים לא חל עליהן. שאלו את המסעדה בכל זאת.';
+
+  @override
+  String get tripHintRestaurantMustTell =>
+      'ברשימת האלרגנים כאן: המסעדה חייבת לדעת לומר לכם. ובכל זאת, שאלו את המסעדה.';
+
+  @override
+  String get tripHintPackagedOnly =>
+      'מסומן רק על מזון ארוז: מסעדות לא חייבות לומר לכם. שאלו בכל פעם.';
+
+  @override
+  String get tripHintPackagedOnlyLargeChains =>
+      'מסומן על מזון ארוז; רק רשתות גדולות בקליפורניה חייבות לפרט אותו. שאלו בכל פעם.';
+
+  @override
+  String get tripHintNotRegulated =>
+      'לא ברשימת האלרגנים כאן: אף אחד לא חייב לומר לכם. שאלו בכל פעם.';
+
+  @override
+  String get tripBriefingLexiconSection => 'איפה ההגבלות שלכם מסתתרות כאן';
+
+  @override
+  String get tripBriefingLexiconNote =>
+      'רשימה קצרה מהנחיות שפורסמו, לא רשימה מלאה. בזמן הטיול התפריטים נקראים גם לפי המילים האלה; התאמה פירושה לשאול עליה.';
+
+  @override
+  String get tripBriefingLexiconEmpty =>
+      'אין ברשימה הקצרה שלנו פריטים להגבלות שלכם כאן. זה לא אישור: שאלו בכל פעם.';
+
+  @override
+  String tripBriefingHides(String restrictions) {
+    return 'עלול להכיל: $restrictions';
+  }
+
+  @override
+  String get tripBriefingChefCard => 'פתיחת כרטיס השף שלי';
+
+  @override
+  String get tripBriefingChefCardNote =>
+      'הכרטיס נוצר בטלפון הזה ונפתח גם בלי חיבור. הוא בעברית או באנגלית; כרטיסים בשפה המקומית עדיין לא זמינים.';
+
+  @override
   String allergenMatrixNotice(String date) {
     return 'מידע על אלרגנים מהמסעדה, מתאריך $date';
   }

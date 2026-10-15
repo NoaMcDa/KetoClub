@@ -6,6 +6,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/named_profile.dart';
+import 'package:ketoclub/models/trip_destination.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/utils/allergens/chef_card_templates.dart';
@@ -51,6 +52,7 @@ class ChefCardScreen extends StatefulWidget {
     this.dish,
     this.analysed,
     this.menu,
+    this.trip,
     super.key,
   });
 
@@ -75,6 +77,11 @@ class ChefCardScreen extends StatefulWidget {
   /// The menu [dish] is on, read once for kitchen signals
   /// ([KitchenSignals.of]); null reads as no signal.
   final Menu? menu;
+
+  /// Trip mode's destination (ALG-13), so a dish card asks what the menu
+  /// screen asked: the destination's lexicon is evaluated on the device.
+  /// Null when no trip is active.
+  final TripDestination? trip;
 
   /// Raised while the card is open, restored when it closes.
   final ScreenBrightness screenBrightness;
@@ -165,6 +172,7 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
       dish,
       widget.profile,
       hebrew: hebrew,
+      trip: widget.trip,
     );
     return ChefCardText.composeForDish(
       widget.profile,
@@ -189,6 +197,7 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
       hebrew: hebrew,
       heading: _heading,
       kitchen: _reach,
+      trip: widget.trip,
     );
     return GroupChefCardText.composeForDish(
       <PersonDishPart>[

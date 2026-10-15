@@ -3150,6 +3150,180 @@ abstract class AppLocalizations {
   /// **'may be high in it — a heads-up, not a measurement'**
   String get concernCertaintyHeadsUp;
 
+  /// Banto (ALG-13): heading of the Settings section that sets a travel destination.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip mode'**
+  String get settingsTrip;
+
+  /// Banto (ALG-13): the note at the top of the trip section. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'Travelling? Pick where you are going: see what restaurants there must tell you and which local dishes hide your restrictions. Keto is unchanged, and your destination stays on this device.'**
+  String get settingsTripNote;
+
+  /// Banto (ALG-13): opens the destination picker when no trip is on.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a destination'**
+  String get settingsTripPick;
+
+  /// Banto (ALG-13): the trip row's title while a trip is on.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip to {country}'**
+  String settingsTripActive(String country);
+
+  /// Banto (ALG-13): the trip row's subtitle; the row opens the briefing page.
+  ///
+  /// In en, this message translates to:
+  /// **'Before you go: what to ask, and where your restrictions hide'**
+  String get settingsTripBriefing;
+
+  /// Banto (ALG-13): reopens the destination picker while a trip is on.
+  ///
+  /// In en, this message translates to:
+  /// **'Change destination'**
+  String get settingsTripChange;
+
+  /// Banto (ALG-13): one tap that switches trip mode off.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off trip mode'**
+  String get settingsTripOff;
+
+  /// Banto (ALG-13): title of the destination picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Where are you going?'**
+  String get tripPickerTitle;
+
+  /// Banto (ALG-13): a trip destination.
+  ///
+  /// In en, this message translates to:
+  /// **'Israel'**
+  String get tripCountryIsrael;
+
+  /// Banto (ALG-13): a trip destination.
+  ///
+  /// In en, this message translates to:
+  /// **'United States'**
+  String get tripCountryUnitedStates;
+
+  /// Banto (ALG-13): a trip destination.
+  ///
+  /// In en, this message translates to:
+  /// **'United Kingdom'**
+  String get tripCountryUnitedKingdom;
+
+  /// Banto (ALG-13): a trip destination.
+  ///
+  /// In en, this message translates to:
+  /// **'France'**
+  String get tripCountryFrance;
+
+  /// Banto (ALG-13): a trip destination.
+  ///
+  /// In en, this message translates to:
+  /// **'Italy'**
+  String get tripCountryItaly;
+
+  /// Banto (ALG-13): a trip destination.
+  ///
+  /// In en, this message translates to:
+  /// **'Spain'**
+  String get tripCountrySpain;
+
+  /// Banto (ALG-13): a trip destination.
+  ///
+  /// In en, this message translates to:
+  /// **'Germany'**
+  String get tripCountryGermany;
+
+  /// Banto (ALG-13): a trip destination.
+  ///
+  /// In en, this message translates to:
+  /// **'Japan'**
+  String get tripCountryJapan;
+
+  /// Banto (ALG-13): the briefing page's title.
+  ///
+  /// In en, this message translates to:
+  /// **'Before you go: {country}'**
+  String tripBriefingTitle(String country);
+
+  /// Banto (ALG-13): heading of the regulation hints, one per allergy or celiac entry.
+  ///
+  /// In en, this message translates to:
+  /// **'What restaurants there must tell you'**
+  String get tripBriefingRulesSection;
+
+  /// Banto (ALG-13): shown when the profile holds no strict entry. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'None of your restrictions is an allergy or celiac, so no allergen law covers them. Ask the restaurant anyway.'**
+  String get tripBriefingRulesEmpty;
+
+  /// Banto (ALG-13): an EU or UK restaurant duty. Never 'safe'; the floor is 'ask the restaurant'.
+  ///
+  /// In en, this message translates to:
+  /// **'On the allergen list here: the restaurant must be able to tell you. Still ask the restaurant.'**
+  String get tripHintRestaurantMustTell;
+
+  /// Banto (ALG-13): on the list for packaged food, with no restaurant duty (Israel, Japan).
+  ///
+  /// In en, this message translates to:
+  /// **'Labelled on packaged food only: restaurants don\'t have to tell you. Ask every time.'**
+  String get tripHintPackagedOnly;
+
+  /// Banto (ALG-13): the US: the FASTER Act covers packaged food, SB 68 only large Californian chains.
+  ///
+  /// In en, this message translates to:
+  /// **'Labelled on packaged food; only large chains in California must list it. Ask every time.'**
+  String get tripHintPackagedOnlyLargeChains;
+
+  /// Banto (ALG-13): the restriction is on no list at the destination.
+  ///
+  /// In en, this message translates to:
+  /// **'Not on the allergen list here: nobody has to tell you. Ask every time.'**
+  String get tripHintNotRegulated;
+
+  /// Banto (ALG-13): heading of the local hidden-ingredient list.
+  ///
+  /// In en, this message translates to:
+  /// **'Where your restrictions hide here'**
+  String get tripBriefingLexiconSection;
+
+  /// Banto (ALG-13): the note above the local lexicon. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'A short list from published guidance, not a complete one. While the trip is on, menus are also read for these words; a match means ask about it.'**
+  String get tripBriefingLexiconNote;
+
+  /// Banto (ALG-13): no lexicon entry hides anything in the profile. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing on our short list for your restrictions here. That is not a clearance: ask every time.'**
+  String get tripBriefingLexiconEmpty;
+
+  /// Banto (ALG-13): what one local dish may hide, among the profile's restrictions.
+  ///
+  /// In en, this message translates to:
+  /// **'May hide: {restrictions}'**
+  String tripBriefingHides(String restrictions);
+
+  /// Banto (ALG-13): opens the profile's chef card from the briefing.
+  ///
+  /// In en, this message translates to:
+  /// **'Open my chef card'**
+  String get tripBriefingChefCard;
+
+  /// Banto (ALG-13): under the chef card button. Local-language cards are out of scope.
+  ///
+  /// In en, this message translates to:
+  /// **'The card is made on this phone and opens without a connection. It is in Hebrew or English; cards in the local language are not available yet.'**
+  String get tripBriefingChefCardNote;
+
   /// Banto (ALG-16): the menu screen's notice when the restaurant's own allergen matrix is on file; {date} is the day it holds from, formatted for the UI locale. A fact, never a badge or a rating, and never 'safe'.
   ///
   /// In en, this message translates to:
