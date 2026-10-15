@@ -182,21 +182,21 @@ void main() {
       expect(result.sections.single.lines.single, contains('allergy'));
     });
 
-    test('the dish is named once, after the sections, and the closing '
+    test('the dish is named once, before the sections, and the closing '
         'once', () {
       // Act
       final result = card(crossContact: true);
       final text = GroupChefCardText.asText(result);
 
       // Assert
-      expect(result.dishLine, 'The dish I would like: Tahini salad');
+      expect(result.dishLine, 'The dish we would like: Tahini salad');
       expect(
         ChefCardText.closingLine(crossContact: true, hebrew: false),
         result.closing,
       );
       final lines = text.split('\n');
       expect(lines.first, result.intro);
-      expect(lines[lines.length - 2], result.dishLine);
+      expect(lines[1], result.dishLine);
       expect(lines.last, result.closing);
       expect('Tahini salad'.allMatches(text), hasLength(1));
       expect(lines, containsAllInOrder(<String>['Me:', 'Dana:']));
@@ -227,7 +227,7 @@ void main() {
       // Assert
       expect(result.sections.first.heading, 'אני');
       expect(result.sections.first.lines.last, questionHe);
-      expect(result.dishLine, 'המנה שאני רוצה להזמין: סלט עם טחינה');
+      expect(result.dishLine, 'המנה שאנחנו רוצים להזמין: סלט עם טחינה');
       expect(result.intro, startsWith('שלום'));
       expect(
         result.closing,

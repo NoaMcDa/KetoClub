@@ -3670,11 +3670,12 @@ the union profile, and one section per person on it is a follow-up. Discovery's 
 The per-dish group card is built (the follow-up above, issues #354 and
 #350): with more than one person checked and a dish with its analysis,
 `ChefCardScreen` composes `GroupChefCardText.composeForDish` instead of the
-union profile's card. One greeting; then a section per person under their
-name with their own restriction lines (their strict entries, or all of them
-when they hold none; keto for an empty profile), followed by the change and
-every question that apply to *them* for that dish; then "The dish I would
-like: {name}" once; then one closing, the cross-contact request when a
+union profile's card. One greeting; then "The dish we would like: {name}"
+once, so every question below reads after the dish is named; then a section
+per person under their name with their own restriction lines (their strict
+entries, or all of them when they hold none; keto for an empty profile),
+followed by the change and every question that apply to *them* for that
+dish; then one closing, the cross-contact request when a
 kitchen signal threatens a strict entry of anyone and thanks otherwise. A
 person the dish raises nothing for keeps their restriction lines and has no
 question under them, so the kitchen knows they are at the table. The

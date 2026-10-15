@@ -267,7 +267,7 @@ void main() {
       expect(
         find.descendant(
           of: card,
-          matching: find.text('המנה שאני רוצה להזמין: סלט חצילים'),
+          matching: find.text('המנה שאנחנו רוצים להזמין: סלט חצילים'),
         ),
         findsOneWidget,
       );

@@ -10,9 +10,9 @@ Key groupChefCardSectionKey(String heading) =>
 const Key groupChefCardDishKey = Key('groupChefCardDish');
 
 /// The chef card for several people (Banto, ALG-12, issue #354): the
-/// greeting, then one bordered section per person — their name over their
-/// lines, drawn and copied like the single card's ([WaiterScriptWidget]) —
-/// then, on a dish card, the dish's name once, then the closing line.
+/// greeting, on a dish card the dish's name once, then one bordered
+/// section per person — their name over their lines, drawn and copied
+/// like the single card's ([WaiterScriptWidget]) — then the closing line.
 /// [trailingAction] (the Share button) sits under
 /// the last section.
 class GroupChefCardView extends StatelessWidget {
@@ -32,6 +32,16 @@ class GroupChefCardView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(card.intro, style: theme.textTheme.titleMedium),
+        if (card.dishLine.isNotEmpty) ...[
+          const SizedBox(height: 14),
+          Text(
+            card.dishLine,
+            key: groupChefCardDishKey,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
         for (final section in card.sections) ...[
           const SizedBox(height: 14),
           DecoratedBox(
@@ -63,16 +73,6 @@ class GroupChefCardView extends StatelessWidget {
                     ),
                 ],
               ),
-            ),
-          ),
-        ],
-        if (card.dishLine.isNotEmpty) ...[
-          const SizedBox(height: 14),
-          Text(
-            card.dishLine,
-            key: groupChefCardDishKey,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
             ),
           ),
         ],

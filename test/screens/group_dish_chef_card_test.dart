@@ -107,7 +107,10 @@ void main() {
       expect(_inSection('אני', 'בלי שומשום?'), findsOneWidget);
       expect(_inSection('Dana', 'קטו'), findsOneWidget);
       expect(_inSection('Dana', 'בלי שומשום'), findsNothing);
-      expect(find.text('המנה שאני רוצה להזמין: סלט עם טחינה'), findsOneWidget);
+      expect(
+        find.text('המנה שאנחנו רוצים להזמין: סלט עם טחינה'),
+        findsOneWidget,
+      );
       expect(
         find.text(ChefCardText.closingLine(crossContact: true, hebrew: true)),
         findsOneWidget,
@@ -131,7 +134,7 @@ void main() {
         _inSection('Me', 'Can this be made without sesame?'),
         findsOneWidget,
       );
-      expect(find.text('The dish I would like: סלט עם טחינה'), findsOneWidget);
+      expect(find.text('The dish we would like: סלט עם טחינה'), findsOneWidget);
       expect(find.text('אפשר להכין את המנה בלי שומשום?'), findsNothing);
     });
 
@@ -167,10 +170,10 @@ void main() {
       expect(
         lines,
         containsAllInOrder(<String>[
+          'המנה שאנחנו רוצים להזמין: סלט עם טחינה',
           'אני:',
           'אפשר להכין את המנה בלי שומשום?',
           'Dana:',
-          'המנה שאני רוצה להזמין: סלט עם טחינה',
           ChefCardText.closingLine(crossContact: true, hebrew: true),
         ]),
       );

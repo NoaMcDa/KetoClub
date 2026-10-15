@@ -1,9 +1,9 @@
 /// The chef card for several people (Banto; the Allergens epic, ALG-12,
 /// issue #354): one section per person, each the ALG-08a card's own entry
 /// lines ([ChefCardText.compose]) under the person's name; and, for one
-/// dish ([GroupChefCardText.composeForDish]), the same sections each
-/// followed by that person's change and questions for the dish, then the
-/// dish's name once and one closing.
+/// dish ([GroupChefCardText.composeForDish]), the dish's name once, then
+/// the same sections each followed by that person's change and questions
+/// for the dish, and one closing.
 ///
 /// Like [ChefCardText], this text is shown and read to restaurant staff, so
 /// it follows the language picked for the card, not the UI's, and the two
@@ -77,12 +77,13 @@ abstract final class GroupChefCardText {
 
   /// The group card for one dish (ALG-12, issue #354, the follow-up of
   /// ALG-08b), in Hebrew when [hebrew], else English: the greeting once;
-  /// then one section per entry of [parts], in order — the person's name,
+  /// then the dish's name once, as the menu printed it, so the questions
+  /// below read after it (empty when [dishName] is blank); then one
+  /// section per entry of [parts], in order — the person's name,
   /// their restriction lines (their strict entries, or every entry when
   /// they hold none, as the single dish card does; keto for an empty
   /// profile), then the change and every question that apply to *them*
-  /// for this dish; then the dish's name once, as the menu printed it
-  /// (empty when [dishName] is blank); and one closing, the
+  /// for this dish; and one closing, the
   /// cross-contact request when [crossContact] (a kitchen signal
   /// threatens a strict entry of anyone, [kitchenThreatensStrict]) and
   /// thanks otherwise.
@@ -118,7 +119,9 @@ abstract final class GroupChefCardText {
     return (
       intro: hebrew ? _introHe : _introEn,
       sections: List<ChefCardSection>.unmodifiable(sections),
-      dishLine: name.isEmpty ? '' : ChefCardText.dishLine(name, hebrew: hebrew),
+      dishLine: name.isEmpty
+          ? ''
+          : (hebrew ? _dishLineHe : _dishLineEn).replaceAll('{dish}', name),
       closing: ChefCardText.closingLine(
         crossContact: crossContact,
         hebrew: hebrew,
@@ -135,15 +138,16 @@ abstract final class GroupChefCardText {
     (person) => ChefCardText.kitchenThreatensStrict(signals, person.profile),
   );
 
-  /// [card] as the plain text that is shared: the greeting, each heading
-  /// followed by its lines, and the closing, one per line.
+  /// [card] as the plain text that is shared: the greeting, the dish's
+  /// name on a dish card, each heading followed by its lines, and the
+  /// closing, one per line.
   static String asText(GroupChefCard card) => <String>[
     card.intro,
+    if (card.dishLine.isNotEmpty) card.dishLine,
     for (final section in card.sections) ...<String>[
       '${section.heading}:',
       ...section.lines,
     ],
-    if (card.dishLine.isNotEmpty) card.dishLine,
     if (card.closing.isNotEmpty) card.closing,
   ].join('\n');
 
@@ -192,6 +196,9 @@ abstract final class GroupChefCardText {
       'help with our order.';
   static const String _introHe =
       'שלום, לחלק מאיתנו יש הגבלות תזונה ונשמח לעזרתכם בהזמנה.';
+
+  static const String _dishLineEn = 'The dish we would like: {dish}';
+  static const String _dishLineHe = 'המנה שאנחנו רוצים להזמין: {dish}';
 
   static const String _meEn = 'Me';
   static const String _meHe = 'אני';

@@ -59,11 +59,11 @@ class ChefCardScreen extends StatefulWidget {
 
   /// With more than one person the card is theirs instead of [profile]'s:
   /// one section per person under their name (ALG-12, issue #354;
-  /// [GroupChefCardText]). With a [dish] and its analysis too, each
-  /// person's section also holds the change and the questions that apply
-  /// to them for that dish, followed by the dish's name once and one
-  /// closing ([GroupChefCardText.composeForDish]). With one person or
-  /// none, the card is built from [profile] alone.
+  /// [GroupChefCardText]). With a [dish] and its analysis too, the dish's
+  /// name comes once before the sections, each person's section also holds
+  /// the change and the questions that apply to them for that dish, and
+  /// one closing ends it ([GroupChefCardText.composeForDish]). With one
+  /// person or none, the card is built from [profile] alone.
   final List<NamedProfile> people;
 
   /// The dish the card is about, or null for the profile-only card.
