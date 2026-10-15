@@ -27,6 +27,7 @@ from app.models import Base
 from app.routers import (
     chat,
     classify,
+    confirmations,
     discovery,
     health,
     menus,
@@ -114,6 +115,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         per_minute=resolved_settings.ANALYSIS_RATE_LIMIT_PER_MINUTE,
         per_day=resolved_settings.ANALYSIS_RATE_LIMIT_PER_DAY,
     )
+    # ALG-14 (#356): post-meal confirmations get a bucket of their own.
+    app.state.confirmation_rate_limiter = RateLimiter(
+        per_minute=resolved_settings.CONFIRMATION_RATE_LIMIT_PER_MINUTE,
+        per_day=resolved_settings.CONFIRMATION_RATE_LIMIT_PER_DAY,
+    )
     app.state.website_host_limiter = RateLimiter(
         per_minute=resolved_settings.WEBSITE_HOST_RATE_LIMIT_PER_MINUTE,
         per_day=_DISCOVERY_NO_DAILY_CAP,
@@ -156,6 +162,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # all, so its paths are an ordinary 404.
     if resolved_settings.MENU_STORE_ENABLED:
         app.include_router(menus.router, prefix="/v1")
+    # Dish confirmations (ALG-14, #356) are opt-out the same way.
+    if resolved_settings.CONFIRMATIONS_ENABLED:
+        app.include_router(confirmations.router, prefix="/v1")
 
     return app
 

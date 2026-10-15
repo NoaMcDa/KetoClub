@@ -229,6 +229,10 @@ const _boundaries = <_Boundary>[
   _Boundary('/v1/chat', {'services/llm/backend_chat_client.dart'}),
   // The shared menu store (issue #309): one client posts to it.
   _Boundary('/v1/menus', {'services/community/menu_store_client.dart'}),
+  // Post-meal dish confirmations (ALG-14, issue #356): one client posts.
+  _Boundary('/v1/confirmations', {
+    'services/community/confirmation_client.dart',
+  }),
   // A restaurant's own website (architecture.md D19): the web build asks
   // the backend's fetch route, a phone fetches directly with the named
   // User-Agent. Each lives in exactly one file.
