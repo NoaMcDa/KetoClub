@@ -747,4 +747,193 @@ void main() {
       }
     });
   });
+
+  group('hidden sources added for the recall gate (issue #352)', () {
+    // Each term is suspected, in a plain sentence and behind a Hebrew prefix.
+    const soyEn = <String>[
+      'satay',
+      'stir fry',
+      'oyster sauce',
+      'chow mein',
+      'spring roll',
+      'spring rolls',
+      'sausage',
+      'sausages',
+      'bread',
+      'rolls',
+      'garlic sauce',
+      'garlic chili sauce',
+      'garlic and chili sauce',
+      'wakame',
+      'chocolate',
+    ];
+    const soyHe = <String>[
+      'סאטה',
+      'אגרול',
+      'ספרינג רול',
+      'רוטב צדפות',
+      'צ׳או מיין',
+      'נקניק',
+      'נקניקים',
+      'נקניקיה',
+      'נקניקיות',
+      'וואקמה',
+      'שוקולד',
+    ];
+    const celeryEn = <String>['chowder', 'bisque'];
+    const celeryHe = <String>['צ׳אודר'];
+    const mustardEn = <String>[
+      'ranch',
+      'ranch dressing',
+      'blue cheese dressing',
+      'coleslaw',
+      'tartar sauce',
+      'tartare sauce',
+      'tartar',
+      'tartare',
+    ];
+    const mustardHe = <String>[
+      'כבוש',
+      'כבושה',
+      'כבושים',
+      'כבושות',
+      'רוטב טרטר',
+      'טרטר',
+      'קולסלו',
+    ];
+    const sulphitesEn = <String>[
+      'ketchup',
+      'catsup',
+      'bbq sauce',
+      'barbecue sauce',
+      'vinaigrette',
+      'sushi',
+      'goldstar',
+      'san miguel',
+      'heineken',
+      'tuborg',
+      'carlsberg',
+      'guinness',
+    ];
+    const sulphitesHe = <String>[
+      'קטשופ',
+      'רוטב ברביקיו',
+      'ויניגרט',
+      'כבוש',
+      'כבושה',
+      'כבושים',
+      'כבושות',
+      'סושי',
+      'גולדסטאר',
+      'סאן מיגל',
+      'היינקן',
+      'טובורג',
+      'קרלסברג',
+      'גינס',
+      'פריגת ענבים',
+    ];
+
+    _run(<_Case>[
+      for (final term in soyEn)
+        _hit('Served with $term', RestrictionId.soy, <String>[
+          '$term:suspected',
+        ]),
+    ]);
+
+    _run(<_Case>[
+      for (final term in soyHe) ...<_Case>[
+        _hit('מנה עם $term', RestrictionId.soy, <String>['$term:suspected']),
+        _hit('מנה ב$term', RestrictionId.soy, <String>[
+          '$term:suspected',
+        ], why: 'behind the prefix ב'),
+      ],
+    ]);
+
+    _run(<_Case>[
+      for (final term in celeryEn)
+        _hit('Served with $term', RestrictionId.celery, <String>[
+          '$term:suspected',
+        ]),
+    ]);
+
+    _run(<_Case>[
+      for (final term in celeryHe) ...<_Case>[
+        _hit('מנה עם $term', RestrictionId.celery, <String>['$term:suspected']),
+        _hit('מנה ב$term', RestrictionId.celery, <String>[
+          '$term:suspected',
+        ], why: 'behind the prefix ב'),
+      ],
+    ]);
+
+    _run(<_Case>[
+      for (final term in mustardEn)
+        _hit('Served with $term', RestrictionId.mustard, <String>[
+          '$term:suspected',
+        ]),
+    ]);
+
+    _run(<_Case>[
+      for (final term in mustardHe) ...<_Case>[
+        _hit('מנה עם $term', RestrictionId.mustard, <String>[
+          '$term:suspected',
+        ]),
+        _hit('מנה ב$term', RestrictionId.mustard, <String>[
+          '$term:suspected',
+        ], why: 'behind the prefix ב'),
+      ],
+    ]);
+
+    _run(<_Case>[
+      for (final term in sulphitesEn)
+        _hit('Served with $term', RestrictionId.sulphites, <String>[
+          '$term:suspected',
+        ]),
+    ]);
+
+    _run(<_Case>[
+      for (final term in sulphitesHe) ...<_Case>[
+        _hit('מנה עם $term', RestrictionId.sulphites, <String>[
+          '$term:suspected',
+        ]),
+        _hit('מנה ב$term', RestrictionId.sulphites, <String>[
+          '$term:suspected',
+        ], why: 'behind the prefix ב'),
+      ],
+    ]);
+
+    // `legumes` carries every hidden source of soy, peanuts and lupin.
+    _run(<_Case>[
+      _hit('Chicken satay', RestrictionId.legumes, <String>['satay:likely']),
+      _hit('Green curry', RestrictionId.legumes, <String>['curry:suspected']),
+      _hit('Pesto penne', RestrictionId.legumes, <String>['pesto:suspected']),
+      _hit('Granola bowl', RestrictionId.legumes, <String>[
+        'granola:suspected',
+      ]),
+      _hit('Beef in oyster sauce', RestrictionId.legumes, <String>[
+        'oyster sauce:suspected',
+      ]),
+      _hit('Chow mein', RestrictionId.legumes, <String>['chow mein:suspected']),
+      _hit('Bread basket', RestrictionId.legumes, <String>['bread:suspected']),
+      _hit('Chocolate cake', RestrictionId.legumes, <String>[
+        'chocolate:suspected',
+      ]),
+      _hit('Plain croissant', RestrictionId.legumes, <String>[
+        'croissant:suspected',
+      ]),
+      _hit('Quiche Lorraine', RestrictionId.legumes, <String>[
+        'quiche:suspected',
+      ]),
+      _hit('Part-baked dinner rolls', RestrictionId.legumes, <String>[
+        'rolls:suspected',
+      ]),
+      _hit('בסיס ללא גלוטן', RestrictionId.legumes, <String>[
+        'בסיס ללא גלוטן:suspected',
+      ]),
+      _hit('קרואסון חמאה', RestrictionId.legumes, <String>[
+        'קרואסון:suspected',
+      ]),
+      _hit('סאטה עוף', RestrictionId.legumes, <String>['סאטה:likely']),
+      _hit('אגרול ירקות', RestrictionId.legumes, <String>['אגרול:likely']),
+    ]);
+  });
 }
