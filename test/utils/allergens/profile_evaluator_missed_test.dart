@@ -93,12 +93,12 @@ void main() {
       tier: EvidenceTier.inferred,
       matchedText: 'yogurt',
     );
-    final analysed = AnalysedDish(
+    const analysed = AnalysedDish(
       dishId: 'd',
       name: 'Tahini salad',
       verdict: DishVerdict.orderAsIs,
       why: 'Fits',
-      concerns: const <Concern>[milk],
+      concerns: <Concern>[milk],
     );
 
     // Act
