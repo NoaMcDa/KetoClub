@@ -6,10 +6,14 @@ import 'package:ketoclub/widgets/waiter_script_widget.dart';
 Key groupChefCardSectionKey(String heading) =>
     ValueKey<String>('groupChefCardSection_$heading');
 
+/// The line naming the dish on a group dish card.
+const Key groupChefCardDishKey = Key('groupChefCardDish');
+
 /// The chef card for several people (Banto, ALG-12, issue #354): the
 /// greeting, then one bordered section per person — their name over their
 /// lines, drawn and copied like the single card's ([WaiterScriptWidget]) —
-/// then the closing line. [trailingAction] (the Share button) sits under
+/// then, on a dish card, the dish's name once, then the closing line.
+/// [trailingAction] (the Share button) sits under
 /// the last section.
 class GroupChefCardView extends StatelessWidget {
   /// Creates the view of [card].
@@ -59,6 +63,16 @@ class GroupChefCardView extends StatelessWidget {
                     ),
                 ],
               ),
+            ),
+          ),
+        ],
+        if (card.dishLine.isNotEmpty) ...[
+          const SizedBox(height: 14),
+          Text(
+            card.dishLine,
+            key: groupChefCardDishKey,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],
