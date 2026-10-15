@@ -28,6 +28,7 @@ import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/allergen_matcher.dart';
+import 'package:ketoclub/utils/allergens/custom_terms.dart';
 import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/allergens/waiter_questions.dart';
@@ -189,6 +190,9 @@ abstract final class ProfileEvaluator {
   ///    from [AnalysedDish.ingredients] by [AllergenMatcher.find] on each
   ///    name (source [ConcernSource.model], certainty the weaker of the
   ///    ingredient's and the trigger's, the ingredient's role carried).
+  ///    The user's own words ([DietaryProfile.customTerms], ALG-17) are
+  ///    read by the same two passes over a vocabulary of those words alone
+  ///    ([customTermVocabulary]), on the device only (D26 C1).
   /// 2. Only the profile's restrictions are kept; keto is never a concern
   ///    (it stays the wire verdict), and a concern whose matched text
   ///    contains one of its entry's exceptions as whole words is dropped.
@@ -201,7 +205,10 @@ abstract final class ProfileEvaluator {
   ///    sauce, a garnish, an option), or a `modifiable` verdict when the
   ///    profile holds keto → [DishState.fitsWithChange]; otherwise
   ///    [DishState.fits]. A suspected concern on a flexible restriction is
-  ///    listed but moves nothing.
+  ///    listed but moves nothing, and a heads-up restriction's
+  ///    ([headsUpRestrictions]: FODMAP, histamine, small portions) concern
+  ///    is always suspected ([_headsUp]), so none of them ever moves a
+  ///    dish (ALG-17).
   ///
   /// Between 2 and 3, **declarations** (ALG-09; [Declarations.of] over
   /// the dish's declared tags, its own text and its category [heading])
@@ -224,8 +231,8 @@ abstract final class ProfileEvaluator {
         TextNormaliser.containsHebrew(TextNormaliser.dishRulesText(dish));
 
     final (:evidence, :declarations) = _applyDeclarations(<_Evidence>[
-      for (final evidence in _evidence(analysed, dish))
-        if (_applies(evidence.concern, profile)) evidence,
+      for (final evidence in _evidence(analysed, dish, profile.customTerms))
+        if (_applies(evidence.concern, profile)) _headsUp(evidence),
     ], Declarations.of(dish, heading: heading));
 
     var avoid = hasKeto && analysed.verdict == DishVerdict.nonKeto;
@@ -268,7 +275,11 @@ abstract final class ProfileEvaluator {
     return EvaluatedDish(
       dish: analysed,
       concerns: WaiterQuestions.fill(
-        _onePerRestriction(evidence),
+        _askOwnWords(
+          _onePerRestriction(evidence),
+          profile.customTerms,
+          hebrew: isHebrew,
+        ),
         hebrew: isHebrew,
       ),
       state: state,
@@ -377,10 +388,90 @@ abstract final class ProfileEvaluator {
     return field.substring(start, cursor);
   }
 
+  /// [concerns] with each of the user's own concerns (ALG-17) given the
+  /// question that names their word as they wrote it ("כוסברה" for a
+  /// menu's "ובכוסברה"), read back from [customTerms]' vocabulary; a
+  /// question already there is kept, and every other concern is returned
+  /// as it is.
+  static List<Concern> _askOwnWords(
+    List<Concern> concerns,
+    List<String> customTerms, {
+    required bool hebrew,
+  }) {
+    if (customTerms.isEmpty) return concerns;
+    final own = customTermVocabulary(customTerms);
+    return <Concern>[
+      for (final concern in concerns)
+        if (concern.restrictionId != RestrictionId.custom ||
+            (concern.waiterQuestion?.trim().isNotEmpty ?? false))
+          concern
+        else
+          Concern(
+            restrictionId: concern.restrictionId,
+            source: concern.source,
+            certainty: concern.certainty,
+            tier: concern.tier,
+            matchedText: concern.matchedText,
+            waiterQuestion: WaiterQuestions.questionFor(
+              concern,
+              hebrew: hebrew,
+              ownWord: AllergenMatcher.findWith(
+                concern.matchedText ?? '',
+                own,
+              ).firstOrNull?.term,
+            ),
+          ),
+    ];
+  }
+
+  /// [evidence] as a heads-up when its restriction is one
+  /// ([headsUpRestrictions], ALG-17): FODMAP, histamine and small portions
+  /// depend on a dose no menu states, so a finding of theirs is lowered to
+  /// [Certainty.suspected] ("may be high in …"), which a flexible entry
+  /// lists and lets move nothing. Its tier, source and words are kept:
+  /// the onion is still stated on the menu. Every other concern is
+  /// returned as it is.
+  static _Evidence _headsUp(_Evidence evidence) {
+    final concern = evidence.concern;
+    if (!headsUpRestrictions.contains(concern.restrictionId) ||
+        concern.certainty == Certainty.suspected) {
+      return evidence;
+    }
+    return (
+      concern: Concern(
+        restrictionId: concern.restrictionId,
+        source: concern.source,
+        certainty: Certainty.suspected,
+        tier: concern.tier,
+        matchedText: concern.matchedText,
+        waiterQuestion: concern.waiterQuestion,
+      ),
+      removable: evidence.removable,
+      item: evidence.item,
+    );
+  }
+
+  /// The key a concern is kept once under ([_onePerRestriction],
+  /// `GroupEvaluator.combine`): its restriction, and for the user's own
+  /// restriction ([RestrictionId.custom], ALG-17) also its words, so
+  /// "kiwi" and "coriander" in one dish are two concerns, not one.
+  static String concernKey(Concern concern) =>
+      concern.restrictionId == RestrictionId.custom
+      ? '${concern.restrictionId.name}:'
+            '${AllergenMatcher.matchText(concern.matchedText ?? '')}'
+      : concern.restrictionId.name;
+
   /// Every piece of evidence about [dish], whatever the profile: the rule
   /// engine's findings, the analysis's own concerns, then the concerns
-  /// read from its ingredients.
-  static List<_Evidence> _evidence(AnalysedDish analysed, Dish dish) {
+  /// read from its ingredients. With [customTerms], the user's own words
+  /// (ALG-17), the same two passes run once more over a vocabulary of
+  /// those words alone ([customTermVocabulary]): on the device only.
+  static List<_Evidence> _evidence(
+    AnalysedDish analysed,
+    Dish dish,
+    List<String> customTerms,
+  ) {
+    final own = customTermVocabulary(customTerms);
     _Evidence ofConcern(Concern concern) {
       final removable = concern.source == ConcernSource.option;
       final matched = concern.matchedText;
@@ -391,31 +482,43 @@ abstract final class ProfileEvaluator {
       );
     }
 
+    _Evidence ofIngredient(ExtractedIngredient ingredient, AllergenHit hit) => (
+      concern: Concern(
+        restrictionId: hit.id,
+        source: ConcernSource.model,
+        certainty: _weaker(
+          ingredient.certainty,
+          Certainty.values.byName(hit.certainty.name),
+        ),
+        tier:
+            ingredient.certainty == Certainty.stated &&
+                !hit.hidden &&
+                !hit.guarded
+            ? EvidenceTier.stated
+            : EvidenceTier.inferred,
+        matchedText: ingredient.name,
+      ),
+      removable: _removableRoles.contains(ingredient.role),
+      item: ingredient.name,
+    );
+
     return <_Evidence>[
       for (final concern in ClassificationRules.allergenFindings(dish))
         ofConcern(concern),
       for (final concern in analysed.concerns) ofConcern(concern),
       for (final ingredient in analysed.ingredients)
         for (final hit in AllergenMatcher.find(ingredient.name))
-          (
-            concern: Concern(
-              restrictionId: hit.id,
-              source: ConcernSource.model,
-              certainty: _weaker(
-                ingredient.certainty,
-                Certainty.values.byName(hit.certainty.name),
-              ),
-              tier:
-                  ingredient.certainty == Certainty.stated &&
-                      !hit.hidden &&
-                      !hit.guarded
-                  ? EvidenceTier.stated
-                  : EvidenceTier.inferred,
-              matchedText: ingredient.name,
-            ),
-            removable: _removableRoles.contains(ingredient.role),
-            item: ingredient.name,
-          ),
+          ofIngredient(ingredient, hit),
+      if (own.isNotEmpty) ...<_Evidence>[
+        for (final concern in ClassificationRules.allergenFindings(
+          dish,
+          vocabulary: own,
+        ))
+          ofConcern(concern),
+        for (final ingredient in analysed.ingredients)
+          for (final hit in AllergenMatcher.findWith(ingredient.name, own))
+            ofIngredient(ingredient, hit),
+      ],
     ];
   }
 
@@ -464,21 +567,32 @@ abstract final class ProfileEvaluator {
     return true;
   }
 
-  /// [evidence] reduced to one concern per restriction, in taxonomy
-  /// order: the surest, and at a tie the one that cannot be left off,
-  /// then the earliest.
+  /// [evidence] reduced to one concern per restriction ([concernKey]: per
+  /// word for the user's own), in taxonomy order: the surest, and at a tie
+  /// the one that cannot be left off, then the earliest.
   static List<Concern> _onePerRestriction(List<_Evidence> evidence) {
-    final best = <RestrictionId, _Evidence>{};
+    final best = <String, _Evidence>{};
     for (final candidate in evidence) {
-      final kept = best[candidate.concern.restrictionId];
-      if (kept == null || _outranks(candidate, kept)) {
-        best[candidate.concern.restrictionId] = candidate;
-      }
+      final key = concernKey(candidate.concern);
+      final kept = best[key];
+      if (kept == null || _outranks(candidate, kept)) best[key] = candidate;
     }
-    final ids = best.keys.toList()..sort((a, b) => a.index.compareTo(b.index));
-    return List<Concern>.unmodifiable(<Concern>[
-      for (final id in ids) best[id]!.concern,
-    ]);
+    return List<Concern>.unmodifiable(
+      inTaxonomyOrder(<Concern>[for (final kept in best.values) kept.concern]),
+    );
+  }
+
+  /// [concerns] sorted by restriction in taxonomy order, keeping their
+  /// order within one restriction (the user's own words, ALG-17). Pure.
+  static List<Concern> inTaxonomyOrder(List<Concern> concerns) {
+    final indexed = concerns.indexed.toList()
+      ..sort((a, b) {
+        final byId = a.$2.restrictionId.index.compareTo(
+          b.$2.restrictionId.index,
+        );
+        return byId != 0 ? byId : a.$1.compareTo(b.$1);
+      });
+    return <Concern>[for (final (_, concern) in indexed) concern];
   }
 
   /// Whether [candidate] should replace [kept] as its restriction's one

@@ -138,8 +138,10 @@ def load_corpus(directory: Path = CORPUS_DIR) -> list[CorpusDish]:
 
 def strict_ids() -> list[str]:
     """The strict restriction ids, in taxonomy order, from the packaged
-    taxonomy (allergens and celiac disease)."""
-    return [r.id for r in allergens().taxonomy if r.is_strict]
+    taxonomy (allergens and celiac disease), without ``custom``: the user's
+    own restriction (ALG-17) is strict but has no vocabulary to measure,
+    since its words live in the profile on the device."""
+    return [r.id for r in allergens().taxonomy if r.is_strict and r.id != "custom"]
 
 
 def surer(first: str | None, second: str | None) -> str | None:

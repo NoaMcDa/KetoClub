@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/concern.dart';
+import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
@@ -230,10 +231,15 @@ class _ConcernRow extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final locale = Localizations.localeOf(context);
-    final name = restrictionDisplayName(
-      restrictionFor(concern.restrictionId),
-      locale,
-    );
+    final restriction = restrictionFor(concern.restrictionId);
+    final matchedOwn = concern.matchedText?.trim();
+    // The user's own restriction (ALG-17) names the word that matched.
+    final name =
+        restriction.id == RestrictionId.custom &&
+            matchedOwn != null &&
+            matchedOwn.isNotEmpty
+        ? '${restrictionDisplayName(restriction, locale)}: $matchedOwn'
+        : restrictionDisplayName(restriction, locale);
     final muted = theme.textTheme.bodySmall?.copyWith(
       color: theme.colorScheme.onSurfaceVariant,
     );

@@ -22,7 +22,7 @@ const String _menusDir = 'test/fixtures/allergens/menus';
 typedef _Json = Map<String, Object?>;
 
 // TODO(ALG-01a): switch to RestrictionId.values once merged
-/// The 20 restriction ids a label may be keyed by, spelled exactly as the
+/// The restriction ids a label may be keyed by, spelled exactly as the
 /// `RestrictionId` enum will spell them.
 const List<String> _restrictionIds = <String>[
   'peanuts',
@@ -42,8 +42,12 @@ const List<String> _restrictionIds = <String>[
   'lupin',
   'sulphites',
   'legumes',
+  'alphaGal',
+  'fodmap',
+  'histamine',
   'vegan',
   'vegetarian',
+  'glp1',
   'keto',
 ];
 
@@ -51,8 +55,11 @@ const List<String> _restrictionIds = <String>[
 /// `contains` label on any other id must name the role of its trigger.
 const Set<String> _flexibleIds = <String>{
   'lactose',
+  'fodmap',
+  'histamine',
   'vegan',
   'vegetarian',
+  'glp1',
   'keto',
 };
 

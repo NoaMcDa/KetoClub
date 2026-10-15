@@ -3719,6 +3719,48 @@ shared-fryer dishes, which belong to the kitchen signals (ALG-07), the
 secret-sauce wings and the burger whose aioli is only an option to remove,
 and six dishes with no word in their text to match.
 
+**Extended restrictions: alpha-gal, FODMAP, histamine, small portions and
+the user's own words (ALG-17, closes #359).** `RestrictionId` gains
+`alphaGal` (an allergen: strict), `fodmap` and `histamine` (intolerances),
+`glp1` ("Small portions (GLP-1)", a lifestyle) and `custom` (the user's own
+restriction, kind allergen, so strict: file 10's "an allergy by the user's
+word is an allergy"); legumes and mustard were already ids. Their triggers
+live in a seventh group file, `utils/allergens/vocab_extended.dart`, sourced
+to new desk-research sections (file 11 §21 FODMAP, §22 histamine, §23 GLP-1
+eating beside the existing §17 alpha-gal, and file 12 §7 for the Hebrew,
+marked as unreviewed background reading), with Hebrew no-prefix traps
+(`משום`, `כפול`, `מבקר`, `מעגל`, `מטלה`, `מחזיר`, `בציר`, `מענק`). Alpha-gal's
+certainties are honest — a named mammal meat stated, a burger or kebab
+likely and lowered beside chicken or turkey, a casing or stock suspected —
+and dairy is left to the Milk entry, which a dairy-reactive person adds too
+(the picker says so), in place of the epic's "includes dairy" toggle.
+FODMAP, histamine and small portions are `headsUpRestrictions`: the matcher
+reports their triggers as written (C1), and `ProfileEvaluator` lowers every
+such concern to `suspected`, which a flexible entry lists and lets move
+nothing, so none of them ever makes a dish "avoid"; the dish card words
+them "may be high in it — a heads-up, not a measurement", their waiter
+questions ask for less or for a smaller, lighter version ("I go easy on
+…"), and the GLP-1 chef-card line names no medicine. The epic's
+"protein-forward · small portion" sort tag is a follow-up. The user's own
+words are `ProfileEntry.terms` on the `custom` entry (at most 10 of at most
+40 code points, de-duplicated ignoring case, written only when present, so
+older records are byte-identical and an entry with no words is dropped on
+read); the picker's "Add your own" field adds one, and Settings and the
+profile editor list one removable row per word. Contrary to the epic, which
+sent them to the model, **they never leave the device** (C1, the
+coordinator's decision): `custom_terms.dart` compiles them on the device
+into a one-restriction vocabulary (English with its plural and singular,
+Hebrew through `hebrewTriggerPattern`'s prefixes, "no"/"without"/"-free"/
+`ללא`/`בלי` as lowering guards), and the evaluator runs the rule pass and the
+model-ingredient pass once more over it, one concern per word
+(`ProfileEvaluator.concernKey`), each asking about the word as the user wrote
+it; a group's union holds every person's words. The corpus gains five
+alpha-gal `contains` labels (5/5 found); `custom` is left out of the recall
+gate's strict ids, having no vocabulary to measure. `allergens.json` and
+`allergen_concerns.json` gained the new ids' entries and hits only (every
+existing case unchanged), the Python twin's id lists follow, and no keto
+golden moved.
+
 ---
 
 ## 15. Testing strategy

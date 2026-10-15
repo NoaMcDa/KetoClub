@@ -69,6 +69,47 @@ const String waiterQuestionGeneralEn =
 const String waiterQuestionGeneralHe =
     'האם יש במנה {subject}, גם ברוטב או בתוספת?';
 
+/// The opening of every heads-up question (ALG-17: FODMAP, histamine and
+/// small portions), which names what the person goes easy on; `{subject}`
+/// is [WaiterQuestions.subject].
+const String waiterQuestionHeadsUpEn = 'I go easy on {subject}.';
+
+/// [waiterQuestionHeadsUpEn] in Hebrew; the subject takes the preposition
+/// ב, attached.
+const String waiterQuestionHeadsUpHe = 'אני ממעיט/ה ב{subject}.';
+
+/// For a dose sensitivity (FODMAP, histamine) with the menu's words to
+/// quote, after [waiterQuestionHeadsUpEn].
+const String waiterQuestionLessOfItemEn =
+    "The menu says '{item}': can this be made with less of it?";
+
+/// [waiterQuestionLessOfItemEn] in Hebrew.
+const String waiterQuestionLessOfItemHe =
+    "בתפריט כתוב '{item}' — אפשר להכין את המנה עם פחות מזה?";
+
+/// For a dose sensitivity with no words to quote.
+const String waiterQuestionLessEn =
+    'Is there any in this dish, and can it be made with less?';
+
+/// [waiterQuestionLessEn] in Hebrew.
+const String waiterQuestionLessHe = 'יש כאלה במנה, ואפשר להכין אותה עם פחות?';
+
+/// For small portions (GLP-1) with the menu's words to quote.
+const String waiterQuestionSmallerItemEn =
+    "The menu says '{item}': is there a smaller or lighter version of this "
+    'dish?';
+
+/// [waiterQuestionSmallerItemEn] in Hebrew.
+const String waiterQuestionSmallerItemHe =
+    "בתפריט כתוב '{item}' — יש גרסה קטנה או קלה יותר של המנה?";
+
+/// For small portions with no words to quote.
+const String waiterQuestionSmallerEn =
+    'Is there a smaller or lighter version of this dish?';
+
+/// [waiterQuestionSmallerEn] in Hebrew.
+const String waiterQuestionSmallerHe = 'יש גרסה קטנה או קלה יותר של המנה?';
+
 /// The most characters of matched text a question quotes; a longer slice
 /// is a sentence, not an ingredient, and the general question is used.
 const int _maxQuotedLength = 40;
@@ -112,14 +153,35 @@ abstract final class WaiterQuestions {
   ///   own name (a guarded "sesame-free" lowered to suspected) → "Does
   ///   this dish contain {subject}, even in a sauce, a dressing or a
   ///   garnish?".
-  static String questionFor(Concern concern, {required bool hebrew}) {
-    final subjectText = subject(concern.restrictionId, hebrew: hebrew);
+  ///
+  /// Two kinds of restriction ask their own way (ALG-17). A heads-up
+  /// restriction ([headsUpRestrictions]) never asks for a dish "without"
+  /// something: FODMAP and histamine ask for less of it, small portions for
+  /// a smaller or lighter version, each after "I go easy on {subject}."
+  /// The user's own restriction ([RestrictionId.custom]) names their own
+  /// word as the subject — [ownWord] when given (the evaluator passes the
+  /// word as the user wrote it, so "ובכוסברה" on the menu still reads
+  /// "בלי כוסברה"), else the matched text — so "kiwi" reads "Can this be
+  /// made without kiwi?".
+  static String questionFor(
+    Concern concern, {
+    required bool hebrew,
+    String? ownWord,
+  }) {
+    final id = concern.restrictionId;
+    if (headsUpRestrictions.contains(id)) {
+      return _headsUpQuestion(concern, hebrew: hebrew);
+    }
+    final subjectText = id == RestrictionId.custom
+        ? _quotable(ownWord) ??
+              _quotable(concern.matchedText) ??
+              subject(id, hebrew: hebrew)
+        : subject(id, hebrew: hebrew);
     final quotable = _quotable(concern.matchedText);
     final item =
         quotable != null &&
             quotable.toLowerCase() != subjectText.toLowerCase() &&
-            quotable.toLowerCase() !=
-                subject(concern.restrictionId, hebrew: !hebrew).toLowerCase()
+            quotable.toLowerCase() != subject(id, hebrew: !hebrew).toLowerCase()
         ? quotable
         : null;
     final String template;
@@ -144,12 +206,62 @@ abstract final class WaiterQuestions {
         .replaceAll('{item}', item ?? '');
   }
 
+  /// The question for a heads-up restriction (ALG-17): "I go easy on
+  /// {subject}." then, for FODMAP and histamine, "can this be made with
+  /// less of it?" and, for small portions, "is there a smaller or lighter
+  /// version?", quoting the menu's words when there are some to quote.
+  static String _headsUpQuestion(Concern concern, {required bool hebrew}) {
+    final id = concern.restrictionId;
+    final item = _quotable(concern.matchedText);
+    final smaller = id == RestrictionId.glp1;
+    final String ask;
+    if (smaller) {
+      ask = item == null
+          ? (hebrew ? waiterQuestionSmallerHe : waiterQuestionSmallerEn)
+          : (hebrew
+                ? waiterQuestionSmallerItemHe
+                : waiterQuestionSmallerItemEn);
+    } else {
+      ask = item == null
+          ? (hebrew ? waiterQuestionLessHe : waiterQuestionLessEn)
+          : (hebrew ? waiterQuestionLessOfItemHe : waiterQuestionLessOfItemEn);
+    }
+    final opening = (hebrew ? waiterQuestionHeadsUpHe : waiterQuestionHeadsUpEn)
+        .replaceAll('{subject}', subject(id, hebrew: hebrew));
+    return '$opening ${ask.replaceAll('{item}', item ?? '')}';
+  }
+
   /// [id] as the thing a dish must not contain, in Hebrew when [hebrew]:
   /// the restriction's own name for an allergen, celiac disease or an
   /// intolerance (lower-cased in English), and what the diet leaves out
   /// for vegan, vegetarian and keto, whose names are not ingredients.
+  ///
+  /// ALG-17: alpha-gal names the class of foods (its name is a sugar no
+  /// menu prints); FODMAP, histamine and small portions name what the
+  /// person goes easy on; the user's own restriction, whose words are in
+  /// the profile and not here, reads "the foods I listed" (a concern of it
+  /// quotes its own words instead, in [questionFor]).
   static String subject(RestrictionId id, {required bool hebrew}) {
     switch (id) {
+      case RestrictionId.alphaGal:
+        return hebrew
+            ? "בשר יונקים או מוצריו (בקר, כבש, חזיר, ג'לטין או שומן מן החי)"
+            : 'mammal meat or its products (beef, lamb, pork, gelatin or '
+                  'lard)';
+      case RestrictionId.fodmap:
+        return hebrew
+            ? 'בצל, שום ומזונות עתירי פודמאפ'
+            : 'onion, garlic and other high-FODMAP foods';
+      case RestrictionId.histamine:
+        return hebrew
+            ? 'מזונות מיושנים, מעושנים, כבושים או מותססים'
+            : 'aged, smoked, pickled or fermented foods';
+      case RestrictionId.glp1:
+        return hebrew
+            ? 'מנות גדולות ומזון מטוגן, שמנתי או מתוק מאוד'
+            : 'large portions and fried, creamy or very sweet food';
+      case RestrictionId.custom:
+        return hebrew ? 'המזונות שציינתי' : 'the foods I listed';
       case RestrictionId.vegan:
         return hebrew
             ? 'מוצרים מן החי (בשר, דגים, חלב, ביצים או דבש)'

@@ -109,6 +109,12 @@
           "role": "protein",
           "evidence": "\"Beef patty\"",
           "source": "12 §2.2"
+        },
+        "alphaGal": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"cheeseburger\": a beef patty unless the menu says otherwise",
+          "source": "11 §17.1"
         }
       }
     },

@@ -140,10 +140,12 @@ List<_Replay> _replayAll() {
   return out;
 }
 
-/// The strict restriction ids, from the taxonomy.
+/// The strict restriction ids, from the taxonomy, without the user's own
+/// restriction (ALG-17): it is strict, but its words live in the profile
+/// on the device, so the corpus has nothing to label for it.
 List<RestrictionId> _strictIds() => <RestrictionId>[
   for (final id in RestrictionId.values)
-    if (restrictionFor(id).isStrict) id,
+    if (restrictionFor(id).isStrict && id != RestrictionId.custom) id,
 ];
 
 /// Every label of a strict restriction that the rules did not meet.

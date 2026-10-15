@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
-import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/widgets/focus_ring.dart';
 import 'package:ketoclub/widgets/restriction_picker_sheet.dart';
 
@@ -29,12 +28,7 @@ class ProfileSummaryLine extends StatelessWidget {
     final theme = Theme.of(context);
     final locale = Localizations.localeOf(context);
     final names = profile.entries
-        .map(
-          (entry) => restrictionDisplayName(
-            restrictionFor(entry.restrictionId),
-            locale,
-          ),
-        )
+        .map((entry) => profileEntryDisplayName(entry, locale))
         .join(', ');
     final text = l10n.menuProfileSummary(names);
     return Semantics(

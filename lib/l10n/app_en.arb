@@ -886,5 +886,21 @@
   "groupBreakdownEntry": "{name}: {state}",
   "@groupBreakdownEntry": {"description": "Banto (ALG-12): one person's result on a dish card's breakdown line.", "placeholders": {"name": {"type": "String"}, "state": {"type": "String"}}},
   "groupBreakdownSemanticLabel": "For each person: {breakdown}",
-  "@groupBreakdownSemanticLabel": {"description": "Banto (ALG-12): screen-reader label of the per-person breakdown line.", "placeholders": {"breakdown": {"type": "String"}}}
+  "@groupBreakdownSemanticLabel": {"description": "Banto (ALG-12): screen-reader label of the per-person breakdown line.", "placeholders": {"breakdown": {"type": "String"}}},
+  "restrictionHeadsUpHint": "A heads-up from common guidance, not a measurement",
+  "@restrictionHeadsUpHint": {"description": "Banto (ALG-17): the picker's hint under FODMAP, histamine and small portions, which only ever mark a dish 'may be high in'. Never 'safe'."},
+  "restrictionAlphaGalHint": "Mammal meat and its products. If dairy affects you too, add Milk as well",
+  "@restrictionAlphaGalHint": {"description": "Banto (ALG-17): the picker's hint under alpha-gal, whose dairy reaction is individual and carried by the Milk entry."},
+  "restrictionOwnTitle": "Add your own",
+  "@restrictionOwnTitle": {"description": "Banto (ALG-17): heading of the picker's free-text restriction field."},
+  "restrictionOwnNote": "Something not on the list, such as kiwi or coriander. Checked on this device only, as strictly as an allergy, by the words the menu prints.",
+  "@restrictionOwnNote": {"description": "Banto (ALG-17): the note above the free-text restriction field. Never 'safe'."},
+  "restrictionOwnField": "Food to avoid",
+  "@restrictionOwnField": {"description": "Banto (ALG-17): label of the free-text restriction field."},
+  "restrictionOwnAdd": "Add",
+  "@restrictionOwnAdd": {"description": "Banto (ALG-17): adds the typed word as the user's own restriction."},
+  "restrictionOwnRowSubtitle": "Your own · checked strictly",
+  "@restrictionOwnRowSubtitle": {"description": "Banto (ALG-17): subtitle of a free-text restriction row in Settings and the profile editor."},
+  "concernCertaintyHeadsUp": "may be high in it — a heads-up, not a measurement",
+  "@concernCertaintyHeadsUp": {"description": "Banto (ALG-17): the certainty words of a FODMAP, histamine or small-portions concern on the dish card. Never 'safe'."}
 }

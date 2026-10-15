@@ -1137,6 +1137,157 @@ the quoted sentence as press wording until the PDF is checked.
 
 ---
 
+## 21. FODMAP (ALG-17; desk research, brief)
+
+> **Status: desk research from the author's background reading of the
+> public sources named below, added on 2026-10-15 for ALG-17. None of the
+> pages was fetched in this session, so — as with the rest of this file —
+> someone with a browser should open each one before a term's wording
+> ships. Not clinical review.**
+
+**Regulated:** nowhere. FODMAPs (fermentable oligo-, di-, monosaccharides
+and polyols) are not allergens; a low-FODMAP diet is a short, staged
+elimination for irritable bowel syndrome that guidance says to follow with
+a dietitian (NICE CG61; NHS IBS page; Monash University). **Dose is the
+whole story**: Monash rates each food per serving size, and a small amount
+of a "high" food may be tolerated (Gibson & Shepherd 2010). A menu never
+states a dose, so the app may only say "may be high in …" and never rules a
+dish out (file 10 §ALG-17).
+
+### 21.1 Direct triggers (high-FODMAP foods a menu names)
+onion, shallot, leek, garlic (fructans); chickpeas, lentils, kidney and
+baked beans (GOS); apple, pear, mango, watermelon, honey, agave, high
+fructose corn syrup (excess fructose); milk, yoghurt, ice cream, ricotta,
+cottage cheese (lactose); cauliflower, mushrooms, apricot, peach, plum,
+cherries, nectarine, sorbitol, mannitol, xylitol (polyols); asparagus,
+artichoke, cashews, pistachios, inulin / chicory root
+([Monash, high and low FODMAP foods](https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/),
+Gibson PR, Shepherd SJ, *J Gastroenterol Hepatol* 2010;25:252–258).
+
+### 21.2 Hidden sources (restaurant)
+
+| Hidden source | Confidence | Source |
+|---|---|---|
+| Stock, broth, soup and gravy (onion and garlic are the usual base) | possible (inferred from 21.1) | Monash, above |
+| Garlic-based sauces and dips: aioli, tzatziki, pesto, garlic butter | documented common (garlic named) | Monash, above |
+| Hummus and falafel (chickpea, garlic) | documented common | Monash, above |
+| Salsa, marinades, dressings (onion, garlic, honey) | possible | inferred |
+| Wheat breads, pita, pasta and couscous in a full serving (fructans) | possible — dose dependent | Monash, above |
+| Date syrup (silan) and fruit juices (excess fructose) | possible | Monash, above |
+
+### 21.3 Guards
+"Green beans" are not the beans of 21.1, and plant milks (almond, oat,
+rice) are not lactose sources; "lactose-free" lowers the milk trigger. A
+"low FODMAP" label on a menu is a restaurant's own claim.
+
+### 21.4 Confusions
+- FODMAP is not gluten: a gluten-free bread may still be high in fructans
+  from other flours, and a sourdough wheat bread may be lower (Monash).
+- The diet is temporary and individual; the app's heads-up is "based on
+  common FODMAP guidance, not a measurement".
+
+**Sources (21):**
+[Monash University FODMAP](https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/);
+[NICE CG61, IBS in adults](https://www.nice.org.uk/guidance/cg61);
+[NHS, IBS diet](https://www.nhs.uk/conditions/irritable-bowel-syndrome-ibs/diet-lifestyle-and-medicines/);
+Gibson PR, Shepherd SJ. "Evidence-based dietary management of functional
+gastrointestinal symptoms: the FODMAP approach." *J Gastroenterol Hepatol*
+2010;25(2):252–258.
+
+---
+
+## 22. Histamine (ALG-17; desk research, brief)
+
+> **Status:** as §21 — background reading of the named sources, not
+> fetched in this session, not clinical review.
+
+**Regulated:** nowhere. Histamine intolerance is a proposed imbalance
+between dietary histamine and the body's capacity to break it down (the
+enzyme diamine oxidase); its diagnosis is debated, the threshold is
+individual, and histamine rises with ripening, fermentation, curing and
+storage, so freshness and preparation matter as much as the food (Maintz
+& Novak 2007; Comas-Basté et al. 2020). The app may only say "may be high
+in …".
+
+### 22.1 Direct triggers
+aged and ripened cheeses (parmesan, cheddar, gouda, emmental, blue
+cheese, camembert, brie); cured, smoked and processed meats (salami,
+pepperoni, ham, prosciutto, bacon, chorizo, pastrami); tuna, mackerel,
+sardines, anchovies, herring and smoked fish; fermented foods (sauerkraut,
+kimchi, pickles, miso, tempeh, kombucha, kefir); vinegar (balsamic, wine
+vinegar); wine, beer, champagne
+([SIGHI food list](https://www.histaminintoleranz.ch/en/therapy_diet_foodlist.html);
+Maintz L, Novak N, *Am J Clin Nutr* 2007;85:1185–1196).
+
+### 22.2 Hidden sources and "liberators"
+
+| Hidden source | Confidence | Source |
+|---|---|---|
+| Soy sauce, fish sauce, Worcestershire sauce, ketchup (fermented or vinegar based) | documented common | SIGHI list; Maintz & Novak 2007 |
+| Pesto and Caesar dressing (aged parmesan; anchovy) | possible (inferred from 22.1) | — |
+| Tomato (and tomato paste), spinach, aubergine, avocado | documented (histamine-rich vegetables) — dose dependent | SIGHI list; Comas-Basté et al. 2020 |
+| Strawberries, pineapple, chocolate and cocoa ("liberators") | possible — the mechanism is debated | SIGHI list |
+| Leftovers and long-held fish | documented, but invisible on a menu | Maintz & Novak 2007 |
+
+### 22.3 Guards
+"Fresh" beside a fish does not lower anything the app can check; there is
+no reliable guard phrase, so every trigger stays a heads-up.
+
+### 22.4 Confusions
+- Scombroid fish poisoning (spoiled fish) is histamine too, but it is a
+  food-hygiene matter, not this restriction.
+- Histamine intolerance is not an allergy: no cross-contact rule applies.
+
+**Sources (22):**
+[SIGHI, food compatibility list](https://www.histaminintoleranz.ch/en/therapy_diet_foodlist.html);
+Maintz L, Novak N. "Histamine and histamine intolerance." *Am J Clin Nutr*
+2007;85(5):1185–1196; Comas-Basté O, Sánchez-Pérez S, Veciana-Nogués MT,
+Latorre-Moratalla M, Vidal-Carou MC. "Histamine Intolerance: The Current
+State of the Art." *Biomolecules* 2020;10(8):1181.
+
+---
+
+## 23. Small portions for GLP-1 eating (ALG-17; desk research, brief)
+
+> **Status:** as §21. Not clinical review, and the app gives no dietary
+> advice to anyone on a medicine: it marks what a menu says.
+
+**Regulated:** nowhere, and not a restriction. People taking a GLP-1
+medicine (semaglutide, tirzepatide and others) eat less, and a joint
+advisory of four US nutrition and obesity societies (Mozaffarian et al.
+2025) recommends smaller portions, protein first, and limiting fried,
+greasy and very sweet foods and sugary drinks, which tend to worsen the
+medicines' digestive side effects. File 03 has the demand (Gallup 2026:
+11% of US adults; a Toast survey: 72% chose a restaurant for its
+small-appetite options).
+
+### 23.1 Menu cues (all hidden: nothing "names" the restriction)
+
+| Cue | Confidence | Source |
+|---|---|---|
+| Deep-fried, fried, battered, tempura, schnitzel, fries | likely (fried and greasy) | Mozaffarian et al. 2025 |
+| Cream sauces: creamy, alfredo, carbonara | likely (high fat) | Mozaffarian et al. 2025 |
+| Large portions: double, triple, XL, jumbo, giant, family size, platter, all you can eat, bottomless; "large" | likely; "large" possible | Mozaffarian et al. 2025 (portion size); file 03 |
+| Sugary drinks and desserts: cola, soda, lemonade, milkshake, dessert, cake, ice cream, brownie, syrup | likely | Mozaffarian et al. 2025 |
+
+### 23.2 Guards
+"Air-fried" and "stir-fried" are lighter than deep-fried; "double
+espresso" is not a large portion; a "rice cake" is not a dessert.
+
+### 23.3 Confusions
+- The epic's "protein-forward · small portion" tag (from the model's
+  portion hint and protein role) is a sort signal, not this vocabulary,
+  and is a follow-up.
+
+**Sources (23):**
+Mozaffarian D, Agarwal M, Aggarwal M, et al. "Nutritional priorities to
+support GLP-1 therapy for obesity: a joint Advisory from the American
+College of Lifestyle Medicine, the American Society for Nutrition, the
+Obesity Medicine Association, and The Obesity Society." *Am J Clin Nutr*
+2025; file 03 (Gallup, June 2026; Toast, August 2026).
+
+---
+
 ## Sources
 
 Every URL cited above, grouped by publisher. All were reached only as

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
@@ -44,12 +45,66 @@ String restrictionKindLabel(AppLocalizations l10n, RestrictionKind kind) =>
       RestrictionKind.keto => l10n.restrictionKindDiet,
     };
 
+/// The key of the picker's "Add your own" text field (ALG-17).
+const Key restrictionOwnFieldKey = ValueKey<String>('restrictionOwnField');
+
+/// The key of the picker's "Add" button beside [restrictionOwnFieldKey].
+const Key restrictionOwnAddKey = ValueKey<String>('restrictionOwnAdd');
+
+/// What the picker answers: a restriction from the taxonomy, or one of the
+/// user's own words for [RestrictionId.custom] (ALG-17).
+@immutable
+final class RestrictionPick {
+  /// A taxonomy restriction, [id].
+  const new restriction(RestrictionId this.id) : term = null;
+
+  /// One of the user's own words, [term], as typed and trimmed.
+  const new own(String this.term) : id = null;
+
+  /// The restriction picked, or null for an own word.
+  final RestrictionId? id;
+
+  /// The own word typed, or null for a taxonomy restriction.
+  final String? term;
+
+  @override
+  bool operator ==(Object other) =>
+      other is RestrictionPick && other.id == id && other.term == term;
+
+  @override
+  int get hashCode => Object.hash(id, term);
+
+  /// The kind of pick only: an own word is the user's health data and
+  /// stays out of logs (D26 C1).
+  @override
+  String toString() =>
+      id == null ? 'RestrictionPick(own)' : 'RestrictionPick(${id!.name})';
+}
+
+/// How [entry] is named in Settings, the profile editor and the menu's
+/// "Checking for" line, in [locale]'s language: the restriction's name, or
+/// for the user's own restriction (ALG-17) their words, as they wrote
+/// them.
+String profileEntryDisplayName(ProfileEntry entry, Locale locale) =>
+    entry.restrictionId == RestrictionId.custom && entry.terms.isNotEmpty
+    ? entry.terms.join(', ')
+    : restrictionDisplayName(restrictionFor(entry.restrictionId), locale);
+
 /// One line saying which official allergen lists name [restriction]: the
-/// US list, the EU list (which Israel's follows), both or neither.
+/// US list, the EU list (which Israel's follows), both or neither. The
+/// ALG-17 restrictions say what they are instead: a heads-up from common
+/// guidance ([headsUpRestrictions]), or, for alpha-gal, that dairy is the
+/// Milk entry's.
 String restrictionJurisdictionHint(
   AppLocalizations l10n,
   Restriction restriction,
 ) {
+  if (headsUpRestrictions.contains(restriction.id)) {
+    return l10n.restrictionHeadsUpHint;
+  }
+  if (restriction.id == RestrictionId.alphaGal) {
+    return l10n.restrictionAlphaGalHint;
+  }
   final us = restriction.jurisdictions.contains(Jurisdiction.us);
   final eu = restriction.jurisdictions.contains(Jurisdiction.eu);
   final lists = switch ((us, eu)) {
@@ -62,23 +117,34 @@ String restrictionJurisdictionHint(
 }
 
 /// The taxonomy entries the picker offers when the profile already holds
-/// [added]: every restriction except keto and those already added, in
-/// taxonomy order.
+/// [added]: every restriction except keto, the user's own (which is typed,
+/// not picked) and those already added, in taxonomy order.
 List<Restriction> availableRestrictions(Set<RestrictionId> added) => [
   for (final restriction in restrictionTaxonomy)
     if (restriction.kind != RestrictionKind.keto &&
+        restriction.id != RestrictionId.custom &&
         !added.contains(restriction.id))
       restriction,
 ];
 
-/// Opens the [RestrictionPickerSheet] and answers the restriction chosen,
-/// or null when the sheet is dismissed without a choice.
+/// Whether the picker has anything left to offer [profile]: a taxonomy
+/// restriction it does not hold, or room for another own word
+/// ([ProfileEntry.maxTerms]).
+bool canAddToProfile(DietaryProfile profile) =>
+    availableRestrictions(<RestrictionId>{
+      for (final entry in profile.entries) entry.restrictionId,
+    }).isNotEmpty ||
+    profile.customTerms.length < ProfileEntry.maxTerms;
+
+/// Opens the [RestrictionPickerSheet] and answers the choice — a
+/// restriction or an own word — or null when the sheet is dismissed
+/// without one.
 ///
 /// Capped at the app's sheet width ([showKetoClubSheet]).
-Future<RestrictionId?> showRestrictionPickerSheet({
+Future<RestrictionPick?> showRestrictionPickerSheet({
   required BuildContext context,
   required Set<RestrictionId> added,
-}) => showKetoClubSheet<RestrictionId>(
+}) => showKetoClubSheet<RestrictionPick>(
   context: context,
   showDragHandle: true,
   builder: (_) => RestrictionPickerSheet(added: added),
@@ -90,7 +156,13 @@ Future<RestrictionId?> showRestrictionPickerSheet({
 /// include it. Tapping one pops the sheet with its [RestrictionId].
 ///
 /// Keto and every id in [added] are left out. There is no severity control:
-/// a restriction is added or it is not.
+/// a restriction is added or it is not. Below the list, "Add your own"
+/// (ALG-17) takes a word the taxonomy does not have ("kiwi", "כוסברה")
+/// and pops the sheet with it; the word is matched on this device only
+/// and checked as strictly as an allergy.
+///
+/// Tapping a row pops [RestrictionPick.restriction]; adding a word pops
+/// [RestrictionPick.own].
 class RestrictionPickerSheet extends StatelessWidget {
   /// Creates the picker, leaving out [added].
   const new({required this.added, super.key});
@@ -123,6 +195,7 @@ class RestrictionPickerSheet extends StatelessWidget {
             ),
             for (final kind in restrictionKindOrder)
               ..._group(context, l10n, locale, kind, available),
+            const _OwnRestrictionField(),
           ],
         ),
       ),
@@ -160,8 +233,93 @@ class RestrictionPickerSheet extends StatelessWidget {
           key: restrictionOptionKey(restriction.id),
           title: Text(restrictionDisplayName(restriction, locale)),
           subtitle: Text(restrictionJurisdictionHint(l10n, restriction)),
-          onTap: () => Navigator.pop(context, restriction.id),
+          onTap: () => Navigator.pop(
+            context,
+            RestrictionPick.restriction(restriction.id),
+          ),
         ),
     ];
+  }
+}
+
+/// The picker's "Add your own" group (ALG-17): a heading, a note that the
+/// word is checked on this device only and as strictly as an allergy, a
+/// text field and an "Add" button that pops the sheet with the trimmed
+/// word. A blank word adds nothing.
+class _OwnRestrictionField extends StatefulWidget {
+  const new();
+
+  @override
+  State<_OwnRestrictionField> createState() => _OwnRestrictionFieldState();
+}
+
+class _OwnRestrictionFieldState extends State<_OwnRestrictionField> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final term = _controller.text.trim();
+    if (term.isEmpty) return;
+    Navigator.pop(context, RestrictionPick.own(term));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Semantics(
+            header: true,
+            child: Text(
+              l10n.restrictionOwnTitle,
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontSize: 12,
+                letterSpacing: 0.6,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            l10n.restrictionOwnNote,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  key: restrictionOwnFieldKey,
+                  controller: _controller,
+                  maxLength: ProfileEntry.maxTermLength,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => _submit(),
+                  decoration: InputDecoration(
+                    labelText: l10n.restrictionOwnField,
+                    counterText: '',
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              FilledButton(
+                key: restrictionOwnAddKey,
+                onPressed: _submit,
+                child: Text(l10n.restrictionOwnAdd),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }

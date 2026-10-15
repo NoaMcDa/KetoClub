@@ -172,6 +172,43 @@ void main() {
       expect(save.onPressed, isNull);
     });
 
+    testWidgets("the editor adds and removes a person's own word (ALG-17)", (
+      tester,
+    ) async {
+      // Arrange
+      final store = FakeSettingsStore(
+        initial: AppSettings(otherProfiles: <NamedProfile>[_dana]),
+      );
+      await _pump(tester, store);
+      await _tap(tester, find.byKey(settingsProfileRowKey('p1')));
+
+      // Act
+      await _tap(tester, find.byKey(profileEditorAddKey));
+      final field = find.byKey(restrictionOwnFieldKey);
+      await tester.ensureVisible(field);
+      await tester.pumpAndSettle();
+      await tester.enterText(field, 'kiwi');
+      await _tap(tester, find.byKey(restrictionOwnAddKey));
+
+      // Assert
+      expect(find.byKey(profileEditorOwnTermRowKey('kiwi')), findsOneWidget);
+      expect(
+        (await store.read()).otherProfiles.single.profile.customTerms,
+        <String>['kiwi'],
+      );
+      expect((await store.read()).profile, DietaryProfile.empty);
+
+      // Act
+      await _tap(tester, find.byKey(profileEditorOwnTermRemoveKey('kiwi')));
+
+      // Assert
+      expect(find.byKey(profileEditorOwnTermRowKey('kiwi')), findsNothing);
+      expect(
+        (await store.read()).otherProfiles.single.profile.customTerms,
+        isEmpty,
+      );
+    });
+
     testWidgets('rename and delete a person', (tester) async {
       // Arrange
       final store = FakeSettingsStore(

@@ -250,10 +250,17 @@ void main() {
                 expect(question.trim(), isNotEmpty);
                 expect(question, endsWith('?'));
                 expect(question, isNot(contains('{')));
+                // The user's own restriction (ALG-17) names the words
+                // it matched rather than its taxonomy subject.
                 expect(
                   question,
                   contains(
-                    WaiterQuestions.subject(restriction.id, hebrew: hebrew),
+                    restriction.id == RestrictionId.custom && matched != null
+                        ? matched
+                        : WaiterQuestions.subject(
+                            restriction.id,
+                            hebrew: hebrew,
+                          ),
                   ),
                 );
                 expect(_hebrewLetter.hasMatch(question), hebrew);
@@ -340,6 +347,126 @@ void main() {
 
     test('an empty list stays empty', () {
       expect(WaiterQuestions.fill(const <Concern>[], hebrew: false), isEmpty);
+    });
+  });
+
+  group('ALG-17 questions', () {
+    test('FODMAP and histamine ask for less, quoting the menu', () {
+      expect(
+        WaiterQuestions.questionFor(
+          _concern(
+            RestrictionId.fodmap,
+            certainty: Certainty.suspected,
+            matched: 'onion',
+          ),
+          hebrew: false,
+        ),
+        'I go easy on onion, garlic and other high-FODMAP foods. The menu '
+        "says 'onion': can this be made with less of it?",
+      );
+      expect(
+        WaiterQuestions.questionFor(
+          _concern(
+            RestrictionId.histamine,
+            certainty: Certainty.suspected,
+            matched: 'פרמזן',
+          ),
+          hebrew: true,
+        ),
+        'אני ממעיט/ה במזונות מיושנים, מעושנים, כבושים או מותססים. '
+        "בתפריט כתוב 'פרמזן' — אפשר להכין את המנה עם פחות מזה?",
+      );
+    });
+
+    test('small portions ask for a smaller or lighter version', () {
+      expect(
+        WaiterQuestions.questionFor(
+          _concern(RestrictionId.glp1, certainty: Certainty.suspected),
+          hebrew: false,
+        ),
+        'I go easy on large portions and fried, creamy or very sweet food. '
+        'Is there a smaller or lighter version of this dish?',
+      );
+      expect(
+        WaiterQuestions.questionFor(
+          _concern(
+            RestrictionId.glp1,
+            certainty: Certainty.suspected,
+            matched: 'מטוגן',
+          ),
+          hebrew: true,
+        ),
+        'אני ממעיט/ה במנות גדולות ומזון מטוגן, שמנתי או מתוק מאוד. '
+        "בתפריט כתוב 'מטוגן' — יש גרסה קטנה או קלה יותר של המנה?",
+      );
+    });
+
+    test('a heads-up never asks for a dish "without" anything', () {
+      for (final id in headsUpRestrictions) {
+        for (final hebrew in <bool>[false, true]) {
+          final question = WaiterQuestions.questionFor(
+            _concern(id, matched: 'x-item'),
+            hebrew: hebrew,
+          );
+          expect(question, isNot(contains('without')));
+          expect(question, isNot(contains('בלי')));
+        }
+      }
+    });
+
+    test('alpha-gal names its foods', () {
+      expect(
+        WaiterQuestions.questionFor(
+          _concern(RestrictionId.alphaGal, matched: 'Beef'),
+          hebrew: false,
+        ),
+        'Can this be made without mammal meat or its products (beef, lamb, '
+        'pork, gelatin or lard)?',
+      );
+      expect(
+        WaiterQuestions.questionFor(
+          _concern(
+            RestrictionId.alphaGal,
+            source: ConcernSource.hidden,
+            certainty: Certainty.likely,
+            matched: 'קבב',
+          ),
+          hebrew: true,
+        ),
+        "בתפריט כתוב 'קבב' — האם יש בזה בשר יונקים או מוצריו (בקר, כבש, "
+        "חזיר, ג'לטין או שומן מן החי)?",
+      );
+    });
+
+    test('the own restriction names the word, as the user wrote it', () {
+      // Arrange
+      final concern = _concern(RestrictionId.custom, matched: 'ובכוסברה');
+
+      // Act + Assert
+      expect(
+        WaiterQuestions.questionFor(concern, hebrew: true, ownWord: 'כוסברה'),
+        'אפשר להכין את המנה בלי כוסברה?',
+      );
+      expect(
+        WaiterQuestions.questionFor(
+          _concern(
+            RestrictionId.custom,
+            certainty: Certainty.suspected,
+            matched: 'kiwi',
+          ),
+          hebrew: false,
+          ownWord: 'kiwi',
+        ),
+        'Does this dish contain kiwi, even in a sauce, a dressing or a '
+        'garnish?',
+      );
+      expect(
+        WaiterQuestions.questionFor(
+          _concern(RestrictionId.custom),
+          hebrew: false,
+        ),
+        'Can this be made without the foods I listed?',
+      );
     });
   });
 }

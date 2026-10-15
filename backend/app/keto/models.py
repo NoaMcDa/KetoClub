@@ -139,9 +139,14 @@ RestrictionIdName = Literal[
     "lupin",
     "sulphites",
     "legumes",
+    "alphaGal",
+    "fodmap",
+    "histamine",
     "vegan",
     "vegetarian",
+    "glp1",
     "keto",
+    "custom",
 ]
 """The Dart ``RestrictionId`` names; a test pins them to the taxonomy in
 ``allergens.json`` (this module may not import ``app.keto.allergens``, which

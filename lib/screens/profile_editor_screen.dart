@@ -46,6 +46,14 @@ Key profileEditorRowKey(RestrictionId id) =>
 Key profileEditorRemoveKey(RestrictionId id) =>
     ValueKey<String>('profileEditorRemove_${id.name}');
 
+/// The row of [term], one of the user's own words (ALG-17), in the editor.
+Key profileEditorOwnTermRowKey(String term) =>
+    ValueKey<String>('profileEditorOwnTermRow_$term');
+
+/// The remove button of [term]'s row in the editor.
+Key profileEditorOwnTermRemoveKey(String term) =>
+    ValueKey<String>('profileEditorOwnTermRemove_$term');
+
 /// Edits one named profile (Banto, ALG-12, issue #354): its restrictions,
 /// added through the same picker as "My restrictions"
 /// ([RestrictionPickerSheet]) and removed one by one; its name; sharing it
@@ -110,8 +118,12 @@ class ProfileEditorScreen extends StatelessWidget {
                   child: Text(l10n.profileKetoOnly),
                 ),
               for (final entry in entries)
-                _row(context, l10n, controller, entry.restrictionId, locale),
-              if (availableRestrictions(added).isNotEmpty)
+                if (entry.restrictionId == RestrictionId.custom)
+                  for (final term in entry.terms)
+                    _ownTermRow(l10n, controller, term)
+                else
+                  _row(context, l10n, controller, entry.restrictionId, locale),
+              if (canAddToProfile(person.profile))
                 Align(
                   alignment: AlignmentDirectional.centerStart,
                   child: TextButton.icon(
@@ -217,8 +229,35 @@ class ProfileEditorScreen extends StatelessWidget {
       added: added,
     );
     if (picked == null) return;
-    await controller.addRestrictionTo(profileId, picked);
+    final term = picked.term;
+    final id = picked.id;
+    if (term != null) {
+      await controller.addCustomTermTo(profileId, term);
+    } else if (id != null) {
+      await controller.addRestrictionTo(profileId, id);
+    }
   }
+
+  /// One of the person's own words (ALG-17): the word, "Your own · checked
+  /// strictly" and a remove button for that word alone.
+  Widget _ownTermRow(
+    AppLocalizations l10n,
+    SettingsController controller,
+    String term,
+  ) => ListTile(
+    key: profileEditorOwnTermRowKey(term),
+    contentPadding: EdgeInsets.zero,
+    title: Text(term),
+    subtitle: Text(l10n.restrictionOwnRowSubtitle),
+    trailing: IconButton(
+      key: profileEditorOwnTermRemoveKey(term),
+      icon: const Icon(Icons.close),
+      tooltip: l10n.settingsRestrictionsRemove(term),
+      onPressed: controller.isBusy
+          ? null
+          : () => unawaited(controller.removeCustomTermFrom(profileId, term)),
+    ),
+  );
 
   Future<void> _rename(
     BuildContext context,

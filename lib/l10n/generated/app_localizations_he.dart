@@ -1918,4 +1918,30 @@ class AppLocalizationsHe extends AppLocalizations {
   String groupBreakdownSemanticLabel(String breakdown) {
     return 'לכל אחד: $breakdown';
   }
+
+  @override
+  String get restrictionHeadsUpHint => 'התראה לפי הנחיות מקובלות, לא מדידה';
+
+  @override
+  String get restrictionAlphaGalHint =>
+      'בשר יונקים ומוצריו. אם גם מוצרי חלב משפיעים עליך, כדאי להוסיף גם חלב';
+
+  @override
+  String get restrictionOwnTitle => 'להוסיף משלך';
+
+  @override
+  String get restrictionOwnNote =>
+      'משהו שאינו ברשימה, כמו קיווי או כוסברה. נבדק רק במכשיר הזה, בקפדנות כמו אלרגיה, לפי המילים שכתובות בתפריט.';
+
+  @override
+  String get restrictionOwnField => 'מזון שיש להימנע ממנו';
+
+  @override
+  String get restrictionOwnAdd => 'הוספה';
+
+  @override
+  String get restrictionOwnRowSubtitle => 'משלך · נבדק בקפדנות';
+
+  @override
+  String get concernCertaintyHeadsUp => 'ייתכן שיש בזה הרבה — התראה, לא מדידה';
 }

@@ -433,7 +433,13 @@ void main() {
       // Arrange
       var profile = DietaryProfile.empty;
       for (final id in RestrictionId.values) {
-        if (id != RestrictionId.keto) profile = profile.withEntry(id);
+        if (id != RestrictionId.keto && id != RestrictionId.custom) {
+          profile = profile.withEntry(id);
+        }
+      }
+      // ALG-17: the picker also takes the user's own words, up to the cap.
+      for (var i = 0; i < ProfileEntry.maxTerms; i++) {
+        profile = profile.withCustomTerm('word $i');
       }
       final store = FakeSettingsStore(initial: AppSettings(profile: profile));
 
@@ -442,6 +448,109 @@ void main() {
 
       // Assert
       expect(find.byKey(restrictionsAddKey), findsNothing);
+    });
+  });
+
+  group('SettingsScreen with bantoMode: true — your own words (ALG-17)', () {
+    /// Opens the picker, types [word] and taps "Add".
+    Future<void> addOwn(WidgetTester tester, String word) async {
+      await _openPicker(tester);
+      final field = find.byKey(restrictionOwnFieldKey);
+      await tester.ensureVisible(field);
+      await tester.pumpAndSettle();
+      await tester.enterText(field, word);
+      await tester.tap(find.byKey(restrictionOwnAddKey));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('adding a word shows its own row and stores it', (
+      tester,
+    ) async {
+      // Arrange
+      final store = FakeSettingsStore();
+      await _pump(tester, store, bantoMode: true);
+
+      // Act
+      await addOwn(tester, 'kiwi');
+      await addOwn(tester, 'כוסברה');
+
+      // Assert
+      expect(find.byKey(ownTermRowKey('kiwi')), findsOneWidget);
+      expect(find.byKey(ownTermRowKey('כוסברה')), findsOneWidget);
+      expect(find.text(_en.restrictionOwnRowSubtitle), findsNWidgets(2));
+      expect((await store.read()).profile.customTerms, <String>[
+        'kiwi',
+        'כוסברה',
+      ]);
+      expect((await store.read()).profile.toJson(), <Map<String, Object?>>[
+        <String, Object?>{
+          'id': 'custom',
+          'exceptions': <String>[],
+          'terms': <String>['kiwi', 'כוסברה'],
+        },
+      ]);
+    });
+
+    testWidgets('the same word twice is stored once', (tester) async {
+      // Arrange
+      final store = FakeSettingsStore();
+      await _pump(tester, store, bantoMode: true);
+
+      // Act
+      await addOwn(tester, 'kiwi');
+      final writes = store.writeCallCount;
+      await addOwn(tester, 'Kiwi');
+
+      // Assert
+      expect((await store.read()).profile.customTerms, <String>['kiwi']);
+      expect(store.writeCallCount, writes);
+    });
+
+    testWidgets('removing a word removes its row, and the entry with the '
+        'last word', (tester) async {
+      // Arrange
+      final store = FakeSettingsStore(
+        initial: AppSettings(
+          profile: DietaryProfile.empty
+              .withCustomTerm('kiwi')
+              .withCustomTerm('coriander'),
+        ),
+      );
+      await _pump(tester, store, bantoMode: true);
+
+      // Act
+      await tester.ensureVisible(find.byKey(ownTermRemoveKey('kiwi')));
+      await tester.tap(find.byKey(ownTermRemoveKey('kiwi')));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byKey(ownTermRowKey('kiwi')), findsNothing);
+      expect((await store.read()).profile.customTerms, <String>['coriander']);
+
+      // Act
+      await tester.tap(find.byKey(ownTermRemoveKey('coriander')));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect((await store.read()).profile, DietaryProfile.empty);
+      expect(find.byKey(restrictionsEmptyKey), findsOneWidget);
+    });
+
+    testWidgets('under Locale(he) the field and the row read Hebrew', (
+      tester,
+    ) async {
+      // Arrange
+      final store = FakeSettingsStore();
+      await _pump(tester, store, bantoMode: true, locale: const Locale('he'));
+
+      // Act
+      await _openPicker(tester);
+      await tester.ensureVisible(find.byKey(restrictionOwnFieldKey));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(_he.restrictionOwnTitle), findsOneWidget);
+      expect(find.text(_he.restrictionOwnField), findsOneWidget);
     });
   });
 }

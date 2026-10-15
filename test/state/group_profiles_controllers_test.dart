@@ -193,6 +193,34 @@ void main() {
       expect(controller.profile, DietaryProfile.empty);
     });
 
+    test("adds and removes another person's own words (ALG-17)", () async {
+      // Arrange
+      final id = (await controller.addProfile('Dana'))!;
+
+      // Act
+      await controller.addCustomTermTo(id, 'kiwi');
+      await controller.addCustomTermTo(id, 'coriander');
+      await controller.addCustomTermTo(id, 'KIWI');
+      await controller.removeCustomTermFrom(id, 'kiwi');
+      await controller.addCustomTermTo('nobody', 'mango');
+      await controller.removeCustomTermFrom('nobody', 'mango');
+
+      // Assert
+      expect(controller.profileById(id)!.profile.customTerms, <String>[
+        'coriander',
+      ]);
+      expect(controller.profile, DietaryProfile.empty);
+
+      // Act: the primary through its id.
+      await controller.addCustomTermTo(NamedProfile.primaryId, 'kiwi');
+      final added = controller.profile.customTerms;
+      await controller.removeCustomTermFrom(NamedProfile.primaryId, 'kiwi');
+
+      // Assert
+      expect(added, <String>['kiwi']);
+      expect(controller.profile, DietaryProfile.empty);
+    });
+
     test('editing the primary through its id is the old setter', () async {
       // Act
       await controller.addRestrictionTo(

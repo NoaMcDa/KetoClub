@@ -27,13 +27,24 @@ final class ProfileEntry {
   /// Takes [exceptions] as given; [DietaryProfile.withEntry] and
   /// [DietaryProfile.tryFrom] are the ways in that trim, de-duplicate and
   /// cap them ([normaliseExceptions]).
-  const new({required this.restrictionId, this.exceptions = const <String>[]});
+  const new({
+    required this.restrictionId,
+    this.exceptions = const <String>[],
+    this.terms = const <String>[],
+  });
 
   /// The most exceptions one entry keeps.
   static const int maxExceptions = 5;
 
   /// The longest one exception may be, in Unicode code points.
   static const int maxExceptionLength = 60;
+
+  /// The most free-text terms the user's own restriction keeps (ALG-17).
+  static const int maxTerms = 10;
+
+  /// The longest one free-text term may be, in Unicode code points: an
+  /// ingredient's name, not a sentence.
+  static const int maxTermLength = 40;
 
   /// The restriction this entry records.
   final RestrictionId restrictionId;
@@ -43,45 +54,87 @@ final class ProfileEntry {
   /// [maxExceptionLength] code points once normalised.
   final List<String> exceptions;
 
+  /// The user's own words for what they cannot eat ("kiwi", "כוסברה"):
+  /// held only by the [RestrictionId.custom] entry (ALG-17), and matched
+  /// literally on the device, never sent anywhere (D26 C1). At most
+  /// [maxTerms], each at most [maxTermLength] code points once normalised
+  /// ([normaliseTerms]). Empty for every other entry.
+  final List<String> terms;
+
   /// [raw] trimmed, with blanks and repeats dropped, each cut to
   /// [maxExceptionLength] code points and the list cut to [maxExceptions].
   ///
   /// Cut by code point rather than by UTF-16 unit, so a cut never splits a
   /// surrogate pair. The result is unmodifiable.
-  static List<String> normaliseExceptions(Iterable<String> raw) {
+  static List<String> normaliseExceptions(Iterable<String> raw) =>
+      _normalise(raw, maxCount: maxExceptions, maxLength: maxExceptionLength);
+
+  /// [raw] trimmed, with blanks and repeats dropped (a repeat ignoring
+  /// case: "Kiwi" after "kiwi"), each cut to [maxTermLength] code points
+  /// and the list cut to [maxTerms]. Unmodifiable.
+  static List<String> normaliseTerms(Iterable<String> raw) => _normalise(
+    raw,
+    maxCount: maxTerms,
+    maxLength: maxTermLength,
+    ignoreCase: true,
+  );
+
+  static List<String> _normalise(
+    Iterable<String> raw, {
+    required int maxCount,
+    required int maxLength,
+    bool ignoreCase = false,
+  }) {
     final kept = <String>[];
+    final seen = <String>{};
     for (final value in raw) {
-      if (kept.length == maxExceptions) break;
+      if (kept.length == maxCount) break;
       final trimmed = value.trim();
       if (trimmed.isEmpty) continue;
       final runes = trimmed.runes;
-      final capped = runes.length > maxExceptionLength
-          ? String.fromCharCodes(runes.take(maxExceptionLength)).trim()
+      final capped = runes.length > maxLength
+          ? String.fromCharCodes(runes.take(maxLength)).trim()
           : trimmed;
-      if (!kept.contains(capped)) kept.add(capped);
+      if (seen.add(ignoreCase ? capped.toLowerCase() : capped)) {
+        kept.add(capped);
+      }
     }
     return List<String>.unmodifiable(kept);
   }
 
-  /// Writes a form [DietaryProfile.tryFrom] reads back.
+  /// Writes a form [DietaryProfile.tryFrom] reads back. [terms] are
+  /// written only when there are some, so every entry but the user's own
+  /// restriction writes exactly what it wrote before ALG-17.
   Map<String, Object?> toJson() => <String, Object?>{
     'id': restrictionId.name,
     'exceptions': exceptions,
+    if (terms.isNotEmpty) 'terms': terms,
   };
 
   @override
   bool operator ==(Object other) =>
       other is ProfileEntry &&
       other.restrictionId == restrictionId &&
-      listEquals(other.exceptions, exceptions);
+      listEquals(other.exceptions, exceptions) &&
+      listEquals(other.terms, terms);
 
   @override
-  int get hashCode => Object.hash(restrictionId, Object.hashAll(exceptions));
+  int get hashCode => Object.hash(
+    restrictionId,
+    Object.hashAll(exceptions),
+    Object.hashAll(terms),
+  );
 
+  /// The id and its exceptions and, for the user's own restriction, how
+  /// many words it holds — never the words themselves, which are health
+  /// data and stay out of logs (D26 C1).
   @override
-  String toString() => exceptions.isEmpty
-      ? restrictionId.name
-      : '${restrictionId.name} (except ${exceptions.join(', ')})';
+  String toString() {
+    final own = terms.isEmpty ? '' : ' (${terms.length} terms)';
+    return exceptions.isEmpty
+        ? '${restrictionId.name}$own'
+        : '${restrictionId.name}$own (except ${exceptions.join(', ')})';
+  }
 }
 
 /// The restrictions a user chose, in the order they added them, at most one
@@ -102,7 +155,11 @@ final class DietaryProfile {
   /// [RestrictionId.tryParse] does not recognise, is dropped; a repeated
   /// id keeps its first entry; exceptions that are not a list read as
   /// none, non-string exceptions are dropped, and the rest go through
-  /// [ProfileEntry.normaliseExceptions].
+  /// [ProfileEntry.normaliseExceptions]. The user's own restriction
+  /// ([RestrictionId.custom]) reads its `terms` the same way
+  /// ([ProfileEntry.normaliseTerms]) and is dropped when none is left,
+  /// since it means nothing without them; `terms` on any other entry is
+  /// ignored.
   factory tryFrom(Object? json) {
     if (json is! List<Object?>) return empty;
     final entries = <ProfileEntry>[];
@@ -112,15 +169,22 @@ final class DietaryProfile {
       final rawId = item['id'];
       if (rawId is! String) continue;
       final id = RestrictionId.tryParse(rawId);
-      if (id == null || !seen.add(id)) continue;
+      if (id == null || seen.contains(id)) continue;
       final rawExceptions = item['exceptions'];
       final exceptions = rawExceptions is List<Object?>
           ? rawExceptions.whereType<String>()
           : const <String>[];
+      final rawTerms = item['terms'];
+      final terms = id == RestrictionId.custom && rawTerms is List<Object?>
+          ? ProfileEntry.normaliseTerms(rawTerms.whereType<String>())
+          : const <String>[];
+      if (id == RestrictionId.custom && terms.isEmpty) continue;
+      seen.add(id);
       entries.add(
         ProfileEntry(
           restrictionId: id,
           exceptions: ProfileEntry.normaliseExceptions(exceptions),
+          terms: terms,
         ),
       );
     }
@@ -160,13 +224,26 @@ final class DietaryProfile {
   /// When [id] is already present its entry keeps its place and, if
   /// [exceptions] is given, takes the new ones; omitting [exceptions] then
   /// keeps the old. A new [id] goes last, with no exceptions unless given.
-  DietaryProfile withEntry(RestrictionId id, {List<String>? exceptions}) {
+  ///
+  /// [terms] are the user's own restriction's words ([ProfileEntry.terms],
+  /// normalised by [ProfileEntry.normaliseTerms]), kept or replaced the
+  /// same way; they are read only for [RestrictionId.custom].
+  DietaryProfile withEntry(
+    RestrictionId id, {
+    List<String>? exceptions,
+    List<String>? terms,
+  }) {
     final existing = entryFor(id);
     final entry = ProfileEntry(
       restrictionId: id,
       exceptions: exceptions == null
           ? existing?.exceptions ?? const <String>[]
           : ProfileEntry.normaliseExceptions(exceptions),
+      terms: id != RestrictionId.custom
+          ? const <String>[]
+          : terms == null
+          ? existing?.terms ?? const <String>[]
+          : ProfileEntry.normaliseTerms(terms),
     );
     final next = existing == null
         ? <ProfileEntry>[...entries, entry]
@@ -187,6 +264,36 @@ final class DietaryProfile {
     return next.isEmpty
         ? empty
         : DietaryProfile(entries: List<ProfileEntry>.unmodifiable(next));
+  }
+
+  /// The user's own words ([RestrictionId.custom]'s [ProfileEntry.terms]),
+  /// in the order added; empty when the profile holds none (ALG-17).
+  List<String> get customTerms =>
+      entryFor(RestrictionId.custom)?.terms ?? const <String>[];
+
+  /// A copy whose own restriction also holds [term] (ALG-17): the entry is
+  /// added last when absent, and [term] goes after the words already
+  /// there. The same profile when [term] is blank, already held (ignoring
+  /// case) or the entry is full ([ProfileEntry.maxTerms]).
+  DietaryProfile withCustomTerm(String term) {
+    final held = customTerms;
+    final next = ProfileEntry.normaliseTerms(<String>[...held, term]);
+    if (next.length == held.length) return this;
+    return withEntry(RestrictionId.custom, terms: next);
+  }
+
+  /// A copy whose own restriction no longer holds [term]; the entry itself
+  /// goes with its last word. The same profile when [term] is not held.
+  DietaryProfile withoutCustomTerm(String term) {
+    final held = customTerms;
+    if (!held.contains(term)) return this;
+    final next = <String>[
+      for (final kept in held)
+        if (kept != term) kept,
+    ];
+    return next.isEmpty
+        ? withoutEntry(RestrictionId.custom)
+        : withEntry(RestrictionId.custom, terms: next);
   }
 
   /// Writes a list [DietaryProfile.tryFrom] reads back: one object per

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_he.dart';
+import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
@@ -51,7 +52,8 @@ void main() {
       expect(ids, isNot(contains(RestrictionId.keto)));
       expect(ids, isNot(contains(RestrictionId.sesame)));
       expect(ids, isNot(contains(RestrictionId.milk)));
-      expect(ids, hasLength(RestrictionId.values.length - 3));
+      expect(ids, isNot(contains(RestrictionId.custom)));
+      expect(ids, hasLength(RestrictionId.values.length - 4));
       expect(ids.first, RestrictionId.peanuts);
     });
 
@@ -171,7 +173,12 @@ void main() {
       // Act
       await _pumpSheet(
         tester,
-        added: <RestrictionId>{RestrictionId.sesame, RestrictionId.lactose},
+        added: <RestrictionId>{
+          RestrictionId.sesame,
+          RestrictionId.lactose,
+          RestrictionId.fodmap,
+          RestrictionId.histamine,
+        },
       );
 
       // Assert
@@ -184,7 +191,8 @@ void main() {
         find.byKey(restrictionOptionKey(RestrictionId.sesame)),
         findsNothing,
       );
-      // The intolerance group had only lactose, so its heading goes too.
+      // The intolerance group had only lactose, FODMAP and histamine, so
+      // its heading goes too.
       expect(find.text(_en.restrictionKindIntolerance), findsNothing);
       expect(find.byKey(restrictionOptionKey(RestrictionId.milk)), findsOne);
     });
@@ -235,7 +243,7 @@ void main() {
       tester.view.physicalSize = const Size(1400, 1000);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
-      RestrictionId? picked;
+      RestrictionPick? picked;
       await tester.pumpWidget(
         MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -273,8 +281,164 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(picked, RestrictionId.mustard);
+      expect(picked, const RestrictionPick.restriction(RestrictionId.mustard));
       expect(find.byType(RestrictionPickerSheet), findsNothing);
+    });
+  });
+
+  group('ALG-17', () {
+    test('the heads-up restrictions and alpha-gal say what they are', () {
+      for (final id in headsUpRestrictions) {
+        expect(
+          restrictionJurisdictionHint(_en, restrictionFor(id)),
+          _en.restrictionHeadsUpHint,
+        );
+        expect(
+          restrictionJurisdictionHint(_he, restrictionFor(id)),
+          _he.restrictionHeadsUpHint,
+        );
+      }
+      expect(
+        restrictionJurisdictionHint(
+          _en,
+          restrictionFor(RestrictionId.alphaGal),
+        ),
+        _en.restrictionAlphaGalHint,
+      );
+    });
+
+    test('profileEntryDisplayName shows the own words, else the name', () {
+      // Arrange
+      final profile = DietaryProfile.empty
+          .withEntry(RestrictionId.sesame)
+          .withCustomTerm('kiwi')
+          .withCustomTerm('כוסברה');
+
+      // Act
+      final names = <String>[
+        for (final entry in profile.entries)
+          profileEntryDisplayName(entry, const Locale('en')),
+      ];
+
+      // Assert
+      expect(names, <String>['Sesame', 'kiwi, כוסברה']);
+    });
+
+    test('canAddToProfile is true while a word still fits', () {
+      // Arrange: every taxonomy restriction is held.
+      var profile = DietaryProfile.empty;
+      for (final restriction in availableRestrictions(
+        const <RestrictionId>{},
+      )) {
+        profile = profile.withEntry(restriction.id);
+      }
+
+      // Assert
+      expect(canAddToProfile(profile), isTrue);
+      for (var i = 0; i < ProfileEntry.maxTerms; i++) {
+        profile = profile.withCustomTerm('word $i');
+      }
+      expect(canAddToProfile(profile), isFalse);
+    });
+
+    test('RestrictionPick compares by value and never prints the word', () {
+      expect(
+        const RestrictionPick.own('kiwi'),
+        const RestrictionPick.own('kiwi'),
+      );
+      expect(
+        const RestrictionPick.own('kiwi'),
+        isNot(const RestrictionPick.restriction(RestrictionId.custom)),
+      );
+      expect(
+        const RestrictionPick.own('kiwi').toString(),
+        isNot(contains('kiwi')),
+      );
+      expect(
+        const RestrictionPick.restriction(RestrictionId.sesame).toString(),
+        contains('sesame'),
+      );
+    });
+
+    testWidgets('the picker offers neither keto nor the own id as a row', (
+      tester,
+    ) async {
+      await _pumpSheet(tester);
+      expect(
+        find.byKey(restrictionOptionKey(RestrictionId.custom)),
+        findsNothing,
+      );
+      expect(
+        find.byKey(restrictionOptionKey(RestrictionId.keto)),
+        findsNothing,
+      );
+      expect(
+        find.byKey(restrictionOptionKey(RestrictionId.glp1)),
+        findsOneWidget,
+      );
+    });
+
+    Future<RestrictionPick?> typeAndAdd(
+      WidgetTester tester,
+      String text, {
+      Locale locale = const Locale('en'),
+    }) async {
+      RestrictionPick? picked;
+      var closed = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: locale,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                onPressed: () async {
+                  picked = await showRestrictionPickerSheet(
+                    context: context,
+                    added: const <RestrictionId>{},
+                  );
+                  closed = true;
+                },
+                child: const Icon(Icons.add),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.byIcon(Icons.add));
+      await tester.pumpAndSettle();
+      final field = find.byKey(restrictionOwnFieldKey);
+      await tester.ensureVisible(field);
+      await tester.pumpAndSettle();
+      await tester.enterText(field, text);
+      await tester.tap(find.byKey(restrictionOwnAddKey));
+      await tester.pumpAndSettle();
+      expect(closed, picked != null);
+      return picked;
+    }
+
+    testWidgets('"Add your own" pops the trimmed word', (tester) async {
+      expect(
+        await typeAndAdd(tester, '  pine nuts '),
+        const RestrictionPick.own('pine nuts'),
+      );
+      expect(find.byType(RestrictionPickerSheet), findsNothing);
+    });
+
+    testWidgets('a Hebrew word in the Hebrew UI', (tester) async {
+      expect(
+        await typeAndAdd(tester, 'כוסברה', locale: const Locale('he')),
+        const RestrictionPick.own('כוסברה'),
+      );
+    });
+
+    testWidgets('a blank word adds nothing and keeps the sheet open', (
+      tester,
+    ) async {
+      expect(await typeAndAdd(tester, '   '), isNull);
+      expect(find.byType(RestrictionPickerSheet), findsOneWidget);
+      expect(find.text(_en.restrictionOwnTitle), findsOneWidget);
     });
   });
 }

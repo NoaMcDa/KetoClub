@@ -757,5 +757,13 @@
   "groupFitsEveryone": "{count, plural, =1{מנה אחת מתאימה לכולם} other{{count} מנות מתאימות לכולם}}",
   "groupFitsEveryoneStrict": "{count, plural, =1{מנה אחת שלא נמצא בה חשש לאף אחד} other{{count} מנות שלא נמצא בהן חשש לאף אחד}}",
   "groupBreakdownEntry": "{name}: {state}",
-  "groupBreakdownSemanticLabel": "לכל אחד: {breakdown}"
+  "groupBreakdownSemanticLabel": "לכל אחד: {breakdown}",
+  "restrictionHeadsUpHint": "התראה לפי הנחיות מקובלות, לא מדידה",
+  "restrictionAlphaGalHint": "בשר יונקים ומוצריו. אם גם מוצרי חלב משפיעים עליך, כדאי להוסיף גם חלב",
+  "restrictionOwnTitle": "להוסיף משלך",
+  "restrictionOwnNote": "משהו שאינו ברשימה, כמו קיווי או כוסברה. נבדק רק במכשיר הזה, בקפדנות כמו אלרגיה, לפי המילים שכתובות בתפריט.",
+  "restrictionOwnField": "מזון שיש להימנע ממנו",
+  "restrictionOwnAdd": "הוספה",
+  "restrictionOwnRowSubtitle": "משלך · נבדק בקפדנות",
+  "concernCertaintyHeadsUp": "ייתכן שיש בזה הרבה — התראה, לא מדידה"
 }

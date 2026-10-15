@@ -167,6 +167,14 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Falafel",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -210,6 +218,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "Falafel",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "Falafel",
           "restrictionId": "sesame",
@@ -227,6 +243,14 @@
         },
         {
           "certainty": "likely",
+          "matchedText": "Falafel",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
           "matchedText": "hummus",
           "restrictionId": "sesame",
           "source": "hidden",
@@ -239,6 +263,14 @@
           "restrictionId": "legumes",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "hummus",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -295,11 +327,35 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "פיתה",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "חציל",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "ביצה",
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "מטוגן",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -353,6 +409,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "חציל",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "מטוגן",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "ביצה",
           "restrictionId": "eggs",
@@ -396,6 +468,14 @@
           "certainty": "suspected",
           "matchedText": "פיתה",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "פיתה",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -475,6 +555,14 @@
           "restrictionId": "mustard",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "פרמזן",
+          "restrictionId": "histamine",
+          "source": "option",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -627,6 +715,14 @@
         {
           "certainty": "stated",
           "matchedText": "פרמזן",
+          "restrictionId": "histamine",
+          "source": "option",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "פרמזן",
           "restrictionId": "vegan",
           "source": "option",
           "tier": "stated",
@@ -636,6 +732,14 @@
           "certainty": "stated",
           "matchedText": "אנשובי",
           "restrictionId": "fish",
+          "source": "option",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "אנשובי",
+          "restrictionId": "histamine",
           "source": "option",
           "tier": "stated",
           "waiterQuestion": null
@@ -827,6 +931,22 @@
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "dressing",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Soy sauce",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -860,6 +980,14 @@
           "matchedText": "Sesame",
           "restrictionId": "sesame",
           "source": "description",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "dressing",
+          "restrictionId": "fodmap",
+          "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
         },
@@ -925,6 +1053,14 @@
           "restrictionId": "legumes",
           "source": "option",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Soy sauce",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -1117,6 +1253,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "milk",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "milk",
           "restrictionId": "vegan",
@@ -1200,6 +1344,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "milk",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "milk",
           "restrictionId": "vegan",
@@ -1256,6 +1408,14 @@
           "certainty": "suspected",
           "matchedText": "Bread",
           "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Bread",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -1355,6 +1515,14 @@
           "certainty": "suspected",
           "matchedText": "Bread",
           "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Bread",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -1460,6 +1628,22 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "bean",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "fish sauce",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "egg",
           "restrictionId": "vegan",
           "source": "description",
@@ -1472,6 +1656,14 @@
           "restrictionId": "vegetarian",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "fried",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -1534,6 +1726,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "fried",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "egg",
           "restrictionId": "eggs",
@@ -1569,6 +1769,14 @@
           "certainty": "stated",
           "matchedText": "bean",
           "restrictionId": "legumes",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "bean",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -1617,6 +1825,14 @@
           "certainty": "suspected",
           "matchedText": "fish sauce",
           "restrictionId": "molluscs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "fish sauce",
+          "restrictionId": "histamine",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -1859,6 +2075,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "milk",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "aubergine",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Chicken",
           "restrictionId": "vegan",
@@ -1935,6 +2167,14 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "aubergine",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "curry",
           "restrictionId": "peanuts",
           "source": "hidden",
@@ -2006,6 +2246,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "milk",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "milk",
           "restrictionId": "vegan",
@@ -2062,6 +2310,22 @@
           "certainty": "stated",
           "matchedText": "peanuts",
           "restrictionId": "legumes",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Beef",
+          "restrictionId": "alphaGal",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "onion",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -2160,6 +2424,14 @@
         {
           "certainty": "stated",
           "matchedText": "Beef",
+          "restrictionId": "alphaGal",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Beef",
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
@@ -2169,6 +2441,14 @@
           "certainty": "stated",
           "matchedText": "Beef",
           "restrictionId": "vegetarian",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "onion",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -2300,6 +2580,22 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "mushroom",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "fish sauce",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "prawns",
           "restrictionId": "vegan",
           "source": "description",
@@ -2329,6 +2625,14 @@
           "certainty": "suspected",
           "matchedText": "soup",
           "restrictionId": "celery",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "soup",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -2367,6 +2671,14 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "mushroom",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "fish",
           "restrictionId": "fish",
           "source": "description",
@@ -2393,6 +2705,14 @@
           "certainty": "suspected",
           "matchedText": "fish sauce",
           "restrictionId": "molluscs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "fish sauce",
+          "restrictionId": "histamine",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -2478,6 +2798,14 @@
           "certainty": "suspected",
           "matchedText": "Spring Rolls",
           "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Crispy",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -2569,6 +2897,14 @@
           "certainty": "suspected",
           "matchedText": "Rolls",
           "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Crispy",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -2725,6 +3061,22 @@
         {
           "certainty": "stated",
           "matchedText": "Pork",
+          "restrictionId": "alphaGal",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "plum",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Pork",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
@@ -2752,6 +3104,14 @@
         {
           "certainty": "stated",
           "matchedText": "Pork",
+          "restrictionId": "alphaGal",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Pork",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
@@ -2864,6 +3224,14 @@
         {
           "certainty": "stated",
           "matchedText": "Pork",
+          "restrictionId": "alphaGal",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Pork",
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
@@ -2971,6 +3339,14 @@
           "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "plum",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         }
       ],
@@ -3030,6 +3406,14 @@
           "certainty": "stated",
           "matchedText": "peanuts",
           "restrictionId": "legumes",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "vinegar",
+          "restrictionId": "histamine",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -3182,11 +3566,27 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "soy sauce",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "vinegar",
           "restrictionId": "sulphites",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "vinegar",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         }
       ],
@@ -3257,6 +3657,14 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "battered",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -3295,6 +3703,14 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "Crispy",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "battered",
           "restrictionId": "eggs",
           "source": "hidden",
@@ -3315,6 +3731,14 @@
           "restrictionId": "gluten",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "battered",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -3395,6 +3819,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "soy sauce",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Chicken",
           "restrictionId": "vegan",
@@ -3408,6 +3840,14 @@
           "restrictionId": "vegetarian",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Fried",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -3443,6 +3883,14 @@
           "restrictionId": "vegetarian",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Fried",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -3516,6 +3964,14 @@
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "soy sauce",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "name": "asian_takeaway_soy_peanut/9"
@@ -3565,6 +4021,14 @@
         {
           "certainty": "stated",
           "matchedText": "Beef",
+          "restrictionId": "alphaGal",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Beef",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
@@ -3592,6 +4056,14 @@
         {
           "certainty": "stated",
           "matchedText": "Beef",
+          "restrictionId": "alphaGal",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Beef",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
@@ -3602,6 +4074,14 @@
           "matchedText": "Beef",
           "restrictionId": "vegetarian",
           "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "beef",
+          "restrictionId": "alphaGal",
+          "source": "description",
           "tier": "stated",
           "waiterQuestion": null
         },
@@ -3740,6 +4220,14 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "Wheat",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "oyster",
           "restrictionId": "vegan",
           "source": "description",
@@ -3817,6 +4305,14 @@
           "certainty": "stated",
           "matchedText": "Wheat",
           "restrictionId": "gluten",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Wheat",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -3955,11 +4451,27 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "soy sauce",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Egg",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Fried",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -4006,9 +4518,25 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "Fried",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "stir-fried",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "fried",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -4084,6 +4612,14 @@
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "soy sauce",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "name": "asian_takeaway_soy_peanut/12"
@@ -4103,6 +4639,22 @@
           "matchedText": "Tofu",
           "restrictionId": "legumes",
           "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "pork",
+          "restrictionId": "alphaGal",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "bean",
+          "restrictionId": "fodmap",
+          "source": "description",
           "tier": "stated",
           "waiterQuestion": null
         },
@@ -4169,6 +4721,22 @@
           "certainty": "stated",
           "matchedText": "bean",
           "restrictionId": "legumes",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "bean",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "pork",
+          "restrictionId": "alphaGal",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -4256,6 +4824,14 @@
           "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "onion",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -4399,6 +4975,14 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "onion",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "wheat",
           "restrictionId": "wheat",
           "source": "description",
@@ -4409,6 +4993,14 @@
           "certainty": "stated",
           "matchedText": "wheat",
           "restrictionId": "gluten",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "wheat",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -4524,6 +5116,14 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "Garlic",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "Prawns",
           "restrictionId": "vegan",
           "source": "name",
@@ -4549,6 +5149,14 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "stated",
+          "matchedText": "Garlic",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
         {
           "certainty": "stated",
           "matchedText": "Prawns",
@@ -4651,6 +5259,14 @@
           "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "garlic",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -4725,6 +5341,22 @@
         {
           "certainty": "stated",
           "matchedText": "Pork",
+          "restrictionId": "alphaGal",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "vinegar",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Pork",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
@@ -4749,6 +5381,14 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "stated",
+          "matchedText": "Pork",
+          "restrictionId": "alphaGal",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
         {
           "certainty": "stated",
           "matchedText": "Pork",
@@ -4787,6 +5427,14 @@
           "restrictionId": "sesame",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "pork",
+          "restrictionId": "alphaGal",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -4852,6 +5500,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "vinegar",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "name": "asian_takeaway_soy_peanut/16"
@@ -4913,6 +5569,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Garlic",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -4925,6 +5589,14 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "stated",
+          "matchedText": "Garlic",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
         {
           "certainty": "suspected",
           "matchedText": "Stir-fry",
@@ -5012,6 +5684,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "garlic",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "name": "asian_takeaway_soy_peanut/17"
@@ -5054,6 +5734,14 @@
           "certainty": "stated",
           "matchedText": "peanut",
           "restrictionId": "legumes",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "wheat",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -5105,6 +5793,14 @@
           "certainty": "stated",
           "matchedText": "wheat",
           "restrictionId": "gluten",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "wheat",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -5185,6 +5881,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "stated",
+          "matchedText": "Mango",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "cream",
           "restrictionId": "vegan",
@@ -5203,6 +5907,14 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "stated",
+          "matchedText": "Mango",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
         {
           "certainty": "suspected",
           "matchedText": "cream",
@@ -5225,6 +5937,14 @@
           "restrictionId": "vegan",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "mango",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         }
       ],
@@ -5254,6 +5974,14 @@
           "restrictionId": "sesame",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "milk",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -5295,6 +6023,14 @@
           "certainty": "stated",
           "matchedText": "milk",
           "restrictionId": "lactose",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "milk",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -5913,6 +6649,14 @@
         {
           "certainty": "stated",
           "matchedText": "Beef",
+          "restrictionId": "alphaGal",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Beef",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
@@ -5924,6 +6668,14 @@
           "restrictionId": "vegetarian",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "צ׳יפס",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -5937,6 +6689,14 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "stated",
+          "matchedText": "Beef",
+          "restrictionId": "alphaGal",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
         {
           "certainty": "stated",
           "matchedText": "Beef",
@@ -5973,6 +6733,14 @@
           "certainty": "suspected",
           "matchedText": "Burger",
           "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Burger",
+          "restrictionId": "alphaGal",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -6021,6 +6789,14 @@
           "certainty": "suspected",
           "matchedText": "צ׳יפס",
           "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "צ׳יפס",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -6157,7 +6933,16 @@
       "name": "golden_mixed/6"
     },
     {
-      "concerns": [],
+      "concerns": [
+        {
+          "certainty": "stated",
+          "matchedText": "Cauliflower",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        }
+      ],
       "dish": {
         "description": "אורז כרובית",
         "id": "d",
@@ -6167,7 +6952,24 @@
         "page": null,
         "price": 10.0
       },
-      "findings": [],
+      "findings": [
+        {
+          "certainty": "stated",
+          "matchedText": "Cauliflower",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "כרובית",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        }
+      ],
       "name": "golden_mixed/7"
     },
     {
@@ -6222,6 +7024,14 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "Beer",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "fish",
           "restrictionId": "vegan",
           "source": "name",
@@ -6234,6 +7044,14 @@
           "restrictionId": "vegetarian",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "battered",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -6264,6 +7082,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "stated",
+          "matchedText": "Beer",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "battered",
           "restrictionId": "eggs",
@@ -6285,6 +7111,14 @@
           "restrictionId": "gluten",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "battered",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -6342,6 +7176,14 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "יין",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "עוף",
           "restrictionId": "vegan",
           "source": "name",
@@ -6390,6 +7232,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "יין",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "name": "golden_mixed/9"
@@ -6414,6 +7264,14 @@
           "certainty": "suspected",
           "matchedText": "steak",
           "restrictionId": "milk",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "steak",
+          "restrictionId": "alphaGal",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -6449,6 +7307,14 @@
           "certainty": "suspected",
           "matchedText": "steak",
           "restrictionId": "milk",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "steak",
+          "restrictionId": "alphaGal",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -6577,6 +7443,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "Cheeseburger",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Cheeseburger",
           "restrictionId": "vegan",
@@ -6639,6 +7513,14 @@
           "certainty": "suspected",
           "matchedText": "Cheeseburger",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Cheeseburger",
+          "restrictionId": "alphaGal",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -6943,6 +7825,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -7045,6 +7935,14 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "קרואסון",
           "restrictionId": "milk",
           "source": "hidden",
@@ -7127,6 +8025,14 @@
           "certainty": "suspected",
           "matchedText": "שוקולד",
           "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "histamine",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -7807,6 +8713,14 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "עוגת",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -7857,6 +8771,14 @@
           "restrictionId": "gluten",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "עוגת",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -7921,6 +8843,14 @@
           "restrictionId": "gluten",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "עוגת",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -8025,11 +8955,27 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "וביצים",
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "עוגת",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -8084,6 +9030,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "עוגת",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "שוקולד",
           "restrictionId": "milk",
@@ -8111,6 +9065,14 @@
           "certainty": "suspected",
           "matchedText": "שוקולד",
           "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "histamine",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -8172,6 +9134,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "עוגת",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "שוקולד",
           "restrictionId": "milk",
@@ -8199,6 +9169,14 @@
           "certainty": "suspected",
           "matchedText": "שוקולד",
           "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "histamine",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -8273,6 +9251,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "לחם",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "אבוקדו",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "וביצה",
           "restrictionId": "vegan",
@@ -8305,6 +9299,14 @@
           "restrictionId": "gluten",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "אבוקדו",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -8343,6 +9345,22 @@
           "certainty": "suspected",
           "matchedText": "לחם",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "לחם",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "אבוקדו",
+          "restrictionId": "histamine",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -8399,6 +9417,22 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "לחם",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "אבוקדו",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -8425,6 +9459,14 @@
           "restrictionId": "gluten",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "אבוקדו",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -8460,6 +9502,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "לחם",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "כוסמין",
           "restrictionId": "wheat",
@@ -8473,6 +9523,14 @@
           "restrictionId": "gluten",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "אבוקדו",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -8524,6 +9582,14 @@
           "certainty": "suspected",
           "matchedText": "לחם",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "לחם",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -8607,6 +9673,14 @@
           "certainty": "suspected",
           "matchedText": "לחם",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "לחם",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -8699,6 +9773,14 @@
         {
           "certainty": "stated",
           "matchedText": "טונה",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "טונה",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
@@ -8758,6 +9840,14 @@
         {
           "certainty": "stated",
           "matchedText": "טונה",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "טונה",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
@@ -8775,6 +9865,14 @@
           "certainty": "stated",
           "matchedText": "טונה",
           "restrictionId": "fish",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "טונה",
+          "restrictionId": "histamine",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -8833,6 +9931,14 @@
           "restrictionId": "sulphites",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חמוצים",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -8913,6 +10019,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "פסטו",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "עגבניות",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "מוצרלה",
           "restrictionId": "vegan",
@@ -8931,6 +10053,14 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "suspected",
+          "matchedText": "עגבניות",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
         {
           "certainty": "stated",
           "matchedText": "מוצרלה",
@@ -9010,6 +10140,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "פסטו",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "name": "il_cafe_pastries/11"
@@ -9057,6 +10195,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "stated",
+          "matchedText": "תפוחים",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "מיונז",
           "restrictionId": "vegan",
@@ -9087,6 +10233,14 @@
           "certainty": "stated",
           "matchedText": "סלרי",
           "restrictionId": "celery",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "תפוחים",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -9347,6 +10501,14 @@
         {
           "certainty": "stated",
           "matchedText": "ויוגורט",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "ויוגורט",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
@@ -9414,6 +10576,14 @@
         {
           "certainty": "stated",
           "matchedText": "ויוגורט",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "ויוגורט",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
@@ -9433,6 +10603,14 @@
           "restrictionId": "lactose",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "יוגורט",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -9473,6 +10651,14 @@
           "restrictionId": "legumes",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "ודבש",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -9532,6 +10718,14 @@
           "certainty": "likely",
           "matchedText": "וחמאה",
           "restrictionId": "vegan",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "סירופ",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -9628,6 +10822,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "סירופ",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "וחמאה",
           "restrictionId": "milk",
@@ -9668,6 +10870,14 @@
           "certainty": "stated",
           "matchedText": "וחלב",
           "restrictionId": "lactose",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "וחלב",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -9727,6 +10937,14 @@
           "certainty": "stated",
           "matchedText": "וחלב",
           "restrictionId": "lactose",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "וחלב",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -9857,6 +11075,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "וחלב",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "וחלב",
           "restrictionId": "vegan",
@@ -9900,6 +11126,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "וחלב",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "וחלב",
           "restrictionId": "vegan",
@@ -9933,6 +11167,14 @@
           "matchedText": "שוקו",
           "restrictionId": "lactose",
           "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חלב",
+          "restrictionId": "fodmap",
+          "source": "description",
           "tier": "stated",
           "waiterQuestion": null
         },
@@ -9983,6 +11225,14 @@
           "certainty": "stated",
           "matchedText": "חלב",
           "restrictionId": "lactose",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חלב",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -10062,6 +11312,14 @@
           "restrictionId": "legumes",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -10215,6 +11473,14 @@
           "certainty": "suspected",
           "matchedText": "שוקולד",
           "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "שוקולד",
+          "restrictionId": "histamine",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -10435,6 +11701,14 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "גרגרי חומוס",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -10475,6 +11749,14 @@
         {
           "certainty": "likely",
           "matchedText": "חומוס",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "חומוס",
           "restrictionId": "sesame",
           "source": "hidden",
           "tier": "inferred",
@@ -10484,6 +11766,22 @@
           "certainty": "stated",
           "matchedText": "חומוס",
           "restrictionId": "legumes",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "חומוס",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "גרגרי חומוס",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -10502,6 +11800,14 @@
           "restrictionId": "legumes",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "חומוס",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -10524,6 +11830,14 @@
           "certainty": "suspected",
           "matchedText": "פיתה",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "פיתה",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -10575,6 +11889,14 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "פול",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "וביצה",
           "restrictionId": "vegan",
           "source": "description",
@@ -10609,9 +11931,25 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "חומוס",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "פול",
           "restrictionId": "legumes",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "פול",
+          "restrictionId": "fodmap",
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
@@ -10633,9 +11971,25 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "חומוס",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "פול",
           "restrictionId": "legumes",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "פול",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -10694,6 +12048,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "בשר",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "חומוס",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "בשר",
           "restrictionId": "vegan",
@@ -10737,6 +12107,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "חומוס",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "בשר",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "בשר",
           "restrictionId": "vegan",
@@ -10766,6 +12152,22 @@
           "restrictionId": "legumes",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "חומוס",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "בשר",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -10836,6 +12238,22 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חמוצים",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -10865,6 +12283,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "פלאפל",
           "restrictionId": "sesame",
@@ -10881,6 +12307,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "חמוצים",
           "restrictionId": "mustard",
@@ -10894,6 +12328,14 @@
           "restrictionId": "sulphites",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חמוצים",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -10956,6 +12398,30 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חמוצים",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "צ׳יפס",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -10994,6 +12460,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "בפיתה",
           "restrictionId": "wheat",
@@ -11018,6 +12492,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "בפיתה",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "פיתה",
           "restrictionId": "wheat",
@@ -11037,6 +12519,14 @@
           "certainty": "suspected",
           "matchedText": "פיתה",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "פיתה",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -11059,6 +12549,14 @@
         },
         {
           "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
           "matchedText": "חומוס",
           "restrictionId": "sesame",
           "source": "hidden",
@@ -11071,6 +12569,14 @@
           "restrictionId": "legumes",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "חומוס",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -11091,6 +12597,14 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "חמוצים",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "וטחינה",
           "restrictionId": "sesame",
           "source": "description",
@@ -11101,6 +12615,22 @@
           "certainty": "suspected",
           "matchedText": "צ׳יפס",
           "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "צ׳יפס",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "חצילים",
+          "restrictionId": "histamine",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -11157,6 +12687,22 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חמוצים",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -11186,6 +12732,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "בלאפה",
           "restrictionId": "wheat",
@@ -11234,6 +12788,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "חמוצים",
           "restrictionId": "mustard",
@@ -11247,6 +12809,14 @@
           "restrictionId": "sulphites",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חמוצים",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -11303,11 +12873,35 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "פיתה",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "חציל",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "ביצה",
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "מטוגן",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -11370,6 +12964,30 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "פיתה",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "חציל",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "מטוגן",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "ביצה",
           "restrictionId": "eggs",
@@ -11405,6 +13023,22 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "ושום",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "חצילים",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -11426,6 +13060,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "חצילים",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "בטחינה",
           "restrictionId": "sesame",
@@ -11434,9 +13076,25 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "חציל",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "טחינה",
           "restrictionId": "sesame",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "ושום",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -11479,6 +13137,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "stated",
+          "matchedText": "שום",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "חצילים",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "במיונז",
           "restrictionId": "vegan",
@@ -11501,6 +13175,14 @@
           "certainty": "suspected",
           "matchedText": "סלט חצילים",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "חצילים",
+          "restrictionId": "histamine",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -11530,6 +13212,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "חציל",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "מיונז",
           "restrictionId": "eggs",
@@ -11551,6 +13241,14 @@
           "restrictionId": "vegan",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "שום",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -11637,7 +13335,24 @@
       "name": "il_hummus_falafel/9"
     },
     {
-      "concerns": [],
+      "concerns": [
+        {
+          "certainty": "stated",
+          "matchedText": "בצל",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "עגבנייה",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        }
+      ],
       "dish": {
         "description": "עגבנייה, מלפפון, בצל, פטרוזיליה, שמן זית ולימון",
         "id": "d",
@@ -11647,7 +13362,24 @@
         "page": null,
         "price": 10.0
       },
-      "findings": [],
+      "findings": [
+        {
+          "certainty": "suspected",
+          "matchedText": "עגבנייה",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "בצל",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        }
+      ],
       "name": "il_hummus_falafel/10"
     },
     {
@@ -11680,6 +13412,22 @@
           "certainty": "suspected",
           "matchedText": "פיתה",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "פיתה",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "עגבניות",
+          "restrictionId": "histamine",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -11728,6 +13476,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "עגבניות",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "פיתה",
           "restrictionId": "wheat",
@@ -11747,6 +13503,14 @@
           "certainty": "suspected",
           "matchedText": "פיתה",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "פיתה",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -11782,10 +13546,26 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "ועדשים",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "יוגורט",
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "מטוגן",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -11808,11 +13588,43 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "מג׳דרה",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "ועדשים",
           "restrictionId": "legumes",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "ועדשים",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "בצל",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "מטוגן",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -11829,6 +13641,14 @@
           "restrictionId": "lactose",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "יוגורט",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -11859,6 +13679,14 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "עדשים",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -11880,9 +13708,25 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "מרק",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "עדשים",
           "restrictionId": "legumes",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "עדשים",
+          "restrictionId": "fodmap",
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
@@ -11896,9 +13740,25 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "מרק",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "עדשים",
           "restrictionId": "legumes",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "עדשים",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -11928,6 +13788,14 @@
           "certainty": "suspected",
           "matchedText": "חריימה",
           "restrictionId": "molluscs",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "עגבניות",
+          "restrictionId": "histamine",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -12006,6 +13874,14 @@
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "עגבניות",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "name": "il_hummus_falafel/14"
@@ -12032,6 +13908,30 @@
           "certainty": "suspected",
           "matchedText": "במרק",
           "restrictionId": "celery",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "בשר",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "במרק",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "עגבניות",
+          "restrictionId": "histamine",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -12064,6 +13964,14 @@
       },
       "findings": [
         {
+          "certainty": "suspected",
+          "matchedText": "קובה",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "בורגול",
           "restrictionId": "wheat",
@@ -12077,6 +13985,22 @@
           "restrictionId": "gluten",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קובה",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "בשר",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -12115,6 +14039,22 @@
           "certainty": "suspected",
           "matchedText": "במרק",
           "restrictionId": "celery",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "במרק",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "עגבניות",
+          "restrictionId": "histamine",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -12181,6 +14121,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "חומוס",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "עגבנייה",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "עוף",
           "restrictionId": "vegan",
@@ -12194,6 +14150,14 @@
           "restrictionId": "vegetarian",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "שניצל",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -12248,6 +14212,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "שניצל",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "בפיתה",
           "restrictionId": "wheat",
@@ -12267,6 +14239,14 @@
           "certainty": "suspected",
           "matchedText": "בפיתה",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "בפיתה",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -12307,6 +14287,14 @@
           "certainty": "likely",
           "matchedText": "שניצל",
           "restrictionId": "vegetarian",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "שניצל",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -12384,6 +14372,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "לחם",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "חומוס",
           "restrictionId": "sesame",
@@ -12397,6 +14393,22 @@
           "restrictionId": "legumes",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "חומוס",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "עגבנייה",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -12454,6 +14466,22 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "כבש",
+          "restrictionId": "alphaGal",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "בצל",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "קבב",
           "restrictionId": "vegan",
           "source": "name",
@@ -12479,6 +14507,14 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "likely",
+          "matchedText": "קבב",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
         {
           "certainty": "stated",
           "matchedText": "קבב",
@@ -12512,6 +14548,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "קבב",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "קבב",
           "restrictionId": "vegan",
@@ -12530,6 +14574,14 @@
         {
           "certainty": "stated",
           "matchedText": "כבש",
+          "restrictionId": "alphaGal",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "כבש",
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
@@ -12539,6 +14591,14 @@
           "certainty": "stated",
           "matchedText": "כבש",
           "restrictionId": "vegetarian",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "ובקר",
+          "restrictionId": "alphaGal",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -12563,6 +14623,14 @@
           "certainty": "stated",
           "matchedText": "טחינה",
           "restrictionId": "sesame",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "בצל",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -12613,6 +14681,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "מרק",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "עוף",
           "restrictionId": "vegan",
@@ -12656,6 +14732,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "מרק",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "עוף",
           "restrictionId": "vegan",
@@ -12683,6 +14767,14 @@
           "certainty": "suspected",
           "matchedText": "מרק עוף",
           "restrictionId": "celery",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "מרק",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -12763,6 +14855,14 @@
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "חומוס",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -12792,6 +14892,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "קוסקוס",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "קוסקוס",
           "restrictionId": "wheat",
@@ -12805,6 +14913,14 @@
           "restrictionId": "gluten",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "קוסקוס",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -12829,6 +14945,14 @@
           "restrictionId": "legumes",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "חומוס",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -13011,6 +15135,22 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "פיסטוק",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "לקינוח",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -13046,6 +15186,22 @@
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "פיסטוק",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "לקינוח",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "name": "il_hummus_falafel/22"
@@ -13073,6 +15229,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "צ׳יפס",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -13092,12 +15256,29 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "צ׳יפס",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "name": "il_hummus_falafel/24"
     },
     {
-      "concerns": [],
+      "concerns": [
+        {
+          "certainty": "likely",
+          "matchedText": "לימונדה",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        }
+      ],
       "dish": {
         "description": "לימון סחוט, נענע וסוכר",
         "id": "d",
@@ -13107,7 +15288,16 @@
         "page": null,
         "price": 10.0
       },
-      "findings": [],
+      "findings": [
+        {
+          "certainty": "likely",
+          "matchedText": "לימונדה",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        }
+      ],
       "name": "il_hummus_falafel/25"
     },
     {
@@ -13132,6 +15322,14 @@
           "certainty": "suspected",
           "matchedText": "מרק",
           "restrictionId": "celery",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "מרק",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -13180,6 +15378,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "מרק",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "עוף",
           "restrictionId": "vegan",
@@ -13215,6 +15421,14 @@
           "certainty": "suspected",
           "matchedText": "מרק",
           "restrictionId": "celery",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "מרק",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -13236,6 +15450,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "מרק",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "עוף",
           "restrictionId": "vegan",
@@ -13271,6 +15493,14 @@
           "certainty": "suspected",
           "matchedText": "מרק",
           "restrictionId": "celery",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "מרק",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -13340,6 +15570,14 @@
           "restrictionId": "legumes",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "רוטב סויה",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -13474,6 +15712,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "רוטב סויה",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "סויה",
           "restrictionId": "soy",
@@ -13545,6 +15791,14 @@
         {
           "certainty": "stated",
           "matchedText": "טונה",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "טונה",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
@@ -13604,6 +15858,14 @@
         {
           "certainty": "stated",
           "matchedText": "טונה",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "טונה",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
@@ -13621,6 +15883,14 @@
           "certainty": "stated",
           "matchedText": "טונה",
           "restrictionId": "fish",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "טונה",
+          "restrictionId": "histamine",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -13671,6 +15941,14 @@
           "restrictionId": "legumes",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "רוטב סויה",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -13740,6 +16018,14 @@
           "restrictionId": "sesame",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "אבוקדו",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -13826,6 +16112,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "אבוקדו",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "שומשום",
           "restrictionId": "sesame",
@@ -13905,6 +16199,14 @@
         {
           "certainty": "stated",
           "matchedText": "טונה",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "טונה",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
@@ -13916,6 +16218,14 @@
           "restrictionId": "vegetarian",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "וטמפורה",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -13940,6 +16250,14 @@
         {
           "certainty": "stated",
           "matchedText": "טונה",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "טונה",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
@@ -13957,6 +16275,14 @@
           "certainty": "stated",
           "matchedText": "טונה",
           "restrictionId": "fish",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "טונה",
+          "restrictionId": "histamine",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -14026,6 +16352,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "וטמפורה",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "שומשום",
           "restrictionId": "sesame",
@@ -14063,6 +16397,14 @@
           "restrictionId": "legumes",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "ורוטב סויה",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -14159,6 +16501,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "איולי",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "אבוקדו",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "שרימפס",
           "restrictionId": "vegan",
@@ -14172,6 +16530,14 @@
           "restrictionId": "vegetarian",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "טמפורה",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -14218,6 +16584,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "טמפורה",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "שרימפס",
           "restrictionId": "crustaceans",
@@ -14306,6 +16680,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "בטמפורה",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "אבוקדו",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "איולי",
           "restrictionId": "eggs",
@@ -14317,6 +16707,14 @@
           "certainty": "suspected",
           "matchedText": "איולי",
           "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "איולי",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -14389,6 +16787,14 @@
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "רוטב סויה",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -14401,6 +16807,22 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "suspected",
+          "matchedText": "אבוקדו",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "אבוקדו",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
         {
           "certainty": "stated",
           "matchedText": "בשומשום",
@@ -14439,6 +16861,14 @@
           "restrictionId": "legumes",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "רוטב סויה",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -14841,6 +17271,14 @@
         {
           "certainty": "stated",
           "matchedText": "טונה",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "טונה",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
@@ -14916,6 +17354,14 @@
         {
           "certainty": "stated",
           "matchedText": "טונה",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "טונה",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
@@ -14933,6 +17379,14 @@
           "certainty": "stated",
           "matchedText": "טונה",
           "restrictionId": "fish",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "טונה",
+          "restrictionId": "histamine",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -14973,6 +17427,14 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "שעועית",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -15005,6 +17467,14 @@
           "certainty": "stated",
           "matchedText": "שעועית",
           "restrictionId": "legumes",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "שעועית",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -15061,6 +17531,22 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "ובצל",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "מיסו",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -15090,6 +17576,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "מרק",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "מיסו",
           "restrictionId": "soy",
@@ -15101,6 +17595,14 @@
           "certainty": "stated",
           "matchedText": "מיסו",
           "restrictionId": "legumes",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "מיסו",
+          "restrictionId": "histamine",
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
@@ -15122,6 +17624,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "מרק",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "מיסו",
           "restrictionId": "soy",
@@ -15139,6 +17649,14 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "מיסו",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "טופו",
           "restrictionId": "soy",
           "source": "description",
@@ -15149,6 +17667,14 @@
           "certainty": "stated",
           "matchedText": "טופו",
           "restrictionId": "legumes",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "ובצל",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -15431,11 +17957,27 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "ורוטב סויה",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "ביצה",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "מטוגן",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -15461,6 +18003,14 @@
           "certainty": "suspected",
           "matchedText": "אורז מטוגן",
           "restrictionId": "sesame",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "מטוגן",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -15527,6 +18077,14 @@
           "restrictionId": "legumes",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "ורוטב סויה",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -15669,6 +18227,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "טמפורה",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -15706,6 +18272,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "טמפורה",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "טמפורה",
           "restrictionId": "eggs",
@@ -15727,6 +18301,14 @@
           "restrictionId": "gluten",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "טמפורה",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -15775,9 +18357,25 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "stated",
+          "matchedText": "גלידה",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "גלידה",
           "restrictionId": "vegan",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "גלידה",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -15810,9 +18408,25 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "stated",
+          "matchedText": "גלידה",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "גלידה",
           "restrictionId": "vegan",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "גלידה",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -15834,9 +18448,25 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "stated",
+          "matchedText": "גלידה",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "גלידה",
           "restrictionId": "vegan",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "גלידה",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -15860,6 +18490,14 @@
           "restrictionId": "sulphites",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "בירה",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
           "waiterQuestion": null
         }
       ],
@@ -15887,6 +18525,14 @@
           "restrictionId": "sulphites",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "בירה",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
           "waiterQuestion": null
         }
       ],
@@ -15958,6 +18604,14 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "onion",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "Buttermilk",
           "restrictionId": "vegan",
           "source": "name",
@@ -15970,6 +18624,14 @@
           "restrictionId": "vegetarian",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Fried",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -16005,6 +18667,14 @@
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Fried",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -16080,11 +18750,27 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "fries",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "onion rings",
           "restrictionId": "eggs",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "onion",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         }
       ],
@@ -16146,6 +18832,22 @@
           "restrictionId": "sulphites",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Beef",
+          "restrictionId": "alphaGal",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "pickles",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -16216,6 +18918,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "Cheeseburger",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Cheeseburger",
           "restrictionId": "vegan",
@@ -16228,6 +18938,14 @@
           "matchedText": "Cheeseburger",
           "restrictionId": "vegetarian",
           "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Beef",
+          "restrictionId": "alphaGal",
+          "source": "description",
           "tier": "stated",
           "waiterQuestion": null
         },
@@ -16304,9 +19022,25 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "stated",
+          "matchedText": "pickles",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "ketchup",
           "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "ketchup",
+          "restrictionId": "histamine",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -16414,6 +19148,22 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "Beef",
+          "restrictionId": "alphaGal",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Bacon",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "Bacon",
           "restrictionId": "vegan",
           "source": "name",
@@ -16439,6 +19189,22 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "likely",
+          "matchedText": "Bacon",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Bacon",
+          "restrictionId": "histamine",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
         {
           "certainty": "stated",
           "matchedText": "Bacon",
@@ -16496,6 +19262,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "Cheeseburger",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Cheeseburger",
           "restrictionId": "vegan",
@@ -16508,6 +19282,14 @@
           "matchedText": "Cheeseburger",
           "restrictionId": "vegetarian",
           "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Beef",
+          "restrictionId": "alphaGal",
+          "source": "description",
           "tier": "stated",
           "waiterQuestion": null
         },
@@ -16541,6 +19323,22 @@
           "restrictionId": "vegetarian",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "bacon",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "bacon",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -16578,9 +19376,25 @@
         {
           "certainty": "stated",
           "matchedText": "cheddar",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "cheddar",
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "tomato",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -16717,6 +19531,30 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "Bacon",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "bread",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Bacon",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Bacon",
           "restrictionId": "vegan",
@@ -16744,6 +19582,22 @@
       },
       "findings": [
         {
+          "certainty": "likely",
+          "matchedText": "Bacon",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Bacon",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Bacon",
           "restrictionId": "vegan",
@@ -16757,6 +19611,14 @@
           "restrictionId": "vegetarian",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "tomato",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -16819,6 +19681,14 @@
           "certainty": "suspected",
           "matchedText": "bread",
           "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "bread",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -16885,6 +19755,30 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "bacon",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "bread",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "bacon",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Turkey",
           "restrictionId": "vegan",
@@ -16898,6 +19792,14 @@
           "restrictionId": "vegetarian",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "fried",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -16944,6 +19846,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "bacon",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "bacon",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "bacon",
           "restrictionId": "vegan",
@@ -16960,6 +19878,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "fried",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "egg",
           "restrictionId": "eggs",
@@ -16973,6 +19899,14 @@
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "tomato",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -17038,6 +19972,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "bread",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "name": "us_diner_shared_fryer/4"
@@ -17082,6 +20024,22 @@
           "restrictionId": "sesame",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "ribeye",
+          "restrictionId": "alphaGal",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "onions",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -17154,6 +20112,14 @@
         {
           "certainty": "stated",
           "matchedText": "ribeye",
+          "restrictionId": "alphaGal",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "ribeye",
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
@@ -17163,6 +20129,14 @@
           "certainty": "stated",
           "matchedText": "ribeye",
           "restrictionId": "vegetarian",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "onions",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -17286,6 +20260,14 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "Beer",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "Fish",
           "restrictionId": "vegan",
           "source": "name",
@@ -17298,6 +20280,14 @@
           "restrictionId": "vegetarian",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "battered",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -17376,6 +20366,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "stated",
+          "matchedText": "Beer",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "battered",
           "restrictionId": "eggs",
@@ -17397,6 +20395,14 @@
           "restrictionId": "gluten",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "battered",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -17427,6 +20433,14 @@
           "certainty": "suspected",
           "matchedText": "fries",
           "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "fries",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -17469,6 +20483,14 @@
           "restrictionId": "sulphites",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "vinegar",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         }
       ],
@@ -17530,6 +20552,14 @@
           "restrictionId": "vegetarian",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "fries",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -17635,6 +20665,22 @@
           "certainty": "suspected",
           "matchedText": "fries",
           "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "fries",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "fried",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -17749,11 +20795,35 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "pasta",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "cheddar",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Cheese",
           "restrictionId": "vegan",
           "source": "name",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "cream sauce",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -17808,6 +20878,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "pasta",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "cheddar",
           "restrictionId": "milk",
@@ -17821,6 +20899,14 @@
           "restrictionId": "lactose",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "cheddar",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -17867,6 +20953,14 @@
           "certainty": "likely",
           "matchedText": "cream",
           "restrictionId": "vegan",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "cream sauce",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -17922,6 +21016,22 @@
           "restrictionId": "celery",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "broth",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Soup",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -17992,6 +21102,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "Soup",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Chicken",
           "restrictionId": "vegan",
@@ -18011,6 +21129,22 @@
           "certainty": "suspected",
           "matchedText": "broth",
           "restrictionId": "celery",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "broth",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "broth",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -18323,6 +21457,14 @@
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "syrup",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -18462,6 +21604,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "syrup",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "name": "us_diner_shared_fryer/11"
@@ -18517,6 +21667,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "ham",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "ham",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Omelette",
           "restrictionId": "vegan",
@@ -18530,6 +21696,14 @@
           "restrictionId": "vegetarian",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "fries",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -18632,6 +21806,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "ham",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "ham",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "ham",
           "restrictionId": "vegan",
@@ -18666,6 +21856,14 @@
         {
           "certainty": "stated",
           "matchedText": "cheddar",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "cheddar",
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
@@ -18675,6 +21873,14 @@
           "certainty": "suspected",
           "matchedText": "fries",
           "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "fries",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -18741,6 +21947,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "bacon",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "bacon",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Eggs",
           "restrictionId": "vegan",
@@ -18795,6 +22017,22 @@
           "certainty": "stated",
           "matchedText": "eggs",
           "restrictionId": "vegan",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "bacon",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "bacon",
+          "restrictionId": "histamine",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -18949,6 +22187,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "dressing",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "parmesan",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "parmesan",
           "restrictionId": "vegan",
@@ -19017,6 +22271,14 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "Caesar",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "Caesar Salad",
           "restrictionId": "vegan",
           "source": "hidden",
@@ -19045,6 +22307,14 @@
           "restrictionId": "lactose",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "parmesan",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -19113,6 +22383,14 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "Caesar",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "Caesar dressing",
           "restrictionId": "vegan",
           "source": "hidden",
@@ -19123,6 +22401,14 @@
           "certainty": "suspected",
           "matchedText": "Caesar dressing",
           "restrictionId": "vegetarian",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "dressing",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -19162,6 +22448,30 @@
           "restrictionId": "mustard",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "bacon",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "dressing",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "bacon",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -19208,6 +22518,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "bacon",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "bacon",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "bacon",
           "restrictionId": "vegan",
@@ -19219,6 +22545,22 @@
           "certainty": "stated",
           "matchedText": "bacon",
           "restrictionId": "vegetarian",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "avocado",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "blue cheese",
+          "restrictionId": "histamine",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -19291,6 +22633,14 @@
           "certainty": "suspected",
           "matchedText": "ranch dressing",
           "restrictionId": "mustard",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "dressing",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -19328,6 +22678,30 @@
           "certainty": "stated",
           "matchedText": "bean",
           "restrictionId": "legumes",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Beef",
+          "restrictionId": "alphaGal",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "bean",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "cheddar",
+          "restrictionId": "histamine",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -19378,6 +22752,14 @@
         {
           "certainty": "stated",
           "matchedText": "Beef",
+          "restrictionId": "alphaGal",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Beef",
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
@@ -19392,9 +22774,25 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "kidney",
+          "restrictionId": "alphaGal",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "bean",
           "restrictionId": "legumes",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "bean",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -19413,6 +22811,14 @@
           "restrictionId": "lactose",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "cheddar",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -19494,6 +22900,22 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "Onion",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Beer",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "fish",
           "restrictionId": "vegan",
           "source": "description",
@@ -19506,6 +22928,14 @@
           "restrictionId": "vegetarian",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "battered",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -19529,6 +22959,14 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "Onion",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "Beer",
           "restrictionId": "gluten",
           "source": "description",
@@ -19541,6 +22979,14 @@
           "restrictionId": "sulphites",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Beer",
+          "restrictionId": "histamine",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -19565,6 +23011,14 @@
           "restrictionId": "gluten",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "battered",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -19667,6 +23121,14 @@
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Fries",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -19696,9 +23158,33 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "Fries",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "fries",
           "restrictionId": "sulphites",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "fries",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "fried",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -19813,9 +23299,25 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "dressing",
+          "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "mayo",
           "restrictionId": "vegan",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "creamy",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -19864,6 +23366,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "creamy",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "mayo",
           "restrictionId": "eggs",
@@ -19883,6 +23393,14 @@
           "certainty": "likely",
           "matchedText": "mayo",
           "restrictionId": "vegan",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "dressing",
+          "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -19931,6 +23449,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Apple",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -19943,6 +23469,14 @@
         "price": 10.0
       },
       "findings": [
+        {
+          "certainty": "stated",
+          "matchedText": "Apple",
+          "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
         {
           "certainty": "suspected",
           "matchedText": "Pie",
@@ -19965,6 +23499,14 @@
           "restrictionId": "gluten",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Apple",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -20047,9 +23589,33 @@
         {
           "certainty": "stated",
           "matchedText": "Ice cream",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Chocolate",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Ice cream",
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Milkshake",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         }
       ],
@@ -20096,6 +23662,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "Chocolate",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Milkshake",
           "restrictionId": "milk",
@@ -20112,11 +23686,35 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "Milkshake",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "Ice cream",
+          "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "Ice cream",
           "restrictionId": "vegan",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Ice cream",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -20155,6 +23753,14 @@
           "certainty": "stated",
           "matchedText": "milk",
           "restrictionId": "lactose",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "milk",
+          "restrictionId": "fodmap",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -20195,6 +23801,22 @@
           "certainty": "suspected",
           "matchedText": "chocolate",
           "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "chocolate",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "syrup",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -20269,9 +23891,25 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "suspected",
+          "matchedText": "chocolate",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "Butter",
           "restrictionId": "vegan",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "Creamy",
+          "restrictionId": "glp1",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -20376,6 +24014,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "Creamy",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "peanut",
           "restrictionId": "peanuts",
@@ -20457,6 +24103,14 @@
         },
         {
           "certainty": "suspected",
+          "matchedText": "chocolate",
+          "restrictionId": "histamine",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
           "matchedText": "cookie",
           "restrictionId": "milk",
           "source": "hidden",
@@ -20513,7 +24167,16 @@
       "name": "us_diner_shared_fryer/23"
     },
     {
-      "concerns": [],
+      "concerns": [
+        {
+          "certainty": "likely",
+          "matchedText": "Bottomless",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        }
+      ],
       "dish": {
         "description": "Bottomless refills",
         "id": "d",
@@ -20523,7 +24186,16 @@
         "page": null,
         "price": 10.0
       },
-      "findings": [],
+      "findings": [
+        {
+          "certainty": "likely",
+          "matchedText": "Bottomless",
+          "restrictionId": "glp1",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        }
+      ],
       "name": "us_diner_shared_fryer/24"
     }
   ],
@@ -20592,6 +24264,14 @@
               },
               {
                 "certainty": "suspected",
+                "matchedText": "Caesar",
+                "restrictionId": "histamine",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
                 "matchedText": "Caesar salad",
                 "restrictionId": "vegan",
                 "source": "hidden",
@@ -20631,6 +24311,14 @@
                 "restrictionId": "lactose",
                 "source": "hidden",
                 "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "stated",
+                "matchedText": "honey",
+                "restrictionId": "fodmap",
+                "source": "description",
+                "tier": "stated",
                 "waiterQuestion": null
               },
               {
@@ -20693,6 +24381,14 @@
                 "waiterQuestion": null
               },
               {
+                "certainty": "likely",
+                "matchedText": "aioli",
+                "restrictionId": "fodmap",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
                 "certainty": "stated",
                 "matchedText": "Calamari",
                 "restrictionId": "vegan",
@@ -20706,6 +24402,14 @@
                 "restrictionId": "vegetarian",
                 "source": "name",
                 "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "likely",
+                "matchedText": "Deep-fried",
+                "restrictionId": "glp1",
+                "source": "hidden",
+                "tier": "inferred",
                 "waiterQuestion": null
               }
             ],
@@ -20758,6 +24462,14 @@
                 "source": "hidden",
                 "tier": "inferred",
                 "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "Bread",
+                "restrictionId": "fodmap",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
               }
             ],
             "dishId": "e4",
@@ -20800,6 +24512,22 @@
                 "restrictionId": "gluten",
                 "source": "option",
                 "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "stated",
+                "matchedText": "Entrecôte",
+                "restrictionId": "alphaGal",
+                "source": "name",
+                "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "Pasta",
+                "restrictionId": "fodmap",
+                "source": "hidden",
+                "tier": "inferred",
                 "waiterQuestion": null
               },
               {
@@ -20905,6 +24633,22 @@
                 "waiterQuestion": null
               },
               {
+                "certainty": "likely",
+                "matchedText": "bacon",
+                "restrictionId": "alphaGal",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "stated",
+                "matchedText": "bacon",
+                "restrictionId": "histamine",
+                "source": "description",
+                "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
                 "certainty": "stated",
                 "matchedText": "bacon",
                 "restrictionId": "vegan",
@@ -20918,6 +24662,14 @@
                 "restrictionId": "vegetarian",
                 "source": "description",
                 "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "likely",
+                "matchedText": "carbonara",
+                "restrictionId": "glp1",
+                "source": "hidden",
+                "tier": "inferred",
                 "waiterQuestion": null
               }
             ],
@@ -20990,6 +24742,22 @@
               {
                 "certainty": "stated",
                 "matchedText": "Beef",
+                "restrictionId": "alphaGal",
+                "source": "name",
+                "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "stated",
+                "matchedText": "cheddar",
+                "restrictionId": "histamine",
+                "source": "description",
+                "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "stated",
+                "matchedText": "Beef",
                 "restrictionId": "vegan",
                 "source": "name",
                 "tier": "stated",
@@ -21001,6 +24769,14 @@
                 "restrictionId": "vegetarian",
                 "source": "name",
                 "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "likely",
+                "matchedText": "fries",
+                "restrictionId": "glp1",
+                "source": "hidden",
+                "tier": "inferred",
                 "waiterQuestion": null
               }
             ],
@@ -21106,6 +24882,14 @@
                 "waiterQuestion": null
               },
               {
+                "certainty": "likely",
+                "matchedText": "Steak",
+                "restrictionId": "alphaGal",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
                 "certainty": "stated",
                 "matchedText": "Steak",
                 "restrictionId": "vegan",
@@ -21136,6 +24920,14 @@
                 "certainty": "suspected",
                 "matchedText": "French fries",
                 "restrictionId": "sulphites",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "likely",
+                "matchedText": "fries",
+                "restrictionId": "glp1",
                 "source": "hidden",
                 "tier": "inferred",
                 "waiterQuestion": null
@@ -21185,6 +24977,16 @@
             "why": "The core of this dish is keto, but it arrives with a carb component. Ask for the change below."
           },
           {
+            "concerns": [
+              {
+                "certainty": "likely",
+                "matchedText": "Cola",
+                "restrictionId": "glp1",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              }
+            ],
             "dishId": "e13",
             "hiddenCarbs": [],
             "modification": null,
@@ -21216,6 +25018,14 @@
                 "certainty": "stated",
                 "matchedText": "milk",
                 "restrictionId": "lactose",
+                "source": "description",
+                "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "stated",
+                "matchedText": "milk",
+                "restrictionId": "fodmap",
                 "source": "description",
                 "tier": "stated",
                 "waiterQuestion": null
@@ -21497,6 +25307,24 @@
         "analysedAt": "2026-01-01T00:00:00.000Z",
         "dishes": [
           {
+            "concerns": [
+              {
+                "certainty": "stated",
+                "matchedText": "בצל",
+                "restrictionId": "fodmap",
+                "source": "description",
+                "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "עגבניה",
+                "restrictionId": "histamine",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              }
+            ],
             "dishId": "h1",
             "hiddenCarbs": [],
             "modification": null,
@@ -21538,6 +25366,14 @@
                 "source": "name",
                 "tier": "stated",
                 "waiterQuestion": null
+              },
+              {
+                "certainty": "likely",
+                "matchedText": "חומוס",
+                "restrictionId": "fodmap",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
               }
             ],
             "dishId": "h2",
@@ -21573,6 +25409,14 @@
                 "source": "hidden",
                 "tier": "inferred",
                 "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "פיתה",
+                "restrictionId": "fodmap",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
               }
             ],
             "dishId": "h3",
@@ -21599,6 +25443,14 @@
                 "restrictionId": "sulphites",
                 "source": "hidden",
                 "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "stated",
+                "matchedText": "דבש",
+                "restrictionId": "fodmap",
+                "source": "description",
+                "tier": "stated",
                 "waiterQuestion": null
               },
               {
@@ -21669,6 +25521,14 @@
                 "waiterQuestion": null
               },
               {
+                "certainty": "suspected",
+                "matchedText": "לחם",
+                "restrictionId": "fodmap",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
                 "certainty": "likely",
                 "matchedText": "שניצל",
                 "restrictionId": "vegan",
@@ -21680,6 +25540,14 @@
                 "certainty": "likely",
                 "matchedText": "שניצל",
                 "restrictionId": "vegetarian",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "likely",
+                "matchedText": "שניצל",
+                "restrictionId": "glp1",
                 "source": "hidden",
                 "tier": "inferred",
                 "waiterQuestion": null
@@ -21709,6 +25577,14 @@
                 "restrictionId": "lactose",
                 "source": "hidden",
                 "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "stated",
+                "matchedText": "אנטריקוט",
+                "restrictionId": "alphaGal",
+                "source": "name",
+                "tier": "stated",
                 "waiterQuestion": null
               },
               {
@@ -21787,6 +25663,14 @@
                 "waiterQuestion": null
               },
               {
+                "certainty": "likely",
+                "matchedText": "המבורגר",
+                "restrictionId": "alphaGal",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
                 "certainty": "stated",
                 "matchedText": "גבינה",
                 "restrictionId": "vegan",
@@ -21833,6 +25717,14 @@
                 "certainty": "suspected",
                 "matchedText": "המבורגר",
                 "restrictionId": "sulphites",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "likely",
+                "matchedText": "המבורגר",
+                "restrictionId": "alphaGal",
                 "source": "hidden",
                 "tier": "inferred",
                 "waiterQuestion": null
@@ -21897,9 +25789,25 @@
                 "waiterQuestion": null
               },
               {
+                "certainty": "suspected",
+                "matchedText": "פסטה",
+                "restrictionId": "fodmap",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
                 "certainty": "likely",
                 "matchedText": "שמנת",
                 "restrictionId": "vegan",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "likely",
+                "matchedText": "שמנת",
+                "restrictionId": "glp1",
                 "source": "hidden",
                 "tier": "inferred",
                 "waiterQuestion": null
@@ -21954,6 +25862,14 @@
                 "source": "name",
                 "tier": "stated",
                 "waiterQuestion": null
+              },
+              {
+                "certainty": "likely",
+                "matchedText": "מטוגן",
+                "restrictionId": "glp1",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
               }
             ],
             "dishId": "h10",
@@ -21992,6 +25908,14 @@
               },
               {
                 "certainty": "stated",
+                "matchedText": "שום",
+                "restrictionId": "fodmap",
+                "source": "description",
+                "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "stated",
                 "matchedText": "סלמון",
                 "restrictionId": "vegan",
                 "source": "name",
@@ -22016,6 +25940,16 @@
             "why": "לא נמצאו במנה פחמימות, סוכר או ציפוי קמח. אפשר להזמין אותה כמו שהיא."
           },
           {
+            "concerns": [
+              {
+                "certainty": "likely",
+                "matchedText": "קולה",
+                "restrictionId": "glp1",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              }
+            ],
             "dishId": "h12",
             "hiddenCarbs": [],
             "modification": null,
@@ -22025,6 +25959,16 @@
             "why": "המנה מבוססת על קוקה קולה, ואי אפשר להפוך אותה לקטוגנית."
           },
           {
+            "concerns": [
+              {
+                "certainty": "suspected",
+                "matchedText": "קולה",
+                "restrictionId": "glp1",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              }
+            ],
             "dishId": "h13",
             "hiddenCarbs": [],
             "modification": null,
@@ -22060,9 +26004,25 @@
                 "waiterQuestion": null
               },
               {
+                "certainty": "suspected",
+                "matchedText": "חלב",
+                "restrictionId": "fodmap",
+                "source": "description",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
                 "certainty": "likely",
                 "matchedText": "הפוך",
                 "restrictionId": "vegan",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "suspected",
+                "matchedText": "גדול",
+                "restrictionId": "glp1",
                 "source": "hidden",
                 "tier": "inferred",
                 "waiterQuestion": null
@@ -22101,6 +26061,14 @@
                 "certainty": "suspected",
                 "matchedText": "קטשופ",
                 "restrictionId": "sulphites",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "likely",
+                "matchedText": "קטשופ",
+                "restrictionId": "histamine",
                 "source": "hidden",
                 "tier": "inferred",
                 "waiterQuestion": null
@@ -22590,6 +26558,14 @@
               {
                 "certainty": "stated",
                 "matchedText": "Beef",
+                "restrictionId": "alphaGal",
+                "source": "name",
+                "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "stated",
+                "matchedText": "Beef",
                 "restrictionId": "vegan",
                 "source": "name",
                 "tier": "stated",
@@ -22601,6 +26577,14 @@
                 "restrictionId": "vegetarian",
                 "source": "name",
                 "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "likely",
+                "matchedText": "צ׳יפס",
+                "restrictionId": "glp1",
+                "source": "hidden",
+                "tier": "inferred",
                 "waiterQuestion": null
               }
             ],
@@ -22664,6 +26648,16 @@
             "why": "המנה מבוססת על פיצה, ואי אפשר להפוך אותה לקטוגנית."
           },
           {
+            "concerns": [
+              {
+                "certainty": "stated",
+                "matchedText": "Cauliflower",
+                "restrictionId": "fodmap",
+                "source": "name",
+                "tier": "stated",
+                "waiterQuestion": null
+              }
+            ],
             "dishId": "x8",
             "hiddenCarbs": [],
             "modification": null,
@@ -22724,6 +26718,14 @@
               },
               {
                 "certainty": "stated",
+                "matchedText": "Beer",
+                "restrictionId": "histamine",
+                "source": "name",
+                "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "stated",
                 "matchedText": "fish",
                 "restrictionId": "vegan",
                 "source": "name",
@@ -22736,6 +26738,14 @@
                 "restrictionId": "vegetarian",
                 "source": "name",
                 "tier": "stated",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "likely",
+                "matchedText": "battered",
+                "restrictionId": "glp1",
+                "source": "hidden",
+                "tier": "inferred",
                 "waiterQuestion": null
               }
             ],
@@ -22755,6 +26765,14 @@
                 "restrictionId": "sulphites",
                 "source": "hidden",
                 "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "stated",
+                "matchedText": "יין",
+                "restrictionId": "histamine",
+                "source": "name",
+                "tier": "stated",
                 "waiterQuestion": null
               },
               {
@@ -22797,6 +26815,14 @@
                 "certainty": "suspected",
                 "matchedText": "steak",
                 "restrictionId": "milk",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "likely",
+                "matchedText": "steak",
+                "restrictionId": "alphaGal",
                 "source": "hidden",
                 "tier": "inferred",
                 "waiterQuestion": null
@@ -22975,6 +27001,14 @@
                 "certainty": "suspected",
                 "matchedText": "Cheeseburger",
                 "restrictionId": "sesame",
+                "source": "hidden",
+                "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "likely",
+                "matchedText": "Cheeseburger",
+                "restrictionId": "alphaGal",
                 "source": "hidden",
                 "tier": "inferred",
                 "waiterQuestion": null

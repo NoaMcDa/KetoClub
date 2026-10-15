@@ -128,6 +128,20 @@ void main() {
       expect(find.text('בוטנים'), findsOneWidget);
     });
 
+    testWidgets("names the user's own word beside the restriction (ALG-17)", (
+      tester,
+    ) async {
+      await _pump(tester, [
+        _concern(id: RestrictionId.custom, matchedText: 'Kiwi'),
+      ]);
+      expect(find.text('Your own restriction: Kiwi'), findsOneWidget);
+
+      await _pump(tester, [
+        _concern(id: RestrictionId.custom, matchedText: 'קיווי'),
+      ], locale: const Locale('he'));
+      expect(find.text('הגבלה משלך: קיווי'), findsOneWidget);
+    });
+
     testWidgets('quotes the matched text and shows the waiter question', (
       tester,
     ) async {
