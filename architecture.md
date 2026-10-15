@@ -3761,12 +3761,46 @@ gate's strict ids, having no vocabulary to measure. `allergens.json` and
 existing case unchanged), the Python twin's id lists follow, and no keto
 golden moved.
 
+**ALG-14 backend half (#356).** `POST /v1/confirmations` takes one fact a
+kitchen confirmed, `{venue: {source, platform_id}, dishFingerprint,
+restrictionId, polarity: present|absent}`, and counts it in the new
+`dish_confirmations` table beside `stored_menus`, keyed by the same venue key,
+the dish fingerprint, the restriction id and the polarity: a distinct count, a
+raw submission count and a first and last UTC **date** (days, not timestamps,
+so a row cannot be lined up with a request log by the second). It follows the
+D24 rule and C1: no install id column, no note column, nothing profile-shaped.
+`installId`/`install_id`, `note`/`notes`, any profile key and any unknown
+field are a 422 that spends no quota; the fingerprint is an opaque token of
+`A-Za-z0-9._:-` up to 64 characters, so prose cannot ride in it, and the
+restriction id must be in the shipped taxonomy (`custom` excluded: its meaning
+is the user's words). The install id is read for the rate limit (a bucket of
+its own, `CONFIRMATION_RATE_LIMIT_*`) and for **distinct counting without
+storing it**: the route turns it into `HMAC-SHA256(pepper, install id | venue |
+dish | restriction | polarity)`, deletes it, and the service stores only that
+token in `confirmation_voters`, a one-column table with no timestamp or key to
+the counts. Because the token covers the fact, one install has an unrelated
+token for every fact, so tokens cannot be grouped by install, and a repeat of
+a fact finds its token and counts only as a submission. `GET /v1/venue-menus`
+gains an optional `confirmations` list `[{dishFingerprint, restrictionId,
+present, absent, first, last}]`, a polarity listed only when its own row has
+three distinct confirmations (the other reads 0 until it too has three), and
+the key is absent when there is nothing to list, so no existing response moves.
+Honest limits: a confirmation names one restriction id about one dish, so a
+server that logged request order could infer that some install cares about it;
+none is logged, and the profile as a whole (the set, the severity, the
+people) never travels. A single person with many installs can still reach
+three; the per-install limit and the threshold raise the cost, not remove it.
+The Dart `ConfirmationClient` (`lib/services/community/confirmation_client.dart`)
+is the one file naming `/v1/confirmations`; `no_profile_on_the_wire_test.dart`
+allows `restrictionId` there alone, with the reason. Nothing consumes it yet.
+
 ### D27 — Post-meal confirmations, no ratings
 
 *(Banto, the Allergens epic's ALG-14, issue #356. Amends D23's visit
 history; builds on D26's evidence tiers. The device half is recorded
-here; the shared half, the backend table and its route, is added by its
-own pull request at merge.)*
+here; the shared half, `POST /v1/confirmations`, the `dish_confirmations`
+table and `ConfirmationClient`, is D26's last paragraph, "ALG-14 backend
+half".)*
 
 **What changed.** The evidence tiers `confirmed` and `denied` (ALG-06) had
 no source: nothing on the device knew what a kitchen had said. After a
@@ -3846,9 +3880,11 @@ them, and the next time the menu opens the dish shows it. Six decisions:
    `dishFingerprint(dishId)`, eight hex digits of 32-bit FNV-1a (the D23
    hash), which matches the backend's `[A-Za-z0-9._:-]{1,64}`, and
    `isShareable` is false for the user's own words (`custom`, ALG-17): they
-   are recorded and shown locally and are never uploaded. Nothing uploads
-   yet; the opt-in upload, its own consent and the read-back with
-   `/v1/venue-menus` are the shared half.
+   are recorded and shown locally and are never uploaded. Nothing on the
+   device calls `ConfirmationClient` or reads `/v1/venue-menus`'
+   `confirmations` yet: the opt-in upload with its own consent, and turning
+   those counts into `ConfirmationEvidence(shared: true)`, are the wiring
+   left for a later change.
 6. **No rating, ever.** An answer is a fact about one dish, one
    restriction and one day. Nothing on the device, and nothing the shared
    half adds, sums a venue into a number, a star or a score: that is the
