@@ -1944,4 +1944,34 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get concernCertaintyHeadsUp => 'ייתכן שיש בזה הרבה — התראה, לא מדידה';
+
+  @override
+  String allergenMatrixNotice(String date) {
+    return 'מידע על אלרגנים מהמסעדה, מתאריך $date';
+  }
+
+  @override
+  String allergenMatrixUnmatched(int count, String rows) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count שורות בו לא תואמות אף מנה בתפריט הזה: $rows',
+      one: 'שורה אחת בו לא תואמת אף מנה בתפריט הזה: $rows',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get concernSourceMatrix => 'מידע האלרגנים של המסעדה';
+
+  @override
+  String get whySourceMatrix => 'מופיע במידע האלרגנים של המסעדה עצמה';
+
+  @override
+  String get whyTierDeclaredMatrix => 'הוצהר במידע האלרגנים של המסעדה';
+
+  @override
+  String whyMatrixAbsent(String row) {
+    return 'מופיע כנטול ממנו, בשם “$row” — זה מפחית את החשש אבל לא שולל אותו';
+  }
 }

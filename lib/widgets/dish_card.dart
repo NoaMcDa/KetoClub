@@ -542,6 +542,7 @@ String concernSourceLabel(AppLocalizations l10n, Concern concern) {
     ConcernSource.hidden => l10n.concernSourceHidden,
     ConcernSource.model => l10n.concernSourceModel,
     ConcernSource.kitchen => l10n.concernSourceKitchen,
+    ConcernSource.matrix => l10n.concernSourceMatrix,
   };
   // A kitchen concern's matched text is the signal's kind, not menu
   // text: it reads "kitchen: a fryer" in the UI language (ALG-07).
@@ -552,7 +553,8 @@ String concernSourceLabel(AppLocalizations l10n, Concern concern) {
   final quoted = switch (concern.source) {
     ConcernSource.name ||
     ConcernSource.description ||
-    ConcernSource.kitchen => false,
+    ConcernSource.kitchen ||
+    ConcernSource.matrix => false,
     ConcernSource.option ||
     ConcernSource.hidden ||
     ConcernSource.model => text != null && text.trim().isNotEmpty,

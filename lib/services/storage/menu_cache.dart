@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+import 'package:ketoclub/models/allergen_matrix.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
@@ -69,23 +70,31 @@ Map<String, Object?> _analysisToJson(MenuAnalysis analysis) =>
 final class CachedMenu {
   /// Creates an entry for [menu], with [analysis] once one has been
   /// computed from it.
-  const new({required this.menu, this.analysis});
+  const new({required this.menu, this.analysis, this.allergenMatrix});
 
   /// Reads an entry written by [toJson].
   ///
   /// Returns null for any shape mismatch, including a malformed [menu] or
-  /// [analysis], and never throws.
+  /// [analysis], and never throws. An absent or unreadable
+  /// `allergenMatrix` reads as none (ALG-16): it never fails the entry.
   static CachedMenu? tryFrom(Map<String, Object?> json) {
     final rawMenu = json['menu'];
     final rawAnalysis = json['analysis'];
     if (rawMenu is! Map<String, Object?>) return null;
     final menu = Menu.tryFrom(rawMenu);
     if (menu == null) return null;
-    if (rawAnalysis == null) return CachedMenu(menu: menu);
+    final allergenMatrix = AllergenMatrix.tryFrom(json['allergenMatrix']);
+    if (rawAnalysis == null) {
+      return CachedMenu(menu: menu, allergenMatrix: allergenMatrix);
+    }
     if (rawAnalysis is! Map<String, Object?>) return null;
     final analysis = _analysisFrom(rawAnalysis);
     if (analysis == null) return null;
-    return CachedMenu(menu: menu, analysis: analysis);
+    return CachedMenu(
+      menu: menu,
+      analysis: analysis,
+      allergenMatrix: allergenMatrix,
+    );
   }
 
   /// The cached menu.
@@ -94,18 +103,27 @@ final class CachedMenu {
   /// The cached analysis, or null when [menu] has not been analysed yet.
   final MenuAnalysis? analysis;
 
+  /// The restaurant's allergen matrix that came with [menu] (Banto,
+  /// ALG-16), or null. Written only when present, so every entry without
+  /// one is the bytes it was before the field existed.
+  final AllergenMatrix? allergenMatrix;
+
   /// Writes a form [tryFrom] can read back.
   Map<String, Object?> toJson() => <String, Object?>{
     'menu': menu.toJson(),
     'analysis': analysis == null ? null : _analysisToJson(analysis!),
+    if (allergenMatrix case final matrix?) 'allergenMatrix': matrix.toJson(),
   };
 
   @override
   bool operator ==(Object other) =>
-      other is CachedMenu && other.menu == menu && other.analysis == analysis;
+      other is CachedMenu &&
+      other.menu == menu &&
+      other.analysis == analysis &&
+      other.allergenMatrix == allergenMatrix;
 
   @override
-  int get hashCode => Object.hash(menu, analysis);
+  int get hashCode => Object.hash(menu, analysis, allergenMatrix);
 
   @override
   String toString() => 'CachedMenu(${menu.venueRef.cacheKey})';

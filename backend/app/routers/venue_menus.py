@@ -23,6 +23,12 @@ A returned analysis is also written to the shared menu store
 (``stored_menus``, D24) when it is enabled: the menu and the analysis
 without its ``options``, keyed by venue, never by install id.
 
+The restaurant's allergen matrix for the venue (ALG-16, #358), when the
+maintainer entered one that holds today (UTC), rides along as
+``allergenMatrix``; the key is omitted when there is none, and nothing here
+reads or writes the matrix with the install id. A failed matrix read is
+logged and answers no matrix: the menu is the answer.
+
 Errors are ``{reason, status_code}`` bodies the client's
 ``BackendMenuAdapter.venueReasonFor`` maps: 404 ``notFound`` (the
 platform's 404), 502 ``platformChanged`` (any other non-2xx, an empty or
@@ -47,7 +53,7 @@ from app.keto.models import LlmEngine, Menu, MenuAnalysed, VenueRef, to_json
 from app.platforms.tenbis_menu import map_tenbis_menu
 from app.platforms.wolt_menu import map_wolt_menu
 from app.schemas import ClassificationOptionsBody, ErrorResponse, VenueMenuResponse
-from app.services import menu_store
+from app.services import allergen_matrix, menu_store
 from app.services.auth import reject_authorization
 from app.services.classify import ClassifyContext, classify, dart_now
 from app.services.install_id import require_install_id
@@ -199,6 +205,26 @@ async def _store(request: Request, menu: Menu, analysis: MenuAnalysed) -> None:
         logger.warning("venue_menus store failed source=%s", menu.venue_ref.source)
 
 
+async def _matrix(
+    request: Request, ref: VenueRef
+) -> allergen_matrix.AllergenMatrixWire | None:
+    """The venue's allergen matrix that holds today (ALG-16), or None.
+
+    Keyed by venue alone, as ``stored_menus`` is: no install id is passed
+    in. A failure is logged and swallowed, as the menu store's write is.
+    """
+    today = datetime.now(UTC).date()
+    try:
+        return await run_in_threadpool(
+            lambda: allergen_matrix.current(
+                request.app.state.engine, ref.source, ref.platform_id, today
+            )
+        )
+    except Exception:  # noqa: BLE001 - the matrix must not fail the read
+        logger.warning("venue_menus matrix read failed source=%s", ref.source)
+        return None
+
+
 @router.get(
     "/venue-menus/{source}/{platform_id}",
     response_model=VenueMenuResponse,
@@ -253,15 +279,18 @@ async def read_venue_menu(
         if result is not None:
             analysis = result.analysis
             await _store(request, menu, analysis)
+    matrix = await _matrix(request, ref)
     logger.info(
-        "venue_menus source=%s cache=%s classified=%s",
+        "venue_menus source=%s cache=%s classified=%s matrix=%s",
         source,
         "hit" if upstream.from_cache else "miss",
         analysis is not None,
+        matrix is not None,
     )
     return VenueMenuResponse(
         menu=menu,
         analysis=analysis,
         from_cache=upstream.from_cache,
         fetched_at=fetched_at,
+        allergen_matrix=matrix,
     )

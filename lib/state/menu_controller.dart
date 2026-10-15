@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:ketoclub/models/allergen_matrix.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/failures.dart';
@@ -21,6 +22,7 @@ import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
+import 'package:ketoclub/utils/allergens/allergen_matrix.dart';
 import 'package:ketoclub/utils/allergens/group_evaluator.dart';
 import 'package:ketoclub/utils/allergens/kitchen_reach.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
@@ -415,9 +417,16 @@ final class MenuController extends ChangeNotifier {
           _people,
           heading: heading,
           kitchen: reach,
+          matrix: _matrixEvidenceFor(dish.id),
         ).combined
       : applyKitchenSignals(
-          ProfileEvaluator.evaluate(analysed, dish, _profile, heading: heading),
+          ProfileEvaluator.evaluate(
+            analysed,
+            dish,
+            _profile,
+            heading: heading,
+            matrix: _matrixEvidenceFor(dish.id),
+          ),
           dish,
           _profile,
           reach,
@@ -715,6 +724,47 @@ final class MenuController extends ChangeNotifier {
 
   ({Menu menu, KitchenReach reach})? _kitchenMemo;
 
+  /// The restaurant's allergen matrix for the open venue (Banto, ALG-16,
+  /// related to #358), when KetoClub's backend answered with one and it
+  /// holds on the day the menu was fetched ([AllergenMatrix.holdsOn]
+  /// [Menu.fetchedAt]: the backend chose it for that day, and a cached
+  /// menu keeps the matrix it came with). Null without Banto, before a
+  /// menu is loaded, and for every venue with none.
+  AllergenMatrix? get allergenMatrix {
+    final matrix = _allergenMatrix;
+    final currentMenu = _menu;
+    if (!_bantoMode || matrix == null || currentMenu == null) return null;
+    return matrix.holdsOn(currentMenu.fetchedAt) ? matrix : null;
+  }
+
+  AllergenMatrix? _allergenMatrix;
+
+  /// [allergenMatrix] matched against [menu]
+  /// ([AllergenMatrixMatcher.match]): the row that speaks for each dish,
+  /// and the rows that speak for none. Null when there is no matrix.
+  /// Computed once per (menu, matrix).
+  AllergenMatrixMatch? get allergenMatrixMatch {
+    final matrix = allergenMatrix;
+    final currentMenu = _menu;
+    if (matrix == null || currentMenu == null) return null;
+    final memo = _matrixMemo;
+    if (memo != null &&
+        identical(memo.menu, currentMenu) &&
+        identical(memo.match.matrix, matrix)) {
+      return memo.match;
+    }
+    final match = AllergenMatrixMatcher.match(matrix, currentMenu);
+    _matrixMemo = (menu: currentMenu, match: match);
+    return match;
+  }
+
+  ({Menu menu, AllergenMatrixMatch match})? _matrixMemo;
+
+  /// What the matrix says about the dish [dishId], or
+  /// [MatrixEvidence.none].
+  MatrixEvidence _matrixEvidenceFor(String dishId) =>
+      allergenMatrixMatch?.evidenceFor(dishId) ?? MatrixEvidence.none;
+
   /// How the menu screen words its verdicts for [profile] (Banto, ALG-05,
   /// issue #347): [ProfileWording.ketoOnly] unless the screen that opened
   /// this menu shows Banto surfaces and the profile holds a restriction
@@ -780,9 +830,11 @@ final class MenuController extends ChangeNotifier {
       return const <String, EvaluatedDish>{};
     }
     final memo = _evaluationsMemo;
+    final matrix = allergenMatrix;
     if (memo != null &&
         identical(memo.menu, currentMenu) &&
         identical(memo.analysis, currentAnalysis) &&
+        identical(memo.matrix, matrix) &&
         memo.profile == _profile &&
         listEquals(memo.people, _people)) {
       return memo.evaluations;
@@ -802,6 +854,7 @@ final class MenuController extends ChangeNotifier {
                 _people,
                 heading: category.name,
                 kitchen: reach,
+                matrix: _matrixEvidenceFor(dish.id),
               ),
     };
     final evaluations = <String, EvaluatedDish>{
@@ -816,6 +869,7 @@ final class MenuController extends ChangeNotifier {
                     dish,
                     _profile,
                     heading: category.name,
+                    matrix: _matrixEvidenceFor(dish.id),
                   ),
                   dish,
                   _profile,
@@ -825,6 +879,7 @@ final class MenuController extends ChangeNotifier {
     _evaluationsMemo = (
       menu: currentMenu,
       analysis: currentAnalysis,
+      matrix: matrix,
       profile: _profile,
       people: _people,
       evaluations: evaluations,
@@ -836,6 +891,7 @@ final class MenuController extends ChangeNotifier {
   ({
     Menu menu,
     MenuAnalysed analysis,
+    AllergenMatrix? matrix,
     DietaryProfile profile,
     List<NamedProfile> people,
     Map<String, EvaluatedDish> evaluations,
@@ -1040,8 +1096,10 @@ final class MenuController extends ChangeNotifier {
         :final fromCache,
         :final staleReason,
         analysis: final fetchedAnalysis,
+        :final allergenMatrix,
       ):
         _menu = fetchedMenu;
+        _allergenMatrix = allergenMatrix;
         _isFromCache = fromCache;
         _staleReason = staleReason;
         _fetchFailure = null;
@@ -1072,6 +1130,7 @@ final class MenuController extends ChangeNotifier {
         );
       case MenuFetchFailed(:final reason, :final statusCode):
         _menu = null;
+        _allergenMatrix = null;
         _analysis = null;
         _isFromCache = false;
         _staleReason = null;
@@ -1245,12 +1304,14 @@ final class MenuController extends ChangeNotifier {
         :final fromCache,
         :final staleReason,
         analysis: final fetchedAnalysis,
+        :final allergenMatrix,
       ):
         final unchanged =
             previousMenu != null &&
             TextNormaliser.menuFingerprint(previousMenu) ==
                 TextNormaliser.menuFingerprint(fetchedMenu);
         _menu = fetchedMenu;
+        _allergenMatrix = allergenMatrix;
         _isFromCache = fromCache;
         _staleReason = staleReason;
         _fetchFailure = null;

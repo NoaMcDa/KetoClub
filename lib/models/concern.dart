@@ -54,7 +54,14 @@ enum ConcernSource {
   /// it is written nowhere unless a kitchen concern is; its
   /// [Concern.matchedText] holds the kitchen signal kind's name ("fryer"),
   /// not menu text.
-  kitchen;
+  kitchen,
+
+  /// Not in the menu text: the restaurant's own allergen matrix lists the
+  /// dish as containing it or maybe containing it (ALG-16,
+  /// `utils/allergens/allergen_matrix.dart`). Made on the device only,
+  /// like [kitchen], always at [EvidenceTier.declared]; its
+  /// [Concern.matchedText] is null.
+  matrix;
 
   /// The source whose [name] equals [wire], or null when none does.
   static ConcernSource? tryParse(String wire) =>

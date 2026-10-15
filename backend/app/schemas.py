@@ -10,10 +10,12 @@ from pydantic import (
     ConfigDict,
     Field,
     PrivateAttr,
+    SerializerFunctionWrapHandler,
     StrictBool,
     StrictInt,
     StringConstraints,
     field_validator,
+    model_serializer,
     model_validator,
 )
 
@@ -25,6 +27,7 @@ from app.keto.models import (
     WireModel,
 )
 from app.keto.vocabulary import vocabulary
+from app.services.allergen_matrix import AllergenMatrixWire
 from app.services.wolt import WoltLang
 
 
@@ -405,12 +408,27 @@ class VenueMenuResponse(WireModel):
     cache rather than a fresh upstream fetch, and ``fetchedAt`` (ISO-8601,
     as Dart writes it) is when that upstream fetch happened: the same
     instant as ``menu.fetchedAt``.
+
+    ``allergenMatrix`` (ALG-16, #358) is the restaurant's allergen matrix
+    for the venue that holds today, when the maintainer entered one; the
+    key is **omitted** when there is none, so every answer without a matrix
+    is the bytes it was before the field existed.
     """
 
     menu: Menu
     analysis: MenuAnalysed | None
     from_cache: bool
     fetched_at: str
+    allergen_matrix: AllergenMatrixWire | None = None
+
+    @model_serializer(mode="wrap")
+    def _omit_absent_matrix(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, Any]:
+        data: dict[str, Any] = handler(self)
+        if self.allergen_matrix is None:
+            data.pop("allergenMatrix", None)
+        return data
 
     @field_validator("fetched_at")
     @classmethod
