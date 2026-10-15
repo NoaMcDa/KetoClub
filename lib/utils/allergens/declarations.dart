@@ -41,10 +41,11 @@ const List<String> kosherTags = <String>['kosher', 'כשר'];
 /// Whether a declaration says a restriction's trigger is absent or
 /// present.
 ///
-/// Every rule in [declarationRules] declares an absence. [present] is the
-/// shape a restaurant's allergen matrix (ALG-16) will add; nothing emits
-/// it yet, and the evaluator leaves it to the matcher, which already
-/// reads a "contains" phrase as a stated trigger.
+/// Every rule in [declarationRules] declares an absence, as does a
+/// restaurant allergen matrix's `free` cell (ALG-16). Nothing emits
+/// [present]: a matrix's `contains` cell becomes a concern of its own
+/// (`ConcernSource.matrix`), and the matcher already reads a "contains"
+/// phrase as a stated trigger.
 enum DeclarationPolarity {
   /// The dish is declared free of it ("gluten-free", "טבעוני").
   absent,
@@ -63,6 +64,12 @@ enum DeclarationSource {
 
   /// The dish's category heading, written by the restaurant.
   heading,
+
+  /// The restaurant's allergen matrix (ALG-16,
+  /// `utils/allergens/allergen_matrix.dart`): a `free` cell. Made on the
+  /// device only; its [Declaration.matchedText] is the matrix row's
+  /// printed name, so the user can see which row spoke for the dish.
+  allergenMatrix,
 }
 
 /// One kind of self-declaration and what it says.

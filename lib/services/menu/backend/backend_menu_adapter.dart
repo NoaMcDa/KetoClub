@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:ketoclub/models/allergen_matrix.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
@@ -11,6 +12,7 @@ import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/menu/website/backend_website_fetcher.dart';
 import 'package:ketoclub/services/storage/install_id_store.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
 
 /// Reads a complete menu, and usually its analysis, from KetoClub's
 /// backend in one request (architecture.md D25, issue #327;
@@ -39,6 +41,12 @@ import 'package:ketoclub/services/storage/install_id_store.dart';
 /// [MenuResponseParser.schemaVersion]; otherwise it is dropped and the
 /// device classifies the menu as it would any other.
 ///
+/// **The restaurant's allergen matrix (Banto, ALG-16).** With [bantoMode]
+/// on, a venue answer's optional `allergenMatrix` is read tolerantly onto
+/// [MenuFetched.allergenMatrix] (absent or unreadable → null); without it
+/// the key is never read, so a KetoClub build is unchanged. Nothing about
+/// the profile is sent for it (D26 C1).
+///
 /// **No credentials.** The only identifying value sent is the anonymous
 /// install id, as `X-KetoClub-Install-Id`; never an `Authorization`
 /// header.
@@ -65,6 +73,7 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
     required this.source,
     required Future<ClassificationOptions> Function() readOptions,
     this.timeout = const Duration(seconds: 25),
+    this.bantoMode = BantoMode.enabled,
   })
     // Private fields, public parameter names.
     // ignore: prefer_initializing_formals
@@ -85,6 +94,9 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
 
   /// How long the single HTTP request is given before it is abandoned.
   final Duration timeout;
+
+  /// Whether this build reads Banto's fields: the allergen matrix.
+  final bool bantoMode;
 
   @override
   final MenuSource source;
@@ -302,6 +314,9 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
         venueName: menu.venueName,
       ),
       analysis: _reusable(analysis, options) ? analysis : null,
+      allergenMatrix: bantoMode
+          ? AllergenMatrix.tryFrom(decoded['allergenMatrix'])
+          : null,
     );
   }
 

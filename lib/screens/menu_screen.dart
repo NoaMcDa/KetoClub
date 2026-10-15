@@ -31,6 +31,7 @@ import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
 import 'package:ketoclub/utils/profile_wording.dart';
 import 'package:ketoclub/utils/venue_route.dart';
+import 'package:ketoclub/widgets/allergen_matrix_notice.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/app_notice.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
@@ -758,6 +759,13 @@ class _MenuScreenState extends State<MenuScreen> {
         KitchenNotice(
           kitchen: controller.kitchen,
           profile: controller.profile,
+          bantoMode: widget.bantoMode,
+        ),
+      // The restaurant's own allergen information, dated (Banto, ALG-16):
+      // a fact about where it came from, never a badge.
+      if (widget.bantoMode)
+        AllergenMatrixNotice(
+          match: controller.allergenMatrixMatch,
           bantoMode: widget.bantoMode,
         ),
       if (controller.engine != null) ...[

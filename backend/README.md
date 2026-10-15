@@ -637,6 +637,90 @@ curl -sS localhost:8000/v1/confirmations \
 # {"counted":true}
 ```
 
+## Restaurant allergen matrices (Banto, ALG-16, #358)
+
+A restaurant's own allergen matrix for one venue and date: what the
+restaurant says each dish contains, may contain or is free of. It is stored
+in the `allergen_matrices` table beside `stored_menus`, **keyed by venue**
+(`source`, `platform_id`, the same keying as the menu store) plus the first
+day it holds (`valid_from`), and has **no install-id column**. There is no
+public write route and no account system: the maintainer enters a matrix
+with `tools/allergen_matrix.py` (below). `GET /v1/venue-menus` returns the
+one that holds today (UTC; of several, the latest `validFrom`) as an
+optional `allergenMatrix` key, which is **omitted** when the venue has none,
+so every other answer is byte-for-byte what it was. Matching a row to a dish
+is done on the device (`lib/utils/allergens/allergen_matrix.dart`), never
+here.
+
+**The JSON intake document** (one per venue and date):
+
+```json
+{
+  "venue": {"source": "wolt", "platformId": "hamosad"},
+  "source": "restaurant",
+  "enteredBy": "Maintainer name",
+  "validFrom": "2026-10-01",
+  "validUntil": "2027-03-31",
+  "rows": [
+    {"name": "שקשוקה", "aliases": ["Shakshuka"],
+     "allergens": {"eggs": "contains", "gluten": "may_contain", "sesame": "free"}},
+    {"name": "Tahini salad", "allergens": {"sesame": "contains", "milk": ""}}
+  ]
+}
+```
+
+| Field | Rule |
+|---|---|
+| `venue.source` | `wolt` or `tenbis` (the platforms `/v1/venue-menus` serves) |
+| `venue.platformId` | The platform's id, under the menu proxy's patterns (a Wolt slug, a 10bis restaurant id) |
+| `source` | Where the restaurant's information was read: `restaurant` (sent by it), `printed` (printed or posted at the venue) or `website` (on its site). Every value is the restaurant's own word |
+| `enteredBy` | Who typed it in, at most 200 characters. Stored for the maintainer's audit; **never sent to the app** |
+| `validFrom`, `validUntil` | `YYYY-MM-DD`; `validUntil` is the last day it holds, optional (null or absent: until replaced), never before `validFrom` |
+| `rows` | 1 to 500 dishes |
+| `rows[].name` | The dish's name as printed, 1 to 200 characters |
+| `rows[].aliases` | Up to 5 other printed names (the English name on a Hebrew menu, say), matched exactly like `name` |
+| `rows[].allergens` | Column → cell. Columns are the **EU 14** by taxonomy id: `gluten` (cereals containing gluten: the celiac entry, never `wheat`), `crustaceans`, `eggs`, `fish`, `peanuts`, `soy`, `milk`, `treeNuts`, `celery`, `mustard`, `sesame`, `sulphites`, `lupin`, `molluscs`. Cells are `contains`, `may_contain` or `free`; a blank cell (`""`, `null` or absent) says nothing |
+
+Two rows whose names (or aliases) normalise alike (`app.keto.normaliser`,
+the parser's own key: case, punctuation, quote marks, diacritics and Hebrew
+final letters fold) name one dish to the device, so the document is refused.
+Any problem refuses the whole document, naming the row or field; nothing is
+half-written.
+
+**The CSV form** carries the rows only; the rest comes from flags. The
+header names `name`, optionally `aliases` (several separated by `|`), and
+any EU 14 columns in any order; a cell is `contains`, `may_contain` (or
+`may contain`), `free` or empty, in any case; a UTF-8 byte-order mark is
+fine. `template` prints an empty CSV with every column:
+
+```csv
+name,aliases,gluten,eggs,sesame,milk
+שקשוקה,Shakshuka,may_contain,contains,free,
+Tahini salad,,,,contains,
+```
+
+**The maintainer CLI** (run from `backend/`; the database is `DATABASE_URL`
+from `.env`, or `--database-url`):
+
+```bash
+uv run python tools/allergen_matrix.py template > matrix.csv
+uv run python tools/allergen_matrix.py import matrix.json
+uv run python tools/allergen_matrix.py import matrix.csv --venue wolt/hamosad \
+  --source restaurant --entered-by "Maintainer name" --valid-from 2026-10-01
+uv run python tools/allergen_matrix.py list wolt/hamosad
+uv run python tools/allergen_matrix.py remove wolt/hamosad 2026-10-01
+```
+
+Importing again for the same venue and `validFrom` replaces that matrix.
+A refused file exits 1 with `refused: <why>` on stderr.
+
+**On the wire**, `allergenMatrix` is `{source, validFrom, validUntil, rows:
+[{name, aliases, allergens}]}` (no `enteredBy`). A matrix is a fact the app
+shows as "Allergen information from the restaurant, dated …", never a badge
+or a rating, and nothing a restaurant does can buy one (architecture.md D26).
+Not built yet: reading a photographed printed matrix, user-submitted matrix
+photos, and a restaurant-facing upload page.
+
 ## Running locally
 
 ```bash

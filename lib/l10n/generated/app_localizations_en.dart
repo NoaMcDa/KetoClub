@@ -1468,10 +1468,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get whyTierSuspected => 'Suspected — please ask';
 
   @override
-  String get whyTierConfirmed => 'Confirmed by you';
+  String get whyTierConfirmed => 'Confirmed with the staff';
 
   @override
-  String get whyTierDenied => 'Ruled out by you';
+  String get whyTierDenied => 'The staff said it is not there — still ask';
 
   @override
   String get whySourceName => 'Found in the dish name';
@@ -1944,6 +1944,38 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get concernCertaintyHeadsUp =>
       'may be high in it — a heads-up, not a measurement';
+
+  @override
+  String allergenMatrixNotice(String date) {
+    return 'Allergen information from the restaurant, dated $date';
+  }
+
+  @override
+  String allergenMatrixUnmatched(int count, String rows) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count lines of it match no dish on this menu: $rows',
+      one: '1 line of it matches no dish on this menu: $rows',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get concernSourceMatrix => 'restaurant\'s allergen information';
+
+  @override
+  String get whySourceMatrix =>
+      'Listed in the restaurant\'s own allergen information';
+
+  @override
+  String get whyTierDeclaredMatrix =>
+      'Declared in the restaurant\'s allergen information';
+
+  @override
+  String whyMatrixAbsent(String row) {
+    return 'Listed as free of it, as “$row” — this lowers the finding but never rules it out';
+  }
 
   @override
   String get confirmPromptOpen => 'Did you ask the staff?';

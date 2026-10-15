@@ -18,6 +18,7 @@ void main() {
         'hidden',
         'model',
         'kitchen',
+        'matrix',
       ]);
       expect(_names(Certainty.values), ['stated', 'likely', 'suspected']);
       expect(_names(EvidenceTier.values), [

@@ -64,11 +64,14 @@ String whyTierPhrase(AppLocalizations l10n, EvidenceTier tier) =>
 /// The tier phrase for a concern at [EvidenceTier.declared] that
 /// [declaration] lowered (ALG-09): "declared by the platform" for a
 /// platform tag, "declared by the restaurant" for the dish's own text or
-/// its heading. Without a declaration it is [whyTierPhrase]'s.
+/// its heading, "declared in the restaurant's allergen information" for a
+/// matrix's `free` cell (ALG-16). Without a declaration it is
+/// [whyTierPhrase]'s.
 String whyDeclaredTierPhrase(AppLocalizations l10n, Declaration? declaration) =>
     switch (declaration?.source) {
       DeclarationSource.dishText ||
       DeclarationSource.heading => l10n.whyTierDeclaredRestaurant,
+      DeclarationSource.allergenMatrix => l10n.whyTierDeclaredMatrix,
       DeclarationSource.platformTag || null => l10n.whyTierDeclared,
     };
 
@@ -81,6 +84,7 @@ String whySourcePhrase(AppLocalizations l10n, ConcernSource source) =>
       ConcernSource.hidden => l10n.whySourceHidden,
       ConcernSource.model => l10n.whySourceModel,
       ConcernSource.kitchen => l10n.whySourceKitchenGeneric,
+      ConcernSource.matrix => l10n.whySourceMatrix,
     };
 
 /// The line saying where [concern] was found: [whySourcePhrase], except
@@ -313,7 +317,13 @@ class _ConcernRow extends StatelessWidget {
           Text(name, style: theme.textTheme.titleSmall),
           const SizedBox(height: 2),
           Text(
-            concern.tier == EvidenceTier.declared
+            // The restaurant's allergen matrix declares its own concerns
+            // (ALG-16), with no declaration to name.
+            concern.tier == EvidenceTier.declared &&
+                    declaration == null &&
+                    concern.source == ConcernSource.matrix
+                ? l10n.whyTierDeclaredMatrix
+                : concern.tier == EvidenceTier.declared
                 ? whyDeclaredTierPhrase(l10n, declaration)
                 : whyTierPhrase(l10n, concern.tier),
             style: theme.textTheme.labelLarge,
@@ -325,7 +335,9 @@ class _ConcernRow extends StatelessWidget {
           if (declaration case final declared?) ...[
             const SizedBox(height: 2),
             Text(
-              l10n.whyDeclaredAbsent(declared.matchedText),
+              declared.source == DeclarationSource.allergenMatrix
+                  ? l10n.whyMatrixAbsent(declared.matchedText)
+                  : l10n.whyDeclaredAbsent(declared.matchedText),
               style: theme.textTheme.bodyMedium,
             ),
           ],

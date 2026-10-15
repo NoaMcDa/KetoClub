@@ -16,6 +16,7 @@ import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/utils/allergens/allergen_matrix.dart';
 import 'package:ketoclub/utils/allergens/confirmations.dart';
 import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/kitchen_reach.dart';
@@ -161,7 +162,8 @@ abstract final class GroupEvaluator {
   ///
   /// Each person goes through exactly the single-profile pipeline:
   /// [ProfileEvaluator.evaluate] with [hebrew] and the section [heading]
-  /// (its declarations, ALG-09), then [applyKitchenSignals] with [kitchen]
+  /// (its declarations, ALG-09) and the restaurant's allergen [matrix]
+  /// (ALG-16), then [applyKitchenSignals] with [kitchen]
   /// (ALG-07) for that person's profile — so a fryer demotes a dish for
   /// the person whose strict entry it reaches, and the strictest state
   /// carries it. What the staff said about the dish ([confirmations],
@@ -175,6 +177,7 @@ abstract final class GroupEvaluator {
     bool? hebrew,
     String? heading,
     KitchenReach kitchen = KitchenReach.empty,
+    MatrixEvidence matrix = MatrixEvidence.none,
     List<ConfirmationEvidence> confirmations = const <ConfirmationEvidence>[],
   }) {
     final results = <PersonEvaluation>[
@@ -188,6 +191,7 @@ abstract final class GroupEvaluator {
               person.profile,
               hebrew: hebrew,
               heading: heading,
+              matrix: matrix,
               confirmations: confirmations,
             ),
             dish,
