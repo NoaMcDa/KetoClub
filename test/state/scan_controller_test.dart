@@ -3,8 +3,10 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
@@ -478,6 +480,44 @@ void main() {
           carnivoreOnly: false,
         ),
       );
+    });
+
+    test('a Banto profile asks for ingredients, as the menu screen does '
+        '(ALG-03)', () async {
+      // Arrange
+      final sesame = AppSettings(
+        profile: DietaryProfile.empty.withEntry(RestrictionId.sesame),
+      );
+      await settings.write(sesame);
+      final banto = ScanController(
+        classifier: classifier,
+        repository: repository,
+        clock: FakeClock(_epoch),
+        settingsStore: settings,
+        bantoMode: true,
+      );
+      addTearDown(banto.dispose);
+      banto.addPages(distinct(1));
+      controller.addPages(distinct(1));
+
+      // Act
+      await banto.analysePages();
+      await controller.analysePages();
+
+      // Assert: the Banto options match what MenuController.open builds,
+      // so the stored analysis is reused, not re-read as text.
+      final (bantoCall, ketoCall) = (
+        classifier.calls[0].$2,
+        classifier.calls[1].$2,
+      );
+      expect(bantoCall.restrictionsRequested, isTrue);
+      expect(
+        bantoCall.matches(
+          ClassificationOptions.fromSettings(sesame, bantoMode: true).snapshot,
+        ),
+        isTrue,
+      );
+      expect(ketoCall.restrictionsRequested, isFalse);
     });
 
     test('movePage during an analysis does nothing', () async {

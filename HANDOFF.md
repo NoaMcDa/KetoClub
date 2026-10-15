@@ -318,6 +318,46 @@ exist, which keeps them out of the coverage denominator.
 
 ---
 
+## Banto (D26, the Allergens epic #342)
+
+Banto reads a menu for a profile of dietary restrictions, not keto alone.
+Read `architecture.md` D26 (its C1–C3 contract decisions amend the epic in
+`allergen app documentation/10_epic_allergens.md`) and §6.2, §9.6 and §11.
+Everything sits behind `--dart-define=BANTO_MODE=true`; without it the app
+is KetoClub byte for byte, which `test/architecture/keto_unchanged_test.dart`
+pins.
+
+**What exists, on `banto`.** The 25-restriction taxonomy and the bilingual
+vocabulary with its golden and Python twin (ALG-01, ALG-17), the rules-recall
+gate over the labelled corpus (ALG-10), the on-device profile, onboarding and
+group profiles (ALG-02, ALG-12), the profile-independent ingredient
+extraction on every source (ALG-03), the rules pass and `ProfileEvaluator`
+(ALG-04), the four-state menu (ALG-05), evidence tiers, the Why sheet and its
+coverage note (ALG-06), kitchen cross-contact signals (ALG-07), chef cards and
+the allergy note (ALG-08, ALG-15), platform and restaurant declarations
+(ALG-09), the privacy and helper-tool copy with a disclosure shown once more
+for the Banto text (ALG-11), and the GLP-1 "protein-forward · small portion"
+tag. The profile never leaves the device (C1); only the flag asking for
+ingredients does.
+
+**Deliberately unfinished.**
+
+- ALG-13 (trip mode), ALG-14 (post-meal confirmations), ALG-16 (allergen
+  matrices) and ALG-18 (premium gating) are in progress or not started.
+- The model evaluation, `backend/tools/allergen_eval.py`, has never been
+  run with a real key: `docs/ALLERGEN_EVAL.md` says "not yet run", and no
+  extraction request has gone to a real model. Recall figures in D26 are the
+  rules alone.
+- The research behind the vocabulary and the corpus labels (files 11 and 12
+  of `allergen app documentation/`, `test/fixtures/allergens/`) is desk
+  research, marked unreviewed: no dietitian, allergist or lawyer has read it.
+  `docs/TERMS_NOTES.md` needs counsel review before a store listing.
+- Recorded follow-ups: the GLP-1 sort (only the tag is built), a chef card
+  translated for a menu in neither Hebrew nor English, and a reach for the
+  nuts and sesame kitchen signals (they demote nothing, pending the owner).
+
+---
+
 ## Outstanding before release
 
 Several things are genuinely unfinished. None is a surprise; each is unfinished

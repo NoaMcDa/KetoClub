@@ -3,7 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_en.dart';
 import 'package:ketoclub/l10n/generated/app_localizations_he.dart';
+import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/concern.dart';
+import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
 import 'package:ketoclub/widgets/why_sheet.dart';
@@ -39,6 +41,7 @@ Future<void> _pump(
   Locale locale = const Locale('en'),
   bool strictProfile = true,
   bool bantoMode = true,
+  WhyCoverage? coverage,
 }) => tester.pumpWidget(
   _app(
     Scaffold(
@@ -46,6 +49,7 @@ Future<void> _pump(
         dishName: 'Falafel plate',
         concerns: concerns,
         strictProfile: strictProfile,
+        coverage: coverage,
         bantoMode: bantoMode,
       ),
     ),
@@ -370,6 +374,114 @@ void main() {
       await open(tester, const Size(400, 800), bantoMode: false);
 
       expect(find.byType(WhySheet), findsNothing);
+    });
+  });
+
+  group('coverage note (ALG-06)', () {
+    const plain = Dish(
+      id: 'd',
+      name: 'Hummus',
+      description: '',
+      price: 10,
+      options: <DishOption>[],
+    );
+    const full = Dish(
+      id: 'd',
+      name: 'Hummus',
+      description: 'With tahini',
+      price: 10,
+      options: <DishOption>[
+        DishOption(name: 'Extras', values: <String>['Egg']),
+      ],
+    );
+    const keto = AnalysedDish(
+      dishId: 'd',
+      name: 'Hummus',
+      verdict: DishVerdict.orderAsIs,
+      why: 'why',
+    );
+    const extracted = AnalysedDish(
+      dishId: 'd',
+      name: 'Hummus',
+      verdict: DishVerdict.orderAsIs,
+      why: 'why',
+      ingredients: <ExtractedIngredient>[
+        ExtractedIngredient(name: 'chickpeas', certainty: Certainty.stated),
+      ],
+    );
+
+    test('of reads the description, the options and the model list', () {
+      expect(
+        WhyCoverage.of(plain, keto),
+        const WhyCoverage(
+          hasDescription: false,
+          hasOptions: false,
+          modelIngredients: false,
+        ),
+      );
+      expect(
+        WhyCoverage.of(full, extracted),
+        const WhyCoverage(
+          hasDescription: true,
+          hasOptions: true,
+          modelIngredients: true,
+        ),
+      );
+      expect(
+        WhyCoverage.of(plain, keto).hashCode,
+        WhyCoverage.of(plain, keto).hashCode,
+      );
+      expect(WhyCoverage.of(full, keto).toString(), contains('options: true'));
+    });
+
+    test('every menu line is distinct, and the rules alone end on asking', () {
+      final lines = <String>{
+        for (final description in <bool>[true, false])
+          for (final options in <bool>[true, false])
+            WhyCoverage(
+              hasDescription: description,
+              hasOptions: options,
+              modelIngredients: false,
+            ).menuLine(_en),
+      };
+
+      expect(lines, hasLength(4));
+      expect(
+        const WhyCoverage(
+          hasDescription: false,
+          hasOptions: false,
+          modelIngredients: false,
+        ).readerLine(_en),
+        endsWith('Ask the restaurant.'),
+      );
+      expect(
+        const WhyCoverage(
+          hasDescription: false,
+          hasOptions: false,
+          modelIngredients: true,
+        ).readerLine(_he),
+        _he.whyCoverageModelAndRules,
+      );
+    });
+
+    testWidgets('shows under the dish name, with no number', (tester) async {
+      await _pump(tester, const [], coverage: WhyCoverage.of(full, keto));
+
+      expect(
+        find.text('${_en.whyCoverageFull} ${_en.whyCoverageRulesOnly}'),
+        findsOneWidget,
+      );
+      expect(
+        tester.getTopLeft(find.byKey(whyDishNameKey)).dy,
+        lessThan(tester.getTopLeft(find.byKey(whyCoverageKey)).dy),
+      );
+      expect(find.textContaining(RegExp('[0-9%]')), findsNothing);
+    });
+
+    testWidgets('is absent without a coverage', (tester) async {
+      await _pump(tester, const []);
+
+      expect(find.byKey(whyCoverageKey), findsNothing);
     });
   });
 }
