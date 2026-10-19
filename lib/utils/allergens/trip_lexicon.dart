@@ -5,9 +5,12 @@
 /// hide a restriction there without naming it: soba is often part wheat,
 /// dashi is fish stock, a French pastry may hold lupin flour, a German
 /// roulade is spread with mustard. Each [TripLexiconEntry] cites the
-/// allergen documentation section it comes from (file 11 or 12); the
-/// country sections of file 12 §8 are **unreviewed desk research**, and
-/// their wording must be checked in a browser before it ships.
+/// allergen documentation section it comes from (file 11 or 12). File 12
+/// §8's country sections were checked against web search results on
+/// 2026-10-19 for the entries a wrong claim would hurt most (soba, soy
+/// sauce, dashi, French lupin flour, German mustard, and every gloss that
+/// says a dish is commonly made with an allergen); the rest is still
+/// desk research, marked as such there, and no page was read in full.
 ///
 /// Two readers:
 ///
@@ -183,8 +186,12 @@ const List<TripLexiconEntry> _israel = <TripLexiconEntry>[
   TripLexiconEntry(
     terms: <String>['Bamba'],
     hides: <RestrictionId>[_peanuts, _soy],
-    glossEn: 'Peanut puffs: classic Bamba is about half ground peanuts.',
-    glossHe: 'במבה: חטיף בוטנים, כמחציתו בוטנים טחונים.',
+    glossEn:
+        'Peanut puffs: classic Bamba is about half ground peanuts; the '
+        'pack lists soy too (some export packs as "may contain").',
+    glossHe:
+        'במבה: חטיף בוטנים, כמחציתו בוטנים טחונים; גם סויה מופיעה '
+        'באריזה (בחלק מאריזות הייצוא כ"עלול להכיל").',
     source: '12 §1.2',
   ),
   TripLexiconEntry(
@@ -201,8 +208,10 @@ const List<TripLexiconEntry> _israel = <TripLexiconEntry>[
   TripLexiconEntry(
     terms: <String>['falafel'],
     hides: <RestrictionId>[_legumes, _sesame],
-    glossEn: 'Chickpea or fava balls; many batters hold sesame.',
-    glossHe: 'כדורי חומוס או פול; בבלילות רבות יש שומשום.',
+    glossEn:
+        'Chickpea or fava balls; some batters hold sesame, and it is '
+        'served with tahini.',
+    glossHe: 'כדורי חומוס או פול; בחלק מהבלילות יש שומשום, והוא מוגש עם טחינה.',
     source: '12 §1.3',
   ),
   TripLexiconEntry(
@@ -788,9 +797,9 @@ const List<TripLexiconEntry> _germany = <TripLexiconEntry>[
     terms: <String>['Senf'],
     hides: <RestrictionId>[_mustard],
     glossEn:
-        'Mustard: in sauces, dressings, marinades and on every '
-        'sausage.',
-    glossHe: 'חרדל: ברטבים, ברטבי סלט, במרינדות ועל כל נקניקייה.',
+        'Mustard: in sauces, dressings and marinades, and served '
+        'with sausages.',
+    glossHe: 'חרדל: ברטבים, ברטבי סלט ובמרינדות, ומוגש עם נקניקיות.',
     source: '12 §8.6',
   ),
   TripLexiconEntry(
@@ -938,17 +947,21 @@ const List<TripLexiconEntry> _japan = <TripLexiconEntry>[
   TripLexiconEntry(
     terms: <String>['shoyu', 'soy sauce'],
     hides: <RestrictionId>[_wheat, _gluten, _soy],
-    glossEn: 'Soy sauce is brewed with wheat; it is in most sauces.',
-    glossHe: 'רוטב סויה נרקח עם חיטה; הוא נמצא ברוב הרטבים.',
+    glossEn:
+        'Standard soy sauce is brewed with wheat; it goes into many '
+        'Japanese sauces.',
+    glossHe: 'רוטב סויה רגיל נרקח עם חיטה; הוא נכנס לרטבים יפניים רבים.',
     source: '11 §7.2',
   ),
   TripLexiconEntry(
     terms: <String>['dashi'],
     hides: <RestrictionId>[_fish],
     glossEn:
-        'Stock made from bonito (fish) flakes: the base of soups, '
-        'sauces and broths.',
-    glossHe: 'ציר מפתיתי דג בוניטו: הבסיס של מרקים, רטבים וצירים.',
+        'Stock usually made with bonito (fish) flakes or dried '
+        'sardines: the base of soups, sauces and broths.',
+    glossHe:
+        'ציר שמכינים לרוב מפתיתי דג בוניטו או מסרדינים מיובשים: הבסיס '
+        'של מרקים, רטבים וצירים.',
     source: '11 §8.1',
   ),
   TripLexiconEntry(

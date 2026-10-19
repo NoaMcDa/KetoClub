@@ -15,9 +15,12 @@
 /// EU, the UK and Israel add gluten cereals, celery, mustard, sesame,
 /// lupin, molluscs and sulphites; Canada adds mustard, molluscs, sesame,
 /// gluten and sulphites; Australia and New Zealand add sesame, lupin,
-/// molluscs and sulphites; Japan's mandatory list covers milk, eggs, wheat,
-/// peanuts, crustaceans (shrimp, crab) and tree nuts (walnut) — its soy,
-/// sesame and fish are only recommended, and buckwheat has no id yet.
+/// molluscs, sulphites and gluten (PEAL declares "gluten" beside wheat,
+/// barley, oats and rye); Japan's mandatory list covers milk, eggs, wheat,
+/// peanuts, crustaceans (shrimp, crab) and tree nuts (walnut, and cashew
+/// since 1 April 2026) — its soy, sesame, fish and molluscs (squid,
+/// abalone) are only recommended, and buckwheat has no id yet. Checked
+/// 2026-10-19 (file 02, "The lists"; file 12 §8.1).
 ///
 /// ALG-17 adds alpha-gal syndrome (an allergen: strict), FODMAP and
 /// histamine (intolerances: flexible), small portions for GLP-1 eating (a
@@ -124,7 +127,11 @@ const List<Restriction> restrictionTaxonomy = <Restriction>[
   Restriction(
     id: RestrictionId.gluten,
     kind: RestrictionKind.autoimmune,
-    jurisdictions: <Jurisdiction>{..._euUkIl, Jurisdiction.ca},
+    jurisdictions: <Jurisdiction>{
+      ..._euUkIl,
+      Jurisdiction.ca,
+      Jurisdiction.anz,
+    },
     nameEn: 'Gluten',
     nameHe: 'גלוטן',
     source: '11 §7',
@@ -297,22 +304,34 @@ Restriction restrictionFor(RestrictionId id) => restrictionTaxonomy[id.index];
 /// What a jurisdiction's allergen list binds (ALG-13, trip mode): food sold
 /// packaged, or also the food a restaurant serves. [Restriction.jurisdictions]
 /// says which lists name a restriction; this says whether naming it there
-/// obliges a restaurant to tell a diner anything.
+/// obliges a restaurant to tell a diner anything. Checked against web
+/// sources on 2026-10-19 (file 12 §8.1 has each source and its URL).
 enum ListScope {
   /// The list binds non-prepacked food too: a restaurant must be able to
   /// tell a diner which of the listed allergens a dish holds. The EU's
-  /// Regulation 1169/2011 and the UK's rules (file 02, "The lists"; file
-  /// 11 §19.2).
+  /// Regulation 1169/2011, Article 44 (the means — in writing or orally —
+  /// are left to each member state), and the UK's Food Information
+  /// Regulations 2014, where telling orally is enough if a sign says so;
+  /// the FSA's 2025 advice to give it in writing is best practice, not law
+  /// (file 02, "The lists"; file 11 §19.2; file 12 §8.1).
   restaurants,
 
   /// The list binds packaged food only, and a restaurant owes a diner
-  /// nothing: Israel's 2028 rule (file 12 §4.2; file 11 §19.3) and Japan's
-  /// labelling law, which exempts food service (file 12 §8.1).
+  /// nothing today: Israel's rule, mandatory for prepacked food from
+  /// 1 January 2028, with non-prepacked food deferred (a Ministry guide
+  /// is reported to name 1 January 2032; unconfirmed), and Japan's Food
+  /// Labeling Standards, which leave restaurants and food sold over the
+  /// counter outside the allergen rules (file 12 §4.2, §8.1; file 11
+  /// §19.3).
   packagedFood,
 
-  /// The list binds packaged food (the FASTER Act), and only some chains
-  /// must list allergens per dish: California's SB 68, chains with 20 or
-  /// more locations, from 1 July 2026 (file 02; file 06; file 12 §8.1).
+  /// The list binds packaged food (FALCPA and the FASTER Act), and only
+  /// some chains must list allergens per dish: California's SB 68 (the
+  /// ADDE Act, signed 13 October 2025), which from 1 July 2026 requires
+  /// a chain of 20 or more locations to give written notice, on the menu
+  /// or digitally, of which of the nine major allergens each item holds
+  /// as an ingredient — and nothing about cross-contact (file 06; file 12
+  /// §5, §8.1).
   packagedFoodAndLargeChains,
 }
 

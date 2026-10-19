@@ -151,6 +151,24 @@ void main() {
       }
     });
 
+    test('the fact-checked glosses keep their hedges (checked '
+        '2026-10-19; file 12 §8)', () {
+      String gloss(TripDestination destination, String term) =>
+          TripLexicon.entriesFor(destination)
+              .singleWhere((entry) => entry.terms.contains(term))
+              .glossEn;
+
+      // Kelp-only dashi exists: "usually", never "made from".
+      expect(gloss(TripDestination.japan, 'dashi'), contains('usually'));
+      // Tamari can be brewed without wheat: "standard" soy sauce.
+      expect(gloss(TripDestination.japan, 'shoyu'), startsWith('Standard'));
+      // One published recipe is no "many".
+      expect(gloss(TripDestination.israel, 'falafel'), contains('some'));
+      // Osem lists soy; export packs print it as "may contain".
+      expect(gloss(TripDestination.israel, 'Bamba'), contains('soy'));
+      expect(gloss(TripDestination.germany, 'Senf'), isNot(contains('every')));
+    });
+
     test('restrictions add what follows by definition', () {
       const dashi = TripLexiconEntry(
         terms: <String>['dashi'],
