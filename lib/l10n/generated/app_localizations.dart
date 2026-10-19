@@ -3533,6 +3533,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'On {date} the staff told you it is not in the dish. That holds for that visit only, so ask again each time.'**
   String whyDeniedOn(DateTime date);
+
+  /// Banto (ALG-15): heading of the dish's allergy note under the per-dish chef card.
+  ///
+  /// In en, this message translates to:
+  /// **'Allergy note for this dish'**
+  String get chefCardAllergyNoteTitle;
+
+  /// Banto (ALG-15): the line under the dish allergy note's heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Short enough for a delivery app\'s note box. It follows the card\'s language.'**
+  String get chefCardAllergyNoteExplain;
+
+  /// Banto (ALG-14): the dish card's dated line when the person said the kitchen made the change they asked for. It never changes the dish's state.
+  ///
+  /// In en, this message translates to:
+  /// **'The staff changed it as you asked, {date}'**
+  String dishChangeHonouredOn(DateTime date);
+
+  /// Banto (ALG-14): the dish card's dated line when the person said the kitchen did not make the change they asked for.
+  ///
+  /// In en, this message translates to:
+  /// **'The staff did not make the change you asked for, {date}'**
+  String dishChangeNotHonouredOn(DateTime date);
+
+  /// Banto (ALG-14): the Why sheet's line when the person said the kitchen made the change they asked for. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'On {date} the staff changed the dish as you asked. That was for that visit, so ask for the change again each time.'**
+  String whyChangeHonouredOn(DateTime date);
+
+  /// Banto (ALG-14): the Why sheet's line when the person said the kitchen did not make the change they asked for.
+  ///
+  /// In en, this message translates to:
+  /// **'On {date} the staff did not make the change you asked for.'**
+  String whyChangeNotHonouredOn(DateTime date);
 }
 
 class _AppLocalizationsDelegate

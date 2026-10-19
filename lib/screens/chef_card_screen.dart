@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
@@ -9,7 +10,9 @@ import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/models/trip_destination.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
+import 'package:ketoclub/utils/allergens/allergen_matrix.dart';
 import 'package:ketoclub/utils/allergens/chef_card_templates.dart';
+import 'package:ketoclub/utils/allergens/confirmations.dart';
 import 'package:ketoclub/utils/allergens/group_chef_card.dart';
 import 'package:ketoclub/utils/allergens/group_evaluator.dart';
 import 'package:ketoclub/utils/allergens/kitchen_reach.dart';
@@ -39,6 +42,14 @@ import 'package:ketoclub/widgets/waiter_script_widget.dart';
 /// (architecture.md §12). Share sends the same text through [menuSharer];
 /// with none, the button is left out.
 ///
+/// A dish card is evaluated as the menu screen evaluates the dish: with
+/// the section heading it sits under, the restaurant's allergen matrix
+/// ([matrix], ALG-16) and the person's own staff answers
+/// ([confirmations], ALG-14), which the menu screen hands over from its
+/// `MenuController`. Below it, the dish's allergy note
+/// ([ChefCardText.dishAllergyNote], ALG-15), in the card's language, can
+/// be copied or shared for a delivery app's note box.
+///
 /// The card says what the person is and what to ask. It never says a dish
 /// is safe (the helper-tool sentence below it says why).
 class ChefCardScreen extends StatefulWidget {
@@ -53,6 +64,8 @@ class ChefCardScreen extends StatefulWidget {
     this.analysed,
     this.menu,
     this.trip,
+    this.matrix = MatrixEvidence.none,
+    this.confirmations = const <ConfirmationEvidence>[],
     super.key,
   });
 
@@ -83,6 +96,14 @@ class ChefCardScreen extends StatefulWidget {
   /// Null when no trip is active.
   final TripDestination? trip;
 
+  /// What the restaurant's allergen matrix says about [dish] (ALG-16), as
+  /// the menu screen read it; [MatrixEvidence.none] without one.
+  final MatrixEvidence matrix;
+
+  /// What the staff said about [dish] after an earlier meal (ALG-14,
+  /// `Confirmations.forDish`), as the menu screen read it; empty without.
+  final List<ConfirmationEvidence> confirmations;
+
   /// Raised while the card is open, restored when it closes.
   final ScreenBrightness screenBrightness;
 
@@ -101,6 +122,15 @@ const Key chefCardShareKey = Key('chefCardShare');
 
 /// The empty-profile message.
 const Key chefCardEmptyKey = Key('chefCardEmpty');
+
+/// The dish's allergy note text (ALG-15).
+const Key chefCardAllergyNoteKey = Key('chefCardAllergyNote');
+
+/// The button copying the dish's allergy note.
+const Key chefCardAllergyNoteCopyKey = Key('chefCardAllergyNoteCopy');
+
+/// The button sharing the dish's allergy note.
+const Key chefCardAllergyNoteShareKey = Key('chefCardAllergyNoteShare');
 
 class _ChefCardScreenState extends State<ChefCardScreen> {
   /// The user's pick; null until they toggle, so the card follows the
@@ -130,12 +160,10 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
       _crossContact = _isGroup
           ? GroupChefCardText.kitchenThreatensStrict(signals, widget.people)
           : ChefCardText.kitchenThreatensStrict(signals, widget.profile);
-      if (_isGroup) {
-        _reach = KitchenReach.of(menu);
-        for (final category in menu.categories) {
-          if (category.dishes.any((d) => d.id == widget.dish!.id)) {
-            _heading = category.name;
-          }
+      if (_isGroup) _reach = KitchenReach.of(menu);
+      for (final category in menu.categories) {
+        if (category.dishes.any((d) => d.id == widget.dish!.id)) {
+          _heading = category.name;
         }
       }
     }
@@ -157,23 +185,30 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
             : Localizations.localeOf(context).languageCode == 'he');
   }
 
-  /// The card's lines in Hebrew when [hebrew]: the dish card when there is
-  /// a dish and its analysis, re-evaluated in that language so its
-  /// "without" lines and questions follow the toggle; the profile card
-  /// otherwise.
-  List<String> _lines({required bool hebrew}) {
+  /// The dish evaluated for the one profile in Hebrew when [hebrew], as
+  /// the menu screen evaluates it: under its section heading, with the
+  /// restaurant's matrix and the person's staff answers.
+  EvaluatedDish _evaluateDish({required bool hebrew}) =>
+      ProfileEvaluator.evaluate(
+        widget.analysed!,
+        widget.dish!,
+        widget.profile,
+        hebrew: hebrew,
+        heading: _heading,
+        trip: widget.trip,
+        matrix: widget.matrix,
+        confirmations: widget.confirmations,
+      );
+
+  /// The card's lines in Hebrew when [hebrew]: the dish card for
+  /// [evaluated] when there is a dish and its analysis, re-evaluated in
+  /// that language so its "without" lines and questions follow the
+  /// toggle; the profile card otherwise.
+  List<String> _lines({required bool hebrew, EvaluatedDish? evaluated}) {
     final dish = widget.dish;
-    final analysed = widget.analysed;
-    if (dish == null || analysed == null) {
+    if (dish == null || evaluated == null) {
       return ChefCardText.compose(widget.profile, hebrew: hebrew);
     }
-    final evaluated = ProfileEvaluator.evaluate(
-      analysed,
-      dish,
-      widget.profile,
-      hebrew: hebrew,
-      trip: widget.trip,
-    );
     return ChefCardText.composeForDish(
       widget.profile,
       dishName: dish.name,
@@ -188,17 +223,22 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
   /// evaluated on their own through the pipeline the menu screen uses
   /// ([GroupEvaluator.evaluate]: the evaluator, then the kitchen), in the
   /// card's language so the lines follow the toggle.
-  GroupChefCard _groupDishCard({required bool hebrew}) {
+  GroupEvaluation _evaluateGroup({required bool hebrew}) =>
+      GroupEvaluator.evaluate(
+        widget.analysed!,
+        widget.dish!,
+        widget.people,
+        hebrew: hebrew,
+        heading: _heading,
+        kitchen: _reach,
+        trip: widget.trip,
+        matrix: widget.matrix,
+        confirmations: widget.confirmations,
+      );
+
+  /// The group card for [group], the dish's evaluation for every person.
+  GroupChefCard _groupDishCard(GroupEvaluation group, {required bool hebrew}) {
     final dish = widget.dish!;
-    final group = GroupEvaluator.evaluate(
-      widget.analysed!,
-      dish,
-      widget.people,
-      hebrew: hebrew,
-      heading: _heading,
-      kitchen: _reach,
-      trip: widget.trip,
-    );
     return GroupChefCardText.composeForDish(
       <PersonDishPart>[
         for (final result in group.people)
@@ -221,6 +261,74 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
     await widget.menuSharer?.shareText(text, subject: l10n.chefCardTitle);
   }
 
+  /// Copies the dish's allergy [note] (ALG-15) to the clipboard and says
+  /// so, as the menu's own "Copy allergy note" does.
+  Future<void> _copyNote(String note) async {
+    await Clipboard.setData(ClipboardData(text: note));
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(l10n.menuAllergyNoteCopied),
+          showCloseIcon: true,
+        ),
+      );
+  }
+
+  /// The dish's allergy note under the card (ALG-15): a heading, the note
+  /// in the card's language and its Copy and Share buttons.
+  Widget _noteSection(
+    AppLocalizations l10n,
+    ThemeData theme,
+    String note, {
+    required bool hebrew,
+  }) {
+    final sharer = widget.menuSharer;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 22),
+        Text(l10n.chefCardAllergyNoteTitle, style: theme.textTheme.titleSmall),
+        const SizedBox(height: 4),
+        Text(l10n.chefCardAllergyNoteExplain, style: theme.textTheme.bodySmall),
+        const SizedBox(height: 8),
+        SizedBox(
+          width: double.infinity,
+          child: Text(
+            note,
+            key: chefCardAllergyNoteKey,
+            textDirection: hebrew ? TextDirection.rtl : TextDirection.ltr,
+            style: theme.textTheme.bodyMedium,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            OutlinedButton.icon(
+              key: chefCardAllergyNoteCopyKey,
+              onPressed: () => unawaited(_copyNote(note)),
+              icon: const Icon(Icons.copy),
+              label: Text(l10n.menuAllergyNoteAction),
+            ),
+            if (sharer != null)
+              OutlinedButton.icon(
+                key: chefCardAllergyNoteShareKey,
+                onPressed: () => unawaited(
+                  sharer.shareText(note, subject: l10n.menuAllergyNoteSubject),
+                ),
+                icon: const Icon(Icons.ios_share),
+                label: Text(l10n.menuAllergyNoteShare),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -230,12 +338,32 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
     // when there is a dish and its analysis; otherwise the dish card for
     // one profile, then the profile card.
     final isDishCard = widget.dish != null && widget.analysed != null;
+    final groupEvaluation = _isGroup && isDishCard
+        ? _evaluateGroup(hebrew: hebrew)
+        : null;
+    final evaluated = !_isGroup && isDishCard
+        ? _evaluateDish(hebrew: hebrew)
+        : null;
     final group = !_isGroup
         ? null
-        : isDishCard
-        ? _groupDishCard(hebrew: hebrew)
+        : groupEvaluation != null
+        ? _groupDishCard(groupEvaluation, hebrew: hebrew)
         : GroupChefCardText.compose(widget.people, hebrew: hebrew);
-    final lines = group == null ? _lines(hebrew: hebrew) : const <String>[];
+    final lines = group == null
+        ? _lines(hebrew: hebrew, evaluated: evaluated)
+        : const <String>[];
+    // ALG-15: the dish's own allergy note, from the profile and the
+    // concerns the card itself found; none on the profile card.
+    final noteConcerns =
+        groupEvaluation?.combined.concerns ?? evaluated?.concerns;
+    final note = noteConcerns == null
+        ? null
+        : ChefCardText.dishAllergyNote(
+            widget.profile,
+            dishName: widget.dish!.name,
+            concerns: noteConcerns,
+            hebrew: hebrew,
+          );
     final text = group == null
         ? ChefCardText.asText(lines)
         : GroupChefCardText.asText(group);
@@ -338,6 +466,8 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
                           ),
                         ),
                       ),
+                    if (note != null)
+                      _noteSection(l10n, theme, note, hebrew: hebrew),
                     const SizedBox(height: 18),
                     Text(
                       l10n.helperToolSentence,

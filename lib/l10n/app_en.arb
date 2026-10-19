@@ -1030,5 +1030,17 @@
   "whyConfirmedOn": "You confirmed with the staff on {date}",
   "@whyConfirmedOn": {"description": "Banto (ALG-14): the Why sheet's line for a confirmed concern.", "placeholders": {"date": {"type": "DateTime", "format": "MMMMd"}}},
   "whyDeniedOn": "On {date} the staff told you it is not in the dish. That holds for that visit only, so ask again each time.",
-  "@whyDeniedOn": {"description": "Banto (ALG-14): the Why sheet's line for a denied concern. Never 'safe'.", "placeholders": {"date": {"type": "DateTime", "format": "MMMMd"}}}
+  "@whyDeniedOn": {"description": "Banto (ALG-14): the Why sheet's line for a denied concern. Never 'safe'.", "placeholders": {"date": {"type": "DateTime", "format": "MMMMd"}}},
+  "chefCardAllergyNoteTitle": "Allergy note for this dish",
+  "@chefCardAllergyNoteTitle": {"description": "Banto (ALG-15): heading of the dish's allergy note under the per-dish chef card."},
+  "chefCardAllergyNoteExplain": "Short enough for a delivery app's note box. It follows the card's language.",
+  "@chefCardAllergyNoteExplain": {"description": "Banto (ALG-15): the line under the dish allergy note's heading."},
+  "dishChangeHonouredOn": "The staff changed it as you asked, {date}",
+  "@dishChangeHonouredOn": {"description": "Banto (ALG-14): the dish card's dated line when the person said the kitchen made the change they asked for. It never changes the dish's state.", "placeholders": {"date": {"type": "DateTime", "format": "MMMMd"}}},
+  "dishChangeNotHonouredOn": "The staff did not make the change you asked for, {date}",
+  "@dishChangeNotHonouredOn": {"description": "Banto (ALG-14): the dish card's dated line when the person said the kitchen did not make the change they asked for.", "placeholders": {"date": {"type": "DateTime", "format": "MMMMd"}}},
+  "whyChangeHonouredOn": "On {date} the staff changed the dish as you asked. That was for that visit, so ask for the change again each time.",
+  "@whyChangeHonouredOn": {"description": "Banto (ALG-14): the Why sheet's line when the person said the kitchen made the change they asked for. Never 'safe'.", "placeholders": {"date": {"type": "DateTime", "format": "MMMMd"}}},
+  "whyChangeNotHonouredOn": "On {date} the staff did not make the change you asked for.",
+  "@whyChangeNotHonouredOn": {"description": "Banto (ALG-14): the Why sheet's line when the person said the kitchen did not make the change they asked for.", "placeholders": {"date": {"type": "DateTime", "format": "MMMMd"}}}
 }

@@ -2197,4 +2197,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
     return 'On $dateString the staff told you it is not in the dish. That holds for that visit only, so ask again each time.';
   }
+
+  @override
+  String get chefCardAllergyNoteTitle => 'Allergy note for this dish';
+
+  @override
+  String get chefCardAllergyNoteExplain =>
+      'Short enough for a delivery app\'s note box. It follows the card\'s language.';
+
+  @override
+  String dishChangeHonouredOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'The staff changed it as you asked, $dateString';
+  }
+
+  @override
+  String dishChangeNotHonouredOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'The staff did not make the change you asked for, $dateString';
+  }
+
+  @override
+  String whyChangeHonouredOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'On $dateString the staff changed the dish as you asked. That was for that visit, so ask for the change again each time.';
+  }
+
+  @override
+  String whyChangeNotHonouredOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'On $dateString the staff did not make the change you asked for.';
+  }
 }

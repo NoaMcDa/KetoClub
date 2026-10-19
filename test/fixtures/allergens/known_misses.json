@@ -1,18 +1,11 @@
 {
  "misses": [
   {
-   "id": "soy",
-   "menu": "asian_takeaway_soy_peanut.json",
-   "dish": "Cold Sesame Noodles",
-   "label": "may_contain",
-   "reason": "hidden source: add 'satay', 'stir-fry', 'garlic sauce', 'oyster sauce', 'chow mein', 'spring roll', 'sausage', bread classes and sweet wing glazes as soy hidden triggers at suspected (11 §6.2)"
-  },
-  {
    "id": "eggs",
    "menu": "golden_hebrew.json",
    "dish": "פסטה ברוטב שמנת",
    "label": "may_contain",
-   "reason": "hidden source: add egg-bound dish classes as eggs hidden triggers at suspected: spring-roll wrappers, enriched buns, fresh pasta ('פסטה', 'פטוצ׳יני'), yeast pastry ('רוגלך'), cookies, filled dough ('חינקלי', 'סמבוסק', 'חצ׳פורי אימרולי'), creamy dressings (11 §5.2); expect false positives on every pastry and pasta"
+   "reason": "source question: fresh pasta usually contains egg (11 §5.2) but dried pasta is egg-free, and nothing in the dish text or the sources says a cream-sauce pasta is fresh; 'פסטה טרייה' is already a trigger, and bare 'פסטה' is not added (11 §5.2)"
   },
   {
    "id": "sesame",
@@ -22,32 +15,11 @@
    "reason": "label question: the sesame label rests on the manufacturer's allergen list for the filled Bamba, which no dish text carries (12 §1.1)"
   },
   {
-   "id": "milk",
-   "menu": "il_georgian_khachapuri.json",
-   "dish": "שישליק בקר",
-   "label": "may_contain",
-   "reason": "hidden source: add enriched buns, 'רוגלך', 'לוביאני', canned tuna and grilled steak as milk hidden triggers at suspected (11 §3.2); expect false positives on every bakery and steak dish"
-  },
-  {
    "id": "fish",
    "menu": "il_seafood_grill.json",
    "dish": "פירות ים בשמנת",
    "label": "may_contain",
-   "reason": "hidden source: add 'פירות ים' (seafood) and 'פאייה' (paella) as fish hidden triggers at suspected, fish stock (11 §9.2)"
-  },
-  {
-   "id": "eggs",
-   "menu": "il_seafood_grill.json",
-   "dish": "מבחר סלטים",
-   "label": "may_contain",
-   "reason": "hidden source: add 'coleslaw' and 'גפילטע פיש' as eggs hidden triggers at suspected; 'מבחר סלטים' (mayonnaise salads) names no trigger (12 §1.6)"
-  },
-  {
-   "id": "sulphites",
-   "menu": "il_sushi_bar.json",
-   "dish": "אינסייד אאוט אבוקדו",
-   "label": "may_contain",
-   "reason": "hidden source: add 'ketchup' / 'קטשופ', 'bbq' / 'ברביקיו', 'vinaigrette', pickled (כבוש), sushi rice and beer brands as sulphites hidden triggers at suspected (11 §15.2)"
+   "reason": "source question: a seafood sauce may be cooked in fish stock (11 §9.2), but 'פירות ים' and 'seafood' name crustaceans and molluscs, not fish, a decision the sea tests pin; no addition is made (12 §1.7)"
   },
   {
    "id": "eggs",
@@ -76,48 +48,6 @@
    "dish": "French Fries",
    "label": "may_contain",
    "reason": "cross-contact: a shared-fryer statement belongs to the kitchen signals (ALG-07), not the dish matcher; no vocabulary addition (12 §5)"
-  },
-  {
-   "id": "soy",
-   "menu": "wolt_hamosad.json",
-   "dish": "כנפיים | 8 יח׳",
-   "label": "may_contain",
-   "reason": "hidden source: add 'satay', 'stir-fry', 'garlic sauce', 'oyster sauce', 'chow mein', 'spring roll', 'sausage', bread classes and sweet wing glazes as soy hidden triggers at suspected (11 §6.2)"
-  },
-  {
-   "id": "wheat",
-   "menu": "wolt_hamosad.json",
-   "dish": "כנפיים | 8 יח׳",
-   "label": "may_contain",
-   "reason": "hidden source: add 'stir-fry', 'garlic sauce', 'oyster sauce', 'risotto', 'cream sauce', fried fish and 'crispy wings' as wheat and gluten hidden triggers at suspected (11 §7.2)"
-  },
-  {
-   "id": "gluten",
-   "menu": "wolt_hamosad.json",
-   "dish": "כנפיים | 8 יח׳",
-   "label": "may_contain",
-   "reason": "hidden source: add 'stir-fry', 'garlic sauce', 'oyster sauce', 'risotto', 'cream sauce', fried fish and 'crispy wings' as wheat and gluten hidden triggers at suspected (11 §7.2)"
-  },
-  {
-   "id": "mustard",
-   "menu": "wolt_hamosad.json",
-   "dish": "כנפיים | 8 יח׳",
-   "label": "may_contain",
-   "reason": "hidden source: add 'mayonnaise', 'aioli', 'tartar', 'ranch', 'coleslaw', 'dressing' and pickled (כבוש) as mustard hidden triggers at suspected (11 §13.2); expect false positives on every dressing"
-  },
-  {
-   "id": "legumes",
-   "menu": "wolt_hamosad.json",
-   "dish": "כנפיים | 8 יח׳",
-   "label": "may_contain",
-   "reason": "hidden source: legumes mirrors its members: found once the soy, peanut and lupin hidden triggers listed in this table are added with the same terms ('pesto', 'granola', 'curry', 'pastry', gluten-free base) (11 §16.1)"
-  },
-  {
-   "id": "mustard",
-   "menu": "wolt_hamosad.json",
-   "dish": "טבעוני, תוספת ושתייה",
-   "label": "may_contain",
-   "reason": "hidden source: add 'mayonnaise', 'aioli', 'tartar', 'ranch', 'coleslaw', 'dressing' and pickled (כבוש) as mustard hidden triggers at suspected (11 §13.2); expect false positives on every dressing"
   }
  ]
 }

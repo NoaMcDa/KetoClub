@@ -637,4 +637,31 @@ void main() {
       });
     }
   });
+
+  group('hidden sources added for the leftover recall misses (#352)', () {
+    // A crisp coating is usually flour or crumbs (11 §7.2): suspected for
+    // wheat and, through the shared list, for gluten.
+    const cases = <_Hit>[
+      ('Served with crispy chicken', _wheat, 'crispy chicken', _suspected),
+      ('Served with crispy wings', _wheat, 'crispy wings', _suspected),
+      ('Served with crispy wings', _gluten, 'crispy wings', _suspected),
+      ('מנה עם עוף פריך', _wheat, 'פריך', _suspected),
+      ('מנה עם עוף פריך', _gluten, 'פריך', _suspected),
+      ('מנה עם קרום פריכה', _wheat, 'פריכה', _suspected),
+      ('מנה עם נאגטס פריכים', _wheat, 'פריכים', _suspected),
+      ('כנפי עוף פריכות ברוטב מתקתק סודי', _wheat, 'פריכות', _suspected),
+      ('כנפי עוף פריכות ברוטב מתקתק סודי', _gluten, 'פריכות', _suspected),
+      ('מנה ופריכות', _wheat, 'פריכות', _suspected),
+    ];
+    for (final (text, id, term, certainty) in cases) {
+      test('$text gives ${id.name} "$term" (${certainty.name})', () {
+        expect(_certaintyOf(text, id, term), certainty);
+      });
+    }
+
+    test('rice cakes (פריכיות) are another word', () {
+      expect(_certaintyOf('פריכיות אורז', _wheat, 'פריכות'), isNull);
+      expect(_certaintyOf('פריכיות אורז', _wheat, 'פריך'), isNull);
+    });
+  });
 }

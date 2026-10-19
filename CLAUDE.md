@@ -435,13 +435,15 @@ The long form is in `HANDOFF.md`; these are the ones that bite while writing cod
   the backend would classify every Discovery card on the server.
 - **Serialise test runs when several agents share a worktree:**
   `flock /tmp/ketoclub.lock -c 'flutter test …'`.
-- **Banto: rules outrank the model only for strict entries, and never for
-  keto (D26, ALG-04).** `ProfileEvaluator` recomputes the rule findings from
-  the dish on the device and unions them with the model's extraction: a model
-  result can add or raise a concern, never remove one. Only a strict entry
-  (an allergen, celiac, the user's own words) turns a suspected finding into
-  "ask" or takes a kitchen-signal demotion; a flexible one lists it. The
-  wire's keto verdict stays the model's and is never rewritten.
+- **Banto: a firm finding moves every entry; a suspected one only a strict
+  entry (D26, ALG-04, amended by #346).** `ProfileEvaluator` recomputes the
+  rule findings from the dish on the device and unions them with the model's
+  extraction: a model result can add or raise a concern, never remove one. A
+  `stated` or `likely` concern moves the state for a strict or a flexible
+  entry alike (there is no per-restriction model verdict to defer to). Only a
+  strict entry (an allergen, celiac, the user's own words) turns a suspected
+  finding into "ask" or takes a kitchen-signal demotion; a flexible one lists
+  it. The wire's keto verdict stays the model's and is never rewritten.
 - **Banto: no "safe" for a strict entry.** No string says "safe" or "בטוח"
   for a profile with an allergen or celiac entry; the strongest is "No
   trigger found — ask the restaurant" ("ללא חשש" on the tile and header).

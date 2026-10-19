@@ -2194,4 +2194,43 @@ class AppLocalizationsHe extends AppLocalizations {
 
     return 'ב־$dateString הצוות אמר לך שזה לא במנה. זה נכון לביקור ההוא בלבד, לכן כדאי לשאול שוב בכל פעם.';
   }
+
+  @override
+  String get chefCardAllergyNoteTitle => 'הודעת אלרגיה למנה הזו';
+
+  @override
+  String get chefCardAllergyNoteExplain =>
+      'קצרה מספיק לתיבת ההערות באפליקציית משלוחים. היא בשפת הכרטיס.';
+
+  @override
+  String dishChangeHonouredOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'הצוות שינה את המנה כפי שביקשת, $dateString';
+  }
+
+  @override
+  String dishChangeNotHonouredOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'הצוות לא שינה את המנה כפי שביקשת, $dateString';
+  }
+
+  @override
+  String whyChangeHonouredOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'ב־$dateString הצוות שינה את המנה כפי שביקשת. זה היה לביקור ההוא, לכן כדאי לבקש את השינוי שוב בכל פעם.';
+  }
+
+  @override
+  String whyChangeNotHonouredOn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'ב־$dateString הצוות לא שינה את המנה כפי שביקשת.';
+  }
 }

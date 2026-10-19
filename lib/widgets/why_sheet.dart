@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/concern.dart';
+import 'package:ketoclub/models/dish_confirmation.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/confirmations.dart';
@@ -28,6 +29,17 @@ const Key whyDishNameKey = ValueKey<String>('whyDishName');
 
 /// The key of the sheet's coverage note (ALG-06).
 const Key whyCoverageKey = ValueKey<String>('whyCoverage');
+
+/// The key of the sheet's dated line about the change asked for (ALG-14).
+const Key whyChangeAnswerKey = ValueKey<String>('whyChangeAnswer');
+
+/// The dated line for [answer], the person's answer to "they changed the
+/// dish as requested" (ALG-14): the staff changed it on that day, which
+/// was for that visit, or they did not.
+String whyChangeAnswerLine(AppLocalizations l10n, ChangeConfirmation answer) =>
+    answer.honoured
+    ? l10n.whyChangeHonouredOn(answer.day)
+    : l10n.whyChangeNotHonouredOn(answer.day);
 
 /// What the result for one dish was read from (Banto, ALG-06, issue #348):
 /// whether the menu gave a description and options, and whether the
@@ -177,6 +189,7 @@ Future<void> showWhySheet(
   required bool strictProfile,
   List<Declaration> declarations = const <Declaration>[],
   List<ConfirmationEvidence> confirmations = const <ConfirmationEvidence>[],
+  ChangeConfirmation? changeAnswer,
   WhyCoverage? coverage,
   bool bantoMode = BantoMode.enabled,
 }) {
@@ -190,6 +203,7 @@ Future<void> showWhySheet(
       strictProfile: strictProfile,
       declarations: declarations,
       confirmations: confirmations,
+      changeAnswer: changeAnswer,
       coverage: coverage,
       bantoMode: bantoMode,
     ),
@@ -211,7 +225,9 @@ Future<void> showWhySheet(
 ///
 /// A concern the person's own staff answer moved (ALG-14) says when:
 /// "You confirmed with the staff on 12 May", or that the staff said no
-/// that day, which holds for that visit only.
+/// that day, which holds for that visit only. The person's answer about
+/// the change they asked for ([changeAnswer]) is a dated line of its own
+/// under the dish name; like every answer, it moves nothing.
 ///
 /// A [coverage] note under the dish name says what the menu gave and who
 /// read it, the model and the rules or the rules alone (ALG-06).
@@ -225,6 +241,7 @@ class WhySheet extends StatelessWidget {
     required this.strictProfile,
     this.declarations = const <Declaration>[],
     this.confirmations = const <ConfirmationEvidence>[],
+    this.changeAnswer,
     this.coverage,
     this.bantoMode = BantoMode.enabled,
     super.key,
@@ -248,7 +265,10 @@ class WhySheet extends StatelessWidget {
   /// ALG-14), dated under each concern they answer.
   final List<ConfirmationEvidence> confirmations;
 
-  ///
+  /// The person's latest answer to "they changed the dish as requested"
+  /// (ALG-14), or null for none.
+  final ChangeConfirmation? changeAnswer;
+
   /// What the dish's result was read from, or null to say nothing.
   final WhyCoverage? coverage;
 
@@ -300,6 +320,14 @@ class WhySheet extends StatelessWidget {
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
+              ),
+            ],
+            if (changeAnswer case final answer?) ...[
+              const SizedBox(height: 8),
+              Text(
+                whyChangeAnswerLine(l10n, answer),
+                key: whyChangeAnswerKey,
+                style: theme.textTheme.bodyMedium,
               ),
             ],
             const SizedBox(height: 16),

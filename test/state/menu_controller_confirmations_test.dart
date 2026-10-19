@@ -182,4 +182,86 @@ void main() {
     expect(evaluated.state, DishState.avoid);
     expect(evaluated.confirmations, isNotEmpty);
   });
+
+  test('the next open hands the staff answers to a per-dish screen as '
+      'the evaluations read them', () async {
+    // Arrange
+    await history.recordVisit(_ref);
+    await history.setConfirmations(
+      _ref,
+      confirmations: <DishConfirmation>[
+        DishConfirmation(
+          dishId: 'salad',
+          restrictionId: RestrictionId.sesame,
+          polarity: ConfirmationPolarity.present,
+          day: DateTime(2026, 5, 12),
+        ),
+      ],
+      changes: const <ChangeConfirmation>[],
+    );
+    final controller = _controller(AppSettings(profile: _sesame), history);
+
+    // Act
+    await controller.open(_ref, bantoMode: true);
+
+    // Assert
+    final pieces = controller.confirmationsFor('salad');
+    expect(pieces.single.restrictionId, RestrictionId.sesame);
+    expect(pieces.single.polarity, ConfirmationPolarity.present);
+    expect(controller.confirmationsFor('soup'), isEmpty);
+    // No matrix came with the menu.
+    expect(controller.matrixEvidenceFor('salad').isEmpty, isTrue);
+  });
+
+  group('the change answer (ALG-14)', () {
+    test('is read on open, the latest day first, and never moves the '
+        'state', () async {
+      // Arrange: two answers on two days, the later one a "yes".
+      await history.recordVisit(_ref);
+      await history.setConfirmations(
+        _ref,
+        confirmations: const <DishConfirmation>[],
+        changes: <ChangeConfirmation>[
+          ChangeConfirmation(
+            dishId: 'salad',
+            honoured: false,
+            day: DateTime(2026, 4, 2),
+          ),
+          ChangeConfirmation(
+            dishId: 'salad',
+            honoured: true,
+            day: DateTime(2026, 5, 12),
+          ),
+        ],
+      );
+      final before = _controller(AppSettings(profile: _sesame), history);
+      final controller = _controller(AppSettings(profile: _sesame), history);
+      final bare = FakeVisitHistoryStore(FakeClock(DateTime.utc(2026)));
+      final without = _controller(AppSettings(profile: _sesame), bare);
+
+      // Act
+      await controller.open(_ref, bantoMode: true);
+      await without.open(_ref, bantoMode: true);
+
+      // Assert
+      final answer = controller.changeConfirmationFor('salad')!;
+      expect(answer.honoured, isTrue);
+      expect(answer.day, DateTime(2026, 5, 12));
+      expect(controller.changeConfirmationFor('soup'), isNull);
+      expect(before.changeConfirmationFor('salad'), isNull);
+      // The same state as a venue with no answer at all.
+      expect(controller.evaluationFor('salad'), without.evaluationFor('salad'));
+    });
+
+    test('a venue with no history has none', () async {
+      // Arrange
+      final controller = _controller(AppSettings(profile: _sesame), history);
+
+      // Act
+      await controller.open(_ref, bantoMode: true);
+
+      // Assert
+      expect(controller.changeConfirmationFor('salad'), isNull);
+    });
+  });
 }

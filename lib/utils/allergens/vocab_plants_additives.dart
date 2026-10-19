@@ -275,6 +275,25 @@ const List<HiddenTrigger> _soyHiddenEn = <HiddenTrigger>[
     certainty: TriggerCertainty.suspected,
     source: '11 §6.1',
   ),
+  // Leftover recall misses (issue #352): the sesame sauce of Asian cold
+  // noodles and a sweet wing glaze, which FARE's "sauces" and "Asian
+  // cuisine" rows cover (11 §6.2). `peanut sauce` is a legumes term
+  // already.
+  HiddenTrigger(
+    term: 'sesame sauce',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'sesame noodles',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'sweet glaze',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §6.2',
+  ),
 ];
 
 /// Soy's hidden Hebrew sources, shared with `legumes`.
@@ -419,6 +438,17 @@ const List<HiddenTrigger> _soyHiddenHe = <HiddenTrigger>[
     term: 'שוקולד',
     certainty: TriggerCertainty.suspected,
     source: '11 §6.1',
+  ),
+  // Leftover recall misses (issue #352); see _soyHiddenEn.
+  HiddenTrigger(
+    term: 'רוטב מתקתק',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §6.2',
+  ),
+  HiddenTrigger(
+    term: 'רוטב שומשום',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §6.2',
   ),
 ];
 
@@ -893,6 +923,24 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
             certainty: TriggerCertainty.suspected,
             source: '11 §13.2',
           ),
+          // Leftover recall misses (issue #352): a sauce the menu will
+          // not name ("house dressing" is the term Allergy UK says to
+          // refuse without ingredients) and a sweet meat glaze (11 §13.2).
+          HiddenTrigger(
+            term: 'house sauce',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'secret sauce',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'sweet glaze',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §13.2',
+          ),
         ],
         hiddenHe: <HiddenTrigger>[
           HiddenTrigger(
@@ -1002,6 +1050,44 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
           ),
           HiddenTrigger(
             term: 'קולסלו',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §13.2',
+          ),
+          // Leftover recall misses (issue #352): the pickled forms that
+          // are not כבוש ("חלפיניו מוחמץ"), a sauce the menu will not name
+          // and a sweet meat glaze (11 §13.2).
+          HiddenTrigger(
+            term: 'מוחמץ',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'מוחמצת',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'מוחמצים',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'מוחמצות',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'רוטב הבית',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'רוטב סודי',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'רוטב מתקתק',
             certainty: TriggerCertainty.suspected,
             source: '11 §13.2',
           ),
@@ -1303,6 +1389,28 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
             certainty: TriggerCertainty.suspected,
             source: '11 §15.2',
           ),
+          // Leftover recall misses (issue #352): sushi named by its roll,
+          // whose rice is seasoned with vinegar (11 §15.2).
+          HiddenTrigger(
+            term: 'maki',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'uramaki',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'nigiri',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'inside out roll',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
           HiddenTrigger(
             term: 'goldstar',
             certainty: TriggerCertainty.suspected,
@@ -1517,6 +1625,22 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
           ),
           HiddenTrigger(
             term: 'סושי',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          // Leftover recall misses (issue #352); see the English rolls.
+          HiddenTrigger(
+            term: 'מאקי',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'ניגירי',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §15.2',
+          ),
+          HiddenTrigger(
+            term: 'אינסייד אאוט',
             certainty: TriggerCertainty.suspected,
             source: '11 §15.2',
           ),
