@@ -1,3 +1,4 @@
+import 'package:ketoclub/services/platform/entitlement.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
 
@@ -111,6 +112,11 @@ final class FakeAppDependencies {
   /// [FakeMenuStoreClient.uploads].
   final FakeMenuStoreClient menuStoreClient = FakeMenuStoreClient();
 
+  /// The store behind Banto Premium (ALG-18, issue #360):
+  /// [NullEntitlement] by default, which sells nothing and so gates
+  /// nothing. Set a `FakeEntitlement` to exercise the free plan's gates.
+  Entitlement entitlement = const NullEntitlement();
+
   /// The dependency set to hand to the app widget.
   AppDependencies get dependencies => AppDependencies(
     menuRepository: repository,
@@ -131,5 +137,6 @@ final class FakeAppDependencies {
     scannedPages: scannedPages,
     visitHistory: visitHistory,
     menuStoreClient: menuStoreClient,
+    entitlement: entitlement,
   );
 }

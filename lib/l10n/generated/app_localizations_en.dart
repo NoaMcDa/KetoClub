@@ -2199,6 +2199,139 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get premiumTitle => 'Banto Premium';
+
+  @override
+  String get paywallIntro =>
+      'Premium adds more to Banto. Your restrictions are checked the same way on either plan.';
+
+  @override
+  String get paywallReasonRestrictions =>
+      'The free plan keeps one restriction in a profile. Premium lets you add more.';
+
+  @override
+  String get paywallReasonGroup =>
+      'Profiles for other people, and checking a menu for several people at once, are part of Premium.';
+
+  @override
+  String get paywallReasonTrip => 'Trip mode is part of Premium.';
+
+  @override
+  String paywallReasonScans(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'You have used this month\'s $count free scans.',
+      one: 'You have used this month\'s free scan.',
+    );
+    return '$_temp0 Premium has no monthly limit.';
+  }
+
+  @override
+  String get paywallFeaturesHeading => 'What Premium adds';
+
+  @override
+  String get paywallFeatureRestrictions =>
+      'More than one restriction in your profile';
+
+  @override
+  String get paywallFeatureGroup =>
+      'Profiles for the people you eat with, checked together';
+
+  @override
+  String get paywallFeatureTrip =>
+      'Trip mode: local terms and labelling notes for where you are going';
+
+  @override
+  String get paywallFeatureScans =>
+      'Menu scans with no monthly limit: photos, PDFs and pasted text';
+
+  @override
+  String get paywallNeverLocked =>
+      'Never locked, on any plan: every restriction already in your profile is checked on every menu, and the chef card, the waiter questions, the Why sheet and the after-meal check stay free. Always ask the restaurant.';
+
+  @override
+  String paywallPrice(String price) {
+    return '$price a month';
+  }
+
+  @override
+  String get paywallPriceUnknown => 'The price shows once the store answers.';
+
+  @override
+  String get paywallBuy => 'Subscribe';
+
+  @override
+  String get paywallRestore => 'Restore purchase';
+
+  @override
+  String get paywallTerms =>
+      'Billed monthly through your App Store or Google Play account. Cancel any time in the store\'s subscription settings.';
+
+  @override
+  String get paywallActive => 'Premium is active on this device. Thank you.';
+
+  @override
+  String get paywallPending =>
+      'The store is still processing the purchase. Premium opens once it is approved.';
+
+  @override
+  String get paywallCancelled => 'The purchase was cancelled.';
+
+  @override
+  String get paywallRestoredNone =>
+      'The store has no active Premium subscription for this account.';
+
+  @override
+  String get paywallFailedStoreUnavailable =>
+      'The store can\'t be reached from this device right now. Try again later.';
+
+  @override
+  String get paywallFailedProductNotFound =>
+      'Premium isn\'t available in the store yet.';
+
+  @override
+  String get paywallFailedStoreError =>
+      'The store reported an error. Nothing changed; try again.';
+
+  @override
+  String get paywallFailedTimedOut =>
+      'The store didn\'t answer in time. Try again.';
+
+  @override
+  String get paywallFailedNotSold =>
+      'Premium isn\'t sold in this version of the app.';
+
+  @override
+  String get settingsPremiumActive => 'Premium is active';
+
+  @override
+  String settingsPremiumFree(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Free plan: one restriction and $count scans a month',
+      one: 'Free plan: one restriction and one scan a month',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsPremiumOpen => 'See what Premium adds';
+
+  @override
+  String scanFreeScansLeft(int left, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      left,
+      locale: localeName,
+      other: '$left of $total free scans left this month',
+      one: '1 of $total free scans left this month',
+      zero: 'No free scans left this month',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get chefCardAllergyNoteTitle => 'Allergy note for this dish';
 
   @override

@@ -59,8 +59,9 @@ enum AppThemeMode {
 /// banner has been seen (D16, issue #167), the restriction profile
 /// (Banto, ALG-02a, issue #344), whether the first-run restriction
 /// onboarding has been seen (ALG-02b), the other people's profiles and
-/// which of them a menu is read for (ALG-12, issue #354), and trip mode's
-/// destination (ALG-13, issue #355).
+/// which of them a menu is read for (ALG-12, issue #354), trip mode's
+/// destination (ALG-13, issue #355) and the month's scan count the free
+/// plan reads (ALG-18, issue #360).
 @immutable
 final class AppSettings {
   /// Creates settings. Every field defaults to the "nothing set yet"
@@ -93,6 +94,8 @@ final class AppSettings {
     this.tripDestination,
     this.disclosureCopyVersion = 0,
     this.helperToolSeen = false,
+    this.scanMonth = '',
+    this.scanCount = 0,
   });
 
   /// The profiles a menu is read for until the user combines others: the
@@ -146,6 +149,11 @@ final class AppSettings {
   /// too: a missing key, or a value [TripDestination.tryParse] does not
   /// recognise, reads as null — no trip — rather than invalidating the
   /// record.
+  ///
+  /// The monthly scan counter (ALG-18, issue #360) follows it too: a
+  /// missing key, a value that is not a `{month, count}` object, a month
+  /// that is not a string or a count that is not a positive integer reads
+  /// as no scans counted.
   static AppSettings? tryFrom(Map<String, Object?> json) {
     final rawLanguageTag = json['languageTag'];
     if (rawLanguageTag != null && rawLanguageTag is! String) return null;
@@ -181,6 +189,7 @@ final class AppSettings {
         ? MenuFilter.tryParse(rawLastFilter)
         : null;
     final others = _readOthers(json[_otherProfilesKey]);
+    final scans = _readScans(json[_monthlyScansKey]);
     return AppSettings(
       languageTag: rawLanguageTag is String ? rawLanguageTag : null,
       filter: filter,
@@ -207,7 +216,21 @@ final class AppSettings {
       },
       disclosureCopyVersion: _readCopyVersion(json[_disclosureCopyVersionKey]),
       helperToolSeen: json[_helperToolSeenKey] == true,
+      scanMonth: scans.month,
+      scanCount: scans.count,
     );
+  }
+
+  /// The month and count stored under [_monthlyScansKey]; see [tryFrom].
+  static ({String month, int count}) _readScans(Object? raw) {
+    const none = (month: '', count: 0);
+    if (raw is! Map<String, Object?>) return none;
+    final month = raw['month'];
+    final count = raw['count'];
+    if (month is! String || month.isEmpty || count is! int || count <= 0) {
+      return none;
+    }
+    return (month: month, count: count);
   }
 
   /// [raw] as a disclosure copy version: a non-negative integer, else 0.
@@ -283,6 +306,13 @@ final class AppSettings {
   /// The JSON key [helperToolSeen] is stored under, written only when it
   /// is true, for the same reason.
   static const String _helperToolSeenKey = 'helperToolSeen';
+
+  /// The JSON key the monthly scan counter ([scanMonth], [scanCount]) is
+  /// stored under (ALG-18), as one `{month, count}` object written only
+  /// while the count is above 0, so a keto install's stored record — and
+  /// `const AppSettings().toJson()`, which `keto_unchanged_test` pins —
+  /// stays byte-identical. Only a Banto build counts scans.
+  static const String _monthlyScansKey = 'monthlyScans';
 
   /// The JSON key [profile] is stored under. [toJson] writes it only for a
   /// non-empty profile, so a keto-only install's stored record — and
@@ -395,6 +425,19 @@ final class AppSettings {
   /// value reads as false.
   final bool helperToolSeen;
 
+  /// The month [scanCount] counts, as `YYYY-MM` (`scanMonthKey`); empty
+  /// before the first scan is counted (Banto, ALG-18, issue #360).
+  final String scanMonth;
+
+  /// How many scans were read in [scanMonth]: what the free plan's monthly
+  /// limit reads. Kept on the device only, and never sent.
+  final int scanCount;
+
+  /// The scans counted in [month]: [scanCount] when it is [scanMonth], and
+  /// 0 for any other month, so a new month starts from nothing without a
+  /// write.
+  int scansIn(String month) => month == scanMonth ? scanCount : 0;
+
   /// Every profile on the device: the user's own ([profile], under
   /// [primaryProfileName]) first, then [otherProfiles].
   List<NamedProfile> get profiles => <NamedProfile>[
@@ -455,6 +498,8 @@ final class AppSettings {
     Object? tripDestination = _unset,
     int? disclosureCopyVersion,
     bool? helperToolSeen,
+    String? scanMonth,
+    int? scanCount,
   }) => AppSettings(
     languageTag: identical(languageTag, _unset)
         ? this.languageTag
@@ -484,6 +529,8 @@ final class AppSettings {
         : tripDestination as TripDestination?,
     disclosureCopyVersion: disclosureCopyVersion ?? this.disclosureCopyVersion,
     helperToolSeen: helperToolSeen ?? this.helperToolSeen,
+    scanMonth: scanMonth ?? this.scanMonth,
+    scanCount: scanCount ?? this.scanCount,
   );
 
   /// Writes a form [tryFrom] can read back. [profile] is written only
@@ -492,7 +539,8 @@ final class AppSettings {
   /// written only when they differ from their defaults; see
   /// [_primaryNameKey]. [tripDestination] is written only while a trip is
   /// active; see [_tripKey]. So are [disclosureCopyVersion] and
-  /// [helperToolSeen] (ALG-11).
+  /// [helperToolSeen] (ALG-11). The scan counter is written only while it
+  /// counts a scan; see [_monthlyScansKey].
   Map<String, Object?> toJson() => <String, Object?>{
     'languageTag': languageTag,
     'filter': filter.name,
@@ -518,6 +566,11 @@ final class AppSettings {
     if (disclosureCopyVersion > 0)
       _disclosureCopyVersionKey: disclosureCopyVersion,
     if (helperToolSeen) _helperToolSeenKey: true,
+    if (scanCount > 0 && scanMonth.isNotEmpty)
+      _monthlyScansKey: <String, Object?>{
+        'month': scanMonth,
+        'count': scanCount,
+      },
   };
 
   @override
@@ -541,7 +594,9 @@ final class AppSettings {
       listEquals(other.activeProfileIds, activeProfileIds) &&
       other.tripDestination == tripDestination &&
       other.disclosureCopyVersion == disclosureCopyVersion &&
-      other.helperToolSeen == helperToolSeen;
+      other.helperToolSeen == helperToolSeen &&
+      other.scanMonth == scanMonth &&
+      other.scanCount == scanCount;
 
   @override
   int get hashCode => Object.hash(
@@ -564,6 +619,8 @@ final class AppSettings {
     tripDestination,
     disclosureCopyVersion,
     helperToolSeen,
+    // Object.hash takes at most 20 values; the counter's two hash as one.
+    Object.hash(scanMonth, scanCount),
   );
 
   @override
@@ -584,7 +641,8 @@ final class AppSettings {
       // Whether a trip is on, never where (C1).
       'trip: ${tripDestination != null}, '
       'disclosureCopyVersion: $disclosureCopyVersion, '
-      'helperToolSeen: $helperToolSeen)';
+      'helperToolSeen: $helperToolSeen, '
+      'scans: $scanCount in $scanMonth)';
 }
 
 /// On-device storage for [AppSettings] (architecture.md §6.4). Backed by

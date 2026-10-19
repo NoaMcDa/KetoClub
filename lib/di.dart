@@ -35,12 +35,14 @@ import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/device_page_picker.dart';
+import 'package:ketoclub/services/platform/entitlement.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/image_downscaler.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/qr_scanner.dart';
 import 'package:ketoclub/services/platform/scan_budget.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
+import 'package:ketoclub/services/platform/store_entitlement.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/install_id_store.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
@@ -52,6 +54,7 @@ import 'package:ketoclub/services/venue/venue_search_service.dart';
 import 'package:ketoclub/services/venue/wolt/wolt_venue_search_service.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/widgets/mobile_qr_scanner.dart';
 import 'package:screen_brightness/screen_brightness.dart' as plugin;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -356,6 +359,21 @@ QrScanner qrScannerFor({
     ? const NoQrScanner()
     : MobileQrScanner(navigatorKey: navigatorKey);
 
+/// Where Banto Premium is bought and restored (ALG-18, issue #360).
+///
+/// A Banto build on a phone sells it through the App Store or Google Play:
+/// a [StoreEntitlement], which reaches the plugin only on first use. The
+/// web build has no store and stays free (its quota is the backend's rate
+/// limit), and a KetoClub build sells nothing: both get [NullEntitlement],
+/// with which nothing is gated.
+///
+/// A pure, top-level function so `di_test.dart` can cover every branch.
+Entitlement entitlementFor({
+  required bool runsInBrowser,
+  required bool bantoMode,
+}) =>
+    bantoMode && !runsInBrowser ? StoreEntitlement() : const NullEntitlement();
+
 /// Composition root (architecture.md §18.1).
 ///
 /// This is the only file under lib/ that may construct a concrete service,
@@ -592,5 +610,11 @@ AppDependencies buildDependencies() {
     // Whether menus, scans and searches go to the backend first (D25);
     // the consent and scan disclosures follow it (issue #330).
     backendConfigured: backendBase != null,
+    // Banto Premium (ALG-18): the store on a Banto phone, nothing sold on
+    // web or in KetoClub. Touches no plugin until a gate needs it.
+    entitlement: entitlementFor(
+      runsInBrowser: kIsWeb,
+      bantoMode: BantoMode.enabled,
+    ),
   );
 }

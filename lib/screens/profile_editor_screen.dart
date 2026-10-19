@@ -6,11 +6,13 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/screens/chef_card_screen.dart';
+import 'package:ketoclub/screens/premium_gate.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 import 'package:ketoclub/utils/allergens/profile_transfer.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
+import 'package:ketoclub/utils/premium_gates.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/profile_name_dialog.dart';
 import 'package:ketoclub/widgets/profile_names.dart';
@@ -231,6 +233,21 @@ class ProfileEditorScreen extends StatelessWidget {
     if (picked == null) return;
     final term = picked.term;
     final id = picked.id;
+    // A second restriction is Premium (ALG-18); what is saved stays.
+    final adding = term != null ? RestrictionId.custom : id;
+    final held = controller.profileById(profileId)?.profile;
+    if (adding != null && held != null && context.mounted) {
+      final allowed = await passPremiumGate(
+        context,
+        PremiumFeature.restrictions,
+        locks: (access) => PremiumGates.locksAddingRestriction(
+          access,
+          profile: held,
+          adding: adding,
+        ),
+      );
+      if (!allowed) return;
+    }
     if (term != null) {
       await controller.addCustomTermTo(profileId, term);
     } else if (id != null) {
