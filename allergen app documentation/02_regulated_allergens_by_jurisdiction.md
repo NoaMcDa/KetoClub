@@ -10,13 +10,22 @@ the additions, and they decide what the product's taxonomy has to look like.
 
 | Jurisdiction (law) | Count | Added beyond the Codex eight | Notes |
 |---|---|---|---|
-| **United States** (FALCPA + FASTER Act) | 9 | Sesame (since January 2023) | No duty to label molluscs, mustard, celery or lupin |
+| **United States** (FALCPA + FASTER Act) | 9 | Sesame (since January 2023) | No duty to label molluscs, mustard, celery or lupin. Packaged food only; restaurants are outside federal law, and California's SB 68 (from 1 July 2026) makes chains of 20+ locations list the nine per item |
 | **European Union** (FIC, Regulation 1169/2011) | 14 | Gluten-containing cereals, celery, mustard, sesame, lupin, molluscs, sulphites above 10 mg/kg | Applies to non-prepacked food too — i.e. **restaurants** |
 | **United Kingdom** | 14 | Same as the EU | Natasha's Law covers food prepacked for direct sale |
 | **Canada** | 10 + gluten + sulphites | Mustard, molluscs, sesame | Bilingual labelling (English/French) |
-| **Australia / New Zealand** (PEAL) | ~12–13 | Sesame, lupin, molluscs, sulphites; tree nuts named by type | A "Contains" statement is mandatory |
-| **Japan** | 8 mandatory + ~20 recommended | Buckwheat, crab, shrimp and walnut mandatory; cashew in transition; soy and sesame only recommended | Buckwheat, critical in Japan, is on no Western list. Recommended list includes kiwi, banana, apple, peach, beef, chicken, pork, salmon, salmon roe, mackerel, gelatin and more |
-| **Israel** | aligned to the EU list (the same 14) | Allergens emphasised inside the ingredient list; a "fava beans — not suitable for G6PD-deficient" marking | Voluntary from 1 Jan 2025, **mandatory from 1 Jan 2028 — for pre-packaged food only.** The 2022 draft defers non-pre-packaged (restaurant) food to "a later stage"; no restaurant duty was found (file 12 §4) |
+| **Australia / New Zealand** (PEAL) | ~12–13 | Sesame, lupin, molluscs, sulphites, gluten (declared beside wheat, barley, oats, rye); tree nuts named by type | A "Contains" statement is mandatory |
+| **Japan** | 9 mandatory + 20 recommended (since 1 April 2026) | Mandatory: egg, milk, wheat, shrimp, crab, peanut, buckwheat, walnut, and cashew (moved from recommended on 1 April 2026; transition to 31 March 2028). Soy, sesame, fish (salmon, mackerel) and molluscs (squid, abalone) only recommended | Packaged food only: restaurants and over-the-counter food are outside the rules. Buckwheat, critical in Japan, is on no Western list. The 20 recommended: almond, abalone, squid, salmon roe, orange, kiwi, beef, sesame, salmon, mackerel, soy, chicken, banana, pistachio (added 2026), pork, macadamia, peach, yam, apple, gelatin |
+| **Israel** | aligned to the EU list (the same 14) | Allergens emphasised inside the ingredient list; a "fava beans — not suitable for G6PD-deficient" marking | Voluntary from 1 Jan 2025, **mandatory from 1 Jan 2028 — for pre-packaged food only.** The 2022 draft defers non-pre-packaged (restaurant) food to "a later stage"; a search excerpt of the Ministry's guide names 1 Jan 2032 for it (unconfirmed). No restaurant duty today (file 12 §4) |
+
+**Checked 2026-10-19** against web search results (no page could be opened
+in full from this environment, so every check rests on result excerpts):
+the US, Canada, Japan, EU/UK and Israel rows are confirmed or corrected
+above; the sources are listed in file 12 §8.1. Corrections: Japan's
+mandatory list is nine since 1 April 2026 (cashew), and its recommended
+list gained pistachio; the PEAL list declares gluten. The Australia / New
+Zealand row's full required-name list (oats, rye, sulphites by name) was
+not confirmed beyond the excerpts.
 
 ## What it means for the product
 

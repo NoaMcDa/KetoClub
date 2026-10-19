@@ -8,7 +8,11 @@
 /// whole point (file 10 §ALG-13, file 12 §4): Israel's 2028 rule and the
 /// US FASTER Act cover packaged food, so in both home markets the hint is
 /// "ask every time"; only in the EU and the UK, and in large Californian
-/// chains, must a restaurant be able to answer.
+/// chains, must a restaurant be able to answer. Each of those facts was
+/// checked against web sources on 2026-10-19 (file 12 §8.1): SB 68 was
+/// signed and took effect on 1 July 2026, Japan's labelling rules leave
+/// restaurants out, and Israel's restaurant duty, if it comes, is years
+/// away.
 ///
 /// A hint is never a reason to ask less: even where a restaurant must be
 /// able to tell, the app's floor is "ask the restaurant".
@@ -28,8 +32,9 @@ enum RegulationHint {
   /// you nothing, so ask every time.
   packagedOnly,
 
-  /// On the US list for packaged food; only large Californian chains must
-  /// list it per dish (SB 68). Ask every time.
+  /// On the US list for packaged food; only chains of 20 or more
+  /// locations must list it per dish in California (SB 68, from 1 July
+  /// 2026). Ask every time.
   packagedOnlyLargeChains,
 
   /// On no list at the destination: ask every time.
