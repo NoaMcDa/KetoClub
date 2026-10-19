@@ -138,6 +138,62 @@ void main() {
       }
     });
 
+    test('Japan lists only its mandatory items: milk, eggs, wheat, '
+        'peanuts, shrimp and crab, walnut and cashew (checked 2026-10-19; '
+        'buckwheat has no id)', () {
+      // Arrange
+      const japan = <RestrictionId>{
+        RestrictionId.peanuts,
+        RestrictionId.treeNuts,
+        RestrictionId.milk,
+        RestrictionId.eggs,
+        RestrictionId.wheat,
+        RestrictionId.crustaceans,
+      };
+
+      // Act
+      final regulated = <RestrictionId>{
+        for (final entry in restrictionTaxonomy)
+          if (entry.jurisdictions.contains(Jurisdiction.jp)) entry.id,
+      };
+
+      // Assert: soy, sesame, fish and molluscs are only recommended there.
+      expect(regulated, japan);
+    });
+
+    test('Canada and Australia / New Zealand: the Codex eight, sesame and '
+        'their own additions, gluten in both (checked 2026-10-19)', () {
+      // Arrange
+      const codexAndSesame = <RestrictionId>{
+        RestrictionId.peanuts,
+        RestrictionId.treeNuts,
+        RestrictionId.milk,
+        RestrictionId.eggs,
+        RestrictionId.soy,
+        RestrictionId.wheat,
+        RestrictionId.fish,
+        RestrictionId.crustaceans,
+        RestrictionId.sesame,
+        RestrictionId.gluten,
+        RestrictionId.molluscs,
+        RestrictionId.sulphites,
+      };
+      Set<RestrictionId> listedIn(Jurisdiction jurisdiction) => <RestrictionId>{
+        for (final entry in restrictionTaxonomy)
+          if (entry.jurisdictions.contains(jurisdiction)) entry.id,
+      };
+
+      // Assert
+      expect(listedIn(Jurisdiction.ca), <RestrictionId>{
+        ...codexAndSesame,
+        RestrictionId.mustard,
+      });
+      expect(listedIn(Jurisdiction.anz), <RestrictionId>{
+        ...codexAndSesame,
+        RestrictionId.lupin,
+      });
+    });
+
     test('sesame is regulated in the US and the EU', () {
       final sesame = restrictionFor(RestrictionId.sesame);
       expect(sesame.jurisdictions, contains(Jurisdiction.us));

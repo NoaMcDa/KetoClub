@@ -14,7 +14,9 @@ primary page before putting any figure in the product.
 **Could not verify** (named again in the relevant sections):
 
 - Whether the Ministry of Health's 2028 allergen rule reaches restaurant
-  menus (every source found says it covers pre-packaged food only).
+  menus (every source found says it covers pre-packaged food only;
+  re-checked 2026-10-19, §4.2: still prepacked only, and a search excerpt
+  of the Ministry guide names 1 Jan 2032 for non-prepacked food).
 - Whether Wolt Israel or 10bis carry a *structured* per-dish allergen or
   dietary field. Both show venue-level tags and restaurant-written text; no
   official documentation of a dish-level schema was found.
@@ -49,7 +51,7 @@ Why it leads the list: sesame is the signature Israeli allergen (§3.1).
 | חומוס (ממרח) | hummus spread | made with tahini, so sesame even when the menu names only chickpeas | same, plus Dubdevan children's guide: https://www.rdm.co.il/food-allergy/ **[weak]** |
 | חלבה | halva | sesame-based confection — **not** a milk product despite the spelling similarity to חלב (milk) | https://allergy.org.il/אלרגיה-לשומשום/ **[medium]** |
 | בורקס | bourekas | sesame scattered on the egg-washed top ("מברישים בביצה טרופה ומפזרים מעל שומשום") | https://www.hidabroot.org/article/1226396 **[weak]** |
-| פלאפל | falafel | sesame is in many batters ("1 כף שומשום" in HaKosem's published recipe) and used as a coating | https://www.mako.co.il/food-weekend/falafel-hakosem/Article-24b9ad2f82a7351006.htm ; https://taimeta.co.il/falafel-making-spoon-recipe/ **[weak]** |
+| פלאפל | falafel | sesame is in some batters ("1 כף שומשום" in HaKosem's published recipe) and used as a coating; served with tahini. *Checked 2026-10-19:* "many" became "some" — one recipe is the only batter source, though Virginia Tech lists falafel as a food that may contain sesame and the FSA recalled a falafel mix for undeclared sesame (https://pubs.ext.vt.edu/FST/fst-449/fst-449.html **[S]** ; https://www.food.gov.uk/news-alerts/alert/fsa-aa-60-2025 **[S]**) | https://www.mako.co.il/food-weekend/falafel-hakosem/Article-24b9ad2f82a7351006.htm ; https://taimeta.co.il/falafel-making-spoon-recipe/ **[weak]** |
 | סביח | sabich | served with tahini and often amba; egg too (see 1.6) | https://www.bishulim.co.il/מתכון/סביח-חצילים-וביצה-קשה **[weak]** |
 | סלט חצילים (בטחינה) | eggplant salad | one of two common bases is tahini (the other is mayonnaise, see 1.6); menus often omit which | https://www.krutit.co.il/סלט-חצילים-בטחינה-ומיונז/ **[weak]** |
 | לחמנייה / פיתה / בייגלה / בייגל ירושלמי | rolls, pita, pretzels, Jerusalem bagel | sesame topping; Dubdevan tells sesame-allergic children to avoid לחמנייה | https://www.rdm.co.il/food-allergy/ **[weak]** |
@@ -72,7 +74,7 @@ tokens.
 | אגוזי מלך | walnuts | in חרוסת, salads, cakes | (menu vocabulary) |
 | צנוברים | pine nuts | on hummus, in rice and pastries | (menu vocabulary) |
 | אגוזי לוז | hazelnuts | spreads, filled Bamba | Osem Bamba nougat: https://www.osem-nestle.co.il/brands/במבה/חטיף-במבה-במילוי-קרם-נוגט-אריזה-גדולה **[strong]** |
-| במבה | Bamba | classic Bamba is **54% ground peanuts**; Osem lists allergens as peanuts and soy | https://www.osem-nestle.co.il/brands/במבה/חטיף-במבה-קלאסית **[strong, manufacturer]** |
+| במבה | Bamba | classic Bamba is **54% ground peanuts**; Osem lists allergens as peanuts and soy. *Checked 2026-10-19:* export retail listings print 50–54% peanut and give soy only as "may contain" (https://www.woolworths.com.au/shop/productdetails/131914/osem-snacks-bamba-with-peanuts ; https://stopandshop.com/groceries/snacks/chips/more-chip-varieties/osem-bamba-peanut-snack-7-oz-bag.html **[weak, retailer]**) | https://www.osem-nestle.co.il/brands/במבה/חטיף-במבה-קלאסית **[strong, manufacturer]** |
 | "Arachis hypogaea" | peanut (Latin, on labels and medicines) | | http://ek.meydalle.info/kalfon212.htm **[weak]** |
 
 Israeli allergy guidance is to avoid *all* nuts until an allergist separates
@@ -392,6 +394,17 @@ A follow-up found most infants avoiding milk did not actually have CMA
   version that advanced, while schools got the EpiPen duty.
   https://www.israelhayom.co.il/article/871289 **[medium]** ;
   https://www.themarker.com/news/health/2021-04-20/ty-article/.premium/0000017f-dc12-db5a-a57f-dc7aaed60000 **[medium]**
+- **Re-checked 2026-10-19:** a web search excerpt of the Ministry's own
+  guide (above, v2 29 Jun 2025) says the requirement for non-prepacked
+  food is deferred and applies in Israel from **1.1.2032**; the excerpt
+  was garbled and a direct search for the date found nothing else, so the
+  date stays **unconfirmed**. Press reports of the Oct 2025 announcement
+  tie 2028 to packaged food only
+  (https://www.israelhayom.co.il/business/consumers/article/19118233 ;
+  https://finance.walla.co.il/item/3790019 **[medium]**). A 2020 blog
+  (https://mayatzur.com/2020/03/11/ **[weak, dated]**) claims a
+  mass-catering timetable from July 2026 that no official source repeats;
+  not adopted.
 - **Not verified:** any 2028 obligation on restaurant menus. Every source
   found ties 2028 to packaged food. The app should assume restaurant
   allergen information in Israel is **voluntary** for the foreseeable future
@@ -460,8 +473,10 @@ and restaurant food is outside federal labelling law — KFA notes no federal or
 state menu-allergen rule as of 2025, with California's ADDE Act (chains with
 20+ locations, top-9 allergens in writing, no cross-contact labelling) the
 first to move
-(https://community.kidswithfoodallergies.org/blog/new-california-bill-would-require-allergen-labeling-on-restaurant-menus **[medium]**;
-**not verified** whether signed). FARE's registry found reactions cluster at
+(https://community.kidswithfoodallergies.org/blog/new-california-bill-would-require-allergen-labeling-on-restaurant-menus **[medium]**).
+**Checked 2026-10-19: signed.** This is SB 68: signed by the Governor on
+13 Oct 2025, in force from 1 July 2026 (§8.1 has the sources). File 06's
+"SB 68" and this section's "ADDE Act" are the same law. FARE's registry found reactions cluster at
 cafes, fast food, **Asian restaurants**, ice-cream parlours and bars
 (https://www.foodallergy.org/fare-blog/fare-patient-registry-data-sheds-light-prevention-and-management-food-allergy-reactions **[strong]**).
 
@@ -494,6 +509,22 @@ with weekly than daily oil changes
 (https://icds.p.asnevents.com.au/days/2026-11-20/abstract/139049 **[medium,
 abstract]**); CDF still advises asking for a dedicated fryer.
 
+**Checked 2026-10-19 (the trip lexicon's US entries).** Enchilada sauce,
+mole, chili and egg rolls as peanut hiders: confirmed by hospital and
+state peanut-diet sheets ("may be thickened with peanut butter")
+(https://www.cedars-sinai.org/health-topics/peanut-allergy-diet **[M]** ;
+https://www.decal.ga.gov/documents/attachments/Child-Care-Center-Food-Allergy-Fact-Sheet-Peanuts.pdf **[S]**).
+Sesame oil in spicy tuna: confirmed, weakly — most published recipes mix
+mayonnaise, sriracha and sesame oil
+(https://www.justonecookbook.com/wprm_print/spicy-tuna **[W]** ;
+https://www.kitchenaid.com/countertop-appliances/recipes/spicy-tuna-roll **[W]**).
+Sesame in pad thai: **unconfirmed** — the recipes and meal-kit labels found
+use peanuts, fish sauce and egg but no sesame oil
+(https://www.gastronomixs.com/en/components/pad-thai **[W]**); only Spokin
+reports it, so the lexicon keeps it as "sesame oil is reported", a
+suspected trigger that asks and never avoids. The other rows of this
+table remain **unreviewed** beyond their original sources.
+
 ---
 
 ## 6. Implications for the app (summary)
@@ -519,7 +550,18 @@ abstract]**); CDF still advises asking for a dedicated fryer.
 ## 7. Hebrew menu terms for the extended restrictions (ALG-17)
 
 **Status: desk research, added on 2026-10-15 for ALG-17, not clinical
-review.** These are the Hebrew spellings an Israeli menu uses for the
+review. Checked 2026-10-19, in part:** the English food facts behind the
+tables are file 11 §17 and §21–§23, whose sources were re-checked that day
+(file 11 §21–§23 status lines); alpha-gal's gelatin, mammal fats and stock
+are confirmed by CDC and state health material
+(https://stacks.cdc.gov/view/cdc/131346/cdc_131346_DS1.pdf **[strong]** ;
+https://www.mass.gov/doc/alpha-gal-syndrome-information-for-local-boards-of-health-and-food-establishments/download **[strong]**),
+and shawarma's meat as chicken, turkey or lamb (so "suspected" for
+alpha-gal, as the table has it) by restaurant directory text
+(https://www.b144.co.il/%D7%A9%D7%95%D7%95%D7%90%D7%A8%D7%9E%D7%94/%D7%91%D7%AA-%D7%99%D7%9D/ **[weak]**).
+**Still unreviewed:** the Hebrew spellings themselves, which no web source
+can confirm; they need a native-speaking dietitian. These are the Hebrew
+spellings an Israeli menu uses for the
 foods that file 11 §17 (alpha-gal) and §21–§23 (FODMAP, histamine, GLP-1
 eating) list in English, with the sources cited there. As §20 of file 11
 says of all Hebrew dish vocabulary, they are the app's own lexicon, not
@@ -584,14 +626,19 @@ reacts to dairy adds that entry too.
 
 ## 8. Trip mode: restaurant duties and local hidden-ingredient lexicons (ALG-13)
 
-**Status: unreviewed desk research — check in a browser before shipping
-wording.** Added on 2026-10-15 for ALG-13 (issue #355) from general
-culinary and regulatory knowledge, with **no page fetched and no source
-read for this section**. Where a fact is already sourced elsewhere in file
-11 or this file, the code cites that section instead of this one; every
-claim below that the code cites as `12 §8.x` needs a reviewer with a
-browser to confirm it (a national allergy charity, the regulator, a
-standard recipe reference) before its wording is final. The lists are
+**Status: checked 2026-10-19, in part.** Added on 2026-10-15 for ALG-13
+(issue #355) from general culinary and regulatory knowledge. On
+2026-10-19 §8.1 (every row) and the lexicon entries a wrong claim would
+hurt most were checked against **web search results**; this environment
+still cannot open a page (every direct fetch failed at DNS or was refused
+by the egress proxy), so every check rests on result excerpts, and the
+URL and grade sit beside each claim. Rows marked **checked** cite their
+source; rows without a mark remain **unreviewed desk research** and need a
+reviewer with a browser (a national allergy charity, the regulator, a
+standard recipe reference) before their wording is final. No claim was
+upgraded: corrections only removed or softened wording. Where a fact is
+already sourced elsewhere in file 11 or this file, the code cites that
+section instead of this one. The lists are
 deliberately short: a trip-mode term is only ever a *suspected* trigger,
 which turns a strict entry's dish into "ask", never into "avoid", and
 never clears anything. Terms are the Latin-script words a menu at the
@@ -601,14 +648,14 @@ them with their glosses.
 
 ### 8.1 Who must tell you: packaged food versus restaurants
 
-| Jurisdiction | What its list binds | Hint the app shows for a listed allergen | Basis |
+| Jurisdiction | What its list binds | Hint the app shows for a listed allergen | Basis (checked 2026-10-19) |
 |---|---|---|---|
-| EU (France, Italy, Spain, Germany) | packaged **and** non-prepacked food: a restaurant must be able to say which of the 14 a dish holds | "the restaurant must be able to tell you — still ask" | file 02 "The lists"; file 11 §19.2 |
-| United Kingdom | the same 14, for non-prepacked food too (FSA guidance) | the same | file 02; file 11 §19.2 |
-| Israel | packaged food only, mandatory from 1 Jan 2028; restaurants have no duty | "labelled on packaged food only — ask every time" | §4.2; file 11 §19.3 |
-| United States | packaged food (FALCPA, FASTER Act); restaurant food is outside federal law; California requires chains of 20+ locations to list the nine per dish from 1 July 2026 (file 06 calls it SB 68; §5 above records a California bill as not verified signed — the two need reconciling) | "labelled on packaged food; only large chains in California must list it — ask every time" | file 02; file 06; §5 |
-| Japan | **unverified:** the Food Labeling Act's mandatory allergen labelling (eight items: shrimp, crab, walnut, wheat, buckwheat, egg, milk, peanut) applies to packaged food; restaurants and food made and sold on the spot are understood to be exempt, with voluntary disclosure encouraged. Check the Consumer Affairs Agency's own pages | "labelled on packaged food only — ask every time" | this section |
-| Canada, Australia / New Zealand | not researched (not trip destinations yet) | read as packaged-only, the side that never overstates a duty | this section |
+| EU (France, Italy, Spain, Germany) | packaged **and** non-prepacked food: under Article 44 of Regulation 1169/2011 the Annex II allergen particulars are mandatory for food sold non-prepacked, so a restaurant must be able to say which of the 14 a dish holds; each member state may set the *means* (in writing or orally) | "the restaurant must be able to tell you — still ask" | **confirmed**: https://www.legislation.gov.uk/eur/2011/1169/article/44 **[S]** ; Commission notice on Annex II (2017) https://elelmiszerlanc.kormany.hu/akadalymentes/download/2/1f/d1000/labelling_legislation_guidance_allegens-2017-4864_en%20published.pdf **[S]** |
+| United Kingdom | the same 14 for non-prepacked food (Food Information Regulations 2014): the information may be given orally if a sign says so. The FSA's March 2025 best-practice guidance asks for written information plus a conversation, but is not law; "Owen's Law", the campaign to make writing mandatory, has not been enacted. Natasha's Law (1 Oct 2021) covers only food prepacked for direct sale (full ingredient list, allergens emphasised) | the same | **confirmed**: https://www.food.gov.uk/news-alerts/news/updated-industry-guidance-issued-for-food-allergen-information-in-the-out-of-home-sector **[S]** ; https://food.gov.uk/business-guidance/allergen-information-for-non-prepacked-foods-best-practice-approach **[S]** ; https://www.allergyuk.org/news/17778/ **[M]** ; https://www.open.edu/openlearn/health-sports-psychology/owens-law-the-case-written-allergen-information-every-food-business **[M]** ; https://www.food.gov.uk/news-alerts/news/millions-with-food-allergies-to-benefit-as-new-allergen-labelling-law-comes-into-force **[S]** |
+| Israel | packaged food only, voluntary from 1 Jan 2025 and mandatory from 1 Jan 2028; restaurants have no duty today. Non-prepacked food is deferred — to 1 Jan 2032 per one garbled search excerpt of the Ministry guide (**unconfirmed**) | "labelled on packaged food only — ask every time" | **confirmed** (the 2028 rule and its scope): §4.1–§4.2; https://www.teamfrance-export.fr/infos-sectorielles/39650/39650-nouvelles-obligations-detiquetage-des-allergenes **[M]** ; https://www.israelhayom.co.il/business/consumers/article/19118233 **[M]** ; https://www.gov.il/BlobFolder/generalpage/allergens-guidance/he/files_publications_units_food_control_services_allergens-guidance.pdf **[S, excerpt only]** |
+| United States | packaged food (FALCPA, FASTER Act); restaurant food is outside federal law. **California SB 68**, the Allergen Disclosure for Dining Experiences ("ADDE") Act, was **signed on 13 Oct 2025** and took effect on **1 July 2026**: a food facility in a chain of **20 or more locations** (same name, substantially the same menu items) must give **written notification** of the nine major allergens each menu item contains as an ingredient, on the menu or in a digital format (with an alternative for people without the technology). It requires **no cross-contact** statement. File 06's "misdemeanour for not disclosing cross-contact" was wrong on cross-contact (corrected there); the penalty itself was not confirmed | "labelled on packaged food; only large chains in California must list it — ask every time" | **confirmed**: https://sd20.senate.ca.gov/news/california-first-nation-require-allergen-disclosures-restaurant-menus-sb-68 **[S, the author's office]** ; https://community.kidswithfoodallergies.org/blog/governor-newsom-signs-aafa-bill-to-require-allergen-labeling-in-california-restaurants **[M]** ; https://www.allergicliving.com/2026/06/29/adde-allergens-on-menu-act-takes-effect-inspiring-more-states/ **[M]** ; https://www.fisherphillips.com/en/insights/insights/many-restaurant-chains-must-comply-with-californias-new-allergen-disclosure-law **[M, law firm]** ; https://www.gtlaw.com/he/insights/2025/9/california-poised-to-become-first-state-to-mandate-food-allergen-disclosures-for-restaurants-sb-68-awaits-gov-newsoms-signature **[M, law firm]**. The bill text on leginfo.legislature.ca.gov was refused by the egress proxy |
+| Japan | packaged processed food only: restaurants, take-away counters and food sold face to face are outside the labelling rules, and any menu allergen information is voluntary. Since **1 April 2026** the mandatory list is **nine** (egg, milk, wheat, shrimp, crab, peanut, buckwheat, walnut, and cashew, with a transition to 31 March 2028) and the recommended list twenty (pistachio added) | "labelled on packaged food only — ask every time" | **confirmed**: https://www.foodallergy.jp/2022-nutrition-dietary-guidelines/ndg2022-7/ **[S, the Japanese Society for Food Allergy's guideline]** ; https://www.pref.yamanashi.jp/shokuhin-st/shokuhinhyouji/kurumi.html **[S, prefecture]** ; https://www.pref.fukushima.lg.jp/sec/21045e/syokuhinhyouji-allergen.html **[S, prefecture]** ; https://food.chemlinked.com/news/food-news/new-compliance-alert-mandatory-labeling-changes-for-food-exports-to-japan **[M]** ; https://tabemasen.io/allergies/labeling-guide/ **[W]**. The Consumer Affairs Agency's own page was not reached |
+| Canada, Australia / New Zealand | not researched as restaurant rules (not trip destinations yet) | read as packaged-only, the side that never overstates a duty | their packaged lists: file 11 §19.4 (PEAL's "gluten" required name re-checked 2026-10-19: https://foodlabelmaker.com/regulatory-hub/fsanz/peal-allergen-labelling-guide/ **[W]** ; https://agriexchange.apeda.gov.in/ImportRegulations/New%20Allergen%20Labeling%20Requirement%20for%20Australia%20and%20New%20ZealandCanberraAustraliaAS20240007.pdf **[M]**) |
 
 Japan's mandatory list includes **buckwheat**, which has no restriction id
 in the taxonomy (file 02); the briefing tells a buckwheat-allergic user to
@@ -634,6 +681,26 @@ because most soba is cut with wheat flour.
 | tamagoyaki, tamago | eggs, fish | rolled omelette, often seasoned with dashi |
 | gyoza | wheat, gluten | wheat wrappers |
 
+**Checked 2026-10-19 (Japan).** *soba*: confirmed — only *juwari*
+soba is buckwheat alone; *ni-hachi* is about 80% buckwheat and 20% wheat,
+and supermarket soba may be mostly wheat
+(https://www.healthline.com/nutrition/soba-noodles **[M]** ;
+https://www.americastestkitchen.com/taste_tests/2030-soba-noodles **[M]**).
+*shoyu*: confirmed — standard (*koikuchi*) soy sauce is brewed from soy
+and wheat in roughly equal parts; tamari has little or no wheat, so the
+gloss now says "standard soy sauce", and "in most sauces" became "many
+Japanese sauces"
+(https://www.kikkoman.co.uk/inspiration/difference-between-tamari-and-regular-soy-sauce/ **[M, manufacturer]** ;
+https://japanesetaste.com/blogs/japanese-taste-blog/tamari-vs-soy-sauce-whats-the-difference-and-which-should-you-use **[W]**).
+*dashi*: **corrected** — usually bonito flakes (*katsuobushi*) or dried
+sardines (*niboshi*), but kelp-only dashi exists, so the gloss no longer
+says it is "made from bonito"; fish stays its hidden restriction
+(https://www.japanryokanguide.com/en/blog/food-allergy-ryokans-japan **[W]** ;
+undeclared bonito and sardine in a packaged dashi, FDA recall
+https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts/jfc-international-inc-issues-allergy-alert-undeclared-fish-bonito-sardine-tuna-wel-pac-shrimp-soup **[S]**).
+Buckwheat's place on the mandatory list: confirmed (§8.1). The other rows
+of this table remain **unreviewed**.
+
 Shoyu, teriyaki (file 11 §7.2), dashi and katsuobushi (file 11 §8.1) are
 cited to file 11.
 
@@ -650,6 +717,16 @@ cited to file 11.
 | financier | tree nuts, milk, eggs, wheat, gluten | almond-flour cake with brown butter |
 | croque monsieur, croque madame | wheat, gluten, milk, eggs | ham-and-cheese toast with béchamel; the madame adds an egg |
 | gratin, dauphinois | milk | baked in cream, milk or cheese |
+
+**Checked 2026-10-19 (France).** *viennoiserie* and lupin: confirmed —
+the French food-safety agency's 2007 opinion says lupin flour is commonly
+used in bakery and *viennoiserie* products, with reactive doses as low as
+265 mg and lupin 3.7% of food allergies in France
+(https://www.anses.fr/fr/system/files/NUT2007sa0029.pdf **[S]** ;
+Anaphylaxis UK lupin factsheet
+https://www.anaphylaxis.org.uk/wp-content/uploads/2026/08/Lupin-V5.pdf **[M]**).
+The gloss keeps "in some doughs": the opinion is from 2007 and no current
+share was found. The other rows of the France table remain **unreviewed**.
 
 ### 8.4 Italy
 
@@ -668,6 +745,9 @@ Pesto, trapanese, mortadella, cannoli, puttanesca and polpette are cited
 to §5; gianduja to file 11 §2.1; carbonara to file 11 §5.2; bottarga to
 file 11 §8.1.
 
+**Italy:** not checked on 2026-10-19 beyond the entries shared with §5
+and file 11; every row of this table remains **unreviewed**.
+
 ### 8.5 Spain
 
 | Term | Hides | Why (to confirm) |
@@ -684,6 +764,9 @@ file 11 §8.1.
 | turrón | tree nuts, eggs | almond nougat with egg white |
 | rebozado, empanado, empanada | wheat, gluten, eggs | battered, breaded, or a wheat-pastry turnover |
 | ensaladilla | eggs, fish | potato salad in mayonnaise, often with tuna |
+
+**Spain:** not checked on 2026-10-19 beyond the shared entries; every
+row remains **unreviewed**.
 
 Altramuces (lupin) is cited to file 11 §14.1.
 
@@ -703,6 +786,15 @@ Altramuces (lupin) is cited to file 11 §14.1.
 | Suppengrün, Suppengemüse | celery | soup-vegetable bundle that includes celeriac |
 | Bienenstich | tree nuts, milk, eggs, wheat, gluten | yeast cake with almond topping and custard |
 
+**Checked 2026-10-19 (Germany).** *Rouladen*: confirmed — classic
+recipes spread the beef with mustard before rolling
+(https://www.lecker.de/klassische-rinderrouladen-23918.html **[W, recipe]** ;
+https://www.heidelberg24.de/ratgeber/rinderrouladen-wie-bei-oma-so-gelingen-sie-garantiert-zr-94164621.html **[W]**).
+*Remoulade*: confirmed, weakly — a mayonnaise (egg) sauce with mustard,
+gherkins, capers and herbs (https://kvalifood.com/posts/remoulade/ **[W]**).
+*Senf*: the gloss's "on every sausage" was an overstatement and now reads
+"served with sausages". The other rows remain **unreviewed**.
+
 Currywurst and Kartoffelsalat are cited to file 11 §13.2 (curry powder,
 potato salad); Brühe to file 11 §12.2; Marzipan to file 11 §2.2;
 Lupinenmehl to file 11 §14.1.
@@ -719,6 +811,9 @@ Lupinenmehl to file 11 §14.1.
 | Welsh rarebit | milk, wheat, gluten, mustard, fish | cheese sauce on toast, usually with mustard and Worcestershire sauce |
 | stuffing | wheat, gluten, celery | breadcrumb stuffing, often with celery or stock |
 | ploughman's | milk, wheat, gluten, mustard | cheese, bread and pickle |
+
+**United Kingdom:** not checked on 2026-10-19 beyond §8.1; every row
+remains **unreviewed**.
 
 Gravy and Marmite are cited to file 11 §12.2, brown sauce to file 11 §7.2
 (malt vinegar), Worcestershire to file 11 §8.2 and piccalilli to file 11

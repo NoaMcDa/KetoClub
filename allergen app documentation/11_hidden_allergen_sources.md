@@ -1028,9 +1028,14 @@ and [University of Reading](https://www.reading.ac.uk/foodlaw/label/allergens-li
 13. **Lupin** and products thereof.
 14. **Molluscs** and products thereof.
 
-Applies to non-prepacked food (restaurants) in the EU/UK; the FSA says
+Applies to non-prepacked food (restaurants) in the EU/UK (Article 44;
+re-checked 2026-10-19,
+[legislation.gov.uk Article 44](https://www.legislation.gov.uk/eur/2011/1169/article/44):
+the allergen particulars are mandatory for non-prepacked food, the means
+are national); the FSA says
 loose food must have allergen information available for every item,
-best practice in writing ([FSA allergen guidance](https://www.food.gov.uk/business-guidance/allergen-guidance-for-food-businesses),
+best practice in writing (March 2025 guidance, not law; oral information
+with a sign still meets the legal minimum) ([FSA allergen guidance](https://www.food.gov.uk/business-guidance/allergen-guidance-for-food-businesses),
 [FSA non-prepacked](https://www.food.gov.uk/business-guidance/allergen-information-for-non-prepacked-foods-best-practice-approach)).
 
 ### 19.3 Israel — confirmation and corrections
@@ -1112,7 +1117,13 @@ the quoted sentence as press wording until the PDF is checked.
   nut, cashew, hazelnut, macadamia, pecan, pistachio, pine nut, walnut),
   individual cereals, molluscs separate from crustaceans, lupin (mandatory
   since 26 May 2018), sesame, sulphites ≥ 10 mg/kg, with a bold "Contains"
-  summary statement
+  summary statement. *Re-checked 2026-10-19:* a gluten-containing cereal
+  is declared by name **and** as "gluten" ("Contains wheat, gluten"), so
+  the taxonomy now tags gluten for Australia / New Zealand; the full
+  required-name list (oats, rye, sulphites by name) was not confirmed
+  beyond excerpts
+  ([Food Label Maker PEAL guide](https://foodlabelmaker.com/regulatory-hub/fsanz/peal-allergen-labelling-guide/) **[weak]**,
+  [APEDA notice](https://agriexchange.apeda.gov.in/ImportRegulations/New%20Allergen%20Labeling%20Requirement%20for%20Australia%20and%20New%20ZealandCanberraAustraliaAS20240007.pdf))
   ([FSANZ business](https://www.foodstandards.gov.au/business/labelling/allergen-labelling),
   [FSANZ consumer](https://www.foodstandards.gov.au/consumer/labelling/allergen-labelling),
   [FSANZ sulphites](https://www.foodstandards.gov.au/consumer/additives/sulphite)).
@@ -1127,9 +1138,17 @@ the quoted sentence as press wording until the PDF is checked.
   ketchup/BBQ as mustard sources, carrageenan and alpha-gal, ghee's
   lactose content, prawn crackers, shakshuka, za'atar, dashi, bottarga,
   carob/tamarind. All are marked *possible* or *inferred* above.
+  *Re-checked 2026-10-19:* falafel now has an extension-service listing
+  ("may contain sesame") and an FSA recall of a falafel mix for undeclared
+  sesame, and dashi a travel guide plus an FDA recall for undeclared bonito
+  and sardine (file 12 §1.1 and §8.2 have the URLs); neither is a
+  clinical source, so both stay *possible*.
 - The Israeli fava wording, the 2032 date for non-prepacked food and the
   enactment status of the 2022 draft regulations rest on snippets and
-  press; the gov.il PDFs are the place to confirm them.
+  press; the gov.il PDFs are the place to confirm them. Re-searched on
+  2026-10-19: the 2032 date again surfaced only in one garbled excerpt of
+  the Ministry guide and is still **unconfirmed**; the 2028 date and its
+  prepacked-only scope are confirmed (file 12 §8.1).
 - No Israeli prevalence data for celery, mustard or lupin allergy was
   found; the EU alignment is regulatory, not epidemiological.
 - No source gives Hebrew *dish-level* vocabulary; that is file 12's job and
@@ -1140,10 +1159,20 @@ the quoted sentence as press wording until the PDF is checked.
 ## 21. FODMAP (ALG-17; desk research, brief)
 
 > **Status: desk research from the author's background reading of the
-> public sources named below, added on 2026-10-15 for ALG-17. None of the
-> pages was fetched in this session, so — as with the rest of this file —
-> someone with a browser should open each one before a term's wording
-> ships. Not clinical review.**
+> public sources named below, added on 2026-10-15 for ALG-17. Not clinical
+> review. Checked 2026-10-19 against web search results (no page could be
+> opened in full): Gibson & Shepherd 2010 is real as cited (PMID 20136989,
+> [PubMed](https://pubmed.ncbi.nlm.nih.gov/20136989/)) and says the diet
+> needs a trained dietitian; NICE's advice is that a low-FODMAP diet be
+> given only by "a healthcare professional with expertise in dietary
+> management" ([NICE QS114 statement 3](https://www.nice.org.uk/guidance/QS114/chapter/quality-statement-3-dietary-management),
+> the quality standard built on CG61; whether CG61 itself has been
+> replaced was not confirmed); Monash's own page
+> ([monashfodmap.com](https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods))
+> and dietitian summaries of it confirm onion, garlic, leek, shallot,
+> apple, pear, mango, watermelon, honey, cauliflower, mushrooms, cashews
+> and pistachios, and that chickpeas are dose dependent. The §21.2 rows
+> marked "inferred" remain unreviewed.**
 
 **Regulated:** nowhere. FODMAPs (fermentable oligo-, di-, monosaccharides
 and polyols) are not allergens; a low-FODMAP diet is a short, staged
@@ -1199,7 +1228,17 @@ gastrointestinal symptoms: the FODMAP approach." *J Gastroenterol Hepatol*
 ## 22. Histamine (ALG-17; desk research, brief)
 
 > **Status:** as §21 — background reading of the named sources, not
-> fetched in this session, not clinical review.
+> clinical review. **Checked 2026-10-19:** Maintz & Novak 2007 is real as
+> cited (*Am J Clin Nutr* 85(5):1185–1196, PMID 17490952) and defines
+> histamine intolerance as a disequilibrium of histamine and the capacity
+> to degrade it, with diamine oxidase the main enzyme
+> ([nutrition-evidence.com](https://nutrition-evidence.com/article/99495/histamine-and-histamine-intolerance));
+> SIGHI's list exists, distinguishes histamine-rich foods from
+> "liberators" and sorts foods into three tolerance groups
+> ([SIGHI downloads](https://histaminintoleranz.ch/en/downloads.html)).
+> **Unconfirmed:** SIGHI's rating of each food in §22.1–§22.2 (tomato,
+> spinach, strawberries, aged cheeses): the list itself could not be
+> opened, so those rows rest on the 2026-10-15 reading.
 
 **Regulated:** nowhere. Histamine intolerance is a proposed imbalance
 between dietary histamine and the body's capacity to break it down (the
@@ -1250,7 +1289,19 @@ State of the Art." *Biomolecules* 2020;10(8):1181.
 ## 23. Small portions for GLP-1 eating (ALG-17; desk research, brief)
 
 > **Status:** as §21. Not clinical review, and the app gives no dietary
-> advice to anyone on a medicine: it marks what a menu says.
+> advice to anyone on a medicine: it marks what a menu says. **Checked
+> 2026-10-19:** the advisory is real — Mozaffarian D et al., *Am J Clin
+> Nutr* 2025;122(1):344–367, doi 10.1016/j.ajcnut.2025.04.023, from the
+> four societies named, with managing gastrointestinal side effects one of
+> its eight priorities
+> ([Obesity Society PDF](https://www.obesity.org/wp-content/uploads/2025/06/Joint_Nutritional-Priorities-to-Support-GLP-1-Therapy-for-Obesity.pdf));
+> Gallup's 11% (May–June 2026, 5,065 adults) is confirmed
+> ([Gallup](https://news.gallup.com/poll/712157/glp-usage-reaches-new-high.aspx)).
+> **Unconfirmed:** that the advisory itself names smaller portions and
+> limiting fried, greasy and very sweet foods — the search excerpts did not
+> quote its food advice, and only clinic and consumer pages say it (e.g.
+> [Oshi Health](https://oshihealth.com/glp1-nausea/) **[weak]**). The
+> Toast survey was not re-checked.
 
 **Regulated:** nowhere, and not a restriction. People taking a GLP-1
 medicine (semaglutide, tirzepatide and others) eat less, and a joint

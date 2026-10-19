@@ -3777,7 +3777,8 @@ lexicon per destination (romanised or Latin-script terms, Hebrew for
 Israel; glosses in both languages; fish and mammal-meat entries also hide
 vegetarian and vegan, milk and eggs vegan, milk lactose), whose
 country-specific facts are file 12 §8, **unreviewed desk research to check in
-a browser before its wording ships**. While a trip is on and the screen is
+a browser before its wording ships** (checked in part on 2026-10-19; see the
+fact-check paragraph at the end of this decision). While a trip is on and the screen is
 Banto, `MenuController` passes it to `ProfileEvaluator.evaluate` (and through
 `GroupEvaluator.evaluate` and the dish chef card), whose one hook,
 `TripLexicon.withTrip`, adds the destination's terms to the pass that already
@@ -3883,6 +3884,36 @@ is no Python evaluator and no profile in `options`; an empty extraction keeps
 the dish's keto verdict rather than failing it; and the flow test of
 "שמנת" in a description reads it as avoid, since a description is not a
 part to leave off (only an option is).
+
+**Fact-check, 2026-10-19 (#355, #342).** The research behind the trip
+hints and lexicons was checked against web search results (no page could
+be opened in full from this environment; each claim's URL and date sit in
+file 12 §8.1 and the "checked 2026-10-19" lines of files 02, 06, 11 and
+12). Confirmed, so `jurisdictionListScope` and every `RegulationHint` are
+unchanged: California's SB 68 was signed on 13 October 2025 and took
+effect on 1 July 2026 for chains of 20 or more locations (the nine
+allergens each item holds as an ingredient, in writing, on the menu or
+digitally — no cross-contact duty, so file 06's "misdemeanour for not
+disclosing cross-contact" was corrected); Japan's labelling rules leave
+restaurants out; the EU's Article 44 and the UK's 2014 regulations make
+restaurants give allergen information (the FSA's 2025 written-information
+advice is guidance, not law); and Israel's rule is mandatory for
+prepacked food from 1 January 2028, with non-prepacked food deferred (a
+2032 date seen once, unconfirmed). Corrected in the data: Japan's
+mandatory list gained cashew on 1 April 2026 (doc comments only — tree
+nuts were already tagged), and gluten is now tagged for Australia / New
+Zealand, whose PEAL rules declare it, which changes the `allergens.json`
+golden and its backend copy by one tag and nothing a user sees (neither is
+a trip destination, and the picker shows only US and EU tags). In
+`trip_lexicon.dart` five glosses were softened, none strengthened and no
+term or hidden restriction removed: dashi is "usually" bonito or dried
+sardine (kelp-only dashi exists), "standard" soy sauce holds wheat and goes
+into "many" sauces, "some" falafel batters hold sesame, Senf is served
+with sausages rather than "on every sausage", and Bamba's soy is named
+(Osem lists it; export packs print "may contain"). Still unreviewed and
+marked so: the Spain, Italy and UK lexicon rows, most French, German and
+Japanese rows, SIGHI's per-food ratings, the GLP-1 advisory's own food
+advice, and every Hebrew spelling in file 12 §7.
 
 ### D27 — Post-meal confirmations, no ratings
 
