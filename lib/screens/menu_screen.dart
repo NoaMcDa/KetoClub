@@ -1535,6 +1535,11 @@ class _MenuScreenState extends State<MenuScreen> {
             groupBreakdown: groupBreakdownFor(controller, row.dish.id),
             // The GLP-1 tag (ALG-17), for a profile holding small portions.
             smallPortions: controller.profile.contains(RestrictionId.glp1),
+            // ALG-14: whether the kitchen made the change asked for after
+            // an earlier meal, dated; it moves no state.
+            changeAnswer: widget.bantoMode
+                ? controller.changeConfirmationFor(row.dish.id)
+                : null,
             // A pasted menu has no prices, and a website's are unverified
             // (D18, D19): neither shows one.
             showPrice:
@@ -1718,6 +1723,10 @@ class _MenuScreenState extends State<MenuScreen> {
                 analysed: evaluated.dish,
                 menu: controller.menu,
                 trip: controller.trip,
+                // Evaluated as the menu evaluates it (ALG-16, ALG-14): the
+                // restaurant's matrix and the staff's answers for the dish.
+                matrix: controller.matrixEvidenceFor(row.dish.id),
+                confirmations: controller.confirmationsFor(row.dish.id),
                 menuSharer: widget.menuSharer,
               ),
       ),

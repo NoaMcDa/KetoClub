@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/concern.dart';
+import 'package:ketoclub/models/dish_confirmation.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
@@ -49,7 +50,10 @@ import 'package:provider/provider.dart';
 /// row carrying [VerdictCopy.waiterLine]. The net-carb chip and the
 /// hidden-carb flags stay only while [holdsKeto]. A dish the platform
 /// flags kosher shows "declared kosher by the platform" beside the price
-/// (ALG-09). Otherwise the card is exactly as before.
+/// (ALG-09). When the person said after an earlier meal whether the
+/// kitchen made the change they asked for ([changeAnswer], ALG-14), a
+/// dated line under the concerns says so; it never changes the state.
+/// Otherwise the card is exactly as before.
 class DishCard extends StatefulWidget {
   /// Creates a card for [row], formatting its price for [localeTag] and
   /// calling [onShowScript] with [row] when the user asks to open the
@@ -68,6 +72,7 @@ class DishCard extends StatefulWidget {
     this.bantoMode = BantoMode.enabled,
     this.groupBreakdown,
     this.smallPortions = false,
+    this.changeAnswer,
     super.key,
   });
 
@@ -129,6 +134,11 @@ class DishCard extends StatefulWidget {
   /// applies. A tag only, in state mode: it never changes the state, the
   /// colours or the order.
   final bool smallPortions;
+
+  /// The person's latest answer to "they changed the dish as requested"
+  /// (ALG-14, D27), or null for none. Shown with its date in state mode
+  /// only, and never read by the state.
+  final ChangeConfirmation? changeAnswer;
 
   /// Whether this card renders [evaluated]'s state rather than the keto
   /// verdict.
@@ -344,6 +354,7 @@ class _DishCardState extends State<DishCard> {
               coverage: WhyCoverage.of(dish, evaluated.dish),
               strictProfile: widget.wording == ProfileWording.strict,
               bantoMode: widget.bantoMode,
+              changeAnswer: widget.changeAnswer,
             ),
           ],
           if (evaluated != null && stateLine != null && tone != null) ...[
@@ -507,6 +518,9 @@ Color _stateCardEdge(
 /// The key of the concern line at [index] on a dish card (ALG-05).
 Key dishConcernKey(int index) => ValueKey<String>('dishConcern_$index');
 
+/// The key of the dated "the staff changed it as you asked" line (ALG-14).
+const Key dishChangeAnswerKey = ValueKey<String>('dishChangeAnswer');
+
 /// The key of a dish card's "Why?" button (ALG-05).
 const Key dishWhyKey = ValueKey<String>('dishWhy');
 
@@ -665,6 +679,7 @@ class _ConcernsBlock extends StatelessWidget {
     required this.coverage,
     required this.strictProfile,
     required this.bantoMode,
+    this.changeAnswer,
   });
 
   /// The dish's evaluation, whose [EvaluatedDish.concerns] are listed.
@@ -686,10 +701,16 @@ class _ConcernsBlock extends StatelessWidget {
   /// Passed through to [showWhySheet].
   final bool bantoMode;
 
+  /// The person's answer about the change asked for (ALG-14), dated under
+  /// the concern lines and passed to the Why sheet; null for none.
+  final ChangeConfirmation? changeAnswer;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     final concerns = evaluated.concerns;
+    final answer = changeAnswer;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -701,6 +722,19 @@ class _ConcernsBlock extends StatelessWidget {
               concern: concerns[i],
               hebrew: hebrew,
               confirmations: evaluated.confirmations,
+            ),
+          ),
+        if (answer != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Text(
+              answer.honoured
+                  ? l10n.dishChangeHonouredOn(answer.day)
+                  : l10n.dishChangeNotHonouredOn(answer.day),
+              key: dishChangeAnswerKey,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
         // A node of its own (container): without it the button's flag and
@@ -742,6 +776,7 @@ class _ConcernsBlock extends StatelessWidget {
       strictProfile: strictProfile,
       declarations: evaluated.declarations,
       confirmations: evaluated.confirmations,
+      changeAnswer: changeAnswer,
       coverage: coverage,
       bantoMode: bantoMode,
     ),

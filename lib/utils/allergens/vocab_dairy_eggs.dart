@@ -592,6 +592,18 @@ dairyEggsVocabulary = <RestrictionId, RestrictionVocabulary>{
         certainty: TriggerCertainty.suspected,
         source: '11 §3.2',
       ),
+      // Leftover recall misses (issue #352): grilled beef on a skewer is
+      // the same grilled steak (11 §3.2).
+      HiddenTrigger(
+        term: 'shashlik',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §3.2',
+      ),
+      HiddenTrigger(
+        term: 'beef skewers',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §3.2',
+      ),
       HiddenTrigger(
         term: 'ribeye',
         certainty: TriggerCertainty.suspected,
@@ -1126,6 +1138,17 @@ dairyEggsVocabulary = <RestrictionId, RestrictionVocabulary>{
       ),
       HiddenTrigger(
         term: 'אנטרקוט',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §3.2',
+      ),
+      // Leftover recall misses (issue #352); see the English skewers.
+      HiddenTrigger(
+        term: 'שישליק',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §3.2',
+      ),
+      HiddenTrigger(
+        term: 'שיפודי בקר',
         certainty: TriggerCertainty.suspected,
         source: '11 §3.2',
       ),
@@ -2994,6 +3017,13 @@ dairyEggsVocabulary = <RestrictionId, RestrictionVocabulary>{
       // challah (12 §1.6).
       HiddenTrigger(
         term: 'פסטה טרייה',
+        certainty: TriggerCertainty.suspected,
+        source: '12 §1.6',
+      ),
+      // Leftover recall misses (issue #352): a spread of salads usually
+      // holds the mayonnaise ones, eggplant and cabbage (12 §1.6).
+      HiddenTrigger(
+        term: 'מבחר סלטים',
         certainty: TriggerCertainty.suspected,
         source: '12 §1.6',
       ),

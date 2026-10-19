@@ -623,6 +623,18 @@ const List<HiddenTrigger> _wheatHiddenEn = <HiddenTrigger>[
     certainty: TriggerCertainty.suspected,
     source: '12 §5',
   ),
+  // Leftover recall misses (issue #352): crispy wings and chicken are
+  // usually floured or crumbed (11 §7.2).
+  HiddenTrigger(
+    term: 'crispy chicken',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'crispy wings',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
 ];
 
 /// Hebrew hidden sources of wheat (11 §7.1, §7.2, 12 §1.4). Shared by
@@ -862,6 +874,29 @@ const List<HiddenTrigger> _wheatHiddenHe = <HiddenTrigger>[
     term: 'סשימי',
     certainty: TriggerCertainty.suspected,
     source: '12 §5',
+  ),
+  // Leftover recall misses (issue #352): "crispy" in Hebrew, the twin of
+  // קריספי, since a crisp coating is usually flour or crumbs (11 §7.2).
+  // `פריכיות` (rice cakes) is another word and does not match.
+  HiddenTrigger(
+    term: 'פריך',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'פריכה',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'פריכים',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
+  ),
+  HiddenTrigger(
+    term: 'פריכות',
+    certainty: TriggerCertainty.suspected,
+    source: '11 §7.2',
   ),
 ];
 

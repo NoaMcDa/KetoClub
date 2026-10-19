@@ -5,6 +5,7 @@
 // disclaims).
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/chef_card_templates.dart';
@@ -608,6 +609,225 @@ void main() {
                   : (hebrew ? 'לא לכלול' : 'leave them out'),
             ),
           );
+          _expectInsideFloor(note);
+        });
+      }
+    }
+  });
+
+  group('ChefCardText.dishAllergyNote', () {
+    Concern concern(
+      RestrictionId id, {
+      Certainty certainty = Certainty.stated,
+      ConcernSource source = ConcernSource.description,
+      String? matched,
+    }) => Concern(
+      restrictionId: id,
+      source: source,
+      certainty: certainty,
+      tier: EvidenceTier.stated,
+      matchedText: matched,
+    );
+
+    test('keto alone, or nothing, has no note', () {
+      for (final profile in <DietaryProfile>[
+        DietaryProfile.empty,
+        _only(RestrictionId.keto),
+      ]) {
+        expect(
+          ChefCardText.dishAllergyNote(
+            profile,
+            dishName: 'Sabich',
+            concerns: const <Concern>[],
+            hebrew: false,
+          ),
+          isNull,
+        );
+      }
+    });
+
+    // The template table: profile, dish, concerns → the note in English
+    // and in Hebrew.
+    final cases =
+        <
+          ({
+            String why,
+            DietaryProfile profile,
+            String dish,
+            List<Concern> concerns,
+            String en,
+            String he,
+          })
+        >[
+          (
+            why: 'a stated sesame item is asked without, and kept away',
+            profile: _only(RestrictionId.sesame),
+            dish: 'סביח',
+            concerns: <Concern>[
+              concern(RestrictionId.sesame, matched: 'טחינה'),
+            ],
+            en:
+                'I have an allergy to sesame. For סביח: please make it '
+                "without 'טחינה'. Please make sure nothing touches sesame in "
+                'preparation. Thank you.',
+            he:
+                "יש לי אלרגיה לשומשום. לגבי סביח: בבקשה להכין בלי 'טחינה'. "
+                'בבקשה לוודא ששום דבר לא בא במגע עם שומשום בהכנה. תודה.',
+          ),
+          (
+            why: 'a suspected concern is a question, not a removal',
+            profile: _only(RestrictionId.soy),
+            dish: 'Wings',
+            concerns: <Concern>[
+              concern(
+                RestrictionId.soy,
+                certainty: Certainty.suspected,
+                source: ConcernSource.hidden,
+                matched: 'sweet glaze',
+              ),
+            ],
+            en:
+                'I have an allergy to soy. For Wings: please check whether '
+                'it contains soy. Please make sure nothing touches soy in '
+                'preparation. Thank you.',
+            he:
+                'יש לי אלרגיה לסויה. לגבי Wings: בבקשה לבדוק אם יש בה סויה. '
+                'בבקשה לוודא ששום דבר לא בא במגע עם סויה בהכנה. תודה.',
+          ),
+          (
+            why: 'no concern asks to check every ingredient',
+            profile: _only(RestrictionId.peanuts),
+            dish: 'Green salad',
+            concerns: const <Concern>[],
+            en:
+                'I have an allergy to peanuts. For Green salad: please check '
+                'every ingredient, including sauces. Please make sure nothing '
+                'touches peanuts in preparation. Thank you.',
+            he:
+                'יש לי אלרגיה לבוטנים. לגבי Green salad: בבקשה לבדוק כל '
+                'מרכיב, כולל רטבים. בבקשה לוודא ששום דבר לא בא במגע עם '
+                'בוטנים בהכנה. תודה.',
+          ),
+          (
+            why: 'a flexible profile has no cross-contact line',
+            profile: _only(RestrictionId.lactose),
+            dish: 'Pasta',
+            concerns: <Concern>[
+              concern(RestrictionId.lactose, matched: 'cream'),
+            ],
+            en:
+                "I avoid lactose. For Pasta: please make it without 'cream'. "
+                'Thank you.',
+            he:
+                "אני נמנע/ת מלקטוז. לגבי Pasta: בבקשה להכין בלי 'cream'. "
+                'תודה.',
+          ),
+          (
+            why:
+                'a removal and a question join; a kitchen concern adds '
+                'nothing; text that only names the restriction is not quoted',
+            profile: DietaryProfile.empty
+                .withEntry(RestrictionId.sesame)
+                .withEntry(RestrictionId.milk),
+            dish: 'Bowl',
+            concerns: <Concern>[
+              concern(RestrictionId.sesame, matched: 'sesame'),
+              concern(
+                RestrictionId.milk,
+                certainty: Certainty.suspected,
+                source: ConcernSource.hidden,
+              ),
+              concern(
+                RestrictionId.sesame,
+                certainty: Certainty.suspected,
+                source: ConcernSource.kitchen,
+                matched: 'fryer',
+              ),
+            ],
+            en:
+                'I have an allergy to sesame and milk. For Bowl: please make '
+                'it without sesame, and please check whether it contains '
+                'milk. Please make sure nothing touches sesame and milk in '
+                'preparation. Thank you.',
+            he:
+                'יש לי אלרגיה לשומשום ולחלב. לגבי Bowl: בבקשה להכין בלי '
+                'שומשום, ובבקשה לבדוק אם יש בה חלב. בבקשה לוודא ששום דבר לא '
+                'בא במגע עם שומשום וחלב בהכנה. תודה.',
+          ),
+        ];
+    for (final c in cases) {
+      test(c.why, () {
+        final en = ChefCardText.dishAllergyNote(
+          c.profile,
+          dishName: c.dish,
+          concerns: c.concerns,
+          hebrew: false,
+        );
+        final he = ChefCardText.dishAllergyNote(
+          c.profile,
+          dishName: c.dish,
+          concerns: c.concerns,
+          hebrew: true,
+        );
+        expect(en, c.en);
+        expect(he, c.he);
+        for (final note in <String>[en!, he!]) {
+          expect(note.length, lessThanOrEqualTo(allergyNoteMaxLength));
+          _expectInsideFloor(note);
+        }
+      });
+    }
+
+    test('a long note drops the flexible sentence, the closing list and '
+        'the name, never an allergen or an item', () {
+      // Arrange: every restriction at once, and a long dish name.
+      final everything = DietaryProfile(
+        entries: <ProfileEntry>[
+          for (final restriction in restrictionTaxonomy)
+            ProfileEntry(restrictionId: restriction.id),
+        ],
+      );
+      for (final hebrew in <bool>[false, true]) {
+        // Act
+        final note = ChefCardText.dishAllergyNote(
+          everything,
+          dishName: 'A very long dish name that would not fit',
+          concerns: <Concern>[concern(RestrictionId.sesame, matched: 'tahini')],
+          hebrew: hebrew,
+        )!;
+
+        // Assert
+        expect(note, contains("'tahini'"));
+        expect(note, isNot(contains('A very long dish name')));
+        expect(note, contains(hebrew ? 'מגע צולב' : 'cross-contact'));
+        for (final restriction in restrictionTaxonomy) {
+          if (restriction.kind != RestrictionKind.allergen) continue;
+          expect(
+            note,
+            contains(WaiterQuestions.subject(restriction.id, hebrew: hebrew)),
+            reason: restriction.id.name,
+          );
+        }
+        _expectInsideFloor(note);
+      }
+    });
+
+    for (final restriction in restrictionTaxonomy) {
+      if (restriction.id == RestrictionId.keto) continue;
+      for (final hebrew in <bool>[false, true]) {
+        test('${restriction.id.name} ${hebrew ? 'he' : 'en'}: one short '
+            'dish note in its language, inside the wording floor', () {
+          final note = ChefCardText.dishAllergyNote(
+            _only(restriction.id),
+            dishName: hebrew ? 'סלט' : 'Salad',
+            concerns: <Concern>[
+              concern(restriction.id, certainty: Certainty.likely),
+            ],
+            hebrew: hebrew,
+          )!;
+          expect(note.length, lessThanOrEqualTo(allergyNoteMaxLength));
+          expect(note, isNot(contains('\n')));
+          expect(RegExp('[֐-׿]').hasMatch(note), hebrew);
           _expectInsideFloor(note);
         });
       }

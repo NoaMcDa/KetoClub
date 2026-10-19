@@ -936,4 +936,86 @@ void main() {
       _hit('אגרול ירקות', RestrictionId.legumes, <String>['אגרול:likely']),
     ]);
   });
+
+  group('hidden sources added for the leftover recall misses (#352)', () {
+    // Each term is suspected (11 §6.2, 11 §13.2, 11 §15.2), in a plain
+    // sentence and behind a Hebrew prefix.
+    const soyEn = <String>['sesame sauce', 'sesame noodles', 'sweet glaze'];
+    const soyHe = <String>['רוטב מתקתק', 'רוטב שומשום'];
+    const mustardEn = <String>['house sauce', 'secret sauce', 'sweet glaze'];
+    const mustardHe = <String>[
+      'מוחמץ',
+      'מוחמצת',
+      'מוחמצים',
+      'מוחמצות',
+      'רוטב הבית',
+      'רוטב סודי',
+      'רוטב מתקתק',
+    ];
+    const sulphitesEn = <String>[
+      'maki',
+      'uramaki',
+      'nigiri',
+      'inside out roll',
+    ];
+    const sulphitesHe = <String>['מאקי', 'ניגירי', 'אינסייד אאוט'];
+    const english = <(RestrictionId, List<String>)>[
+      (RestrictionId.soy, soyEn),
+      (RestrictionId.legumes, soyEn),
+      (RestrictionId.mustard, mustardEn),
+      (RestrictionId.sulphites, sulphitesEn),
+    ];
+    const hebrew = <(RestrictionId, List<String>)>[
+      (RestrictionId.soy, soyHe),
+      (RestrictionId.legumes, soyHe),
+      (RestrictionId.mustard, mustardHe),
+      (RestrictionId.sulphites, sulphitesHe),
+    ];
+
+    for (final (id, terms) in english) {
+      _run(<_Case>[
+        for (final term in terms)
+          _hit('Served with $term', id, <String>['$term:suspected']),
+      ]);
+    }
+    for (final (id, terms) in hebrew) {
+      _run(<_Case>[
+        for (final term in terms) ...<_Case>[
+          _hit('מנה עם $term', id, <String>['$term:suspected']),
+          _hit('מנה ב$term', id, <String>[
+            '$term:suspected',
+          ], why: 'behind the prefix ב'),
+        ],
+      ]);
+    }
+
+    // The corpus dishes each addition closes, and what it must not read.
+    _run(<_Case>[
+      _hit(
+        'Cold Sesame Noodles. Cold wheat noodles in a peanut and sesame sauce',
+        RestrictionId.soy,
+        <String>['sesame noodles:suspected', 'sesame sauce:suspected'],
+      ),
+      _hit('כנפי עוף פריכות ברוטב מתקתק סודי', RestrictionId.soy, <String>[
+        'רוטב מתקתק:suspected',
+      ], why: 'a sweet wing glaze'),
+      _hit('כנפי עוף פריכות ברוטב מתקתק סודי', RestrictionId.mustard, <String>[
+        'רוטב מתקתק:suspected',
+      ], why: 'a sweet meat glaze'),
+      _hit('חלפיניו מוחמץ', RestrictionId.mustard, <String>[
+        'מוחמץ:suspected',
+      ], why: 'a pickled product'),
+      _hit(
+        'אבוקדו, מלפפון וגזר בשומשום (אינסייד אאוט)',
+        RestrictionId.sulphites,
+        <String>['אינסייד אאוט:suspected'],
+      ),
+      _miss(
+        'Makizushi workshop',
+        RestrictionId.sulphites,
+        lacks: <String>['maki'],
+        why: 'is another word',
+      ),
+    ]);
+  });
 }

@@ -190,6 +190,12 @@ final class MenuController extends ChangeNotifier {
   /// venue with none, and read by nothing in a keto-only menu.
   List<DishConfirmation> _confirmations = const <DishConfirmation>[];
 
+  /// Whether the kitchen made the change asked for on the open venue's
+  /// dishes after an earlier meal (ALG-14, D27), read with
+  /// [_confirmations] in [open]; see [changeConfirmationFor]. It never
+  /// enters an evaluation.
+  List<ChangeConfirmation> _changeConfirmations = const <ChangeConfirmation>[];
+
   /// The upload [open] last started, or an already-complete future when
   /// none has been; see [lastUpload].
   Future<void> _lastUpload = Future<void>.value();
@@ -794,6 +800,32 @@ final class MenuController extends ChangeNotifier {
   MatrixEvidence _matrixEvidenceFor(String dishId) =>
       allergenMatrixMatch?.evidenceFor(dishId) ?? MatrixEvidence.none;
 
+  /// What the restaurant's allergen matrix says about the dish [dishId]
+  /// (ALG-16), exactly as this controller's own evaluations read it, or
+  /// [MatrixEvidence.none]: for a screen that evaluates the dish again in
+  /// another language, such as the per-dish chef card (ALG-08b).
+  MatrixEvidence matrixEvidenceFor(String dishId) => _matrixEvidenceFor(dishId);
+
+  /// What the staff said about the dish [dishId] after an earlier meal
+  /// (ALG-14, D27), as this controller's own evaluations read it
+  /// ([Confirmations.forDish]); empty for a dish with no answer.
+  List<ConfirmationEvidence> confirmationsFor(String dishId) =>
+      Confirmations.forDish(dishId, _confirmations);
+
+  /// The latest answer to "they changed the dish as requested" for the
+  /// dish [dishId] (ALG-14, D27), read from the visit history in [open],
+  /// or null when there is none. Shown beside the dish with its date and
+  /// never read by an evaluation: it moves no state. At a tie on the day,
+  /// the last recorded answer is the one returned.
+  ChangeConfirmation? changeConfirmationFor(String dishId) {
+    ChangeConfirmation? latest;
+    for (final answer in _changeConfirmations) {
+      if (answer.dishId != dishId) continue;
+      if (latest == null || !answer.day.isBefore(latest.day)) latest = answer;
+    }
+    return latest;
+  }
+
   /// How the menu screen words its verdicts for [profile] (Banto, ALG-05,
   /// issue #347): [ProfileWording.ketoOnly] unless the screen that opened
   /// this menu shows Banto surfaces and the profile holds a restriction
@@ -1126,6 +1158,8 @@ final class MenuController extends ChangeNotifier {
     _dishNotes = await _notes.readAll(ref);
     final previous = await _history.read(ref);
     _confirmations = previous?.confirmations ?? const <DishConfirmation>[];
+    _changeConfirmations =
+        previous?.changeConfirmations ?? const <ChangeConfirmation>[];
     if (previous?.name != _historyName || previous?.city != _historyCity) {
       _historyName = previous?.name;
       _historyCity = previous?.city;

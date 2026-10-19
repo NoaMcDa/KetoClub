@@ -18,6 +18,7 @@
 /// used for every allergen. Pure: no widget, no clock, no I/O.
 library;
 
+import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/kitchen_signals.dart';
@@ -152,84 +153,189 @@ abstract final class ChefCardText {
   /// [allergyNoteMaxLength] the flexible sentence is dropped; the allergen
   /// list is never cut. No severity word, no promise and no "safe".
   static String? allergyNote(DietaryProfile profile, {required bool hebrew}) {
-    final allergens = <RestrictionId>[];
-    var celiac = false;
-    final flexible = <RestrictionId>[];
-    final ownTerms = <String>[];
-    var ownEntry = false;
-    for (final entry in profile.entries) {
-      final restriction = restrictionFor(entry.restrictionId);
-      if (restriction.id == RestrictionId.custom) {
-        ownEntry = true;
-        ownTerms.addAll(entry.terms);
-        continue;
-      }
-      switch (restriction.kind) {
-        case RestrictionKind.allergen:
-          allergens.add(restriction.id);
-        case RestrictionKind.autoimmune:
-          celiac = true;
-        case RestrictionKind.keto:
-          break;
-        case RestrictionKind.intolerance:
-        case RestrictionKind.lifestyle:
-        case RestrictionKind.religiousComponent:
-          flexible.add(restriction.id);
-      }
-    }
-    final strict = allergens.isNotEmpty || celiac || ownEntry;
-    if (!strict && flexible.isEmpty) return null;
-
-    String subjects(List<RestrictionId> ids, String prefix) =>
-        _joinList(<String>[
-          for (final id in ids)
-            '$prefix${WaiterQuestions.subject(id, hebrew: hebrew)}',
-        ], hebrew: hebrew);
-
-    final allergenSentence = allergens.isEmpty
-        ? null
-        : (hebrew ? 'יש לי אלרגיה {list}.' : 'I have an allergy to {list}.')
-              .replaceAll('{list}', subjects(allergens, hebrew ? 'ל' : ''));
-    final celiacSentence = !celiac
-        ? null
-        : (hebrew
-              ? 'יש לי צליאק ואני לא יכול/ה לאכול גלוטן.'
-              : 'I have celiac disease and cannot eat gluten.');
-    final ownList = ownTerms.isEmpty
-        ? WaiterQuestions.subject(RestrictionId.custom, hebrew: hebrew)
-        : _joinList(ownTerms, hebrew: hebrew);
-    final ownSentence = !ownEntry
-        ? null
-        : (hebrew
-                  ? (allergens.isNotEmpty || celiac
-                        ? 'אני גם לא יכול/ה לאכול {list}.'
-                        : 'אני לא יכול/ה לאכול {list}.')
-                  : (allergens.isNotEmpty || celiac
-                        ? 'I also cannot eat {list}.'
-                        : 'I cannot eat {list}.'))
-              .replaceAll('{list}', ownList);
-    final flexibleSentence = flexible.isEmpty
-        ? null
-        : (hebrew
-                  ? (strict ? 'אני גם נמנע/ת {list}.' : 'אני נמנע/ת {list}.')
-                  : (strict ? 'I also avoid {list}.' : 'I avoid {list}.'))
-              .replaceAll('{list}', subjects(flexible, hebrew ? 'מ' : ''));
-    final closing = strict
+    final parts = _NoteParts.of(profile, hebrew: hebrew);
+    if (parts == null) return null;
+    final closing = parts.strict
         ? (hebrew ? _noteClosingStrictHe : _noteClosingStrictEn)
         : (hebrew ? _noteClosingHe : _noteClosingEn);
 
     String join({required bool withFlexible}) => <String>[
-      ?allergenSentence,
-      ?celiacSentence,
-      ?ownSentence,
-      if (withFlexible) ?flexibleSentence,
+      ...parts.sentences(withFlexible: withFlexible),
       closing,
     ].join(' ');
 
     final full = join(withFlexible: true);
-    if (full.length <= allergyNoteMaxLength || !strict) return full;
+    if (full.length <= allergyNoteMaxLength || !parts.strict) return full;
     return join(withFlexible: false);
   }
+
+  /// The allergy note for one dish (ALG-15, issue #357): [allergyNote]'s
+  /// profile sentences, then what to do about this dish, composed from
+  /// its [concerns] (an `EvaluatedDish`'s, already the profile's), in
+  /// Hebrew when [hebrew], else English, for a delivery app's note box or
+  /// a waiter. Null when [profile] holds nothing but keto.
+  ///
+  /// After the profile, "For {dish}:" and, for every concern that is
+  /// stated or likely, "please make it without {items}" with the menu's
+  /// own words in quotes (the restriction's name when there are none to
+  /// quote); for every suspected one, "please check whether it contains
+  /// {restrictions}". With no such concern it asks to check every
+  /// ingredient. A profile with a strict entry closes with "make sure
+  /// nothing touches {its strict restrictions} in preparation"; a
+  /// flexible one with thanks. A kitchen concern (ALG-07) is the closing
+  /// line's business, and a heads-up restriction (ALG-17) never asks for
+  /// a dish "without" something, so neither adds an item.
+  ///
+  /// To stay within [allergyNoteMaxLength] it drops, in order, the
+  /// flexible sentence, the list in the closing line (keeping "no
+  /// cross-contact in preparation") and the dish's name; it never drops
+  /// an allergen, an item or a question. No severity word, no promise and
+  /// no "safe".
+  static String? dishAllergyNote(
+    DietaryProfile profile, {
+    required String dishName,
+    required List<Concern> concerns,
+    required bool hebrew,
+  }) {
+    final parts = _NoteParts.of(profile, hebrew: hebrew);
+    if (parts == null) return null;
+
+    final without = <String>[];
+    final check = <String>[];
+    final seen = <String>{};
+    void add(List<String> into, String value) {
+      if (seen.add(value.toLowerCase())) into.add(value);
+    }
+
+    for (final concern in concerns) {
+      final id = concern.restrictionId;
+      if (concern.source == ConcernSource.kitchen) continue;
+      if (headsUpRestrictions.contains(id)) continue;
+      final subject = WaiterQuestions.subject(id, hebrew: hebrew);
+      if (concern.certainty == Certainty.suspected) {
+        add(check, subject);
+        continue;
+      }
+      final quoted = concern.source == ConcernSource.matrix
+          ? null
+          : _quotable(concern.matchedText);
+      add(
+        without,
+        quoted == null ||
+                quoted.toLowerCase() == subject.toLowerCase() ||
+                quoted.toLowerCase() ==
+                    WaiterQuestions.subject(id, hebrew: !hebrew).toLowerCase()
+            ? subject
+            : "'$quoted'",
+      );
+    }
+    // A restriction both asked about and to leave out is left out.
+    check.removeWhere(
+      (subject) => without.any((item) => item.toLowerCase() == subject),
+    );
+
+    final strictSubjects = <String>[
+      for (final entry in profile.entries)
+        if (restrictionFor(entry.restrictionId).isStrict)
+          if (entry.restrictionId == RestrictionId.custom &&
+              entry.terms.isNotEmpty)
+            ...entry.terms
+          else
+            WaiterQuestions.subject(entry.restrictionId, hebrew: hebrew),
+    ];
+
+    String dishSentence({required bool named}) {
+      final name = dishName.trim();
+      final lead = !named || name.isEmpty
+          ? ''
+          : (hebrew ? 'לגבי {dish}: ' : 'For {dish}: ').replaceAll(
+              '{dish}',
+              name,
+            );
+      final asks = <String>[
+        if (without.isNotEmpty)
+          (hebrew ? 'בבקשה להכין בלי {list}' : 'please make it without {list}')
+              .replaceAll('{list}', _joinList(without, hebrew: hebrew)),
+        if (check.isNotEmpty)
+          (hebrew
+                  ? 'בבקשה לבדוק אם יש בה {list}'
+                  : 'please check whether it contains {list}')
+              .replaceAll('{list}', _joinList(check, hebrew: hebrew)),
+        if (without.isEmpty && check.isEmpty && hebrew)
+          'בבקשה לבדוק כל מרכיב, כולל רטבים',
+        if (without.isEmpty && check.isEmpty && !hebrew)
+          'please check every ingredient, including sauces',
+      ];
+      final body = asks.join(hebrew ? ', ו' : ', and ');
+      final sentence = '$lead$body.';
+      // Capitalise an English sentence that has no dish name to lead it.
+      return lead.isEmpty && !hebrew
+          ? '${sentence[0].toUpperCase()}${sentence.substring(1)}'
+          : sentence;
+    }
+
+    String closing({required bool listed}) {
+      if (!parts.strict) return hebrew ? _closingHe : _closingEn;
+      if (!listed || strictSubjects.isEmpty) {
+        return hebrew ? _dishNoteClosingHe : _dishNoteClosingEn;
+      }
+      return (hebrew ? _dishNoteClosingListHe : _dishNoteClosingListEn)
+          .replaceAll('{list}', _joinList(strictSubjects, hebrew: hebrew));
+    }
+
+    String compose({
+      required bool withFlexible,
+      required bool listed,
+      required bool named,
+    }) => <String>[
+      ...parts.sentences(withFlexible: withFlexible),
+      dishSentence(named: named),
+      closing(listed: listed),
+    ].join(' ');
+
+    // Each step drops one more thing; the last is returned whatever its
+    // length, since what is left is never cut.
+    final steps = <({bool withFlexible, bool listed, bool named})>[
+      (withFlexible: true, listed: true, named: true),
+      (withFlexible: false, listed: true, named: true),
+      (withFlexible: false, listed: false, named: true),
+      (withFlexible: false, listed: false, named: false),
+    ];
+    var note = '';
+    for (final step in steps) {
+      note = compose(
+        withFlexible: step.withFlexible || !parts.strict,
+        listed: step.listed,
+        named: step.named,
+      );
+      if (note.length <= allergyNoteMaxLength) return note;
+    }
+    return note;
+  }
+
+  /// [matched] trimmed, when it is short enough to quote as the menu's
+  /// own words (at most [_maxQuotedNoteLength] characters); null
+  /// otherwise.
+  static String? _quotable(String? matched) {
+    final item = matched?.trim();
+    if (item == null || item.isEmpty || item.length > _maxQuotedNoteLength) {
+      return null;
+    }
+    return item;
+  }
+
+  /// The most characters of menu text a dish note quotes, as a waiter
+  /// question does: a longer slice is a sentence, not an ingredient.
+  static const int _maxQuotedNoteLength = 40;
+
+  static const String _dishNoteClosingListEn =
+      'Please make sure nothing touches {list} in preparation. Thank you.';
+  static const String _dishNoteClosingListHe =
+      'בבקשה לוודא ששום דבר לא בא במגע עם {list} בהכנה. תודה.';
+  static const String _dishNoteClosingEn =
+      'Please make sure there is no cross-contact in preparation. Thank you.';
+  static const String _dishNoteClosingHe =
+      'בבקשה לוודא שאין מגע צולב בהכנה. תודה.';
 
   /// [items] as one list in running text: "a", "a and b", "a, b and c";
   /// in Hebrew the last joins with the conjunction ו, attached to it.
@@ -409,4 +515,112 @@ abstract final class ChefCardText {
     }
     return 'אני בתזונה $name — נא לומר לי אילו מנות אינן מתאימות לה.';
   }
+}
+
+/// The profile half of an allergy note (ALG-15), shared by
+/// [ChefCardText.allergyNote] and [ChefCardText.dishAllergyNote]: one
+/// sentence for the allergens, celiac disease, the user's own words and
+/// the flexible entries, each in Hebrew or English.
+final class _NoteParts {
+  const new({
+    required this.strict,
+    required this.allergen,
+    required this.celiac,
+    required this.own,
+    required this.flexible,
+  });
+
+  /// The parts for [profile], or null when it holds nothing but keto,
+  /// which a kitchen note does not carry.
+  static _NoteParts? of(DietaryProfile profile, {required bool hebrew}) {
+    final allergens = <RestrictionId>[];
+    var celiac = false;
+    final flexible = <RestrictionId>[];
+    final ownTerms = <String>[];
+    var ownEntry = false;
+    for (final entry in profile.entries) {
+      final restriction = restrictionFor(entry.restrictionId);
+      if (restriction.id == RestrictionId.custom) {
+        ownEntry = true;
+        ownTerms.addAll(entry.terms);
+        continue;
+      }
+      switch (restriction.kind) {
+        case RestrictionKind.allergen:
+          allergens.add(restriction.id);
+        case RestrictionKind.autoimmune:
+          celiac = true;
+        case RestrictionKind.keto:
+          break;
+        case RestrictionKind.intolerance:
+        case RestrictionKind.lifestyle:
+        case RestrictionKind.religiousComponent:
+          flexible.add(restriction.id);
+      }
+    }
+    final strict = allergens.isNotEmpty || celiac || ownEntry;
+    if (!strict && flexible.isEmpty) return null;
+
+    String subjects(List<RestrictionId> ids, String prefix) =>
+        ChefCardText._joinList(<String>[
+          for (final id in ids)
+            '$prefix${WaiterQuestions.subject(id, hebrew: hebrew)}',
+        ], hebrew: hebrew);
+
+    final ownList = ownTerms.isEmpty
+        ? WaiterQuestions.subject(RestrictionId.custom, hebrew: hebrew)
+        : ChefCardText._joinList(ownTerms, hebrew: hebrew);
+    return _NoteParts(
+      strict: strict,
+      allergen: allergens.isEmpty
+          ? null
+          : (hebrew ? 'יש לי אלרגיה {list}.' : 'I have an allergy to {list}.')
+                .replaceAll('{list}', subjects(allergens, hebrew ? 'ל' : '')),
+      celiac: !celiac
+          ? null
+          : (hebrew
+                ? 'יש לי צליאק ואני לא יכול/ה לאכול גלוטן.'
+                : 'I have celiac disease and cannot eat gluten.'),
+      own: !ownEntry
+          ? null
+          : (hebrew
+                    ? (allergens.isNotEmpty || celiac
+                          ? 'אני גם לא יכול/ה לאכול {list}.'
+                          : 'אני לא יכול/ה לאכול {list}.')
+                    : (allergens.isNotEmpty || celiac
+                          ? 'I also cannot eat {list}.'
+                          : 'I cannot eat {list}.'))
+                .replaceAll('{list}', ownList),
+      flexible: flexible.isEmpty
+          ? null
+          : (hebrew
+                    ? (strict ? 'אני גם נמנע/ת {list}.' : 'אני נמנע/ת {list}.')
+                    : (strict ? 'I also avoid {list}.' : 'I avoid {list}.'))
+                .replaceAll('{list}', subjects(flexible, hebrew ? 'מ' : '')),
+    );
+  }
+
+  /// Whether the profile holds a strict entry: an allergen, celiac
+  /// disease or the user's own words.
+  final bool strict;
+
+  /// "I have an allergy to …", or null without an allergen.
+  final String? allergen;
+
+  /// The celiac sentence, or null without celiac disease.
+  final String? celiac;
+
+  /// "I (also) cannot eat …", or null without the user's own words.
+  final String? own;
+
+  /// "I (also) avoid …", or null without a flexible entry.
+  final String? flexible;
+
+  /// The sentences in order, the flexible one only when [withFlexible].
+  List<String> sentences({required bool withFlexible}) => <String>[
+    ?allergen,
+    ?celiac,
+    ?own,
+    if (withFlexible) ?flexible,
+  ];
 }

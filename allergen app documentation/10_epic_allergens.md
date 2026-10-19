@@ -371,10 +371,12 @@ plain sight in the dish name.
 3. **The veto.** For a strict entry (any allergen, celiac), a rules
    concern with certainty `stated`/`likely` forces the verdict to at least
    `modifiable` (if the trigger sits on a removable role) or `nonKeto`
-   (otherwise), whatever the model said. For a flexible entry the model's
-   verdict stands and the rules concern is shown as evidence only. This is
-   the only place in the engine where rules outrank the model, and it is
-   documented as such.
+   (otherwise), whatever the model said. **Amended (#346, owner's
+   decision 2026-10-19; architecture.md D26):** a flexible entry's
+   `stated` or `likely` rules concern moves the dish's state the same
+   way, because option B has no per-restriction model verdict to defer
+   to; only a flexible entry's `suspected` concern moves nothing and is
+   shown as evidence. The wire's keto verdict is still the model's.
 4. **Rules-only mode.** When the model cannot answer, the rules pass is the
    whole analysis (as today for keto), the engine chip says "rules", and
    ALG-05 wording for strict entries becomes stricter still ("menu text
@@ -996,8 +998,9 @@ payments, no accounts, and a per-install rate limit that is the only
   descriptions), D22 (the one schema bump), D24 (new table, same install-id
   rule), D25 (profile in `options`).
 - **Docs:** `architecture.md` §6.2, §6.3, §7, §9, §11, §14, §17;
-  `CLAUDE.md` status banner and traps (add: "rules outrank the model only
-  for strict entries", "no 'safe' for a strict entry", "a profile never
+  `CLAUDE.md` status banner and traps (add: "a firm finding moves every
+  entry; a suspected one only a strict entry" (#346), "no 'safe' for a
+  strict entry", "a profile never
   enters a request body");
   `HANDOFF.md`; `README.md`'s classification narrative.
 - **CI:** the ALG-10 gate as a required job beside `backend/check.sh`.

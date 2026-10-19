@@ -924,7 +924,9 @@ dish's name, description and non-removal option values, and
 `ProfileEvaluator.evaluate` unions those findings — always recomputed from
 the dish, never trusted from a cache or a server — with the analysis's own
 concerns and the concerns read from its ingredients. A model result can add
-or raise a concern, never remove one. Only a strict entry (an allergen,
+or raise a concern, never remove one. A `stated` or `likely` concern moves
+the state for every entry, strict or flexible (D26's #346 amendment). Only a
+strict entry (an allergen,
 celiac disease, the user's own words) turns a suspected finding into "ask"
 or takes a kitchen-signal demotion; a flexible entry lists it. The derived
 `DishState` (fits, with a change, ask, avoid) is the UI's; the wire verdict
@@ -3842,8 +3844,9 @@ badge, a rank, a score or a rating of the venue; no restaurant can buy a
 rating, a placement or a better state, and no copy for it says "verified"
 or "safe" (file 07's B2B rule). Out of this slice: reading a photographed
 printed matrix through the vision path, user-submitted matrix photos held
-as `suspected`, the restaurant-facing upload page, and the per-dish chef
-card's re-evaluation, which does not yet take the matrix.
+as `suspected` and the restaurant-facing upload page. (The per-dish chef
+card's re-evaluation, left out of this slice, now takes the matrix: see
+"The Banto leftovers" below.)
 
 **Close-out of ALG-03, ALG-04, ALG-06 and ALG-11, and the GLP-1 tag (#345,
 #346, #348, #353, #359).** Option B and its reasons are now in §9.6 and the
@@ -3883,6 +3886,63 @@ is no Python evaluator and no profile in `options`; an empty extraction keeps
 the dish's keto verdict rather than failing it; and the flow test of
 "שמנת" in a description reads it as avoid, since a description is not a
 part to leave off (only an option is).
+
+**Amendment: a flexible entry's firm rules finding moves its state (#346;
+the owner's decision, 2026-10-19).** The epic's ALG-04 says that "for a
+flexible entry the model's verdict stands and the rules concern is shown as
+evidence only". That sentence was written for option A, in which the model
+gives a verdict per restriction and the rules could defer to it. Option B
+(§9.6), which shipped, has no per-restriction model verdict to defer to: the
+model only extracts ingredients, and `ProfileEvaluator` derives every state
+from the union of concerns. So the rule is now: for **every** entry, strict
+or flexible, a `stated` or `likely` concern moves the dish's state, to
+`avoid` on a part that cannot be left off and to `fitsWithChange` on a
+removable one, whether the rules or the model's extraction found it; only a
+**`suspected`** concern of a flexible entry moves nothing (it is listed, and
+the Why sheet explains it), while a strict entry's suspected concern still
+turns the dish to `ask`. This is what `ProfileEvaluator` has done since
+ALG-04b; the amendment records it as a decision rather than an accident,
+and the epic's ALG-04 text is corrected to match. The keto verdict on the
+wire is still the model's and is never rewritten.
+
+**The Banto leftovers (related to #350, #352, #356, #358; ALG-15).** Four
+small pieces close gaps the slices above left. *The per-dish chef card
+evaluates like the menu:* `MenuController.matrixEvidenceFor(dishId)` and
+`confirmationsFor(dishId)` hand the dish's `MatrixEvidence` and
+`Confirmations.forDish` to `ChefCardScreen` (`matrix:`, `confirmations:`),
+which passes them, with the dish's section heading, to
+`ProfileEvaluator.evaluate` for one profile and to `GroupEvaluator.evaluate`
+for a group, so a matrix `contains` cell or a staff answer asks the same
+question on the card as on the menu. *A dish-level allergy note (ALG-15):*
+`ChefCardText.dishAllergyNote(profile, dishName:, concerns:, hebrew:)`
+reuses `allergyNote`'s profile sentences (now one private `_NoteParts`) and
+adds "For {dish}: please make it without '{the menu's words}'" for each
+stated or likely concern and "please check whether it contains {subject}"
+for each suspected one (`WaiterQuestions.subject`), closing for a strict
+profile with "make sure nothing touches {its strict restrictions} in
+preparation"; it stays within `allergyNoteMaxLength` by dropping, in order,
+the flexible sentence, that list (for "no cross-contact in preparation") and
+the dish's name, and never an allergen, an item or a question. The per-dish
+chef card shows it, in the card's language, with Copy and Share; the menu's
+overflow keeps the profile-level note. No severity word ("Severe sesame
+allergy" in the epic's example is not used: there are no severity levels).
+*The change answer on reopen (D27 §4's "recorded but not yet shown"):*
+`MenuController.open` reads `VisitEntry.changeConfirmations` with the
+concern answers, and `changeConfirmationFor(dishId)` returns the latest
+day's; with `bantoMode` the dish card dates it under its concern lines ("The
+staff changed it as you asked, May 12", "הצוות שינה את המנה כפי שביקשת, 12
+במאי", or that they did not) and the Why sheet adds a line saying the change
+was for that visit. It enters no evaluation, so it never alters a state.
+*Recall:* the vocabulary closed ten of the seventeen known misses (soy for
+sesame noodles and a sweet wing glaze, wheat and gluten for crisp coatings,
+mustard for a pickled option and a sweet glaze, legumes through soy,
+sulphites for named sushi rolls, milk for grilled beef skewers, eggs for a
+salad spread), every term `suspected` and cited to file 11 or 12, with no
+change to either false-positive count; `may_contain` recall rose from 484
+to 494 of 500. Seven remain: the two label questions, the three shared-fryer
+dishes, the cream-sauce pasta (no source says it is fresh pasta, and dried
+pasta is egg-free) and the seafood cream dish for fish (`פירות ים` names
+crustaceans and molluscs, a decision the sea tests pin).
 
 ### D27 — Post-meal confirmations, no ratings
 
@@ -3959,7 +4019,9 @@ them, and the next time the menu opens the dish shows it. Six decisions:
    staff told you it is not in the dish. That holds for that visit only,
    so ask again each time" (Hebrew: "אישרת עם הצוות ב־12 במאי"); the date
    is an ARB `DateTime` placeholder in the UI's locale. Neither says
-   "safe" or "בטוח". The change answer is recorded but not yet shown.
+   "safe" or "בטוח". The change answer is shown too, dated, on the dish
+   card and the Why sheet, and moves nothing (D26, "The Banto
+   leftovers").
 5. **Ready for shared counts, with no network code.** `ConfirmationEvidence`
    carries `shared` and `count`, so the same rule can read counts other
    people shared: a shared piece counts only from

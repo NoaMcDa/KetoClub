@@ -654,4 +654,40 @@ void main() {
       ]);
     });
   });
+
+  group('hidden sources added for the leftover recall misses (#352)', () {
+    // Milk: grilled beef on a skewer is a grilled steak (11 §3.2). Eggs: a
+    // spread of salads holds the mayonnaise ones (12 §1.6). Each term is
+    // suspected, in a plain sentence and behind a Hebrew prefix.
+    test('milk: grilled beef skewers are suspected', () {
+      _expectAll(<_Case>[
+        _case(RestrictionId.milk, 'Served with shashlik', _suspected, 'en'),
+        _case(RestrictionId.milk, 'Served with beef skewers', _suspected, 'en'),
+        for (final term in <String>['שישליק', 'שיפודי בקר']) ...<_Case>[
+          _case(RestrictionId.milk, 'מנה עם $term', _suspected, term),
+          _case(RestrictionId.milk, 'מנה ב$term', _suspected, 'ב: $term'),
+        ],
+        _case(
+          RestrictionId.milk,
+          'שישליק בקר: שיפודי בקר בגריל עם בצל סגול וסומק',
+          _suspected,
+          'the corpus dish',
+        ),
+      ]);
+    });
+
+    test('eggs: a spread of salads is suspected', () {
+      _expectAll(<_Case>[
+        _case(RestrictionId.eggs, 'מבחר סלטים', _suspected, 'the dish'),
+        _case(RestrictionId.eggs, 'מנה עם מבחר סלטים', _suspected, 'עם'),
+        _case(RestrictionId.eggs, 'ומבחר סלטים', _suspected, 'prefix ו'),
+        _case(
+          RestrictionId.eggs,
+          'סלט חצילים בטחינה',
+          null,
+          'an eggplant salad alone stays unflagged',
+        ),
+      ]);
+    });
+  });
 }

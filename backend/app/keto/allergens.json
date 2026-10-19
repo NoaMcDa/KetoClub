@@ -43990,6 +43990,168 @@
         "hits": [
           {
             "certainty": "suspected",
+            "end": 8,
+            "guarded": false,
+            "id": "milk",
+            "start": 0,
+            "term": "shashlik"
+          }
+        ],
+        "matchText": "shashlik",
+        "normalised": "shashlik",
+        "text": "shashlik"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 20,
+            "guarded": false,
+            "id": "milk",
+            "start": 12,
+            "term": "shashlik"
+          }
+        ],
+        "matchText": "served with shashlik on the side",
+        "normalised": "served with shashlik on the side",
+        "text": "Served with shashlik on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 20,
+            "guarded": false,
+            "id": "milk",
+            "start": 12,
+            "term": "shashlik"
+          }
+        ],
+        "matchText": "served with shashlik on the side",
+        "normalised": "served with shashlik on the side",
+        "text": "Served with SHASHLIK on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 12,
+            "guarded": false,
+            "id": "milk",
+            "start": 0,
+            "term": "beef skewers"
+          },
+          {
+            "certainty": "stated",
+            "end": 4,
+            "guarded": false,
+            "id": "alphaGal",
+            "start": 0,
+            "term": "beef"
+          },
+          {
+            "certainty": "stated",
+            "end": 4,
+            "guarded": false,
+            "id": "vegan",
+            "start": 0,
+            "term": "beef"
+          },
+          {
+            "certainty": "stated",
+            "end": 4,
+            "guarded": false,
+            "id": "vegetarian",
+            "start": 0,
+            "term": "beef"
+          }
+        ],
+        "matchText": "beef skewers",
+        "normalised": "beef skewers",
+        "text": "beef skewers"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 24,
+            "guarded": false,
+            "id": "milk",
+            "start": 12,
+            "term": "beef skewers"
+          },
+          {
+            "certainty": "stated",
+            "end": 16,
+            "guarded": false,
+            "id": "alphaGal",
+            "start": 12,
+            "term": "beef"
+          },
+          {
+            "certainty": "stated",
+            "end": 16,
+            "guarded": false,
+            "id": "vegan",
+            "start": 12,
+            "term": "beef"
+          },
+          {
+            "certainty": "stated",
+            "end": 16,
+            "guarded": false,
+            "id": "vegetarian",
+            "start": 12,
+            "term": "beef"
+          }
+        ],
+        "matchText": "served with beef skewers on the side",
+        "normalised": "served with beef skewers on the side",
+        "text": "Served with beef skewers on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 24,
+            "guarded": false,
+            "id": "milk",
+            "start": 12,
+            "term": "beef skewers"
+          },
+          {
+            "certainty": "stated",
+            "end": 16,
+            "guarded": false,
+            "id": "alphaGal",
+            "start": 12,
+            "term": "beef"
+          },
+          {
+            "certainty": "stated",
+            "end": 16,
+            "guarded": false,
+            "id": "vegan",
+            "start": 12,
+            "term": "beef"
+          },
+          {
+            "certainty": "stated",
+            "end": 16,
+            "guarded": false,
+            "id": "vegetarian",
+            "start": 12,
+            "term": "beef"
+          }
+        ],
+        "matchText": "served with beef skewers on the side",
+        "normalised": "served with beef skewers on the side",
+        "text": "Served with BEEF SKEWERS on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
             "end": 6,
             "guarded": false,
             "id": "milk",
@@ -65146,6 +65308,296 @@
         "matchText": "מוגש עמ אנטרקוטי בצד",
         "normalised": "מוגש עמ אנטרקוטי בצד",
         "text": "מוגש עם אנטרקוטי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 6,
+            "guarded": false,
+            "id": "milk",
+            "start": 0,
+            "term": "שישליק"
+          }
+        ],
+        "matchText": "שישליק",
+        "normalised": "שישליק",
+        "text": "שישליק"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "milk",
+            "start": 8,
+            "term": "שישליק"
+          }
+        ],
+        "matchText": "מוגש עמ שישליק בצד",
+        "normalised": "מוגש עמ שישליק בצד",
+        "text": "מוגש עם שישליק בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 15,
+            "guarded": false,
+            "id": "milk",
+            "start": 8,
+            "term": "שישליק"
+          }
+        ],
+        "matchText": "מוגש עמ השישליק בצד",
+        "normalised": "מוגש עמ השישליק בצד",
+        "text": "מוגש עם השישליק בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 16,
+            "guarded": false,
+            "id": "milk",
+            "start": 8,
+            "term": "שישליק"
+          }
+        ],
+        "matchText": "מוגש עמ ובשישליק בצד",
+        "normalised": "מוגש עמ ובשישליק בצד",
+        "text": "מוגש עם ובשישליק בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ושהשישליק בצד",
+        "normalised": "מוגש עמ ושהשישליק בצד",
+        "text": "מוגש עם ושהשישליק בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ שישליקי בצד",
+        "normalised": "מוגש עמ שישליקי בצד",
+        "text": "מוגש עם שישליקי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 10,
+            "guarded": false,
+            "id": "milk",
+            "start": 0,
+            "term": "שיפודי בקר"
+          },
+          {
+            "certainty": "stated",
+            "end": 10,
+            "guarded": false,
+            "id": "alphaGal",
+            "start": 7,
+            "term": "בקר"
+          },
+          {
+            "certainty": "stated",
+            "end": 10,
+            "guarded": false,
+            "id": "vegan",
+            "start": 7,
+            "term": "בקר"
+          },
+          {
+            "certainty": "stated",
+            "end": 10,
+            "guarded": false,
+            "id": "vegetarian",
+            "start": 7,
+            "term": "בקר"
+          }
+        ],
+        "matchText": "שיפודי בקר",
+        "normalised": "שיפודי בקר",
+        "text": "שיפודי בקר"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 18,
+            "guarded": false,
+            "id": "milk",
+            "start": 8,
+            "term": "שיפודי בקר"
+          },
+          {
+            "certainty": "stated",
+            "end": 18,
+            "guarded": false,
+            "id": "alphaGal",
+            "start": 15,
+            "term": "בקר"
+          },
+          {
+            "certainty": "stated",
+            "end": 18,
+            "guarded": false,
+            "id": "vegan",
+            "start": 15,
+            "term": "בקר"
+          },
+          {
+            "certainty": "stated",
+            "end": 18,
+            "guarded": false,
+            "id": "vegetarian",
+            "start": 15,
+            "term": "בקר"
+          }
+        ],
+        "matchText": "מוגש עמ שיפודי בקר בצד",
+        "normalised": "מוגש עמ שיפודי בקר בצד",
+        "text": "מוגש עם שיפודי בקר בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 19,
+            "guarded": false,
+            "id": "milk",
+            "start": 8,
+            "term": "שיפודי בקר"
+          },
+          {
+            "certainty": "stated",
+            "end": 19,
+            "guarded": false,
+            "id": "alphaGal",
+            "start": 16,
+            "term": "בקר"
+          },
+          {
+            "certainty": "stated",
+            "end": 19,
+            "guarded": false,
+            "id": "vegan",
+            "start": 16,
+            "term": "בקר"
+          },
+          {
+            "certainty": "stated",
+            "end": 19,
+            "guarded": false,
+            "id": "vegetarian",
+            "start": 16,
+            "term": "בקר"
+          }
+        ],
+        "matchText": "מוגש עמ השיפודי בקר בצד",
+        "normalised": "מוגש עמ השיפודי בקר בצד",
+        "text": "מוגש עם השיפודי בקר בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 20,
+            "guarded": false,
+            "id": "milk",
+            "start": 8,
+            "term": "שיפודי בקר"
+          },
+          {
+            "certainty": "stated",
+            "end": 20,
+            "guarded": false,
+            "id": "alphaGal",
+            "start": 17,
+            "term": "בקר"
+          },
+          {
+            "certainty": "stated",
+            "end": 20,
+            "guarded": false,
+            "id": "vegan",
+            "start": 17,
+            "term": "בקר"
+          },
+          {
+            "certainty": "stated",
+            "end": 20,
+            "guarded": false,
+            "id": "vegetarian",
+            "start": 17,
+            "term": "בקר"
+          }
+        ],
+        "matchText": "מוגש עמ ובשיפודי בקר בצד",
+        "normalised": "מוגש עמ ובשיפודי בקר בצד",
+        "text": "מוגש עם ובשיפודי בקר בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "stated",
+            "end": 21,
+            "guarded": false,
+            "id": "alphaGal",
+            "start": 18,
+            "term": "בקר"
+          },
+          {
+            "certainty": "stated",
+            "end": 21,
+            "guarded": false,
+            "id": "vegan",
+            "start": 18,
+            "term": "בקר"
+          },
+          {
+            "certainty": "stated",
+            "end": 21,
+            "guarded": false,
+            "id": "vegetarian",
+            "start": 18,
+            "term": "בקר"
+          }
+        ],
+        "matchText": "מוגש עמ ושהשיפודי בקר בצד",
+        "normalised": "מוגש עמ ושהשיפודי בקר בצד",
+        "text": "מוגש עם ושהשיפודי בקר בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 19,
+            "guarded": false,
+            "id": "peanuts",
+            "start": 15,
+            "term": "קרי"
+          },
+          {
+            "certainty": "suspected",
+            "end": 19,
+            "guarded": false,
+            "id": "treeNuts",
+            "start": 15,
+            "term": "קרי"
+          },
+          {
+            "certainty": "suspected",
+            "end": 19,
+            "guarded": false,
+            "id": "legumes",
+            "start": 15,
+            "term": "קרי"
+          }
+        ],
+        "matchText": "מוגש עמ שיפודי בקרי בצד",
+        "normalised": "מוגש עמ שיפודי בקרי בצד",
+        "text": "מוגש עם שיפודי בקרי בצד"
       },
       {
         "hits": [
@@ -99470,6 +99922,78 @@
         "hits": [
           {
             "certainty": "suspected",
+            "end": 10,
+            "guarded": false,
+            "id": "eggs",
+            "start": 0,
+            "term": "מבחר סלטים"
+          }
+        ],
+        "matchText": "מבחר סלטימ",
+        "normalised": "מבחר סלטימ",
+        "text": "מבחר סלטים"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 18,
+            "guarded": false,
+            "id": "eggs",
+            "start": 8,
+            "term": "מבחר סלטים"
+          }
+        ],
+        "matchText": "מוגש עמ מבחר סלטימ בצד",
+        "normalised": "מוגש עמ מבחר סלטימ בצד",
+        "text": "מוגש עם מבחר סלטים בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 19,
+            "guarded": false,
+            "id": "eggs",
+            "start": 8,
+            "term": "מבחר סלטים"
+          }
+        ],
+        "matchText": "מוגש עמ המבחר סלטימ בצד",
+        "normalised": "מוגש עמ המבחר סלטימ בצד",
+        "text": "מוגש עם המבחר סלטים בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 20,
+            "guarded": false,
+            "id": "eggs",
+            "start": 8,
+            "term": "מבחר סלטים"
+          }
+        ],
+        "matchText": "מוגש עמ ובמבחר סלטימ בצד",
+        "normalised": "מוגש עמ ובמבחר סלטימ בצד",
+        "text": "מוגש עם ובמבחר סלטים בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ושהמבחר סלטימ בצד",
+        "normalised": "מוגש עמ ושהמבחר סלטימ בצד",
+        "text": "מוגש עם ושהמבחר סלטים בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ מבחר סלטימי בצד",
+        "normalised": "מוגש עמ מבחר סלטימי בצד",
+        "text": "מוגש עם מבחר סלטיםי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
             "end": 6,
             "guarded": false,
             "id": "eggs",
@@ -113043,6 +113567,333 @@
         "hits": [
           {
             "certainty": "suspected",
+            "end": 12,
+            "guarded": false,
+            "id": "soy",
+            "start": 0,
+            "term": "sesame sauce"
+          },
+          {
+            "certainty": "stated",
+            "end": 6,
+            "guarded": false,
+            "id": "sesame",
+            "start": 0,
+            "term": "sesame"
+          },
+          {
+            "certainty": "suspected",
+            "end": 12,
+            "guarded": false,
+            "id": "legumes",
+            "start": 0,
+            "term": "sesame sauce"
+          }
+        ],
+        "matchText": "sesame sauce",
+        "normalised": "sesame sauce",
+        "text": "sesame sauce"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 24,
+            "guarded": false,
+            "id": "soy",
+            "start": 12,
+            "term": "sesame sauce"
+          },
+          {
+            "certainty": "stated",
+            "end": 18,
+            "guarded": false,
+            "id": "sesame",
+            "start": 12,
+            "term": "sesame"
+          },
+          {
+            "certainty": "suspected",
+            "end": 24,
+            "guarded": false,
+            "id": "legumes",
+            "start": 12,
+            "term": "sesame sauce"
+          }
+        ],
+        "matchText": "served with sesame sauce on the side",
+        "normalised": "served with sesame sauce on the side",
+        "text": "Served with sesame sauce on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 24,
+            "guarded": false,
+            "id": "soy",
+            "start": 12,
+            "term": "sesame sauce"
+          },
+          {
+            "certainty": "stated",
+            "end": 18,
+            "guarded": false,
+            "id": "sesame",
+            "start": 12,
+            "term": "sesame"
+          },
+          {
+            "certainty": "suspected",
+            "end": 24,
+            "guarded": false,
+            "id": "legumes",
+            "start": 12,
+            "term": "sesame sauce"
+          }
+        ],
+        "matchText": "served with sesame sauce on the side",
+        "normalised": "served with sesame sauce on the side",
+        "text": "Served with SESAME SAUCE on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "soy",
+            "start": 0,
+            "term": "sesame noodles"
+          },
+          {
+            "certainty": "stated",
+            "end": 6,
+            "guarded": false,
+            "id": "sesame",
+            "start": 0,
+            "term": "sesame"
+          },
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "legumes",
+            "start": 0,
+            "term": "sesame noodles"
+          },
+          {
+            "certainty": "stated",
+            "end": 14,
+            "guarded": false,
+            "id": "wheat",
+            "start": 7,
+            "term": "noodles"
+          },
+          {
+            "certainty": "stated",
+            "end": 14,
+            "guarded": false,
+            "id": "gluten",
+            "start": 7,
+            "term": "noodles"
+          }
+        ],
+        "matchText": "sesame noodles",
+        "normalised": "sesame noodles",
+        "text": "sesame noodles"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 26,
+            "guarded": false,
+            "id": "soy",
+            "start": 12,
+            "term": "sesame noodles"
+          },
+          {
+            "certainty": "stated",
+            "end": 18,
+            "guarded": false,
+            "id": "sesame",
+            "start": 12,
+            "term": "sesame"
+          },
+          {
+            "certainty": "suspected",
+            "end": 26,
+            "guarded": false,
+            "id": "legumes",
+            "start": 12,
+            "term": "sesame noodles"
+          },
+          {
+            "certainty": "stated",
+            "end": 26,
+            "guarded": false,
+            "id": "wheat",
+            "start": 19,
+            "term": "noodles"
+          },
+          {
+            "certainty": "stated",
+            "end": 26,
+            "guarded": false,
+            "id": "gluten",
+            "start": 19,
+            "term": "noodles"
+          }
+        ],
+        "matchText": "served with sesame noodles on the side",
+        "normalised": "served with sesame noodles on the side",
+        "text": "Served with sesame noodles on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 26,
+            "guarded": false,
+            "id": "soy",
+            "start": 12,
+            "term": "sesame noodles"
+          },
+          {
+            "certainty": "stated",
+            "end": 18,
+            "guarded": false,
+            "id": "sesame",
+            "start": 12,
+            "term": "sesame"
+          },
+          {
+            "certainty": "suspected",
+            "end": 26,
+            "guarded": false,
+            "id": "legumes",
+            "start": 12,
+            "term": "sesame noodles"
+          },
+          {
+            "certainty": "stated",
+            "end": 26,
+            "guarded": false,
+            "id": "wheat",
+            "start": 19,
+            "term": "noodles"
+          },
+          {
+            "certainty": "stated",
+            "end": 26,
+            "guarded": false,
+            "id": "gluten",
+            "start": 19,
+            "term": "noodles"
+          }
+        ],
+        "matchText": "served with sesame noodles on the side",
+        "normalised": "served with sesame noodles on the side",
+        "text": "Served with SESAME NOODLES on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 11,
+            "guarded": false,
+            "id": "soy",
+            "start": 0,
+            "term": "sweet glaze"
+          },
+          {
+            "certainty": "suspected",
+            "end": 11,
+            "guarded": false,
+            "id": "mustard",
+            "start": 0,
+            "term": "sweet glaze"
+          },
+          {
+            "certainty": "suspected",
+            "end": 11,
+            "guarded": false,
+            "id": "legumes",
+            "start": 0,
+            "term": "sweet glaze"
+          }
+        ],
+        "matchText": "sweet glaze",
+        "normalised": "sweet glaze",
+        "text": "sweet glaze"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 23,
+            "guarded": false,
+            "id": "soy",
+            "start": 12,
+            "term": "sweet glaze"
+          },
+          {
+            "certainty": "suspected",
+            "end": 23,
+            "guarded": false,
+            "id": "mustard",
+            "start": 12,
+            "term": "sweet glaze"
+          },
+          {
+            "certainty": "suspected",
+            "end": 23,
+            "guarded": false,
+            "id": "legumes",
+            "start": 12,
+            "term": "sweet glaze"
+          }
+        ],
+        "matchText": "served with sweet glaze on the side",
+        "normalised": "served with sweet glaze on the side",
+        "text": "Served with sweet glaze on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 23,
+            "guarded": false,
+            "id": "soy",
+            "start": 12,
+            "term": "sweet glaze"
+          },
+          {
+            "certainty": "suspected",
+            "end": 23,
+            "guarded": false,
+            "id": "mustard",
+            "start": 12,
+            "term": "sweet glaze"
+          },
+          {
+            "certainty": "suspected",
+            "end": 23,
+            "guarded": false,
+            "id": "legumes",
+            "start": 12,
+            "term": "sweet glaze"
+          }
+        ],
+        "matchText": "served with sweet glaze on the side",
+        "normalised": "served with sweet glaze on the side",
+        "text": "Served with SWEET GLAZE on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
             "end": 5,
             "guarded": false,
             "id": "soy",
@@ -121178,6 +122029,287 @@
         "matchText": "מוגש עמ וואקמהי בצד",
         "normalised": "מוגש עמ וואקמהי בצד",
         "text": "מוגש עם וואקמהי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 10,
+            "guarded": false,
+            "id": "soy",
+            "start": 0,
+            "term": "רוטב מתקתק"
+          },
+          {
+            "certainty": "suspected",
+            "end": 10,
+            "guarded": false,
+            "id": "mustard",
+            "start": 0,
+            "term": "רוטב מתקתק"
+          },
+          {
+            "certainty": "suspected",
+            "end": 10,
+            "guarded": false,
+            "id": "legumes",
+            "start": 0,
+            "term": "רוטב מתקתק"
+          }
+        ],
+        "matchText": "רוטב מתקתק",
+        "normalised": "רוטב מתקתק",
+        "text": "רוטב מתקתק"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 18,
+            "guarded": false,
+            "id": "soy",
+            "start": 8,
+            "term": "רוטב מתקתק"
+          },
+          {
+            "certainty": "suspected",
+            "end": 18,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "רוטב מתקתק"
+          },
+          {
+            "certainty": "suspected",
+            "end": 18,
+            "guarded": false,
+            "id": "legumes",
+            "start": 8,
+            "term": "רוטב מתקתק"
+          }
+        ],
+        "matchText": "מוגש עמ רוטב מתקתק בצד",
+        "normalised": "מוגש עמ רוטב מתקתק בצד",
+        "text": "מוגש עם רוטב מתקתק בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 19,
+            "guarded": false,
+            "id": "soy",
+            "start": 8,
+            "term": "רוטב מתקתק"
+          },
+          {
+            "certainty": "suspected",
+            "end": 19,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "רוטב מתקתק"
+          },
+          {
+            "certainty": "suspected",
+            "end": 19,
+            "guarded": false,
+            "id": "legumes",
+            "start": 8,
+            "term": "רוטב מתקתק"
+          }
+        ],
+        "matchText": "מוגש עמ הרוטב מתקתק בצד",
+        "normalised": "מוגש עמ הרוטב מתקתק בצד",
+        "text": "מוגש עם הרוטב מתקתק בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 20,
+            "guarded": false,
+            "id": "soy",
+            "start": 8,
+            "term": "רוטב מתקתק"
+          },
+          {
+            "certainty": "suspected",
+            "end": 20,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "רוטב מתקתק"
+          },
+          {
+            "certainty": "suspected",
+            "end": 20,
+            "guarded": false,
+            "id": "legumes",
+            "start": 8,
+            "term": "רוטב מתקתק"
+          }
+        ],
+        "matchText": "מוגש עמ וברוטב מתקתק בצד",
+        "normalised": "מוגש עמ וברוטב מתקתק בצד",
+        "text": "מוגש עם וברוטב מתקתק בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ושהרוטב מתקתק בצד",
+        "normalised": "מוגש עמ ושהרוטב מתקתק בצד",
+        "text": "מוגש עם ושהרוטב מתקתק בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ רוטב מתקתקי בצד",
+        "normalised": "מוגש עמ רוטב מתקתקי בצד",
+        "text": "מוגש עם רוטב מתקתקי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 11,
+            "guarded": false,
+            "id": "soy",
+            "start": 0,
+            "term": "רוטב שומשום"
+          },
+          {
+            "certainty": "suspected",
+            "end": 11,
+            "guarded": false,
+            "id": "legumes",
+            "start": 0,
+            "term": "רוטב שומשום"
+          },
+          {
+            "certainty": "stated",
+            "end": 11,
+            "guarded": false,
+            "id": "sesame",
+            "start": 5,
+            "term": "שומשום"
+          }
+        ],
+        "matchText": "רוטב שומשומ",
+        "normalised": "רוטב שומשומ",
+        "text": "רוטב שומשום"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 19,
+            "guarded": false,
+            "id": "soy",
+            "start": 8,
+            "term": "רוטב שומשום"
+          },
+          {
+            "certainty": "suspected",
+            "end": 19,
+            "guarded": false,
+            "id": "legumes",
+            "start": 8,
+            "term": "רוטב שומשום"
+          },
+          {
+            "certainty": "stated",
+            "end": 19,
+            "guarded": false,
+            "id": "sesame",
+            "start": 13,
+            "term": "שומשום"
+          }
+        ],
+        "matchText": "מוגש עמ רוטב שומשומ בצד",
+        "normalised": "מוגש עמ רוטב שומשומ בצד",
+        "text": "מוגש עם רוטב שומשום בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 20,
+            "guarded": false,
+            "id": "soy",
+            "start": 8,
+            "term": "רוטב שומשום"
+          },
+          {
+            "certainty": "suspected",
+            "end": 20,
+            "guarded": false,
+            "id": "legumes",
+            "start": 8,
+            "term": "רוטב שומשום"
+          },
+          {
+            "certainty": "stated",
+            "end": 20,
+            "guarded": false,
+            "id": "sesame",
+            "start": 14,
+            "term": "שומשום"
+          }
+        ],
+        "matchText": "מוגש עמ הרוטב שומשומ בצד",
+        "normalised": "מוגש עמ הרוטב שומשומ בצד",
+        "text": "מוגש עם הרוטב שומשום בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 21,
+            "guarded": false,
+            "id": "soy",
+            "start": 8,
+            "term": "רוטב שומשום"
+          },
+          {
+            "certainty": "suspected",
+            "end": 21,
+            "guarded": false,
+            "id": "legumes",
+            "start": 8,
+            "term": "רוטב שומשום"
+          },
+          {
+            "certainty": "stated",
+            "end": 21,
+            "guarded": false,
+            "id": "sesame",
+            "start": 15,
+            "term": "שומשום"
+          }
+        ],
+        "matchText": "מוגש עמ וברוטב שומשומ בצד",
+        "normalised": "מוגש עמ וברוטב שומשומ בצד",
+        "text": "מוגש עם וברוטב שומשום בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "stated",
+            "end": 22,
+            "guarded": false,
+            "id": "sesame",
+            "start": 16,
+            "term": "שומשום"
+          }
+        ],
+        "matchText": "מוגש עמ ושהרוטב שומשומ בצד",
+        "normalised": "מוגש עמ ושהרוטב שומשומ בצד",
+        "text": "מוגש עם ושהרוטב שומשום בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ רוטב שומשומי בצד",
+        "normalised": "מוגש עמ רוטב שומשומי בצד",
+        "text": "מוגש עם רוטב שומשוםי בצד"
       },
       {
         "hits": [
@@ -133482,6 +134614,240 @@
         "matchText": "served with deep fried on the side",
         "normalised": "served with deep fried on the side",
         "text": "Served with DEEP FRIED on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "wheat",
+            "start": 0,
+            "term": "crispy chicken"
+          },
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "gluten",
+            "start": 0,
+            "term": "crispy chicken"
+          },
+          {
+            "certainty": "suspected",
+            "end": 6,
+            "guarded": false,
+            "id": "glp1",
+            "start": 0,
+            "term": "crispy"
+          },
+          {
+            "certainty": "stated",
+            "end": 14,
+            "guarded": false,
+            "id": "vegan",
+            "start": 7,
+            "term": "chicken"
+          },
+          {
+            "certainty": "stated",
+            "end": 14,
+            "guarded": false,
+            "id": "vegetarian",
+            "start": 7,
+            "term": "chicken"
+          }
+        ],
+        "matchText": "crispy chicken",
+        "normalised": "crispy chicken",
+        "text": "crispy chicken"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 26,
+            "guarded": false,
+            "id": "wheat",
+            "start": 12,
+            "term": "crispy chicken"
+          },
+          {
+            "certainty": "suspected",
+            "end": 26,
+            "guarded": false,
+            "id": "gluten",
+            "start": 12,
+            "term": "crispy chicken"
+          },
+          {
+            "certainty": "suspected",
+            "end": 18,
+            "guarded": false,
+            "id": "glp1",
+            "start": 12,
+            "term": "crispy"
+          },
+          {
+            "certainty": "stated",
+            "end": 26,
+            "guarded": false,
+            "id": "vegan",
+            "start": 19,
+            "term": "chicken"
+          },
+          {
+            "certainty": "stated",
+            "end": 26,
+            "guarded": false,
+            "id": "vegetarian",
+            "start": 19,
+            "term": "chicken"
+          }
+        ],
+        "matchText": "served with crispy chicken on the side",
+        "normalised": "served with crispy chicken on the side",
+        "text": "Served with crispy chicken on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 26,
+            "guarded": false,
+            "id": "wheat",
+            "start": 12,
+            "term": "crispy chicken"
+          },
+          {
+            "certainty": "suspected",
+            "end": 26,
+            "guarded": false,
+            "id": "gluten",
+            "start": 12,
+            "term": "crispy chicken"
+          },
+          {
+            "certainty": "suspected",
+            "end": 18,
+            "guarded": false,
+            "id": "glp1",
+            "start": 12,
+            "term": "crispy"
+          },
+          {
+            "certainty": "stated",
+            "end": 26,
+            "guarded": false,
+            "id": "vegan",
+            "start": 19,
+            "term": "chicken"
+          },
+          {
+            "certainty": "stated",
+            "end": 26,
+            "guarded": false,
+            "id": "vegetarian",
+            "start": 19,
+            "term": "chicken"
+          }
+        ],
+        "matchText": "served with crispy chicken on the side",
+        "normalised": "served with crispy chicken on the side",
+        "text": "Served with CRISPY CHICKEN on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 12,
+            "guarded": false,
+            "id": "wheat",
+            "start": 0,
+            "term": "crispy wings"
+          },
+          {
+            "certainty": "suspected",
+            "end": 12,
+            "guarded": false,
+            "id": "gluten",
+            "start": 0,
+            "term": "crispy wings"
+          },
+          {
+            "certainty": "suspected",
+            "end": 6,
+            "guarded": false,
+            "id": "glp1",
+            "start": 0,
+            "term": "crispy"
+          }
+        ],
+        "matchText": "crispy wings",
+        "normalised": "crispy wings",
+        "text": "crispy wings"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 24,
+            "guarded": false,
+            "id": "wheat",
+            "start": 12,
+            "term": "crispy wings"
+          },
+          {
+            "certainty": "suspected",
+            "end": 24,
+            "guarded": false,
+            "id": "gluten",
+            "start": 12,
+            "term": "crispy wings"
+          },
+          {
+            "certainty": "suspected",
+            "end": 18,
+            "guarded": false,
+            "id": "glp1",
+            "start": 12,
+            "term": "crispy"
+          }
+        ],
+        "matchText": "served with crispy wings on the side",
+        "normalised": "served with crispy wings on the side",
+        "text": "Served with crispy wings on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 24,
+            "guarded": false,
+            "id": "wheat",
+            "start": 12,
+            "term": "crispy wings"
+          },
+          {
+            "certainty": "suspected",
+            "end": 24,
+            "guarded": false,
+            "id": "gluten",
+            "start": 12,
+            "term": "crispy wings"
+          },
+          {
+            "certainty": "suspected",
+            "end": 18,
+            "guarded": false,
+            "id": "glp1",
+            "start": 12,
+            "term": "crispy"
+          }
+        ],
+        "matchText": "served with crispy wings on the side",
+        "normalised": "served with crispy wings on the side",
+        "text": "Served with CRISPY WINGS on the side"
       },
       {
         "hits": [
@@ -148649,6 +150015,422 @@
         "hits": [
           {
             "certainty": "suspected",
+            "end": 4,
+            "guarded": false,
+            "id": "wheat",
+            "start": 0,
+            "term": "פריך"
+          },
+          {
+            "certainty": "suspected",
+            "end": 4,
+            "guarded": false,
+            "id": "gluten",
+            "start": 0,
+            "term": "פריך"
+          }
+        ],
+        "matchText": "פריכ",
+        "normalised": "פריכ",
+        "text": "פריך"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 12,
+            "guarded": false,
+            "id": "wheat",
+            "start": 8,
+            "term": "פריך"
+          },
+          {
+            "certainty": "suspected",
+            "end": 12,
+            "guarded": false,
+            "id": "gluten",
+            "start": 8,
+            "term": "פריך"
+          }
+        ],
+        "matchText": "מוגש עמ פריכ בצד",
+        "normalised": "מוגש עמ פריכ בצד",
+        "text": "מוגש עם פריך בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 13,
+            "guarded": false,
+            "id": "wheat",
+            "start": 8,
+            "term": "פריך"
+          },
+          {
+            "certainty": "suspected",
+            "end": 13,
+            "guarded": false,
+            "id": "gluten",
+            "start": 8,
+            "term": "פריך"
+          }
+        ],
+        "matchText": "מוגש עמ הפריכ בצד",
+        "normalised": "מוגש עמ הפריכ בצד",
+        "text": "מוגש עם הפריך בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "wheat",
+            "start": 8,
+            "term": "פריך"
+          },
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "gluten",
+            "start": 8,
+            "term": "פריך"
+          }
+        ],
+        "matchText": "מוגש עמ ובפריכ בצד",
+        "normalised": "מוגש עמ ובפריכ בצד",
+        "text": "מוגש עם ובפריך בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ושהפריכ בצד",
+        "normalised": "מוגש עמ ושהפריכ בצד",
+        "text": "מוגש עם ושהפריך בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ פריכי בצד",
+        "normalised": "מוגש עמ פריכי בצד",
+        "text": "מוגש עם פריךי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 5,
+            "guarded": false,
+            "id": "wheat",
+            "start": 0,
+            "term": "פריכה"
+          },
+          {
+            "certainty": "suspected",
+            "end": 5,
+            "guarded": false,
+            "id": "gluten",
+            "start": 0,
+            "term": "פריכה"
+          }
+        ],
+        "matchText": "פריכה",
+        "normalised": "פריכה",
+        "text": "פריכה"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 13,
+            "guarded": false,
+            "id": "wheat",
+            "start": 8,
+            "term": "פריכה"
+          },
+          {
+            "certainty": "suspected",
+            "end": 13,
+            "guarded": false,
+            "id": "gluten",
+            "start": 8,
+            "term": "פריכה"
+          }
+        ],
+        "matchText": "מוגש עמ פריכה בצד",
+        "normalised": "מוגש עמ פריכה בצד",
+        "text": "מוגש עם פריכה בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "wheat",
+            "start": 8,
+            "term": "פריכה"
+          },
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "gluten",
+            "start": 8,
+            "term": "פריכה"
+          }
+        ],
+        "matchText": "מוגש עמ הפריכה בצד",
+        "normalised": "מוגש עמ הפריכה בצד",
+        "text": "מוגש עם הפריכה בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 15,
+            "guarded": false,
+            "id": "wheat",
+            "start": 8,
+            "term": "פריכה"
+          },
+          {
+            "certainty": "suspected",
+            "end": 15,
+            "guarded": false,
+            "id": "gluten",
+            "start": 8,
+            "term": "פריכה"
+          }
+        ],
+        "matchText": "מוגש עמ ובפריכה בצד",
+        "normalised": "מוגש עמ ובפריכה בצד",
+        "text": "מוגש עם ובפריכה בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ושהפריכה בצד",
+        "normalised": "מוגש עמ ושהפריכה בצד",
+        "text": "מוגש עם ושהפריכה בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ פריכהי בצד",
+        "normalised": "מוגש עמ פריכהי בצד",
+        "text": "מוגש עם פריכהי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 6,
+            "guarded": false,
+            "id": "wheat",
+            "start": 0,
+            "term": "פריכים"
+          },
+          {
+            "certainty": "suspected",
+            "end": 6,
+            "guarded": false,
+            "id": "gluten",
+            "start": 0,
+            "term": "פריכים"
+          }
+        ],
+        "matchText": "פריכימ",
+        "normalised": "פריכימ",
+        "text": "פריכים"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "wheat",
+            "start": 8,
+            "term": "פריכים"
+          },
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "gluten",
+            "start": 8,
+            "term": "פריכים"
+          }
+        ],
+        "matchText": "מוגש עמ פריכימ בצד",
+        "normalised": "מוגש עמ פריכימ בצד",
+        "text": "מוגש עם פריכים בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 15,
+            "guarded": false,
+            "id": "wheat",
+            "start": 8,
+            "term": "פריכים"
+          },
+          {
+            "certainty": "suspected",
+            "end": 15,
+            "guarded": false,
+            "id": "gluten",
+            "start": 8,
+            "term": "פריכים"
+          }
+        ],
+        "matchText": "מוגש עמ הפריכימ בצד",
+        "normalised": "מוגש עמ הפריכימ בצד",
+        "text": "מוגש עם הפריכים בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 16,
+            "guarded": false,
+            "id": "wheat",
+            "start": 8,
+            "term": "פריכים"
+          },
+          {
+            "certainty": "suspected",
+            "end": 16,
+            "guarded": false,
+            "id": "gluten",
+            "start": 8,
+            "term": "פריכים"
+          }
+        ],
+        "matchText": "מוגש עמ ובפריכימ בצד",
+        "normalised": "מוגש עמ ובפריכימ בצד",
+        "text": "מוגש עם ובפריכים בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ושהפריכימ בצד",
+        "normalised": "מוגש עמ ושהפריכימ בצד",
+        "text": "מוגש עם ושהפריכים בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ פריכימי בצד",
+        "normalised": "מוגש עמ פריכימי בצד",
+        "text": "מוגש עם פריכיםי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 6,
+            "guarded": false,
+            "id": "wheat",
+            "start": 0,
+            "term": "פריכות"
+          },
+          {
+            "certainty": "suspected",
+            "end": 6,
+            "guarded": false,
+            "id": "gluten",
+            "start": 0,
+            "term": "פריכות"
+          }
+        ],
+        "matchText": "פריכות",
+        "normalised": "פריכות",
+        "text": "פריכות"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "wheat",
+            "start": 8,
+            "term": "פריכות"
+          },
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "gluten",
+            "start": 8,
+            "term": "פריכות"
+          }
+        ],
+        "matchText": "מוגש עמ פריכות בצד",
+        "normalised": "מוגש עמ פריכות בצד",
+        "text": "מוגש עם פריכות בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 15,
+            "guarded": false,
+            "id": "wheat",
+            "start": 8,
+            "term": "פריכות"
+          },
+          {
+            "certainty": "suspected",
+            "end": 15,
+            "guarded": false,
+            "id": "gluten",
+            "start": 8,
+            "term": "פריכות"
+          }
+        ],
+        "matchText": "מוגש עמ הפריכות בצד",
+        "normalised": "מוגש עמ הפריכות בצד",
+        "text": "מוגש עם הפריכות בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 16,
+            "guarded": false,
+            "id": "wheat",
+            "start": 8,
+            "term": "פריכות"
+          },
+          {
+            "certainty": "suspected",
+            "end": 16,
+            "guarded": false,
+            "id": "gluten",
+            "start": 8,
+            "term": "פריכות"
+          }
+        ],
+        "matchText": "מוגש עמ ובפריכות בצד",
+        "normalised": "מוגש עמ ובפריכות בצד",
+        "text": "מוגש עם ובפריכות בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ושהפריכות בצד",
+        "normalised": "מוגש עמ ושהפריכות בצד",
+        "text": "מוגש עם ושהפריכות בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ פריכותי בצד",
+        "normalised": "מוגש עמ פריכותי בצד",
+        "text": "מוגש עם פריכותי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
             "end": 20,
             "guarded": true,
             "id": "wheat",
@@ -155347,6 +157129,14 @@
         "hits": [
           {
             "certainty": "suspected",
+            "end": 16,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 12,
+            "term": "maki"
+          },
+          {
+            "certainty": "suspected",
             "end": 21,
             "guarded": true,
             "id": "wheat",
@@ -155376,6 +157166,14 @@
       },
       {
         "hits": [
+          {
+            "certainty": "suspected",
+            "end": 16,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 12,
+            "term": "maki"
+          },
           {
             "certainty": "likely",
             "end": 25,
@@ -157234,6 +159032,14 @@
         "hits": [
           {
             "certainty": "suspected",
+            "end": 16,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 12,
+            "term": "maki"
+          },
+          {
+            "certainty": "suspected",
             "end": 22,
             "guarded": false,
             "id": "soy",
@@ -157287,6 +159093,14 @@
       },
       {
         "hits": [
+          {
+            "certainty": "suspected",
+            "end": 16,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 12,
+            "term": "maki"
+          },
           {
             "certainty": "suspected",
             "end": 26,
@@ -202404,6 +204218,96 @@
       {
         "hits": [
           {
+            "certainty": "suspected",
+            "end": 11,
+            "guarded": false,
+            "id": "mustard",
+            "start": 0,
+            "term": "house sauce"
+          }
+        ],
+        "matchText": "house sauce",
+        "normalised": "house sauce",
+        "text": "house sauce"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 23,
+            "guarded": false,
+            "id": "mustard",
+            "start": 12,
+            "term": "house sauce"
+          }
+        ],
+        "matchText": "served with house sauce on the side",
+        "normalised": "served with house sauce on the side",
+        "text": "Served with house sauce on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 23,
+            "guarded": false,
+            "id": "mustard",
+            "start": 12,
+            "term": "house sauce"
+          }
+        ],
+        "matchText": "served with house sauce on the side",
+        "normalised": "served with house sauce on the side",
+        "text": "Served with HOUSE SAUCE on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 12,
+            "guarded": false,
+            "id": "mustard",
+            "start": 0,
+            "term": "secret sauce"
+          }
+        ],
+        "matchText": "secret sauce",
+        "normalised": "secret sauce",
+        "text": "secret sauce"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 24,
+            "guarded": false,
+            "id": "mustard",
+            "start": 12,
+            "term": "secret sauce"
+          }
+        ],
+        "matchText": "served with secret sauce on the side",
+        "normalised": "served with secret sauce on the side",
+        "text": "Served with secret sauce on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 24,
+            "guarded": false,
+            "id": "mustard",
+            "start": 12,
+            "term": "secret sauce"
+          }
+        ],
+        "matchText": "served with secret sauce on the side",
+        "normalised": "served with secret sauce on the side",
+        "text": "Served with SECRET SAUCE on the side"
+      },
+      {
+        "hits": [
+          {
             "certainty": "stated",
             "end": 4,
             "guarded": false,
@@ -205396,6 +207300,438 @@
         "matchText": "מוגש עמ כבושותי בצד",
         "normalised": "מוגש עמ כבושותי בצד",
         "text": "מוגש עם כבושותי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 5,
+            "guarded": false,
+            "id": "mustard",
+            "start": 0,
+            "term": "מוחמץ"
+          }
+        ],
+        "matchText": "מוחמצ",
+        "normalised": "מוחמצ",
+        "text": "מוחמץ"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 13,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "מוחמץ"
+          }
+        ],
+        "matchText": "מוגש עמ מוחמצ בצד",
+        "normalised": "מוגש עמ מוחמצ בצד",
+        "text": "מוגש עם מוחמץ בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "מוחמץ"
+          }
+        ],
+        "matchText": "מוגש עמ המוחמצ בצד",
+        "normalised": "מוגש עמ המוחמצ בצד",
+        "text": "מוגש עם המוחמץ בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 15,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "מוחמץ"
+          }
+        ],
+        "matchText": "מוגש עמ ובמוחמצ בצד",
+        "normalised": "מוגש עמ ובמוחמצ בצד",
+        "text": "מוגש עם ובמוחמץ בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ושהמוחמצ בצד",
+        "normalised": "מוגש עמ ושהמוחמצ בצד",
+        "text": "מוגש עם ושהמוחמץ בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ מוחמצי בצד",
+        "normalised": "מוגש עמ מוחמצי בצד",
+        "text": "מוגש עם מוחמץי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 6,
+            "guarded": false,
+            "id": "mustard",
+            "start": 0,
+            "term": "מוחמצת"
+          }
+        ],
+        "matchText": "מוחמצת",
+        "normalised": "מוחמצת",
+        "text": "מוחמצת"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "מוחמצת"
+          }
+        ],
+        "matchText": "מוגש עמ מוחמצת בצד",
+        "normalised": "מוגש עמ מוחמצת בצד",
+        "text": "מוגש עם מוחמצת בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 15,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "מוחמצת"
+          }
+        ],
+        "matchText": "מוגש עמ המוחמצת בצד",
+        "normalised": "מוגש עמ המוחמצת בצד",
+        "text": "מוגש עם המוחמצת בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 16,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "מוחמצת"
+          }
+        ],
+        "matchText": "מוגש עמ ובמוחמצת בצד",
+        "normalised": "מוגש עמ ובמוחמצת בצד",
+        "text": "מוגש עם ובמוחמצת בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ושהמוחמצת בצד",
+        "normalised": "מוגש עמ ושהמוחמצת בצד",
+        "text": "מוגש עם ושהמוחמצת בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ מוחמצתי בצד",
+        "normalised": "מוגש עמ מוחמצתי בצד",
+        "text": "מוגש עם מוחמצתי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 7,
+            "guarded": false,
+            "id": "mustard",
+            "start": 0,
+            "term": "מוחמצים"
+          }
+        ],
+        "matchText": "מוחמצימ",
+        "normalised": "מוחמצימ",
+        "text": "מוחמצים"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 15,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "מוחמצים"
+          }
+        ],
+        "matchText": "מוגש עמ מוחמצימ בצד",
+        "normalised": "מוגש עמ מוחמצימ בצד",
+        "text": "מוגש עם מוחמצים בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 16,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "מוחמצים"
+          }
+        ],
+        "matchText": "מוגש עמ המוחמצימ בצד",
+        "normalised": "מוגש עמ המוחמצימ בצד",
+        "text": "מוגש עם המוחמצים בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 17,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "מוחמצים"
+          }
+        ],
+        "matchText": "מוגש עמ ובמוחמצימ בצד",
+        "normalised": "מוגש עמ ובמוחמצימ בצד",
+        "text": "מוגש עם ובמוחמצים בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ושהמוחמצימ בצד",
+        "normalised": "מוגש עמ ושהמוחמצימ בצד",
+        "text": "מוגש עם ושהמוחמצים בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ מוחמצימי בצד",
+        "normalised": "מוגש עמ מוחמצימי בצד",
+        "text": "מוגש עם מוחמציםי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 7,
+            "guarded": false,
+            "id": "mustard",
+            "start": 0,
+            "term": "מוחמצות"
+          }
+        ],
+        "matchText": "מוחמצות",
+        "normalised": "מוחמצות",
+        "text": "מוחמצות"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 15,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "מוחמצות"
+          }
+        ],
+        "matchText": "מוגש עמ מוחמצות בצד",
+        "normalised": "מוגש עמ מוחמצות בצד",
+        "text": "מוגש עם מוחמצות בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 16,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "מוחמצות"
+          }
+        ],
+        "matchText": "מוגש עמ המוחמצות בצד",
+        "normalised": "מוגש עמ המוחמצות בצד",
+        "text": "מוגש עם המוחמצות בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 17,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "מוחמצות"
+          }
+        ],
+        "matchText": "מוגש עמ ובמוחמצות בצד",
+        "normalised": "מוגש עמ ובמוחמצות בצד",
+        "text": "מוגש עם ובמוחמצות בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ושהמוחמצות בצד",
+        "normalised": "מוגש עמ ושהמוחמצות בצד",
+        "text": "מוגש עם ושהמוחמצות בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ מוחמצותי בצד",
+        "normalised": "מוגש עמ מוחמצותי בצד",
+        "text": "מוגש עם מוחמצותי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 9,
+            "guarded": false,
+            "id": "mustard",
+            "start": 0,
+            "term": "רוטב הבית"
+          }
+        ],
+        "matchText": "רוטב הבית",
+        "normalised": "רוטב הבית",
+        "text": "רוטב הבית"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 17,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "רוטב הבית"
+          }
+        ],
+        "matchText": "מוגש עמ רוטב הבית בצד",
+        "normalised": "מוגש עמ רוטב הבית בצד",
+        "text": "מוגש עם רוטב הבית בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 18,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "רוטב הבית"
+          }
+        ],
+        "matchText": "מוגש עמ הרוטב הבית בצד",
+        "normalised": "מוגש עמ הרוטב הבית בצד",
+        "text": "מוגש עם הרוטב הבית בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 19,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "רוטב הבית"
+          }
+        ],
+        "matchText": "מוגש עמ וברוטב הבית בצד",
+        "normalised": "מוגש עמ וברוטב הבית בצד",
+        "text": "מוגש עם וברוטב הבית בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ושהרוטב הבית בצד",
+        "normalised": "מוגש עמ ושהרוטב הבית בצד",
+        "text": "מוגש עם ושהרוטב הבית בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ רוטב הביתי בצד",
+        "normalised": "מוגש עמ רוטב הביתי בצד",
+        "text": "מוגש עם רוטב הביתי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 9,
+            "guarded": false,
+            "id": "mustard",
+            "start": 0,
+            "term": "רוטב סודי"
+          }
+        ],
+        "matchText": "רוטב סודי",
+        "normalised": "רוטב סודי",
+        "text": "רוטב סודי"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 17,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "רוטב סודי"
+          }
+        ],
+        "matchText": "מוגש עמ רוטב סודי בצד",
+        "normalised": "מוגש עמ רוטב סודי בצד",
+        "text": "מוגש עם רוטב סודי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 18,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "רוטב סודי"
+          }
+        ],
+        "matchText": "מוגש עמ הרוטב סודי בצד",
+        "normalised": "מוגש עמ הרוטב סודי בצד",
+        "text": "מוגש עם הרוטב סודי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 19,
+            "guarded": false,
+            "id": "mustard",
+            "start": 8,
+            "term": "רוטב סודי"
+          }
+        ],
+        "matchText": "מוגש עמ וברוטב סודי בצד",
+        "normalised": "מוגש עמ וברוטב סודי בצד",
+        "text": "מוגש עם וברוטב סודי בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ושהרוטב סודי בצד",
+        "normalised": "מוגש עמ ושהרוטב סודי בצד",
+        "text": "מוגש עם ושהרוטב סודי בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ רוטב סודיי בצד",
+        "normalised": "מוגש עמ רוטב סודיי בצד",
+        "text": "מוגש עם רוטב סודיי בצד"
       },
       {
         "hits": [
@@ -218631,6 +220967,258 @@
         "hits": [
           {
             "certainty": "suspected",
+            "end": 4,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 0,
+            "term": "maki"
+          }
+        ],
+        "matchText": "maki",
+        "normalised": "maki",
+        "text": "maki"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 16,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 12,
+            "term": "maki"
+          }
+        ],
+        "matchText": "served with maki on the side",
+        "normalised": "served with maki on the side",
+        "text": "Served with maki on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 16,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 12,
+            "term": "maki"
+          }
+        ],
+        "matchText": "served with maki on the side",
+        "normalised": "served with maki on the side",
+        "text": "Served with MAKI on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 7,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 0,
+            "term": "uramaki"
+          }
+        ],
+        "matchText": "uramaki",
+        "normalised": "uramaki",
+        "text": "uramaki"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 19,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 12,
+            "term": "uramaki"
+          }
+        ],
+        "matchText": "served with uramaki on the side",
+        "normalised": "served with uramaki on the side",
+        "text": "Served with uramaki on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 19,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 12,
+            "term": "uramaki"
+          }
+        ],
+        "matchText": "served with uramaki on the side",
+        "normalised": "served with uramaki on the side",
+        "text": "Served with URAMAKI on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 6,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 0,
+            "term": "nigiri"
+          }
+        ],
+        "matchText": "nigiri",
+        "normalised": "nigiri",
+        "text": "nigiri"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 18,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 12,
+            "term": "nigiri"
+          }
+        ],
+        "matchText": "served with nigiri on the side",
+        "normalised": "served with nigiri on the side",
+        "text": "Served with nigiri on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 18,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 12,
+            "term": "nigiri"
+          }
+        ],
+        "matchText": "served with nigiri on the side",
+        "normalised": "served with nigiri on the side",
+        "text": "Served with NIGIRI on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 15,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 0,
+            "term": "inside out roll"
+          },
+          {
+            "certainty": "likely",
+            "end": 15,
+            "guarded": false,
+            "id": "wheat",
+            "start": 11,
+            "term": "roll"
+          },
+          {
+            "certainty": "likely",
+            "end": 15,
+            "guarded": false,
+            "id": "gluten",
+            "start": 11,
+            "term": "roll"
+          },
+          {
+            "certainty": "suspected",
+            "end": 15,
+            "guarded": false,
+            "id": "sesame",
+            "start": 11,
+            "term": "roll"
+          }
+        ],
+        "matchText": "inside out roll",
+        "normalised": "inside out roll",
+        "text": "inside out roll"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 27,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 12,
+            "term": "inside out roll"
+          },
+          {
+            "certainty": "likely",
+            "end": 27,
+            "guarded": false,
+            "id": "wheat",
+            "start": 23,
+            "term": "roll"
+          },
+          {
+            "certainty": "likely",
+            "end": 27,
+            "guarded": false,
+            "id": "gluten",
+            "start": 23,
+            "term": "roll"
+          },
+          {
+            "certainty": "suspected",
+            "end": 27,
+            "guarded": false,
+            "id": "sesame",
+            "start": 23,
+            "term": "roll"
+          }
+        ],
+        "matchText": "served with inside out roll on the side",
+        "normalised": "served with inside out roll on the side",
+        "text": "Served with inside out roll on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 27,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 12,
+            "term": "inside out roll"
+          },
+          {
+            "certainty": "likely",
+            "end": 27,
+            "guarded": false,
+            "id": "wheat",
+            "start": 23,
+            "term": "roll"
+          },
+          {
+            "certainty": "likely",
+            "end": 27,
+            "guarded": false,
+            "id": "gluten",
+            "start": 23,
+            "term": "roll"
+          },
+          {
+            "certainty": "suspected",
+            "end": 27,
+            "guarded": false,
+            "id": "sesame",
+            "start": 23,
+            "term": "roll"
+          }
+        ],
+        "matchText": "served with inside out roll on the side",
+        "normalised": "served with inside out roll on the side",
+        "text": "Served with INSIDE OUT ROLL on the side"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
             "end": 8,
             "guarded": false,
             "id": "sulphites",
@@ -220881,6 +223469,222 @@
         "matchText": "מוגש עמ קטשופי בצד",
         "normalised": "מוגש עמ קטשופי בצד",
         "text": "מוגש עם קטשופי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 4,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 0,
+            "term": "מאקי"
+          }
+        ],
+        "matchText": "מאקי",
+        "normalised": "מאקי",
+        "text": "מאקי"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 12,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 8,
+            "term": "מאקי"
+          }
+        ],
+        "matchText": "מוגש עמ מאקי בצד",
+        "normalised": "מוגש עמ מאקי בצד",
+        "text": "מוגש עם מאקי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 13,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 8,
+            "term": "מאקי"
+          }
+        ],
+        "matchText": "מוגש עמ המאקי בצד",
+        "normalised": "מוגש עמ המאקי בצד",
+        "text": "מוגש עם המאקי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 8,
+            "term": "מאקי"
+          }
+        ],
+        "matchText": "מוגש עמ ובמאקי בצד",
+        "normalised": "מוגש עמ ובמאקי בצד",
+        "text": "מוגש עם ובמאקי בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ושהמאקי בצד",
+        "normalised": "מוגש עמ ושהמאקי בצד",
+        "text": "מוגש עם ושהמאקי בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ מאקיי בצד",
+        "normalised": "מוגש עמ מאקיי בצד",
+        "text": "מוגש עם מאקיי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 6,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 0,
+            "term": "ניגירי"
+          }
+        ],
+        "matchText": "ניגירי",
+        "normalised": "ניגירי",
+        "text": "ניגירי"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 14,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 8,
+            "term": "ניגירי"
+          }
+        ],
+        "matchText": "מוגש עמ ניגירי בצד",
+        "normalised": "מוגש עמ ניגירי בצד",
+        "text": "מוגש עם ניגירי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 15,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 8,
+            "term": "ניגירי"
+          }
+        ],
+        "matchText": "מוגש עמ הניגירי בצד",
+        "normalised": "מוגש עמ הניגירי בצד",
+        "text": "מוגש עם הניגירי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 16,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 8,
+            "term": "ניגירי"
+          }
+        ],
+        "matchText": "מוגש עמ ובניגירי בצד",
+        "normalised": "מוגש עמ ובניגירי בצד",
+        "text": "מוגש עם ובניגירי בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ושהניגירי בצד",
+        "normalised": "מוגש עמ ושהניגירי בצד",
+        "text": "מוגש עם ושהניגירי בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ניגיריי בצד",
+        "normalised": "מוגש עמ ניגיריי בצד",
+        "text": "מוגש עם ניגיריי בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 12,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 0,
+            "term": "אינסייד אאוט"
+          }
+        ],
+        "matchText": "אינסייד אאוט",
+        "normalised": "אינסייד אאוט",
+        "text": "אינסייד אאוט"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 20,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 8,
+            "term": "אינסייד אאוט"
+          }
+        ],
+        "matchText": "מוגש עמ אינסייד אאוט בצד",
+        "normalised": "מוגש עמ אינסייד אאוט בצד",
+        "text": "מוגש עם אינסייד אאוט בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 21,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 8,
+            "term": "אינסייד אאוט"
+          }
+        ],
+        "matchText": "מוגש עמ האינסייד אאוט בצד",
+        "normalised": "מוגש עמ האינסייד אאוט בצד",
+        "text": "מוגש עם האינסייד אאוט בצד"
+      },
+      {
+        "hits": [
+          {
+            "certainty": "suspected",
+            "end": 22,
+            "guarded": false,
+            "id": "sulphites",
+            "start": 8,
+            "term": "אינסייד אאוט"
+          }
+        ],
+        "matchText": "מוגש עמ ובאינסייד אאוט בצד",
+        "normalised": "מוגש עמ ובאינסייד אאוט בצד",
+        "text": "מוגש עם ובאינסייד אאוט בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ ושהאינסייד אאוט בצד",
+        "normalised": "מוגש עמ ושהאינסייד אאוט בצד",
+        "text": "מוגש עם ושהאינסייד אאוט בצד"
+      },
+      {
+        "hits": [],
+        "matchText": "מוגש עמ אינסייד אאוטי בצד",
+        "normalised": "מוגש עמ אינסייד אאוטי בצד",
+        "text": "מוגש עם אינסייד אאוטי בצד"
       },
       {
         "hits": [
@@ -283446,6 +286250,13 @@
         },
         {
           "certainty": "suspected",
+          "normalised": "מבחר סלטימ",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}מבחר סלטימ(?![א-ת])",
+          "source": "12 §1.6",
+          "term": "מבחר סלטים"
+        },
+        {
+          "certainty": "suspected",
           "normalised": "סורימי",
           "pattern": "(?<![א-ת])[בהוכלמש]{0,2}סורימי(?![א-ת])",
           "source": "12 §1.6",
@@ -287836,6 +290647,20 @@
           "term": "sashimi"
         },
         {
+          "certainty": "suspected",
+          "normalised": "crispy chicken",
+          "pattern": "\\bcrispy chicken\\b",
+          "source": "11 §7.2",
+          "term": "crispy chicken"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "crispy wings",
+          "pattern": "\\bcrispy wings\\b",
+          "source": "11 §7.2",
+          "term": "crispy wings"
+        },
+        {
           "certainty": "likely",
           "normalised": "goldstar",
           "pattern": "\\bgoldstar\\b",
@@ -288228,6 +291053,34 @@
           "pattern": "(?<![א-ת])[בהוכלמש]{0,2}סשימי(?![א-ת])",
           "source": "12 §5",
           "term": "סשימי"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "פריכ",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}פריכ(?![א-ת])",
+          "source": "11 §7.2",
+          "term": "פריך"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "פריכה",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}פריכה(?![א-ת])",
+          "source": "11 §7.2",
+          "term": "פריכה"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "פריכימ",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}פריכימ(?![א-ת])",
+          "source": "11 §7.2",
+          "term": "פריכים"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "פריכות",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}פריכות(?![א-ת])",
+          "source": "11 §7.2",
+          "term": "פריכות"
         },
         {
           "certainty": "likely",
@@ -291973,6 +294826,27 @@
           "term": "chocolate"
         },
         {
+          "certainty": "suspected",
+          "normalised": "sesame sauce",
+          "pattern": "\\bsesame sauce\\b",
+          "source": "11 §6.2",
+          "term": "sesame sauce"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "sesame noodles",
+          "pattern": "\\bsesame noodles\\b",
+          "source": "11 §6.2",
+          "term": "sesame noodles"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "sweet glaze",
+          "pattern": "\\bsweet glaze\\b",
+          "source": "11 §6.2",
+          "term": "sweet glaze"
+        },
+        {
           "certainty": "likely",
           "normalised": "satay",
           "pattern": "\\bsatay\\b",
@@ -292554,6 +295428,20 @@
           "pattern": "(?<![א-ת])[בהוכלמש]{0,2}שוקולד(?![א-ת])",
           "source": "11 §6.1",
           "term": "שוקולד"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "רוטב מתקתק",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}רוטב מתקתק(?![א-ת])",
+          "source": "11 §6.2",
+          "term": "רוטב מתקתק"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "רוטב שומשומ",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}רוטב שומשומ(?![א-ת])",
+          "source": "11 §6.2",
+          "term": "רוטב שומשום"
         },
         {
           "certainty": "likely",
@@ -294304,6 +297192,20 @@
         },
         {
           "certainty": "suspected",
+          "normalised": "shashlik",
+          "pattern": "\\bshashlik\\b",
+          "source": "11 §3.2",
+          "term": "shashlik"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "beef skewers",
+          "pattern": "\\bbeef skewers\\b",
+          "source": "11 §3.2",
+          "term": "beef skewers"
+        },
+        {
+          "certainty": "suspected",
           "normalised": "ribeye",
           "pattern": "\\bribeye\\b",
           "source": "11 §3.2",
@@ -295031,6 +297933,20 @@
           "pattern": "(?<![א-ת])[בהוכלמש]{0,2}אנטרקוט(?![א-ת])",
           "source": "11 §3.2",
           "term": "אנטרקוט"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "שישליק",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}שישליק(?![א-ת])",
+          "source": "11 §3.2",
+          "term": "שישליק"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "שיפודי בקר",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}שיפודי בקר(?![א-ת])",
+          "source": "11 §3.2",
+          "term": "שיפודי בקר"
         },
         {
           "certainty": "suspected",
@@ -296060,6 +298976,27 @@
           "pattern": "\\btartare\\b",
           "source": "11 §13.2",
           "term": "tartare"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "house sauce",
+          "pattern": "\\bhouse sauce\\b",
+          "source": "11 §13.2",
+          "term": "house sauce"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "secret sauce",
+          "pattern": "\\bsecret sauce\\b",
+          "source": "11 §13.2",
+          "term": "secret sauce"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "sweet glaze",
+          "pattern": "\\bsweet glaze\\b",
+          "source": "11 §13.2",
+          "term": "sweet glaze"
         }
       ],
       "hiddenHe": [
@@ -296216,6 +299153,55 @@
           "pattern": "(?<![א-ת])[בהוכלמש]{0,2}קולסלו(?![א-ת])",
           "source": "11 §13.2",
           "term": "קולסלו"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "מוחמצ",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}מוחמצ(?![א-ת])",
+          "source": "11 §13.2",
+          "term": "מוחמץ"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "מוחמצת",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}מוחמצת(?![א-ת])",
+          "source": "11 §13.2",
+          "term": "מוחמצת"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "מוחמצימ",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}מוחמצימ(?![א-ת])",
+          "source": "11 §13.2",
+          "term": "מוחמצים"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "מוחמצות",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}מוחמצות(?![א-ת])",
+          "source": "11 §13.2",
+          "term": "מוחמצות"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "רוטב הבית",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}רוטב הבית(?![א-ת])",
+          "source": "11 §13.2",
+          "term": "רוטב הבית"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "רוטב סודי",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}רוטב סודי(?![א-ת])",
+          "source": "11 §13.2",
+          "term": "רוטב סודי"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "רוטב מתקתק",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}רוטב מתקתק(?![א-ת])",
+          "source": "11 §13.2",
+          "term": "רוטב מתקתק"
         }
       ],
       "noPrefixHe": [],
@@ -298000,6 +300986,27 @@
         },
         {
           "certainty": "suspected",
+          "normalised": "sesame sauce",
+          "pattern": "\\bsesame sauce\\b",
+          "source": "11 §6.2",
+          "term": "sesame sauce"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "sesame noodles",
+          "pattern": "\\bsesame noodles\\b",
+          "source": "11 §6.2",
+          "term": "sesame noodles"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "sweet glaze",
+          "pattern": "\\bsweet glaze\\b",
+          "source": "11 §6.2",
+          "term": "sweet glaze"
+        },
+        {
+          "certainty": "suspected",
           "normalised": "satay",
           "pattern": "\\bsatay\\b",
           "source": "11 §6.2",
@@ -298230,6 +301237,20 @@
           "pattern": "(?<![א-ת])[בהוכלמש]{0,2}שוקולד(?![א-ת])",
           "source": "11 §6.1",
           "term": "שוקולד"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "רוטב מתקתק",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}רוטב מתקתק(?![א-ת])",
+          "source": "11 §6.2",
+          "term": "רוטב מתקתק"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "רוטב שומשומ",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}רוטב שומשומ(?![א-ת])",
+          "source": "11 §6.2",
+          "term": "רוטב שומשום"
         },
         {
           "certainty": "likely",
@@ -298792,6 +301813,34 @@
         },
         {
           "certainty": "suspected",
+          "normalised": "maki",
+          "pattern": "\\bmaki\\b",
+          "source": "11 §15.2",
+          "term": "maki"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "uramaki",
+          "pattern": "\\buramaki\\b",
+          "source": "11 §15.2",
+          "term": "uramaki"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "nigiri",
+          "pattern": "\\bnigiri\\b",
+          "source": "11 §15.2",
+          "term": "nigiri"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "inside out roll",
+          "pattern": "\\binside out roll\\b",
+          "source": "11 §15.2",
+          "term": "inside out roll"
+        },
+        {
+          "certainty": "suspected",
           "normalised": "goldstar",
           "pattern": "\\bgoldstar\\b",
           "source": "11 §15.2",
@@ -299092,6 +302141,27 @@
           "pattern": "(?<![א-ת])[בהוכלמש]{0,2}סושי(?![א-ת])",
           "source": "11 §15.2",
           "term": "סושי"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "מאקי",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}מאקי(?![א-ת])",
+          "source": "11 §15.2",
+          "term": "מאקי"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "ניגירי",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}ניגירי(?![א-ת])",
+          "source": "11 §15.2",
+          "term": "ניגירי"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "אינסייד אאוט",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}אינסייד אאוט(?![א-ת])",
+          "source": "11 §15.2",
+          "term": "אינסייד אאוט"
         },
         {
           "certainty": "suspected",
@@ -303857,6 +306927,20 @@
           "pattern": "\\bsashimi\\b",
           "source": "12 §5",
           "term": "sashimi"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "crispy chicken",
+          "pattern": "\\bcrispy chicken\\b",
+          "source": "11 §7.2",
+          "term": "crispy chicken"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "crispy wings",
+          "pattern": "\\bcrispy wings\\b",
+          "source": "11 §7.2",
+          "term": "crispy wings"
         }
       ],
       "hiddenHe": [
@@ -304188,6 +307272,34 @@
           "pattern": "(?<![א-ת])[בהוכלמש]{0,2}סשימי(?![א-ת])",
           "source": "12 §5",
           "term": "סשימי"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "פריכ",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}פריכ(?![א-ת])",
+          "source": "11 §7.2",
+          "term": "פריך"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "פריכה",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}פריכה(?![א-ת])",
+          "source": "11 §7.2",
+          "term": "פריכה"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "פריכימ",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}פריכימ(?![א-ת])",
+          "source": "11 §7.2",
+          "term": "פריכים"
+        },
+        {
+          "certainty": "suspected",
+          "normalised": "פריכות",
+          "pattern": "(?<![א-ת])[בהוכלמש]{0,2}פריכות(?![א-ת])",
+          "source": "11 §7.2",
+          "term": "פריכות"
         }
       ],
       "noPrefixHe": [
