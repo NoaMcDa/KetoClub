@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/trip_destination.dart';
+import 'package:ketoclub/screens/premium_gate.dart';
 import 'package:ketoclub/screens/trip_briefing_screen.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/state/settings_controller.dart';
+import 'package:ketoclub/utils/premium_gates.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
 import 'package:provider/provider.dart';
 
@@ -143,6 +145,14 @@ class SettingsTripRows extends StatelessWidget {
     BuildContext context,
     SettingsController controller,
   ) async {
+    // Picking a destination is Premium (ALG-18); turning a trip off and
+    // its briefing never are.
+    final allowed = await passPremiumGate(
+      context,
+      PremiumFeature.tripMode,
+      locks: PremiumGates.locksPickingDestination,
+    );
+    if (!allowed || !context.mounted) return;
     final picked = await showTripDestinationPicker(
       context,
       current: controller.tripDestination,

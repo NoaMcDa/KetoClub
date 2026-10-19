@@ -10,9 +10,11 @@ import 'package:flutter/material.dart' hide MenuController;
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/screens/chef_card_screen.dart';
+import 'package:ketoclub/screens/premium_gate.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/state/menu_controller.dart';
+import 'package:ketoclub/utils/premium_gates.dart';
 import 'package:ketoclub/utils/profile_wording.dart';
 import 'package:ketoclub/widgets/group_breakdown_line.dart';
 import 'package:ketoclub/widgets/group_combine_sheet.dart';
@@ -78,7 +80,19 @@ Future<void> openGroupCombine(
       ),
     ),
   );
-  if (ids == null) return;
+  if (ids == null || !context.mounted) return;
+  // Checking several people is Premium (ALG-18); the choice already saved,
+  // and narrowing it, never are.
+  final allowed = await passPremiumGate(
+    context,
+    PremiumFeature.groupProfiles,
+    locks: (access) => PremiumGates.locksCheckingPeople(
+      access,
+      current: <String>[for (final person in controller.people) person.id],
+      next: ids,
+    ),
+  );
+  if (!allowed) return;
   await controller.setActiveProfiles(ids);
 }
 

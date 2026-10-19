@@ -15,6 +15,7 @@ import 'package:ketoclub/services/venue/qr_payload_router.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/premium_gates.dart';
 
 /// Why [ScanController.addPages] refused pages (issue #82).
 enum ScanPageRejection {
@@ -50,6 +51,12 @@ enum ScanPageRejection {
 /// caller to open, and the two outcomes with no menu behind them (a
 /// platform not supported yet, a code that is not a menu link) are kept as
 /// [qrNotice] for the screen to explain (issue #182).
+///
+/// **The month's count (Banto, ALG-18).** With [bantoMode] on, every scan
+/// that produced a menu — pages read or text pasted — is counted in
+/// `AppSettings` under the month it was read in ([scansThisMonth]), which
+/// the free plan's monthly limit reads. A failed read is not counted, and a
+/// KetoClub build counts nothing, so its stored settings never change.
 ///
 /// Never throws — the repository, classifier and scanner do not, and
 /// [TextMenuSource.parse] and [QrPayloadRouter.classify] are pure.
@@ -111,6 +118,32 @@ final class ScanController extends ChangeNotifier {
   bool _disposed = false;
   bool _qrScanning = false;
   QrTarget? _qrNotice;
+  int _scansThisMonth = 0;
+
+  /// The scans counted this month, as of the last [loadScanCount] or
+  /// counted scan; 0 before either.
+  int get scansThisMonth => _scansThisMonth;
+
+  /// Reads this month's count from the settings store (ALG-18) and answers
+  /// it. A new month reads 0.
+  Future<int> loadScanCount() async {
+    final settings = await _settingsStore.read();
+    _scansThisMonth = settings.scansIn(scanMonthKey(_clock.now()));
+    _notify();
+    return _scansThisMonth;
+  }
+
+  /// Counts one scan in this month (ALG-18), only in a Banto build.
+  Future<void> _countScan() async {
+    if (!bantoMode) return;
+    final settings = await _settingsStore.read();
+    final month = scanMonthKey(_clock.now());
+    final count = settings.scansIn(month) + 1;
+    await _settingsStore.write(
+      settings.copyWith(scanMonth: month, scanCount: count),
+    );
+    _scansThisMonth = count;
+  }
 
   /// The text currently in the paste field.
   String get text => _text;
@@ -156,6 +189,7 @@ final class ScanController extends ChangeNotifier {
     _isSubmitting = true;
     notifyListeners();
     await _repository.store(menu);
+    await _countScan();
     _isSubmitting = false;
     _emptyPaste = false;
     _notify();
@@ -339,6 +373,7 @@ final class ScanController extends ChangeNotifier {
         await _repository.store(menu);
         await _repository.saveAnalysis(ref, analysis);
         _pagesRegistry?.put(ref, scan);
+        await _countScan();
       case ScannedMenuFailed(:final reason):
         _lastFailure = reason;
     }

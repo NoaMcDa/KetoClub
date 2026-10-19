@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
+import 'package:ketoclub/screens/premium_gate.dart';
 import 'package:ketoclub/screens/profile_editor_screen.dart';
 import 'package:ketoclub/screens/profile_import_screen.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/state/settings_controller.dart';
+import 'package:ketoclub/utils/premium_gates.dart';
 import 'package:ketoclub/widgets/profile_name_dialog.dart';
 import 'package:ketoclub/widgets/profile_names.dart';
 import 'package:provider/provider.dart';
@@ -81,9 +83,7 @@ class SettingsProfilesList extends StatelessWidget {
                   key: settingsProfilesImportKey,
                   icon: const Icon(Icons.download_outlined),
                   label: Text(l10n.settingsProfilesImport),
-                  onPressed: () => unawaited(
-                    _push(context, controller, const ProfileImportScreen()),
-                  ),
+                  onPressed: () => unawaited(_import(context, controller)),
                 ),
               ],
             ],
@@ -93,7 +93,24 @@ class SettingsProfilesList extends StatelessWidget {
     );
   }
 
+  /// Whether another person may be added: Premium's group profiles
+  /// (ALG-18). The people already on the device stay, whatever the plan.
+  Future<bool> _mayAddPerson(BuildContext context) => passPremiumGate(
+    context,
+    PremiumFeature.groupProfiles,
+    locks: PremiumGates.locksAddingPerson,
+  );
+
+  Future<void> _import(
+    BuildContext context,
+    SettingsController controller,
+  ) async {
+    if (!await _mayAddPerson(context) || !context.mounted) return;
+    await _push(context, controller, const ProfileImportScreen());
+  }
+
   Future<void> _add(BuildContext context, SettingsController controller) async {
+    if (!await _mayAddPerson(context) || !context.mounted) return;
     final l10n = AppLocalizations.of(context)!;
     final name = await showProfileNameDialog(
       context,

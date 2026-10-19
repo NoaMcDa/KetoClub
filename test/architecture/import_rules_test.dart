@@ -305,6 +305,11 @@ const _boundaries = <_Boundary>[
   // services/platform/, because it owns a full-screen page; one file
   // touches the plugin either way.
   _Boundary('package:mobile_scanner/', {'widgets/mobile_qr_scanner.dart'}),
+  // Banto Premium's store (ALG-18, issue #360): StoreKit and Play Billing
+  // through one plugin, reached from one file behind the Entitlement seam.
+  _Boundary('package:in_app_purchase', {
+    'services/platform/store_entitlement.dart',
+  }),
   // One button hierarchy and one field style (issue #248,
   // architecture.md §6.6): no ElevatedButton anywhere, and the field
   // border is drawn once, by the theme's inputDecorationTheme.

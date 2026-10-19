@@ -55,6 +55,7 @@ import 'package:ketoclub/services/menu/wolt/wolt_adapter.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
+import 'package:ketoclub/services/platform/entitlement.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/page_picker.dart';
@@ -245,6 +246,11 @@ final class FakeAppDependencies {
   /// value — so Settings shows no key section unless a flow sets one.
   ApiKeyStore? apiKeyStore;
 
+  /// The store behind Banto Premium (ALG-18, issue #360): [NullEntitlement]
+  /// by default, which sells nothing and so gates nothing, as on web. A
+  /// flow that exercises the free plan sets a scripted store.
+  Entitlement entitlement = const NullEntitlement();
+
   /// The engine behind "Estimate this list" (issue #42, D13): the real
   /// on-device rule engine over the same fixed time as [clock], exactly
   /// as `di.dart` wires it, so a flow sees real rules verdicts while
@@ -275,6 +281,7 @@ final class FakeAppDependencies {
     menuQuestionAnswerer: questionAnswerer,
     visitHistory: visitHistory,
     menuStoreClient: menuStoreClient,
+    entitlement: entitlement,
   );
 }
 
