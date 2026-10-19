@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/screens/premium_gate.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
+import 'package:ketoclub/utils/premium_gates.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/restriction_picker_sheet.dart';
 import 'package:provider/provider.dart';
@@ -140,7 +142,18 @@ class _RestrictionOnboardingScreenState
   final List<RestrictionId> _chosen = <RestrictionId>[];
   bool _saving = false;
 
-  void _toggle(RestrictionId id, bool selected) {
+  Future<void> _toggle(RestrictionId id, bool selected) async {
+    // The free plan keeps one restriction (ALG-18): choosing a second
+    // opens the paywall, and the chip is chosen only once Premium is on.
+    if (selected) {
+      final allowed = await passPremiumGate(
+        context,
+        PremiumFeature.restrictions,
+        locks: (access) =>
+            PremiumGates.locksChoosing(access, chosen: _chosen, adding: id),
+      );
+      if (!allowed || !mounted) return;
+    }
     setState(() {
       if (selected) {
         if (!_chosen.contains(id)) _chosen.add(id);
@@ -280,7 +293,7 @@ class _RestrictionOnboardingScreenState
               selected: _chosen.contains(restriction.id),
               onSelected: _saving
                   ? null
-                  : (selected) => _toggle(restriction.id, selected),
+                  : (selected) => unawaited(_toggle(restriction.id, selected)),
             ),
         ],
       ),

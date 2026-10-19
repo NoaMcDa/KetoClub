@@ -5,6 +5,8 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/screens/chef_card_screen.dart';
+import 'package:ketoclub/screens/premium_gate.dart';
+import 'package:ketoclub/screens/settings_premium_section.dart';
 import 'package:ketoclub/screens/settings_profiles_section.dart';
 import 'package:ketoclub/screens/settings_trip_section.dart';
 import 'package:ketoclub/services/platform/app_info.dart';
@@ -13,12 +15,14 @@ import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/locale_controller.dart';
+import 'package:ketoclub/state/premium_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
 import 'package:ketoclub/state/theme_mode_controller.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/premium_gates.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/helper_tool_sheet.dart';
 import 'package:ketoclub/widgets/restriction_picker_sheet.dart';
@@ -237,6 +241,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final controller = context.watch<SettingsController>();
+    // Banto Premium (ALG-18): only in a Banto build that sells it, so never
+    // on web and never in KetoClub.
+    final premium = Provider.of<PremiumController?>(context, listen: false);
+    final sellsPremium = widget.bantoMode && (premium?.sellsPremium ?? false);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settingsTitle)),
@@ -265,6 +273,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 20),
                 _tripSection(l10n),
                 const SizedBox(height: 20),
+                if (sellsPremium) ...[
+                  _premiumSection(l10n),
+                  const SizedBox(height: 20),
+                ],
               ],
               _ketoRulesSection(context, l10n, controller),
               const SizedBox(height: 20),
@@ -802,6 +814,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ],
   );
 
+  /// The "Banto Premium" section (ALG-18, issue #360), built only in a
+  /// Banto build that sells Premium: [SettingsPremiumRows].
+  Widget _premiumSection(AppLocalizations l10n) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _SectionLabel(l10n.premiumTitle),
+      const _SettingsGroup(children: [SettingsPremiumRows()]),
+    ],
+  );
+
   /// One row of the "My restrictions" section: [restriction]'s name in
   /// [locale]'s language, its kind under it, and a remove button.
   Widget _restrictionRow(
@@ -863,6 +885,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (picked == null || !mounted) return;
     final term = picked.term;
     final id = picked.id;
+    // The free plan keeps one restriction (ALG-18): a second one opens the
+    // paywall, and is added only once Premium is active. What is already
+    // saved is never touched.
+    final adding = term != null ? RestrictionId.custom : id;
+    if (adding != null && context.mounted) {
+      final allowed = await passPremiumGate(
+        context,
+        PremiumFeature.restrictions,
+        locks: (access) => PremiumGates.locksAddingRestriction(
+          access,
+          profile: controller.profile,
+          adding: adding,
+        ),
+      );
+      if (!allowed || !mounted) return;
+    }
     if (term != null) {
       await controller.addCustomTerm(term);
     } else if (id != null) {

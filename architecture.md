@@ -3884,6 +3884,52 @@ the dish's keto verdict rather than failing it; and the flow test of
 "שמנת" in a description reads it as avoid, since a description is not a
 part to leave off (only an option is).
 
+**Premium gating and the paywall (ALG-18, closes #360).** The owner chose a
+full paywall. `services/platform/entitlement.dart` is the seam: an
+`Entitlement` with `sellsPremium`, `isPremium`, a `changes` stream,
+`refresh()`, `purchase()`, `restore()` and the store's own
+`localizedPrice()`, every call a sealed `EntitlementResult`
+(`PremiumActive`, `PremiumInactive`, `PurchaseCancelled`,
+`PurchasePending`, `EntitlementFailed(reason)`) and never a throw.
+`NullEntitlement` sells nothing and gates nothing: it is the web build's
+(free; its quota stays the backend's rate limit), KetoClub's and every
+test's default. `StoreEntitlement` (`store_entitlement.dart`, the one file
+`import_rules_test` lets import `in_app_purchase`) sells one monthly
+product, `banto_premium_monthly`, through StoreKit 2 and Play Billing; the
+plugin is reached on first use only, so `di.dart`'s `entitlementFor` (store
+on a Banto phone, null otherwise) does no plugin I/O. There is no receipt
+server and no account, and the backend learns nothing: a refresh is the
+plugin's restore, which on both stores reads only what is active now
+(StoreKit 2's current entitlements, Play's owned purchases, neither
+prompting a sign-in), so a lapsed subscription simply reads as inactive.
+`state/premium_controller.dart` is app-lifetime, provided above every
+route, and reads the store once per session, the first time a gate or the
+paywall needs it, never at start-up. The decisions are pure,
+`utils/premium_gates.dart`: only a Banto build that sells Premium without it
+is limited, to `freeRestrictionCount` (1, keto never counted) and
+`freeScansPerMonth` (5: file 07 says "up to X", so the issue's default
+holds until the owner picks one); the four gates are adding a second
+restriction (Settings, a person's editor, the onboarding chips), adding or
+importing a person and checking a new person into a menu's group, picking
+a trip destination, and a scan (photos, PDF or pasted text) past the
+month's count. `screens/premium_gate.dart`'s `passPremiumGate` opens
+`PaywallScreen` when one trips, never failing silently, and the action goes
+ahead once Premium is active. **Only adding is gated**: a person whose
+Premium lapsed keeps every saved restriction, person, active group and
+trip, each still evaluated on every menu and removable, and the chef cards,
+the helper copy, confirmations, waiter questions, the Why sheet and the
+trip briefing never mention Premium (`premium_gate_usage_test` pins the
+callers and those files; a flow walks a lapsed user through all of them).
+The month's count is `AppSettings.scanMonth`/`scanCount` (UTC `YYYY-MM`,
+key `monthlyScans`, written only while it counts a scan and only by a
+Banto `ScanController`, after a read that produced a menu), so
+`const AppSettings().toJson()` is unchanged. The paywall's price line is
+always the store's string, never a figure in the app; its copy (ARB keys
+`premiumTitle`, `paywall*`, `settingsPremium*`, `scanFreeScansLeft`) says
+what Premium adds and that nothing already in a profile is ever locked,
+and never "safe". No real purchase has been made: no device, no store
+account and no store product exist yet.
+
 ### D27 — Post-meal confirmations, no ratings
 
 *(Banto, the Allergens epic's ALG-14, issue #356. Amends D23's visit

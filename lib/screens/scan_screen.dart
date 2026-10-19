@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/premium_gate.dart';
 import 'package:ketoclub/services/platform/page_picker.dart';
 import 'package:ketoclub/services/venue/qr_payload_router.dart';
 import 'package:ketoclub/state/menu_controller.dart' show LoadPhase;
+import 'package:ketoclub/state/premium_controller.dart';
 import 'package:ketoclub/state/scan_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/premium_gates.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/analysis_progress_row.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
@@ -16,6 +19,9 @@ import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/scan_failure_copy.dart';
 import 'package:ketoclub/widgets/scanned_pages_sheet.dart';
 import 'package:provider/provider.dart';
+
+/// The Scan tab's "N of 5 free scans left this month" line (ALG-18).
+const Key scanFreeScansLeftKey = Key('scanFreeScansLeft');
 
 /// The Scan tab (architecture.md §6.6, D15, D18; issues #11, #82, #83):
 /// take a photo, choose photos or choose a PDF, list and remove the pages
@@ -38,6 +44,11 @@ import 'package:provider/provider.dart';
 /// store the menu through [ScanController] and then push
 /// `/venue/scan/{id}`, so the menu screen loads, classifies and caches it
 /// exactly like a venue from a delivery platform.
+///
+/// In a Banto build that sells Premium, the free plan reads
+/// [freeScansPerMonth] scans a month (ALG-18): a line under the modes
+/// says how many are left, and Analyse past the count opens the paywall
+/// instead of sending anything.
 ///
 /// A `StatefulWidget` only to own the [TextEditingController], the
 /// selected mode, the in-flight picker flag and the last page rejection;
@@ -83,9 +94,34 @@ class _ScanScreenState extends State<ScanScreen> {
   _ScanMode _mode = _ScanMode.pages;
 
   @override
+  void initState() {
+    super.initState();
+    // After the first frame, so building the tab starts no read.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(context.read<ScanController>().loadScanCount());
+    });
+  }
+
+  @override
   void dispose() {
     _field.dispose();
     super.dispose();
+  }
+
+  /// Whether one more scan may be read: past the free plan's monthly count
+  /// it opens the paywall first (ALG-18), and answers whether Premium is
+  /// now active.
+  Future<bool> _mayScan() async {
+    final controller = context.read<ScanController>();
+    final count = await controller.loadScanCount();
+    if (!mounted) return false;
+    return await passPremiumGate(
+      context,
+      PremiumFeature.scans,
+      locks: (access) => PremiumGates.locksScan(access, scansThisMonth: count),
+      scansThisMonth: count,
+    );
   }
 
   Future<void> _pick(Future<List<ScannedPage>> Function() source) async {
@@ -131,11 +167,13 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   Future<void> _analysePages() async {
+    if (!await _mayScan() || !mounted) return;
     final ref = await context.read<ScanController>().analysePages();
     _open(ref);
   }
 
   Future<void> _analysePaste() async {
+    if (!await _mayScan() || !mounted) return;
     final ref = await context.read<ScanController>().submitPaste(
       uncategorisedName: AppLocalizations.of(context)!.sourceScanned,
     );
@@ -194,6 +232,7 @@ class _ScanScreenState extends State<ScanScreen> {
                   setState(() => _mode = selection.single),
             ),
             const SizedBox(height: 20),
+            if (mode != _ScanMode.qr) ..._freeScansLine(l10n, controller),
             ...switch (mode) {
               _ScanMode.pages => _pagesMode(l10n, controller),
               _ScanMode.paste => _pasteMode(l10n, controller),
@@ -365,6 +404,27 @@ class _ScanScreenState extends State<ScanScreen> {
           child: Text(l10n.scanScreenSettingsLink),
         ),
       ),
+    ];
+  }
+
+  /// "N of 5 free scans left this month" on the free plan of a Banto build
+  /// that sells Premium (ALG-18); nothing otherwise.
+  List<Widget> _freeScansLine(
+    AppLocalizations l10n,
+    ScanController controller,
+  ) {
+    final premium = Provider.of<PremiumController?>(context);
+    if (premium == null || !premium.access.limited) return const <Widget>[];
+    return [
+      Text(
+        l10n.scanFreeScansLeft(
+          PremiumGates.freeScansLeft(controller.scansThisMonth),
+          freeScansPerMonth,
+        ),
+        key: scanFreeScansLeftKey,
+        style: Theme.of(context).textTheme.bodySmall,
+      ),
+      const SizedBox(height: 12),
     ];
   }
 

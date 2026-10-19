@@ -19,6 +19,7 @@ import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/state/confirmation_controller.dart';
 import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/menu_controller.dart';
+import 'package:ketoclub/state/premium_controller.dart';
 import 'package:ketoclub/state/saved_controller.dart';
 import 'package:ketoclub/state/scan_controller.dart';
 import 'package:ketoclub/state/settings_controller.dart';
@@ -72,6 +73,7 @@ class _KetoClubAppState extends State<KetoClubApp> {
   late final ThemeModeController _themeModeController;
   late final CarbBudgetController _carbBudget;
   late final VenueSearchController _venueSearch;
+  late final PremiumController _premium;
 
   @override
   void initState() {
@@ -82,6 +84,12 @@ class _KetoClubAppState extends State<KetoClubApp> {
     );
     _carbBudget = CarbBudgetController();
     final dependencies = widget.dependencies;
+    // Banto Premium (ALG-18): one answer for every route's gates. Reads
+    // the store only when a gate or the paywall first needs it.
+    _premium = PremiumController(
+      dependencies.entitlement,
+      bantoMode: widget.bantoMode,
+    );
     _venueSearch = VenueSearchController(
       dependencies.settingsStore,
       // The quick score reads through the device's own adapters, never the
@@ -106,6 +114,7 @@ class _KetoClubAppState extends State<KetoClubApp> {
     _themeModeController.dispose();
     _carbBudget.dispose();
     _venueSearch.dispose();
+    _premium.dispose();
     super.dispose();
   }
 
@@ -129,6 +138,7 @@ class _KetoClubAppState extends State<KetoClubApp> {
         ChangeNotifierProvider<VenueSearchController>.value(
           value: _venueSearch,
         ),
+        ChangeNotifierProvider<PremiumController>.value(value: _premium),
       ],
       child: AnimatedBuilder(
         animation: Listenable.merge([_localeController, _themeModeController]),

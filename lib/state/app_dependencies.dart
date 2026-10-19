@@ -9,6 +9,7 @@ import 'package:ketoclub/services/platform/app_info.dart';
 import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
+import 'package:ketoclub/services/platform/entitlement.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/image_downscaler.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
@@ -70,6 +71,11 @@ class AppDependencies {
   /// build's real value; `di.dart` passes whether a backend URL is set
   /// (issue #330).
   ///
+  /// [entitlement] defaults to [NullEntitlement], which sells nothing, so
+  /// nothing is gated: the web build's real value, and every test's that
+  /// does not script a store. `di.dart` passes the store's on a phone in a
+  /// Banto build (ALG-18, issue #360).
+  ///
   /// [estimateMenuRepository] defaults to [menuRepository], which is also
   /// the no-backend build's real value; with a backend `di.dart` passes a
   /// repository over the direct adapters sharing the same cache (issue
@@ -100,6 +106,7 @@ class AppDependencies {
     this.visitHistory = const NoVisitHistoryStore(),
     this.menuStoreClient = const NoMenuStoreClient(),
     this.backendConfigured = false,
+    this.entitlement = const NullEntitlement(),
     MenuRepository? estimateMenuRepository,
   }) : estimateMenuRepository = estimateMenuRepository ?? menuRepository;
 
@@ -228,4 +235,9 @@ class AppDependencies {
   /// with the user's own Gemini key used only if the server cannot be
   /// reached (issue #330); the consent and scan disclosures follow it.
   final bool backendConfigured;
+
+  /// Whether Banto Premium is active, and the way to buy or restore it
+  /// (ALG-18, issue #360). Read only through the app-lifetime
+  /// `PremiumController`; the backend never learns of it.
+  final Entitlement entitlement;
 }

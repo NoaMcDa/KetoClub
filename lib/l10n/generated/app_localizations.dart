@@ -3533,6 +3533,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'On {date} the staff told you it is not in the dish. That holds for that visit only, so ask again each time.'**
   String whyDeniedOn(DateTime date);
+
+  /// Banto (ALG-18): the paywall's title and the Settings section label. A product name.
+  ///
+  /// In en, this message translates to:
+  /// **'Banto Premium'**
+  String get premiumTitle;
+
+  /// Banto (ALG-18): the paywall's first line.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium adds more to Banto. Your restrictions are checked the same way on either plan.'**
+  String get paywallIntro;
+
+  /// Banto (ALG-18): why the paywall opened: adding a second restriction.
+  ///
+  /// In en, this message translates to:
+  /// **'The free plan keeps one restriction in a profile. Premium lets you add more.'**
+  String get paywallReasonRestrictions;
+
+  /// Banto (ALG-18): why the paywall opened: adding a person or checking several.
+  ///
+  /// In en, this message translates to:
+  /// **'Profiles for other people, and checking a menu for several people at once, are part of Premium.'**
+  String get paywallReasonGroup;
+
+  /// Banto (ALG-18): why the paywall opened: picking a trip destination.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip mode is part of Premium.'**
+  String get paywallReasonTrip;
+
+  /// Banto (ALG-18): why the paywall opened: the month's free scans are used.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{You have used this month\'s free scan.} other{You have used this month\'s {count} free scans.}} Premium has no monthly limit.'**
+  String paywallReasonScans(int count);
+
+  /// Banto (ALG-18): heading of the paywall's feature list.
+  ///
+  /// In en, this message translates to:
+  /// **'What Premium adds'**
+  String get paywallFeaturesHeading;
+
+  /// Banto (ALG-18): a Premium feature.
+  ///
+  /// In en, this message translates to:
+  /// **'More than one restriction in your profile'**
+  String get paywallFeatureRestrictions;
+
+  /// Banto (ALG-18): a Premium feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Profiles for the people you eat with, checked together'**
+  String get paywallFeatureGroup;
+
+  /// Banto (ALG-18): a Premium feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip mode: local terms and labelling notes for where you are going'**
+  String get paywallFeatureTrip;
+
+  /// Banto (ALG-18): a Premium feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu scans with no monthly limit: photos, PDFs and pasted text'**
+  String get paywallFeatureScans;
+
+  /// Banto (ALG-18): what is never gated. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'Never locked, on any plan: every restriction already in your profile is checked on every menu, and the chef card, the waiter questions, the Why sheet and the after-meal check stay free. Always ask the restaurant.'**
+  String get paywallNeverLocked;
+
+  /// Banto (ALG-18): the store's own localized price, never a figure the app writes.
+  ///
+  /// In en, this message translates to:
+  /// **'{price} a month'**
+  String paywallPrice(String price);
+
+  /// Banto (ALG-18): the price line before or without the store's answer.
+  ///
+  /// In en, this message translates to:
+  /// **'The price shows once the store answers.'**
+  String get paywallPriceUnknown;
+
+  /// Banto (ALG-18): the paywall's buy button.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe'**
+  String get paywallBuy;
+
+  /// Banto (ALG-18): restores a purchase from the store.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchase'**
+  String get paywallRestore;
+
+  /// Banto (ALG-18): the billing line under the buy button.
+  ///
+  /// In en, this message translates to:
+  /// **'Billed monthly through your App Store or Google Play account. Cancel any time in the store\'s subscription settings.'**
+  String get paywallTerms;
+
+  /// Banto (ALG-18): after a purchase or restore that found Premium.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium is active on this device. Thank you.'**
+  String get paywallActive;
+
+  /// Banto (ALG-18): a pending purchase.
+  ///
+  /// In en, this message translates to:
+  /// **'The store is still processing the purchase. Premium opens once it is approved.'**
+  String get paywallPending;
+
+  /// Banto (ALG-18): the person closed the store's sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'The purchase was cancelled.'**
+  String get paywallCancelled;
+
+  /// Banto (ALG-18): a restore that found nothing.
+  ///
+  /// In en, this message translates to:
+  /// **'The store has no active Premium subscription for this account.'**
+  String get paywallRestoredNone;
+
+  /// Banto (ALG-18): billing unavailable or no connection.
+  ///
+  /// In en, this message translates to:
+  /// **'The store can\'t be reached from this device right now. Try again later.'**
+  String get paywallFailedStoreUnavailable;
+
+  /// Banto (ALG-18): the store does not know the product.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium isn\'t available in the store yet.'**
+  String get paywallFailedProductNotFound;
+
+  /// Banto (ALG-18): the store answered with an error.
+  ///
+  /// In en, this message translates to:
+  /// **'The store reported an error. Nothing changed; try again.'**
+  String get paywallFailedStoreError;
+
+  /// Banto (ALG-18): the store did not answer.
+  ///
+  /// In en, this message translates to:
+  /// **'The store didn\'t answer in time. Try again.'**
+  String get paywallFailedTimedOut;
+
+  /// Banto (ALG-18): a build with no store (web).
+  ///
+  /// In en, this message translates to:
+  /// **'Premium isn\'t sold in this version of the app.'**
+  String get paywallFailedNotSold;
+
+  /// Banto (ALG-18): the Settings row's status with Premium.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium is active'**
+  String get settingsPremiumActive;
+
+  /// Banto (ALG-18): the Settings row's status without Premium.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Free plan: one restriction and one scan a month} other{Free plan: one restriction and {count} scans a month}}'**
+  String settingsPremiumFree(int count);
+
+  /// Banto (ALG-18): opens the paywall from Settings.
+  ///
+  /// In en, this message translates to:
+  /// **'See what Premium adds'**
+  String get settingsPremiumOpen;
+
+  /// Banto (ALG-18): the Scan tab's count on the free plan.
+  ///
+  /// In en, this message translates to:
+  /// **'{left, plural, =0{No free scans left this month} =1{1 of {total} free scans left this month} other{{left} of {total} free scans left this month}}'**
+  String scanFreeScansLeft(int left, int total);
 }
 
 class _AppLocalizationsDelegate

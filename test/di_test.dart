@@ -31,11 +31,13 @@ import 'package:ketoclub/services/platform/app_logger.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/device_page_picker.dart';
+import 'package:ketoclub/services/platform/entitlement.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/qr_scanner.dart';
 import 'package:ketoclub/services/platform/scan_budget.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
+import 'package:ketoclub/services/platform/store_entitlement.dart';
 import 'package:ketoclub/services/storage/api_key_store.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
@@ -148,6 +150,8 @@ void main() {
       // No backend URL: nothing goes to a backend first (issue #331), and
       // the quick score shares the menu screen's repository.
       expect(dependencies.backendConfigured, isFalse);
+      // Built without BANTO_MODE: KetoClub sells nothing (ALG-18).
+      expect(dependencies.entitlement, isA<NullEntitlement>());
       expect(
         identical(
           dependencies.estimateMenuRepository,
@@ -179,6 +183,31 @@ void main() {
         first.get(const VenueRef(source: MenuSource.scan, platformId: 'a')),
         isNull,
       );
+    });
+  });
+
+  group('entitlementFor (ALG-18, issue #360)', () {
+    test('a Banto phone sells Premium through the store, reaching no '
+        'plugin yet', () {
+      final entitlement = entitlementFor(runsInBrowser: false, bantoMode: true);
+      expect(entitlement, isA<StoreEntitlement>());
+      expect(entitlement.sellsPremium, isTrue);
+      expect(entitlement.isPremium, isFalse);
+    });
+
+    test('the web build and a KetoClub build sell nothing', () {
+      for (final (runsInBrowser, bantoMode) in <(bool, bool)>[
+        (true, true),
+        (true, false),
+        (false, false),
+      ]) {
+        final entitlement = entitlementFor(
+          runsInBrowser: runsInBrowser,
+          bantoMode: bantoMode,
+        );
+        expect(entitlement, isA<NullEntitlement>());
+        expect(entitlement.sellsPremium, isFalse);
+      }
     });
   });
 

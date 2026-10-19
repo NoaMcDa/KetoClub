@@ -46,6 +46,10 @@ dependencies:
   # second pass whose target is Gemini's practical cap. Only
   # device_page_picker.dart imports it.
   image_picker: ^1.2.3
+  # Banto Premium (ALG-18, issue #360): StoreKit on iOS, Play Billing on
+  # Android. Only services/platform/store_entitlement.dart imports it; the
+  # web build sells nothing and never calls it.
+  in_app_purchase: ^3.3.1
   intl: ^0.20.3
   # The Scan tab's "Scan QR code" (issue #182): the camera view that reads a
   # table's QR code. Only widgets/mobile_qr_scanner.dart imports it.

@@ -2194,4 +2194,131 @@ class AppLocalizationsHe extends AppLocalizations {
 
     return 'ב־$dateString הצוות אמר לך שזה לא במנה. זה נכון לביקור ההוא בלבד, לכן כדאי לשאול שוב בכל פעם.';
   }
+
+  @override
+  String get premiumTitle => 'Banto Premium';
+
+  @override
+  String get paywallIntro =>
+      'פרימיום מוסיף עוד ל־Banto. ההגבלות שלך נבדקות באותו אופן בשתי התוכניות.';
+
+  @override
+  String get paywallReasonRestrictions =>
+      'בתוכנית החינמית יש בפרופיל הגבלה אחת. בפרימיום אפשר להוסיף עוד.';
+
+  @override
+  String get paywallReasonGroup =>
+      'פרופילים לאנשים אחרים, ובדיקת תפריט לכמה אנשים יחד, הם חלק מפרימיום.';
+
+  @override
+  String get paywallReasonTrip => 'מצב טיול הוא חלק מפרימיום.';
+
+  @override
+  String paywallReasonScans(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'השתמשת ב־$count הסריקות החינמיות של החודש.',
+      one: 'השתמשת בסריקה החינמית של החודש.',
+    );
+    return '$_temp0 בפרימיום אין מגבלה חודשית.';
+  }
+
+  @override
+  String get paywallFeaturesHeading => 'מה פרימיום מוסיף';
+
+  @override
+  String get paywallFeatureRestrictions => 'יותר מהגבלה אחת בפרופיל';
+
+  @override
+  String get paywallFeatureGroup => 'פרופילים לאנשים שאוכלים איתך, שנבדקים יחד';
+
+  @override
+  String get paywallFeatureTrip =>
+      'מצב טיול: מונחים מקומיים והערות על חוקי הסימון ביעד';
+
+  @override
+  String get paywallFeatureScans =>
+      'סריקות תפריט בלי מגבלה חודשית: תמונות, PDF וטקסט מודבק';
+
+  @override
+  String get paywallNeverLocked =>
+      'בשום תוכנית לא נועלים: כל הגבלה שכבר שמורה בפרופיל נבדקת בכל תפריט, וכרטיס השף, השאלות למלצר, ההסבר \"למה\" והבדיקה אחרי הארוחה נשארים בחינם. תמיד כדאי לשאול את המסעדה.';
+
+  @override
+  String paywallPrice(String price) {
+    return '$price לחודש';
+  }
+
+  @override
+  String get paywallPriceUnknown => 'המחיר יוצג כשהחנות תענה.';
+
+  @override
+  String get paywallBuy => 'הרשמה למינוי';
+
+  @override
+  String get paywallRestore => 'שחזור רכישה';
+
+  @override
+  String get paywallTerms =>
+      'החיוב חודשי דרך חשבון ה־App Store או Google Play. אפשר לבטל בכל עת בהגדרות המינויים של החנות.';
+
+  @override
+  String get paywallActive => 'פרימיום פעיל במכשיר הזה. תודה.';
+
+  @override
+  String get paywallPending =>
+      'החנות עדיין מעבדת את הרכישה. פרימיום ייפתח כשהיא תאושר.';
+
+  @override
+  String get paywallCancelled => 'הרכישה בוטלה.';
+
+  @override
+  String get paywallRestoredNone => 'בחנות אין מינוי פרימיום פעיל לחשבון הזה.';
+
+  @override
+  String get paywallFailedStoreUnavailable =>
+      'אי אפשר להגיע לחנות מהמכשיר הזה כרגע. אפשר לנסות שוב מאוחר יותר.';
+
+  @override
+  String get paywallFailedProductNotFound => 'פרימיום עדיין לא זמין בחנות.';
+
+  @override
+  String get paywallFailedStoreError =>
+      'החנות החזירה שגיאה. שום דבר לא השתנה; אפשר לנסות שוב.';
+
+  @override
+  String get paywallFailedTimedOut => 'החנות לא ענתה בזמן. אפשר לנסות שוב.';
+
+  @override
+  String get paywallFailedNotSold => 'פרימיום לא נמכר בגרסה הזו של האפליקציה.';
+
+  @override
+  String get settingsPremiumActive => 'פרימיום פעיל';
+
+  @override
+  String settingsPremiumFree(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'תוכנית חינמית: הגבלה אחת ו־$count סריקות בחודש',
+      one: 'תוכנית חינמית: הגבלה אחת וסריקה אחת בחודש',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsPremiumOpen => 'מה פרימיום מוסיף';
+
+  @override
+  String scanFreeScansLeft(int left, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      left,
+      locale: localeName,
+      other: 'נשארו $left מתוך $total סריקות חינמיות החודש',
+      one: 'נשארה סריקה חינמית אחת מתוך $total החודש',
+      zero: 'לא נשארו סריקות חינמיות החודש',
+    );
+    return '$_temp0';
+  }
 }
