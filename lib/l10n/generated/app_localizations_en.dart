@@ -2407,6 +2407,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'No restriction matches. You can add it as your own below.';
 
   @override
+  String get discoveryChipFitsProfile => 'Fits my profile';
+
+  @override
   String get settingsShareConfirmations => 'Share what the staff told you';
 
   @override

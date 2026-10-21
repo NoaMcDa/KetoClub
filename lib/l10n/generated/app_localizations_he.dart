@@ -2397,6 +2397,9 @@ class AppLocalizationsHe extends AppLocalizations {
       'אין הגבלה מתאימה. אפשר להוסיף אותה כמילה משלך למטה.';
 
   @override
+  String get discoveryChipFitsProfile => 'מתאים לפרופיל שלי';
+
+  @override
   String get settingsShareConfirmations => 'שיתוף מה שהצוות אמר לך';
 
   @override
