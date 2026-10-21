@@ -51,7 +51,8 @@ double _top(WidgetTester tester, Finder finder) => tester.getTopLeft(finder).dy;
 
 void main() {
   group('availableRestrictions', () {
-    test('leaves out keto and the added ids, in taxonomy order', () {
+    test('leaves out keto and the added ids, in taxonomy order (each '
+        'single legume after legumes)', () {
       // Act
       final available = availableRestrictions(<RestrictionId>{
         RestrictionId.sesame,
@@ -64,13 +65,16 @@ void main() {
       expect(ids, isNot(contains(RestrictionId.sesame)));
       expect(ids, isNot(contains(RestrictionId.milk)));
       expect(ids, isNot(contains(RestrictionId.custom)));
-      expect(ids, <RestrictionId>[
-        for (final id in RestrictionId.values)
-          if (restrictionOffered(id) &&
-              id != RestrictionId.sesame &&
-              id != RestrictionId.milk)
-            id,
-      ]);
+      expect(
+        ids,
+        childrenAfterParents(<Restriction>[
+          for (final restriction in restrictionTaxonomy)
+            if (restrictionOffered(restriction.id) &&
+                restriction.id != RestrictionId.sesame &&
+                restriction.id != RestrictionId.milk)
+              restriction,
+        ]).map((restriction) => restriction.id).toList(),
+      );
       expect(ids.first, RestrictionId.peanuts);
     });
 

@@ -58,6 +58,7 @@ Seventeen menus: five are copied from existing fixtures and twelve are written f
 | `asian_takeaway_soy_peanut.json` | synthetic Thai and Chinese place | en |
 | `us_steakhouse.json` | synthetic steakhouse (Worcestershire, blue cheese) | en |
 | `bakery_lupin_sulphites.json` | synthetic bakery: lupin flour, dried fruit | en |
+| `legume_parts_labels.json` | synthetic single legumes: hummus, ful, mujadara, peas, hilbeh, dal, ta'ameya | mixed |
 
 The golden menus are copies of their dish texts, never imports: the corpus
 and the golden export (`tool/golden`) are different things. The goldens pin

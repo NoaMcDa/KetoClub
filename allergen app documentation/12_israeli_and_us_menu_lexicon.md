@@ -890,6 +890,80 @@ tomato (עגבניות שרי), not sherry.
 
 ---
 
+## 12. Hebrew menu terms for the single legumes (issue #342)
+
+**Status: desk research, added and checked 2026-10-21, not reviewed by a
+native-speaking dietitian or an allergist.** The food facts are file 11
+§28, with their sources, and §1.3 above. Confirmed on the web, as search
+snippets: **מסבחה** is whole chickpeas, served warm with a lemon-garlic
+sauce and often tahini, and **משאוושה** is "the Galilean version of
+masabacha" (Ynet, https://www.ynet.co.il/articles/mobile/0,7340,L-3221930,00.html **[M]**;
+Wolt menu text of an Israeli hummus place,
+https://wolt.com/en/isr/modiin/restaurant/hummus-assaf **[W]**);
+**חילבה** is fenugreek seed, "זרעי גרגרנית יוונית", and Yemenite meals
+come with "חילבה וזחוק" (Hamichlol, *The Yemenite kitchen*,
+https://www.hamichlol.org.il/המטבח_התימני **[W]**). The corpus's real Wolt
+menu prints "*חלבון אפונה וסויה" under a vegan burger (file
+`test/fixtures/wolt_hamosad_menu.json`), so pea protein does reach an
+Israeli menu. **Still unreviewed:** every other Hebrew spelling below,
+which no web source confirms; as §7 says, they are the app's own lexicon.
+Spelling variants follow §1 (geresh and apostrophe read alike; the parser
+allows the prefixes ב/ה/ו/כ/ל/מ/ש unless a term is listed as taking none).
+
+### 12.1 Chickpea — גרגרי חומוס
+
+| Term | Meaning | Use |
+|---|---|---|
+| חומוס, הומוס, גרגירי חומוס, גרגרי חומוס, חימצה | chickpea, hummus, whole chickpeas, green chickpeas | direct |
+| מסבחה, מסבאחה, משאוושה | whole-chickpea dishes | direct |
+| קמח חומוס | chickpea flour | direct, through חומוס |
+| פלאפל | falafel: chickpea in Israel | likely |
+| סביח | often served with hummus or chickpeas | suspected |
+
+### 12.2 Lentil — עדשים
+
+| Term | Meaning | Use |
+|---|---|---|
+| עדשים, עדשה, מרק עדשים | lentils, lentil soup | direct |
+| מג'דרה, מוג'דרה, מג'אדרה | mujadara | direct |
+
+### 12.3 Pea — אפונה
+
+| Term | Meaning | Use |
+|---|---|---|
+| אפונה, חלבון אפונה | peas, pea protein | direct (חלבון אפונה through אפונה) |
+| המבורגר טבעוני, בשר טבעוני, תחליף בשר, שניצל טבעוני, קציצות טבעוניות, ביונד מיט, ביונד בורגר, חלבון צמחי | plant-based meat and "vegetable protein" | suspected (file 11 §16.2) |
+| סמוסה | samosa | suspected (file 11 §28.3) |
+
+### 12.4 Fenugreek — חילבה
+
+| Term | Meaning | Use |
+|---|---|---|
+| חילבה, גרגרנית (as in גרגרנית יוונית) | fenugreek, the condiment and the plant | direct |
+| מרק תימני | Yemenite soup, served with hilbeh (§1.3) | suspected |
+| חוויג', חוואייג' | hawaij, a spice blend that sometimes holds fenugreek | suspected |
+| אבקת קארי | curry powder | suspected; not the bare קארי, which would flood |
+
+**Never חלבה:** חלבה is halva, a sesame sweet (§1.1). A Yemenite spelling
+of hilbeh as חלבה exists in speech but cannot be a term. סחוג is not
+listed (file 11 §28.4).
+
+### 12.5 Fava — פול
+
+| Term | Meaning | Use |
+|---|---|---|
+| פול (and הפול, בפול, ופול), פולים, פול מדמס, פול ירוק | fava beans, ful medames | direct; פול takes no free prefix |
+| פלאפל | falafel: rarely fava in Israel (file 11 §28.5) | suspected |
+
+**Words פול must not match:** כפול ("double", as in אספרסו כפול), which is
+why פול takes no free prefix and its real prefixed forms are listed;
+**פולי**, the construct form, which on a menu is פולי סויה (soybeans),
+פולי קפה (coffee beans) or פולי קקאו (cocoa beans) and is never listed;
+and longer words (פולני, "Polish"), which the right-hand boundary already
+excludes.
+
+---
+
 ## Sources
 
 Grades: **[S]** strong (official, clinical, peer-reviewed, manufacturer),

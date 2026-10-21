@@ -1538,6 +1538,152 @@ salmon.
 
 ---
 
+## 28. Single legumes: chickpea, lentil, pea, fenugreek, fava (issue #342; desk research, brief)
+
+> **Status: desk research, not clinical review. Checked 2026-10-21** from
+> web search-result snippets only, as the banner above describes (no page
+> was opened in full). §16 is the parent (legumes as a group); this section
+> is what each single legume, a toggle of its own under legumes (§16.5),
+> hides in. Rows marked **unreviewed desk research** had no snippet that
+> confirmed them and carry `suspected` at most. Grades as in file 12:
+> **[S]** strong, **[M]** medium, **[W]** weak.
+
+**Regulated:** none of the five is on any mandatory list (§16). Fava is
+not an allergen at all: favism is acute haemolysis in G6PD deficiency after
+eating fava beans, caused by vicine and convicine, which are heat-stable,
+so cooking does not help
+([PMC, favism review](https://pmc.ncbi.nlm.nih.gov/articles/PMC9013287/) **[S]**;
+[Singapore Food Agency](https://www.sfa.gov.sg/food-information/risk-at-a-glance/the-arch-enemy-of-g6pd-deficient-individuals-fava-beans) **[S]**).
+The app models it as a strict health condition, never an allergy.
+
+**Cross-reactivity, once for all five.** Allergy UK: legume allergy is
+thought to be rising in the UK, lentil and chickpea allergy is commoner in
+India, the Middle East and some Mediterranean countries, and pea
+cross-reacts with lentil and chickpea
+([Allergy UK, Reactions to Legumes v2](https://www.allergyuk.org/wp-content/uploads/2025/07/Reactions-to-Legumes-v2.pdf) **[M]**).
+A 2024 review lists pea, lentil, chickpea and fenugreek among the
+"non-priority" legumes that cause mild to severe reactions
+([Jappe et al., Curr Allergy Asthma Rep 2024](https://link.springer.com/article/10.1007/s11882-024-01165-7) **[S]**;
+[PMC legume review](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11364600/) **[S]**).
+**Fenugreek and peanut:** in a French cohort of 195 peanut-allergic
+children, 122 were sensitised to another legume and 66% of those to
+fenugreek, but fenugreek was not among the confirmed allergies (lentil,
+lupin and pea were); an in-vitro study says peanut-fenugreek
+cross-reactivity "should be considered", and a primary fenugreek allergy
+without peanut allergy is rare but reported
+([J Allergy Clin Immunol Glob 2024](https://doaj.org/article/05a25352b09449448445f24a39522a53) **[S]**;
+[Swiss case report](https://boris.unibe.ch/182348/1/s40629-022-00202-z__1_.pdf) **[S]**;
+file 12 §1.3). The app does not infer one legume from another: each is its
+own toggle, and the parent `legumes` carries every word of all five.
+
+### 28.1 Chickpea
+Direct: chickpea(s), chick pea(s), garbanzo(s), hummus (houmous, humus,
+hommus), chana / channa (Hindi), chole (Punjabi, "chickpeas"; a dish of
+chickpea curry), msabbaha / masabacha (warm whole chickpeas), gram flour
+and besan, which are milled chana, the small Indian chickpea
+([Archana's Kitchen, chole](https://archanaskitchen.com/chola-chana-masala-north-indian-spiced-chickpea-curry) **[W]**;
+[ckbk / Oxford Companion to Food, besan](https://app.ckbk.com/reference/food77337c02s001e148) **[M]**).
+"Chana" as the Hindi word was not confirmed by a snippet (unreviewed desk
+research) but every chana-masala recipe found is chickpeas.
+
+| Hidden source | Confidence | Source |
+|---|---|---|
+| Falafel: Israeli falafel is chickpea (fava was dropped in Israel because of favism); Egyptian ta'ameya is fava; some falafel mixes both | likely | [My Jewish Learning, classic falafel](https://www.myjewishlearning.com/the-nosher/classic-falafel-recipe/) **[W]**; [Tasting Table, ta'ameya](https://tastingtable.com/901336/the-real-difference-between-taameya-and-falafel) **[W]**; file 12 §1.3 |
+| Pakora and bhaji: vegetable fritters in a besan batter | likely | [ckbk / Oxford Companion, besan](https://app.ckbk.com/reference/food77337c02s001e148) **[M]**; [Recipes Wiki, chickpea flour](https://recipes.fandom.com/wiki/Chickpea_flour) **[W]** |
+| Socca, farinata: chickpea-flour flatbreads | likely | standard use, §16.2 (unreviewed desk research) |
+| Aquafaba: the cooking liquid of chickpeas, used as an egg-white substitute in vegan baking | likely | [The Kitchn](https://www.thekitchn.com/the-most-magical-egg-replacement-and-how-to-use-it-234588) **[W]**; [Vegetarian Resource Group](https://vrg.org/journal/vj2017issue2/2017_issue2_aquafabulous.php) **[W]** |
+| Harira: Moroccan soup on a tomato, lentil and chickpea base | likely | [Wikipedia, Harira](https://en.wikipedia.org/wiki/Harira) **[M]** |
+| Koshari: chickpeas are optional | suspected | see §28.2 |
+| Sabich: often served with hummus or chickpeas | suspected | file 12 §1.3 |
+
+### 28.2 Lentil
+Direct: lentil(s), mujadara and its spellings (majadra, mejadra,
+mujaddara, mujadra) — rice or bulgur with lentils and onions
+([Wikipedia, Mujaddara](https://en.wikipedia.org/wiki/Mujaddara) **[M]**) —
+masoor (red lentil), mercimek (Turkish, "lentil"; unreviewed desk research).
+
+| Hidden source | Confidence | Source |
+|---|---|---|
+| Dal (dhal, dahl, daal): dried split pulses — lentils, peas or beans — and the dish made of them; so lentil is likely, not certain | likely | [Wikipedia, Dal](https://en.wikipedia.org/wiki/Dal) **[M]** (citing the Oxford Companion to Food) |
+| Koshari / kushari: Egypt's rice, brown lentils, pasta and tomato sauce | likely | [WGBH, koshary](https://www.wgbh.org/news/2017-02-22/egypts-beloved-koshary-is-a-modern-mystery-in-an-ancient-cuisine) **[M]**; [Zaatar and Zaytoun](https://zaatarandzaytoun.com/koshari/) **[W]** |
+| Harira | likely | §28.1 |
+| Lentil flour in some schnitzel coatings | not used: one forum answer (file 12 §1.3) and it would flood every schnitzel | — |
+
+"Dal" is also Italian ("from the") on Italian menus ("dal forno"); the
+word is kept, since a false alarm is the acceptable direction.
+
+### 28.3 Pea
+Direct: pea(s), split pea(s), green pea(s), pea protein, petits pois,
+mangetout, sugar snap (snow peas, snap peas and mushy peas are found
+through "peas"), pease pudding, matar (Hindi, as in methi matar malai).
+Mangetout, snow peas and snap peas are all *Pisum sativum*, the garden pea
+([Horticulture Magazine, mangetout](https://horticulture.co.uk/blogs/growing/mangetout) **[W]**;
+[Saucy Dressings](https://saucydressings.com/blog/snow-peas-sugar-snap-peas-and-common-or-garden-peas-a-definitive-guide/) **[W]**;
+[Archana's Kitchen, methi matar malai](https://archanaskitchen.com/methi-malai-matar-recipe-fenugreek-peas-curry-with-cream) **[W]**).
+
+| Hidden source | Confidence | Source |
+|---|---|---|
+| Pea protein and pea fibre in plant-based meat substitutes, sometimes labelled only "vegetable protein" or "vegetable fibre"; vegetable burgers named as a dish that commonly holds peas; concentrated pea protein may react more strongly than peas | suspected (documented common, but a given burger may be soy) | [Allergy UK, pea protein](https://www.allergyuk.org/resources/reactions-to-pea-protein/) **[M]**; [BSACI](https://www.bsaci.org/pea-protein-and-food-allergy-labelling/) **[M]**; §16.2 |
+| Samosa: potato, onion and pea filling is the common vegetable samosa | suspected | [M&S vegetable samosas](https://www.marksandspencer.com/food/4-vegetable-samosas/p/fdp60512264) **[W]**; [Tesco samosa platter](https://www.tesco.com/groceries/en-GB/products/314696058) **[W]** |
+| Greek "fava" (Santorini fava): a purée of yellow split peas, or on Santorini of *Lathyrus clymenum*, a grass pea — not fava beans | likely | [Wikipedia, Fava (Greek dish)](https://en.wikipedia.org/wiki/Fava_(Greek_dish)) **[M]**; [Hodmedod's](https://www.hodmedods.co.uk/blogs/recipes/fava-santorini-yellow-split-peas) **[W]** |
+
+**Guards:** "pea" is a whole word, so it is never found inside chickpea,
+peanut or peach. It is found in "chick peas", "black-eyed peas", "pigeon
+peas" and "butterfly pea", none of them the garden pea: a term guard
+lowers those to suspected (they are legumes, so they are not cleared).
+
+### 28.4 Fenugreek
+Direct: fenugreek, methi (fresh or dried — kasuri methi — fenugreek
+leaves), hilbeh and its spellings (hilbe, helbeh, helba, hulba, hulbah),
+the Yemenite condiment of soaked, whipped fenugreek seed, sold at Israeli
+falafel shops and added to soup or eaten as a dip
+([My Jewish Learning, hilbeh](https://www.myjewishlearning.com/the-nosher/hilbeh-recipe) **[W]**;
+[Wikipedia, Hulbah](https://wikipedia.com/wiki/Hulbah) **[M]**;
+[Cook with Manali, methi](https://www.cookwithmanali.com/ingredients/methi/) **[W]**).
+
+| Hidden source | Confidence | Source |
+|---|---|---|
+| Panch phoron: fenugreek is one of its five standard seeds | likely | [Wikipedia, Panch phoron](https://en.wikipedia.org/wiki/Panch_phoron) **[M]** |
+| Saltah: Yemen's national stew, served with hilbeh on top | likely | [My Jewish Learning, hilbeh](https://www.myjewishlearning.com/the-nosher/hilbeh-recipe) **[W]** |
+| Curry powder: many blends hold fenugreek, not all | suspected | [Williams-Sonoma, curry powder](https://www.williams-sonoma.com/m/recipe/curry-powder.amp.html) **[W]**; [Wikipedia, Curry powder](https://en.wikipedia.org/wiki/Curry_powder) **[M]** |
+| Hawaij: the elaborate soup blends and some commercial ones add fenugreek; the basic and Adeni blends do not | suspected | [Wikipedia, Hawaij](https://en.wikipedia.org/wiki/Hawaij) **[M]**; [Stay Spiced hawaij](https://www.fromaustria.com/en-GB/stay-spiced/hawaij-curry-mix) **[W]** |
+| Zhug / schug | not used: cilantro, chilli, garlic, cardamom; fenugreek appears only as one chef's suggested variation | [Food52, zhug](https://food52.com/recipes/72133-zhug) **[W]** |
+| "Spice" on a packaged label may hide fenugreek | not actionable on a menu | [Wyndly](https://www.wyndly.com/blogs/learn/fenugreek-allergy) **[W]** |
+
+"Curry" alone is not a fenugreek term: Thai curry pastes are not fenugreek
+blends, and the word would flood every Asian menu.
+
+### 28.5 Fava (G6PD deficiency)
+Direct: fava, fava beans, faba, broad bean(s), horse bean(s), ful, ful
+medames and its spellings (foul medames, ful / foul mudammas, fool
+medames): Egypt's national dish, a stew of fava beans with olive oil and
+cumin; "ful" is Arabic for beans
+([Wikipedia, Ful medames](https://en.wikipedia.org/wiki/Ful_medames) **[M]**;
+[Saveur](https://www.saveur.com/article/Recipes/Classic-Stewed-Fava-Beans) **[W]**).
+Not the bare "foul" (an English word) and not "fave" (menu slang for
+"favourite").
+
+| Hidden source | Confidence | Source |
+|---|---|---|
+| Ta'ameya / tamiya: Egyptian falafel of fava beans | likely | [Tasting Table](https://tastingtable.com/901336/the-real-difference-between-taameya-and-falafel) **[W]**; [Chowhound](https://www.chowhound.com/1702705/difference-falafel-vs-taammeya/) **[W]**; [Egyptian Streets](https://egyptianstreets.com/2019/06/12/falafel-or-taameya-celebrating-the-popular-dishs-many-disguises-on-international-falafel-day/) **[W]** |
+| Falafel: in Israel chickpea, because makers dropped fava over favism; elsewhere fava or a mix | suspected | [My Jewish Learning, classic falafel](https://www.myjewishlearning.com/the-nosher/classic-falafel-recipe/) **[W]**; [Israeli embassy recipe](https://embassies.gov.il/chicago/CulturalNews/Our%20Weekly%20Recipe/Pages/Falafel-for-Yom-Haazmaot.aspx) **[M]**; file 12 §1.3 |
+| Bissara: Moroccan soup or purée of dried fava beans, sometimes with split peas | likely | [Wikipedia, Ful medames](https://en.wikipedia.org/wiki/Ful_medames) **[M]**; [MarocMama](https://marocmama.com/vegetarian-moroccan-bean-recipes/) **[W]** |
+
+**Guard:** "Santorini fava" and "Greek fava" are yellow split peas (§28.3),
+so the fava hit beside them is lowered, never cleared.
+
+### 28.6 Confusions
+- Hummus is chickpea **and** sesame (file 12 §1.1); falafel is chickpea
+  and/or fava and often sesame; the parent `legumes` takes each as stated.
+- Green beans and other *Phaseolus* beans are legumes but none of the five.
+- The waiter wording for fava asks for "fava beans (broad beans)" / "פול",
+  never "favism": the kitchen needs the food, not the diagnosis.
+
+**Sources (28):** see the inline links, read as search-result snippets on
+2026-10-21.
+
+---
+
 ## Sources
 
 Every URL cited above, grouped by publisher. All were reached only as

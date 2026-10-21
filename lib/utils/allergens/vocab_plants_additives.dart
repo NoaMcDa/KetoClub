@@ -32,11 +32,15 @@
 /// `legumes` carries every direct term of `soy`, `peanuts` and `lupin`
 /// and every hidden source of the three, because a peanut, a soybean and a
 /// lupin are legumes (the corpus invariant `legumes >= max(peanuts, soy,
-/// lupin)`).
+/// lupin)`). It carries every word of the single legumes too (chickpea,
+/// lentil, pea, fenugreek, fava), spread from `vocab_legume_parts.dart`,
+/// where its own chickpea-to-fenugreek words now live in the order it
+/// listed them.
 library;
 
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/vocab_gluten_grains.dart';
+import 'package:ketoclub/utils/allergens/vocab_legume_parts.dart';
 import 'package:ketoclub/utils/allergens/vocab_nuts_seeds.dart';
 import 'package:ketoclub/utils/allergens/vocabulary_types.dart';
 
@@ -1706,36 +1710,13 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
           'legume',
           'legumes',
           'pulses',
-          'chickpea',
-          'chickpeas',
-          'chick pea',
-          'chick peas',
-          'garbanzo',
-          'garbanzos',
-          'hummus',
-          'houmous',
-          'humus',
+          ...chickpeaDirectEn,
           'falafel',
-          'lentil',
-          'lentils',
-          'dal',
-          'dhal',
-          'dahl',
-          'majadra',
-          'mujadara',
-          'mejadra',
-          'pea',
-          'peas',
-          'split pea',
-          'split peas',
-          'green pea',
-          'green peas',
-          'pea protein',
-          'fava',
-          'fava beans',
-          'broad bean',
-          'broad beans',
-          'ful medames',
+          ...lentilDirectEn,
+          ...dalEn,
+          ...mujadaraEn,
+          ...peaDirectEn,
+          ...favaDirectEn,
           'bean',
           'beans',
           'black beans',
@@ -1747,7 +1728,14 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
           'adzuki',
           'cowpea',
           'black eyed peas',
-          'fenugreek',
+          ...fenugreekDirectEn,
+          // The single legumes' own words (`vocab_legume_parts.dart`),
+          // after every word `legumes` had before they were split out.
+          ...chickpeaExtraEn,
+          ...lentilExtraEn,
+          ...peaExtraEn,
+          ...fenugreekExtraEn,
+          ...favaExtraEn,
         ],
         directHe: <String>[
           ..._soyDirectHe,
@@ -1755,24 +1743,18 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
           ...lupinDirectHe,
           'קטניות',
           'קטנית',
-          'חומוס',
-          'הומוס',
-          'גרגירי חומוס',
-          'חימצה',
+          ...chickpeaDirectHe,
           'פלאפל',
-          "מג'דרה",
-          "מוג'דרה",
-          'משאוושה',
-          'עדשים',
-          'עדשה',
-          'אפונה',
-          'פול',
-          'פולים',
-          'הפול',
-          'בפול',
-          'ופול',
+          ...mujadaraHe,
+          ...mashawshaHe,
+          ...lentilDirectHe,
+          ...peaDirectHe,
+          ...favaDirectHe,
           'שעועית',
-          'חילבה',
+          ...fenugreekDirectHe,
+          ...chickpeaExtraHe,
+          ...lentilExtraHe,
+          ...fenugreekExtraHe,
         ],
         hiddenEn: <HiddenTrigger>[
           ..._soyHiddenEn,
@@ -1813,6 +1795,7 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
             certainty: TriggerCertainty.suspected,
             source: '12 §1.3',
           ),
+          ...legumePartsHiddenEn,
         ],
         hiddenHe: <HiddenTrigger>[
           ..._soyHiddenHe,
@@ -1823,12 +1806,9 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
             certainty: TriggerCertainty.suspected,
             source: '12 §1.3',
           ),
+          ...legumePartsHiddenHe,
         ],
-        guards: AllergenGuards(
-          beforeEn: <String>['no', 'without'],
-          afterEn: <String>['free'],
-          beforeHe: <String>['ללא', 'וללא', 'בלי', 'ובלי', 'נטול', 'נטולת'],
-        ),
+        guards: legumeGuards,
         // A coffee, vanilla or cocoa bean and a jelly bean are no legume
         // (ALG-04a): term guards on "bean", not restriction-wide.
         termGuards: <String, AllergenGuards>{
@@ -1843,6 +1823,8 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
           '12 §1.3',
           '11 §1.1',
           '11 §14.1',
+          '11 §28',
+          '12 §12',
         ],
       ),
     };

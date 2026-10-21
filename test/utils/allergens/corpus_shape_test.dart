@@ -126,11 +126,6 @@ const Set<String> _awaitingLabels = <String>{
   'corn',
   'sunflower',
   'flax',
-  'chickpea',
-  'lentil',
-  'pea',
-  'fenugreek',
-  'fava',
 };
 
 /// The values of a label's `label` key.

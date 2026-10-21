@@ -4087,6 +4087,26 @@ kosher or halal *certification*, which no app can verify (file 03; their
 components are a separate pull request). Chestnut is no id: it stays a
 tree-nut question for that vocabulary (file 11 §2.5).
 
+**The single legumes' words (`vocab_legume_parts`, related to #342).**
+Chickpea, lentil, pea, fenugreek and fava now hold terms, so all five
+appear in the picker. The words `legumes` already had are cut out of it
+into public lists in its own order and spread back, so its golden output
+only grows, and the new words are spread into it too: `legumes` stays a
+superset of every single legume (a test checks it) and a term is written
+once. A word whose certainty differs is written in each: falafel is
+stated for `legumes`, likely for chickpea (Israeli falafel is chickpea)
+and suspected for fava; dal (any split pulse) is likely for lentil; gram
+flour is stated for chickpea. Pea's "pea"/"peas" are lowered beside
+"chick", "eyed", "pigeon" and "butterfly"; fava keeps `פול` without a
+prefix (`כפול`) and never lists `פולי` (`פולי סויה`), and Greek or
+Santorini "fava" (yellow split peas) lowers the fava hit and is a likely
+pea source; fenugreek is `חילבה`, never `חלבה` (halva). Fava's concern
+asks for "fava beans (broad beans)" / "פול", never "favism". Sources: file
+11 §28 and file 12 §12 (checked 2026-10-21 against search snippets; the
+Hebrew spellings remain unreviewed), with a new corpus menu,
+`legume_parts_labels.json`, at 23/23 contains and 5/5 may-contain recall;
+the one false alarm on a `free` label is pea's lowered "chick peas".
+
 ### D27 — Post-meal confirmations, no ratings
 
 *(Banto, the Allergens epic's ALG-14, issue #356. Amends D23's visit

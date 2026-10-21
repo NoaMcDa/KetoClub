@@ -1,0 +1,897 @@
+{
+  "_fixture_note": "synthetic menu of single legumes (chickpea, lentil, pea, fenugreek, fava) written for the corpus from 11 §16 and 12 §1.3; labels are unreviewed desk research; mixed Hebrew and English",
+  "language": "mixed",
+  "dishes": [
+    {
+      "name": "צלחת חומוס",
+      "description": "חומוס ביתי עם גרגרי חומוס שלמים ושמן זית",
+      "options": [],
+      "labels": {
+        "chickpea": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חומוס\" and \"גרגרי חומוס\" are chickpeas",
+          "source": "12 §1.3"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חומוס\" is chickpeas",
+          "source": "12 §1.3"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חומוס\" is made with tahini even when the menu names only chickpeas",
+          "source": "12 §1.1"
+        },
+        "lentil": {
+          "label": "free",
+          "evidence": "only chickpeas and olive oil named; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "pea": {
+          "label": "free",
+          "evidence": "only chickpeas and olive oil named; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "fava": {
+          "label": "free",
+          "evidence": "no ful named; cross-contact not assessed",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "חומוס פול",
+      "description": "חומוס עם פול מבושל, כמון ושמן זית",
+      "options": [],
+      "labels": {
+        "chickpea": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חומוס\" is chickpeas",
+          "source": "12 §1.3"
+        },
+        "fava": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"פול\" is fava beans",
+          "source": "12 §1.3"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חומוס\" and \"פול\"",
+          "source": "12 §1.3"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חומוס\" is made with tahini",
+          "source": "12 §1.1"
+        }
+      }
+    },
+    {
+      "name": "מסבחה",
+      "description": "גרגרי חומוס חמים ברוטב לימון ושום",
+      "options": [],
+      "labels": {
+        "chickpea": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"מסבחה\" is warm whole chickpeas; \"גרגרי חומוס\" named",
+          "source": "12 §1.3"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"גרגרי חומוס\" (chickpeas)",
+          "source": "12 §1.3"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "masabacha is the hummus plate's whole-chickpea twin and is usually dressed with tahini",
+          "source": "12 §1.1"
+        },
+        "fava": {
+          "label": "free",
+          "evidence": "no ful named; cross-contact not assessed",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "פלאפל בצלחת",
+      "description": "כדורי פלאפל וסלט ירקות קצוץ",
+      "options": [],
+      "labels": {
+        "chickpea": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "Israeli \"פלאפל\" is chickpea balls",
+          "source": "12 §1.3"
+        },
+        "fava": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "some falafel is made of fava (פול ירוק) or a mix",
+          "source": "12 §1.3"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פלאפל\" is chickpea (or fava) balls",
+          "source": "12 §1.3"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "sesame is in some falafel batters and coatings",
+          "source": "12 §1.1"
+        }
+      }
+    },
+    {
+      "name": "פול מדמס",
+      "description": "פול מבושל עם כמון, לימון ושמן זית",
+      "options": [],
+      "labels": {
+        "fava": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פול מדמס\" is stewed fava beans",
+          "source": "12 §1.3"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פול\" is fava beans",
+          "source": "12 §1.3"
+        },
+        "chickpea": {
+          "label": "free",
+          "evidence": "only fava beans, cumin, lemon and oil named; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "lentil": {
+          "label": "free",
+          "evidence": "only fava beans named; cross-contact not assessed",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "ארטישוק ופול ירוק",
+      "description": "לבבות ארטישוק מוקפצים עם פול ירוק טרי ושמיר",
+      "options": [],
+      "labels": {
+        "fava": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"ופול\" is fava beans",
+          "source": "12 §1.3"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"ופול\" is fava beans",
+          "source": "12 §1.3"
+        },
+        "pea": {
+          "label": "free",
+          "evidence": "artichoke, fava and dill only; cross-contact not assessed",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "מג'דרה",
+      "description": "אורז ועדשים חומות עם בצל מטוגן",
+      "options": [],
+      "labels": {
+        "lentil": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"מג'דרה\" is rice with lentils; \"עדשים\" named",
+          "source": "12 §1.3"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"עדשים\" (lentils)",
+          "source": "12 §1.3"
+        },
+        "chickpea": {
+          "label": "free",
+          "evidence": "rice, lentils and onion only; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "pea": {
+          "label": "free",
+          "evidence": "rice, lentils and onion only; cross-contact not assessed",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "מרק עדשים כתומות",
+      "description": "מרק עדשים עם כמון, גזר ולימון",
+      "options": [],
+      "labels": {
+        "lentil": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"עדשים\" (lentils)",
+          "source": "12 §1.3"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"עדשים\" (lentils)",
+          "source": "12 §1.3"
+        },
+        "celery": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "soups are made with stock or a celery base",
+          "source": "12 §1.9"
+        },
+        "chickpea": {
+          "label": "free",
+          "evidence": "no chickpea named; cross-contact not assessed",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "אורז עם אפונה וגזר",
+      "description": "אורז לבן מבושל עם אפונה וקוביות גזר",
+      "options": [],
+      "labels": {
+        "pea": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"אפונה\" (peas)",
+          "source": "12 §1.3"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"אפונה\" (peas)",
+          "source": "12 §1.3"
+        },
+        "lentil": {
+          "label": "free",
+          "evidence": "rice, peas and carrot only; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "chickpea": {
+          "label": "free",
+          "evidence": "rice, peas and carrot only; cross-contact not assessed",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "קציצת אפונה צמחית",
+      "description": "קציצה מחלבון אפונה, מוגשת עם סלט ירוק",
+      "options": [],
+      "labels": {
+        "pea": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"חלבון אפונה\" is pea protein",
+          "source": "11 §16.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "pea protein",
+          "source": "11 §16.2"
+        },
+        "eggs": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "patties are bound with egg",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "patties are bound with bread or flour",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "patties are bound with bread or flour",
+          "source": "12 §1.4"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "animal-derived: patties are bound with egg",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "חילבה",
+      "description": "רוטב חילבה תימני לטבילה",
+      "options": [],
+      "labels": {
+        "fenugreek": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חילבה\" is the Yemenite fenugreek condiment",
+          "source": "12 §1.3"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "fenugreek is a legume",
+          "source": "12 §1.3"
+        },
+        "chickpea": {
+          "label": "free",
+          "evidence": "fenugreek paste only; cross-contact not assessed",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "ג'חנון",
+      "description": "ג'חנון עם רסק עגבניות וחילבה",
+      "options": [],
+      "labels": {
+        "fenugreek": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "served with \"חילבה\" (fenugreek)",
+          "source": "12 §1.3"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"חילבה\" (fenugreek)",
+          "source": "12 §1.3"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ג'חנון\" is white-flour dough",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ג'חנון\" is white-flour dough",
+          "source": "12 §1.4"
+        },
+        "milk": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "traditionally clarified butter, today often margarine; the menu does not say which",
+          "source": "12 §1.5"
+        },
+        "lactose": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "traditionally clarified butter, today often margarine; the menu does not say which",
+          "source": "12 §1.5"
+        },
+        "sesame": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "jachnun is commonly served with tahini-based sides",
+          "source": "12 §1.1"
+        },
+        "vegan": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "animal-derived: traditionally clarified butter",
+          "source": "12 §1.5"
+        }
+      }
+    },
+    {
+      "name": "מרק תימני",
+      "description": "מרק עוף עם תפוחי אדמה וחוויג'",
+      "options": [],
+      "labels": {
+        "fenugreek": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "hilbeh is served with Yemenite soup, and some hawaij holds fenugreek",
+          "source": "12 §1.3"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "fenugreek may come with the soup",
+          "source": "12 §1.3"
+        },
+        "celery": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "chicken soup is made with celery in the stock",
+          "source": "12 §1.9"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "12 §2.2"
+        },
+        "chickpea": {
+          "label": "free",
+          "evidence": "chicken, potato and spice only; cross-contact not assessed",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "סביח",
+      "description": "חציל מטוגן, ביצה קשה, טחינה ועמבה בפיתה",
+      "options": [],
+      "labels": {
+        "chickpea": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "sabich is often served with hummus or chickpeas in the pita",
+          "source": "12 §1.3"
+        },
+        "legumes": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "sabich is often served with hummus or chickpeas",
+          "source": "12 §1.3"
+        },
+        "eggs": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"ביצה קשה\"",
+          "source": "12 §1.6"
+        },
+        "wheat": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיתה\"",
+          "source": "12 §1.4"
+        },
+        "gluten": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פיתה\"",
+          "source": "12 §1.4"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"טחינה\"",
+          "source": "12 §1.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "animal-derived: \"ביצה קשה\"",
+          "source": "12 §1.6"
+        }
+      }
+    },
+    {
+      "name": "סלט ירוק",
+      "description": "חסה, מלפפון, עגבנייה, שמן זית ולימון",
+      "options": [],
+      "labels": {
+        "chickpea": {
+          "label": "free",
+          "evidence": "no legume named; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "lentil": {
+          "label": "free",
+          "evidence": "no legume named; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "pea": {
+          "label": "free",
+          "evidence": "no legume named; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "fenugreek": {
+          "label": "free",
+          "evidence": "no legume named; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "fava": {
+          "label": "free",
+          "evidence": "no legume named; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "legumes": {
+          "label": "free",
+          "evidence": "no legume named; cross-contact not assessed",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "אספרסו כפול",
+      "description": "",
+      "options": [],
+      "labels": {
+        "fava": {
+          "label": "free",
+          "evidence": "\"כפול\" is \"double\", not ful; cross-contact not assessed",
+          "source": "12 §1.3"
+        },
+        "legumes": {
+          "label": "free",
+          "evidence": "\"כפול\" is \"double\", not ful; cross-contact not assessed",
+          "source": "12 §1.3"
+        }
+      }
+    },
+    {
+      "name": "חלבה",
+      "description": "קוביות חלבה ותה נענע",
+      "options": [],
+      "labels": {
+        "fenugreek": {
+          "label": "free",
+          "evidence": "\"חלבה\" is halva, not \"חילבה\"; cross-contact not assessed",
+          "source": "12 §1.1"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חלבה\" is a sesame confection",
+          "source": "12 §1.1"
+        }
+      }
+    },
+    {
+      "name": "Chana masala",
+      "description": "Chickpeas simmered with tomato, onion and ginger",
+      "options": [],
+      "labels": {
+        "chickpea": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"chana\" and \"chickpeas\" named",
+          "source": "11 §16.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "chickpeas",
+          "source": "11 §16.1"
+        },
+        "lentil": {
+          "label": "free",
+          "evidence": "chickpeas, tomato and onion only; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "pea": {
+          "label": "free",
+          "evidence": "chickpeas, tomato and onion only; cross-contact not assessed",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "Onion bhaji",
+      "description": "Crisp onion fritters",
+      "options": [],
+      "labels": {
+        "chickpea": {
+          "label": "contains",
+          "role": "hidden",
+          "evidence": "bhaji batter is gram (chickpea) flour",
+          "source": "11 §16.2"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "hidden",
+          "evidence": "gram flour batter",
+          "source": "11 §16.2"
+        }
+      }
+    },
+    {
+      "name": "Red lentil dal",
+      "description": "Masoor dal tempered with cumin and garlic",
+      "options": [],
+      "labels": {
+        "lentil": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"lentil\" and \"masoor\" (red lentils) named",
+          "source": "11 §16.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "lentils",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "Brown lentil soup",
+      "description": "Lentils, carrot and celery, simmered with cumin",
+      "options": [],
+      "labels": {
+        "lentil": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"lentils\" named",
+          "source": "11 §16.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "lentils",
+          "source": "11 §16.1"
+        },
+        "celery": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"celery\" named",
+          "source": "11 §12.1"
+        },
+        "pea": {
+          "label": "free",
+          "evidence": "lentils, carrot and celery only; cross-contact not assessed",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "Mushy peas",
+      "description": "A side of mushy peas with mint",
+      "options": [],
+      "labels": {
+        "pea": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"peas\" named",
+          "source": "11 §16.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "peas",
+          "source": "11 §16.1"
+        },
+        "chickpea": {
+          "label": "free",
+          "evidence": "peas and mint only; cross-contact not assessed",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "Sugar snap salad",
+      "description": "Sugar snap peas, radish and cucumber with lemon",
+      "options": [],
+      "labels": {
+        "pea": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "sugar snap peas are garden peas",
+          "source": "11 §16.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "peas",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "Hummus with chick peas",
+      "description": "Hummus topped with whole chick peas and olive oil",
+      "options": [],
+      "labels": {
+        "chickpea": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"hummus\" and \"chick peas\" named",
+          "source": "11 §16.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "chickpeas",
+          "source": "11 §16.1"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "hummus is made with tahini",
+          "source": "12 §1.1"
+        },
+        "pea": {
+          "label": "free",
+          "evidence": "guard: \"chick peas\" are chickpeas, not garden peas (a term guard lowers \"peas\"); cross-contact not assessed",
+          "source": "11 §16.5"
+        }
+      }
+    },
+    {
+      "name": "Methi malai paneer",
+      "description": "Paneer and cream with fresh fenugreek leaves",
+      "options": [],
+      "labels": {
+        "fenugreek": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"methi\" and \"fenugreek\" named",
+          "source": "11 §16.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "fenugreek",
+          "source": "11 §16.1"
+        },
+        "milk": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "paneer and cream",
+          "source": "11 §3.1"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "paneer and cream",
+          "source": "11 §3.1"
+        }
+      }
+    },
+    {
+      "name": "Ful medames",
+      "description": "Slow-cooked fava beans with cumin, lemon and olive oil",
+      "options": [],
+      "labels": {
+        "fava": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ful medames\" and \"fava beans\" named",
+          "source": "11 §16.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "fava beans",
+          "source": "11 §16.1"
+        },
+        "chickpea": {
+          "label": "free",
+          "evidence": "fava beans only; cross-contact not assessed",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "Ta'ameya",
+      "description": "Egyptian green falafel with tahini",
+      "options": [],
+      "labels": {
+        "fava": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "Egyptian ta'ameya is falafel of fava beans",
+          "source": "11 §16.1"
+        },
+        "chickpea": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "falafel is chickpea and/or fava",
+          "source": "11 §16.5"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "falafel",
+          "source": "11 §16.5"
+        },
+        "sesame": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"tahini\" named",
+          "source": "11 §11.1"
+        }
+      }
+    },
+    {
+      "name": "Garden salad",
+      "description": "Leaves, cucumber, tomato and a lemon dressing",
+      "options": [],
+      "labels": {
+        "chickpea": {
+          "label": "free",
+          "evidence": "no legume named; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "lentil": {
+          "label": "free",
+          "evidence": "no legume named; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "pea": {
+          "label": "free",
+          "evidence": "no legume named; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "fenugreek": {
+          "label": "free",
+          "evidence": "no legume named; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "fava": {
+          "label": "free",
+          "evidence": "no legume named; cross-contact not assessed",
+          "source": "11 §16.1"
+        }
+      }
+    },
+    {
+      "name": "Grilled chicken breast",
+      "description": "With roasted potatoes and green beans",
+      "options": [],
+      "labels": {
+        "chickpea": {
+          "label": "free",
+          "evidence": "no chickpea named; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "lentil": {
+          "label": "free",
+          "evidence": "no lentil named; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "fava": {
+          "label": "free",
+          "evidence": "green beans are not fava; cross-contact not assessed",
+          "source": "11 §16.1"
+        },
+        "legumes": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "green beans are a legume",
+          "source": "12 §1.3"
+        },
+        "vegan": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "chicken",
+          "source": "12 §2.2"
+        },
+        "vegetarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "chicken",
+          "source": "12 §2.2"
+        },
+        "fenugreek": {
+          "label": "free",
+          "evidence": "no fenugreek named; cross-contact not assessed",
+          "source": "11 §16.1"
+        }
+      }
+    }
+  ]
+}

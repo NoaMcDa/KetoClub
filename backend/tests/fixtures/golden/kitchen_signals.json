@@ -6675,6 +6675,348 @@
           {
             "dishes": [
               {
+                "description": "חומוס ביתי עם גרגרי חומוס שלמים ושמן זית",
+                "id": "k1",
+                "imageUrl": null,
+                "name": "צלחת חומוס",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "חומוס עם פול מבושל, כמון ושמן זית",
+                "id": "k2",
+                "imageUrl": null,
+                "name": "חומוס פול",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "גרגרי חומוס חמים ברוטב לימון ושום",
+                "id": "k3",
+                "imageUrl": null,
+                "name": "מסבחה",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "כדורי פלאפל וסלט ירקות קצוץ",
+                "id": "k4",
+                "imageUrl": null,
+                "name": "פלאפל בצלחת",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "פול מבושל עם כמון, לימון ושמן זית",
+                "id": "k5",
+                "imageUrl": null,
+                "name": "פול מדמס",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "לבבות ארטישוק מוקפצים עם פול ירוק טרי ושמיר",
+                "id": "k6",
+                "imageUrl": null,
+                "name": "ארטישוק ופול ירוק",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "אורז ועדשים חומות עם בצל מטוגן",
+                "id": "k7",
+                "imageUrl": null,
+                "name": "מג'דרה",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "מרק עדשים עם כמון, גזר ולימון",
+                "id": "k8",
+                "imageUrl": null,
+                "name": "מרק עדשים כתומות",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "אורז לבן מבושל עם אפונה וקוביות גזר",
+                "id": "k9",
+                "imageUrl": null,
+                "name": "אורז עם אפונה וגזר",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "קציצה מחלבון אפונה, מוגשת עם סלט ירוק",
+                "id": "k10",
+                "imageUrl": null,
+                "name": "קציצת אפונה צמחית",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "רוטב חילבה תימני לטבילה",
+                "id": "k11",
+                "imageUrl": null,
+                "name": "חילבה",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "ג'חנון עם רסק עגבניות וחילבה",
+                "id": "k12",
+                "imageUrl": null,
+                "name": "ג'חנון",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "מרק עוף עם תפוחי אדמה וחוויג'",
+                "id": "k13",
+                "imageUrl": null,
+                "name": "מרק תימני",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "חציל מטוגן, ביצה קשה, טחינה ועמבה בפיתה",
+                "id": "k14",
+                "imageUrl": null,
+                "name": "סביח",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "חסה, מלפפון, עגבנייה, שמן זית ולימון",
+                "id": "k15",
+                "imageUrl": null,
+                "name": "סלט ירוק",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "",
+                "id": "k16",
+                "imageUrl": null,
+                "name": "אספרסו כפול",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "קוביות חלבה ותה נענע",
+                "id": "k17",
+                "imageUrl": null,
+                "name": "חלבה",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Chickpeas simmered with tomato, onion and ginger",
+                "id": "k18",
+                "imageUrl": null,
+                "name": "Chana masala",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Crisp onion fritters",
+                "id": "k19",
+                "imageUrl": null,
+                "name": "Onion bhaji",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Masoor dal tempered with cumin and garlic",
+                "id": "k20",
+                "imageUrl": null,
+                "name": "Red lentil dal",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Lentils, carrot and celery, simmered with cumin",
+                "id": "k21",
+                "imageUrl": null,
+                "name": "Brown lentil soup",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "A side of mushy peas with mint",
+                "id": "k22",
+                "imageUrl": null,
+                "name": "Mushy peas",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Sugar snap peas, radish and cucumber with lemon",
+                "id": "k23",
+                "imageUrl": null,
+                "name": "Sugar snap salad",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Hummus topped with whole chick peas and olive oil",
+                "id": "k24",
+                "imageUrl": null,
+                "name": "Hummus with chick peas",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Paneer and cream with fresh fenugreek leaves",
+                "id": "k25",
+                "imageUrl": null,
+                "name": "Methi malai paneer",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Slow-cooked fava beans with cumin, lemon and olive oil",
+                "id": "k26",
+                "imageUrl": null,
+                "name": "Ful medames",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Egyptian green falafel with tahini",
+                "id": "k27",
+                "imageUrl": null,
+                "name": "Ta'ameya",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Leaves, cucumber, tomato and a lemon dressing",
+                "id": "k28",
+                "imageUrl": null,
+                "name": "Garden salad",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "With roasted potatoes and green beans",
+                "id": "k29",
+                "imageUrl": null,
+                "name": "Grilled chicken breast",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              }
+            ],
+            "id": "legume_parts_labels",
+            "name": "Menu"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "legume_parts_labels",
+          "source": "scan"
+        }
+      },
+      "name": "legume_parts_labels",
+      "signals": [
+        {
+          "evidence": [
+            "פלאפל בצלחת",
+            "מג'דרה",
+            "סביח"
+          ],
+          "kind": "fryer",
+          "questionEn": "Do the fried dishes share a fryer or frying oil with breaded or battered ones?",
+          "questionHe": "האם המנות המטוגנות מטוגנות באותו שמן או באותה מטגנת עם מנות בציפוי או בבלילה?",
+          "threatens": [
+            "wheat",
+            "gluten"
+          ]
+        },
+        {
+          "evidence": [
+            "ארטישוק ופול ירוק"
+          ],
+          "kind": "wok",
+          "questionEn": "Is the wok shared between dishes, and is it cleaned between orders?",
+          "questionHe": "האם אותו ווק משמש למנות שונות, והאם מנקים אותו בין הזמנות?",
+          "threatens": [
+            "peanuts",
+            "soy",
+            "wheat",
+            "gluten",
+            "crustaceans",
+            "molluscs",
+            "sesame"
+          ]
+        },
+        {
+          "evidence": [
+            "ג'חנון"
+          ],
+          "kind": "bakery",
+          "questionEn": "Is flour or bread handled on the surfaces where other dishes are prepared?",
+          "questionHe": "האם מכינים מנות אחרות על אותם משטחים שבהם עובדים עם קמח או לחם?",
+          "threatens": [
+            "milk",
+            "eggs",
+            "wheat",
+            "gluten",
+            "sesame"
+          ]
+        },
+        {
+          "evidence": [
+            "סביח",
+            "Hummus with chick peas",
+            "Ta'ameya"
+          ],
+          "kind": "sesame",
+          "questionEn": "Are sesame or tahini used on shared surfaces or utensils, and can my dish be prepared without them?",
+          "questionHe": "האם משתמשים בשומשום או בטחינה על משטחים או כלים משותפים, ואפשר להכין את המנה שלי בלעדיהם?",
+          "threatens": [
+            "sesame"
+          ]
+        }
+      ]
+    },
+    {
+      "menu": {
+        "categories": [
+          {
+            "dishes": [
+              {
                 "description": "Three pieces, buttermilk-brined and hand-breaded, cooked in the same fryer as our fries and onion rings",
                 "id": "k1",
                 "imageUrl": null,

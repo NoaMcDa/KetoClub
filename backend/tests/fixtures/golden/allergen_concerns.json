@@ -175,6 +175,22 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "hummus",
+          "restrictionId": "chickpea",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Falafel",
+          "restrictionId": "fava",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -226,6 +242,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "Falafel",
+          "restrictionId": "chickpea",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Falafel",
+          "restrictionId": "fava",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "Falafel",
           "restrictionId": "sesame",
@@ -251,6 +283,22 @@
         },
         {
           "certainty": "likely",
+          "matchedText": "Falafel",
+          "restrictionId": "chickpea",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Falafel",
+          "restrictionId": "fava",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
           "matchedText": "hummus",
           "restrictionId": "sesame",
           "source": "hidden",
@@ -271,6 +319,14 @@
           "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "hummus",
+          "restrictionId": "chickpea",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -357,6 +413,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "סביח",
+          "restrictionId": "chickpea",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -404,6 +468,14 @@
           "certainty": "suspected",
           "matchedText": "סביח",
           "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "סביח",
+          "restrictionId": "chickpea",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -2305,6 +2377,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Veggie burger",
+          "restrictionId": "pea",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -2329,6 +2409,14 @@
           "certainty": "suspected",
           "matchedText": "Veggie burger",
           "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "Veggie burger",
+          "restrictionId": "pea",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -6337,6 +6425,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "peas",
+          "restrictionId": "pea",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -6425,6 +6521,14 @@
           "certainty": "stated",
           "matchedText": "peas",
           "restrictionId": "legumes",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "peas",
+          "restrictionId": "pea",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -13781,6 +13885,14 @@
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חומוס",
+          "restrictionId": "chickpea",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -13827,6 +13939,30 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "stated",
+          "matchedText": "חומוס",
+          "restrictionId": "chickpea",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "מסבחה",
+          "restrictionId": "legumes",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "מסבחה",
+          "restrictionId": "chickpea",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "חומוס",
           "restrictionId": "sesame",
@@ -13848,6 +13984,22 @@
           "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חומוס",
+          "restrictionId": "chickpea",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "גרגרי חומוס",
+          "restrictionId": "legumes",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -13859,6 +14011,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "stated",
+          "matchedText": "גרגרי חומוס",
+          "restrictionId": "chickpea",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "חומוס",
           "restrictionId": "sesame",
@@ -13880,6 +14040,14 @@
           "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חומוס",
+          "restrictionId": "chickpea",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -13974,6 +14142,22 @@
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חומוס",
+          "restrictionId": "chickpea",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "פול",
+          "restrictionId": "fava",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -14012,6 +14196,14 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "חומוס",
+          "restrictionId": "chickpea",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "פול",
           "restrictionId": "legumes",
           "source": "name",
@@ -14022,6 +14214,14 @@
           "certainty": "stated",
           "matchedText": "פול",
           "restrictionId": "fodmap",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "פול",
+          "restrictionId": "fava",
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
@@ -14052,6 +14252,14 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "חומוס",
+          "restrictionId": "chickpea",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "פול",
           "restrictionId": "legumes",
           "source": "description",
@@ -14062,6 +14270,14 @@
           "certainty": "stated",
           "matchedText": "פול",
           "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "פול",
+          "restrictionId": "fava",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -14150,6 +14366,14 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חומוס",
+          "restrictionId": "chickpea",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -14184,6 +14408,14 @@
           "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חומוס",
+          "restrictionId": "chickpea",
+          "source": "name",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -14232,6 +14464,14 @@
           "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חומוס",
+          "restrictionId": "chickpea",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -14326,6 +14566,22 @@
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "chickpea",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "פלאפל",
+          "restrictionId": "fava",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -14363,6 +14619,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "chickpea",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "פלאפל",
+          "restrictionId": "fava",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "פלאפל",
           "restrictionId": "sesame",
@@ -14382,6 +14654,22 @@
           "certainty": "likely",
           "matchedText": "פלאפל",
           "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "chickpea",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "פלאפל",
+          "restrictionId": "fava",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -14494,6 +14782,22 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חומוס",
+          "restrictionId": "chickpea",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "פלאפל",
+          "restrictionId": "fava",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -14540,6 +14844,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "chickpea",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "פלאפל",
+          "restrictionId": "fava",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "בפיתה",
           "restrictionId": "wheat",
@@ -14629,6 +14949,22 @@
         },
         {
           "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "chickpea",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "פלאפל",
+          "restrictionId": "fava",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
           "matchedText": "חומוס",
           "restrictionId": "sesame",
           "source": "hidden",
@@ -14649,6 +14985,14 @@
           "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חומוס",
+          "restrictionId": "chickpea",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -14775,6 +15119,22 @@
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "chickpea",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "פלאפל",
+          "restrictionId": "fava",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -14812,6 +15172,22 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "chickpea",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "פלאפל",
+          "restrictionId": "fava",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "stated",
           "matchedText": "בלאפה",
           "restrictionId": "wheat",
@@ -14863,6 +15239,22 @@
           "certainty": "likely",
           "matchedText": "פלאפל",
           "restrictionId": "fodmap",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "פלאפל",
+          "restrictionId": "chickpea",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "פלאפל",
+          "restrictionId": "fava",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -14975,6 +15367,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "סביח",
+          "restrictionId": "chickpea",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -15007,6 +15407,14 @@
           "certainty": "suspected",
           "matchedText": "סביח",
           "restrictionId": "legumes",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "סביח",
+          "restrictionId": "chickpea",
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
@@ -15639,6 +16047,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "מג׳דרה",
+          "restrictionId": "lentil",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -15669,6 +16085,14 @@
         },
         {
           "certainty": "stated",
+          "matchedText": "מג׳דרה",
+          "restrictionId": "lentil",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
           "matchedText": "ועדשים",
           "restrictionId": "legumes",
           "source": "description",
@@ -15679,6 +16103,14 @@
           "certainty": "stated",
           "matchedText": "ועדשים",
           "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "ועדשים",
+          "restrictionId": "lentil",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -15759,6 +16191,14 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "עדשים",
+          "restrictionId": "lentil",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -15804,6 +16244,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "stated",
+          "matchedText": "עדשים",
+          "restrictionId": "lentil",
+          "source": "name",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "suspected",
           "matchedText": "מרק",
           "restrictionId": "celery",
@@ -15831,6 +16279,14 @@
           "certainty": "stated",
           "matchedText": "עדשים",
           "restrictionId": "fodmap",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "עדשים",
+          "restrictionId": "lentil",
           "source": "description",
           "tier": "stated",
           "waiterQuestion": null
@@ -16231,6 +16687,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חומוס",
+          "restrictionId": "chickpea",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -16473,6 +16937,14 @@
           "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חומוס",
+          "restrictionId": "chickpea",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -16935,6 +17407,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "גרגירי חומוס",
+          "restrictionId": "chickpea",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -17004,6 +17484,14 @@
           "waiterQuestion": null
         },
         {
+          "certainty": "stated",
+          "matchedText": "גרגירי חומוס",
+          "restrictionId": "chickpea",
+          "source": "description",
+          "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
           "certainty": "likely",
           "matchedText": "חומוס",
           "restrictionId": "sesame",
@@ -17025,6 +17513,14 @@
           "restrictionId": "fodmap",
           "source": "hidden",
           "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "stated",
+          "matchedText": "חומוס",
+          "restrictionId": "chickpea",
+          "source": "description",
+          "tier": "stated",
           "waiterQuestion": null
         },
         {
@@ -28087,6 +28583,14 @@
                 "restrictionId": "fodmap",
                 "source": "hidden",
                 "tier": "inferred",
+                "waiterQuestion": null
+              },
+              {
+                "certainty": "stated",
+                "matchedText": "חומוס",
+                "restrictionId": "chickpea",
+                "source": "name",
+                "tier": "stated",
                 "waiterQuestion": null
               }
             ],
