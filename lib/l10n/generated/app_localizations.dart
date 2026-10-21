@@ -3900,6 +3900,30 @@ abstract class AppLocalizations {
   /// **'Your profile has changed since. Open this menu to check it again.'**
   String get savedRecheck;
 
+  /// Banto (#421): the notice above the dishes and above the Discovery list while the profile holds nothing but keto. Never says a dish is safe.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell Banto what you avoid to see which dishes fit you'**
+  String get profileNudgeMessage;
+
+  /// Banto (#421): the notice's action, which opens the restriction picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Add what you avoid'**
+  String get profileNudgeChoose;
+
+  /// Banto (#421): dismisses the notice for that screen; the choice is remembered on the device.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get profileNudgeDismiss;
+
+  /// Banto (#421): the My restrictions row that reopens the first-run 'What do you avoid?' screen, pre-filled with the current profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Run the setup again'**
+  String get settingsRestrictionsRerun;
+
   /// Banto (#417): title of the exceptions sheet opened from a restriction's row; the name is the restriction's, in the UI language.
   ///
   /// In en, this message translates to:

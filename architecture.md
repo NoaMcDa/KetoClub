@@ -4281,6 +4281,35 @@ Settings no longer matches their old mark by name (the mark stays in the
 entry, unshown), and a dish id that a platform reassigns orphans a stored
 dish's answers as it does a cached one's (D27).
 
+**Re-running the setup, and the empty-profile notice (#421).** The first-run
+"What do you avoid?" screen is also reachable from Settings, "Run the setup
+again" in My restrictions (`RestrictionOnboardingScreen(prefill: true)`,
+pushed over the Settings route's own `SettingsController`): the chips start as
+the profile's, "Continue" replaces the profile through
+`SettingsController.replaceRestrictions` (a kept restriction keeps its place and
+its exceptions, a new one goes last, an unchosen one goes; keto and the user's
+own words are not on the screen and are left alone) and "Skip" writes nothing.
+The free plan's gate still applies, unchanged: the chips already chosen count,
+so choosing a second one opens the paywall, and a profile saved before is never
+re-gated. Under `bantoMode`, while the profiles a menu is read for hold nothing
+but keto, one dismissible `AppNotice.info` ("Tell Banto what you avoid to see
+which dishes fit you", with "Add what you avoid" and "Not now") sits above the
+dishes on the menu screen (`MenuController.showsProfileNudge`) and below the
+search on Discovery (`DiscoveryProfileNudge`, which reads the settings store
+itself like the disclosure banner, the Explore route having no settings
+controller). The action opens the restriction picker and adds the pick to the
+user's own profile, so no paywall step is needed (the first restriction is
+never gated, and `premium_gate_usage_test`'s allowlist is unchanged); the
+helper-tool sheet of ALG-11 follows the first one. "Not now" is remembered per
+surface by two settings keys, `profileNudgeMenuDismissed` and
+`profileNudgeDiscoveryDismissed`, each written only when true, so
+`const AppSettings().toJson()` and a keto install's stored record are
+byte-identical (`keto_unchanged_test`). **What it accepts.** A menu already
+open when sesame is added from its notice keeps its filter, so it lists every
+dish with the new pills until the user taps a tile, exactly as after editing
+the profile in Settings; and Discovery's notice sits below the fold on a very
+short screen.
+
 **Editing a restriction's exceptions (ALG-02a and ALG-12; #417).** The model,
 the evaluator, the group union and the chef card already carried
 `ProfileEntry.exceptions`; this adds the one screen that sets them. Under

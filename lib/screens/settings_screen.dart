@@ -6,6 +6,7 @@ import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/screens/chef_card_screen.dart';
 import 'package:ketoclub/screens/premium_gate.dart';
+import 'package:ketoclub/screens/restriction_onboarding_screen.dart';
 import 'package:ketoclub/screens/settings_premium_section.dart';
 import 'package:ketoclub/screens/settings_profiles_section.dart';
 import 'package:ketoclub/screens/settings_trip_section.dart';
@@ -107,6 +108,10 @@ const Key aboutReportKey = Key('settingsAboutReport');
 /// The "My restrictions" section's "Add restriction" button (Banto,
 /// ALG-02a, issue #344), shown only when `bantoMode` is on.
 const Key restrictionsAddKey = Key('settingsRestrictionsAdd');
+
+/// The "My restrictions" section's "Run the setup again" row (Banto, issue
+/// #421).
+const Key restrictionsRerunKey = Key('settingsRestrictionsRerun');
 
 /// The "My restrictions" section's empty-state line.
 const Key restrictionsEmptyKey = Key('settingsRestrictionsEmpty');
@@ -792,6 +797,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
               ),
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(8, 0, 8, 4),
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: TextButton.icon(
+                  key: restrictionsRerunKey,
+                  icon: const Icon(Icons.refresh),
+                  label: Text(l10n.settingsRestrictionsRerun),
+                  onPressed: busy
+                      ? null
+                      : () => unawaited(_runSetupAgain(context, controller)),
+                ),
+              ),
+            ),
             if (entries.isNotEmpty)
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(16, 4, 16, 12),
@@ -937,6 +956,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
       onPressed: controller.isBusy
           ? null
           : () => unawaited(controller.removeCustomTerm(term)),
+    ),
+  );
+
+  /// Opens the first-run "What do you avoid?" screen again, pre-filled with
+  /// the current profile (issue #421). Continue replaces the profile and
+  /// Skip leaves it as it was; either closes the screen and this section
+  /// follows the controller.
+  Future<void> _runSetupAgain(
+    BuildContext context,
+    SettingsController controller,
+  ) => Navigator.of(context).push<void>(
+    MaterialPageRoute<void>(
+      builder: (routeContext) =>
+          ChangeNotifierProvider<SettingsController>.value(
+            value: controller,
+            child: RestrictionOnboardingScreen(
+              prefill: true,
+              onFinished: () => Navigator.of(routeContext).pop(),
+            ),
+          ),
     ),
   );
 

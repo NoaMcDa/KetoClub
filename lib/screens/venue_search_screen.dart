@@ -17,6 +17,7 @@ import 'package:ketoclub/widgets/consent_disclosure_banner.dart';
 import 'package:ketoclub/widgets/content_width.dart';
 import 'package:ketoclub/widgets/failure_copy.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
+import 'package:ketoclub/widgets/profile_nudge.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/venue_card.dart';
 import 'package:ketoclub/widgets/venue_grid.dart';
@@ -304,6 +305,13 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
                   _chips(l10n, controller),
                   const SizedBox(height: 16),
                 ],
+                // Banto (issue #421): asks an empty profile what it avoids.
+                DiscoveryProfileNudge(
+                  store: widget.settingsStore,
+                  bantoMode: widget.bantoMode,
+                  onProfileChanged: () =>
+                      unawaited(controller.load(bantoMode: widget.bantoMode)),
+                ),
                 _body(context, l10n, controller),
               ],
             ),

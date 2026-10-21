@@ -2464,6 +2464,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your profile has changed since. Open this menu to check it again.';
 
   @override
+  String get profileNudgeMessage =>
+      'Tell Banto what you avoid to see which dishes fit you';
+
+  @override
+  String get profileNudgeChoose => 'Add what you avoid';
+
+  @override
+  String get profileNudgeDismiss => 'Not now';
+
+  @override
+  String get settingsRestrictionsRerun => 'Run the setup again';
+
+  @override
   String exceptionsSheetTitle(String name) {
     return 'Exceptions: $name';
   }
