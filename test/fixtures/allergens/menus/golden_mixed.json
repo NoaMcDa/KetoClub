@@ -330,6 +330,12 @@
           "role": "protein",
           "evidence": "\"עוף\" (chicken)",
           "source": "12 §2.2"
+        },
+        "halal": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"ברוטב יין\"",
+          "source": "12 §9.4"
         }
       }
     },

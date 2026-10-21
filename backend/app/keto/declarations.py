@@ -73,6 +73,8 @@ class DeclarationRule:
     restrictions: tuple[str, ...]
     symbols: tuple[str, ...] = ()
     polarity: DeclarationPolarity = DeclarationPolarity.ABSENT
+    tags_only: bool = False
+    """Dart ``DeclarationRule.tagsOnly``: only a platform tag makes it."""
 
     def to_json(self) -> dict[str, Any]:
         """The rule as the golden corpus writes it."""
@@ -83,6 +85,7 @@ class DeclarationRule:
             "symbols": list(self.symbols),
             "restrictions": list(self.restrictions),
             "polarity": self.polarity.value,
+            "tagsOnly": self.tags_only,
         }
 
 
@@ -170,6 +173,20 @@ DECLARATION_RULES: Final = (
         en=("egg free", "eggless", "without eggs"),
         he=("ללא ביצים", "ללא ביצה", "נטול ביצים", "בלי ביצים"),
         restrictions=("eggs",),
+    ),
+    DeclarationRule(
+        id="kosher",
+        en=("kosher",),
+        he=("כשר", "כשרה"),
+        restrictions=("kosher",),
+        tags_only=True,
+    ),
+    DeclarationRule(
+        id="halal",
+        en=("halal",),
+        he=("חלאל",),
+        restrictions=("halal",),
+        tags_only=True,
     ),
 )
 
@@ -260,10 +277,13 @@ def declarations_of_tags(tags: Sequence[str]) -> list[Declaration]:
 
 def declarations_in_text(raw: str, source: DeclarationSource) -> list[Declaration]:
     """Dart ``Declarations.inText``: per rule, its first unguarded English
-    then Hebrew term, else its first symbol the raw text holds."""
+    then Hebrew term, else its first symbol the raw text holds; a
+    ``tags_only`` rule only for a platform tag."""
     haystack = normalise(raw)
     found: list[Declaration] = []
     for rule, terms in _compiled():
+        if rule.tags_only and source is not DeclarationSource.PLATFORM_TAG:
+            continue
         matched = _first_term(haystack, terms)
         if matched is None:
             matched = next((s for s in rule.symbols if s in raw), None)

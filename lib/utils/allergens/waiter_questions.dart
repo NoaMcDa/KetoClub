@@ -22,7 +22,10 @@ library;
 
 import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/utils/allergens/allergen_matcher.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
+import 'package:ketoclub/utils/allergens/vocab_religious.dart';
+import 'package:ketoclub/utils/classification_rules.dart';
 
 /// "Can this be made without …?" for a restriction stated in the dish
 /// itself; `{subject}` is [WaiterQuestions.subject].
@@ -110,6 +113,36 @@ const String waiterQuestionSmallerEn =
 /// [waiterQuestionSmallerEn] in Hebrew.
 const String waiterQuestionSmallerHe = 'יש גרסה קטנה או קלה יותר של המנה?';
 
+/// For kosher's meat with dairy (issue #342) when both are stated in the
+/// dish; `{item}` is the dairy words as the menu printed them.
+const String waiterQuestionMeatDairyWithoutEn =
+    "Can this be made without the '{item}', so there is no dairy with the "
+    'meat?';
+
+/// [waiterQuestionMeatDairyWithoutEn] in Hebrew.
+const String waiterQuestionMeatDairyWithoutHe =
+    "אפשר להכין את המנה בלי '{item}', כדי שלא יהיה בה בשר עם חלב?";
+
+/// For meat with dairy where the dairy is only likely (a sauce that is
+/// usually made with butter or cream).
+const String waiterQuestionMeatDairyAskEn =
+    'Is there any dairy (butter, cream, cheese) in this meat dish?';
+
+/// [waiterQuestionMeatDairyAskEn] in Hebrew.
+const String waiterQuestionMeatDairyAskHe =
+    'יש במנה הבשרית הזו מוצרי חלב (חמאה, שמנת, גבינה)?';
+
+/// For meat with dairy where one of them is only an option; `{meat}` and
+/// `{dairy}` are the menu's words. It offers to leave one off.
+const String waiterQuestionMeatDairyOptionEn =
+    "This dish has '{meat}' and '{dairy}': can one of them be left off, so "
+    'there is no meat with dairy?';
+
+/// [waiterQuestionMeatDairyOptionEn] in Hebrew.
+const String waiterQuestionMeatDairyOptionHe =
+    "במנה יש '{meat}' וגם '{dairy}' — אפשר לוותר על אחד מהם, כדי שלא יהיה "
+    'בה בשר עם חלב?';
+
 /// The most characters of matched text a question quotes; a longer slice
 /// is a sentence, not an ingredient, and the general question is used.
 const int _maxQuotedLength = 40;
@@ -158,6 +191,10 @@ abstract final class WaiterQuestions {
   /// restriction ([headsUpRestrictions]) never asks for a dish "without"
   /// something: FODMAP and histamine ask for less of it, small portions for
   /// a smaller or lighter version, each after "I go easy on {subject}."
+  /// Kosher and halal (issue #342) name the component the concern's words
+  /// are ([componentSubject]: "Can this be made without pork?"), and
+  /// kosher's meat with dairy asks its own way
+  /// ([ClassificationRules.isMeatWithDairy]).
   /// The user's own restriction ([RestrictionId.custom]) names their own
   /// word as the subject — [ownWord] when given (the evaluator passes the
   /// word as the user wrote it, so "ובכוסברה" on the menu still reads
@@ -172,11 +209,20 @@ abstract final class WaiterQuestions {
     if (headsUpRestrictions.contains(id)) {
       return _headsUpQuestion(concern, hebrew: hebrew);
     }
-    final subjectText = id == RestrictionId.custom
-        ? _quotable(ownWord) ??
-              _quotable(concern.matchedText) ??
-              subject(id, hebrew: hebrew)
-        : subject(id, hebrew: hebrew);
+    final meatWithDairy = ClassificationRules.meatWithDairyParts(concern);
+    if (meatWithDairy != null) {
+      return _meatWithDairyQuestion(concern, meatWithDairy, hebrew: hebrew);
+    }
+    final subjectText = switch (id) {
+      RestrictionId.custom =>
+        _quotable(ownWord) ??
+            _quotable(concern.matchedText) ??
+            subject(id, hebrew: hebrew),
+      RestrictionId.kosher || RestrictionId.halal =>
+        componentSubject(concern.matchedText, hebrew: hebrew) ??
+            subject(id, hebrew: hebrew),
+      _ => subject(id, hebrew: hebrew),
+    };
     final quotable = _quotable(concern.matchedText);
     final item =
         quotable != null &&
@@ -204,6 +250,50 @@ abstract final class WaiterQuestions {
     return template
         .replaceAll('{subject}', subjectText)
         .replaceAll('{item}', item ?? '');
+  }
+
+  /// The question for kosher's meat with dairy (issue #342): with an
+  /// option on one side, whether one of them can be left off; with both
+  /// stated in the dish, whether it can be made without the dairy; else
+  /// whether there is dairy in the meat dish. Never says "kosher".
+  static String _meatWithDairyQuestion(
+    Concern concern,
+    ({String meat, String dairy}) parts, {
+    required bool hebrew,
+  }) {
+    final meat = _quotable(parts.meat);
+    final dairy = _quotable(parts.dairy);
+    if (concern.source == ConcernSource.option &&
+        meat != null &&
+        dairy != null) {
+      return (hebrew
+              ? waiterQuestionMeatDairyOptionHe
+              : waiterQuestionMeatDairyOptionEn)
+          .replaceAll('{meat}', meat)
+          .replaceAll('{dairy}', dairy);
+    }
+    if (concern.certainty == Certainty.stated && dairy != null) {
+      return (hebrew
+              ? waiterQuestionMeatDairyWithoutHe
+              : waiterQuestionMeatDairyWithoutEn)
+          .replaceAll('{item}', dairy);
+    }
+    return hebrew ? waiterQuestionMeatDairyAskHe : waiterQuestionMeatDairyAskEn;
+  }
+
+  /// The component a kosher or halal concern's [matched] words name
+  /// ([religiousComponents]: pork, shellfish, alcohol …), in Hebrew when
+  /// [hebrew]: the first component whose words the matcher finds in them.
+  /// Null when none does (a model's own concern may quote anything).
+  static String? componentSubject(String? matched, {required bool hebrew}) {
+    final text = matched?.trim() ?? '';
+    if (text.isEmpty) return null;
+    for (final component in religiousComponents) {
+      if (AllergenMatcher.findWith(text, component.vocabulary).isNotEmpty) {
+        return hebrew ? component.subjectHe : component.subjectEn;
+      }
+    }
+    return null;
   }
 
   /// The question for a heads-up restriction (ALG-17): "I go easy on
@@ -241,6 +331,12 @@ abstract final class WaiterQuestions {
   /// person goes easy on; the user's own restriction, whose words are in
   /// the profile and not here, reads "the foods I listed" (a concern of it
   /// quotes its own words instead, in [questionFor]).
+  ///
+  /// Kosher and halal (issue #342) name their components, never the
+  /// restriction: a question asks about pork or alcohol, not about
+  /// "kosher", which no waiter's answer about one dish can settle. A
+  /// concern of theirs names the one component its words are
+  /// ([componentSubject]) in [questionFor].
   static String subject(RestrictionId id, {required bool hebrew}) {
     switch (id) {
       case RestrictionId.alphaGal:
@@ -270,6 +366,12 @@ abstract final class WaiterQuestions {
         return hebrew ? 'בשר, עוף או דגים' : 'meat, poultry or fish';
       case RestrictionId.keto:
         return hebrew ? 'סוכר או קמח' : 'sugar or flour';
+      case RestrictionId.kosher:
+        return hebrew
+            ? 'חזיר, פירות ים או בשר עם חלב'
+            : 'pork, shellfish or meat with dairy';
+      case RestrictionId.halal:
+        return hebrew ? "חזיר, אלכוהול או ג'לטין" : 'pork, alcohol or gelatin';
       case RestrictionId.peanuts:
       case RestrictionId.treeNuts:
       case RestrictionId.milk:

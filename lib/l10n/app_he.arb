@@ -865,5 +865,8 @@
   "dishChangeHonouredOn": "הצוות שינה את המנה כפי שביקשת, {date}",
   "dishChangeNotHonouredOn": "הצוות לא שינה את המנה כפי שביקשת, {date}",
   "whyChangeHonouredOn": "ב־{date} הצוות שינה את המנה כפי שביקשת. זה היה לביקור ההוא, לכן כדאי לבקש את השינוי שוב בכל פעם.",
-  "whyChangeNotHonouredOn": "ב־{date} הצוות לא שינה את המנה כפי שביקשת."
+  "whyChangeNotHonouredOn": "ב־{date} הצוות לא שינה את המנה כפי שביקשת.",
+  "restrictionKindReligious": "תזונה דתית",
+  "restrictionKosherHint": "מסמן חזיר, פירות ים ובשר עם חלב לפי מילות התפריט. על תעודה יש לשאול את המסעדה",
+  "restrictionHalalHint": "מסמן חזיר, אלכוהול, ג'לטין ודם לפי מילות התפריט. על תעודה יש לשאול את המסעדה"
 }

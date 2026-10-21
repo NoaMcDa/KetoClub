@@ -220,12 +220,18 @@ void main() {
       );
     });
 
-    test('kosher is no restriction, only the platform flag', () {
+    test('a kosher tag declares the kosher components absent, and nothing '
+        'for halal (#342)', () {
       // Arrange
       final dish = _dish('Bread', tags: <String>[kosherDeclaredTag]);
 
       // Act & Assert
-      expect(_read(dish), isEmpty);
+      expect(_read(dish), [
+        ('kosher', DeclarationSource.platformTag, kosherDeclaredTag),
+      ]);
+      expect(Declarations.of(dish).single.restrictionIds, <RestrictionId>[
+        RestrictionId.kosher,
+      ]);
       expect(Declarations.declaresKosher(dish), isTrue);
       expect(
         Declarations.declaresKosher(_dish('Bread', tags: <String>['KOSHER'])),
@@ -241,6 +247,23 @@ void main() {
     test('kosher in the dish text is not the platform flag', () {
       // Act & Assert
       expect(Declarations.declaresKosher(_dish('Kosher bread כשר')), isFalse);
+    });
+
+    test('a halal tag declares halal only; menu text declares neither '
+        '(#342)', () {
+      expect(_read(_dish('Kebab', tags: <String>['Halal'])), [
+        ('halal', DeclarationSource.platformTag, 'Halal'),
+      ]);
+      expect(_read(_dish('Kebab', tags: <String>['חלאל'])), [
+        ('halal', DeclarationSource.platformTag, 'חלאל'),
+      ]);
+      expect(
+        _read(
+          _dish('Steak with kosher salt', description: 'Halal chicken, כשר'),
+          heading: 'Kosher and halal',
+        ),
+        isEmpty,
+      );
     });
   });
 

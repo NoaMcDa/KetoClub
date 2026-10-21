@@ -62,6 +62,8 @@ _IDS = [
     "vegan",
     "vegetarian",
     "glp1",
+    "kosher",
+    "halal",
     "keto",
     "custom",
 ]
@@ -111,6 +113,7 @@ def test_the_golden_has_every_section() -> None:
         "jurisdictions",
         "certainties",
         "vocabulary",
+        "meatWithDairy",
         "matcherCases",
         "fixture",
     }

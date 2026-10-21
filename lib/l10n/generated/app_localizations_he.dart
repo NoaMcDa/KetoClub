@@ -2360,4 +2360,15 @@ class AppLocalizationsHe extends AppLocalizations {
 
     return 'ב־$dateString הצוות לא שינה את המנה כפי שביקשת.';
   }
+
+  @override
+  String get restrictionKindReligious => 'תזונה דתית';
+
+  @override
+  String get restrictionKosherHint =>
+      'מסמן חזיר, פירות ים ובשר עם חלב לפי מילות התפריט. על תעודה יש לשאול את המסעדה';
+
+  @override
+  String get restrictionHalalHint =>
+      'מסמן חזיר, אלכוהול, ג\'לטין ודם לפי מילות התפריט. על תעודה יש לשאול את המסעדה';
 }

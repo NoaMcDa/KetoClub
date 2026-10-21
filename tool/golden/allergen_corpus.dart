@@ -346,4 +346,22 @@ final List<Dish> allergenConcernDishes = <Dish>[
     ],
   ),
   allergenDish('Water'),
+  // Kosher's meat with dairy (issue #342): both stated, a likely dairy
+  // sauce, dairy only in an option, fish with cream (nothing), guarded
+  // words on either side (nothing), and a Hebrew pair.
+  allergenDish('Ribeye steak', description: 'Blue cheese butter'),
+  allergenDish('Chicken alfredo'),
+  allergenDish(
+    'Beef burger',
+    options: const <DishOption>[
+      DishOption(name: 'Extras', values: <String>['Cheddar', 'No cheese']),
+    ],
+  ),
+  allergenDish('Salmon in cream sauce'),
+  allergenDish('Veggie burger', description: 'With goat cheese'),
+  allergenDish('Chicken curry', description: 'Coconut milk'),
+  allergenDish('שניצל עוף', description: 'ברוטב שמנת ופטריות'),
+  allergenDish('פילה לברק', description: 'ברוטב חמאה ולימון'),
+  allergenDish('Cheeseburger', description: 'Pork belly bacon'),
+  allergenDish('Penne alla vodka', description: 'Red wine, no alcohol'),
 ];

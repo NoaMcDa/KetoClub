@@ -50,6 +50,8 @@ const Set<RestrictionId> _flexible = <RestrictionId>{
   RestrictionId.vegan,
   RestrictionId.vegetarian,
   RestrictionId.glp1,
+  RestrictionId.kosher,
+  RestrictionId.halal,
   RestrictionId.keto,
 };
 

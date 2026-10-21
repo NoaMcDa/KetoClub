@@ -20,9 +20,12 @@ enum ProfileWording {
   /// diet): four states, and "fits" may be said.
   flexible,
 
-  /// At least one strict restriction (an allergen or celiac disease): four
-  /// states, and a dish with nothing found reads "No trigger found — ask
-  /// the restaurant", never "fits" and never "safe" (file 09 §3.6).
+  /// At least one strict restriction (an allergen or celiac disease), or
+  /// kosher or halal (issue #342): four states, and a dish with nothing
+  /// found reads "No trigger found — ask the restaurant", never "fits" and
+  /// never "safe" (file 09 §3.6). Kosher and halal are flexible, but a
+  /// "fits" beside them would read as "kosher" or "halal", which only the
+  /// restaurant can say.
   strict;
 
   /// The wording for [profile] in a build with [bantoMode].
@@ -31,7 +34,9 @@ enum ProfileWording {
     bool bantoMode = BantoMode.enabled,
   }) {
     if (!bantoMode || !profile.hasNonKetoEntry) return ketoOnly;
-    return profile.hasStrictEntry ? strict : flexible;
+    return profile.hasStrictEntry || profile.hasReligiousEntry
+        ? strict
+        : flexible;
   }
 
   /// Whether the menu screen shows four states rather than three verdicts.

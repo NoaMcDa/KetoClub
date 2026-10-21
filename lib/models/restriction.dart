@@ -93,6 +93,17 @@ enum RestrictionId {
   /// ALG-17.
   glp1,
 
+  /// Kosher: the components a kosher diet leaves out (pork, shellfish,
+  /// fish without fins and scales, blood, and meat served with dairy),
+  /// flagged from the menu's words. Never a certification: whether a
+  /// kitchen is kosher is the restaurant's to say (issue #342).
+  kosher,
+
+  /// Halal: the components a halal diet leaves out (pork, alcohol, blood
+  /// and gelatin), flagged from the menu's words. Never a certification,
+  /// as for [kosher].
+  halal,
+
   /// Keto, the diet KetoClub was built for.
   keto,
 
@@ -126,8 +137,8 @@ enum RestrictionKind {
   /// A lifestyle diet, such as vegan or vegetarian: flexible.
   lifestyle,
 
-  /// A component of a religious rule (reserved; no entry uses it yet):
-  /// flexible.
+  /// A component of a religious rule — kosher and halal, read as the
+  /// components a menu names, never as a certification: flexible.
   religiousComponent,
 
   /// Keto: flexible.
