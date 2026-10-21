@@ -11,6 +11,7 @@ import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/allergen_matcher.dart';
+import 'package:ketoclub/utils/allergens/vocab_religious.dart';
 import 'package:ketoclub/utils/allergens/vocabulary.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
@@ -419,16 +420,13 @@ bool _isHighSurrogate(int unit) => unit >= 0xD800 && unit <= 0xDBFF;
 /// Whether [unit] is the low (trailing) half of a UTF-16 surrogate pair.
 bool _isLowSurrogate(int unit) => unit >= 0xDC00 && unit <= 0xDFFF;
 
-/// One [Concern] per allergen hit in [raw], found where [source] says,
-/// over [vocabulary] when given and the registry otherwise.
+/// One [Concern] per allergen hit in [hits], read from [raw] where
+/// [source] says.
 Iterable<Concern> _findingsIn(
   String raw,
   ConcernSource source,
-  Map<RestrictionId, RestrictionVocabulary>? vocabulary,
+  List<AllergenHit> hits,
 ) sync* {
-  final hits = vocabulary == null
-      ? AllergenMatcher.find(raw)
-      : AllergenMatcher.findWith(raw, vocabulary);
   for (final hit in hits) {
     final lowered = hit.hidden || hit.guarded;
     yield Concern(
@@ -439,6 +437,70 @@ Iterable<Concern> _findingsIn(
       matchedText: _rawSlice(raw, hit.start, hit.end),
     );
   }
+}
+
+/// One side of the meat-with-dairy rule: a hit, the part it was read
+/// from, and that part's source.
+typedef _SideHit = ({AllergenHit hit, String raw, ConcernSource source});
+
+/// The surest of [hits] (stated > likely > suspected), the earliest at a
+/// tie; null when there is none.
+_SideHit? _surest(Iterable<_SideHit> hits) {
+  _SideHit? best;
+  for (final candidate in hits) {
+    if (best == null ||
+        candidate.hit.certainty.index < best.hit.certainty.index) {
+      best = candidate;
+    }
+  }
+  return best;
+}
+
+/// Whether two spans of one part overlap.
+bool _overlaps(AllergenHit a, AllergenHit b) =>
+    a.start < b.end && b.start < a.end;
+
+/// The kosher meat-with-dairy concern of one dish (issue #342; file 11
+/// §24.5), from its unguarded [meat] hits ([meatWithDairyMeatVocabulary])
+/// and its unguarded stated or likely Milk hits ([dairy]); null unless
+/// both sides have one.
+///
+/// Both sides in the name, the description or a hidden source → stated
+/// when the surest of each is stated, suspected otherwise, with the dairy
+/// side's source; one side only in an option → suspected, source
+/// [ConcernSource.option], since leaving the option off may settle it.
+/// The matched text is the meat words, [meatWithDairyJoiner], then the
+/// dairy words ("Ribeye + butter").
+Concern? _meatWithDairy(List<_SideHit> meat, List<_SideHit> dairy) {
+  bool inDish(_SideHit side) => side.source != ConcernSource.option;
+  final meatInDish = _surest(meat.where(inDish));
+  final dairyInDish = _surest(dairy.where(inDish));
+  final meatSide = meatInDish ?? _surest(meat);
+  final dairySide = dairyInDish ?? _surest(dairy);
+  if (meatSide == null || dairySide == null) return null;
+  final inOption = meatInDish == null || dairyInDish == null;
+  final stated =
+      !inOption &&
+      meatSide.hit.certainty == TriggerCertainty.stated &&
+      dairySide.hit.certainty == TriggerCertainty.stated;
+  final ConcernSource source;
+  if (inOption) {
+    source = ConcernSource.option;
+  } else if (dairySide.hit.hidden) {
+    source = ConcernSource.hidden;
+  } else {
+    source = dairySide.source;
+  }
+  return Concern(
+    restrictionId: RestrictionId.kosher,
+    source: source,
+    certainty: stated ? Certainty.stated : Certainty.suspected,
+    tier: stated ? EvidenceTier.stated : EvidenceTier.inferred,
+    matchedText:
+        '${_rawSlice(meatSide.raw, meatSide.hit.start, meatSide.hit.end)}'
+        '$meatWithDairyJoiner'
+        '${_rawSlice(dairySide.raw, dairySide.hit.start, dairySide.hit.end)}',
+  );
 }
 
 /// Runs the bilingual heuristic vocabulary over one dish's text
@@ -682,20 +744,82 @@ abstract final class ClassificationRules {
   /// name is never hidden behind a stronger one in an option. Pure; never
   /// throws.
   ///
+  /// After every hit, at most one more kosher concern: **meat with
+  /// dairy** (issue #342; file 11 §24.5), when the dish names a meat or
+  /// poultry ([meatWithDairyMeatVocabulary]) and a stated or likely dairy
+  /// word (the Milk restriction's own hits) that do not overlap. Fish is
+  /// no meat here, so a fish in a cream sauce raises nothing, and a
+  /// guarded word on either side ("veggie burger", "goat cheese", "coconut
+  /// milk", "no cheese") never counts; see [_meatWithDairy] for its
+  /// certainty and source.
+  ///
   /// [vocabulary] replaces the registry for one call: the on-device
   /// evaluator reads the user's own words through it (ALG-17,
-  /// `custom_terms.dart`), with the same parts, removal skips and slices.
+  /// `custom_terms.dart`), with the same parts, removal skips and slices,
+  /// and no meat-with-dairy rule.
   static List<Concern> allergenFindings(
     Dish dish, {
     Map<RestrictionId, RestrictionVocabulary>? vocabulary,
-  }) => <Concern>[
-    ..._findingsIn(dish.name, ConcernSource.name, vocabulary),
-    ..._findingsIn(dish.description, ConcernSource.description, vocabulary),
-    for (final option in dish.options)
-      for (final value in option.values)
-        if (!TextNormaliser.isRemovalOptionValue(value.replaceAll(_maqaf, ' ')))
-          ..._findingsIn(value, ConcernSource.option, vocabulary),
-  ];
+  }) {
+    final parts = <(String, ConcernSource)>[
+      (dish.name, ConcernSource.name),
+      (dish.description, ConcernSource.description),
+      for (final option in dish.options)
+        for (final value in option.values)
+          if (!TextNormaliser.isRemovalOptionValue(
+            value.replaceAll(_maqaf, ' '),
+          ))
+            (value, ConcernSource.option),
+    ];
+    final findings = <Concern>[];
+    final meat = <_SideHit>[];
+    final dairy = <_SideHit>[];
+    for (final (raw, source) in parts) {
+      final hits = vocabulary == null
+          ? AllergenMatcher.find(raw)
+          : AllergenMatcher.findWith(raw, vocabulary);
+      findings.addAll(_findingsIn(raw, source, hits));
+      if (vocabulary != null) continue;
+      final meatHits = AllergenMatcher.findWith(
+        raw,
+        meatWithDairyMeatVocabulary,
+      );
+      for (final hit in meatHits) {
+        if (!hit.guarded) meat.add((hit: hit, raw: raw, source: source));
+      }
+      for (final hit in hits) {
+        if (hit.id == RestrictionId.milk &&
+            !hit.guarded &&
+            hit.certainty != TriggerCertainty.suspected &&
+            !meatHits.any((other) => _overlaps(hit, other))) {
+          dairy.add((hit: hit, raw: raw, source: source));
+        }
+      }
+    }
+    final combined = _meatWithDairy(meat, dairy);
+    if (combined != null) findings.add(combined);
+    return findings;
+  }
+
+  /// Whether [concern] is the kosher meat-with-dairy concern
+  /// ([allergenFindings]), whose matched text joins the meat words and the
+  /// dairy words with [meatWithDairyJoiner].
+  static bool isMeatWithDairy(Concern concern) =>
+      concern.restrictionId == RestrictionId.kosher &&
+      (concern.matchedText?.contains(meatWithDairyJoiner) ?? false);
+
+  /// The meat words and the dairy words of a meat-with-dairy [concern]
+  /// ([isMeatWithDairy]), as the menu printed them; null for any other
+  /// concern.
+  static ({String meat, String dairy})? meatWithDairyParts(Concern concern) {
+    if (!isMeatWithDairy(concern)) return null;
+    final text = concern.matchedText!;
+    final at = text.indexOf(meatWithDairyJoiner);
+    return (
+      meat: text.substring(0, at),
+      dairy: text.substring(at + meatWithDairyJoiner.length),
+    );
+  }
 
   /// [allergenFindings] reduced to one [Concern] per restriction (ALG-04b),
   /// in taxonomy order: the surest finding (stated > likely > suspected)

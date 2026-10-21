@@ -42,6 +42,7 @@ import 'package:ketoclub/utils/allergens/allergen_matcher.dart';
 import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/kitchen_signals.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
+import 'package:ketoclub/utils/allergens/vocab_religious.dart';
 import 'package:ketoclub/utils/allergens/vocabulary.dart';
 import 'package:ketoclub/utils/classification_rules.dart';
 import 'package:ketoclub/utils/constants.dart';
@@ -1670,6 +1671,7 @@ Map<String, Object?> _allergens() => <String, Object?>{
     for (final certainty in TriggerCertainty.values) certainty.name,
   ],
   'vocabulary': _allergenVocabulary(allergenVocabulary),
+  'meatWithDairy': _allergenVocabulary(meatWithDairyMeatVocabulary),
   'matcherCases': _allergenCases(
     allergenVocabulary,
     <String>[
@@ -1886,6 +1888,7 @@ Map<String, Object?> _declarations(_Inputs inputs) {
           'symbols': rule.symbols,
           'restrictions': <String>[for (final id in rule.restrictions) id.name],
           'polarity': rule.polarity.name,
+          'tagsOnly': rule.tagsOnly,
         },
     ],
     'guardsEn': _guardWords(declarationGuardsEn),

@@ -121,6 +121,11 @@
           "role": "garnish",
           "evidence": "animal-derived: \"גבינה בולגרית\"",
           "source": "12 §1.5"
+        },
+        "halal": {
+          "label": "free",
+          "evidence": "\"עגבניות שרי\" are cherry tomatoes, not sherry",
+          "source": "12 §9.4"
         }
       }
     },
@@ -559,6 +564,18 @@
           "role": "protein",
           "evidence": "\"פנצ׳טה\" (cured pork)",
           "source": "12 §2.2"
+        },
+        "kosher": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"פנצ׳טה\"",
+          "source": "12 §9.1"
+        },
+        "halal": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"פנצ׳טה\"",
+          "source": "12 §9.1"
         }
       }
     },
@@ -931,6 +948,12 @@
           "role": "base",
           "evidence": "beer is a sulphite source",
           "source": "11 §15.2"
+        },
+        "halal": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בירה\"",
+          "source": "12 §9.4"
         }
       }
     }

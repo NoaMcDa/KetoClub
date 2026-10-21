@@ -363,6 +363,18 @@
           "role": "protein",
           "evidence": "\"Pork\"",
           "source": "12 §2.2"
+        },
+        "kosher": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Pork\"",
+          "source": "11 §24.1"
+        },
+        "halal": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"Pork\"",
+          "source": "11 §25.1"
         }
       }
     },
@@ -588,6 +600,12 @@
           "role": "protein",
           "evidence": "\"beef\"",
           "source": "11 §17.1"
+        },
+        "kosher": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"oyster sauce\" is made from oysters",
+          "source": "11 §24.2"
         }
       }
     },

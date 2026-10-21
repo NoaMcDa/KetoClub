@@ -30,6 +30,12 @@
           "role": "protein",
           "evidence": "\"ribeye\"",
           "source": "12 §2.2"
+        },
+        "kosher": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"ribeye\" finished with \"butter\": meat with dairy",
+          "source": "11 §24.5"
         }
       }
     },
@@ -73,6 +79,18 @@
           "role": "protein",
           "evidence": "\"filet\"",
           "source": "12 §2.2"
+        },
+        "kosher": {
+          "label": "may_contain",
+          "role": "sauce",
+          "evidence": "\"béarnaise\" is a butter sauce, on beef",
+          "source": "11 §24.5"
+        },
+        "halal": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"red wine reduction\"",
+          "source": "11 §25.2"
         }
       }
     },
@@ -165,6 +183,12 @@
           "role": "protein",
           "evidence": "\"patty\"",
           "source": "12 §2.2"
+        },
+        "kosher": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "a beef \"patty\" with \"blue cheese\"",
+          "source": "11 §24.5"
         }
       }
     },
@@ -213,6 +237,18 @@
           "role": "protein",
           "evidence": "\"bacon\"",
           "source": "12 §2.2"
+        },
+        "kosher": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"bacon\"",
+          "source": "11 §24.1"
+        },
+        "halal": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"bacon\"",
+          "source": "11 §25.1"
         }
       }
     },
@@ -305,6 +341,17 @@
           "role": "protein",
           "evidence": "fish/shellfish: \"shrimp\"",
           "source": "11 §9.1"
+        },
+        "kosher": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"shrimp\"",
+          "source": "11 §24.2"
+        },
+        "halal": {
+          "label": "free",
+          "evidence": "cocktail sauce is ketchup and horseradish, no alcohol",
+          "source": "11 §25.5"
         }
       }
     },
@@ -409,6 +456,18 @@
           "role": "protein",
           "evidence": "\"Beef broth\"",
           "source": "12 §2.2"
+        },
+        "kosher": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Beef broth\" with \"Gruyère\"",
+          "source": "11 §24.5"
+        },
+        "halal": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"sherry\"",
+          "source": "11 §25.2"
         }
       }
     },
@@ -578,6 +637,16 @@
           "label": "free",
           "evidence": "only plant ingredients named",
           "source": "12 §2.2"
+        },
+        "kosher": {
+          "label": "free",
+          "evidence": "asparagus with olive oil, lemon and salt",
+          "source": "11 §24.1"
+        },
+        "halal": {
+          "label": "free",
+          "evidence": "asparagus with olive oil, lemon and salt",
+          "source": "11 §25.1"
         }
       }
     },
@@ -608,6 +677,12 @@
           "role": "sauce",
           "evidence": "animal-derived: \"cream sauce\"",
           "source": "11 §3.1"
+        },
+        "halal": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"Brandy cream sauce\"",
+          "source": "11 §25.2"
         }
       }
     },
@@ -631,6 +706,11 @@
           "role": "sauce",
           "evidence": "\"red wine vinegar\"",
           "source": "11 §15.2"
+        },
+        "halal": {
+          "label": "free",
+          "evidence": "\"red wine vinegar\" is vinegar, not wine",
+          "source": "11 §25.5"
         }
       }
     },
@@ -796,6 +876,12 @@
           "role": "base",
           "evidence": "wine is a sulphite source",
           "source": "11 §15.2"
+        },
+        "halal": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"Red Wine\"",
+          "source": "11 §25.2"
         }
       }
     }

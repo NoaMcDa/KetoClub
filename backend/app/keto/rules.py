@@ -8,7 +8,8 @@ three ``mentions_*`` checks run the bilingual vocabulary
 :func:`allergen_findings` and :func:`allergen_concerns` (Banto; ALG-04b) run
 the allergen matcher (:mod:`app.keto.allergens`) over a dish's name,
 description and non-removal option values; the golden
-``allergen_concerns.json`` pins them.
+``allergen_concerns.json`` pins them, kosher's meat-with-dairy rule (#342)
+included.
 
 Behaviour the port keeps from Dart:
 
@@ -46,7 +47,7 @@ from dataclasses import dataclass
 from functools import cache
 from typing import Final, Literal, cast
 
-from app.keto.allergens import allergens, find, match_text
+from app.keto.allergens import AllergenHit, allergens, find, find_with, match_text
 from app.keto.dart_text import DART_WHITESPACE, utf16_len, utf16_slice
 from app.keto.models import Certainty, Concern, ConcernSource, Dish, RestrictionIdName
 from app.keto.normaliser import (
@@ -514,8 +515,11 @@ def _raw_slice(raw: str, start: int, end: int) -> str:
     return raw[raw_start:raw_end]
 
 
-def _findings_in(raw: str, source: ConcernSource) -> list[Concern]:
-    """Dart ``_findingsIn``: one concern per allergen hit in ``raw``."""
+def _findings_in(
+    raw: str, source: ConcernSource, hits: Sequence[AllergenHit]
+) -> list[Concern]:
+    """Dart ``_findingsIn``: one concern per allergen hit in ``hits``, read
+    from ``raw``."""
     return [
         Concern(
             restriction_id=cast(RestrictionIdName, hit.id),
@@ -524,24 +528,113 @@ def _findings_in(raw: str, source: ConcernSource) -> list[Concern]:
             tier="inferred" if hit.hidden or hit.guarded else "stated",
             matched_text=_raw_slice(raw, hit.start, hit.end),
         )
-        for hit in find(raw)
+        for hit in hits
     ]
+
+
+MEAT_WITH_DAIRY_JOINER: Final = " + "
+"""Dart ``meatWithDairyJoiner``: joins the meat and the dairy words of a
+meat-with-dairy concern's matched text."""
+
+
+@dataclass(frozen=True, slots=True)
+class _SideHit:
+    """Dart ``_SideHit``: one side of the meat-with-dairy rule."""
+
+    hit: AllergenHit
+    raw: str
+    source: ConcernSource
+
+
+def _surest(hits: Sequence[_SideHit]) -> _SideHit | None:
+    """Dart ``_surest``: the surest hit, the earliest at a tie."""
+    best: _SideHit | None = None
+    for candidate in hits:
+        if (
+            best is None
+            or _CERTAINTY_RANK[candidate.hit.certainty]
+            < _CERTAINTY_RANK[best.hit.certainty]
+        ):
+            best = candidate
+    return best
+
+
+def _overlaps(a: AllergenHit, b: AllergenHit) -> bool:
+    return a.start < b.end and b.start < a.end
+
+
+def _meat_with_dairy(
+    meat: Sequence[_SideHit], dairy: Sequence[_SideHit]
+) -> Concern | None:
+    """Dart ``_meatWithDairy``: kosher's meat-with-dairy concern (#342)."""
+    meat_in_dish = _surest([side for side in meat if side.source != "option"])
+    dairy_in_dish = _surest([side for side in dairy if side.source != "option"])
+    meat_side = meat_in_dish or _surest(meat)
+    dairy_side = dairy_in_dish or _surest(dairy)
+    if meat_side is None or dairy_side is None:
+        return None
+    in_option = meat_in_dish is None or dairy_in_dish is None
+    stated = (
+        not in_option
+        and meat_side.hit.certainty == "stated"
+        and dairy_side.hit.certainty == "stated"
+    )
+    source: ConcernSource
+    if in_option:
+        source = "option"
+    elif dairy_side.hit.hidden:
+        source = "hidden"
+    else:
+        source = dairy_side.source
+    return Concern(
+        restriction_id="kosher",
+        source=source,
+        certainty="stated" if stated else "suspected",
+        tier="stated" if stated else "inferred",
+        matched_text=(
+            _raw_slice(meat_side.raw, meat_side.hit.start, meat_side.hit.end)
+            + MEAT_WITH_DAIRY_JOINER
+            + _raw_slice(dairy_side.raw, dairy_side.hit.start, dairy_side.hit.end)
+        ),
+    )
 
 
 def allergen_findings(dish: Dish) -> list[Concern]:
     """``ClassificationRules.allergenFindings``: one concern per allergen hit
     in the dish's name, then description, then each non-removal option value
     (a maqaf read as a space for the removal check), each part matched on
-    its own; option group names are not read."""
-    findings = [
-        *_findings_in(dish.name, "name"),
-        *_findings_in(dish.description, "description"),
+    its own; option group names are not read. Then at most one kosher
+    meat-with-dairy concern (#342): an unguarded meat word and an unguarded
+    stated or likely Milk word that do not overlap."""
+    parts: list[tuple[str, ConcernSource]] = [
+        (dish.name, "name"),
+        (dish.description, "description"),
     ]
     for option in dish.options:
         for value in option.values:
             if is_removal_option_value(value.replace(_MAQAF, " ")):
                 continue
-            findings.extend(_findings_in(value, "option"))
+            parts.append((value, "option"))
+    findings: list[Concern] = []
+    meat: list[_SideHit] = []
+    dairy: list[_SideHit] = []
+    meat_vocabulary = allergens().meat_with_dairy
+    for raw, source in parts:
+        hits = find(raw)
+        findings.extend(_findings_in(raw, source, hits))
+        meat_hits = find_with(raw, meat_vocabulary)
+        meat.extend(_SideHit(hit, raw, source) for hit in meat_hits if not hit.guarded)
+        dairy.extend(
+            _SideHit(hit, raw, source)
+            for hit in hits
+            if hit.id == "milk"
+            and not hit.guarded
+            and hit.certainty != "suspected"
+            and not any(_overlaps(hit, other) for other in meat_hits)
+        )
+    combined = _meat_with_dairy(meat, dairy)
+    if combined is not None:
+        findings.append(combined)
     return findings
 
 

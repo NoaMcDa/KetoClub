@@ -2371,6 +2371,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get restrictionKindReligious => 'Religious diet';
+
+  @override
+  String get restrictionKosherHint =>
+      'Flags pork, shellfish and meat with dairy in the menu\'s words. Ask the restaurant about its certificate';
+
+  @override
+  String get restrictionHalalHint =>
+      'Flags pork, alcohol, gelatin and blood in the menu\'s words. Ask the restaurant about its certificate';
+
+  @override
   String get restrictionKindMedical => 'Health condition';
 
   @override
