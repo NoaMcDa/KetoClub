@@ -1931,7 +1931,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get restrictionOwnNote =>
-      'משהו שאינו ברשימה, כמו קיווי או כוסברה. נבדק רק במכשיר הזה, בקפדנות כמו אלרגיה, לפי המילים שכתובות בתפריט.';
+      'משהו שאינו ברשימה, כמו מנגו או כוסברה. נבדק רק במכשיר הזה, בקפדנות כמו אלרגיה, לפי המילים שכתובות בתפריט.';
 
   @override
   String get restrictionOwnField => 'מזון שיש להימנע ממנו';

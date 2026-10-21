@@ -39,7 +39,12 @@ test/fixtures/allergens/
   menus/*.json      one file per menu
 ```
 
-Seventeen menus: five are copied from existing fixtures and twelve are written for the corpus. More than half of the dishes are Hebrew (a Hebrew letter in the name or description); the shape test enforces that and the minimum sizes, so this file states no counts that could go stale.
+
+
+
+
+Five menus are copied from existing fixtures and the rest are written for the corpus. More than half of the dishes are Hebrew (a Hebrew letter in the name or description); the shape test enforces that and the minimum sizes, so this file states no counts that could go stale.
+Eighteen menus: five are copied from existing fixtures and thirteen are written for the corpus. More than half of the dishes are Hebrew (a Hebrew letter in the name or description); the shape test enforces that and the minimum sizes, so this file states no counts that could go stale.
 
 | File | Source | Language |
 |---|---|---|
@@ -58,6 +63,15 @@ Seventeen menus: five are copied from existing fixtures and twelve are written f
 | `asian_takeaway_soy_peanut.json` | synthetic Thai and Chinese place | en |
 | `us_steakhouse.json` | synthetic steakhouse (Worcestershire, blue cheese) | en |
 | `bakery_lupin_sulphites.json` | synthetic bakery: lupin flour, dried fruit | en |
+| `diets_extra_labels.json` | synthetic mixed menu for the extra diets (pescatarian, paleo, Whole30, AIP, Jain): fish, roots, grains, honey, wine | mixed |
+
+| `foods_extra_labels.json` | synthetic Israeli cafe-and-grill and US diner / Japanese noodle dishes for buckwheat and Japan's recommended foods (issue #342); labels only those eleven ids | mixed |
+
+| `sensitivities_labels.json` | synthetic mixed menu labelled only for the five heads-up sensitivities (nightshades, MSG, caffeine, salicylates, oral allergy syndrome; 11 §29, 12 §13) | mixed |
+
+| `seeds_extra_labels.json` | synthetic cafe and Latin grill: corn, sunflower seed, flaxseed, chestnut and their traps (issue #342) | mixed |
+
+| `legume_parts_labels.json` | synthetic single legumes: hummus, ful, mujadara, peas, hilbeh, dal, ta'ameya | mixed |
 
 The golden menus are copies of their dish texts, never imports: the corpus
 and the golden export (`tool/golden`) are different things. The goldens pin
@@ -141,6 +155,24 @@ blood, or meat or poultry served with dairy (a fish with butter is
 sauce included, and `free` for wine *vinegar* and cherry tomatoes
 (עגבניות שרי). Both are flexible, so the recall gate does not read them;
 `corpus_recall_test.dart` prints their recall and false positives only.
+
+Issue #342's foods-extra follow-up added `foods_extra_labels.json`, which
+labels only `buckwheat`, `kiwi`, `peach`, `apple`, `banana`, `orange`,
+`beef`, `pork`, `chicken`, `gelatin` and `yam` (file 11 §26, file 12 §10),
+with explicit `free` labels for the traps: spelt (כוסמין) and yakisoba are
+not buckwheat, potatoes (תפוחי אדמה) are not apples, persimmon is not peach,
+candied yams and בטטה are sweet potato, orange roughy is a fish and
+chicken-fried steak is beef. Its dishes carry no labels for any other id,
+so a hit there on milk or wheat counts as unlabelled, never as a false
+positive against `free`.
+
+The five heads-up sensitivities are labelled only in
+`sensitivities_labels.json` (file 11 §29, file 12 §13), which labels
+nothing else. A heads-up never moves a dish, so the recall gate does not
+read them either; `vocab_sensitivities_test.dart` replays that menu (every
+`contains` found unguarded, every `may_contain` found, every `free` with
+no hit or only a guarded one) and prints how many corpus dishes each one
+flags.
 
 ### `label`
 

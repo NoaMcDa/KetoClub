@@ -1930,7 +1930,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get restrictionOwnNote =>
-      'Something not on the list, such as kiwi or coriander. Checked on this device only, as strictly as an allergy, by the words the menu prints.';
+      'Something not on the list, such as mango or coriander. Checked on this device only, as strictly as an allergy, by the words the menu prints.';
 
   @override
   String get restrictionOwnField => 'Food to avoid';

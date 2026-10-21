@@ -51,7 +51,8 @@ double _top(WidgetTester tester, Finder finder) => tester.getTopLeft(finder).dy;
 
 void main() {
   group('availableRestrictions', () {
-    test('leaves out keto and the added ids, in taxonomy order', () {
+    test('leaves out keto and the added ids, in taxonomy order (each '
+        'single legume after legumes)', () {
       // Act
       final available = availableRestrictions(<RestrictionId>{
         RestrictionId.sesame,
@@ -64,13 +65,16 @@ void main() {
       expect(ids, isNot(contains(RestrictionId.sesame)));
       expect(ids, isNot(contains(RestrictionId.milk)));
       expect(ids, isNot(contains(RestrictionId.custom)));
-      expect(ids, <RestrictionId>[
-        for (final id in RestrictionId.values)
-          if (restrictionOffered(id) &&
-              id != RestrictionId.sesame &&
-              id != RestrictionId.milk)
-            id,
-      ]);
+      expect(
+        ids,
+        childrenAfterParents(<Restriction>[
+          for (final restriction in restrictionTaxonomy)
+            if (restrictionOffered(restriction.id) &&
+                restriction.id != RestrictionId.sesame &&
+                restriction.id != RestrictionId.milk)
+              restriction,
+        ]).map((restriction) => restriction.id).toList(),
+      );
       expect(ids.first, RestrictionId.peanuts);
     });
 
@@ -314,6 +318,11 @@ void main() {
           RestrictionId.lactose,
           RestrictionId.fodmap,
           RestrictionId.histamine,
+          RestrictionId.nightshades,
+          RestrictionId.msg,
+          RestrictionId.caffeine,
+          RestrictionId.salicylates,
+          RestrictionId.oralAllergy,
         },
       );
 
@@ -327,8 +336,8 @@ void main() {
         find.byKey(restrictionOptionKey(RestrictionId.sesame)),
         findsNothing,
       );
-      // The intolerance group had only lactose, FODMAP and histamine, so
-      // its heading goes too.
+      // The intolerance group had only lactose, FODMAP, histamine and the
+      // five sensitivities, so its heading goes too.
       expect(find.text(_en.restrictionKindIntolerance), findsNothing);
       expect(find.byKey(restrictionOptionKey(RestrictionId.milk)), findsOne);
     });
@@ -590,16 +599,22 @@ void main() {
       }
       expect(restrictionOffered(RestrictionId.sesame), isTrue);
       expect(restrictionOffered(RestrictionId.keto), isFalse);
-      // Kosher and halal arrive with their words, so they are offered;
-      // Jain, a religious component too, waits for its vocabulary.
+      // Kosher and halal arrive with their words, so they are offered,
+      // and so is Jain, a religious component too, since its vocabulary
+      // holds terms.
       expect(restrictionOffered(RestrictionId.kosher), isTrue);
       expect(restrictionOffered(RestrictionId.halal), isTrue);
-      expect(restrictionOffered(RestrictionId.jain), isFalse);
-      expect(
-        availableRestrictions(const <RestrictionId>{})
-            .map((restriction) => restriction.id),
-        isNot(contains(RestrictionId.buckwheat)),
-      );
+      expect(restrictionOffered(RestrictionId.jain), isTrue);
+      final available = availableRestrictions(const <RestrictionId>{})
+          .map((restriction) => restriction.id)
+          .toSet();
+      for (final id in RestrictionId.values) {
+        if (allergenVocabulary[id]!.isEmpty) {
+          expect(available, isNot(contains(id)), reason: id.name);
+        }
+      }
+      // Filled by its follow-up (vocab_foods_extra.dart), so offered.
+      expect(available, contains(RestrictionId.buckwheat));
     });
 
     test('each single legume follows legumes, in taxonomy order', () {

@@ -4087,6 +4087,92 @@ kosher or halal *certification*, which no app can verify (file 03; their
 components are a separate pull request). Chestnut is no id: it stays a
 tree-nut question for that vocabulary (file 11 §2.5).
 
+**The extra diets: pescatarian, paleo, Whole30, AIP and Jain (related to
+#342).** `vocab_diets_extra.dart` fills the five flexible diets mostly by
+spreading other groups' public pieces rather than copying them: the meat,
+poultry and sea-animal lists of `vegetarian`, the wheat foods and gluten
+grains, the legume words (peas apart, since Whole30 allows them), the milk
+words without ghee (Whole30 allows it), the egg, tree-nut and sesame
+direct lists, and halal's alcohol list for Jain; exposing them kept every
+list's order, so no earlier golden moved. The strict allergens' hidden
+lists are not spread (they overlap, and a term may be listed only once per
+restriction), so each diet has a short hidden list of its own. Paleo's
+refined sugar and seed oils are `suspected`, Whole30's sugars and alcohol
+`stated`, AIP adds nightshades, seed spices, coffee and chocolate (listed
+here until the sensitivities group has pieces to share), and Jain adds
+honey, eggs and the roots (onion, garlic, potato, carrot, beet, ginger),
+with mushrooms `suspected`; when Jain practice limits eating after sunset
+or on fasting days, no menu shows it, so the app says nothing. Under the
+#346 rule a stated or likely hit moves the dish; Jain, a
+`religiousComponent`, keeps the strict wording "No trigger found — ask the
+restaurant". Sources: file 11 §30, file 12 §14 (search snippets only,
+unreviewed).
+
+**Foods extra filled (related to #342).** `vocab_foods_extra.dart` now holds
+buckwheat and Japan's ten recommended foods, sourced to file 11 §26 and file
+12 §10 (desk research checked against search excerpts on 2026-10-21,
+unreviewed rows suspected), so the eleven ids are offered. Buckwheat stays a
+guard of wheat and gluten only, never of itself; yam is Japan's yamaimo and
+the bare word "yam" (US sweet potato) and `בטטה` are no terms; `תפוח` is
+lowered before `אדמה` and `תפוחי אדמה` never matches; orange roughy, orange
+wine, banana peppers and chicken-fried steak are lowered. Pork spreads the
+kosher and halal pork words and pork and beef their gelatin pieces, made
+public in `vocab_religious.dart` in the same order (no kosher or halal golden
+changes); the Gelatin entry keeps its own words, gelatin stated and fish
+gelatin included. A corpus menu, `foods_extra_labels.json`, labels the eleven
+ids, and the own-word hint's example is mango, since kiwi is now offered.
+
+**The sensitivities' words (#342 follow-up).** `vocab_sensitivities.dart`
+fills nightshades, MSG, caffeine, salicylates and oral allergy syndrome
+from file 11 §29 and file 12 §13 (unreviewed desk research, checked by
+web search on 2026-10-21), so all five now appear in the picker. They
+stay heads-ups: every finding is `suspected` and moves nothing. MSG is
+stated only where a menu names it (MSG, E621, monosodium glutamate),
+never inferred from a cuisine; stock powders and yeast extract are
+suspected. Salicylates rest on contested data, so every term is hidden
+and suspected. A guard lowers and never cancels: decaf and herbal tea for
+caffeine, sweet potato and black pepper for nightshades, and for oral
+allergy syndrome a cooked form beside a fruit or vegetable ("apple pie",
+"גזר מבושל"), with no cooking guard on celery and nuts, which may react
+cooked. Their corpus menu, `sensitivities_labels.json`, labels only these
+five; the strict recall gate does not measure heads-ups, so
+`vocab_sensitivities_test.dart` replays it instead.
+
+*Seeds extra filled (corn, sunflower, flax).* `vocab_seeds_extra.dart`
+now holds the three vocabularies from file 11 §27 and file 12 §11, so
+the picker offers them. Refined products the guidance disagrees about
+(corn oil, syrup and starch, קורנפלור, sunflower oil and lecithin) are
+`suspected` hidden terms and term guards on the food word, so "corn
+oil" is lowered and never dropped; a tortilla, taco or seeded bread is
+`suspected`, nachos, arepas, tamales and Bamba `likely`. The Hebrew
+sunflower words take no free prefix, because ל + חמנייה is לחמנייה, a
+bread roll. Corn and flax keep their wheat roles (term guards on wheat's
+`flour` and `crackers`, which lower wheat only), and corn stays a keto
+carb trigger: no keto golden changed. Chestnut joins tree nuts as a
+`suspected` trigger with a jurisdiction note (file 11 §2.5, §27.5), with
+"water chestnut" lowered and the Hebrew construct ערמוני not a term.
+`seeds_extra_labels.json` adds 28 labelled dishes.
+
+**The single legumes' words (`vocab_legume_parts`, related to #342).**
+Chickpea, lentil, pea, fenugreek and fava now hold terms, so all five
+appear in the picker. The words `legumes` already had are cut out of it
+into public lists in its own order and spread back, so its golden output
+only grows, and the new words are spread into it too: `legumes` stays a
+superset of every single legume (a test checks it) and a term is written
+once. A word whose certainty differs is written in each: falafel is
+stated for `legumes`, likely for chickpea (Israeli falafel is chickpea)
+and suspected for fava; dal (any split pulse) is likely for lentil; gram
+flour is stated for chickpea. Pea's "pea"/"peas" are lowered beside
+"chick", "eyed", "pigeon" and "butterfly"; fava keeps `פול` without a
+prefix (`כפול`) and never lists `פולי` (`פולי סויה`), and Greek or
+Santorini "fava" (yellow split peas) lowers the fava hit and is a likely
+pea source; fenugreek is `חילבה`, never `חלבה` (halva). Fava's concern
+asks for "fava beans (broad beans)" / "פול", never "favism". Sources: file
+11 §28 and file 12 §12 (checked 2026-10-21 against search snippets; the
+Hebrew spellings remain unreviewed), with a new corpus menu,
+`legume_parts_labels.json`, at 23/23 contains and 5/5 may-contain recall;
+the one false alarm on a `free` label is pea's lowered "chick peas".
+
 ### D27 — Post-meal confirmations, no ratings
 
 *(Banto, the Allergens epic's ALG-14, issue #356. Amends D23's visit

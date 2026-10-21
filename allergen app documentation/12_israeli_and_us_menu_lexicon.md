@@ -890,6 +890,386 @@ tomato (עגבניות שרי), not sherry.
 
 ---
 
+## 14. Hebrew menu terms for the extra diets (issue #342)
+
+**Status: desk research, added 2026-10-21, not reviewed by a dietitian, a
+rabbi, a Jain scholar or a native-speaking editor.** The diet rules are
+file 11 §30 with their sources; the Hebrew words below are the app's own
+menu lexicon, and no web source confirms their spellings (as §7 says of all
+Hebrew dish vocabulary). Most terms are reused from other sections: meat and
+poultry (§2.2), fish (§1.7), wheat and gluten grains (§1.4), legumes
+(§1.3), milk (§1.5), eggs (§1.6), tree nuts (§1.2), sesame (§1.1) and
+halal's alcohol (§9.4).
+
+### 14.1 Grains, legumes and dairy (paleo, Whole30, AIP)
+
+| Term | Meaning | Use |
+|---|---|---|
+| אורז, ריזוטו, פאייה, תירס, קורנפלור, פולנטה, ממליגה, פופקורן, טורטיה, נאצ'וס, שיבולת שועל, קוואקר, דייסה, גרנולה, מוזלי, קינואה, כוסמת, דוחן, סורגום, אמרנט, סובה, דגנים | rice, corn, oats and the other grains | direct |
+| קמח, שניצל, נאגטס, פאי, סושי, ניגירי, טאקו, בוריטו, קסדייה, טאבולה, קובה | dishes that carry a grain | likely; מקומח, טארט, ראפ suspected |
+| סאטה, טריאקי, הויסין, פונזו, קונג פאו | soy- and peanut-based sauces | likely |
+| חלבי, הפוך, לאטה, קפוצ'ינו, גלידה, צזיקי, אלפרדו, בשמל, הולנדייז, פסטו, טירמיסו | dairy coffees, sauces, desserts | likely; קרמי suspected |
+| גהי, סמנה, סאמנה | ghee | suspected (paleo, AIP); not a trigger for Whole30 |
+| אורז כרובית, קמח שקדים, חלב שקדים/קוקוס/סויה, חמאת בוטנים/שקדים, שעועית ירוקה, חומץ אורז | look-alikes | guards (the second word lowers the first) |
+
+### 14.2 Sugar, oils and alcohol
+
+| Term | Meaning | Use |
+|---|---|---|
+| סוכר, מסוכר, קרמל, סירופ גלוקוזה, פונדנט, טופי, סוכריות | refined sugar | suspected (paleo, AIP); stated for Whole30 |
+| דבש, מייפל, אגבה, סילאן, מולסה, סטיביה, ממתיק, סירופ | other sweeteners | stated for Whole30 only |
+| מקורמל, מזוגג | caramelised, glazed | suspected (Whole30) |
+| ברביקיו, קטשופ, חמוץ מתוק, צ'ילי מתוק | sweetened sauces | likely (Whole30) |
+| קנולה, שמן צמחי, שמן חמניות, מרגרינה, טיגון עמוק | seed oils | suspected (paleo, AIP) |
+| יין (and היין, ביין, ויין), יינות, וודקה, רום, ויסקי, ג'ין, טקילה, ברנדי, קוניאק, ליקר, סאקה, שמפניה, פרוסקו, סנגריה, קוקטייל, מוחיטו, ספריץ, אפרול, קמפרי, ורמוט, ערק, אוזו, לימונצ'לו, אלכוהול | alcohol | stated for Whole30 and AIP; יין and רום take no free prefix (מיין, מרום); Jain reuses §9.4 |
+| מירין, מרסלה, פלמבה | alcohol in cooking | likely; מרגריטה suspected and lowered after פיצה |
+| חומץ יין | wine vinegar | guard |
+
+### 14.3 AIP: seeds, spices, nightshades, coffee
+
+| Term | Meaning | Use |
+|---|---|---|
+| אגוזים, זרעים, זרעי, גרעינים, גרעיני, צ'יה, פשתן, פרג | nuts and seeds | direct |
+| כמון, קימל, אניס, חרדל, מוסקט | seed spices | direct |
+| קארי, זעתר, דוקה, בהרט, חוואייג', ראס אל חנות, גרם מסאלה | spice blends | likely |
+| עגבנייה, עגבניות, תפוח אדמה, תפוחי אדמה, צ'יפס, חציל, חצילים, פלפל, פלפלים, גמבה, צ'ילי, פפריקה, חלפיניו, קאיין | nightshades | direct; פלפל lowered before שחור/לבן/אנגלי and after מלח; צ'יפס lowered before בטטה |
+| פירה, סלסה, קטשופ, מרינרה, ארביאטה, בולונז, הריסה, סחוג, מטבוחה, באבא גנוש, רטטוי, מוסקה | tomato, pepper and potato dishes | likely; פירה lowered before בטטה/כרובית |
+| קפה, אספרסו, אמריקנו, מוקה, מקיאטו, שוקולד, קקאו | coffee and chocolate | direct; נוטלה likely |
+
+### 14.4 Jain: roots and fungi
+
+| Term | Meaning | Use |
+|---|---|---|
+| בצל, בצלים, שאלוט, כרישה, כרישות | onion family | direct |
+| שום (and השום, ושום, בשום, ובשום, והשום) | garlic | direct; no free prefix (משום, "because"); lowered after אין and before דבר ("any") |
+| תפוח אדמה, תפוחי אדמה, צ'יפס, גזר, סלק, צנון, צנונית, לפת, בטטה, ג'ינג'ר, זנגביל, חזרת | roots and tubers | direct |
+| פירה, לביבות, ניוקי, וואסאבי, צזיקי, פסטו, סלסה, צ'ימיצ'ורי | dishes built on a root | likely |
+| פטריות, פטרייה, כמהין, ציר, מרק | fungi; stock and soup (onion) | suspected |
+| דבש | honey | direct; lowered before תמרים (date "honey" is silan) |
+
+### 14.5 Pescatarian: meat beyond §2.2
+
+| Term | Meaning | Use |
+|---|---|---|
+| מרגז, קבנוס, צ'וריסו, מעורב ירושלמי | sausages, Jerusalem mixed grill | direct |
+| כבד, כבדים, קציצות, עראייס, קרפצ'יו, נקניקיה | liver, meatballs, arayes, carpaccio, hot dog | likely; ציר suspected |
+| סטייק טונה, המבורגר דגים, קציצות דגים, שניצל טבעוני | fish or plant versions | guards (a fish or plant word after the meat word) |
+
+## 10. Hebrew and US menu terms for buckwheat and Japan's recommended foods (issue #342)
+
+**Status: desk research, written and checked 2026-10-21 against web
+search results only (no page opened in full); not clinical review.** The
+English food facts and their sources are file 11 §26 (the subsections
+below match its numbering). As §7 says of all Hebrew dish vocabulary,
+**the Hebrew spellings are the app's own lexicon**: no web source can
+confirm them, and a native-speaking dietitian should review them. Rows
+whose meaning rests on a source cite it; the rest are **unreviewed**.
+Spelling variants follow §1 (geresh and apostrophe read alike; the
+grammatical prefixes ב/ה/ו/כ/ל/מ/ש are allowed unless a term is listed as
+taking none). (§9 is the kosher and halal section.)
+
+### 10.1 Buckwheat — כוסמת
+
+| Term | Meaning | Use |
+|---|---|---|
+| כוסמת | buckwheat | direct |
+| סובה | soba (buckwheat noodles, often part wheat: §8.2) | direct; "יאקי סובה" lowered (one word, יאקיסובה, never matches) |
+| בליני | blini — buckwheat or wheat pancakes | suspected |
+| ללא גלוטן | gluten-free baking, where buckwheat is a common flour (file 11 §26.1) | suspected |
+
+**כוסמת is not כוסמין.** In modern Hebrew the singular כוסמת names
+buckwheat and the plural-looking כוסמין names spelt, sold side by side in
+the same aisle (https://www.balashon.com/2010/07/kusemet.html **[W]** ;
+https://languagehat.com/kusemet/ **[W]**). The matcher's strict right
+boundary keeps them apart: כוסמין never matches כוסמת. Spelt is wheat
+(file 11 §7.5), not buckwheat.
+
+### 10.2 Kiwi — קיווי
+
+| Term | Meaning | Use |
+|---|---|---|
+| קיווי, קיוי | kiwi | direct |
+| סלט פירות, שייק פירות, סמוטי, פבלובה | fruit salad, fruit shake, smoothie, pavlova | suspected |
+
+### 10.3 Peach — אפרסק
+
+| Term | Meaning | Use |
+|---|---|---|
+| אפרסק, אפרסקים | peach | direct |
+| נקטרינה, נקטרינות | nectarine (the same species, file 11 §26.3) | likely |
+
+אפרסמון (persimmon) is another fruit and does not contain the word.
+
+### 10.4 Apple — תפוח
+
+| Term | Meaning | Use |
+|---|---|---|
+| תפוח, תפוחים, תפוחי עץ | apple | direct; תפוח lowered before אדמה |
+| סיידר, קלבדוס | cider, calvados | suspected |
+
+**תפוח אדמה is potato.** The usual plural, תפוחי אדמה, never matches
+(תפוחי alone is not a term, and the matcher allows no suffix); the
+singular is lowered by its guard, never cleared, as the FODMAP entry does
+(§7.2). תפוז (orange) is another word.
+
+### 10.5 Banana — בננה
+
+| Term | Meaning | Use |
+|---|---|---|
+| בננה, בננות | banana | direct |
+
+### 10.6 Orange — תפוז
+
+| Term | Meaning | Use |
+|---|---|---|
+| תפוז, תפוזים | orange (מיץ תפוזים, קליפת תפוז follow) | direct |
+| מרמלדה | marmalade — in Israeli usage often any jam (**unreviewed**) | suspected |
+| גרנד מרנייה, קואנטרו, טריפל סק | orange liqueurs | suspected |
+
+### 10.7 Beef — בקר
+
+| Term | Meaning | Use |
+|---|---|---|
+| בקר, עגל (and הבקר, ובקר, העגל, ועגל) | beef, veal; no free prefix, since מבקר is a visitor and מעגל a circle (§7.1) | direct |
+| אנטריקוט, סינטה, שייטל, פיקניה, אסאדו, אוסובוקו, רוסטביף, ברזאולה | beef and veal cuts and cured beef | direct |
+| המבורגר, סטייק, קרפצ'יו, בולונז | usually beef; lowered beside עוף/הודו/דג/טונה/סלמון/סלק | likely |
+| פסטרמה, קבב, קציצות, בשר, צ'ולנט, חמין, מח עצם, ציר, ג'לטין | beef or another meat: Israeli pastrami is often turkey, kebab beef and lamb, בשר beef or lamb (§7.1) | suspected |
+
+### 10.8 Pork — חזיר
+
+| Term | Meaning | Use |
+|---|---|---|
+| חזיר (and החזיר, וחזיר, בחזיר) | pork; no free prefix, since מחזיר is "returns" | direct |
+| בשר לבן, ירך לבן | "white meat": the menu euphemism for pork in Israel's non-kosher restaurants (https://www.kipa.co.il/חדשות/%d7%91%d7%94%d7%90%d7%a8%d7%a5-%d7%9e%d7%91%d7%9b%d7%99%d7%9d-%d7%90%d7%aa-%d7%94%d7%99%d7%a2%d7%9c%d7%9e%d7%95%d7%aa-%d7%91%d7%a9%d7%a8-%d7%94%d7%97%d7%96%d7%99%d7%a8-%d7%9e%d7%94%d7%9e-2/ **[M]** ; https://timeout.co.il/ירך-לבן/ **[M]**); "white meat" is also poultry, so never stated | likely |
+| בייקון, פרושוטו, פנצ'טה | cured pork; kosher menus print בייקון בקר, פרושוטו אווז, which are lowered | likely |
+| סטייק לבן, סלמי, פפרוני, צ'וריסו, נקניק, ג'לטין | maybe pork | suspected |
+
+### 10.9 Chicken — עוף
+
+| Term | Meaning | Use |
+|---|---|---|
+| עוף, עופות | chicken, poultry | direct |
+| פרגית, פרגיות | chicken thigh meat (https://www.makorrishon.co.il/culture/article/260588 **[M]**) | direct |
+| שניצל, שניצלונים, נאגטס | Israeli schnitzel and nuggets: poultry, mostly chicken (file 11 §26.9); lowered beside הודו/תירס/חציל/טבעוני | likely |
+| כנפיים, שוקיים, קורקבנים, שווארמה, ציר | wings, drumsticks, gizzards (usually chicken), shawarma (turkey or chicken), stock | suspected |
+
+### 10.10 Gelatin — ג'לטין
+
+| Term | Meaning | Use |
+|---|---|---|
+| ג'לטין | gelatin | direct |
+| פנקוטה, פנה קוטה, מרשמלו, סוכריות גומי, דובוני גומי | gelatin desserts and sweets (§7.1) | likely |
+| ג'לי, מוס, עוגת גבינה קרה | jelly, mousse, no-bake cheesecake | suspected |
+
+### 10.11 Yam — יאמאימו
+
+| Term | Meaning | Use |
+|---|---|---|
+| יאמאימו, נאגאימו, טורורו | Japanese mountain yam and grated yam (transliterations, **unreviewed**) | direct |
+| אוקונומיאקי | okonomiyaki, whose batter often holds grated yam | suspected |
+
+**בטטה is sweet potato, never yam** (file 11 §26.11), and is not a term.
+
+### 10.12 US menu words that look like these foods
+
+| Words | What they are | Use |
+|---|---|---|
+| candied yams, yams | sweet potato on a US menu (file 11 §26.11) | not a term |
+| banana peppers | a mild chilli | lowered (banana) |
+| orange roughy, orange wine | a fish; a skin-contact white wine (file 11 §26.6) | lowered (orange) |
+| chicken-fried steak | beef steak fried like chicken | lowered (chicken); beef stays likely |
+| turkey bacon, turkey ham, beef bacon | not pork | lowered (pork) |
+| orange chicken, duck à l'orange | orange sauce | direct (orange) |
+
+## 13. Hebrew menu terms for the sensitivities (issue #342)
+
+**Status: unreviewed desk research, added 2026-10-21.** The food facts are
+file 11 §29 and its sources (checked 2026-10-21 as search excerpts). No
+Hebrew clinical page was consulted: one Hebrew press excerpt confirms that
+MSG (E621) is found in soup powders, preserves, processed meat and sauces
+(https://www.ynet.co.il/health/article/5455263 **[M]**). The Hebrew
+spellings themselves are the app's own lexicon and need a native-speaking
+dietitian. Spelling variants follow §1 (geresh and apostrophe read alike;
+gershayim are dropped, so תפו"א reads as תפוא).
+
+### 13.1 Nightshades — סולניים
+
+| Term | Meaning | Use |
+|---|---|---|
+| עגבנייה, עגבניה, עגבניות, עגבניית; תפוח אדמה, תפוחי אדמה, תפו"א; חציל, חצילים | tomato, potato, aubergine | direct |
+| פלפל, פלפלים, גמבה, פלפלון, פלפלונים, פפריקה, צ'ילי, חלפיניו (חלאפיניו, חלפניו), הבנרו, צ'יפוטלה, גוג'י | peppers, chilli, paprika, goji | direct; פלפל lowered beside שחור, לבן, אנגלי (allspice), ורוד, גרוס, לימון, סצ'ואן and after מלח ("מלח ופלפל") |
+| קטשופ, סלסה (סלסת), מרינרה, בולונז, ארביאטה, רוטב אדום, שקשוקה, מטבוחה, גולאש, מוסקה, באבא גנוש, סביח, סלט ישראלי | tomato, pepper or aubergine dishes | likely |
+| סחוג, הריסה (אריסה), טבסקו | chilli pastes and sauces | likely |
+| צ'יפס, פוטטוס, פירה | fries, wedges, mash (potato) | likely; צ'יפס lowered before בטטה, קישוא, פולנטה |
+| ניוקי, פיצה, חריף, חריפה | often potato, tomato sauce, chilli | suspected; פיצה lowered before לבנה/ביאנקה |
+
+### 13.2 MSG — מונוסודיום גלוטמט
+
+| Term | Meaning | Use |
+|---|---|---|
+| מונוסודיום גלוטמט, גלוטמט, גלוטומט; MSG and E621 in Latin letters | MSG named | direct |
+| משפר טעם, משפרי טעם, מגבר טעם, מגברי טעם, מעצים טעם | "flavour enhancer" | likely |
+| אבקת מרק, קוביית מרק (קובית מרק), קוביות מרק, תמצית שמרים | soup powder, stock cubes, yeast extract | suspected |
+
+"ללא תוספת" (no added) and ללא/בלי lower every term, a Latin "MSG" too.
+
+### 13.3 Caffeine — קפאין
+
+| Term | Meaning | Use |
+|---|---|---|
+| קפאין, קפה, נסקפה, אספרסו, הפוך, קפוצ'ינו, לאטה, אמריקנו, מקיאטו, קורטדו, מוקה, ריסטרטו, תה שחור, תה ירוק, מאצ'ה, קולה, משקה אנרגיה, משקאות אנרגיה | coffee, tea, cola, energy drinks | direct; הפוך takes no free prefix (להפוך is "to flip"), nor קולה (שקולה is "balanced") |
+| תה (and ותה, התה), צ'אי, טירמיסו | tea, chai, tiramisu | likely; תה takes no free prefix (שתה "drank", כתה "class"); lowered before צמחים, נענע, קמומיל, פירות, לואיזה, רויבוס, ג'ינג'ר, זנגביל, היביסקוס (תה נענע is often black tea with mint, so this only lowers) |
+| שוקולד, קקאו | chocolate, cocoa | suspected; שוקולד לבן lowered |
+
+נטול קפאין, ללא קפאין and דקף lower, never cancel: decaf keeps a little
+caffeine (file 11 §29.3).
+
+### 13.4 Salicylates — סליצילטים (unreviewed)
+
+All suspected, as file 11 §29.4: קארי, גרם מסאלה, פפריקה, טימין,
+רוזמרין, נענע, מנטה, פטל, אוכמניות, חמוציות, פירות יער, צימוקים, שזיפים
+מיובשים, פירות יבשים, דבש, תה, ליקריץ, שקד, שקדים, רסק עגבניות, מלפפון
+חמוץ, מלפפונים חמוצים, ווסטרשייר. "שקדי מרק" (soup croutons) is not an
+almond and does not match.
+
+### 13.5 Oral allergy syndrome — תסמונת אלרגיה אוראלית
+
+| Term | Meaning | Use |
+|---|---|---|
+| תפוח, תפוחים, תפוחי עץ, אפרסק, דובדבן, אגס, שזיף (and plurals), קיווי, גזר (וגזר, הגזר, בגזר), מלון (ומלון), אבטיח, בננה, בננות, מלפפון, מלפפונים, קישוא, קישואים | raw birch- and ragweed-group fruit and vegetables | direct; lowered by a cooked form: before (ריבת, ריבה, עוגת, פאי, קומפוט, מרק, שטרודל, טארט, קרמבל, רסק, לחם, מאפה) or after (אפוי, מבושל, קלוי, צלוי, מקורמל, מטוגן, מוקפץ, כבוש, חמוץ and their inflections); תפוח lowered before אדמה (potato) |
+| סלרי, אגוזי לוז, אגוז לוז, שקד, שקדים | celery and nuts | direct, with no cooking guard (they may react cooked) |
+| סלט פירות, סלט ישראלי | raw fruit; raw cucumber | likely |
+| סמוטי, שייק פירות, קולסלאו, סלט ירקות | often raw fruit, carrot or cucumber | suspected |
+
+גזר and מלון take no free prefix: מגזר is a sector, במלון "at the hotel"
+(מלון is also "hotel"). "לוז" alone is not listed: as לו"ז it is a
+schedule.
+
+## 11. Hebrew menu terms for corn, sunflower seed, flaxseed and chestnut (issue #342)
+
+**Status: desk research, added on 2026-10-21, not clinical review.** The
+English food facts behind these tables are file 11 §27 (and §2.5 for
+chestnut), whose sources were checked that day as search results. A
+Hebrew search for corn, sunflower and flax allergy guidance (checked
+2026-10-21) found no Israeli clinical page on any of the three; the
+nearest Israeli result is a 2023 recall of a "קורנפלור עמילן תירס"
+product for undeclared soy
+([כיפה](https://www.kipa.co.il/חדשות/1152800-0) **[M]**), which confirms
+only that Israeli shelves sell cornstarch under the name קורנפלור.
+**Still unreviewed:** the Hebrew spellings themselves, which need a
+native-speaking dietitian, as §7 says of its own tables. Spelling
+variants follow §1 (geresh and apostrophe read alike; the parser allows
+the grammatical prefixes ב/ה/ו/כ/ל/מ/ש).
+
+### 11.1 Corn — תירס
+
+| Term | Meaning | Use |
+|---|---|---|
+| תירס (and תירס גמדי, גרעיני תירס, שניצל תירס, קמח תירס) | corn, baby corn, corn kernels, a corn schnitzel, corn flour | direct |
+| פולנטה, פופקורן, קורנפלקס | polenta, popcorn, cornflakes (the Israeli schnitzel coating) | direct |
+| נאצ'וס, במבה, ארפה | nachos, Bamba (puffed maize, file 11 §27.2), arepa | likely |
+| טורטייה, טורטיה, טורטיות, טורטיית, טאקו | tortilla (corn or wheat), taco | suspected |
+| קורנפלור, עמילן תירס, שמן תירס, סירופ תירס | cornstarch (the Israeli name), corn oil, corn syrup | suspected; תירס lowered after שמן/סירופ/עמילן |
+
+### 11.2 Sunflower seed — גרעיני חמנייה
+
+| Term | Meaning | Use |
+|---|---|---|
+| חמנייה, חמניה, חמניות, חמנית (and גרעיני חמנייה; וחמנייה and the other "and" forms listed) | sunflower, sunflower seeds | direct; no free prefix, because ל + חמנייה is לחמנייה, a bread roll; lowered after שמן |
+| גרעינים | "seeds": on an Israeli menu or snack stand usually sunflower seeds | suspected; lowered before דלעת/אבטיח/רימון |
+| שמן חמניות | sunflower oil (often tolerated refined, file 11 §27.3) | suspected |
+| לחם דגנים, לחמניית דגנים, רב דגנים, לחם זרעים, תערובת זרעים, קרקר זרעים | seeded and multigrain breads and seed mixes | suspected (shared with §11.3) |
+
+A bare חלבה is tahini halva in Israel (§1.1), not a sunflower trigger.
+
+### 11.3 Flaxseed — זרעי פשתן
+
+| Term | Meaning | Use |
+|---|---|---|
+| פשתן, זרעי פשתן (and שמן פשתן, קרקר פשתן) | flax, flaxseed, flax oil, flax crackers | direct |
+| לחם דגנים, לחמניית דגנים, רב דגנים, לחם זרעים, תערובת זרעים, קרקר זרעים | seeded breads that often hold flax (file 11 §27.4) | suspected |
+
+### 11.4 Chestnut — ערמונים (tree nuts)
+
+| Term | Meaning | Use |
+|---|---|---|
+| ערמונים, ערמון | chestnuts | suspected tree-nut trigger (file 11 §2.5, §27.5: FARE yes, EU and FDA since 2025 no) |
+| ערמוני מים | water chestnuts, an aquatic vegetable | not a trigger: the construct form ערמוני is not a term, and מים lowers ערמונים/ערמון beside it |
+
+## 12. Hebrew menu terms for the single legumes (issue #342)
+
+**Status: desk research, added and checked 2026-10-21, not reviewed by a
+native-speaking dietitian or an allergist.** The food facts are file 11
+§28, with their sources, and §1.3 above. Confirmed on the web, as search
+snippets: **מסבחה** is whole chickpeas, served warm with a lemon-garlic
+sauce and often tahini, and **משאוושה** is "the Galilean version of
+masabacha" (Ynet, https://www.ynet.co.il/articles/mobile/0,7340,L-3221930,00.html **[M]**;
+Wolt menu text of an Israeli hummus place,
+https://wolt.com/en/isr/modiin/restaurant/hummus-assaf **[W]**);
+**חילבה** is fenugreek seed, "זרעי גרגרנית יוונית", and Yemenite meals
+come with "חילבה וזחוק" (Hamichlol, *The Yemenite kitchen*,
+https://www.hamichlol.org.il/המטבח_התימני **[W]**). The corpus's real Wolt
+menu prints "*חלבון אפונה וסויה" under a vegan burger (file
+`test/fixtures/wolt_hamosad_menu.json`), so pea protein does reach an
+Israeli menu. **Still unreviewed:** every other Hebrew spelling below,
+which no web source confirms; as §7 says, they are the app's own lexicon.
+Spelling variants follow §1 (geresh and apostrophe read alike; the parser
+allows the prefixes ב/ה/ו/כ/ל/מ/ש unless a term is listed as taking none).
+
+### 12.1 Chickpea — גרגרי חומוס
+
+| Term | Meaning | Use |
+|---|---|---|
+| חומוס, הומוס, גרגירי חומוס, גרגרי חומוס, חימצה | chickpea, hummus, whole chickpeas, green chickpeas | direct |
+| מסבחה, מסבאחה, משאוושה | whole-chickpea dishes | direct |
+| קמח חומוס | chickpea flour | direct, through חומוס |
+| פלאפל | falafel: chickpea in Israel | likely |
+| סביח | often served with hummus or chickpeas | suspected |
+
+### 12.2 Lentil — עדשים
+
+| Term | Meaning | Use |
+|---|---|---|
+| עדשים, עדשה, מרק עדשים | lentils, lentil soup | direct |
+| מג'דרה, מוג'דרה, מג'אדרה | mujadara | direct |
+
+### 12.3 Pea — אפונה
+
+| Term | Meaning | Use |
+|---|---|---|
+| אפונה, חלבון אפונה | peas, pea protein | direct (חלבון אפונה through אפונה) |
+| המבורגר טבעוני, בשר טבעוני, תחליף בשר, שניצל טבעוני, קציצות טבעוניות, ביונד מיט, ביונד בורגר, חלבון צמחי | plant-based meat and "vegetable protein" | suspected (file 11 §16.2) |
+| סמוסה | samosa | suspected (file 11 §28.3) |
+
+### 12.4 Fenugreek — חילבה
+
+| Term | Meaning | Use |
+|---|---|---|
+| חילבה, גרגרנית (as in גרגרנית יוונית) | fenugreek, the condiment and the plant | direct |
+| מרק תימני | Yemenite soup, served with hilbeh (§1.3) | suspected |
+| חוויג', חוואייג' | hawaij, a spice blend that sometimes holds fenugreek | suspected |
+| אבקת קארי | curry powder | suspected; not the bare קארי, which would flood |
+
+**Never חלבה:** חלבה is halva, a sesame sweet (§1.1). A Yemenite spelling
+of hilbeh as חלבה exists in speech but cannot be a term. סחוג is not
+listed (file 11 §28.4).
+
+### 12.5 Fava — פול
+
+| Term | Meaning | Use |
+|---|---|---|
+| פול (and הפול, בפול, ופול), פולים, פול מדמס, פול ירוק | fava beans, ful medames | direct; פול takes no free prefix |
+| פלאפל | falafel: rarely fava in Israel (file 11 §28.5) | suspected |
+
+**Words פול must not match:** כפול ("double", as in אספרסו כפול), which is
+why פול takes no free prefix and its real prefixed forms are listed;
+**פולי**, the construct form, which on a menu is פולי סויה (soybeans),
+פולי קפה (coffee beans) or פולי קקאו (cocoa beans) and is never listed;
+and longer words (פולני, "Polish"), which the right-hand boundary already
+excludes.
+
+---
+
 ## Sources
 
 Grades: **[S]** strong (official, clinical, peer-reviewed, manufacturer),

@@ -97,7 +97,8 @@ def test_model_findings_runs_the_matcher_on_ingredient_names() -> None:
 
 def test_model_findings_cuts_a_hit_to_the_ingredients_certainty() -> None:
     found = ev.model_findings([{"name": "tahini", "certainty": "suspected"}])
-    assert found == {"sesame": "suspected"}
+    # Tahini is sesame, and a seed AIP leaves out (file 11 §30.4).
+    assert found == {"sesame": "suspected", "aip": "suspected"}
 
 
 def test_model_findings_skips_anything_malformed() -> None:

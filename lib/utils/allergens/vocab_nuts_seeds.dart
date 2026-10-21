@@ -282,6 +282,99 @@ const List<HiddenTrigger> peanutHiddenHe = <HiddenTrigger>[
   ),
 ];
 
+/// Tree nuts' direct English triggers (11 §2.1). Public because the
+/// diets that leave out nuts (`vocab_diets_extra.dart`) spread them.
+const List<String> treeNutsDirectEn = <String>[
+  'tree nut',
+  'tree nuts',
+  'almond',
+  'almonds',
+  'hazelnut',
+  'hazelnuts',
+  'filbert',
+  'filberts',
+  'walnut',
+  'walnuts',
+  'cashew',
+  'cashews',
+  'pecan',
+  'pecans',
+  'pistachio',
+  'pistachios',
+  'macadamia',
+  'macadamias',
+  'queensland nut',
+  'brazil nut',
+  'brazil nuts',
+  'pine nut',
+  'pine nuts',
+  'pine kernel',
+  'pine kernels',
+  'pignoli',
+  'pili nut',
+  'pili nuts',
+  'marzipan',
+  'praline',
+  'pralines',
+  'frangipane',
+  'gianduja',
+];
+
+/// [treeNutsDirectEn] in Hebrew (12 §1.2).
+const List<String> treeNutsDirectHe = <String>[
+  'שקדים',
+  'שקד',
+  'לוז',
+  'אגוזי מלך',
+  'אגוז מלך',
+  'פקאן',
+  'קשיו',
+  'פיסטוק',
+  'פיסטוקים',
+  'אגוזי ברזיל',
+  'אגוז ברזיל',
+  'מקדמיה',
+  'צנוברים',
+  'צנובר',
+  'אגוזי עץ',
+  'מרציפן',
+  'פרלין',
+  'פראלין',
+];
+
+/// Sesame's direct English triggers (11 §11.1). Public because the diets
+/// that leave out seeds (`vocab_diets_extra.dart`) spread them.
+const List<String> sesameDirectEn = <String>[
+  'sesame',
+  'tahini',
+  'tahina',
+  'tehina',
+  'techina',
+  'halva',
+  'halvah',
+  'helva',
+  'benne',
+  'gingelly',
+  'gomasio',
+  'sesamol',
+  'sesamum',
+];
+
+/// [sesameDirectEn] in Hebrew (12 §1.1).
+const List<String> sesameDirectHe = <String>[
+  'שומשום',
+  'שומשומים',
+  'שומשומין',
+  'סומסום',
+  'סומסומים',
+  'סומסומין',
+  'טחינה',
+  'טחינא',
+  'טחינת',
+  'חלבה',
+  'חלווה',
+];
+
 /// Nuts and seeds: one entry per restriction this group owns.
 const Map<RestrictionId, RestrictionVocabulary>
 nutsSeedsVocabulary = <RestrictionId, RestrictionVocabulary>{
@@ -299,61 +392,8 @@ nutsSeedsVocabulary = <RestrictionId, RestrictionVocabulary>{
     sources: <String>['11 §1.1', '11 §1.3', '11 §1.5', '12 §1.2'],
   ),
   RestrictionId.treeNuts: RestrictionVocabulary(
-    directEn: <String>[
-      'tree nut',
-      'tree nuts',
-      'almond',
-      'almonds',
-      'hazelnut',
-      'hazelnuts',
-      'filbert',
-      'filberts',
-      'walnut',
-      'walnuts',
-      'cashew',
-      'cashews',
-      'pecan',
-      'pecans',
-      'pistachio',
-      'pistachios',
-      'macadamia',
-      'macadamias',
-      'queensland nut',
-      'brazil nut',
-      'brazil nuts',
-      'pine nut',
-      'pine nuts',
-      'pine kernel',
-      'pine kernels',
-      'pignoli',
-      'pili nut',
-      'pili nuts',
-      'marzipan',
-      'praline',
-      'pralines',
-      'frangipane',
-      'gianduja',
-    ],
-    directHe: <String>[
-      'שקדים',
-      'שקד',
-      'לוז',
-      'אגוזי מלך',
-      'אגוז מלך',
-      'פקאן',
-      'קשיו',
-      'פיסטוק',
-      'פיסטוקים',
-      'אגוזי ברזיל',
-      'אגוז ברזיל',
-      'מקדמיה',
-      'צנוברים',
-      'צנובר',
-      'אגוזי עץ',
-      'מרציפן',
-      'פרלין',
-      'פראלין',
-    ],
+    directEn: treeNutsDirectEn,
+    directHe: treeNutsDirectHe,
     hiddenEn: <HiddenTrigger>[
       // A bare "nuts" and the unnamed nut products 11 §2.2 lists.
       HiddenTrigger(
@@ -502,6 +542,31 @@ nutsSeedsVocabulary = <RestrictionId, RestrictionVocabulary>{
         certainty: TriggerCertainty.suspected,
         source: '12 §5',
       ),
+      // Chestnut: a tree nut for FARE, not for the EU list, Anaphylaxis UK
+      // or the FDA since 2025, and allergy to it is unusual, so a
+      // low-confidence trigger with a jurisdiction note (11 §2.5, §27.5).
+      // A water chestnut is an aquatic vegetable, lowered by its term
+      // guard.
+      HiddenTrigger(
+        term: 'chestnut',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §2.5',
+      ),
+      HiddenTrigger(
+        term: 'chestnuts',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §2.5',
+      ),
+      HiddenTrigger(
+        term: 'marrons glaces',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §27.5',
+      ),
+      HiddenTrigger(
+        term: 'marron glace',
+        certainty: TriggerCertainty.suspected,
+        source: '11 §27.5',
+      ),
     ],
     hiddenHe: <HiddenTrigger>[
       // A bare "אגוזים" on an Israeli menu is tree nuts first (12 §1.2);
@@ -597,6 +662,18 @@ nutsSeedsVocabulary = <RestrictionId, RestrictionVocabulary>{
         certainty: TriggerCertainty.suspected,
         source: '12 §5',
       ),
+      // Chestnut (11 §2.5; 12 §11.4). The construct form ערמוני is not a
+      // term, so "ערמוני מים" (water chestnuts) never reads as one.
+      HiddenTrigger(
+        term: 'ערמונים',
+        certainty: TriggerCertainty.suspected,
+        source: '12 §11.4',
+      ),
+      HiddenTrigger(
+        term: 'ערמון',
+        certainty: TriggerCertainty.suspected,
+        source: '12 §11.4',
+      ),
     ],
     guards: AllergenGuards(
       beforeEn: <String>[
@@ -616,37 +693,17 @@ nutsSeedsVocabulary = <RestrictionId, RestrictionVocabulary>{
       beforeHe: <String>['ללא', 'בלי', 'וללא', 'ובלי'],
       afterHe: <String>['ללא אגוזים', 'בלי אגוזים'],
     ),
+    termGuards: <String, AllergenGuards>{
+      'chestnut': AllergenGuards(beforeEn: <String>['water']),
+      'chestnuts': AllergenGuards(beforeEn: <String>['water']),
+      'ערמונים': AllergenGuards(afterHe: <String>['מים']),
+      'ערמון': AllergenGuards(afterHe: <String>['מים']),
+    },
     sources: <String>['11 §2.1', '11 §2.3', '11 §2.5', '12 §1.2'],
   ),
   RestrictionId.sesame: RestrictionVocabulary(
-    directEn: <String>[
-      'sesame',
-      'tahini',
-      'tahina',
-      'tehina',
-      'techina',
-      'halva',
-      'halvah',
-      'helva',
-      'benne',
-      'gingelly',
-      'gomasio',
-      'sesamol',
-      'sesamum',
-    ],
-    directHe: <String>[
-      'שומשום',
-      'שומשומים',
-      'שומשומין',
-      'סומסום',
-      'סומסומים',
-      'סומסומין',
-      'טחינה',
-      'טחינא',
-      'טחינת',
-      'חלבה',
-      'חלווה',
-    ],
+    directEn: sesameDirectEn,
+    directHe: sesameDirectHe,
     hiddenEn: <HiddenTrigger>[
       // Hummus, baba ghanoush, bourekas, sabich and za'atar: the dishes
       // that carry sesame without saying so.

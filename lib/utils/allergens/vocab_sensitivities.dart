@@ -2,31 +2,1429 @@
 /// salicylates and oral allergy syndrome (Banto; issue #342; file 03, "The
 /// map"; file 02, "Less common allergens worth supporting").
 ///
-/// All five are heads-up restrictions (`headsUpRestrictions` in
-/// `taxonomy.dart`): a menu never states a dose, so `ProfileEvaluator`
-/// reads every concern of theirs as "may be high in …", and none ever
-/// moves a dish.
-///
-/// **Empty until its follow-up fills it**: this file is the contract step,
-/// so every id is registered and no menu verdict changes. The picker
-/// offers a restriction only once its vocabulary holds a term
-/// (`restrictionOffered`), so none of these can be added yet.
-///
-/// Every term must cite its section, as `vocabulary_test.dart` checks;
-/// after a change, regenerate the goldens and copy `allergens.json` to
+/// Every term comes from
+/// `allergen app documentation/11_hidden_allergen_sources.md` §29 or
+/// `12_israeli_and_us_menu_lexicon.md` §13 and its source cites the
+/// section, which `test/utils/allergens/vocabulary_test.dart` checks. After
+/// a change, regenerate the goldens and copy `allergens.json` to
 /// `backend/app/keto/` (architecture.md D26).
+///
+/// All five are heads-up restrictions (`headsUpRestrictions` in
+/// `taxonomy.dart`), as FODMAP and histamine are in `vocab_extended.dart`:
+/// a menu never states a dose, so `ProfileEvaluator` reads every concern of
+/// theirs as "may be high in …", whatever its certainty here, and none
+/// ever moves a dish. The certainties still say how sure the matcher is
+/// that the food is there: a named tomato is stated, a ketchup likely, a
+/// pizza suspected.
+///
+/// - **Nightshades** are the tomato, potato, aubergine and capsicum family;
+///   sweet potato and black pepper are not, and lower the trigger beside
+///   them.
+/// - **MSG** is stated only where the menu names it (MSG, E621,
+///   monosodium glutamate); no dish is assumed to hold it for its cuisine.
+/// - **Caffeine**: decaf, herbal tea and white chocolate lower it, never
+///   cancel it (decaf is not caffeine-free).
+/// - **Salicylates** rest on thin, contested data (file 11 §29.4 is
+///   unreviewed desk research), so every term is hidden and suspected.
+/// - **Oral allergy syndrome** is about raw fruit and vegetables; a cooked
+///   form beside one lowers it, except celery and nuts, which may still
+///   react cooked. The waiter question asks whether it is raw.
 library;
 
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/vocabulary_types.dart';
 
-/// Sensitivities: one entry per restriction this group owns, each empty
-/// until its follow-up fills it.
+/// The cooked and processed forms that lower an English oral allergy
+/// trigger: the heat-labile proteins behind the syndrome rarely survive
+/// cooking (11 §29.5).
+const AllergenGuards _cookedEn = AllergenGuards(
+  beforeEn: <String>[
+    'baked',
+    'cooked',
+    'roasted',
+    'grilled',
+    'stewed',
+    'poached',
+    'caramelised',
+    'caramelized',
+    'fried',
+    'braised',
+    'sauteed',
+    'glazed',
+    'pickled',
+    'candied',
+  ],
+  afterEn: <String>[
+    'pie',
+    'pies',
+    'jam',
+    'crumble',
+    'compote',
+    'cake',
+    'tart',
+    'sauce',
+    'puree',
+    'soup',
+    'strudel',
+    'chutney',
+    'jelly',
+    'bread',
+    'muffin',
+    'muffins',
+    'cider',
+    'vinegar',
+    'pickle',
+    'pickles',
+  ],
+);
+
+/// [_cookedEn], plus the cherry tomato, which is not a cherry.
+const AllergenGuards _cookedCherryEn = AllergenGuards(
+  beforeEn: <String>[
+    'baked',
+    'cooked',
+    'roasted',
+    'grilled',
+    'stewed',
+    'poached',
+    'caramelised',
+    'caramelized',
+    'fried',
+    'braised',
+    'sauteed',
+    'glazed',
+    'pickled',
+    'candied',
+  ],
+  afterEn: <String>[
+    'pie',
+    'pies',
+    'jam',
+    'crumble',
+    'compote',
+    'cake',
+    'tart',
+    'sauce',
+    'puree',
+    'soup',
+    'strudel',
+    'chutney',
+    'jelly',
+    'bread',
+    'muffin',
+    'muffins',
+    'cider',
+    'vinegar',
+    'pickle',
+    'pickles',
+    'tomato',
+    'tomatoes',
+  ],
+);
+
+/// The cooked and processed forms that lower a Hebrew oral allergy
+/// trigger: a construct before it ("ריבת דובדבנים") or an adjective
+/// after it ("גזר מבושל") (12 §13.5).
+const AllergenGuards _cookedHe = AllergenGuards(
+  beforeHe: <String>[
+    'ריבת',
+    'ריבה',
+    'עוגת',
+    'פאי',
+    'קומפוט',
+    'מרק',
+    'שטרודל',
+    'טארט',
+    'קרמבל',
+    'רסק',
+    'לחם',
+    'מאפה',
+  ],
+  afterHe: <String>[
+    'אפוי',
+    'אפויה',
+    'אפויים',
+    'אפויות',
+    'מבושל',
+    'מבושלת',
+    'מבושלים',
+    'מבושלות',
+    'קלוי',
+    'קלויה',
+    'קלויים',
+    'קלויות',
+    'צלוי',
+    'צלויה',
+    'צלויים',
+    'צלויות',
+    'מקורמל',
+    'מקורמלת',
+    'מקורמלים',
+    'מטוגן',
+    'מטוגנים',
+    'מוקפץ',
+    'מוקפצים',
+    'כבוש',
+    'כבושים',
+    'חמוץ',
+    'חמוצים',
+  ],
+);
+
+/// [_cookedHe], plus the potato: "תפוח אדמה" is not an apple.
+const AllergenGuards _cookedAppleHe = AllergenGuards(
+  beforeHe: <String>[
+    'ריבת',
+    'ריבה',
+    'עוגת',
+    'פאי',
+    'קומפוט',
+    'מרק',
+    'שטרודל',
+    'טארט',
+    'קרמבל',
+    'רסק',
+    'לחם',
+    'מאפה',
+  ],
+  afterHe: <String>[
+    'אפוי',
+    'אפויה',
+    'אפויים',
+    'אפויות',
+    'מבושל',
+    'מבושלת',
+    'מבושלים',
+    'מבושלות',
+    'קלוי',
+    'קלויה',
+    'קלויים',
+    'קלויות',
+    'צלוי',
+    'צלויה',
+    'צלויים',
+    'צלויות',
+    'מקורמל',
+    'מקורמלת',
+    'מקורמלים',
+    'מטוגן',
+    'מטוגנים',
+    'מוקפץ',
+    'מוקפצים',
+    'כבוש',
+    'כבושים',
+    'חמוץ',
+    'חמוצים',
+    'אדמה',
+  ],
+);
+
+/// The sensitivities' vocabularies (issue #342).
 const Map<RestrictionId, RestrictionVocabulary> sensitivitiesVocabulary =
     <RestrictionId, RestrictionVocabulary>{
-      RestrictionId.nightshades: RestrictionVocabulary.empty,
-      RestrictionId.msg: RestrictionVocabulary.empty,
-      RestrictionId.caffeine: RestrictionVocabulary.empty,
-      RestrictionId.salicylates: RestrictionVocabulary.empty,
-      RestrictionId.oralAllergy: RestrictionVocabulary.empty,
+      // Nightshades: tomato, potato, aubergine, peppers and chilli, and
+      // the dishes and sauces made of them (11 §29.1, 12 §13.1).
+      RestrictionId.nightshades: RestrictionVocabulary(
+        directEn: <String>[
+          'tomato',
+          'tomatoes',
+          'potato',
+          'potatoes',
+          'patatas',
+          'eggplant',
+          'eggplants',
+          'aubergine',
+          'aubergines',
+          'peppers',
+          'bell pepper',
+          'bell peppers',
+          'red pepper',
+          'green pepper',
+          'yellow pepper',
+          'roasted pepper',
+          'roasted peppers',
+          'sweet pepper',
+          'hot pepper',
+          'chili pepper',
+          'chilli pepper',
+          'chili',
+          'chilli',
+          'chilies',
+          'chillies',
+          'jalapeno',
+          'jalapenos',
+          'habanero',
+          'chipotle',
+          'poblano',
+          'pimento',
+          'pimiento',
+          'peperoncino',
+          'paprika',
+          'cayenne',
+          'goji',
+          'tomatillo',
+          'tomatillos',
+          'pomodoro',
+        ],
+        directHe: <String>[
+          'עגבנייה',
+          'עגבניה',
+          'עגבניות',
+          'עגבניית',
+          'תפוח אדמה',
+          'תפוחי אדמה',
+          'תפו"א',
+          'חציל',
+          'חצילים',
+          'פלפל',
+          'פלפלים',
+          'גמבה',
+          'פלפלון',
+          'פלפלונים',
+          'פפריקה',
+          "צ'ילי",
+          'חלפיניו',
+          'חלאפיניו',
+          'חלפניו',
+          'הבנרו',
+          "צ'יפוטלה",
+          "גוג'י",
+        ],
+        hiddenEn: <HiddenTrigger>[
+          HiddenTrigger(
+            term: 'pepper',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'ketchup',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'salsa',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'marinara',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'bolognese',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'arrabbiata',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'shakshuka',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'harissa',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'sriracha',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'tabasco',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'hot sauce',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'gochujang',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'sambal',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'gazpacho',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'ratatouille',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'moussaka',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'baba ganoush',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'baba ghanoush',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'goulash',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'fries',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'hash brown',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'hash browns',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'gnocchi',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'pizza',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.1',
+          ),
+          HiddenTrigger(
+            term: 'spicy',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.1',
+          ),
+        ],
+        hiddenHe: <HiddenTrigger>[
+          HiddenTrigger(
+            term: 'קטשופ',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'סלסה',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'סלסת',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'טבסקו',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'פוטטוס',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'שקשוקה',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'מטבוחה',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'סחוג',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'הריסה',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'אריסה',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'מרינרה',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'בולונז',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'ארביאטה',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'רוטב אדום',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'גולאש',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'מוסקה',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'באבא גנוש',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'סביח',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'סלט ישראלי',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'פירה',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: "צ'יפס",
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'ניוקי',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'פיצה',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'חריף',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.1',
+          ),
+          HiddenTrigger(
+            term: 'חריפה',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.1',
+          ),
+        ],
+        guards: AllergenGuards(
+          beforeEn: <String>['no', 'without'],
+          afterEn: <String>['free'],
+          beforeHe: <String>['ללא', 'וללא', 'בלי', 'ובלי'],
+        ),
+        termGuards: <String, AllergenGuards>{
+          'potato': AllergenGuards(beforeEn: <String>['sweet']),
+          'potatoes': AllergenGuards(beforeEn: <String>['sweet']),
+          'fries': AllergenGuards(
+            beforeEn: <String>[
+              'sweet potato',
+              'zucchini',
+              'courgette',
+              'cassava',
+              'yuca',
+              'polenta',
+              'halloumi',
+              'carrot',
+              'parsnip',
+            ],
+          ),
+          'pepper': AllergenGuards(
+            beforeEn: <String>[
+              'black',
+              'white',
+              'pink',
+              'sichuan',
+              'szechuan',
+              'cracked',
+              'ground',
+              'salt',
+              'salt and',
+              'lemon',
+            ],
+            afterEn: <String>['sauce', 'crust', 'crusted', 'steak'],
+          ),
+          'pizza': AllergenGuards(
+            beforeEn: <String>['white'],
+            afterEn: <String>['bianca'],
+          ),
+          'פלפל': AllergenGuards(
+            beforeHe: <String>['מלח'],
+            afterHe: <String>[
+              'שחור',
+              'לבן',
+              'אנגלי',
+              'ורוד',
+              'גרוס',
+              'לימון',
+              "סצ'ואן",
+            ],
+          ),
+          "צ'יפס": AllergenGuards(
+            afterHe: <String>['בטטה', 'קישוא', 'קישואים', 'פולנטה'],
+          ),
+          'פיצה': AllergenGuards(afterHe: <String>['לבנה', 'ביאנקה']),
+        },
+        sources: <String>['11 §29.1', '12 §13.1'],
+      ),
+      // MSG: only a word that names it is stated; flavour enhancers,
+      // stock powders and yeast extract are hidden (11 §29.2,
+      // 12 §13.2). No dish is assumed to hold MSG for its cuisine.
+      RestrictionId.msg: RestrictionVocabulary(
+        directEn: <String>[
+          'msg',
+          'monosodium glutamate',
+          'glutamate',
+          'e621',
+          'e 621',
+        ],
+        directHe: <String>['מונוסודיום גלוטמט', 'גלוטמט', 'גלוטומט'],
+        hiddenEn: <HiddenTrigger>[
+          HiddenTrigger(
+            term: 'flavour enhancer',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.2',
+          ),
+          HiddenTrigger(
+            term: 'flavor enhancer',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.2',
+          ),
+          HiddenTrigger(
+            term: 'flavour enhancers',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.2',
+          ),
+          HiddenTrigger(
+            term: 'flavor enhancers',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.2',
+          ),
+          HiddenTrigger(
+            term: 'stock cube',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.2',
+          ),
+          HiddenTrigger(
+            term: 'stock cubes',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.2',
+          ),
+          HiddenTrigger(
+            term: 'bouillon',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.2',
+          ),
+          HiddenTrigger(
+            term: 'stock powder',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.2',
+          ),
+          HiddenTrigger(
+            term: 'soup powder',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.2',
+          ),
+          HiddenTrigger(
+            term: 'yeast extract',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.2',
+          ),
+          HiddenTrigger(
+            term: 'hydrolyzed vegetable protein',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.2',
+          ),
+          HiddenTrigger(
+            term: 'hydrolysed vegetable protein',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.2',
+          ),
+        ],
+        hiddenHe: <HiddenTrigger>[
+          HiddenTrigger(
+            term: 'משפר טעם',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'משפרי טעם',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'מגבר טעם',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'מגברי טעם',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'מעצים טעם',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'אבקת מרק',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'קוביית מרק',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'קובית מרק',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'קוביות מרק',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.2',
+          ),
+          HiddenTrigger(
+            term: 'תמצית שמרים',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.2',
+          ),
+        ],
+        guards: AllergenGuards(
+          beforeEn: <String>[
+            'no',
+            'without',
+            'no added',
+            'ללא',
+            'בלי',
+            'ללא תוספת',
+          ],
+          afterEn: <String>['free'],
+          beforeHe: <String>[
+            'ללא',
+            'וללא',
+            'בלי',
+            'ובלי',
+            'ללא תוספת',
+            'בלי תוספת',
+          ],
+        ),
+        termGuards: <String, AllergenGuards>{
+          'glutamate': AllergenGuards(beforeEn: <String>['monosodium']),
+          'גלוטמט': AllergenGuards(beforeHe: <String>['מונוסודיום']),
+          'גלוטומט': AllergenGuards(beforeHe: <String>['מונוסודיום']),
+        },
+        sources: <String>['11 §29.2', '12 §13.2'],
+      ),
+      // Caffeine: coffee, tea, cola and energy drinks; chocolate and
+      // cocoa are low-dose and suspected (11 §29.3, 12 §13.3).
+      RestrictionId.caffeine: RestrictionVocabulary(
+        directEn: <String>[
+          'caffeine',
+          'coffee',
+          'espresso',
+          'cappuccino',
+          'latte',
+          'americano',
+          'macchiato',
+          'cortado',
+          'flat white',
+          'mocha',
+          'ristretto',
+          'lungo',
+          'cold brew',
+          'affogato',
+          'matcha',
+          'black tea',
+          'green tea',
+          'earl grey',
+          'english breakfast',
+          'oolong',
+          'yerba mate',
+          'cola',
+          'energy drink',
+          'energy drinks',
+          'guarana',
+        ],
+        directHe: <String>[
+          'קפאין',
+          'קפה',
+          'נסקפה',
+          'אספרסו',
+          'הפוך',
+          'והפוך',
+          "קפוצ'ינו",
+          'לאטה',
+          'אמריקנו',
+          'מקיאטו',
+          'קורטדו',
+          'מוקה',
+          'ריסטרטו',
+          'תה שחור',
+          'תה ירוק',
+          "מאצ'ה",
+          'קולה',
+          'וקולה',
+          'הקולה',
+          'משקה אנרגיה',
+          'משקאות אנרגיה',
+        ],
+        hiddenEn: <HiddenTrigger>[
+          HiddenTrigger(
+            term: 'tea',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.3',
+          ),
+          HiddenTrigger(
+            term: 'chai',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.3',
+          ),
+          HiddenTrigger(
+            term: 'tiramisu',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.3',
+          ),
+          HiddenTrigger(
+            term: 'chocolate',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.3',
+          ),
+          HiddenTrigger(
+            term: 'cocoa',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.3',
+          ),
+        ],
+        hiddenHe: <HiddenTrigger>[
+          HiddenTrigger(
+            term: 'תה',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.3',
+          ),
+          HiddenTrigger(
+            term: 'ותה',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.3',
+          ),
+          HiddenTrigger(
+            term: 'התה',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.3',
+          ),
+          HiddenTrigger(
+            term: "צ'אי",
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.3',
+          ),
+          HiddenTrigger(
+            term: 'טירמיסו',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.3',
+          ),
+          HiddenTrigger(
+            term: 'שוקולד',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.3',
+          ),
+          HiddenTrigger(
+            term: 'קקאו',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.3',
+          ),
+        ],
+        guards: AllergenGuards(
+          beforeEn: <String>[
+            'no',
+            'without',
+            'decaf',
+            'decaffeinated',
+            'caffeine free',
+            'ללא',
+            'בלי',
+          ],
+          afterEn: <String>['free', 'decaf', 'decaffeinated'],
+          beforeHe: <String>[
+            'ללא',
+            'וללא',
+            'בלי',
+            'ובלי',
+            'דקף',
+            'נטול',
+            'נטולת',
+          ],
+          afterHe: <String>['נטול קפאין', 'נטולת קפאין', 'ללא קפאין', 'דקף'],
+        ),
+        termGuards: <String, AllergenGuards>{
+          'coffee': AllergenGuards(afterEn: <String>['cake']),
+          'latte': AllergenGuards(
+            beforeEn: <String>['turmeric', 'golden', 'beetroot', 'beet'],
+          ),
+          'tea': AllergenGuards(
+            beforeEn: <String>[
+              'herbal',
+              'mint',
+              'peppermint',
+              'chamomile',
+              'camomile',
+              'rooibos',
+              'fruit',
+              'ginger',
+              'hibiscus',
+              'lemongrass',
+              'verbena',
+            ],
+            afterEn: <String>['cake', 'cakes', 'sandwich', 'sandwiches'],
+          ),
+          'chocolate': AllergenGuards(beforeEn: <String>['white']),
+          'תה': AllergenGuards(
+            afterHe: <String>[
+              'צמחים',
+              'נענע',
+              'קמומיל',
+              'פירות',
+              'לואיזה',
+              'רויבוס',
+              "ג'ינג'ר",
+              'זנגביל',
+              'היביסקוס',
+            ],
+          ),
+          'ותה': AllergenGuards(
+            afterHe: <String>[
+              'צמחים',
+              'נענע',
+              'קמומיל',
+              'פירות',
+              'לואיזה',
+              'רויבוס',
+              "ג'ינג'ר",
+              'זנגביל',
+              'היביסקוס',
+            ],
+          ),
+          'התה': AllergenGuards(
+            afterHe: <String>[
+              'צמחים',
+              'נענע',
+              'קמומיל',
+              'פירות',
+              'לואיזה',
+              'רויבוס',
+              "ג'ינג'ר",
+              'זנגביל',
+              'היביסקוס',
+            ],
+          ),
+          'שוקולד': AllergenGuards(afterHe: <String>['לבן']),
+        },
+        noPrefixHe: <String>['הפוך', 'תה', 'ותה', 'התה', 'קולה'],
+        sources: <String>['11 §29.3', '12 §13.3'],
+      ),
+      // Salicylates: the herbs, spices, berries and dried fruit the
+      // published food analyses rate high. The data are thin and
+      // contested, so every term is hidden and suspected (11 §29.4,
+      // 12 §13.4; unreviewed desk research).
+      RestrictionId.salicylates: RestrictionVocabulary(
+        hiddenEn: <HiddenTrigger>[
+          HiddenTrigger(
+            term: 'curry',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'garam masala',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'paprika',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'thyme',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'rosemary',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'mint',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'peppermint',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'raspberry',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'raspberries',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'blackberry',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'blackberries',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'blueberry',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'blueberries',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'cranberry',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'cranberries',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'berries',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'raisins',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'prunes',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'dried fruit',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'honey',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'tea',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'liquorice',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'licorice',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'almond',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'almonds',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'tomato paste',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'gherkin',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'gherkins',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+          HiddenTrigger(
+            term: 'worcestershire',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.4',
+          ),
+        ],
+        hiddenHe: <HiddenTrigger>[
+          HiddenTrigger(
+            term: 'קארי',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'גרם מסאלה',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'פפריקה',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'טימין',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'רוזמרין',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'נענע',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'מנטה',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'פטל',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'אוכמניות',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'חמוציות',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'פירות יער',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'צימוקים',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'שזיפים מיובשים',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'פירות יבשים',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'דבש',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'תה',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'ותה',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'התה',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'ליקריץ',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'שקד',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'שקדים',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'רסק עגבניות',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'מלפפון חמוץ',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'מלפפונים חמוצים',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+          HiddenTrigger(
+            term: 'ווסטרשייר',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.4',
+          ),
+        ],
+        guards: AllergenGuards(
+          beforeEn: <String>['no', 'without'],
+          afterEn: <String>['free'],
+          beforeHe: <String>['ללא', 'וללא', 'בלי', 'ובלי'],
+        ),
+        noPrefixHe: <String>['תה', 'ותה', 'התה'],
+        sources: <String>['11 §29.4', '12 §13.4'],
+      ),
+      // Oral allergy syndrome (pollen-food): the raw fruit, vegetables
+      // and nuts that cross-react with birch and ragweed pollen.
+      // Cooking usually ends it, so a cooked form beside a fruit or
+      // vegetable lowers it (the `_cooked*` guards); celery and nuts
+      // get none, since they may react cooked (11 §29.5, 12 §13.5).
+      RestrictionId.oralAllergy: RestrictionVocabulary(
+        directEn: <String>[
+          'apple',
+          'apples',
+          'peach',
+          'peaches',
+          'cherry',
+          'cherries',
+          'pear',
+          'pears',
+          'plum',
+          'plums',
+          'kiwi',
+          'carrot',
+          'carrots',
+          'melon',
+          'cantaloupe',
+          'honeydew',
+          'watermelon',
+          'banana',
+          'bananas',
+          'cucumber',
+          'cucumbers',
+          'zucchini',
+          'courgette',
+          'celery',
+          'hazelnut',
+          'hazelnuts',
+          'almond',
+          'almonds',
+        ],
+        directHe: <String>[
+          'תפוח',
+          'תפוחים',
+          'תפוחי עץ',
+          'אפרסק',
+          'אפרסקים',
+          'דובדבן',
+          'דובדבנים',
+          'אגס',
+          'אגסים',
+          'שזיף',
+          'שזיפים',
+          'קיווי',
+          'גזר',
+          'וגזר',
+          'הגזר',
+          'בגזר',
+          'מלון',
+          'ומלון',
+          'אבטיח',
+          'בננה',
+          'בננות',
+          'מלפפון',
+          'מלפפונים',
+          'קישוא',
+          'קישואים',
+          'סלרי',
+          'אגוזי לוז',
+          'אגוז לוז',
+          'שקד',
+          'שקדים',
+        ],
+        hiddenEn: <HiddenTrigger>[
+          HiddenTrigger(
+            term: 'fruit salad',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.5',
+          ),
+          HiddenTrigger(
+            term: 'crudites',
+            certainty: TriggerCertainty.likely,
+            source: '11 §29.5',
+          ),
+          HiddenTrigger(
+            term: 'smoothie',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.5',
+          ),
+          HiddenTrigger(
+            term: 'coleslaw',
+            certainty: TriggerCertainty.suspected,
+            source: '11 §29.5',
+          ),
+        ],
+        hiddenHe: <HiddenTrigger>[
+          HiddenTrigger(
+            term: 'סלט פירות',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.5',
+          ),
+          HiddenTrigger(
+            term: 'סלט ישראלי',
+            certainty: TriggerCertainty.likely,
+            source: '12 §13.5',
+          ),
+          HiddenTrigger(
+            term: 'סמוטי',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.5',
+          ),
+          HiddenTrigger(
+            term: 'שייק פירות',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.5',
+          ),
+          HiddenTrigger(
+            term: 'קולסלאו',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.5',
+          ),
+          HiddenTrigger(
+            term: 'סלט ירקות',
+            certainty: TriggerCertainty.suspected,
+            source: '12 §13.5',
+          ),
+        ],
+        guards: AllergenGuards(
+          beforeEn: <String>['no', 'without'],
+          afterEn: <String>['free'],
+          beforeHe: <String>['ללא', 'וללא', 'בלי', 'ובלי'],
+        ),
+        termGuards: <String, AllergenGuards>{
+          'apple': _cookedEn,
+          'apples': _cookedEn,
+          'peach': _cookedEn,
+          'peaches': _cookedEn,
+          'cherry': _cookedCherryEn,
+          'cherries': _cookedCherryEn,
+          'pear': _cookedEn,
+          'pears': _cookedEn,
+          'plum': _cookedEn,
+          'plums': _cookedEn,
+          'kiwi': _cookedEn,
+          'carrot': _cookedEn,
+          'carrots': _cookedEn,
+          'melon': _cookedEn,
+          'cantaloupe': _cookedEn,
+          'honeydew': _cookedEn,
+          'watermelon': _cookedEn,
+          'banana': _cookedEn,
+          'bananas': _cookedEn,
+          'cucumber': _cookedEn,
+          'cucumbers': _cookedEn,
+          'zucchini': _cookedEn,
+          'courgette': _cookedEn,
+          'תפוח': _cookedAppleHe,
+          'תפוחים': _cookedHe,
+          'תפוחי עץ': _cookedHe,
+          'אפרסק': _cookedHe,
+          'אפרסקים': _cookedHe,
+          'דובדבן': _cookedHe,
+          'דובדבנים': _cookedHe,
+          'אגס': _cookedHe,
+          'אגסים': _cookedHe,
+          'שזיף': _cookedHe,
+          'שזיפים': _cookedHe,
+          'קיווי': _cookedHe,
+          'גזר': _cookedHe,
+          'וגזר': _cookedHe,
+          'הגזר': _cookedHe,
+          'בגזר': _cookedHe,
+          'מלון': _cookedHe,
+          'ומלון': _cookedHe,
+          'אבטיח': _cookedHe,
+          'בננה': _cookedHe,
+          'בננות': _cookedHe,
+          'מלפפון': _cookedHe,
+          'מלפפונים': _cookedHe,
+          'קישוא': _cookedHe,
+          'קישואים': _cookedHe,
+        },
+        noPrefixHe: <String>['גזר', 'מלון'],
+        sources: <String>['11 §29.5', '12 §13.5'],
+      ),
     };

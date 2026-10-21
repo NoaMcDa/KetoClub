@@ -32,16 +32,22 @@
 /// `legumes` carries every direct term of `soy`, `peanuts` and `lupin`
 /// and every hidden source of the three, because a peanut, a soybean and a
 /// lupin are legumes (the corpus invariant `legumes >= max(peanuts, soy,
-/// lupin)`).
+/// lupin)`). It carries every word of the single legumes too (chickpea,
+/// lentil, pea, fenugreek, fava), spread from `vocab_legume_parts.dart`,
+/// where its own chickpea-to-fenugreek words now live in the order it
+/// listed them.
 library;
 
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/vocab_gluten_grains.dart';
+import 'package:ketoclub/utils/allergens/vocab_legume_parts.dart';
 import 'package:ketoclub/utils/allergens/vocab_nuts_seeds.dart';
 import 'package:ketoclub/utils/allergens/vocabulary_types.dart';
 
 /// Soy's direct English triggers, shared with `legumes` (soy is a legume).
-const List<String> _soyDirectEn = <String>[
+/// Public because the diets that leave out soy (`vocab_diets_extra.dart`)
+/// spread it.
+const List<String> soyDirectEn = <String>[
   'soy',
   'soya',
   'soybean',
@@ -65,8 +71,9 @@ const List<String> _soyDirectEn = <String>[
   'tvp',
 ];
 
-/// Soy's direct Hebrew triggers, shared with `legumes`.
-const List<String> _soyDirectHe = <String>[
+/// Soy's direct Hebrew triggers, shared with `legumes` and spread like
+/// [soyDirectEn].
+const List<String> soyDirectHe = <String>[
   'סויה',
   'סוייה',
   'פולי סויה',
@@ -456,7 +463,7 @@ const List<HiddenTrigger> _soyHiddenHe = <HiddenTrigger>[
 /// sibling groups do not list as direct triggers. `legumes` spreads the
 /// sibling lists ([peanutDirectEn], [lupinDirectEn]) and these, so it
 /// carries every peanut and lupin spelling (a test compares them).
-const List<String> _peanutLupinExtraEn = <String>[
+const List<String> peanutLupinExtraEn = <String>[
   'peanut butter',
   'peanut flour',
   'peanut oil',
@@ -479,12 +486,104 @@ const List<String> _notLegumeBeansEn = <String>[
   'jelly',
 ];
 
+/// The English legume words beyond soy, peanut and lupin, before the peas
+/// (11 §16.1): the family, chickpeas and hummus, falafel, lentils and dal.
+/// Public, with [peaFoodsEn] and [beanFoodsEn], because the diets that
+/// leave out legumes (`vocab_diets_extra.dart`) spread them, and Whole30
+/// allows peas.
+const List<String> pulseFoodsEn = <String>[
+  'legume',
+  'legumes',
+  'pulses',
+  ...chickpeaDirectEn,
+  'falafel',
+  ...lentilDirectEn,
+  ...dalEn,
+  ...mujadaraEn,
+];
+
+/// The English pea words of `legumes` (11 §16.1); see [pulseFoodsEn].
+const List<String> peaFoodsEn = <String>[...peaDirectEn];
+
+/// The English bean words of `legumes` after the peas (11 §16.1): fava,
+/// the beans and fenugreek; see [pulseFoodsEn].
+const List<String> beanFoodsEn = <String>[
+  ...favaDirectEn,
+  'bean',
+  'beans',
+  'black beans',
+  'kidney beans',
+  'cannellini',
+  'haricot',
+  'mung bean',
+  'mung beans',
+  'adzuki',
+  'cowpea',
+  'black eyed peas',
+  ...fenugreekDirectEn,
+];
+
+/// [pulseFoodsEn] in Hebrew (11 §16.1, 12 §1.3).
+const List<String> pulseFoodsHe = <String>[
+  'קטניות',
+  'קטנית',
+  ...chickpeaDirectHe,
+  'פלאפל',
+  ...mujadaraHe,
+  ...mashawshaHe,
+  ...lentilDirectHe,
+];
+
+/// [peaFoodsEn] in Hebrew.
+const List<String> peaFoodsHe = <String>[...peaDirectHe];
+
+/// [beanFoodsEn] in Hebrew. `פול` is compiled with no permissive prefix
+/// (`כפול` is "double") wherever it is spread.
+const List<String> beanFoodsHe = <String>[
+  ...favaDirectHe,
+  'שעועית',
+  ...fenugreekDirectHe,
+];
+
+/// Every direct English trigger of `legumes`: soy, peanut and lupin and
+/// the other legumes. Public because the diets that leave out every legume
+/// (paleo, AIP) spread it.
+const List<String> legumesDirectEn = <String>[
+  ...soyDirectEn,
+  ...peanutDirectEn,
+  ...lupinDirectEn,
+  ...peanutLupinExtraEn,
+  ...pulseFoodsEn,
+  ...peaFoodsEn,
+  ...beanFoodsEn,
+  // The single legumes' own words (`vocab_legume_parts.dart`), after
+  // every word `legumes` had before they were split out.
+  ...chickpeaExtraEn,
+  ...lentilExtraEn,
+  ...peaExtraEn,
+  ...fenugreekExtraEn,
+  ...favaExtraEn,
+];
+
+/// [legumesDirectEn] in Hebrew.
+const List<String> legumesDirectHe = <String>[
+  ...soyDirectHe,
+  ...peanutDirectHe,
+  ...lupinDirectHe,
+  ...pulseFoodsHe,
+  ...peaFoodsHe,
+  ...beanFoodsHe,
+  ...chickpeaExtraHe,
+  ...lentilExtraHe,
+  ...fenugreekExtraHe,
+];
+
 /// Plants and additives: one entry per restriction this group owns.
 const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
     <RestrictionId, RestrictionVocabulary>{
       RestrictionId.soy: RestrictionVocabulary(
-        directEn: <String>[..._soyDirectEn],
-        directHe: <String>[..._soyDirectHe],
+        directEn: <String>[...soyDirectEn],
+        directHe: <String>[...soyDirectHe],
         hiddenEn: <HiddenTrigger>[
           ..._soyHiddenEn,
           // The Asian dishes below are not in the shared list: `legumes`
@@ -1698,82 +1797,8 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
         sources: <String>['11 §15.1', '11 §15.2', '11 §15.3', '12 §1.10'],
       ),
       RestrictionId.legumes: RestrictionVocabulary(
-        directEn: <String>[
-          ..._soyDirectEn,
-          ...peanutDirectEn,
-          ...lupinDirectEn,
-          ..._peanutLupinExtraEn,
-          'legume',
-          'legumes',
-          'pulses',
-          'chickpea',
-          'chickpeas',
-          'chick pea',
-          'chick peas',
-          'garbanzo',
-          'garbanzos',
-          'hummus',
-          'houmous',
-          'humus',
-          'falafel',
-          'lentil',
-          'lentils',
-          'dal',
-          'dhal',
-          'dahl',
-          'majadra',
-          'mujadara',
-          'mejadra',
-          'pea',
-          'peas',
-          'split pea',
-          'split peas',
-          'green pea',
-          'green peas',
-          'pea protein',
-          'fava',
-          'fava beans',
-          'broad bean',
-          'broad beans',
-          'ful medames',
-          'bean',
-          'beans',
-          'black beans',
-          'kidney beans',
-          'cannellini',
-          'haricot',
-          'mung bean',
-          'mung beans',
-          'adzuki',
-          'cowpea',
-          'black eyed peas',
-          'fenugreek',
-        ],
-        directHe: <String>[
-          ..._soyDirectHe,
-          ...peanutDirectHe,
-          ...lupinDirectHe,
-          'קטניות',
-          'קטנית',
-          'חומוס',
-          'הומוס',
-          'גרגירי חומוס',
-          'חימצה',
-          'פלאפל',
-          "מג'דרה",
-          "מוג'דרה",
-          'משאוושה',
-          'עדשים',
-          'עדשה',
-          'אפונה',
-          'פול',
-          'פולים',
-          'הפול',
-          'בפול',
-          'ופול',
-          'שעועית',
-          'חילבה',
-        ],
+        directEn: legumesDirectEn,
+        directHe: legumesDirectHe,
         hiddenEn: <HiddenTrigger>[
           ..._soyHiddenEn,
           ...peanutHiddenEn,
@@ -1813,6 +1838,7 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
             certainty: TriggerCertainty.suspected,
             source: '12 §1.3',
           ),
+          ...legumePartsHiddenEn,
         ],
         hiddenHe: <HiddenTrigger>[
           ..._soyHiddenHe,
@@ -1823,12 +1849,9 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
             certainty: TriggerCertainty.suspected,
             source: '12 §1.3',
           ),
+          ...legumePartsHiddenHe,
         ],
-        guards: AllergenGuards(
-          beforeEn: <String>['no', 'without'],
-          afterEn: <String>['free'],
-          beforeHe: <String>['ללא', 'וללא', 'בלי', 'ובלי', 'נטול', 'נטולת'],
-        ),
+        guards: legumeGuards,
         // A coffee, vanilla or cocoa bean and a jelly bean are no legume
         // (ALG-04a): term guards on "bean", not restriction-wide.
         termGuards: <String, AllergenGuards>{
@@ -1843,6 +1866,8 @@ const Map<RestrictionId, RestrictionVocabulary> plantsAdditivesVocabulary =
           '12 §1.3',
           '11 §1.1',
           '11 §14.1',
+          '11 §28',
+          '12 §12',
         ],
       ),
     };

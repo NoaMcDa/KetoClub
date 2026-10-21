@@ -1,0 +1,415 @@
+{
+  "_fixture_note": "synthetic; buckwheat and the foods on Japan's recommended list (kiwi, peach, apple, banana, orange, beef, pork, chicken, gelatin, yam; issue #342): an Israeli cafe-and-grill half in Hebrew and a US diner and Japanese noodle half in English, with the traps of 11 §26 and 12 §10 (spelt is not buckwheat, yakisoba is wheat, potatoes and persimmons are not apples or peaches, candied yams and בטטה are sweet potatoes, orange roughy is a fish, chicken-fried steak is beef); labels only these eleven ids; mixed",
+  "language": "mixed",
+  "dishes": [
+    {
+      "name": "סלט כוסמת",
+      "description": "כוסמת קלויה, ירקות קלויים ולימון",
+      "options": [],
+      "labels": {
+        "buckwheat": {"label": "contains", "role": "base", "evidence": "\"כוסמת\" in the name", "source": "12 §10.1"}
+      }
+    },
+    {
+      "name": "אטריות סובה קרות",
+      "description": "סובה, מלפפון, בצל ירוק ורוטב שויו",
+      "options": [],
+      "labels": {
+        "buckwheat": {"label": "contains", "role": "base", "evidence": "\"סובה\" (buckwheat noodles) in the name", "source": "12 §10.1"}
+      }
+    },
+    {
+      "name": "לחם כוסמין",
+      "description": "לחם מחמצת מקמח כוסמין מלא",
+      "options": [],
+      "labels": {
+        "buckwheat": {"label": "free", "evidence": "כוסמין is spelt, not buckwheat (כוסמת); cross-contact not assessed", "source": "12 §10.1"}
+      }
+    },
+    {
+      "name": "יאקיסובה עוף",
+      "description": "אטריות חיטה מוקפצות עם רצועות עוף וירקות",
+      "options": [],
+      "labels": {
+        "buckwheat": {"label": "free", "evidence": "yakisoba is wheat noodles, not soba; cross-contact not assessed", "source": "12 §10.1"},
+        "chicken": {"label": "contains", "role": "protein", "evidence": "\"עוף\" in the name", "source": "12 §10.9"}
+      }
+    },
+    {
+      "name": "אטריות סובה עם טורורו",
+      "description": "סובה קרה, יאם יפני מגורר וביצה",
+      "options": [],
+      "labels": {
+        "buckwheat": {"label": "contains", "role": "base", "evidence": "\"סובה\" in the name", "source": "12 §10.1"},
+        "yam": {"label": "contains", "role": "sauce", "evidence": "\"טורורו\" (grated mountain yam) in the name", "source": "12 §10.11"}
+      }
+    },
+    {
+      "name": "שייק קיווי ותפוח",
+      "description": "קיווי, תפוח ירוק ונענע",
+      "options": [],
+      "labels": {
+        "kiwi": {"label": "contains", "role": "base", "evidence": "\"קיווי\" in the name", "source": "12 §10.2"},
+        "apple": {"label": "contains", "role": "base", "evidence": "\"תפוח\" in the name", "source": "12 §10.4"}
+      }
+    },
+    {
+      "name": "סלט קיווי ותותים",
+      "description": "קיווי, תותים ונענע",
+      "options": [],
+      "labels": {
+        "kiwi": {"label": "contains", "role": "base", "evidence": "\"קיווי\" in the name", "source": "12 §10.2"}
+      }
+    },
+    {
+      "name": "פבלובה",
+      "description": "מרנג, קצפת ופירות העונה",
+      "options": [],
+      "labels": {
+        "kiwi": {"label": "may_contain", "role": "garnish", "evidence": "pavlova is often topped with kiwi; \"פירות העונה\" unnamed", "source": "12 §10.2"}
+      }
+    },
+    {
+      "name": "עוגת אפרסקים",
+      "description": "בצק פריך ואפרסקים טריים",
+      "options": [],
+      "labels": {
+        "peach": {"label": "contains", "role": "base", "evidence": "\"אפרסקים\" in the name", "source": "12 §10.3"}
+      }
+    },
+    {
+      "name": "סלט נקטרינות",
+      "description": "נקטרינות, גבינת עיזים ואגוזי מלך",
+      "options": [],
+      "labels": {
+        "peach": {"label": "contains", "role": "base", "evidence": "\"נקטרינות\": the nectarine is a peach of the same species", "source": "12 §10.3"}
+      }
+    },
+    {
+      "name": "אפרסמון צלוי",
+      "description": "אפרסמון, יוגורט ודבש",
+      "options": [],
+      "labels": {
+        "peach": {"label": "free", "evidence": "אפרסמון is persimmon, not peach; cross-contact not assessed", "source": "12 §10.3"}
+      }
+    },
+    {
+      "name": "שטרודל תפוחים",
+      "description": "בצק עלים, תפוחי עץ וקינמון",
+      "options": [],
+      "labels": {
+        "apple": {"label": "contains", "role": "base", "evidence": "\"תפוחים\" in the name, \"תפוחי עץ\" in the description", "source": "12 §10.4"}
+      }
+    },
+    {
+      "name": "תפוחי אדמה אפויים",
+      "description": "תפוחי אדמה בתנור עם רוזמרין",
+      "options": [],
+      "labels": {
+        "apple": {"label": "free", "evidence": "תפוחי אדמה are potatoes, not apples; cross-contact not assessed", "source": "12 §10.4"}
+      }
+    },
+    {
+      "name": "פנקייק בננה",
+      "description": "פנקייקים עם בננה וסילאן",
+      "options": [],
+      "labels": {
+        "banana": {"label": "contains", "role": "base", "evidence": "\"בננה\" in the name", "source": "12 §10.5"}
+      }
+    },
+    {
+      "name": "שייק בננה תמרים",
+      "description": "בננה, תמרים וחלב שקדים",
+      "options": [],
+      "labels": {
+        "banana": {"label": "contains", "role": "base", "evidence": "\"בננה\" in the name", "source": "12 §10.5"}
+      }
+    },
+    {
+      "name": "מיץ תפוזים סחוט",
+      "description": "",
+      "options": [],
+      "labels": {
+        "orange": {"label": "contains", "role": "base", "evidence": "\"תפוזים\" in the name", "source": "12 §10.6"}
+      }
+    },
+    {
+      "name": "עוף בתפוזים",
+      "description": "כרעיים בתנור ברוטב תפוזים ודבש",
+      "options": [],
+      "labels": {
+        "orange": {"label": "contains", "role": "sauce", "evidence": "\"רוטב תפוזים\" in the description", "source": "12 §10.6"},
+        "chicken": {"label": "contains", "role": "protein", "evidence": "\"עוף\" in the name", "source": "12 §10.9"}
+      }
+    },
+    {
+      "name": "אנטריקוט על האש",
+      "description": "300 גרם, צ'יפס וסלט",
+      "options": [],
+      "labels": {
+        "beef": {"label": "contains", "role": "protein", "evidence": "\"אנטריקוט\" (a beef cut) in the name", "source": "12 §10.7"}
+      }
+    },
+    {
+      "name": "המבורגר הבית",
+      "description": "200 גרם בקר טחון, חסה ועגבנייה",
+      "options": [],
+      "labels": {
+        "beef": {"label": "contains", "role": "protein", "evidence": "\"בקר\" in the description", "source": "12 §10.7"}
+      }
+    },
+    {
+      "name": "שיפודי פרגית",
+      "description": "פרגיות על האש עם אורז",
+      "options": [],
+      "labels": {
+        "chicken": {"label": "contains", "role": "protein", "evidence": "\"פרגית\" (chicken thigh) in the name", "source": "12 §10.9"}
+      }
+    },
+    {
+      "name": "שניצל בצלחת",
+      "description": "שניצל, פירה וסלט",
+      "options": [],
+      "labels": {
+        "chicken": {"label": "may_contain", "role": "protein", "evidence": "an Israeli schnitzel is poultry, mostly chicken; the meat is not named", "source": "12 §10.9"}
+      }
+    },
+    {
+      "name": "שניצל תירס",
+      "description": "שניצל טבעוני מפירורי תירס",
+      "options": [],
+      "labels": {
+        "chicken": {"label": "may_contain", "role": "protein", "evidence": "guard: 'תירס' and 'טבעוני' beside שניצל lower it, never clear it (11 §0)", "source": "12 §10.9"}
+      }
+    },
+    {
+      "name": "צלעות בשר לבן",
+      "description": "צלעות ברוטב ברביקיו",
+      "options": [],
+      "labels": {
+        "pork": {"label": "contains", "role": "protein", "evidence": "\"בשר לבן\", the menu euphemism for pork", "source": "12 §10.8"}
+      }
+    },
+    {
+      "name": "צלעות חזיר",
+      "description": "צלעות חזיר מעושנות ברוטב ברביקיו",
+      "options": [],
+      "labels": {
+        "pork": {"label": "contains", "role": "protein", "evidence": "\"חזיר\" in the name", "source": "12 §10.8"}
+      }
+    },
+    {
+      "name": "פסטה פרושוטו",
+      "description": "פפרדלה, פרושוטו ופרמזן",
+      "options": [],
+      "labels": {
+        "pork": {"label": "contains", "role": "protein", "evidence": "\"פרושוטו\" (cured pork) in the name", "source": "12 §10.8"}
+      }
+    },
+    {
+      "name": "פנקוטה וניל",
+      "description": "פנקוטה עם רוטב פירות יער",
+      "options": [],
+      "labels": {
+        "gelatin": {"label": "contains", "role": "base", "evidence": "\"פנקוטה\" is set with gelatin", "source": "12 §10.10"}
+      }
+    },
+    {
+      "name": "קינוח ג'לי פירות",
+      "description": "ג'לי פירות אדומים וקצפת",
+      "options": [],
+      "labels": {
+        "gelatin": {"label": "may_contain", "role": "base", "evidence": "\"ג'לי\" may be set with gelatin", "source": "12 §10.10"}
+      }
+    },
+    {
+      "name": "מוס שוקולד",
+      "description": "שוקולד מריר וקצפת",
+      "options": [],
+      "labels": {
+        "gelatin": {"label": "may_contain", "role": "hidden", "evidence": "\"מוס\" may be set with gelatin", "source": "12 §10.10"}
+      }
+    },
+    {
+      "name": "בטטה צלויה",
+      "description": "בטטה בתנור עם שמן זית",
+      "options": [],
+      "labels": {
+        "yam": {"label": "free", "evidence": "בטטה is sweet potato, not Japan's yam; cross-contact not assessed", "source": "12 §10.11"}
+      }
+    },
+    {
+      "name": "Buckwheat galette",
+      "description": "Buckwheat crêpe with ham, egg and Gruyère",
+      "options": [],
+      "labels": {
+        "buckwheat": {"label": "contains", "role": "base", "evidence": "\"buckwheat\" in the name", "source": "11 §26.1"},
+        "pork": {"label": "contains", "role": "protein", "evidence": "\"ham\" in the description", "source": "11 §26.8"}
+      }
+    },
+    {
+      "name": "Zaru soba",
+      "description": "Chilled soba noodles with dipping sauce",
+      "options": [],
+      "labels": {
+        "buckwheat": {"label": "contains", "role": "base", "evidence": "\"soba\" in the name", "source": "11 §26.1"}
+      }
+    },
+    {
+      "name": "Yamakake don",
+      "description": "Tuna sashimi over rice with grated nagaimo",
+      "options": [],
+      "labels": {
+        "yam": {"label": "contains", "role": "sauce", "evidence": "\"nagaimo\" in the description", "source": "11 §26.11"}
+      }
+    },
+    {
+      "name": "Tororo soba",
+      "description": "Hot soba with grated mountain yam",
+      "options": [],
+      "labels": {
+        "yam": {"label": "contains", "role": "sauce", "evidence": "\"tororo\" and \"mountain yam\"", "source": "11 §26.11"},
+        "buckwheat": {"label": "contains", "role": "base", "evidence": "\"soba\" in the name", "source": "11 §26.1"}
+      }
+    },
+    {
+      "name": "Okonomiyaki",
+      "description": "Cabbage pancake with pork belly and bonito flakes",
+      "options": [],
+      "labels": {
+        "yam": {"label": "may_contain", "role": "hidden", "evidence": "okonomiyaki batter often holds grated nagaimo", "source": "11 §26.11"},
+        "pork": {"label": "contains", "role": "protein", "evidence": "\"pork belly\" in the description", "source": "11 §26.8"}
+      }
+    },
+    {
+      "name": "Candied yams",
+      "description": "Baked sweet potatoes with brown sugar and pecans",
+      "options": [],
+      "labels": {
+        "yam": {"label": "free", "evidence": "US \"yams\" are sweet potatoes, as the description says; cross-contact not assessed", "source": "11 §26.11"}
+      }
+    },
+    {
+      "name": "Kiwi sorbet",
+      "description": "Fresh kiwifruit and lime",
+      "options": [],
+      "labels": {
+        "kiwi": {"label": "contains", "role": "base", "evidence": "\"kiwi\" in the name", "source": "11 §26.2"}
+      }
+    },
+    {
+      "name": "Peach cobbler",
+      "description": "Baked peaches with a biscuit topping",
+      "options": [],
+      "labels": {
+        "peach": {"label": "contains", "role": "base", "evidence": "\"peach\" in the name", "source": "11 §26.3"}
+      }
+    },
+    {
+      "name": "Apple pie",
+      "description": "Granny Smith apples and cinnamon",
+      "options": [],
+      "labels": {
+        "apple": {"label": "contains", "role": "base", "evidence": "\"apple\" in the name", "source": "11 §26.4"}
+      }
+    },
+    {
+      "name": "Banana split",
+      "description": "Banana, three scoops and chocolate sauce",
+      "options": [],
+      "labels": {
+        "banana": {"label": "contains", "role": "base", "evidence": "\"banana\" in the name", "source": "11 §26.5"}
+      }
+    },
+    {
+      "name": "Pan-fried orange roughy",
+      "description": "With lemon butter and green beans",
+      "options": [],
+      "labels": {
+        "orange": {"label": "free", "evidence": "guard: orange roughy is a fish, not an orange; cross-contact not assessed", "source": "11 §26.6"}
+      }
+    },
+    {
+      "name": "Orange chicken",
+      "description": "Crispy chicken in a sweet orange glaze",
+      "options": [],
+      "labels": {
+        "orange": {"label": "contains", "role": "sauce", "evidence": "\"orange glaze\"", "source": "11 §26.6"},
+        "chicken": {"label": "contains", "role": "protein", "evidence": "\"chicken\" in the name", "source": "11 §26.9"}
+      }
+    },
+    {
+      "name": "Ribeye steak",
+      "description": "16 oz with garlic butter",
+      "options": [],
+      "labels": {
+        "beef": {"label": "contains", "role": "protein", "evidence": "\"ribeye\" (a beef cut)", "source": "11 §26.7"}
+      }
+    },
+    {
+      "name": "Veal piccata",
+      "description": "Veal cutlets with lemon and capers",
+      "options": [],
+      "labels": {
+        "beef": {"label": "contains", "role": "protein", "evidence": "\"veal\" is young beef", "source": "11 §26.7"}
+      }
+    },
+    {
+      "name": "Chicken-fried steak",
+      "description": "Breaded beef cube steak with country gravy",
+      "options": [],
+      "labels": {
+        "beef": {"label": "contains", "role": "protein", "evidence": "\"beef\" in the description", "source": "11 §26.7"},
+        "chicken": {"label": "free", "evidence": "guard: 'chicken-fried' is a frying style, the steak is beef; cross-contact not assessed", "source": "11 §26.9"}
+      }
+    },
+    {
+      "name": "Pulled pork sandwich",
+      "description": "Slow-smoked pork shoulder and slaw",
+      "options": [],
+      "labels": {
+        "pork": {"label": "contains", "role": "protein", "evidence": "\"pork\" in the name", "source": "11 §26.8"}
+      }
+    },
+    {
+      "name": "Turkey bacon club",
+      "description": "Turkey bacon, lettuce and tomato on sourdough",
+      "options": [],
+      "labels": {
+        "pork": {"label": "may_contain", "role": "protein", "evidence": "guard: 'turkey' beside bacon lowers it, never clears it (11 §0)", "source": "11 §26.8"}
+      }
+    },
+    {
+      "name": "Buffalo wings",
+      "description": "Ten wings with blue cheese dip",
+      "options": [],
+      "labels": {
+        "chicken": {"label": "contains", "role": "protein", "evidence": "Buffalo wings are chicken wings", "source": "11 §26.9"}
+      }
+    },
+    {
+      "name": "Gummy bears",
+      "description": "Assorted fruit gummies",
+      "options": [],
+      "labels": {
+        "gelatin": {"label": "contains", "role": "base", "evidence": "gummy sweets are set with gelatin", "source": "11 §26.10"}
+      }
+    },
+    {
+      "name": "S'mores",
+      "description": "Toasted marshmallow and chocolate on graham crackers",
+      "options": [],
+      "labels": {
+        "gelatin": {"label": "contains", "role": "base", "evidence": "\"marshmallow\" in the description", "source": "11 §26.10"}
+      }
+    },
+    {
+      "name": "Vegan panna cotta",
+      "description": "Coconut milk set with agar",
+      "options": [],
+      "labels": {
+        "gelatin": {"label": "may_contain", "role": "base", "evidence": "guard: 'vegan' lowers panna cotta, never clears it (11 §0)", "source": "11 §26.10"}
+      }
+    }
+  ]
+}

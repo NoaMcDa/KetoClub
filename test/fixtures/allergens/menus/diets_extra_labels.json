@@ -1,0 +1,892 @@
+{
+  "_fixture_note": "synthetic; written for the extra diets (pescatarian, paleo, Whole30, AIP, Jain; issue #342, file 11 §30, file 12 §14). Labels only those five ids; absence of another id is not a claim. Mostly Hebrew.",
+  "language": "mixed",
+  "dishes": [
+    {
+      "name": "סלמון בגריל",
+      "description": "פילה סלמון, תפוחי אדמה צלויים ושום",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy or refined sugar named in the dish text",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy, added sugar or alcohol named in the dish text",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"תפוחי אדמה\" (potato, a nightshade)",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"סלמון\" (fish), \"תפוחי אדמה\" and \"שום\" (roots)",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "שניצל עוף",
+      "description": "חזה עוף בציפוי פירורי לחם, צ'יפס",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פירורי לחם\" (bread crumbs, wheat)",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פירורי לחם\" (bread crumbs, wheat)",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פירורי לחם\" (wheat) and \"צ'יפס\" (potato)",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken) and \"צ'יפס\" (potato)",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "סלט ירוק",
+      "description": "חסה, מלפפון, עשבי תיבול, שמן זית ולימון",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy or refined sugar named in the dish text",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy, added sugar or alcohol named in the dish text",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "free",
+          "evidence": "nothing the AIP elimination phase leaves out named in the dish text",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "free",
+          "evidence": "no meat, fish, egg, honey, alcohol or root vegetable named in the dish text",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "חומוס מסבחה",
+      "description": "חומוס, טחינה, ביצה קשה, פיתה",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חומוס\" (chickpea) and \"פיתה\" (wheat)",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חומוס\" (chickpea) and \"פיתה\" (wheat)",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "chickpea, sesame (\"טחינה\"), egg and pita",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"ביצה\" (egg)",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "קציצות דגים ברוטב עגבניות",
+      "description": "קציצות דג לבן ברוטב עגבניות, בצל ושום",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy or refined sugar named in the dish text",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy, added sugar or alcohol named in the dish text",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"עגבניות\" (tomato)",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"דג\" (fish), \"בצל\" and \"שום\" (roots)",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "סטייק אנטריקוט",
+      "description": "300 גרם, ירקות צלויים",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"סטייק אנטריקוט\" (beef)",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy or refined sugar named in the dish text",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy, added sugar or alcohol named in the dish text",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "free",
+          "evidence": "nothing the AIP elimination phase leaves out named in the dish text",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"סטייק אנטריקוט\" (beef)",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "פסטה ברוטב שמנת ופטריות",
+      "description": "פנה, שמנת מתוקה, פטריות שמפיניון ופרמזן",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פסטה\" (wheat), \"שמנת\" and \"פרמזן\" (dairy)",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פסטה\" (wheat), \"שמנת\" and \"פרמזן\" (dairy)",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פסטה\" (wheat), \"שמנת\" (dairy)",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "may_contain",
+          "role": "side",
+          "evidence": "\"פטריות\" (mushrooms, which many Jains avoid)",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "סלט סלק וגזר",
+      "description": "סלק צלוי, גזר, נענע ולימון",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy or refined sugar named in the dish text",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy, added sugar or alcohol named in the dish text",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "free",
+          "evidence": "nothing the AIP elimination phase leaves out named in the dish text",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"סלק\" and \"גזר\" (roots)",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "עוגת דבש",
+      "description": "עוגה ביתית עם דבש וקינמון",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"עוגה\" (wheat cake)",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"עוגה\" (wheat) and \"דבש\" (added sugar)",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"עוגה\" (wheat cake)",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"דבש\" (honey)",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "יין אדום - כוס",
+      "description": "יין הבית",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy or refined sugar named in the dish text",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"יין\" (alcohol)",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"יין\" (alcohol)",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"יין\" (alcohol)",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "קפה הפוך",
+      "description": "אספרסו כפול עם חלב מוקצף",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חלב\" (milk)",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חלב\" (milk)",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"קפה\" and \"אספרסו\" (coffee), \"חלב\" (milk)",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "free",
+          "evidence": "no meat, fish, egg, honey, alcohol or root vegetable named in the dish text",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "אורז כרובית מוקפץ",
+      "description": "כרובית מגוררת, גזר, אפונה ובצל ירוק",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"אפונה\" (peas, a legume)",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy, added sugar or alcohol named in the dish text",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"אפונה\" (peas, a legume)",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"גזר\" and \"בצל ירוק\" (roots)",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "סלט עגבניות ופלפלים",
+      "description": "עגבניות, פלפל אדום, בצל סגול, שמן זית",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy or refined sugar named in the dish text",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy, added sugar or alcohol named in the dish text",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"עגבניות\" and \"פלפל אדום\" (nightshades)",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"בצל\" (onion)",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "כרעיים עוף בתנור",
+      "description": "עם תפוחי אדמה ורוזמרין",
+      "options": [
+        {
+          "name": "תוספת",
+          "values": [
+            "אורז",
+            "סלט"
+          ]
+        }
+      ],
+      "labels": {
+        "pescatarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken)",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "rice option (\"אורז\")",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "may_contain",
+          "role": "option",
+          "evidence": "rice option (\"אורז\")",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"תפוחי אדמה\" (potato)",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"עוף\" (chicken), \"תפוחי אדמה\" (potato)",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "שקשוקה",
+      "description": "ביצים ברוטב עגבניות ופלפלים, לחם בצד",
+      "options": [
+        {
+          "name": "תוספת",
+          "values": [
+            "לחם",
+            "בלי לחם"
+          ]
+        }
+      ],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"לחם\" on the side (wheat)",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"לחם\" on the side (wheat)",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "eggs and tomato",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"ביצים\" (eggs)",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "פילה דניס עם טחינה",
+      "description": "דניס בגריל, טחינה, סלט עשבים",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy or refined sugar named in the dish text",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy, added sugar or alcohol named in the dish text",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"טחינה\" (sesame, a seed)",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"דניס\" (fish)",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "בורגר טבעוני",
+      "description": "קציצת עדשים בלחמנייה עם חסה ועגבנייה",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"עדשים\" (lentil) and \"לחמנייה\" (wheat)",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"עדשים\" (lentil) and \"לחמנייה\" (wheat)",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "lentil, bun and tomato",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "free",
+          "evidence": "no meat, fish, egg, honey, alcohol or root vegetable named in the dish text",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "Grilled shrimp skewers",
+      "description": "Garlic butter, lemon, side of rice",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"butter\" and \"rice\"",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"butter\" and \"rice\"",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "side",
+          "evidence": "\"butter\" and \"rice\"",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"shrimp\" and \"garlic\"",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "Chicken Caesar salad",
+      "description": "Romaine, parmesan, croutons",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"chicken\"",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"parmesan\" and \"croutons\"",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"parmesan\" and \"croutons\"",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"parmesan\" and \"croutons\"",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"chicken\"",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "Roasted cauliflower",
+      "description": "Tahini, pomegranate, herbs",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy or refined sugar named in the dish text",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy, added sugar or alcohol named in the dish text",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"tahini\" (sesame)",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "free",
+          "evidence": "no meat, fish, egg, honey, alcohol or root vegetable named in the dish text",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "Sweet potato fries",
+      "description": "",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy or refined sugar named in the dish text",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy, added sugar or alcohol named in the dish text",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "free",
+          "evidence": "nothing the AIP elimination phase leaves out named in the dish text",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "sweet potato is a root",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "Margherita pizza",
+      "description": "Tomato sauce, mozzarella, basil",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"pizza\" (wheat) and \"mozzarella\"",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"pizza\" (wheat) and \"mozzarella\"",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "pizza, tomato and mozzarella",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "free",
+          "evidence": "no meat, fish, egg, honey, alcohol or root vegetable named in the dish text",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "Beef pho",
+      "description": "Rice noodles, beef broth, ginger, scallions",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"beef\"",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"rice noodles\"",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"rice noodles\"",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"rice noodles\"",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"beef\", \"ginger\" and \"scallions\"",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "Tuna steak",
+      "description": "Seared tuna, sesame crust, wasabi",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy or refined sugar named in the dish text",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy, added sugar or alcohol named in the dish text",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"sesame\" (a seed)",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"tuna\" (fish)",
+          "source": "11 §30.5"
+        }
+      }
+    },
+    {
+      "name": "Fruit salad",
+      "description": "Seasonal fruit, mint",
+      "options": [],
+      "labels": {
+        "pescatarian": {
+          "label": "free",
+          "evidence": "no meat or poultry named in the dish text",
+          "source": "11 §30.1"
+        },
+        "paleo": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy or refined sugar named in the dish text",
+          "source": "11 §30.2"
+        },
+        "whole30": {
+          "label": "free",
+          "evidence": "no grain, legume, dairy, added sugar or alcohol named in the dish text",
+          "source": "11 §30.3"
+        },
+        "aip": {
+          "label": "free",
+          "evidence": "nothing the AIP elimination phase leaves out named in the dish text",
+          "source": "11 §30.4"
+        },
+        "jain": {
+          "label": "free",
+          "evidence": "no meat, fish, egg, honey, alcohol or root vegetable named in the dish text",
+          "source": "11 §30.5"
+        }
+      }
+    }
+  ]
+}

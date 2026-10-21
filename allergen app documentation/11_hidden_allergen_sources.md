@@ -1538,6 +1538,868 @@ salmon.
 
 ---
 
+## 30. The extra diets: pescatarian, paleo, Whole30, AIP and Jain (issue #342; desk research, brief)
+
+> **Status: desk research, not dietetic or religious review. Checked
+> 2026-10-21** from web-search result snippets only: no page could be
+> fetched in full from this environment (`whole30.com`, `healthline.com`
+> and `wikipedia.org` refused the fetch), so every claim below is what the
+> snippets of the named pages say. **Diets, not allergies:** each of the
+> five is a lifestyle or religious choice whose rules vary between
+> followers, so a finding is "the menu names something this diet leaves
+> out", never a safety claim, and the app's wording floor stays "ask the
+> restaurant". All five are flexible (`lifestyle`; Jain a
+> `religiousComponent`), so under D26's #346 rule a stated or likely
+> finding moves the dish and a suspected one is only listed.
+
+**Regulated:** nowhere. None of the five is an allergen list in any
+jurisdiction.
+
+**How the vocabulary is built.** These diets are exclusion sets of food
+groups the other sections already cover: meat and poultry (12 §2.2), fish
+and seafood (§8–§10), wheat and the gluten grains (§7.1), legumes (§16.1),
+milk (§3.1), eggs (§5.1), tree nuts (§2.1), sesame (§11.1), and alcohol
+(halal, §25.2). `vocab_diets_extra.dart` spreads those sections' public
+direct lists and adds only what no other section names (the other grains,
+sugar, seed oils, nightshades, seed spices, coffee and chocolate, roots).
+
+### 30.1 Pescatarian
+A pescatarian eats fish and seafood but no other meat; eggs and dairy are
+optional, not part of the definition
+([Merriam-Webster](https://www.merriam-webster.com/dictionary/pescatarian) **[M]**;
+[Oxford Learner's](https://www.oxfordlearnersdictionaries.com/definition/english/pescatarian) **[M]**;
+[Healthline, pescatarian diet](https://www.healthline.com/nutrition/pescatarian-diet) **[W]**).
+Direct: vegetarian's meat and poultry words (12 §2.2), plus kebab,
+shawarma, chorizo, pastrami, meatloaf, liver, gyro, merguez, bone broth.
+Likely: schnitzel (in Israel almost always chicken), nuggets, wings, hot
+dogs, kofta, carpaccio. Suspected: gravy, stock, broth and pâté, which are
+often but not always meat-based. Fish is never a trigger.
+
+### 30.2 Paleo
+The paleo diet leaves out the foods that came with farming: grains,
+legumes (beans, lentils, peanuts), dairy, refined and added sugar, and
+highly processed foods
+([Mayo Clinic, Paleo diet](https://www.mayoclinic.org/healthy-lifestyle/nutrition-and-healthy-eating/in-depth/paleo-diet/art-20111182) **[M]**).
+Refined vegetable oils appear in the exclusion lists of secondary summaries
+that cite Harvard's Nutrition Source
+([ExRx, Paleo](https://exrx.net/Nutrition/Diets/Paleo) **[W]**), not in
+the Mayo page itself, so the seed oils are **suspected** only. Refined
+sugar is **suspected** too: paleo plans allow honey and maple syrup, and a
+menu rarely says which sugar it used. Ghee is dairy, but many paleo plans
+allow it (unreviewed desk research): suspected. White potatoes are left
+out of the vocabulary: Harvard's list (via ExRx) excludes them, most
+current paleo plans do not. Direct: every wheat food and gluten grain, rice,
+corn, oats and the pseudo-cereals (quinoa, buckwheat, millet, amaranth,
+teff), every legume and peanut word, every milk word and named cheese.
+Likely: flour, breaded cutlets, sushi, tortilla dishes, tabbouleh, satay,
+teriyaki and hoisin (soy), latte and cappuccino, ice cream, pesto,
+béchamel.
+
+### 30.3 Whole30
+The official rules exclude **added sugar, real or artificial** (maple
+syrup, honey, agave, coconut sugar, date syrup, stevia, sucralose,
+xylitol), **alcohol in any form, cooking included**, **grains** (wheat,
+rye, barley, oats, corn, rice, millet, bulgur, sorghum and the
+pseudo-cereals quinoa, amaranth, buckwheat), **legumes** (beans, chickpeas,
+lentils, peanuts and peanut butter, all soy) and **dairy**
+([Whole30, Original Program Rules](https://whole30.com/wp-content/uploads/2023/08/Original-Whole30-Rules.pdf) **[S]**;
+[Whole30, official program rules](https://whole30.com/wp-content/uploads/2023/10/official-whole30-program-rules.pdf) **[S]**).
+The "fine print" allows ghee or clarified butter, fruit juice as a
+sweetener, green beans and most peas, vinegars and botanical extracts, and
+coconut aminos; peas of every kind (green, yellow, split) were allowed in
+January 2021, MSG was removed from the list in January 2022, and the 2024
+update allows cooking oils regardless of source and names the allowed
+vinegars (cane, Champagne, red wine, rice, sherry, white wine)
+([Whole30, program rule changes](https://whole30.com/program-rules-changes/) **[S]**;
+[2024 update](https://whole30.com/wp-content/uploads/2023/08/Original-Whole30-Program-Rules-2024-update.pdf) **[S]**).
+So the vocabulary is paleo's without peas, ghee or seed oils, with every
+sugar and sweetener **stated**, alcohol stated, and the wine, sherry,
+champagne and rice vinegars guarded. Likely: barbecue sauce, ketchup,
+sweet-and-sour and sweet chili (sweetened sauces), mirin, marsala, a
+flambé. Out of scope: the rule against recreating baked goods and treats
+with compliant ingredients, which no menu word shows.
+
+### 30.4 AIP (the autoimmune protocol)
+The elimination phase removes paleo's groups and, on top, **eggs, nuts,
+seeds (including seed-based spices), nightshades, coffee and alcohol**
+([PMC review of the AIP diet](https://pmc.ncbi.nlm.nih.gov/articles/PMC11755016/) **[S]**;
+[Healthline, AIP diet](https://www.healthline.com/nutrition/aip-diet-autoimmune-protocol-diet) **[W]**;
+[American College of Rheumatology blog](https://rheumatology.org/patient-blog/what-is-the-autoimmune-protocol-diet/) **[M]**).
+Nightshades: tomatoes, potatoes, eggplant and peppers, sweet and hot, with
+paprika and cayenne; goji is one too ([WebMD](https://www.webmd.com/diet/autoimmune-protocol-diet) **[M]**).
+Seed spices: cumin, fennel, anise, mustard and nutmeg are named
+([Green Chef, Paleo 101: the autoimmune protocol](https://chef.greenchef.com/eat/paleo-diet-101/autoimmune-protocol) **[W]**);
+coriander seed, caraway, cardamom and allspice are added from the same
+rule (unreviewed). Coffee and chocolate are seeds and are out in "core"
+AIP, back in "modified" AIP
+([Autoimmune Wellness, tricky foods](https://autoimmunewellness.com/whats-in-whats-out-on-aip-answers-to-tricky-foods/) **[W]**).
+Black pepper is left out (not a nightshade; its status in AIP varies), and
+sweet potato is guarded (not a nightshade). Likely: curry and spice blends
+(garam masala, za'atar, dukkah, baharat, hawaij), salsa, ketchup,
+marinara, harissa, sriracha, ratatouille, moussaka, baba ghanoush,
+affogato, Nutella. Out of scope: food additives, gums and emulsifiers.
+
+### 30.5 Jain
+Jain practice is vegetarian and also excludes **eggs, honey** (its
+collection kills bees; honey is *abhakshya*, "not to be eaten"),
+**alcohol** (fermentation destroys life), and, for most Jains, **root and
+underground vegetables**, because uprooting kills the whole plant and
+the soil life around it, and a root is held to contain countless lives
+(*anantkay*) ([Wikipedia, Jain vegetarianism](https://en.wikipedia.org/wiki/Jain_vegetarianism) **[M]**;
+[Slow Food, Jain foodways](https://www.slowfood.com/?p=31299) **[W]**).
+Pew found that 92% of Indian Jains are vegetarian and **67% abstain from
+root vegetables such as garlic and onion**
+([Pew Research Center, religion and food, 2021](https://www.pewresearch.org/religion/2021/06/29/religion-and-food/) **[S]**;
+[Pew, 6 facts about Jains in India](https://www.pewresearch.org/short-reads/2021/08/17/6-facts-about-jains-in-india/) **[S]**).
+Airline Jain meals (VJML) leave out onion, garlic, potato, carrot,
+beetroot, ginger, radish and mushrooms
+([Inflight Feed, VJML](https://inflightfeed.com/meal/special-meals-vegetarian-jain-meals/) **[W]**;
+[HappyFares, Jain meals on flights](https://happyfares.in/blog/special-meals-indian-flights-2026/) **[W]**).
+Dairy is allowed by most, refused by some, so it is no trigger. Direct:
+vegetarian's meat, poultry and sea-animal words, eggs (§5.1), honey, and
+the roots: onion and the onion family, garlic, potato, carrot, beet,
+radish, turnip, parsnip, yam, cassava, taro, celeriac, horseradish, ginger
+(dried ginger is accepted by some; unreviewed) and the Hindi *aloo*.
+Alcohol: halal's list (§25.2), likely. Likely: hash browns, latkes,
+gnocchi, wasabi, chips, and the garlic and onion sauces (tzatziki, pesto,
+salsa, chimichurri, gazpacho). Suspected: mushrooms, truffles, stock and
+broth. **Out of scope, said plainly:** many Jains do not eat after sunset
+(*chauvihar*; unreviewed) or on certain days, and some avoid fermented foods (vinegar,
+yogurt, soy sauce), honey-like syrups, or green vegetables on fasting days;
+a menu carries none of that, so the app says nothing about it.
+
+### 30.6 Guards and confusions
+- **A fish word makes a meat word fish** for pescatarian: tuna steak,
+  salmon burger, fish sausage, סטייק טונה, קציצות דגים (term guards on the
+  meat word; lowered to suspected, never cancelled).
+- **A plant compound is another food:** almond or coconut flour, cauliflower
+  rice, zucchini noodles, spaghetti squash, coconut milk, nut butter, a
+  Spanish tortilla, green beans, whole-grain mustard, sugar snap peas,
+  wine, sherry and champagne vinegar, חומץ יין, אורז כרובית, חלב שקדים.
+  An oat, soy or rice milk keeps its oat, soy or rice for paleo and
+  Whole30.
+- **Black and white pepper and sweet potato** are no nightshades (AIP).
+- **"Margarita" is also a pizza** (and מרגריטה nearly always is), so it is
+  only suspected, and lowered beside pizza/פיצה.
+- **A "vegan" or "plant-based" meat or egg word** lowers it for Jain, by
+  term guard only, so "vegetarian onion soup" keeps its onion. A "Jain"
+  label before a dish ("Jain pav bhaji") lowers what follows.
+- **`שום` also means "any"** ("אין שום", "שום דבר"): it is compiled with no
+  free prefix (משום is "because") and guarded in those phrases.
+
+**Sources (30):** as linked above; all reached only as search-result
+snippets on 2026-10-21.
+
+## 26. Buckwheat and the foods on Japan's recommended list (issue #342; desk research, brief)
+
+> **Status: desk research, not clinical review.** Written on 2026-10-21
+> for the `vocab_foods_extra.dart` follow-up of issue #342 and **checked
+> 2026-10-21 against web search results only**: as everywhere in this
+> file, no page could be opened in full, so each claim rests on the result
+> excerpt of the URL beside it, graded as in file 12 (**[S]** strong,
+> **[M]** medium, **[W]** weak). Rows marked **unreviewed** have no
+> source beyond general culinary knowledge; their vocabulary terms are
+> `suspected` or left out. No allergist or dietitian has read this
+> section. (§24–§25 are the kosher and halal sections.)
+
+**Regulated:** buckwheat is one of Japan's nine *mandatory* labelling
+items; kiwi, peach, apple, banana, orange, beef, pork, chicken, gelatin
+and yam are among its twenty *recommended* ones (file 02; the list is
+confirmed by a Tokyo Metropolitan Government handout, which names
+"Yams" and "Gelatin" in English,
+https://www.hokeniryo1.metro.tokyo.lg.jp/shokuhin/hyouji/kyouzai/files/nihongo(r8.4)_tenpu.pdf
+**[S]**, and by Kyoto Prefecture's English page,
+https://www.pref.kyoto.jp/en/labelling_of_food_with_allergens.html
+**[S]**). None is on the US, EU or Israeli list, and Japan's rules bind
+packaged food only (file 12 §8.1). Every term in this section is
+therefore a menu word for a person who has *chosen* the restriction; the
+app says "ask the restaurant", never "safe".
+
+### 26.1 Buckwheat
+
+**Direct:** buckwheat, kasha (the Eastern European name for buckwheat
+groats), soba (buckwheat noodles), *sarrasin* and *blé noir* (French),
+*grano saraceno* (Italian), *juwari* soba (100% buckwheat). **Hidden:**
+pizzoccheri (Valtellina buckwheat pasta) and polenta taragna (likely);
+galettes, crêpes and blinis, which are buckwheat pancakes in some regions
+and wheat in others, and poffertjes (suspected); gluten-free breads and
+flours, because buckwheat is a common gluten-free flour (suspected);
+buckwheat honey (suspected: a honey, not the grain — **unreviewed**).
+Sources: Anaphylaxis UK, buckwheat factsheet ("grano saraceno", "blé
+noir", galettes, crêpes, blinis, pizzoccheri, polenta taragna,
+poffertjes, caution on gluten-free food)
+https://www.anaphylaxis.org.uk/wp-content/uploads/2025/09/Buckwheat-V5-neffy-update-25.pdf
+**[S]** ; Heffler et al., "Buckwheat allergy: an emerging clinical
+problem in Europe" (anaphylaxis from a pizza dough of mixed wheat and
+buckwheat flour)
+https://iris.unito.it/retrieve/handle/2318/1645935/354564/buckwheat-allergy-an-emerging-clinical-problem-in-europe-2155-6121.1000168.pdf
+**[S]** ; soba's buckwheat-and-wheat mix, file 12 §8.2.
+**Guards:** "no buckwheat", "buckwheat-free", "ללא כוסמת".
+**Confusions:**
+- **Buckwheat is not wheat** (§7.5): it stays a *guard* of the wheat and
+  gluten triggers ("buckwheat flour" lowers wheat's "flour"), and that
+  guard never lowers a buckwheat hit.
+- **Yakisoba is not soba**: wheat noodles despite the name (file 12
+  §8.2); "yakisoba" is one word to the matcher and never matches "soba",
+  and "yaki soba" written apart is lowered.
+- Soba may be mostly wheat (file 12 §8.2): a soba dish is buckwheat *and*
+  wheat, never one instead of the other.
+- In Hebrew, כוסמת is buckwheat and כוסמין is spelt (file 12 §10.1).
+
+### 26.2 Kiwi
+
+**Direct:** kiwi, kiwifruit. **Hidden (suspected):** fruit salads, fruit
+mixes and smoothies, desserts and tropical juices (Thermo Fisher's kiwi
+allergen sheet lists syrups, shakes, cocktails, puddings and fruit sauces;
+a consumer page names fruit mixes, smoothies, desserts and salads):
+https://www.thermofisher.com/allergy/us/en/allergen-fact-sheets/kiwi.html
+**[S]** ; https://www.wyndly.com/blogs/learn/kiwi-allergy **[W]**.
+Pavlova, often topped with kiwi, is **unreviewed** (suspected). Some
+people tolerate heated kiwi, others not (Thermo Fisher), so a cooked dish
+is no guard. Kiwi used as a meat tenderiser was **not confirmed** by any
+source and is left out. Kiwi belongs to the latex-fruit syndrome with
+banana and avocado (§26.5).
+
+### 26.3 Peach
+
+**Direct:** peach. **Hidden:** nectarine (**likely**): the nectarine is a
+smooth-skinned form of the same species, *Prunus persica*, and its fruit
+carries the same lipid transfer protein, Pru p 3, the main peach allergen
+(Botton et al., Pru p 3 in every peach *and* nectarine cultivar studied
+but one: https://research.unipd.it/handle/11577/2481986 **[S]** ;
+https://pmc.ncbi.nlm.nih.gov/articles/PMC8569022 **[S]**). Pru p 3 resists
+heat and is concentrated in the skin
+(https://www.altmeyers.org/en/allergology/peach-allergy-133292 **[M]**),
+so a cooked or peeled peach is no guard. A Bellini (peach purée and
+sparkling wine) is **unreviewed** (suspected).
+
+### 26.4 Apple
+
+**Direct:** apple, apples, applesauce. **Hidden (suspected):** cider,
+calvados (apple brandy), tarte Tatin and Waldorf salad — **unreviewed**:
+no source reviewed names them, but each is made from apple by definition.
+Apple allergy has two forms: a birch-pollen form (Mal d 1, destroyed by
+cooking, so many people tolerate cooked apple) and a lipid-transfer form
+(Mal d 3, heat-stable), and an apple drink has caused anaphylaxis
+(https://www.altmeyers.org/en/allergology/apple-allergy-133032 **[M]** ;
+https://www.thermofisher.com/phadia/us/en/resources/allergen-encyclopedia/f49.html
+**[S]**), so cooking is never a guard. **Guards:** "pineapple" is one word
+and never matches; custard, sugar, star, rose and wax apples are other
+fruits (lowered — **unreviewed**). In Hebrew תפוח אדמה is potato, not
+apple (file 12 §10.4).
+
+### 26.5 Banana
+
+**Direct:** banana, bananas. **Hidden:** banoffee (banana and toffee,
+likely), smoothies and banana bread follow from "banana" (suspected:
+"banana flavoring in baked goods or smoothies",
+https://www.healthline.com/health/banana-allergy **[M]**). Plantain is a
+close relative, but **no source reviewed** says a banana-allergic person
+reacts to it: suspected. Banana is the commonest fruit of the latex-fruit
+syndrome (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11278189/ **[S]**).
+**Guards:** a banana pepper is a chilli and a banana shallot a shallot; a
+banana leaf is a wrapper (lowered, not cleared: the leaf touches the
+food) — **unreviewed**.
+
+### 26.6 Orange
+
+**Direct:** orange, oranges (orange juice, zest and peel follow). **Hidden
+(suspected):** marmalade (orange marmalade is the classic; other citrus
+exist), and the orange liqueurs Grand Marnier, Cointreau, triple sec and
+curaçao: orange extracts and peel oils are used "in the liqueur and food
+industry" and peel-oil components are possible allergens
+(https://www.altmeyers.org/en/allergology/orange-133441 **[M]**); the
+liqueurs by name are **unreviewed**. Germin-like allergens are shared
+across the peels of orange, lemon and mandarin
+(https://mdpi-res.com/d_attachment/cimb/cimb-47-00621/article_deploy/cimb-47-00621.pdf
+**[S]**), but Japan's item is orange alone, so mandarin, lemon and the
+other citrus are left out. **Guards (real false positives on menus):**
+orange roughy is a deep-sea fish, *Hoplostethus atlanticus*
+(https://www.fishbase.org/summary/334 **[S]**), and orange wine is a
+skin-contact white wine that holds no orange
+(https://www.wine.com/content/article/orange-wine-guide **[M]**). "Orange"
+as a colour (orange peppers, orange lentils) was **not** shown by a source
+to be a real menu false positive and is not guarded.
+
+### 26.7 Beef
+
+**Direct:** beef, veal ("the meat from a calf or young beef animal", USDA
+FSIS, https://www.fsis.usda.gov/es/node/3531 **[S]**), named beef cuts
+(ribeye, sirloin, entrecôte, filet mignon, brisket, oxtail, osso buco)
+and breeds (wagyu, Angus), bresaola (air-dried salted beef,
+https://www.yourdictionary.com/bresaola **[W]**), corned beef and roast
+beef. **Hidden:** steak, burgers, carpaccio and pastrami (cured, spiced,
+smoked beef in the US,
+https://www.mentalfloss.com/food/pastrami-vs-corned-beef-what-is-difference
+**[M]**), Bolognese and ragù (likely; turkey, chicken, tuna and plant
+versions are guards); meatballs, kebab, kofta, gyro, "meat", stock,
+broth, gravy, demi-glace, bone marrow, tallow and gelatin (suspected).
+The main beef allergen, bovine serum albumin (Bos d 6), is also in cow's
+milk, and some beef-allergic people react to milk, veal and beef
+by-products; a consumer page advises reading for beef broth, beef stock,
+bovine gelatin and beef flavouring
+(https://thermofisher.com/phadia/gb/en/resources/allergen-encyclopedia/f27.html
+**[S]** ; https://riteaid.com/health/allergic-reactions-to-beef **[W]**).
+Milk is **not** listed here: the Milk restriction carries it, as for
+alpha-gal (§17.5). Beef allergy (a protein allergy) is not alpha-gal
+syndrome (a sugar), which also covers pork and lamb (§17).
+
+### 26.8 Pork
+
+**Direct:** pork, pig, suckling pig, wild boar, bacon, ham, gammon, lard,
+lardo, lardons, pancetta, guanciale (cured pork jowl,
+https://www.wikipedia.com/wiki/Guanciale **[W]**), prosciutto, jamón,
+porchetta, carnitas, char siu (Chinese barbecued pork), tonkatsu
+(breaded fried pork cutlet, https://en.wikipedia.org/wiki/Tonkatsu
+**[W]**) and tonkotsu (pork-bone broth). **Hidden:** chorizo, mortadella,
+speck, bratwurst, kielbasa, chicharrón and spare ribs (likely); salami,
+pepperoni, sausages, hot dogs, carbonara and amatriciana (guanciale or
+pancetta in the classic recipe) and gelatin (suspected). Consumer
+guidance names ham, bacon, sausage, pork-based broths and gravies,
+gelatin from pork collagen, lard and bacon drippings
+(https://riteaid.com/health/pork-allergy **[W]** ;
+https://livestrong.com/article/330965-what-foods-to-avoid-if-allergic-to-pork
+**[W]**). Pork allergy is often the pork–cat syndrome, a cross-reaction
+of cat and pig serum albumin (https://dx.doi.org/10.20344/amp.15483
+**[S]** ; https://departments.med.virginia.edu/medannual2013/?p=1145
+**[M]**). **Guards:** turkey, beef, duck, goose and chicken bacon, ham,
+salami and sausages (kosher menus print them often); a guinea pig is not
+a pig dish. The kosher and halal follow-up (`vocab_religious.dart`, §24–
+§25) builds a pork list of its own; the two may later share one.
+
+### 26.9 Chicken
+
+**Direct:** chicken, poussin, capon, Cornish hen, coq au vin, *pollo*.
+**Hidden:** wings, nuggets and tenders (likely: chicken unless the menu
+says otherwise); schnitzel (suspected in English; Israel's is "almost
+always" poultry, chicken or turkey,
+https://myjewishlearning.com/the-nosher/how-schnitzel-became-an-israeli-staple
+**[M]** ; https://forward.com/food/132482/foods-of-israel-schnitzel/
+**[M]**); shawarma (suspected: in Israel turkey is the most popular,
+chicken common,
+https://www.tastingtable.com/1150931/the-untraditional-meat-thats-popular-for-israeli-shawarma
+**[M]**); poultry, stock, broth and bouillon (suspected: a clinician "may
+advise avoiding chicken broth",
+https://www.medicalnewstoday.com/articles/323070 **[M]**; chicken
+bouillon is made from chicken bones and meat). **Guards (real false
+positives):** chicken-fried steak is beef fried like chicken; chicken of
+the woods is a mushroom; chicken eggs are eggs, not chicken meat (the
+bird–egg syndrome links the two in some people, but the Eggs restriction
+carries eggs) — **unreviewed** desk knowledge.
+
+### 26.10 Gelatin
+
+**Direct:** gelatin, gelatine, aspic, Jell-O. **Hidden:** gummy sweets,
+marshmallows and panna cotta (likely: gummies and marshmallows are
+"particularly problematic", https://alphagalinformation.org/gelatin
+**[M]**; panna cotta and marshmallow, §17.2); jelly, mousse, no-bake
+cheesecake, trifle, bavarois, terrine and mirror glaze (suspected: set with gelatin in
+many recipes — **unreviewed**). Gelatin comes from pig skin, cattle hide
+and bone, or fish; a fish-gelatin marshmallow has caused anaphylaxis
+(https://www.ovid.com/journals/jaci/pdf/00004483-200903000-00036~anaphylaxis-provoked-by-ingestion-of-marshmallows-containing
+**[S]**), so "fish gelatin" stays a gelatin trigger. Some yogurts hold
+gelatin (https://www.wyndly.com/blogs/learn/gelatin-allergy **[W]**), but a
+restaurant's yogurt sauce rarely does, and listing yogurt would flood
+every labneh and tzatziki: left out. **Guards:** agar, vegan and
+"gelatin-free" lower a hit.
+
+### 26.11 Yam
+
+**What it is:** Japan's *yamaimo* (やまいも), the Japanese mountain yams
+of the genus *Dioscorea*: *nagaimo*, *yamaimo*, *jinenjo*; *tororo* is
+the grated yam (https://www.masterclass.com/articles/tororo-explained
+**[M]**; the Tokyo and Kyoto lists above). **It is not sweet potato**:
+true yams (Dioscoreaceae) and sweet potatoes (morning-glory family) are
+not related, and what a US menu calls "yams" is almost always a sweet
+potato (Library of Congress,
+https://www.loc.gov/everyday-mysteries/agriculture/item/what-is-the-difference-between-sweet-potatoes-and-yams/
+**[S]**). So the bare word "yam" is **not** a trigger (candied yams are
+sweet potato; Thai *yam* is a salad — **unreviewed**), and בטטה is never
+one. **Direct:** yamaimo, nagaimo, jinenjo, tororo, Japanese, Chinese and
+mountain yam. **Hidden:** yamakake (tuna or soba under tororo, likely);
+okonomiyaki, whose batter often holds grated nagaimo, though some recipes
+leave it out (suspected,
+https://www.americastestkitchen.com/recipes/16992-japanese-yam-okonomiyaki
+**[M]** ; https://www.justonecookbook.com/wprm_print/okonomiyaki
+**[W]**); hanpen fish cake, some of which list yamaimo (suspected,
+https://greenbeans.com/products/14971661153141/details **[W]**); purple
+yam and ube (suspected — **unreviewed** whether Japan's item covers
+*D. alata*).
+
+**Sources (26):** as cited inline; every URL above was reached only as a
+search-result excerpt on 2026-10-21.
+
+## 29. Sensitivities: nightshades, MSG, caffeine, salicylates, oral allergy syndrome (issue #342; desk research, brief)
+
+> **Status: unreviewed desk research, checked 2026-10-21 by web search
+> only.** Every page below was reached as a search-result excerpt; opening
+> any of them failed (DNS), so no page was read in full. Not clinical
+> review. All five are heads-up restrictions in the app
+> (`headsUpRestrictions`): a menu never states a dose, the app says only
+> "may be high in …", and a concern never moves a dish. The Hebrew menu
+> words are file 12 §13.
+>
+> **Confirmed in the excerpts:** the nightshade core (tomato, white potato,
+> peppers of every colour including chilli and cayenne, aubergine,
+> tomatillo, goji/golden berry) and that sweet potato is not one
+> (Cleveland Clinic); FDA's rule that added MSG is declared as
+> "monosodium glutamate" and that hydrolysed protein and yeast extract
+> carry glutamate naturally (FDA Q&A); FDA's caffeine ranges per drink and
+> decaf's residual caffeine (FDA; Mayo Clinic); Swain et al. 1985's very
+> high salicylate in curry powder, paprika, thyme, garam masala and
+> rosemary, and salicylate in berries, dried fruit, tea, liquorice,
+> peppermint and some honeys; the birch and ragweed food lists and that
+> cooking usually ends the reaction except for celery and nuts (Columbia
+> University; Stanford; AAAAI Delphi consensus 2024).
+> **Not confirmed:** paprika as a nightshade from a strong source (only
+> lists of weak quality name it; it is ground capsicum, so it is kept);
+> which bouillon cubes hold MSG (Open Food Facts listings disagree, so
+> stock powders are suspected); caffeine in chocolate from USDA directly
+> (a secondary blog quoting USDA FoodData Central); almonds and tomato
+> paste as high-salicylate (consumer and dietetic summaries only,
+> **[weak]**); honey beyond "some honeys" (Swain 1985 abstract).
+
+### 29.1 Nightshades (Solanaceae)
+
+**Regulated:** nowhere; not an allergen class. People avoid the family for
+an intolerance or an autoimmune protocol; Cleveland Clinic says there is
+no proof that nightshades cause inflammation. A true allergy to one of
+them (tomato, potato) is a separate, food-specific allergy.
+
+| Trigger | Certainty | Source |
+|---|---|---|
+| tomato, potato, aubergine/eggplant, peppers (bell, red, green, sweet, hot), chilli, jalapeño, habanero, chipotle, poblano, pimento, cayenne, tomatillo, goji | stated | [Cleveland Clinic, "What's the deal with nightshade vegetables"](https://health.clevelandclinic.org/whats-the-deal-with-nightshade-vegetables/) **[medium]**; [Cleveland Clinic, arthritis and nightshades](https://health.clevelandclinic.org/arthritis-should-you-avoid-nightshade-vegetables) **[medium]** |
+| paprika | stated (ground capsicum) | [UC Davis-hosted list](https://sandbox.dss.ucdavis.edu/complete-list-of-nightshade-vegetables) **[weak]** |
+| ketchup, salsa, marinara, bolognese, arrabbiata, shakshuka, gazpacho, ratatouille, moussaka, baba ganoush, goulash (tomato, aubergine or paprika based) | likely | inferred from the core list |
+| harissa, sriracha, Tabasco, hot sauce, gochujang, sambal (chilli pastes and sauces) | likely | UC Davis-hosted list (names harissa, gochujang, sambal, hot sauce) **[weak]** |
+| fries, hash browns (potato) | likely | inferred |
+| "pepper" alone, gnocchi (often potato), pizza (usually tomato sauce), "spicy" (usually chilli) | suspected | inferred |
+
+**Guards:** sweet potato is a different family (Cleveland Clinic), so
+"sweet" before potato and "sweet potato" before fries lower the trigger;
+black, white, pink and Sichuan pepper are peppercorns, not capsicum
+([Nutrition to Fit](https://nutritiontofit.com/nightshade-vegetables-list/)
+**[weak]**), so they lower "pepper", as do "salt and", "pepper sauce",
+"pepper steak" and "pepper crust" (steakhouse peppercorn dishes). "Pizza
+bianca" has no tomato sauce.
+
+### 29.2 MSG (monosodium glutamate)
+
+**Regulated:** the FDA rates MSG as generally recognised as safe and
+requires added MSG to be listed as "monosodium glutamate"; hydrolysed
+vegetable protein, autolysed yeast and yeast extract contain glutamate
+naturally and are listed under their own names, and a product holding
+them may not claim "No MSG"
+([FDA Q&A on MSG](https://www.fda.gov/food/food-additives-petitions/questions-and-answers-monosodium-glutamate-msg)
+**[strong]**). The EU code is E621. The "MSG symptom complex" has not been
+reproduced under controlled conditions, and the 1968 "Chinese restaurant
+syndrome" label carried bias
+([AARP summary](https://www.aarp.org/health/healthy-living/info-2022/msg-health.html)
+**[medium]**), so the app never infers MSG from a cuisine.
+
+| Trigger | Certainty | Source |
+|---|---|---|
+| MSG, monosodium glutamate, glutamate, E621 | stated | FDA Q&A, above |
+| flavour enhancer (E620–E625 class; MSG the commonest) | likely | FDA Q&A; [Open Food Facts, E621](https://us.openfoodfacts.org/additive/e621-monosodium-glutamate) **[weak]** |
+| stock cube, bouillon, stock or soup powder | suspected (some brands hold E621, some do not) | [Open Food Facts product listings](https://world.openfoodfacts.org/product/7613034189714/bouillon-cube-maggi-mouton-halal) **[weak]** |
+| yeast extract, hydrolysed vegetable protein | suspected (natural glutamate, not added MSG) | FDA Q&A, above |
+
+**Guards:** "no", "without", "no added" before and "free" after ("MSG-free");
+on a Hebrew menu "ללא" before a Latin "MSG".
+
+### 29.3 Caffeine
+
+**Regulated:** the FDA names 400 mg a day as an amount not generally
+linked to harm in healthy adults; caffeine content is mostly unlabelled.
+Per 12 oz (FDA): brewed coffee about 113–247 mg, black tea about 71 mg,
+green tea about 37 mg, caffeinated soft drinks about 23–83 mg, energy
+drinks 41–246 mg
+([FDA, "Spilling the beans"](https://www.fda.gov/consumers/consumer-updates/spilling-beans-how-much-caffeine-too-much)
+**[strong]**). Decaf must have 97% of its caffeine removed and still holds
+roughly 2 mg per cup, more in some samples
+([Mayo Clinic caffeine table](https://www.mayoclinic.org/healthy-lifestyle/nutrition-and-healthy-eating/in-depth/caffeine/art-20049372)
+**[medium]**). Matcha is green tea (about 40–70 mg per teaspoon).
+Chocolate is a low-dose source that scales with cocoa solids: about
+80 mg/100 g dark, 20 mg/100 g milk, none in white chocolate (USDA
+FoodData Central as quoted by
+[Barista Life](https://baristalife.co/blogs/blog/chocolate-caffeine-content)
+**[weak]**).
+
+| Trigger | Certainty | Source |
+|---|---|---|
+| coffee, espresso and its drinks (cappuccino, latte, flat white, americano, macchiato, cortado, mocha, cold brew, affogato), black and green tea, matcha, earl grey, oolong, yerba mate, cola, energy drinks, guarana, "caffeine" | stated | FDA; Mayo Clinic |
+| tea (unspecified: usually black), chai, tiramisu (espresso-soaked) | likely | FDA (tea); inferred (tiramisu) |
+| chocolate, cocoa | suspected (low dose) | USDA via Barista Life **[weak]** |
+
+**Guards:** decaf, decaffeinated and "caffeine-free" lower, never cancel
+(decaf is not zero); herbal, mint, chamomile, rooibos, fruit and ginger
+tea lower "tea" (herbal infusions use no tea leaves: inferred, not
+confirmed in the excerpts); turmeric, golden and beetroot lattes lower
+"latte"; white chocolate lowers "chocolate"; "coffee cake" (US) often has
+no coffee.
+
+### 29.4 Salicylates
+
+> **Unreviewed, weak evidence.** Salicylate sensitivity is diagnosed and
+> managed by specialist dietitians with a staged elimination (the RPAH or
+> FAILSAFE diet), and published food values are scattered and disagree:
+> content changes with ripeness, variety and processing. Every term below
+> is `suspected`; none is direct.
+
+The best primary data is Swain AR, Dutton SP, Truswell AS, "Salicylates in
+foods", *J Am Diet Assoc* 1985;85(8):950–960 (333 foods by HPLC; abstract
+via [Academia.edu](https://independent.academia.edu/SwainAnne) **[medium]**):
+very high in curry powder, paprika, thyme, garam masala and rosemary;
+present in berries and dried fruit, tea, liquorice, peppermint sweets and
+some honeys; negligible in cereals, meat, fish and dairy. UK dietetic
+leaflets agree on the method and that fruit and vegetables are the main
+source
+([Royal Berkshire NHS](https://www.royalberkshire.nhs.uk/media/3vkpur2n/salicylate-sensitivity_sep24.pdf)
+**[medium]**; [BDA](https://bda.uk.com/static/5284c6c5-ee49-43f5-a50cede11ba44e85/Salicylate-Sensitivity-2022.pdf)
+**[medium]**; [RPAH/FAILSAFE guide](https://www.dietvsdisease.org/failsafe-rpah-food-chemical-diet/)
+**[weak]**).
+
+| Trigger | Certainty | Source |
+|---|---|---|
+| curry, garam masala, paprika, thyme, rosemary | suspected | Swain et al. 1985 |
+| mint, peppermint, tea, liquorice, honey | suspected | Swain et al. 1985 |
+| raspberries, blackberries, blueberries, cranberries, berries, raisins, prunes, dried fruit | suspected | Swain et al. 1985; [WebMD](https://www.webmd.com/diet/high-salicylate-foods) **[weak]** |
+| almonds, tomato paste, gherkins, Worcestershire sauce | suspected | Swain et al. 1985 (gherkins); dietetic summaries **[weak]** |
+
+**Guards:** "no" and "without" only. Coffee, cinnamon and cumin were left
+out: the excerpts did not settle them.
+
+### 29.5 Oral allergy syndrome (pollen-food allergy syndrome)
+
+**Regulated:** nowhere. A cross-reaction between pollen proteins and
+heat-labile proteins (mainly PR-10 and profilins) in raw fruit,
+vegetables and some nuts; reactions usually stay in the mouth and throat,
+and prevalence is 2–10.8% by region
+([AAAAI international Delphi consensus, Dec 2024](https://aaaai.org/Aaaai/media/Media-Library-PDFs/Allergist%20Resources/Statements%20and%20Practice%20Parameters/International-Delphi-Consensus-on-Pollen-Food-Allergy-Syndrome-Dec-2024.pdf)
+**[strong]**). Cooking or processing usually prevents it, with **celery
+and nuts the exceptions** (they may still react cooked), and some foods
+(kiwi, hazelnut, celery) can cause systemic reactions
+([Columbia University](https://www.columbiadoctors.org/childrens-health/pediatric-specialties/allergy/treatments-conditions/oral-allergy-syndrome)
+**[medium]**). Cooking is not a guarantee for everyone
+([AAAAI Ask the Expert](https://www.aaaai.org/ask-the-expert/pollen-food-syndrome)
+**[strong]**), which is why a guard lowers and never cancels.
+
+| Trigger | Certainty | Source |
+|---|---|---|
+| birch: apple, almond, carrot, celery, cherry, hazelnut, kiwi, peach, pear, plum | stated | Columbia University |
+| ragweed: banana, cucumber, melon (cantaloupe, honeydew, watermelon), zucchini | stated | Columbia University; [Stanford Health Care handout](https://stanfordhealthcare.org/content/dam/SHC/clinics/menlo-medical-clinic/docs/Allergy/Oral%20Allergy%20Syndrome.pdf) **[medium]** |
+| fruit salad, crudités (raw) | likely | inferred |
+| smoothie, coleslaw (often raw fruit or carrot) | suspected | inferred |
+
+**Guards:** a cooked or processed form beside a fruit or vegetable lowers
+it: baked, cooked, roasted, grilled, stewed, poached, caramelised, fried,
+braised, sautéed, glazed, pickled, candied before; pie, jam, crumble,
+compote, cake, tart, sauce, purée, soup, strudel, chutney, jelly, bread,
+muffin, cider, vinegar, pickle after (Columbia: "cooked or baked … or
+processed fruits such as applesauce"). Celery, hazelnut and almond carry
+no cooking guard. "Cherry tomato" is not a cherry.
+
+**Sources (29):** Cleveland Clinic (nightshades, two pages); FDA (MSG Q&A;
+"Spilling the beans"); Mayo Clinic (caffeine table); Swain AR, Dutton SP,
+Truswell AS, *J Am Diet Assoc* 1985;85:950–960; Royal Berkshire NHS and
+BDA salicylate leaflets; AAAAI Delphi consensus on PFAS (2024, *J Allergy
+Clin Immunol Pract*, doi 10.1016/j.jaip.2024.09.037); Columbia University
+and Stanford Health Care OAS pages; weaker: UC Davis-hosted nightshade
+list, Nutrition to Fit, Open Food Facts, Barista Life (USDA figures),
+WebMD, Diet vs Disease (FAILSAFE). All checked 2026-10-21 as search
+excerpts.
+
+## 27. Corn, sunflower seed and flaxseed (issue #342; desk research)
+
+> **Status: desk research, not clinical review. Checked 2026-10-21 against
+> web search results only** (no page was opened in full, as the banner
+> says of the whole file). Every row below names its source and grade:
+> **[S]** strong (clinical journal, hospital dietitian handout, regulator),
+> **[M]** medium (allergy association, encyclopedia, health publisher),
+> **[W]** weak (recipe, retailer, blog). Rows resting only on [W] or on
+> inference are **unreviewed desk research**, and their vocabulary terms
+> are `suspected`. The Hebrew spellings are in file 12 §11.
+
+**Regulated:** none of the three is a mandatory allergen in the US (9),
+the EU (14) or Israel (§19). File 02 lists them under "less common
+allergens worth supporting". No label law makes a supplier or a kitchen
+name them, so the app favours recall here: a person with one of these
+allergies has to ask about every dish anyway.
+
+### 27.1 Corn — direct triggers
+
+corn, maize, sweetcorn, baby corn, corn on the cob, cornmeal, corn flour
+(US: ground corn), cornbread, cornflakes, popcorn, polenta, grits,
+hominy, masa / masa harina, elote, esquites. A Children's Hospital of
+Philadelphia handout for corn-allergic patients lists "corn bread, corn
+flour, cornmeal, grits, hominy, masa, polenta, popcorn, corn tortillas"
+to avoid **[S]**
+([CHOP, corn-free diet](https://chopib.staywellsolutionsonline.com/22,38103));
+Children's Wisconsin's corn-free diet sheet also lists polenta, popcorn
+and grits **[S]**
+([Children's Wisconsin](https://childrenswi.org/teaching-sheet/clinical-nutrition/corn-free-diet)).
+Cornflakes, polenta and tortilla chips are among the "foods with corn as
+basic ingredient" a maize-allergy study screened for **[S]**
+([PMC4493620](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4493620/)).
+
+**Refined products — the guidance disagrees.** The same CHOP handout
+says: "we do not restrict corn oil, corn syrup, corn sugar, maltodextrin
+or cornstarch for most patients, because they are 99.5% protein-free"
+**[S]**. Johns Hopkins and Children's Wisconsin are stricter (call the
+manufacturer when the starch source is not named; cross-contact in
+manufacture) **[S]**
+([Johns Hopkins corn-free diet](https://www.hopkinsmedicine.org/-/media/johns-hopkins-childrens-center/documents/specialties/adolescent-medicine/cfs-corn-free-diet.pdf)).
+So corn oil, corn syrup, high-fructose corn syrup, cornstarch and UK
+"cornflour" (which is cornstarch) are **suspected**, never stated: the
+hit stays and asks the restaurant, and the person's own allergist
+decides. Maltodextrin and dextrose are label words a menu does not
+print; they are not listed.
+
+### 27.2 Corn — hidden sources (restaurant)
+
+| Hidden source | Confidence | Source |
+|---|---|---|
+| Arepa, tamale, pupusa: corn masa formed and griddled or steamed | documented common (definitional) | Food Republic, "What is masa harina?" **[W]** ([foodrepublic.com](https://www.foodrepublic.com/2013/04/23/what-is-masa-harina/)); CHOP lists masa **[S]** |
+| Nachos, tortilla chips, tostadas (fried corn tortillas) | documented common | PMC4493620 names tortilla chips **[S]** |
+| Bamba: "peanut-butter-flavored puffed maize"; US listings give peanuts, corn grits, sunflower oil, salt | documented | [Wikipedia, Bamba](https://en.wikipedia.org/wiki/Bamba_(snack)) **[M]**; retailer listing **[W]** |
+| Tortilla: corn or wheat. "Flour tortillas" are wheat; mass-produced corn tortillas may still have wheat blended in | possible — the menu rarely says which | [Healthline, corn vs flour tortilla](https://www.healthline.com/nutrition/corn-vs-flour-tortilla) **[M]**; CHOP lists corn tortillas **[S]** |
+| Tacos, enchiladas (usually corn tortillas; soft tacos may be flour) | possible | inferred from the tortilla row — **unreviewed desk research** |
+| Pozole (hominy stew), succotash (corn and lima beans) | documented common (definitional) | CHOP lists hominy **[S]**; succotash **unreviewed desk research** |
+| Sauces and soups thickened with cornstarch; corn syrup in glazes | possible | [Wikipedia, corn allergy](https://en.wikipedia.org/wiki/Corn_allergy) **[M]** (corn starch and modified food starch); CHOP disagrees on whether it matters **[S]** |
+| Cross-contact: a product free of corn can pick up traces in manufacture | documented | Johns Hopkins **[S]** |
+
+### 27.3 Sunflower seed
+
+**Direct:** sunflower, sunflower seeds / kernels, sunflower butter
+(sunflower seed butter, SunButter), sunflower halva. A sunflower-seed
+butter caused a reaction in a three-year-old who had eaten sunflower oil
+for years without one **[S]**
+([Allergy Asthma Clin Immunol 2014](https://aacijournal.biomedcentral.com/track/pdf/10.1186/s13223-014-0065-6)).
+
+**Refined oil is often tolerated:** sunflower-seed-sensitive patients ate
+refined and cold-pressed sunflower oil without reaction in a 1986
+challenge study (the cold-pressed oil held a trace of protein) **[S]**
+([PubMed 3760399](https://pubmed.ncbi.nlm.nih.gov/3760399/)); a 2021 case
+report describes anaphylaxis to the seed with a passed oil challenge, and
+notes that refining lowers the protein content **[S]**
+([PMC8305662](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8305662/)).
+So "sunflower oil" and sunflower lecithin are **suspected**, never
+stated. The keto seed-oil rule (`constants.dart`) already reads
+sunflower oil for a different reason; this vocabulary changes no keto
+verdict.
+
+**Halva:** sunflower halva, made from roasted ground sunflower seeds in
+place of sesame, is popular in the former Soviet states, Bulgaria and
+Romania **[M]** ([Wikipedia, Halva](https://en.wikipedia.org/wiki/Halva);
+[University of Liège review](https://orbi.uliege.be/handle/2268/158495)
+**[S]**). Israeli halva is tahini (file 12 §1.1), so a bare "halva" is
+**not** a sunflower trigger; a halva that names sunflower is one, through
+the word itself.
+
+**Seeded breads:** multigrain and seeded loaves commonly combine
+sunflower and flax seeds (recipes and retail ingredient lists **[W]**:
+[Karen's Kitchen Stories, multigrain bread with sunflower and flax](https://karenskitchenstories.com/2013/05/multigrain-bread-with-sunflower-and.html),
+[Simple Truth multiseed bread listing](https://www.kroger.com/p/p/0001111013554)).
+**Unreviewed desk research**: suspected only, for sunflower and flax
+alike.
+
+### 27.4 Flaxseed (linseed)
+
+**Direct:** flax, flaxseed, flax seed, linseed, flax meal / ground flax,
+flaxseed oil, linum. **Hidden:** multigrain and seeded breads, seed
+crackers, cereals and energy bars. A 40-year-old man had repeated severe
+reactions minutes after multigrain bread, with positive skin and IgE
+tests **[M]**
+([Thermo Fisher allergen encyclopedia, f333](https://www.thermofisher.com/phadia/wo/en/resources/allergen-encyclopedia/f333.html));
+a case report of anaphylaxis to *Linum* notes earlier symptoms from bird
+feed and multigrain bread **[S]**
+([Allergol Immunopathol](https://elsevier.es/es-revista-allergologia-et-immunopathologia-105-articulo-anaphylaxis-linum-13042843));
+a 2026 case series describes reactions to grains, biscuits, yoghurts,
+milkshakes, salads and an energy bar holding flaxseed, blames diagnostic
+delay partly on flax being frequently omitted from labels, and argues
+for priority-allergen status **[S]**
+([Eur Ann Allergy Clin Immunol, flaxseed case series](https://www.eurannallergyimm.com/flaxseed-allergy-insights-from-a-case-series/)).
+Multigrain and seeded breads are **suspected**: the case reports show
+they can hold flax, and the seed mix is rarely on the menu (§27.3).
+
+### 27.5 Guards and confusions
+
+- **Water chestnut is not a nut:** "aquatic vegetables that grow in
+  marshes … not botanically related to tree nuts" **[M]**
+  ([Food Allergy Canada, Ask the allergist](https://www.foodallergycanada.ca/ask-the-allergist-march-2026/)).
+  It is a term guard on `chestnut` (lowered, never cancelled, per §0).
+- **Chestnut itself** (amends §2.5): FARE's FAQ calls chestnuts tree
+  nuts **[M]**
+  ([FARE, holiday cooking questions](https://www.foodallergy.org/fare-blog/nutmeg-nut-and-other-holiday-cooking-questions));
+  Food Allergy Canada agrees and says chestnut allergy is not that
+  common **[M]**; the Royal Children's Hospital Melbourne puts chestnut
+  in a different botanical category to tree nuts **[S]**
+  ([RCH tree nut allergy](https://www.rch.org.au/uploadedFiles/Main/Content/allergy/Tree%20Nut%20Allergy.pdf));
+  the FDA removed chestnut from its tree-nut list in January 2025
+  (§2.5). Chestnut is therefore a **suspected** tree-nut trigger with
+  this jurisdiction note, marrons glacés included.
+- **"Popcorn shrimp" and "popcorn chicken"** name a size of fried
+  morsel, not a corn coating (the breading may still hold cornstarch):
+  lowered.
+- **Corn inside other words:** "peppercorn", "acorn squash" and "corned
+  beef" are not corn; the word boundary keeps them out. "Corn flour" and
+  "קמח תירס" lower wheat (it is not wheat flour, ALG-04a) and still
+  report corn: the guard belongs to wheat only.
+- **Flax in "flax crackers"** lowers wheat's `crackers` and still reports
+  flax.
+- **Refined oils, syrups and starches** (§27.1, §27.3) are term guards
+  on corn and sunflower: lowered, never dropped.
+- **Guards:** "corn-free", "no corn", "without flax", "ללא תירס".
+
+**Sources (27):** the links above, each checked 2026-10-21 as a search
+result only.
+
+## 28. Single legumes: chickpea, lentil, pea, fenugreek, fava (issue #342; desk research, brief)
+
+> **Status: desk research, not clinical review. Checked 2026-10-21** from
+> web search-result snippets only, as the banner above describes (no page
+> was opened in full). §16 is the parent (legumes as a group); this section
+> is what each single legume, a toggle of its own under legumes (§16.5),
+> hides in. Rows marked **unreviewed desk research** had no snippet that
+> confirmed them and carry `suspected` at most. Grades as in file 12:
+> **[S]** strong, **[M]** medium, **[W]** weak.
+
+**Regulated:** none of the five is on any mandatory list (§16). Fava is
+not an allergen at all: favism is acute haemolysis in G6PD deficiency after
+eating fava beans, caused by vicine and convicine, which are heat-stable,
+so cooking does not help
+([PMC, favism review](https://pmc.ncbi.nlm.nih.gov/articles/PMC9013287/) **[S]**;
+[Singapore Food Agency](https://www.sfa.gov.sg/food-information/risk-at-a-glance/the-arch-enemy-of-g6pd-deficient-individuals-fava-beans) **[S]**).
+The app models it as a strict health condition, never an allergy.
+
+**Cross-reactivity, once for all five.** Allergy UK: legume allergy is
+thought to be rising in the UK, lentil and chickpea allergy is commoner in
+India, the Middle East and some Mediterranean countries, and pea
+cross-reacts with lentil and chickpea
+([Allergy UK, Reactions to Legumes v2](https://www.allergyuk.org/wp-content/uploads/2025/07/Reactions-to-Legumes-v2.pdf) **[M]**).
+A 2024 review lists pea, lentil, chickpea and fenugreek among the
+"non-priority" legumes that cause mild to severe reactions
+([Jappe et al., Curr Allergy Asthma Rep 2024](https://link.springer.com/article/10.1007/s11882-024-01165-7) **[S]**;
+[PMC legume review](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11364600/) **[S]**).
+**Fenugreek and peanut:** in a French cohort of 195 peanut-allergic
+children, 122 were sensitised to another legume and 66% of those to
+fenugreek, but fenugreek was not among the confirmed allergies (lentil,
+lupin and pea were); an in-vitro study says peanut-fenugreek
+cross-reactivity "should be considered", and a primary fenugreek allergy
+without peanut allergy is rare but reported
+([J Allergy Clin Immunol Glob 2024](https://doaj.org/article/05a25352b09449448445f24a39522a53) **[S]**;
+[Swiss case report](https://boris.unibe.ch/182348/1/s40629-022-00202-z__1_.pdf) **[S]**;
+file 12 §1.3). The app does not infer one legume from another: each is its
+own toggle, and the parent `legumes` carries every word of all five.
+
+### 28.1 Chickpea
+Direct: chickpea(s), chick pea(s), garbanzo(s), hummus (houmous, humus,
+hommus), chana / channa (Hindi), chole (Punjabi, "chickpeas"; a dish of
+chickpea curry), msabbaha / masabacha (warm whole chickpeas), gram flour
+and besan, which are milled chana, the small Indian chickpea
+([Archana's Kitchen, chole](https://archanaskitchen.com/chola-chana-masala-north-indian-spiced-chickpea-curry) **[W]**;
+[ckbk / Oxford Companion to Food, besan](https://app.ckbk.com/reference/food77337c02s001e148) **[M]**).
+"Chana" as the Hindi word was not confirmed by a snippet (unreviewed desk
+research) but every chana-masala recipe found is chickpeas.
+
+| Hidden source | Confidence | Source |
+|---|---|---|
+| Falafel: Israeli falafel is chickpea (fava was dropped in Israel because of favism); Egyptian ta'ameya is fava; some falafel mixes both | likely | [My Jewish Learning, classic falafel](https://www.myjewishlearning.com/the-nosher/classic-falafel-recipe/) **[W]**; [Tasting Table, ta'ameya](https://tastingtable.com/901336/the-real-difference-between-taameya-and-falafel) **[W]**; file 12 §1.3 |
+| Pakora and bhaji: vegetable fritters in a besan batter | likely | [ckbk / Oxford Companion, besan](https://app.ckbk.com/reference/food77337c02s001e148) **[M]**; [Recipes Wiki, chickpea flour](https://recipes.fandom.com/wiki/Chickpea_flour) **[W]** |
+| Socca, farinata: chickpea-flour flatbreads | likely | standard use, §16.2 (unreviewed desk research) |
+| Aquafaba: the cooking liquid of chickpeas, used as an egg-white substitute in vegan baking | likely | [The Kitchn](https://www.thekitchn.com/the-most-magical-egg-replacement-and-how-to-use-it-234588) **[W]**; [Vegetarian Resource Group](https://vrg.org/journal/vj2017issue2/2017_issue2_aquafabulous.php) **[W]** |
+| Harira: Moroccan soup on a tomato, lentil and chickpea base | likely | [Wikipedia, Harira](https://en.wikipedia.org/wiki/Harira) **[M]** |
+| Koshari: chickpeas are optional | suspected | see §28.2 |
+| Sabich: often served with hummus or chickpeas | suspected | file 12 §1.3 |
+
+### 28.2 Lentil
+Direct: lentil(s), mujadara and its spellings (majadra, mejadra,
+mujaddara, mujadra) — rice or bulgur with lentils and onions
+([Wikipedia, Mujaddara](https://en.wikipedia.org/wiki/Mujaddara) **[M]**) —
+masoor (red lentil), mercimek (Turkish, "lentil"; unreviewed desk research).
+
+| Hidden source | Confidence | Source |
+|---|---|---|
+| Dal (dhal, dahl, daal): dried split pulses — lentils, peas or beans — and the dish made of them; so lentil is likely, not certain | likely | [Wikipedia, Dal](https://en.wikipedia.org/wiki/Dal) **[M]** (citing the Oxford Companion to Food) |
+| Koshari / kushari: Egypt's rice, brown lentils, pasta and tomato sauce | likely | [WGBH, koshary](https://www.wgbh.org/news/2017-02-22/egypts-beloved-koshary-is-a-modern-mystery-in-an-ancient-cuisine) **[M]**; [Zaatar and Zaytoun](https://zaatarandzaytoun.com/koshari/) **[W]** |
+| Harira | likely | §28.1 |
+| Lentil flour in some schnitzel coatings | not used: one forum answer (file 12 §1.3) and it would flood every schnitzel | — |
+
+"Dal" is also Italian ("from the") on Italian menus ("dal forno"); the
+word is kept, since a false alarm is the acceptable direction.
+
+### 28.3 Pea
+Direct: pea(s), split pea(s), green pea(s), pea protein, petits pois,
+mangetout, sugar snap (snow peas, snap peas and mushy peas are found
+through "peas"), pease pudding, matar (Hindi, as in methi matar malai).
+Mangetout, snow peas and snap peas are all *Pisum sativum*, the garden pea
+([Horticulture Magazine, mangetout](https://horticulture.co.uk/blogs/growing/mangetout) **[W]**;
+[Saucy Dressings](https://saucydressings.com/blog/snow-peas-sugar-snap-peas-and-common-or-garden-peas-a-definitive-guide/) **[W]**;
+[Archana's Kitchen, methi matar malai](https://archanaskitchen.com/methi-malai-matar-recipe-fenugreek-peas-curry-with-cream) **[W]**).
+
+| Hidden source | Confidence | Source |
+|---|---|---|
+| Pea protein and pea fibre in plant-based meat substitutes, sometimes labelled only "vegetable protein" or "vegetable fibre"; vegetable burgers named as a dish that commonly holds peas; concentrated pea protein may react more strongly than peas | suspected (documented common, but a given burger may be soy) | [Allergy UK, pea protein](https://www.allergyuk.org/resources/reactions-to-pea-protein/) **[M]**; [BSACI](https://www.bsaci.org/pea-protein-and-food-allergy-labelling/) **[M]**; §16.2 |
+| Samosa: potato, onion and pea filling is the common vegetable samosa | suspected | [M&S vegetable samosas](https://www.marksandspencer.com/food/4-vegetable-samosas/p/fdp60512264) **[W]**; [Tesco samosa platter](https://www.tesco.com/groceries/en-GB/products/314696058) **[W]** |
+| Greek "fava" (Santorini fava): a purée of yellow split peas, or on Santorini of *Lathyrus clymenum*, a grass pea — not fava beans | likely | [Wikipedia, Fava (Greek dish)](https://en.wikipedia.org/wiki/Fava_(Greek_dish)) **[M]**; [Hodmedod's](https://www.hodmedods.co.uk/blogs/recipes/fava-santorini-yellow-split-peas) **[W]** |
+
+**Guards:** "pea" is a whole word, so it is never found inside chickpea,
+peanut or peach. It is found in "chick peas", "black-eyed peas", "pigeon
+peas" and "butterfly pea", none of them the garden pea: a term guard
+lowers those to suspected (they are legumes, so they are not cleared).
+
+### 28.4 Fenugreek
+Direct: fenugreek, methi (fresh or dried — kasuri methi — fenugreek
+leaves), hilbeh and its spellings (hilbe, helbeh, helba, hulba, hulbah),
+the Yemenite condiment of soaked, whipped fenugreek seed, sold at Israeli
+falafel shops and added to soup or eaten as a dip
+([My Jewish Learning, hilbeh](https://www.myjewishlearning.com/the-nosher/hilbeh-recipe) **[W]**;
+[Wikipedia, Hulbah](https://wikipedia.com/wiki/Hulbah) **[M]**;
+[Cook with Manali, methi](https://www.cookwithmanali.com/ingredients/methi/) **[W]**).
+
+| Hidden source | Confidence | Source |
+|---|---|---|
+| Panch phoron: fenugreek is one of its five standard seeds | likely | [Wikipedia, Panch phoron](https://en.wikipedia.org/wiki/Panch_phoron) **[M]** |
+| Saltah: Yemen's national stew, served with hilbeh on top | likely | [My Jewish Learning, hilbeh](https://www.myjewishlearning.com/the-nosher/hilbeh-recipe) **[W]** |
+| Curry powder: many blends hold fenugreek, not all | suspected | [Williams-Sonoma, curry powder](https://www.williams-sonoma.com/m/recipe/curry-powder.amp.html) **[W]**; [Wikipedia, Curry powder](https://en.wikipedia.org/wiki/Curry_powder) **[M]** |
+| Hawaij: the elaborate soup blends and some commercial ones add fenugreek; the basic and Adeni blends do not | suspected | [Wikipedia, Hawaij](https://en.wikipedia.org/wiki/Hawaij) **[M]**; [Stay Spiced hawaij](https://www.fromaustria.com/en-GB/stay-spiced/hawaij-curry-mix) **[W]** |
+| Zhug / schug | not used: cilantro, chilli, garlic, cardamom; fenugreek appears only as one chef's suggested variation | [Food52, zhug](https://food52.com/recipes/72133-zhug) **[W]** |
+| "Spice" on a packaged label may hide fenugreek | not actionable on a menu | [Wyndly](https://www.wyndly.com/blogs/learn/fenugreek-allergy) **[W]** |
+
+"Curry" alone is not a fenugreek term: Thai curry pastes are not fenugreek
+blends, and the word would flood every Asian menu.
+
+### 28.5 Fava (G6PD deficiency)
+Direct: fava, fava beans, faba, broad bean(s), horse bean(s), ful, ful
+medames and its spellings (foul medames, ful / foul mudammas, fool
+medames): Egypt's national dish, a stew of fava beans with olive oil and
+cumin; "ful" is Arabic for beans
+([Wikipedia, Ful medames](https://en.wikipedia.org/wiki/Ful_medames) **[M]**;
+[Saveur](https://www.saveur.com/article/Recipes/Classic-Stewed-Fava-Beans) **[W]**).
+Not the bare "foul" (an English word) and not "fave" (menu slang for
+"favourite").
+
+| Hidden source | Confidence | Source |
+|---|---|---|
+| Ta'ameya / tamiya: Egyptian falafel of fava beans | likely | [Tasting Table](https://tastingtable.com/901336/the-real-difference-between-taameya-and-falafel) **[W]**; [Chowhound](https://www.chowhound.com/1702705/difference-falafel-vs-taammeya/) **[W]**; [Egyptian Streets](https://egyptianstreets.com/2019/06/12/falafel-or-taameya-celebrating-the-popular-dishs-many-disguises-on-international-falafel-day/) **[W]** |
+| Falafel: in Israel chickpea, because makers dropped fava over favism; elsewhere fava or a mix | suspected | [My Jewish Learning, classic falafel](https://www.myjewishlearning.com/the-nosher/classic-falafel-recipe/) **[W]**; [Israeli embassy recipe](https://embassies.gov.il/chicago/CulturalNews/Our%20Weekly%20Recipe/Pages/Falafel-for-Yom-Haazmaot.aspx) **[M]**; file 12 §1.3 |
+| Bissara: Moroccan soup or purée of dried fava beans, sometimes with split peas | likely | [Wikipedia, Ful medames](https://en.wikipedia.org/wiki/Ful_medames) **[M]**; [MarocMama](https://marocmama.com/vegetarian-moroccan-bean-recipes/) **[W]** |
+
+**Guard:** "Santorini fava" and "Greek fava" are yellow split peas (§28.3),
+so the fava hit beside them is lowered, never cleared.
+
+### 28.6 Confusions
+- Hummus is chickpea **and** sesame (file 12 §1.1); falafel is chickpea
+  and/or fava and often sesame; the parent `legumes` takes each as stated.
+- Green beans and other *Phaseolus* beans are legumes but none of the five.
+- The waiter wording for fava asks for "fava beans (broad beans)" / "פול",
+  never "favism": the kitchen needs the food, not the diagnosis.
+
+**Sources (28):** see the inline links, read as search-result snippets on
+2026-10-21.
+
+---
+
 ## Sources
 
 Every URL cited above, grouped by publisher. All were reached only as
