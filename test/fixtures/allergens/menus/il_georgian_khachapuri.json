@@ -514,6 +514,12 @@
           "role": "protein",
           "evidence": "\"עוף\" (chicken)",
           "source": "12 §2.2"
+        },
+        "kosher": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"עוף\" fried \"בחמאה\": poultry with dairy",
+          "source": "12 §9.3"
         }
       }
     },

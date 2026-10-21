@@ -94,9 +94,9 @@ const List<String> _fishHe = <String>[
   "סביצ'ה",
 ];
 
-/// English crustacean triggers (11 §9.1). "Seafood" and "shellfish" name both
-/// crustaceans and molluscs, so both carry them.
-const List<String> _crustaceansEn = <String>[
+/// English crustacean names (11 §9.1): the head of [_crustaceansEn], public
+/// so the kosher vocabulary (`vocab_religious.dart`) reads the same words.
+const List<String> crustaceanNamesEn = <String>[
   'shrimp',
   'shrimps',
   'prawn',
@@ -112,14 +112,26 @@ const List<String> _crustaceansEn = <String>[
   'scampi',
   'krill',
   'bisque',
+];
+
+/// English words that name crustaceans and molluscs together (11 §9.1,
+/// §10.1): the tail of both [_crustaceansEn] and [_molluscsEn].
+const List<String> shellfishNamesEn = <String>[
   'seafood',
   'shellfish',
   'frutti di mare',
 ];
 
-/// Hebrew crustacean triggers (11 §9.1, 12 §1.7). `פירות ים` names both
-/// crustaceans and molluscs.
-const List<String> _crustaceansHe = <String>[
+/// English crustacean triggers (11 §9.1). "Seafood" and "shellfish" name both
+/// crustaceans and molluscs, so both carry them.
+const List<String> _crustaceansEn = <String>[
+  ...crustaceanNamesEn,
+  ...shellfishNamesEn,
+];
+
+/// Hebrew crustacean names (11 §9.1, 12 §1.7): the head of
+/// [_crustaceansHe], public for the kosher vocabulary.
+const List<String> crustaceanNamesHe = <String>[
   'שרימפס',
   'שרימפסים',
   'סרטן',
@@ -127,14 +139,22 @@ const List<String> _crustaceansHe = <String>[
   'לובסטר',
   'לנגוסטין',
   'קראב',
-  'פירות ים',
-  'פירות הים',
 ];
 
-/// English mollusc triggers (11 §10.1). `oyster` is guarded against the oyster
-/// mushroom; the Hebrew `צדפה` is left out because `פטריות צדפה` is the
-/// mushroom.
-const List<String> _molluscsEn = <String>[
+/// Hebrew words that name crustaceans and molluscs together (12 §1.7): the
+/// tail of both [_crustaceansHe] and [_molluscsHe].
+const List<String> shellfishNamesHe = <String>['פירות ים', 'פירות הים'];
+
+/// Hebrew crustacean triggers (11 §9.1, 12 §1.7). `פירות ים` names both
+/// crustaceans and molluscs.
+const List<String> _crustaceansHe = <String>[
+  ...crustaceanNamesHe,
+  ...shellfishNamesHe,
+];
+
+/// English mollusc names (11 §10.1): the head of [_molluscsEn], public for
+/// the kosher vocabulary.
+const List<String> molluscNamesEn = <String>[
   'mussel',
   'mussels',
   'moules',
@@ -161,13 +181,19 @@ const List<String> _molluscsEn = <String>[
   'periwinkle',
   'vongole',
   'cozze',
-  'seafood',
-  'shellfish',
-  'frutti di mare',
 ];
 
-/// Hebrew mollusc triggers (11 §10.1, 12 §1.7).
-const List<String> _molluscsHe = <String>[
+/// English mollusc triggers (11 §10.1). `oyster` is guarded against the oyster
+/// mushroom; the Hebrew `צדפה` is left out because `פטריות צדפה` is the
+/// mushroom.
+const List<String> _molluscsEn = <String>[
+  ...molluscNamesEn,
+  ...shellfishNamesEn,
+];
+
+/// Hebrew mollusc names (11 §10.1, 12 §1.7): the head of [_molluscsHe],
+/// public for the kosher vocabulary.
+const List<String> molluscNamesHe = <String>[
   'מולים',
   'צדפות',
   'סקאלופס',
@@ -182,8 +208,12 @@ const List<String> _molluscsHe = <String>[
   'חלזונות',
   'אסקרגו',
   'רכיכות',
-  'פירות ים',
-  'פירות הים',
+];
+
+/// Hebrew mollusc triggers (11 §10.1, 12 §1.7).
+const List<String> _molluscsHe = <String>[
+  ...molluscNamesHe,
+  ...shellfishNamesHe,
 ];
 
 /// English hidden sources of fish (11 §8.1, §8.2, §8.5, 12 §5).
@@ -335,8 +365,9 @@ const List<HiddenTrigger> _fishHiddenHe = <HiddenTrigger>[
   ),
 ];
 
-/// English hidden sources of crustaceans (11 §9.1, §9.2).
-const List<HiddenTrigger> _crustaceansHiddenEn = <HiddenTrigger>[
+/// The shrimp pastes (11 §9.1): the head of [_crustaceansHiddenEn], public
+/// for the kosher vocabulary.
+const List<HiddenTrigger> shrimpPastesEn = <HiddenTrigger>[
   HiddenTrigger(
     term: 'shrimp paste',
     certainty: TriggerCertainty.suspected,
@@ -352,6 +383,11 @@ const List<HiddenTrigger> _crustaceansHiddenEn = <HiddenTrigger>[
     certainty: TriggerCertainty.suspected,
     source: '11 §9.1',
   ),
+];
+
+/// English hidden sources of crustaceans (11 §9.1, §9.2).
+const List<HiddenTrigger> _crustaceansHiddenEn = <HiddenTrigger>[
+  ...shrimpPastesEn,
   HiddenTrigger(
     term: 'paella',
     certainty: TriggerCertainty.suspected,
@@ -403,8 +439,9 @@ const List<HiddenTrigger> _crustaceansHiddenHe = <HiddenTrigger>[
   ),
 ];
 
-/// English hidden sources of molluscs (11 §9.1, §10.2).
-const List<HiddenTrigger> _molluscsHiddenEn = <HiddenTrigger>[
+/// The mollusc sauces (11 §10.2): the head of [_molluscsHiddenEn], public
+/// for the kosher vocabulary.
+const List<HiddenTrigger> molluscSaucesEn = <HiddenTrigger>[
   HiddenTrigger(
     term: 'oyster sauce',
     certainty: TriggerCertainty.likely,
@@ -415,6 +452,11 @@ const List<HiddenTrigger> _molluscsHiddenEn = <HiddenTrigger>[
     certainty: TriggerCertainty.likely,
     source: '11 §10.2',
   ),
+];
+
+/// English hidden sources of molluscs (11 §9.1, §10.2).
+const List<HiddenTrigger> _molluscsHiddenEn = <HiddenTrigger>[
+  ...molluscSaucesEn,
   HiddenTrigger(
     term: 'fish sauce',
     certainty: TriggerCertainty.suspected,
@@ -452,8 +494,9 @@ const List<HiddenTrigger> _molluscsHiddenEn = <HiddenTrigger>[
   ),
 ];
 
-/// Hebrew hidden sources of molluscs (12 §1.7).
-const List<HiddenTrigger> _molluscsHiddenHe = <HiddenTrigger>[
+/// The mollusc sauces in Hebrew (12 §1.7): the head of
+/// [_molluscsHiddenHe], public for the kosher vocabulary.
+const List<HiddenTrigger> molluscSaucesHe = <HiddenTrigger>[
   HiddenTrigger(
     term: 'רוטב צדפות',
     certainty: TriggerCertainty.likely,
@@ -464,12 +507,32 @@ const List<HiddenTrigger> _molluscsHiddenHe = <HiddenTrigger>[
     certainty: TriggerCertainty.likely,
     source: '12 §1.7',
   ),
+];
+
+/// Hebrew hidden sources of molluscs (12 §1.7).
+const List<HiddenTrigger> _molluscsHiddenHe = <HiddenTrigger>[
+  ...molluscSaucesHe,
   HiddenTrigger(
     term: 'חריימה',
     certainty: TriggerCertainty.suspected,
     source: '12 §1.7',
   ),
 ];
+
+/// The crustacean term guards: "crab apple" is not a crab. Public for the
+/// kosher vocabulary.
+const Map<String, AllergenGuards> crustaceanTermGuards =
+    <String, AllergenGuards>{
+      'crab': AllergenGuards(afterEn: <String>['apple', 'apples']),
+      'crabs': AllergenGuards(afterEn: <String>['apple', 'apples']),
+    };
+
+/// The mollusc term guards: an oyster mushroom is not an oyster. Public for
+/// the kosher vocabulary.
+const Map<String, AllergenGuards> molluscTermGuards = <String, AllergenGuards>{
+  'oyster': AllergenGuards(afterEn: <String>['mushroom', 'mushrooms']),
+  'oysters': AllergenGuards(afterEn: <String>['mushroom', 'mushrooms']),
+};
 
 /// Fish and seafood: one entry per restriction this group owns.
 ///
@@ -513,10 +576,7 @@ const Map<RestrictionId, RestrictionVocabulary> seaVocabulary =
           beforeHe: <String>['ללא', 'בלי', 'נטול', 'כשר', 'כשרה'],
           afterHe: <String>['כשר', 'כשרה', 'כשרים', 'טבעוני', 'טבעונית'],
         ),
-        termGuards: <String, AllergenGuards>{
-          'crab': AllergenGuards(afterEn: <String>['apple', 'apples']),
-          'crabs': AllergenGuards(afterEn: <String>['apple', 'apples']),
-        },
+        termGuards: crustaceanTermGuards,
         sources: <String>['11 §9.1', '11 §9.3', '12 §1.7', '12 §2.2'],
       ),
       RestrictionId.molluscs: RestrictionVocabulary(
@@ -537,10 +597,7 @@ const Map<RestrictionId, RestrictionVocabulary> seaVocabulary =
           beforeHe: <String>['ללא', 'בלי', 'נטול', 'כשר', 'כשרה'],
           afterHe: <String>['כשר', 'כשרה', 'כשרים', 'טבעוני', 'טבעונית'],
         ),
-        termGuards: <String, AllergenGuards>{
-          'oyster': AllergenGuards(afterEn: <String>['mushroom', 'mushrooms']),
-          'oysters': AllergenGuards(afterEn: <String>['mushroom', 'mushrooms']),
-        },
+        termGuards: molluscTermGuards,
         sources: <String>['11 §10.1', '11 §10.3', '12 §1.7', '12 §2.2'],
       ),
     };

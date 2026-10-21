@@ -113,24 +113,43 @@ These strings, the names of the `RestrictionId` enum:
 `peanuts`, `treeNuts`, `milk`, `lactose`, `eggs`, `soy`, `wheat`, `gluten`,
 `fish`, `crustaceans`, `molluscs`, `sesame`, `celery`, `mustard`, `lupin`,
 `sulphites`, `legumes`, `alphaGal`, `fodmap`, `histamine`, `vegan`,
-`vegetarian`, `glp1`, `buckwheat`, `kiwi`, `peach`, `apple`, `banana`,
-`orange`, `beef`, `pork`, `chicken`, `gelatin`, `yam`, `corn`, `sunflower`,
-`flax`, `chickpea`, `lentil`, `pea`, `fenugreek`, `fava`, `nightshades`,
-`msg`, `caffeine`, `salicylates`, `oralAllergy`, `pescatarian`, `paleo`,
-`whole30`, `aip`, `jain`, `keto`. The enum's last id, `custom` (the user's
-own words, ALG-17), is never labelled: its vocabulary lives in a profile on
-a device, so the corpus has nothing to measure for it.
+`vegetarian`, `glp1`, `kosher`, `halal`, `buckwheat`, `kiwi`, `peach`,
+`apple`, `banana`, `orange`, `beef`, `pork`, `chicken`, `gelatin`, `yam`,
+`corn`, `sunflower`, `flax`, `chickpea`, `lentil`, `pea`, `fenugreek`,
+`fava`, `nightshades`, `msg`, `caffeine`, `salicylates`, `oralAllergy`,
+`pescatarian`, `paleo`, `whole30`, `aip`, `jain`, `keto`. The enum's last
+id, `custom` (the user's own words, ALG-17), is never labelled: its
+vocabulary lives in a profile on a device, so the corpus has nothing to
+measure for it.
 
 `keto` is never labelled. **Strict** restrictions are every id except
-`lactose`, `fodmap`, `histamine`, `vegan`, `vegetarian`, `glp1`, the five
-heads-up sensitivities (`nightshades`, `msg`, `caffeine`, `salicylates`,
-`oralAllergy`), the five research diets (`pescatarian`, `paleo`, `whole30`,
-`aip`, `jain`) and `keto`. The research restrictions (issue #342) arrive with
-empty vocabularies and carry no labels yet; each vocabulary follow-up adds
-its labels and leaves `_awaitingLabels` in `corpus_shape_test.dart`, and the
-Python twin measures only ids whose vocabulary holds a term.
+`lactose`, `fodmap`, `histamine`, `vegan`, `vegetarian`, `glp1`, `kosher`,
+`halal`, the five heads-up sensitivities (`nightshades`, `msg`, `caffeine`,
+`salicylates`, `oralAllergy`), the five research diets (`pescatarian`,
+`paleo`, `whole30`, `aip`, `jain`) and `keto`. The research restrictions
+(issue #342) arrive with empty vocabularies and carry no labels yet; each
+vocabulary follow-up adds its labels and leaves `_awaitingLabels` in
+`corpus_shape_test.dart`, and the Python twin measures only ids whose
+vocabulary holds a term.
 ALG-17 added five `alphaGal` labels (beef, pork and lamb dishes and a
 cheeseburger); FODMAP, histamine and GLP-1 carry none yet.
+
+Issue #342 added `kosher` and `halal` labels on 23 dishes of seven menus.
+They label **components only, never certification** (file 11 §24, §25):
+`kosher` is `contains` for pork, shellfish, a fish without fins and scales,
+blood, or meat or poultry served with dairy (a fish with butter is
+`free`); `halal` is `contains` for pork, blood or alcohol, cooked into a
+sauce included, and `free` for wine *vinegar* and cherry tomatoes
+(עגבניות שרי). Both are flexible, so the recall gate does not read them;
+`corpus_recall_test.dart` prints their recall and false positives only.
+
+The five heads-up sensitivities are labelled only in
+`sensitivities_labels.json` (file 11 §29, file 12 §13), which labels
+nothing else. A heads-up never moves a dish, so the recall gate does not
+read them either; `vocab_sensitivities_test.dart` replays that menu (every
+`contains` found unguarded, every `may_contain` found, every `free` with
+no hit or only a guarded one) and prints how many corpus dishes each one
+flags.
 
 ### `label`
 

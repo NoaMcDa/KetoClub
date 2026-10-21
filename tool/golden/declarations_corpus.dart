@@ -170,4 +170,31 @@ final List<DeclarationCase> declarationCases = <DeclarationCase>[
     dish: _dish('d30', 'פיצה עם גבינה טבעונית'),
     heading: 'פיצות',
   ),
+  // Kosher and halal (issue #342): a platform tag declares them, menu
+  // text never does, and a kosher tag never speaks for halal.
+  (
+    name: 'platform_tag_halal',
+    dish: _dish('d31', 'Lamb kebab', tags: <String>['halal']),
+    heading: null,
+  ),
+  (
+    name: 'platform_tag_halal_hebrew',
+    dish: _dish('d32', 'קבב טלה', tags: <String>['חלאל']),
+    heading: null,
+  ),
+  (
+    name: 'text_kosher_salt_declares_nothing',
+    dish: _dish('d33', 'Steak with kosher salt'),
+    heading: 'Kosher',
+  ),
+  (
+    name: 'text_halal_declares_nothing',
+    dish: _dish('d34', 'Halal chicken wrap'),
+    heading: 'מנות חלאל',
+  ),
+  (
+    name: 'platform_tag_kosher_not_halal',
+    dish: _dish('d35', 'Chicken wrap', tags: <String>['kosher']),
+    heading: null,
+  ),
 ];

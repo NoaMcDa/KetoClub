@@ -1339,6 +1339,205 @@ Obesity Medicine Association, and The Obesity Society." *Am J Clin Nutr*
 
 ---
 
+## 24. Kosher components (issue #342; desk research, brief)
+
+> **Status: desk research, not rabbinic review. Checked 2026-10-21** from
+> search-result snippets only, as the banner above describes (no page was
+> fetched in full: `chabad.org` and `thejc.com` refused the fetch from this
+> environment). **Components only, never certification** (file 03,
+> "Kosher, halal, Jain"; file 10's non-goals): a menu can name pork,
+> shrimp or a steak in butter; it can never show that the meat was
+> slaughtered and prepared under supervision or that the kitchen keeps
+> meat and dairy apart. The app flags the components a menu names and asks
+> about the certificate; it never says a dish or a kitchen is kosher. The
+> only kosher statement it makes stays ALG-09's attributed chip, "Declared
+> kosher by the platform".
+
+**Regulated:** nowhere as an allergen. Kosher is a religious rule, and
+whether a restaurant is kosher is a certificate (in Israel a rabbinate
+*teudat kashrut*), which only the restaurant can show.
+
+### 24.1 Pork
+Pork and every pig product is forbidden: a land mammal is kosher only if it
+both has split hooves and chews the cud, and the pig does not
+([Yale Chaplain's Office](https://chaplain.yale.edu/sites/default/files/2024-10/Jewish%20Dietary%20Restrictions%20Reference%20Sheet.pdf) **[M]**;
+[Wikipedia, Kosher foods](https://en.wikipedia.org/wiki/Kosher_foods) **[M]**;
+[University of Kentucky extension FCS3-577](https://publications.ca.uky.edu/sites/publications.ca.uky.edu/files/FCS3577.pdf) **[M]**).
+Direct: pork, pig, piglet, suckling pig, boar, bacon, ham, gammon, lard,
+lardo, lardons, carnitas, char siu, tonkatsu, tonkotsu, porchetta,
+guanciale, prosciutto, pancetta, jamón, serrano ham. Likely: chorizo,
+mortadella, speck, bratwurst, kielbasa, chicharrón, spare ribs, baby back
+ribs. Suspected (often beef or turkey on an Israeli menu): salami,
+pepperoni, sausage, hot dog. The lists are the app's culinary lexicon, not
+sourced dish by dish; the rule they apply is.
+
+### 24.2 Shellfish and fish without fins and scales
+Of water creatures only those with both fins and removable scales are
+kosher; shrimp, lobster, crab, oysters and every mollusc are not
+([Yale](https://chaplain.yale.edu/sites/default/files/2024-10/Jewish%20Dietary%20Restrictions%20Reference%20Sheet.pdf) **[M]**;
+[UKY FCS3-577](https://publications.ca.uky.edu/sites/publications.ca.uky.edu/files/FCS3577.pdf) **[M]**;
+[MyJewishLearning, kosher fish](https://www.myjewishlearning.com/article/kosher-fish-list/) **[M]**).
+The shellfish words are the Crustaceans and Molluscs vocabularies of §9
+and §10, reused. Fish with no removable scales: catfish (and the
+pangasius, basa and swai sold as catfish), eel, shark
+([Chabad, non-kosher fish list, reprinting the OU's](https://www.chabad.org/library/article_cdo/aid/2998673/jewish/Non-Kosher-Fish-List.htm) **[M]**),
+monkfish ([Chabad, "Is monkfish kosher"](https://www.chabad.org/library/article_cdo/aid/4660914/jewish/Is-Monkfish-Kosher.htm) **[M]**)
+and skate ([Kashrut Authority of Australia](https://www.ka.org.au/consumer-resources/common-kosher-and-non-kosher-fish) **[M]**;
+London Beth Din via [isitkosherapp](https://isitkosherapp.com/product/fish/fish-general-remark/1181163) **[W]**).
+**Sturgeon** has ganoid scales that cannot be removed without tearing the
+skin, so it is not kosher, and **caviar** is sturgeon roe
+([Chabad, "Which scales make a fish kosher"](https://www.chabad.org/library/article_cdo/aid/6379285/jewish/Which-Scales-Make-a-Fish-Kosher.htm) **[M]**):
+likely, since "salmon caviar" and "eggplant caviar" are something else.
+**Swordfish** is disputed — "not accepted as kosher by contemporary
+certifying agencies", while the Conservative movement accepts it and
+sturgeon (same Chabad page; [MyJewishLearning](https://www.myjewishlearning.com/article/kosher-fish-list/) **[M]**):
+suspected.
+
+### 24.3 Other animals
+Rabbit and hare are not kosher (no split hoof)
+([Yale](https://chaplain.yale.edu/sites/default/files/2024-10/Jewish%20Dietary%20Restrictions%20Reference%20Sheet.pdf) **[M]**:
+"Less common meats that are not permitted include rabbit, hare, camel, any
+rodent, reptile, amphibian or insect"). Frog legs follow from
+"amphibian". Birds of prey are forbidden but never on a menu.
+
+### 24.4 Blood
+Blood is forbidden, so kosher meat is salted to draw it out
+([Wikipedia, Kosher foods](https://en.wikipedia.org/wiki/Kosher_foods) **[M]**):
+black pudding, blood pudding, blood sausage, morcilla, boudin noir,
+blutwurst (the dishes are culinary knowledge; they are also pork).
+
+### 24.5 Meat with dairy
+Meat and dairy may not be eaten together, and the rule extends to
+**poultry**; **fish with dairy is permitted**
+([Yale](https://chaplain.yale.edu/sites/default/files/2024-10/Jewish%20Dietary%20Restrictions%20Reference%20Sheet.pdf) **[M]**:
+"it is acceptable to eat dairy with fish or with eggs";
+[Medical News Today, "What is kosher"](https://www.medicalnewstoday.com/articles/what-is-kosher) **[M]**:
+"The rabbis extended this prohibition to include not eating milk and
+poultry together"; [UKY FCS3-577](https://publications.ca.uky.edu/sites/publications.ca.uky.edu/files/FCS3577.pdf) **[M]**).
+No single word names it, so the app reads it as a **rule over two words of
+one dish**: a meat or poultry word (alpha-gal's mammal meats and cuts, §17,
+plus chicken, turkey, duck, goose, burger, steak, schnitzel, kebab,
+shawarma, sausage …) and a stated or likely dairy word (the Milk
+vocabulary, §3). Both in the dish → **stated** when both are stated, else
+suspected; one only in an option → suspected, asking whether one can be
+left off. A guarded word on either side (veggie burger, goat cheese,
+coconut milk, "no cheese") never counts, and fish never does, so salmon
+in a cream sauce is not flagged. Cheeseburger and cheesesteak name both at
+once and are direct triggers. *Parve* cream substitutes are common in
+Israeli kosher meat restaurants and a menu rarely says so: a stated pair
+is a question for the waiter, not proof.
+
+### 24.6 Gelatin
+Mainstream agencies (OK, Star-K, OU) do not accept gelatin from non-kosher
+animals; kosher gelatin is from kosher-slaughtered cattle, kosher fish or
+agar ([OK Kosher, "A closer look: gelatin"](https://www.ok.org/article/closer-look-gelatin) **[S]**;
+[OU Kosher, "Kosher gelatin"](https://oukosher.org/blog/articles/kosher-gelatin-innovation-and-tradition/) **[S]**;
+[OK, "Fish gelatin"](https://www.ok.org/article/fish-gelatin/) **[S]**).
+A menu never says which, so gelatin and the desserts set with it (panna
+cotta, marshmallow, gummies, aspic) are **suspected**; "fish gelatin" is
+guarded.
+
+### 24.7 Guards
+"No", "without", "-free", "vegan", "plant-based", "meatless",
+"imitation", "faux", "mock", "substitute", and **"kosher" beside the
+word** ("kosher bacon" is beef bacon; "סרטן כשר" is surimi, file 12 §2.2).
+The meat words beside a cured meat ("turkey bacon", "בייקון בקר",
+"פרושוטו אווז") and the compounds that name another food ("crab apple",
+"oyster mushroom", "eel sauce", "salmon caviar"). A guard lowers to
+suspected and never cancels (§0). "Vegetarian" is not a guard, as for the
+sea group.
+
+### 24.8 Confusions
+- **Certification is not a component.** A dish with no flagged word is
+  "No trigger found — ask the restaurant" for a kosher profile, never
+  "fits", and the chef card asks "Is your meat kosher-certified?" on its
+  own line.
+- **A platform's kosher tag** (10bis `kosher: true`) lowers the kosher
+  concerns of its dish by one step, as every declaration does (ALG-09); it
+  never speaks for halal. "Kosher salt" and "kosher-style" in menu text
+  declare nothing.
+- "Kosher" in the trip lexicon: an entry that hides shellfish is not
+  kosher by definition, so trip mode adds kosher to it.
+
+**Sources (24):** see the inline links; all were read as search-result
+snippets on 2026-10-21. **Unreviewed:** the culinary word lists (which
+cured meats are usually pork, which desserts hold gelatin) are desk
+research, not sourced word by word.
+
+---
+
+## 25. Halal components (issue #342; desk research, brief)
+
+> **Status:** as §24 — desk research from search-result snippets, checked
+> 2026-10-21, not reviewed by a scholar. **Components only, never
+> certification**: whether meat is *zabiha* (slaughtered as halal) is the
+> restaurant's to show, and the chef card asks "Is your meat
+> halal-certified?".
+
+**Regulated:** nowhere as an allergen.
+
+### 25.1 Pork
+Pork and its by-products are always haram, with lard a common cooking fat
+([Yale Chaplain's Office, Muslim dietary restrictions](https://chaplain.yale.edu/muslim-dietary-restrictions) **[M]**;
+[Maine DOE, Halal foods fact sheet](https://www.maine.gov/doe/sites/maine.gov.doe/files/inline-files/Halal%20Foods%20Fact%20Sheet.pdf) **[S]**;
+[City of Toronto, Halal fact sheet](https://www.toronto.ca/wp-content/uploads/2023/08/857f-HalalFactSheet20235.pdf) **[S]**).
+The pork lists are §24.1's, shared.
+
+### 25.2 Alcohol
+Intoxicating drinks are haram, **in cooking as well as in a glass**: wine,
+beer, liquor, cooking wine and mirin are named
+([Maine DOE](https://www.maine.gov/doe/sites/maine.gov.doe/files/inline-files/Halal%20Foods%20Fact%20Sheet.pdf) **[S]**;
+[Halal Foundation, halal and haram ingredients](https://halalfoundation.org/halal-and-haram-ingredients-list/) **[M]**;
+[Institute of Science Tokyo, halal guide](https://discover.titech.ac.jp/2025/08/life-as-a-muslim-in-tokyo-an-introductory-guide-to-eating-halal/) **[M]**,
+which also flags rice wine in Japanese rice dishes and soups). Some
+opinions differ on traces (brewer's yeast, Yale), which the app does not
+read. Every alcohol word is **hidden and likely** — the menu names the
+drink, not its alcohol, and some kitchens cook it off: wine, beer, lager,
+rum, vodka, whisky, bourbon, brandy, cognac, liqueur, sake, mirin, marsala,
+sherry, gin, tequila, champagne, prosecco, arak, ouzo, sangria, cocktail,
+flambé, beurre blanc, coq au vin, bourguignon, limoncello, amaretto,
+mojito, martini, vermouth, Irish coffee, zabaglione; suspected:
+tiramisu, risotto, teriyaki, fondue. The dish list is culinary knowledge.
+
+### 25.3 Blood
+Flowing blood is forbidden; halal slaughter drains it
+([Toronto fact sheet](https://www.toronto.ca/wp-content/uploads/2023/08/857f-HalalFactSheet20235.pdf) **[S]**).
+The blood dishes are §24.4's.
+
+### 25.4 Gelatin
+Gelatin is haram unless from fish or a halal source, and is to be avoided
+unless labelled halal or kosher
+([Maine DOE](https://www.maine.gov/doe/sites/maine.gov.doe/files/inline-files/Halal%20Foods%20Fact%20Sheet.pdf) **[S]**;
+[Halal Foundation](https://halalfoundation.org/halal-and-haram-ingredients-list/) **[M]**):
+suspected, as in §24.6.
+
+### 25.5 Guards
+As §24.7 with "halal" for "kosher", plus the words that mark a drink
+without alcohol ("non-alcoholic", "alcohol-free", "ללא אלכוהול", "נטול
+אלכוהול") and the compounds that are not alcohol: **wine vinegar** (vinegar
+is generally permitted; unreviewed for every school), root and ginger
+beer, malt beer (בירה שחורה), a shrimp cocktail or cocktail sauce, and
+"sake" before nigiri, maki or sashimi, where it is the Japanese word for
+salmon.
+
+### 25.6 Confusions
+- **Shellfish is not flagged for halal.** The Shafi'i, Maliki and Hanbali
+  schools treat all seafood as halal; the Hanafi school limits it to fish
+  and disputes shrimp
+  ([Wikipedia, Islamic dietary laws](https://en.wikipedia.org/wiki/Islamic_dietary_laws) **[M]**;
+  [ISA Halal, "Can Muslims eat shrimp"](https://www.isahalal.com/news-events/blog/halal-seafood-can-muslims-eat-shrimp-and-other-shellfish) **[M]**;
+  [SeekersGuidance, squid in the Hanafi school](https://seekersguidance.org/answers/hanafi-fiqh/is-it-permissible-to-eat-squid-in-the-hanafi-school/) **[M]**).
+  A Hanafi diner adds the Crustaceans and Molluscs entries, or their own
+  words.
+- **Meat that is not zabiha** cannot be read from a menu: it is the
+  certificate question.
+- A kosher tag never lowers halal: the two rules differ (alcohol, slaughter).
+
+**Sources (25):** see the inline links, read as search-result snippets on
+2026-10-21.
+
+---
+
 ## 29. Sensitivities: nightshades, MSG, caffeine, salicylates, oral allergy syndrome (issue #342; desk research, brief)
 
 > **Status: unreviewed desk research, checked 2026-10-21 by web search
@@ -1673,3 +1872,26 @@ search-result URLs with snippets (see banner).
 - https://www.jdn.co.il/news/2507491/
 - https://www.teamfrance-export.fr/infos-sectorielles/39650/39650-nouvelles-obligations-detiquetage-des-allergenes
 - https://www.freyrsolutions.com/consumer-industry-news/israel-proposes-alignment-of-food-labelling-rules-with-eu-regulation-11692011
+
+**Kosher and halal (§24, §25; checked 2026-10-21, snippets only)**
+- https://chaplain.yale.edu/sites/default/files/2024-10/Jewish%20Dietary%20Restrictions%20Reference%20Sheet.pdf
+- https://chaplain.yale.edu/muslim-dietary-restrictions
+- https://en.wikipedia.org/wiki/Kosher_foods
+- https://en.wikipedia.org/wiki/Islamic_dietary_laws
+- https://publications.ca.uky.edu/sites/publications.ca.uky.edu/files/FCS3577.pdf
+- https://www.medicalnewstoday.com/articles/what-is-kosher
+- https://www.myjewishlearning.com/article/kosher-fish-list/
+- https://www.chabad.org/library/article_cdo/aid/2998673/jewish/Non-Kosher-Fish-List.htm
+- https://www.chabad.org/library/article_cdo/aid/4660914/jewish/Is-Monkfish-Kosher.htm
+- https://www.chabad.org/library/article_cdo/aid/6379285/jewish/Which-Scales-Make-a-Fish-Kosher.htm
+- https://www.ka.org.au/consumer-resources/common-kosher-and-non-kosher-fish
+- https://isitkosherapp.com/product/fish/fish-general-remark/1181163
+- https://www.ok.org/article/closer-look-gelatin
+- https://www.ok.org/article/fish-gelatin/
+- https://oukosher.org/blog/articles/kosher-gelatin-innovation-and-tradition/
+- https://www.maine.gov/doe/sites/maine.gov.doe/files/inline-files/Halal%20Foods%20Fact%20Sheet.pdf
+- https://www.toronto.ca/wp-content/uploads/2023/08/857f-HalalFactSheet20235.pdf
+- https://halalfoundation.org/halal-and-haram-ingredients-list/
+- https://discover.titech.ac.jp/2025/08/life-as-a-muslim-in-tokyo-an-introductory-guide-to-eating-halal/
+- https://www.isahalal.com/news-events/blog/halal-seafood-can-muslims-eat-shrimp-and-other-shellfish
+- https://seekersguidance.org/answers/hanafi-fiqh/is-it-permissible-to-eat-squid-in-the-hanafi-school/
