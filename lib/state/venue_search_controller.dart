@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/named_profile.dart';
+import 'package:ketoclub/models/trip_destination.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/location/location_service.dart';
@@ -12,8 +14,11 @@ import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/services/venue/venue_search_service.dart';
+import 'package:ketoclub/utils/allergens/discovery_fit.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/geo.dart';
+import 'package:ketoclub/utils/profile_wording.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/utils/verdict_counts.dart';
 
@@ -50,6 +55,14 @@ enum DiscoveryChip {
 
   /// Only venues tagged with [VenueSearchController.topCuisine].
   cuisine,
+
+  /// Banto (issue #410): hides a scored venue none of whose food dishes
+  /// fits the active profiles, as it is or with a change
+  /// ([DiscoveryFit.hasFittingDish]). A venue without numbers is neither
+  /// hidden nor counted as fitting: it keeps its "not scored yet" state
+  /// (D21). Offered only while [VenueSearchController.showsFit] holds,
+  /// and filters nothing otherwise.
+  fitsProfile,
 }
 
 /// What a venue card may show about a venue's keto-friendliness (D13):
@@ -62,6 +75,11 @@ typedef VenueCardNumbers = ({
   int yellow,
   AnalysisEngine engine,
 });
+
+/// A menu and the analysis a card's numbers were read from, kept so the
+/// Banto fit (issue #410) can be evaluated on the device for whichever
+/// profiles are active, now or after a return from Settings.
+typedef _ScoredMenu = ({Menu menu, MenuAnalysed analysis});
 
 /// Screen state for the Discovery screen (architecture.md §6.5, §6.6,
 /// D13; `phase2_discovery_research.md` §6; issue #40).
@@ -92,6 +110,14 @@ typedef VenueCardNumbers = ({
 /// locate, search result, clear or chip change cancels it. Nothing is
 /// fetched on scroll, and putting the last nearby list back fetches
 /// nothing: it was scored when it arrived.
+///
+/// **Banto (issue #410).** With the `bantoMode` [load] was given and an
+/// active profile holding a restriction besides keto ([showsFit]), each
+/// card with numbers also has a [cardFit]: the same analysis evaluated on
+/// the device for the active profiles ([DiscoveryFit.of]; "fits everyone"
+/// for a group), computed lazily and kept until the profile changes. It
+/// adds no fetch, no model call and no backend call, and the quick score's
+/// options stay keto-only, so its cached analysis is today's.
 ///
 /// It also reads [AppSettings.lastVenue] (issue #55) so the screen can
 /// offer a "Continue with {venue}" row instead of opening it directly on
@@ -168,6 +194,17 @@ final class VenueSearchController extends ChangeNotifier {
   final Set<DiscoveryChip> _activeChips = <DiscoveryChip>{};
   Map<VenueRef, VenueCardNumbers> _numbers =
       const <VenueRef, VenueCardNumbers>{};
+  // The menu and analysis behind each entry of [_numbers] (issue #410),
+  // mirrored for the nearby list as [_nearbyNumbers] is.
+  Map<VenueRef, _ScoredMenu> _sources = const <VenueRef, _ScoredMenu>{};
+  Map<VenueRef, _ScoredMenu> _nearbySources = const <VenueRef, _ScoredMenu>{};
+  // [cardFit]'s results, each with the analysis it was evaluated from;
+  // emptied whenever the profiles, the trip or the flag change.
+  final Map<VenueRef, ({MenuAnalysed analysis, DiscoveryFit? fit})> _fits =
+      <VenueRef, ({MenuAnalysed analysis, DiscoveryFit? fit})>{};
+  bool _bantoMode = false;
+  List<NamedProfile> _people = const <NamedProfile>[];
+  TripDestination? _trip;
   // Venues a quick-score run has started fetching in the current result
   // set, so each is fetched at most once per list (D21); mirrored for the
   // remembered nearby list as [_nearbyNumbers] mirrors [_numbers].
@@ -282,6 +319,40 @@ final class VenueSearchController extends ChangeNotifier {
   /// Whether at least one result has card numbers — what enables the
   /// *Keto 8+* chip, which would otherwise always filter to nothing (D13).
   bool get hasAnyNumbers => _results.any((v) => _numbers.containsKey(v.ref));
+
+  /// How a card words its fit (issue #410): [ProfileWording.ketoOnly]
+  /// until [load] has run with `bantoMode` on and the active profiles hold
+  /// a restriction besides keto ([DiscoveryFit.wordingFor]).
+  ProfileWording get fitWording =>
+      DiscoveryFit.wordingFor(_people, bantoMode: _bantoMode);
+
+  /// Whether cards show a fit instead of the keto score, and the "Fits my
+  /// profile" chip is offered (issue #410): [fitWording] uses states.
+  bool get showsFit => fitWording.usesStates;
+
+  /// The fit of [venue]'s menu for the active profiles (issue #410), or
+  /// null when [showsFit] does not hold or [venue] has no [cardNumbers]:
+  /// an unscored card keeps its "not scored yet" state. Evaluated on the
+  /// device from the analysis its numbers came from, once per analysis
+  /// and profile.
+  DiscoveryFit? cardFit(Venue venue) {
+    if (!showsFit) return null;
+    final source = _sources[venue.ref];
+    if (source == null) return null;
+    final memo = _fits[venue.ref];
+    if (memo != null && identical(memo.analysis, source.analysis)) {
+      return memo.fit;
+    }
+    final fit = DiscoveryFit.of(
+      source.menu,
+      source.analysis,
+      _people,
+      trip: _trip,
+      bantoMode: _bantoMode,
+    );
+    _fits[venue.ref] = (analysis: source.analysis, fit: fit);
+    return fit;
+  }
 
   /// [results] narrowed by every chip in [activeChips], in the same order.
   List<Venue> get visibleResults {
@@ -455,12 +526,19 @@ final class VenueSearchController extends ChangeNotifier {
   /// Reads [AppSettings.lastVenue] and, when set, the name to show for it
   /// (see the class doc). Notifies listeners once.
   ///
+  /// It also records [bantoMode] and, with it, the active profiles and
+  /// the trip destination the cards' fits are evaluated for (issue #410),
+  /// so a profile edited in Settings shows on the cards on return. The
+  /// "Fits my profile" chip is turned off when [showsFit] no longer holds.
+  ///
   /// Safe to call on every return to the Explore tab, which is when the
   /// screen calls it now that this controller lives as long as the app
   /// (issue #233): it touches only the "Continue with…" row, never the
   /// query, the results or the chip, and starts no search.
-  Future<void> load() async {
-    final lastVenue = (await _settings.read()).lastVenue;
+  Future<void> load({bool bantoMode = BantoMode.enabled}) async {
+    final settings = await _settings.read();
+    _applyProfile(settings, bantoMode: bantoMode);
+    final lastVenue = settings.lastVenue;
     _lastVenue = lastVenue;
     final known = lastVenue == null ? null : await _knownFor(lastVenue);
     _lastVenueHint = known;
@@ -470,6 +548,22 @@ final class VenueSearchController extends ChangeNotifier {
               VenueRefResolver.websiteHost(lastVenue) ??
               lastVenue.platformId;
     _notify();
+  }
+
+  /// Records [bantoMode] and [settings]' active profiles and trip, and
+  /// forgets every fit when any of them changed.
+  void _applyProfile(AppSettings settings, {required bool bantoMode}) {
+    final people = bantoMode ? settings.activeProfiles : const <NamedProfile>[];
+    final trip = bantoMode ? settings.tripDestination : null;
+    if (bantoMode != _bantoMode ||
+        trip != _trip ||
+        !listEquals(people, _people)) {
+      _fits.clear();
+    }
+    _bantoMode = bantoMode;
+    _people = people;
+    _trip = trip;
+    if (!showsFit) _activeChips.remove(DiscoveryChip.fitsProfile);
   }
 
   /// "Quick score the rest" (issue #42, D13, D21): fetches the menu of
@@ -604,22 +698,25 @@ final class VenueSearchController extends ChangeNotifier {
     if (_isStale(generation)) return;
     switch (result) {
       case VenuesFound(:final venues):
-        final numbers = await _readNumbers(venues);
+        final (:numbers, :sources) = await _readNumbers(venues);
         if (_isStale(generation)) return;
         _results = venues;
         _numbers = numbers;
+        _sources = sources;
         _attempted = <VenueRef>{};
         _hasSearched = true;
         _activeChips.clear();
         if (isNearby) {
           _nearbyResults = venues;
           _nearbyNumbers = numbers;
+          _nearbySources = sources;
           _nearbyAttempted = <VenueRef>{};
         }
       case VenueSearchFailed(:final reason):
         _failure = reason;
         _results = const <Venue>[];
         _numbers = const <VenueRef, VenueCardNumbers>{};
+        _sources = const <VenueRef, _ScoredMenu>{};
         _attempted = <VenueRef>{};
         _hasSearched = false;
     }
@@ -633,23 +730,39 @@ final class VenueSearchController extends ChangeNotifier {
   /// The card numbers for [venues] as a list arrives, read from the
   /// device cache only (D13) — [MenuRepository.cached], never
   /// [MenuRepository.load]; the quick score that follows (D21) is what
-  /// fetches.
-  Future<Map<VenueRef, VenueCardNumbers>> _readNumbers(
-    List<Venue> venues,
-  ) async {
+  /// fetches. Each comes with the menu and analysis it was read from, for
+  /// [cardFit].
+  Future<
+    ({
+      Map<VenueRef, VenueCardNumbers> numbers,
+      Map<VenueRef, _ScoredMenu> sources,
+    })
+  >
+  _readNumbers(List<Venue> venues) async {
     final entries = await Future.wait(
       venues.map((venue) async {
         final cached = await _repository.cached(venue.ref);
         if (cached == null) return null;
-        final numbers = _numbersFrom(cached.menu, cached.analysis);
-        if (numbers == null) return null;
-        return MapEntry<VenueRef, VenueCardNumbers>(venue.ref, numbers);
+        final analysis = cached.analysis;
+        final numbers = _numbersFrom(cached.menu, analysis);
+        if (numbers == null || analysis is! MenuAnalysed) return null;
+        return (
+          ref: venue.ref,
+          numbers: numbers,
+          source: (menu: cached.menu, analysis: analysis),
+        );
       }),
     );
-    return <VenueRef, VenueCardNumbers>{
-      for (final entry in entries)
-        if (entry != null) entry.key: entry.value,
-    };
+    return (
+      numbers: <VenueRef, VenueCardNumbers>{
+        for (final entry in entries)
+          if (entry != null) entry.ref: entry.numbers,
+      },
+      sources: <VenueRef, _ScoredMenu>{
+        for (final entry in entries)
+          if (entry != null) entry.ref: entry.source,
+      },
+    );
   }
 
   /// The card numbers [analysis] supports over [menu]: its food-only
@@ -692,7 +805,9 @@ final class VenueSearchController extends ChangeNotifier {
     if (_isEstimateStale(run)) return;
     final numbers = _numbersFrom(fetched.menu, analysis);
     if (numbers == null) return;
+    final source = (menu: fetched.menu, analysis: analysis);
     _numbers = <VenueRef, VenueCardNumbers>{..._numbers, ref: numbers};
+    _sources = <VenueRef, _ScoredMenu>{..._sources, ref: source};
     // The same numbers stand when a cleared search puts the nearby list
     // back.
     if (_nearbyResults?.any((venue) => venue.ref == ref) ?? false) {
@@ -700,6 +815,7 @@ final class VenueSearchController extends ChangeNotifier {
         ..._nearbyNumbers,
         ref: numbers,
       };
+      _nearbySources = <VenueRef, _ScoredMenu>{..._nearbySources, ref: source};
     }
   }
 
@@ -724,6 +840,8 @@ final class VenueSearchController extends ChangeNotifier {
         DiscoveryChip.openNow => venue.isOnline ?? false,
         DiscoveryChip.cuisine =>
           cuisine == null || venue.cuisineTags.contains(cuisine),
+        // An unscored venue, or a keto-only profile, filters nothing.
+        DiscoveryChip.fitsProfile => cardFit(venue)?.hasFittingDish ?? true,
       };
       if (!passes) return false;
     }
@@ -740,6 +858,7 @@ final class VenueSearchController extends ChangeNotifier {
     if (nearby == null) {
       _results = const <Venue>[];
       _numbers = const <VenueRef, VenueCardNumbers>{};
+      _sources = const <VenueRef, _ScoredMenu>{};
       _attempted = <VenueRef>{};
       _hasSearched = false;
       _notify();
@@ -747,6 +866,7 @@ final class VenueSearchController extends ChangeNotifier {
     }
     _results = nearby;
     _numbers = _nearbyNumbers;
+    _sources = _nearbySources;
     // Its attempted set comes back with it, so no venue the nearby run
     // already fetched is fetched again (D21); no automatic run starts.
     _attempted = <VenueRef>{..._nearbyAttempted};

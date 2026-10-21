@@ -2405,4 +2405,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get restrictionSearchEmpty =>
       'No restriction matches. You can add it as your own below.';
+
+  @override
+  String get discoveryChipFitsProfile => 'Fits my profile';
 }

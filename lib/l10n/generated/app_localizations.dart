@@ -3809,6 +3809,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No restriction matches. You can add it as your own below.'**
   String get restrictionSearchEmpty;
+
+  /// Banto (issue #410): the Discovery chip beside Keto 8+ that keeps venues with at least one dish fitting the active profiles, as it is or with a change; unscored venues stay. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'Fits my profile'**
+  String get discoveryChipFitsProfile;
 }
 
 class _AppLocalizationsDelegate

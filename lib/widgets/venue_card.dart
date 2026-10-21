@@ -5,11 +5,14 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
+import 'package:ketoclub/utils/allergens/discovery_fit.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/geo.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/focus_ring.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
 import 'package:ketoclub/widgets/photo_tile.dart';
+import 'package:ketoclub/widgets/verdict_copy.dart';
 
 /// One venue in the Discovery list (issue #40, `.design/Discovery.dc.html`):
 /// a photo tile, the name, the keto score, the platform's blurb, a
@@ -41,6 +44,14 @@ import 'package:ketoclub/widgets/photo_tile.dart';
 /// small "Closed" tag in the photo's top-end corner (issue #227); open and
 /// unknown venues are drawn exactly as before.
 ///
+/// **Banto (issue #410).** With [bantoMode] on and a [fit] given, the
+/// card says how the menu fits the active profiles instead of keto: one
+/// line, "N fit · M with a change · K to ask", in
+/// [VerdictCopy.headerCounts]' own words for the fit's wording (a strict
+/// profile's "no trigger found", never "safe"), in place of the keto
+/// score, the green pill and the amber count. The engine chip stays. With
+/// no [fit] the card is exactly the keto card.
+///
 /// Laid out with directional insets and [PositionedDirectional] only, so
 /// the whole card mirrors under a right-to-left [Directionality].
 class VenueCard extends StatelessWidget {
@@ -49,8 +60,10 @@ class VenueCard extends StatelessWidget {
     required this.venue,
     required this.onTap,
     this.numbers,
+    this.fit,
     this.distanceKm,
     this.photoAspectRatio,
+    this.bantoMode = BantoMode.enabled,
     super.key,
   });
 
@@ -60,6 +73,13 @@ class VenueCard extends StatelessWidget {
   /// The cached analysis's score and counts for [venue] (D13), or null to
   /// show neither.
   final VenueCardNumbers? numbers;
+
+  /// How [venue]'s menu fits the active profiles (Banto, issue #410), or
+  /// null for the keto card. Shown only with [bantoMode] and [numbers].
+  final DiscoveryFit? fit;
+
+  /// Whether this build shows Banto surfaces (D26's convention).
+  final bool bantoMode;
 
   /// How far [venue] is from the search position, in kilometres, or null
   /// when either is unknown.
@@ -138,7 +158,7 @@ class VenueCard extends StatelessWidget {
                   Stack(
                     children: [
                       photo,
-                      if (cardNumbers != null)
+                      if (cardNumbers != null && _shownFit == null)
                         PositionedDirectional(
                           top: 11,
                           start: 11,
@@ -189,6 +209,7 @@ class VenueCard extends StatelessWidget {
     final theme = Theme.of(context);
     final verdictColors = VerdictColors.of(context);
     final cardNumbers = numbers;
+    final shownFit = _shownFit;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -204,7 +225,7 @@ class VenueCard extends StatelessWidget {
                 ),
               ),
             ),
-            if (cardNumbers != null) ...[
+            if (cardNumbers != null && shownFit == null) ...[
               const SizedBox(width: 10),
               KetoScoreBadge(score: cardNumbers.score, inline: true),
             ],
@@ -229,7 +250,16 @@ class VenueCard extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               if (meta.isNotEmpty) Text(meta, style: theme.textTheme.bodySmall),
-              if (cardNumbers != null)
+              if (shownFit != null)
+                _FitCounts(
+                  text: VerdictCopy.headerCounts(
+                    l10n,
+                    shownFit.counts,
+                    shownFit.wording,
+                  ),
+                  color: verdictColors.green.rail,
+                )
+              else if (cardNumbers != null)
                 _YellowCount(
                   text: l10n.venueCardYellowCount(cardNumbers.yellow),
                   color: verdictColors.amber.rail,
@@ -242,6 +272,9 @@ class VenueCard extends StatelessWidget {
       ],
     );
   }
+
+  /// [fit] when the card shows it: with [bantoMode], beside [numbers].
+  DiscoveryFit? get _shownFit => bantoMode && numbers != null ? fit : null;
 
   /// "{cuisine} · {distance} · {N} min", leaving out whichever part is
   /// unknown (issue #230).
@@ -276,11 +309,14 @@ class VenueCard extends StatelessWidget {
   /// the counts — one announcement for the whole card.
   String _semanticLabel(AppLocalizations l10n) {
     final cardNumbers = numbers;
+    final shownFit = _shownFit;
     return [
       venue.name,
       if (venue.isOnline case final online?)
         if (online) l10n.venueCardOpenNow else l10n.venueCardClosed,
-      if (cardNumbers != null) ...[
+      if (shownFit != null)
+        VerdictCopy.headerCounts(l10n, shownFit.counts, shownFit.wording)
+      else if (cardNumbers != null) ...[
         l10n.menuKetoScoreSemanticLabel(cardNumbers.score.toStringAsFixed(1)),
         l10n.venueCardGreenCount(cardNumbers.green),
         l10n.venueCardYellowCount(cardNumbers.yellow),
@@ -390,6 +426,39 @@ class _YellowCount extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(Icons.edit_note, size: 13, color: color),
+        const SizedBox(width: 5),
+        Flexible(
+          child: Text(
+            text,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Banto's "N fit · M with a change · K to ask" line (issue #410): an
+/// icon beside the words, as [_YellowCount] draws the keto count, so the
+/// colour never stands alone (architecture.md §6.6).
+class _FitCounts extends StatelessWidget {
+  const new({required this.text, required this.color});
+
+  final String text;
+
+  /// The icon's colour.
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.checklist, size: 13, color: color),
         const SizedBox(width: 5),
         Flexible(
           child: Text(

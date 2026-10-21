@@ -4180,6 +4180,37 @@ Hebrew spellings remain unreviewed), with a new corpus menu,
 `legume_parts_labels.json`, at 23/23 contains and 5/5 may-contain recall;
 the one false alarm on a `free` label is pea's lowered "chick peas".
 
+**Profile-aware Discovery (#410; amends ALG-12's "Discovery's quick score
+is untouched").** The quick score itself is still keto's: the same rule
+engine over `estimateMenuRepository`, keto-only options (no
+`restrictionsRequested`, so its cached analysis, prompt and key are
+today's), never the router, the backend's classifying routes or a model.
+What changes is what a card says about the analysis it already holds.
+`VenueSearchController.load` takes the screen's `bantoMode` and reads the
+active profiles and the trip; when their union holds a restriction
+besides keto (`showsFit`), `cardFit` evaluates the cached or quick-scored
+analysis on the device through `DiscoveryFit.of`
+(`utils/allergens/discovery_fit.dart`): each dish through
+`GroupEvaluator.evaluate` with its section heading and the menu's
+`KitchenReach`, so `ProfileEvaluator` re-reads the rules'
+`allergenFindings` for every dish, the strictest state across the active
+people kept ("fits everyone"), counted food-only by
+`VerdictCounts.ofStates`. Fits are memoised per analysis and dropped when
+the profile, the trip or the flag changes, so a profile edited in
+Settings shows on return without a fetch. With a fit, `VenueCard` shows
+`VerdictCopy.headerCounts` ("N fit · M with a change · K to ask"; strict:
+"no trigger found"/"ללא חשש") in place of the keto badge, the green pill
+and the amber count, keeping the engine chip; no new verdict word. A
+"Fits my profile" chip (`DiscoveryChip.fitsProfile`, offered only while
+`showsFit`, enabled like *Keto 8+*) hides a scored venue with no dish that
+fits as it is or with a change; a venue the quick score has not scored is
+neither hidden nor counted, and keeps D21's "not scored yet". *Keto 8+*
+stays and still filters by the keto score. C1 holds (the profile is read
+from `shared_preferences` and evaluated on the device; nothing new is
+sent), C3 holds (no schema bump, no new cache field), and with the flag
+off or a keto-only profile the controller's output for the golden venue
+list equals the keto output (`keto_unchanged_test`'s `bantoMode` layer).
+
 ### D27 — Post-meal confirmations, no ratings
 
 *(Banto, the Allergens epic's ALG-14, issue #356. Amends D23's visit
