@@ -890,6 +890,70 @@ tomato (עגבניות שרי), not sherry.
 
 ---
 
+## 13. Hebrew menu terms for the sensitivities (issue #342)
+
+**Status: unreviewed desk research, added 2026-10-21.** The food facts are
+file 11 §29 and its sources (checked 2026-10-21 as search excerpts). No
+Hebrew clinical page was consulted: one Hebrew press excerpt confirms that
+MSG (E621) is found in soup powders, preserves, processed meat and sauces
+(https://www.ynet.co.il/health/article/5455263 **[M]**). The Hebrew
+spellings themselves are the app's own lexicon and need a native-speaking
+dietitian. Spelling variants follow §1 (geresh and apostrophe read alike;
+gershayim are dropped, so תפו"א reads as תפוא).
+
+### 13.1 Nightshades — סולניים
+
+| Term | Meaning | Use |
+|---|---|---|
+| עגבנייה, עגבניה, עגבניות, עגבניית; תפוח אדמה, תפוחי אדמה, תפו"א; חציל, חצילים | tomato, potato, aubergine | direct |
+| פלפל, פלפלים, גמבה, פלפלון, פלפלונים, פפריקה, צ'ילי, חלפיניו (חלאפיניו, חלפניו), הבנרו, צ'יפוטלה, גוג'י | peppers, chilli, paprika, goji | direct; פלפל lowered beside שחור, לבן, אנגלי (allspice), ורוד, גרוס, לימון, סצ'ואן and after מלח ("מלח ופלפל") |
+| קטשופ, סלסה (סלסת), מרינרה, בולונז, ארביאטה, רוטב אדום, שקשוקה, מטבוחה, גולאש, מוסקה, באבא גנוש, סביח, סלט ישראלי | tomato, pepper or aubergine dishes | likely |
+| סחוג, הריסה (אריסה), טבסקו | chilli pastes and sauces | likely |
+| צ'יפס, פוטטוס, פירה | fries, wedges, mash (potato) | likely; צ'יפס lowered before בטטה, קישוא, פולנטה |
+| ניוקי, פיצה, חריף, חריפה | often potato, tomato sauce, chilli | suspected; פיצה lowered before לבנה/ביאנקה |
+
+### 13.2 MSG — מונוסודיום גלוטמט
+
+| Term | Meaning | Use |
+|---|---|---|
+| מונוסודיום גלוטמט, גלוטמט, גלוטומט; MSG and E621 in Latin letters | MSG named | direct |
+| משפר טעם, משפרי טעם, מגבר טעם, מגברי טעם, מעצים טעם | "flavour enhancer" | likely |
+| אבקת מרק, קוביית מרק (קובית מרק), קוביות מרק, תמצית שמרים | soup powder, stock cubes, yeast extract | suspected |
+
+"ללא תוספת" (no added) and ללא/בלי lower every term, a Latin "MSG" too.
+
+### 13.3 Caffeine — קפאין
+
+| Term | Meaning | Use |
+|---|---|---|
+| קפאין, קפה, נסקפה, אספרסו, הפוך, קפוצ'ינו, לאטה, אמריקנו, מקיאטו, קורטדו, מוקה, ריסטרטו, תה שחור, תה ירוק, מאצ'ה, קולה, משקה אנרגיה, משקאות אנרגיה | coffee, tea, cola, energy drinks | direct; הפוך takes no free prefix (להפוך is "to flip"), nor קולה (שקולה is "balanced") |
+| תה (and ותה, התה), צ'אי, טירמיסו | tea, chai, tiramisu | likely; תה takes no free prefix (שתה "drank", כתה "class"); lowered before צמחים, נענע, קמומיל, פירות, לואיזה, רויבוס, ג'ינג'ר, זנגביל, היביסקוס (תה נענע is often black tea with mint, so this only lowers) |
+| שוקולד, קקאו | chocolate, cocoa | suspected; שוקולד לבן lowered |
+
+נטול קפאין, ללא קפאין and דקף lower, never cancel: decaf keeps a little
+caffeine (file 11 §29.3).
+
+### 13.4 Salicylates — סליצילטים (unreviewed)
+
+All suspected, as file 11 §29.4: קארי, גרם מסאלה, פפריקה, טימין,
+רוזמרין, נענע, מנטה, פטל, אוכמניות, חמוציות, פירות יער, צימוקים, שזיפים
+מיובשים, פירות יבשים, דבש, תה, ליקריץ, שקד, שקדים, רסק עגבניות, מלפפון
+חמוץ, מלפפונים חמוצים, ווסטרשייר. "שקדי מרק" (soup croutons) is not an
+almond and does not match.
+
+### 13.5 Oral allergy syndrome — תסמונת אלרגיה אוראלית
+
+| Term | Meaning | Use |
+|---|---|---|
+| תפוח, תפוחים, תפוחי עץ, אפרסק, דובדבן, אגס, שזיף (and plurals), קיווי, גזר (וגזר, הגזר, בגזר), מלון (ומלון), אבטיח, בננה, בננות, מלפפון, מלפפונים, קישוא, קישואים | raw birch- and ragweed-group fruit and vegetables | direct; lowered by a cooked form: before (ריבת, ריבה, עוגת, פאי, קומפוט, מרק, שטרודל, טארט, קרמבל, רסק, לחם, מאפה) or after (אפוי, מבושל, קלוי, צלוי, מקורמל, מטוגן, מוקפץ, כבוש, חמוץ and their inflections); תפוח lowered before אדמה (potato) |
+| סלרי, אגוזי לוז, אגוז לוז, שקד, שקדים | celery and nuts | direct, with no cooking guard (they may react cooked) |
+| סלט פירות, סלט ישראלי | raw fruit; raw cucumber | likely |
+| סמוטי, שייק פירות, קולסלאו, סלט ירקות | often raw fruit, carrot or cucumber | suspected |
+
+גזר and מלון take no free prefix: מגזר is a sector, במלון "at the hotel"
+(מלון is also "hotel"). "לוז" alone is not listed: as לו"ז it is a
+schedule.
+
 ## 11. Hebrew menu terms for corn, sunflower seed, flaxseed and chestnut (issue #342)
 
 **Status: desk research, added on 2026-10-21, not clinical review.** The

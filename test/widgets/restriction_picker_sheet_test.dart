@@ -318,6 +318,11 @@ void main() {
           RestrictionId.lactose,
           RestrictionId.fodmap,
           RestrictionId.histamine,
+          RestrictionId.nightshades,
+          RestrictionId.msg,
+          RestrictionId.caffeine,
+          RestrictionId.salicylates,
+          RestrictionId.oralAllergy,
         },
       );
 
@@ -331,8 +336,8 @@ void main() {
         find.byKey(restrictionOptionKey(RestrictionId.sesame)),
         findsNothing,
       );
-      // The intolerance group had only lactose, FODMAP and histamine, so
-      // its heading goes too.
+      // The intolerance group had only lactose, FODMAP, histamine and the
+      // five sensitivities, so its heading goes too.
       expect(find.text(_en.restrictionKindIntolerance), findsNothing);
       expect(find.byKey(restrictionOptionKey(RestrictionId.milk)), findsOne);
     });

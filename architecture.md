@@ -4087,6 +4087,22 @@ kosher or halal *certification*, which no app can verify (file 03; their
 components are a separate pull request). Chestnut is no id: it stays a
 tree-nut question for that vocabulary (file 11 §2.5).
 
+**The sensitivities' words (#342 follow-up).** `vocab_sensitivities.dart`
+fills nightshades, MSG, caffeine, salicylates and oral allergy syndrome
+from file 11 §29 and file 12 §13 (unreviewed desk research, checked by
+web search on 2026-10-21), so all five now appear in the picker. They
+stay heads-ups: every finding is `suspected` and moves nothing. MSG is
+stated only where a menu names it (MSG, E621, monosodium glutamate),
+never inferred from a cuisine; stock powders and yeast extract are
+suspected. Salicylates rest on contested data, so every term is hidden
+and suspected. A guard lowers and never cancels: decaf and herbal tea for
+caffeine, sweet potato and black pepper for nightshades, and for oral
+allergy syndrome a cooked form beside a fruit or vegetable ("apple pie",
+"גזר מבושל"), with no cooking guard on celery and nuts, which may react
+cooked. Their corpus menu, `sensitivities_labels.json`, labels only these
+five; the strict recall gate does not measure heads-ups, so
+`vocab_sensitivities_test.dart` replays it instead.
+
 *Seeds extra filled (corn, sunflower, flax).* `vocab_seeds_extra.dart`
 now holds the three vocabularies from file 11 §27 and file 12 §11, so
 the picker offers them. Refined products the guidance disagrees about

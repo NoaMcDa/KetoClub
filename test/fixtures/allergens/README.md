@@ -39,6 +39,8 @@ test/fixtures/allergens/
   menus/*.json      one file per menu
 ```
 
+Five menus are copied from existing fixtures and the rest are written for the corpus. More than half of the dishes are Hebrew (a Hebrew letter in the name or description); the shape test enforces that and the minimum sizes, so this file states no counts that could go stale.
+
 Eighteen menus: five are copied from existing fixtures and thirteen are written for the corpus. More than half of the dishes are Hebrew (a Hebrew letter in the name or description); the shape test enforces that and the minimum sizes, so this file states no counts that could go stale.
 
 | File | Source | Language |
@@ -58,6 +60,8 @@ Eighteen menus: five are copied from existing fixtures and thirteen are written 
 | `asian_takeaway_soy_peanut.json` | synthetic Thai and Chinese place | en |
 | `us_steakhouse.json` | synthetic steakhouse (Worcestershire, blue cheese) | en |
 | `bakery_lupin_sulphites.json` | synthetic bakery: lupin flour, dried fruit | en |
+| `sensitivities_labels.json` | synthetic mixed menu labelled only for the five heads-up sensitivities (nightshades, MSG, caffeine, salicylates, oral allergy syndrome; 11 §29, 12 §13) | mixed |
+
 | `seeds_extra_labels.json` | synthetic cafe and Latin grill: corn, sunflower seed, flaxseed, chestnut and their traps (issue #342) | mixed |
 
 | `legume_parts_labels.json` | synthetic single legumes: hummus, ful, mujadara, peas, hilbeh, dal, ta'ameya | mixed |
@@ -144,6 +148,14 @@ blood, or meat or poultry served with dairy (a fish with butter is
 sauce included, and `free` for wine *vinegar* and cherry tomatoes
 (עגבניות שרי). Both are flexible, so the recall gate does not read them;
 `corpus_recall_test.dart` prints their recall and false positives only.
+
+The five heads-up sensitivities are labelled only in
+`sensitivities_labels.json` (file 11 §29, file 12 §13), which labels
+nothing else. A heads-up never moves a dish, so the recall gate does not
+read them either; `vocab_sensitivities_test.dart` replays that menu (every
+`contains` found unguarded, every `may_contain` found, every `free` with
+no hit or only a guarded one) and prints how many corpus dishes each one
+flags.
 
 ### `label`
 
