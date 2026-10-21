@@ -39,12 +39,10 @@ test/fixtures/allergens/
   menus/*.json      one file per menu
 ```
 
-
-
-
-
-Five menus are copied from existing fixtures and the rest are written for the corpus. More than half of the dishes are Hebrew (a Hebrew letter in the name or description); the shape test enforces that and the minimum sizes, so this file states no counts that could go stale.
-Eighteen menus: five are copied from existing fixtures and thirteen are written for the corpus. More than half of the dishes are Hebrew (a Hebrew letter in the name or description); the shape test enforces that and the minimum sizes, so this file states no counts that could go stale.
+Five menus are copied from existing fixtures and the rest are written for the
+corpus. More than half of the dishes are Hebrew (a Hebrew letter in the name
+or description); the shape test enforces that and the minimum sizes, so this
+file states no counts that could go stale.
 
 | File | Source | Language |
 |---|---|---|
@@ -64,13 +62,9 @@ Eighteen menus: five are copied from existing fixtures and thirteen are written 
 | `us_steakhouse.json` | synthetic steakhouse (Worcestershire, blue cheese) | en |
 | `bakery_lupin_sulphites.json` | synthetic bakery: lupin flour, dried fruit | en |
 | `diets_extra_labels.json` | synthetic mixed menu for the extra diets (pescatarian, paleo, Whole30, AIP, Jain): fish, roots, grains, honey, wine | mixed |
-
 | `foods_extra_labels.json` | synthetic Israeli cafe-and-grill and US diner / Japanese noodle dishes for buckwheat and Japan's recommended foods (issue #342); labels only those eleven ids | mixed |
-
 | `sensitivities_labels.json` | synthetic mixed menu labelled only for the five heads-up sensitivities (nightshades, MSG, caffeine, salicylates, oral allergy syndrome; 11 §29, 12 §13) | mixed |
-
 | `seeds_extra_labels.json` | synthetic cafe and Latin grill: corn, sunflower seed, flaxseed, chestnut and their traps (issue #342) | mixed |
-
 | `legume_parts_labels.json` | synthetic single legumes: hummus, ful, mujadara, peas, hilbeh, dal, ta'ameya | mixed |
 
 The golden menus are copies of their dish texts, never imports: the corpus
@@ -140,10 +134,10 @@ measure for it.
 `halal`, the five heads-up sensitivities (`nightshades`, `msg`, `caffeine`,
 `salicylates`, `oralAllergy`), the five research diets (`pescatarian`,
 `paleo`, `whole30`, `aip`, `jain`) and `keto`. The research restrictions
-(issue #342) arrive with empty vocabularies and carry no labels yet; each
-vocabulary follow-up adds its labels and leaves `_awaitingLabels` in
-`corpus_shape_test.dart`, and the Python twin measures only ids whose
-vocabulary holds a term.
+(issue #342) arrived with empty vocabularies; each vocabulary follow-up
+filled its file and added its labels, and the Python twin measures only ids
+whose vocabulary holds a term.
+
 ALG-17 added five `alphaGal` labels (beef, pork and lamb dishes and a
 cheeseburger); FODMAP, histamine and GLP-1 carry none yet.
 
@@ -288,7 +282,7 @@ apostrophe, `מלווח`, `טחינא`, `שומשומין`.
 
 ## Gate design notes
 
-For the test that will replay an engine over this corpus:
+How `corpus_recall_test.dart`, which replays the engine over this corpus, reads it:
 
 - **False positives are measured only against explicit `free` labels.** An
   absent label is *unlabelled*, not `free`: nobody asserted the engine is wrong
@@ -305,8 +299,9 @@ For the test that will replay an engine over this corpus:
 
 ## What this is not
 
-It is not a gate. No test here replays an engine; the recall gate that
-closes issue #352 arrives with the engine (ALG-03/04). The corpus is also
+This folder holds data, not a gate: the gate is
+`test/utils/allergens/corpus_recall_test.dart` (ALG-10, issue #352), which
+replays an engine over it, and its Python twin. The corpus is also
 not a statement about any real restaurant: the synthetic menus describe no
 real venue, and the Wolt and 10bis files carry only the public dish text of
 the fixtures they were copied from.

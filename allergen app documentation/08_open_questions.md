@@ -60,10 +60,13 @@
     per entry.
 13. **Name and brand.** Rename, or ship an "allergens" mode inside
     KetoClub first and decide after the pilot?
-    **Answer: a rename is planned; the name is not decided.** The epic
+    **Answer: decided — the name is "Banto", shipped as a mode inside the
+    one codebase behind `--dart-define=BANTO_MODE=true` (`architecture.md`
+    D26); without the define the app is KetoClub byte for byte.** The epic
     keeps every code identifier and wire name (`nonKeto`, `ketoScore`,
-    the `keto*` constants) and changes UI copy only, so the rename is a
-    branding and store-listing task, not an engine task.
+    the `keto*` constants) and changes UI copy only, so the rename was a
+    branding and store-listing task, not an engine task. The store
+    listing itself is not done.
 14. **Keto users' experience.** When the profile has only "keto", the app
     must look and behave exactly as today; is a regression suite for that
     promise enough, or does keto need to stay a separate mode?
