@@ -3900,6 +3900,72 @@ abstract class AppLocalizations {
   /// **'Your profile has changed since. Open this menu to check it again.'**
   String get savedRecheck;
 
+  /// Banto (issue #418): the dish card's toggle, as a tooltip and screen-reader label, when the dish is not in the order yet. In memory only.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to my order'**
+  String get orderAdd;
+
+  /// Banto (issue #418): the dish card's toggle, as a tooltip and screen-reader label, when the dish is already in the order.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from my order'**
+  String get orderRemove;
+
+  /// Banto (issue #418): the floating pill over the menu once the order has dishes; opens the order card.
+  ///
+  /// In en, this message translates to:
+  /// **'My order · {count}'**
+  String orderPill(int count);
+
+  /// Banto (issue #418): what a screen reader announces for the order pill.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{My order, 1 dish. Opens the order card.} other{My order, {count} dishes. Opens the order card.}}'**
+  String orderPillSemantic(int count);
+
+  /// Banto (issue #418): the order card's small title; also the share subject.
+  ///
+  /// In en, this message translates to:
+  /// **'My order'**
+  String get orderCardTitle;
+
+  /// Banto (issue #418): the screen-reader label and tooltip of a section's remove button on the order card.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {dish} from my order'**
+  String orderCardRemoveDish(String dish);
+
+  /// Banto (issue #418): the label over the allergy note, shown once after the dishes on the order card.
+  ///
+  /// In en, this message translates to:
+  /// **'For the whole order'**
+  String get orderCardAllergyTitle;
+
+  /// Banto (issue #418): copies the whole order card as text.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get orderCardCopy;
+
+  /// Banto (issue #418): the snack bar after Copy on the order card.
+  ///
+  /// In en, this message translates to:
+  /// **'Order copied'**
+  String get orderCardCopied;
+
+  /// Banto (issue #418): shares the whole order card as text.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get orderCardShare;
+
+  /// Banto (issue #418): empties the order and closes the order card.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear order'**
+  String get orderCardClear;
+
   /// Banto (#419): the chef card's language picker segment for French, shown during a trip to France.
   ///
   /// In en, this message translates to:

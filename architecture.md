@@ -4281,6 +4281,46 @@ Settings no longer matches their old mark by name (the mark stays in the
 entry, unshown), and a dish id that a platform reassigns orphans a stored
 dish's answers as it does a cached one's (D27).
 
+**The order card: one card for the whole order (#418; restores the
+"Waiter card · N dishes" pill #169 deleted, on a new card).** With
+`bantoMode` and a wording that uses states, every evaluated dish card
+carries an "Add to my order" icon toggle beside the state pill (its label
+names what a tap does, for screen readers and as a tooltip; a keto card
+and a keto-only profile get none). The order is `OrderController`
+(`state/order_controller.dart`): dish ids per `VenueRef`, in the order
+added, **in memory only** (C1: no store, no cache, no history, no upload),
+and **app-scoped** — provided by `KetoClubApp` only under Banto and read
+by the menu screen as nullable — rather than a field of `MenuController`,
+which lives and dies with its route and would lose the order when the
+person goes back to Explore and returns; each menu keeps its own, so
+opening another neither shows nor clears it. It holds ids, never text or
+states: the card re-reads `MenuController.evaluationFor`, so it never
+shows a state the menu no longer gives, and a dish the menu no longer has
+drops out. While the order has a dish the menu evaluates, a "My order ·
+N" pill floats at the bottom centre of the dish list (over the list
+itself, so in two panes it is centred on the dishes, with the list's
+bottom padding grown to clear it; the menu route has no bottom bar or
+rail), and opens `OrderCardScreen` full screen with the Waiter Card's
+shell (brightness raised and restored, large type, `contentDirection`,
+a pinned Done): one section per dish — the name as printed, then the
+evaluator's change and `VerdictCopy.waiterQuestions`, both in the dish's
+language — followed once by `ChefCardText.allergyNote` for the profile
+the menu is read for (a group's union, exactly what the overflow's "Copy
+allergy note" copies), in the menu's language
+(`MenuShareText.menuIsHebrew`). The composer is pure,
+`utils/allergens/order_card_text.dart` (`OrderCardText`), taking the
+questions as plain strings because `VerdictCopy` sits in `widgets/`; its
+one new sentence, for a dish to avoid that the person adds anyway, is
+"The menu names '{the menu's words}' in this dish." / "התפריט מציין
+'{…}' במנה הזו." (the restriction as the thing avoided when the words are
+over 40 characters), in Dart per §6.3's exception, followed by the dish's
+question; never "safe" or "בטוח". In a group each dish reads the combined
+evaluation (every person's concern once), and per-person attribution on
+the order card is not built. The card's actions are Remove per dish (the
+last one closes the card), Copy, Share (`MenuSharer.shareText`, subject
+"My order") and Clear order; their labels are `order*` ARB keys. Nothing
+moves on the wire, in the goldens or in the Python twin.
+
 **The chef card in the destination's language, and as an image (ALG-13's
 local card, ALG-08; #419, #420; amends the trip-mode paragraph's "the card
 stays Hebrew or English").** `ChefCardLanguage`
