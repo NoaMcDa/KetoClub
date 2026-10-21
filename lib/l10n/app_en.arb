@@ -893,7 +893,7 @@
   "@restrictionAlphaGalHint": {"description": "Banto (ALG-17): the picker's hint under alpha-gal, whose dairy reaction is individual and carried by the Milk entry."},
   "restrictionOwnTitle": "Add your own",
   "@restrictionOwnTitle": {"description": "Banto (ALG-17): heading of the picker's free-text restriction field."},
-  "restrictionOwnNote": "Something not on the list, such as kiwi or coriander. Checked on this device only, as strictly as an allergy, by the words the menu prints.",
+  "restrictionOwnNote": "Something not on the list, such as mango or coriander. Checked on this device only, as strictly as an allergy, by the words the menu prints.",
   "@restrictionOwnNote": {"description": "Banto (ALG-17): the note above the free-text restriction field. Never 'safe'."},
   "restrictionOwnField": "Food to avoid",
   "@restrictionOwnField": {"description": "Banto (ALG-17): label of the free-text restriction field."},

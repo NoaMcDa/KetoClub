@@ -3802,6 +3802,538 @@
           {
             "dishes": [
               {
+                "description": "כוסמת קלויה, ירקות קלויים ולימון",
+                "id": "k1",
+                "imageUrl": null,
+                "name": "סלט כוסמת",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "סובה, מלפפון, בצל ירוק ורוטב שויו",
+                "id": "k2",
+                "imageUrl": null,
+                "name": "אטריות סובה קרות",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "לחם מחמצת מקמח כוסמין מלא",
+                "id": "k3",
+                "imageUrl": null,
+                "name": "לחם כוסמין",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "אטריות חיטה מוקפצות עם רצועות עוף וירקות",
+                "id": "k4",
+                "imageUrl": null,
+                "name": "יאקיסובה עוף",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "סובה קרה, יאם יפני מגורר וביצה",
+                "id": "k5",
+                "imageUrl": null,
+                "name": "אטריות סובה עם טורורו",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "קיווי, תפוח ירוק ונענע",
+                "id": "k6",
+                "imageUrl": null,
+                "name": "שייק קיווי ותפוח",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "קיווי, תותים ונענע",
+                "id": "k7",
+                "imageUrl": null,
+                "name": "סלט קיווי ותותים",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "מרנג, קצפת ופירות העונה",
+                "id": "k8",
+                "imageUrl": null,
+                "name": "פבלובה",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "בצק פריך ואפרסקים טריים",
+                "id": "k9",
+                "imageUrl": null,
+                "name": "עוגת אפרסקים",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "נקטרינות, גבינת עיזים ואגוזי מלך",
+                "id": "k10",
+                "imageUrl": null,
+                "name": "סלט נקטרינות",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "אפרסמון, יוגורט ודבש",
+                "id": "k11",
+                "imageUrl": null,
+                "name": "אפרסמון צלוי",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "בצק עלים, תפוחי עץ וקינמון",
+                "id": "k12",
+                "imageUrl": null,
+                "name": "שטרודל תפוחים",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "תפוחי אדמה בתנור עם רוזמרין",
+                "id": "k13",
+                "imageUrl": null,
+                "name": "תפוחי אדמה אפויים",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "פנקייקים עם בננה וסילאן",
+                "id": "k14",
+                "imageUrl": null,
+                "name": "פנקייק בננה",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "בננה, תמרים וחלב שקדים",
+                "id": "k15",
+                "imageUrl": null,
+                "name": "שייק בננה תמרים",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "",
+                "id": "k16",
+                "imageUrl": null,
+                "name": "מיץ תפוזים סחוט",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "כרעיים בתנור ברוטב תפוזים ודבש",
+                "id": "k17",
+                "imageUrl": null,
+                "name": "עוף בתפוזים",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "300 גרם, צ'יפס וסלט",
+                "id": "k18",
+                "imageUrl": null,
+                "name": "אנטריקוט על האש",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "200 גרם בקר טחון, חסה ועגבנייה",
+                "id": "k19",
+                "imageUrl": null,
+                "name": "המבורגר הבית",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "פרגיות על האש עם אורז",
+                "id": "k20",
+                "imageUrl": null,
+                "name": "שיפודי פרגית",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "שניצל, פירה וסלט",
+                "id": "k21",
+                "imageUrl": null,
+                "name": "שניצל בצלחת",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "שניצל טבעוני מפירורי תירס",
+                "id": "k22",
+                "imageUrl": null,
+                "name": "שניצל תירס",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "צלעות ברוטב ברביקיו",
+                "id": "k23",
+                "imageUrl": null,
+                "name": "צלעות בשר לבן",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "צלעות חזיר מעושנות ברוטב ברביקיו",
+                "id": "k24",
+                "imageUrl": null,
+                "name": "צלעות חזיר",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "פפרדלה, פרושוטו ופרמזן",
+                "id": "k25",
+                "imageUrl": null,
+                "name": "פסטה פרושוטו",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "פנקוטה עם רוטב פירות יער",
+                "id": "k26",
+                "imageUrl": null,
+                "name": "פנקוטה וניל",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "ג'לי פירות אדומים וקצפת",
+                "id": "k27",
+                "imageUrl": null,
+                "name": "קינוח ג'לי פירות",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "שוקולד מריר וקצפת",
+                "id": "k28",
+                "imageUrl": null,
+                "name": "מוס שוקולד",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "בטטה בתנור עם שמן זית",
+                "id": "k29",
+                "imageUrl": null,
+                "name": "בטטה צלויה",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Buckwheat crêpe with ham, egg and Gruyère",
+                "id": "k30",
+                "imageUrl": null,
+                "name": "Buckwheat galette",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Chilled soba noodles with dipping sauce",
+                "id": "k31",
+                "imageUrl": null,
+                "name": "Zaru soba",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Tuna sashimi over rice with grated nagaimo",
+                "id": "k32",
+                "imageUrl": null,
+                "name": "Yamakake don",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Hot soba with grated mountain yam",
+                "id": "k33",
+                "imageUrl": null,
+                "name": "Tororo soba",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Cabbage pancake with pork belly and bonito flakes",
+                "id": "k34",
+                "imageUrl": null,
+                "name": "Okonomiyaki",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Baked sweet potatoes with brown sugar and pecans",
+                "id": "k35",
+                "imageUrl": null,
+                "name": "Candied yams",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Fresh kiwifruit and lime",
+                "id": "k36",
+                "imageUrl": null,
+                "name": "Kiwi sorbet",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Baked peaches with a biscuit topping",
+                "id": "k37",
+                "imageUrl": null,
+                "name": "Peach cobbler",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Granny Smith apples and cinnamon",
+                "id": "k38",
+                "imageUrl": null,
+                "name": "Apple pie",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Banana, three scoops and chocolate sauce",
+                "id": "k39",
+                "imageUrl": null,
+                "name": "Banana split",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "With lemon butter and green beans",
+                "id": "k40",
+                "imageUrl": null,
+                "name": "Pan-fried orange roughy",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Crispy chicken in a sweet orange glaze",
+                "id": "k41",
+                "imageUrl": null,
+                "name": "Orange chicken",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "16 oz with garlic butter",
+                "id": "k42",
+                "imageUrl": null,
+                "name": "Ribeye steak",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Veal cutlets with lemon and capers",
+                "id": "k43",
+                "imageUrl": null,
+                "name": "Veal piccata",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Breaded beef cube steak with country gravy",
+                "id": "k44",
+                "imageUrl": null,
+                "name": "Chicken-fried steak",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Slow-smoked pork shoulder and slaw",
+                "id": "k45",
+                "imageUrl": null,
+                "name": "Pulled pork sandwich",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Turkey bacon, lettuce and tomato on sourdough",
+                "id": "k46",
+                "imageUrl": null,
+                "name": "Turkey bacon club",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Ten wings with blue cheese dip",
+                "id": "k47",
+                "imageUrl": null,
+                "name": "Buffalo wings",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Assorted fruit gummies",
+                "id": "k48",
+                "imageUrl": null,
+                "name": "Gummy bears",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Toasted marshmallow and chocolate on graham crackers",
+                "id": "k49",
+                "imageUrl": null,
+                "name": "S'mores",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Coconut milk set with agar",
+                "id": "k50",
+                "imageUrl": null,
+                "name": "Vegan panna cotta",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              }
+            ],
+            "id": "foods_extra_labels",
+            "name": "Menu"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "foods_extra_labels",
+          "source": "scan"
+        }
+      },
+      "name": "foods_extra_labels",
+      "signals": [
+        {
+          "evidence": [
+            "אנטריקוט על האש",
+            "שניצל בצלחת",
+            "שניצל תירס"
+          ],
+          "kind": "fryer",
+          "questionEn": "Do the fried dishes share a fryer or frying oil with breaded or battered ones?",
+          "questionHe": "האם המנות המטוגנות מטוגנות באותו שמן או באותה מטגנת עם מנות בציפוי או בבלילה?",
+          "threatens": [
+            "wheat",
+            "gluten"
+          ]
+        },
+        {
+          "evidence": [
+            "יאקיסובה עוף"
+          ],
+          "kind": "wok",
+          "questionEn": "Is the wok shared between dishes, and is it cleaned between orders?",
+          "questionHe": "האם אותו ווק משמש למנות שונות, והאם מנקים אותו בין הזמנות?",
+          "threatens": [
+            "peanuts",
+            "soy",
+            "wheat",
+            "gluten",
+            "crustaceans",
+            "molluscs",
+            "sesame"
+          ]
+        },
+        {
+          "evidence": [
+            "לחם כוסמין",
+            "עוגת אפרסקים",
+            "שטרודל תפוחים"
+          ],
+          "kind": "bakery",
+          "questionEn": "Is flour or bread handled on the surfaces where other dishes are prepared?",
+          "questionHe": "האם מכינים מנות אחרות על אותם משטחים שבהם עובדים עם קמח או לחם?",
+          "threatens": [
+            "milk",
+            "eggs",
+            "wheat",
+            "gluten",
+            "sesame"
+          ]
+        },
+        {
+          "evidence": [
+            "שייק בננה תמרים"
+          ],
+          "kind": "nuts",
+          "questionEn": "Are nuts used in this kitchen, and can my dish be prepared with no contact with them?",
+          "questionHe": "האם משתמשים באגוזים במטבח הזה, ואפשר להכין את המנה שלי בלי מגע איתם?",
+          "threatens": [
+            "peanuts",
+            "treeNuts"
+          ]
+        }
+      ]
+    },
+    {
+      "menu": {
+        "categories": [
+          {
+            "dishes": [
+              {
                 "description": "Romaine, croutons",
                 "id": "k1",
                 "imageUrl": null,

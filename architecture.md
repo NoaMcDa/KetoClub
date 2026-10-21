@@ -4087,6 +4087,20 @@ kosher or halal *certification*, which no app can verify (file 03; their
 components are a separate pull request). Chestnut is no id: it stays a
 tree-nut question for that vocabulary (file 11 §2.5).
 
+**Foods extra filled (related to #342).** `vocab_foods_extra.dart` now holds
+buckwheat and Japan's ten recommended foods, sourced to file 11 §26 and file
+12 §10 (desk research checked against search excerpts on 2026-10-21,
+unreviewed rows suspected), so the eleven ids are offered. Buckwheat stays a
+guard of wheat and gluten only, never of itself; yam is Japan's yamaimo and
+the bare word "yam" (US sweet potato) and `בטטה` are no terms; `תפוח` is
+lowered before `אדמה` and `תפוחי אדמה` never matches; orange roughy, orange
+wine, banana peppers and chicken-fried steak are lowered. Pork spreads the
+kosher and halal pork words and pork and beef their gelatin pieces, made
+public in `vocab_religious.dart` in the same order (no kosher or halal golden
+changes); the Gelatin entry keeps its own words, gelatin stated and fish
+gelatin included. A corpus menu, `foods_extra_labels.json`, labels the eleven
+ids, and the own-word hint's example is mango, since kiwi is now offered.
+
 **The sensitivities' words (#342 follow-up).** `vocab_sensitivities.dart`
 fills nightshades, MSG, caffeine, salicylates and oral allergy syndrome
 from file 11 §29 and file 12 §13 (unreviewed desk research, checked by

@@ -604,11 +604,16 @@ void main() {
       expect(restrictionOffered(RestrictionId.kosher), isTrue);
       expect(restrictionOffered(RestrictionId.halal), isTrue);
       expect(restrictionOffered(RestrictionId.jain), isFalse);
-      expect(
-        availableRestrictions(const <RestrictionId>{})
-            .map((restriction) => restriction.id),
-        isNot(contains(RestrictionId.buckwheat)),
-      );
+      final available = availableRestrictions(const <RestrictionId>{})
+          .map((restriction) => restriction.id)
+          .toSet();
+      for (final id in RestrictionId.values) {
+        if (allergenVocabulary[id]!.isEmpty) {
+          expect(available, isNot(contains(id)), reason: id.name);
+        }
+      }
+      // Filled by its follow-up (vocab_foods_extra.dart), so offered.
+      expect(available, contains(RestrictionId.buckwheat));
     });
 
     test('each single legume follows legumes, in taxonomy order', () {

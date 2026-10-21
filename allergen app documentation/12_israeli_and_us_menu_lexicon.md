@@ -890,6 +890,132 @@ tomato (עגבניות שרי), not sherry.
 
 ---
 
+## 10. Hebrew and US menu terms for buckwheat and Japan's recommended foods (issue #342)
+
+**Status: desk research, written and checked 2026-10-21 against web
+search results only (no page opened in full); not clinical review.** The
+English food facts and their sources are file 11 §26 (the subsections
+below match its numbering). As §7 says of all Hebrew dish vocabulary,
+**the Hebrew spellings are the app's own lexicon**: no web source can
+confirm them, and a native-speaking dietitian should review them. Rows
+whose meaning rests on a source cite it; the rest are **unreviewed**.
+Spelling variants follow §1 (geresh and apostrophe read alike; the
+grammatical prefixes ב/ה/ו/כ/ל/מ/ש are allowed unless a term is listed as
+taking none). (§9 is the kosher and halal section.)
+
+### 10.1 Buckwheat — כוסמת
+
+| Term | Meaning | Use |
+|---|---|---|
+| כוסמת | buckwheat | direct |
+| סובה | soba (buckwheat noodles, often part wheat: §8.2) | direct; "יאקי סובה" lowered (one word, יאקיסובה, never matches) |
+| בליני | blini — buckwheat or wheat pancakes | suspected |
+| ללא גלוטן | gluten-free baking, where buckwheat is a common flour (file 11 §26.1) | suspected |
+
+**כוסמת is not כוסמין.** In modern Hebrew the singular כוסמת names
+buckwheat and the plural-looking כוסמין names spelt, sold side by side in
+the same aisle (https://www.balashon.com/2010/07/kusemet.html **[W]** ;
+https://languagehat.com/kusemet/ **[W]**). The matcher's strict right
+boundary keeps them apart: כוסמין never matches כוסמת. Spelt is wheat
+(file 11 §7.5), not buckwheat.
+
+### 10.2 Kiwi — קיווי
+
+| Term | Meaning | Use |
+|---|---|---|
+| קיווי, קיוי | kiwi | direct |
+| סלט פירות, שייק פירות, סמוטי, פבלובה | fruit salad, fruit shake, smoothie, pavlova | suspected |
+
+### 10.3 Peach — אפרסק
+
+| Term | Meaning | Use |
+|---|---|---|
+| אפרסק, אפרסקים | peach | direct |
+| נקטרינה, נקטרינות | nectarine (the same species, file 11 §26.3) | likely |
+
+אפרסמון (persimmon) is another fruit and does not contain the word.
+
+### 10.4 Apple — תפוח
+
+| Term | Meaning | Use |
+|---|---|---|
+| תפוח, תפוחים, תפוחי עץ | apple | direct; תפוח lowered before אדמה |
+| סיידר, קלבדוס | cider, calvados | suspected |
+
+**תפוח אדמה is potato.** The usual plural, תפוחי אדמה, never matches
+(תפוחי alone is not a term, and the matcher allows no suffix); the
+singular is lowered by its guard, never cleared, as the FODMAP entry does
+(§7.2). תפוז (orange) is another word.
+
+### 10.5 Banana — בננה
+
+| Term | Meaning | Use |
+|---|---|---|
+| בננה, בננות | banana | direct |
+
+### 10.6 Orange — תפוז
+
+| Term | Meaning | Use |
+|---|---|---|
+| תפוז, תפוזים | orange (מיץ תפוזים, קליפת תפוז follow) | direct |
+| מרמלדה | marmalade — in Israeli usage often any jam (**unreviewed**) | suspected |
+| גרנד מרנייה, קואנטרו, טריפל סק | orange liqueurs | suspected |
+
+### 10.7 Beef — בקר
+
+| Term | Meaning | Use |
+|---|---|---|
+| בקר, עגל (and הבקר, ובקר, העגל, ועגל) | beef, veal; no free prefix, since מבקר is a visitor and מעגל a circle (§7.1) | direct |
+| אנטריקוט, סינטה, שייטל, פיקניה, אסאדו, אוסובוקו, רוסטביף, ברזאולה | beef and veal cuts and cured beef | direct |
+| המבורגר, סטייק, קרפצ'יו, בולונז | usually beef; lowered beside עוף/הודו/דג/טונה/סלמון/סלק | likely |
+| פסטרמה, קבב, קציצות, בשר, צ'ולנט, חמין, מח עצם, ציר, ג'לטין | beef or another meat: Israeli pastrami is often turkey, kebab beef and lamb, בשר beef or lamb (§7.1) | suspected |
+
+### 10.8 Pork — חזיר
+
+| Term | Meaning | Use |
+|---|---|---|
+| חזיר (and החזיר, וחזיר, בחזיר) | pork; no free prefix, since מחזיר is "returns" | direct |
+| בשר לבן, ירך לבן | "white meat": the menu euphemism for pork in Israel's non-kosher restaurants (https://www.kipa.co.il/חדשות/%d7%91%d7%94%d7%90%d7%a8%d7%a5-%d7%9e%d7%91%d7%9b%d7%99%d7%9d-%d7%90%d7%aa-%d7%94%d7%99%d7%a2%d7%9c%d7%9e%d7%95%d7%aa-%d7%91%d7%a9%d7%a8-%d7%94%d7%97%d7%96%d7%99%d7%a8-%d7%9e%d7%94%d7%9e-2/ **[M]** ; https://timeout.co.il/ירך-לבן/ **[M]**); "white meat" is also poultry, so never stated | likely |
+| בייקון, פרושוטו, פנצ'טה | cured pork; kosher menus print בייקון בקר, פרושוטו אווז, which are lowered | likely |
+| סטייק לבן, סלמי, פפרוני, צ'וריסו, נקניק, ג'לטין | maybe pork | suspected |
+
+### 10.9 Chicken — עוף
+
+| Term | Meaning | Use |
+|---|---|---|
+| עוף, עופות | chicken, poultry | direct |
+| פרגית, פרגיות | chicken thigh meat (https://www.makorrishon.co.il/culture/article/260588 **[M]**) | direct |
+| שניצל, שניצלונים, נאגטס | Israeli schnitzel and nuggets: poultry, mostly chicken (file 11 §26.9); lowered beside הודו/תירס/חציל/טבעוני | likely |
+| כנפיים, שוקיים, קורקבנים, שווארמה, ציר | wings, drumsticks, gizzards (usually chicken), shawarma (turkey or chicken), stock | suspected |
+
+### 10.10 Gelatin — ג'לטין
+
+| Term | Meaning | Use |
+|---|---|---|
+| ג'לטין | gelatin | direct |
+| פנקוטה, פנה קוטה, מרשמלו, סוכריות גומי, דובוני גומי | gelatin desserts and sweets (§7.1) | likely |
+| ג'לי, מוס, עוגת גבינה קרה | jelly, mousse, no-bake cheesecake | suspected |
+
+### 10.11 Yam — יאמאימו
+
+| Term | Meaning | Use |
+|---|---|---|
+| יאמאימו, נאגאימו, טורורו | Japanese mountain yam and grated yam (transliterations, **unreviewed**) | direct |
+| אוקונומיאקי | okonomiyaki, whose batter often holds grated yam | suspected |
+
+**בטטה is sweet potato, never yam** (file 11 §26.11), and is not a term.
+
+### 10.12 US menu words that look like these foods
+
+| Words | What they are | Use |
+|---|---|---|
+| candied yams, yams | sweet potato on a US menu (file 11 §26.11) | not a term |
+| banana peppers | a mild chilli | lowered (banana) |
+| orange roughy, orange wine | a fish; a skin-contact white wine (file 11 §26.6) | lowered (orange) |
+| chicken-fried steak | beef steak fried like chicken | lowered (chicken); beef stays likely |
+| turkey bacon, turkey ham, beef bacon | not pork | lowered (pork) |
+| orange chicken, duck à l'orange | orange sauce | direct (orange) |
+
 ## 13. Hebrew menu terms for the sensitivities (issue #342)
 
 **Status: unreviewed desk research, added 2026-10-21.** The food facts are
