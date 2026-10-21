@@ -8,9 +8,11 @@ import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/models/trip_destination.dart';
+import 'package:ketoclub/screens/chef_card_image_screen.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/utils/allergens/allergen_matrix.dart';
+import 'package:ketoclub/utils/allergens/chef_card_locales.dart';
 import 'package:ketoclub/utils/allergens/chef_card_templates.dart';
 import 'package:ketoclub/utils/allergens/confirmations.dart';
 import 'package:ketoclub/utils/allergens/group_chef_card.dart';
@@ -41,6 +43,22 @@ import 'package:ketoclub/widgets/waiter_script_widget.dart';
 /// from [ChefCardText] and are in the chosen language, never the UI's
 /// (architecture.md §12). Share sends the same text through [menuSharer];
 /// with none, the button is left out.
+///
+/// **In the trip's language (issue #419).** While trip mode is on for
+/// France, Italy, Spain, Germany or Japan ([trip]), the toggle offers that
+/// language beside Hebrew and English and the card opens in it
+/// ([ChefCardLanguage.forTrip]); the sentences and names come from
+/// `chef_card_locales.dart`, composed on the device, so the card works
+/// offline as trip mode does. Under a translated card one muted line in
+/// the UI's language says it was translated by the app and not checked by
+/// a native speaker. A dish card's change and questions are the
+/// evaluator's English ones in a translated card, and its allergy note is
+/// English: only the card's own sentences are translated.
+///
+/// **As an image (issue #420).** "Share as image" opens
+/// [ChefCardImageScreen]: the card in the language shown, in the light
+/// theme, with a helper-not-a-guarantee footer in that language, rendered
+/// to a PNG and shared as a file; the text share stays.
 ///
 /// A dish card is evaluated as the menu screen evaluates the dish: with
 /// the section heading it sits under, the restaurant's allergen matrix
@@ -114,8 +132,26 @@ class ChefCardScreen extends StatefulWidget {
   State<ChefCardScreen> createState() => _ChefCardScreenState();
 }
 
-/// Scopes a test to the Hebrew/English toggle.
+/// Scopes a test to the language toggle.
 const Key chefCardLanguageToggleKey = Key('chefCardLanguageToggle');
+
+/// The "translated by the app" line under a translated card (#419).
+const Key chefCardTranslatedNoteKey = Key('chefCardTranslatedNote');
+
+/// The "Share as image" button (#420).
+const Key chefCardShareImageKey = Key('chefCardShareImage');
+
+/// [language]'s name in the UI language, for the card's language toggle.
+String chefCardLanguageName(AppLocalizations l10n, ChefCardLanguage language) =>
+    switch (language) {
+      ChefCardLanguage.he => l10n.settingsLanguageHebrew,
+      ChefCardLanguage.en => l10n.settingsLanguageEnglish,
+      ChefCardLanguage.fr => l10n.chefCardLanguageFrench,
+      ChefCardLanguage.it => l10n.chefCardLanguageItalian,
+      ChefCardLanguage.es => l10n.chefCardLanguageSpanish,
+      ChefCardLanguage.de => l10n.chefCardLanguageGerman,
+      ChefCardLanguage.ja => l10n.chefCardLanguageJapanese,
+    };
 
 /// The Share button, public so a test can tap it.
 const Key chefCardShareKey = Key('chefCardShare');
@@ -134,9 +170,9 @@ const Key chefCardAllergyNoteShareKey = Key('chefCardAllergyNoteShare');
 
 class _ChefCardScreenState extends State<ChefCardScreen> {
   /// The user's pick; null until they toggle, so the card follows the
-  /// menu's language (a dish card) or the app's (the profile card) until
-  /// then.
-  bool? _hebrewChoice;
+  /// trip's language (#419), else the menu's language (a dish card) or
+  /// the app's (the profile card) until then.
+  ChefCardLanguage? _choice;
 
   /// Whether the menu's kitchen threatens a strict entry of the profile,
   /// computed once: the menu does not change while the card is open.
@@ -177,12 +213,18 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
     super.dispose();
   }
 
-  bool get _hebrew {
+  /// The trip's language when the card has one for it; null otherwise.
+  ChefCardLanguage? get _tripLanguage => ChefCardLanguage.forTrip(widget.trip);
+
+  ChefCardLanguage get _language {
     final dish = widget.dish;
-    return _hebrewChoice ??
-        (dish != null && widget.analysed != null
-            ? VerdictCopy.dishIsHebrew(dish)
-            : Localizations.localeOf(context).languageCode == 'he');
+    return _choice ??
+        _tripLanguage ??
+        ChefCardLanguage.of(
+          hebrew: dish != null && widget.analysed != null
+              ? VerdictCopy.dishIsHebrew(dish)
+              : Localizations.localeOf(context).languageCode == 'he',
+        );
   }
 
   /// The dish evaluated for the one profile in Hebrew when [hebrew], as
@@ -200,14 +242,19 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
         confirmations: widget.confirmations,
       );
 
-  /// The card's lines in Hebrew when [hebrew]: the dish card for
-  /// [evaluated] when there is a dish and its analysis, re-evaluated in
-  /// that language so its "without" lines and questions follow the
-  /// toggle; the profile card otherwise.
-  List<String> _lines({required bool hebrew, EvaluatedDish? evaluated}) {
+  /// The card's lines in [language]: the dish card for [evaluated] when
+  /// there is a dish and its analysis, re-evaluated in Hebrew or English
+  /// (English for a translated card) so its "without" lines and questions
+  /// follow the toggle; the profile card otherwise.
+  List<String> _lines(ChefCardLanguage language, {EvaluatedDish? evaluated}) {
+    final hebrew = language == ChefCardLanguage.he;
     final dish = widget.dish;
     if (dish == null || evaluated == null) {
-      return ChefCardText.compose(widget.profile, hebrew: hebrew);
+      return ChefCardText.compose(
+        widget.profile,
+        hebrew: hebrew,
+        language: language,
+      );
     }
     return ChefCardText.composeForDish(
       widget.profile,
@@ -216,6 +263,7 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
       questions: VerdictCopy.waiterQuestions(evaluated, hebrew: hebrew),
       crossContact: _crossContact,
       hebrew: hebrew,
+      language: language,
     );
   }
 
@@ -236,8 +284,13 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
         confirmations: widget.confirmations,
       );
 
-  /// The group card for [group], the dish's evaluation for every person.
-  GroupChefCard _groupDishCard(GroupEvaluation group, {required bool hebrew}) {
+  /// The group card for [group], the dish's evaluation for every person,
+  /// in [language].
+  GroupChefCard _groupDishCard(
+    GroupEvaluation group,
+    ChefCardLanguage language,
+  ) {
+    final hebrew = language == ChefCardLanguage.he;
     final dish = widget.dish!;
     return GroupChefCardText.composeForDish(
       <PersonDishPart>[
@@ -254,6 +307,29 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
       dishName: dish.name,
       crossContact: _crossContact,
       hebrew: hebrew,
+      language: language,
+    );
+  }
+
+  /// Opens the card as an image, ready to share (#420).
+  void _openImage({
+    required List<String> lines,
+    required GroupChefCard? group,
+    required ChefCardLanguage language,
+    required String text,
+    required MenuSharer sharer,
+  }) {
+    Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        fullscreenDialog: true,
+        builder: (_) => ChefCardImageScreen(
+          lines: lines,
+          group: group,
+          language: language,
+          text: text,
+          menuSharer: sharer,
+        ),
+      ),
     );
   }
 
@@ -333,7 +409,10 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final hebrew = _hebrew;
+    final language = _language;
+    final tripLanguage = _tripLanguage;
+    // A translated card's dish lines and allergy note are English.
+    final hebrew = language == ChefCardLanguage.he;
     // Precedence: with more than one person the group card, for the dish
     // when there is a dish and its analysis; otherwise the dish card for
     // one profile, then the profile card.
@@ -347,10 +426,14 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
     final group = !_isGroup
         ? null
         : groupEvaluation != null
-        ? _groupDishCard(groupEvaluation, hebrew: hebrew)
-        : GroupChefCardText.compose(widget.people, hebrew: hebrew);
+        ? _groupDishCard(groupEvaluation, language)
+        : GroupChefCardText.compose(
+            widget.people,
+            hebrew: hebrew,
+            language: language,
+          );
     final lines = group == null
-        ? _lines(hebrew: hebrew, evaluated: evaluated)
+        ? _lines(language, evaluated: evaluated)
         : const <String>[];
     // ALG-15: the dish's own allergy note, from the profile and the
     // concerns the card itself found; none on the profile card.
@@ -405,22 +488,23 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
                     Semantics(
                       container: true,
                       label: l10n.chefCardLanguageLabel,
-                      child: SegmentedButton<bool>(
+                      child: SegmentedButton<ChefCardLanguage>(
                         key: chefCardLanguageToggleKey,
                         showSelectedIcon: false,
-                        segments: <ButtonSegment<bool>>[
-                          ButtonSegment<bool>(
-                            value: true,
-                            label: Text(l10n.settingsLanguageHebrew),
-                          ),
-                          ButtonSegment<bool>(
-                            value: false,
-                            label: Text(l10n.settingsLanguageEnglish),
-                          ),
+                        segments: <ButtonSegment<ChefCardLanguage>>[
+                          for (final option in <ChefCardLanguage>[
+                            ?tripLanguage,
+                            ChefCardLanguage.he,
+                            ChefCardLanguage.en,
+                          ])
+                            ButtonSegment<ChefCardLanguage>(
+                              value: option,
+                              label: Text(chefCardLanguageName(l10n, option)),
+                            ),
                         ],
-                        selected: <bool>{hebrew},
+                        selected: <ChefCardLanguage>{language},
                         onSelectionChanged: (selection) =>
-                            setState(() => _hebrewChoice = selection.first),
+                            setState(() => _choice = selection.first),
                       ),
                     ),
                     const SizedBox(height: 22),
@@ -463,6 +547,35 @@ class _ChefCardScreenState extends State<ChefCardScreen> {
                                     icon: const Icon(Icons.ios_share),
                                     label: Text(l10n.chefCardShare),
                                   ),
+                          ),
+                        ),
+                      ),
+                    if (language.locale case final locale?
+                        when !locale.nativeSpeakerReviewed &&
+                            (group != null || lines.isNotEmpty)) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        l10n.chefCardTranslatedNote,
+                        key: chefCardTranslatedNoteKey,
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ],
+                    if (sharer != null && (group != null || lines.isNotEmpty))
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: OutlinedButton.icon(
+                            key: chefCardShareImageKey,
+                            onPressed: () => _openImage(
+                              lines: lines,
+                              group: group,
+                              language: language,
+                              text: text,
+                              sharer: sharer,
+                            ),
+                            icon: const Icon(Icons.image_outlined),
+                            label: Text(l10n.chefCardShareImage),
                           ),
                         ),
                       ),

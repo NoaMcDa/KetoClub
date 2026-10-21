@@ -804,6 +804,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       MaterialPageRoute<void>(
                         builder: (_) => ChefCardScreen(
                           profile: controller.profile,
+                          trip: controller.tripDestination,
                           screenBrightness: widget.screenBrightness,
                           menuSharer: widget.menuSharer,
                         ),

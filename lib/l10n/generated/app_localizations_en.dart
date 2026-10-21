@@ -2082,7 +2082,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tripBriefingChefCardNote =>
-      'The card is made on this phone and opens without a connection. It is in Hebrew or English; cards in the local language are not available yet.';
+      'The card is made on this phone and opens without a connection.';
 
   @override
   String allergenMatrixNotice(String date) {
@@ -2462,4 +2462,49 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get savedRecheck =>
       'Your profile has changed since. Open this menu to check it again.';
+
+  @override
+  String get chefCardLanguageFrench => 'French';
+
+  @override
+  String get chefCardLanguageItalian => 'Italian';
+
+  @override
+  String get chefCardLanguageSpanish => 'Spanish';
+
+  @override
+  String get chefCardLanguageGerman => 'German';
+
+  @override
+  String get chefCardLanguageJapanese => 'Japanese';
+
+  @override
+  String get chefCardTranslatedNote =>
+      'Translated by the app, not checked by a native speaker — show the card and ask.';
+
+  @override
+  String get chefCardShareImage => 'Share as image';
+
+  @override
+  String get chefCardImageTitle => 'The card as an image';
+
+  @override
+  String get chefCardImageExplain =>
+      'This is the image that will be shared. The app does not keep it.';
+
+  @override
+  String get chefCardImageShareButton => 'Share image';
+
+  @override
+  String get chefCardImageTextFallback =>
+      'This device can\'t share images, so the card was shared as text.';
+
+  @override
+  String get chefCardImageFailed =>
+      'The image could not be made. You can still share the card as text.';
+
+  @override
+  String tripBriefingChefCardLocalNote(String language) {
+    return 'The card opens in $language, translated by the app and not checked by a native speaker. Hebrew and English are a tap away.';
+  }
 }

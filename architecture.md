@@ -4281,6 +4281,57 @@ Settings no longer matches their old mark by name (the mark stays in the
 entry, unshown), and a dish id that a platform reassigns orphans a stored
 dish's answers as it does a cached one's (D27).
 
+**The chef card in the destination's language, and as an image (ALG-13's
+local card, ALG-08; #419, #420; amends the trip-mode paragraph's "the card
+stays Hebrew or English").** `ChefCardLanguage`
+(`lib/utils/allergens/chef_card_locales.dart`) adds French, Italian,
+Spanish, German and Japanese to the card, one `ChefCardLocale` block each
+(the greeting, a sentence per restriction kind and for keto, vegan,
+vegetarian, kosher, halal and small portions, the certification questions,
+the user's own words and exceptions, the dish lines, both closings, the
+image footer, and a name per restriction). Like the Hebrew and English
+sentences they live in Dart, not ARB (§6.3's exception, §12): the card is
+read by the restaurant. **The names copied from the law are marked**
+(`officialNames`: Annex II of Regulation (EU) No 1169/2011 in each EU
+language for the 14 and wheat; the Consumer Affairs Agency's list for
+Japanese), and **every sentence and every other name is the app's
+translation, unreviewed by a native speaker** (`nativeSpeakerReviewed:
+false` in all five blocks; file 12 §15 has the sources, checked from
+search excerpts only, and the rules a reviewer keeps). A name sits after a
+colon so no sentence agrees with it; a restriction a block cannot name is
+named in English, never dropped; and `banned_words_test.dart` composes
+every line in all seven languages and bans *safe*, בטוח, *sûr*/*sans
+danger*, *sicuro*, *seguro*, *sicher* and 安全 with their stems. Every
+existing composer (`ChefCardText.compose`, `composeForDish`, `dishLine`,
+`closingLine`, `certificationQuestion`, `GroupChefCardText.compose`,
+`composeForDish`, `headingFor`) keeps its signature and gains an optional
+`language` that wins over `hebrew`, so a caller that passes none is byte
+for byte what it was; the allergy notes stay Hebrew or English.
+`ChefCardScreen` takes the trip from every caller (Settings, the profile
+editor, the group sheet, the briefing; the menu already passed it): while
+a trip to France, Italy, Spain, Germany or Japan is on, its toggle offers
+that language first and opens in it (`ChefCardLanguage.forTrip`; Israel,
+the US and the UK keep Hebrew and English), and under a translated card one
+muted line in the UI's language says it was translated by the app and not
+checked by a native speaker. A translated dish card's change and questions
+are the evaluator's English ones. The briefing's note no longer says the
+local card is missing; it names the language the card opens in. **As an
+image:** "Share as image" opens `ChefCardImageScreen`, which shows
+`ChefCardImage` (the card in the language shown, always in the light
+theme, with "Banto · a helper, not a guarantee — always ask the
+restaurant" in that language) inside a `RepaintBoundary`, renders it to a
+PNG in memory and hands it to `MenuSharer.shareImage` (new; `share_plus`
+with `XFile.fromData`, and its web download and mail fallbacks turned off),
+which on a platform that cannot share files shares the card's text instead
+and lets the screen say so in a snackbar; the text share stays. The image
+is never written by the app and nothing is uploaded (C1); everything is
+composed on the device, so the card and its image work offline, as trip
+mode does (a `flutter-tester` flow proves France → French → image).
+**What it accepts:** five unreviewed translations shown to restaurant staff,
+marked as such on screen; Japanese glyphs on the web build depend on a font
+the app does not bundle (phones have one; not checked in a browser); and
+no physical phone has shared the image yet.
+
 ### D27 — Post-meal confirmations, no ratings
 
 *(Banto, the Allergens epic's ALG-14, issue #356. Amends D23's visit

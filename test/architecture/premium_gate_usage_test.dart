@@ -40,6 +40,10 @@ const _neverGated = <String>[
   'utils/allergens/chef_card_templates.dart',
   'utils/allergens/group_chef_card.dart',
   'widgets/group_chef_card_view.dart',
+  // The chef card in the trip's language and as an image (#419, #420).
+  'utils/allergens/chef_card_locales.dart',
+  'screens/chef_card_image_screen.dart',
+  'widgets/chef_card_image.dart',
   // The liability and helper copy.
   'widgets/helper_tool_sheet.dart',
   'widgets/consent_disclosure_banner.dart',

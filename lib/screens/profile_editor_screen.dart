@@ -164,6 +164,7 @@ class ProfileEditorScreen extends StatelessWidget {
                       MaterialPageRoute<void>(
                         builder: (_) => ChefCardScreen(
                           profile: person.profile,
+                          trip: controller.tripDestination,
                           screenBrightness: screenBrightness,
                           menuSharer: menuSharer,
                         ),

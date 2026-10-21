@@ -2081,7 +2081,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get tripBriefingChefCardNote =>
-      'הכרטיס נוצר בטלפון הזה ונפתח גם בלי חיבור. הוא בעברית או באנגלית; כרטיסים בשפה המקומית עדיין לא זמינים.';
+      'הכרטיס נוצר בטלפון הזה ונפתח גם בלי חיבור.';
 
   @override
   String allergenMatrixNotice(String date) {
@@ -2452,4 +2452,49 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get savedRecheck =>
       'הפרופיל שלך השתנה מאז. אפשר לפתוח את התפריט כדי לבדוק שוב.';
+
+  @override
+  String get chefCardLanguageFrench => 'צרפתית';
+
+  @override
+  String get chefCardLanguageItalian => 'איטלקית';
+
+  @override
+  String get chefCardLanguageSpanish => 'ספרדית';
+
+  @override
+  String get chefCardLanguageGerman => 'גרמנית';
+
+  @override
+  String get chefCardLanguageJapanese => 'יפנית';
+
+  @override
+  String get chefCardTranslatedNote =>
+      'תורגם על ידי האפליקציה ולא נבדק על ידי דובר/ת השפה — הציגו את הכרטיס ושאלו.';
+
+  @override
+  String get chefCardShareImage => 'שיתוף כתמונה';
+
+  @override
+  String get chefCardImageTitle => 'הכרטיס כתמונה';
+
+  @override
+  String get chefCardImageExplain =>
+      'זו התמונה שתשותף. האפליקציה לא שומרת אותה.';
+
+  @override
+  String get chefCardImageShareButton => 'שיתוף התמונה';
+
+  @override
+  String get chefCardImageTextFallback =>
+      'המכשיר הזה לא יכול לשתף תמונות, ולכן הכרטיס שותף כטקסט.';
+
+  @override
+  String get chefCardImageFailed =>
+      'לא ניתן היה ליצור את התמונה. אפשר עדיין לשתף את הכרטיס כטקסט.';
+
+  @override
+  String tripBriefingChefCardLocalNote(String language) {
+    return 'הכרטיס נפתח ב$language, בתרגום של האפליקציה שלא נבדק על ידי דובר/ת השפה. עברית ואנגלית זמינות בלחיצה.';
+  }
 }

@@ -587,6 +587,20 @@ final class FlowFakeMenuSharer implements MenuSharer {
     shareCalls.add((text: text, subject: subject));
     return true;
   }
+
+  /// The PNG bytes of every [shareImage] call, in call order.
+  final List<Uint8List> imageCalls = <Uint8List>[];
+
+  @override
+  Future<bool> shareImage(
+    Uint8List png, {
+    String? subject,
+    String? fallbackText,
+    void Function()? onTextFallback,
+  }) async {
+    imageCalls.add(png);
+    return true;
+  }
 }
 
 /// A [LocationService] whose answer is settable — mirrors `test/fakes`'

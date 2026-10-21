@@ -74,6 +74,7 @@ Future<void> openGroupCombine(
         builder: (_) => ChefCardScreen(
           profile: people.first.profile,
           people: people,
+          trip: controller.trip,
           screenBrightness: screenBrightness,
           menuSharer: menuSharer,
         ),

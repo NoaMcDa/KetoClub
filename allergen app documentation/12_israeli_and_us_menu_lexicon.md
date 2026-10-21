@@ -1268,6 +1268,122 @@ why פול takes no free prefix and its real prefixed forms are listed;
 and longer words (פולני, "Polish"), which the right-hand boundary already
 excludes.
 
+## 15. The chef card in the destination's language (issue #419)
+
+**Status: every block is UNREVIEWED BY A NATIVE SPEAKER.** Added on
+2026-10-21 for issue #419. The chef card a traveller hands to a waiter in
+Paris, Rome, Madrid, Berlin or Tokyo now comes in French, Italian, Spanish,
+German or Japanese (`lib/utils/allergens/chef_card_locales.dart`), beside
+Hebrew and English. Two kinds of text sit in each block, and they are not
+equally trustworthy:
+
+- **Restriction names copied from the law** (a block's `officialNames`):
+  for French, Italian, Spanish and German, the 14 allergens as Annex II of
+  Regulation (EU) No 1169/2011 words them in that language, plus wheat,
+  which Annex II point 1 names inside "cereals containing gluten"; for
+  Japanese, the items of the Consumer Affairs Agency's allergen list
+  (特定原材料, mandatory, and 特定原材料に準ずるもの, recommended) as the
+  list writes them. The card uses each item's **head phrase** only ("lait",
+  not "lait et produits à base de lait (y compris le lactose)"), lower-cased
+  after a colon in French, Italian and Spanish (the regulation capitalises
+  the first word of each list item). This environment could not open
+  EUR-Lex or caa.go.jp (the egress proxy refused both); every name was
+  checked against **web search excerpts** of the official text and of
+  national authorities quoting it (sources below, checked 2026-10-21).
+- **Everything else is the app's own translation**: every sentence (the
+  greeting, the strict "check every ingredient" line, celiac disease's line,
+  the flexible "tell me which dishes contain it" line, the diets' lines,
+  the cross-contact closing and "thank you", the dish line, the group
+  greeting, the image footer) and every name not in `officialNames`
+  (lactose, the single legumes, the sensitivities, the diets, Japan's
+  "fish", "crustaceans", "molluscs" and "tree nuts" groupings, which are
+  built from the CAA's own item names with a grouping word of the app's,
+  and gluten in Japanese, グルテン, which the CAA list does not name). None
+  of it has been read by a native speaker. The screen says so under every
+  translated card, in the UI's language: "Translated by the app, not
+  checked by a native speaker — show the card and ask."
+
+Rules the translations keep, and a reviewer should keep:
+
+- **Never a word meaning "safe"**: not *sûr* or *sans danger* (fr),
+  *sicuro* (it), *seguro* (es), *sicher* (de, which also rules out
+  *sicherstellen*), 安全 (ja). `test/l10n/banned_words_test.dart` composes
+  every line in every language and fails on any of them, and on their
+  stems at a word start (*sécurité*, *Sicherheit*, *seguridad*).
+- **A name sits after a colon** ("Allergie alimentaire : {name}",
+  "Lebensmittelallergie: {name}", "食物アレルギー：{name}") wherever the
+  language would otherwise need an article, a gender or a case for it, so
+  no sentence has to agree with the name it carries.
+- **A strict entry is stated and asked about; nothing is promised.** The
+  sentences mirror the English card one for one; none adds a claim.
+- **A restriction a block cannot name is named in English** on the card,
+  never dropped (`ChefCardLocales.nameOf`). Today every block names every
+  restriction, so this is a guard for restrictions added later.
+- **A dish card's change and questions, and the allergy note, stay in
+  English** in a translated card: they are composed by the evaluator from
+  the menu's own words, and only the card's own sentences are translated.
+
+### 15.1 Annex II names used on the card
+
+| Restriction | French | Italian | Spanish | German |
+|---|---|---|---|---|
+| gluten (celiac) | céréales contenant du gluten | cereali contenenti glutine | cereales que contengan gluten | glutenhaltiges Getreide |
+| wheat (point 1) | blé | grano | trigo | Weizen |
+| crustaceans | crustacés | crostacei | crustáceos | Krebstiere |
+| eggs | œufs | uova | huevos | Eier |
+| fish | poissons | pesce | pescado | Fische |
+| peanuts | arachides | arachidi | cacahuetes | Erdnüsse |
+| soy | soja | soia | soja | Sojabohnen |
+| milk | lait | latte | leche | Milch |
+| tree nuts | fruits à coque | frutta a guscio | frutos de cáscara | Schalenfrüchte |
+| celery | céleri | sedano | apio | Sellerie |
+| mustard | moutarde | senape | mostaza | Senf |
+| sesame | graines de sésame | semi di sesamo | granos de sésamo | Sesamsamen |
+| sulphites | anhydride sulfureux et sulfites | anidride solforosa e solfiti | dióxido de azufre y sulfitos | Schwefeldioxid und Sulphite |
+| lupin | lupin | lupini | altramuces | Lupinen |
+| molluscs | mollusques | molluschi | moluscos | Weichtiere |
+
+**Confirmed in excerpts (2026-10-21):** the French items 1, 8, 12 and 14
+(their wording and thresholds); the Italian items 1, 8, 12, 13 and 14,
+including "grano, segale, orzo, avena, farro, kamut" in item 1; the
+Spanish item 1 heading "Cereales que contengan gluten", "granos de sésamo y
+productos a base de granos de sésamo" and "dióxido de azufre y sulfitos";
+the German "glutenhaltiges Getreide", "Sesamsamen", "Schwefeldioxid und
+Sulphite" and "Lupinen" items. **From the regulation's standard wording,
+not re-seen in an excerpt this time:** the remaining short names (eggs,
+fish, peanuts, soy, milk, celery, mustard in each language; the Spanish
+"cacahuetes", "altramuces", "frutos de cáscara" and "moluscos"; the German
+"Krebstiere", "Weichtiere" and "Schalenfrüchte"). A reviewer with a browser
+should read Annex II on EUR-Lex in each language once, and check that the
+Italian "grano" for wheat matches the text as amended by Delegated
+Regulation (EU) No 78/2014 (which added spelt and khorasan wheat to item 1).
+
+### 15.2 Japanese names (Consumer Affairs Agency list, 2026)
+
+Since 1 April 2026 the mandatory list (特定原材料) is nine items — えび,
+かに, くるみ, 小麦, そば, 卵, 乳, 落花生 (ピーナッツ), カシューナッツ — and
+the recommended list (特定原材料に準ずるもの) twenty: アーモンド, あわび,
+いか, いくら, オレンジ, キウイフルーツ, 牛肉, ごま, さけ, さば, 大豆, 鶏肉,
+バナナ, ピスタチオ, 豚肉, マカダミアナッツ, もも, やまいも, りんご, ゼラチン
+(pistachio added and cashew moved to the mandatory list on 1 April 2026;
+macadamia added and matsutake removed in 2024; §8.1 has the restaurant
+side). The card uses these as written for peanuts, wheat, buckwheat, eggs,
+milk, soy, sesame, kiwi, peach, apple, banana, orange, beef, pork, chicken,
+gelatin and yam. Crustaceans (えび・かに), tree nuts (くるみ, カシューナッツ,
+アーモンド, ピスタチオ, マカダミアナッツ), fish (さけ, さば) and molluscs
+(いか, あわび) are named with the list's items inside a grouping word of the
+app's (甲殻類, ナッツ類, 魚, 貝類), which is unreviewed. The CAA's own page
+was not reached; the list comes from prefectural pages quoting it.
+
+### 15.3 What the translations still need
+
+A native speaker per language reading every sentence of their block on a
+phone, and a restaurant worker in each country saying whether the card
+reads as a request they would act on. Until then the five blocks keep
+`nativeSpeakerReviewed: false`, and the screen's line under the card stays.
+Japanese text on the web build may need a CJK font the app does not bundle
+(phones have one); this was not checked in a browser.
+
 ---
 
 ## Sources
@@ -1428,3 +1544,26 @@ Grades: **[S]** strong (official, clinical, peer-reviewed, manufacturer),
 - [W] https://www.hellofresh.ca/recipes/classic-turkey-meatballs-6829eb1d99bb603b9b4386e6
 - [W] https://www.partstown.com/about-us/seafood-allergies-in-restaurants
 - [W] https://www.allergyhome.org/handbook/daily-life-with-food-allergies/restaurants
+
+### The chef card's official names (§15; checked 2026-10-21, snippets only)
+- [S] https://eur-lex.europa.eu/legal-content/FR/TXT/?uri=CELEX:32011R1169 — Regulation (EU) No 1169/2011, French text (not reached: refused by the egress proxy)
+- [S] https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:32011R1169 — Italian text (not reached)
+- [S] https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:32011R1169 — Spanish text (not reached)
+- [S] https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32011R1169 — German text (not reached)
+- [S] https://faolex.fao.org/docs/pdf/fra83379.pdf — the French text as FAOLEX holds it (excerpt)
+- [S] https://www.weblex.fr/sites/default/files/images/docs/denrees%20alimentaires%20allergenes.pdf — Annex II, French (excerpt)
+- [S] https://www.jura.ch/Htdocs/Files/v/25562.pdf/Departements/DES/SCAV/HYG-et-INSP/Allergenes-dans-les-denrees-alimentaires.pdf — a cantonal food authority quoting Annex II in French (excerpt)
+- [S] https://www.bz.camcom.it/it/servizi/regolazione-del-mercato/etichettatura-prodotti-alimentari/allergeni — Annex II, Italian, Bolzano chamber of commerce (excerpt)
+- [M] https://www.comune.sardara.su.it/.galleries/doc-notizie/ALLERGENI_ALLEGATO_II.pdf — Annex II, Italian (excerpt)
+- [S] https://www.saludcastillayleon.es/fr/seguridadalimentaria/alergias-intolerancias-alimentarias/programa-control-oficial.fichiers/152770-Anexo%20II%20del%20Reglamento%20%28UE%29%20n%C2%BA%201169-2011.pdf — Annex II, Spanish, Castilla y León health service (excerpt)
+- [S] https://www.comunidad.madrid/servicios/salud/alergias-e-intolerancias-alimentarias — the 14, Spanish, Comunidad de Madrid (excerpt)
+- [S] https://aesan.gob.es/seguridad-alimentaria/informacion-alimentaria/etiquetado-sustancias — AESAN on Annex II (excerpt)
+- [S] https://freirecht.de/g/EU2011VO1169:a2 — Annex II, German (excerpt)
+- [S] https://gesetze.legal/eu/vo_eu_2011_1169/anhang_ii — Annex II, German (excerpt)
+- [S] https://www.ihk.de/blueprint/servlet/resource/blob/2643168/37e3f90147a031485a41fe3f06276c00/liste-der-allergene-1--data.pdf — IHK list of the 14, German (excerpt)
+- [S] https://umwelt-online.de/recht/eu/24d/24d_2512.htm — Delegated Regulation (EU) 2024/2512 amending Annex II (excerpt)
+- [S] https://www.caa.go.jp/policies/policy/food_labeling/food_sanitation/allergy/ — the Consumer Affairs Agency's allergen page (not reached: refused by the egress proxy)
+- [S] https://www.pref.yamanashi.jp/shokuhin-st/shokuhinhyouji/kurumi.html — prefecture: the mandatory list and walnut (excerpt)
+- [S] https://www.pref.kyoto.jp/shoku-kawaraban/allergie01.html — prefecture: the two lists (excerpt)
+- [S] https://www.city.nagano.nagano.jp/n107000/contents/p002221.html — city: the 2026 lists, cashew mandatory, pistachio recommended (excerpt)
+- [S] https://www.hokeniryo.metro.tokyo.lg.jp/documents/d/hokeniryo/tabemonoanshinnet107 — Tokyo Metropolitan Government (excerpt)

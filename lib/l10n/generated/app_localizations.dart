@@ -3378,10 +3378,10 @@ abstract class AppLocalizations {
   /// **'Open my chef card'**
   String get tripBriefingChefCard;
 
-  /// Banto (ALG-13): under the chef card button. Local-language cards are out of scope.
+  /// Banto (ALG-13): under the chef card button. A trip whose language has a card adds tripBriefingChefCardLocalNote (#419).
   ///
   /// In en, this message translates to:
-  /// **'The card is made on this phone and opens without a connection. It is in Hebrew or English; cards in the local language are not available yet.'**
+  /// **'The card is made on this phone and opens without a connection.'**
   String get tripBriefingChefCardNote;
 
   /// Banto (ALG-16): the menu screen's notice when the restaurant's own allergen matrix is on file; {date} is the day it holds from, formatted for the UI locale. A fact, never a badge or a rating, and never 'safe'.
@@ -3899,6 +3899,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your profile has changed since. Open this menu to check it again.'**
   String get savedRecheck;
+
+  /// Banto (#419): the chef card's language picker segment for French, shown during a trip to France.
+  ///
+  /// In en, this message translates to:
+  /// **'French'**
+  String get chefCardLanguageFrench;
+
+  /// Banto (#419): the chef card's language picker segment for Italian.
+  ///
+  /// In en, this message translates to:
+  /// **'Italian'**
+  String get chefCardLanguageItalian;
+
+  /// Banto (#419): the chef card's language picker segment for Spanish.
+  ///
+  /// In en, this message translates to:
+  /// **'Spanish'**
+  String get chefCardLanguageSpanish;
+
+  /// Banto (#419): the chef card's language picker segment for German.
+  ///
+  /// In en, this message translates to:
+  /// **'German'**
+  String get chefCardLanguageGerman;
+
+  /// Banto (#419): the chef card's language picker segment for Japanese.
+  ///
+  /// In en, this message translates to:
+  /// **'Japanese'**
+  String get chefCardLanguageJapanese;
+
+  /// Banto (#419): the muted line under a chef card shown in French, Italian, Spanish, German or Japanese. In the UI language.
+  ///
+  /// In en, this message translates to:
+  /// **'Translated by the app, not checked by a native speaker — show the card and ask.'**
+  String get chefCardTranslatedNote;
+
+  /// Banto (#420): opens the chef card as an image, ready to share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share as image'**
+  String get chefCardShareImage;
+
+  /// Banto (#420): title of the page that shows the chef card image before it is shared.
+  ///
+  /// In en, this message translates to:
+  /// **'The card as an image'**
+  String get chefCardImageTitle;
+
+  /// Banto (#420): under the image's title. Nothing is stored or uploaded.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the image that will be shared. The app does not keep it.'**
+  String get chefCardImageExplain;
+
+  /// Banto (#420): shares the chef card image through the platform's share sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Share image'**
+  String get chefCardImageShareButton;
+
+  /// Banto (#420): snackbar when the platform cannot share files and the card's text was shared instead.
+  ///
+  /// In en, this message translates to:
+  /// **'This device can\'t share images, so the card was shared as text.'**
+  String get chefCardImageTextFallback;
+
+  /// Banto (#420): snackbar when the card could not be rendered to an image.
+  ///
+  /// In en, this message translates to:
+  /// **'The image could not be made. You can still share the card as text.'**
+  String get chefCardImageFailed;
+
+  /// Banto (#419): under the chef card button on the briefing of a trip to France, Italy, Spain, Germany or Japan.
+  ///
+  /// In en, this message translates to:
+  /// **'The card opens in {language}, translated by the app and not checked by a native speaker. Hebrew and English are a tap away.'**
+  String tripBriefingChefCardLocalNote(String language);
 }
 
 class _AppLocalizationsDelegate

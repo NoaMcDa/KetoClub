@@ -16,11 +16,18 @@
 /// *asked about*; nothing here says a dish is safe, and nothing promises
 /// anything. There are no severity levels, so the same strict sentence is
 /// used for every allergen. Pure: no widget, no clock, no I/O.
+///
+/// The card's own sentences also come in French, Italian, Spanish, German
+/// and Japanese for trip mode (issue #419): every composer that takes
+/// `hebrew` also takes an optional [ChefCardLanguage], which wins when
+/// given, and reads those five from `chef_card_locales.dart`. The allergy
+/// notes stay Hebrew or English.
 library;
 
 import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/utils/allergens/chef_card_locales.dart';
 import 'package:ketoclub/utils/allergens/kitchen_signals.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/allergens/waiter_questions.dart';
@@ -47,31 +54,66 @@ abstract final class ChefCardText {
   /// precautions when the profile holds a strict entry; a profile of
   /// flexible entries only closes with thanks, since there is nothing to
   /// cross-contaminate.
-  static List<String> compose(DietaryProfile profile, {required bool hebrew}) {
+  ///
+  /// With [language], the card is in that language instead, whatever
+  /// [hebrew] says (issue #419).
+  static List<String> compose(
+    DietaryProfile profile, {
+    required bool hebrew,
+    ChefCardLanguage? language,
+  }) {
     if (profile.isEmpty) return const <String>[];
+    final lang = language ?? ChefCardLanguage.of(hebrew: hebrew);
     final strict = profile.entries.any(
       (entry) => restrictionFor(entry.restrictionId).isStrict,
     );
-    final closing = switch ((hebrew, strict)) {
-      (false, true) => _closingStrictEn,
-      (false, false) => _closingEn,
-      (true, true) => _closingStrictHe,
-      (true, false) => _closingHe,
-    };
     return List<String>.unmodifiable(<String>[
-      if (hebrew) _introHe else _introEn,
-      for (final entry in profile.entries)
-        ..._entryLines(entry, hebrew: hebrew),
-      closing,
+      intro(lang),
+      for (final entry in profile.entries) ..._entryLines(entry, lang),
+      closingLine(crossContact: strict, hebrew: false, language: lang),
     ]);
   }
+
+  /// The card's greeting in [language].
+  static String intro(ChefCardLanguage language) => switch (language) {
+    ChefCardLanguage.he => _introHe,
+    ChefCardLanguage.en => _introEn,
+    _ => language.locale!.intro,
+  };
+
+  /// The footer of the card shared as an image (issue #420), in
+  /// [language]: a helper, not a guarantee; always ask the restaurant.
+  static String imageFooter(ChefCardLanguage language) => switch (language) {
+    ChefCardLanguage.he => _footerHe,
+    ChefCardLanguage.en => _footerEn,
+    _ => language.locale!.footer,
+  };
+
+  static const String _footerEn =
+      'Banto · a helper, not a guarantee — always ask the restaurant';
+  static const String _footerHe =
+      'Banto · כלי עזר, לא ערובה — תמיד לשאול את המסעדה';
 
   /// The question a kosher or halal entry adds under its own line (issue
   /// #342), in Hebrew when [hebrew]; null for every other restriction.
   /// The app flags components only and never says a dish or a kitchen is
   /// kosher or halal, so whether the meat is certified is asked, here and
   /// only here.
+  ///
+  /// With [language], the question is in that language instead.
   static String? certificationQuestion(
+    RestrictionId id, {
+    required bool hebrew,
+    ChefCardLanguage? language,
+  }) {
+    if (language?.locale case final locale?) {
+      return ChefCardLocales.certificationQuestion(id, locale);
+    }
+    final he = language == null ? hebrew : language == ChefCardLanguage.he;
+    return _certificationQuestion(id, hebrew: he);
+  }
+
+  static String? _certificationQuestion(
     RestrictionId id, {
     required bool hebrew,
   }) => switch (id) {
@@ -86,13 +128,27 @@ abstract final class ChefCardText {
     _ => null,
   };
 
-  /// [entry]'s line ([_entryLine]) and, for kosher and halal, the
-  /// [certificationQuestion] after it.
-  static List<String> _entryLines(ProfileEntry entry, {required bool hebrew}) =>
-      <String>[
+  /// [entry]'s line ([_entryLine], or the translated block's) and, for
+  /// kosher and halal, the [certificationQuestion] after it, in
+  /// [language].
+  static List<String> _entryLines(
+    ProfileEntry entry,
+    ChefCardLanguage language,
+  ) {
+    final locale = language.locale;
+    final hebrew = language == ChefCardLanguage.he;
+    return <String>[
+      if (locale != null)
+        ChefCardLocales.entryLine(entry, locale)
+      else
         _entryLine(entry, hebrew: hebrew),
-        ?certificationQuestion(entry.restrictionId, hebrew: hebrew),
-      ];
+      ?certificationQuestion(
+        entry.restrictionId,
+        hebrew: hebrew,
+        language: language,
+      ),
+    ];
+  }
 
   /// [lines] as the plain text that is copied and shared: one line each.
   static String asText(List<String> lines) => lines.join('\n');
@@ -110,6 +166,9 @@ abstract final class ChefCardText {
   /// threatens a strict entry ([kitchenThreatensStrict]) — and is plain
   /// thanks otherwise. [dishName], [modification] and [questions] are used
   /// as given: they are already in the menu's language.
+  ///
+  /// With [language], the card's own sentences are in that language
+  /// instead; [modification] and [questions] are still used as given.
   static List<String> composeForDish(
     DietaryProfile profile, {
     required String dishName,
@@ -117,8 +176,10 @@ abstract final class ChefCardText {
     required List<String> questions,
     required bool crossContact,
     required bool hebrew,
+    ChefCardLanguage? language,
   }) {
     if (profile.isEmpty) return const <String>[];
+    final lang = language ?? ChefCardLanguage.of(hebrew: hebrew);
     final strictEntries = <ProfileEntry>[
       for (final entry in profile.entries)
         if (restrictionFor(entry.restrictionId).isStrict) entry,
@@ -126,35 +187,53 @@ abstract final class ChefCardText {
     final headed = strictEntries.isEmpty ? profile.entries : strictEntries;
     final name = dishName.trim();
     return List<String>.unmodifiable(<String>[
-      if (hebrew) _introHe else _introEn,
-      for (final entry in headed) ..._entryLines(entry, hebrew: hebrew),
-      if (name.isNotEmpty) dishLine(name, hebrew: hebrew),
+      intro(lang),
+      for (final entry in headed) ..._entryLines(entry, lang),
+      if (name.isNotEmpty) dishLine(name, hebrew: hebrew, language: lang),
       if (modification != null)
         for (final line in modification.split('\n'))
           if (line.trim().isNotEmpty) line.trim(),
       for (final question in questions)
         if (question.trim().isNotEmpty) question.trim(),
-      closingLine(crossContact: crossContact, hebrew: hebrew),
+      closingLine(crossContact: crossContact, hebrew: false, language: lang),
     ]);
   }
 
   /// "The dish I would like: {dish}" in Hebrew when [hebrew], else
-  /// English, with [dishName] as the menu printed it (a dish card's one
-  /// naming line; also the group dish card's, ALG-12).
-  static String dishLine(String dishName, {required bool hebrew}) =>
-      (hebrew ? _dishLineHe : _dishLineEn).replaceAll('{dish}', dishName);
+  /// English (or in [language] when given), with [dishName] as the menu
+  /// printed it (a dish card's one naming line).
+  static String dishLine(
+    String dishName, {
+    required bool hebrew,
+    ChefCardLanguage? language,
+  }) {
+    final template = switch (language ?? ChefCardLanguage.of(hebrew: hebrew)) {
+      ChefCardLanguage.he => _dishLineHe,
+      ChefCardLanguage.en => _dishLineEn,
+      final other => other.locale!.dishLine,
+    };
+    return template.replaceAll('{dish}', dishName);
+  }
 
   /// A dish card's last line: the request to confirm how cross-contact is
-  /// avoided when [crossContact], plain thanks otherwise.
+  /// avoided when [crossContact], plain thanks otherwise; in [language]
+  /// when given.
   static String closingLine({
     required bool crossContact,
     required bool hebrew,
-  }) => switch ((hebrew, crossContact)) {
-    (false, true) => _closingStrictEn,
-    (false, false) => _closingEn,
-    (true, true) => _closingStrictHe,
-    (true, false) => _closingHe,
-  };
+    ChefCardLanguage? language,
+  }) {
+    final lang = language ?? ChefCardLanguage.of(hebrew: hebrew);
+    if (lang.locale case final locale?) {
+      return crossContact ? locale.closingStrict : locale.closing;
+    }
+    return switch ((lang == ChefCardLanguage.he, crossContact)) {
+      (false, true) => _closingStrictEn,
+      (false, false) => _closingEn,
+      (true, true) => _closingStrictHe,
+      (true, false) => _closingHe,
+    };
+  }
 
   /// Whether any of [signals] threatens a strict entry of [profile] (an
   /// allergen or celiac disease): the condition for [composeForDish]'s

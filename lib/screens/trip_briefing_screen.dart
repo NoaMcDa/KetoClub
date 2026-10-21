@@ -9,6 +9,7 @@ import 'package:ketoclub/screens/chef_card_screen.dart';
 import 'package:ketoclub/services/platform/menu_sharer.dart';
 import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/state/settings_controller.dart';
+import 'package:ketoclub/utils/allergens/chef_card_locales.dart';
 import 'package:ketoclub/utils/allergens/group_evaluator.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/allergens/trip_lexicon.dart';
@@ -26,6 +27,11 @@ Key tripLexiconRowKey(String term) => ValueKey<String>('tripLexiconRow_$term');
 
 /// The briefing's "Open my chef card" button.
 const Key tripBriefingChefCardKey = Key('tripBriefingChefCard');
+
+/// The note naming the language the chef card opens in (#419).
+const Key tripBriefingChefCardLocalNoteKey = Key(
+  'tripBriefingChefCardLocalNote',
+);
 
 /// The briefing's "Turn off trip mode" button.
 const Key tripBriefingOffKey = Key('tripBriefingOff');
@@ -72,8 +78,10 @@ String tripHintText(AppLocalizations l10n, RegulationHint hint) =>
 /// Everything on it is composed on the device from the stored profile and
 /// the destination: nothing is fetched, so it opens, and so does its chef
 /// card, with no connection — the "pre-cached" card of file 10 §ALG-13.
-/// The card stays Hebrew or English; a card in the local language is not
-/// built yet.
+/// For France, Italy, Spain, Germany and Japan the card opens in the
+/// local language (issue #419, [ChefCardLanguage.forTrip]), translated by
+/// the app and marked so, with Hebrew and English a tap away; the note
+/// under the button says which language.
 ///
 /// Reads its [SettingsController] from `provider`, pushed by Settings'
 /// trip rows (`settings_trip_section.dart`) with Settings' own controller.
@@ -136,6 +144,7 @@ class TripBriefingScreen extends StatelessWidget {
                       builder: (_) => ChefCardScreen(
                         profile: profile,
                         people: people,
+                        trip: trip,
                         screenBrightness: screenBrightness,
                         menuSharer: menuSharer,
                       ),
@@ -148,6 +157,14 @@ class TripBriefingScreen extends StatelessWidget {
                 l10n.tripBriefingChefCardNote,
                 style: theme.textTheme.bodySmall,
               ),
+              if (ChefCardLanguage.forTrip(trip) case final language?)
+                Text(
+                  l10n.tripBriefingChefCardLocalNote(
+                    chefCardLanguageName(l10n, language),
+                  ),
+                  key: tripBriefingChefCardLocalNoteKey,
+                  style: theme.textTheme.bodySmall,
+                ),
               const SizedBox(height: 16),
               Align(
                 alignment: AlignmentDirectional.centerStart,
