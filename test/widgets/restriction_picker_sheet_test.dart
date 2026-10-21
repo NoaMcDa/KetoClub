@@ -101,6 +101,28 @@ void main() {
       );
     });
 
+    test('kosher and halal name their components, never the word itself '
+        '(#342)', () {
+      for (final l10n in [_en, _he]) {
+        final kosher = restrictionJurisdictionHint(
+          l10n,
+          restrictionFor(RestrictionId.kosher),
+        );
+        final halal = restrictionJurisdictionHint(
+          l10n,
+          restrictionFor(RestrictionId.halal),
+        );
+        expect(kosher, l10n.restrictionKosherHint);
+        expect(halal, l10n.restrictionHalalHint);
+        for (final hint in [kosher, halal]) {
+          expect(hint.toLowerCase(), isNot(contains('kosher')));
+          expect(hint.toLowerCase(), isNot(contains('halal')));
+          expect(hint, isNot(contains('כשר')));
+          expect(hint, isNot(contains('חלאל')));
+        }
+      }
+    });
+
     test('reads in Hebrew', () {
       expect(
         restrictionJurisdictionHint(_he, restrictionFor(RestrictionId.celery)),
@@ -114,7 +136,8 @@ void main() {
   });
 
   group('restrictionKindLabel', () {
-    test('maps every kind to allergy, autoimmune, intolerance or diet', () {
+    test('maps every kind to allergy, autoimmune, intolerance, diet or '
+        'religious diet', () {
       expect(
         restrictionKindLabel(_en, RestrictionKind.allergen),
         _en.restrictionKindAllergy,
@@ -129,11 +152,14 @@ void main() {
       );
       for (final kind in <RestrictionKind>[
         RestrictionKind.lifestyle,
-        RestrictionKind.religiousComponent,
         RestrictionKind.keto,
       ]) {
         expect(restrictionKindLabel(_en, kind), _en.restrictionKindDiet);
       }
+      expect(
+        restrictionKindLabel(_en, RestrictionKind.religiousComponent),
+        _en.restrictionKindReligious,
+      );
     });
   });
 

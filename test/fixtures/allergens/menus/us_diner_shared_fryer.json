@@ -115,6 +115,12 @@
           "role": "protein",
           "evidence": "\"cheeseburger\": a beef patty unless the menu says otherwise",
           "source": "11 §17.1"
+        },
+        "kosher": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"Cheeseburger\": beef with cheese",
+          "source": "11 §24.5"
         }
       }
     },

@@ -821,6 +821,75 @@ Gravy and Marmite are cited to file 11 §12.2, brown sauce to file 11 §7.2
 
 ---
 
+## 9. Hebrew menu terms for kosher and halal (issue #342)
+
+**Status: desk research, added and checked 2026-10-21, not reviewed by a
+rabbi, a scholar or a native-speaking dietitian.** The food rules are
+file 11 §24 (kosher) and §25 (halal), with their sources. One Hebrew usage
+was confirmed on the web: **"בשר לבן" ("white meat") and "סטייק לבן" are
+the accepted Israeli euphemism for pork** — Wikipedia, *White meat*
+(https://en.wikipedia.org/wiki/White_meat **[M]**), the Forward, "a pork
+chop is called *stek lavan*" (https://forward.com/articles/105658 **[M]**),
+the JC, "shops still euphemistically call pork 'white meat'"
+(https://www.thejc.com/life/food/how-the-holy-land-got-a-pork-habit-uzc8a7su **[M]**)
+and New Voices (https://newvoices.org/2010/10/03/israeli-bacon/ **[W]**),
+all read as search snippets. Because "white meat" also means poultry
+breast, both are **likely**, never stated, and lowered beside עוף/הודו.
+**Still unreviewed:** every other Hebrew spelling below, which no web
+source confirms; as §7 says of all Hebrew dish vocabulary, it is the app's
+own lexicon. Components only, never certification: no term here says a
+dish is kosher or halal, and "כשר"/"חלאל" beside a word is a guard (a
+substitute), never a declaration — only a platform's tag declares (§4.4).
+
+### 9.1 Pork — חזיר
+
+| Term | Meaning | Use |
+|---|---|---|
+| חזיר (and החזיר, וחזיר, בחזיר) | pork | direct; no free prefix, since מחזיר is "returns" |
+| בשר לבן, סטייק לבן | Israeli euphemisms for pork | likely; lowered beside עוף/הודו |
+| בייקון, פרושוטו, פנצ'טה | bacon, prosciutto, pancetta | likely; lowered beside בקר/הודו/עוף/אווז/ברווז/טלה (beef and goose bacon are common on kosher menus) |
+| סלמי, פפרוני, צ'וריסו, נקניק | cured meats, usually beef or turkey in Israel | suspected; lowered beside עוף/הודו/בקר |
+
+### 9.2 Shellfish and other animals (kosher)
+
+| Term | Meaning | Use |
+|---|---|---|
+| שרימפס, סרטן, לובסטר, קלמרי, מולים, פירות ים … | shellfish | §1.7's crustacean and mollusc terms, reused |
+| צלופח, אונאגי, שפמנון, פנגסיוס, כריש | eel, catfish, pangasius, shark | direct; "רוטב אונאגי" (eel sauce) lowered |
+| חדקן, קוויאר, קביאר | sturgeon, caviar | likely; קוויאר lowered beside חצילים/סלמון/פורל/עדשים |
+| דג חרב | swordfish | suspected (disputed, file 11 §24.2) |
+| ארנב, ארנבת | rabbit, hare | direct |
+
+### 9.3 Meat with dairy (kosher)
+
+The meat side of file 11 §24.5's rule: §7.1's mammal meats and cuts, plus
+בשר (no free prefix; and הבשר, בבשר, ובשר), עוף, עופות, הודו, ברווז, אווז,
+פרגית, שניצל, המבורגר, קבב, קציצות, סטייק, שווארמה, שיפודים, פסטרמה,
+סלמי, נקניקיה, קבנוס, מרגז, עראייס, כבד, צלעות, צ'ולנט, חמין, and ציר
+(suspected). Lowered beside a fish or a vegetable (שניצל תירס, קציצות דגים,
+סטייק כרובית, ציר ירקות). The dairy side is the Milk vocabulary (§1.5).
+צ'יזבורגר names both and is a direct kosher term.
+
+### 9.4 Alcohol (halal)
+
+| Term | Meaning | Use |
+|---|---|---|
+| יין, בירה, וודקה, רום, ליקר, מירין, ברנדי, קוניאק, סאקה, ויסקי, וויסקי, ערק, שמפניה, מרסלה, טקילה, סנגריה, קוקטייל, אלכוהול, פלמבה | alcohol in a glass or a sauce | likely; רום takes no free prefix |
+| טירמיסו, ריזוטו, טריאקי | desserts and dishes often made with alcohol | suspected |
+| ללא אלכוהול, נטול/נטולת אלכוהול; חומץ יין; בירה שחורה | non-alcoholic; wine vinegar; malt beer | guards |
+
+**"שרי" is left out on purpose:** on an Israeli menu it is the cherry
+tomato (עגבניות שרי), not sherry.
+
+### 9.5 Blood and gelatin
+
+| Term | Meaning | Use |
+|---|---|---|
+| נקניק דם | blood sausage | direct (kosher and halal) |
+| ג'לטין, פנקוטה, פנה קוטה, מרשמלו, סוכריות גומי | gelatin and gelatin desserts | suspected; ג'לטין lowered before דגים |
+
+---
+
 ## Sources
 
 Grades: **[S]** strong (official, clinical, peer-reviewed, manufacturer),
@@ -915,6 +984,13 @@ Grades: **[S]** strong (official, clinical, peer-reviewed, manufacturer),
 - [W] https://dietmaya.substack.com/p/e5f — "ללא סוכר" threshold
 - [W] https://www.hidabroot.org/article/1226391
 - [M] https://www.ynet.co.il/health/article/SyRdRSYLu — Osher Deri case
+
+### Kosher and halal Hebrew terms (§9; checked 2026-10-21, snippets only)
+- [M] https://en.wikipedia.org/wiki/White_meat — "white meat" is the Israeli euphemism for pork
+- [M] https://forward.com/articles/105658 — *basar lavan*, *stek lavan* on menus
+- [M] https://www.thejc.com/life/food/how-the-holy-land-got-a-pork-habit-uzc8a7su
+- [W] https://newvoices.org/2010/10/03/israeli-bacon/
+- [W] https://jewishpress.com/review/in-print-review/hebrew-lingo/2020/11/26
 
 ### Israeli regulation and platforms
 - [S] https://tazkirim.gov.il/s/legislativeworkactivity/a133Y00000K4MkhQAF/הפצה-להערות-ציבור?language=en_US — 2022 draft

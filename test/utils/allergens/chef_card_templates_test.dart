@@ -232,7 +232,13 @@ void main() {
           final entryLine = lines[1];
 
           // Assert: intro, entry, closing; the entry line is not empty.
-          expect(lines, hasLength(3));
+          // Kosher and halal add their certification question (#342).
+          final asks = ChefCardText.certificationQuestion(
+            restriction.id,
+            hebrew: hebrew,
+          );
+          expect(lines, hasLength(asks == null ? 3 : 4));
+          if (asks != null) expect(lines[2], asks);
           for (final line in lines) {
             expect(line.trim(), isNotEmpty);
             for (final banned in _bannedEnglish) {
@@ -434,7 +440,11 @@ void main() {
               crossContact: crossContact,
               hebrew: hebrew,
             );
-            expect(lines, hasLength(4));
+            final asks = ChefCardText.certificationQuestion(
+              restriction.id,
+              hebrew: hebrew,
+            );
+            expect(lines, hasLength(asks == null ? 4 : 5));
             lines.forEach(_expectInsideFloor);
           });
         }

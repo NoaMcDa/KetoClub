@@ -145,6 +145,8 @@ RestrictionIdName = Literal[
     "vegan",
     "vegetarian",
     "glp1",
+    "kosher",
+    "halal",
     "keto",
     "custom",
 ]

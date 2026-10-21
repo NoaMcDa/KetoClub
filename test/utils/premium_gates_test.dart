@@ -283,4 +283,41 @@ void main() {
       expect(scanMonthKey(instant.toLocal()), '2026-11');
     });
   });
+
+  group('kosher and halal (#342)', () {
+    const free = PremiumAccess(
+      bantoMode: true,
+      sellsPremium: true,
+      premium: false,
+    );
+
+    test('count as a restriction like any other', () {
+      final kosher = DietaryProfile.empty.withEntry(RestrictionId.kosher);
+      expect(PremiumGates.countedRestrictions(kosher), 1);
+      expect(
+        PremiumGates.locksAddingRestriction(
+          free,
+          profile: DietaryProfile.empty,
+          adding: RestrictionId.kosher,
+        ),
+        isFalse,
+      );
+      expect(
+        PremiumGates.locksAddingRestriction(
+          free,
+          profile: kosher,
+          adding: RestrictionId.halal,
+        ),
+        isTrue,
+      );
+      expect(
+        PremiumGates.locksChoosing(
+          free,
+          chosen: const <RestrictionId>[RestrictionId.halal],
+          adding: RestrictionId.peanuts,
+        ),
+        isTrue,
+      );
+    });
+  });
 }

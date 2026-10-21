@@ -83,6 +83,7 @@ final class DeclarationRule {
     required this.restrictions,
     this.symbols = const <String>[],
     this.polarity = DeclarationPolarity.absent,
+    this.tagsOnly = false,
   });
 
   /// A stable name for the rule ("vegan", "glutenFree").
@@ -102,6 +103,11 @@ final class DeclarationRule {
 
   /// Whether it declares them absent or present.
   final DeclarationPolarity polarity;
+
+  /// Whether only a platform's own tag ([Dish.declaredTags]) makes the
+  /// declaration, never the menu's text: "kosher salt" or "kosher-style"
+  /// in a description declares nothing (issue #342).
+  final bool tagsOnly;
 }
 
 /// What a dish declares about one rule, read from one source.
@@ -175,6 +181,12 @@ final class Declaration {
 /// wheat: a gluten-free product may still hold wheat starch. "Parve"
 /// (פרווה) is left out on purpose: a parve label is a kosher category,
 /// not a milk-allergy statement.
+///
+/// Kosher and halal (issue #342) are declared by a platform's tag only
+/// ([DeclarationRule.tagsOnly]): 10bis's `kosher` flag lowers the kosher
+/// concerns of its dish by one step, and a kosher tag never speaks for
+/// halal. Menu text never declares either, since "kosher salt" and
+/// "kosher-style" are not a kitchen's statement.
 const List<DeclarationRule> declarationRules = <DeclarationRule>[
   DeclarationRule(
     id: 'vegan',
@@ -241,6 +253,20 @@ const List<DeclarationRule> declarationRules = <DeclarationRule>[
     en: <String>['egg free', 'eggless', 'without eggs'],
     he: <String>['ללא ביצים', 'ללא ביצה', 'נטול ביצים', 'בלי ביצים'],
     restrictions: <RestrictionId>[RestrictionId.eggs],
+  ),
+  DeclarationRule(
+    id: 'kosher',
+    en: <String>['kosher'],
+    he: <String>['כשר', 'כשרה'],
+    restrictions: <RestrictionId>[RestrictionId.kosher],
+    tagsOnly: true,
+  ),
+  DeclarationRule(
+    id: 'halal',
+    en: <String>['halal'],
+    he: <String>['חלאל'],
+    restrictions: <RestrictionId>[RestrictionId.halal],
+    tagsOnly: true,
   ),
 ];
 
@@ -346,11 +372,13 @@ abstract final class Declarations {
 
   /// The declarations [raw] makes, read as [source]: for each rule in
   /// order, its first unguarded English then Hebrew term, else its first
-  /// symbol the raw text holds.
+  /// symbol the raw text holds. A [DeclarationRule.tagsOnly] rule is read
+  /// only when [source] is [DeclarationSource.platformTag].
   static List<Declaration> inText(String raw, DeclarationSource source) {
     final haystack = TextNormaliser.normalise(raw);
     final found = <Declaration>[];
     for (final (:rule, :terms) in _compiled) {
+      if (rule.tagsOnly && source != DeclarationSource.platformTag) continue;
       final matched = _firstTerm(haystack, terms) ?? _firstSymbol(raw, rule);
       if (matched == null) continue;
       found.add(

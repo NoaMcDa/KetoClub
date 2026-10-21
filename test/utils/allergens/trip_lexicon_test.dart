@@ -203,6 +203,21 @@ void main() {
         source: '12 §8.6',
       );
       expect(mustard.restrictions, <RestrictionId>[RestrictionId.mustard]);
+      // Shellfish is not kosher by definition (#342); fish is.
+      const scampi = TripLexiconEntry(
+        terms: <String>['scampi'],
+        hides: <RestrictionId>[RestrictionId.crustaceans],
+        glossEn: 'x',
+        glossHe: 'x',
+        source: '11 §9.1',
+      );
+      expect(scampi.restrictions, <RestrictionId>[
+        RestrictionId.crustaceans,
+        RestrictionId.vegan,
+        RestrictionId.vegetarian,
+        RestrictionId.kosher,
+      ]);
+      expect(dashi.restrictions, isNot(contains(RestrictionId.kosher)));
     });
   });
 

@@ -32,16 +32,17 @@ String restrictionDisplayName(Restriction restriction, Locale locale) =>
 
 /// The short label of [kind]: allergy, autoimmune, intolerance or diet.
 ///
-/// A lifestyle diet, a religious component and keto all read as "diet";
-/// strictness is never shown as a severity (there is none), only implied by
-/// the kind.
+/// A lifestyle diet and keto read as "diet", and kosher and halal as a
+/// religious diet (issue #342), so the picker never shows two "Diet"
+/// groups; strictness is never shown as a severity (there is none), only
+/// implied by the kind.
 String restrictionKindLabel(AppLocalizations l10n, RestrictionKind kind) =>
     switch (kind) {
       RestrictionKind.allergen => l10n.restrictionKindAllergy,
       RestrictionKind.autoimmune => l10n.restrictionKindAutoimmune,
       RestrictionKind.intolerance => l10n.restrictionKindIntolerance,
+      RestrictionKind.religiousComponent => l10n.restrictionKindReligious,
       RestrictionKind.lifestyle ||
-      RestrictionKind.religiousComponent ||
       RestrictionKind.keto => l10n.restrictionKindDiet,
     };
 
@@ -94,7 +95,8 @@ String profileEntryDisplayName(ProfileEntry entry, Locale locale) =>
 /// US list, the EU list (which Israel's follows), both or neither. The
 /// ALG-17 restrictions say what they are instead: a heads-up from common
 /// guidance ([headsUpRestrictions]), or, for alpha-gal, that dairy is the
-/// Milk entry's.
+/// Milk entry's; kosher and halal (issue #342) say they flag components
+/// and leave the certificate to the restaurant.
 String restrictionJurisdictionHint(
   AppLocalizations l10n,
   Restriction restriction,
@@ -104,6 +106,12 @@ String restrictionJurisdictionHint(
   }
   if (restriction.id == RestrictionId.alphaGal) {
     return l10n.restrictionAlphaGalHint;
+  }
+  if (restriction.id == RestrictionId.kosher) {
+    return l10n.restrictionKosherHint;
+  }
+  if (restriction.id == RestrictionId.halal) {
+    return l10n.restrictionHalalHint;
   }
   final us = restriction.jurisdictions.contains(Jurisdiction.us);
   final eu = restriction.jurisdictions.contains(Jurisdiction.eu);

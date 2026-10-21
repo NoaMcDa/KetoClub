@@ -29,6 +29,13 @@
 /// file 10 §ALG-17 has it: an allergy by the user's word is an allergy).
 /// None of them is on a labelling list.
 ///
+/// Issue #342 adds kosher and halal, the first entries of
+/// [RestrictionKind.religiousComponent] (flexible). They flag the
+/// components a menu names — pork, shellfish, meat with dairy, alcohol —
+/// and never a certification, which no menu text can show (file 03,
+/// "Kosher, halal, Jain"; file 10's non-goals); file 11 §24 and §25 are
+/// their sources.
+///
 /// The display names are shown beside the dish's own text and read to a
 /// waiter, so like the waiter sentences in `constants.dart` they follow
 /// the menu's language, not the UI locale (architecture.md §12), and live
@@ -263,6 +270,22 @@ const List<Restriction> restrictionTaxonomy = <Restriction>[
     nameEn: 'Small portions (GLP-1)',
     nameHe: 'מנות קטנות (GLP-1)',
     source: '11 §23',
+  ),
+  Restriction(
+    id: RestrictionId.kosher,
+    kind: RestrictionKind.religiousComponent,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Kosher',
+    nameHe: 'כשרות',
+    source: '11 §24',
+  ),
+  Restriction(
+    id: RestrictionId.halal,
+    kind: RestrictionKind.religiousComponent,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Halal',
+    nameHe: 'חלאל',
+    source: '11 §25',
   ),
   Restriction(
     id: RestrictionId.keto,

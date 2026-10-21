@@ -112,14 +112,24 @@ These strings, the names of the `RestrictionId` enum:
 `peanuts`, `treeNuts`, `milk`, `lactose`, `eggs`, `soy`, `wheat`, `gluten`,
 `fish`, `crustaceans`, `molluscs`, `sesame`, `celery`, `mustard`, `lupin`,
 `sulphites`, `legumes`, `alphaGal`, `fodmap`, `histamine`, `vegan`,
-`vegetarian`, `glp1`, `keto`. The enum's last id, `custom` (the user's own
+`vegetarian`, `glp1`, `kosher`, `halal`, `keto`. The enum's last id, `custom` (the user's own
 words, ALG-17), is never labelled: its vocabulary lives in a profile on a
 device, so the corpus has nothing to measure for it.
 
 `keto` is never labelled. **Strict** restrictions are every id except
-`lactose`, `fodmap`, `histamine`, `vegan`, `vegetarian`, `glp1` and `keto`.
+`lactose`, `fodmap`, `histamine`, `vegan`, `vegetarian`, `glp1`, `kosher`,
+`halal` and `keto`.
 ALG-17 added five `alphaGal` labels (beef, pork and lamb dishes and a
 cheeseburger); FODMAP, histamine and GLP-1 carry none yet.
+
+Issue #342 added `kosher` and `halal` labels on 23 dishes of seven menus.
+They label **components only, never certification** (file 11 §24, §25):
+`kosher` is `contains` for pork, shellfish, a fish without fins and scales,
+blood, or meat or poultry served with dairy (a fish with butter is
+`free`); `halal` is `contains` for pork, blood or alcohol, cooked into a
+sauce included, and `free` for wine *vinegar* and cherry tomatoes
+(עגבניות שרי). Both are flexible, so the recall gate does not read them;
+`corpus_recall_test.dart` prints their recall and false positives only.
 
 ### `label`
 

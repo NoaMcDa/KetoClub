@@ -31,6 +31,8 @@ void main() {
         RestrictionId.vegan,
         RestrictionId.vegetarian,
         RestrictionId.glp1,
+        RestrictionId.kosher,
+        RestrictionId.halal,
         RestrictionId.keto,
       };
 

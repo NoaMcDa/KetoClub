@@ -3,7 +3,7 @@ import 'package:ketoclub/models/restriction.dart';
 
 void main() {
   group('RestrictionId', () {
-    test('has exactly the 25 ids, in order; a rename needs a migration', () {
+    test('has exactly the 27 ids, in order; a rename needs a migration', () {
       // Arrange
       const expectedNames = <String>[
         'peanuts',
@@ -29,6 +29,8 @@ void main() {
         'vegan',
         'vegetarian',
         'glp1',
+        'kosher',
+        'halal',
         'keto',
         'custom',
       ];
