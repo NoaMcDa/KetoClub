@@ -3899,6 +3899,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your profile has changed since. Open this menu to check it again.'**
   String get savedRecheck;
+
+  /// Banto (#417): title of the exceptions sheet opened from a restriction's row; the name is the restriction's, in the UI language.
+  ///
+  /// In en, this message translates to:
+  /// **'Exceptions: {name}'**
+  String exceptionsSheetTitle(String name);
+
+  /// Banto (#417): the sheet's one-sentence explanation of what an exception does. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'Dishes whose only match is one of these words are not flagged for this restriction.'**
+  String get exceptionsExplain;
+
+  /// Banto (#417): a hint under the explanation, true of the evaluator: an exception matches as whole words, with no plural folding.
+  ///
+  /// In en, this message translates to:
+  /// **'A word counts only as written, so add the plural too if you want it covered.'**
+  String get exceptionsWholeWord;
+
+  /// Banto (#417): heading above the removable chips of the current exceptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Your exceptions'**
+  String get exceptionsCurrentHeading;
+
+  /// Banto (#417): shown in place of the chips when there is no exception.
+  ///
+  /// In en, this message translates to:
+  /// **'None yet'**
+  String get exceptionsNone;
+
+  /// Banto (#417): heading above the suggestion chips drawn from the restriction's own words.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestions'**
+  String get exceptionsSuggestionsHeading;
+
+  /// Banto (#417): label of the exceptions sheet's free-text field.
+  ///
+  /// In en, this message translates to:
+  /// **'Another word'**
+  String get exceptionsField;
+
+  /// Banto (#417): adds the typed word to the exceptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get exceptionsAdd;
+
+  /// Banto (#417): saves the exceptions and closes the sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get exceptionsSave;
+
+  /// Banto (#417): tooltip of an exception chip's remove button.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {word}'**
+  String exceptionsRemove(String word);
+
+  /// Banto (#417): shown when a word is added past the cap.
+  ///
+  /// In en, this message translates to:
+  /// **'You can keep up to {max} exceptions for one restriction. Remove one to add another.'**
+  String exceptionsFull(int max);
+
+  /// Banto (#417): the extra line for a strict restriction (allergy, celiac, health condition). Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'An exception means the app stops flagging that word. Still ask the restaurant.'**
+  String get exceptionsStrictNote;
+
+  /// Banto (#417): the muted line under a restriction's row listing its exceptions, joined by commas.
+  ///
+  /// In en, this message translates to:
+  /// **'Except {words}'**
+  String exceptionsRowLine(String words);
+
+  /// Banto (#417): the accessibility hint of a restriction row, which opens the exceptions sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit exceptions'**
+  String get exceptionsEditHint;
 }
 
 class _AppLocalizationsDelegate

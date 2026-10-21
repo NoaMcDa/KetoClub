@@ -4281,6 +4281,33 @@ Settings no longer matches their old mark by name (the mark stays in the
 entry, unshown), and a dish id that a platform reassigns orphans a stored
 dish's answers as it does a cached one's (D27).
 
+**Editing a restriction's exceptions (ALG-02a and ALG-12; #417).** The model,
+the evaluator, the group union and the chef card already carried
+`ProfileEntry.exceptions`; this adds the one screen that sets them. Under
+`bantoMode`, tapping a restriction's row in Settings' "My restrictions" or in
+the profile editor opens `ExceptionsSheet` (`widgets/exceptions_sheet.dart`):
+one sentence on what an exception does, the current ones as removable chips,
+suggestion chips, a free-text field (Hebrew or English) and Save, which calls
+`setExceptions` or the new `setExceptionsFor(profileId, id, …)`. The row's
+subtitle (`RestrictionRowSubtitle`) gains one muted "Except …" line.
+**The sentence is true because of how the evaluator matches**
+(`ProfileEvaluator._applies`): a concern is dropped when its matched text
+contains an exception as whole words, normalised and with no plural folding,
+so "almond" covers "almond" and "almond milk" but not "almonds", and a dish
+with another trigger beside the excepted one is still flagged for that
+other one. The sheet therefore says a word counts as written, and its
+suggestions (`exceptionSuggestions`) are the restriction's direct terms in
+the UI language, singular and plural both, minus the restriction's own name
+(excepting "tree nuts" would switch the restriction off), eight at most. A
+strict kind (`RestrictionKind.isStrict`: allergy, celiac, health condition)
+adds one line, "an exception means the app stops flagging that word; still
+ask the restaurant", and no copy says "safe". The cap is the model's
+(`maxExceptions`, five; `maxExceptionLength`, sixty): a word past it is refused
+with a message rather than dropped silently, blanks and repeats (ignoring
+case) are ignored, and Save takes a word still typed. C1 holds (the words stay
+in the profile on the device; nothing new is sent), C3 holds (no schema bump,
+no cache field), and with the flag off the rows are not built.
+
 ### D27 — Post-meal confirmations, no ratings
 
 *(Banto, the Allergens epic's ALG-14, issue #356. Amends D23's visit

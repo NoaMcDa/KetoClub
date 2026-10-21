@@ -2462,4 +2462,57 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get savedRecheck =>
       'Your profile has changed since. Open this menu to check it again.';
+
+  @override
+  String exceptionsSheetTitle(String name) {
+    return 'Exceptions: $name';
+  }
+
+  @override
+  String get exceptionsExplain =>
+      'Dishes whose only match is one of these words are not flagged for this restriction.';
+
+  @override
+  String get exceptionsWholeWord =>
+      'A word counts only as written, so add the plural too if you want it covered.';
+
+  @override
+  String get exceptionsCurrentHeading => 'Your exceptions';
+
+  @override
+  String get exceptionsNone => 'None yet';
+
+  @override
+  String get exceptionsSuggestionsHeading => 'Suggestions';
+
+  @override
+  String get exceptionsField => 'Another word';
+
+  @override
+  String get exceptionsAdd => 'Add';
+
+  @override
+  String get exceptionsSave => 'Save';
+
+  @override
+  String exceptionsRemove(String word) {
+    return 'Remove $word';
+  }
+
+  @override
+  String exceptionsFull(int max) {
+    return 'You can keep up to $max exceptions for one restriction. Remove one to add another.';
+  }
+
+  @override
+  String get exceptionsStrictNote =>
+      'An exception means the app stops flagging that word. Still ask the restaurant.';
+
+  @override
+  String exceptionsRowLine(String words) {
+    return 'Except $words';
+  }
+
+  @override
+  String get exceptionsEditHint => 'Edit exceptions';
 }

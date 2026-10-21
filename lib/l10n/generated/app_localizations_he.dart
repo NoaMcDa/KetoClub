@@ -2452,4 +2452,57 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get savedRecheck =>
       'הפרופיל שלך השתנה מאז. אפשר לפתוח את התפריט כדי לבדוק שוב.';
+
+  @override
+  String exceptionsSheetTitle(String name) {
+    return 'חריגים: $name';
+  }
+
+  @override
+  String get exceptionsExplain =>
+      'מנות שההתאמה היחידה שלהן היא אחת המילים האלה לא יסומנו עבור ההגבלה הזו.';
+
+  @override
+  String get exceptionsWholeWord =>
+      'מילה נספרת רק כפי שהיא כתובה, ולכן כדאי להוסיף גם את הרבים אם רוצים שגם הוא יכוסה.';
+
+  @override
+  String get exceptionsCurrentHeading => 'החריגים שלך';
+
+  @override
+  String get exceptionsNone => 'אין עדיין';
+
+  @override
+  String get exceptionsSuggestionsHeading => 'הצעות';
+
+  @override
+  String get exceptionsField => 'מילה נוספת';
+
+  @override
+  String get exceptionsAdd => 'הוספה';
+
+  @override
+  String get exceptionsSave => 'שמירה';
+
+  @override
+  String exceptionsRemove(String word) {
+    return 'הסרת $word';
+  }
+
+  @override
+  String exceptionsFull(int max) {
+    return 'אפשר לשמור עד $max חריגים להגבלה אחת. כדאי להסיר אחד כדי להוסיף אחר.';
+  }
+
+  @override
+  String get exceptionsStrictNote =>
+      'חריג אומר שהאפליקציה מפסיקה לסמן את המילה הזו. עדיין כדאי לשאול במסעדה.';
+
+  @override
+  String exceptionsRowLine(String words) {
+    return 'למעט $words';
+  }
+
+  @override
+  String get exceptionsEditHint => 'עריכת חריגים';
 }

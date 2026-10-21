@@ -24,6 +24,7 @@ import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/premium_gates.dart';
 import 'package:ketoclub/widgets/content_width.dart';
+import 'package:ketoclub/widgets/exceptions_sheet.dart';
 import 'package:ketoclub/widgets/helper_tool_sheet.dart';
 import 'package:ketoclub/widgets/restriction_picker_sheet.dart';
 import 'package:provider/provider.dart';
@@ -875,19 +876,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
     Locale locale,
   ) {
     final name = restrictionDisplayName(restriction, locale);
-    return ListTile(
-      key: restrictionRowKey(restriction.id),
-      title: Text(name),
-      subtitle: Text(restrictionKindLabel(l10n, restriction.kind)),
-      trailing: IconButton(
-        key: restrictionRemoveKey(restriction.id),
-        icon: const Icon(Icons.close),
-        tooltip: l10n.settingsRestrictionsRemove(name),
-        onPressed: controller.isBusy
+    final exceptions =
+        controller.profile.entryFor(restriction.id)?.exceptions ??
+        const <String>[];
+    return Semantics(
+      onTapHint: l10n.exceptionsEditHint,
+      child: ListTile(
+        key: restrictionRowKey(restriction.id),
+        title: Text(name),
+        subtitle: RestrictionRowSubtitle(
+          kindLabel: restrictionKindLabel(l10n, restriction.kind),
+          exceptions: exceptions,
+        ),
+        onTap: controller.isBusy
             ? null
-            : () => unawaited(controller.removeRestriction(restriction.id)),
+            : () => unawaited(_editExceptions(context, restriction.id)),
+        trailing: IconButton(
+          key: restrictionRemoveKey(restriction.id),
+          icon: const Icon(Icons.close),
+          tooltip: l10n.settingsRestrictionsRemove(name),
+          onPressed: controller.isBusy
+              ? null
+              : () => unawaited(controller.removeRestriction(restriction.id)),
+        ),
       ),
     );
+  }
+
+  /// Opens the exceptions sheet for [id] and saves what the user keeps
+  /// (#417). Dismissing the sheet changes nothing.
+  Future<void> _editExceptions(BuildContext context, RestrictionId id) async {
+    final controller = context.read<SettingsController>();
+    final held = controller.profile.entryFor(id)?.exceptions;
+    if (held == null) return;
+    final saved = await showExceptionsSheet(
+      context: context,
+      restriction: id,
+      exceptions: held,
+    );
+    if (saved == null || !mounted) return;
+    await controller.setExceptions(id, saved);
   }
 
   /// One of the user's own words (ALG-17) as a row of the "My
