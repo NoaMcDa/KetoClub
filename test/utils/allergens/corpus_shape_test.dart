@@ -183,8 +183,9 @@ Set<String> _buildValidSources() {
   for (var k = 1; k <= 4; k++) {
     out.add('11 §19.$k');
   }
-  // Kosher (§24, eight subsections) and halal (§25, six), issue #342.
-  const religious = <int, int>{24: 8, 25: 6};
+  // Kosher (§24, eight subsections) and halal (§25, six), issue #342;
+  // the extra diets (§30, six).
+  const religious = <int, int>{24: 8, 25: 6, 30: 6};
   religious.forEach((section, count) {
     out.add('11 §$section');
     for (var k = 1; k <= count; k++) {
@@ -193,8 +194,18 @@ Set<String> _buildValidSources() {
   });
   // Documentation file 12: section 1 has 11 subsections, 2 has two, 3 has
   // five, 4 has four, 5 has none and 6 is a numbered list of five.
-  // Section 9 (issue #342) has five: the Hebrew kosher and halal terms.
-  const subsections = <int, int>{1: 11, 2: 2, 3: 5, 4: 4, 5: 0, 6: 5, 9: 5};
+  // Section 9 (issue #342) has five: the Hebrew kosher and halal terms;
+  // section 14 has five: the Hebrew terms of the extra diets.
+  const subsections = <int, int>{
+    1: 11,
+    2: 2,
+    3: 5,
+    4: 4,
+    5: 0,
+    6: 5,
+    9: 5,
+    14: 5,
+  };
   subsections.forEach((section, count) {
     out.add('12 §$section');
     for (var k = 1; k <= count; k++) {

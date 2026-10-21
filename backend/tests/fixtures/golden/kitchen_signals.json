@@ -3802,6 +3802,329 @@
           {
             "dishes": [
               {
+                "description": "פילה סלמון, תפוחי אדמה צלויים ושום",
+                "id": "k1",
+                "imageUrl": null,
+                "name": "סלמון בגריל",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "חזה עוף בציפוי פירורי לחם, צ'יפס",
+                "id": "k2",
+                "imageUrl": null,
+                "name": "שניצל עוף",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "חסה, מלפפון, עשבי תיבול, שמן זית ולימון",
+                "id": "k3",
+                "imageUrl": null,
+                "name": "סלט ירוק",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "חומוס, טחינה, ביצה קשה, פיתה",
+                "id": "k4",
+                "imageUrl": null,
+                "name": "חומוס מסבחה",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "קציצות דג לבן ברוטב עגבניות, בצל ושום",
+                "id": "k5",
+                "imageUrl": null,
+                "name": "קציצות דגים ברוטב עגבניות",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "300 גרם, ירקות צלויים",
+                "id": "k6",
+                "imageUrl": null,
+                "name": "סטייק אנטריקוט",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "פנה, שמנת מתוקה, פטריות שמפיניון ופרמזן",
+                "id": "k7",
+                "imageUrl": null,
+                "name": "פסטה ברוטב שמנת ופטריות",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "סלק צלוי, גזר, נענע ולימון",
+                "id": "k8",
+                "imageUrl": null,
+                "name": "סלט סלק וגזר",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "עוגה ביתית עם דבש וקינמון",
+                "id": "k9",
+                "imageUrl": null,
+                "name": "עוגת דבש",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "יין הבית",
+                "id": "k10",
+                "imageUrl": null,
+                "name": "יין אדום - כוס",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "אספרסו כפול עם חלב מוקצף",
+                "id": "k11",
+                "imageUrl": null,
+                "name": "קפה הפוך",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "כרובית מגוררת, גזר, אפונה ובצל ירוק",
+                "id": "k12",
+                "imageUrl": null,
+                "name": "אורז כרובית מוקפץ",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "עגבניות, פלפל אדום, בצל סגול, שמן זית",
+                "id": "k13",
+                "imageUrl": null,
+                "name": "סלט עגבניות ופלפלים",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "עם תפוחי אדמה ורוזמרין",
+                "id": "k14",
+                "imageUrl": null,
+                "name": "כרעיים עוף בתנור",
+                "options": [
+                  {
+                    "name": "תוספת",
+                    "values": [
+                      "אורז",
+                      "סלט"
+                    ]
+                  }
+                ],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "ביצים ברוטב עגבניות ופלפלים, לחם בצד",
+                "id": "k15",
+                "imageUrl": null,
+                "name": "שקשוקה",
+                "options": [
+                  {
+                    "name": "תוספת",
+                    "values": [
+                      "לחם",
+                      "בלי לחם"
+                    ]
+                  }
+                ],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "דניס בגריל, טחינה, סלט עשבים",
+                "id": "k16",
+                "imageUrl": null,
+                "name": "פילה דניס עם טחינה",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "קציצת עדשים בלחמנייה עם חסה ועגבנייה",
+                "id": "k17",
+                "imageUrl": null,
+                "name": "בורגר טבעוני",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Garlic butter, lemon, side of rice",
+                "id": "k18",
+                "imageUrl": null,
+                "name": "Grilled shrimp skewers",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Romaine, parmesan, croutons",
+                "id": "k19",
+                "imageUrl": null,
+                "name": "Chicken Caesar salad",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Tahini, pomegranate, herbs",
+                "id": "k20",
+                "imageUrl": null,
+                "name": "Roasted cauliflower",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "",
+                "id": "k21",
+                "imageUrl": null,
+                "name": "Sweet potato fries",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Tomato sauce, mozzarella, basil",
+                "id": "k22",
+                "imageUrl": null,
+                "name": "Margherita pizza",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Rice noodles, beef broth, ginger, scallions",
+                "id": "k23",
+                "imageUrl": null,
+                "name": "Beef pho",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Seared tuna, sesame crust, wasabi",
+                "id": "k24",
+                "imageUrl": null,
+                "name": "Tuna steak",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Seasonal fruit, mint",
+                "id": "k25",
+                "imageUrl": null,
+                "name": "Fruit salad",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              }
+            ],
+            "id": "diets_extra_labels",
+            "name": "Menu"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "diets_extra_labels",
+          "source": "scan"
+        }
+      },
+      "name": "diets_extra_labels",
+      "signals": [
+        {
+          "evidence": [
+            "שניצל עוף",
+            "Sweet potato fries"
+          ],
+          "kind": "fryer",
+          "questionEn": "Do the fried dishes share a fryer or frying oil with breaded or battered ones?",
+          "questionHe": "האם המנות המטוגנות מטוגנות באותו שמן או באותה מטגנת עם מנות בציפוי או בבלילה?",
+          "threatens": [
+            "wheat",
+            "gluten"
+          ]
+        },
+        {
+          "evidence": [
+            "אורז כרובית מוקפץ"
+          ],
+          "kind": "wok",
+          "questionEn": "Is the wok shared between dishes, and is it cleaned between orders?",
+          "questionHe": "האם אותו ווק משמש למנות שונות, והאם מנקים אותו בין הזמנות?",
+          "threatens": [
+            "peanuts",
+            "soy",
+            "wheat",
+            "gluten",
+            "crustaceans",
+            "molluscs",
+            "sesame"
+          ]
+        },
+        {
+          "evidence": [
+            "שניצל עוף",
+            "עוגת דבש",
+            "שקשוקה"
+          ],
+          "kind": "bakery",
+          "questionEn": "Is flour or bread handled on the surfaces where other dishes are prepared?",
+          "questionHe": "האם מכינים מנות אחרות על אותם משטחים שבהם עובדים עם קמח או לחם?",
+          "threatens": [
+            "milk",
+            "eggs",
+            "wheat",
+            "gluten",
+            "sesame"
+          ]
+        },
+        {
+          "evidence": [
+            "חומוס מסבחה",
+            "פילה דניס עם טחינה",
+            "Roasted cauliflower"
+          ],
+          "kind": "sesame",
+          "questionEn": "Are sesame or tahini used on shared surfaces or utensils, and can my dish be prepared without them?",
+          "questionHe": "האם משתמשים בשומשום או בטחינה על משטחים או כלים משותפים, ואפשר להכין את המנה שלי בלעדיהם?",
+          "threatens": [
+            "sesame"
+          ]
+        }
+      ]
+    },
+    {
+      "menu": {
+        "categories": [
+          {
+            "dishes": [
+              {
                 "description": "Romaine, croutons",
                 "id": "k1",
                 "imageUrl": null,

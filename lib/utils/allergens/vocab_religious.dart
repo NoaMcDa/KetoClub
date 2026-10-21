@@ -460,7 +460,8 @@ const List<String> _cheeseMeatHe = <String>["צ'יזבורגר", "צ'יז בור
 /// English drinks and dishes that hold alcohol (11 §25.2). Every one is
 /// hidden and likely: the menu names the drink, not its alcohol, and some
 /// kitchens cook it off — which most halal guidance still forbids.
-const List<HiddenTrigger> _alcoholEn = <HiddenTrigger>[
+/// Public because the Jain diet (`vocab_diets_extra.dart`) spreads it.
+const List<HiddenTrigger> alcoholHiddenEn = <HiddenTrigger>[
   HiddenTrigger(
     term: 'wine',
     certainty: TriggerCertainty.likely,
@@ -690,8 +691,8 @@ const List<HiddenTrigger> _alcoholEn = <HiddenTrigger>[
 
 /// Hebrew drinks and dishes that hold alcohol (12 §9.4). "שרי" is left
 /// out: on an Israeli menu it is the cherry tomato (עגבניות שרי), not
-/// sherry.
-const List<HiddenTrigger> _alcoholHe = <HiddenTrigger>[
+/// sherry. Spread by Jain like [alcoholHiddenEn].
+const List<HiddenTrigger> alcoholHiddenHe = <HiddenTrigger>[
   HiddenTrigger(
     term: 'יין',
     certainty: TriggerCertainty.likely,
@@ -806,8 +807,9 @@ const List<HiddenTrigger> _alcoholHe = <HiddenTrigger>[
 
 /// The words beside an alcohol word that name something else: wine
 /// vinegar, root beer, a shrimp cocktail, salmon nigiri ("sake" is also
-/// the Japanese word for salmon), malt beer (בירה שחורה).
-const Map<String, AllergenGuards> _alcoholTermGuards = <String, AllergenGuards>{
+/// the Japanese word for salmon), malt beer (בירה שחורה). Public because
+/// the diets that leave out alcohol (`vocab_diets_extra.dart`) spread it.
+const Map<String, AllergenGuards> alcoholTermGuards = <String, AllergenGuards>{
   'wine': AllergenGuards(afterEn: <String>['vinegar']),
   'sherry': AllergenGuards(afterEn: <String>['vinegar']),
   'champagne': AllergenGuards(afterEn: <String>['vinegar']),
@@ -928,87 +930,95 @@ const AllergenGuards _halalGuards = AllergenGuards(
 );
 
 /// The kosher and halal vocabularies (11 §24, §25; 12 §9).
-const Map<RestrictionId, RestrictionVocabulary>
-religiousVocabulary = <RestrictionId, RestrictionVocabulary>{
-  RestrictionId.kosher: RestrictionVocabulary(
-    directEn: <String>[
-      ..._porkEn,
-      ...crustaceanNamesEn,
-      ...molluscNamesEn,
-      ...shellfishNamesEn,
-      ..._finlessFishEn,
-      ..._otherAnimalsEn,
-      ..._bloodEn,
-      ..._cheeseMeatEn,
-    ],
-    directHe: <String>[
-      ..._porkHe,
-      ...crustaceanNamesHe,
-      ...molluscNamesHe,
-      ...shellfishNamesHe,
-      ..._finlessFishHe,
-      ..._otherAnimalsHe,
-      ..._bloodHe,
-      ..._cheeseMeatHe,
-    ],
-    hiddenEn: <HiddenTrigger>[
-      ..._porkHiddenEn,
-      ...shrimpPastesEn,
-      ...molluscSaucesEn,
-      ..._disputedFishEn,
-      ..._gelatinEn,
-    ],
-    hiddenHe: <HiddenTrigger>[
-      ..._porkHiddenHe,
-      ...molluscSaucesHe,
-      ..._disputedFishHe,
-      ..._gelatinHe,
-    ],
-    guards: _kosherGuards,
-    termGuards: <String, AllergenGuards>{
-      ..._porkTermGuards,
-      ...crustaceanTermGuards,
-      ...molluscTermGuards,
-      ..._fishTermGuards,
-      ..._gelatinTermGuards,
-    },
-    noPrefixHe: <String>['חזיר'],
-    sources: <String>[
-      '11 §24.1',
-      '11 §24.2',
-      '11 §24.3',
-      '11 §24.4',
-      '11 §24.5',
-      '11 §24.7',
-      '12 §9.1',
-      '12 §9.2',
-      '12 §9.3',
-      '12 §9.5',
-    ],
-  ),
-  RestrictionId.halal: RestrictionVocabulary(
-    directEn: <String>[..._porkEn, ..._bloodEn],
-    directHe: <String>[..._porkHe, ..._bloodHe],
-    hiddenEn: <HiddenTrigger>[..._porkHiddenEn, ..._alcoholEn, ..._gelatinEn],
-    hiddenHe: <HiddenTrigger>[..._porkHiddenHe, ..._alcoholHe, ..._gelatinHe],
-    guards: _halalGuards,
-    termGuards: <String, AllergenGuards>{
-      ..._porkTermGuards,
-      ..._alcoholTermGuards,
-      ..._gelatinTermGuards,
-    },
-    noPrefixHe: <String>['חזיר', 'רום'],
-    sources: <String>[
-      '11 §25.1',
-      '11 §25.2',
-      '11 §25.3',
-      '11 §25.5',
-      '12 §9.1',
-      '12 §9.4',
-      '12 §9.5',
-    ],
-  ),
-};
+const Map<RestrictionId, RestrictionVocabulary> religiousVocabulary =
+    <RestrictionId, RestrictionVocabulary>{
+      RestrictionId.kosher: RestrictionVocabulary(
+        directEn: <String>[
+          ..._porkEn,
+          ...crustaceanNamesEn,
+          ...molluscNamesEn,
+          ...shellfishNamesEn,
+          ..._finlessFishEn,
+          ..._otherAnimalsEn,
+          ..._bloodEn,
+          ..._cheeseMeatEn,
+        ],
+        directHe: <String>[
+          ..._porkHe,
+          ...crustaceanNamesHe,
+          ...molluscNamesHe,
+          ...shellfishNamesHe,
+          ..._finlessFishHe,
+          ..._otherAnimalsHe,
+          ..._bloodHe,
+          ..._cheeseMeatHe,
+        ],
+        hiddenEn: <HiddenTrigger>[
+          ..._porkHiddenEn,
+          ...shrimpPastesEn,
+          ...molluscSaucesEn,
+          ..._disputedFishEn,
+          ..._gelatinEn,
+        ],
+        hiddenHe: <HiddenTrigger>[
+          ..._porkHiddenHe,
+          ...molluscSaucesHe,
+          ..._disputedFishHe,
+          ..._gelatinHe,
+        ],
+        guards: _kosherGuards,
+        termGuards: <String, AllergenGuards>{
+          ..._porkTermGuards,
+          ...crustaceanTermGuards,
+          ...molluscTermGuards,
+          ..._fishTermGuards,
+          ..._gelatinTermGuards,
+        },
+        noPrefixHe: <String>['חזיר'],
+        sources: <String>[
+          '11 §24.1',
+          '11 §24.2',
+          '11 §24.3',
+          '11 §24.4',
+          '11 §24.5',
+          '11 §24.7',
+          '12 §9.1',
+          '12 §9.2',
+          '12 §9.3',
+          '12 §9.5',
+        ],
+      ),
+      RestrictionId.halal: RestrictionVocabulary(
+        directEn: <String>[..._porkEn, ..._bloodEn],
+        directHe: <String>[..._porkHe, ..._bloodHe],
+        hiddenEn: <HiddenTrigger>[
+          ..._porkHiddenEn,
+          ...alcoholHiddenEn,
+          ..._gelatinEn,
+        ],
+        hiddenHe: <HiddenTrigger>[
+          ..._porkHiddenHe,
+          ...alcoholHiddenHe,
+          ..._gelatinHe,
+        ],
+        guards: _halalGuards,
+        termGuards: <String, AllergenGuards>{
+          ..._porkTermGuards,
+          ...alcoholTermGuards,
+          ..._gelatinTermGuards,
+        },
+        noPrefixHe: <String>['חזיר', 'רום'],
+        sources: <String>[
+          '11 §25.1',
+          '11 §25.2',
+          '11 §25.3',
+          '11 §25.5',
+          '12 §9.1',
+          '12 §9.4',
+          '12 §9.5',
+        ],
+      ),
+    };
 
 // --- Meat with dairy (kosher; 11 §24.5, 12 §9.3) ---------------------------
 
@@ -1361,8 +1371,8 @@ const List<ReligiousComponent> religiousComponents = <ReligiousComponent>[
     subjectHe: 'אלכוהול',
     vocabulary: <RestrictionId, RestrictionVocabulary>{
       RestrictionId.kosher: RestrictionVocabulary(
-        hiddenEn: _alcoholEn,
-        hiddenHe: _alcoholHe,
+        hiddenEn: alcoholHiddenEn,
+        hiddenHe: alcoholHiddenHe,
         noPrefixHe: <String>['רום'],
       ),
     },

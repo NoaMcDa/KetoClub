@@ -178,6 +178,52 @@ String _pct(int hit, int total) => total == 0
     ? '     -'
     : '${(100 * hit / total).toStringAsFixed(1)}%'.padLeft(6);
 
+/// Prints the recall and false positives of the flexible [ids] over
+/// [replay] under [title], and returns how many labels they carry.
+int _printFlexible(
+  List<_Replay> replay,
+  String title,
+  List<RestrictionId> ids,
+) {
+  const columns = 'contains  may_contain  free  FP(free)  FP(unlabelled)';
+  final lines = <String>[title, '  ${'restriction'.padRight(12)} $columns'];
+  var labelled = 0;
+  for (final id in ids) {
+    var c = 0;
+    var cHit = 0;
+    var m = 0;
+    var mHit = 0;
+    var free = 0;
+    var fpFree = 0;
+    var fpUnlabelled = 0;
+    for (final dish in replay) {
+      final label = (dish.labels[id.name] as _Json?)?['label'];
+      final got = dish.found[id]?.certainty;
+      switch (label) {
+        case 'contains':
+          c++;
+          if (_meets(got, Certainty.likely)) cHit++;
+        case 'may_contain':
+          m++;
+          if (_meets(got, Certainty.suspected)) mHit++;
+        case 'free':
+          free++;
+          if (got != null) fpFree++;
+        default:
+          if (got != null) fpUnlabelled++;
+      }
+    }
+    labelled += c + m + free;
+    lines.add(
+      '  ${id.name.padRight(12)} ${'$cHit/$c'.padLeft(8)}  '
+      '${'$mHit/$m'.padLeft(11)}  ${'$free'.padLeft(4)}  '
+      '${'$fpFree'.padLeft(8)}  ${'$fpUnlabelled'.padLeft(14)}',
+    );
+  }
+  stdout.writeln(lines.join('\n'));
+  return labelled;
+}
+
 void main() {
   final replay = _replayAll();
   final misses = _misses(replay);
@@ -243,48 +289,28 @@ void main() {
   // their recall and false positives are printed only, so a vocabulary
   // change shows what it moves.
   test("prints the religious components' recall and false positives", () {
-    const columns = 'contains  may_contain  free  FP(free)  FP(unlabelled)';
-    final lines = <String>[
+    final labelled = _printFlexible(
+      replay,
       'religious components (rules only, not gated)',
-      '  ${'restriction'.padRight(12)} $columns',
-    ];
-    var labelled = 0;
-    for (final id in <RestrictionId>[
-      RestrictionId.kosher,
-      RestrictionId.halal,
-    ]) {
-      var c = 0;
-      var cHit = 0;
-      var m = 0;
-      var mHit = 0;
-      var free = 0;
-      var fpFree = 0;
-      var fpUnlabelled = 0;
-      for (final dish in replay) {
-        final label = (dish.labels[id.name] as _Json?)?['label'];
-        final got = dish.found[id]?.certainty;
-        switch (label) {
-          case 'contains':
-            c++;
-            if (_meets(got, Certainty.likely)) cHit++;
-          case 'may_contain':
-            m++;
-            if (_meets(got, Certainty.suspected)) mHit++;
-          case 'free':
-            free++;
-            if (got != null) fpFree++;
-          default:
-            if (got != null) fpUnlabelled++;
-        }
-      }
-      labelled += c + m + free;
-      lines.add(
-        '  ${id.name.padRight(12)} ${'$cHit/$c'.padLeft(8)}  '
-        '${'$mHit/$m'.padLeft(11)}  ${'$free'.padLeft(4)}  '
-        '${'$fpFree'.padLeft(8)}  ${'$fpUnlabelled'.padLeft(14)}',
-      );
-    }
-    stdout.writeln(lines.join('\n'));
+      <RestrictionId>[RestrictionId.kosher, RestrictionId.halal],
+    );
+    expect(labelled, greaterThan(0));
+  });
+
+  // The extra diets (#342; file 11 §30) are flexible too: printed, never
+  // gated.
+  test("prints the extra diets' recall and false positives", () {
+    final labelled = _printFlexible(
+      replay,
+      'extra diets (rules only, not gated)',
+      <RestrictionId>[
+        RestrictionId.pescatarian,
+        RestrictionId.paleo,
+        RestrictionId.whole30,
+        RestrictionId.aip,
+        RestrictionId.jain,
+      ],
+    );
     expect(labelled, greaterThan(0));
   });
 
