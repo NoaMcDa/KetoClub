@@ -490,6 +490,28 @@ final class SettingsController extends ChangeNotifier {
     );
   }
 
+  /// Replaces the exceptions of [restriction] in the profile [id] (#417);
+  /// for the user's own, exactly [setExceptions]. A no-op, with no write,
+  /// when [id] is unknown or the profile does not hold [restriction].
+  Future<void> setExceptionsFor(
+    String id,
+    RestrictionId restriction,
+    List<String> exceptions,
+  ) async {
+    if (id == NamedProfile.primaryId) {
+      await setExceptions(restriction, exceptions);
+      return;
+    }
+    final named = profileById(id);
+    if (named == null || !named.profile.contains(restriction)) return;
+    await _replaceOther(
+      id,
+      (named) => named.copyWith(
+        profile: named.profile.withEntry(restriction, exceptions: exceptions),
+      ),
+    );
+  }
+
   /// Adds [term] to the own restriction of the profile [id] (ALG-17); for
   /// the user's own profile, exactly [addCustomTerm]. A no-op when nothing
   /// would change or [id] is unknown.
