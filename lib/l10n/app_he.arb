@@ -875,5 +875,6 @@
   "restrictionLegumePartHint": "קטנית אחת בנפרד, לא כל הקטניות",
   "restrictionFavaHint": "חסר G6PD (פביזם), לא אלרגיה. נבדק באותה הקפדה",
   "restrictionSearchField": "חיפוש הגבלה",
-  "restrictionSearchEmpty": "אין הגבלה מתאימה. אפשר להוסיף אותה כמילה משלך למטה."
+  "restrictionSearchEmpty": "אין הגבלה מתאימה. אפשר להוסיף אותה כמילה משלך למטה.",
+  "discoveryChipFitsProfile": "מתאים לפרופיל שלי"
 }

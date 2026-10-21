@@ -1122,5 +1122,7 @@
   "restrictionSearchField": "Search restrictions",
   "@restrictionSearchField": {"description": "Banto (issue #342): the label of the picker's search field."},
   "restrictionSearchEmpty": "No restriction matches. You can add it as your own below.",
-  "@restrictionSearchEmpty": {"description": "Banto (issue #342): shown in the picker when the search matches nothing; points to 'Add your own'."}
+  "@restrictionSearchEmpty": {"description": "Banto (issue #342): shown in the picker when the search matches nothing; points to 'Add your own'."},
+  "discoveryChipFitsProfile": "Fits my profile",
+  "@discoveryChipFitsProfile": {"description": "Banto (issue #410): the Discovery chip beside Keto 8+ that keeps venues with at least one dish fitting the active profiles, as it is or with a change; unscored venues stay. Never 'safe'."}
 }

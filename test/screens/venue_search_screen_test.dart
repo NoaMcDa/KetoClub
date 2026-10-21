@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/drinks_guide_screen.dart';
 import 'package:ketoclub/screens/venue_search_screen.dart';
+import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
@@ -64,6 +67,7 @@ Future<void> _pump(
   bool? autofocusSearch,
   bool directToGoogle = false,
   bool backendConfigured = false,
+  bool bantoMode = false,
 }) {
   _useTallSurface(tester);
   return tester.pumpWidget(
@@ -75,6 +79,7 @@ Future<void> _pump(
         supportedLocales: AppLocalizations.supportedLocales,
         locale: locale,
         home: VenueSearchScreen(
+          bantoMode: bantoMode,
           autofocusSearch: autofocusSearch,
           directToGoogle: directToGoogle,
           backendConfigured: backendConfigured,
@@ -111,6 +116,45 @@ Future<void> _type(WidgetTester tester, String text) async {
   await tester.enterText(find.byType(TextField), text);
   await tester.pump(venueSearchDebounce);
   await tester.pump();
+}
+
+/// [ref]'s menu with the rule engine's keto-only analysis, as the quick
+/// score caches it (D21): a salmon that fits a sesame allergy and a
+/// sesame-crusted steak that does not, or the steak alone when
+/// [withSalmon] is false (issue #410).
+Future<CachedMenu> _sesameMenu(VenueRef ref, {bool withSalmon = true}) async {
+  final menu = Menu(
+    venueRef: ref,
+    currency: 'ILS',
+    fetchedAt: DateTime.utc(2026),
+    categories: <MenuCategory>[
+      MenuCategory(
+        id: 'mains',
+        name: 'Mains',
+        dishes: <Dish>[
+          if (withSalmon)
+            const Dish(
+              id: 'salmon',
+              name: 'Grilled salmon',
+              description: 'With a green salad',
+              price: 80,
+              options: <DishOption>[],
+            ),
+          const Dish(
+            id: 'steak',
+            name: 'Steak',
+            description: 'Sesame crusted',
+            price: 90,
+            options: <DishOption>[],
+          ),
+        ],
+      ),
+    ],
+  );
+  final analysis = await HeuristicMenuClassifier(
+    clock: FakeClock(DateTime.utc(2026)),
+  ).classify(menu);
+  return CachedMenu(menu: menu, analysis: analysis);
 }
 
 /// The localised strings of the pumped screen.
@@ -1636,6 +1680,105 @@ void main() {
 
         // Assert
         expect(searchFocused(tester), isFalse);
+      });
+    });
+
+    group('Banto fit (issue #410)', () {
+      /// Lists a venue with a fitting dish, one without and one unscored,
+      /// under [profile], and pumps the screen with [bantoMode].
+      Future<void> pumpThree(
+        WidgetTester tester, {
+        required DietaryProfile profile,
+        required bool bantoMode,
+      }) async {
+        settingsStore = FakeSettingsStore(
+          initial: AppSettings(profile: profile, disclosureSeen: true),
+        );
+        controller = buildController();
+        repository
+          ..seedCache(await _sesameMenu(_venue('grill').ref))
+          ..seedCache(
+            await _sesameMenu(_venue('sesame').ref, withSalmon: false),
+          );
+        search.queueFound([
+          _venue('grill'),
+          _venue('sesame'),
+          _venue('unscored'),
+        ]);
+        await _pump(
+          tester,
+          controller: controller,
+          pushedNames: pushedNames,
+          bantoMode: bantoMode,
+        );
+        await tester.pumpAndSettle();
+        await locate(tester);
+      }
+
+      testWidgets("a sesame profile shows each scored card's fit, and "
+          '"Fits my profile" keeps the fitting and the unscored', (
+        tester,
+      ) async {
+        // Arrange
+        await pumpThree(
+          tester,
+          profile: DietaryProfile.empty.withEntry(RestrictionId.sesame),
+          bantoMode: true,
+        );
+        final l10n = _l10n(tester);
+
+        // Assert: the fits replace the keto score; Keto 8+ stays.
+        expect(
+          find.text(l10n.headerStateCountsStrict(1, 0, 0)),
+          findsOneWidget,
+        );
+        expect(
+          find.text(l10n.headerStateCountsStrict(0, 0, 0)),
+          findsOneWidget,
+        );
+        expect(find.text('5.0'), findsNothing);
+        expect(
+          find.widgetWithText(FilterChip, l10n.discoveryChipKetoEightPlus),
+          findsOneWidget,
+        );
+
+        // Act
+        await tester.tap(
+          find.widgetWithText(FilterChip, l10n.discoveryChipFitsProfile),
+        );
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(find.text('Venue grill'), findsOneWidget);
+        expect(find.text('Venue sesame'), findsNothing);
+        expect(find.text('Venue unscored'), findsOneWidget);
+        expect(repository.loadCalls, isEmpty);
+      });
+
+      testWidgets("an empty profile keeps today's screen: the keto score "
+          'and no fit chip', (tester) async {
+        // Arrange
+        await pumpThree(tester, profile: DietaryProfile.empty, bantoMode: true);
+        final l10n = _l10n(tester);
+
+        // Assert
+        expect(find.text(l10n.discoveryChipFitsProfile), findsNothing);
+        expect(find.text(l10n.headerStateCountsStrict(1, 0, 0)), findsNothing);
+        expect(find.byType(VenueCard), findsNWidgets(3));
+      });
+
+      testWidgets('bantoMode off ignores the profile', (tester) async {
+        // Arrange
+        await pumpThree(
+          tester,
+          profile: DietaryProfile.empty.withEntry(RestrictionId.sesame),
+          bantoMode: false,
+        );
+        final l10n = _l10n(tester);
+
+        // Assert
+        expect(find.text(l10n.discoveryChipFitsProfile), findsNothing);
+        expect(find.text(l10n.headerStateCountsStrict(1, 0, 0)), findsNothing);
       });
     });
   });

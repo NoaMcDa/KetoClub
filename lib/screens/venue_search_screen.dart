@@ -126,7 +126,9 @@ class VenueSearchScreen extends StatefulWidget {
 
   /// Whether this build shows Banto surfaces (D26's convention): the
   /// disclosure banner then says what of the profile leaves the device
-  /// and is shown once more for that copy (ALG-11).
+  /// and is shown once more for that copy (ALG-11), and with a profile
+  /// beyond keto the cards show their fit and a "Fits my profile" chip
+  /// joins *Keto 8+* (issue #410).
   final bool bantoMode;
 
   @override
@@ -145,7 +147,9 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
     _field.text = context.read<VenueSearchController>().input;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      unawaited(context.read<VenueSearchController>().load());
+      unawaited(
+        context.read<VenueSearchController>().load(bantoMode: widget.bantoMode),
+      );
     });
   }
 
@@ -420,7 +424,9 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
 
   /// The chip row: *Keto 8+* (always there, disabled with a tooltip until a
   /// card has numbers, D13), *Open now* and the one most common cuisine,
-  /// when there is one. The chips combine (issue #231); "Nearby" is the
+  /// when there is one, and in Banto with a profile beyond keto *Fits my
+  /// profile* beside *Keto 8+*, enabled on the same condition (issue #410).
+  /// The chips combine (issue #231); "Nearby" is the
   /// default order, so it is not one. A horizontally scrollable [Row], as
   /// `CategoryChips` is.
   Widget _chips(AppLocalizations l10n, VenueSearchController controller) {
@@ -432,6 +438,12 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
         l10n.discoveryChipKetoEightPlus,
         controller.hasAnyNumbers,
       ),
+      if (widget.bantoMode && controller.showsFit)
+        (
+          DiscoveryChip.fitsProfile,
+          l10n.discoveryChipFitsProfile,
+          controller.hasAnyNumbers,
+        ),
       (DiscoveryChip.openNow, l10n.discoveryChipOpenNow, true),
       if (cuisine != null)
         (DiscoveryChip.cuisine, VenueCard.cuisineLabel(cuisine), true),
@@ -461,7 +473,8 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
   }
 
   /// [chip] as it is when [enabled]; otherwise wrapped in the tooltip that
-  /// says why *Keto 8+* cannot be used yet (the only chip ever disabled).
+  /// says why *Keto 8+* — or Banto's *Fits my profile*, which waits for
+  /// the same scores — cannot be used yet (the only chips ever disabled).
   Widget _chipWithHint(
     AppLocalizations l10n, {
     required bool enabled,
@@ -553,6 +566,8 @@ class _VenueSearchScreenState extends State<VenueSearchScreen> {
           itemBuilder: (context, i, photoAspectRatio) => VenueCard(
             venue: visible[i],
             numbers: controller.cardNumbers(visible[i]),
+            fit: controller.cardFit(visible[i]),
+            bantoMode: widget.bantoMode,
             distanceKm: controller.distanceKmTo(visible[i]),
             photoAspectRatio: photoAspectRatio,
             onTap: () => _openVenue(

@@ -10,6 +10,9 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/theme/app_theme.dart';
+import 'package:ketoclub/utils/allergens/discovery_fit.dart';
+import 'package:ketoclub/utils/profile_wording.dart';
+import 'package:ketoclub/utils/verdict_counts.dart';
 import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
 import 'package:ketoclub/widgets/photo_tile.dart';
@@ -53,6 +56,34 @@ const VenueCardNumbers _rulesNumbers = (
   yellow: 2,
   engine: RulesEngine(reason: MenuAnalysisFailureReason.offline),
 );
+
+/// A strict profile's fit: 4 with no trigger found, 2 with a change and
+/// 1 to ask (issue #410).
+const DiscoveryFit _strictFit = DiscoveryFit(
+  counts: VerdictCounts(
+    green: 4,
+    yellow: 2,
+    hiddenCarbYellow: 0,
+    red: 3,
+    ask: 1,
+  ),
+  wording: ProfileWording.strict,
+);
+
+/// [_strictFit]'s counts worded for a flexible profile.
+const DiscoveryFit _flexibleFit = DiscoveryFit(
+  counts: VerdictCounts(
+    green: 4,
+    yellow: 2,
+    hiddenCarbYellow: 0,
+    red: 3,
+    ask: 1,
+  ),
+  wording: ProfileWording.flexible,
+);
+
+/// The Hebrew strings.
+final AppLocalizations _he = AppLocalizationsHe();
 
 /// Pumps [card] in a themed, localised app at [locale], right-to-left
 /// when [rtl], [width] wide when given, else the surface's full width.
@@ -644,6 +675,143 @@ void main() {
 
       // Assert
       expect(opened, 2);
+    });
+  });
+
+  group('VenueCard, Banto fit (issue #410)', () {
+    testWidgets('shows the strict state summary instead of the keto score', (
+      tester,
+    ) async {
+      // Act
+      await _pump(
+        tester,
+        VenueCard(
+          venue: _venue,
+          numbers: _rulesNumbers,
+          fit: _strictFit,
+          bantoMode: true,
+          onTap: () {},
+        ),
+      );
+
+      // Assert: the verdict copy's own strict words, no keto badge.
+      expect(find.text(_en.headerStateCountsStrict(4, 2, 1)), findsOneWidget);
+      expect(find.byType(KetoScoreBadge), findsNothing);
+      expect(find.text(_en.venueCardGreenCount(3)), findsNothing);
+      expect(find.text(_en.venueCardYellowCount(2)), findsNothing);
+      // Rules-only numbers keep their estimate marker.
+      expect(find.byType(EngineChip), findsOneWidget);
+    });
+
+    testWidgets('a flexible profile reads "fit"', (tester) async {
+      // Act
+      await _pump(
+        tester,
+        VenueCard(
+          venue: _venue,
+          numbers: _llmNumbers,
+          fit: _flexibleFit,
+          bantoMode: true,
+          onTap: () {},
+        ),
+      );
+
+      // Assert
+      expect(find.text(_en.headerStateCounts(4, 2, 1)), findsOneWidget);
+      expect(find.byType(KetoScoreBadge), findsNothing);
+    });
+
+    testWidgets('reads in Hebrew, right to left, and never says safe', (
+      tester,
+    ) async {
+      // Act
+      await _pump(
+        tester,
+        VenueCard(
+          venue: _venue,
+          numbers: _rulesNumbers,
+          fit: _strictFit,
+          bantoMode: true,
+          onTap: () {},
+        ),
+        locale: const Locale('he'),
+        rtl: true,
+        width: 360,
+      );
+
+      // Assert
+      final summary = _he.headerStateCountsStrict(4, 2, 1);
+      expect(summary, contains('ללא חשש'));
+      expect(find.text(summary), findsOneWidget);
+      expect(find.textContaining('בטוח'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a screen reader hears the summary instead of the score', (
+      tester,
+    ) async {
+      // Arrange
+      final handle = tester.ensureSemantics();
+
+      // Act
+      await _pump(
+        tester,
+        VenueCard(
+          venue: _venue,
+          numbers: _llmNumbers,
+          fit: _strictFit,
+          bantoMode: true,
+          onTap: () {},
+        ),
+      );
+
+      // Assert
+      final label = tester.getSemantics(find.byType(VenueCard).first).label;
+      expect(label, contains(_en.headerStateCountsStrict(4, 2, 1)));
+      expect(label, isNot(contains('9.1')));
+      expect(label.toLowerCase(), isNot(contains('safe')));
+      handle.dispose();
+    });
+
+    testWidgets('with bantoMode off a fit changes nothing', (tester) async {
+      // Act
+      await _pump(
+        tester,
+        VenueCard(
+          venue: _venue,
+          numbers: _llmNumbers,
+          fit: _strictFit,
+          // An explicit false, whatever the define.
+          // ignore: avoid_redundant_argument_values
+          bantoMode: false,
+          onTap: () {},
+        ),
+      );
+
+      // Assert: today's keto card.
+      expect(find.text('9.1'), findsOneWidget);
+      expect(find.text(_en.venueCardGreenCount(9)), findsOneWidget);
+      expect(find.text(_en.venueCardYellowCount(5)), findsOneWidget);
+      expect(find.text(_en.headerStateCountsStrict(4, 2, 1)), findsNothing);
+    });
+
+    testWidgets('without numbers a fit is never shown (not scored yet)', (
+      tester,
+    ) async {
+      // Act
+      await _pump(
+        tester,
+        VenueCard(
+          venue: _venue,
+          fit: _strictFit,
+          bantoMode: true,
+          onTap: () {},
+        ),
+      );
+
+      // Assert
+      expect(find.text(_en.headerStateCountsStrict(4, 2, 1)), findsNothing);
+      expect(find.byType(KetoScoreBadge), findsNothing);
     });
   });
 }
