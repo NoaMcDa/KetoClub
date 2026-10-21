@@ -2362,6 +2362,17 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get restrictionKindReligious => 'תזונה דתית';
+
+  @override
+  String get restrictionKosherHint =>
+      'מסמן חזיר, פירות ים ובשר עם חלב לפי מילות התפריט. על תעודה יש לשאול את המסעדה';
+
+  @override
+  String get restrictionHalalHint =>
+      'מסמן חזיר, אלכוהול, ג\'לטין ודם לפי מילות התפריט. על תעודה יש לשאול את המסעדה';
+
+  @override
   String get restrictionKindMedical => 'מצב בריאותי';
 
   @override

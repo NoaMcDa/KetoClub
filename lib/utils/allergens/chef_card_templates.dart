@@ -24,6 +24,7 @@ import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/kitchen_signals.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 import 'package:ketoclub/utils/allergens/waiter_questions.dart';
+import 'package:ketoclub/utils/classification_rules.dart';
 
 /// The longest [ChefCardText.allergyNote] aims to be, in characters: what
 /// a delivery app's note box takes without scrolling. The allergen list is
@@ -59,10 +60,39 @@ abstract final class ChefCardText {
     };
     return List<String>.unmodifiable(<String>[
       if (hebrew) _introHe else _introEn,
-      for (final entry in profile.entries) _entryLine(entry, hebrew: hebrew),
+      for (final entry in profile.entries)
+        ..._entryLines(entry, hebrew: hebrew),
       closing,
     ]);
   }
+
+  /// The question a kosher or halal entry adds under its own line (issue
+  /// #342), in Hebrew when [hebrew]; null for every other restriction.
+  /// The app flags components only and never says a dish or a kitchen is
+  /// kosher or halal, so whether the meat is certified is asked, here and
+  /// only here.
+  static String? certificationQuestion(
+    RestrictionId id, {
+    required bool hebrew,
+  }) => switch (id) {
+    RestrictionId.kosher =>
+      hebrew
+          ? 'האם יש לבשר אצלכם תעודת כשרות?'
+          : 'Is your meat kosher-certified?',
+    RestrictionId.halal =>
+      hebrew
+          ? 'האם יש לבשר אצלכם תעודת חלאל?'
+          : 'Is your meat halal-certified?',
+    _ => null,
+  };
+
+  /// [entry]'s line ([_entryLine]) and, for kosher and halal, the
+  /// [certificationQuestion] after it.
+  static List<String> _entryLines(ProfileEntry entry, {required bool hebrew}) =>
+      <String>[
+        _entryLine(entry, hebrew: hebrew),
+        ?certificationQuestion(entry.restrictionId, hebrew: hebrew),
+      ];
 
   /// [lines] as the plain text that is copied and shared: one line each.
   static String asText(List<String> lines) => lines.join('\n');
@@ -97,7 +127,7 @@ abstract final class ChefCardText {
     final name = dishName.trim();
     return List<String>.unmodifiable(<String>[
       if (hebrew) _introHe else _introEn,
-      for (final entry in headed) _entryLine(entry, hebrew: hebrew),
+      for (final entry in headed) ..._entryLines(entry, hebrew: hebrew),
       if (name.isNotEmpty) dishLine(name, hebrew: hebrew),
       if (modification != null)
         for (final line in modification.split('\n'))
@@ -216,9 +246,13 @@ abstract final class ChefCardText {
         add(check, subject);
         continue;
       }
+      // Meat with dairy (issue #342) leaves out the dairy, not the meat.
+      final words =
+          ClassificationRules.meatWithDairyParts(concern)?.dairy ??
+          concern.matchedText;
       final quoted = concern.source == ConcernSource.matrix
           ? null
-          : _quotable(concern.matchedText);
+          : _quotable(words);
       add(
         without,
         quoted == null ||
@@ -401,8 +435,11 @@ abstract final class ChefCardText {
               'sauces, oils and garnishes.';
   }
 
-  /// The ALG-17 restrictions whose line is their own rather than their
-  /// kind's, in English; `{name}` is the restriction's name, lower-cased.
+  /// The ALG-17 restrictions, and kosher and halal (issue #342), whose
+  /// line is their own rather than their kind's, in English; `{name}` is
+  /// the restriction's name, lower-cased. Kosher and halal name their
+  /// components and say what the person keeps; whether the meat is
+  /// certified is the [certificationQuestion] after them.
   /// Alpha-gal names its foods, since nobody orders "alpha-gal"; FODMAP,
   /// histamine and small portions ask to be told, as every flexible line
   /// does, and name what they go easy on. Small portions names no medicine:
@@ -429,6 +466,12 @@ abstract final class ChefCardText {
         RestrictionId.glp1:
             'I eat small portions — please tell me which dishes come in a '
             'smaller size, and which are fried, creamy or very sweet.',
+        RestrictionId.kosher:
+            'I keep kosher — please tell me if a dish has pork, shellfish, '
+            'fish without fins and scales, or mixes meat and dairy.',
+        RestrictionId.halal:
+            'I eat halal — please tell me if a dish has pork, alcohol (even '
+            'cooked into a sauce), gelatin or blood.',
         RestrictionId.fava:
             'I have G6PD deficiency and cannot eat {name} — please check '
             'every ingredient, including falafel, ful, sauces and garnishes.',
@@ -482,6 +525,12 @@ abstract final class ChefCardText {
         RestrictionId.glp1:
             'אני אוכל/ת מנות קטנות — נא לומר לי אילו מנות אפשר לקבל בגודל '
             'קטן יותר, ואילו מטוגנות, שמנתיות או מתוקות מאוד.',
+        RestrictionId.kosher:
+            'אני שומר/ת כשרות — נא לומר לי אם במנה יש חזיר, פירות ים, דג '
+            'ללא סנפירים וקשקשים, או בשר עם חלב.',
+        RestrictionId.halal:
+            'אני אוכל/ת חלאל — נא לומר לי אם במנה יש חזיר, אלכוהול (גם '
+            "כשהוא מבושל ברוטב), ג'לטין או דם.",
         RestrictionId.fava:
             'יש לי חסר באנזים G6PD ואני לא יכול/ה לאכול {name} — נא לבדוק '
             'כל מרכיב, כולל פלאפל, רטבים וקישוטים.',

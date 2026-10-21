@@ -239,6 +239,55 @@ void main() {
     expect(containsTotal, greaterThan(0));
   });
 
+  // Kosher and halal (#342) are flexible, so they stay outside the gate;
+  // their recall and false positives are printed only, so a vocabulary
+  // change shows what it moves.
+  test("prints the religious components' recall and false positives", () {
+    const columns = 'contains  may_contain  free  FP(free)  FP(unlabelled)';
+    final lines = <String>[
+      'religious components (rules only, not gated)',
+      '  ${'restriction'.padRight(12)} $columns',
+    ];
+    var labelled = 0;
+    for (final id in <RestrictionId>[
+      RestrictionId.kosher,
+      RestrictionId.halal,
+    ]) {
+      var c = 0;
+      var cHit = 0;
+      var m = 0;
+      var mHit = 0;
+      var free = 0;
+      var fpFree = 0;
+      var fpUnlabelled = 0;
+      for (final dish in replay) {
+        final label = (dish.labels[id.name] as _Json?)?['label'];
+        final got = dish.found[id]?.certainty;
+        switch (label) {
+          case 'contains':
+            c++;
+            if (_meets(got, Certainty.likely)) cHit++;
+          case 'may_contain':
+            m++;
+            if (_meets(got, Certainty.suspected)) mHit++;
+          case 'free':
+            free++;
+            if (got != null) fpFree++;
+          default:
+            if (got != null) fpUnlabelled++;
+        }
+      }
+      labelled += c + m + free;
+      lines.add(
+        '  ${id.name.padRight(12)} ${'$cHit/$c'.padLeft(8)}  '
+        '${'$mHit/$m'.padLeft(11)}  ${'$free'.padLeft(4)}  '
+        '${'$fpFree'.padLeft(8)}  ${'$fpUnlabelled'.padLeft(14)}',
+      );
+    }
+    stdout.writeln(lines.join('\n'));
+    expect(labelled, greaterThan(0));
+  });
+
   test('the allowlist is well-formed', () {
     for (final entry in known) {
       expect(entry.keys.toSet(), <String>{

@@ -156,6 +156,9 @@ class Allergens:
     jurisdictions: tuple[str, ...]
     certainties: tuple[str, ...]
     vocabulary: Mapping[str, RestrictionVocabulary]
+    meat_with_dairy: Mapping[str, RestrictionVocabulary]
+    """Dart ``meatWithDairyMeatVocabulary``: the meat words of kosher's
+    meat-with-dairy rule (issue #342), keyed ``kosher``."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -266,6 +269,7 @@ def parse_allergens(raw: Any) -> Allergens:
         jurisdictions=_strs(root["jurisdictions"], "jurisdictions"),
         certainties=_strs(root["certainties"], "certainties"),
         vocabulary=parse_restriction_vocabularies(root["vocabulary"]),
+        meat_with_dairy=parse_restriction_vocabularies(root["meatWithDairy"]),
     )
 
 
