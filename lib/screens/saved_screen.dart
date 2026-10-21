@@ -8,8 +8,10 @@ import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/confirmation_controller.dart';
 import 'package:ketoclub/state/saved_controller.dart';
 import 'package:ketoclub/theme/verdict_colors.dart';
+import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/profile_wording.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/widgets/confirmation_sheet.dart';
 import 'package:ketoclub/widgets/content_width.dart';
@@ -17,6 +19,8 @@ import 'package:ketoclub/widgets/engine_chip.dart';
 import 'package:ketoclub/widgets/keto_score_badge.dart';
 import 'package:ketoclub/widgets/rename_menu_dialog.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
+import 'package:ketoclub/widgets/verdict_copy.dart';
+import 'package:ketoclub/widgets/worked_for_tag.dart';
 import 'package:provider/provider.dart';
 
 /// The brand name shown for [ref]'s source (architecture.md §10) — the same
@@ -112,6 +116,21 @@ String cacheExpiryLabel(
   return l10n.savedExpiresDays(rounded.inDays);
 }
 
+/// The key of the "Worked for me" filter chip (Banto, #412).
+const Key savedWorkedChipKey = ValueKey<String>('savedWorkedChip');
+
+/// The key of the overflow button on [ref]'s Recent row (Banto, #412).
+Key savedMoreKey(VenueRef ref) => ValueKey<String>('savedMore_${ref.cacheKey}');
+
+/// The key of the overflow's "worked for me" toggle.
+const Key savedWorkedToggleKey = ValueKey<String>('savedWorkedToggle');
+
+/// The key of the "re-check" hint on a Recent row (Banto, #411).
+const Key savedRecheckKey = ValueKey<String>('savedRecheck');
+
+/// The key of the state counts on a Recent row (Banto, #411).
+const Key savedStateCountsKey = ValueKey<String>('savedStateCounts');
+
 /// The Recent tab (architecture.md §6.6; issues #48, #313): every menu
 /// opened on this device, most recently opened first, with swipe or a
 /// trailing action to remove one.
@@ -130,9 +149,17 @@ String cacheExpiryLabel(
 ///
 /// **Banto (ALG-14, issue #356).** With [bantoMode] on and
 /// [createConfirmations] given, a row whose menu was opened with a strict
-/// restriction (`VisitEntry.openedStrict`) and is still cached offers "Did
-/// you ask the staff?", which opens the post-meal prompt
-/// ([showConfirmationSheet]). Without it the tab is as before.
+/// restriction (`VisitEntry.openedStrict`) offers "Did you ask the staff?",
+/// which opens the post-meal prompt ([showConfirmationSheet]): while the
+/// menu is cached it lists the live dishes, and past the cache it lists the
+/// strict dishes the visit kept (#411). Without it the tab is as before.
+///
+/// **Banto, per profile (#411, #412).** With [bantoMode] on and a profile
+/// holding a restriction besides keto, a row shows the four state counts in
+/// the profile's wording instead of the keto badge (or, when the profile is
+/// not the one the menu was counted for, a hint to open it again); a "Worked
+/// for me" chip filters the marked venues, a tag marks them and an overflow
+/// toggles the mark. A keto-only profile keeps today's row exactly.
 class SavedScreen extends StatefulWidget {
   /// Creates the Saved tab.
   const new({
@@ -162,7 +189,9 @@ class _SavedScreenState extends State<SavedScreen> {
     // StatefulWidget rather than provider's create.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      unawaited(context.read<SavedController>().load());
+      unawaited(
+        context.read<SavedController>().load(bantoMode: widget.bantoMode),
+      );
     });
   }
 
@@ -235,21 +264,25 @@ class _SavedScreenState extends State<SavedScreen> {
   );
 
   /// The Recent list, `controller.entries` already most recently opened
-  /// first.
+  /// first; under a profile, with the "Worked for me" chip above it.
   Widget _list(
     BuildContext context,
     AppLocalizations l10n,
     SavedController controller,
   ) {
     final entries = controller.entries;
-    return ListView.separated(
+    final list = ListView.separated(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
       itemCount: entries.length,
       separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
         final entry = entries[index];
+        final workedNames = controller.workedForOf(entry);
         return _SavedEntryTile(
           entry: entry,
+          kind: controller.rowKindFor(entry),
+          wording: controller.wording,
+          workedNames: workedNames,
           // A scan whose copy has gone cannot open: no platform can serve
           // it again (issue #313).
           onTap: entry.isGone
@@ -277,25 +310,54 @@ class _SavedScreenState extends State<SavedScreen> {
             controller.setPinned(entry.ref, pinned: !entry.isPinned),
           ),
           onConfirm: _canConfirm(entry)
-              ? () => unawaited(_confirm(context, entry))
+              ? () => unawaited(_confirm(context, controller, entry))
+              : null,
+          onToggleWorked: widget.bantoMode && controller.readsProfile
+              ? () => unawaited(
+                  controller.setWorked(entry.ref, worked: workedNames.isEmpty),
+                )
               : null,
         );
       },
+    );
+    if (!widget.bantoMode || !controller.hasWorkedMarks) return list;
+    return Column(
+      children: [
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+            child: FilterChip(
+              key: savedWorkedChipKey,
+              label: Text(l10n.workedChip),
+              selected: controller.workedOnly,
+              onSelected: (value) => controller.setWorkedOnly(value: value),
+            ),
+          ),
+        ),
+        Expanded(child: list),
+      ],
     );
   }
 
   /// Whether [entry]'s row offers the post-meal prompt (ALG-14): a Banto
   /// build with a prompt to make, a menu opened with a strict restriction,
-  /// and its cached copy still on the device to ask about.
+  /// and something to ask about — the cached copy, or, past the cache, the
+  /// strict dishes the visit kept (#411).
   bool _canConfirm(RecentEntry entry) =>
       widget.bantoMode &&
       widget.createConfirmations != null &&
       entry.visit.openedStrict &&
-      entry.isCached;
+      entry.canAskStaff;
 
   /// Opens the post-meal prompt for [entry] and says so when the answers
-  /// were saved.
-  Future<void> _confirm(BuildContext context, RecentEntry entry) async {
+  /// were saved. A save that cleared every strict concern offers "This
+  /// place worked for me" (#412) unless the venue is marked already.
+  Future<void> _confirm(
+    BuildContext context,
+    SavedController controller,
+    RecentEntry entry,
+  ) async {
     final create = widget.createConfirmations;
     if (create == null) return;
     final messenger = ScaffoldMessenger.of(context);
@@ -304,6 +366,9 @@ class _SavedScreenState extends State<SavedScreen> {
       context,
       create: () => create(entry.ref),
       bantoMode: widget.bantoMode,
+      onMarkWorked: controller.readsProfile && !controller.isWorkedFor(entry)
+          ? () => controller.setWorked(entry.ref, worked: true)
+          : null,
     );
     if (!saved) return;
     messenger.showSnackBar(SnackBar(content: Text(l10n.confirmSaved)));
@@ -390,11 +455,30 @@ class _SavedEntryTile extends StatelessWidget {
     required this.onRemove,
     required this.onRename,
     required this.onTogglePin,
+    this.kind = RecentRowKind.keto,
+    this.wording = ProfileWording.ketoOnly,
+    this.workedNames = const <String>[],
+    this.onToggleWorked,
     this.onConfirm,
   });
 
   /// The opened menu this row summarises.
   final RecentEntry entry;
+
+  /// What the row shows in place of the keto score (Banto, #411); the
+  /// keto score and counts for [RecentRowKind.keto].
+  final RecentRowKind kind;
+
+  /// How the profile now words a verdict, for the state counts.
+  final ProfileWording wording;
+
+  /// The people the venue "worked for" among those menus are read for
+  /// (Banto, #412); empty draws no tag.
+  final List<String> workedNames;
+
+  /// Called by the overflow's "worked for me" toggle; null shows no
+  /// overflow.
+  final VoidCallback? onToggleWorked;
 
   /// Called when the row itself is tapped, to open [entry]'s menu; null
   /// when it cannot open, which disables the row.
@@ -432,12 +516,28 @@ class _SavedEntryTile extends StatelessWidget {
     final yellow = entry.yellowCount;
     final engine = entry.engine;
     final openCount = entry.visit.openCount;
+    final visit = entry.visit;
     final counts = <Widget>[
       if (dishCount != null) Text(l10n.savedEntryDishCount(dishCount)),
-      if (score != null && green != null) Text(l10n.venueCardGreenCount(green)),
-      if (score != null && yellow != null)
-        Text(l10n.venueCardYellowCount(yellow)),
-      if (engine != null) EngineChip(engine: engine),
+      if (kind == RecentRowKind.keto) ...[
+        if (score != null && green != null)
+          Text(l10n.venueCardGreenCount(green)),
+        if (score != null && yellow != null)
+          Text(l10n.venueCardYellowCount(yellow)),
+      ] else if (kind == RecentRowKind.states) ...[
+        for (final (state, count) in <(DishState, int)>[
+          (DishState.fits, visit.fits ?? 0),
+          (DishState.fitsWithChange, visit.withChange ?? 0),
+          (DishState.ask, visit.ask ?? 0),
+          (DishState.avoid, visit.avoid ?? 0),
+        ])
+          Text(
+            l10n.savedStateCount(VerdictCopy.tile(l10n, state, wording), count),
+            key: state == DishState.fits ? savedStateCountsKey : null,
+          ),
+      ],
+      if (engine != null && kind != RecentRowKind.recheck)
+        EngineChip(engine: engine),
     ];
 
     return Dismissible(
@@ -471,9 +571,13 @@ class _SavedEntryTile extends StatelessWidget {
             title: Row(
               children: [
                 Expanded(child: Text(title)),
-                if (score != null) ...[
+                if (kind == RecentRowKind.keto && score != null) ...[
                   const SizedBox(width: 10),
                   KetoScoreBadge(score: score, inline: true),
+                ],
+                if (workedNames.isNotEmpty) ...[
+                  const SizedBox(width: 10),
+                  Flexible(child: WorkedForTag(names: workedNames)),
                 ],
               ],
             ),
@@ -499,6 +603,14 @@ class _SavedEntryTile extends StatelessWidget {
                     spacing: 8,
                     runSpacing: 4,
                     children: counts,
+                  ),
+                ],
+                if (kind == RecentRowKind.recheck) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.savedRecheck,
+                    key: savedRecheckKey,
+                    style: theme.textTheme.bodySmall,
                   ),
                 ],
                 if (onConfirm case final confirm?) ...[
@@ -540,6 +652,23 @@ class _SavedEntryTile extends StatelessWidget {
                           : l10n.savedKeep,
                       onPressed: onTogglePin,
                     ),
+                  ),
+                if (onToggleWorked case final toggle?)
+                  PopupMenuButton<bool>(
+                    key: savedMoreKey(entry.ref),
+                    tooltip: l10n.actionMoreMenuOptions,
+                    onSelected: (_) => toggle(),
+                    itemBuilder: (context) => [
+                      PopupMenuItem<bool>(
+                        key: savedWorkedToggleKey,
+                        value: true,
+                        child: Text(
+                          workedNames.isEmpty
+                              ? l10n.workedMark
+                              : l10n.workedUnmark,
+                        ),
+                      ),
+                    ],
                   ),
                 Semantics(
                   label: l10n.savedRemoveSemanticLabel(title),

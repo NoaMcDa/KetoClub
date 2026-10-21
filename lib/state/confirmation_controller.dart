@@ -6,6 +6,7 @@ import 'package:ketoclub/models/dish_confirmation.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/models/visit_dish.dart';
 import 'package:ketoclub/services/community/confirmation_client.dart'
     as community;
 import 'package:ketoclub/services/menu/menu_repository.dart';
@@ -189,39 +190,46 @@ final class ConfirmationController extends ChangeNotifier {
     final entry = await _history.read(ref);
     final cached = await _repository.cached(ref);
     final analysis = cached?.analysis;
-    if (entry == null || cached == null || analysis is! MenuAnalysed) {
+    final hasMenu = cached != null && analysis is MenuAnalysed;
+    // Past the cache's 24 hours the visit's own strict dishes stand in
+    // (Banto, #411), so the prompt outlives the cached menu.
+    if (entry == null || (!hasMenu && entry.strictDishes == null)) {
       _isAvailable = false;
       _isLoading = false;
       notifyListeners();
       return;
     }
-    final settings = await _settings.read();
-    final profile = GroupEvaluator.union(<DietaryProfile>[
-      for (final named in settings.activeProfiles) named.profile,
-    ]);
-    final analysedById = <String, AnalysedDish>{
-      for (final dish in analysis.dishes) dish.dishId: dish,
-    };
     final dishes = <ConfirmationDish>[];
-    for (final category in cached.menu.categories) {
-      for (final dish in category.dishes) {
-        final analysed = analysedById[dish.id];
-        if (analysed == null) continue;
-        final evaluated = ProfileEvaluator.evaluate(
-          analysed,
-          dish,
-          profile,
-          heading: category.name,
-        );
-        if (evaluated.concerns.isEmpty) continue;
-        dishes.add(
-          ConfirmationDish(
-            dish: dish,
-            concerns: evaluated.concerns,
-            hasChange: evaluated.modification != null,
-          ),
-        );
+    if (cached != null && analysis is MenuAnalysed) {
+      final settings = await _settings.read();
+      final profile = GroupEvaluator.union(<DietaryProfile>[
+        for (final named in settings.activeProfiles) named.profile,
+      ]);
+      final analysedById = <String, AnalysedDish>{
+        for (final dish in analysis.dishes) dish.dishId: dish,
+      };
+      for (final category in cached.menu.categories) {
+        for (final dish in category.dishes) {
+          final analysed = analysedById[dish.id];
+          if (analysed == null) continue;
+          final evaluated = ProfileEvaluator.evaluate(
+            analysed,
+            dish,
+            profile,
+            heading: category.name,
+          );
+          if (evaluated.concerns.isEmpty) continue;
+          dishes.add(
+            ConfirmationDish(
+              dish: dish,
+              concerns: evaluated.concerns,
+              hasChange: evaluated.modification != null,
+            ),
+          );
+        }
       }
+    } else {
+      dishes.addAll(_storedDishes(entry));
     }
     _dishes = List<ConfirmationDish>.unmodifiable(dishes);
     _today = confirmationDay(_clock.now());
@@ -246,6 +254,35 @@ final class ConfirmationController extends ChangeNotifier {
     _isLoading = false;
     notifyListeners();
   }
+
+  /// The prompt's dishes as [entry] kept them (Banto, #411): its strict
+  /// dishes, each concern as it was found, for a menu whose cached copy
+  /// has gone. A dish has no description, price or options here; the prompt
+  /// shows only its name.
+  static List<ConfirmationDish> _storedDishes(VisitEntry entry) =>
+      <ConfirmationDish>[
+        for (final kept in entry.strictDishes ?? const <VisitDish>[])
+          ConfirmationDish(
+            dish: Dish(
+              id: kept.dishId,
+              name: kept.name,
+              description: '',
+              price: 0,
+              options: const <DishOption>[],
+            ),
+            concerns: <Concern>[
+              for (final concern in kept.concerns)
+                Concern(
+                  restrictionId: concern.restrictionId,
+                  source: concern.source ?? ConcernSource.name,
+                  certainty: Certainty.suspected,
+                  tier: EvidenceTier.suspected,
+                  matchedText: concern.matchedText,
+                ),
+            ],
+            hasChange: kept.hasChange,
+          ),
+      ];
 
   /// Writes the prompt's answers and notes; see the class doc. Returns
   /// whether anything was written. Never throws.

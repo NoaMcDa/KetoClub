@@ -22,6 +22,15 @@
 /// there are some, so a keto build's entries are byte for byte as before.
 /// They name a restriction, and like the rest of the entry they stay on
 /// the device (D26 C1).
+///
+/// The Recent tab's per-profile row and "Worked for me" (issues #411,
+/// #412) add, each written only under a non-keto profile or after a mark
+/// and so absent from every keto entry: the four state counts the menu had
+/// for the profile it was opened with and that profile's fingerprint
+/// ([VisitSnapshot]), the strict dishes the post-meal prompt asks about once
+/// the cached menu has expired, and the people the venue "worked for"
+/// ([VisitEntry.workedFor]). Like the rest they never leave the device (D23,
+/// D26 C1) and sum into no number (D27).
 library;
 
 import 'dart:convert';
@@ -30,7 +39,46 @@ import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:ketoclub/models/dish_confirmation.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/models/visit_dish.dart';
 import 'package:ketoclub/services/platform/clock.dart';
+
+/// What a menu looked like for one profile when it was last opened (Banto,
+/// issue #411): the four state counts, a fingerprint of the restrictions
+/// they were made for, and the strict dishes the post-meal prompt asks
+/// about. Recorded by `MenuController.open` under a non-keto profile only.
+@immutable
+final class VisitSnapshot {
+  /// Creates a snapshot; [strictDishes] is cut to the first
+  /// [VisitEntry.maxConfirmations].
+  new({
+    required this.fits,
+    required this.withChange,
+    required this.ask,
+    required this.avoid,
+    required this.profileFingerprint,
+    required List<VisitDish> strictDishes,
+  }) : strictDishes = List<VisitDish>.unmodifiable(
+         strictDishes.take(VisitEntry.maxConfirmations),
+       );
+
+  /// Food dishes that fit (for a strict profile: no trigger found).
+  final int fits;
+
+  /// Food dishes that fit with a change.
+  final int withChange;
+
+  /// Food dishes to ask about.
+  final int ask;
+
+  /// Food dishes to avoid.
+  final int avoid;
+
+  /// A hash of the sorted restriction ids the counts were made for.
+  final String profileFingerprint;
+
+  /// The dishes the profile had a strict concern about, in menu order.
+  final List<VisitDish> strictDishes;
+}
 
 /// One menu in the visit history: which menu, under what name, when and how
 /// often it was opened, and the numbers the Recent list last showed for it.
@@ -51,11 +99,22 @@ final class VisitEntry {
     this.openedStrict = false,
     this.confirmations = const <DishConfirmation>[],
     this.changeConfirmations = const <ChangeConfirmation>[],
+    this.fits,
+    this.withChange,
+    this.ask,
+    this.avoid,
+    this.profileFingerprint,
+    this.strictDishes,
+    this.workedFor = const <String>[],
   });
 
   /// The most [confirmations] (and, separately, [changeConfirmations]) an
   /// entry keeps; past it the oldest days are dropped first (ALG-14).
   static const int maxConfirmations = 200;
+
+  /// The most people [workedFor] names: a device holds at most this many
+  /// profiles.
+  static const int maxWorkedFor = 8;
 
   /// Reads an entry written by [toJson].
   ///
@@ -69,7 +128,12 @@ final class VisitEntry {
   /// so a bad one never costs the visit: `openedStrict` is true only when
   /// it is `true`, and a `confirmations` or `changeConfirmations` that is
   /// not a list reads as empty, a malformed answer in it is dropped, and
-  /// so is a repeat.
+  /// so is a repeat. The same goes for the Recent tab's fields (#411,
+  /// #412): a count that is not an int, a fingerprint that is not a string,
+  /// a `strictDishes` that is not a list (a malformed dish in it is dropped,
+  /// at most [maxConfirmations] kept) and a `workedFor` that is not a list
+  /// of non-empty strings (at most [maxWorkedFor], repeats dropped) each read
+  /// as absent.
   static VisitEntry? tryFrom(Map<String, Object?> json) {
     final rawSource = json['source'];
     final rawId = json['platformId'];
@@ -115,7 +179,37 @@ final class VisitEntry {
         json['changeConfirmations'],
         ChangeConfirmation.tryFromJson,
       ),
+      fits: _readCount(json['fits']),
+      withChange: _readCount(json['withChange']),
+      ask: _readCount(json['ask']),
+      avoid: _readCount(json['avoid']),
+      profileFingerprint: _readText(json['profileFingerprint']),
+      strictDishes: json['strictDishes'] is List<Object?>
+          ? _readList(json['strictDishes'], VisitDish.tryFromJson)
+          : null,
+      workedFor: _readNames(json['workedFor']),
     );
+  }
+
+  /// The non-negative count [raw] holds, or null when it holds none.
+  static int? _readCount(Object? raw) => raw is int && raw >= 0 ? raw : null;
+
+  /// The non-empty string [raw] holds, or null when it holds none.
+  static String? _readText(Object? raw) =>
+      raw is String && raw.isNotEmpty ? raw : null;
+
+  /// The distinct non-empty strings [raw] holds, at most [maxWorkedFor];
+  /// empty when [raw] is not a list.
+  static List<String> _readNames(Object? raw) {
+    if (raw is! List<Object?>) return const <String>[];
+    final names = <String>[];
+    for (final item in raw) {
+      if (item is String && item.isNotEmpty && !names.contains(item)) {
+        names.add(item);
+      }
+      if (names.length == maxWorkedFor) break;
+    }
+    return List<String>.unmodifiable(names);
   }
 
   /// The records [raw] holds, each read by [read]: malformed ones and
@@ -180,16 +274,64 @@ final class VisitEntry {
   /// (ALG-14). Empty when none was recorded.
   final List<ChangeConfirmation> changeConfirmations;
 
-  /// This entry with its post-meal answers replaced by [confirmations] and
-  /// [changes], repeats dropped and each cut to the [maxConfirmations]
-  /// latest days.
-  VisitEntry withConfirmations({
-    required List<DishConfirmation> confirmations,
-    required List<ChangeConfirmation> changes,
+  /// How many food dishes fit the profile the menu was last opened with
+  /// (Banto, #411); null for a keto entry or one opened before the field.
+  final int? fits;
+
+  /// How many food dishes fit with a change, from the same visit as
+  /// [fits].
+  final int? withChange;
+
+  /// How many food dishes are to be asked about, from the same visit.
+  final int? ask;
+
+  /// How many food dishes are to be avoided, from the same visit.
+  final int? avoid;
+
+  /// A hash of the sorted restriction ids [fits] and the rest were made for
+  /// (`profileFingerprintOf`), so a changed profile reads as "re-check"
+  /// rather than as stale numbers; null with them.
+  final String? profileFingerprint;
+
+  /// The dishes the profile had a strict concern about when the menu was
+  /// last opened, at most [maxConfirmations]: what the post-meal prompt
+  /// asks about once the cached menu has gone (#411). Null when none was
+  /// recorded (a keto entry, an older one); empty when the menu was read
+  /// and held nothing to ask about.
+  final List<VisitDish>? strictDishes;
+
+  /// The people this venue "worked for" (Banto, #412): their profile names,
+  /// or `Me` for the owner's own unnamed one. Empty when none, and never
+  /// written then. A mark is the person's own and a filter only: nothing
+  /// sums it into a number (D27).
+  final List<String> workedFor;
+
+  /// Whether the four state counts are all recorded.
+  bool get hasStates =>
+      fits != null && withChange != null && ask != null && avoid != null;
+
+  /// This entry with [name] and [city] replaced (null clears).
+  VisitEntry renamed({required String? name, required String? city}) =>
+      _copy(name: name, city: city, replaceName: true);
+
+  /// This entry with [workedFor] replaced by [names], repeats dropped and
+  /// cut to [maxWorkedFor].
+  VisitEntry withWorkedFor(Iterable<String> names) =>
+      _copy(workedFor: _readNames(names.toList()));
+
+  /// A copy with the given parts replaced; [name] and [city] only when
+  /// [replaceName] (they may be set to null).
+  VisitEntry _copy({
+    String? name,
+    String? city,
+    bool replaceName = false,
+    List<DishConfirmation>? confirmations,
+    List<ChangeConfirmation>? changes,
+    List<String>? workedFor,
   }) => VisitEntry(
     ref: ref,
-    name: name,
-    city: city,
+    name: replaceName ? name : this.name,
+    city: replaceName ? city : this.city,
     firstOpenedAt: firstOpenedAt,
     lastOpenedAt: lastOpenedAt,
     openCount: openCount,
@@ -198,8 +340,26 @@ final class VisitEntry {
     greenCount: greenCount,
     yellowCount: yellowCount,
     openedStrict: openedStrict,
+    confirmations: confirmations ?? this.confirmations,
+    changeConfirmations: changes ?? changeConfirmations,
+    fits: fits,
+    withChange: withChange,
+    ask: ask,
+    avoid: avoid,
+    profileFingerprint: profileFingerprint,
+    strictDishes: strictDishes,
+    workedFor: workedFor ?? this.workedFor,
+  );
+
+  /// This entry with its post-meal answers replaced by [confirmations] and
+  /// [changes], repeats dropped and each cut to the [maxConfirmations]
+  /// latest days.
+  VisitEntry withConfirmations({
+    required List<DishConfirmation> confirmations,
+    required List<ChangeConfirmation> changes,
+  }) => _copy(
     confirmations: _newest(confirmations, (item) => item.day),
-    changeConfirmations: _newest(changes, (item) => item.day),
+    changes: _newest(changes, (item) => item.day),
   );
 
   /// [items] without repeats, cut to the [maxConfirmations] whose [day] is
@@ -242,6 +402,14 @@ final class VisitEntry {
       'changeConfirmations': <Object?>[
         for (final change in changeConfirmations) change.toJson(),
       ],
+    'fits': ?fits,
+    'withChange': ?withChange,
+    'ask': ?ask,
+    'avoid': ?avoid,
+    'profileFingerprint': ?profileFingerprint,
+    if (strictDishes case final dishes?)
+      'strictDishes': <Object?>[for (final dish in dishes) dish.toJson()],
+    if (workedFor.isNotEmpty) 'workedFor': workedFor,
   };
 
   @override
@@ -259,7 +427,14 @@ final class VisitEntry {
       other.yellowCount == yellowCount &&
       other.openedStrict == openedStrict &&
       listEquals(other.confirmations, confirmations) &&
-      listEquals(other.changeConfirmations, changeConfirmations);
+      listEquals(other.changeConfirmations, changeConfirmations) &&
+      other.fits == fits &&
+      other.withChange == withChange &&
+      other.ask == ask &&
+      other.avoid == avoid &&
+      other.profileFingerprint == profileFingerprint &&
+      listEquals(other.strictDishes, strictDishes) &&
+      listEquals(other.workedFor, workedFor);
 
   @override
   int get hashCode => Object.hash(
@@ -276,6 +451,13 @@ final class VisitEntry {
     openedStrict,
     Object.hashAll(confirmations),
     Object.hashAll(changeConfirmations),
+    fits,
+    withChange,
+    ask,
+    avoid,
+    profileFingerprint,
+    strictDishes == null ? null : Object.hashAll(strictDishes!),
+    Object.hashAll(workedFor),
   );
 
   @override
@@ -313,6 +495,9 @@ abstract interface class VisitHistoryStore {
   /// null: a null never erases what an earlier visit recorded. In the same
   /// way [openedStrict] (ALG-14) sets [VisitEntry.openedStrict] when true
   /// and keeps it when false, and the post-meal answers are always kept.
+  /// A [snapshot] (Banto, #411) replaces the recorded state counts,
+  /// fingerprint and strict dishes as a whole when given and keeps them when
+  /// null; the people in [VisitEntry.workedFor] are always kept.
   ///
   /// Never throws.
   Future<void> recordVisit(
@@ -324,7 +509,15 @@ abstract interface class VisitHistoryStore {
     int? greenCount,
     int? yellowCount,
     bool openedStrict = false,
+    VisitSnapshot? snapshot,
   });
+
+  /// Replaces the people [ref]'s entry "worked for" (Banto, #412) with
+  /// [names] ([VisitEntry.withWorkedFor]). Does nothing when [ref] has no
+  /// entry, so a mark never creates one.
+  ///
+  /// Never throws.
+  Future<void> setWorkedFor(VenueRef ref, Iterable<String> names);
 
   /// Replaces the post-meal answers recorded for [ref] (ALG-14, D27) with
   /// [confirmations] and [changes] ([VisitEntry.withConfirmations]). Does
@@ -362,7 +555,7 @@ abstract interface class VisitHistoryStore {
 
 /// [existing] updated by one more visit at [now] (see
 /// [VisitHistoryStore.recordVisit]), or a first visit when it is null.
-VisitEntry _visitAfterOpening(
+VisitEntry visitAfterOpening(
   VisitEntry? existing,
   VenueRef ref,
   DateTime now, {
@@ -373,6 +566,7 @@ VisitEntry _visitAfterOpening(
   int? greenCount,
   int? yellowCount,
   bool openedStrict = false,
+  VisitSnapshot? snapshot,
 }) => VisitEntry(
   ref: ref,
   name: name ?? existing?.name,
@@ -388,28 +582,14 @@ VisitEntry _visitAfterOpening(
   confirmations: existing?.confirmations ?? const <DishConfirmation>[],
   changeConfirmations:
       existing?.changeConfirmations ?? const <ChangeConfirmation>[],
-);
-
-/// [existing] with its name and city replaced by [name] and [city] (see
-/// [VisitHistoryStore.rename]).
-VisitEntry _visitRenamed(
-  VisitEntry existing, {
-  required String? name,
-  required String? city,
-}) => VisitEntry(
-  ref: existing.ref,
-  name: name,
-  city: city,
-  firstOpenedAt: existing.firstOpenedAt,
-  lastOpenedAt: existing.lastOpenedAt,
-  openCount: existing.openCount,
-  dishCount: existing.dishCount,
-  score: existing.score,
-  greenCount: existing.greenCount,
-  yellowCount: existing.yellowCount,
-  openedStrict: existing.openedStrict,
-  confirmations: existing.confirmations,
-  changeConfirmations: existing.changeConfirmations,
+  fits: snapshot?.fits ?? existing?.fits,
+  withChange: snapshot?.withChange ?? existing?.withChange,
+  ask: snapshot?.ask ?? existing?.ask,
+  avoid: snapshot?.avoid ?? existing?.avoid,
+  profileFingerprint:
+      snapshot?.profileFingerprint ?? existing?.profileFingerprint,
+  strictDishes: snapshot?.strictDishes ?? existing?.strictDishes,
+  workedFor: existing?.workedFor ?? const <String>[],
 );
 
 /// A [VisitHistoryStore] in a Hive box of JSON strings, one per
@@ -517,12 +697,13 @@ final class HiveVisitHistoryStore implements VisitHistoryStore {
     int? greenCount,
     int? yellowCount,
     bool openedStrict = false,
+    VisitSnapshot? snapshot,
   }) async {
     final box = await _boxOrNull();
     if (box == null) return;
     await _put(
       box,
-      _visitAfterOpening(
+      visitAfterOpening(
         _get(box, ref),
         ref,
         clock.now(),
@@ -533,8 +714,18 @@ final class HiveVisitHistoryStore implements VisitHistoryStore {
         greenCount: greenCount,
         yellowCount: yellowCount,
         openedStrict: openedStrict,
+        snapshot: snapshot,
       ),
     );
+  }
+
+  @override
+  Future<void> setWorkedFor(VenueRef ref, Iterable<String> names) async {
+    final box = await _boxOrNull();
+    if (box == null) return;
+    final existing = _get(box, ref);
+    if (existing == null) return;
+    await _put(box, existing.withWorkedFor(names));
   }
 
   @override
@@ -566,7 +757,7 @@ final class HiveVisitHistoryStore implements VisitHistoryStore {
     if (box == null) return;
     final existing = _get(box, ref);
     if (existing == null) return;
-    await _put(box, _visitRenamed(existing, name: name, city: city));
+    await _put(box, existing.renamed(name: name, city: city));
   }
 
   @override
@@ -620,7 +811,11 @@ final class NoVisitHistoryStore implements VisitHistoryStore {
     int? greenCount,
     int? yellowCount,
     bool openedStrict = false,
+    VisitSnapshot? snapshot,
   }) async {}
+
+  @override
+  Future<void> setWorkedFor(VenueRef ref, Iterable<String> names) async {}
 
   @override
   Future<void> setConfirmations(

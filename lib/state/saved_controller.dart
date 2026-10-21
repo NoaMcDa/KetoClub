@@ -1,9 +1,30 @@
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/dietary_profile.dart';
+import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/storage/menu_cache.dart';
+import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/storage/visit_history_store.dart';
+import 'package:ketoclub/utils/allergens/group_evaluator.dart';
+import 'package:ketoclub/utils/banto_mode.dart';
+import 'package:ketoclub/utils/profile_wording.dart';
+import 'package:ketoclub/utils/visit_profile.dart';
+
+/// What a Recent row shows in place of the keto score (Banto, issue #411).
+enum RecentRowKind {
+  /// Today's row: the keto score and the green and yellow counts. Every
+  /// row of a build without Banto, or under a keto-only profile.
+  keto,
+
+  /// The four state counts the menu had for the profile as it is now.
+  states,
+
+  /// The profile is not the one the menu was last counted for (or it was
+  /// never counted for one): no numbers, a hint to open the menu again.
+  recheck,
+}
 
 /// One row of the Recent list (issue #313): a menu opened on this device
 /// ([visit], from the [VisitHistoryStore]) joined with its cached copy
@@ -65,6 +86,11 @@ final class RecentEntry {
   /// visit's snapshot; null when neither knows.
   int? get dishCount => cached?.dishCount ?? visit.dishCount;
 
+  /// Whether the post-meal prompt can list this row's dishes: the cached
+  /// menu is still on the device, or the visit kept its strict dishes
+  /// (Banto, #411).
+  bool get canAskStaff => isCached || visit.strictDishes != null;
+
   /// The engine behind the cached analysis, or null when nothing cached
   /// carries a completed one. The visit snapshot records no engine.
   AnalysisEngine? get engine => cached?.engine;
@@ -113,9 +139,21 @@ final class SavedController extends ChangeNotifier {
   /// cached copies in [_repository]. The optional [VisitHistoryStore]
   /// defaults to [NoVisitHistoryStore], which remembers nothing, so the
   /// list is then always empty (issue #307).
-  new(this._repository, [this._history = const NoVisitHistoryStore()]);
+  ///
+  /// With a [SettingsStore] and `load(bantoMode: true)` the list is read for
+  /// the profile the device holds (Banto, #411, #412): per-profile counts,
+  /// a "re-check" hint, and the "Worked for me" mark and filter. Without
+  /// either, the list is exactly the keto list.
+  new(
+    this._repository, [
+    this._history = const NoVisitHistoryStore(),
+    this._settings,
+  ]);
 
   final MenuRepository _repository;
+
+  /// Where the active profiles are read from (Banto); null reads none.
+  final SettingsStore? _settings;
 
   /// The menus opened on this device (issue #307): what [entries] lists.
   final VisitHistoryStore _history;
@@ -123,19 +161,99 @@ final class SavedController extends ChangeNotifier {
   bool _isLoading = false;
   List<RecentEntry> _entries = const <RecentEntry>[];
 
+  /// The people the device reads menus for, and how the union of their
+  /// profiles words a verdict; both are the keto defaults until [load] reads
+  /// the settings under Banto.
+  List<NamedProfile> _people = const <NamedProfile>[];
+  ProfileWording _wording = ProfileWording.ketoOnly;
+  String? _fingerprint;
+  bool _workedOnly = false;
+
   /// Whether [load] is currently reading the history and the cache.
   bool get isLoading => _isLoading;
 
   /// Every listed menu not currently [hide]den, most recently opened
-  /// ([VisitEntry.lastOpenedAt]) first.
-  List<RecentEntry> get entries => List.unmodifiable(_entries);
+  /// ([VisitEntry.lastOpenedAt]) first; with [workedOnly], only those
+  /// marked as having worked for the people the device reads menus for.
+  List<RecentEntry> get entries => List.unmodifiable(
+    workedOnly ? _entries.where(isWorkedFor).toList() : _entries,
+  );
+
+  /// How the profile the device holds words a verdict (Banto, #411);
+  /// [ProfileWording.ketoOnly] without Banto or with an empty profile.
+  ProfileWording get wording => _wording;
+
+  /// Whether the list is read for a profile with a restriction besides
+  /// keto: what swaps the keto badge for the state counts and offers the
+  /// "Worked for me" mark.
+  bool get readsProfile => _wording.usesStates;
+
+  /// What [entry]'s row shows in place of the keto score (Banto, #411).
+  RecentRowKind rowKindFor(RecentEntry entry) {
+    if (!readsProfile) return RecentRowKind.keto;
+    final visit = entry.visit;
+    return visit.hasStates && visit.profileFingerprint == _fingerprint
+        ? RecentRowKind.states
+        : RecentRowKind.recheck;
+  }
+
+  /// The people [entry]'s venue "worked for" among those the device reads
+  /// menus for, by name, in the order they were marked (Banto, #412);
+  /// empty without a profile.
+  List<String> workedForOf(RecentEntry entry) => readsProfile
+      ? markedAmong(entry.visit.workedFor, _people)
+      : const <String>[];
+
+  /// Whether [entry]'s venue is marked as having worked for anyone the
+  /// device reads menus for.
+  bool isWorkedFor(RecentEntry entry) => workedForOf(entry).isNotEmpty;
+
+  /// Whether any listed menu carries a mark: what shows the filter chip.
+  bool get hasWorkedMarks => _entries.any(isWorkedFor);
+
+  /// Whether the list is narrowed to the marked menus. A filter only: it
+  /// never orders or counts anything (D27).
+  bool get workedOnly => _workedOnly && readsProfile && hasWorkedMarks;
+
+  /// Narrows the list to the marked menus, or shows all again.
+  void setWorkedOnly({required bool value}) {
+    if (_workedOnly == value) return;
+    _workedOnly = value;
+    notifyListeners();
+  }
+
+  /// Marks (or unmarks) the venue [ref] as having worked for the people
+  /// the device reads menus for (Banto, #412); other people's marks stay.
+  /// Written to the visit history, then the row is rebuilt from it. Does
+  /// nothing without a profile. Never throws.
+  Future<void> setWorked(VenueRef ref, {required bool worked}) async {
+    if (!readsProfile) return;
+    final names = <String>[for (final p in _people) workedForNameOf(p)];
+    final current = await _history.read(ref);
+    if (current == null) return;
+    await _history.setWorkedFor(ref, <String>[
+      for (final name in current.workedFor)
+        if (!names.contains(name)) name,
+      if (worked) ...names,
+    ]);
+    final updated = await _history.read(ref);
+    final index = _entries.indexWhere((entry) => entry.ref == ref);
+    if (updated == null || index == -1) return;
+    _entries = List<RecentEntry>.of(_entries)
+      ..[index] = RecentEntry(visit: updated, cached: _entries[index].cached);
+    notifyListeners();
+  }
 
   /// Reads the visit history and the cache, and joins them by [VenueRef]:
   /// one [RecentEntry] per visit, most recently opened first.
-  Future<void> load() async {
+  ///
+  /// With [bantoMode] and a settings store it also reads the profiles the
+  /// device reads menus for (Banto, #411), so the rows speak that profile.
+  Future<void> load({bool bantoMode = BantoMode.enabled}) async {
     _isLoading = true;
     notifyListeners();
 
+    await _readProfile(bantoMode: bantoMode);
     final visits = await _history.entries();
     final saved = await _repository.savedMenus();
     final cachedByKey = <String, CachedMenuEntry>{
@@ -148,6 +266,25 @@ final class SavedController extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  /// Reads the active profiles into [wording] and the fingerprint rows are
+  /// compared with; the keto defaults without Banto or a settings store.
+  Future<void> _readProfile({required bool bantoMode}) async {
+    final settings = _settings;
+    if (!bantoMode || settings == null) {
+      _people = const <NamedProfile>[];
+      _wording = ProfileWording.ketoOnly;
+      _fingerprint = null;
+      return;
+    }
+    final read = await settings.read();
+    _people = read.activeProfiles;
+    final profile = GroupEvaluator.union(<DietaryProfile>[
+      for (final person in _people) person.profile,
+    ]);
+    _wording = ProfileWording.of(profile, bantoMode: true);
+    _fingerprint = profileFingerprintOf(profile);
   }
 
   /// Takes the entry for [ref] out of [entries] without deleting it from
@@ -202,32 +339,11 @@ final class SavedController extends ChangeNotifier {
     final current = _entries[index];
     _entries = List<RecentEntry>.of(_entries)
       ..[index] = RecentEntry(
-        visit: _renamed(current.visit, name: cleanName, city: cleanCity),
+        visit: current.visit.renamed(name: cleanName, city: cleanCity),
         cached: current.cached,
       );
     notifyListeners();
   }
-
-  /// [visit] with its name and city replaced, as the store now holds it.
-  static VisitEntry _renamed(
-    VisitEntry visit, {
-    required String? name,
-    required String? city,
-  }) => VisitEntry(
-    ref: visit.ref,
-    name: name,
-    city: city,
-    firstOpenedAt: visit.firstOpenedAt,
-    lastOpenedAt: visit.lastOpenedAt,
-    openCount: visit.openCount,
-    dishCount: visit.dishCount,
-    score: visit.score,
-    greenCount: visit.greenCount,
-    yellowCount: visit.yellowCount,
-    openedStrict: visit.openedStrict,
-    confirmations: visit.confirmations,
-    changeConfirmations: visit.changeConfirmations,
-  );
 
   /// [value] trimmed, or null when nothing is left of it.
   static String? _blankToNull(String? value) {

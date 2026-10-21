@@ -2423,4 +2423,33 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get sharedConfirmationFooter =>
       'שותף על ידי סועדים אחרים. האפליקציה לא יכולה לבדוק את זה: תמיד לשאול במסעדה.';
+
+  @override
+  String get workedOffer => 'המקום הזה עבד לי';
+
+  @override
+  String get workedOfferSkip => 'לא עכשיו';
+
+  @override
+  String get workedChip => 'עבד לי';
+
+  @override
+  String workedTagNames(String names) {
+    return 'עבד עבור $names';
+  }
+
+  @override
+  String get workedMark => 'לסמן כמקום שעבד לי';
+
+  @override
+  String get workedUnmark => 'להסיר את הסימון \"עבד לי\"';
+
+  @override
+  String savedStateCount(String label, int count) {
+    return '$label: $count';
+  }
+
+  @override
+  String get savedRecheck =>
+      'הפרופיל שלך השתנה מאז. אפשר לפתוח את התפריט כדי לבדוק שוב.';
 }

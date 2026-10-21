@@ -273,6 +273,8 @@ Route<void>? generateRoute(
           create: (_) => SavedController(
             dependencies.menuRepository,
             dependencies.visitHistory,
+            // Read only under bantoMode, for the rows' profile (#411).
+            dependencies.settingsStore,
           ),
           child: SavedScreen(
             bantoMode: bantoMode,

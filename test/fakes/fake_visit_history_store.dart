@@ -13,6 +13,7 @@ typedef RecordedVisit = ({
   int? greenCount,
   int? yellowCount,
   bool openedStrict,
+  VisitSnapshot? snapshot,
 });
 
 /// A [VisitHistoryStore] backed by an in-memory map keyed by
@@ -64,6 +65,7 @@ final class FakeVisitHistoryStore implements VisitHistoryStore {
     int? greenCount,
     int? yellowCount,
     bool openedStrict = false,
+    VisitSnapshot? snapshot,
   }) async {
     recordCalls.add((
       ref: ref,
@@ -74,25 +76,32 @@ final class FakeVisitHistoryStore implements VisitHistoryStore {
       greenCount: greenCount,
       yellowCount: yellowCount,
       openedStrict: openedStrict,
+      snapshot: snapshot,
     ));
-    final now = clock.now();
-    final existing = _entries[ref.cacheKey];
-    _entries[ref.cacheKey] = VisitEntry(
-      ref: ref,
-      name: name ?? existing?.name,
-      city: city ?? existing?.city,
-      firstOpenedAt: existing?.firstOpenedAt ?? now,
-      lastOpenedAt: now,
-      openCount: (existing?.openCount ?? 0) + 1,
-      dishCount: dishCount ?? existing?.dishCount,
-      score: score ?? existing?.score,
-      greenCount: greenCount ?? existing?.greenCount,
-      yellowCount: yellowCount ?? existing?.yellowCount,
-      openedStrict: openedStrict || (existing?.openedStrict ?? false),
-      confirmations: existing?.confirmations ?? const <DishConfirmation>[],
-      changeConfirmations:
-          existing?.changeConfirmations ?? const <ChangeConfirmation>[],
+    _entries[ref.cacheKey] = visitAfterOpening(
+      _entries[ref.cacheKey],
+      ref,
+      clock.now(),
+      name: name,
+      city: city,
+      dishCount: dishCount,
+      score: score,
+      greenCount: greenCount,
+      yellowCount: yellowCount,
+      openedStrict: openedStrict,
+      snapshot: snapshot,
     );
+  }
+
+  /// Every [setWorkedFor] call's ref, in call order (#412).
+  final List<VenueRef> workedCalls = <VenueRef>[];
+
+  @override
+  Future<void> setWorkedFor(VenueRef ref, Iterable<String> names) async {
+    workedCalls.add(ref);
+    final existing = _entries[ref.cacheKey];
+    if (existing == null) return;
+    _entries[ref.cacheKey] = existing.withWorkedFor(names);
   }
 
   @override
@@ -119,21 +128,7 @@ final class FakeVisitHistoryStore implements VisitHistoryStore {
     renameCalls.add((ref: ref, name: name, city: city));
     final existing = _entries[ref.cacheKey];
     if (existing == null) return;
-    _entries[ref.cacheKey] = VisitEntry(
-      ref: existing.ref,
-      name: name,
-      city: city,
-      firstOpenedAt: existing.firstOpenedAt,
-      lastOpenedAt: existing.lastOpenedAt,
-      openCount: existing.openCount,
-      dishCount: existing.dishCount,
-      score: existing.score,
-      greenCount: existing.greenCount,
-      yellowCount: existing.yellowCount,
-      openedStrict: existing.openedStrict,
-      confirmations: existing.confirmations,
-      changeConfirmations: existing.changeConfirmations,
-    );
+    _entries[ref.cacheKey] = existing.renamed(name: name, city: city);
   }
 
   @override

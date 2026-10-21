@@ -136,6 +136,11 @@ void main() {
       );
       await tapAndSettle(tester, find.byKey(confirmSaveKey));
 
+      // Assert: the one strict concern was answered, so the one-line
+      // "worked for me" offer follows; decline it here.
+      expect(find.text(_en.workedOffer), findsOneWidget);
+      await tapAndSettle(tester, find.byKey(workedOfferSkipKey));
+
       // Assert: saved on the device, with the visit history.
       expect(find.text(_en.confirmSaved), findsOneWidget);
       final entry = await fakes.visitHistory.read(_ref);
@@ -160,6 +165,66 @@ void main() {
       // Assert: it says when the staff were asked.
       expect(find.text(_en.whySheetTitle), findsOneWidget);
       expect(find.text(_en.whyDeniedOn(day)), findsOneWidget);
+    });
+
+    testWidgets('the prompt outlives the cache: with the menu expired, '
+        'Recent still asks about the dishes the visit kept and records '
+        'the answer (issue #411)', (tester) async {
+      // Setup: a peanut profile, past the onboarding.
+      final fakes = FakeAppDependencies();
+      await fakes.settingsStore.write(
+        AppSettings(
+          profile: DietaryProfile.empty.withEntry(RestrictionId.peanuts),
+          onboardingSeen: true,
+        ),
+      );
+      fakes.repository.stub(_ref, MenuFetched(menu: _menu));
+      fakes.classifier.respondWith(_analysis);
+      await tester.pumpWidget(
+        KetoClubApp(dependencies: fakes.dependencies, bantoMode: true),
+      );
+      await tester.pumpAndSettle();
+
+      // Act: open the venue, so the visit keeps its strict dish.
+      await enterText(tester, _woltUrl);
+      await tapAndSettle(tester, find.byTooltip(_en.venueSearchOpenLink));
+      final kept = (await fakes.visitHistory.read(_ref))?.strictDishes;
+      expect(kept?.single.dishId, 'cake');
+
+      // Act: the 24 hours pass; the menu is no longer cached.
+      await fakes.repository.clearCache();
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tapAndSettle(tester, navDestination(_en.navSaved));
+
+      // Assert: the row says the menu is not on the device, and still
+      // offers the prompt, which lists the kept dish.
+      expect(find.text(_en.savedNotOnDevice), findsOneWidget);
+      expect(find.text(_en.confirmPromptOpen), findsOneWidget);
+      await tapAndSettle(tester, find.text(_en.confirmPromptOpen));
+      expect(find.text(_en.confirmUnavailable), findsNothing);
+      final peanuts = restrictionFor(RestrictionId.peanuts).nameEn;
+      expect(
+        find.text(_en.confirmPromptQuestion(peanuts, _nutCake.name)),
+        findsOneWidget,
+      );
+
+      // Act: the staff said there are peanuts.
+      await tapAndSettle(
+        tester,
+        find.byKey(confirmAnswerKey('cake', 0, ConfirmationAnswer.present)),
+      );
+      await tapAndSettle(tester, find.byKey(confirmSaveKey));
+
+      // Assert: recorded with the visit, and no offer after a "present".
+      expect(find.text(_en.workedOffer), findsNothing);
+      expect(find.text(_en.confirmSaved), findsOneWidget);
+      final entry = await fakes.visitHistory.read(_ref);
+      expect(entry?.confirmations.single.dishId, 'cake');
+      expect(
+        entry?.confirmations.single.polarity,
+        ConfirmationPolarity.present,
+      );
     });
   });
 }

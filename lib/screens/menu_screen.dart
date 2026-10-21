@@ -58,6 +58,7 @@ import 'package:ketoclub/widgets/scanned_pages_sheet.dart';
 import 'package:ketoclub/widgets/skeletons.dart';
 import 'package:ketoclub/widgets/verdict_copy.dart';
 import 'package:ketoclub/widgets/verdict_counter_tiles.dart';
+import 'package:ketoclub/widgets/worked_for_tag.dart';
 import 'package:provider/provider.dart';
 
 /// The narrowest window, in logical pixels, at which a loaded menu is laid
@@ -219,6 +220,9 @@ class MenuScreen extends StatefulWidget {
   State<MenuScreen> createState() => _MenuScreenState();
 }
 
+/// The key of the overflow's "worked for me" item (Banto, #412).
+const Key menuWorkedToggleKey = ValueKey<String>('menuWorkedToggle');
+
 /// The entries of the menu app bar's overflow menu (issue #238).
 enum _MenuOverflowAction {
   /// Shares the menu's green and yellow dishes as text.
@@ -229,6 +233,10 @@ enum _MenuOverflowAction {
 
   /// Copies the allergy note for a delivery app (Banto, ALG-15).
   allergyNote,
+
+  /// Marks or unmarks the venue as having worked for the person (Banto,
+  /// #412).
+  workedForMe,
 }
 
 class _MenuScreenState extends State<MenuScreen> {
@@ -378,7 +386,10 @@ class _MenuScreenState extends State<MenuScreen> {
           // Explore, issue #257) and, for a scanned menu, "Rename" (issue
           // #315), so with neither it is hidden rather than opening an
           // empty menu.
-          if (canShare || controller.canRename || allergyNote != null)
+          if (canShare ||
+              controller.canRename ||
+              allergyNote != null ||
+              controller.canMarkWorked)
             PopupMenuButton<_MenuOverflowAction>(
               tooltip: l10n.actionMoreMenuOptions,
               onSelected: (action) => switch (action) {
@@ -388,6 +399,9 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
                 _MenuOverflowAction.allergyNote => unawaited(
                   _copyAllergyNote(allergyNote),
+                ),
+                _MenuOverflowAction.workedForMe => unawaited(
+                  controller.setWorkedForMe(worked: !controller.isWorkedFor),
                 ),
               },
               itemBuilder: (context) => [
@@ -405,6 +419,16 @@ class _MenuScreenState extends State<MenuScreen> {
                   PopupMenuItem(
                     value: _MenuOverflowAction.allergyNote,
                     child: Text(l10n.menuAllergyNoteAction),
+                  ),
+                if (controller.canMarkWorked)
+                  PopupMenuItem(
+                    key: menuWorkedToggleKey,
+                    value: _MenuOverflowAction.workedForMe,
+                    child: Text(
+                      controller.isWorkedFor
+                          ? l10n.workedUnmark
+                          : l10n.workedMark,
+                    ),
                   ),
               ],
             ),
@@ -1047,11 +1071,24 @@ class _MenuScreenState extends State<MenuScreen> {
     // Banto: "N dishes fit everyone" for a group (ALG-12).
     final groupFits = groupFitsEveryoneLine(context, l10n, controller);
     final pages = _scannedPages;
-    if (pages == null && counts == null && groupFits == null) return titleRow;
+    // Banto (#412): the venue worked for the people this menu is read for.
+    final worked = controller.isWorkedFor
+        ? Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: WorkedForTag(names: controller.workedForPeople),
+          )
+        : null;
+    if (pages == null &&
+        counts == null &&
+        groupFits == null &&
+        worked == null) {
+      return titleRow;
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         titleRow,
+        ?worked,
         ?counts,
         ?groupFits,
         if (pages != null) _scannedSourceRow(context, l10n, pages),
