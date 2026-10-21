@@ -875,5 +875,11 @@
   "restrictionLegumePartHint": "קטנית אחת בנפרד, לא כל הקטניות",
   "restrictionFavaHint": "חסר G6PD (פביזם), לא אלרגיה. נבדק באותה הקפדה",
   "restrictionSearchField": "חיפוש הגבלה",
-  "restrictionSearchEmpty": "אין הגבלה מתאימה. אפשר להוסיף אותה כמילה משלך למטה."
+  "restrictionSearchEmpty": "אין הגבלה מתאימה. אפשר להוסיף אותה כמילה משלך למטה.",
+  "settingsShareConfirmations": "שיתוף מה שהצוות אמר לך",
+  "settingsShareConfirmationsBody": "כל תשובה שנשמרת אחרי ארוחה שולחת את המסעדה, את המנה, את ההגבלה ששאלת עליה ואם כן או לא, כדי שאחרים יראו כמה אנשים שמעו אותו דבר. לעולם לא את הפרופיל שלך, לעולם לא את ההערה שלך.",
+  "whatLeavesDeviceSharedConfirmations": "שיתוף מה שהצוות אמר לך פועל: כל תשובה שנשמרת שולחת לשרת של קטוקלאב את המסעדה, את המנה, את ההגבלה האחת ששאלת עליה ואם כן או לא, בלי שום פרט שמזהה אותך. לעולם לא את הפרופיל שלך, לעולם לא את ההערה שלך.",
+  "sharedConfirmationAbsent": "{count} אנשים שאלו כאן ונאמר להם שאין במנה {restriction}",
+  "sharedConfirmationPresent": "{count} אנשים שאלו כאן ונאמר להם שיש במנה {restriction}",
+  "sharedConfirmationFooter": "שותף על ידי סועדים אחרים. האפליקציה לא יכולה לבדוק את זה: תמיד לשאול במסעדה."
 }

@@ -3809,6 +3809,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No restriction matches. You can add it as your own below.'**
   String get restrictionSearchEmpty;
+
+  /// Banto (ALG-14, issue #409): the second toggle under AI & privacy, off by default. Shares post-meal answers with KetoClub's server.
+  ///
+  /// In en, this message translates to:
+  /// **'Share what the staff told you'**
+  String get settingsShareConfirmations;
+
+  /// Banto (ALG-14, issue #409): the one sentence under the share toggle saying exactly what is sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Each answer you save after a meal sends the venue, the dish, the restriction you asked about and yes or no, so other people see how many were told the same. Never your profile, never your note.'**
+  String get settingsShareConfirmationsBody;
+
+  /// Banto (ALG-14, issue #409): added to the AI disclosure (Explore banner, Settings) while the share toggle is on.
+  ///
+  /// In en, this message translates to:
+  /// **'You share what the staff told you: each answer you save sends the venue, the dish, the one restriction you asked about and yes or no to KetoClub\'s server, with nothing that identifies you. Never your profile, never your note.'**
+  String get whatLeavesDeviceSharedConfirmations;
+
+  /// Banto (ALG-14, issue #409): a dish's shared line, from three people. {restriction} names what was asked about. Never 'safe'; the footer says to ask.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} people were told it has no {restriction} here'**
+  String sharedConfirmationAbsent(int count, String restriction);
+
+  /// Banto (ALG-14, issue #409): a dish's shared line when people were told the restriction's ingredient is in the dish.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} people were told it has {restriction} here'**
+  String sharedConfirmationPresent(int count, String restriction);
+
+  /// Banto (ALG-14, issue #409): the helper-tool footer under the shared lines on a dish card.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared by other diners. The app cannot check it: always ask the restaurant.'**
+  String get sharedConfirmationFooter;
 }
 
 class _AppLocalizationsDelegate

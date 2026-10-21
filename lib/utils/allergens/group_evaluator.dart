@@ -261,6 +261,13 @@ abstract final class GroupEvaluator {
       confirmations: List<ConfirmationEvidence>.unmodifiable(
         confirmations.toSet(),
       ),
+      // What other people were told, about any person's restriction
+      // (issue #409).
+      sharedConfirmations: List<ConfirmationEvidence>.unmodifiable(
+        <ConfirmationEvidence>{
+          for (final result in evaluated) ...result.sharedConfirmations,
+        },
+      ),
       concerns: List<Concern>.unmodifiable(
         ProfileEvaluator.inTaxonomyOrder(best.values.toList()),
       ),

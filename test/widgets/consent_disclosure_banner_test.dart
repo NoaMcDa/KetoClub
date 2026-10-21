@@ -248,4 +248,45 @@ void main() {
       expect(saved.toJson().containsKey('disclosureCopyVersion'), isFalse);
     });
   });
+
+  group('ConsentDisclosureBanner and shared confirmations (issue #409)', () {
+    testWidgets('names them while sharing is on', (tester) async {
+      // Arrange: a tall surface, since the banner is bare in this test and
+      // in the app it sits in Explore's scrolling column.
+      tester.view.physicalSize = const Size(800, 2400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      // Act
+      await _pump(
+        tester,
+        store: FakeSettingsStore(
+          initial: const AppSettings(shareConfirmations: true),
+        ),
+        bantoMode: true,
+      );
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(
+        find.text(
+          '${_en.settingsConsentBody}\n\n${_en.whatLeavesDeviceBanto}'
+          '\n\n${_en.whatLeavesDeviceSharedConfirmations}',
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('says nothing of them while sharing is off', (tester) async {
+      // Act
+      await _pump(tester, bantoMode: true);
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(
+        find.textContaining(_en.whatLeavesDeviceSharedConfirmations),
+        findsNothing,
+      );
+    });
+  });
 }

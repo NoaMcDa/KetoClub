@@ -147,6 +147,7 @@ final class CachedMenuRepository implements MenuRepository {
         menu: cached.menu,
         fromCache: true,
         allergenMatrix: cached.allergenMatrix,
+        sharedConfirmations: cached.sharedConfirmations,
       );
     }
 
@@ -156,6 +157,7 @@ final class CachedMenuRepository implements MenuRepository {
         menu: final fetched,
         :final analysis,
         :final allergenMatrix,
+        :final sharedConfirmations,
       ):
         // An analysis the adapter made while reading the menu (a website
         // PDF, D19; the backend's complete result, D25) is the freshest
@@ -163,7 +165,8 @@ final class CachedMenuRepository implements MenuRepository {
         // did not change. It rides on the result too, so the caller knows
         // it came with this fetch (issue #331). The restaurant's allergen
         // matrix (ALG-16) is whatever this fetch carried: a fresh answer
-        // without one means the venue has none today.
+        // without one means the venue has none today. So are the counts
+        // other people shared (ALG-14, #409).
         final merged = analysis != null
             ? CachedMenu(menu: fetched, analysis: analysis)
             : _merge(previous: cached, fetched: fetched);
@@ -172,12 +175,14 @@ final class CachedMenuRepository implements MenuRepository {
             menu: merged.menu,
             analysis: merged.analysis,
             allergenMatrix: allergenMatrix,
+            sharedConfirmations: sharedConfirmations,
           ),
         );
         return MenuFetched(
           menu: fetched,
           analysis: analysis,
           allergenMatrix: allergenMatrix,
+          sharedConfirmations: sharedConfirmations,
         );
       case MenuFetchFailed(:final reason):
         if (cached != null) {
@@ -186,6 +191,7 @@ final class CachedMenuRepository implements MenuRepository {
             fromCache: true,
             staleReason: reason,
             allergenMatrix: cached.allergenMatrix,
+            sharedConfirmations: cached.sharedConfirmations,
           );
         }
         return result;
@@ -220,6 +226,7 @@ final class CachedMenuRepository implements MenuRepository {
         menu: entry.menu,
         analysis: analysis,
         allergenMatrix: entry.allergenMatrix,
+        sharedConfirmations: entry.sharedConfirmations,
       ),
     );
   }

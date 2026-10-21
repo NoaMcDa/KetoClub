@@ -714,6 +714,10 @@ Built, but not confirmed end to end, and not to be reported as done:
   SQLite; no app build has posted a menu to a running backend, from a browser
   or a phone, and the upload rule in `MenuController.open` is evidenced by
   fakes only.
+- **No confirmation has been uploaded to a running backend (D27, #409).**
+  The opt-in share of post-meal answers is proven over a mocked HTTP
+  client and the shared counts on the dish over a scripted venue-menu
+  answer; no build has posted to, or read counts from, a live backend.
 - **The Wolt `city` field (D24, #311) comes from synthetic fixtures.**
   `WoltVenueMapper` reads `city` from the discovery items in
   `wolt_pages_restaurants.json` and `wolt_pages_search.json`, which were

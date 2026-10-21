@@ -45,7 +45,9 @@ const int bantoDisclosureCopyVersion = 1;
 /// [AppSettings.disclosureCopyVersion] is below
 /// [bantoDisclosureCopyVersion] even when the keto text was seen; either
 /// button records that version. With it off the banner is exactly the keto
-/// one and never writes the version.
+/// one and never writes the version. While the user shares what the staff
+/// told them ([AppSettings.shareConfirmations], issue #409) the Banto text
+/// names that too.
 class ConsentDisclosureBanner extends StatefulWidget {
   /// Creates a banner over [settingsStore].
   const new({
@@ -138,7 +140,12 @@ class _ConsentDisclosureBannerState extends State<ConsentDisclosureBanner> {
         : widget.backendConfigured
         ? l10n.settingsConsentBodyDirectViaBackend
         : l10n.settingsConsentBodyDirect;
-    return widget.bantoMode ? '$keto\n\n${l10n.whatLeavesDeviceBanto}' : keto;
+    if (!widget.bantoMode) return keto;
+    final banto = '$keto\n\n${l10n.whatLeavesDeviceBanto}';
+    // Named while the user shares post-meal answers (issue #409).
+    return _settings?.shareConfirmations ?? false
+        ? '$banto\n\n${l10n.whatLeavesDeviceSharedConfirmations}'
+        : banto;
   }
 
   @override

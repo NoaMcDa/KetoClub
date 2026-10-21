@@ -14,6 +14,7 @@ import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/scanned_classifier_router.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/vision_menu_classifier.dart';
+import 'package:ketoclub/services/community/confirmation_client.dart';
 import 'package:ketoclub/services/community/menu_store_client.dart';
 import 'package:ketoclub/services/llm/backend_chat_client.dart';
 import 'package:ketoclub/services/llm/fallback_chat_client.dart';
@@ -359,6 +360,29 @@ QrScanner qrScannerFor({
     ? const NoQrScanner()
     : MobileQrScanner(navigatorKey: navigatorKey);
 
+/// The client the post-meal prompt shares an answer through (Banto,
+/// ALG-14, issue #409): a [BackendConfirmationClient] posting to
+/// [backendBase]'s confirmations route when the build has a backend, and
+/// [NoConfirmationClient], which sends nothing, when it has none.
+/// Constructing either performs no I/O: the install id is read on the
+/// first [ConfirmationClient.confirm], and only when the user turned
+/// sharing on.
+///
+/// A pure, top-level function so `di_test.dart` can cover both branches.
+ConfirmationClient confirmationClientFor({
+  required Uri? backendBase,
+  required http.Client client,
+  required InstallIdStore installIdStore,
+  required AppLogger logger,
+}) => backendBase == null
+    ? const NoConfirmationClient()
+    : BackendConfirmationClient(
+        client: client,
+        baseUrl: backendBase,
+        installIdStore: installIdStore,
+        logger: logger,
+      );
+
 /// Where Banto Premium is bought and restored (ALG-18, issue #360).
 ///
 /// A Banto build on a phone sells it through the App Store or Google Play:
@@ -615,6 +639,14 @@ AppDependencies buildDependencies() {
     entitlement: entitlementFor(
       runsInBrowser: kIsWeb,
       bantoMode: BantoMode.enabled,
+    ),
+    // The post-meal answers (ALG-14, issue #409): sent only when the user
+    // turned sharing on, one fact each, and nowhere without a backend.
+    confirmationClient: confirmationClientFor(
+      backendBase: backendBase,
+      client: client,
+      installIdStore: installIdStore,
+      logger: logger,
     ),
   );
 }

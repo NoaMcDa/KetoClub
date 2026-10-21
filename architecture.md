@@ -4283,6 +4283,48 @@ one optional `recordVisit` parameter, threaded through four
 implementations; one more optional parameter on the evaluator and the
 group evaluator; one more list on `EvaluatedDish`.
 
+**Shared confirmations, wired (issue #409).** The two halves are joined,
+behind a consent of their own. `AppSettings.shareConfirmations` ("Share
+what the staff told you", under AI & privacy, Banto and a backend URL
+only) is off by default, read tolerantly and written only when true, so
+`const AppSettings().toJson()` is unchanged; while it is on, the Explore
+banner and both Settings disclosures add one sentence naming it. `di.dart`
+builds a `BackendConfirmationClient` only when a backend URL is configured
+(`confirmationClientFor`; `NoConfirmationClient` otherwise, and neither
+reads the install id until a send). `ConfirmationController.save`, after
+the answers are kept on the device, sends each answer newly recorded that
+day — `{venue: {source, platformId}, dishFingerprint, restrictionId,
+polarity}` with the install id in its header only — one request per
+answer, in the background (`lastShare`), and only when the setting is on
+and the client is configured. Never the note, never the change answer,
+never an answer about the user's own words, never the profile;
+`no_profile_on_the_wire_test` runs that path and pins the body to the one
+restriction answered. A failure is logged by the client and ignored: the
+answer on the device stands, and nothing retries. A corrected answer is
+sent again; the earlier count on the server is not withdrawn. On the way
+back, `BackendMenuAdapter` reads the venue-menu route's `confirmations`
+with Banto on into `SharedConfirmations` (`models/shared_confirmation.dart`,
+read tolerantly: an unknown or `custom` id, a non-token fingerprint or a
+bad day drops the entry), which rides on `MenuFetched` and `CachedMenu`
+(written only when present) like the allergen matrix, and
+`MenuController` passes `Confirmations.sharedForDish` beside the person's
+own answers. A shared piece counts from `sharedConfirmationThreshold` (3,
+the backend's floor too). Decision 5's rule is narrowed on one point: **a
+shared present raises nothing** (`Confirmations.adjust` returns the concern
+unchanged, and with no source it is never added): other people's word is
+a hint, not a verdict, so three installs cannot turn every guest's dish
+"avoid"; it still blocks a shared denial from lowering. A shared denial
+lowers one step, never below suspected, so a strict entry's dish stays
+"ask". `EvaluatedDish.sharedConfirmations` keeps the shared pieces about a
+restriction the profile holds (a group's union), and the dish card and the
+Why sheet word each as "4 people were told it has no sesame here" (or "…
+has sesame here"), the restriction named as the thing asked about in the
+UI language, followed by "Shared by other diners. The app cannot check it:
+always ask the restaurant." on the card and the helper-tool sentence in
+the sheet. Still per dish and per restriction: nothing sums a venue. No
+backend route changed: the Dart body is `ConfirmationRequest`'s shape. Not
+verified: no confirmation has been uploaded to a running backend.
+
 ---
 
 ## 15. Testing strategy

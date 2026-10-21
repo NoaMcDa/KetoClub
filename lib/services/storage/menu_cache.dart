@@ -6,6 +6,7 @@ import 'package:ketoclub/models/allergen_matrix.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/shared_confirmation.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/utils/verdict_counts.dart';
 
@@ -70,13 +71,20 @@ Map<String, Object?> _analysisToJson(MenuAnalysis analysis) =>
 final class CachedMenu {
   /// Creates an entry for [menu], with [analysis] once one has been
   /// computed from it.
-  const new({required this.menu, this.analysis, this.allergenMatrix});
+  const new({
+    required this.menu,
+    this.analysis,
+    this.allergenMatrix,
+    this.sharedConfirmations,
+  });
 
   /// Reads an entry written by [toJson].
   ///
   /// Returns null for any shape mismatch, including a malformed [menu] or
   /// [analysis], and never throws. An absent or unreadable
-  /// `allergenMatrix` reads as none (ALG-16): it never fails the entry.
+  /// `allergenMatrix` reads as none (ALG-16), and so does an absent or
+  /// unreadable `sharedConfirmations` (ALG-14, #409): neither ever fails
+  /// the entry.
   static CachedMenu? tryFrom(Map<String, Object?> json) {
     final rawMenu = json['menu'];
     final rawAnalysis = json['analysis'];
@@ -84,8 +92,13 @@ final class CachedMenu {
     final menu = Menu.tryFrom(rawMenu);
     if (menu == null) return null;
     final allergenMatrix = AllergenMatrix.tryFrom(json['allergenMatrix']);
+    final shared = SharedConfirmations.tryFrom(json[_sharedKey]);
     if (rawAnalysis == null) {
-      return CachedMenu(menu: menu, allergenMatrix: allergenMatrix);
+      return CachedMenu(
+        menu: menu,
+        allergenMatrix: allergenMatrix,
+        sharedConfirmations: shared,
+      );
     }
     if (rawAnalysis is! Map<String, Object?>) return null;
     final analysis = _analysisFrom(rawAnalysis);
@@ -94,8 +107,12 @@ final class CachedMenu {
       menu: menu,
       analysis: analysis,
       allergenMatrix: allergenMatrix,
+      sharedConfirmations: shared,
     );
   }
+
+  /// The JSON key [sharedConfirmations] is stored under.
+  static const String _sharedKey = 'sharedConfirmations';
 
   /// The cached menu.
   final Menu menu;
@@ -108,11 +125,18 @@ final class CachedMenu {
   /// one is the bytes it was before the field existed.
   final AllergenMatrix? allergenMatrix;
 
+  /// What other people were told by the staff about [menu]'s dishes, as
+  /// the backend counted it when the menu was fetched (Banto, ALG-14,
+  /// #409), or null. Written only when present, so every entry without
+  /// counts is the bytes it was before the field existed.
+  final SharedConfirmations? sharedConfirmations;
+
   /// Writes a form [tryFrom] can read back.
   Map<String, Object?> toJson() => <String, Object?>{
     'menu': menu.toJson(),
     'analysis': analysis == null ? null : _analysisToJson(analysis!),
     if (allergenMatrix case final matrix?) 'allergenMatrix': matrix.toJson(),
+    if (sharedConfirmations case final shared?) _sharedKey: shared.toJson(),
   };
 
   @override
@@ -120,10 +144,12 @@ final class CachedMenu {
       other is CachedMenu &&
       other.menu == menu &&
       other.analysis == analysis &&
-      other.allergenMatrix == allergenMatrix;
+      other.allergenMatrix == allergenMatrix &&
+      other.sharedConfirmations == sharedConfirmations;
 
   @override
-  int get hashCode => Object.hash(menu, analysis, allergenMatrix);
+  int get hashCode =>
+      Object.hash(menu, analysis, allergenMatrix, sharedConfirmations);
 
   @override
   String toString() => 'CachedMenu(${menu.venueRef.cacheKey})';
