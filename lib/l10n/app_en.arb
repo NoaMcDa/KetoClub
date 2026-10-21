@@ -1102,5 +1102,19 @@
   "whyChangeHonouredOn": "On {date} the staff changed the dish as you asked. That was for that visit, so ask for the change again each time.",
   "@whyChangeHonouredOn": {"description": "Banto (ALG-14): the Why sheet's line when the person said the kitchen made the change they asked for. Never 'safe'.", "placeholders": {"date": {"type": "DateTime", "format": "MMMMd"}}},
   "whyChangeNotHonouredOn": "On {date} the staff did not make the change you asked for.",
-  "@whyChangeNotHonouredOn": {"description": "Banto (ALG-14): the Why sheet's line when the person said the kitchen did not make the change they asked for.", "placeholders": {"date": {"type": "DateTime", "format": "MMMMd"}}}
+  "@whyChangeNotHonouredOn": {"description": "Banto (ALG-14): the Why sheet's line when the person said the kitchen did not make the change they asked for.", "placeholders": {"date": {"type": "DateTime", "format": "MMMMd"}}},
+  "restrictionKindMedical": "Health condition",
+  "@restrictionKindMedical": {"description": "Banto (issue #342): the picker's kind label of a strict restriction that is a health condition and not an allergy (fava beans for G6PD deficiency). Never 'safe'."},
+  "restrictionJapanListHint": "On Japan's mandatory allergen list",
+  "@restrictionJapanListHint": {"description": "Banto (issue #342): the picker's hint under a restriction only Japan's mandatory list names (buckwheat)."},
+  "restrictionJapanRecommendedHint": "Recommended in Japan, on no mandatory allergen list",
+  "@restrictionJapanRecommendedHint": {"description": "Banto (issue #342): the picker's hint under a food on Japan's recommended (not mandatory) allergen list, such as kiwi or beef."},
+  "restrictionLegumePartHint": "One legume on its own, apart from all legumes",
+  "@restrictionLegumePartHint": {"description": "Banto (issue #342): the picker's hint under a single legume (chickpeas, lentils, peas, fenugreek) listed under Legumes."},
+  "restrictionFavaHint": "G6PD deficiency (favism), not an allergy. Checked as strictly as one",
+  "@restrictionFavaHint": {"description": "Banto (issue #342): the picker's hint under fava beans. Never 'safe'."},
+  "restrictionSearchField": "Search restrictions",
+  "@restrictionSearchField": {"description": "Banto (issue #342): the label of the picker's search field."},
+  "restrictionSearchEmpty": "No restriction matches. You can add it as your own below.",
+  "@restrictionSearchEmpty": {"description": "Banto (issue #342): shown in the picker when the search matches nothing; points to 'Add your own'."}
 }

@@ -865,5 +865,12 @@
   "dishChangeHonouredOn": "הצוות שינה את המנה כפי שביקשת, {date}",
   "dishChangeNotHonouredOn": "הצוות לא שינה את המנה כפי שביקשת, {date}",
   "whyChangeHonouredOn": "ב־{date} הצוות שינה את המנה כפי שביקשת. זה היה לביקור ההוא, לכן כדאי לבקש את השינוי שוב בכל פעם.",
-  "whyChangeNotHonouredOn": "ב־{date} הצוות לא שינה את המנה כפי שביקשת."
+  "whyChangeNotHonouredOn": "ב־{date} הצוות לא שינה את המנה כפי שביקשת.",
+  "restrictionKindMedical": "מצב בריאותי",
+  "restrictionJapanListHint": "ברשימת החובה של האלרגנים ביפן",
+  "restrictionJapanRecommendedHint": "מומלץ לסימון ביפן, לא באף רשימת חובה",
+  "restrictionLegumePartHint": "קטנית אחת בנפרד, לא כל הקטניות",
+  "restrictionFavaHint": "חסר G6PD (פביזם), לא אלרגיה. נבדק באותה הקפדה",
+  "restrictionSearchField": "חיפוש הגבלה",
+  "restrictionSearchEmpty": "אין הגבלה מתאימה. אפשר להוסיף אותה כמילה משלך למטה."
 }

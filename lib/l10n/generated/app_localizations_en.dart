@@ -2369,4 +2369,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
     return 'On $dateString the staff did not make the change you asked for.';
   }
+
+  @override
+  String get restrictionKindMedical => 'Health condition';
+
+  @override
+  String get restrictionJapanListHint => 'On Japan\'s mandatory allergen list';
+
+  @override
+  String get restrictionJapanRecommendedHint =>
+      'Recommended in Japan, on no mandatory allergen list';
+
+  @override
+  String get restrictionLegumePartHint =>
+      'One legume on its own, apart from all legumes';
+
+  @override
+  String get restrictionFavaHint =>
+      'G6PD deficiency (favism), not an allergy. Checked as strictly as one';
+
+  @override
+  String get restrictionSearchField => 'Search restrictions';
+
+  @override
+  String get restrictionSearchEmpty =>
+      'No restriction matches. You can add it as your own below.';
 }

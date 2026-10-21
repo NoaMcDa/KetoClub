@@ -6,25 +6,36 @@ import 'package:ketoclub/l10n/generated/app_localizations_he.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
+import 'package:ketoclub/utils/allergens/vocabulary.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
 import 'package:ketoclub/widgets/restriction_picker_sheet.dart';
 
 final AppLocalizations _en = AppLocalizationsEn();
 final AppLocalizations _he = AppLocalizationsHe();
 
-/// Pumps [RestrictionPickerSheet] leaving out [added], as a page body.
+/// Pumps [RestrictionPickerSheet] leaving out [added], as a page body;
+/// [everything] offers every restriction, vocabulary or not.
 Future<void> _pumpSheet(
   WidgetTester tester, {
   Set<RestrictionId> added = const <RestrictionId>{},
   Locale locale = const Locale('en'),
+  bool everything = false,
 }) => tester.pumpWidget(
   MaterialApp(
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     locale: locale,
-    home: Scaffold(body: RestrictionPickerSheet(added: added)),
+    home: Scaffold(
+      body: everything
+          ? RestrictionPickerSheet(added: added, offered: _always)
+          : RestrictionPickerSheet(added: added),
+    ),
   ),
 );
+
+/// Offers every restriction, as the picker will once every vocabulary is
+/// filled.
+bool _always(RestrictionId id) => true;
 
 /// A restriction for the pure helpers, with only [jurisdictions] mattering.
 Restriction _withJurisdictions(Set<Jurisdiction> jurisdictions) => Restriction(
@@ -53,7 +64,13 @@ void main() {
       expect(ids, isNot(contains(RestrictionId.sesame)));
       expect(ids, isNot(contains(RestrictionId.milk)));
       expect(ids, isNot(contains(RestrictionId.custom)));
-      expect(ids, hasLength(RestrictionId.values.length - 4));
+      expect(ids, <RestrictionId>[
+        for (final id in RestrictionId.values)
+          if (restrictionOffered(id) &&
+              id != RestrictionId.sesame &&
+              id != RestrictionId.milk)
+            id,
+      ]);
       expect(ids.first, RestrictionId.peanuts);
     });
 
@@ -126,6 +143,10 @@ void main() {
       expect(
         restrictionKindLabel(_en, RestrictionKind.intolerance),
         _en.restrictionKindIntolerance,
+      );
+      expect(
+        restrictionKindLabel(_en, RestrictionKind.medical),
+        _en.restrictionKindMedical,
       );
       for (final kind in <RestrictionKind>[
         RestrictionKind.lifestyle,
@@ -439,6 +460,207 @@ void main() {
       expect(await typeAndAdd(tester, '   '), isNull);
       expect(find.byType(RestrictionPickerSheet), findsOneWidget);
       expect(find.text(_en.restrictionOwnTitle), findsOneWidget);
+    });
+  });
+
+  group('issue #342: the research restrictions', () {
+    test('a restriction is offered once its vocabulary holds a term, so '
+        'the empty research vocabularies are not offered yet', () {
+      for (final id in RestrictionId.values) {
+        expect(
+          restrictionOffered(id),
+          !allergenVocabulary[id]!.isEmpty,
+          reason: id.name,
+        );
+      }
+      expect(restrictionOffered(RestrictionId.sesame), isTrue);
+      expect(restrictionOffered(RestrictionId.keto), isFalse);
+      expect(
+        availableRestrictions(const <RestrictionId>{})
+            .map((restriction) => restriction.id),
+        isNot(contains(RestrictionId.buckwheat)),
+      );
+    });
+
+    test('each single legume follows legumes, in taxonomy order', () {
+      // Act
+      final ids = availableRestrictions(
+        const <RestrictionId>{},
+        offered: _always,
+      ).map((restriction) => restriction.id).toList();
+
+      // Assert
+      final at = ids.indexOf(RestrictionId.legumes);
+      expect(ids.sublist(at, at + 5), <RestrictionId>[
+        RestrictionId.legumes,
+        RestrictionId.chickpea,
+        RestrictionId.lentil,
+        RestrictionId.pea,
+        RestrictionId.fenugreek,
+      ]);
+      expect(ids.toSet(), hasLength(ids.length));
+      expect(ids, hasLength(RestrictionId.values.length - 2));
+    });
+
+    test('with legumes added, a single legume stays at its own place', () {
+      // Act
+      final ids = availableRestrictions(<RestrictionId>{
+        RestrictionId.legumes,
+      }, offered: _always).map((restriction) => restriction.id).toList();
+
+      // Assert
+      expect(ids, contains(RestrictionId.chickpea));
+      expect(
+        ids.indexOf(RestrictionId.chickpea),
+        greaterThan(ids.indexOf(RestrictionId.flax)),
+      );
+    });
+
+    test('the hints say what each research restriction is', () {
+      String hint(RestrictionId id) =>
+          restrictionJurisdictionHint(_en, restrictionFor(id));
+      expect(hint(RestrictionId.fava), _en.restrictionFavaHint);
+      expect(hint(RestrictionId.chickpea), _en.restrictionLegumePartHint);
+      expect(hint(RestrictionId.kiwi), _en.restrictionJapanRecommendedHint);
+      expect(hint(RestrictionId.beef), _en.restrictionJapanRecommendedHint);
+      expect(hint(RestrictionId.buckwheat), _en.restrictionJapanListHint);
+      expect(hint(RestrictionId.corn), _en.restrictionJurisdictionHint('none'));
+      expect(hint(RestrictionId.nightshades), _en.restrictionHeadsUpHint);
+      expect(hint(RestrictionId.oralAllergy), _en.restrictionHeadsUpHint);
+      // Every new hint reads in Hebrew, and differently from English.
+      for (final (en, he) in <(String, String)>[
+        (_en.restrictionFavaHint, _he.restrictionFavaHint),
+        (_en.restrictionLegumePartHint, _he.restrictionLegumePartHint),
+        (
+          _en.restrictionJapanRecommendedHint,
+          _he.restrictionJapanRecommendedHint,
+        ),
+        (_en.restrictionJapanListHint, _he.restrictionJapanListHint),
+        (_en.restrictionKindMedical, _he.restrictionKindMedical),
+        (_en.restrictionSearchField, _he.restrictionSearchField),
+        (_en.restrictionSearchEmpty, _he.restrictionSearchEmpty),
+      ]) {
+        expect(he, isNot(en));
+        expect(RegExp('[א-ת]').hasMatch(he), isTrue, reason: he);
+      }
+      for (final text in <String>[
+        _en.restrictionFavaHint,
+        _he.restrictionFavaHint,
+        _en.restrictionKindMedical,
+      ]) {
+        expect(text.toLowerCase(), isNot(contains('safe')));
+        expect(text, isNot(contains('בטוח')));
+      }
+    });
+
+    test('restrictionMatchesQuery searches both names, ignoring case', () {
+      final chickpea = restrictionFor(RestrictionId.chickpea);
+      expect(restrictionMatchesQuery(chickpea, ''), isTrue);
+      expect(restrictionMatchesQuery(chickpea, '  CHICK '), isTrue);
+      expect(restrictionMatchesQuery(chickpea, 'חומוס'), isTrue);
+      expect(restrictionMatchesQuery(chickpea, 'sesame'), isFalse);
+    });
+
+    testWidgets('lists a single legume indented, right under legumes, and '
+        'fava under its own heading', (tester) async {
+      // Act
+      await _pumpSheet(tester, everything: true);
+
+      // Assert
+      double left(RestrictionId id) => tester
+          .getTopLeft(
+            find.descendant(
+              of: find.byKey(restrictionOptionKey(id)),
+              matching: find.text(
+                restrictionDisplayName(restrictionFor(id), const Locale('en')),
+              ),
+            ),
+          )
+          .dx;
+      final legumes = find.byKey(restrictionOptionKey(RestrictionId.legumes));
+      final chickpea = find.byKey(restrictionOptionKey(RestrictionId.chickpea));
+      expect(_top(tester, chickpea), greaterThan(_top(tester, legumes)));
+      expect(
+        _top(tester, chickpea),
+        lessThan(
+          _top(tester, find.byKey(restrictionOptionKey(RestrictionId.lentil))),
+        ),
+      );
+      expect(
+        left(RestrictionId.chickpea),
+        greaterThan(left(RestrictionId.legumes)),
+      );
+      final medical = find.text(_en.restrictionKindMedical);
+      expect(medical, findsOneWidget);
+      final fava = find.byKey(restrictionOptionKey(RestrictionId.fava));
+      expect(_top(tester, fava), greaterThan(_top(tester, medical)));
+      expect(
+        _top(tester, medical),
+        lessThan(_top(tester, find.text(_en.restrictionKindIntolerance))),
+      );
+    });
+
+    testWidgets('the search narrows the rows and drops empty headings', (
+      tester,
+    ) async {
+      // Arrange
+      await _pumpSheet(tester);
+
+      // Act
+      await tester.enterText(find.byKey(restrictionSearchFieldKey), 'ses');
+      await tester.pump();
+
+      // Assert
+      expect(
+        find.byKey(restrictionOptionKey(RestrictionId.sesame)),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(restrictionOptionKey(RestrictionId.peanuts)),
+        findsNothing,
+      );
+      expect(find.text(_en.restrictionKindAllergy), findsOneWidget);
+      expect(find.text(_en.restrictionKindDiet), findsNothing);
+      expect(find.text(_en.restrictionSearchEmpty), findsNothing);
+    });
+
+    testWidgets('a search that matches nothing points to "Add your own"', (
+      tester,
+    ) async {
+      // Arrange
+      await _pumpSheet(tester);
+
+      // Act
+      await tester.enterText(find.byKey(restrictionSearchFieldKey), 'zzz');
+      await tester.pump();
+
+      // Assert
+      expect(find.text(_en.restrictionSearchEmpty), findsOneWidget);
+      expect(find.byType(ListTile), findsNothing);
+      expect(find.byKey(restrictionOwnFieldKey), findsOneWidget);
+    });
+
+    testWidgets('a Hebrew name finds its row under the Hebrew UI', (
+      tester,
+    ) async {
+      // Arrange
+      await _pumpSheet(tester, locale: const Locale('he'), everything: true);
+
+      // Act
+      await tester.enterText(find.byKey(restrictionSearchFieldKey), 'חומוס');
+      await tester.pump();
+
+      // Assert
+      expect(
+        find.byKey(restrictionOptionKey(RestrictionId.chickpea)),
+        findsOneWidget,
+      );
+      expect(find.text('גרגרי חומוס'), findsOneWidget);
+      expect(
+        find.byKey(restrictionOptionKey(RestrictionId.sesame)),
+        findsNothing,
+      );
+      expect(tester.takeException(), isNull);
     });
   });
 }

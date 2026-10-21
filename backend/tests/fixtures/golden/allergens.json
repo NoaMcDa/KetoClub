@@ -7169,6 +7169,10 @@
     {
       "isStrict": false,
       "name": "keto"
+    },
+    {
+      "isStrict": true,
+      "name": "medical"
     }
   ],
   "matcherCases": {
@@ -283335,6 +283339,269 @@
       "source": "11 §23"
     },
     {
+      "id": "buckwheat",
+      "isStrict": true,
+      "jurisdictions": [
+        "jp"
+      ],
+      "kind": "allergen",
+      "nameEn": "Buckwheat",
+      "nameHe": "כוסמת",
+      "source": "02 §The lists"
+    },
+    {
+      "id": "kiwi",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Kiwi",
+      "nameHe": "קיווי",
+      "source": "02 §The lists"
+    },
+    {
+      "id": "peach",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Peach",
+      "nameHe": "אפרסק",
+      "source": "02 §The lists"
+    },
+    {
+      "id": "apple",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Apple",
+      "nameHe": "תפוח",
+      "source": "02 §The lists"
+    },
+    {
+      "id": "banana",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Banana",
+      "nameHe": "בננה",
+      "source": "02 §The lists"
+    },
+    {
+      "id": "orange",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Orange",
+      "nameHe": "תפוז",
+      "source": "02 §The lists"
+    },
+    {
+      "id": "beef",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Beef",
+      "nameHe": "בקר",
+      "source": "02 §The lists"
+    },
+    {
+      "id": "pork",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Pork",
+      "nameHe": "חזיר",
+      "source": "02 §The lists"
+    },
+    {
+      "id": "chicken",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Chicken",
+      "nameHe": "עוף",
+      "source": "02 §The lists"
+    },
+    {
+      "id": "gelatin",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Gelatin",
+      "nameHe": "ג'לטין",
+      "source": "11 §17.1"
+    },
+    {
+      "id": "yam",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Yam (yamaimo)",
+      "nameHe": "יאם (יאמאימו)",
+      "source": "02 §The lists"
+    },
+    {
+      "id": "corn",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Corn",
+      "nameHe": "תירס",
+      "source": "02 §Less common allergens"
+    },
+    {
+      "id": "sunflower",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Sunflower seeds",
+      "nameHe": "גרעיני חמנייה",
+      "source": "02 §Less common allergens"
+    },
+    {
+      "id": "flax",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Flaxseed",
+      "nameHe": "זרעי פשתן",
+      "source": "02 §Less common allergens"
+    },
+    {
+      "id": "chickpea",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Chickpeas",
+      "nameHe": "גרגרי חומוס",
+      "source": "11 §16.5"
+    },
+    {
+      "id": "lentil",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Lentils",
+      "nameHe": "עדשים",
+      "source": "11 §16.5"
+    },
+    {
+      "id": "pea",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Peas",
+      "nameHe": "אפונה",
+      "source": "11 §16.5"
+    },
+    {
+      "id": "fenugreek",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "allergen",
+      "nameEn": "Fenugreek",
+      "nameHe": "חילבה",
+      "source": "11 §16.5"
+    },
+    {
+      "id": "fava",
+      "isStrict": true,
+      "jurisdictions": [],
+      "kind": "medical",
+      "nameEn": "Fava beans (favism)",
+      "nameHe": "פול (פביזם)",
+      "source": "11 §16.5"
+    },
+    {
+      "id": "nightshades",
+      "isStrict": false,
+      "jurisdictions": [],
+      "kind": "intolerance",
+      "nameEn": "Nightshades",
+      "nameHe": "סולניים",
+      "source": "03 §The map"
+    },
+    {
+      "id": "msg",
+      "isStrict": false,
+      "jurisdictions": [],
+      "kind": "intolerance",
+      "nameEn": "MSG",
+      "nameHe": "מונוסודיום גלוטמט",
+      "source": "03 §The map"
+    },
+    {
+      "id": "caffeine",
+      "isStrict": false,
+      "jurisdictions": [],
+      "kind": "intolerance",
+      "nameEn": "Caffeine",
+      "nameHe": "קפאין",
+      "source": "03 §The map"
+    },
+    {
+      "id": "salicylates",
+      "isStrict": false,
+      "jurisdictions": [],
+      "kind": "intolerance",
+      "nameEn": "Salicylates",
+      "nameHe": "סליצילטים",
+      "source": "03 §The map"
+    },
+    {
+      "id": "oralAllergy",
+      "isStrict": false,
+      "jurisdictions": [],
+      "kind": "intolerance",
+      "nameEn": "Oral allergy syndrome",
+      "nameHe": "תסמונת אלרגיה אוראלית",
+      "source": "02 §Less common allergens"
+    },
+    {
+      "id": "pescatarian",
+      "isStrict": false,
+      "jurisdictions": [],
+      "kind": "lifestyle",
+      "nameEn": "Pescatarian",
+      "nameHe": "פסקטריאני",
+      "source": "03 §The map"
+    },
+    {
+      "id": "paleo",
+      "isStrict": false,
+      "jurisdictions": [],
+      "kind": "lifestyle",
+      "nameEn": "Paleo",
+      "nameHe": "פליאו",
+      "source": "03 §The map"
+    },
+    {
+      "id": "whole30",
+      "isStrict": false,
+      "jurisdictions": [],
+      "kind": "lifestyle",
+      "nameEn": "Whole30",
+      "nameHe": "תוכנית Whole30",
+      "source": "03 §The map"
+    },
+    {
+      "id": "aip",
+      "isStrict": false,
+      "jurisdictions": [],
+      "kind": "lifestyle",
+      "nameEn": "AIP (autoimmune protocol)",
+      "nameHe": "AIP (פרוטוקול אוטואימוני)",
+      "source": "03 §The map"
+    },
+    {
+      "id": "jain",
+      "isStrict": false,
+      "jurisdictions": [],
+      "kind": "religiousComponent",
+      "nameEn": "Jain",
+      "nameHe": "ג'ייני",
+      "source": "03 §The map"
+    },
+    {
       "id": "keto",
       "isStrict": false,
       "jurisdictions": [],
@@ -283354,6 +283621,21 @@
     }
   ],
   "vocabulary": {
+    "aip": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
     "alphaGal": {
       "directEn": [
         {
@@ -284581,6 +284863,81 @@
         }
       }
     },
+    "apple": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
+    "banana": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
+    "beef": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
+    "buckwheat": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
+    "caffeine": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
     "celery": {
       "directEn": [
         {
@@ -284924,6 +285281,51 @@
         "11 §12.3",
         "12 §1.9"
       ],
+      "termGuards": {}
+    },
+    "chicken": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
+    "chickpea": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
+    "corn": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
       "termGuards": {}
     },
     "crustaceans": {
@@ -286569,6 +286971,36 @@
       ],
       "termGuards": {}
     },
+    "fava": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
+    "fenugreek": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
     "fish": {
       "directEn": [
         {
@@ -287161,6 +287593,21 @@
         "11 §8.3",
         "12 §1.7"
       ],
+      "termGuards": {}
+    },
+    "flax": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
       "termGuards": {}
     },
     "fodmap": {
@@ -288024,6 +288471,21 @@
           "beforeHe": []
         }
       }
+    },
+    "gelatin": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
     },
     "glp1": {
       "directEn": [],
@@ -292020,7 +292482,37 @@
         }
       }
     },
+    "jain": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
     "keto": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
+    "kiwi": {
       "directEn": [],
       "directHe": [],
       "guards": {
@@ -295728,6 +296220,21 @@
         }
       }
     },
+    "lentil": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
     "lupin": {
       "directEn": [
         {
@@ -298641,6 +299148,21 @@
         }
       }
     },
+    "msg": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
     "mustard": {
       "directEn": [
         {
@@ -299214,6 +299736,96 @@
       ],
       "termGuards": {}
     },
+    "nightshades": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
+    "oralAllergy": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
+    "orange": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
+    "paleo": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
+    "pea": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
+    "peach": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
     "peanuts": {
       "directEn": [
         {
@@ -299620,6 +300232,51 @@
         "11 §1.5",
         "12 §1.2"
       ],
+      "termGuards": {}
+    },
+    "pescatarian": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
+    "pork": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
+    "salicylates": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
       "termGuards": {}
     },
     "sesame": {
@@ -302223,6 +302880,21 @@
         "11 §15.3",
         "12 §1.10"
       ],
+      "termGuards": {}
+    },
+    "sunflower": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
       "termGuards": {}
     },
     "treeNuts": {
@@ -307438,6 +308110,36 @@
           "beforeHe": []
         }
       }
+    },
+    "whole30": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
+    },
+    "yam": {
+      "directEn": [],
+      "directHe": [],
+      "guards": {
+        "afterEn": [],
+        "afterHe": [],
+        "beforeEn": [],
+        "beforeHe": []
+      },
+      "hiddenEn": [],
+      "hiddenHe": [],
+      "noPrefixHe": [],
+      "sources": [],
+      "termGuards": {}
     }
   }
 }

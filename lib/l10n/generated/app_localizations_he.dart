@@ -2360,4 +2360,28 @@ class AppLocalizationsHe extends AppLocalizations {
 
     return 'ב־$dateString הצוות לא שינה את המנה כפי שביקשת.';
   }
+
+  @override
+  String get restrictionKindMedical => 'מצב בריאותי';
+
+  @override
+  String get restrictionJapanListHint => 'ברשימת החובה של האלרגנים ביפן';
+
+  @override
+  String get restrictionJapanRecommendedHint =>
+      'מומלץ לסימון ביפן, לא באף רשימת חובה';
+
+  @override
+  String get restrictionLegumePartHint => 'קטנית אחת בנפרד, לא כל הקטניות';
+
+  @override
+  String get restrictionFavaHint =>
+      'חסר G6PD (פביזם), לא אלרגיה. נבדק באותה הקפדה';
+
+  @override
+  String get restrictionSearchField => 'חיפוש הגבלה';
+
+  @override
+  String get restrictionSearchEmpty =>
+      'אין הגבלה מתאימה. אפשר להוסיף אותה כמילה משלך למטה.';
 }

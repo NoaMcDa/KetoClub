@@ -4,8 +4,9 @@
 /// A [Restriction] is one thing a person can put in a dietary profile:
 /// an allergen, an intolerance, celiac disease, a lifestyle diet or keto.
 /// There are no severity levels. A restriction is either **strict** — its
-/// [RestrictionKind] is [RestrictionKind.allergen] or
-/// [RestrictionKind.autoimmune] — or **flexible** (every other kind).
+/// [RestrictionKind] is [RestrictionKind.allergen],
+/// [RestrictionKind.autoimmune] or [RestrictionKind.medical] — or
+/// **flexible** (every other kind).
 /// Strictness is derived from the kind; it is never stored and never asked.
 ///
 /// The entries themselves live in `lib/utils/allergens/taxonomy.dart`.
@@ -93,6 +94,99 @@ enum RestrictionId {
   /// ALG-17.
   glp1,
 
+  /// Buckwheat allergy: on Japan's mandatory list and no Western one
+  /// (soba). Not wheat, and naturally gluten-free.
+  buckwheat,
+
+  /// Kiwi allergy (on Japan's recommended list).
+  kiwi,
+
+  /// Peach allergy (on Japan's recommended list).
+  peach,
+
+  /// Apple allergy (on Japan's recommended list).
+  apple,
+
+  /// Banana allergy (on Japan's recommended list).
+  banana,
+
+  /// Orange allergy (on Japan's recommended list).
+  orange,
+
+  /// Beef allergy (on Japan's recommended list). One meat, distinct from
+  /// [alphaGal], which covers every mammal meat.
+  beef,
+
+  /// Pork allergy (on Japan's recommended list).
+  pork,
+
+  /// Chicken allergy (on Japan's recommended list).
+  chicken,
+
+  /// Gelatin allergy (on Japan's recommended list).
+  gelatin,
+
+  /// Japanese yam (yamaimo, nagaimo) allergy, on Japan's recommended list;
+  /// not sweet potato.
+  yam,
+
+  /// Corn (maize) allergy.
+  corn,
+
+  /// Sunflower seed allergy.
+  sunflower,
+
+  /// Flaxseed (linseed) allergy.
+  flax,
+
+  /// Chickpea allergy: one legume on its own, under [legumes].
+  chickpea,
+
+  /// Lentil allergy: one legume on its own, under [legumes].
+  lentil,
+
+  /// Pea allergy (pea protein too): one legume on its own, under
+  /// [legumes].
+  pea,
+
+  /// Fenugreek allergy: one legume on its own, under [legumes].
+  fenugreek,
+
+  /// Fava beans for G6PD deficiency (favism): haemolysis, not an allergy,
+  /// so its kind is [RestrictionKind.medical]. Strict.
+  fava,
+
+  /// Nightshades (tomato, potato, aubergine, peppers): a heads-up.
+  nightshades,
+
+  /// Monosodium glutamate: a heads-up.
+  msg,
+
+  /// Caffeine: a heads-up.
+  caffeine,
+
+  /// Salicylates: a dose sensitivity read as a heads-up.
+  salicylates,
+
+  /// Oral allergy syndrome: raw fruit and vegetables that cross-react with
+  /// pollen, usually fine cooked; a heads-up.
+  oralAllergy,
+
+  /// A pescatarian diet: fish, no meat or poultry.
+  pescatarian,
+
+  /// A paleo diet.
+  paleo,
+
+  /// The Whole30 programme.
+  whole30,
+
+  /// The autoimmune protocol (AIP) diet.
+  aip,
+
+  /// A Jain diet: no meat, fish or eggs, and no root vegetables.
+  jain,
+
   /// Keto, the diet KetoClub was built for.
   keto,
 
@@ -126,17 +220,21 @@ enum RestrictionKind {
   /// A lifestyle diet, such as vegan or vegetarian: flexible.
   lifestyle,
 
-  /// A component of a religious rule (reserved; no entry uses it yet):
-  /// flexible.
+  /// A component of a religious rule, such as a Jain diet: flexible.
   religiousComponent,
 
   /// Keto: flexible.
-  keto;
+  keto,
 
-  /// Whether a restriction of this kind is strict — an allergen or an
-  /// autoimmune condition, where the app never says "fits" without "ask
-  /// the restaurant". Every other kind is flexible.
-  bool get isStrict => this == allergen || this == autoimmune;
+  /// A health condition that is not an allergy, such as G6PD deficiency
+  /// (favism): strict. Added last, so no stored name moves.
+  medical;
+
+  /// Whether a restriction of this kind is strict — an allergen, an
+  /// autoimmune condition or a medical condition, where the app never says
+  /// "fits" without "ask the restaurant". Every other kind is flexible.
+  bool get isStrict =>
+      this == allergen || this == autoimmune || this == medical;
 
   /// The kind whose [name] equals [wire], or null when none does.
   static RestrictionKind? tryParse(String wire) {

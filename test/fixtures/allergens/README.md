@@ -112,12 +112,22 @@ These strings, the names of the `RestrictionId` enum:
 `peanuts`, `treeNuts`, `milk`, `lactose`, `eggs`, `soy`, `wheat`, `gluten`,
 `fish`, `crustaceans`, `molluscs`, `sesame`, `celery`, `mustard`, `lupin`,
 `sulphites`, `legumes`, `alphaGal`, `fodmap`, `histamine`, `vegan`,
-`vegetarian`, `glp1`, `keto`. The enum's last id, `custom` (the user's own
-words, ALG-17), is never labelled: its vocabulary lives in a profile on a
-device, so the corpus has nothing to measure for it.
+`vegetarian`, `glp1`, `buckwheat`, `kiwi`, `peach`, `apple`, `banana`,
+`orange`, `beef`, `pork`, `chicken`, `gelatin`, `yam`, `corn`, `sunflower`,
+`flax`, `chickpea`, `lentil`, `pea`, `fenugreek`, `fava`, `nightshades`,
+`msg`, `caffeine`, `salicylates`, `oralAllergy`, `pescatarian`, `paleo`,
+`whole30`, `aip`, `jain`, `keto`. The enum's last id, `custom` (the user's
+own words, ALG-17), is never labelled: its vocabulary lives in a profile on
+a device, so the corpus has nothing to measure for it.
 
 `keto` is never labelled. **Strict** restrictions are every id except
-`lactose`, `fodmap`, `histamine`, `vegan`, `vegetarian`, `glp1` and `keto`.
+`lactose`, `fodmap`, `histamine`, `vegan`, `vegetarian`, `glp1`, the five
+heads-up sensitivities (`nightshades`, `msg`, `caffeine`, `salicylates`,
+`oralAllergy`), the five research diets (`pescatarian`, `paleo`, `whole30`,
+`aip`, `jain`) and `keto`. The research restrictions (issue #342) arrive with
+empty vocabularies and carry no labels yet; each vocabulary follow-up adds
+its labels and leaves `_awaitingLabels` in `corpus_shape_test.dart`, and the
+Python twin measures only ids whose vocabulary holds a term.
 ALG-17 added five `alphaGal` labels (beef, pork and lamb dishes and a
 cheeseburger); FODMAP, histamine and GLP-1 carry none yet.
 

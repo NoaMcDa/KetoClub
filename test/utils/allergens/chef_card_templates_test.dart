@@ -257,7 +257,8 @@ void main() {
           if (restriction.id != RestrictionId.custom &&
               (restriction.kind == RestrictionKind.allergen ||
                   restriction.kind == RestrictionKind.intolerance ||
-                  restriction.kind == RestrictionKind.autoimmune)) {
+                  restriction.kind == RestrictionKind.autoimmune ||
+                  restriction.kind == RestrictionKind.medical)) {
             expect(
               entryLine.toLowerCase(),
               contains(
@@ -925,6 +926,79 @@ void main() {
       )!;
       expect(note, startsWith('אני לא יכול/ה לאכול קיווי.'));
       expect(note, contains('מגע צולב'));
+    });
+  });
+
+  group('issue #342 lines', () {
+    test('fava names G6PD deficiency, not an allergy, and asks for the '
+        'check', () {
+      final en = ChefCardText.compose(_only(RestrictionId.fava), hebrew: false);
+      final he = ChefCardText.compose(_only(RestrictionId.fava), hebrew: true);
+      expect(en[1], contains('G6PD'));
+      expect(en[1], isNot(contains('allergy')));
+      expect(en[1], contains('please check every ingredient'));
+      expect(he[1], contains('G6PD'));
+      expect(he[1], isNot(contains('אלרגיה')));
+      // Strict: the closing asks about cross-contact.
+      expect(en.last, contains('cross-contact'));
+    });
+
+    test('the allergy note gives fava its own sentence, after the '
+        'allergens, and the own words say "also"', () {
+      // Arrange
+      final profile = DietaryProfile.empty
+          .withEntry(RestrictionId.sesame)
+          .withEntry(RestrictionId.fava)
+          .withCustomTerm('kiwi');
+
+      // Act
+      final note = ChefCardText.allergyNote(profile, hebrew: false)!;
+
+      // Assert
+      expect(
+        note,
+        startsWith(
+          'I have an allergy to sesame. Because of a health condition I '
+          'cannot eat fava beans (broad beans). I also cannot eat kiwi.',
+        ),
+      );
+      expect(note, isNot(contains('allergy to fava')));
+    });
+
+    test('fava alone: the note is strict, without "also"', () {
+      final note = ChefCardText.allergyNote(
+        _only(RestrictionId.fava),
+        hebrew: true,
+      )!;
+      expect(note, startsWith('בגלל מצב בריאותי אני לא יכול/ה לאכול פול.'));
+      expect(note, contains('מגע צולב'));
+    });
+
+    test('the heads-up sensitivities and the research diets ask to be '
+        'told and name what they leave out', () {
+      for (final id in <RestrictionId>[
+        RestrictionId.nightshades,
+        RestrictionId.msg,
+        RestrictionId.caffeine,
+        RestrictionId.salicylates,
+        RestrictionId.oralAllergy,
+        RestrictionId.pescatarian,
+        RestrictionId.paleo,
+        RestrictionId.whole30,
+        RestrictionId.aip,
+        RestrictionId.jain,
+      ]) {
+        for (final hebrew in <bool>[false, true]) {
+          final lines = ChefCardText.compose(_only(id), hebrew: hebrew);
+          expect(
+            lines[1],
+            contains(hebrew ? 'נא לומר לי' : 'please tell me'),
+            reason: '${id.name} $hebrew',
+          );
+          expect(lines[1], isNot(contains('I avoid')), reason: id.name);
+          expect(lines.last, hebrew ? 'תודה.' : 'Thank you.');
+        }
+      }
     });
   });
 }

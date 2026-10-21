@@ -3,6 +3,7 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
+import 'package:ketoclub/utils/allergens/vocabulary.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
 
 /// The kinds the picker groups by, in display order: the strict kinds
@@ -11,6 +12,7 @@ import 'package:ketoclub/widgets/app_sheet.dart';
 const List<RestrictionKind> restrictionKindOrder = <RestrictionKind>[
   RestrictionKind.allergen,
   RestrictionKind.autoimmune,
+  RestrictionKind.medical,
   RestrictionKind.intolerance,
   RestrictionKind.lifestyle,
   RestrictionKind.religiousComponent,
@@ -30,7 +32,8 @@ Key restrictionOptionKey(RestrictionId id) =>
 String restrictionDisplayName(Restriction restriction, Locale locale) =>
     locale.languageCode == 'he' ? restriction.nameHe : restriction.nameEn;
 
-/// The short label of [kind]: allergy, autoimmune, intolerance or diet.
+/// The short label of [kind]: allergy, autoimmune, health condition,
+/// intolerance or diet.
 ///
 /// A lifestyle diet, a religious component and keto all read as "diet";
 /// strictness is never shown as a severity (there is none), only implied by
@@ -39,6 +42,7 @@ String restrictionKindLabel(AppLocalizations l10n, RestrictionKind kind) =>
     switch (kind) {
       RestrictionKind.allergen => l10n.restrictionKindAllergy,
       RestrictionKind.autoimmune => l10n.restrictionKindAutoimmune,
+      RestrictionKind.medical => l10n.restrictionKindMedical,
       RestrictionKind.intolerance => l10n.restrictionKindIntolerance,
       RestrictionKind.lifestyle ||
       RestrictionKind.religiousComponent ||
@@ -95,6 +99,12 @@ String profileEntryDisplayName(ProfileEntry entry, Locale locale) =>
 /// ALG-17 restrictions say what they are instead: a heads-up from common
 /// guidance ([headsUpRestrictions]), or, for alpha-gal, that dairy is the
 /// Milk entry's.
+///
+/// Issue #342: fava says it is G6PD deficiency and not an allergy; a
+/// single legume ([restrictionParent]) that it stands apart from all
+/// legumes; a food on Japan's recommended list ([japanRecommendedOnly])
+/// that it is recommended there and mandatory nowhere; and a restriction
+/// on Japan's mandatory list alone (buckwheat) that it is on Japan's.
 String restrictionJurisdictionHint(
   AppLocalizations l10n,
   Restriction restriction,
@@ -105,8 +115,18 @@ String restrictionJurisdictionHint(
   if (restriction.id == RestrictionId.alphaGal) {
     return l10n.restrictionAlphaGalHint;
   }
+  if (restriction.id == RestrictionId.fava) return l10n.restrictionFavaHint;
+  if (restrictionParent.containsKey(restriction.id)) {
+    return l10n.restrictionLegumePartHint;
+  }
+  if (japanRecommendedOnly.contains(restriction.id)) {
+    return l10n.restrictionJapanRecommendedHint;
+  }
   final us = restriction.jurisdictions.contains(Jurisdiction.us);
   final eu = restriction.jurisdictions.contains(Jurisdiction.eu);
+  if (!us && !eu && restriction.jurisdictions.contains(Jurisdiction.jp)) {
+    return l10n.restrictionJapanListHint;
+  }
   final lists = switch ((us, eu)) {
     (true, true) => 'usEu',
     (true, false) => 'us',
@@ -116,16 +136,70 @@ String restrictionJurisdictionHint(
   return l10n.restrictionJurisdictionHint(lists);
 }
 
+/// Whether the picker and the onboarding offer [id]: once its vocabulary
+/// holds a term (issue #342).
+///
+/// A restriction with an empty vocabulary would find nothing on any menu,
+/// so a profile holding it would read every dish as having no concern
+/// for it — for a strict restriction, a silence that looks like an
+/// answer. The research restrictions are added with empty vocabularies
+/// (the contract step) and appear here one group at a time, as each
+/// follow-up fills its file. Keto (whose words live in the rule engine)
+/// and the user's own restriction (typed, not picked) are never offered
+/// as rows anyway.
+bool restrictionOffered(RestrictionId id) =>
+    !(allergenVocabulary[id]?.isEmpty ?? true);
+
 /// The taxonomy entries the picker offers when the profile already holds
-/// [added]: every restriction except keto, the user's own (which is typed,
-/// not picked) and those already added, in taxonomy order.
-List<Restriction> availableRestrictions(Set<RestrictionId> added) => [
+/// [added]: every restriction [offered] (by default
+/// [restrictionOffered]) except keto, the user's own (which is typed, not
+/// picked) and those already added, in taxonomy order — except that a
+/// child ([restrictionParent]: chickpeas under legumes) follows its parent
+/// when the parent is offered too.
+List<Restriction> availableRestrictions(
+  Set<RestrictionId> added, {
+  bool Function(RestrictionId id) offered = restrictionOffered,
+}) => childrenAfterParents([
   for (final restriction in restrictionTaxonomy)
     if (restriction.kind != RestrictionKind.keto &&
         restriction.id != RestrictionId.custom &&
-        !added.contains(restriction.id))
+        !added.contains(restriction.id) &&
+        offered(restriction.id))
       restriction,
-];
+]);
+
+/// [restrictions] in their order, except that each child
+/// ([restrictionParent]) is moved to just after its parent when the
+/// parent is among them; a child whose parent is not stays where it was.
+List<Restriction> childrenAfterParents(List<Restriction> restrictions) {
+  final present = <RestrictionId>{
+    for (final restriction in restrictions) restriction.id,
+  };
+  return <Restriction>[
+    for (final restriction in restrictions)
+      if (!present.contains(restrictionParent[restriction.id])) ...[
+        restriction,
+        for (final child in restrictions)
+          if (restrictionParent[child.id] == restriction.id) child,
+      ],
+  ];
+}
+
+/// Whether [restriction]'s English or Hebrew name holds [query], ignoring
+/// case and surrounding spaces; an empty query matches everything. The
+/// picker's search (issue #342), which searches both languages whatever
+/// the UI locale, so "חומוס" finds chickpeas under an English UI.
+bool restrictionMatchesQuery(Restriction restriction, String query) {
+  final needle = query.trim().toLowerCase();
+  if (needle.isEmpty) return true;
+  return restriction.nameEn.toLowerCase().contains(needle) ||
+      restriction.nameHe.contains(needle);
+}
+
+/// The key of the picker's search field (issue #342).
+const Key restrictionSearchFieldKey = ValueKey<String>(
+  'restrictionSearchField',
+);
 
 /// Whether the picker has anything left to offer [profile]: a taxonomy
 /// restriction it does not hold, or room for another own word
@@ -155,6 +229,12 @@ Future<RestrictionPick?> showRestrictionPickerSheet({
 /// language and a one-line hint naming the official allergen lists that
 /// include it. Tapping one pops the sheet with its [RestrictionId].
 ///
+/// A search field above the list (issue #342) narrows it by name, in
+/// either language ([restrictionMatchesQuery]), so the list stays usable
+/// as it grows; a kind with no match loses its heading, and a search that
+/// matches nothing points to "Add your own". A child restriction (a single
+/// legume) is listed indented, right after its parent.
+///
 /// Keto and every id in [added] are left out. There is no severity control:
 /// a restriction is added or it is not. Below the list, "Add your own"
 /// (ALG-17) takes a word the taxonomy does not have ("kiwi", "כוסברה")
@@ -163,22 +243,44 @@ Future<RestrictionPick?> showRestrictionPickerSheet({
 ///
 /// Tapping a row pops [RestrictionPick.restriction]; adding a word pops
 /// [RestrictionPick.own].
-class RestrictionPickerSheet extends StatelessWidget {
-  /// Creates the picker, leaving out [added].
-  const new({required this.added, super.key});
+class RestrictionPickerSheet extends StatefulWidget {
+  /// Creates the picker, leaving out [added] and every restriction that is
+  /// not [offered].
+  const new({
+    required this.added,
+    this.offered = restrictionOffered,
+    super.key,
+  });
 
   /// The restrictions already in the profile, which the picker leaves out.
   final Set<RestrictionId> added;
+
+  /// Which restrictions the picker may offer at all; by default those
+  /// whose vocabulary holds a term ([restrictionOffered]).
+  final bool Function(RestrictionId id) offered;
+
+  @override
+  State<RestrictionPickerSheet> createState() => _RestrictionPickerSheetState();
+}
+
+class _RestrictionPickerSheetState extends State<RestrictionPickerSheet> {
+  String _query = '';
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final locale = Localizations.localeOf(context);
-    final available = availableRestrictions(added);
+    final available = [
+      for (final restriction in availableRestrictions(
+        widget.added,
+        offered: widget.offered,
+      ))
+        if (restrictionMatchesQuery(restriction, _query)) restriction,
+    ];
 
-    // A plain Column, not a lazy ListView: about twenty rows, and every
-    // row must exist in the tree so a test or a screen reader finds it.
+    // A plain Column, not a lazy ListView: every row must exist in the
+    // tree so a test or a screen reader finds it; the search narrows it.
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsetsDirectional.fromSTEB(8, 0, 8, 16),
@@ -193,8 +295,28 @@ class RestrictionPickerSheet extends StatelessWidget {
                 style: theme.textTheme.titleMedium,
               ),
             ),
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 4),
+              child: TextField(
+                key: restrictionSearchFieldKey,
+                onChanged: (value) => setState(() => _query = value),
+                textInputAction: TextInputAction.search,
+                decoration: InputDecoration(
+                  labelText: l10n.restrictionSearchField,
+                  prefixIcon: const Icon(Icons.search),
+                ),
+              ),
+            ),
             for (final kind in restrictionKindOrder)
               ..._group(context, l10n, locale, kind, available),
+            if (available.isEmpty && _query.trim().isNotEmpty)
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 16, 0),
+                child: Text(
+                  l10n.restrictionSearchEmpty,
+                  style: theme.textTheme.bodyMedium,
+                ),
+              ),
             const _OwnRestrictionField(),
           ],
         ),
@@ -216,6 +338,7 @@ class RestrictionPickerSheet extends StatelessWidget {
         if (restriction.kind == kind) restriction,
     ];
     if (members.isEmpty) return const <Widget>[];
+    final shown = <RestrictionId>{for (final member in members) member.id};
     return [
       Padding(
         padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 16, 4),
@@ -231,6 +354,10 @@ class RestrictionPickerSheet extends StatelessWidget {
       for (final restriction in members)
         ListTile(
           key: restrictionOptionKey(restriction.id),
+          // A child sits indented under its parent when both are shown.
+          contentPadding: shown.contains(restrictionParent[restriction.id])
+              ? const EdgeInsetsDirectional.only(start: 40, end: 16)
+              : null,
           title: Text(restrictionDisplayName(restriction, locale)),
           subtitle: Text(restrictionJurisdictionHint(l10n, restriction)),
           onTap: () => Navigator.pop(

@@ -207,7 +207,9 @@ def test_the_venue_may_use_the_camel_case_spelling(app_client: TestClient) -> No
     assert (row.source, row.platform_id) == ("scan", "scan/1a2b3c4d")
 
 
-@pytest.mark.parametrize("restriction", ["peanuts", "sesame", "gluten", "alphaGal"])
+@pytest.mark.parametrize(
+    "restriction", ["peanuts", "sesame", "gluten", "alphaGal", "buckwheat", "fava"]
+)
 def test_every_taxonomy_id_is_accepted(
     app_client: TestClient, restriction: str
 ) -> None:

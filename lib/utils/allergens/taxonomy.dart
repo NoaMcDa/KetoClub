@@ -1,8 +1,8 @@
 /// The restriction taxonomy: one [Restriction] per [RestrictionId]
 /// (Banto; ALG-01, issue #343).
 ///
-/// The kinds follow the owner's rule — no severity levels: an allergen or
-/// an autoimmune condition is strict, everything else flexible
+/// The kinds follow the owner's rule — no severity levels: an allergen, an
+/// autoimmune or a medical condition is strict, everything else flexible
 /// ([RestrictionKind.isStrict]). So [RestrictionId.milk] is the allergy
 /// (strict) and [RestrictionId.lactose] the intolerance (flexible);
 /// [RestrictionId.gluten] is celiac disease (autoimmune, strict), distinct
@@ -19,7 +19,8 @@
 /// barley, oats and rye); Japan's mandatory list covers milk, eggs, wheat,
 /// peanuts, crustaceans (shrimp, crab) and tree nuts (walnut, and cashew
 /// since 1 April 2026) — its soy, sesame, fish and molluscs (squid,
-/// abalone) are only recommended, and buckwheat has no id yet. Checked
+/// abalone) are only recommended, and so is buckwheat (mandatory there
+/// and on no Western list), tagged [Jurisdiction.jp] alone. Checked
 /// 2026-10-19 (file 02, "The lists"; file 12 §8.1).
 ///
 /// ALG-17 adds alpha-gal syndrome (an allergen: strict), FODMAP and
@@ -28,6 +29,22 @@
 /// user's own free-text restriction, [RestrictionId.custom] (strict, as
 /// file 10 §ALG-17 has it: an allergy by the user's word is an allergy).
 /// None of them is on a labelling list.
+///
+/// The research restrictions (issue #342) add, with empty vocabularies
+/// until each group's follow-up fills its file: buckwheat; the foods on
+/// Japan's *recommended* list that no other id covers (kiwi, peach, apple,
+/// banana, orange, beef, pork, chicken, gelatin, yam —
+/// [japanRecommendedOnly], with no [Jurisdiction.jp] tag, which means the
+/// mandatory list only); corn, sunflower and flax (file 02, "Less common
+/// allergens worth supporting"); chickpea, lentil, pea and fenugreek, each
+/// its own toggle under [RestrictionId.legumes] ([restrictionParent];
+/// file 11 §16.5); fava beans for G6PD deficiency, a
+/// [RestrictionKind.medical] condition and not an allergy (file 11 §16.5;
+/// Israel's "contains fava" marking is not an allergen list, so it carries
+/// no [Jurisdiction.il] tag); nightshades, MSG, caffeine, salicylates and
+/// oral allergy syndrome, heads-up sensitivities (file 03, "The map";
+/// file 02); and the pescatarian, paleo, Whole30, AIP and Jain diets
+/// (file 03, "The map"). Yam is Japan's yamaimo, not sweet potato (בטטה).
 ///
 /// The display names are shown beside the dish's own text and read to a
 /// waiter, so like the waiter sentences in `constants.dart` they follow
@@ -265,6 +282,238 @@ const List<Restriction> restrictionTaxonomy = <Restriction>[
     source: '11 §23',
   ),
   Restriction(
+    id: RestrictionId.buckwheat,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{Jurisdiction.jp},
+    nameEn: 'Buckwheat',
+    nameHe: 'כוסמת',
+    source: '02 §The lists',
+  ),
+  Restriction(
+    id: RestrictionId.kiwi,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Kiwi',
+    nameHe: 'קיווי',
+    source: '02 §The lists',
+  ),
+  Restriction(
+    id: RestrictionId.peach,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Peach',
+    nameHe: 'אפרסק',
+    source: '02 §The lists',
+  ),
+  Restriction(
+    id: RestrictionId.apple,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Apple',
+    nameHe: 'תפוח',
+    source: '02 §The lists',
+  ),
+  Restriction(
+    id: RestrictionId.banana,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Banana',
+    nameHe: 'בננה',
+    source: '02 §The lists',
+  ),
+  Restriction(
+    id: RestrictionId.orange,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Orange',
+    nameHe: 'תפוז',
+    source: '02 §The lists',
+  ),
+  Restriction(
+    id: RestrictionId.beef,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Beef',
+    nameHe: 'בקר',
+    source: '02 §The lists',
+  ),
+  Restriction(
+    id: RestrictionId.pork,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Pork',
+    nameHe: 'חזיר',
+    source: '02 §The lists',
+  ),
+  Restriction(
+    id: RestrictionId.chicken,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Chicken',
+    nameHe: 'עוף',
+    source: '02 §The lists',
+  ),
+  Restriction(
+    id: RestrictionId.gelatin,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Gelatin',
+    nameHe: "ג'לטין",
+    source: '11 §17.1',
+  ),
+  Restriction(
+    id: RestrictionId.yam,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Yam (yamaimo)',
+    nameHe: 'יאם (יאמאימו)',
+    source: '02 §The lists',
+  ),
+  Restriction(
+    id: RestrictionId.corn,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Corn',
+    nameHe: 'תירס',
+    source: '02 §Less common allergens',
+  ),
+  Restriction(
+    id: RestrictionId.sunflower,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Sunflower seeds',
+    nameHe: 'גרעיני חמנייה',
+    source: '02 §Less common allergens',
+  ),
+  Restriction(
+    id: RestrictionId.flax,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Flaxseed',
+    nameHe: 'זרעי פשתן',
+    source: '02 §Less common allergens',
+  ),
+  Restriction(
+    id: RestrictionId.chickpea,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Chickpeas',
+    nameHe: 'גרגרי חומוס',
+    source: '11 §16.5',
+  ),
+  Restriction(
+    id: RestrictionId.lentil,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Lentils',
+    nameHe: 'עדשים',
+    source: '11 §16.5',
+  ),
+  Restriction(
+    id: RestrictionId.pea,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Peas',
+    nameHe: 'אפונה',
+    source: '11 §16.5',
+  ),
+  Restriction(
+    id: RestrictionId.fenugreek,
+    kind: RestrictionKind.allergen,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Fenugreek',
+    nameHe: 'חילבה',
+    source: '11 §16.5',
+  ),
+  Restriction(
+    id: RestrictionId.fava,
+    kind: RestrictionKind.medical,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Fava beans (favism)',
+    nameHe: 'פול (פביזם)',
+    source: '11 §16.5',
+  ),
+  Restriction(
+    id: RestrictionId.nightshades,
+    kind: RestrictionKind.intolerance,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Nightshades',
+    nameHe: 'סולניים',
+    source: '03 §The map',
+  ),
+  Restriction(
+    id: RestrictionId.msg,
+    kind: RestrictionKind.intolerance,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'MSG',
+    nameHe: 'מונוסודיום גלוטמט',
+    source: '03 §The map',
+  ),
+  Restriction(
+    id: RestrictionId.caffeine,
+    kind: RestrictionKind.intolerance,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Caffeine',
+    nameHe: 'קפאין',
+    source: '03 §The map',
+  ),
+  Restriction(
+    id: RestrictionId.salicylates,
+    kind: RestrictionKind.intolerance,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Salicylates',
+    nameHe: 'סליצילטים',
+    source: '03 §The map',
+  ),
+  Restriction(
+    id: RestrictionId.oralAllergy,
+    kind: RestrictionKind.intolerance,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Oral allergy syndrome',
+    nameHe: 'תסמונת אלרגיה אוראלית',
+    source: '02 §Less common allergens',
+  ),
+  Restriction(
+    id: RestrictionId.pescatarian,
+    kind: RestrictionKind.lifestyle,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Pescatarian',
+    nameHe: 'פסקטריאני',
+    source: '03 §The map',
+  ),
+  Restriction(
+    id: RestrictionId.paleo,
+    kind: RestrictionKind.lifestyle,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Paleo',
+    nameHe: 'פליאו',
+    source: '03 §The map',
+  ),
+  Restriction(
+    id: RestrictionId.whole30,
+    kind: RestrictionKind.lifestyle,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Whole30',
+    nameHe: 'תוכנית Whole30',
+    source: '03 §The map',
+  ),
+  Restriction(
+    id: RestrictionId.aip,
+    kind: RestrictionKind.lifestyle,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'AIP (autoimmune protocol)',
+    nameHe: 'AIP (פרוטוקול אוטואימוני)',
+    source: '03 §The map',
+  ),
+  Restriction(
+    id: RestrictionId.jain,
+    kind: RestrictionKind.religiousComponent,
+    jurisdictions: <Jurisdiction>{},
+    nameEn: 'Jain',
+    nameHe: "ג'ייני",
+    source: '03 §The map',
+  ),
+  Restriction(
     id: RestrictionId.keto,
     kind: RestrictionKind.keto,
     jurisdictions: <Jurisdiction>{},
@@ -285,17 +534,59 @@ const List<Restriction> restrictionTaxonomy = <Restriction>[
 /// The restrictions whose concerns are a **heads-up**, never a verdict
 /// (ALG-17): FODMAP and histamine are dose and preparation sensitivities
 /// (onion in a sauce, an aged cheese grated on top), and GLP-1 eating is a
-/// preference for small, light portions. A menu says nothing of the dose,
-/// so `ProfileEvaluator` lowers every concern of these to `suspected`
-/// ("may be high in …"), which a flexible entry lists and lets move
-/// nothing: none of them ever makes a dish "avoid". The matcher still
-/// reports their triggers as written (C1: extraction does not know who is
-/// asking).
+/// preference for small, light portions. Nightshades, MSG, caffeine,
+/// salicylates and oral allergy syndrome (issue #342) join them: each is
+/// a sensitivity a menu cannot measure (oral allergy syndrome reacts to
+/// raw fruit and vegetables, usually not cooked ones). A menu says
+/// nothing of the dose, so `ProfileEvaluator` lowers every concern of
+/// these to `suspected` ("may be high in …"), which a flexible entry lists
+/// and lets move nothing: none of them ever makes a dish "avoid". The
+/// matcher still reports their triggers as written (C1: extraction does
+/// not know who is asking).
 const Set<RestrictionId> headsUpRestrictions = <RestrictionId>{
   RestrictionId.fodmap,
   RestrictionId.histamine,
   RestrictionId.glp1,
+  RestrictionId.nightshades,
+  RestrictionId.msg,
+  RestrictionId.caffeine,
+  RestrictionId.salicylates,
+  RestrictionId.oralAllergy,
 };
+
+/// The restrictions Japan names on its *recommended* allergen list and no
+/// mandatory list does (file 02, "The lists": the 20 recommended items,
+/// less those another id already covers — almond, pistachio and macadamia
+/// are [RestrictionId.treeNuts], abalone and squid [RestrictionId.molluscs],
+/// salmon, mackerel and salmon roe [RestrictionId.fish], soy and sesame
+/// their own ids). [Jurisdiction.jp] means the mandatory list only, so
+/// these carry no jurisdiction; the picker says "recommended in Japan".
+const Set<RestrictionId> japanRecommendedOnly = <RestrictionId>{
+  RestrictionId.kiwi,
+  RestrictionId.peach,
+  RestrictionId.apple,
+  RestrictionId.banana,
+  RestrictionId.orange,
+  RestrictionId.beef,
+  RestrictionId.pork,
+  RestrictionId.chicken,
+  RestrictionId.gelatin,
+  RestrictionId.yam,
+};
+
+/// A restriction's parent, for the restrictions that are one part of a
+/// broader one: each legume as its own toggle under
+/// [RestrictionId.legumes] (file 11 §16.5: "a reaction to one legume
+/// doesn't mean all legumes must be avoided"). The picker lists a child
+/// right after its parent. Fava is not here: favism is not an allergy and
+/// is a restriction of its own (file 11 §16.5).
+const Map<RestrictionId, RestrictionId> restrictionParent =
+    <RestrictionId, RestrictionId>{
+      RestrictionId.chickpea: RestrictionId.legumes,
+      RestrictionId.lentil: RestrictionId.legumes,
+      RestrictionId.pea: RestrictionId.legumes,
+      RestrictionId.fenugreek: RestrictionId.legumes,
+    };
 
 /// The taxonomy entry for [id]. Total: [restrictionTaxonomy] holds one
 /// entry per id, in [RestrictionId] order (a test pins both).

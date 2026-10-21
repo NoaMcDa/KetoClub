@@ -3,9 +3,9 @@ import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 
 /// A citation of the allergen documentation: file 11 or 12 and a section,
-/// file 02, or (for keto alone, which no research file covers) the epic's
-/// own ALG-01 section in file 10.
-final RegExp _citation = RegExp(r'^(1[12] §\d+(\.\d+)?|02 §|10 §ALG-\d+)');
+/// file 02 or 03 and a heading, or (for keto alone, which no research file
+/// covers) the epic's own ALG-01 section in file 10.
+final RegExp _citation = RegExp(r'^(1[12] §\d+(\.\d+)?|0[23] §\S|10 §ALG-\d+)');
 
 void main() {
   group('restrictionTaxonomy', () {
@@ -22,7 +22,8 @@ void main() {
       }
     });
 
-    test('strictness: allergens and celiac are strict, the rest are not', () {
+    test('strictness: allergens, celiac and fava are strict, the rest are '
+        'not', () {
       // Arrange
       const flexible = <RestrictionId>{
         RestrictionId.lactose,
@@ -31,6 +32,16 @@ void main() {
         RestrictionId.vegan,
         RestrictionId.vegetarian,
         RestrictionId.glp1,
+        RestrictionId.nightshades,
+        RestrictionId.msg,
+        RestrictionId.caffeine,
+        RestrictionId.salicylates,
+        RestrictionId.oralAllergy,
+        RestrictionId.pescatarian,
+        RestrictionId.paleo,
+        RestrictionId.whole30,
+        RestrictionId.aip,
+        RestrictionId.jain,
         RestrictionId.keto,
       };
 
@@ -139,8 +150,8 @@ void main() {
     });
 
     test('Japan lists only its mandatory items: milk, eggs, wheat, '
-        'peanuts, shrimp and crab, walnut and cashew (checked 2026-10-19; '
-        'buckwheat has no id)', () {
+        'peanuts, shrimp and crab, buckwheat, walnut and cashew (checked '
+        '2026-10-19)', () {
       // Arrange
       const japan = <RestrictionId>{
         RestrictionId.peanuts,
@@ -149,6 +160,7 @@ void main() {
         RestrictionId.eggs,
         RestrictionId.wheat,
         RestrictionId.crustaceans,
+        RestrictionId.buckwheat,
       };
 
       // Act
@@ -200,9 +212,13 @@ void main() {
       expect(sesame.jurisdictions, contains(Jurisdiction.eu));
     });
 
-    test('legumes, lactose, the diets and the ALG-17 restrictions are '
-        'regulated nowhere', () {
+    test('legumes, lactose, the diets, the ALG-17 restrictions and the '
+        'research restrictions but buckwheat are regulated nowhere', () {
       for (final id in <RestrictionId>[
+        for (final id in RestrictionId.values)
+          if (id.index > RestrictionId.buckwheat.index &&
+              id.index < RestrictionId.keto.index)
+            id,
         RestrictionId.legumes,
         RestrictionId.alphaGal,
         RestrictionId.fodmap,
@@ -224,6 +240,75 @@ void main() {
         expect(entry.nameEn.trim(), isNotEmpty, reason: entry.id.name);
         expect(hebrewLetter.hasMatch(entry.nameHe), isTrue);
       }
+    });
+
+    test('the heads-up restrictions are FODMAP, histamine, small portions '
+        'and the five research sensitivities, none of them strict', () {
+      expect(headsUpRestrictions, <RestrictionId>{
+        RestrictionId.fodmap,
+        RestrictionId.histamine,
+        RestrictionId.glp1,
+        RestrictionId.nightshades,
+        RestrictionId.msg,
+        RestrictionId.caffeine,
+        RestrictionId.salicylates,
+        RestrictionId.oralAllergy,
+      });
+      for (final id in headsUpRestrictions) {
+        expect(restrictionFor(id).isStrict, isFalse, reason: id.name);
+      }
+    });
+
+    test('fava is a medical condition (G6PD), strict, and not an allergen; '
+        "Israel's fava marking is no allergen list", () {
+      final fava = restrictionFor(RestrictionId.fava);
+      expect(fava.kind, RestrictionKind.medical);
+      expect(fava.isStrict, isTrue);
+      expect(fava.jurisdictions, isEmpty);
+      expect(restrictionParent, isNot(contains(RestrictionId.fava)));
+    });
+
+    test('each single legume is an allergen under legumes', () {
+      expect(restrictionParent, <RestrictionId, RestrictionId>{
+        RestrictionId.chickpea: RestrictionId.legumes,
+        RestrictionId.lentil: RestrictionId.legumes,
+        RestrictionId.pea: RestrictionId.legumes,
+        RestrictionId.fenugreek: RestrictionId.legumes,
+      });
+      for (final MapEntry(key: child, value: parent)
+          in restrictionParent.entries) {
+        expect(
+          restrictionFor(child).kind,
+          restrictionFor(parent).kind,
+          reason: child.name,
+        );
+      }
+    });
+
+    test("Japan's recommended-only foods carry no jurisdiction (jp is the "
+        'mandatory list) and are allergens', () {
+      expect(japanRecommendedOnly, hasLength(10));
+      for (final id in japanRecommendedOnly) {
+        final restriction = restrictionFor(id);
+        expect(restriction.jurisdictions, isEmpty, reason: id.name);
+        expect(restriction.kind, RestrictionKind.allergen, reason: id.name);
+      }
+    });
+
+    test('the research diets: four lifestyles and Jain, a religious '
+        'component', () {
+      for (final id in <RestrictionId>[
+        RestrictionId.pescatarian,
+        RestrictionId.paleo,
+        RestrictionId.whole30,
+        RestrictionId.aip,
+      ]) {
+        expect(restrictionFor(id).kind, RestrictionKind.lifestyle);
+      }
+      expect(
+        restrictionFor(RestrictionId.jain).kind,
+        RestrictionKind.religiousComponent,
+      );
     });
 
     test('every source cites the allergen documentation', () {

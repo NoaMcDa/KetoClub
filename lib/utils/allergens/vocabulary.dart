@@ -1,7 +1,9 @@
 /// The allergen vocabulary registry (Banto; ALG-01, issue #343): every
 /// restriction's [RestrictionVocabulary], assembled from the group files
-/// (six, and since ALG-17 a seventh for the extended restrictions) so that
-/// each group's pull request touches only its own file.
+/// (six, since ALG-17 a seventh for the extended restrictions, and since
+/// issue #342 five more for the research restrictions, empty until their
+/// follow-ups fill them) so that each group's pull request touches only
+/// its own file.
 ///
 /// Profile-independent (architecture.md D26, C1): the registry and the
 /// matcher over it know nothing of anyone's profile.
@@ -10,11 +12,16 @@ library;
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/vocab_dairy_eggs.dart';
 import 'package:ketoclub/utils/allergens/vocab_diets.dart';
+import 'package:ketoclub/utils/allergens/vocab_diets_extra.dart';
 import 'package:ketoclub/utils/allergens/vocab_extended.dart';
+import 'package:ketoclub/utils/allergens/vocab_foods_extra.dart';
 import 'package:ketoclub/utils/allergens/vocab_gluten_grains.dart';
+import 'package:ketoclub/utils/allergens/vocab_legume_parts.dart';
 import 'package:ketoclub/utils/allergens/vocab_nuts_seeds.dart';
 import 'package:ketoclub/utils/allergens/vocab_plants_additives.dart';
 import 'package:ketoclub/utils/allergens/vocab_sea.dart';
+import 'package:ketoclub/utils/allergens/vocab_seeds_extra.dart';
+import 'package:ketoclub/utils/allergens/vocab_sensitivities.dart';
 import 'package:ketoclub/utils/allergens/vocabulary_types.dart';
 
 export 'package:ketoclub/utils/allergens/vocabulary_types.dart';
@@ -32,6 +39,11 @@ const Map<RestrictionId, RestrictionVocabulary> allergenVocabulary =
       ...plantsAdditivesVocabulary,
       ...dietsVocabulary,
       ...extendedVocabulary,
+      ...foodsExtraVocabulary,
+      ...seedsExtraVocabulary,
+      ...legumePartsVocabulary,
+      ...sensitivitiesVocabulary,
+      ...dietsExtraVocabulary,
     };
 
 /// The group maps, by file name, for the registry test.
@@ -44,4 +56,9 @@ allergenVocabularyGroups = <String, Map<RestrictionId, RestrictionVocabulary>>{
   'vocab_plants_additives.dart': plantsAdditivesVocabulary,
   'vocab_diets.dart': dietsVocabulary,
   'vocab_extended.dart': extendedVocabulary,
+  'vocab_foods_extra.dart': foodsExtraVocabulary,
+  'vocab_seeds_extra.dart': seedsExtraVocabulary,
+  'vocab_legume_parts.dart': legumePartsVocabulary,
+  'vocab_sensitivities.dart': sensitivitiesVocabulary,
+  'vocab_diets_extra.dart': dietsExtraVocabulary,
 };

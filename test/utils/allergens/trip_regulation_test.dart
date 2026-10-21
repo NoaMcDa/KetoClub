@@ -35,11 +35,33 @@ const Set<RestrictionId> _euAdditions = <RestrictionId>{
   RestrictionId.sulphites,
 };
 
-/// Strict, but on no list anywhere.
+/// On Japan's mandatory list alone (file 02): buckwheat.
+const Set<RestrictionId> _japanOnly = <RestrictionId>{RestrictionId.buckwheat};
+
+/// Strict, but on no list anywhere. Japan's recommended-only foods are
+/// here: its recommended list binds nothing (file 02).
 const Set<RestrictionId> _nowhere = <RestrictionId>{
   RestrictionId.legumes,
   RestrictionId.alphaGal,
   RestrictionId.custom,
+  RestrictionId.kiwi,
+  RestrictionId.peach,
+  RestrictionId.apple,
+  RestrictionId.banana,
+  RestrictionId.orange,
+  RestrictionId.beef,
+  RestrictionId.pork,
+  RestrictionId.chicken,
+  RestrictionId.gelatin,
+  RestrictionId.yam,
+  RestrictionId.corn,
+  RestrictionId.sunflower,
+  RestrictionId.flax,
+  RestrictionId.chickpea,
+  RestrictionId.lentil,
+  RestrictionId.pea,
+  RestrictionId.fenugreek,
+  RestrictionId.fava,
 };
 
 /// Flexible: no hint at all.
@@ -50,6 +72,16 @@ const Set<RestrictionId> _flexible = <RestrictionId>{
   RestrictionId.vegan,
   RestrictionId.vegetarian,
   RestrictionId.glp1,
+  RestrictionId.nightshades,
+  RestrictionId.msg,
+  RestrictionId.caffeine,
+  RestrictionId.salicylates,
+  RestrictionId.oralAllergy,
+  RestrictionId.pescatarian,
+  RestrictionId.paleo,
+  RestrictionId.whole30,
+  RestrictionId.aip,
+  RestrictionId.jain,
   RestrictionId.keto,
 };
 
@@ -72,6 +104,7 @@ RegulationHint? _expected(RestrictionId id, TripDestination destination) {
   if (_nowhere.contains(id)) return RegulationHint.notRegulated;
   final listed =
       _everywhere.contains(id) ||
+      (_japanOnly.contains(id) && destination == TripDestination.japan) ||
       (_allButJapan.contains(id) && destination != TripDestination.japan) ||
       (_euAdditions.contains(id) &&
           destination != TripDestination.japan &&
@@ -85,6 +118,7 @@ void main() {
       _everywhere,
       _allButJapan,
       _euAdditions,
+      _japanOnly,
       _nowhere,
       _flexible,
     ];
@@ -145,8 +179,19 @@ void main() {
       }
     });
 
-    test('mustard is not regulated in the US; buckwheat-free Japan does '
-        'not list sesame', () {
+    test('buckwheat is listed in Japan only, for packaged food', () {
+      expect(
+        TripRegulation.hintFor(RestrictionId.buckwheat, TripDestination.japan),
+        RegulationHint.packagedOnly,
+      );
+      expect(
+        TripRegulation.hintFor(RestrictionId.buckwheat, TripDestination.france),
+        RegulationHint.notRegulated,
+      );
+    });
+
+    test('mustard is not regulated in the US; Japan does not list '
+        'sesame', () {
       expect(
         TripRegulation.hintFor(
           RestrictionId.mustard,

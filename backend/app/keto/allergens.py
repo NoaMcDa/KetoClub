@@ -12,7 +12,7 @@ vocabulary registry; a test asserts the two files are identical.
 a text or a dish exactly as the Dart ``AllergenMatcher`` does, and report
 every trigger for every restriction, whatever anyone's profile (C1). There
 are no severity levels: a restriction is strict when its kind is
-``allergen`` or ``autoimmune`` (:attr:`Restriction.is_strict`).
+``allergen``, ``autoimmune`` or ``medical`` (:attr:`Restriction.is_strict`).
 
 Behaviour the port keeps from Dart:
 
