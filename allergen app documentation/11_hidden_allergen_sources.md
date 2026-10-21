@@ -1339,6 +1339,247 @@ Obesity Medicine Association, and The Obesity Society." *Am J Clin Nutr*
 
 ---
 
+## 26. Buckwheat and the foods on Japan's recommended list (issue #342; desk research, brief)
+
+> **Status: desk research, not clinical review.** Written on 2026-10-21
+> for the `vocab_foods_extra.dart` follow-up of issue #342 and **checked
+> 2026-10-21 against web search results only**: as everywhere in this
+> file, no page could be opened in full, so each claim rests on the result
+> excerpt of the URL beside it, graded as in file 12 (**[S]** strong,
+> **[M]** medium, **[W]** weak). Rows marked **unreviewed** have no
+> source beyond general culinary knowledge; their vocabulary terms are
+> `suspected` or left out. No allergist or dietitian has read this
+> section. (§24–§25 are the kosher and halal sections.)
+
+**Regulated:** buckwheat is one of Japan's nine *mandatory* labelling
+items; kiwi, peach, apple, banana, orange, beef, pork, chicken, gelatin
+and yam are among its twenty *recommended* ones (file 02; the list is
+confirmed by a Tokyo Metropolitan Government handout, which names
+"Yams" and "Gelatin" in English,
+https://www.hokeniryo1.metro.tokyo.lg.jp/shokuhin/hyouji/kyouzai/files/nihongo(r8.4)_tenpu.pdf
+**[S]**, and by Kyoto Prefecture's English page,
+https://www.pref.kyoto.jp/en/labelling_of_food_with_allergens.html
+**[S]**). None is on the US, EU or Israeli list, and Japan's rules bind
+packaged food only (file 12 §8.1). Every term in this section is
+therefore a menu word for a person who has *chosen* the restriction; the
+app says "ask the restaurant", never "safe".
+
+### 26.1 Buckwheat
+
+**Direct:** buckwheat, kasha (the Eastern European name for buckwheat
+groats), soba (buckwheat noodles), *sarrasin* and *blé noir* (French),
+*grano saraceno* (Italian), *juwari* soba (100% buckwheat). **Hidden:**
+pizzoccheri (Valtellina buckwheat pasta) and polenta taragna (likely);
+galettes, crêpes and blinis, which are buckwheat pancakes in some regions
+and wheat in others, and poffertjes (suspected); gluten-free breads and
+flours, because buckwheat is a common gluten-free flour (suspected);
+buckwheat honey (suspected: a honey, not the grain — **unreviewed**).
+Sources: Anaphylaxis UK, buckwheat factsheet ("grano saraceno", "blé
+noir", galettes, crêpes, blinis, pizzoccheri, polenta taragna,
+poffertjes, caution on gluten-free food)
+https://www.anaphylaxis.org.uk/wp-content/uploads/2025/09/Buckwheat-V5-neffy-update-25.pdf
+**[S]** ; Heffler et al., "Buckwheat allergy: an emerging clinical
+problem in Europe" (anaphylaxis from a pizza dough of mixed wheat and
+buckwheat flour)
+https://iris.unito.it/retrieve/handle/2318/1645935/354564/buckwheat-allergy-an-emerging-clinical-problem-in-europe-2155-6121.1000168.pdf
+**[S]** ; soba's buckwheat-and-wheat mix, file 12 §8.2.
+**Guards:** "no buckwheat", "buckwheat-free", "ללא כוסמת".
+**Confusions:**
+- **Buckwheat is not wheat** (§7.5): it stays a *guard* of the wheat and
+  gluten triggers ("buckwheat flour" lowers wheat's "flour"), and that
+  guard never lowers a buckwheat hit.
+- **Yakisoba is not soba**: wheat noodles despite the name (file 12
+  §8.2); "yakisoba" is one word to the matcher and never matches "soba",
+  and "yaki soba" written apart is lowered.
+- Soba may be mostly wheat (file 12 §8.2): a soba dish is buckwheat *and*
+  wheat, never one instead of the other.
+- In Hebrew, כוסמת is buckwheat and כוסמין is spelt (file 12 §10.1).
+
+### 26.2 Kiwi
+
+**Direct:** kiwi, kiwifruit. **Hidden (suspected):** fruit salads, fruit
+mixes and smoothies, desserts and tropical juices (Thermo Fisher's kiwi
+allergen sheet lists syrups, shakes, cocktails, puddings and fruit sauces;
+a consumer page names fruit mixes, smoothies, desserts and salads):
+https://www.thermofisher.com/allergy/us/en/allergen-fact-sheets/kiwi.html
+**[S]** ; https://www.wyndly.com/blogs/learn/kiwi-allergy **[W]**.
+Pavlova, often topped with kiwi, is **unreviewed** (suspected). Some
+people tolerate heated kiwi, others not (Thermo Fisher), so a cooked dish
+is no guard. Kiwi used as a meat tenderiser was **not confirmed** by any
+source and is left out. Kiwi belongs to the latex-fruit syndrome with
+banana and avocado (§26.5).
+
+### 26.3 Peach
+
+**Direct:** peach. **Hidden:** nectarine (**likely**): the nectarine is a
+smooth-skinned form of the same species, *Prunus persica*, and its fruit
+carries the same lipid transfer protein, Pru p 3, the main peach allergen
+(Botton et al., Pru p 3 in every peach *and* nectarine cultivar studied
+but one: https://research.unipd.it/handle/11577/2481986 **[S]** ;
+https://pmc.ncbi.nlm.nih.gov/articles/PMC8569022 **[S]**). Pru p 3 resists
+heat and is concentrated in the skin
+(https://www.altmeyers.org/en/allergology/peach-allergy-133292 **[M]**),
+so a cooked or peeled peach is no guard. A Bellini (peach purée and
+sparkling wine) is **unreviewed** (suspected).
+
+### 26.4 Apple
+
+**Direct:** apple, apples, applesauce. **Hidden (suspected):** cider,
+calvados (apple brandy), tarte Tatin and Waldorf salad — **unreviewed**:
+no source reviewed names them, but each is made from apple by definition.
+Apple allergy has two forms: a birch-pollen form (Mal d 1, destroyed by
+cooking, so many people tolerate cooked apple) and a lipid-transfer form
+(Mal d 3, heat-stable), and an apple drink has caused anaphylaxis
+(https://www.altmeyers.org/en/allergology/apple-allergy-133032 **[M]** ;
+https://www.thermofisher.com/phadia/us/en/resources/allergen-encyclopedia/f49.html
+**[S]**), so cooking is never a guard. **Guards:** "pineapple" is one word
+and never matches; custard, sugar, star, rose and wax apples are other
+fruits (lowered — **unreviewed**). In Hebrew תפוח אדמה is potato, not
+apple (file 12 §10.4).
+
+### 26.5 Banana
+
+**Direct:** banana, bananas. **Hidden:** banoffee (banana and toffee,
+likely), smoothies and banana bread follow from "banana" (suspected:
+"banana flavoring in baked goods or smoothies",
+https://www.healthline.com/health/banana-allergy **[M]**). Plantain is a
+close relative, but **no source reviewed** says a banana-allergic person
+reacts to it: suspected. Banana is the commonest fruit of the latex-fruit
+syndrome (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11278189/ **[S]**).
+**Guards:** a banana pepper is a chilli and a banana shallot a shallot; a
+banana leaf is a wrapper (lowered, not cleared: the leaf touches the
+food) — **unreviewed**.
+
+### 26.6 Orange
+
+**Direct:** orange, oranges (orange juice, zest and peel follow). **Hidden
+(suspected):** marmalade (orange marmalade is the classic; other citrus
+exist), and the orange liqueurs Grand Marnier, Cointreau, triple sec and
+curaçao: orange extracts and peel oils are used "in the liqueur and food
+industry" and peel-oil components are possible allergens
+(https://www.altmeyers.org/en/allergology/orange-133441 **[M]**); the
+liqueurs by name are **unreviewed**. Germin-like allergens are shared
+across the peels of orange, lemon and mandarin
+(https://mdpi-res.com/d_attachment/cimb/cimb-47-00621/article_deploy/cimb-47-00621.pdf
+**[S]**), but Japan's item is orange alone, so mandarin, lemon and the
+other citrus are left out. **Guards (real false positives on menus):**
+orange roughy is a deep-sea fish, *Hoplostethus atlanticus*
+(https://www.fishbase.org/summary/334 **[S]**), and orange wine is a
+skin-contact white wine that holds no orange
+(https://www.wine.com/content/article/orange-wine-guide **[M]**). "Orange"
+as a colour (orange peppers, orange lentils) was **not** shown by a source
+to be a real menu false positive and is not guarded.
+
+### 26.7 Beef
+
+**Direct:** beef, veal ("the meat from a calf or young beef animal", USDA
+FSIS, https://www.fsis.usda.gov/es/node/3531 **[S]**), named beef cuts
+(ribeye, sirloin, entrecôte, filet mignon, brisket, oxtail, osso buco)
+and breeds (wagyu, Angus), bresaola (air-dried salted beef,
+https://www.yourdictionary.com/bresaola **[W]**), corned beef and roast
+beef. **Hidden:** steak, burgers, carpaccio and pastrami (cured, spiced,
+smoked beef in the US,
+https://www.mentalfloss.com/food/pastrami-vs-corned-beef-what-is-difference
+**[M]**), Bolognese and ragù (likely; turkey, chicken, tuna and plant
+versions are guards); meatballs, kebab, kofta, gyro, "meat", stock,
+broth, gravy, demi-glace, bone marrow, tallow and gelatin (suspected).
+The main beef allergen, bovine serum albumin (Bos d 6), is also in cow's
+milk, and some beef-allergic people react to milk, veal and beef
+by-products; a consumer page advises reading for beef broth, beef stock,
+bovine gelatin and beef flavouring
+(https://thermofisher.com/phadia/gb/en/resources/allergen-encyclopedia/f27.html
+**[S]** ; https://riteaid.com/health/allergic-reactions-to-beef **[W]**).
+Milk is **not** listed here: the Milk restriction carries it, as for
+alpha-gal (§17.5). Beef allergy (a protein allergy) is not alpha-gal
+syndrome (a sugar), which also covers pork and lamb (§17).
+
+### 26.8 Pork
+
+**Direct:** pork, pig, suckling pig, wild boar, bacon, ham, gammon, lard,
+lardo, lardons, pancetta, guanciale (cured pork jowl,
+https://www.wikipedia.com/wiki/Guanciale **[W]**), prosciutto, jamón,
+porchetta, carnitas, char siu (Chinese barbecued pork), tonkatsu
+(breaded fried pork cutlet, https://en.wikipedia.org/wiki/Tonkatsu
+**[W]**) and tonkotsu (pork-bone broth). **Hidden:** chorizo, mortadella,
+speck, bratwurst, kielbasa, chicharrón and spare ribs (likely); salami,
+pepperoni, sausages, hot dogs, carbonara and amatriciana (guanciale or
+pancetta in the classic recipe) and gelatin (suspected). Consumer
+guidance names ham, bacon, sausage, pork-based broths and gravies,
+gelatin from pork collagen, lard and bacon drippings
+(https://riteaid.com/health/pork-allergy **[W]** ;
+https://livestrong.com/article/330965-what-foods-to-avoid-if-allergic-to-pork
+**[W]**). Pork allergy is often the pork–cat syndrome, a cross-reaction
+of cat and pig serum albumin (https://dx.doi.org/10.20344/amp.15483
+**[S]** ; https://departments.med.virginia.edu/medannual2013/?p=1145
+**[M]**). **Guards:** turkey, beef, duck, goose and chicken bacon, ham,
+salami and sausages (kosher menus print them often); a guinea pig is not
+a pig dish. The kosher and halal follow-up (`vocab_religious.dart`, §24–
+§25) builds a pork list of its own; the two may later share one.
+
+### 26.9 Chicken
+
+**Direct:** chicken, poussin, capon, Cornish hen, coq au vin, *pollo*.
+**Hidden:** wings, nuggets and tenders (likely: chicken unless the menu
+says otherwise); schnitzel (suspected in English; Israel's is "almost
+always" poultry, chicken or turkey,
+https://myjewishlearning.com/the-nosher/how-schnitzel-became-an-israeli-staple
+**[M]** ; https://forward.com/food/132482/foods-of-israel-schnitzel/
+**[M]**); shawarma (suspected: in Israel turkey is the most popular,
+chicken common,
+https://www.tastingtable.com/1150931/the-untraditional-meat-thats-popular-for-israeli-shawarma
+**[M]**); poultry, stock, broth and bouillon (suspected: a clinician "may
+advise avoiding chicken broth",
+https://www.medicalnewstoday.com/articles/323070 **[M]**; chicken
+bouillon is made from chicken bones and meat). **Guards (real false
+positives):** chicken-fried steak is beef fried like chicken; chicken of
+the woods is a mushroom; chicken eggs are eggs, not chicken meat (the
+bird–egg syndrome links the two in some people, but the Eggs restriction
+carries eggs) — **unreviewed** desk knowledge.
+
+### 26.10 Gelatin
+
+**Direct:** gelatin, gelatine, aspic, Jell-O. **Hidden:** gummy sweets,
+marshmallows and panna cotta (likely: gummies and marshmallows are
+"particularly problematic", https://alphagalinformation.org/gelatin
+**[M]**; panna cotta and marshmallow, §17.2); jelly, mousse, no-bake
+cheesecake, trifle, bavarois, terrine and mirror glaze (suspected: set with gelatin in
+many recipes — **unreviewed**). Gelatin comes from pig skin, cattle hide
+and bone, or fish; a fish-gelatin marshmallow has caused anaphylaxis
+(https://www.ovid.com/journals/jaci/pdf/00004483-200903000-00036~anaphylaxis-provoked-by-ingestion-of-marshmallows-containing
+**[S]**), so "fish gelatin" stays a gelatin trigger. Some yogurts hold
+gelatin (https://www.wyndly.com/blogs/learn/gelatin-allergy **[W]**), but a
+restaurant's yogurt sauce rarely does, and listing yogurt would flood
+every labneh and tzatziki: left out. **Guards:** agar, vegan and
+"gelatin-free" lower a hit.
+
+### 26.11 Yam
+
+**What it is:** Japan's *yamaimo* (やまいも), the Japanese mountain yams
+of the genus *Dioscorea*: *nagaimo*, *yamaimo*, *jinenjo*; *tororo* is
+the grated yam (https://www.masterclass.com/articles/tororo-explained
+**[M]**; the Tokyo and Kyoto lists above). **It is not sweet potato**:
+true yams (Dioscoreaceae) and sweet potatoes (morning-glory family) are
+not related, and what a US menu calls "yams" is almost always a sweet
+potato (Library of Congress,
+https://www.loc.gov/everyday-mysteries/agriculture/item/what-is-the-difference-between-sweet-potatoes-and-yams/
+**[S]**). So the bare word "yam" is **not** a trigger (candied yams are
+sweet potato; Thai *yam* is a salad — **unreviewed**), and בטטה is never
+one. **Direct:** yamaimo, nagaimo, jinenjo, tororo, Japanese, Chinese and
+mountain yam. **Hidden:** yamakake (tuna or soba under tororo, likely);
+okonomiyaki, whose batter often holds grated nagaimo, though some recipes
+leave it out (suspected,
+https://www.americastestkitchen.com/recipes/16992-japanese-yam-okonomiyaki
+**[M]** ; https://www.justonecookbook.com/wprm_print/okonomiyaki
+**[W]**); hanpen fish cake, some of which list yamaimo (suspected,
+https://greenbeans.com/products/14971661153141/details **[W]**); purple
+yam and ube (suspected — **unreviewed** whether Japan's item covers
+*D. alata*).
+
+**Sources (26):** as cited inline; every URL above was reached only as a
+search-result excerpt on 2026-10-21.
+
+---
+
 ## Sources
 
 Every URL cited above, grouped by publisher. All were reached only as
