@@ -1122,5 +1122,21 @@
   "restrictionSearchField": "Search restrictions",
   "@restrictionSearchField": {"description": "Banto (issue #342): the label of the picker's search field."},
   "restrictionSearchEmpty": "No restriction matches. You can add it as your own below.",
-  "@restrictionSearchEmpty": {"description": "Banto (issue #342): shown in the picker when the search matches nothing; points to 'Add your own'."}
+  "@restrictionSearchEmpty": {"description": "Banto (issue #342): shown in the picker when the search matches nothing; points to 'Add your own'."},
+  "workedOffer": "This place worked for me",
+  "@workedOffer": {"description": "Banto (#412): the one-line offer after a post-meal save in which every strict concern was cleared. One tap marks the venue on this device. Never a rating."},
+  "workedOfferSkip": "Not now",
+  "@workedOfferSkip": {"description": "Banto (#412): declines the 'This place worked for me' offer and closes the post-meal sheet."},
+  "workedChip": "Worked for me",
+  "@workedChip": {"description": "Banto (#412): the Recent tab's filter chip and the tag on a marked row or menu header when the mark is the person's own. A filter only; never a score."},
+  "workedTagNames": "Worked for {names}",
+  "@workedTagNames": {"description": "Banto (#412): the tag on a marked row or menu header naming the people it worked for (a group, or a named profile).", "placeholders": {"names": {"type": "String"}}},
+  "workedMark": "Mark as worked for me",
+  "@workedMark": {"description": "Banto (#412): the overflow item that marks a venue as having worked for the people the menu is read for."},
+  "workedUnmark": "Remove the \"worked for me\" mark",
+  "@workedUnmark": {"description": "Banto (#412): the overflow item that removes the mark."},
+  "savedStateCount": "{label}: {count}",
+  "@savedStateCount": {"description": "Banto (#411): one state count on a Recent row, such as 'No trigger found: 3'; the label is the verdict tile's own word.", "placeholders": {"label": {"type": "String"}, "count": {"type": "int"}}},
+  "savedRecheck": "Your profile has changed since. Open this menu to check it again.",
+  "@savedRecheck": {"description": "Banto (#411): shown on a Recent row, in place of numbers, when the profile now differs from the one the menu was last counted for."}
 }

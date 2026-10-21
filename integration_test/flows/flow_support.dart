@@ -660,25 +660,28 @@ final class FlowFakeVisitHistoryStore implements VisitHistoryStore {
     int? greenCount,
     int? yellowCount,
     bool openedStrict = false,
+    VisitSnapshot? snapshot,
   }) async {
-    final now = FlowFakeClock().now();
-    final existing = _entries[ref.cacheKey];
-    _entries[ref.cacheKey] = VisitEntry(
-      ref: ref,
-      name: name ?? existing?.name,
-      city: city ?? existing?.city,
-      firstOpenedAt: existing?.firstOpenedAt ?? now,
-      lastOpenedAt: now,
-      openCount: (existing?.openCount ?? 0) + 1,
-      dishCount: dishCount ?? existing?.dishCount,
-      score: score ?? existing?.score,
-      greenCount: greenCount ?? existing?.greenCount,
-      yellowCount: yellowCount ?? existing?.yellowCount,
-      openedStrict: openedStrict || (existing?.openedStrict ?? false),
-      confirmations: existing?.confirmations ?? const <DishConfirmation>[],
-      changeConfirmations:
-          existing?.changeConfirmations ?? const <ChangeConfirmation>[],
+    _entries[ref.cacheKey] = visitAfterOpening(
+      _entries[ref.cacheKey],
+      ref,
+      FlowFakeClock().now(),
+      name: name,
+      city: city,
+      dishCount: dishCount,
+      score: score,
+      greenCount: greenCount,
+      yellowCount: yellowCount,
+      openedStrict: openedStrict,
+      snapshot: snapshot,
     );
+  }
+
+  @override
+  Future<void> setWorkedFor(VenueRef ref, Iterable<String> names) async {
+    final existing = _entries[ref.cacheKey];
+    if (existing == null) return;
+    _entries[ref.cacheKey] = existing.withWorkedFor(names);
   }
 
   @override
@@ -703,21 +706,7 @@ final class FlowFakeVisitHistoryStore implements VisitHistoryStore {
   }) async {
     final existing = _entries[ref.cacheKey];
     if (existing == null) return;
-    _entries[ref.cacheKey] = VisitEntry(
-      ref: existing.ref,
-      name: name,
-      city: city,
-      firstOpenedAt: existing.firstOpenedAt,
-      lastOpenedAt: existing.lastOpenedAt,
-      openCount: existing.openCount,
-      dishCount: existing.dishCount,
-      score: existing.score,
-      greenCount: existing.greenCount,
-      yellowCount: existing.yellowCount,
-      openedStrict: existing.openedStrict,
-      confirmations: existing.confirmations,
-      changeConfirmations: existing.changeConfirmations,
-    );
+    _entries[ref.cacheKey] = existing.renamed(name: name, city: city);
   }
 
   @override

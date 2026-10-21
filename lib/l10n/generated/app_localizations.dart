@@ -3809,6 +3809,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No restriction matches. You can add it as your own below.'**
   String get restrictionSearchEmpty;
+
+  /// Banto (#412): the one-line offer after a post-meal save in which every strict concern was cleared. One tap marks the venue on this device. Never a rating.
+  ///
+  /// In en, this message translates to:
+  /// **'This place worked for me'**
+  String get workedOffer;
+
+  /// Banto (#412): declines the 'This place worked for me' offer and closes the post-meal sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get workedOfferSkip;
+
+  /// Banto (#412): the Recent tab's filter chip and the tag on a marked row or menu header when the mark is the person's own. A filter only; never a score.
+  ///
+  /// In en, this message translates to:
+  /// **'Worked for me'**
+  String get workedChip;
+
+  /// Banto (#412): the tag on a marked row or menu header naming the people it worked for (a group, or a named profile).
+  ///
+  /// In en, this message translates to:
+  /// **'Worked for {names}'**
+  String workedTagNames(String names);
+
+  /// Banto (#412): the overflow item that marks a venue as having worked for the people the menu is read for.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as worked for me'**
+  String get workedMark;
+
+  /// Banto (#412): the overflow item that removes the mark.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove the \"worked for me\" mark'**
+  String get workedUnmark;
+
+  /// Banto (#411): one state count on a Recent row, such as 'No trigger found: 3'; the label is the verdict tile's own word.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {count}'**
+  String savedStateCount(String label, int count);
+
+  /// Banto (#411): shown on a Recent row, in place of numbers, when the profile now differs from the one the menu was last counted for.
+  ///
+  /// In en, this message translates to:
+  /// **'Your profile has changed since. Open this menu to check it again.'**
+  String get savedRecheck;
 }
 
 class _AppLocalizationsDelegate

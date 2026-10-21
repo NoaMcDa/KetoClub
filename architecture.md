@@ -4173,6 +4173,76 @@ Hebrew spellings remain unreviewed), with a new corpus menu,
 `legume_parts_labels.json`, at 23/23 contains and 5/5 may-contain recall;
 the one false alarm on a `free` label is pea's lowered "chick peas".
 
+**The Recent tab per profile, the prompt past the cache, and "Worked for me"
+(ALG-05, ALG-14; #411, #412; amends D23 and D27).** The visit history gains
+seven optional fields on `VisitEntry`, each written only under `bantoMode` and
+only after the menu was read for a profile with a restriction besides keto
+(or, for `workedFor`, after a mark), read tolerantly (a wrong type reads as
+absent and never costs the visit) and left out of the JSON when absent, so a
+keto entry is byte for byte what it was (a test pins the string) and the
+Hive adapter keeps its version. `MenuController.open` records, through one
+`VisitSnapshot`, `fits`, `withChange`, `ask` and `avoid` (the food-only
+`stateCounts`), `profileFingerprint` (eight hex digits of FNV-1a over the
+sorted restriction ids of the union of the active people's profiles; the
+exceptions and the user's own words are not in it) and `strictDishes`: per
+dish with a strict concern found in the dish itself (not the kitchen's
+cross-contact or the restaurant's matrix, which the prompt never asked
+about), its id, its name, the strict restriction ids with where they were
+found (and the words, for the user's own restriction, since its answers are
+keyed by them) and whether it carried a change; at most 200, in menu order.
+An empty list means "read, nothing to ask"; an absent one means "never
+recorded". A later open replaces the snapshot as a whole. Nothing here is
+derived from a verdict stored on the dish: a dish's kind is still computed
+(D21) and no `schemaVersion` moves. **Rows.** With `bantoMode` and a profile
+with a restriction besides keto, a Recent row shows the dish count and the
+four state counts in the verdict tiles' own words ("No trigger found: 4" for a
+strict profile, "Fit: 4" for a flexible one; no new verdict string, never
+"safe") in place of the keto badge and its green and yellow counts; when the
+fingerprint is not the current profile's, or the entry was never counted for
+one, the counts are replaced by one line asking to open the menu again
+(`SavedController.rowKindFor`: keto, states or re-check). A keto-only
+profile, or a build without Banto, keeps today's row exactly. **The prompt
+past the cache.** "Did you ask the staff?" is offered for every strict visit
+that is cached or kept its dish list (`RecentEntry.canAskStaff`); when the
+cache has gone, `ConfirmationController.load` builds the prompt from
+`strictDishes` (`_storedDishes`, the one method added to that controller; the
+live path is untouched and is still preferred while the menu is cached), and
+the answers are keyed by the stored dish id, so the next open of the menu
+finds them exactly as before. A change question is asked for a kept dish that
+carried one. A visit recorded before this field, with nothing cached, still
+reads "no longer on this device". **Worked for me.** `VisitEntry.workedFor`
+holds the profile names (`Me` for the owner's unnamed profile, shown as the
+profile's default name in the UI's language) the venue worked for, at most 8.
+The offer "This place worked for me" is one line in the confirmation sheet
+after a save, shown when the prompt holds at least one strict concern and
+every strict concern is "confirmed absent" or sits on a dish whose change was
+confirmed made (`workedForMeOffered`; a concern not asked, confirmed present
+or only flexible withholds it); one tap marks the people the menu is read
+for, "Not now" closes. The mark is also toggled from the Recent row's
+overflow and the menu header's overflow, and shows as a tag ("Worked for me",
+or "Worked for Dana, Noa" for a group or a named profile) on the row and in
+the header, for the marked people among those the menu is read for. In a
+group the mark is per person: marking adds every active person, and unmarking
+removes only them. The Recent tab's "Worked for me" chip is a filter only: it
+narrows the list and orders and counts nothing, and lets go by itself when
+the last mark goes (D27's non-goal stands: no number, star, score or ranking
+is derived from the marks, a venue is never rated). **None of it leaves the
+device** (D23, D26 C1): `MenuUpload.toJson` is unchanged, a test asserts a
+Banto open under a profile on a marked venue uploads none of the history's
+keys and no restriction name, and "Clear saved menus" clears the marks with
+the history because they are fields of the same entries (#314 is unchanged).
+**What it costs.** `VisitHistoryStore` gains `setWorkedFor` and a `snapshot`
+parameter on `recordVisit`, threaded through four implementations;
+`SavedController` takes the settings store (read only under `bantoMode`) and
+`load` a `bantoMode` flag; an entry written by this build and read by an older
+one simply loses the fields. **What it accepts.** The counts are the
+snapshot of the last open, not recomputed from the cache, so a menu refreshed
+by Discovery's quick score does not move them; a profile that is edited back
+to the one a row was counted for reads its numbers again; a person renamed in
+Settings no longer matches their old mark by name (the mark stays in the
+entry, unshown), and a dish id that a platform reassigns orphans a stored
+dish's answers as it does a cached one's (D27).
+
 ### D27 — Post-meal confirmations, no ratings
 
 *(Banto, the Allergens epic's ALG-14, issue #356. Amends D23's visit

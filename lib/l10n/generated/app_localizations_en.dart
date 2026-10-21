@@ -2405,4 +2405,33 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get restrictionSearchEmpty =>
       'No restriction matches. You can add it as your own below.';
+
+  @override
+  String get workedOffer => 'This place worked for me';
+
+  @override
+  String get workedOfferSkip => 'Not now';
+
+  @override
+  String get workedChip => 'Worked for me';
+
+  @override
+  String workedTagNames(String names) {
+    return 'Worked for $names';
+  }
+
+  @override
+  String get workedMark => 'Mark as worked for me';
+
+  @override
+  String get workedUnmark => 'Remove the \"worked for me\" mark';
+
+  @override
+  String savedStateCount(String label, int count) {
+    return '$label: $count';
+  }
+
+  @override
+  String get savedRecheck =>
+      'Your profile has changed since. Open this menu to check it again.';
 }

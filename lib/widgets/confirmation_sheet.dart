@@ -28,22 +28,56 @@ Key confirmNoteKey(String dishId) => ValueKey<String>('confirmNote_$dishId');
 /// The key of the Save button.
 const Key confirmSaveKey = ValueKey<String>('confirmSave');
 
+/// The key of the "This place worked for me" offer's button.
+const Key workedOfferKey = ValueKey<String>('workedOffer');
+
+/// The key of the offer's "Not now" button.
+const Key workedOfferSkipKey = ValueKey<String>('workedOfferSkip');
+
+/// Whether the saved answers in [controller] earn the one-line "This place
+/// worked for me" offer (Banto, #412): the prompt holds at least one strict
+/// concern, and every strict concern was answered "confirmed absent" or sits
+/// on a dish whose change the kitchen made as asked. A concern left
+/// "didn't ask", or answered present, withholds it, and so does a
+/// restriction that is not strict: the offer follows an allergen being
+/// cleared, never a preference being met. Pure; never a rating (D27).
+bool workedForMeOffered(ConfirmationController controller) {
+  var strictConcerns = 0;
+  for (final item in controller.dishes) {
+    final changed =
+        item.hasChange && controller.changeFor(item.dish.id) == true;
+    for (final concern in item.concerns) {
+      if (!restrictionFor(concern.restrictionId).isStrict) continue;
+      strictConcerns++;
+      final answer = controller.answerFor(item.dish.id, concern);
+      if (answer != ConfirmationAnswer.absent && !changed) return false;
+    }
+  }
+  return strictConcerns > 0;
+}
+
 /// Opens the post-meal prompt (ALG-14) over a controller [create] makes,
 /// capped at the app's sheet width ([showKetoClubSheet]). Completes with
 /// true when the answers were saved and something was written.
 ///
 /// With [bantoMode] off nothing opens and the future completes with false,
 /// so a caller needs no gate of its own.
+///
+/// With [onMarkWorked] given, a save for which [workedForMeOffered] holds
+/// shows the one-line "This place worked for me" offer before closing; one
+/// tap calls [onMarkWorked] (Banto, #412). Null offers nothing.
 Future<bool> showConfirmationSheet(
   BuildContext context, {
   required ConfirmationController Function() create,
   bool bantoMode = BantoMode.enabled,
+  Future<void> Function()? onMarkWorked,
 }) async {
   if (!bantoMode) return false;
   final saved = await showKetoClubSheet<bool>(
     context: context,
     showDragHandle: true,
-    builder: (_) => ConfirmationSheet(create: create),
+    builder: (_) =>
+        ConfirmationSheet(create: create, onMarkWorked: onMarkWorked),
   );
   return saved ?? false;
 }
@@ -60,10 +94,14 @@ Future<bool> showConfirmationSheet(
 /// whether anything was written.
 class ConfirmationSheet extends StatefulWidget {
   /// Creates the prompt over the controller [create] makes.
-  const new({required this.create, super.key});
+  const new({required this.create, this.onMarkWorked, super.key});
 
   /// Makes the prompt's controller, once.
   final ConfirmationController Function() create;
+
+  /// Marks the venue as having worked for the person (Banto, #412), when
+  /// the offer is wanted; null shows no offer.
+  final Future<void> Function()? onMarkWorked;
 
   @override
   State<ConfirmationSheet> createState() => _ConfirmationSheetState();
@@ -72,6 +110,11 @@ class ConfirmationSheet extends StatefulWidget {
 class _ConfirmationSheetState extends State<ConfirmationSheet> {
   late final ConfirmationController _controller;
   bool _saving = false;
+
+  /// Whether the saved prompt gave way to the "worked for me" offer, and
+  /// whether the save wrote anything (what the sheet then pops with).
+  bool _offering = false;
+  bool _wrote = false;
 
   @override
   void initState() {
@@ -93,7 +136,53 @@ class _ConfirmationSheetState extends State<ConfirmationSheet> {
     setState(() => _saving = true);
     final wrote = await _controller.save();
     if (!mounted) return;
+    if (widget.onMarkWorked != null && workedForMeOffered(_controller)) {
+      setState(() {
+        _wrote = wrote;
+        _saving = false;
+        _offering = true;
+      });
+      return;
+    }
     Navigator.of(context).pop(wrote);
+  }
+
+  Future<void> _markWorked() async {
+    setState(() => _saving = true);
+    await widget.onMarkWorked?.call();
+    if (!mounted) return;
+    Navigator.of(context).pop(_wrote);
+  }
+
+  /// The one-line offer that follows a save which cleared every strict
+  /// concern: the saved line, "This place worked for me" and "Not now".
+  Widget _offer(BuildContext context, AppLocalizations l10n, ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(24, 0, 24, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Semantics(
+            header: true,
+            liveRegion: true,
+            child: Text(l10n.confirmSaved, style: theme.textTheme.titleMedium),
+          ),
+          const SizedBox(height: 12),
+          FilledButton(
+            key: workedOfferKey,
+            onPressed: _saving ? null : () => unawaited(_markWorked()),
+            child: Text(l10n.workedOffer),
+          ),
+          const SizedBox(height: 4),
+          TextButton(
+            key: workedOfferSkipKey,
+            onPressed: _saving ? null : () => Navigator.of(context).pop(_wrote),
+            child: Text(l10n.workedOfferSkip),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -101,6 +190,7 @@ class _ConfirmationSheetState extends State<ConfirmationSheet> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final maxHeight = MediaQuery.sizeOf(context).height * 0.85;
+    if (_offering) return SafeArea(child: _offer(context, l10n, theme));
     return ListenableBuilder(
       listenable: _controller,
       builder: (context, _) {

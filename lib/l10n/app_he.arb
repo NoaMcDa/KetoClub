@@ -875,5 +875,13 @@
   "restrictionLegumePartHint": "קטנית אחת בנפרד, לא כל הקטניות",
   "restrictionFavaHint": "חסר G6PD (פביזם), לא אלרגיה. נבדק באותה הקפדה",
   "restrictionSearchField": "חיפוש הגבלה",
-  "restrictionSearchEmpty": "אין הגבלה מתאימה. אפשר להוסיף אותה כמילה משלך למטה."
+  "restrictionSearchEmpty": "אין הגבלה מתאימה. אפשר להוסיף אותה כמילה משלך למטה.",
+  "workedOffer": "המקום הזה עבד לי",
+  "workedOfferSkip": "לא עכשיו",
+  "workedChip": "עבד לי",
+  "workedTagNames": "עבד עבור {names}",
+  "workedMark": "לסמן כמקום שעבד לי",
+  "workedUnmark": "להסיר את הסימון \"עבד לי\"",
+  "savedStateCount": "{label}: {count}",
+  "savedRecheck": "הפרופיל שלך השתנה מאז. אפשר לפתוח את התפריט כדי לבדוק שוב."
 }

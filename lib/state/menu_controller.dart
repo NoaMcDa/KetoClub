@@ -37,6 +37,7 @@ import 'package:ketoclub/utils/profile_wording.dart';
 import 'package:ketoclub/utils/text_normaliser.dart';
 import 'package:ketoclub/utils/venue_route.dart';
 import 'package:ketoclub/utils/verdict_counts.dart';
+import 'package:ketoclub/utils/visit_profile.dart';
 
 /// The state of a user-initiated menu question (architecture.md §9.5;
 /// issue #214).
@@ -189,6 +190,11 @@ final class MenuController extends ChangeNotifier {
   /// [open]; the evaluations carry it ([Confirmations.apply]). Empty for a
   /// venue with none, and read by nothing in a keto-only menu.
   List<DishConfirmation> _confirmations = const <DishConfirmation>[];
+
+  /// The people the open venue "worked for" (Banto, #412), read from its
+  /// visit history entry in [open] and kept in step by [setWorkedForMe].
+  /// Empty for a venue with none; read by nothing in a keto-only menu.
+  List<String> _workedFor = const <String>[];
 
   /// Whether the kitchen made the change asked for on the open venue's
   /// dishes after an earlier meal (ALG-14, D27), read with
@@ -1157,6 +1163,7 @@ final class MenuController extends ChangeNotifier {
     _filter = appSettings.lastFilter ?? _defaultFilter(appSettings.filter);
     _dishNotes = await _notes.readAll(ref);
     final previous = await _history.read(ref);
+    _workedFor = previous?.workedFor ?? const <String>[];
     _confirmations = previous?.confirmations ?? const <DishConfirmation>[];
     _changeConfirmations =
         previous?.changeConfirmations ?? const <ChangeConfirmation>[];
@@ -1253,6 +1260,11 @@ final class MenuController extends ChangeNotifier {
       // What puts the post-meal prompt on the Recent row (ALG-14); never
       // true in a keto build, whose wording is always keto-only.
       openedStrict: wording == ProfileWording.strict,
+      // The Recent row's per-profile counts and strict dishes (#411):
+      // only under a non-keto profile, so a keto entry is as it was.
+      snapshot: wording.usesStates && analysis is MenuAnalysed
+          ? _snapshotOf(menu)
+          : null,
     );
     // The store never lets a null erase a recorded value, so what it now
     // holds is what was written, else what it held before.
@@ -1275,6 +1287,57 @@ final class MenuController extends ChangeNotifier {
     if (analysedByFetch && !fresh) return;
     if (previous != null && !fresh && !newer) return;
     _startUpload(ref, menu, llm);
+  }
+
+  /// What [menu] looked like for [profile] now (Banto, #411): the four
+  /// state counts, the profile's fingerprint and the strict dishes the
+  /// post-meal prompt asks about. Stays on the device with the visit.
+  VisitSnapshot _snapshotOf(Menu menu) {
+    final counts = stateCounts;
+    return VisitSnapshot(
+      fits: counts.green,
+      withChange: counts.yellow,
+      ask: counts.ask,
+      avoid: counts.red,
+      profileFingerprint: profileFingerprintOf(_profile),
+      strictDishes: strictDishesOf(menu, evaluations),
+    );
+  }
+
+  /// Which of the people this menu is read for the open venue "worked
+  /// for" (Banto, #412), by name, in the order they were marked; empty
+  /// without Banto or under a keto-only profile.
+  List<String> get workedForPeople => _bantoMode && wording.usesStates
+      ? markedAmong(_workedFor, _people)
+      : const <String>[];
+
+  /// Whether the open venue is marked as having worked for anyone this
+  /// menu is read for: what puts the tag in the header.
+  bool get isWorkedFor => workedForPeople.isNotEmpty;
+
+  /// Whether the header's overflow offers the mark: a Banto menu read for
+  /// a profile with a restriction besides keto, once it is loaded.
+  bool get canMarkWorked =>
+      _bantoMode && _ref != null && _menu != null && wording.usesStates;
+
+  /// Marks (or unmarks) the open venue as having worked for the people
+  /// this menu is read for (Banto, #412); the other people's marks stay.
+  /// Written to the visit history, on the device only. A no-op before a
+  /// menu is open. Never throws.
+  Future<void> setWorkedForMe({required bool worked}) async {
+    final ref = _ref;
+    if (ref == null || !canMarkWorked) return;
+    final names = <String>[
+      for (final person in _people) workedForNameOf(person),
+    ];
+    final next = <String>[
+      for (final name in _workedFor)
+        if (!names.contains(name)) name,
+      if (worked) ...names,
+    ];
+    await _history.setWorkedFor(ref, next);
+    _workedFor = (await _history.read(ref))?.workedFor ?? next;
+    notifyListeners();
   }
 
   /// Sends [menu] and [analysis] (null when the language model made none)
