@@ -39,7 +39,7 @@ test/fixtures/allergens/
   menus/*.json      one file per menu
 ```
 
-Seventeen menus: five are copied from existing fixtures and twelve are written for the corpus. More than half of the dishes are Hebrew (a Hebrew letter in the name or description); the shape test enforces that and the minimum sizes, so this file states no counts that could go stale.
+Five menus are copied from existing fixtures and the rest are written for the corpus. More than half of the dishes are Hebrew (a Hebrew letter in the name or description); the shape test enforces that and the minimum sizes, so this file states no counts that could go stale.
 
 | File | Source | Language |
 |---|---|---|
@@ -58,6 +58,7 @@ Seventeen menus: five are copied from existing fixtures and twelve are written f
 | `asian_takeaway_soy_peanut.json` | synthetic Thai and Chinese place | en |
 | `us_steakhouse.json` | synthetic steakhouse (Worcestershire, blue cheese) | en |
 | `bakery_lupin_sulphites.json` | synthetic bakery: lupin flour, dried fruit | en |
+| `sensitivities_labels.json` | synthetic mixed menu labelled only for the five heads-up sensitivities (nightshades, MSG, caffeine, salicylates, oral allergy syndrome; 11 §29, 12 §13) | mixed |
 
 The golden menus are copies of their dish texts, never imports: the corpus
 and the golden export (`tool/golden`) are different things. The goldens pin

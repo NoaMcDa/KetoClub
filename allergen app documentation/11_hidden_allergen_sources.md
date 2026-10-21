@@ -1339,6 +1339,188 @@ Obesity Medicine Association, and The Obesity Society." *Am J Clin Nutr*
 
 ---
 
+## 29. Sensitivities: nightshades, MSG, caffeine, salicylates, oral allergy syndrome (issue #342; desk research, brief)
+
+> **Status: unreviewed desk research, checked 2026-10-21 by web search
+> only.** Every page below was reached as a search-result excerpt; opening
+> any of them failed (DNS), so no page was read in full. Not clinical
+> review. All five are heads-up restrictions in the app
+> (`headsUpRestrictions`): a menu never states a dose, the app says only
+> "may be high in …", and a concern never moves a dish. The Hebrew menu
+> words are file 12 §13.
+>
+> **Confirmed in the excerpts:** the nightshade core (tomato, white potato,
+> peppers of every colour including chilli and cayenne, aubergine,
+> tomatillo, goji/golden berry) and that sweet potato is not one
+> (Cleveland Clinic); FDA's rule that added MSG is declared as
+> "monosodium glutamate" and that hydrolysed protein and yeast extract
+> carry glutamate naturally (FDA Q&A); FDA's caffeine ranges per drink and
+> decaf's residual caffeine (FDA; Mayo Clinic); Swain et al. 1985's very
+> high salicylate in curry powder, paprika, thyme, garam masala and
+> rosemary, and salicylate in berries, dried fruit, tea, liquorice,
+> peppermint and some honeys; the birch and ragweed food lists and that
+> cooking usually ends the reaction except for celery and nuts (Columbia
+> University; Stanford; AAAAI Delphi consensus 2024).
+> **Not confirmed:** paprika as a nightshade from a strong source (only
+> lists of weak quality name it; it is ground capsicum, so it is kept);
+> which bouillon cubes hold MSG (Open Food Facts listings disagree, so
+> stock powders are suspected); caffeine in chocolate from USDA directly
+> (a secondary blog quoting USDA FoodData Central); almonds and tomato
+> paste as high-salicylate (consumer and dietetic summaries only,
+> **[weak]**); honey beyond "some honeys" (Swain 1985 abstract).
+
+### 29.1 Nightshades (Solanaceae)
+
+**Regulated:** nowhere; not an allergen class. People avoid the family for
+an intolerance or an autoimmune protocol; Cleveland Clinic says there is
+no proof that nightshades cause inflammation. A true allergy to one of
+them (tomato, potato) is a separate, food-specific allergy.
+
+| Trigger | Certainty | Source |
+|---|---|---|
+| tomato, potato, aubergine/eggplant, peppers (bell, red, green, sweet, hot), chilli, jalapeño, habanero, chipotle, poblano, pimento, cayenne, tomatillo, goji | stated | [Cleveland Clinic, "What's the deal with nightshade vegetables"](https://health.clevelandclinic.org/whats-the-deal-with-nightshade-vegetables/) **[medium]**; [Cleveland Clinic, arthritis and nightshades](https://health.clevelandclinic.org/arthritis-should-you-avoid-nightshade-vegetables) **[medium]** |
+| paprika | stated (ground capsicum) | [UC Davis-hosted list](https://sandbox.dss.ucdavis.edu/complete-list-of-nightshade-vegetables) **[weak]** |
+| ketchup, salsa, marinara, bolognese, arrabbiata, shakshuka, gazpacho, ratatouille, moussaka, baba ganoush, goulash (tomato, aubergine or paprika based) | likely | inferred from the core list |
+| harissa, sriracha, Tabasco, hot sauce, gochujang, sambal (chilli pastes and sauces) | likely | UC Davis-hosted list (names harissa, gochujang, sambal, hot sauce) **[weak]** |
+| fries, hash browns (potato) | likely | inferred |
+| "pepper" alone, gnocchi (often potato), pizza (usually tomato sauce), "spicy" (usually chilli) | suspected | inferred |
+
+**Guards:** sweet potato is a different family (Cleveland Clinic), so
+"sweet" before potato and "sweet potato" before fries lower the trigger;
+black, white, pink and Sichuan pepper are peppercorns, not capsicum
+([Nutrition to Fit](https://nutritiontofit.com/nightshade-vegetables-list/)
+**[weak]**), so they lower "pepper", as do "salt and", "pepper sauce",
+"pepper steak" and "pepper crust" (steakhouse peppercorn dishes). "Pizza
+bianca" has no tomato sauce.
+
+### 29.2 MSG (monosodium glutamate)
+
+**Regulated:** the FDA rates MSG as generally recognised as safe and
+requires added MSG to be listed as "monosodium glutamate"; hydrolysed
+vegetable protein, autolysed yeast and yeast extract contain glutamate
+naturally and are listed under their own names, and a product holding
+them may not claim "No MSG"
+([FDA Q&A on MSG](https://www.fda.gov/food/food-additives-petitions/questions-and-answers-monosodium-glutamate-msg)
+**[strong]**). The EU code is E621. The "MSG symptom complex" has not been
+reproduced under controlled conditions, and the 1968 "Chinese restaurant
+syndrome" label carried bias
+([AARP summary](https://www.aarp.org/health/healthy-living/info-2022/msg-health.html)
+**[medium]**), so the app never infers MSG from a cuisine.
+
+| Trigger | Certainty | Source |
+|---|---|---|
+| MSG, monosodium glutamate, glutamate, E621 | stated | FDA Q&A, above |
+| flavour enhancer (E620–E625 class; MSG the commonest) | likely | FDA Q&A; [Open Food Facts, E621](https://us.openfoodfacts.org/additive/e621-monosodium-glutamate) **[weak]** |
+| stock cube, bouillon, stock or soup powder | suspected (some brands hold E621, some do not) | [Open Food Facts product listings](https://world.openfoodfacts.org/product/7613034189714/bouillon-cube-maggi-mouton-halal) **[weak]** |
+| yeast extract, hydrolysed vegetable protein | suspected (natural glutamate, not added MSG) | FDA Q&A, above |
+
+**Guards:** "no", "without", "no added" before and "free" after ("MSG-free");
+on a Hebrew menu "ללא" before a Latin "MSG".
+
+### 29.3 Caffeine
+
+**Regulated:** the FDA names 400 mg a day as an amount not generally
+linked to harm in healthy adults; caffeine content is mostly unlabelled.
+Per 12 oz (FDA): brewed coffee about 113–247 mg, black tea about 71 mg,
+green tea about 37 mg, caffeinated soft drinks about 23–83 mg, energy
+drinks 41–246 mg
+([FDA, "Spilling the beans"](https://www.fda.gov/consumers/consumer-updates/spilling-beans-how-much-caffeine-too-much)
+**[strong]**). Decaf must have 97% of its caffeine removed and still holds
+roughly 2 mg per cup, more in some samples
+([Mayo Clinic caffeine table](https://www.mayoclinic.org/healthy-lifestyle/nutrition-and-healthy-eating/in-depth/caffeine/art-20049372)
+**[medium]**). Matcha is green tea (about 40–70 mg per teaspoon).
+Chocolate is a low-dose source that scales with cocoa solids: about
+80 mg/100 g dark, 20 mg/100 g milk, none in white chocolate (USDA
+FoodData Central as quoted by
+[Barista Life](https://baristalife.co/blogs/blog/chocolate-caffeine-content)
+**[weak]**).
+
+| Trigger | Certainty | Source |
+|---|---|---|
+| coffee, espresso and its drinks (cappuccino, latte, flat white, americano, macchiato, cortado, mocha, cold brew, affogato), black and green tea, matcha, earl grey, oolong, yerba mate, cola, energy drinks, guarana, "caffeine" | stated | FDA; Mayo Clinic |
+| tea (unspecified: usually black), chai, tiramisu (espresso-soaked) | likely | FDA (tea); inferred (tiramisu) |
+| chocolate, cocoa | suspected (low dose) | USDA via Barista Life **[weak]** |
+
+**Guards:** decaf, decaffeinated and "caffeine-free" lower, never cancel
+(decaf is not zero); herbal, mint, chamomile, rooibos, fruit and ginger
+tea lower "tea" (herbal infusions use no tea leaves: inferred, not
+confirmed in the excerpts); turmeric, golden and beetroot lattes lower
+"latte"; white chocolate lowers "chocolate"; "coffee cake" (US) often has
+no coffee.
+
+### 29.4 Salicylates
+
+> **Unreviewed, weak evidence.** Salicylate sensitivity is diagnosed and
+> managed by specialist dietitians with a staged elimination (the RPAH or
+> FAILSAFE diet), and published food values are scattered and disagree:
+> content changes with ripeness, variety and processing. Every term below
+> is `suspected`; none is direct.
+
+The best primary data is Swain AR, Dutton SP, Truswell AS, "Salicylates in
+foods", *J Am Diet Assoc* 1985;85(8):950–960 (333 foods by HPLC; abstract
+via [Academia.edu](https://independent.academia.edu/SwainAnne) **[medium]**):
+very high in curry powder, paprika, thyme, garam masala and rosemary;
+present in berries and dried fruit, tea, liquorice, peppermint sweets and
+some honeys; negligible in cereals, meat, fish and dairy. UK dietetic
+leaflets agree on the method and that fruit and vegetables are the main
+source
+([Royal Berkshire NHS](https://www.royalberkshire.nhs.uk/media/3vkpur2n/salicylate-sensitivity_sep24.pdf)
+**[medium]**; [BDA](https://bda.uk.com/static/5284c6c5-ee49-43f5-a50cede11ba44e85/Salicylate-Sensitivity-2022.pdf)
+**[medium]**; [RPAH/FAILSAFE guide](https://www.dietvsdisease.org/failsafe-rpah-food-chemical-diet/)
+**[weak]**).
+
+| Trigger | Certainty | Source |
+|---|---|---|
+| curry, garam masala, paprika, thyme, rosemary | suspected | Swain et al. 1985 |
+| mint, peppermint, tea, liquorice, honey | suspected | Swain et al. 1985 |
+| raspberries, blackberries, blueberries, cranberries, berries, raisins, prunes, dried fruit | suspected | Swain et al. 1985; [WebMD](https://www.webmd.com/diet/high-salicylate-foods) **[weak]** |
+| almonds, tomato paste, gherkins, Worcestershire sauce | suspected | Swain et al. 1985 (gherkins); dietetic summaries **[weak]** |
+
+**Guards:** "no" and "without" only. Coffee, cinnamon and cumin were left
+out: the excerpts did not settle them.
+
+### 29.5 Oral allergy syndrome (pollen-food allergy syndrome)
+
+**Regulated:** nowhere. A cross-reaction between pollen proteins and
+heat-labile proteins (mainly PR-10 and profilins) in raw fruit,
+vegetables and some nuts; reactions usually stay in the mouth and throat,
+and prevalence is 2–10.8% by region
+([AAAAI international Delphi consensus, Dec 2024](https://aaaai.org/Aaaai/media/Media-Library-PDFs/Allergist%20Resources/Statements%20and%20Practice%20Parameters/International-Delphi-Consensus-on-Pollen-Food-Allergy-Syndrome-Dec-2024.pdf)
+**[strong]**). Cooking or processing usually prevents it, with **celery
+and nuts the exceptions** (they may still react cooked), and some foods
+(kiwi, hazelnut, celery) can cause systemic reactions
+([Columbia University](https://www.columbiadoctors.org/childrens-health/pediatric-specialties/allergy/treatments-conditions/oral-allergy-syndrome)
+**[medium]**). Cooking is not a guarantee for everyone
+([AAAAI Ask the Expert](https://www.aaaai.org/ask-the-expert/pollen-food-syndrome)
+**[strong]**), which is why a guard lowers and never cancels.
+
+| Trigger | Certainty | Source |
+|---|---|---|
+| birch: apple, almond, carrot, celery, cherry, hazelnut, kiwi, peach, pear, plum | stated | Columbia University |
+| ragweed: banana, cucumber, melon (cantaloupe, honeydew, watermelon), zucchini | stated | Columbia University; [Stanford Health Care handout](https://stanfordhealthcare.org/content/dam/SHC/clinics/menlo-medical-clinic/docs/Allergy/Oral%20Allergy%20Syndrome.pdf) **[medium]** |
+| fruit salad, crudités (raw) | likely | inferred |
+| smoothie, coleslaw (often raw fruit or carrot) | suspected | inferred |
+
+**Guards:** a cooked or processed form beside a fruit or vegetable lowers
+it: baked, cooked, roasted, grilled, stewed, poached, caramelised, fried,
+braised, sautéed, glazed, pickled, candied before; pie, jam, crumble,
+compote, cake, tart, sauce, purée, soup, strudel, chutney, jelly, bread,
+muffin, cider, vinegar, pickle after (Columbia: "cooked or baked … or
+processed fruits such as applesauce"). Celery, hazelnut and almond carry
+no cooking guard. "Cherry tomato" is not a cherry.
+
+**Sources (29):** Cleveland Clinic (nightshades, two pages); FDA (MSG Q&A;
+"Spilling the beans"); Mayo Clinic (caffeine table); Swain AR, Dutton SP,
+Truswell AS, *J Am Diet Assoc* 1985;85:950–960; Royal Berkshire NHS and
+BDA salicylate leaflets; AAAAI Delphi consensus on PFAS (2024, *J Allergy
+Clin Immunol Pract*, doi 10.1016/j.jaip.2024.09.037); Columbia University
+and Stanford Health Care OAS pages; weaker: UC Davis-hosted nightshade
+list, Nutrition to Fit, Open Food Facts, Barista Life (USDA figures),
+WebMD, Diet vs Disease (FAILSAFE). All checked 2026-10-21 as search
+excerpts.
+
+---
+
 ## Sources
 
 Every URL cited above, grouped by publisher. All were reached only as

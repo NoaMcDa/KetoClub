@@ -188,6 +188,14 @@ Set<String> _buildValidSources() {
       out.add('12 §$section.$k');
     }
   });
+  // The sensitivities (issue #342): file 11 §29 and file 12 §13, one
+  // subsection per restriction.
+  for (final section in <String>['11 §29', '12 §13']) {
+    out.add(section);
+    for (var k = 1; k <= 5; k++) {
+      out.add('$section.$k');
+    }
+  }
   return out;
 }
 

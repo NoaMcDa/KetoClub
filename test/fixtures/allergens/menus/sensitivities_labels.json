@@ -1,0 +1,729 @@
+{
+  "_fixture_note": "synthetic mixed menu written for the corpus from 11 §29 and 12 §13 (nightshades, MSG, caffeine, salicylates, oral allergy syndrome); labels only these five heads-up restrictions, so a strict restriction left unlabelled here is not a claim of absence; labels are unreviewed desk research; Hebrew and English",
+  "language": "mixed",
+  "dishes": [
+    {
+      "name": "שקשוקה קלאסית",
+      "description": "ביצים ברוטב עגבניות ופלפלים, לחם בצד",
+      "options": [],
+      "labels": {
+        "nightshades": {
+          "label": "contains",
+          "evidence": "\"עגבניות\", \"פלפלים\" (tomato, peppers)",
+          "source": "12 §13.1"
+        },
+        "caffeine": {
+          "label": "free",
+          "evidence": "no coffee, tea, cola or chocolate named",
+          "source": "12 §13.3"
+        },
+        "oralAllergy": {
+          "label": "free",
+          "evidence": "a cooked dish; no raw fruit named",
+          "source": "12 §13.5"
+        }
+      }
+    },
+    {
+      "name": "סלט ישראלי",
+      "description": "עגבנייה, מלפפון ובצל קצוצים, שמן זית ולימון",
+      "options": [],
+      "labels": {
+        "nightshades": {
+          "label": "contains",
+          "evidence": "\"עגבנייה\" (tomato)",
+          "source": "12 §13.1"
+        },
+        "oralAllergy": {
+          "label": "contains",
+          "evidence": "raw \"מלפפון\" (cucumber, ragweed group)",
+          "source": "12 §13.5"
+        },
+        "msg": {
+          "label": "free",
+          "evidence": "no MSG, stock powder or flavour enhancer named",
+          "source": "12 §13.2"
+        }
+      }
+    },
+    {
+      "name": "צ'יפס בטטה",
+      "description": "בטטה בתנור עם מלח ים",
+      "options": [],
+      "labels": {
+        "nightshades": {
+          "label": "free",
+          "evidence": "guard: \"בטטה\" (sweet potato) is not a nightshade",
+          "source": "12 §13.1"
+        },
+        "oralAllergy": {
+          "label": "free",
+          "evidence": "baked; no raw fruit named",
+          "source": "12 §13.5"
+        }
+      }
+    },
+    {
+      "name": "פסטה שמנת ופלפל שחור",
+      "description": "פנה ברוטב שמנת, פרמזן ופלפל שחור גרוס",
+      "options": [],
+      "labels": {
+        "nightshades": {
+          "label": "free",
+          "evidence": "guard: \"פלפל שחור\" (black pepper) is not a nightshade",
+          "source": "12 §13.1"
+        },
+        "caffeine": {
+          "label": "free",
+          "evidence": "no caffeine source named",
+          "source": "12 §13.3"
+        }
+      }
+    },
+    {
+      "name": "קפה הפוך",
+      "description": "אספרסו כפול עם חלב מוקצף",
+      "options": [],
+      "labels": {
+        "caffeine": {
+          "label": "contains",
+          "evidence": "\"קפה\", \"אספרסו\" (coffee, espresso)",
+          "source": "12 §13.3"
+        }
+      }
+    },
+    {
+      "name": "הפוך נטול קפאין",
+      "description": "קפה נטול קפאין עם חלב מוקצף",
+      "options": [],
+      "labels": {
+        "caffeine": {
+          "label": "may_contain",
+          "evidence": "guard: decaf (\"נטול קפאין\") keeps a little caffeine",
+          "source": "12 §13.3"
+        }
+      }
+    },
+    {
+      "name": "תה צמחים",
+      "description": "חליטת לואיזה ונענע טריות",
+      "options": [],
+      "labels": {
+        "caffeine": {
+          "label": "free",
+          "evidence": "guard: \"תה צמחים\" (herbal tea)",
+          "source": "12 §13.3"
+        },
+        "salicylates": {
+          "label": "may_contain",
+          "evidence": "\"נענע\" (mint)",
+          "source": "12 §13.4"
+        }
+      }
+    },
+    {
+      "name": "תה שחור עם נענע",
+      "description": "כוס תה שחור חם עם עלי נענע",
+      "options": [],
+      "labels": {
+        "caffeine": {
+          "label": "contains",
+          "evidence": "\"תה שחור\" (black tea)",
+          "source": "12 §13.3"
+        },
+        "salicylates": {
+          "label": "may_contain",
+          "evidence": "\"תה\", \"נענע\" (tea, mint)",
+          "source": "12 §13.4"
+        }
+      }
+    },
+    {
+      "name": "טירמיסו",
+      "description": "בישקוטים טבולים באספרסו, מסקרפונה וקקאו",
+      "options": [],
+      "labels": {
+        "caffeine": {
+          "label": "contains",
+          "evidence": "\"אספרסו\" (espresso)",
+          "source": "12 §13.3"
+        }
+      }
+    },
+    {
+      "name": "קולה זירו",
+      "description": "פחית 330 מ\"ל",
+      "options": [],
+      "labels": {
+        "caffeine": {
+          "label": "contains",
+          "evidence": "\"קולה\" (cola)",
+          "source": "12 §13.3"
+        }
+      }
+    },
+    {
+      "name": "עוגת שוקולד",
+      "description": "עוגה בחושה משוקולד מריר וקקאו",
+      "options": [],
+      "labels": {
+        "caffeine": {
+          "label": "may_contain",
+          "evidence": "\"שוקולד\", \"קקאו\": low-dose caffeine",
+          "source": "12 §13.3"
+        }
+      }
+    },
+    {
+      "name": "סלט פירות",
+      "description": "תפוח, אגס, קיווי ובננה טריים",
+      "options": [],
+      "labels": {
+        "oralAllergy": {
+          "label": "contains",
+          "evidence": "raw \"תפוח\", \"אגס\", \"קיווי\", \"בננה\"",
+          "source": "12 §13.5"
+        }
+      }
+    },
+    {
+      "name": "פאי תפוחים",
+      "description": "תפוחים אפויים בבצק פריך עם קינמון",
+      "options": [],
+      "labels": {
+        "oralAllergy": {
+          "label": "free",
+          "evidence": "guard: baked (\"פאי\", \"אפויים\")",
+          "source": "12 §13.5"
+        },
+        "nightshades": {
+          "label": "free",
+          "evidence": "no tomato, potato, aubergine or pepper named",
+          "source": "12 §13.1"
+        }
+      }
+    },
+    {
+      "name": "מרק גזר",
+      "description": "גזר מבושל עם ג'ינג'ר וקרם קוקוס",
+      "options": [],
+      "labels": {
+        "oralAllergy": {
+          "label": "free",
+          "evidence": "guard: cooked (\"מרק\", \"מבושל\")",
+          "source": "12 §13.5"
+        }
+      }
+    },
+    {
+      "name": "סלט גזר וסלרי",
+      "description": "גזר מגורד וסלרי טרי בוויניגרט",
+      "options": [],
+      "labels": {
+        "oralAllergy": {
+          "label": "contains",
+          "evidence": "raw \"גזר\", \"סלרי\" (carrot, celery)",
+          "source": "12 §13.5"
+        }
+      }
+    },
+    {
+      "name": "ירקות מוקפצים",
+      "description": "ירקות ברוטב סויה, ללא תוספת מונוסודיום גלוטמט",
+      "options": [],
+      "labels": {
+        "msg": {
+          "label": "free",
+          "evidence": "guard: \"ללא תוספת\" (no added MSG)",
+          "source": "12 §13.2"
+        }
+      }
+    },
+    {
+      "name": "מרק עוף",
+      "description": "מרק עוף ביתי על בסיס אבקת מרק, עם אטריות",
+      "options": [],
+      "labels": {
+        "msg": {
+          "label": "may_contain",
+          "evidence": "\"אבקת מרק\" (soup powder) may hold MSG",
+          "source": "12 §13.2"
+        },
+        "salicylates": {
+          "label": "free",
+          "evidence": "chicken and noodles: meat and cereals carry negligible salicylate",
+          "source": "12 §13.4"
+        }
+      }
+    },
+    {
+      "name": "נודלס מוקפצים",
+      "description": "נודלס עם ירקות ומשפר טעם (E621)",
+      "options": [],
+      "labels": {
+        "msg": {
+          "label": "contains",
+          "evidence": "\"E621\", \"משפר טעם\" (flavour enhancer)",
+          "source": "12 §13.2"
+        }
+      }
+    },
+    {
+      "name": "מטבוחה",
+      "description": "סלט עגבניות ופלפלים מבושל לאט",
+      "options": [],
+      "labels": {
+        "nightshades": {
+          "label": "contains",
+          "evidence": "\"עגבניות\", \"פלפלים\"; \"מטבוחה\"",
+          "source": "12 §13.1"
+        }
+      }
+    },
+    {
+      "name": "סביח",
+      "description": "פיתה עם חציל מטוגן, ביצה, תפוח אדמה, עמבה וטחינה",
+      "options": [],
+      "labels": {
+        "nightshades": {
+          "label": "contains",
+          "evidence": "\"חציל\", \"תפוח אדמה\" (aubergine, potato)",
+          "source": "12 §13.1"
+        },
+        "oralAllergy": {
+          "label": "free",
+          "evidence": "guard: \"תפוח אדמה\" is a potato, not an apple",
+          "source": "12 §13.5"
+        }
+      }
+    },
+    {
+      "name": "חומוס עם סחוג",
+      "description": "חומוס, שמן זית, סחוג ופטרוזיליה",
+      "options": [],
+      "labels": {
+        "nightshades": {
+          "label": "contains",
+          "evidence": "\"סחוג\" is a chilli paste",
+          "source": "12 §13.1"
+        }
+      }
+    },
+    {
+      "name": "שייק פירות",
+      "description": "בננה, תות ומנגו עם יוגורט",
+      "options": [],
+      "labels": {
+        "oralAllergy": {
+          "label": "contains",
+          "evidence": "raw \"בננה\" (banana, ragweed group)",
+          "source": "12 §13.5"
+        }
+      }
+    },
+    {
+      "name": "טוסט ריבה וגבינה",
+      "description": "לחם קלוי עם ריבת דובדבנים וגבינת שמנת",
+      "options": [],
+      "labels": {
+        "oralAllergy": {
+          "label": "free",
+          "evidence": "guard: jam (\"ריבת\")",
+          "source": "12 §13.5"
+        }
+      }
+    },
+    {
+      "name": "סלט קפרזה",
+      "description": "עגבניות שרי, מוצרלה ובזיליקום",
+      "options": [],
+      "labels": {
+        "nightshades": {
+          "label": "contains",
+          "evidence": "\"עגבניות\" (tomatoes)",
+          "source": "12 §13.1"
+        },
+        "msg": {
+          "label": "free",
+          "evidence": "no MSG named",
+          "source": "12 §13.2"
+        }
+      }
+    },
+    {
+      "name": "עוף בקארי",
+      "description": "עוף בקארי צהוב עם אורז לבן",
+      "options": [],
+      "labels": {
+        "salicylates": {
+          "label": "may_contain",
+          "evidence": "\"קארי\" (curry powder)",
+          "source": "12 §13.4"
+        },
+        "caffeine": {
+          "label": "free",
+          "evidence": "no caffeine source named",
+          "source": "12 §13.3"
+        }
+      }
+    },
+    {
+      "name": "אגוזי לוז קלויים",
+      "description": "קערית אגוזי לוז קלויים ומלוחים",
+      "options": [],
+      "labels": {
+        "oralAllergy": {
+          "label": "may_contain",
+          "evidence": "\"אגוזי לוז\": nuts may react even roasted",
+          "source": "12 §13.5"
+        }
+      }
+    },
+    {
+      "name": "סלט ירוק",
+      "description": "חסה, מלפפון, אבוקדו ונבטים",
+      "options": [],
+      "labels": {
+        "oralAllergy": {
+          "label": "contains",
+          "evidence": "raw \"מלפפון\" (cucumber)",
+          "source": "12 §13.5"
+        },
+        "nightshades": {
+          "label": "free",
+          "evidence": "no tomato, potato, aubergine or pepper named",
+          "source": "12 §13.1"
+        }
+      }
+    },
+    {
+      "name": "דג על הגריל",
+      "description": "פילה דג עם לימון ועשבי תיבול, ירוקים בצד",
+      "options": [],
+      "labels": {
+        "nightshades": {
+          "label": "free",
+          "evidence": "no nightshade named",
+          "source": "12 §13.1"
+        },
+        "msg": {
+          "label": "free",
+          "evidence": "no MSG named",
+          "source": "12 §13.2"
+        },
+        "caffeine": {
+          "label": "free",
+          "evidence": "no caffeine source named",
+          "source": "12 §13.3"
+        },
+        "oralAllergy": {
+          "label": "free",
+          "evidence": "no raw fruit or vegetable from the pollen lists named",
+          "source": "12 §13.5"
+        }
+      }
+    },
+    {
+      "name": "סטייק אנטריקוט",
+      "description": "עם מלח גס ופלפל שחור גרוס",
+      "options": [],
+      "labels": {
+        "nightshades": {
+          "label": "free",
+          "evidence": "guard: \"פלפל שחור\" (black pepper)",
+          "source": "12 §13.1"
+        },
+        "oralAllergy": {
+          "label": "free",
+          "evidence": "no raw fruit named",
+          "source": "12 §13.5"
+        }
+      }
+    },
+    {
+      "name": "Patatas bravas",
+      "description": "fried potatoes with spicy tomato sauce and aioli",
+      "options": [],
+      "labels": {
+        "nightshades": {
+          "label": "contains",
+          "evidence": "\"potatoes\", \"tomato\"",
+          "source": "11 §29.1"
+        }
+      }
+    },
+    {
+      "name": "Sweet potato fries",
+      "description": "oven baked, sea salt",
+      "options": [],
+      "labels": {
+        "nightshades": {
+          "label": "free",
+          "evidence": "guard: \"sweet potato\" is not a nightshade",
+          "source": "11 §29.1"
+        },
+        "oralAllergy": {
+          "label": "free",
+          "evidence": "baked; no raw fruit named",
+          "source": "11 §29.5"
+        }
+      }
+    },
+    {
+      "name": "Pepper steak",
+      "description": "sirloin with a cracked black pepper crust, green salad",
+      "options": [],
+      "labels": {
+        "nightshades": {
+          "label": "free",
+          "evidence": "guard: black peppercorn, not capsicum",
+          "source": "11 §29.1"
+        },
+        "caffeine": {
+          "label": "free",
+          "evidence": "no caffeine source named",
+          "source": "11 §29.3"
+        }
+      }
+    },
+    {
+      "name": "Stuffed bell peppers",
+      "description": "bell peppers filled with rice and herbs",
+      "options": [],
+      "labels": {
+        "nightshades": {
+          "label": "contains",
+          "evidence": "\"bell peppers\"",
+          "source": "11 §29.1"
+        }
+      }
+    },
+    {
+      "name": "Flat white",
+      "description": "double shot, steamed milk",
+      "options": [],
+      "labels": {
+        "caffeine": {
+          "label": "contains",
+          "evidence": "\"flat white\" is an espresso drink",
+          "source": "11 §29.3"
+        }
+      }
+    },
+    {
+      "name": "Decaf cappuccino",
+      "description": "decaffeinated espresso, milk foam",
+      "options": [],
+      "labels": {
+        "caffeine": {
+          "label": "may_contain",
+          "evidence": "guard: decaf keeps a little caffeine",
+          "source": "11 §29.3"
+        }
+      }
+    },
+    {
+      "name": "Peppermint tea",
+      "description": "loose-leaf, caffeine-free",
+      "options": [],
+      "labels": {
+        "caffeine": {
+          "label": "free",
+          "evidence": "guard: \"peppermint tea\", \"caffeine-free\"",
+          "source": "11 §29.3"
+        },
+        "salicylates": {
+          "label": "may_contain",
+          "evidence": "\"peppermint\"",
+          "source": "11 §29.4"
+        }
+      }
+    },
+    {
+      "name": "Iced matcha latte",
+      "description": "ceremonial matcha, oat milk, ice",
+      "options": [],
+      "labels": {
+        "caffeine": {
+          "label": "contains",
+          "evidence": "\"matcha\" is green tea",
+          "source": "11 §29.3"
+        }
+      }
+    },
+    {
+      "name": "Turmeric latte",
+      "description": "oat milk, turmeric, cinnamon and black pepper",
+      "options": [],
+      "labels": {
+        "caffeine": {
+          "label": "free",
+          "evidence": "guard: \"turmeric latte\" has no coffee",
+          "source": "11 §29.3"
+        },
+        "nightshades": {
+          "label": "free",
+          "evidence": "guard: \"black pepper\"",
+          "source": "11 §29.1"
+        }
+      }
+    },
+    {
+      "name": "Chicken noodle soup",
+      "description": "made with house stock, no MSG",
+      "options": [],
+      "labels": {
+        "msg": {
+          "label": "free",
+          "evidence": "guard: \"no MSG\"",
+          "source": "11 §29.2"
+        }
+      }
+    },
+    {
+      "name": "Egg fried rice",
+      "description": "wok-fried rice with egg, scallions and flavour enhancer (E621)",
+      "options": [],
+      "labels": {
+        "msg": {
+          "label": "contains",
+          "evidence": "\"E621\", \"flavour enhancer\"",
+          "source": "11 §29.2"
+        },
+        "salicylates": {
+          "label": "free",
+          "evidence": "rice and egg: cereals and eggs carry negligible salicylate",
+          "source": "11 §29.4"
+        }
+      }
+    },
+    {
+      "name": "Miso ramen",
+      "description": "miso broth with yeast extract, corn and bean sprouts",
+      "options": [],
+      "labels": {
+        "msg": {
+          "label": "may_contain",
+          "evidence": "\"yeast extract\" carries free glutamate",
+          "source": "11 §29.2"
+        }
+      }
+    },
+    {
+      "name": "Apple and celery salad",
+      "description": "raw apple, celery, walnuts, yogurt dressing",
+      "options": [],
+      "labels": {
+        "oralAllergy": {
+          "label": "contains",
+          "evidence": "raw \"apple\", \"celery\"",
+          "source": "11 §29.5"
+        }
+      }
+    },
+    {
+      "name": "Baked apple crumble",
+      "description": "baked apples, oat crumble, custard",
+      "options": [],
+      "labels": {
+        "oralAllergy": {
+          "label": "free",
+          "evidence": "guard: baked (\"apple crumble\", \"baked apples\")",
+          "source": "11 §29.5"
+        }
+      }
+    },
+    {
+      "name": "Mixed berry pavlova",
+      "description": "meringue, raspberries, blueberries, whipped cream",
+      "options": [],
+      "labels": {
+        "salicylates": {
+          "label": "may_contain",
+          "evidence": "\"raspberries\", \"blueberries\"",
+          "source": "11 §29.4"
+        },
+        "caffeine": {
+          "label": "free",
+          "evidence": "no caffeine source named",
+          "source": "11 §29.3"
+        }
+      }
+    },
+    {
+      "name": "Honey glazed salmon",
+      "description": "salmon, honey soy glaze, rosemary potatoes",
+      "options": [],
+      "labels": {
+        "salicylates": {
+          "label": "may_contain",
+          "evidence": "\"honey\", \"rosemary\"",
+          "source": "11 §29.4"
+        },
+        "nightshades": {
+          "label": "contains",
+          "evidence": "\"potatoes\"",
+          "source": "11 §29.1"
+        }
+      }
+    },
+    {
+      "name": "Garden salad",
+      "description": "lettuce, cucumber, radish, lemon dressing",
+      "options": [],
+      "labels": {
+        "oralAllergy": {
+          "label": "contains",
+          "evidence": "raw \"cucumber\"",
+          "source": "11 §29.5"
+        },
+        "nightshades": {
+          "label": "free",
+          "evidence": "no nightshade named",
+          "source": "11 §29.1"
+        }
+      }
+    },
+    {
+      "name": "Carrot cake",
+      "description": "spiced carrot cake with cream cheese frosting",
+      "options": [],
+      "labels": {
+        "oralAllergy": {
+          "label": "free",
+          "evidence": "guard: baked (\"carrot cake\")",
+          "source": "11 §29.5"
+        }
+      }
+    },
+    {
+      "name": "Melon and prosciutto",
+      "description": "chilled cantaloupe with prosciutto",
+      "options": [],
+      "labels": {
+        "oralAllergy": {
+          "label": "contains",
+          "evidence": "raw \"melon\", \"cantaloupe\"",
+          "source": "11 §29.5"
+        }
+      }
+    },
+    {
+      "name": "Grilled zucchini",
+      "description": "grilled zucchini with mint and feta",
+      "options": [],
+      "labels": {
+        "oralAllergy": {
+          "label": "free",
+          "evidence": "guard: \"grilled zucchini\"",
+          "source": "11 §29.5"
+        },
+        "salicylates": {
+          "label": "may_contain",
+          "evidence": "\"mint\"",
+          "source": "11 §29.4"
+        }
+      }
+    }
+  ]
+}

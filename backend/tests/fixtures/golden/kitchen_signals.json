@@ -6675,6 +6675,530 @@
           {
             "dishes": [
               {
+                "description": "ביצים ברוטב עגבניות ופלפלים, לחם בצד",
+                "id": "k1",
+                "imageUrl": null,
+                "name": "שקשוקה קלאסית",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "עגבנייה, מלפפון ובצל קצוצים, שמן זית ולימון",
+                "id": "k2",
+                "imageUrl": null,
+                "name": "סלט ישראלי",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "בטטה בתנור עם מלח ים",
+                "id": "k3",
+                "imageUrl": null,
+                "name": "צ'יפס בטטה",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "פנה ברוטב שמנת, פרמזן ופלפל שחור גרוס",
+                "id": "k4",
+                "imageUrl": null,
+                "name": "פסטה שמנת ופלפל שחור",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "אספרסו כפול עם חלב מוקצף",
+                "id": "k5",
+                "imageUrl": null,
+                "name": "קפה הפוך",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "קפה נטול קפאין עם חלב מוקצף",
+                "id": "k6",
+                "imageUrl": null,
+                "name": "הפוך נטול קפאין",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "חליטת לואיזה ונענע טריות",
+                "id": "k7",
+                "imageUrl": null,
+                "name": "תה צמחים",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "כוס תה שחור חם עם עלי נענע",
+                "id": "k8",
+                "imageUrl": null,
+                "name": "תה שחור עם נענע",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "בישקוטים טבולים באספרסו, מסקרפונה וקקאו",
+                "id": "k9",
+                "imageUrl": null,
+                "name": "טירמיסו",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "פחית 330 מ\"ל",
+                "id": "k10",
+                "imageUrl": null,
+                "name": "קולה זירו",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "עוגה בחושה משוקולד מריר וקקאו",
+                "id": "k11",
+                "imageUrl": null,
+                "name": "עוגת שוקולד",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "תפוח, אגס, קיווי ובננה טריים",
+                "id": "k12",
+                "imageUrl": null,
+                "name": "סלט פירות",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "תפוחים אפויים בבצק פריך עם קינמון",
+                "id": "k13",
+                "imageUrl": null,
+                "name": "פאי תפוחים",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "גזר מבושל עם ג'ינג'ר וקרם קוקוס",
+                "id": "k14",
+                "imageUrl": null,
+                "name": "מרק גזר",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "גזר מגורד וסלרי טרי בוויניגרט",
+                "id": "k15",
+                "imageUrl": null,
+                "name": "סלט גזר וסלרי",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "ירקות ברוטב סויה, ללא תוספת מונוסודיום גלוטמט",
+                "id": "k16",
+                "imageUrl": null,
+                "name": "ירקות מוקפצים",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "מרק עוף ביתי על בסיס אבקת מרק, עם אטריות",
+                "id": "k17",
+                "imageUrl": null,
+                "name": "מרק עוף",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "נודלס עם ירקות ומשפר טעם (E621)",
+                "id": "k18",
+                "imageUrl": null,
+                "name": "נודלס מוקפצים",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "סלט עגבניות ופלפלים מבושל לאט",
+                "id": "k19",
+                "imageUrl": null,
+                "name": "מטבוחה",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "פיתה עם חציל מטוגן, ביצה, תפוח אדמה, עמבה וטחינה",
+                "id": "k20",
+                "imageUrl": null,
+                "name": "סביח",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "חומוס, שמן זית, סחוג ופטרוזיליה",
+                "id": "k21",
+                "imageUrl": null,
+                "name": "חומוס עם סחוג",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "בננה, תות ומנגו עם יוגורט",
+                "id": "k22",
+                "imageUrl": null,
+                "name": "שייק פירות",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "לחם קלוי עם ריבת דובדבנים וגבינת שמנת",
+                "id": "k23",
+                "imageUrl": null,
+                "name": "טוסט ריבה וגבינה",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "עגבניות שרי, מוצרלה ובזיליקום",
+                "id": "k24",
+                "imageUrl": null,
+                "name": "סלט קפרזה",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "עוף בקארי צהוב עם אורז לבן",
+                "id": "k25",
+                "imageUrl": null,
+                "name": "עוף בקארי",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "קערית אגוזי לוז קלויים ומלוחים",
+                "id": "k26",
+                "imageUrl": null,
+                "name": "אגוזי לוז קלויים",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "חסה, מלפפון, אבוקדו ונבטים",
+                "id": "k27",
+                "imageUrl": null,
+                "name": "סלט ירוק",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "פילה דג עם לימון ועשבי תיבול, ירוקים בצד",
+                "id": "k28",
+                "imageUrl": null,
+                "name": "דג על הגריל",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "עם מלח גס ופלפל שחור גרוס",
+                "id": "k29",
+                "imageUrl": null,
+                "name": "סטייק אנטריקוט",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "fried potatoes with spicy tomato sauce and aioli",
+                "id": "k30",
+                "imageUrl": null,
+                "name": "Patatas bravas",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "oven baked, sea salt",
+                "id": "k31",
+                "imageUrl": null,
+                "name": "Sweet potato fries",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "sirloin with a cracked black pepper crust, green salad",
+                "id": "k32",
+                "imageUrl": null,
+                "name": "Pepper steak",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "bell peppers filled with rice and herbs",
+                "id": "k33",
+                "imageUrl": null,
+                "name": "Stuffed bell peppers",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "double shot, steamed milk",
+                "id": "k34",
+                "imageUrl": null,
+                "name": "Flat white",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "decaffeinated espresso, milk foam",
+                "id": "k35",
+                "imageUrl": null,
+                "name": "Decaf cappuccino",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "loose-leaf, caffeine-free",
+                "id": "k36",
+                "imageUrl": null,
+                "name": "Peppermint tea",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "ceremonial matcha, oat milk, ice",
+                "id": "k37",
+                "imageUrl": null,
+                "name": "Iced matcha latte",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "oat milk, turmeric, cinnamon and black pepper",
+                "id": "k38",
+                "imageUrl": null,
+                "name": "Turmeric latte",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "made with house stock, no MSG",
+                "id": "k39",
+                "imageUrl": null,
+                "name": "Chicken noodle soup",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "wok-fried rice with egg, scallions and flavour enhancer (E621)",
+                "id": "k40",
+                "imageUrl": null,
+                "name": "Egg fried rice",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "miso broth with yeast extract, corn and bean sprouts",
+                "id": "k41",
+                "imageUrl": null,
+                "name": "Miso ramen",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "raw apple, celery, walnuts, yogurt dressing",
+                "id": "k42",
+                "imageUrl": null,
+                "name": "Apple and celery salad",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "baked apples, oat crumble, custard",
+                "id": "k43",
+                "imageUrl": null,
+                "name": "Baked apple crumble",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "meringue, raspberries, blueberries, whipped cream",
+                "id": "k44",
+                "imageUrl": null,
+                "name": "Mixed berry pavlova",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "salmon, honey soy glaze, rosemary potatoes",
+                "id": "k45",
+                "imageUrl": null,
+                "name": "Honey glazed salmon",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "lettuce, cucumber, radish, lemon dressing",
+                "id": "k46",
+                "imageUrl": null,
+                "name": "Garden salad",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "spiced carrot cake with cream cheese frosting",
+                "id": "k47",
+                "imageUrl": null,
+                "name": "Carrot cake",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "chilled cantaloupe with prosciutto",
+                "id": "k48",
+                "imageUrl": null,
+                "name": "Melon and prosciutto",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "grilled zucchini with mint and feta",
+                "id": "k49",
+                "imageUrl": null,
+                "name": "Grilled zucchini",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              }
+            ],
+            "id": "sensitivities_labels",
+            "name": "Menu"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "sensitivities_labels",
+          "source": "scan"
+        }
+      },
+      "name": "sensitivities_labels",
+      "signals": [
+        {
+          "evidence": [
+            "צ'יפס בטטה",
+            "סביח",
+            "Patatas bravas"
+          ],
+          "kind": "fryer",
+          "questionEn": "Do the fried dishes share a fryer or frying oil with breaded or battered ones?",
+          "questionHe": "האם המנות המטוגנות מטוגנות באותו שמן או באותה מטגנת עם מנות בציפוי או בבלילה?",
+          "threatens": [
+            "wheat",
+            "gluten"
+          ]
+        },
+        {
+          "evidence": [
+            "ירקות מוקפצים",
+            "נודלס מוקפצים",
+            "Egg fried rice"
+          ],
+          "kind": "wok",
+          "questionEn": "Is the wok shared between dishes, and is it cleaned between orders?",
+          "questionHe": "האם אותו ווק משמש למנות שונות, והאם מנקים אותו בין הזמנות?",
+          "threatens": [
+            "peanuts",
+            "soy",
+            "wheat",
+            "gluten",
+            "crustaceans",
+            "molluscs",
+            "sesame"
+          ]
+        },
+        {
+          "evidence": [
+            "שקשוקה קלאסית",
+            "עוגת שוקולד",
+            "פאי תפוחים"
+          ],
+          "kind": "bakery",
+          "questionEn": "Is flour or bread handled on the surfaces where other dishes are prepared?",
+          "questionHe": "האם מכינים מנות אחרות על אותם משטחים שבהם עובדים עם קמח או לחם?",
+          "threatens": [
+            "milk",
+            "eggs",
+            "wheat",
+            "gluten",
+            "sesame"
+          ]
+        },
+        {
+          "evidence": [
+            "סביח"
+          ],
+          "kind": "sesame",
+          "questionEn": "Are sesame or tahini used on shared surfaces or utensils, and can my dish be prepared without them?",
+          "questionHe": "האם משתמשים בשומשום או בטחינה על משטחים או כלים משותפים, ואפשר להכין את המנה שלי בלעדיהם?",
+          "threatens": [
+            "sesame"
+          ]
+        }
+      ]
+    },
+    {
+      "menu": {
+        "categories": [
+          {
+            "dishes": [
+              {
                 "description": "Three pieces, buttermilk-brined and hand-breaded, cooked in the same fryer as our fries and onion rings",
                 "id": "k1",
                 "imageUrl": null,
