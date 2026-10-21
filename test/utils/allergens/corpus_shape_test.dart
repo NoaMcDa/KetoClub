@@ -21,9 +21,9 @@ const String _menusDir = 'test/fixtures/allergens/menus';
 /// A decoded JSON object.
 typedef _Json = Map<String, Object?>;
 
-// TODO(ALG-01a): switch to RestrictionId.values once merged
 /// The restriction ids a label may be keyed by, spelled exactly as the
-/// `RestrictionId` enum will spell them.
+/// `RestrictionId` enum spells them. `custom` (the user's own words) is left
+/// out: it is never labelled.
 const List<String> _restrictionIds = <String>[
   'peanuts',
   'treeNuts',
@@ -106,12 +106,6 @@ const Set<String> _flexibleIds = <String>{
   'jain',
   'keto',
 };
-
-/// The strict research restrictions (issue #342) whose vocabularies are
-/// still empty, so the corpus carries no labels for them yet and the
-/// "three contains labels" floor does not apply. Each vocabulary
-/// follow-up adds its labels and removes its ids from this set.
-const Set<String> _awaitingLabels = <String>{};
 
 /// The values of a label's `label` key.
 const Set<String> _labelValues = <String>{'contains', 'may_contain', 'free'};
@@ -574,9 +568,7 @@ void main() {
           '  ${id.padRight(12)} ${'$contains'.padLeft(8)}  '
           '${'$free'.padLeft(4)}',
         );
-        if (!_flexibleIds.contains(id) &&
-            !_awaitingLabels.contains(id) &&
-            contains < 3) {
+        if (!_flexibleIds.contains(id) && contains < 3) {
           short.add('$id has $contains');
         }
       }

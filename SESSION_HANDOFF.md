@@ -93,12 +93,12 @@ real device run.
 ## 5. Follow-ups worth filing as issues
 
 From `docs/VISUAL_AUDIT.md` (product decisions, not bugs):
-- Bundle a Hebrew font: on web, Hebrew renders as empty boxes whenever
-  `fonts.gstatic.com` is unreachable.
+- ~~Bundle a Hebrew font~~ Resolved by D20 (G7): Noto Sans Hebrew is bundled.
 - The artboard's floating "Waiter card · N dishes" pill
   (`WaiterCardSheet.forRows` has no caller) and the menu's hero photo band.
-- Whole-shekel prices (`price_format_test` pins two decimals).
-- The rules banner and the engine chip say the same thing twice.
+- ~~Whole-shekel prices~~ Resolved by D20 (M12): prices are whole shekels.
+- ~~The rules banner and the engine chip say the same thing twice~~ Resolved
+  by D20 (M14): the menu screen shows the banner and not the chip.
 - "Show the keto menu" turns on for any bare word (a bare word parses as a
   Wolt slug).
 - The Settings artboard's key/model section predates D12; regenerate it.
