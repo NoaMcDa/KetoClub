@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/utils/allergens/vocabulary.dart';
 import 'package:ketoclub/utils/classification_rules.dart';
 
 /// A dish with [name], [description] and [options].
@@ -281,6 +282,116 @@ void main() {
 
       // Act / Assert
       expect(() => concerns.add(concerns.first), throwsUnsupportedError);
+    });
+  });
+
+  group('kosher meat with dairy (#342)', () {
+    /// The meat-with-dairy findings of [dish]: certainty, source, words.
+    List<(Certainty, ConcernSource, String?)> combined(Dish dish) => [
+      for (final concern in ClassificationRules.allergenFindings(dish))
+        if (ClassificationRules.isMeatWithDairy(concern))
+          (concern.certainty, concern.source, concern.matchedText),
+    ];
+
+    final table = <(String, Dish, List<(Certainty, ConcernSource, String?)>)>[
+      (
+        'meat and cheese both stated',
+        _dish('Ribeye steak', description: 'Blue cheese butter'),
+        [(Certainty.stated, ConcernSource.description, 'Ribeye + cheese')],
+      ),
+      (
+        'poultry counts as meat',
+        _dish('Chicken schnitzel', description: 'In a cream sauce'),
+        [(Certainty.stated, ConcernSource.description, 'Chicken + cream')],
+      ),
+      (
+        'Hebrew, with prefix letters kept as printed',
+        _dish('שניצל עוף', description: 'ברוטב שמנת'),
+        [(Certainty.stated, ConcernSource.description, 'שניצל + שמנת')],
+      ),
+      (
+        'a likely dairy sauce is suspected, from the hidden source',
+        _dish('Chicken alfredo'),
+        [(Certainty.suspected, ConcernSource.hidden, 'Chicken + alfredo')],
+      ),
+      (
+        'dairy only in an option is suspected, from the option',
+        _dish('Beef burger', options: _extras(<String>['Cheddar'])),
+        [(Certainty.suspected, ConcernSource.option, 'Beef + Cheddar')],
+      ),
+      (
+        'a removal option is not dairy',
+        _dish('Beef burger', options: _extras(<String>['No cheese'])),
+        [],
+      ),
+      ('fish with cream is never flagged', _dish('Salmon in cream sauce'), []),
+      (
+        'Hebrew fish with butter is never flagged',
+        _dish('פילה לברק', description: 'ברוטב חמאה ולימון'),
+        [],
+      ),
+      (
+        'a guarded meat word never counts',
+        _dish('Veggie burger', description: 'With cheddar'),
+        [],
+      ),
+      (
+        'a guarded dairy word never counts',
+        _dish('Chicken curry', description: 'Coconut milk'),
+        [],
+      ),
+      ('goat cheese is not goat meat', _dish('Goat cheese salad'), []),
+      (
+        'a negated dairy word never counts',
+        _dish('Steak', description: 'No cheese'),
+        [],
+      ),
+      (
+        "milk's own suspected steak-butter guess is not dairy",
+        _dish('Steak frites'),
+        [],
+      ),
+    ];
+    for (final (label, dish, expected) in table) {
+      test(label, () => expect(combined(dish), expected));
+    }
+
+    test('its parts split back into the meat and the dairy words', () {
+      final concern = ClassificationRules.allergenFindings(
+        _dish('Ribeye', description: 'With butter'),
+      ).firstWhere(ClassificationRules.isMeatWithDairy);
+      expect(ClassificationRules.meatWithDairyParts(concern), (
+        meat: 'Ribeye',
+        dairy: 'butter',
+      ));
+      expect(
+        ClassificationRules.meatWithDairyParts(
+          const Concern(
+            restrictionId: RestrictionId.kosher,
+            source: ConcernSource.name,
+            certainty: Certainty.stated,
+            tier: EvidenceTier.stated,
+            matchedText: 'Pork',
+          ),
+        ),
+        isNull,
+      );
+    });
+
+    test("the user's own words never run the rule", () {
+      final findings = ClassificationRules.allergenFindings(
+        _dish('Ribeye', description: 'With butter'),
+        vocabulary: const <RestrictionId, RestrictionVocabulary>{},
+      );
+      expect(findings, isEmpty);
+    });
+
+    test('allergenConcerns keeps the surest kosher finding', () {
+      final concerns = ClassificationRules.allergenConcerns(
+        _dish('Bacon cheeseburger'),
+      );
+      expect(_for(concerns, RestrictionId.kosher)?.matchedText, 'Bacon');
+      expect(_for(concerns, RestrictionId.halal)?.matchedText, 'Bacon');
     });
   });
 }

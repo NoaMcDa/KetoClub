@@ -3750,6 +3750,24 @@ abstract class AppLocalizations {
   /// **'On {date} the staff did not make the change you asked for.'**
   String whyChangeNotHonouredOn(DateTime date);
 
+  /// Banto (#342): the picker's and onboarding's group heading over kosher, halal and Jain, and their kind label in Settings. Names no certification.
+  ///
+  /// In en, this message translates to:
+  /// **'Religious diet'**
+  String get restrictionKindReligious;
+
+  /// Banto (#342): the picker's hint under kosher. The app flags components only and never says a dish or a kitchen is kosher; must not contain the word kosher.
+  ///
+  /// In en, this message translates to:
+  /// **'Flags pork, shellfish and meat with dairy in the menu\'s words. Ask the restaurant about its certificate'**
+  String get restrictionKosherHint;
+
+  /// Banto (#342): the picker's hint under halal. The app flags components only and never says a dish or a kitchen is halal; must not contain the word halal.
+  ///
+  /// In en, this message translates to:
+  /// **'Flags pork, alcohol, gelatin and blood in the menu\'s words. Ask the restaurant about its certificate'**
+  String get restrictionHalalHint;
+
   /// Banto (issue #342): the picker's kind label of a strict restriction that is a health condition and not an allergy (fava beans for G6PD deficiency). Never 'safe'.
   ///
   /// In en, this message translates to:

@@ -18,6 +18,7 @@ from app.keto import declarations as dc
 from app.keto.declarations import (
     DeclarationPolarity,
     DeclarationSource,
+    declarations_in_text,
     declarations_of,
     declarations_of_tags,
     declares_kosher,
@@ -109,4 +110,20 @@ def test_a_tag_is_read_through_the_text_table_with_its_own_spelling() -> None:
             "matchedText": "GLUTEN_FREE",
         }
     ]
-    assert declarations_of_tags(["kosher"]) == []
+    # Kosher and halal (#342) are declared by a tag only, and one never
+    # speaks for the other.
+    assert [d.to_json() for d in declarations_of_tags(["kosher"])] == [
+        {
+            "rule": "kosher",
+            "restrictionIds": ["kosher"],
+            "polarity": "absent",
+            "source": "platformTag",
+            "matchedText": "kosher",
+        }
+    ]
+    assert [d.rule for d in declarations_of_tags(["חלאל"])] == ["halal"]
+
+
+def test_menu_text_never_declares_kosher_or_halal() -> None:
+    found = declarations_in_text("Kosher halal steak", DeclarationSource.DISH_TEXT)
+    assert found == []

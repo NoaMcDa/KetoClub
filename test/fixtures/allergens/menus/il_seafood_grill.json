@@ -29,6 +29,16 @@
           "role": "protein",
           "evidence": "fish/shellfish: \"דניס\" (sea bream)",
           "source": "12 §1.7"
+        },
+        "kosher": {
+          "label": "free",
+          "evidence": "a whole bream: a fish with fins and scales, no dairy",
+          "source": "11 §24.2"
+        },
+        "halal": {
+          "label": "free",
+          "evidence": "grilled fish with olive oil and lemon",
+          "source": "11 §25.1"
         }
       }
     },
@@ -126,6 +136,11 @@
           "role": "protein",
           "evidence": "fish/shellfish: \"לברק\" (sea bass)",
           "source": "12 §1.7"
+        },
+        "kosher": {
+          "label": "free",
+          "evidence": "fish with butter is not meat with dairy",
+          "source": "11 §24.5"
         }
       }
     },
@@ -249,6 +264,18 @@
           "role": "protein",
           "evidence": "fish/shellfish: \"שרימפס\"",
           "source": "12 §1.7"
+        },
+        "kosher": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"שרימפס\"",
+          "source": "12 §9.2"
+        },
+        "halal": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"ויין לבן\"",
+          "source": "12 §9.4"
         }
       }
     },
@@ -334,6 +361,18 @@
           "role": "protein",
           "evidence": "fish/shellfish: \"מולים\" (mussels)",
           "source": "12 §1.7"
+        },
+        "kosher": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"מולים\"",
+          "source": "12 §9.2"
+        },
+        "halal": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"ברוטב יין לבן\"",
+          "source": "12 §9.4"
         }
       }
     },
@@ -395,6 +434,12 @@
           "role": "protein",
           "evidence": "fish/shellfish: \"פירות ים\" means shellfish",
           "source": "12 §1.7"
+        },
+        "kosher": {
+          "label": "contains",
+          "role": "protein",
+          "evidence": "\"פירות ים\"",
+          "source": "12 §9.2"
         }
       }
     },

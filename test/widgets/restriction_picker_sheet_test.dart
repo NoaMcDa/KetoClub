@@ -118,6 +118,28 @@ void main() {
       );
     });
 
+    test('kosher and halal name their components, never the word itself '
+        '(#342)', () {
+      for (final l10n in [_en, _he]) {
+        final kosher = restrictionJurisdictionHint(
+          l10n,
+          restrictionFor(RestrictionId.kosher),
+        );
+        final halal = restrictionJurisdictionHint(
+          l10n,
+          restrictionFor(RestrictionId.halal),
+        );
+        expect(kosher, l10n.restrictionKosherHint);
+        expect(halal, l10n.restrictionHalalHint);
+        for (final hint in [kosher, halal]) {
+          expect(hint.toLowerCase(), isNot(contains('kosher')));
+          expect(hint.toLowerCase(), isNot(contains('halal')));
+          expect(hint, isNot(contains('כשר')));
+          expect(hint, isNot(contains('חלאל')));
+        }
+      }
+    });
+
     test('reads in Hebrew', () {
       expect(
         restrictionJurisdictionHint(_he, restrictionFor(RestrictionId.celery)),
@@ -131,7 +153,8 @@ void main() {
   });
 
   group('restrictionKindLabel', () {
-    test('maps every kind to allergy, autoimmune, intolerance or diet', () {
+    test('maps every kind to allergy, autoimmune, intolerance, diet or '
+        'religious diet', () {
       expect(
         restrictionKindLabel(_en, RestrictionKind.allergen),
         _en.restrictionKindAllergy,
@@ -150,11 +173,14 @@ void main() {
       );
       for (final kind in <RestrictionKind>[
         RestrictionKind.lifestyle,
-        RestrictionKind.religiousComponent,
         RestrictionKind.keto,
       ]) {
         expect(restrictionKindLabel(_en, kind), _en.restrictionKindDiet);
       }
+      expect(
+        restrictionKindLabel(_en, RestrictionKind.religiousComponent),
+        _en.restrictionKindReligious,
+      );
     });
   });
 
@@ -188,6 +214,95 @@ void main() {
       expect(_top(tester, lactose), greaterThan(_top(tester, intolerance)));
       expect(_top(tester, lactose), lessThan(_top(tester, diet)));
       expect(_top(tester, vegan), greaterThan(_top(tester, diet)));
+    });
+
+    testWidgets('puts every kind under its heading in restrictionKindOrder, '
+        'health condition and religious diet included', (tester) async {
+      // Arrange: one row of each kind, so every heading fits on screen.
+      const shown = <RestrictionId>{
+        RestrictionId.sesame,
+        RestrictionId.gluten,
+        RestrictionId.fava,
+        RestrictionId.lactose,
+        RestrictionId.vegan,
+        RestrictionId.kosher,
+        RestrictionId.jain,
+      };
+
+      // Act
+      await _pumpSheet(
+        tester,
+        everything: true,
+        added: <RestrictionId>{
+          for (final id in RestrictionId.values)
+            if (!shown.contains(id)) id,
+        },
+      );
+
+      // Assert
+      final headings = <Finder>[
+        for (final kind in restrictionKindOrder)
+          find.text(restrictionKindLabel(_en, kind)),
+      ];
+      expect(restrictionKindOrder, <RestrictionKind>[
+        RestrictionKind.allergen,
+        RestrictionKind.autoimmune,
+        RestrictionKind.medical,
+        RestrictionKind.intolerance,
+        RestrictionKind.lifestyle,
+        RestrictionKind.religiousComponent,
+      ]);
+      for (final heading in headings) {
+        expect(heading, findsOneWidget);
+      }
+      for (var i = 1; i < headings.length; i++) {
+        expect(
+          _top(tester, headings[i - 1]),
+          lessThan(_top(tester, headings[i])),
+        );
+      }
+      final medical = find.text(_en.restrictionKindMedical);
+      final intolerance = find.text(_en.restrictionKindIntolerance);
+      final religious = find.text(_en.restrictionKindReligious);
+      final fava = find.byKey(restrictionOptionKey(RestrictionId.fava));
+      expect(_top(tester, fava), greaterThan(_top(tester, medical)));
+      expect(_top(tester, fava), lessThan(_top(tester, intolerance)));
+      // Kosher and Jain share the one "Religious diet" heading.
+      for (final id in <RestrictionId>[
+        RestrictionId.kosher,
+        RestrictionId.jain,
+      ]) {
+        expect(
+          _top(tester, find.byKey(restrictionOptionKey(id))),
+          greaterThan(_top(tester, religious)),
+        );
+      }
+    });
+
+    testWidgets('offers kosher and halal under "Religious diet" by default', (
+      tester,
+    ) async {
+      // Act
+      await _pumpSheet(
+        tester,
+        added: <RestrictionId>{
+          for (final id in RestrictionId.values)
+            if (id != RestrictionId.kosher && id != RestrictionId.halal) id,
+        },
+      );
+
+      // Assert
+      final religious = find.text(_en.restrictionKindReligious);
+      expect(religious, findsOneWidget);
+      expect(find.text(_en.restrictionKindDiet), findsNothing);
+      for (final id in <RestrictionId>[
+        RestrictionId.kosher,
+        RestrictionId.halal,
+      ]) {
+        final row = find.byKey(restrictionOptionKey(id));
+        expect(row, findsOneWidget);
+        expect(_top(tester, row), greaterThan(_top(tester, religious)));
+      }
     });
 
     testWidgets('leaves out keto and the added ids', (tester) async {
@@ -475,6 +590,11 @@ void main() {
       }
       expect(restrictionOffered(RestrictionId.sesame), isTrue);
       expect(restrictionOffered(RestrictionId.keto), isFalse);
+      // Kosher and halal arrive with their words, so they are offered;
+      // Jain, a religious component too, waits for its vocabulary.
+      expect(restrictionOffered(RestrictionId.kosher), isTrue);
+      expect(restrictionOffered(RestrictionId.halal), isTrue);
+      expect(restrictionOffered(RestrictionId.jain), isFalse);
       expect(
         availableRestrictions(const <RestrictionId>{})
             .map((restriction) => restriction.id),

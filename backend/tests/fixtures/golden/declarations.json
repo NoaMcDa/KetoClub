@@ -692,7 +692,17 @@
       "name": "platform_tag_negated"
     },
     {
-      "declarations": [],
+      "declarations": [
+        {
+          "matchedText": "kosher",
+          "polarity": "absent",
+          "restrictionIds": [
+            "kosher"
+          ],
+          "rule": "kosher",
+          "source": "platformTag"
+        }
+      ],
       "declaresKosher": true,
       "dish": {
         "declaredTags": [
@@ -710,7 +720,17 @@
       "name": "platform_tag_kosher"
     },
     {
-      "declarations": [],
+      "declarations": [
+        {
+          "matchedText": "KOSHER",
+          "polarity": "absent",
+          "restrictionIds": [
+            "kosher"
+          ],
+          "rule": "kosher",
+          "source": "platformTag"
+        }
+      ],
       "declaresKosher": true,
       "dish": {
         "declaredTags": [
@@ -793,6 +813,120 @@
       },
       "heading": "פיצות",
       "name": "he_vegan_cheese_component"
+    },
+    {
+      "declarations": [
+        {
+          "matchedText": "halal",
+          "polarity": "absent",
+          "restrictionIds": [
+            "halal"
+          ],
+          "rule": "halal",
+          "source": "platformTag"
+        }
+      ],
+      "declaresKosher": false,
+      "dish": {
+        "declaredTags": [
+          "halal"
+        ],
+        "description": "",
+        "id": "d31",
+        "imageUrl": null,
+        "name": "Lamb kebab",
+        "options": [],
+        "page": null,
+        "price": 0.0
+      },
+      "heading": null,
+      "name": "platform_tag_halal"
+    },
+    {
+      "declarations": [
+        {
+          "matchedText": "חלאל",
+          "polarity": "absent",
+          "restrictionIds": [
+            "halal"
+          ],
+          "rule": "halal",
+          "source": "platformTag"
+        }
+      ],
+      "declaresKosher": false,
+      "dish": {
+        "declaredTags": [
+          "חלאל"
+        ],
+        "description": "",
+        "id": "d32",
+        "imageUrl": null,
+        "name": "קבב טלה",
+        "options": [],
+        "page": null,
+        "price": 0.0
+      },
+      "heading": null,
+      "name": "platform_tag_halal_hebrew"
+    },
+    {
+      "declarations": [],
+      "declaresKosher": false,
+      "dish": {
+        "description": "",
+        "id": "d33",
+        "imageUrl": null,
+        "name": "Steak with kosher salt",
+        "options": [],
+        "page": null,
+        "price": 0.0
+      },
+      "heading": "Kosher",
+      "name": "text_kosher_salt_declares_nothing"
+    },
+    {
+      "declarations": [],
+      "declaresKosher": false,
+      "dish": {
+        "description": "",
+        "id": "d34",
+        "imageUrl": null,
+        "name": "Halal chicken wrap",
+        "options": [],
+        "page": null,
+        "price": 0.0
+      },
+      "heading": "מנות חלאל",
+      "name": "text_halal_declares_nothing"
+    },
+    {
+      "declarations": [
+        {
+          "matchedText": "kosher",
+          "polarity": "absent",
+          "restrictionIds": [
+            "kosher"
+          ],
+          "rule": "kosher",
+          "source": "platformTag"
+        }
+      ],
+      "declaresKosher": true,
+      "dish": {
+        "declaredTags": [
+          "kosher"
+        ],
+        "description": "",
+        "id": "d35",
+        "imageUrl": null,
+        "name": "Chicken wrap",
+        "options": [],
+        "page": null,
+        "price": 0.0
+      },
+      "heading": null,
+      "name": "platform_tag_kosher_not_halal"
     }
   ],
   "guardsEn": {
@@ -3332,7 +3466,17 @@
       "declarations": {
         "1001": [],
         "1002-shared": [],
-        "1003": [],
+        "1003": [
+          {
+            "matchedText": "kosher",
+            "polarity": "absent",
+            "restrictionIds": [
+              "kosher"
+            ],
+            "rule": "kosher",
+            "source": "platformTag"
+          }
+        ],
         "1004": [],
         "1005": []
       },
@@ -4122,7 +4266,8 @@
       ],
       "symbols": [
         "🌱"
-      ]
+      ],
+      "tagsOnly": false
     },
     {
       "en": [
@@ -4142,7 +4287,8 @@
         "molluscs",
         "vegetarian"
       ],
-      "symbols": []
+      "symbols": [],
+      "tagsOnly": false
     },
     {
       "en": [
@@ -4165,7 +4311,8 @@
       ],
       "symbols": [
         "🌾"
-      ]
+      ],
+      "tagsOnly": false
     },
     {
       "en": [
@@ -4187,7 +4334,8 @@
         "milk",
         "lactose"
       ],
-      "symbols": []
+      "symbols": [],
+      "tagsOnly": false
     },
     {
       "en": [
@@ -4203,7 +4351,8 @@
       "restrictions": [
         "lactose"
       ],
-      "symbols": []
+      "symbols": [],
+      "tagsOnly": false
     },
     {
       "en": [
@@ -4222,7 +4371,39 @@
       "restrictions": [
         "eggs"
       ],
-      "symbols": []
+      "symbols": [],
+      "tagsOnly": false
+    },
+    {
+      "en": [
+        "kosher"
+      ],
+      "he": [
+        "כשר",
+        "כשרה"
+      ],
+      "id": "kosher",
+      "polarity": "absent",
+      "restrictions": [
+        "kosher"
+      ],
+      "symbols": [],
+      "tagsOnly": true
+    },
+    {
+      "en": [
+        "halal"
+      ],
+      "he": [
+        "חלאל"
+      ],
+      "id": "halal",
+      "polarity": "absent",
+      "restrictions": [
+        "halal"
+      ],
+      "symbols": [],
+      "tagsOnly": true
     }
   ]
 }
