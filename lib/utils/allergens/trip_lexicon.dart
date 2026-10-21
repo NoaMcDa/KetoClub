@@ -74,8 +74,8 @@ final class TripLexiconEntry {
   final String source;
 
   /// [hides] with what follows from it by definition, in taxonomy order:
-  /// fish, shellfish and mammal meat are not vegetarian; those and milk and
-  /// eggs are not vegan; milk may carry lactose; shellfish is not kosher
+  /// fish, shellfish, meat and gelatin are not vegetarian; those and milk
+  /// and eggs are not vegan; milk may carry lactose; shellfish is not kosher
   /// (issue #342). What the evaluator and the briefing read.
   List<RestrictionId> get restrictions {
     final ids = <RestrictionId>{...hides};
@@ -84,6 +84,10 @@ final class TripLexiconEntry {
       RestrictionId.crustaceans,
       RestrictionId.molluscs,
       RestrictionId.alphaGal,
+      RestrictionId.beef,
+      RestrictionId.pork,
+      RestrictionId.chicken,
+      RestrictionId.gelatin,
     };
     if (hides.any(animal.contains)) {
       ids
@@ -126,6 +130,7 @@ const RestrictionId _lupin = RestrictionId.lupin;
 const RestrictionId _sulphites = RestrictionId.sulphites;
 const RestrictionId _legumes = RestrictionId.legumes;
 const RestrictionId _alphaGal = RestrictionId.alphaGal;
+const RestrictionId _buckwheat = RestrictionId.buckwheat;
 
 /// Israel: the dishes a tourist menu prints in transliteration, and a few
 /// Hebrew words the base vocabulary reads otherwise (file 12 §1).
@@ -924,14 +929,13 @@ const List<TripLexiconEntry> _germany = <TripLexiconEntry>[
 const List<TripLexiconEntry> _japan = <TripLexiconEntry>[
   TripLexiconEntry(
     terms: <String>['soba'],
-    hides: <RestrictionId>[_wheat, _gluten],
+    hides: <RestrictionId>[_wheat, _gluten, _buckwheat],
     glossEn:
         'Buckwheat noodles, usually mixed with wheat flour. Buckwheat '
-        "is on Japan's mandatory list; if you react to it, add it as your "
-        'own word.',
+        "is on Japan's mandatory list.",
     glossHe:
         'אטריות כוסמת, לרוב מעורבבות בקמח חיטה. כוסמת ברשימת החובה '
-        'של יפן; אם יש לך רגישות אליה, הוסיפו אותה כמילה משלך.',
+        'של יפן.',
     source: '12 §8.2',
   ),
   TripLexiconEntry(

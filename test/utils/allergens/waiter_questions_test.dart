@@ -469,4 +469,69 @@ void main() {
       );
     });
   });
+
+  group('issue #342', () {
+    test('oral allergy syndrome asks whether it is raw and can be cooked', () {
+      expect(
+        WaiterQuestions.questionFor(
+          _concern(
+            RestrictionId.oralAllergy,
+            certainty: Certainty.suspected,
+            matched: 'apple',
+          ),
+          hebrew: false,
+        ),
+        'I go easy on raw fruit and raw vegetables. The menu says '
+        "'apple': is it raw, and can it be served cooked?",
+      );
+      expect(
+        WaiterQuestions.questionFor(
+          _concern(RestrictionId.oralAllergy, certainty: Certainty.suspected),
+          hebrew: true,
+        ),
+        'אני ממעיט/ה בפירות וירקות לא מבושלים. יש כאלה במנה שאינם '
+        'מבושלים, ואפשר להגיש אותם מבושלים?',
+      );
+    });
+
+    test('the dose sensitivities ask for less', () {
+      expect(
+        WaiterQuestions.questionFor(
+          _concern(RestrictionId.caffeine, certainty: Certainty.suspected),
+          hebrew: false,
+        ),
+        'I go easy on coffee, tea, cola and other caffeine. Is there any in '
+        'this dish, and can it be made with less?',
+      );
+    });
+
+    test('fava asks for the beans, never "favism"', () {
+      final question = WaiterQuestions.questionFor(
+        _concern(RestrictionId.fava),
+        hebrew: false,
+      );
+      expect(question, 'Can this be made without fava beans (broad beans)?');
+      expect(
+        WaiterQuestions.questionFor(_concern(RestrictionId.fava), hebrew: true),
+        'אפשר להכין את המנה בלי פול?',
+      );
+    });
+
+    test('a single food names itself; a diet names what it leaves out', () {
+      expect(
+        WaiterQuestions.questionFor(
+          _concern(RestrictionId.chickpea),
+          hebrew: true,
+        ),
+        'אפשר להכין את המנה בלי גרגרי חומוס?',
+      );
+      expect(
+        WaiterQuestions.questionFor(
+          _concern(RestrictionId.pescatarian),
+          hebrew: false,
+        ),
+        'Can this be made without meat or poultry?',
+      );
+    });
+  });
 }

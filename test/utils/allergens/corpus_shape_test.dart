@@ -50,12 +50,41 @@ const List<String> _restrictionIds = <String>[
   'glp1',
   'kosher',
   'halal',
+  'buckwheat',
+  'kiwi',
+  'peach',
+  'apple',
+  'banana',
+  'orange',
+  'beef',
+  'pork',
+  'chicken',
+  'gelatin',
+  'yam',
+  'corn',
+  'sunflower',
+  'flax',
+  'chickpea',
+  'lentil',
+  'pea',
+  'fenugreek',
+  'fava',
+  'nightshades',
+  'msg',
+  'caffeine',
+  'salicylates',
+  'oralAllergy',
+  'pescatarian',
+  'paleo',
+  'whole30',
+  'aip',
+  'jain',
   'keto',
 ];
 
 /// Restrictions that are not strict: the intolerances, the diets, kosher
-/// and halal (issue #342) and keto. A
-/// `contains` label on any other id must name the role of its trigger.
+/// and halal (issue #342) and keto. A `contains` label on any other id
+/// must name the role of its trigger.
 const Set<String> _flexibleIds = <String>{
   'lactose',
   'fodmap',
@@ -65,7 +94,43 @@ const Set<String> _flexibleIds = <String>{
   'glp1',
   'kosher',
   'halal',
+  'nightshades',
+  'msg',
+  'caffeine',
+  'salicylates',
+  'oralAllergy',
+  'pescatarian',
+  'paleo',
+  'whole30',
+  'aip',
+  'jain',
   'keto',
+};
+
+/// The strict research restrictions (issue #342) whose vocabularies are
+/// still empty, so the corpus carries no labels for them yet and the
+/// "three contains labels" floor does not apply. Each vocabulary
+/// follow-up adds its labels and removes its ids from this set.
+const Set<String> _awaitingLabels = <String>{
+  'buckwheat',
+  'kiwi',
+  'peach',
+  'apple',
+  'banana',
+  'orange',
+  'beef',
+  'pork',
+  'chicken',
+  'gelatin',
+  'yam',
+  'corn',
+  'sunflower',
+  'flax',
+  'chickpea',
+  'lentil',
+  'pea',
+  'fenugreek',
+  'fava',
 };
 
 /// The values of a label's `label` key.
@@ -497,7 +562,9 @@ void main() {
           '  ${id.padRight(12)} ${'$contains'.padLeft(8)}  '
           '${'$free'.padLeft(4)}',
         );
-        if (!_flexibleIds.contains(id) && contains < 3) {
+        if (!_flexibleIds.contains(id) &&
+            !_awaitingLabels.contains(id) &&
+            contains < 3) {
           short.add('$id has $contains');
         }
       }

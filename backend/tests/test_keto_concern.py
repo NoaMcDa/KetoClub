@@ -192,7 +192,7 @@ def test_malformed_and_unknown_entries_are_dropped() -> None:
                 _INGREDIENT,
                 ExtractedIngredient.model_validate(_INGREDIENT),
             ],
-            concerns=[7, {**_CONCERN, "restrictionId": "kiwi"}, _CONCERN],
+            concerns=[7, {**_CONCERN, "restrictionId": "durian"}, _CONCERN],
         )
     )
     assert [to_json(i) for i in dish.ingredients] == [_INGREDIENT, _INGREDIENT]

@@ -2371,4 +2371,28 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get restrictionHalalHint =>
       'מסמן חזיר, אלכוהול, ג\'לטין ודם לפי מילות התפריט. על תעודה יש לשאול את המסעדה';
+
+  @override
+  String get restrictionKindMedical => 'מצב בריאותי';
+
+  @override
+  String get restrictionJapanListHint => 'ברשימת החובה של האלרגנים ביפן';
+
+  @override
+  String get restrictionJapanRecommendedHint =>
+      'מומלץ לסימון ביפן, לא באף רשימת חובה';
+
+  @override
+  String get restrictionLegumePartHint => 'קטנית אחת בנפרד, לא כל הקטניות';
+
+  @override
+  String get restrictionFavaHint =>
+      'חסר G6PD (פביזם), לא אלרגיה. נבדק באותה הקפדה';
+
+  @override
+  String get restrictionSearchField => 'חיפוש הגבלה';
+
+  @override
+  String get restrictionSearchEmpty =>
+      'אין הגבלה מתאימה. אפשר להוסיף אותה כמילה משלך למטה.';
 }

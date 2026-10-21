@@ -4048,6 +4048,45 @@ dish with nothing found reads "No trigger found — ask the restaurant", never
 `test/l10n/religious_words_test.dart` pins. No `schemaVersion` bump (C3):
 the concerns are computed, never stored.
 
+**The research restrictions: ids first, words later (related to #342).**
+Every restriction the allergen documentation names that the taxonomy did
+not model gets an id, inserted before `keto` (ids are stored by name, so
+nothing moves): *strict allergens* `buckwheat` (Japan's mandatory list,
+tagged `jp` alone); `kiwi`, `peach`, `apple`, `banana`, `orange`, `beef`,
+`pork`, `chicken`, `gelatin` and `yam` (yamaimo, not sweet potato), from
+Japan's *recommended* list and untagged, since `jp` means the mandatory
+list (`japanRecommendedOnly`); `corn`, `sunflower` and `flax` (file 02,
+"Less common allergens"); and `chickpea`, `lentil`, `pea` and `fenugreek`,
+each its own toggle under `legumes` (`restrictionParent`, file 11 §16.5).
+`fava`, for G6PD deficiency, gets a new strict kind,
+`RestrictionKind.medical` ("Health condition"): favism is haemolysis, not
+an allergy, and the allergy sentences ("I have an allergy to …") would
+misstate it; Israel's fava marking is not an allergen list, so it carries
+no `il` tag. *Heads-up sensitivities* (kind `intolerance`, in
+`headsUpRestrictions`, so a finding is only ever `suspected` and moves
+nothing): `nightshades`, `msg`, `caffeine`, `salicylates` and
+`oralAllergy` (file 03, "The map"; file 02), the last asking whether an
+item is raw and can be served cooked. *Diets*: `pescatarian`, `paleo`,
+`whole30` and `aip` (`lifestyle`) and `jain` (`religiousComponent`, so it
+sits under kosher's and halal's "Religious diet" heading and, since
+`hasReligiousEntry` reads the kind, takes their strict wording). Each
+has its names, picker hint, waiter subject and chef card line in both
+languages. Their vocabularies are five new group files, **empty** in this
+step (`vocab_foods_extra`, `vocab_seeds_extra`, `vocab_legume_parts`,
+`vocab_sensitivities`, `vocab_diets_extra`), so no menu verdict and no
+golden concern changes; and `restrictionOffered` keeps a restriction out
+of the picker and the onboarding until its vocabulary holds a term, since
+a strict entry that can find nothing would read every dish as free of it.
+Each follow-up fills one file, with sources and corpus labels, and its ids
+appear. The picker gains a search over both languages' names, a "Health
+condition" heading, and single legumes indented under legumes; soba in
+the Japan trip lexicon now hides `buckwheat`. Left out on purpose: the
+medical diets that need nutrient numbers a menu does not carry (kidney,
+PKU, gout, diabetes, pregnancy, GERD, IBD, EoE; file 10, file 03), and
+kosher or halal *certification*, which no app can verify (file 03; their
+components are a separate pull request). Chestnut is no id: it stays a
+tree-nut question for that vocabulary (file 11 §2.5).
+
 ### D27 — Post-meal confirmations, no ratings
 
 *(Banto, the Allergens epic's ALG-14, issue #356. Amends D23's visit

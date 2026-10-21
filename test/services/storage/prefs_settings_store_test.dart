@@ -626,7 +626,7 @@ void main() {
         'flutter.ketoclub_settings':
             '{"languageTag":null,"filter":"all",'
             '"estimationConsentGiven":true,"lastVenue":null,'
-            '"dietaryProfile":[{"id":"buckwheat"},'
+            '"dietaryProfile":[{"id":"durian"},'
             '{"id":"sesame","exceptions":["tahini dressing"]}]}',
       });
       final store = PrefsSettingsStore(load: SharedPreferences.getInstance);

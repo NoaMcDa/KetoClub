@@ -444,6 +444,11 @@ abstract final class ChefCardText {
   /// histamine and small portions ask to be told, as every flexible line
   /// does, and name what they go easy on. Small portions names no medicine:
   /// the kitchen needs the portion, not the reason.
+  ///
+  /// Issue #342 adds fava (G6PD deficiency, strict: "check every
+  /// ingredient", and falafel, which may be made of fava), the heads-up
+  /// sensitivities (each names the foods that carry it) and the diets
+  /// whose names are not ingredients (each names what it leaves out).
   static const Map<RestrictionId, String> _extendedLineEn =
       <RestrictionId, String>{
         RestrictionId.alphaGal:
@@ -467,6 +472,41 @@ abstract final class ChefCardText {
         RestrictionId.halal:
             'I eat halal — please tell me if a dish has pork, alcohol (even '
             'cooked into a sauce), gelatin or blood.',
+        RestrictionId.fava:
+            'I have G6PD deficiency and cannot eat {name} — please check '
+            'every ingredient, including falafel, ful, sauces and garnishes.',
+        RestrictionId.nightshades:
+            'I am sensitive to {name} — please tell me which dishes contain '
+            'tomato, potato, aubergine, peppers, chilli or paprika.',
+        RestrictionId.msg:
+            'I am sensitive to MSG — please tell me which dishes have MSG, '
+            'stock powder or a seasoning mix added.',
+        RestrictionId.caffeine:
+            'I go easy on {name} — please tell me which dishes and drinks '
+            'contain coffee, tea, cola, chocolate or energy drinks.',
+        RestrictionId.salicylates:
+            'I am sensitive to {name} — please tell me which dishes are '
+            'heavy in spices, herbs, tomato, berries or dried fruit.',
+        RestrictionId.oralAllergy:
+            'I have {name}: raw fruit and vegetables bother me — please tell '
+            'me which dishes contain them raw, and whether they can be '
+            'served cooked.',
+        RestrictionId.pescatarian:
+            'I eat a pescatarian diet — please tell me which dishes contain '
+            'meat or poultry.',
+        RestrictionId.paleo:
+            'I follow a paleo diet — please tell me which dishes contain '
+            'grains, legumes, dairy or refined sugar.',
+        RestrictionId.whole30:
+            'I follow the Whole30 programme — please tell me which dishes '
+            'contain sugar, grains, legumes, dairy or alcohol.',
+        RestrictionId.aip:
+            'I follow the autoimmune protocol (AIP) — please tell me which '
+            'dishes contain grains, legumes, dairy, eggs, nuts, seeds or '
+            'nightshades.',
+        RestrictionId.jain:
+            'I follow a Jain diet — please tell me which dishes contain meat, '
+            'fish, eggs, honey, onion, garlic or other root vegetables.',
       };
 
   /// [_extendedLineEn] in Hebrew; `{name}` is the Hebrew name.
@@ -491,6 +531,38 @@ abstract final class ChefCardText {
         RestrictionId.halal:
             'אני אוכל/ת חלאל — נא לומר לי אם במנה יש חזיר, אלכוהול (גם '
             "כשהוא מבושל ברוטב), ג'לטין או דם.",
+        RestrictionId.fava:
+            'יש לי חסר באנזים G6PD ואני לא יכול/ה לאכול {name} — נא לבדוק '
+            'כל מרכיב, כולל פלאפל, רטבים וקישוטים.',
+        RestrictionId.nightshades:
+            'אני רגיש/ה ל{name} — נא לומר לי אילו מנות מכילות עגבנייה, תפוח '
+            "אדמה, חציל, פלפל, צ'ילי או פפריקה.",
+        RestrictionId.msg:
+            'אני רגיש/ה ל{name} — נא לומר לי לאילו מנות מוסיפים MSG, אבקת '
+            'מרק או תערובת תיבול.',
+        RestrictionId.caffeine:
+            'אני ממעיט/ה ב{name} — נא לומר לי אילו מנות ומשקאות מכילים קפה, '
+            'תה, קולה, שוקולד או משקאות אנרגיה.',
+        RestrictionId.salicylates:
+            'אני רגיש/ה ל{name} — נא לומר לי אילו מנות מתובלות מאוד או '
+            'עשירות בעשבי תיבול, עגבניות, פירות יער או פירות יבשים.',
+        RestrictionId.oralAllergy:
+            'יש לי {name}: פירות וירקות לא מבושלים מפריעים לי — נא לומר לי '
+            'באילו מנות הם לא מבושלים, והאם אפשר להגיש אותם מבושלים.',
+        RestrictionId.pescatarian:
+            'אני פסקטריאני/ת — נא לומר לי אילו מנות מכילות בשר או עוף.',
+        RestrictionId.paleo:
+            'אני בתזונת פליאו — נא לומר לי אילו מנות מכילות דגנים, קטניות, '
+            'מוצרי חלב או סוכר מעובד.',
+        RestrictionId.whole30:
+            'אני בתוכנית Whole30 — נא לומר לי אילו מנות מכילות סוכר, דגנים, '
+            'קטניות, מוצרי חלב או אלכוהול.',
+        RestrictionId.aip:
+            'אני בפרוטוקול האוטואימוני (AIP) — נא לומר לי אילו מנות מכילות '
+            'דגנים, קטניות, מוצרי חלב, ביצים, אגוזים, זרעים או סולניים.',
+        RestrictionId.jain:
+            "אני שומר/ת על תזונה ג'יינית — נא לומר לי אילו מנות מכילות בשר, "
+            'דגים, ביצים, דבש, בצל, שום או ירקות שורש אחרים.',
       };
 
   static String _baseEn(Restriction restriction) {
@@ -512,6 +584,9 @@ abstract final class ChefCardText {
         return 'I follow a keto diet (very low carbohydrate) — please tell '
             'me which dishes contain sugar, flour, rice, potato or sweet '
             'sauces.';
+      case RestrictionKind.medical:
+        return 'Because of a health condition I cannot eat $name — please '
+            'check every ingredient, including sauces, oils and garnishes.';
       case RestrictionKind.intolerance:
       case RestrictionKind.religiousComponent:
         return 'I avoid $name — please tell me which dishes contain it.';
@@ -548,6 +623,9 @@ abstract final class ChefCardText {
       case RestrictionKind.keto:
         return 'אני בתזונת קטו (דלת פחמימות) — נא לומר לי אילו מנות מכילות '
             'סוכר, קמח, אורז, תפוחי אדמה או רטבים מתוקים.';
+      case RestrictionKind.medical:
+        return 'בגלל מצב בריאותי אני לא יכול/ה לאכול $name — נא לבדוק כל '
+            'מרכיב, כולל רטבים, שמנים וקישוטים.';
       case RestrictionKind.intolerance:
       case RestrictionKind.religiousComponent:
         return 'אני נמנע/ת מ$name — נא לומר לי אילו מנות מכילות אותו.';
@@ -575,6 +653,7 @@ final class _NoteParts {
     required this.strict,
     required this.allergen,
     required this.celiac,
+    required this.medical,
     required this.own,
     required this.flexible,
   });
@@ -584,6 +663,7 @@ final class _NoteParts {
   static _NoteParts? of(DietaryProfile profile, {required bool hebrew}) {
     final allergens = <RestrictionId>[];
     var celiac = false;
+    final medical = <RestrictionId>[];
     final flexible = <RestrictionId>[];
     final ownTerms = <String>[];
     var ownEntry = false;
@@ -599,6 +679,8 @@ final class _NoteParts {
           allergens.add(restriction.id);
         case RestrictionKind.autoimmune:
           celiac = true;
+        case RestrictionKind.medical:
+          medical.add(restriction.id);
         case RestrictionKind.keto:
           break;
         case RestrictionKind.intolerance:
@@ -607,7 +689,8 @@ final class _NoteParts {
           flexible.add(restriction.id);
       }
     }
-    final strict = allergens.isNotEmpty || celiac || ownEntry;
+    final strictBefore = allergens.isNotEmpty || celiac || medical.isNotEmpty;
+    final strict = strictBefore || ownEntry;
     if (!strict && flexible.isEmpty) return null;
 
     String subjects(List<RestrictionId> ids, String prefix) =>
@@ -630,13 +713,19 @@ final class _NoteParts {
           : (hebrew
                 ? 'יש לי צליאק ואני לא יכול/ה לאכול גלוטן.'
                 : 'I have celiac disease and cannot eat gluten.'),
+      medical: medical.isEmpty
+          ? null
+          : (hebrew
+                    ? 'בגלל מצב בריאותי אני לא יכול/ה לאכול {list}.'
+                    : 'Because of a health condition I cannot eat {list}.')
+                .replaceAll('{list}', subjects(medical, '')),
       own: !ownEntry
           ? null
           : (hebrew
-                    ? (allergens.isNotEmpty || celiac
+                    ? (strictBefore
                           ? 'אני גם לא יכול/ה לאכול {list}.'
                           : 'אני לא יכול/ה לאכול {list}.')
-                    : (allergens.isNotEmpty || celiac
+                    : (strictBefore
                           ? 'I also cannot eat {list}.'
                           : 'I cannot eat {list}.'))
                 .replaceAll('{list}', ownList),
@@ -650,7 +739,7 @@ final class _NoteParts {
   }
 
   /// Whether the profile holds a strict entry: an allergen, celiac
-  /// disease or the user's own words.
+  /// disease, a medical condition or the user's own words.
   final bool strict;
 
   /// "I have an allergy to …", or null without an allergen.
@@ -658,6 +747,10 @@ final class _NoteParts {
 
   /// The celiac sentence, or null without celiac disease.
   final String? celiac;
+
+  /// "Because of a health condition I cannot eat …" (issue #342: fava for
+  /// G6PD deficiency), or null without a medical entry.
+  final String? medical;
 
   /// "I (also) cannot eat …", or null without the user's own words.
   final String? own;
@@ -669,6 +762,7 @@ final class _NoteParts {
   List<String> sentences({required bool withFlexible}) => <String>[
     ?allergen,
     ?celiac,
+    ?medical,
     ?own,
     if (withFlexible) ?flexible,
   ];

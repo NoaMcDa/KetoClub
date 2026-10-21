@@ -464,4 +464,26 @@ void main() {
       expect(profile.entryFor(RestrictionId.sesame)!.terms, isEmpty);
     });
   });
+
+  group('issue #342', () {
+    test('the research ids read back by name, like every other', () {
+      final profile = DietaryProfile.tryFrom(const <Object?>[
+        <String, Object?>{'id': 'buckwheat'},
+        <String, Object?>{'id': 'fava'},
+        <String, Object?>{'id': 'oralAllergy'},
+        <String, Object?>{'id': 'whole30'},
+        <String, Object?>{'id': 'jain'},
+      ]);
+      expect(
+        profile.entries.map((entry) => entry.restrictionId),
+        <RestrictionId>[
+          RestrictionId.buckwheat,
+          RestrictionId.fava,
+          RestrictionId.oralAllergy,
+          RestrictionId.whole30,
+          RestrictionId.jain,
+        ],
+      );
+    });
+  });
 }

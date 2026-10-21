@@ -21,11 +21,12 @@ enum ProfileWording {
   flexible,
 
   /// At least one strict restriction (an allergen or celiac disease), or
-  /// kosher or halal (issue #342): four states, and a dish with nothing
-  /// found reads "No trigger found — ask the restaurant", never "fits" and
-  /// never "safe" (file 09 §3.6). Kosher and halal are flexible, but a
-  /// "fits" beside them would read as "kosher" or "halal", which only the
-  /// restaurant can say.
+  /// a religious component — kosher, halal or Jain (issue #342): four
+  /// states, and a dish with nothing found reads "No trigger found — ask
+  /// the restaurant", never "fits" and never "safe" (file 09 §3.6). The
+  /// religious components are flexible, but a "fits" beside them would
+  /// read as "kosher", "halal" or "Jain", which only the restaurant can
+  /// say.
   strict;
 
   /// The wording for [profile] in a build with [bantoMode].

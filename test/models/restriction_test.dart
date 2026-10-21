@@ -3,7 +3,7 @@ import 'package:ketoclub/models/restriction.dart';
 
 void main() {
   group('RestrictionId', () {
-    test('has exactly the 27 ids, in order; a rename needs a migration', () {
+    test('has exactly the 56 ids, in order; a rename needs a migration', () {
       // Arrange
       const expectedNames = <String>[
         'peanuts',
@@ -31,6 +31,35 @@ void main() {
         'glp1',
         'kosher',
         'halal',
+        'buckwheat',
+        'kiwi',
+        'peach',
+        'apple',
+        'banana',
+        'orange',
+        'beef',
+        'pork',
+        'chicken',
+        'gelatin',
+        'yam',
+        'corn',
+        'sunflower',
+        'flax',
+        'chickpea',
+        'lentil',
+        'pea',
+        'fenugreek',
+        'fava',
+        'nightshades',
+        'msg',
+        'caffeine',
+        'salicylates',
+        'oralAllergy',
+        'pescatarian',
+        'paleo',
+        'whole30',
+        'aip',
+        'jain',
         'keto',
         'custom',
       ];
@@ -57,7 +86,8 @@ void main() {
   });
 
   group('RestrictionKind', () {
-    test('only an allergen or an autoimmune condition is strict', () {
+    test('only an allergen, an autoimmune or a medical condition is '
+        'strict', () {
       // Arrange
       const expected = <RestrictionKind, bool>{
         RestrictionKind.allergen: true,
@@ -66,6 +96,7 @@ void main() {
         RestrictionKind.lifestyle: false,
         RestrictionKind.religiousComponent: false,
         RestrictionKind.keto: false,
+        RestrictionKind.medical: true,
       };
 
       // Act

@@ -74,6 +74,20 @@ void main() {
           banto: true,
           want: ProfileWording.strict,
         ),
+        // Jain (#342) is the third religious component, by its kind: a
+        // "fits" beside it would read as the kitchen's word too.
+        (
+          name: 'jain, Banto',
+          profile: DietaryProfile.empty.withEntry(RestrictionId.jain),
+          banto: true,
+          want: ProfileWording.strict,
+        ),
+        (
+          name: 'pescatarian, Banto',
+          profile: DietaryProfile.empty.withEntry(RestrictionId.pescatarian),
+          banto: true,
+          want: ProfileWording.flexible,
+        ),
         (
           name: 'kosher, not Banto',
           profile: DietaryProfile.empty.withEntry(RestrictionId.kosher),
@@ -115,7 +129,7 @@ void main() {
   });
 
   group('hasReligiousEntry', () {
-    test('is kosher or halal, never another flexible entry', () {
+    test('is kosher, halal or Jain, never another flexible entry', () {
       expect(
         DietaryProfile.empty.withEntry(RestrictionId.kosher).hasReligiousEntry,
         isTrue,
@@ -123,6 +137,14 @@ void main() {
       expect(
         DietaryProfile.empty.withEntry(RestrictionId.halal).hasReligiousEntry,
         isTrue,
+      );
+      expect(
+        DietaryProfile.empty.withEntry(RestrictionId.jain).hasReligiousEntry,
+        isTrue,
+      );
+      expect(
+        DietaryProfile.empty.withEntry(RestrictionId.jain).hasStrictEntry,
+        isFalse,
       );
       expect(
         DietaryProfile.empty.withEntry(RestrictionId.vegan).hasReligiousEntry,

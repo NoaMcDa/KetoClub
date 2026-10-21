@@ -868,5 +868,12 @@
   "whyChangeNotHonouredOn": "ב־{date} הצוות לא שינה את המנה כפי שביקשת.",
   "restrictionKindReligious": "תזונה דתית",
   "restrictionKosherHint": "מסמן חזיר, פירות ים ובשר עם חלב לפי מילות התפריט. על תעודה יש לשאול את המסעדה",
-  "restrictionHalalHint": "מסמן חזיר, אלכוהול, ג'לטין ודם לפי מילות התפריט. על תעודה יש לשאול את המסעדה"
+  "restrictionHalalHint": "מסמן חזיר, אלכוהול, ג'לטין ודם לפי מילות התפריט. על תעודה יש לשאול את המסעדה",
+  "restrictionKindMedical": "מצב בריאותי",
+  "restrictionJapanListHint": "ברשימת החובה של האלרגנים ביפן",
+  "restrictionJapanRecommendedHint": "מומלץ לסימון ביפן, לא באף רשימת חובה",
+  "restrictionLegumePartHint": "קטנית אחת בנפרד, לא כל הקטניות",
+  "restrictionFavaHint": "חסר G6PD (פביזם), לא אלרגיה. נבדק באותה הקפדה",
+  "restrictionSearchField": "חיפוש הגבלה",
+  "restrictionSearchEmpty": "אין הגבלה מתאימה. אפשר להוסיף אותה כמילה משלך למטה."
 }

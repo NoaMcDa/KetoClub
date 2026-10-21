@@ -143,6 +143,24 @@ const String waiterQuestionMeatDairyOptionHe =
     "במנה יש '{meat}' וגם '{dairy}' — אפשר לוותר על אחד מהם, כדי שלא יהיה "
     'בה בשר עם חלב?';
 
+/// For oral allergy syndrome (issue #342) with the menu's words to quote:
+/// raw fruit and vegetables are the trouble, and cooked ones usually are
+/// not, so it asks whether the item is raw and can be cooked.
+const String waiterQuestionCookedItemEn =
+    "The menu says '{item}': is it raw, and can it be served cooked?";
+
+/// [waiterQuestionCookedItemEn] in Hebrew.
+const String waiterQuestionCookedItemHe =
+    "בתפריט כתוב '{item}' — זה לא מבושל, ואפשר להגיש את זה מבושל?";
+
+/// For oral allergy syndrome with no words to quote.
+const String waiterQuestionCookedEn =
+    'Is any of it raw in this dish, and can it be served cooked?';
+
+/// [waiterQuestionCookedEn] in Hebrew.
+const String waiterQuestionCookedHe =
+    'יש כאלה במנה שאינם מבושלים, ואפשר להגיש אותם מבושלים?';
+
 /// The most characters of matched text a question quotes; a longer slice
 /// is a sentence, not an ingredient, and the general question is used.
 const int _maxQuotedLength = 40;
@@ -297,15 +315,22 @@ abstract final class WaiterQuestions {
   }
 
   /// The question for a heads-up restriction (ALG-17): "I go easy on
-  /// {subject}." then, for FODMAP and histamine, "can this be made with
-  /// less of it?" and, for small portions, "is there a smaller or lighter
-  /// version?", quoting the menu's words when there are some to quote.
+  /// {subject}." then, for small portions, "is there a smaller or lighter
+  /// version?", for oral allergy syndrome (issue #342) "is it raw, and can
+  /// it be served cooked?", and for the dose sensitivities (FODMAP,
+  /// histamine, nightshades, MSG, caffeine, salicylates) "can this be made
+  /// with less of it?", quoting the menu's words when there are some to
+  /// quote.
   static String _headsUpQuestion(Concern concern, {required bool hebrew}) {
     final id = concern.restrictionId;
     final item = _quotable(concern.matchedText);
     final smaller = id == RestrictionId.glp1;
     final String ask;
-    if (smaller) {
+    if (id == RestrictionId.oralAllergy) {
+      ask = item == null
+          ? (hebrew ? waiterQuestionCookedHe : waiterQuestionCookedEn)
+          : (hebrew ? waiterQuestionCookedItemHe : waiterQuestionCookedItemEn);
+    } else if (smaller) {
       ask = item == null
           ? (hebrew ? waiterQuestionSmallerHe : waiterQuestionSmallerEn)
           : (hebrew
@@ -324,7 +349,12 @@ abstract final class WaiterQuestions {
   /// [id] as the thing a dish must not contain, in Hebrew when [hebrew]:
   /// the restriction's own name for an allergen, celiac disease or an
   /// intolerance (lower-cased in English), and what the diet leaves out
-  /// for vegan, vegetarian and keto, whose names are not ingredients.
+  /// for vegan, vegetarian, keto and the issue #342 diets (pescatarian,
+  /// paleo, Whole30, AIP, Jain), whose names are not ingredients.
+  ///
+  /// Issue #342: fava names the beans (its name carries "favism", a
+  /// condition, not a food); the heads-up sensitivities name the foods
+  /// that carry them, as FODMAP and histamine do.
   ///
   /// ALG-17: alpha-gal names the class of foods (its name is a sugar no
   /// menu prints); FODMAP, histamine and small portions name what the
@@ -358,6 +388,48 @@ abstract final class WaiterQuestions {
             : 'large portions and fried, creamy or very sweet food';
       case RestrictionId.custom:
         return hebrew ? 'המזונות שציינתי' : 'the foods I listed';
+      case RestrictionId.fava:
+        return hebrew ? 'פול' : 'fava beans (broad beans)';
+      case RestrictionId.nightshades:
+        return hebrew
+            ? 'עגבנייה, תפוח אדמה, חציל ופלפלים'
+            : 'tomato, potato, aubergine and peppers';
+      case RestrictionId.msg:
+        return hebrew
+            ? 'מונוסודיום גלוטמט (MSG) ואבקות מרק'
+            : 'MSG (monosodium glutamate) and stock powders';
+      case RestrictionId.caffeine:
+        return hebrew
+            ? 'קפה, תה, קולה ומקורות קפאין אחרים'
+            : 'coffee, tea, cola and other caffeine';
+      case RestrictionId.salicylates:
+        return hebrew
+            ? 'מזון מתובל מאוד, עשבי תיבול, עגבניות, פירות יער ומזונות '
+                  'עתירי סליצילטים'
+            : 'spices, herbs, tomato, berries and other high-salicylate '
+                  'foods';
+      case RestrictionId.oralAllergy:
+        return hebrew
+            ? 'פירות וירקות לא מבושלים'
+            : 'raw fruit and raw vegetables';
+      case RestrictionId.pescatarian:
+        return hebrew ? 'בשר או עוף' : 'meat or poultry';
+      case RestrictionId.paleo:
+        return hebrew
+            ? 'דגנים, קטניות, מוצרי חלב או סוכר מעובד'
+            : 'grains, legumes, dairy or refined sugar';
+      case RestrictionId.whole30:
+        return hebrew
+            ? 'סוכר, דגנים, קטניות, מוצרי חלב או אלכוהול'
+            : 'sugar, grains, legumes, dairy or alcohol';
+      case RestrictionId.aip:
+        return hebrew
+            ? 'דגנים, קטניות, מוצרי חלב, ביצים, אגוזים, זרעים או סולניים'
+            : 'grains, legumes, dairy, eggs, nuts, seeds or nightshades';
+      case RestrictionId.jain:
+        return hebrew
+            ? 'בשר, דגים, ביצים, דבש, בצל, שום או ירקות שורש'
+            : 'meat, fish, eggs, honey, onion, garlic or root vegetables';
       case RestrictionId.vegan:
         return hebrew
             ? 'מוצרים מן החי (בשר, דגים, חלב, ביצים או דבש)'
@@ -389,6 +461,24 @@ abstract final class WaiterQuestions {
       case RestrictionId.lupin:
       case RestrictionId.sulphites:
       case RestrictionId.legumes:
+      case RestrictionId.buckwheat:
+      case RestrictionId.kiwi:
+      case RestrictionId.peach:
+      case RestrictionId.apple:
+      case RestrictionId.banana:
+      case RestrictionId.orange:
+      case RestrictionId.beef:
+      case RestrictionId.pork:
+      case RestrictionId.chicken:
+      case RestrictionId.gelatin:
+      case RestrictionId.yam:
+      case RestrictionId.corn:
+      case RestrictionId.sunflower:
+      case RestrictionId.flax:
+      case RestrictionId.chickpea:
+      case RestrictionId.lentil:
+      case RestrictionId.pea:
+      case RestrictionId.fenugreek:
         final restriction = restrictionFor(id);
         return hebrew ? restriction.nameHe : restriction.nameEn.toLowerCase();
     }

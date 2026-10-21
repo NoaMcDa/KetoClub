@@ -3750,7 +3750,7 @@ abstract class AppLocalizations {
   /// **'On {date} the staff did not make the change you asked for.'**
   String whyChangeNotHonouredOn(DateTime date);
 
-  /// Banto (#342): the picker's and onboarding's group heading over kosher and halal, and their kind label in Settings. Names no certification.
+  /// Banto (#342): the picker's and onboarding's group heading over kosher, halal and Jain, and their kind label in Settings. Names no certification.
   ///
   /// In en, this message translates to:
   /// **'Religious diet'**
@@ -3767,6 +3767,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Flags pork, alcohol, gelatin and blood in the menu\'s words. Ask the restaurant about its certificate'**
   String get restrictionHalalHint;
+
+  /// Banto (issue #342): the picker's kind label of a strict restriction that is a health condition and not an allergy (fava beans for G6PD deficiency). Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'Health condition'**
+  String get restrictionKindMedical;
+
+  /// Banto (issue #342): the picker's hint under a restriction only Japan's mandatory list names (buckwheat).
+  ///
+  /// In en, this message translates to:
+  /// **'On Japan\'s mandatory allergen list'**
+  String get restrictionJapanListHint;
+
+  /// Banto (issue #342): the picker's hint under a food on Japan's recommended (not mandatory) allergen list, such as kiwi or beef.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended in Japan, on no mandatory allergen list'**
+  String get restrictionJapanRecommendedHint;
+
+  /// Banto (issue #342): the picker's hint under a single legume (chickpeas, lentils, peas, fenugreek) listed under Legumes.
+  ///
+  /// In en, this message translates to:
+  /// **'One legume on its own, apart from all legumes'**
+  String get restrictionLegumePartHint;
+
+  /// Banto (issue #342): the picker's hint under fava beans. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'G6PD deficiency (favism), not an allergy. Checked as strictly as one'**
+  String get restrictionFavaHint;
+
+  /// Banto (issue #342): the label of the picker's search field.
+  ///
+  /// In en, this message translates to:
+  /// **'Search restrictions'**
+  String get restrictionSearchField;
+
+  /// Banto (issue #342): shown in the picker when the search matches nothing; points to 'Add your own'.
+  ///
+  /// In en, this message translates to:
+  /// **'No restriction matches. You can add it as your own below.'**
+  String get restrictionSearchEmpty;
 }
 
 class _AppLocalizationsDelegate

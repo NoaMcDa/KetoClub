@@ -561,4 +561,35 @@ void main() {
       );
     });
   });
+
+  group('issue #342', () {
+    test('soba hides buckwheat as well as wheat and gluten', () {
+      final soba = TripLexicon.entriesFor(TripDestination.japan)
+          .singleWhere((entry) => entry.terms.contains('soba'));
+      expect(soba.restrictions, contains(RestrictionId.buckwheat));
+      expect(soba.restrictions, contains(RestrictionId.wheat));
+      expect(soba.glossEn, isNot(contains('own word')));
+      expect(
+        TripLexicon.vocabularyFor(
+          TripDestination.japan,
+        )[RestrictionId.buckwheat]!.hiddenEn.map((trigger) => trigger.term),
+        contains('soba'),
+      );
+    });
+
+    test('a single meat is not vegetarian or vegan by definition', () {
+      const tonkatsu = TripLexiconEntry(
+        terms: <String>['tonkatsu'],
+        hides: <RestrictionId>[RestrictionId.pork],
+        glossEn: 'x',
+        glossHe: 'x',
+        source: '12 §8.2',
+      );
+      expect(tonkatsu.restrictions, <RestrictionId>[
+        RestrictionId.vegan,
+        RestrictionId.vegetarian,
+        RestrictionId.pork,
+      ]);
+    });
+  });
 }

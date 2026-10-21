@@ -11,12 +11,17 @@ library;
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/vocab_dairy_eggs.dart';
 import 'package:ketoclub/utils/allergens/vocab_diets.dart';
+import 'package:ketoclub/utils/allergens/vocab_diets_extra.dart';
 import 'package:ketoclub/utils/allergens/vocab_extended.dart';
+import 'package:ketoclub/utils/allergens/vocab_foods_extra.dart';
 import 'package:ketoclub/utils/allergens/vocab_gluten_grains.dart';
+import 'package:ketoclub/utils/allergens/vocab_legume_parts.dart';
 import 'package:ketoclub/utils/allergens/vocab_nuts_seeds.dart';
 import 'package:ketoclub/utils/allergens/vocab_plants_additives.dart';
 import 'package:ketoclub/utils/allergens/vocab_religious.dart';
 import 'package:ketoclub/utils/allergens/vocab_sea.dart';
+import 'package:ketoclub/utils/allergens/vocab_seeds_extra.dart';
+import 'package:ketoclub/utils/allergens/vocab_sensitivities.dart';
 import 'package:ketoclub/utils/allergens/vocabulary_types.dart';
 
 export 'package:ketoclub/utils/allergens/vocabulary_types.dart';
@@ -35,6 +40,11 @@ const Map<RestrictionId, RestrictionVocabulary> allergenVocabulary =
       ...dietsVocabulary,
       ...extendedVocabulary,
       ...religiousVocabulary,
+      ...foodsExtraVocabulary,
+      ...seedsExtraVocabulary,
+      ...legumePartsVocabulary,
+      ...sensitivitiesVocabulary,
+      ...dietsExtraVocabulary,
     };
 
 /// The group maps, by file name, for the registry test.
@@ -48,4 +58,9 @@ allergenVocabularyGroups = <String, Map<RestrictionId, RestrictionVocabulary>>{
   'vocab_diets.dart': dietsVocabulary,
   'vocab_extended.dart': extendedVocabulary,
   'vocab_religious.dart': religiousVocabulary,
+  'vocab_foods_extra.dart': foodsExtraVocabulary,
+  'vocab_seeds_extra.dart': seedsExtraVocabulary,
+  'vocab_legume_parts.dart': legumePartsVocabulary,
+  'vocab_sensitivities.dart': sensitivitiesVocabulary,
+  'vocab_diets_extra.dart': dietsExtraVocabulary,
 };

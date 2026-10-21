@@ -64,6 +64,35 @@ _IDS = [
     "glp1",
     "kosher",
     "halal",
+    "buckwheat",
+    "kiwi",
+    "peach",
+    "apple",
+    "banana",
+    "orange",
+    "beef",
+    "pork",
+    "chicken",
+    "gelatin",
+    "yam",
+    "corn",
+    "sunflower",
+    "flax",
+    "chickpea",
+    "lentil",
+    "pea",
+    "fenugreek",
+    "fava",
+    "nightshades",
+    "msg",
+    "caffeine",
+    "salicylates",
+    "oralAllergy",
+    "pescatarian",
+    "paleo",
+    "whole30",
+    "aip",
+    "jain",
     "keto",
     "custom",
 ]
@@ -129,11 +158,15 @@ def test_the_taxonomy_loads_with_every_id_in_order() -> None:
 
 def test_strictness_is_derived_from_the_kind() -> None:
     loaded = allergens()
-    assert loaded.strict_kinds == {"allergen", "autoimmune"}
+    assert loaded.strict_kinds == {"allergen", "autoimmune", "medical"}
     by_id = {entry.id: entry for entry in loaded.taxonomy}
     assert by_id["gluten"].kind == "autoimmune" and by_id["gluten"].is_strict
     assert by_id["lactose"].kind == "intolerance" and not by_id["lactose"].is_strict
     assert not by_id["keto"].is_strict
+    assert by_id["fava"].kind == "medical" and by_id["fava"].is_strict
+    assert by_id["nightshades"].kind == "intolerance"
+    assert not by_id["nightshades"].is_strict
+    assert by_id["buckwheat"].jurisdictions == ("jp",)
     assert {"us", "eu"} <= set(by_id["sesame"].jurisdictions)
 
 
