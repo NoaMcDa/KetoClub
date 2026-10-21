@@ -17,12 +17,15 @@
 ///   flexible entry's concern is kept too, at suspected, where it moves
 ///   nothing, so the Why sheet can still say what the staff said.
 ///
-/// The evidence is a list of [ConfirmationEvidence] so the same rule can
-/// later read counts shared by other people ([ConfirmationEvidence.shared],
-/// [ConfirmationEvidence.count]): a shared piece counts only from
-/// [sharedConfirmationThreshold] people, a shared denial lowers one step
-/// rather than straight to suspected, and the person's own answer always
-/// outranks a shared one. Nothing builds shared evidence yet; there is no
+/// The evidence is a list of [ConfirmationEvidence] so the same rule
+/// reads counts shared by other people ([ConfirmationEvidence.shared],
+/// [ConfirmationEvidence.count]; built by [Confirmations.sharedForDish]
+/// from what KetoClub's backend answered, issue #409): a shared piece
+/// counts only from [sharedConfirmationThreshold] people, a shared denial
+/// lowers one step rather than straight to suspected, a shared present
+/// **raises nothing** (it is a hint, not a verdict: it only stops a shared
+/// denial from lowering, and the dish card says how many were told), and
+/// the person's own answer always outranks a shared one. There is no
 /// network code here.
 ///
 /// Device-only and pure: no golden, no Python twin (D26 C1). Never a
@@ -34,6 +37,7 @@ import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/concern.dart';
 import 'package:ketoclub/models/dish_confirmation.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/models/shared_confirmation.dart';
 import 'package:ketoclub/utils/allergens/allergen_matcher.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
 
@@ -42,7 +46,7 @@ import 'package:ketoclub/utils/allergens/taxonomy.dart';
 const int sharedConfirmationThreshold = 3;
 
 /// One piece of staff-confirmation evidence about one restriction in one
-/// dish: the person's own answer, or (later) a count shared by others.
+/// dish: the person's own answer, or a count shared by others.
 @immutable
 final class ConfirmationEvidence {
   /// Creates a piece of evidence about [restrictionId].
@@ -132,6 +136,38 @@ abstract final class Confirmations {
         ConfirmationEvidence.fromLocal(confirmation),
   ];
 
+  /// What other people were told about the dish [dishId] among [shared]
+  /// (issue #409), as evidence: one piece per polarity whose count reaches
+  /// [sharedConfirmationThreshold], dated with the last day counted and
+  /// knowing no source (so a shared present is never added as a concern).
+  /// Empty when [shared] is null or says nothing about the dish.
+  static List<ConfirmationEvidence> sharedForDish(
+    String dishId,
+    SharedConfirmations? shared,
+  ) {
+    if (shared == null) return const <ConfirmationEvidence>[];
+    return <ConfirmationEvidence>[
+      for (final count in shared.forDish(dishId)) ...[
+        if (count.present >= sharedConfirmationThreshold)
+          ConfirmationEvidence(
+            restrictionId: count.restrictionId,
+            polarity: ConfirmationPolarity.present,
+            day: count.last,
+            shared: true,
+            count: count.present,
+          ),
+        if (count.absent >= sharedConfirmationThreshold)
+          ConfirmationEvidence(
+            restrictionId: count.restrictionId,
+            polarity: ConfirmationPolarity.absent,
+            day: count.last,
+            shared: true,
+            count: count.absent,
+          ),
+      ],
+    ];
+  }
+
   /// The key a concern and a piece of evidence are matched under: the
   /// restriction, and for the user's own restriction (ALG-17) also its
   /// words, as `ProfileEvaluator.concernKey` keys it.
@@ -188,15 +224,19 @@ abstract final class Confirmations {
         kept.polarity == ConfirmationPolarity.absent;
   }
 
-  /// [concern] as [piece] leaves it: present → [Certainty.stated] (a
-  /// heads-up restriction's certainty unchanged) at
-  /// [EvidenceTier.confirmed]; absent → [Certainty.suspected] for the
-  /// person's own answer and one step lower for a shared count, never
-  /// below suspected, at [EvidenceTier.denied]. Source, words and
-  /// question are kept.
+  /// [concern] as [piece] leaves it: the person's own present →
+  /// [Certainty.stated] (a heads-up restriction's certainty unchanged) at
+  /// [EvidenceTier.confirmed]; a shared present → [concern] unchanged,
+  /// since other people's word never raises a concern (issue #409);
+  /// absent → [Certainty.suspected] for the person's own answer and one
+  /// step lower for a shared count, never below suspected, at
+  /// [EvidenceTier.denied]. Source, words and question are kept.
   static Concern adjust(Concern concern, ConfirmationEvidence piece) {
     final Certainty certainty;
     final EvidenceTier tier;
+    if (piece.polarity == ConfirmationPolarity.present && piece.shared) {
+      return concern;
+    }
     if (piece.polarity == ConfirmationPolarity.present) {
       certainty = headsUpRestrictions.contains(concern.restrictionId)
           ? concern.certainty

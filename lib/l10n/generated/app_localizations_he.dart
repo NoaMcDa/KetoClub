@@ -2398,4 +2398,29 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get discoveryChipFitsProfile => 'מתאים לפרופיל שלי';
+
+  @override
+  String get settingsShareConfirmations => 'שיתוף מה שהצוות אמר לך';
+
+  @override
+  String get settingsShareConfirmationsBody =>
+      'כל תשובה שנשמרת אחרי ארוחה שולחת את המסעדה, את המנה, את ההגבלה ששאלת עליה ואם כן או לא, כדי שאחרים יראו כמה אנשים שמעו אותו דבר. לעולם לא את הפרופיל שלך, לעולם לא את ההערה שלך.';
+
+  @override
+  String get whatLeavesDeviceSharedConfirmations =>
+      'שיתוף מה שהצוות אמר לך פועל: כל תשובה שנשמרת שולחת לשרת של קטוקלאב את המסעדה, את המנה, את ההגבלה האחת ששאלת עליה ואם כן או לא, בלי שום פרט שמזהה אותך. לעולם לא את הפרופיל שלך, לעולם לא את ההערה שלך.';
+
+  @override
+  String sharedConfirmationAbsent(int count, String restriction) {
+    return '$count אנשים שאלו כאן ונאמר להם שאין במנה $restriction';
+  }
+
+  @override
+  String sharedConfirmationPresent(int count, String restriction) {
+    return '$count אנשים שאלו כאן ונאמר להם שיש במנה $restriction';
+  }
+
+  @override
+  String get sharedConfirmationFooter =>
+      'שותף על ידי סועדים אחרים. האפליקציה לא יכולה לבדוק את זה: תמיד לשאול במסעדה.';
 }

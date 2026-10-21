@@ -6,6 +6,8 @@ import 'package:ketoclub/models/dish_confirmation.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/community/confirmation_client.dart'
+    as community;
 import 'package:ketoclub/services/menu/menu_repository.dart';
 import 'package:ketoclub/services/platform/clock.dart';
 import 'package:ketoclub/services/storage/notes_store.dart';
@@ -63,10 +65,22 @@ final class ConfirmationDish {
 /// [save] writes the answers with the visit history
 /// ([VisitHistoryStore.setConfirmations]) stamped with today's date from
 /// the clock, and each changed note to the [NotesStore]. "Didn't ask" is
-/// recorded as nothing, and nothing is written when nothing changed. None
-/// of it leaves the device (D26 C1).
+/// recorded as nothing, and nothing is written when nothing changed.
+///
+/// **Sharing (issue #409).** Nothing leaves the device unless the user
+/// turned on "Share what the staff told you"
+/// ([AppSettings.shareConfirmations]) and the build has a backend
+/// ([community.ConfirmationClient.isConfigured]). Then [save] also sends
+/// each answer it newly recorded today through [_sharing], one request per
+/// answer: the venue [ref], [dishFingerprint] of the dish id, the one
+/// restriction asked about and the polarity. Never the note, never the
+/// change answer, never the profile, and never an answer about the user's
+/// own words ([DishConfirmation.isShareable]). A failure is logged by the
+/// client and ignored: the answer on the device stands. The sends run
+/// after [save] returns; [lastShare] completes when they are done.
 final class ConfirmationController extends ChangeNotifier {
-  /// Creates the prompt for the menu [ref].
+  /// Creates the prompt for the menu [ref]. `sharing` defaults to a
+  /// client that sends nothing.
   new({
     required this.ref,
     required this._repository,
@@ -74,6 +88,7 @@ final class ConfirmationController extends ChangeNotifier {
     required this._history,
     required this._notes,
     required this._clock,
+    this._sharing = const community.NoConfirmationClient(),
   });
 
   /// The menu the prompt is about.
@@ -84,6 +99,12 @@ final class ConfirmationController extends ChangeNotifier {
   final VisitHistoryStore _history;
   final NotesStore _notes;
   final Clock _clock;
+  final community.ConfirmationClient _sharing;
+  Future<void> _lastShare = Future<void>.value();
+
+  /// Completes when the answers the latest [save] shared have all been
+  /// sent (or failed); already complete when nothing was shared.
+  Future<void> get lastShare => _lastShare;
 
   bool _isLoading = true;
   bool _isAvailable = false;
@@ -271,7 +292,15 @@ final class ConfirmationController extends ChangeNotifier {
         confirmations: confirmations,
         changes: changes,
       );
+      final previous = _stored;
       _stored = List<DishConfirmation>.unmodifiable(confirmations);
+      _lastShare = _share(<DishConfirmation>[
+        for (final confirmation in confirmations)
+          if (confirmation.day == _today &&
+              confirmation.isShareable &&
+              !previous.contains(confirmation))
+            confirmation,
+      ]);
       _storedChanges = List<ChangeConfirmation>.unmodifiable(changes);
       wrote = true;
     }
@@ -288,6 +317,27 @@ final class ConfirmationController extends ChangeNotifier {
     _loadedNotes = await _notes.readAll(ref);
     _notesDraft.clear();
     return wrote;
+  }
+
+  /// Sends each of [answers] through [_sharing] when the user shares and
+  /// the build has a backend; see the class doc. Never throws.
+  Future<void> _share(List<DishConfirmation> answers) async {
+    if (answers.isEmpty || !_sharing.isConfigured) return;
+    if (!(await _settings.read()).shareConfirmations) return;
+    for (final answer in answers) {
+      // The result is ignored: the client logs a failure, and the answer
+      // on the device stands whatever the backend said.
+      await _sharing.confirm(
+        ref: ref,
+        dishFingerprint: dishFingerprint(answer.dishId),
+        restrictionId: answer.restrictionId.name,
+        polarity: switch (answer.polarity) {
+          ConfirmationPolarity.present =>
+            community.ConfirmationPolarity.present,
+          ConfirmationPolarity.absent => community.ConfirmationPolarity.absent,
+        },
+      );
+    }
   }
 
   /// The polarity to record today for [concern] in the dish [dishId], or

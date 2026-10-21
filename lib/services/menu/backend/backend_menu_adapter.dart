@@ -6,6 +6,7 @@ import 'package:ketoclub/models/allergen_matrix.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/shared_confirmation.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_response_parser.dart';
@@ -46,6 +47,12 @@ import 'package:ketoclub/utils/banto_mode.dart';
 /// [MenuFetched.allergenMatrix] (absent or unreadable → null); without it
 /// the key is never read, so a KetoClub build is unchanged. Nothing about
 /// the profile is sent for it (D26 C1).
+///
+/// **What other people were told (Banto, ALG-14, issue #409).** With
+/// [bantoMode] on, a venue answer's optional `confirmations` list is read
+/// tolerantly onto [MenuFetched.sharedConfirmations] (absent or
+/// unreadable → null, an unreadable entry dropped); without it the key is
+/// never read. Nothing is sent for it.
 ///
 /// **No credentials.** The only identifying value sent is the anonymous
 /// install id, as `X-KetoClub-Install-Id`; never an `Authorization`
@@ -95,7 +102,8 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
   /// How long the single HTTP request is given before it is abandoned.
   final Duration timeout;
 
-  /// Whether this build reads Banto's fields: the allergen matrix.
+  /// Whether this build reads Banto's fields: the allergen matrix and the
+  /// shared confirmation counts.
   final bool bantoMode;
 
   @override
@@ -316,6 +324,9 @@ final class BackendMenuAdapter implements PlatformMenuAdapter {
       analysis: _reusable(analysis, options) ? analysis : null,
       allergenMatrix: bantoMode
           ? AllergenMatrix.tryFrom(decoded['allergenMatrix'])
+          : null,
+      sharedConfirmations: bantoMode
+          ? SharedConfirmations.tryFrom(decoded['confirmations'])
           : null,
     );
   }

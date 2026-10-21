@@ -285,6 +285,8 @@ Route<void>? generateRoute(
               history: dependencies.visitHistory,
               notes: dependencies.notesStore,
               clock: dependencies.clock,
+              // Used only when the user shares (issue #409).
+              sharing: dependencies.confirmationClient,
             ),
           ),
         ),

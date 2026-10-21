@@ -1124,5 +1124,17 @@
   "restrictionSearchEmpty": "No restriction matches. You can add it as your own below.",
   "@restrictionSearchEmpty": {"description": "Banto (issue #342): shown in the picker when the search matches nothing; points to 'Add your own'."},
   "discoveryChipFitsProfile": "Fits my profile",
-  "@discoveryChipFitsProfile": {"description": "Banto (issue #410): the Discovery chip beside Keto 8+ that keeps venues with at least one dish fitting the active profiles, as it is or with a change; unscored venues stay. Never 'safe'."}
+  "@discoveryChipFitsProfile": {"description": "Banto (issue #410): the Discovery chip beside Keto 8+ that keeps venues with at least one dish fitting the active profiles, as it is or with a change; unscored venues stay. Never 'safe'."},
+  "settingsShareConfirmations": "Share what the staff told you",
+  "@settingsShareConfirmations": {"description": "Banto (ALG-14, issue #409): the second toggle under AI & privacy, off by default. Shares post-meal answers with KetoClub's server."},
+  "settingsShareConfirmationsBody": "Each answer you save after a meal sends the venue, the dish, the restriction you asked about and yes or no, so other people see how many were told the same. Never your profile, never your note.",
+  "@settingsShareConfirmationsBody": {"description": "Banto (ALG-14, issue #409): the one sentence under the share toggle saying exactly what is sent."},
+  "whatLeavesDeviceSharedConfirmations": "You share what the staff told you: each answer you save sends the venue, the dish, the one restriction you asked about and yes or no to KetoClub's server, with nothing that identifies you. Never your profile, never your note.",
+  "@whatLeavesDeviceSharedConfirmations": {"description": "Banto (ALG-14, issue #409): added to the AI disclosure (Explore banner, Settings) while the share toggle is on."},
+  "sharedConfirmationAbsent": "{count} people were told it has no {restriction} here",
+  "@sharedConfirmationAbsent": {"description": "Banto (ALG-14, issue #409): a dish's shared line, from three people. {restriction} names what was asked about. Never 'safe'; the footer says to ask.", "placeholders": {"count": {"type": "int"}, "restriction": {"type": "String"}}},
+  "sharedConfirmationPresent": "{count} people were told it has {restriction} here",
+  "@sharedConfirmationPresent": {"description": "Banto (ALG-14, issue #409): a dish's shared line when people were told the restriction's ingredient is in the dish.", "placeholders": {"count": {"type": "int"}, "restriction": {"type": "String"}}},
+  "sharedConfirmationFooter": "Shared by other diners. The app cannot check it: always ask the restaurant.",
+  "@sharedConfirmationFooter": {"description": "Banto (ALG-14, issue #409): the helper-tool footer under the shared lines on a dish card."}
 }

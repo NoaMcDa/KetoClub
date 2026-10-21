@@ -19,10 +19,38 @@
 // names ONE restriction id per request as a fact about a dish. Every other
 // service — the HTTP clients, the classifiers, the logger — still cannot name
 // it.
+//
+// Since issue #409 the confirmation client is called: the post-meal prompt
+// shares each answer when the user turned sharing on. The last test runs
+// that path end to end over a recording HTTP client and pins the body: the
+// one restriction answered and nothing else — no other restriction of the
+// profile, no profile, no note, no install id.
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:ketoclub/models/analysis.dart';
+import 'package:ketoclub/models/dietary_profile.dart';
+import 'package:ketoclub/models/dish_confirmation.dart';
+import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/community/confirmation_client.dart'
+    as community;
+import 'package:ketoclub/services/storage/menu_cache.dart';
+import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/state/confirmation_controller.dart';
+
+import '../fakes/fake_app_logger.dart';
+import '../fakes/fake_clock.dart';
+import '../fakes/fake_install_id_store.dart';
+import '../fakes/fake_menu_repository.dart';
+import '../fakes/fake_notes_store.dart';
+import '../fakes/fake_settings_store.dart';
+import '../fakes/fake_visit_history_store.dart';
 
 /// Identifiers (and one word) that name the restriction profile.
 ///
@@ -98,6 +126,129 @@ void main() {
           'The restriction profile stays on the device (Banto C1). A service '
           'must not name it:\n${violations.join('\n')}',
     );
+  });
+
+  test('a shared post-meal answer carries the one restriction answered '
+      'and nothing else (issue #409)', () async {
+    // Arrange: a profile of several restrictions and an own word, a dish
+    // with a sesame concern and a note.
+    const ref = VenueRef(source: MenuSource.wolt, platformId: 'hummus');
+    const dish = Dish(
+      id: 'salad',
+      name: 'סלט חצילים',
+      description: 'עם טחינה',
+      price: 40,
+      options: <DishOption>[],
+    );
+    const note = 'ask Dana about the dressing';
+    const installId = 'ffeeddccbbaa99887766554433221100';
+    final profile = DietaryProfile.empty
+        .withEntry(RestrictionId.sesame)
+        .withEntry(RestrictionId.peanuts)
+        .withEntry(RestrictionId.milk)
+        .withEntry(RestrictionId.gluten)
+        .withCustomTerm('kiwi');
+    final requests = <http.Request>[];
+    final repository = FakeMenuRepository()
+      ..seedCache(
+        CachedMenu(
+          menu: Menu(
+            venueRef: ref,
+            currency: 'ILS',
+            fetchedAt: DateTime.utc(2026),
+            categories: const <MenuCategory>[
+              MenuCategory(id: 'c', name: 'Mains', dishes: <Dish>[dish]),
+            ],
+          ),
+          analysis: MenuAnalysed(
+            dishes: const <AnalysedDish>[
+              AnalysedDish(
+                dishId: 'salad',
+                name: 'סלט חצילים',
+                verdict: DishVerdict.orderAsIs,
+                why: 'Fits',
+              ),
+            ],
+            unclassified: const <String>[],
+            engine: const LlmEngine(model: 'test-model'),
+            analysedAt: DateTime.utc(2026),
+          ),
+        ),
+      );
+    final clock = FakeClock(DateTime(2026, 5, 12, 21));
+    final history = FakeVisitHistoryStore(clock);
+    await history.recordVisit(ref, openedStrict: true);
+    final controller = ConfirmationController(
+      ref: ref,
+      repository: repository,
+      settings: FakeSettingsStore(
+        initial: AppSettings(profile: profile, shareConfirmations: true),
+      ),
+      history: history,
+      notes: FakeNotesStore(),
+      clock: clock,
+      sharing: community.BackendConfirmationClient(
+        client: MockClient((request) async {
+          requests.add(request);
+          return http.Response('{"counted": true}', 201);
+        }),
+        baseUrl: Uri.parse('http://localhost:8000'),
+        installIdStore: FakeInstallIdStore(installId: installId),
+        logger: FakeAppLogger(),
+      ),
+    );
+    await controller.load();
+    final item = controller.dishes.single;
+    for (final concern in item.concerns) {
+      controller.setAnswer('salad', concern, ConfirmationAnswer.absent);
+    }
+    controller.setNote('salad', note);
+
+    // Act
+    await controller.save();
+    await controller.lastShare;
+
+    // Assert
+    expect(requests, hasLength(1));
+    final request = requests.single;
+    final body = jsonDecode(request.body) as Map<String, Object?>;
+    expect(
+      body.keys,
+      unorderedEquals(<String>[
+        'venue',
+        'dishFingerprint',
+        'restrictionId',
+        'polarity',
+      ]),
+    );
+    expect(body['venue'], <String, Object?>{
+      'source': 'wolt',
+      'platformId': 'hummus',
+    });
+    expect(body['dishFingerprint'], dishFingerprint('salad'));
+    expect(body['restrictionId'], RestrictionId.sesame.name);
+    expect(body['polarity'], 'absent');
+    for (final other in <RestrictionId>[
+      RestrictionId.peanuts,
+      RestrictionId.milk,
+      RestrictionId.gluten,
+      RestrictionId.custom,
+    ]) {
+      expect(request.body, isNot(contains('"${other.name}"')));
+    }
+    for (final forbidden in <String>[
+      'kiwi',
+      note,
+      installId,
+      'profile',
+      'note',
+      'severity',
+      'entries',
+    ]) {
+      expect(request.body, isNot(contains(forbidden)), reason: forbidden);
+    }
+    expect(request.headers['X-KetoClub-Install-Id'], installId);
+    expect(request.headers.containsKey('Authorization'), isFalse);
   });
 
   test('every allowlisted file exists and still needs its exemption', () {

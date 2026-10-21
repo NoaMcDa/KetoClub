@@ -10,6 +10,7 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/menu_question.dart';
 import 'package:ketoclub/models/named_profile.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/models/shared_confirmation.dart';
 import 'package:ketoclub/models/trip_destination.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
@@ -195,6 +196,13 @@ final class MenuController extends ChangeNotifier {
   /// [_confirmations] in [open]; see [changeConfirmationFor]. It never
   /// enters an evaluation.
   List<ChangeConfirmation> _changeConfirmations = const <ChangeConfirmation>[];
+
+  /// What other people were told by the staff about the open venue's
+  /// dishes (Banto, ALG-14, issue #409), as KetoClub's backend counted it
+  /// when the menu was fetched ([MenuFetched.sharedConfirmations]); the
+  /// evaluations read it beside [_confirmations]. Null without Banto,
+  /// before a menu is loaded, and for a venue with none.
+  SharedConfirmations? _shared;
 
   /// The upload [open] last started, or an already-complete future when
   /// none has been; see [lastUpload].
@@ -450,7 +458,7 @@ final class MenuController extends ChangeNotifier {
           kitchen: reach,
           trip: _trip,
           matrix: _matrixEvidenceFor(dish.id),
-          confirmations: Confirmations.forDish(dish.id, _confirmations),
+          confirmations: _evidenceFor(dish.id),
         ).combined
       : applyKitchenSignals(
           ProfileEvaluator.evaluate(
@@ -460,7 +468,7 @@ final class MenuController extends ChangeNotifier {
             heading: heading,
             trip: _trip,
             matrix: _matrixEvidenceFor(dish.id),
-            confirmations: Confirmations.forDish(dish.id, _confirmations),
+            confirmations: _evidenceFor(dish.id),
           ),
           dish,
           _profile,
@@ -807,10 +815,19 @@ final class MenuController extends ChangeNotifier {
   MatrixEvidence matrixEvidenceFor(String dishId) => _matrixEvidenceFor(dishId);
 
   /// What the staff said about the dish [dishId] after an earlier meal
-  /// (ALG-14, D27), as this controller's own evaluations read it
-  /// ([Confirmations.forDish]); empty for a dish with no answer.
+  /// (ALG-14, D27), as this controller's own evaluations read it: the
+  /// person's own answers ([Confirmations.forDish]) then the counts other
+  /// people shared ([Confirmations.sharedForDish], issue #409); empty for
+  /// a dish with neither.
   List<ConfirmationEvidence> confirmationsFor(String dishId) =>
-      Confirmations.forDish(dishId, _confirmations);
+      _evidenceFor(dishId);
+
+  /// See [confirmationsFor].
+  List<ConfirmationEvidence> _evidenceFor(String dishId) {
+    final own = Confirmations.forDish(dishId, _confirmations);
+    final shared = Confirmations.sharedForDish(dishId, _shared);
+    return shared.isEmpty ? own : <ConfirmationEvidence>[...own, ...shared];
+  }
 
   /// The latest answer to "they changed the dish as requested" for the
   /// dish [dishId] (ALG-14, D27), read from the visit history in [open],
@@ -899,7 +916,8 @@ final class MenuController extends ChangeNotifier {
         memo.profile == _profile &&
         memo.trip == _trip &&
         listEquals(memo.people, _people) &&
-        identical(memo.confirmations, _confirmations)) {
+        identical(memo.confirmations, _confirmations) &&
+        identical(memo.shared, _shared)) {
       return memo.evaluations;
     }
     final analysedById = _analysedById();
@@ -919,7 +937,7 @@ final class MenuController extends ChangeNotifier {
                 kitchen: reach,
                 trip: _trip,
                 matrix: _matrixEvidenceFor(dish.id),
-                confirmations: Confirmations.forDish(dish.id, _confirmations),
+                confirmations: _evidenceFor(dish.id),
               ),
     };
     final evaluations = <String, EvaluatedDish>{
@@ -936,10 +954,7 @@ final class MenuController extends ChangeNotifier {
                     heading: category.name,
                     trip: _trip,
                     matrix: _matrixEvidenceFor(dish.id),
-                    confirmations: Confirmations.forDish(
-                      dish.id,
-                      _confirmations,
-                    ),
+                    confirmations: _evidenceFor(dish.id),
                   ),
                   dish,
                   _profile,
@@ -954,6 +969,7 @@ final class MenuController extends ChangeNotifier {
       trip: _trip,
       people: _people,
       confirmations: _confirmations,
+      shared: _shared,
       evaluations: evaluations,
       groups: groups,
     );
@@ -968,6 +984,7 @@ final class MenuController extends ChangeNotifier {
     TripDestination? trip,
     List<NamedProfile> people,
     List<DishConfirmation> confirmations,
+    SharedConfirmations? shared,
     Map<String, EvaluatedDish> evaluations,
     Map<String, GroupEvaluation> groups,
   })?
@@ -1174,9 +1191,11 @@ final class MenuController extends ChangeNotifier {
         :final staleReason,
         analysis: final fetchedAnalysis,
         :final allergenMatrix,
+        :final sharedConfirmations,
       ):
         _menu = fetchedMenu;
         _allergenMatrix = allergenMatrix;
+        _shared = _bantoMode ? sharedConfirmations : null;
         _isFromCache = fromCache;
         _staleReason = staleReason;
         _fetchFailure = null;
@@ -1208,6 +1227,7 @@ final class MenuController extends ChangeNotifier {
       case MenuFetchFailed(:final reason, :final statusCode):
         _menu = null;
         _allergenMatrix = null;
+        _shared = null;
         _analysis = null;
         _isFromCache = false;
         _staleReason = null;
@@ -1385,6 +1405,7 @@ final class MenuController extends ChangeNotifier {
         :final staleReason,
         analysis: final fetchedAnalysis,
         :final allergenMatrix,
+        :final sharedConfirmations,
       ):
         final unchanged =
             previousMenu != null &&
@@ -1392,6 +1413,7 @@ final class MenuController extends ChangeNotifier {
                 TextNormaliser.menuFingerprint(fetchedMenu);
         _menu = fetchedMenu;
         _allergenMatrix = allergenMatrix;
+        _shared = _bantoMode ? sharedConfirmations : null;
         _isFromCache = fromCache;
         _staleReason = staleReason;
         _fetchFailure = null;

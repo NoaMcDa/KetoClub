@@ -96,6 +96,7 @@ final class AppSettings {
     this.helperToolSeen = false,
     this.scanMonth = '',
     this.scanCount = 0,
+    this.shareConfirmations = false,
   });
 
   /// The profiles a menu is read for until the user combines others: the
@@ -154,6 +155,9 @@ final class AppSettings {
   /// missing key, a value that is not a `{month, count}` object, a month
   /// that is not a string or a count that is not a positive integer reads
   /// as no scans counted.
+  ///
+  /// [shareConfirmations] (ALG-14, issue #409) follows it too: anything
+  /// but a stored `true` reads as off.
   static AppSettings? tryFrom(Map<String, Object?> json) {
     final rawLanguageTag = json['languageTag'];
     if (rawLanguageTag != null && rawLanguageTag is! String) return null;
@@ -218,6 +222,7 @@ final class AppSettings {
       helperToolSeen: json[_helperToolSeenKey] == true,
       scanMonth: scans.month,
       scanCount: scans.count,
+      shareConfirmations: json[_shareConfirmationsKey] == true,
     );
   }
 
@@ -313,6 +318,12 @@ final class AppSettings {
   /// `const AppSettings().toJson()`, which `keto_unchanged_test` pins —
   /// stays byte-identical. Only a Banto build counts scans.
   static const String _monthlyScansKey = 'monthlyScans';
+
+  /// The JSON key [shareConfirmations] is stored under (ALG-14, issue
+  /// #409), written only when it is true, so a keto install's stored
+  /// record — and `const AppSettings().toJson()`, which
+  /// `keto_unchanged_test` pins — stays byte-identical.
+  static const String _shareConfirmationsKey = 'shareConfirmations';
 
   /// The JSON key [profile] is stored under. [toJson] writes it only for a
   /// non-empty profile, so a keto-only install's stored record — and
@@ -438,6 +449,15 @@ final class AppSettings {
   /// write.
   int scansIn(String month) => month == scanMonth ? scanCount : 0;
 
+  /// Whether the user chose to share what the staff told them after a
+  /// meal (Banto, ALG-14, issue #409): a consent of its own, off by
+  /// default and separate from [estimationConsentGiven]. When it is on
+  /// and the build has a backend, each answer saved in the post-meal
+  /// prompt is sent as one fact — the venue, the dish's fingerprint, the
+  /// one restriction asked about and yes or no — never the profile, a
+  /// note or the change answer.
+  final bool shareConfirmations;
+
   /// Every profile on the device: the user's own ([profile], under
   /// [primaryProfileName]) first, then [otherProfiles].
   List<NamedProfile> get profiles => <NamedProfile>[
@@ -500,6 +520,7 @@ final class AppSettings {
     bool? helperToolSeen,
     String? scanMonth,
     int? scanCount,
+    bool? shareConfirmations,
   }) => AppSettings(
     languageTag: identical(languageTag, _unset)
         ? this.languageTag
@@ -531,6 +552,7 @@ final class AppSettings {
     helperToolSeen: helperToolSeen ?? this.helperToolSeen,
     scanMonth: scanMonth ?? this.scanMonth,
     scanCount: scanCount ?? this.scanCount,
+    shareConfirmations: shareConfirmations ?? this.shareConfirmations,
   );
 
   /// Writes a form [tryFrom] can read back. [profile] is written only
@@ -540,7 +562,8 @@ final class AppSettings {
   /// [_primaryNameKey]. [tripDestination] is written only while a trip is
   /// active; see [_tripKey]. So are [disclosureCopyVersion] and
   /// [helperToolSeen] (ALG-11). The scan counter is written only while it
-  /// counts a scan; see [_monthlyScansKey].
+  /// counts a scan; see [_monthlyScansKey]. [shareConfirmations] is
+  /// written only when it is on; see [_shareConfirmationsKey].
   Map<String, Object?> toJson() => <String, Object?>{
     'languageTag': languageTag,
     'filter': filter.name,
@@ -571,6 +594,7 @@ final class AppSettings {
         'month': scanMonth,
         'count': scanCount,
       },
+    if (shareConfirmations) _shareConfirmationsKey: true,
   };
 
   @override
@@ -596,7 +620,8 @@ final class AppSettings {
       other.disclosureCopyVersion == disclosureCopyVersion &&
       other.helperToolSeen == helperToolSeen &&
       other.scanMonth == scanMonth &&
-      other.scanCount == scanCount;
+      other.scanCount == scanCount &&
+      other.shareConfirmations == shareConfirmations;
 
   @override
   int get hashCode => Object.hash(
@@ -619,8 +644,8 @@ final class AppSettings {
     tripDestination,
     disclosureCopyVersion,
     helperToolSeen,
-    // Object.hash takes at most 20 values; the counter's two hash as one.
-    Object.hash(scanMonth, scanCount),
+    // Object.hash takes at most 20 values; the last three hash as one.
+    Object.hash(scanMonth, scanCount, shareConfirmations),
   );
 
   @override
@@ -642,7 +667,8 @@ final class AppSettings {
       'trip: ${tripDestination != null}, '
       'disclosureCopyVersion: $disclosureCopyVersion, '
       'helperToolSeen: $helperToolSeen, '
-      'scans: $scanCount in $scanMonth)';
+      'scans: $scanCount in $scanMonth, '
+      'shareConfirmations: $shareConfirmations)';
 }
 
 /// On-device storage for [AppSettings] (architecture.md §6.4). Backed by

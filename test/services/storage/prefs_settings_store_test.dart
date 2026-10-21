@@ -578,6 +578,50 @@ void main() {
     });
   });
 
+  group('shareConfirmations (ALG-14, issue #409)', () {
+    test('is off by default and written only when on', () {
+      final unset = const AppSettings().toJson();
+      final set = const AppSettings(shareConfirmations: true).toJson();
+
+      expect(const AppSettings().shareConfirmations, isFalse);
+      expect(unset.containsKey('shareConfirmations'), isFalse);
+      expect(set['shareConfirmations'], isTrue);
+    });
+
+    test('round-trips, and copyWith keeps and changes it', () {
+      const settings = AppSettings(shareConfirmations: true);
+
+      expect(AppSettings.tryFrom(settings.toJson()), equals(settings));
+      expect(
+        settings.copyWith(filter: MenuFilter.redOnly).shareConfirmations,
+        isTrue,
+      );
+      expect(
+        settings.copyWith(shareConfirmations: false),
+        equals(const AppSettings()),
+      );
+      expect(settings, isNot(equals(const AppSettings())));
+      expect(settings.hashCode, isNot(equals(const AppSettings().hashCode)));
+      expect(settings.toString(), contains('shareConfirmations: true'));
+    });
+
+    test('an absent key, or anything but true, reads as off', () {
+      final base = const AppSettings().toJson();
+
+      expect(AppSettings.tryFrom(base)!.shareConfirmations, isFalse);
+      for (final raw in <Object?>['true', 1, null, false]) {
+        expect(
+          AppSettings.tryFrom(<String, Object?>{
+            ...base,
+            'shareConfirmations': raw,
+          })!.shareConfirmations,
+          isFalse,
+          reason: '$raw',
+        );
+      }
+    });
+  });
+
   group('PrefsSettingsStore dietary profile (ALG-02a, issue #344)', () {
     test('an install that stored settings before the profile existed reads '
         'an empty profile and keeps every other field', () async {
