@@ -1930,7 +1930,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get restrictionOwnNote =>
-      'Something not on the list, such as kiwi or coriander. Checked on this device only, as strictly as an allergy, by the words the menu prints.';
+      'Something not on the list, such as mango or coriander. Checked on this device only, as strictly as an allergy, by the words the menu prints.';
 
   @override
   String get restrictionOwnField => 'Food to avoid';
@@ -2369,6 +2369,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
     return 'On $dateString the staff did not make the change you asked for.';
   }
+
+  @override
+  String get restrictionKindReligious => 'Religious diet';
+
+  @override
+  String get restrictionKosherHint =>
+      'Flags pork, shellfish and meat with dairy in the menu\'s words. Ask the restaurant about its certificate';
+
+  @override
+  String get restrictionHalalHint =>
+      'Flags pork, alcohol, gelatin and blood in the menu\'s words. Ask the restaurant about its certificate';
 
   @override
   String get restrictionKindMedical => 'Health condition';

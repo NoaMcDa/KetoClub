@@ -142,13 +142,13 @@ void main() {
           }
         });
 
-        test('cites only file 11 §26 and file 12 §10', () {
+        test('cites file 11 §26 and 12 §10, or the shared §24 and §9', () {
           for (final source in <String>[
             ...vocabulary.sources,
             for (final trigger in vocabulary.hiddenEn) trigger.source,
             for (final trigger in vocabulary.hiddenHe) trigger.source,
           ]) {
-            expect(source, matches(RegExp(r'^(11 §26|12 §10)\.\d+$')));
+            expect(source, matches(RegExp(r'^(11 §2[46]|12 §(9|10))\.\d+$')));
           }
         });
       });

@@ -22,6 +22,16 @@ extension DietaryProfileStrictness on DietaryProfile {
   /// autoimmune condition ([RestrictionKind.isStrict]).
   bool get hasStrictEntry =>
       entries.any((entry) => restrictionFor(entry.restrictionId).isStrict);
+
+  /// Whether any entry is a religious component — kosher, halal or Jain
+  /// (issue #342): flexible, yet worded like a strict entry on the menu
+  /// screen, so "fits" is never read as a certification or as the
+  /// kitchen's word (`ProfileWording.of`).
+  bool get hasReligiousEntry => entries.any(
+    (entry) =>
+        restrictionFor(entry.restrictionId).kind ==
+        RestrictionKind.religiousComponent,
+  );
 }
 
 /// What a [DietaryProfile] asks of the menu screen (Banto, ALG-05, issue

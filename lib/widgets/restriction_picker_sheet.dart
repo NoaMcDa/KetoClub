@@ -33,19 +33,20 @@ String restrictionDisplayName(Restriction restriction, Locale locale) =>
     locale.languageCode == 'he' ? restriction.nameHe : restriction.nameEn;
 
 /// The short label of [kind]: allergy, autoimmune, health condition,
-/// intolerance or diet.
+/// intolerance, religious diet or diet.
 ///
-/// A lifestyle diet, a religious component and keto all read as "diet";
-/// strictness is never shown as a severity (there is none), only implied by
-/// the kind.
+/// A lifestyle diet and keto read as "diet", and kosher, halal and Jain as
+/// a religious diet (issue #342), so the picker never shows two "Diet"
+/// groups; strictness is never shown as a severity (there is none), only
+/// implied by the kind.
 String restrictionKindLabel(AppLocalizations l10n, RestrictionKind kind) =>
     switch (kind) {
       RestrictionKind.allergen => l10n.restrictionKindAllergy,
       RestrictionKind.autoimmune => l10n.restrictionKindAutoimmune,
       RestrictionKind.medical => l10n.restrictionKindMedical,
       RestrictionKind.intolerance => l10n.restrictionKindIntolerance,
+      RestrictionKind.religiousComponent => l10n.restrictionKindReligious,
       RestrictionKind.lifestyle ||
-      RestrictionKind.religiousComponent ||
       RestrictionKind.keto => l10n.restrictionKindDiet,
     };
 
@@ -98,7 +99,8 @@ String profileEntryDisplayName(ProfileEntry entry, Locale locale) =>
 /// US list, the EU list (which Israel's follows), both or neither. The
 /// ALG-17 restrictions say what they are instead: a heads-up from common
 /// guidance ([headsUpRestrictions]), or, for alpha-gal, that dairy is the
-/// Milk entry's.
+/// Milk entry's; kosher and halal (issue #342) say they flag components
+/// and leave the certificate to the restaurant.
 ///
 /// Issue #342: fava says it is G6PD deficiency and not an allergy; a
 /// single legume ([restrictionParent]) that it stands apart from all
@@ -114,6 +116,12 @@ String restrictionJurisdictionHint(
   }
   if (restriction.id == RestrictionId.alphaGal) {
     return l10n.restrictionAlphaGalHint;
+  }
+  if (restriction.id == RestrictionId.kosher) {
+    return l10n.restrictionKosherHint;
+  }
+  if (restriction.id == RestrictionId.halal) {
+    return l10n.restrictionHalalHint;
   }
   if (restriction.id == RestrictionId.fava) return l10n.restrictionFavaHint;
   if (restrictionParent.containsKey(restriction.id)) {

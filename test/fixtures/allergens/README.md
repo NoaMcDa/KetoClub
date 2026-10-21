@@ -39,7 +39,7 @@ test/fixtures/allergens/
   menus/*.json      one file per menu
 ```
 
-Seventeen menus: five are copied from existing fixtures and twelve are written for the corpus. More than half of the dishes are Hebrew (a Hebrew letter in the name or description); the shape test enforces that and the minimum sizes, so this file states no counts that could go stale.
+Eighteen menus: five are copied from existing fixtures and thirteen are written for the corpus. More than half of the dishes are Hebrew (a Hebrew letter in the name or description); the shape test enforces that and the minimum sizes, so this file states no counts that could go stale.
 
 | File | Source | Language |
 |---|---|---|
@@ -58,6 +58,7 @@ Seventeen menus: five are copied from existing fixtures and twelve are written f
 | `asian_takeaway_soy_peanut.json` | synthetic Thai and Chinese place | en |
 | `us_steakhouse.json` | synthetic steakhouse (Worcestershire, blue cheese) | en |
 | `bakery_lupin_sulphites.json` | synthetic bakery: lupin flour, dried fruit | en |
+| `foods_extra_labels.json` | synthetic Israeli cafe-and-grill and US diner / Japanese noodle dishes for buckwheat and Japan's recommended foods (issue #342); labels only those eleven ids | mixed |
 
 The golden menus are copies of their dish texts, never imports: the corpus
 and the golden export (`tool/golden`) are different things. The goldens pin
@@ -112,24 +113,45 @@ These strings, the names of the `RestrictionId` enum:
 `peanuts`, `treeNuts`, `milk`, `lactose`, `eggs`, `soy`, `wheat`, `gluten`,
 `fish`, `crustaceans`, `molluscs`, `sesame`, `celery`, `mustard`, `lupin`,
 `sulphites`, `legumes`, `alphaGal`, `fodmap`, `histamine`, `vegan`,
-`vegetarian`, `glp1`, `buckwheat`, `kiwi`, `peach`, `apple`, `banana`,
-`orange`, `beef`, `pork`, `chicken`, `gelatin`, `yam`, `corn`, `sunflower`,
-`flax`, `chickpea`, `lentil`, `pea`, `fenugreek`, `fava`, `nightshades`,
-`msg`, `caffeine`, `salicylates`, `oralAllergy`, `pescatarian`, `paleo`,
-`whole30`, `aip`, `jain`, `keto`. The enum's last id, `custom` (the user's
-own words, ALG-17), is never labelled: its vocabulary lives in a profile on
-a device, so the corpus has nothing to measure for it.
+`vegetarian`, `glp1`, `kosher`, `halal`, `buckwheat`, `kiwi`, `peach`,
+`apple`, `banana`, `orange`, `beef`, `pork`, `chicken`, `gelatin`, `yam`,
+`corn`, `sunflower`, `flax`, `chickpea`, `lentil`, `pea`, `fenugreek`,
+`fava`, `nightshades`, `msg`, `caffeine`, `salicylates`, `oralAllergy`,
+`pescatarian`, `paleo`, `whole30`, `aip`, `jain`, `keto`. The enum's last
+id, `custom` (the user's own words, ALG-17), is never labelled: its
+vocabulary lives in a profile on a device, so the corpus has nothing to
+measure for it.
 
 `keto` is never labelled. **Strict** restrictions are every id except
-`lactose`, `fodmap`, `histamine`, `vegan`, `vegetarian`, `glp1`, the five
-heads-up sensitivities (`nightshades`, `msg`, `caffeine`, `salicylates`,
-`oralAllergy`), the five research diets (`pescatarian`, `paleo`, `whole30`,
-`aip`, `jain`) and `keto`. The research restrictions (issue #342) arrive with
-empty vocabularies and carry no labels yet; each vocabulary follow-up adds
-its labels and leaves `_awaitingLabels` in `corpus_shape_test.dart`, and the
-Python twin measures only ids whose vocabulary holds a term.
+`lactose`, `fodmap`, `histamine`, `vegan`, `vegetarian`, `glp1`, `kosher`,
+`halal`, the five heads-up sensitivities (`nightshades`, `msg`, `caffeine`,
+`salicylates`, `oralAllergy`), the five research diets (`pescatarian`,
+`paleo`, `whole30`, `aip`, `jain`) and `keto`. The research restrictions
+(issue #342) arrive with empty vocabularies and carry no labels yet; each
+vocabulary follow-up adds its labels and leaves `_awaitingLabels` in
+`corpus_shape_test.dart`, and the Python twin measures only ids whose
+vocabulary holds a term.
 ALG-17 added five `alphaGal` labels (beef, pork and lamb dishes and a
 cheeseburger); FODMAP, histamine and GLP-1 carry none yet.
+
+Issue #342 added `kosher` and `halal` labels on 23 dishes of seven menus.
+They label **components only, never certification** (file 11 §24, §25):
+`kosher` is `contains` for pork, shellfish, a fish without fins and scales,
+blood, or meat or poultry served with dairy (a fish with butter is
+`free`); `halal` is `contains` for pork, blood or alcohol, cooked into a
+sauce included, and `free` for wine *vinegar* and cherry tomatoes
+(עגבניות שרי). Both are flexible, so the recall gate does not read them;
+`corpus_recall_test.dart` prints their recall and false positives only.
+
+Issue #342's foods-extra follow-up added `foods_extra_labels.json`, which
+labels only `buckwheat`, `kiwi`, `peach`, `apple`, `banana`, `orange`,
+`beef`, `pork`, `chicken`, `gelatin` and `yam` (file 11 §26, file 12 §10),
+with explicit `free` labels for the traps: spelt (כוסמין) and yakisoba are
+not buckwheat, potatoes (תפוחי אדמה) are not apples, persimmon is not peach,
+candied yams and בטטה are sweet potato, orange roughy is a fish and
+chicken-fried steak is beef. Its dishes carry no labels for any other id,
+so a hit there on milk or wheat counts as unlabelled, never as a false
+positive against `free`.
 
 ### `label`
 

@@ -45,11 +45,14 @@
 /// Milk is not listed under beef, though some beef-allergic people react
 /// to it (bovine serum albumin, 11 §26.7): the Milk restriction carries
 /// it, as for alpha-gal. Eggs are not chicken meat; the Eggs restriction
-/// carries them. The kosher and halal follow-up builds a pork list of its
-/// own (`vocab_religious.dart`); the two may later share one.
+/// carries them. Pork spreads the kosher and halal pork words, and pork and
+/// beef their gelatin pieces (`vocab_religious.dart`, public for this), so
+/// one word list serves all three; the Gelatin entry keeps its own words,
+/// because for it gelatin is stated and fish gelatin is still gelatin.
 library;
 
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/utils/allergens/vocab_religious.dart';
 import 'package:ketoclub/utils/allergens/vocabulary_types.dart';
 
 /// The English phrases that lower a trigger of any food here from the
@@ -563,16 +566,8 @@ foodsExtraVocabulary = <RestrictionId, RestrictionVocabulary>{
         certainty: TriggerCertainty.suspected,
         source: '11 §26.7',
       ),
-      HiddenTrigger(
-        term: 'gelatin',
-        certainty: TriggerCertainty.suspected,
-        source: '11 §26.7',
-      ),
-      HiddenTrigger(
-        term: 'gelatine',
-        certainty: TriggerCertainty.suspected,
-        source: '11 §26.7',
-      ),
+      // Bovine gelatin, read as kosher and halal read it (11 §24.6).
+      ...gelatinHiddenEn,
     ],
     hiddenHe: <HiddenTrigger>[
       HiddenTrigger(
@@ -660,14 +655,11 @@ foodsExtraVocabulary = <RestrictionId, RestrictionVocabulary>{
         certainty: TriggerCertainty.suspected,
         source: '12 §10.7',
       ),
-      HiddenTrigger(
-        term: "ג'לטין",
-        certainty: TriggerCertainty.suspected,
-        source: '12 §10.7',
-      ),
+      ...gelatinHiddenHe,
     ],
     guards: _meatGuards,
     termGuards: <String, AllergenGuards>{
+      ...gelatinTermGuards,
       'steak': AllergenGuards(
         beforeEn: <String>[
           'tuna',
@@ -765,106 +757,14 @@ foodsExtraVocabulary = <RestrictionId, RestrictionVocabulary>{
     noPrefixHe: <String>['בקר', 'עגל', 'בשר', 'ציר'],
     sources: <String>['11 §26.7', '12 §10.7'],
   ),
-  // Pork (11 §26.8, 12 §10.8).
+  // Pork (11 §26.8, 12 §10.8): the kosher and halal pork words
+  // (`vocab_religious.dart`, 11 §24.1, 12 §9.1), shared so a word added
+  // there reaches the allergy too, plus the pork dishes this entry adds.
   RestrictionId.pork: RestrictionVocabulary(
-    directEn: <String>[
-      'pork',
-      'pig',
-      'piglet',
-      'boar',
-      'bacon',
-      'ham',
-      'gammon',
-      'lard',
-      'lardo',
-      'lardons',
-      'pancetta',
-      'guanciale',
-      'prosciutto',
-      'jamón',
-      'porchetta',
-      'carnitas',
-      'char siu',
-      'tonkatsu',
-      'tonkotsu',
-    ],
-    directHe: <String>['חזיר', 'החזיר', 'וחזיר', 'בחזיר'],
+    directEn: porkNamesEn,
+    directHe: porkNamesHe,
     hiddenEn: <HiddenTrigger>[
-      HiddenTrigger(
-        term: 'chorizo',
-        certainty: TriggerCertainty.likely,
-        source: '11 §26.8',
-      ),
-      HiddenTrigger(
-        term: 'mortadella',
-        certainty: TriggerCertainty.likely,
-        source: '11 §26.8',
-      ),
-      HiddenTrigger(
-        term: 'speck',
-        certainty: TriggerCertainty.likely,
-        source: '11 §26.8',
-      ),
-      HiddenTrigger(
-        term: 'bratwurst',
-        certainty: TriggerCertainty.likely,
-        source: '11 §26.8',
-      ),
-      HiddenTrigger(
-        term: 'kielbasa',
-        certainty: TriggerCertainty.likely,
-        source: '11 §26.8',
-      ),
-      HiddenTrigger(
-        term: 'chicharrón',
-        certainty: TriggerCertainty.likely,
-        source: '11 §26.8',
-      ),
-      HiddenTrigger(
-        term: 'chicharrones',
-        certainty: TriggerCertainty.likely,
-        source: '11 §26.8',
-      ),
-      HiddenTrigger(
-        term: 'spare ribs',
-        certainty: TriggerCertainty.likely,
-        source: '11 §26.8',
-      ),
-      HiddenTrigger(
-        term: 'baby back ribs',
-        certainty: TriggerCertainty.likely,
-        source: '11 §26.8',
-      ),
-      HiddenTrigger(
-        term: 'salami',
-        certainty: TriggerCertainty.suspected,
-        source: '11 §26.8',
-      ),
-      HiddenTrigger(
-        term: 'pepperoni',
-        certainty: TriggerCertainty.suspected,
-        source: '11 §26.8',
-      ),
-      HiddenTrigger(
-        term: 'sausage',
-        certainty: TriggerCertainty.suspected,
-        source: '11 §26.8',
-      ),
-      HiddenTrigger(
-        term: 'sausages',
-        certainty: TriggerCertainty.suspected,
-        source: '11 §26.8',
-      ),
-      HiddenTrigger(
-        term: 'hot dog',
-        certainty: TriggerCertainty.suspected,
-        source: '11 §26.8',
-      ),
-      HiddenTrigger(
-        term: 'hot dogs',
-        certainty: TriggerCertainty.suspected,
-        source: '11 §26.8',
-      ),
+      ...porkHiddenEn,
       HiddenTrigger(
         term: 'carbonara',
         certainty: TriggerCertainty.suspected,
@@ -875,154 +775,26 @@ foodsExtraVocabulary = <RestrictionId, RestrictionVocabulary>{
         certainty: TriggerCertainty.suspected,
         source: '11 §26.8',
       ),
-      HiddenTrigger(
-        term: 'gelatin',
-        certainty: TriggerCertainty.suspected,
-        source: '11 §26.8',
-      ),
-      HiddenTrigger(
-        term: 'gelatine',
-        certainty: TriggerCertainty.suspected,
-        source: '11 §26.8',
-      ),
+      ...gelatinHiddenEn,
     ],
     hiddenHe: <HiddenTrigger>[
-      HiddenTrigger(
-        term: 'בשר לבן',
-        certainty: TriggerCertainty.likely,
-        source: '12 §10.8',
-      ),
+      ...porkHiddenHe,
       HiddenTrigger(
         term: 'ירך לבן',
         certainty: TriggerCertainty.likely,
         source: '12 §10.8',
       ),
-      HiddenTrigger(
-        term: 'בייקון',
-        certainty: TriggerCertainty.likely,
-        source: '12 §10.8',
-      ),
-      HiddenTrigger(
-        term: 'פרושוטו',
-        certainty: TriggerCertainty.likely,
-        source: '12 §10.8',
-      ),
-      HiddenTrigger(
-        term: "פנצ'טה",
-        certainty: TriggerCertainty.likely,
-        source: '12 §10.8',
-      ),
-      HiddenTrigger(
-        term: 'סטייק לבן',
-        certainty: TriggerCertainty.suspected,
-        source: '12 §10.8',
-      ),
-      HiddenTrigger(
-        term: 'סלמי',
-        certainty: TriggerCertainty.suspected,
-        source: '12 §10.8',
-      ),
-      HiddenTrigger(
-        term: 'פפרוני',
-        certainty: TriggerCertainty.suspected,
-        source: '12 §10.8',
-      ),
-      HiddenTrigger(
-        term: "צ'וריסו",
-        certainty: TriggerCertainty.suspected,
-        source: '12 §10.8',
-      ),
-      HiddenTrigger(
-        term: 'נקניק',
-        certainty: TriggerCertainty.suspected,
-        source: '12 §10.8',
-      ),
-      HiddenTrigger(
-        term: "ג'לטין",
-        certainty: TriggerCertainty.suspected,
-        source: '12 §10.8',
-      ),
+      ...gelatinHiddenHe,
     ],
     guards: _meatGuards,
     termGuards: <String, AllergenGuards>{
-      // The words beside a pork word that name another meat: kosher
-      // menus print "turkey bacon", "בייקון בקר" and "פרושוטו אווז".
+      ...porkTermGuards,
+      ...gelatinTermGuards,
+      // A guinea pig is not a pig dish.
       'pig': AllergenGuards(beforeEn: <String>['guinea']),
-      'bacon': AllergenGuards(
-        beforeEn: <String>[
-          'turkey',
-          'beef',
-          'veggie',
-          'coconut',
-          'duck',
-          'lamb',
-          'goose',
-          'chicken',
-          'salmon',
-          'mushroom',
-          'tempeh',
-        ],
-      ),
-      'ham': AllergenGuards(
-        beforeEn: <String>['turkey', 'chicken', 'beef', 'goose', 'duck'],
-      ),
-      'prosciutto': AllergenGuards(
-        beforeEn: <String>['duck', 'goose', 'beef', 'turkey'],
-      ),
-      'char siu': AllergenGuards(beforeEn: <String>['chicken', 'tofu']),
-      'tonkatsu': AllergenGuards(beforeEn: <String>['chicken']),
-      'chorizo': AllergenGuards(
-        beforeEn: <String>['chicken', 'beef', 'veggie'],
-      ),
-      'bratwurst': AllergenGuards(
-        beforeEn: <String>['chicken', 'turkey', 'veggie'],
-      ),
-      'kielbasa': AllergenGuards(beforeEn: <String>['turkey', 'beef']),
-      'salami': AllergenGuards(
-        beforeEn: <String>['turkey', 'chicken', 'beef', 'goose'],
-      ),
-      'pepperoni': AllergenGuards(
-        beforeEn: <String>['turkey', 'chicken', 'beef'],
-      ),
-      'sausage': AllergenGuards(
-        beforeEn: <String>[
-          'chicken',
-          'turkey',
-          'beef',
-          'lamb',
-          'veggie',
-          'fish',
-        ],
-      ),
-      'sausages': AllergenGuards(
-        beforeEn: <String>[
-          'chicken',
-          'turkey',
-          'beef',
-          'lamb',
-          'veggie',
-          'fish',
-        ],
-      ),
-      'hot dog': AllergenGuards(
-        beforeEn: <String>['chicken', 'turkey', 'beef'],
-      ),
-      'hot dogs': AllergenGuards(
-        beforeEn: <String>['chicken', 'turkey', 'beef'],
-      ),
-      'בייקון': AllergenGuards(
-        afterHe: <String>['בקר', 'הודו', 'אווז', 'טלה', 'עוף'],
-      ),
-      'פרושוטו': AllergenGuards(
-        afterHe: <String>['אווז', 'ברווז', 'בקר', 'הודו'],
-      ),
-      'סלמי': AllergenGuards(afterHe: <String>['הודו', 'עוף', 'בקר', 'אווז']),
-      'פפרוני': AllergenGuards(afterHe: <String>['הודו', 'עוף', 'בקר']),
-      "צ'וריסו": AllergenGuards(afterHe: <String>['עוף', 'בקר']),
-      'נקניק': AllergenGuards(afterHe: <String>['עוף', 'הודו', 'בקר']),
     },
     noPrefixHe: <String>['חזיר'],
-    sources: <String>['11 §26.8', '12 §10.8'],
+    sources: <String>['11 §24.1', '11 §26.8', '12 §9.1', '12 §10.8'],
   ),
   // Chicken (11 §26.9, 12 §10.9): eggs are not chicken meat.
   RestrictionId.chicken: RestrictionVocabulary(

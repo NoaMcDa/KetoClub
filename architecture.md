@@ -4020,6 +4020,33 @@ to 494 of 500. Seven remain: the two label questions, the three shared-fryer
 dishes, the cream-sauce pasta (no source says it is fresh pasta, and dried
 pasta is egg-free) and the seafood cream dish for fish (`פירות ים` names
 crustaceans and molluscs, a decision the sea tests pin).
+*Kosher and halal (related to #342):* the first two entries of
+`RestrictionKind.religiousComponent` (flexible), ids `kosher` and `halal`
+after `glp1`, **components only, never certification** (file 03; file 10's
+non-goals). `vocab_religious.dart` flags pork, shellfish (the sea group's
+crustacean and mollusc lists, split into public pieces in their old order,
+so every existing golden entry is byte-identical), fish without fins and
+scales, rabbit, blood and gelatin for kosher, and pork, alcohol (every term
+hidden and likely; "שרי" left out as the cherry tomato), blood and gelatin
+for halal, each term cited to file 11 §24–§25 or file 12 §9. Kosher's meat
+with dairy is a rule, not a word: `ClassificationRules.allergenFindings`
+(and its Python twin in `rules.py`) appends one kosher concern when a dish
+names an unguarded meat or poultry word (`meatWithDairyMeatVocabulary`,
+alpha-gal's mammal lists spread, exported as `meatWithDairy` in
+`allergens.json`) and an unguarded stated or likely Milk word that do not
+overlap — stated when both are stated in the dish, suspected otherwise or
+when one side is only an option; fish never counts. Declarations gain
+`DeclarationRule.tagsOnly`: a platform's `kosher` or `halal` tag lowers that
+restriction alone, and menu text ("kosher salt") declares nothing. Waiter
+questions name the component ("Can this be made without pork?", "The menu
+says 'wine': does it contain alcohol?"; meat with dairy asks about the dairy
+or, from an option, whether one can be left off), never the word; the chef
+card adds "I keep kosher …" / "I eat halal …" and a certificate question on
+its own line; and a profile holding either uses the strict wording, so a
+dish with nothing found reads "No trigger found — ask the restaurant", never
+"Fits". The only kosher statement stays ALG-09's attributed chip, which
+`test/l10n/religious_words_test.dart` pins. No `schemaVersion` bump (C3):
+the concerns are computed, never stored.
 
 **The research restrictions: ids first, words later (related to #342).**
 Every restriction the allergen documentation names that the taxonomy did
@@ -4040,7 +4067,9 @@ no `il` tag. *Heads-up sensitivities* (kind `intolerance`, in
 nothing): `nightshades`, `msg`, `caffeine`, `salicylates` and
 `oralAllergy` (file 03, "The map"; file 02), the last asking whether an
 item is raw and can be served cooked. *Diets*: `pescatarian`, `paleo`,
-`whole30` and `aip` (`lifestyle`) and `jain` (`religiousComponent`). Each
+`whole30` and `aip` (`lifestyle`) and `jain` (`religiousComponent`, so it
+sits under kosher's and halal's "Religious diet" heading and, since
+`hasReligiousEntry` reads the kind, takes their strict wording). Each
 has its names, picker hint, waiter subject and chef card line in both
 languages. Their vocabularies are five new group files, **empty** in this
 step (`vocab_foods_extra`, `vocab_seeds_extra`, `vocab_legume_parts`,
@@ -4057,6 +4086,20 @@ PKU, gout, diabetes, pregnancy, GERD, IBD, EoE; file 10, file 03), and
 kosher or halal *certification*, which no app can verify (file 03; their
 components are a separate pull request). Chestnut is no id: it stays a
 tree-nut question for that vocabulary (file 11 §2.5).
+
+**Foods extra filled (related to #342).** `vocab_foods_extra.dart` now holds
+buckwheat and Japan's ten recommended foods, sourced to file 11 §26 and file
+12 §10 (desk research checked against search excerpts on 2026-10-21,
+unreviewed rows suspected), so the eleven ids are offered. Buckwheat stays a
+guard of wheat and gluten only, never of itself; yam is Japan's yamaimo and
+the bare word "yam" (US sweet potato) and `בטטה` are no terms; `תפוח` is
+lowered before `אדמה` and `תפוחי אדמה` never matches; orange roughy, orange
+wine, banana peppers and chicken-fried steak are lowered. Pork spreads the
+kosher and halal pork words and pork and beef their gelatin pieces, made
+public in `vocab_religious.dart` in the same order (no kosher or halal golden
+changes); the Gelatin entry keeps its own words, gelatin stated and fish
+gelatin included. A corpus menu, `foods_extra_labels.json`, labels the eleven
+ids, and the own-word hint's example is mango, since kiwi is now offered.
 
 ### D27 — Post-meal confirmations, no ratings
 

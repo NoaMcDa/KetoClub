@@ -75,8 +75,8 @@ final class TripLexiconEntry {
 
   /// [hides] with what follows from it by definition, in taxonomy order:
   /// fish, shellfish, meat and gelatin are not vegetarian; those and milk
-  /// and eggs are not vegan; milk may carry lactose. What the evaluator and
-  /// the briefing read.
+  /// and eggs are not vegan; milk may carry lactose; shellfish is not kosher
+  /// (issue #342). What the evaluator and the briefing read.
   List<RestrictionId> get restrictions {
     final ids = <RestrictionId>{...hides};
     const animal = <RestrictionId>{
@@ -99,6 +99,10 @@ final class TripLexiconEntry {
       ids.add(RestrictionId.vegan);
     }
     if (hides.contains(RestrictionId.milk)) ids.add(RestrictionId.lactose);
+    if (hides.contains(RestrictionId.crustaceans) ||
+        hides.contains(RestrictionId.molluscs)) {
+      ids.add(RestrictionId.kosher);
+    }
     return List<RestrictionId>.unmodifiable(
       ids.toList()..sort((a, b) => a.index.compareTo(b.index)),
     );

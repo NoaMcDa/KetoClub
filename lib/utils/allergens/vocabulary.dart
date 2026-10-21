@@ -1,9 +1,8 @@
 /// The allergen vocabulary registry (Banto; ALG-01, issue #343): every
 /// restriction's [RestrictionVocabulary], assembled from the group files
 /// (six, since ALG-17 a seventh for the extended restrictions, and since
-/// issue #342 five more for the research restrictions, empty until their
-/// follow-ups fill them) so that each group's pull request touches only
-/// its own file.
+/// issue #342 an eighth for kosher and halal) so that each group's pull
+/// request touches only its own file.
 ///
 /// Profile-independent (architecture.md D26, C1): the registry and the
 /// matcher over it know nothing of anyone's profile.
@@ -19,6 +18,7 @@ import 'package:ketoclub/utils/allergens/vocab_gluten_grains.dart';
 import 'package:ketoclub/utils/allergens/vocab_legume_parts.dart';
 import 'package:ketoclub/utils/allergens/vocab_nuts_seeds.dart';
 import 'package:ketoclub/utils/allergens/vocab_plants_additives.dart';
+import 'package:ketoclub/utils/allergens/vocab_religious.dart';
 import 'package:ketoclub/utils/allergens/vocab_sea.dart';
 import 'package:ketoclub/utils/allergens/vocab_seeds_extra.dart';
 import 'package:ketoclub/utils/allergens/vocab_sensitivities.dart';
@@ -39,6 +39,7 @@ const Map<RestrictionId, RestrictionVocabulary> allergenVocabulary =
       ...plantsAdditivesVocabulary,
       ...dietsVocabulary,
       ...extendedVocabulary,
+      ...religiousVocabulary,
       ...foodsExtraVocabulary,
       ...seedsExtraVocabulary,
       ...legumePartsVocabulary,
@@ -56,6 +57,7 @@ allergenVocabularyGroups = <String, Map<RestrictionId, RestrictionVocabulary>>{
   'vocab_plants_additives.dart': plantsAdditivesVocabulary,
   'vocab_diets.dart': dietsVocabulary,
   'vocab_extended.dart': extendedVocabulary,
+  'vocab_religious.dart': religiousVocabulary,
   'vocab_foods_extra.dart': foodsExtraVocabulary,
   'vocab_seeds_extra.dart': seedsExtraVocabulary,
   'vocab_legume_parts.dart': legumePartsVocabulary,
