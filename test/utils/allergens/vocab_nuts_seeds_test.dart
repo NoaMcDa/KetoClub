@@ -345,12 +345,18 @@ void main() {
       ]);
     });
 
+    test('chestnut is a low-confidence trigger (11 §2.5, §27.5)', () {
+      _expectAll(<_Case>[
+        _case(id, 'Chestnut soup', _suspected, 'FARE yes, EU and FDA no'),
+        _guard(id, 'Water chestnuts', 'an aquatic vegetable, lowered'),
+        _case(id, 'ערמוני מים', null, 'Hebrew water chestnuts'),
+      ]);
+    });
+
     test('foods that are not tree nuts find nothing', () {
       _expectAll(<_Case>[
         _case(id, 'Coconut cream pie', null, 'coconut'),
         _case(id, 'Nutmeg latte', null, 'nutmeg'),
-        _case(id, 'Chestnut soup', null, 'chestnut'),
-        _case(id, 'Water chestnuts', null, 'water chestnut'),
         _case(id, 'Butternut squash', null, 'butternut'),
         _case(id, 'Peanut butter', null, 'peanut is a legume'),
         _case(id, 'Doughnut', null, 'a doughnut'),

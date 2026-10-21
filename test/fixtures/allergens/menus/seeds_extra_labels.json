@@ -1,0 +1,448 @@
+{
+  "_fixture_note": "synthetic; a mixed Israeli cafe and Latin grill menu written for the corn, sunflower seed and flaxseed vocabularies (issue #342) and the chestnut entries of tree nuts, with the traps file 11 §27.5 names (peppercorn, corned beef, popcorn shrimp, water chestnuts, refined oils); mixed Hebrew and English",
+  "language": "mixed",
+  "dishes": [
+    {
+      "name": "סלט תירס וגזר",
+      "description": "תירס מתוק, גזר מגורר, פטרוזיליה ומיונז",
+      "options": [],
+      "labels": {
+        "corn": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"תירס\" in the name",
+          "source": "12 §11.1"
+        },
+        "sunflower": {
+          "label": "free",
+          "evidence": "no sunflower ingredient named in the dish text; cross-contact not assessed",
+          "source": "11 §27.3"
+        },
+        "flax": {
+          "label": "free",
+          "evidence": "no flax ingredient named in the dish text; cross-contact not assessed",
+          "source": "11 §27.4"
+        }
+      }
+    },
+    {
+      "name": "פולנטה קרמית עם פטריות",
+      "description": "פולנטה רכה, פטריות יער, פרמזן",
+      "options": [],
+      "labels": {
+        "corn": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פולנטה\" is cornmeal",
+          "source": "11 §27.1"
+        },
+        "flax": {
+          "label": "free",
+          "evidence": "no flax ingredient named in the dish text; cross-contact not assessed",
+          "source": "11 §27.4"
+        }
+      }
+    },
+    {
+      "name": "שניצל קורנפלקס",
+      "description": "חזה עוף בציפוי קורנפלקס פריך, לצד צ'יפס",
+      "options": [],
+      "labels": {
+        "corn": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"קורנפלקס\" coating",
+          "source": "12 §11.1"
+        }
+      }
+    },
+    {
+      "name": "נאצ'וס עם גואקמולה",
+      "description": "צ'יפס טורטייה, גואקמולה, סלסה ושמנת חמוצה",
+      "options": [],
+      "labels": {
+        "corn": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"נאצ'וס\" are fried corn tortilla chips",
+          "source": "11 §27.2"
+        },
+        "sunflower": {
+          "label": "free",
+          "evidence": "no sunflower ingredient named in the dish text; cross-contact not assessed",
+          "source": "11 §27.3"
+        }
+      }
+    },
+    {
+      "name": "טאקו דג",
+      "description": "שתי טורטיות רכות, דג לבן צלוי, כרוב סגול וסלסה",
+      "options": [],
+      "labels": {
+        "corn": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"טורטיות\" may be corn or wheat",
+          "source": "11 §27.2"
+        }
+      }
+    },
+    {
+      "name": "Elote",
+      "description": "Grilled corn on the cob with crema, cotija and chili",
+      "options": [],
+      "labels": {
+        "corn": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"corn on the cob\" in the description",
+          "source": "11 §27.1"
+        }
+      }
+    },
+    {
+      "name": "Arepa with cheese",
+      "description": "Griddled masa cake filled with white cheese",
+      "options": [],
+      "labels": {
+        "corn": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"arepa\" and \"masa\" are corn dough",
+          "source": "11 §27.2"
+        }
+      }
+    },
+    {
+      "name": "פופקורן חמאה",
+      "description": "קערת פופקורן חם עם חמאה ומלח",
+      "options": [],
+      "labels": {
+        "corn": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פופקורן\" in the name",
+          "source": "12 §11.1"
+        },
+        "sunflower": {
+          "label": "free",
+          "evidence": "no sunflower ingredient named in the dish text; cross-contact not assessed",
+          "source": "11 §27.3"
+        }
+      }
+    },
+    {
+      "name": "Popcorn shrimp",
+      "description": "Small breaded shrimp, fried, with lemon aioli",
+      "options": [],
+      "labels": {
+        "corn": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "\"popcorn\" names the size, and the breading may hold cornstarch",
+          "source": "11 §27.5"
+        }
+      }
+    },
+    {
+      "name": "מרק עוף סמיך",
+      "description": "מרק עוף עם ירקות, מוסמך בקורנפלור",
+      "options": [],
+      "labels": {
+        "corn": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "\"קורנפלור\" is cornstarch, a refined corn product",
+          "source": "12 §11.1"
+        }
+      }
+    },
+    {
+      "name": "סלט מקסיקני",
+      "description": "שעועית שחורה, עגבניות, כוסברה ולימון, ללא תירס",
+      "options": [],
+      "labels": {
+        "corn": {
+          "label": "may_contain",
+          "role": "unknown",
+          "evidence": "guard: 'ללא תירס' (11 §0)",
+          "source": "11 §27.5"
+        }
+      }
+    },
+    {
+      "name": "Peppercorn steak",
+      "description": "Sirloin with a green peppercorn sauce and roast potatoes",
+      "options": [],
+      "labels": {
+        "corn": {
+          "label": "free",
+          "evidence": "peppercorn is not corn; cross-contact not assessed",
+          "source": "11 §27.5"
+        },
+        "sunflower": {
+          "label": "free",
+          "evidence": "no sunflower ingredient named in the dish text; cross-contact not assessed",
+          "source": "11 §27.3"
+        }
+      }
+    },
+    {
+      "name": "Corned beef on rye",
+      "description": "Corned beef, mustard and pickles on rye bread",
+      "options": [],
+      "labels": {
+        "corn": {
+          "label": "free",
+          "evidence": "corned beef is salt-cured beef, not corn; cross-contact not assessed",
+          "source": "11 §27.5"
+        }
+      }
+    },
+    {
+      "name": "סלט ירוק עם גרעיני חמנייה",
+      "description": "חסה, מלפפון, עשבי תיבול וגרעיני חמנייה קלויים",
+      "options": [],
+      "labels": {
+        "sunflower": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"גרעיני חמנייה\" in the name",
+          "source": "12 §11.2"
+        },
+        "corn": {
+          "label": "free",
+          "evidence": "no corn ingredient named in the dish text; cross-contact not assessed",
+          "source": "11 §27.1"
+        },
+        "flax": {
+          "label": "free",
+          "evidence": "no flax ingredient named in the dish text; cross-contact not assessed",
+          "source": "11 §27.4"
+        }
+      }
+    },
+    {
+      "name": "חלבת חמניות",
+      "description": "חלבה מגרעיני חמנייה קלויים, בסגנון רוסי",
+      "options": [],
+      "labels": {
+        "sunflower": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"חמניות\" halva made of sunflower seeds",
+          "source": "11 §27.3"
+        }
+      }
+    },
+    {
+      "name": "Kale salad",
+      "description": "Kale, apple, toasted sunflower seeds and lemon dressing",
+      "options": [],
+      "labels": {
+        "sunflower": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"sunflower seeds\" in the description",
+          "source": "11 §27.3"
+        },
+        "flax": {
+          "label": "free",
+          "evidence": "no flax ingredient named in the dish text; cross-contact not assessed",
+          "source": "11 §27.4"
+        }
+      }
+    },
+    {
+      "name": "Sunbutter toast",
+      "description": "Toasted sourdough with sunflower seed butter and banana",
+      "options": [],
+      "labels": {
+        "sunflower": {
+          "label": "contains",
+          "role": "sauce",
+          "evidence": "\"sunflower seed butter\" in the description",
+          "source": "11 §27.3"
+        }
+      }
+    },
+    {
+      "name": "צ'יפס בית",
+      "description": "תפוחי אדמה מטוגנים בשמן חמניות, מלח ים",
+      "options": [],
+      "labels": {
+        "sunflower": {
+          "label": "may_contain",
+          "role": "hidden",
+          "evidence": "\"שמן חמניות\": refined sunflower oil is often tolerated",
+          "source": "11 §27.3"
+        },
+        "corn": {
+          "label": "free",
+          "evidence": "no corn ingredient named in the dish text; cross-contact not assessed",
+          "source": "11 §27.1"
+        }
+      }
+    },
+    {
+      "name": "שקית גרעינים",
+      "description": "גרעינים קלויים ומלוחים",
+      "options": [],
+      "labels": {
+        "sunflower": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "a bare \"גרעינים\" is usually sunflower seeds",
+          "source": "12 §11.2"
+        }
+      }
+    },
+    {
+      "name": "יוגורט עם פשתן",
+      "description": "יוגורט עזים, זרעי פשתן טחונים ודבש",
+      "options": [],
+      "labels": {
+        "flax": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"זרעי פשתן\" in the description",
+          "source": "12 §11.3"
+        },
+        "corn": {
+          "label": "free",
+          "evidence": "no corn ingredient named in the dish text; cross-contact not assessed",
+          "source": "11 §27.1"
+        }
+      }
+    },
+    {
+      "name": "קרקר פשתן ביתי",
+      "description": "קרקרים אפויים של פשתן, צ'יה ושומשום",
+      "options": [],
+      "labels": {
+        "flax": {
+          "label": "contains",
+          "role": "base",
+          "evidence": "\"פשתן\" in the name",
+          "source": "12 §11.3"
+        }
+      }
+    },
+    {
+      "name": "Overnight oats",
+      "description": "Oats soaked in oat milk with ground flaxseed and berries",
+      "options": [],
+      "labels": {
+        "flax": {
+          "label": "contains",
+          "role": "garnish",
+          "evidence": "\"flaxseed\" in the description",
+          "source": "11 §27.4"
+        },
+        "sunflower": {
+          "label": "free",
+          "evidence": "no sunflower ingredient named in the dish text; cross-contact not assessed",
+          "source": "11 §27.3"
+        }
+      }
+    },
+    {
+      "name": "כריך בלחם דגנים",
+      "description": "לחם דגנים, חביתה, עגבנייה ומלפפון",
+      "options": [],
+      "labels": {
+        "flax": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחם דגנים\" often holds flax seeds",
+          "source": "11 §27.4"
+        },
+        "sunflower": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"לחם דגנים\" often holds sunflower seeds",
+          "source": "11 §27.3"
+        }
+      }
+    },
+    {
+      "name": "Avocado toast",
+      "description": "Multigrain toast, smashed avocado, chili flakes",
+      "options": [],
+      "labels": {
+        "flax": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"multigrain\" bread often holds flax seeds",
+          "source": "11 §27.4"
+        },
+        "sunflower": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"multigrain\" bread often holds sunflower seeds",
+          "source": "11 §27.3"
+        },
+        "corn": {
+          "label": "free",
+          "evidence": "no corn ingredient named in the dish text; cross-contact not assessed",
+          "source": "11 §27.1"
+        }
+      }
+    },
+    {
+      "name": "מרק ערמונים",
+      "description": "מרק קטיפתי של ערמונים קלויים ושמנת",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"ערמונים\": chestnut is a tree nut for FARE, not for the EU list",
+          "source": "11 §2.5"
+        }
+      }
+    },
+    {
+      "name": "Roast chestnuts",
+      "description": "A paper cone of chestnuts roasted over coals",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "may_contain",
+          "role": "base",
+          "evidence": "\"chestnuts\": a tree nut for FARE, not for the EU list",
+          "source": "11 §2.5"
+        }
+      }
+    },
+    {
+      "name": "מוקפץ ירקות עם ערמוני מים",
+      "description": "ברוקולי, גזר, ערמוני מים ובצל ירוק",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "water chestnuts are an aquatic vegetable, not a tree nut; cross-contact not assessed",
+          "source": "11 §27.5"
+        },
+        "corn": {
+          "label": "free",
+          "evidence": "no corn ingredient named in the dish text; cross-contact not assessed",
+          "source": "11 §27.1"
+        }
+      }
+    },
+    {
+      "name": "Water chestnut stir-fry",
+      "description": "Snow peas, water chestnuts and spring onion",
+      "options": [],
+      "labels": {
+        "treeNuts": {
+          "label": "free",
+          "evidence": "water chestnuts are an aquatic vegetable, not a tree nut; cross-contact not assessed",
+          "source": "11 §27.5"
+        }
+      }
+    }
+  ]
+}

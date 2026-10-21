@@ -11585,6 +11585,14 @@
           "source": "name",
           "tier": "stated",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "במבה",
+          "restrictionId": "corn",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -11639,6 +11647,14 @@
         },
         {
           "certainty": "likely",
+          "matchedText": "במבה",
+          "restrictionId": "corn",
+          "source": "hidden",
+          "tier": "inferred",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
           "matchedText": "נוגט",
           "restrictionId": "treeNuts",
           "source": "hidden",
@@ -11683,6 +11699,14 @@
           "restrictionId": "legumes",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "likely",
+          "matchedText": "במבה",
+          "restrictionId": "corn",
+          "source": "hidden",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
@@ -20681,6 +20705,14 @@
           "source": "hidden",
           "tier": "inferred",
           "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "popcorn",
+          "restrictionId": "corn",
+          "source": "description",
+          "tier": "inferred",
+          "waiterQuestion": null
         }
       ],
       "dish": {
@@ -20747,6 +20779,14 @@
           "restrictionId": "gluten",
           "source": "description",
           "tier": "stated",
+          "waiterQuestion": null
+        },
+        {
+          "certainty": "suspected",
+          "matchedText": "popcorn",
+          "restrictionId": "corn",
+          "source": "description",
+          "tier": "inferred",
           "waiterQuestion": null
         },
         {
