@@ -590,11 +590,12 @@ void main() {
       }
       expect(restrictionOffered(RestrictionId.sesame), isTrue);
       expect(restrictionOffered(RestrictionId.keto), isFalse);
-      // Kosher and halal arrive with their words, so they are offered;
-      // Jain, a religious component too, waits for its vocabulary.
+      // Kosher and halal arrive with their words, so they are offered,
+      // and so is Jain, a religious component too, since its vocabulary
+      // holds terms.
       expect(restrictionOffered(RestrictionId.kosher), isTrue);
       expect(restrictionOffered(RestrictionId.halal), isTrue);
-      expect(restrictionOffered(RestrictionId.jain), isFalse);
+      expect(restrictionOffered(RestrictionId.jain), isTrue);
       expect(
         availableRestrictions(const <RestrictionId>{})
             .map((restriction) => restriction.id),
