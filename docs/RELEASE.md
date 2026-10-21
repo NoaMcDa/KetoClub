@@ -186,9 +186,9 @@ through.
 
 | Limitation | Detail |
 |---|---|
-| Discovery not built | No nearby venue search or geolocation. Paste-a-link is the only way in. Blocked on finding a Wolt venue-search endpoint (`architecture.md` §17.2) |
+| Discovery fixtures are synthetic | Nearby and by-name venue search is built (Phase 2, `architecture.md` D13), but `test/fixtures/wolt_pages_restaurants.json` and `wolt_pages_search.json` were hand-built from third-party documentation, not recorded (#38), so whether Wolt's real items carry every field the mapper reads, `city` included, is unobserved |
 | 10bis fixture is synthetic | `test/fixtures/tenbis_synthetic_menu.json` says so in its first key. Re-record through the 10bis proxy (#122, merged) once a real restaurant id is captured (#44) |
-| Mobile without the backend define is rules-only | iOS and Android call Wolt directly for menus, but AI classification always goes through the backend (`/v1/chat`). With no `KETOCLUB_BACKEND_URL` set at build time, every platform, including phones, falls back to the on-device rule engine and shows "Rules (notConfigured)" |
+| A phone with no key and no backend is rules-only | Since D17, iOS and Android call Wolt and Google directly, the second with a key the user pastes into Settings. With no key saved (and no `KETOCLUB_BACKEND_URL` set at build time) the on-device rule engine answers and the menu says "rules", with the reason `apiKeyMissing`; a web build with no backend says `notConfigured`. With a backend URL, every platform asks the backend first (D25) |
 | WCAG AA contrast failures | Fixed (issue #64, contrast half): the green status pill's own text on its green fill, light-mode `ink3` on `bg`, and dark-mode `ink3` on `bg` all now clear 4.5:1. Pinned by `test/theme/contrast_test.dart`; see `lib/theme/app_tokens.dart` |
 
 Also worth a line if still true at release time: no human has reviewed the

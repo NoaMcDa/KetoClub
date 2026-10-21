@@ -99,8 +99,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 > four-state menu (fits / with a change / ask / avoid; ALG-05), evidence tiers
 > and the Why sheet (ALG-06), kitchen signals (ALG-07), chef cards and the
 > allergy note (ALG-08, ALG-15), platform declarations (ALG-09), the privacy
-> and helper-tool copy (ALG-11), group profiles (ALG-12) and the extended
-> restrictions (ALG-17). The profile never leaves the device (C1).
+> and helper-tool copy (ALG-11), group profiles (ALG-12), trip mode (ALG-13,
+> #395), post-meal confirmations (ALG-14, D27: #394 on the device, #392 the
+> backend route and client), restaurant allergen matrices, first slice
+> (ALG-16, #393), Premium gating with the paywall (ALG-18, #399), the extended
+> restrictions (ALG-17), kosher and halal components (#401) and the research
+> restrictions with their vocabularies (#400, #405). The profile never leaves
+> the device (C1).
 >
 > **Read `architecture.md` first — it is authoritative.** This file and `README.md`
 > predate the code in places; where any of them disagrees with `architecture.md`,
@@ -623,6 +628,12 @@ up next.
   can address; otherwise it falls back to the pre-D25 device path.
 - A client for `POST /v1/text-menu`: the route exists (D25) but the Scan tab
   still pastes on the device.
+- Banto's store side. No store product exists: `StoreEntitlement` (ALG-18,
+  #399) sells `banto_premium_monthly`, but no developer account, no store
+  listing and no product have been created, so Premium cannot be bought. The
+  allergen-matrix intake (ALG-16, #393) is manual, a maintainer's tool; a
+  trip card in the destination's language and the GLP-1 sort are recorded
+  follow-ups, not built (`HANDOFF.md`, "Banto").
 - The pinned Gemini model has answered the real prompt only through the
   backend, from a laptop (the #165 smoke test); the phones' direct client has
   never been run with a real key. See "What is NOT verified yet" below.
@@ -739,12 +750,35 @@ Built, but not confirmed end to end, and not to be reported as done:
   flows already fail under `flutter-tester` at the pre-D25 commit (`680845e`);
   that is not a D25 regression.
 - **No human has reviewed this code.**
+- **No store purchase has been made (Banto, ALG-18, #399).** Because no store
+  product exists, `StoreEntitlement` has never completed a purchase or a
+  restore on StoreKit 2 or Play Billing; the gates and the paywall are
+  evidenced by `NullEntitlement` and fakes only.
+- **The ingredient-extraction prompt has never reached a real model (Banto,
+  ALG-03, #345).** `backend/tools/allergen_eval.py` is the person-run check
+  and `docs/ALLERGEN_EVAL.md` says "not yet run"; every recall figure in D26 is
+  the rules alone, and whether the model's `ingredients` reply parses and adds
+  anything is unobserved.
+- **Trip mode's offline behaviour is proven under `flutter-tester` only
+  (Banto, ALG-13, #395).** The flow that opens the destination's card with no
+  connection ran against fakes; no phone has been put in aeroplane mode, and
+  the trip lexicons and regulation hints are desk research checked in part
+  (#397).
+- **No dietitian, allergist or lawyer has reviewed the Banto vocabularies or
+  the corpus labels.** The terms, certainties and guards (files 11 and 12 of
+  `allergen app documentation/`, the `vocab_*.dart` files) and the labels in
+  `test/fixtures/allergens/` are desk research, marked unreviewed; the recall
+  gate measures the engine against them, not against clinical truth.
+- **No confirmation has been uploaded to a running backend (Banto, ALG-14,
+  #392).** `ConfirmationClient` and `POST /v1/confirmations` are tested
+  against a mocked HTTP client and an in-memory SQLite; nothing on the device
+  calls the client yet, so the shared counts have never held a real report.
 - The three colour pairs that failed WCAG AA contrast (green-on-green at
   4.08:1, light `ink3`-on-bg at 2.78:1, dark `ink3`-on-bg at 4.02:1) were
   fixed and are now pinned by `test/theme/contrast_test.dart`, along with
   every other `on`/surface pair `VerdictColors` produces — see the
   "Contrast fixes" note in `lib/theme/app_tokens.dart` (issue #64, the
-  contrast half; semantics/RTL/large text are a later PR).
+  contrast half; semantics, RTL and large text are in `docs/ACCESSIBILITY.md`).
 
 ## Getting started
 
@@ -756,7 +790,7 @@ Built, but not confirmed end to end, and not to be reported as done:
    is Phase 3's remaining milestone (community database, reviews, submissions;
    `backend_plan.md` §5 milestone C, issues #105–#108) and Phase 4's open
    scan issue (#88; §16's Phase 4 steps). §14 has the decisions
-   log D1–D25, §17 the open questions with the default the code follows.
+   log D1–D27, §17 the open questions with the default the code follows.
 3. The convention documents: `PR_CONVENTIONS.md`, `ISSUE_CONVENTIONS.md`,
    `MILESTONE_CONVENTIONS.md`, `UNIT_TEST_CONVENTIONS.md`, `FLOW_TEST_CONVENTIONS.md`.
    **Caveat:** the test-convention documents contain illustrative examples referencing

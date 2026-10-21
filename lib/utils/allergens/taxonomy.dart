@@ -37,8 +37,8 @@
 /// "Kosher, halal, Jain"; file 10's non-goals); file 11 §24 and §25 are
 /// their sources.
 ///
-/// The research restrictions (issue #342) add, with empty vocabularies
-/// until each group's follow-up fills its file: buckwheat; the foods on
+/// The research restrictions (issue #342) add, each with a vocabulary in
+/// its own group file: buckwheat; the foods on
 /// Japan's *recommended* list that no other id covers (kiwi, peach, apple,
 /// banana, orange, beef, pork, chicken, gelatin, yam —
 /// [japanRecommendedOnly], with no [Jurisdiction.jp] tag, which means the

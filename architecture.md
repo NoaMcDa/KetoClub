@@ -3060,9 +3060,9 @@ architecture-test host-string boundaries; one `AppDependencies` field for the
 estimate repository and one for `backendConfigured`; and `MenuFetched.analysis`
 now meaning "the backend answered with this" as well as "a website PDF was read".
 
-### D26 — Banto: a profile for every restriction (in progress)
+### D26 — Banto: a profile for every restriction
 
-*Stub; the decision grows with the Banto work.* Banto extends the menu
+Banto extends the menu
 analysis from keto alone to a profile of dietary restrictions. Everything it
 adds sits behind one compile-time flag, `--dart-define=BANTO_MODE=true`, read
 in exactly one file, `lib/utils/banto_mode.dart` (`BantoMode.enabled`; the
@@ -3093,8 +3093,8 @@ both branches with no define.
   `restrictionsRequested` entering `AnalysisOptionsSnapshot.matches`.
 
 **The restriction taxonomy, the allergen vocabulary and its golden (ALG-01a,
-#343).** `lib/models/restriction.dart` names the 20 restrictions a profile can
-hold (`RestrictionId`, wire form by name; a test pins the list) and their
+#343).** `lib/models/restriction.dart` names the 20 restrictions a profile held
+at this slice (56 since the research restrictions, below) (`RestrictionId`, wire form by name; a test pins the list) and their
 `RestrictionKind`. There are no severity levels: a restriction is **strict**
 when its kind is `allergen` or `autoimmune` (celiac, the `gluten` id, distinct
 from the `wheat` allergy) and **flexible** otherwise (`lactose` is an
@@ -3115,8 +3115,8 @@ every restriction it finds, whatever the profile (C1); a dish is read as
 matcher's hits over `tool/golden/allergen_corpus.dart` and over a fixture
 vocabulary that pins the matcher before the groups are filled;
 `backend/app/keto/allergens.py` replays it, and its packaged copy is pinned
-byte-equal. Nothing consults the matcher yet (ALG-04 will); no keto golden
-changed.
+byte-equal. At this slice nothing consulted the matcher; ALG-04b (#346) wired it
+into the rules pass and the on-device evaluator, below. No keto golden changed.
 
 **The dietary profile and the flagged "My restrictions" section (ALG-02a,
 #344).** `lib/models/dietary_profile.dart` holds the profile: a
@@ -3142,8 +3142,9 @@ the UI language, its kind, a remove button) or an empty state, and "Add
 restriction", which opens `RestrictionPickerSheet` (the taxonomy grouped by
 kind, strict kinds first, each with the official allergen lists that name it;
 keto and added ids left out; the app sheet width). Keto stays the existing
-toggles, and nothing reads the profile for classification yet
-(`ClassificationOptions` is unchanged; Wave 2 does that).
+toggles. At this slice nothing read the profile for classification
+(`ClassificationOptions` was unchanged); ALG-03 (#345) and ALG-04b (#346) made
+it do so, below.
 
 **The Wave 2 contract (W2-0, #345, #346).** `lib/models/concern.dart` holds
 the wire types the allergen engine will fill: `Concern {restrictionId,
@@ -3159,8 +3160,9 @@ except an unknown role, which reads as `unknown` so an ingredient is never
 lost over it. `AnalysedDish` gains `ingredients` and `concerns` (absent →
 empty, written only when non-empty) and `ClassificationOptions` and
 `AnalysisOptionsSnapshot` gain `restrictionsRequested` (the snapshot key
-written only when true, part of `matches`); `fromSettings` leaves it false and
-nothing produces a concern yet. `backend/app/keto/models.py` mirrors all of
+written only when true, part of `matches`); `fromSettings` left it false and
+nothing produced a concern at this slice; ALG-03 (#345) set the flag and
+ALG-04b (#346) produced the concerns. `backend/app/keto/models.py` mirrors all of
 it, omitting the same keys through a `model_serializer`. Per C3 there is no
 `schemaVersion` bump, and no golden or keto baseline changed.
 
@@ -3185,7 +3187,8 @@ entry. The card states what the person is and asks; it never says "safe" or
 "בטוח" (a table test pins every restriction in both languages), and no
 severity exists to vary it. The card needs no menu and sends nothing anywhere
 (C1). The per-dish card with a dish's name, modification and questions, and the
-cross-contact closing line driven by ALG-07 signals, are ALG-08b.
+cross-contact closing line driven by ALG-07 signals, shipped as ALG-08b
+(#350), below.
 
 **Kitchen cross-contact signals, the pure part (ALG-07, #349).**
 `KitchenSignals.of(menu)` in `lib/utils/allergens/kitchen_signals.dart`
@@ -3211,8 +3214,8 @@ eggs, wheat, gluten and sesame, nuts to peanuts and tree nuts, sesame to
 sesame; wheat is added beside gluten wherever flour is the cause, because a
 wheat allergy shares the cause with celiac disease. A signal is a menu-level
 fact beside the per-dish answer: it changes no verdict, and nothing consults
-it yet (the notice, the demotion of green dishes for strict entries and the
-keto-only no-op are ALG-07's later part). A new golden, `kitchen_signals.json`,
+it at this slice; the notice, the demotion of green dishes for strict entries
+and the keto-only no-op are ALG-07's later part (#349), below. A new golden, `kitchen_signals.json`,
 carries the term lists, guards, threat table and questions and the signals of
 every golden menu, the allergen corpus menus and menus built for each rule,
 all under a small nuts, sesame and seafood vocabulary of its own
@@ -3220,8 +3223,8 @@ all under a small nuts, sesame and seafood vocabulary of its own
 vocabulary files are filled; no other golden changed.
 
 **The Why sheet (ALG-06, #348).** `lib/widgets/why_sheet.dart` is the "why this
-result" bottom sheet, built and tested on its own and wired into no screen
-yet. `WhySheet` takes a dish name, a list of `Concern` and whether the profile
+result" bottom sheet, built and tested on its own and, at this slice, wired into no screen;
+ALG-05 (#347) opens it from the dish card, below. `WhySheet` takes a dish name, a list of `Concern` and whether the profile
 is strict, and shows one row per concern: the restriction's name in the UI
 language, the evidence tier as a phrase (declared by the platform, stated on
 the menu, inferred from a typical recipe, suspected (please ask), confirmed by
@@ -3361,7 +3364,8 @@ identity of today's verdicts; the wire verdict is never rewritten. The state
 is computed from every finding, so a removable stated mention cannot mask a
 likely one in the name. `MenuController.evaluatedRows` pairs each analysed
 visible row with its evaluation for the profile recorded when the menu was
-last classified; nothing renders it yet (ALG-05).
+last classified; at this slice nothing rendered it, and ALG-05 (#347) made the
+menu screen draw it, below.
 
 
 
@@ -3499,7 +3503,8 @@ dairy-free. `ProfileEvaluator.evaluate` takes the dish's `heading` (passed by
 restriction by one step, once per restriction, to tier `declared`: never
 below `suspected` and never removed for a strict entry (file 09), while a
 flexible entry's suspected concern is cleared; a declaration with no concern
-adds nothing, and `present` (reserved for ALG-16's matrix) changes nothing.
+adds nothing, and `present` (nothing produces one; ALG-16's matrix, below, yields only absent
+ones) changes nothing.
 `EvaluatedDish.declarations` keeps the ones applied, and the Why sheet says
 "declared by the platform" or "declared by the restaurant" and quotes the
 declaration as lowering, never ruling out, the finding. Declarations stay on
@@ -3757,7 +3762,9 @@ people) never travels. A single person with many installs can still reach
 three; the per-install limit and the threshold raise the cost, not remove it.
 The Dart `ConfirmationClient` (`lib/services/community/confirmation_client.dart`)
 is the one file naming `/v1/confirmations`; `no_profile_on_the_wire_test.dart`
-allows `restrictionId` there alone, with the reason. Nothing consumes it yet.
+allows `restrictionId` there alone, with the reason. The client is built and
+tested against a mocked HTTP client, and no screen or controller calls it:
+nothing on the device has uploaded a confirmation to a running backend.
 
 **Trip mode (ALG-13, related to #355).** `TripDestination`
 (`lib/models/trip_destination.dart`: Israel, the US, the UK, France, Italy,
@@ -4072,7 +4079,7 @@ sits under kosher's and halal's "Religious diet" heading and, since
 `hasReligiousEntry` reads the kind, takes their strict wording). Each
 has its names, picker hint, waiter subject and chef card line in both
 languages. Their vocabularies are five new group files, **empty** in this
-step (`vocab_foods_extra`, `vocab_seeds_extra`, `vocab_legume_parts`,
+step and filled by the follow-up paragraphs below (`vocab_foods_extra`, `vocab_seeds_extra`, `vocab_legume_parts`,
 `vocab_sensitivities`, `vocab_diets_extra`), so no menu verdict and no
 golden concern changes; and `restrictionOffered` keeps a restriction out
 of the picker and the onboarding until its vocabulary holds a term, since
@@ -4632,8 +4639,10 @@ default the implementation follows until answered.
    D25) it goes to KetoClub's server first, which forwards it to Wolt and
    keeps a four-decimal coordinate in the key of a response it caches for five
    minutes (`DISCOVERY_CACHE_TTL_SECONDS`), never beside an install id. Default: leave
-   the wording as it is until the backend is hosted for anyone but its owner,
-   then reword the venue-search sentence in all three consent strings.
+   the wording as it is until the backend is hosted for anyone but its owner.
+   **A hosting-time follow-up (#109), not a Banto one:** the day it is hosted,
+   reword the venue-search sentence in all three consent strings so that
+   neither "to Wolt" nor "not stored" is left standing as the whole story.
 
 ---
 
