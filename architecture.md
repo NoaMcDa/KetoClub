@@ -4087,6 +4087,21 @@ kosher or halal *certification*, which no app can verify (file 03; their
 components are a separate pull request). Chestnut is no id: it stays a
 tree-nut question for that vocabulary (file 11 §2.5).
 
+*Seeds extra filled (corn, sunflower, flax).* `vocab_seeds_extra.dart`
+now holds the three vocabularies from file 11 §27 and file 12 §11, so
+the picker offers them. Refined products the guidance disagrees about
+(corn oil, syrup and starch, קורנפלור, sunflower oil and lecithin) are
+`suspected` hidden terms and term guards on the food word, so "corn
+oil" is lowered and never dropped; a tortilla, taco or seeded bread is
+`suspected`, nachos, arepas, tamales and Bamba `likely`. The Hebrew
+sunflower words take no free prefix, because ל + חמנייה is לחמנייה, a
+bread roll. Corn and flax keep their wheat roles (term guards on wheat's
+`flour` and `crackers`, which lower wheat only), and corn stays a keto
+carb trigger: no keto golden changed. Chestnut joins tree nuts as a
+`suspected` trigger with a jurisdiction note (file 11 §2.5, §27.5), with
+"water chestnut" lowered and the Hebrew construct ערמוני not a term.
+`seeds_extra_labels.json` adds 28 labelled dishes.
+
 **The single legumes' words (`vocab_legume_parts`, related to #342).**
 Chickpea, lentil, pea, fenugreek and fava now hold terms, so all five
 appear in the picker. The words `legumes` already had are cut out of it

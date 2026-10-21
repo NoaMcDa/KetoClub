@@ -1538,6 +1538,151 @@ salmon.
 
 ---
 
+## 27. Corn, sunflower seed and flaxseed (issue #342; desk research)
+
+> **Status: desk research, not clinical review. Checked 2026-10-21 against
+> web search results only** (no page was opened in full, as the banner
+> says of the whole file). Every row below names its source and grade:
+> **[S]** strong (clinical journal, hospital dietitian handout, regulator),
+> **[M]** medium (allergy association, encyclopedia, health publisher),
+> **[W]** weak (recipe, retailer, blog). Rows resting only on [W] or on
+> inference are **unreviewed desk research**, and their vocabulary terms
+> are `suspected`. The Hebrew spellings are in file 12 §11.
+
+**Regulated:** none of the three is a mandatory allergen in the US (9),
+the EU (14) or Israel (§19). File 02 lists them under "less common
+allergens worth supporting". No label law makes a supplier or a kitchen
+name them, so the app favours recall here: a person with one of these
+allergies has to ask about every dish anyway.
+
+### 27.1 Corn — direct triggers
+
+corn, maize, sweetcorn, baby corn, corn on the cob, cornmeal, corn flour
+(US: ground corn), cornbread, cornflakes, popcorn, polenta, grits,
+hominy, masa / masa harina, elote, esquites. A Children's Hospital of
+Philadelphia handout for corn-allergic patients lists "corn bread, corn
+flour, cornmeal, grits, hominy, masa, polenta, popcorn, corn tortillas"
+to avoid **[S]**
+([CHOP, corn-free diet](https://chopib.staywellsolutionsonline.com/22,38103));
+Children's Wisconsin's corn-free diet sheet also lists polenta, popcorn
+and grits **[S]**
+([Children's Wisconsin](https://childrenswi.org/teaching-sheet/clinical-nutrition/corn-free-diet)).
+Cornflakes, polenta and tortilla chips are among the "foods with corn as
+basic ingredient" a maize-allergy study screened for **[S]**
+([PMC4493620](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4493620/)).
+
+**Refined products — the guidance disagrees.** The same CHOP handout
+says: "we do not restrict corn oil, corn syrup, corn sugar, maltodextrin
+or cornstarch for most patients, because they are 99.5% protein-free"
+**[S]**. Johns Hopkins and Children's Wisconsin are stricter (call the
+manufacturer when the starch source is not named; cross-contact in
+manufacture) **[S]**
+([Johns Hopkins corn-free diet](https://www.hopkinsmedicine.org/-/media/johns-hopkins-childrens-center/documents/specialties/adolescent-medicine/cfs-corn-free-diet.pdf)).
+So corn oil, corn syrup, high-fructose corn syrup, cornstarch and UK
+"cornflour" (which is cornstarch) are **suspected**, never stated: the
+hit stays and asks the restaurant, and the person's own allergist
+decides. Maltodextrin and dextrose are label words a menu does not
+print; they are not listed.
+
+### 27.2 Corn — hidden sources (restaurant)
+
+| Hidden source | Confidence | Source |
+|---|---|---|
+| Arepa, tamale, pupusa: corn masa formed and griddled or steamed | documented common (definitional) | Food Republic, "What is masa harina?" **[W]** ([foodrepublic.com](https://www.foodrepublic.com/2013/04/23/what-is-masa-harina/)); CHOP lists masa **[S]** |
+| Nachos, tortilla chips, tostadas (fried corn tortillas) | documented common | PMC4493620 names tortilla chips **[S]** |
+| Bamba: "peanut-butter-flavored puffed maize"; US listings give peanuts, corn grits, sunflower oil, salt | documented | [Wikipedia, Bamba](https://en.wikipedia.org/wiki/Bamba_(snack)) **[M]**; retailer listing **[W]** |
+| Tortilla: corn or wheat. "Flour tortillas" are wheat; mass-produced corn tortillas may still have wheat blended in | possible — the menu rarely says which | [Healthline, corn vs flour tortilla](https://www.healthline.com/nutrition/corn-vs-flour-tortilla) **[M]**; CHOP lists corn tortillas **[S]** |
+| Tacos, enchiladas (usually corn tortillas; soft tacos may be flour) | possible | inferred from the tortilla row — **unreviewed desk research** |
+| Pozole (hominy stew), succotash (corn and lima beans) | documented common (definitional) | CHOP lists hominy **[S]**; succotash **unreviewed desk research** |
+| Sauces and soups thickened with cornstarch; corn syrup in glazes | possible | [Wikipedia, corn allergy](https://en.wikipedia.org/wiki/Corn_allergy) **[M]** (corn starch and modified food starch); CHOP disagrees on whether it matters **[S]** |
+| Cross-contact: a product free of corn can pick up traces in manufacture | documented | Johns Hopkins **[S]** |
+
+### 27.3 Sunflower seed
+
+**Direct:** sunflower, sunflower seeds / kernels, sunflower butter
+(sunflower seed butter, SunButter), sunflower halva. A sunflower-seed
+butter caused a reaction in a three-year-old who had eaten sunflower oil
+for years without one **[S]**
+([Allergy Asthma Clin Immunol 2014](https://aacijournal.biomedcentral.com/track/pdf/10.1186/s13223-014-0065-6)).
+
+**Refined oil is often tolerated:** sunflower-seed-sensitive patients ate
+refined and cold-pressed sunflower oil without reaction in a 1986
+challenge study (the cold-pressed oil held a trace of protein) **[S]**
+([PubMed 3760399](https://pubmed.ncbi.nlm.nih.gov/3760399/)); a 2021 case
+report describes anaphylaxis to the seed with a passed oil challenge, and
+notes that refining lowers the protein content **[S]**
+([PMC8305662](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8305662/)).
+So "sunflower oil" and sunflower lecithin are **suspected**, never
+stated. The keto seed-oil rule (`constants.dart`) already reads
+sunflower oil for a different reason; this vocabulary changes no keto
+verdict.
+
+**Halva:** sunflower halva, made from roasted ground sunflower seeds in
+place of sesame, is popular in the former Soviet states, Bulgaria and
+Romania **[M]** ([Wikipedia, Halva](https://en.wikipedia.org/wiki/Halva);
+[University of Liège review](https://orbi.uliege.be/handle/2268/158495)
+**[S]**). Israeli halva is tahini (file 12 §1.1), so a bare "halva" is
+**not** a sunflower trigger; a halva that names sunflower is one, through
+the word itself.
+
+**Seeded breads:** multigrain and seeded loaves commonly combine
+sunflower and flax seeds (recipes and retail ingredient lists **[W]**:
+[Karen's Kitchen Stories, multigrain bread with sunflower and flax](https://karenskitchenstories.com/2013/05/multigrain-bread-with-sunflower-and.html),
+[Simple Truth multiseed bread listing](https://www.kroger.com/p/p/0001111013554)).
+**Unreviewed desk research**: suspected only, for sunflower and flax
+alike.
+
+### 27.4 Flaxseed (linseed)
+
+**Direct:** flax, flaxseed, flax seed, linseed, flax meal / ground flax,
+flaxseed oil, linum. **Hidden:** multigrain and seeded breads, seed
+crackers, cereals and energy bars. A 40-year-old man had repeated severe
+reactions minutes after multigrain bread, with positive skin and IgE
+tests **[M]**
+([Thermo Fisher allergen encyclopedia, f333](https://www.thermofisher.com/phadia/wo/en/resources/allergen-encyclopedia/f333.html));
+a case report of anaphylaxis to *Linum* notes earlier symptoms from bird
+feed and multigrain bread **[S]**
+([Allergol Immunopathol](https://elsevier.es/es-revista-allergologia-et-immunopathologia-105-articulo-anaphylaxis-linum-13042843));
+a 2026 case series describes reactions to grains, biscuits, yoghurts,
+milkshakes, salads and an energy bar holding flaxseed, blames diagnostic
+delay partly on flax being frequently omitted from labels, and argues
+for priority-allergen status **[S]**
+([Eur Ann Allergy Clin Immunol, flaxseed case series](https://www.eurannallergyimm.com/flaxseed-allergy-insights-from-a-case-series/)).
+Multigrain and seeded breads are **suspected**: the case reports show
+they can hold flax, and the seed mix is rarely on the menu (§27.3).
+
+### 27.5 Guards and confusions
+
+- **Water chestnut is not a nut:** "aquatic vegetables that grow in
+  marshes … not botanically related to tree nuts" **[M]**
+  ([Food Allergy Canada, Ask the allergist](https://www.foodallergycanada.ca/ask-the-allergist-march-2026/)).
+  It is a term guard on `chestnut` (lowered, never cancelled, per §0).
+- **Chestnut itself** (amends §2.5): FARE's FAQ calls chestnuts tree
+  nuts **[M]**
+  ([FARE, holiday cooking questions](https://www.foodallergy.org/fare-blog/nutmeg-nut-and-other-holiday-cooking-questions));
+  Food Allergy Canada agrees and says chestnut allergy is not that
+  common **[M]**; the Royal Children's Hospital Melbourne puts chestnut
+  in a different botanical category to tree nuts **[S]**
+  ([RCH tree nut allergy](https://www.rch.org.au/uploadedFiles/Main/Content/allergy/Tree%20Nut%20Allergy.pdf));
+  the FDA removed chestnut from its tree-nut list in January 2025
+  (§2.5). Chestnut is therefore a **suspected** tree-nut trigger with
+  this jurisdiction note, marrons glacés included.
+- **"Popcorn shrimp" and "popcorn chicken"** name a size of fried
+  morsel, not a corn coating (the breading may still hold cornstarch):
+  lowered.
+- **Corn inside other words:** "peppercorn", "acorn squash" and "corned
+  beef" are not corn; the word boundary keeps them out. "Corn flour" and
+  "קמח תירס" lower wheat (it is not wheat flour, ALG-04a) and still
+  report corn: the guard belongs to wheat only.
+- **Flax in "flax crackers"** lowers wheat's `crackers` and still reports
+  flax.
+- **Refined oils, syrups and starches** (§27.1, §27.3) are term guards
+  on corn and sunflower: lowered, never dropped.
+- **Guards:** "corn-free", "no corn", "without flax", "ללא תירס".
+
+**Sources (27):** the links above, each checked 2026-10-21 as a search
+result only.
+
 ## 28. Single legumes: chickpea, lentil, pea, fenugreek, fava (issue #342; desk research, brief)
 
 > **Status: desk research, not clinical review. Checked 2026-10-21** from

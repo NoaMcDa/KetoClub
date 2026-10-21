@@ -890,6 +890,57 @@ tomato (עגבניות שרי), not sherry.
 
 ---
 
+## 11. Hebrew menu terms for corn, sunflower seed, flaxseed and chestnut (issue #342)
+
+**Status: desk research, added on 2026-10-21, not clinical review.** The
+English food facts behind these tables are file 11 §27 (and §2.5 for
+chestnut), whose sources were checked that day as search results. A
+Hebrew search for corn, sunflower and flax allergy guidance (checked
+2026-10-21) found no Israeli clinical page on any of the three; the
+nearest Israeli result is a 2023 recall of a "קורנפלור עמילן תירס"
+product for undeclared soy
+([כיפה](https://www.kipa.co.il/חדשות/1152800-0) **[M]**), which confirms
+only that Israeli shelves sell cornstarch under the name קורנפלור.
+**Still unreviewed:** the Hebrew spellings themselves, which need a
+native-speaking dietitian, as §7 says of its own tables. Spelling
+variants follow §1 (geresh and apostrophe read alike; the parser allows
+the grammatical prefixes ב/ה/ו/כ/ל/מ/ש).
+
+### 11.1 Corn — תירס
+
+| Term | Meaning | Use |
+|---|---|---|
+| תירס (and תירס גמדי, גרעיני תירס, שניצל תירס, קמח תירס) | corn, baby corn, corn kernels, a corn schnitzel, corn flour | direct |
+| פולנטה, פופקורן, קורנפלקס | polenta, popcorn, cornflakes (the Israeli schnitzel coating) | direct |
+| נאצ'וס, במבה, ארפה | nachos, Bamba (puffed maize, file 11 §27.2), arepa | likely |
+| טורטייה, טורטיה, טורטיות, טורטיית, טאקו | tortilla (corn or wheat), taco | suspected |
+| קורנפלור, עמילן תירס, שמן תירס, סירופ תירס | cornstarch (the Israeli name), corn oil, corn syrup | suspected; תירס lowered after שמן/סירופ/עמילן |
+
+### 11.2 Sunflower seed — גרעיני חמנייה
+
+| Term | Meaning | Use |
+|---|---|---|
+| חמנייה, חמניה, חמניות, חמנית (and גרעיני חמנייה; וחמנייה and the other "and" forms listed) | sunflower, sunflower seeds | direct; no free prefix, because ל + חמנייה is לחמנייה, a bread roll; lowered after שמן |
+| גרעינים | "seeds": on an Israeli menu or snack stand usually sunflower seeds | suspected; lowered before דלעת/אבטיח/רימון |
+| שמן חמניות | sunflower oil (often tolerated refined, file 11 §27.3) | suspected |
+| לחם דגנים, לחמניית דגנים, רב דגנים, לחם זרעים, תערובת זרעים, קרקר זרעים | seeded and multigrain breads and seed mixes | suspected (shared with §11.3) |
+
+A bare חלבה is tahini halva in Israel (§1.1), not a sunflower trigger.
+
+### 11.3 Flaxseed — זרעי פשתן
+
+| Term | Meaning | Use |
+|---|---|---|
+| פשתן, זרעי פשתן (and שמן פשתן, קרקר פשתן) | flax, flaxseed, flax oil, flax crackers | direct |
+| לחם דגנים, לחמניית דגנים, רב דגנים, לחם זרעים, תערובת זרעים, קרקר זרעים | seeded breads that often hold flax (file 11 §27.4) | suspected |
+
+### 11.4 Chestnut — ערמונים (tree nuts)
+
+| Term | Meaning | Use |
+|---|---|---|
+| ערמונים, ערמון | chestnuts | suspected tree-nut trigger (file 11 §2.5, §27.5: FARE yes, EU and FDA since 2025 no) |
+| ערמוני מים | water chestnuts, an aquatic vegetable | not a trigger: the construct form ערמוני is not a term, and מים lowers ערמונים/ערמון beside it |
+
 ## 12. Hebrew menu terms for the single legumes (issue #342)
 
 **Status: desk research, added and checked 2026-10-21, not reviewed by a

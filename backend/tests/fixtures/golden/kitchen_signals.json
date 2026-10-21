@@ -7017,6 +7017,341 @@
           {
             "dishes": [
               {
+                "description": "תירס מתוק, גזר מגורר, פטרוזיליה ומיונז",
+                "id": "k1",
+                "imageUrl": null,
+                "name": "סלט תירס וגזר",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "פולנטה רכה, פטריות יער, פרמזן",
+                "id": "k2",
+                "imageUrl": null,
+                "name": "פולנטה קרמית עם פטריות",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "חזה עוף בציפוי קורנפלקס פריך, לצד צ'יפס",
+                "id": "k3",
+                "imageUrl": null,
+                "name": "שניצל קורנפלקס",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "צ'יפס טורטייה, גואקמולה, סלסה ושמנת חמוצה",
+                "id": "k4",
+                "imageUrl": null,
+                "name": "נאצ'וס עם גואקמולה",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "שתי טורטיות רכות, דג לבן צלוי, כרוב סגול וסלסה",
+                "id": "k5",
+                "imageUrl": null,
+                "name": "טאקו דג",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Grilled corn on the cob with crema, cotija and chili",
+                "id": "k6",
+                "imageUrl": null,
+                "name": "Elote",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Griddled masa cake filled with white cheese",
+                "id": "k7",
+                "imageUrl": null,
+                "name": "Arepa with cheese",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "קערת פופקורן חם עם חמאה ומלח",
+                "id": "k8",
+                "imageUrl": null,
+                "name": "פופקורן חמאה",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Small breaded shrimp, fried, with lemon aioli",
+                "id": "k9",
+                "imageUrl": null,
+                "name": "Popcorn shrimp",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "מרק עוף עם ירקות, מוסמך בקורנפלור",
+                "id": "k10",
+                "imageUrl": null,
+                "name": "מרק עוף סמיך",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "שעועית שחורה, עגבניות, כוסברה ולימון, ללא תירס",
+                "id": "k11",
+                "imageUrl": null,
+                "name": "סלט מקסיקני",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Sirloin with a green peppercorn sauce and roast potatoes",
+                "id": "k12",
+                "imageUrl": null,
+                "name": "Peppercorn steak",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Corned beef, mustard and pickles on rye bread",
+                "id": "k13",
+                "imageUrl": null,
+                "name": "Corned beef on rye",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "חסה, מלפפון, עשבי תיבול וגרעיני חמנייה קלויים",
+                "id": "k14",
+                "imageUrl": null,
+                "name": "סלט ירוק עם גרעיני חמנייה",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "חלבה מגרעיני חמנייה קלויים, בסגנון רוסי",
+                "id": "k15",
+                "imageUrl": null,
+                "name": "חלבת חמניות",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Kale, apple, toasted sunflower seeds and lemon dressing",
+                "id": "k16",
+                "imageUrl": null,
+                "name": "Kale salad",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Toasted sourdough with sunflower seed butter and banana",
+                "id": "k17",
+                "imageUrl": null,
+                "name": "Sunbutter toast",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "תפוחי אדמה מטוגנים בשמן חמניות, מלח ים",
+                "id": "k18",
+                "imageUrl": null,
+                "name": "צ'יפס בית",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "גרעינים קלויים ומלוחים",
+                "id": "k19",
+                "imageUrl": null,
+                "name": "שקית גרעינים",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "יוגורט עזים, זרעי פשתן טחונים ודבש",
+                "id": "k20",
+                "imageUrl": null,
+                "name": "יוגורט עם פשתן",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "קרקרים אפויים של פשתן, צ'יה ושומשום",
+                "id": "k21",
+                "imageUrl": null,
+                "name": "קרקר פשתן ביתי",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Oats soaked in oat milk with ground flaxseed and berries",
+                "id": "k22",
+                "imageUrl": null,
+                "name": "Overnight oats",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "לחם דגנים, חביתה, עגבנייה ומלפפון",
+                "id": "k23",
+                "imageUrl": null,
+                "name": "כריך בלחם דגנים",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Multigrain toast, smashed avocado, chili flakes",
+                "id": "k24",
+                "imageUrl": null,
+                "name": "Avocado toast",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "מרק קטיפתי של ערמונים קלויים ושמנת",
+                "id": "k25",
+                "imageUrl": null,
+                "name": "מרק ערמונים",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "A paper cone of chestnuts roasted over coals",
+                "id": "k26",
+                "imageUrl": null,
+                "name": "Roast chestnuts",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "ברוקולי, גזר, ערמוני מים ובצל ירוק",
+                "id": "k27",
+                "imageUrl": null,
+                "name": "מוקפץ ירקות עם ערמוני מים",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              },
+              {
+                "description": "Snow peas, water chestnuts and spring onion",
+                "id": "k28",
+                "imageUrl": null,
+                "name": "Water chestnut stir-fry",
+                "options": [],
+                "page": null,
+                "price": 0.0
+              }
+            ],
+            "id": "seeds_extra_labels",
+            "name": "Menu"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "seeds_extra_labels",
+          "source": "scan"
+        }
+      },
+      "name": "seeds_extra_labels",
+      "signals": [
+        {
+          "evidence": [
+            "שניצל קורנפלקס",
+            "נאצ'וס עם גואקמולה",
+            "Popcorn shrimp"
+          ],
+          "kind": "fryer",
+          "questionEn": "Do the fried dishes share a fryer or frying oil with breaded or battered ones?",
+          "questionHe": "האם המנות המטוגנות מטוגנות באותו שמן או באותה מטגנת עם מנות בציפוי או בבלילה?",
+          "threatens": [
+            "wheat",
+            "gluten",
+            "crustaceans"
+          ]
+        },
+        {
+          "evidence": [
+            "מוקפץ ירקות עם ערמוני מים",
+            "Water chestnut stir-fry"
+          ],
+          "kind": "wok",
+          "questionEn": "Is the wok shared between dishes, and is it cleaned between orders?",
+          "questionHe": "האם אותו ווק משמש למנות שונות, והאם מנקים אותו בין הזמנות?",
+          "threatens": [
+            "peanuts",
+            "soy",
+            "wheat",
+            "gluten",
+            "crustaceans",
+            "molluscs",
+            "sesame"
+          ]
+        },
+        {
+          "evidence": [
+            "Arepa with cheese",
+            "Corned beef on rye",
+            "Sunbutter toast"
+          ],
+          "kind": "bakery",
+          "questionEn": "Is flour or bread handled on the surfaces where other dishes are prepared?",
+          "questionHe": "האם מכינים מנות אחרות על אותם משטחים שבהם עובדים עם קמח או לחם?",
+          "threatens": [
+            "milk",
+            "eggs",
+            "wheat",
+            "gluten",
+            "sesame"
+          ]
+        },
+        {
+          "evidence": [
+            "קרקר פשתן ביתי"
+          ],
+          "kind": "sesame",
+          "questionEn": "Are sesame or tahini used on shared surfaces or utensils, and can my dish be prepared without them?",
+          "questionHe": "האם משתמשים בשומשום או בטחינה על משטחים או כלים משותפים, ואפשר להכין את המנה שלי בלעדיהם?",
+          "threatens": [
+            "sesame"
+          ]
+        }
+      ]
+    },
+    {
+      "menu": {
+        "categories": [
+          {
+            "dishes": [
+              {
                 "description": "Three pieces, buttermilk-brined and hand-breaded, cooked in the same fryer as our fries and onion rings",
                 "id": "k1",
                 "imageUrl": null,

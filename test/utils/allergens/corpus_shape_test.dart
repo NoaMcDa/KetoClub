@@ -123,9 +123,6 @@ const Set<String> _awaitingLabels = <String>{
   'chicken',
   'gelatin',
   'yam',
-  'corn',
-  'sunflower',
-  'flax',
 };
 
 /// The values of a label's `label` key.
@@ -186,6 +183,16 @@ Set<String> _buildValidSources() {
       out.add('11 §$section.$k');
     }
   });
+  // Corn, sunflower seed and flaxseed (issue #342): file 11 §27 has five
+  // subsections and file 12 §11 four.
+  out.add('11 §27');
+  for (var k = 1; k <= 5; k++) {
+    out.add('11 §27.$k');
+  }
+  out.add('12 §11');
+  for (var k = 1; k <= 4; k++) {
+    out.add('12 §11.$k');
+  }
   // Documentation file 12: section 1 has 11 subsections, 2 has two, 3 has
   // five, 4 has four, 5 has none and 6 is a numbered list of five.
   // Section 9 (issue #342) has five: the Hebrew kosher and halal terms.
