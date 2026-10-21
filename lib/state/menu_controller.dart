@@ -25,6 +25,7 @@ import 'package:ketoclub/services/storage/notes_store.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/services/storage/visit_history_store.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
+import 'package:ketoclub/state/profile_nudge_actions.dart' as nudge;
 import 'package:ketoclub/utils/allergens/allergen_matrix.dart';
 import 'package:ketoclub/utils/allergens/confirmations.dart';
 import 'package:ketoclub/utils/allergens/group_evaluator.dart';
@@ -219,6 +220,10 @@ final class MenuController extends ChangeNotifier {
   /// by [profile] and [evaluatedRows].
   DietaryProfile _profile = DietaryProfile.empty;
 
+  /// Whether the user dismissed the empty-profile notice on the menu screen
+  /// (issue #421), recorded with [_profile].
+  bool _nudgeDismissed = false;
+
   /// The profiles the menu is read for (ALG-12, issue #354), recorded with
   /// [_profile], which is their union ([GroupEvaluator.union]); empty
   /// until the settings are first read.
@@ -369,6 +374,30 @@ final class MenuController extends ChangeNotifier {
   /// summary. Read from the settings on this device only.
   DietaryProfile get profile => _profile;
 
+  /// Whether the menu screen should show the empty-profile notice (Banto,
+  /// issue #421): the screen shows Banto surfaces, the profiles the menu is
+  /// read for hold nothing but keto, and the user has not dismissed it.
+  bool get showsProfileNudge =>
+      _bantoMode && !_profile.hasNonKetoEntry && !_nudgeDismissed;
+
+  /// Dismisses the empty-profile notice for good on this device (issue
+  /// #421). Never throws.
+  Future<void> dismissProfileNudge() async {
+    _nudgeDismissed = true;
+    notifyListeners();
+    await nudge.dismissProfileNudge(_settings, ProfileNudgeSurface.menu);
+  }
+
+  /// Adds the restriction [id], or the user's own word [term], to their
+  /// profile from the empty-profile notice (issue #421), then re-reads the
+  /// profiles so the menu is evaluated against it. Answers whether the
+  /// helper-tool sheet should be shown now. Never throws.
+  Future<bool> addToProfile({RestrictionId? id, String? term}) async {
+    final showHelper = await nudge.addToProfile(_settings, id: id, term: term);
+    await refreshProfile();
+    return showHelper;
+  }
+
   /// Re-reads [profile] from the settings, for when the user comes back
   /// from editing it in Settings. Notifies only when it changed. Never
   /// throws.
@@ -381,7 +410,8 @@ final class MenuController extends ChangeNotifier {
     // is derived from these, so it changed only if they did.
     if (listEquals(settings.activeProfiles, _people) &&
         listEquals(settings.profiles, _allProfiles) &&
-        _tripFrom(settings) == _trip) {
+        _tripFrom(settings) == _trip &&
+        settings.menuNudgeDismissed == _nudgeDismissed) {
       return;
     }
     _applyPeople(settings);
@@ -434,6 +464,7 @@ final class MenuController extends ChangeNotifier {
   /// [_allProfiles], and their union in [_profile].
   void _applyPeople(AppSettings settings) {
     _trip = _tripFrom(settings);
+    _nudgeDismissed = settings.menuNudgeDismissed;
     _people = settings.activeProfiles;
     _allProfiles = settings.profiles;
     _profile = GroupEvaluator.union(<DietaryProfile>[

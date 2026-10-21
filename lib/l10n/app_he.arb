@@ -890,5 +890,9 @@
   "workedMark": "לסמן כמקום שעבד לי",
   "workedUnmark": "להסיר את הסימון \"עבד לי\"",
   "savedStateCount": "{label}: {count}",
-  "savedRecheck": "הפרופיל שלך השתנה מאז. אפשר לפתוח את התפריט כדי לבדוק שוב."
+  "savedRecheck": "הפרופיל שלך השתנה מאז. אפשר לפתוח את התפריט כדי לבדוק שוב.",
+  "profileNudgeMessage": "ספרו ל־Banto ממה אתם נמנעים כדי לראות אילו מנות מתאימות לכם",
+  "profileNudgeChoose": "הוספת מה שאתם נמנעים ממנו",
+  "profileNudgeDismiss": "לא עכשיו",
+  "settingsRestrictionsRerun": "להריץ שוב את ההגדרה"
 }

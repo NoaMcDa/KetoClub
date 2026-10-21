@@ -2452,4 +2452,17 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get savedRecheck =>
       'הפרופיל שלך השתנה מאז. אפשר לפתוח את התפריט כדי לבדוק שוב.';
+
+  @override
+  String get profileNudgeMessage =>
+      'ספרו ל־Banto ממה אתם נמנעים כדי לראות אילו מנות מתאימות לכם';
+
+  @override
+  String get profileNudgeChoose => 'הוספת מה שאתם נמנעים ממנו';
+
+  @override
+  String get profileNudgeDismiss => 'לא עכשיו';
+
+  @override
+  String get settingsRestrictionsRerun => 'להריץ שוב את ההגדרה';
 }

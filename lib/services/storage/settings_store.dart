@@ -51,6 +51,16 @@ enum AppThemeMode {
   }
 }
 
+/// The two surfaces that nudge an empty profile (Banto, issue #421), each
+/// dismissed on its own.
+enum ProfileNudgeSurface {
+  /// The menu screen, above the dishes.
+  menu,
+
+  /// The Discovery list.
+  discovery,
+}
+
 /// The user's on-device preferences (architecture.md §6.4): UI language,
 /// filter default, AI-estimation consent, the last venue opened, the
 /// appearance (issue #58), the net-carb limit (issue #57), the
@@ -61,7 +71,8 @@ enum AppThemeMode {
 /// onboarding has been seen (ALG-02b), the other people's profiles and
 /// which of them a menu is read for (ALG-12, issue #354), trip mode's
 /// destination (ALG-13, issue #355) and the month's scan count the free
-/// plan reads (ALG-18, issue #360).
+/// plan reads (ALG-18, issue #360), and which of the two empty-profile
+/// notices the user dismissed (issue #421).
 @immutable
 final class AppSettings {
   /// Creates settings. Every field defaults to the "nothing set yet"
@@ -97,6 +108,8 @@ final class AppSettings {
     this.scanMonth = '',
     this.scanCount = 0,
     this.shareConfirmations = false,
+    this.menuNudgeDismissed = false,
+    this.discoveryNudgeDismissed = false,
   });
 
   /// The profiles a menu is read for until the user combines others: the
@@ -223,6 +236,8 @@ final class AppSettings {
       scanMonth: scans.month,
       scanCount: scans.count,
       shareConfirmations: json[_shareConfirmationsKey] == true,
+      menuNudgeDismissed: json[_menuNudgeDismissedKey] == true,
+      discoveryNudgeDismissed: json[_discoveryNudgeDismissedKey] == true,
     );
   }
 
@@ -324,6 +339,17 @@ final class AppSettings {
   /// record — and `const AppSettings().toJson()`, which
   /// `keto_unchanged_test` pins — stays byte-identical.
   static const String _shareConfirmationsKey = 'shareConfirmations';
+
+  /// The JSON key [menuNudgeDismissed] is stored under (issue #421),
+  /// written only when it is true, so a keto install's stored record — and
+  /// `const AppSettings().toJson()`, which `keto_unchanged_test` pins —
+  /// stays byte-identical.
+  static const String _menuNudgeDismissedKey = 'profileNudgeMenuDismissed';
+
+  /// The JSON key [discoveryNudgeDismissed] is stored under (issue #421),
+  /// written only when it is true, for the same reason.
+  static const String _discoveryNudgeDismissedKey =
+      'profileNudgeDiscoveryDismissed';
 
   /// The JSON key [profile] is stored under. [toJson] writes it only for a
   /// non-empty profile, so a keto-only install's stored record — and
@@ -458,6 +484,21 @@ final class AppSettings {
   /// note or the change answer.
   final bool shareConfirmations;
 
+  /// Whether the user dismissed the "Tell Banto what you avoid" notice on
+  /// the menu screen (Banto, issue #421). Remembered per surface; a missing
+  /// or non-boolean value reads as false, and a keto build never sets it.
+  final bool menuNudgeDismissed;
+
+  /// Whether the user dismissed the same notice on Discovery (issue #421);
+  /// see [menuNudgeDismissed].
+  final bool discoveryNudgeDismissed;
+
+  /// Whether the notice of [surface] has been dismissed (issue #421).
+  bool nudgeDismissed(ProfileNudgeSurface surface) => switch (surface) {
+    ProfileNudgeSurface.menu => menuNudgeDismissed,
+    ProfileNudgeSurface.discovery => discoveryNudgeDismissed,
+  };
+
   /// Every profile on the device: the user's own ([profile], under
   /// [primaryProfileName]) first, then [otherProfiles].
   List<NamedProfile> get profiles => <NamedProfile>[
@@ -521,6 +562,8 @@ final class AppSettings {
     String? scanMonth,
     int? scanCount,
     bool? shareConfirmations,
+    bool? menuNudgeDismissed,
+    bool? discoveryNudgeDismissed,
   }) => AppSettings(
     languageTag: identical(languageTag, _unset)
         ? this.languageTag
@@ -553,6 +596,9 @@ final class AppSettings {
     scanMonth: scanMonth ?? this.scanMonth,
     scanCount: scanCount ?? this.scanCount,
     shareConfirmations: shareConfirmations ?? this.shareConfirmations,
+    menuNudgeDismissed: menuNudgeDismissed ?? this.menuNudgeDismissed,
+    discoveryNudgeDismissed:
+        discoveryNudgeDismissed ?? this.discoveryNudgeDismissed,
   );
 
   /// Writes a form [tryFrom] can read back. [profile] is written only
@@ -563,7 +609,9 @@ final class AppSettings {
   /// active; see [_tripKey]. So are [disclosureCopyVersion] and
   /// [helperToolSeen] (ALG-11). The scan counter is written only while it
   /// counts a scan; see [_monthlyScansKey]. [shareConfirmations] is
-  /// written only when it is on; see [_shareConfirmationsKey].
+  /// written only when it is on; see [_shareConfirmationsKey]. The two
+  /// nudge dismissals are written only when set; see
+  /// [_menuNudgeDismissedKey].
   Map<String, Object?> toJson() => <String, Object?>{
     'languageTag': languageTag,
     'filter': filter.name,
@@ -595,6 +643,8 @@ final class AppSettings {
         'count': scanCount,
       },
     if (shareConfirmations) _shareConfirmationsKey: true,
+    if (menuNudgeDismissed) _menuNudgeDismissedKey: true,
+    if (discoveryNudgeDismissed) _discoveryNudgeDismissedKey: true,
   };
 
   @override
@@ -621,7 +671,9 @@ final class AppSettings {
       other.helperToolSeen == helperToolSeen &&
       other.scanMonth == scanMonth &&
       other.scanCount == scanCount &&
-      other.shareConfirmations == shareConfirmations;
+      other.shareConfirmations == shareConfirmations &&
+      other.menuNudgeDismissed == menuNudgeDismissed &&
+      other.discoveryNudgeDismissed == discoveryNudgeDismissed;
 
   @override
   int get hashCode => Object.hash(
@@ -644,8 +696,14 @@ final class AppSettings {
     tripDestination,
     disclosureCopyVersion,
     helperToolSeen,
-    // Object.hash takes at most 20 values; the last three hash as one.
-    Object.hash(scanMonth, scanCount, shareConfirmations),
+    // Object.hash takes at most 20 values; the last five hash as one.
+    Object.hash(
+      scanMonth,
+      scanCount,
+      shareConfirmations,
+      menuNudgeDismissed,
+      discoveryNudgeDismissed,
+    ),
   );
 
   @override

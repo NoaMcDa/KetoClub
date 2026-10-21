@@ -50,6 +50,7 @@ import 'package:ketoclub/widgets/menu_question_sheet.dart';
 import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
+import 'package:ketoclub/widgets/profile_nudge.dart';
 import 'package:ketoclub/widgets/rename_menu_dialog.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/scanned_page_chips.dart';
@@ -778,6 +779,8 @@ class _MenuScreenState extends State<MenuScreen> {
     final notices = <Widget>[
       AnalysisProgressRow(phase: controller.phase),
       ...banners,
+      // Banto (issue #421): asks an empty profile what it avoids.
+      MenuProfileNudge(controller: controller, bantoMode: widget.bantoMode),
       // What the menu reveals about its kitchen, for a strict profile
       // (Banto, ALG-07); a keto build never reads the kitchen.
       if (widget.bantoMode)

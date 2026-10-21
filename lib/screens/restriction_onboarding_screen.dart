@@ -123,13 +123,22 @@ class _RestrictionOnboardingGateState extends State<RestrictionOnboardingGate> {
 /// adds what was chosen, in the order it was chosen, and "Skip" adds
 /// nothing, which is a keto-only profile. Reads a [SettingsController] from
 /// the nearest [Provider].
+///
+/// Opened again from Settings ("Run the setup again", issue #421) with
+/// [prefill], the chips the profile already holds start chosen, "Continue"
+/// replaces the profile with the chips chosen (the free plan's gate still
+/// applies to a new second one) and "Skip" leaves it exactly as it was.
 class RestrictionOnboardingScreen extends StatefulWidget {
   /// Creates the screen; [onFinished] is called once either button has
   /// been saved.
-  const new({required this.onFinished, super.key});
+  const new({required this.onFinished, this.prefill = false, super.key});
 
   /// Called after the choice (or the skip) is saved.
   final VoidCallback onFinished;
+
+  /// Whether the chips start as the current profile (the setup run again
+  /// from Settings) rather than empty (the first run).
+  final bool prefill;
 
   @override
   State<RestrictionOnboardingScreen> createState() =>
@@ -141,6 +150,20 @@ class _RestrictionOnboardingScreenState
   /// The chosen restrictions, in the order they were tapped.
   final List<RestrictionId> _chosen = <RestrictionId>[];
   bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!widget.prefill) return;
+    // The chips the screen can show: keto and the user's own words are not
+    // among them, and stay as they are when the setup is saved.
+    for (final entry in context.read<SettingsController>().profile.entries) {
+      final id = entry.restrictionId;
+      if (id != RestrictionId.keto && id != RestrictionId.custom) {
+        _chosen.add(id);
+      }
+    }
+  }
 
   Future<void> _toggle(RestrictionId id, bool selected) async {
     // The free plan keeps one restriction (ALG-18): choosing a second
@@ -168,9 +191,7 @@ class _RestrictionOnboardingScreenState
     setState(() => _saving = true);
     final controller = context.read<SettingsController>();
     if (keepChoices) {
-      for (final id in _chosen) {
-        await controller.addRestriction(id);
-      }
+      await controller.replaceRestrictions(_chosen);
       // This screen carries the helper-tool sentence itself, so the sheet
       // Settings shows on a first restriction is not shown again (ALG-11).
       if (_chosen.isNotEmpty) await controller.markHelperToolSeen();

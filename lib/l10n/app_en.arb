@@ -1152,5 +1152,13 @@
   "savedStateCount": "{label}: {count}",
   "@savedStateCount": {"description": "Banto (#411): one state count on a Recent row, such as 'No trigger found: 3'; the label is the verdict tile's own word.", "placeholders": {"label": {"type": "String"}, "count": {"type": "int"}}},
   "savedRecheck": "Your profile has changed since. Open this menu to check it again.",
-  "@savedRecheck": {"description": "Banto (#411): shown on a Recent row, in place of numbers, when the profile now differs from the one the menu was last counted for."}
+  "@savedRecheck": {"description": "Banto (#411): shown on a Recent row, in place of numbers, when the profile now differs from the one the menu was last counted for."},
+  "profileNudgeMessage": "Tell Banto what you avoid to see which dishes fit you",
+  "@profileNudgeMessage": {"description": "Banto (#421): the notice above the dishes and above the Discovery list while the profile holds nothing but keto. Never says a dish is safe."},
+  "profileNudgeChoose": "Add what you avoid",
+  "@profileNudgeChoose": {"description": "Banto (#421): the notice's action, which opens the restriction picker."},
+  "profileNudgeDismiss": "Not now",
+  "@profileNudgeDismiss": {"description": "Banto (#421): dismisses the notice for that screen; the choice is remembered on the device."},
+  "settingsRestrictionsRerun": "Run the setup again",
+  "@settingsRestrictionsRerun": {"description": "Banto (#421): the My restrictions row that reopens the first-run 'What do you avoid?' screen, pre-filled with the current profile."}
 }

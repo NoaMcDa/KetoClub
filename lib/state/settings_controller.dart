@@ -332,6 +332,28 @@ final class SettingsController extends ChangeNotifier {
     await _update(_appSettings.copyWith(profile: profile.withEntry(id)));
   }
 
+  /// Makes the profile hold exactly [ids] besides keto and the user's own
+  /// words, for the setup run again from Settings (issue #421): an id the
+  /// profile holds keeps its place and its exceptions, one it does not is
+  /// added last, and an entry not in [ids] is removed. The keto entry and
+  /// the user's own words are not on the setup screen and are left alone.
+  /// A no-op, with no write, when nothing would change.
+  Future<void> replaceRestrictions(List<RestrictionId> ids) async {
+    var next = profile;
+    for (final entry in profile.entries) {
+      final id = entry.restrictionId;
+      if (id == RestrictionId.keto || id == RestrictionId.custom) continue;
+      if (!ids.contains(id)) next = next.withoutEntry(id);
+    }
+    for (final id in ids) {
+      if (id != RestrictionId.keto && id != RestrictionId.custom) {
+        next = next.withEntry(id);
+      }
+    }
+    if (next == profile) return;
+    await _update(_appSettings.copyWith(profile: next));
+  }
+
   /// Removes [id] and its exceptions from the profile (issue #344). A
   /// no-op, with no write, when the profile does not hold [id].
   Future<void> removeRestriction(RestrictionId id) async {
