@@ -32,6 +32,14 @@ import 'package:provider/provider.dart';
 /// device (ALG-11, issue #353), present only with `bantoMode` on.
 const Key consentBantoNoteKey = Key('settingsConsentBantoNote');
 
+/// The "Share what the staff told you" toggle under AI & privacy (Banto,
+/// ALG-14, issue #409), present only with `bantoMode` on and a backend.
+const Key shareConfirmationsToggleKey = Key('settingsShareConfirmations');
+
+/// The consent disclosure's note that shared confirmations are on (issue
+/// #409), present only while the toggle is.
+const Key consentSharedNoteKey = Key('settingsConsentSharedNote');
+
 /// The "Show my chef card" button in the "My restrictions" section (Banto,
 /// ALG-08a, issue #350), present only for a non-empty profile.
 const Key restrictionsChefCardKey = Key('settingsRestrictionsChefCard');
@@ -346,6 +354,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 _GroupNote(_consentBody(l10n, controller)),
                 if (widget.bantoMode) _GroupNote(l10n.whatLeavesDeviceBanto),
+                if (_sharesConfirmations(controller))
+                  _GroupNote(l10n.whatLeavesDeviceSharedConfirmations),
               ],
             ),
             ListTile(
@@ -396,6 +406,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// build: straight to Google with the user's key on iOS and Android
   /// (D17), through KetoClub's server on web (D12) — so the disclosure
   /// follows [SettingsController.supportsApiKey].
+  ///
+  /// In a Banto build with a backend, a second toggle, off by default,
+  /// shares what the staff told the user after a meal (ALG-14, issue
+  /// #409), and the disclosure names it while it is on.
   Widget _consentSection(
     BuildContext context,
     AppLocalizations l10n,
@@ -427,6 +441,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     l10n.whatLeavesDeviceBanto,
                     key: consentBantoNoteKey,
                   ),
+                // Named while the user shares post-meal answers (#409).
+                if (_sharesConfirmations(controller))
+                  _GroupNote(
+                    l10n.whatLeavesDeviceSharedConfirmations,
+                    key: consentSharedNoteKey,
+                  ),
               ],
             ),
             CheckboxListTile(
@@ -438,11 +458,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         unawaited(controller.setConsent(given: given ?? false)),
               title: Text(l10n.settingsConsentAccept),
             ),
+            // A consent of its own, off by default (ALG-14, issue #409),
+            // offered only where there is a server to share with.
+            if (widget.bantoMode && widget.backendConfigured)
+              SwitchListTile(
+                key: shareConfirmationsToggleKey,
+                value: controller.shareConfirmations,
+                onChanged: busy
+                    ? null
+                    : (enabled) => unawaited(
+                        controller.setShareConfirmations(enabled: enabled),
+                      ),
+                title: Text(l10n.settingsShareConfirmations),
+                subtitle: Text(l10n.settingsShareConfirmationsBody),
+              ),
           ],
         ),
       ],
     );
   }
+
+  /// Whether the disclosures name the shared post-meal answers: a Banto
+  /// build with a backend whose user turned sharing on (issue #409).
+  bool _sharesConfirmations(SettingsController controller) =>
+      widget.bantoMode &&
+      widget.backendConfigured &&
+      controller.shareConfirmations;
 
   /// The Gemini API key field, its save and remove actions and the
   /// saved/not-saved status line (architecture.md D17, §11): the second

@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_question_answerer.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
+import 'package:ketoclub/services/community/confirmation_client.dart';
 import 'package:ketoclub/services/community/menu_store_client.dart';
 import 'package:ketoclub/services/location/location_service.dart';
 import 'package:ketoclub/services/menu/menu_repository.dart';
@@ -76,6 +77,10 @@ class AppDependencies {
   /// does not script a store. `di.dart` passes the store's on a phone in a
   /// Banto build (ALG-18, issue #360).
   ///
+  /// [confirmationClient] defaults to [NoConfirmationClient], which sends
+  /// nothing and does no I/O; `di.dart` passes the backend's when a
+  /// backend URL is configured (Banto, ALG-14, issue #409).
+  ///
   /// [estimateMenuRepository] defaults to [menuRepository], which is also
   /// the no-backend build's real value; with a backend `di.dart` passes a
   /// repository over the direct adapters sharing the same cache (issue
@@ -107,6 +112,7 @@ class AppDependencies {
     this.menuStoreClient = const NoMenuStoreClient(),
     this.backendConfigured = false,
     this.entitlement = const NullEntitlement(),
+    this.confirmationClient = const NoConfirmationClient(),
     MenuRepository? estimateMenuRepository,
   }) : estimateMenuRepository = estimateMenuRepository ?? menuRepository;
 
@@ -240,4 +246,10 @@ class AppDependencies {
   /// (ALG-18, issue #360). Read only through the app-lifetime
   /// `PremiumController`; the backend never learns of it.
   final Entitlement entitlement;
+
+  /// Shares one post-meal answer with KetoClub's backend (Banto, ALG-14,
+  /// issue #409), used by the post-meal prompt only when the user turned
+  /// sharing on (`AppSettings.shareConfirmations`). Sends one fact per
+  /// answer and nothing about the user: see `ConfirmationClient.confirm`.
+  final ConfirmationClient confirmationClient;
 }

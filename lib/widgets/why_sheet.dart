@@ -8,6 +8,7 @@ import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/utils/allergens/confirmations.dart';
 import 'package:ketoclub/utils/allergens/declarations.dart';
 import 'package:ketoclub/utils/allergens/taxonomy.dart';
+import 'package:ketoclub/utils/allergens/waiter_questions.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/widgets/app_sheet.dart';
 import 'package:ketoclub/widgets/content_direction.dart';
@@ -32,6 +33,29 @@ const Key whyCoverageKey = ValueKey<String>('whyCoverage');
 
 /// The key of the sheet's dated line about the change asked for (ALG-14).
 const Key whyChangeAnswerKey = ValueKey<String>('whyChangeAnswer');
+
+/// The key of the sheet's shared line at [index] (issue #409): what other
+/// people were told about the dish.
+Key whySharedConfirmationKey(int index) =>
+    ValueKey<String>('whySharedConfirmation_$index');
+
+/// What other people were told about a dish, as one line in the UI
+/// language (Banto, ALG-14, issue #409): "5 people were told it has no
+/// sesame here", or "…it has sesame here". [piece] is a shared count
+/// ([ConfirmationEvidence.shared]); [hebrew] is whether the UI is Hebrew,
+/// the language the restriction is named in, as the thing asked about
+/// ([WaiterQuestions.subject]: "animal products" for vegan). Never "safe":
+/// it is what people were told, and the footer says to ask.
+String sharedConfirmationLine(
+  AppLocalizations l10n,
+  ConfirmationEvidence piece, {
+  required bool hebrew,
+}) {
+  final subject = WaiterQuestions.subject(piece.restrictionId, hebrew: hebrew);
+  return piece.polarity == ConfirmationPolarity.present
+      ? l10n.sharedConfirmationPresent(piece.count, subject)
+      : l10n.sharedConfirmationAbsent(piece.count, subject);
+}
 
 /// The dated line for [answer], the person's answer to "they changed the
 /// dish as requested" (ALG-14): the staff changed it on that day, which
@@ -112,7 +136,8 @@ Key whyConfirmationKey(int index) => ValueKey<String>('whyConfirmation_$index');
 /// [EvidenceTier.confirmed] or [EvidenceTier.denied] (ALG-14): "You
 /// confirmed with the staff on 12 May", or that the staff said no on that
 /// day and it holds for that visit only. Null for any other concern, and
-/// for one only a shared count decided (no such count exists yet).
+/// for one only a shared count decided: that is worded on its own line
+/// ([sharedConfirmationLine], issue #409).
 String? whyConfirmationLine(
   AppLocalizations l10n,
   Concern concern,
@@ -189,6 +214,8 @@ Future<void> showWhySheet(
   required bool strictProfile,
   List<Declaration> declarations = const <Declaration>[],
   List<ConfirmationEvidence> confirmations = const <ConfirmationEvidence>[],
+  List<ConfirmationEvidence> sharedConfirmations =
+      const <ConfirmationEvidence>[],
   ChangeConfirmation? changeAnswer,
   WhyCoverage? coverage,
   bool bantoMode = BantoMode.enabled,
@@ -203,6 +230,7 @@ Future<void> showWhySheet(
       strictProfile: strictProfile,
       declarations: declarations,
       confirmations: confirmations,
+      sharedConfirmations: sharedConfirmations,
       changeAnswer: changeAnswer,
       coverage: coverage,
       bantoMode: bantoMode,
@@ -229,6 +257,10 @@ Future<void> showWhySheet(
 /// the change they asked for ([changeAnswer]) is a dated line of its own
 /// under the dish name; like every answer, it moves nothing.
 ///
+/// What other people were told ([sharedConfirmations], issue #409) is one
+/// line each above the footer: "5 people were told it has no sesame
+/// here". The footer, the helper-tool sentence, says to ask.
+///
 /// A [coverage] note under the dish name says what the menu gave and who
 /// read it, the model and the rules or the rules alone (ALG-06).
 ///
@@ -241,6 +273,7 @@ class WhySheet extends StatelessWidget {
     required this.strictProfile,
     this.declarations = const <Declaration>[],
     this.confirmations = const <ConfirmationEvidence>[],
+    this.sharedConfirmations = const <ConfirmationEvidence>[],
     this.changeAnswer,
     this.coverage,
     this.bantoMode = BantoMode.enabled,
@@ -264,6 +297,10 @@ class WhySheet extends StatelessWidget {
   /// The staff answers that moved a concern (`EvaluatedDish.confirmations`,
   /// ALG-14), dated under each concern they answer.
   final List<ConfirmationEvidence> confirmations;
+
+  /// What other people were told about the dish
+  /// (`EvaluatedDish.sharedConfirmations`, issue #409), one line each.
+  final List<ConfirmationEvidence> sharedConfirmations;
 
   /// The person's latest answer to "they changed the dish as requested"
   /// (ALG-14), or null for none.
@@ -352,6 +389,23 @@ class WhySheet extends StatelessWidget {
                   confirmationKey: whyConfirmationKey(i),
                 ),
               ],
+            if (sharedConfirmations.isNotEmpty) ...[
+              const Divider(height: 24),
+              for (var i = 0; i < sharedConfirmations.length; i++)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    sharedConfirmationLine(
+                      l10n,
+                      sharedConfirmations[i],
+                      hebrew:
+                          Localizations.localeOf(context).languageCode == 'he',
+                    ),
+                    key: whySharedConfirmationKey(i),
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ),
+            ],
             const SizedBox(height: 20),
             Text(
               l10n.helperToolSentence,

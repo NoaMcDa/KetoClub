@@ -25,13 +25,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/l10n/generated/app_localizations.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
+import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_analysis_prompt.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_response_parser.dart';
+import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
+import 'package:ketoclub/services/storage/menu_cache.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/keto_score.dart';
 import 'package:ketoclub/utils/menu_share_text.dart';
@@ -42,6 +47,10 @@ import 'package:ketoclub/widgets/verdict_copy.dart';
 
 import '../../tool/golden/golden_corpus.dart';
 import '../fakes/fake_clock.dart';
+import '../fakes/fake_location_service.dart';
+import '../fakes/fake_menu_repository.dart';
+import '../fakes/fake_settings_store.dart';
+import '../fakes/fake_venue_search_service.dart';
 
 /// Where the hand-edited baseline files live.
 const String _fixtureDirectory = 'test/fixtures/keto_baseline';
@@ -393,6 +402,66 @@ final List<_BantoSeam> _bantoSeams = <_BantoSeam>[
   ),
 ];
 
+/// The Discovery screen's output for the golden venue list (issue #410):
+/// the English golden menu cached with its rules analysis, the Hebrew one
+/// fetched and quick-scored, and a venue with nothing to read, run
+/// through a real [VenueSearchController] whose [VenueSearchController.load]
+/// was given [bantoMode] and an empty profile. Everything a card or a
+/// chip reads, and what the quick score saved, as text.
+Future<String> _discoveryOutput({required bool bantoMode}) async {
+  final english = goldenEnglishMenu;
+  final hebrew = goldenHebrewMenu;
+  const missing = VenueRef(source: MenuSource.wolt, platformId: 'missing');
+  final venues = <Venue>[
+    Venue(ref: english.venueRef, name: english.venueName ?? ''),
+    Venue(ref: hebrew.venueRef, name: hebrew.venueName ?? ''),
+    const Venue(ref: missing, name: 'missing'),
+  ];
+  final repository = FakeMenuRepository()
+    ..seedCache(
+      CachedMenu(
+        menu: english,
+        analysis: await _rulesAnalysis(english, _defaults),
+      ),
+    )
+    ..stub(hebrew.venueRef, MenuFetched(menu: hebrew))
+    ..stub(
+      missing,
+      const MenuFetchFailed(reason: MenuFetchFailureReason.notFound),
+    );
+  final search = FakeVenueSearchService()..queueFound(venues);
+  final controller = VenueSearchController(
+    FakeSettingsStore(),
+    repository,
+    locationService: FakeLocationService(),
+    venueSearchService: search,
+    estimateClassifier: HeuristicMenuClassifier(clock: FakeClock(goldenNow)),
+  );
+  await controller.load(bantoMode: bantoMode);
+  await controller.locate(language: 'en');
+  while (controller.isEstimating) {
+    await Future<void>.delayed(Duration.zero);
+  }
+  final lines = <String>[
+    'showsFit: ${controller.showsFit}',
+    'hasAnyNumbers: ${controller.hasAnyNumbers}',
+    for (final venue in controller.visibleResults)
+      [
+        '${venue.name}: ${controller.cardNumbers(venue)}',
+        'fit: ${controller.cardFit(venue)}',
+      ].join(' '),
+    for (final saved in repository.savedAnalyses)
+      [
+        'saved ${saved.ref.cacheKey}:',
+        _canonicalJson((saved.analysis as MenuAnalysed).toJson()),
+      ].join(' '),
+  ];
+  controller.toggleChip(DiscoveryChip.ketoEightPlus);
+  lines.add('keto 8+: ${controller.visibleResults.map((venue) => venue.name)}');
+  controller.dispose();
+  return lines.join('\n');
+}
+
 void main() {
   group('the baseline folder', () {
     test('holds exactly the fixtures this test reads, plus README', () {
@@ -653,6 +722,18 @@ void main() {
         // Assert
         _expectFixture(seam.fixture, built);
       }
+    });
+
+    test('Discovery over the golden venue list, with an empty profile, '
+        'is the keto output (issue #410)', () async {
+      // Act
+      final keto = await _discoveryOutput(bantoMode: false);
+      final banto = await _discoveryOutput(bantoMode: true);
+
+      // Assert
+      expect(keto, contains('showsFit: false'));
+      expect(keto, contains('saved '));
+      expect(banto, keto);
     });
   });
 }

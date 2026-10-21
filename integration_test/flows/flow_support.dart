@@ -46,6 +46,7 @@ import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 import 'package:ketoclub/services/classifier/scanned_classifier_router.dart';
 import 'package:ketoclub/services/classifier/scanned_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/vision_menu_classifier.dart';
+import 'package:ketoclub/services/community/confirmation_client.dart';
 import 'package:ketoclub/services/community/menu_store_client.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
 import 'package:ketoclub/services/location/location_service.dart';
@@ -251,6 +252,11 @@ final class FakeAppDependencies {
   /// flow that exercises the free plan sets a scripted store.
   Entitlement entitlement = const NullEntitlement();
 
+  /// The client the post-meal prompt shares answers through (issue #409):
+  /// [NoConfirmationClient] by default, which sends nothing, as a build
+  /// with no backend. A flow that exercises sharing sets one.
+  ConfirmationClient confirmationClient = const NoConfirmationClient();
+
   /// The engine behind "Estimate this list" (issue #42, D13): the real
   /// on-device rule engine over the same fixed time as [clock], exactly
   /// as `di.dart` wires it, so a flow sees real rules verdicts while
@@ -282,6 +288,7 @@ final class FakeAppDependencies {
     visitHistory: visitHistory,
     menuStoreClient: menuStoreClient,
     entitlement: entitlement,
+    confirmationClient: confirmationClient,
   );
 }
 

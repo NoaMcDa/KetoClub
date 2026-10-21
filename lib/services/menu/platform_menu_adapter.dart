@@ -3,6 +3,7 @@ import 'package:ketoclub/models/allergen_matrix.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
+import 'package:ketoclub/models/shared_confirmation.dart';
 import 'package:ketoclub/models/venue.dart';
 
 /// The result of asking a [PlatformMenuAdapter] for one venue's menu
@@ -28,6 +29,7 @@ final class MenuFetched extends MenuFetchResult {
     this.staleReason,
     this.analysis,
     this.allergenMatrix,
+    this.sharedConfirmations,
   });
 
   /// The menu, fresh or cached.
@@ -58,6 +60,13 @@ final class MenuFetched extends MenuFetchResult {
   /// a menu served from the cache. Null for every other fetch.
   final AllergenMatrix? allergenMatrix;
 
+  /// What other people were told by the staff about the venue's dishes
+  /// (Banto, ALG-14, issue #409), when KetoClub's backend answered with
+  /// counts beside the menu (`confirmations` on its venue-menu route), or
+  /// the ones cached with a menu served from the cache. Null for every
+  /// other fetch.
+  final SharedConfirmations? sharedConfirmations;
+
   @override
   bool operator ==(Object other) =>
       other is MenuFetched &&
@@ -65,11 +74,18 @@ final class MenuFetched extends MenuFetchResult {
       other.fromCache == fromCache &&
       other.staleReason == staleReason &&
       other.analysis == analysis &&
-      other.allergenMatrix == allergenMatrix;
+      other.allergenMatrix == allergenMatrix &&
+      other.sharedConfirmations == sharedConfirmations;
 
   @override
-  int get hashCode =>
-      Object.hash(menu, fromCache, staleReason, analysis, allergenMatrix);
+  int get hashCode => Object.hash(
+    menu,
+    fromCache,
+    staleReason,
+    analysis,
+    allergenMatrix,
+    sharedConfirmations,
+  );
 
   @override
   String toString() =>

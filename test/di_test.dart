@@ -15,6 +15,7 @@ import 'package:ketoclub/services/classifier/fallback_classifiers.dart';
 import 'package:ketoclub/services/classifier/heuristic_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/classifier/scanned_classifier_router.dart';
+import 'package:ketoclub/services/community/confirmation_client.dart';
 import 'package:ketoclub/services/community/menu_store_client.dart';
 import 'package:ketoclub/services/llm/backend_chat_client.dart';
 import 'package:ketoclub/services/llm/fallback_chat_client.dart';
@@ -152,6 +153,8 @@ void main() {
       expect(dependencies.backendConfigured, isFalse);
       // Built without BANTO_MODE: KetoClub sells nothing (ALG-18).
       expect(dependencies.entitlement, isA<NullEntitlement>());
+      // No backend URL: no post-meal answer can be shared (issue #409).
+      expect(dependencies.confirmationClient, isA<NoConfirmationClient>());
       expect(
         identical(
           dependencies.estimateMenuRepository,
@@ -208,6 +211,37 @@ void main() {
         expect(entitlement, isA<NullEntitlement>());
         expect(entitlement.sellsPremium, isFalse);
       }
+    });
+  });
+
+  group('confirmationClientFor (ALG-14, issue #409)', () {
+    test('a build with a backend posts through it, reading nothing yet', () {
+      // Arrange
+      final installIds = FakeInstallIdStore();
+
+      // Act
+      final client = confirmationClientFor(
+        backendBase: Uri.parse('http://localhost:8000'),
+        client: http.Client(),
+        installIdStore: installIds,
+        logger: const DeveloperLogAppLogger(),
+      );
+
+      // Assert: constructing it read no install id (no plugin I/O).
+      expect(client, isA<BackendConfirmationClient>());
+      expect(client.isConfigured, isTrue);
+      expect(installIds.calls, 0);
+    });
+
+    test('a build with none gets the client that sends nothing', () {
+      final client = confirmationClientFor(
+        backendBase: null,
+        client: http.Client(),
+        installIdStore: FakeInstallIdStore(),
+        logger: const DeveloperLogAppLogger(),
+      );
+      expect(client, isA<NoConfirmationClient>());
+      expect(client.isConfigured, isFalse);
     });
   });
 

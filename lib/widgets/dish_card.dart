@@ -521,6 +521,15 @@ Key dishConcernKey(int index) => ValueKey<String>('dishConcern_$index');
 /// The key of the dated "the staff changed it as you asked" line (ALG-14).
 const Key dishChangeAnswerKey = ValueKey<String>('dishChangeAnswer');
 
+/// The key of the dish card's shared line at [index] (Banto, ALG-14, issue
+/// #409): what other people were told about the dish.
+Key dishSharedConfirmationKey(int index) =>
+    ValueKey<String>('dishSharedConfirmation_$index');
+
+/// The key of the helper-tool footer under the dish card's shared lines
+/// (issue #409).
+const Key dishSharedFooterKey = ValueKey<String>('dishSharedFooter');
+
 /// The key of a dish card's "Why?" button (ALG-05).
 const Key dishWhyKey = ValueKey<String>('dishWhy');
 
@@ -710,6 +719,7 @@ class _ConcernsBlock extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final concerns = evaluated.concerns;
+    final shared = evaluated.sharedConfirmations;
     final answer = changeAnswer;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -724,6 +734,34 @@ class _ConcernsBlock extends StatelessWidget {
               confirmations: evaluated.confirmations,
             ),
           ),
+        // What other people were told (issue #409): only counts of three
+        // or more about a restriction the profile holds reach here
+        // (`EvaluatedDish.sharedConfirmations`), then the footer.
+        if (shared.isNotEmpty) ...[
+          for (var i = 0; i < shared.length; i++)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                sharedConfirmationLine(
+                  l10n,
+                  shared[i],
+                  hebrew: Localizations.localeOf(context).languageCode == 'he',
+                ),
+                key: dishSharedConfirmationKey(i),
+                style: theme.textTheme.bodySmall,
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Text(
+              l10n.sharedConfirmationFooter,
+              key: dishSharedFooterKey,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
         if (answer != null)
           Padding(
             padding: const EdgeInsets.only(bottom: 6),
@@ -776,6 +814,7 @@ class _ConcernsBlock extends StatelessWidget {
       strictProfile: strictProfile,
       declarations: evaluated.declarations,
       confirmations: evaluated.confirmations,
+      sharedConfirmations: evaluated.sharedConfirmations,
       changeAnswer: changeAnswer,
       coverage: coverage,
       bantoMode: bantoMode,

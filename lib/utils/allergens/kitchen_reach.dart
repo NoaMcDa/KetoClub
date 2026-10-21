@@ -190,5 +190,6 @@ EvaluatedDish applyKitchenSignals(
     concerns: List<Concern>.unmodifiable(concerns),
     state: DishState.ask,
     modification: evaluated.modification,
+    sharedConfirmations: evaluated.sharedConfirmations,
   );
 }

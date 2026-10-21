@@ -121,6 +121,10 @@ final class SettingsController extends ChangeNotifier {
   /// #353); see [AppSettings.helperToolSeen].
   bool get helperToolSeen => _appSettings.helperToolSeen;
 
+  /// Whether the user shares what the staff told them after a meal
+  /// (Banto, ALG-14, issue #409); see [AppSettings.shareConfirmations].
+  bool get shareConfirmations => _appSettings.shareConfirmations;
+
   /// How many menus are currently cached (issue #61's Settings section). A
   /// count of entries, never a byte figure —
   /// [MenuRepository.cachedMenuCount]'s own doc comment explains why.
@@ -302,6 +306,14 @@ final class SettingsController extends ChangeNotifier {
   Future<void> markOnboardingSeen() async {
     if (onboardingSeen) return;
     await _update(_appSettings.copyWith(onboardingSeen: true));
+  }
+
+  /// Turns sharing what the staff told the user on or off (ALG-14, issue
+  /// #409). A no-op, with no write, when it is already so. Named rather
+  /// than positional for the reason [setConsent] gives.
+  Future<void> setShareConfirmations({required bool enabled}) async {
+    if (enabled == shareConfirmations) return;
+    await _update(_appSettings.copyWith(shareConfirmations: enabled));
   }
 
   /// Records that the helper-tool sheet has been shown (ALG-11), so it is

@@ -117,6 +117,7 @@ final class EvaluatedDish {
     this.modification,
     this.declarations = const <Declaration>[],
     this.confirmations = const <ConfirmationEvidence>[],
+    this.sharedConfirmations = const <ConfirmationEvidence>[],
   });
 
   /// The analysed dish, wire verdict untouched.
@@ -145,6 +146,14 @@ final class EvaluatedDish {
   /// [Confirmations.apply]): what the Why sheet dates. Empty when none.
   final List<ConfirmationEvidence> confirmations;
 
+  /// What other people were told by the staff about this dish (ALG-14,
+  /// issue #409): every shared piece of the evidence passed in whose
+  /// count reaches [sharedConfirmationThreshold] and whose restriction the
+  /// profile holds, in the order given. What the dish card and the Why
+  /// sheet word as "N people were told it has (no) X here". Empty when
+  /// none.
+  final List<ConfirmationEvidence> sharedConfirmations;
+
   @override
   bool operator ==(Object other) =>
       other is EvaluatedDish &&
@@ -153,7 +162,8 @@ final class EvaluatedDish {
       other.state == state &&
       other.modification == modification &&
       listEquals(other.declarations, declarations) &&
-      listEquals(other.confirmations, confirmations);
+      listEquals(other.confirmations, confirmations) &&
+      listEquals(other.sharedConfirmations, sharedConfirmations);
 
   @override
   int get hashCode => Object.hash(
@@ -163,6 +173,7 @@ final class EvaluatedDish {
     modification,
     Object.hashAll(declarations),
     Object.hashAll(confirmations),
+    Object.hashAll(sharedConfirmations),
   );
 
   @override
@@ -236,7 +247,12 @@ abstract final class ProfileEvaluator {
 
   /// After the declarations, what the staff said about this dish
   /// ([confirmations], ALG-14) re-tiers the concerns it answers
-  /// ([Confirmations.apply]; never below suspected).
+  /// ([Confirmations.apply]; never below suspected). Counts other people
+  /// shared (a piece with [ConfirmationEvidence.shared], issue #409) go
+  /// through the same rule: from [sharedConfirmationThreshold] people a
+  /// denial lowers one step and a present raises nothing, and the person's
+  /// own answer outranks them. The shared pieces about the profile's
+  /// restrictions are kept as [EvaluatedDish.sharedConfirmations].
   ///
   /// An empty profile holds keto: it is the keto-only user of today's
   /// app, and the result is the identity mapping of the wire verdict.
@@ -339,7 +355,27 @@ abstract final class ProfileEvaluator {
       modification: state == DishState.avoid ? null : change,
       declarations: declarations,
       confirmations: staff.applied,
+      sharedConfirmations: _sharedFor(confirmations, profile),
     );
+  }
+
+  /// The shared pieces of [confirmations] that reach
+  /// [sharedConfirmationThreshold] and are about a restriction [profile]
+  /// holds (issue #409).
+  static List<ConfirmationEvidence> _sharedFor(
+    List<ConfirmationEvidence> confirmations,
+    DietaryProfile profile,
+  ) {
+    final shared = <ConfirmationEvidence>[
+      for (final piece in confirmations)
+        if (piece.shared &&
+            piece.count >= sharedConfirmationThreshold &&
+            profile.contains(piece.restrictionId))
+          piece,
+    ];
+    return shared.isEmpty
+        ? const <ConfirmationEvidence>[]
+        : List<ConfirmationEvidence>.unmodifiable(shared);
   }
 
   /// [concerns] as evidence on parts of the dish that cannot be left off:

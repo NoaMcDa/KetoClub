@@ -327,7 +327,8 @@ Everything sits behind `--dart-define=BANTO_MODE=true`; without it the app
 is KetoClub byte for byte, which `test/architecture/keto_unchanged_test.dart`
 pins.
 
-**What exists, on `banto`.** The 25-restriction taxonomy and the bilingual
+**What exists, on `banto`.** The 56-restriction taxonomy (the 20 allergens and intolerances, the extended
+and research restrictions, kosher and halal components) and the bilingual
 vocabulary with its golden and Python twin (ALG-01, ALG-17), the rules-recall
 gate over the labelled corpus (ALG-10), the on-device profile, onboarding and
 group profiles (ALG-02, ALG-12), the profile-independent ingredient
@@ -337,13 +338,22 @@ coverage note (ALG-06), kitchen cross-contact signals (ALG-07), chef cards and
 the allergy note (ALG-08, ALG-15), platform and restaurant declarations
 (ALG-09), the privacy and helper-tool copy with a disclosure shown once more
 for the Banto text (ALG-11), and the GLP-1 "protein-forward · small portion"
-tag. The profile never leaves the device (C1); only the flag asking for
-ingredients does.
+tag. Four slices that earlier notes called open have shipped: trip mode
+(ALG-13, #395, fact-checked in #397), post-meal confirmations (ALG-14: the
+device half #394, the backend route, table and Dart client #392), restaurant
+allergen-matrix intake (ALG-16, first slice, #393) and Premium gating with the
+paywall (ALG-18, #399). The profile never leaves the device (C1); only the
+flag asking for ingredients does.
 
 **Deliberately unfinished.**
 
-- ALG-13 (trip mode), ALG-14 (post-meal confirmations), ALG-16 (allergen
-  matrices) and ALG-18 (premium gating) are in progress or not started.
+- No store purchase has been made (ALG-18, #399): no developer account and no
+  store product exist, so `StoreEntitlement` (#399) has never completed a purchase.
+  Trip mode's offline behaviour (ALG-13, #395) is proven under
+  `flutter-tester` only. No confirmation has been uploaded to a running
+  backend: `ConfirmationClient` (#392) is built and tested against a mocked
+  client, and nothing on the device calls it. ALG-16 (#393) is a first slice
+  of the matrix intake.
 - The model evaluation, `backend/tools/allergen_eval.py`, has never been
   run with a real key: `docs/ALLERGEN_EVAL.md` says "not yet run", and no
   extraction request has gone to a real model. Recall figures in D26 are the
@@ -510,7 +520,7 @@ spacing values) is enforced by a test; pixel fidelity by no test at all.
   `lib/theme/app_tokens.dart`'s "Contrast fixes" note, and every drawn
   `on`/surface pair — these three plus every other one `VerdictColors`
   produces — is pinned by `test/theme/contrast_test.dart` (issue #64's
-  contrast half; semantics/RTL/large text are a later PR).
+  contrast half; semantics, RTL and large text are in `docs/ACCESSIBILITY.md`).
 - **A scan has no rules fallback and no offline path.** The rule engine needs
   text, so with consent withheld, no network or a failed model call a photograph
   or PDF produces an error and nothing else (D15). Pasted text does fall back to

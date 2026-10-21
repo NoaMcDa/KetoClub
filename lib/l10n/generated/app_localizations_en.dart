@@ -2407,6 +2407,34 @@ class AppLocalizationsEn extends AppLocalizations {
       'No restriction matches. You can add it as your own below.';
 
   @override
+  String get discoveryChipFitsProfile => 'Fits my profile';
+
+  @override
+  String get settingsShareConfirmations => 'Share what the staff told you';
+
+  @override
+  String get settingsShareConfirmationsBody =>
+      'Each answer you save after a meal sends the venue, the dish, the restriction you asked about and yes or no, so other people see how many were told the same. Never your profile, never your note.';
+
+  @override
+  String get whatLeavesDeviceSharedConfirmations =>
+      'You share what the staff told you: each answer you save sends the venue, the dish, the one restriction you asked about and yes or no to KetoClub\'s server, with nothing that identifies you. Never your profile, never your note.';
+
+  @override
+  String sharedConfirmationAbsent(int count, String restriction) {
+    return '$count people were told it has no $restriction here';
+  }
+
+  @override
+  String sharedConfirmationPresent(int count, String restriction) {
+    return '$count people were told it has $restriction here';
+  }
+
+  @override
+  String get sharedConfirmationFooter =>
+      'Shared by other diners. The app cannot check it: always ask the restaurant.';
+
+  @override
   String get workedOffer => 'This place worked for me';
 
   @override
