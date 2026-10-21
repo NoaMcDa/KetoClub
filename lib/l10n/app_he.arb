@@ -890,5 +890,16 @@
   "workedMark": "לסמן כמקום שעבד לי",
   "workedUnmark": "להסיר את הסימון \"עבד לי\"",
   "savedStateCount": "{label}: {count}",
-  "savedRecheck": "הפרופיל שלך השתנה מאז. אפשר לפתוח את התפריט כדי לבדוק שוב."
+  "savedRecheck": "הפרופיל שלך השתנה מאז. אפשר לפתוח את התפריט כדי לבדוק שוב.",
+  "orderAdd": "להוסיף להזמנה שלי",
+  "orderRemove": "להסיר מההזמנה שלי",
+  "orderPill": "ההזמנה שלי · {count}",
+  "orderPillSemantic": "{count, plural, =1{ההזמנה שלי, מנה אחת. פותח את כרטיס ההזמנה.} other{ההזמנה שלי, {count} מנות. פותח את כרטיס ההזמנה.}}",
+  "orderCardTitle": "ההזמנה שלי",
+  "orderCardRemoveDish": "להסיר את {dish} מההזמנה שלי",
+  "orderCardAllergyTitle": "לכל ההזמנה",
+  "orderCardCopy": "העתקה",
+  "orderCardCopied": "ההזמנה הועתקה",
+  "orderCardShare": "שיתוף",
+  "orderCardClear": "ניקוי ההזמנה"
 }

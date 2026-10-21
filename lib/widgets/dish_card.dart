@@ -73,6 +73,8 @@ class DishCard extends StatefulWidget {
     this.groupBreakdown,
     this.smallPortions = false,
     this.changeAnswer,
+    this.inOrder = false,
+    this.onToggleOrder,
     super.key,
   });
 
@@ -139,6 +141,15 @@ class DishCard extends StatefulWidget {
   /// (ALG-14, D27), or null for none. Shown with its date in state mode
   /// only, and never read by the state.
   final ChangeConfirmation? changeAnswer;
+
+  /// Whether the dish is in "My order" (Banto, issue #418); read only
+  /// with [onToggleOrder].
+  final bool inOrder;
+
+  /// Called with [row] when the "Add to my order" toggle is tapped (Banto,
+  /// issue #418), or null to leave the toggle out. Drawn in state mode
+  /// only, beside the state pill, so a keto card is unchanged.
+  final ValueChanged<DishRow>? onToggleOrder;
 
   /// Whether this card renders [evaluated]'s state rather than the keto
   /// verdict.
@@ -230,6 +241,13 @@ class _DishCardState extends State<DishCard> {
                   child: StateBadge(state: state, wording: widget.wording),
                 ),
               ),
+              if (widget.onToggleOrder case final toggle?) ...[
+                const SizedBox(width: 4),
+                _OrderToggle(
+                  inOrder: widget.inOrder,
+                  onPressed: () => toggle(row),
+                ),
+              ],
               if (showAddNote) ...[
                 const SizedBox(width: 4),
                 _AddNoteButton(onPressed: () => widget.onEditNote!(row)),
@@ -1116,6 +1134,50 @@ class _HiddenCarbsRow extends StatelessWidget {
 /// The "add a note" affordance (issue #240): one small icon button, shown
 /// only while a dish has no note, so forty dishes do not each carry a muted
 /// text row. Its tooltip is visual; its icon carries the semantics label.
+/// The "Add to my order" toggle (Banto, issue #418), public so a test can
+/// find the toggle of any card.
+const Key dishOrderToggleKey = ValueKey<String>('dishOrderToggle');
+
+/// The dish card's "Add to my order" toggle (Banto, issue #418): an icon
+/// whose label names what a tap does, for screen readers and as a tooltip,
+/// and which reads as toggled while the dish is in the order.
+class _OrderToggle extends StatelessWidget {
+  const new({required this.inOrder, required this.onPressed});
+
+  /// Whether the dish is in the order now.
+  final bool inOrder;
+
+  /// Adds the dish to the order, or takes it out.
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final label = inOrder ? l10n.orderRemove : l10n.orderAdd;
+    final scheme = Theme.of(context).colorScheme;
+    // The tooltip is visual only; the icon's own label is the one
+    // semantics announcement, as on the note button.
+    return Tooltip(
+      message: label,
+      excludeFromSemantics: true,
+      child: Semantics(
+        toggled: inOrder,
+        child: IconButton(
+          key: dishOrderToggleKey,
+          onPressed: onPressed,
+          isSelected: inOrder,
+          icon: Icon(Icons.add_shopping_cart, semanticLabel: label),
+          selectedIcon: Icon(Icons.shopping_cart, semanticLabel: label),
+          iconSize: 18,
+          color: inOrder ? scheme.primary : scheme.onSurfaceVariant,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+        ),
+      ),
+    );
+  }
+}
+
 class _AddNoteButton extends StatelessWidget {
   const new({required this.onPressed});
 

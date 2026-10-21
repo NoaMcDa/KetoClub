@@ -2452,4 +2452,49 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get savedRecheck =>
       'הפרופיל שלך השתנה מאז. אפשר לפתוח את התפריט כדי לבדוק שוב.';
+
+  @override
+  String get orderAdd => 'להוסיף להזמנה שלי';
+
+  @override
+  String get orderRemove => 'להסיר מההזמנה שלי';
+
+  @override
+  String orderPill(int count) {
+    return 'ההזמנה שלי · $count';
+  }
+
+  @override
+  String orderPillSemantic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ההזמנה שלי, $count מנות. פותח את כרטיס ההזמנה.',
+      one: 'ההזמנה שלי, מנה אחת. פותח את כרטיס ההזמנה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get orderCardTitle => 'ההזמנה שלי';
+
+  @override
+  String orderCardRemoveDish(String dish) {
+    return 'להסיר את $dish מההזמנה שלי';
+  }
+
+  @override
+  String get orderCardAllergyTitle => 'לכל ההזמנה';
+
+  @override
+  String get orderCardCopy => 'העתקה';
+
+  @override
+  String get orderCardCopied => 'ההזמנה הועתקה';
+
+  @override
+  String get orderCardShare => 'שיתוף';
+
+  @override
+  String get orderCardClear => 'ניקוי ההזמנה';
 }

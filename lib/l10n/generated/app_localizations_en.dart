@@ -2462,4 +2462,49 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get savedRecheck =>
       'Your profile has changed since. Open this menu to check it again.';
+
+  @override
+  String get orderAdd => 'Add to my order';
+
+  @override
+  String get orderRemove => 'Remove from my order';
+
+  @override
+  String orderPill(int count) {
+    return 'My order · $count';
+  }
+
+  @override
+  String orderPillSemantic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'My order, $count dishes. Opens the order card.',
+      one: 'My order, 1 dish. Opens the order card.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get orderCardTitle => 'My order';
+
+  @override
+  String orderCardRemoveDish(String dish) {
+    return 'Remove $dish from my order';
+  }
+
+  @override
+  String get orderCardAllergyTitle => 'For the whole order';
+
+  @override
+  String get orderCardCopy => 'Copy';
+
+  @override
+  String get orderCardCopied => 'Order copied';
+
+  @override
+  String get orderCardShare => 'Share';
+
+  @override
+  String get orderCardClear => 'Clear order';
 }
