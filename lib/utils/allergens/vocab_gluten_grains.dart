@@ -15,8 +15,9 @@ import 'package:ketoclub/utils/allergens/vocabulary_types.dart';
 
 /// English wheat-containing foods: the grain itself and the dishes
 /// made of it (11 §7.1). Shared by wheat and gluten, because everything
-/// with wheat in it has gluten in it.
-const List<String> _wheatFoodsEn = <String>[
+/// with wheat in it has gluten in it; public because the grain-free diets
+/// (`vocab_diets_extra.dart`) spread it too.
+const List<String> wheatFoodsEn = <String>[
   'wheat',
   'durum',
   'einkorn',
@@ -175,8 +176,8 @@ const List<String> _wheatFoodsEn = <String>[
 /// (12 §1.4). `חיטה`, `חלה` and `חלות` are compiled with no permissive
 /// prefix (a prefix letter turns them into שחיטה, מחלה, מחלות), so
 /// their prefixed forms are listed as their own terms. Shared by wheat
-/// and gluten.
-const List<String> _wheatFoodsHe = <String>[
+/// and gluten, and spread by the grain-free diets like [wheatFoodsEn].
+const List<String> wheatFoodsHe = <String>[
   'חיטה',
   'החיטה',
   'בחיטה',
@@ -901,8 +902,9 @@ const List<HiddenTrigger> _wheatHiddenHe = <HiddenTrigger>[
 ];
 
 /// English gluten cereals beyond wheat, and what is made of them
-/// (11 §7.1): barley, rye, malt and beer.
-const List<String> _glutenGrainsEn = <String>[
+/// (11 §7.1): barley, rye, malt and beer. Public because the grain-free
+/// diets (`vocab_diets_extra.dart`) spread it.
+const List<String> glutenGrainsEn = <String>[
   'gluten',
   'barley',
   'rye',
@@ -919,8 +921,8 @@ const List<String> _glutenGrainsEn = <String>[
 /// Hebrew gluten cereals beyond wheat (12 §1.4). `בירה` is compiled with
 /// no permissive prefix (כבירה is "vast"), so its prefixed forms are
 /// listed as their own terms; `בירות` (beers, but also Beirut) keeps the
-/// prefix.
-const List<String> _glutenGrainsHe = <String>[
+/// prefix. Spread by the grain-free diets like [glutenGrainsEn].
+const List<String> glutenGrainsHe = <String>[
   'גלוטן',
   'שעורה',
   'גריסי פנינה',
@@ -1344,8 +1346,8 @@ const Map<String, AllergenGuards> _wheatTermGuards = <String, AllergenGuards>{
 const Map<RestrictionId, RestrictionVocabulary> glutenGrainsVocabulary =
     <RestrictionId, RestrictionVocabulary>{
       RestrictionId.wheat: RestrictionVocabulary(
-        directEn: _wheatFoodsEn,
-        directHe: _wheatFoodsHe,
+        directEn: wheatFoodsEn,
+        directHe: wheatFoodsHe,
         hiddenEn: _wheatHiddenEn,
         hiddenHe: _wheatHiddenHe,
         guards: AllergenGuards(
@@ -1385,8 +1387,8 @@ const Map<RestrictionId, RestrictionVocabulary> glutenGrainsVocabulary =
         sources: <String>['11 §7.1', '11 §7.3', '12 §1.4'],
       ),
       RestrictionId.gluten: RestrictionVocabulary(
-        directEn: <String>[..._wheatFoodsEn, ..._glutenGrainsEn],
-        directHe: <String>[..._wheatFoodsHe, ..._glutenGrainsHe],
+        directEn: <String>[...wheatFoodsEn, ...glutenGrainsEn],
+        directHe: <String>[...wheatFoodsHe, ...glutenGrainsHe],
         hiddenEn: <HiddenTrigger>[..._wheatHiddenEn, ..._glutenHiddenEn],
         hiddenHe: <HiddenTrigger>[..._wheatHiddenHe, ..._glutenHiddenHe],
         guards: AllergenGuards(

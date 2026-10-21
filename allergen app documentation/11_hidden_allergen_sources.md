@@ -1538,6 +1538,158 @@ salmon.
 
 ---
 
+## 30. The extra diets: pescatarian, paleo, Whole30, AIP and Jain (issue #342; desk research, brief)
+
+> **Status: desk research, not dietetic or religious review. Checked
+> 2026-10-21** from web-search result snippets only: no page could be
+> fetched in full from this environment (`whole30.com`, `healthline.com`
+> and `wikipedia.org` refused the fetch), so every claim below is what the
+> snippets of the named pages say. **Diets, not allergies:** each of the
+> five is a lifestyle or religious choice whose rules vary between
+> followers, so a finding is "the menu names something this diet leaves
+> out", never a safety claim, and the app's wording floor stays "ask the
+> restaurant". All five are flexible (`lifestyle`; Jain a
+> `religiousComponent`), so under D26's #346 rule a stated or likely
+> finding moves the dish and a suspected one is only listed.
+
+**Regulated:** nowhere. None of the five is an allergen list in any
+jurisdiction.
+
+**How the vocabulary is built.** These diets are exclusion sets of food
+groups the other sections already cover: meat and poultry (12 §2.2), fish
+and seafood (§8–§10), wheat and the gluten grains (§7.1), legumes (§16.1),
+milk (§3.1), eggs (§5.1), tree nuts (§2.1), sesame (§11.1), and alcohol
+(halal, §25.2). `vocab_diets_extra.dart` spreads those sections' public
+direct lists and adds only what no other section names (the other grains,
+sugar, seed oils, nightshades, seed spices, coffee and chocolate, roots).
+
+### 30.1 Pescatarian
+A pescatarian eats fish and seafood but no other meat; eggs and dairy are
+optional, not part of the definition
+([Merriam-Webster](https://www.merriam-webster.com/dictionary/pescatarian) **[M]**;
+[Oxford Learner's](https://www.oxfordlearnersdictionaries.com/definition/english/pescatarian) **[M]**;
+[Healthline, pescatarian diet](https://www.healthline.com/nutrition/pescatarian-diet) **[W]**).
+Direct: vegetarian's meat and poultry words (12 §2.2), plus kebab,
+shawarma, chorizo, pastrami, meatloaf, liver, gyro, merguez, bone broth.
+Likely: schnitzel (in Israel almost always chicken), nuggets, wings, hot
+dogs, kofta, carpaccio. Suspected: gravy, stock, broth and pâté, which are
+often but not always meat-based. Fish is never a trigger.
+
+### 30.2 Paleo
+The paleo diet leaves out the foods that came with farming: grains,
+legumes (beans, lentils, peanuts), dairy, refined and added sugar, and
+highly processed foods
+([Mayo Clinic, Paleo diet](https://www.mayoclinic.org/healthy-lifestyle/nutrition-and-healthy-eating/in-depth/paleo-diet/art-20111182) **[M]**).
+Refined vegetable oils appear in the exclusion lists of secondary summaries
+that cite Harvard's Nutrition Source
+([ExRx, Paleo](https://exrx.net/Nutrition/Diets/Paleo) **[W]**), not in
+the Mayo page itself, so the seed oils are **suspected** only. Refined
+sugar is **suspected** too: paleo plans allow honey and maple syrup, and a
+menu rarely says which sugar it used. Ghee is dairy, but many paleo plans
+allow it (unreviewed desk research): suspected. White potatoes are left
+out of the vocabulary: Harvard's list (via ExRx) excludes them, most
+current paleo plans do not. Direct: every wheat food and gluten grain, rice,
+corn, oats and the pseudo-cereals (quinoa, buckwheat, millet, amaranth,
+teff), every legume and peanut word, every milk word and named cheese.
+Likely: flour, breaded cutlets, sushi, tortilla dishes, tabbouleh, satay,
+teriyaki and hoisin (soy), latte and cappuccino, ice cream, pesto,
+béchamel.
+
+### 30.3 Whole30
+The official rules exclude **added sugar, real or artificial** (maple
+syrup, honey, agave, coconut sugar, date syrup, stevia, sucralose,
+xylitol), **alcohol in any form, cooking included**, **grains** (wheat,
+rye, barley, oats, corn, rice, millet, bulgur, sorghum and the
+pseudo-cereals quinoa, amaranth, buckwheat), **legumes** (beans, chickpeas,
+lentils, peanuts and peanut butter, all soy) and **dairy**
+([Whole30, Original Program Rules](https://whole30.com/wp-content/uploads/2023/08/Original-Whole30-Rules.pdf) **[S]**;
+[Whole30, official program rules](https://whole30.com/wp-content/uploads/2023/10/official-whole30-program-rules.pdf) **[S]**).
+The "fine print" allows ghee or clarified butter, fruit juice as a
+sweetener, green beans and most peas, vinegars and botanical extracts, and
+coconut aminos; peas of every kind (green, yellow, split) were allowed in
+January 2021, MSG was removed from the list in January 2022, and the 2024
+update allows cooking oils regardless of source and names the allowed
+vinegars (cane, Champagne, red wine, rice, sherry, white wine)
+([Whole30, program rule changes](https://whole30.com/program-rules-changes/) **[S]**;
+[2024 update](https://whole30.com/wp-content/uploads/2023/08/Original-Whole30-Program-Rules-2024-update.pdf) **[S]**).
+So the vocabulary is paleo's without peas, ghee or seed oils, with every
+sugar and sweetener **stated**, alcohol stated, and the wine, sherry,
+champagne and rice vinegars guarded. Likely: barbecue sauce, ketchup,
+sweet-and-sour and sweet chili (sweetened sauces), mirin, marsala, a
+flambé. Out of scope: the rule against recreating baked goods and treats
+with compliant ingredients, which no menu word shows.
+
+### 30.4 AIP (the autoimmune protocol)
+The elimination phase removes paleo's groups and, on top, **eggs, nuts,
+seeds (including seed-based spices), nightshades, coffee and alcohol**
+([PMC review of the AIP diet](https://pmc.ncbi.nlm.nih.gov/articles/PMC11755016/) **[S]**;
+[Healthline, AIP diet](https://www.healthline.com/nutrition/aip-diet-autoimmune-protocol-diet) **[W]**;
+[American College of Rheumatology blog](https://rheumatology.org/patient-blog/what-is-the-autoimmune-protocol-diet/) **[M]**).
+Nightshades: tomatoes, potatoes, eggplant and peppers, sweet and hot, with
+paprika and cayenne; goji is one too ([WebMD](https://www.webmd.com/diet/autoimmune-protocol-diet) **[M]**).
+Seed spices: cumin, fennel, anise, mustard and nutmeg are named
+([Green Chef, Paleo 101: the autoimmune protocol](https://chef.greenchef.com/eat/paleo-diet-101/autoimmune-protocol) **[W]**);
+coriander seed, caraway, cardamom and allspice are added from the same
+rule (unreviewed). Coffee and chocolate are seeds and are out in "core"
+AIP, back in "modified" AIP
+([Autoimmune Wellness, tricky foods](https://autoimmunewellness.com/whats-in-whats-out-on-aip-answers-to-tricky-foods/) **[W]**).
+Black pepper is left out (not a nightshade; its status in AIP varies), and
+sweet potato is guarded (not a nightshade). Likely: curry and spice blends
+(garam masala, za'atar, dukkah, baharat, hawaij), salsa, ketchup,
+marinara, harissa, sriracha, ratatouille, moussaka, baba ghanoush,
+affogato, Nutella. Out of scope: food additives, gums and emulsifiers.
+
+### 30.5 Jain
+Jain practice is vegetarian and also excludes **eggs, honey** (its
+collection kills bees; honey is *abhakshya*, "not to be eaten"),
+**alcohol** (fermentation destroys life), and, for most Jains, **root and
+underground vegetables**, because uprooting kills the whole plant and
+the soil life around it, and a root is held to contain countless lives
+(*anantkay*) ([Wikipedia, Jain vegetarianism](https://en.wikipedia.org/wiki/Jain_vegetarianism) **[M]**;
+[Slow Food, Jain foodways](https://www.slowfood.com/?p=31299) **[W]**).
+Pew found that 92% of Indian Jains are vegetarian and **67% abstain from
+root vegetables such as garlic and onion**
+([Pew Research Center, religion and food, 2021](https://www.pewresearch.org/religion/2021/06/29/religion-and-food/) **[S]**;
+[Pew, 6 facts about Jains in India](https://www.pewresearch.org/short-reads/2021/08/17/6-facts-about-jains-in-india/) **[S]**).
+Airline Jain meals (VJML) leave out onion, garlic, potato, carrot,
+beetroot, ginger, radish and mushrooms
+([Inflight Feed, VJML](https://inflightfeed.com/meal/special-meals-vegetarian-jain-meals/) **[W]**;
+[HappyFares, Jain meals on flights](https://happyfares.in/blog/special-meals-indian-flights-2026/) **[W]**).
+Dairy is allowed by most, refused by some, so it is no trigger. Direct:
+vegetarian's meat, poultry and sea-animal words, eggs (§5.1), honey, and
+the roots: onion and the onion family, garlic, potato, carrot, beet,
+radish, turnip, parsnip, yam, cassava, taro, celeriac, horseradish, ginger
+(dried ginger is accepted by some; unreviewed) and the Hindi *aloo*.
+Alcohol: halal's list (§25.2), likely. Likely: hash browns, latkes,
+gnocchi, wasabi, chips, and the garlic and onion sauces (tzatziki, pesto,
+salsa, chimichurri, gazpacho). Suspected: mushrooms, truffles, stock and
+broth. **Out of scope, said plainly:** many Jains do not eat after sunset
+(*chauvihar*; unreviewed) or on certain days, and some avoid fermented foods (vinegar,
+yogurt, soy sauce), honey-like syrups, or green vegetables on fasting days;
+a menu carries none of that, so the app says nothing about it.
+
+### 30.6 Guards and confusions
+- **A fish word makes a meat word fish** for pescatarian: tuna steak,
+  salmon burger, fish sausage, סטייק טונה, קציצות דגים (term guards on the
+  meat word; lowered to suspected, never cancelled).
+- **A plant compound is another food:** almond or coconut flour, cauliflower
+  rice, zucchini noodles, spaghetti squash, coconut milk, nut butter, a
+  Spanish tortilla, green beans, whole-grain mustard, sugar snap peas,
+  wine, sherry and champagne vinegar, חומץ יין, אורז כרובית, חלב שקדים.
+  An oat, soy or rice milk keeps its oat, soy or rice for paleo and
+  Whole30.
+- **Black and white pepper and sweet potato** are no nightshades (AIP).
+- **"Margarita" is also a pizza** (and מרגריטה nearly always is), so it is
+  only suspected, and lowered beside pizza/פיצה.
+- **A "vegan" or "plant-based" meat or egg word** lowers it for Jain, by
+  term guard only, so "vegetarian onion soup" keeps its onion. A "Jain"
+  label before a dish ("Jain pav bhaji") lowers what follows.
+- **`שום` also means "any"** ("אין שום", "שום דבר"): it is compiled with no
+  free prefix (משום is "because") and guarded in those phrases.
+
+**Sources (30):** as linked above; all reached only as search-result
+snippets on 2026-10-21.
+
 ## 26. Buckwheat and the foods on Japan's recommended list (issue #342; desk research, brief)
 
 > **Status: desk research, not clinical review.** Written on 2026-10-21

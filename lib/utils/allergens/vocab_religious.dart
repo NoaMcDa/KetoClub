@@ -467,7 +467,8 @@ const List<String> _cheeseMeatHe = <String>["צ'יזבורגר", "צ'יז בור
 /// English drinks and dishes that hold alcohol (11 §25.2). Every one is
 /// hidden and likely: the menu names the drink, not its alcohol, and some
 /// kitchens cook it off — which most halal guidance still forbids.
-const List<HiddenTrigger> _alcoholEn = <HiddenTrigger>[
+/// Public because the Jain diet (`vocab_diets_extra.dart`) spreads it.
+const List<HiddenTrigger> alcoholHiddenEn = <HiddenTrigger>[
   HiddenTrigger(
     term: 'wine',
     certainty: TriggerCertainty.likely,
@@ -697,8 +698,8 @@ const List<HiddenTrigger> _alcoholEn = <HiddenTrigger>[
 
 /// Hebrew drinks and dishes that hold alcohol (12 §9.4). "שרי" is left
 /// out: on an Israeli menu it is the cherry tomato (עגבניות שרי), not
-/// sherry.
-const List<HiddenTrigger> _alcoholHe = <HiddenTrigger>[
+/// sherry. Spread by Jain like [alcoholHiddenEn].
+const List<HiddenTrigger> alcoholHiddenHe = <HiddenTrigger>[
   HiddenTrigger(
     term: 'יין',
     certainty: TriggerCertainty.likely,
@@ -813,8 +814,9 @@ const List<HiddenTrigger> _alcoholHe = <HiddenTrigger>[
 
 /// The words beside an alcohol word that name something else: wine
 /// vinegar, root beer, a shrimp cocktail, salmon nigiri ("sake" is also
-/// the Japanese word for salmon), malt beer (בירה שחורה).
-const Map<String, AllergenGuards> _alcoholTermGuards = <String, AllergenGuards>{
+/// the Japanese word for salmon), malt beer (בירה שחורה). Public because
+/// the diets that leave out alcohol (`vocab_diets_extra.dart`) spread it.
+const Map<String, AllergenGuards> alcoholTermGuards = <String, AllergenGuards>{
   'wine': AllergenGuards(afterEn: <String>['vinegar']),
   'sherry': AllergenGuards(afterEn: <String>['vinegar']),
   'champagne': AllergenGuards(afterEn: <String>['vinegar']),
@@ -998,18 +1000,18 @@ const Map<RestrictionId, RestrictionVocabulary> religiousVocabulary =
         directHe: <String>[...porkNamesHe, ..._bloodHe],
         hiddenEn: <HiddenTrigger>[
           ...porkHiddenEn,
-          ..._alcoholEn,
+          ...alcoholHiddenEn,
           ...gelatinHiddenEn,
         ],
         hiddenHe: <HiddenTrigger>[
           ...porkHiddenHe,
-          ..._alcoholHe,
+          ...alcoholHiddenHe,
           ...gelatinHiddenHe,
         ],
         guards: _halalGuards,
         termGuards: <String, AllergenGuards>{
           ...porkTermGuards,
-          ..._alcoholTermGuards,
+          ...alcoholTermGuards,
           ...gelatinTermGuards,
         },
         noPrefixHe: <String>['חזיר', 'רום'],
@@ -1376,8 +1378,8 @@ const List<ReligiousComponent> religiousComponents = <ReligiousComponent>[
     subjectHe: 'אלכוהול',
     vocabulary: <RestrictionId, RestrictionVocabulary>{
       RestrictionId.kosher: RestrictionVocabulary(
-        hiddenEn: _alcoholEn,
-        hiddenHe: _alcoholHe,
+        hiddenEn: alcoholHiddenEn,
+        hiddenHe: alcoholHiddenHe,
         noPrefixHe: <String>['רום'],
       ),
     },

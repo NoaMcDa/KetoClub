@@ -890,6 +890,71 @@ tomato (עגבניות שרי), not sherry.
 
 ---
 
+## 14. Hebrew menu terms for the extra diets (issue #342)
+
+**Status: desk research, added 2026-10-21, not reviewed by a dietitian, a
+rabbi, a Jain scholar or a native-speaking editor.** The diet rules are
+file 11 §30 with their sources; the Hebrew words below are the app's own
+menu lexicon, and no web source confirms their spellings (as §7 says of all
+Hebrew dish vocabulary). Most terms are reused from other sections: meat and
+poultry (§2.2), fish (§1.7), wheat and gluten grains (§1.4), legumes
+(§1.3), milk (§1.5), eggs (§1.6), tree nuts (§1.2), sesame (§1.1) and
+halal's alcohol (§9.4).
+
+### 14.1 Grains, legumes and dairy (paleo, Whole30, AIP)
+
+| Term | Meaning | Use |
+|---|---|---|
+| אורז, ריזוטו, פאייה, תירס, קורנפלור, פולנטה, ממליגה, פופקורן, טורטיה, נאצ'וס, שיבולת שועל, קוואקר, דייסה, גרנולה, מוזלי, קינואה, כוסמת, דוחן, סורגום, אמרנט, סובה, דגנים | rice, corn, oats and the other grains | direct |
+| קמח, שניצל, נאגטס, פאי, סושי, ניגירי, טאקו, בוריטו, קסדייה, טאבולה, קובה | dishes that carry a grain | likely; מקומח, טארט, ראפ suspected |
+| סאטה, טריאקי, הויסין, פונזו, קונג פאו | soy- and peanut-based sauces | likely |
+| חלבי, הפוך, לאטה, קפוצ'ינו, גלידה, צזיקי, אלפרדו, בשמל, הולנדייז, פסטו, טירמיסו | dairy coffees, sauces, desserts | likely; קרמי suspected |
+| גהי, סמנה, סאמנה | ghee | suspected (paleo, AIP); not a trigger for Whole30 |
+| אורז כרובית, קמח שקדים, חלב שקדים/קוקוס/סויה, חמאת בוטנים/שקדים, שעועית ירוקה, חומץ אורז | look-alikes | guards (the second word lowers the first) |
+
+### 14.2 Sugar, oils and alcohol
+
+| Term | Meaning | Use |
+|---|---|---|
+| סוכר, מסוכר, קרמל, סירופ גלוקוזה, פונדנט, טופי, סוכריות | refined sugar | suspected (paleo, AIP); stated for Whole30 |
+| דבש, מייפל, אגבה, סילאן, מולסה, סטיביה, ממתיק, סירופ | other sweeteners | stated for Whole30 only |
+| מקורמל, מזוגג | caramelised, glazed | suspected (Whole30) |
+| ברביקיו, קטשופ, חמוץ מתוק, צ'ילי מתוק | sweetened sauces | likely (Whole30) |
+| קנולה, שמן צמחי, שמן חמניות, מרגרינה, טיגון עמוק | seed oils | suspected (paleo, AIP) |
+| יין (and היין, ביין, ויין), יינות, וודקה, רום, ויסקי, ג'ין, טקילה, ברנדי, קוניאק, ליקר, סאקה, שמפניה, פרוסקו, סנגריה, קוקטייל, מוחיטו, ספריץ, אפרול, קמפרי, ורמוט, ערק, אוזו, לימונצ'לו, אלכוהול | alcohol | stated for Whole30 and AIP; יין and רום take no free prefix (מיין, מרום); Jain reuses §9.4 |
+| מירין, מרסלה, פלמבה | alcohol in cooking | likely; מרגריטה suspected and lowered after פיצה |
+| חומץ יין | wine vinegar | guard |
+
+### 14.3 AIP: seeds, spices, nightshades, coffee
+
+| Term | Meaning | Use |
+|---|---|---|
+| אגוזים, זרעים, זרעי, גרעינים, גרעיני, צ'יה, פשתן, פרג | nuts and seeds | direct |
+| כמון, קימל, אניס, חרדל, מוסקט | seed spices | direct |
+| קארי, זעתר, דוקה, בהרט, חוואייג', ראס אל חנות, גרם מסאלה | spice blends | likely |
+| עגבנייה, עגבניות, תפוח אדמה, תפוחי אדמה, צ'יפס, חציל, חצילים, פלפל, פלפלים, גמבה, צ'ילי, פפריקה, חלפיניו, קאיין | nightshades | direct; פלפל lowered before שחור/לבן/אנגלי and after מלח; צ'יפס lowered before בטטה |
+| פירה, סלסה, קטשופ, מרינרה, ארביאטה, בולונז, הריסה, סחוג, מטבוחה, באבא גנוש, רטטוי, מוסקה | tomato, pepper and potato dishes | likely; פירה lowered before בטטה/כרובית |
+| קפה, אספרסו, אמריקנו, מוקה, מקיאטו, שוקולד, קקאו | coffee and chocolate | direct; נוטלה likely |
+
+### 14.4 Jain: roots and fungi
+
+| Term | Meaning | Use |
+|---|---|---|
+| בצל, בצלים, שאלוט, כרישה, כרישות | onion family | direct |
+| שום (and השום, ושום, בשום, ובשום, והשום) | garlic | direct; no free prefix (משום, "because"); lowered after אין and before דבר ("any") |
+| תפוח אדמה, תפוחי אדמה, צ'יפס, גזר, סלק, צנון, צנונית, לפת, בטטה, ג'ינג'ר, זנגביל, חזרת | roots and tubers | direct |
+| פירה, לביבות, ניוקי, וואסאבי, צזיקי, פסטו, סלסה, צ'ימיצ'ורי | dishes built on a root | likely |
+| פטריות, פטרייה, כמהין, ציר, מרק | fungi; stock and soup (onion) | suspected |
+| דבש | honey | direct; lowered before תמרים (date "honey" is silan) |
+
+### 14.5 Pescatarian: meat beyond §2.2
+
+| Term | Meaning | Use |
+|---|---|---|
+| מרגז, קבנוס, צ'וריסו, מעורב ירושלמי | sausages, Jerusalem mixed grill | direct |
+| כבד, כבדים, קציצות, עראייס, קרפצ'יו, נקניקיה | liver, meatballs, arayes, carpaccio, hot dog | likely; ציר suspected |
+| סטייק טונה, המבורגר דגים, קציצות דגים, שניצל טבעוני | fish or plant versions | guards (a fish or plant word after the meat word) |
+
 ## 10. Hebrew and US menu terms for buckwheat and Japan's recommended foods (issue #342)
 
 **Status: desk research, written and checked 2026-10-21 against web

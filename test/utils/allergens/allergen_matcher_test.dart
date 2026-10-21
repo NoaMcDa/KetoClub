@@ -677,14 +677,13 @@ void main() {
       final hidden = AllergenMatcher.find('hummus');
       final guarded = AllergenMatcher.find('sesame-free');
 
-      // Assert
-      expect(direct.single.hidden, isFalse);
-      expect(
-        hidden.where((h) => h.id == RestrictionId.sesame).single.hidden,
-        isTrue,
-      );
-      expect(guarded.single.hidden, isFalse);
-      expect(guarded.single.guarded, isTrue);
+      // Assert: sesame's own hits (tahini and sesame are AIP seeds too).
+      AllergenHit sesame(List<AllergenHit> hits) =>
+          hits.where((h) => h.id == RestrictionId.sesame).single;
+      expect(sesame(direct).hidden, isFalse);
+      expect(sesame(hidden).hidden, isTrue);
+      expect(sesame(guarded).hidden, isFalse);
+      expect(sesame(guarded).guarded, isTrue);
     });
   });
 }

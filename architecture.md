@@ -4087,6 +4087,27 @@ kosher or halal *certification*, which no app can verify (file 03; their
 components are a separate pull request). Chestnut is no id: it stays a
 tree-nut question for that vocabulary (file 11 §2.5).
 
+**The extra diets: pescatarian, paleo, Whole30, AIP and Jain (related to
+#342).** `vocab_diets_extra.dart` fills the five flexible diets mostly by
+spreading other groups' public pieces rather than copying them: the meat,
+poultry and sea-animal lists of `vegetarian`, the wheat foods and gluten
+grains, the legume words (peas apart, since Whole30 allows them), the milk
+words without ghee (Whole30 allows it), the egg, tree-nut and sesame
+direct lists, and halal's alcohol list for Jain; exposing them kept every
+list's order, so no earlier golden moved. The strict allergens' hidden
+lists are not spread (they overlap, and a term may be listed only once per
+restriction), so each diet has a short hidden list of its own. Paleo's
+refined sugar and seed oils are `suspected`, Whole30's sugars and alcohol
+`stated`, AIP adds nightshades, seed spices, coffee and chocolate (listed
+here until the sensitivities group has pieces to share), and Jain adds
+honey, eggs and the roots (onion, garlic, potato, carrot, beet, ginger),
+with mushrooms `suspected`; when Jain practice limits eating after sunset
+or on fasting days, no menu shows it, so the app says nothing. Under the
+#346 rule a stated or likely hit moves the dish; Jain, a
+`religiousComponent`, keeps the strict wording "No trigger found — ask the
+restaurant". Sources: file 11 §30, file 12 §14 (search snippets only,
+unreviewed).
+
 **Foods extra filled (related to #342).** `vocab_foods_extra.dart` now holds
 buckwheat and Japan's ten recommended foods, sourced to file 11 §26 and file
 12 §10 (desk research checked against search excerpts on 2026-10-21,

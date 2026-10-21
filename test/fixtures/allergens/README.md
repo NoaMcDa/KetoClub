@@ -41,6 +41,8 @@ test/fixtures/allergens/
 
 
 
+
+
 Five menus are copied from existing fixtures and the rest are written for the corpus. More than half of the dishes are Hebrew (a Hebrew letter in the name or description); the shape test enforces that and the minimum sizes, so this file states no counts that could go stale.
 Eighteen menus: five are copied from existing fixtures and thirteen are written for the corpus. More than half of the dishes are Hebrew (a Hebrew letter in the name or description); the shape test enforces that and the minimum sizes, so this file states no counts that could go stale.
 
@@ -61,6 +63,8 @@ Eighteen menus: five are copied from existing fixtures and thirteen are written 
 | `asian_takeaway_soy_peanut.json` | synthetic Thai and Chinese place | en |
 | `us_steakhouse.json` | synthetic steakhouse (Worcestershire, blue cheese) | en |
 | `bakery_lupin_sulphites.json` | synthetic bakery: lupin flour, dried fruit | en |
+| `diets_extra_labels.json` | synthetic mixed menu for the extra diets (pescatarian, paleo, Whole30, AIP, Jain): fish, roots, grains, honey, wine | mixed |
+
 | `foods_extra_labels.json` | synthetic Israeli cafe-and-grill and US diner / Japanese noodle dishes for buckwheat and Japan's recommended foods (issue #342); labels only those eleven ids | mixed |
 
 | `sensitivities_labels.json` | synthetic mixed menu labelled only for the five heads-up sensitivities (nightshades, MSG, caffeine, salicylates, oral allergy syndrome; 11 §29, 12 §13) | mixed |

@@ -198,13 +198,19 @@ void main() {
       ];
 
       // Assert: taxonomy order, one each. A peanut is also a legume, and
-      // the peanut and egg make the dish not vegan.
+      // the peanut and egg make the dish not vegan; the legume is out for
+      // paleo, Whole30 and AIP, the tahini for AIP, the egg for AIP and
+      // Jain.
       expect(ids, <RestrictionId>[
         RestrictionId.peanuts,
         RestrictionId.eggs,
         RestrictionId.sesame,
         RestrictionId.legumes,
         RestrictionId.vegan,
+        RestrictionId.paleo,
+        RestrictionId.whole30,
+        RestrictionId.aip,
+        RestrictionId.jain,
       ]);
     });
   });

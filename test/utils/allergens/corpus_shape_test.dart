@@ -111,8 +111,7 @@ const Set<String> _flexibleIds = <String>{
 /// still empty, so the corpus carries no labels for them yet and the
 /// "three contains labels" floor does not apply. Each vocabulary
 /// follow-up adds its labels and removes its ids from this set.
-const Set<String> _awaitingLabels = <String>{
-};
+const Set<String> _awaitingLabels = <String>{};
 
 /// The values of a label's `label` key.
 const Set<String> _labelValues = <String>{'contains', 'may_contain', 'free'};
@@ -164,9 +163,10 @@ Set<String> _buildValidSources() {
   for (var k = 1; k <= 4; k++) {
     out.add('11 §19.$k');
   }
-  // Kosher (§24, eight subsections) and halal (§25, six), issue #342.
-  // Buckwheat and Japan's recommended foods (§26, eleven).
-  const research = <int, int>{24: 8, 25: 6, 26: 11};
+  // Kosher (§24, eight subsections) and halal (§25, six), issue #342;
+  // buckwheat and Japan's recommended foods (§26, eleven); the extra
+  // diets (§30, six).
+  const research = <int, int>{24: 8, 25: 6, 26: 11, 30: 6};
   research.forEach((section, count) {
     out.add('11 §$section');
     for (var k = 1; k <= count; k++) {
@@ -186,7 +186,8 @@ Set<String> _buildValidSources() {
   // Documentation file 12: section 1 has 11 subsections, 2 has two, 3 has
   // five, 4 has four, 5 has none and 6 is a numbered list of five.
   // Section 9 (issue #342) has five: the Hebrew kosher and halal terms;
-  // section 10 twelve: buckwheat and Japan's recommended foods.
+  // section 10 twelve: buckwheat and Japan's recommended foods;
+  // section 14 has five: the Hebrew terms of the extra diets.
   const subsections = <int, int>{
     1: 11,
     2: 2,
@@ -196,6 +197,7 @@ Set<String> _buildValidSources() {
     6: 5,
     9: 5,
     10: 12,
+    14: 5,
   };
   subsections.forEach((section, count) {
     out.add('12 §$section');
