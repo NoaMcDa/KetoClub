@@ -48,12 +48,16 @@ is the feature plan, written as one epic called **Allergens**.
 
 ## Status
 
-Research documented and concluded; epic written; **nothing built**.
-GitHub: parent epic **#342** with sub-issues **#343–#360** (one per
-feature; the table at the top of file 10 maps them). The milestone
-`Phase 9: Allergens` still has to be created by hand. Decisions taken on
+Research documented and concluded; the epic **is built** on the `banto`
+branch behind `--dart-define=BANTO_MODE=true` (`architecture.md` D26 and
+D27 are the record of what shipped; `HANDOFF.md`, "Banto", lists what is
+deliberately unfinished). GitHub: parent epic **#342** with sub-issues
+**#343–#360** (one per feature; the table at the top of file 10 maps them).
+Still true: no dietitian, allergist or lawyer has reviewed the vocabularies
+or the corpus labels, and no store product exists. Decisions taken on
 2026-10-11 (markets Israel + US, rename planned, no clinical reviewer, no
-users yet) are recorded in files 08 and 09.
+users yet) are recorded in files 08 and 09; the name was decided afterwards
+(Q13 in file 08).
 
 Files 11 and 12 are web desk research that stands in for a clinical
 reviewer: sourced hidden-allergen lists and an Israeli/US menu lexicon.

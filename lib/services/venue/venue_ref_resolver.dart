@@ -59,11 +59,9 @@ final RegExp _hyphenatedSlug = RegExp(r'^[a-z0-9][a-z0-9-]*-[a-z0-9-]*$');
 /// "digits-only" is an unambiguous test. Anything else non-empty is read
 /// as a Wolt slug.
 ///
-/// The resolved [VenueRef] for a 10bis input still carries
-/// `MenuSource.tenbis`, which `MenuRepository` has no adapter for yet
-/// and so still fails with `unsupportedSource` — recognising the URL is
-/// this class's whole job; fetching from it is Phase 2 (architecture.md
-/// §17, "What is NOT built yet").
+/// The resolved [VenueRef] for a 10bis input carries `MenuSource.tenbis`,
+/// which `TenBisAdapter` fetches (registered in `di.dart`) — recognising
+/// the URL is this class's whole job; fetching from it is the adapter's.
 ///
 /// [platformUrl] is [resolve]'s inverse: it derives the venue's own page
 /// on its platform from an already-resolved [VenueRef], for the "open on
