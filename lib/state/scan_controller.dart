@@ -342,44 +342,48 @@ final class ScanController extends ChangeNotifier {
     _pagesTooLarge = false;
     notifyListeners();
 
-    final settings = await _settingsStore.read();
-    // An unmodifiable copy: the registry keeps exactly the pages that were
-    // read, even if the user edits the list afterwards.
-    final ScannedMenu scan;
-    switch (await scanBudget.fit(ScannedMenu(pages: _pages))) {
-      case ScanFitted(scan: final fitted):
-        scan = fitted;
-      case ScanTooLarge():
-        _pagesTooLarge = true;
-        _analysing = false;
-        _notify();
-        return null;
-    }
-    final result = await classifier.classify(
-      scan,
-      // The menu screen's own options (consent, the net-carb limit, the
-      // toggles and, in Banto, the ingredient request), so the analysis
-      // stored here is the one [MenuController.open] reuses.
-      options: ClassificationOptions.fromSettings(
-        settings,
-        bantoMode: bantoMode,
-      ),
-    );
+    // [analysing] is cleared on every way out, a throw included: the
+    // classifier never throws by contract, but if anything below it ever
+    // breaks that, the Scan tab must not stay on "analysing" (issue #278).
+    try {
+      final settings = await _settingsStore.read();
+      // An unmodifiable copy: the registry keeps exactly the pages that
+      // were read, even if the user edits the list afterwards.
+      final ScannedMenu scan;
+      switch (await scanBudget.fit(ScannedMenu(pages: _pages))) {
+        case ScanFitted(scan: final fitted):
+          scan = fitted;
+        case ScanTooLarge():
+          _pagesTooLarge = true;
+          return null;
+      }
+      final result = await classifier.classify(
+        scan,
+        // The menu screen's own options (consent, the net-carb limit, the
+        // toggles and, in Banto, the ingredient request), so the analysis
+        // stored here is the one [MenuController.open] reuses.
+        options: ClassificationOptions.fromSettings(
+          settings,
+          bantoMode: bantoMode,
+        ),
+      );
 
-    VenueRef? ref;
-    switch (result) {
-      case ScannedMenuRead(:final menu, :final analysis):
-        ref = menu.venueRef;
-        await _repository.store(menu);
-        await _repository.saveAnalysis(ref, analysis);
-        _pagesRegistry?.put(ref, scan);
-        await _countScan();
-      case ScannedMenuFailed(:final reason):
-        _lastFailure = reason;
+      VenueRef? ref;
+      switch (result) {
+        case ScannedMenuRead(:final menu, :final analysis):
+          ref = menu.venueRef;
+          await _repository.store(menu);
+          await _repository.saveAnalysis(ref, analysis);
+          _pagesRegistry?.put(ref, scan);
+          await _countScan();
+        case ScannedMenuFailed(:final reason):
+          _lastFailure = reason;
+      }
+      return ref;
+    } finally {
+      _analysing = false;
+      _notify();
     }
-    _analysing = false;
-    _notify();
-    return ref;
   }
 
   void _notify() {

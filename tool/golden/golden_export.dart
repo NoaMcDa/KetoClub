@@ -450,6 +450,12 @@ Map<String, Object?> _vocabulary() {
       'maxScanPages': maxScanPages,
       'maxScanPageBytes': maxScanPageBytes,
     },
+    // §9.4 rule 3's name fallback (issue #277).
+    'provenance': <String, Object?>{
+      'nameStopWords': nameStopWords.toList()..sort(),
+      'nameOverlapNumerator': nameOverlapNumerator,
+      'nameOverlapDenominator': nameOverlapDenominator,
+    },
     'scanned': <String, Object?>{
       'scannedCategoryId': scannedCategoryId,
       'scannedCategoryNameEn': scannedCategoryNameEn,

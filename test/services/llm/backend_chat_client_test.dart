@@ -10,6 +10,7 @@ import 'package:ketoclub/services/llm/backend_chat_client.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
 
 import '../../fakes/fake_install_id_store.dart';
+import '../../fakes/fake_transport_exceptions.dart';
 import 'llm_chat_client_contract.dart';
 
 /// The backend base every test uses unless it is exercising the URL
@@ -727,6 +728,46 @@ void main() {
         MockClient((request) async {
           throw http.ClientException('Connection refused', request.url);
         }),
+      );
+
+      // Act
+      final result = await client.complete(systemPrompt: 's', userPrompt: 'u');
+
+      // Assert
+      expect(
+        result,
+        equals(const ChatFailed(reason: ChatFailureReason.backendUnreachable)),
+      );
+    });
+
+    test('a TLS handshake failure IOClient throws unwrapped is '
+        'backendUnreachable, never a throw (issue #278)', () async {
+      // Arrange — services/ cannot name dart:io's HandshakeException, so
+      // a stand-in that is an Exception but not a ClientException.
+      final client = _build(
+        MockClient((_) async => throw const FakeHandshakeException()),
+      );
+
+      // Act
+      final result = await client.complete(systemPrompt: 's', userPrompt: 'u');
+
+      // Assert
+      expect(
+        result,
+        equals(const ChatFailed(reason: ChatFailureReason.backendUnreachable)),
+      );
+    });
+
+    test('a socket error while the reply body is read is '
+        'backendUnreachable, never a throw (issue #278)', () async {
+      // Arrange — the status arrives, then the body stream fails.
+      final client = _build(
+        MockClient.streaming(
+          (_, _) async => http.StreamedResponse(
+            Stream<List<int>>.error(const FakeSocketException()),
+            200,
+          ),
+        ),
       );
 
       // Act

@@ -8,6 +8,7 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 import 'package:ketoclub/utils/constants.dart';
+import 'package:ketoclub/utils/text_normaliser.dart';
 
 /// The venue every [Menu] built by this file is addressed to.
 const VenueRef _venueRef = VenueRef(
@@ -215,9 +216,9 @@ void main() {
         expect(analysed.name, 'Grilled Steak');
       });
 
-      test('parse given a dish name sharing a 3+ letter word with a '
-          'source dish name, but a non-matching id, places it under the '
-          'source dish id and canonical name', () {
+      test('parse given a reworded dish name holding the source dish '
+          "name's content words, but a non-matching id, places it under "
+          'the source dish id and canonical name', () {
         // Arrange
         final source = _menuOf([
           _dish('dish-steak-src', 'Grilled Ribeye Steak'),
@@ -1069,6 +1070,182 @@ void main() {
         expect(dish.modification, equals('No fries, green salad please'));
         expect(dish.hiddenCarbs, hasLength(1));
       });
+
+      test('yellow sent with no modification is unclassified even when it '
+          'carries hidden_carbs (rule 5, issue #277)', () {
+        // Arrange — the model's yellow needs its own instruction: the flag
+        // covers the glaze, not whatever else made the model say yellow.
+        final body = _steakReply(
+          verdict: 'modifiable',
+          hiddenCarbs: [_flag('glaze', 'Is the glaze sugar-free?')],
+        );
+
+        // Act
+        final result = _parseSteak(body);
+
+        // Assert
+        expect(result.dishes, isEmpty);
+        expect(result.unclassified, ['Grilled Steak']);
+      });
+
+      test('green over the net-carb limit with a hidden carb but no '
+          'modification is unclassified (issue #57 post-rule, #277)', () {
+        // Arrange
+        final body = _steakReply(
+          netCarbsEstimate: 9,
+          hiddenCarbs: [_flag('glaze', 'Is the glaze sugar-free?')],
+        );
+
+        // Act
+        final result = _parseSteak(body);
+
+        // Assert
+        expect(result.dishes, isEmpty);
+        expect(result.unclassified, ['Grilled Steak']);
+      });
+    });
+
+    // -------------------------------------------------------------------------
+    // Provenance and duplicates (issue #277, architecture.md §9.4 rule 3)
+    // -------------------------------------------------------------------------
+
+    group('provenance and duplicates (issue #277)', () {
+      final source = _menuOf([
+        _dish('d1', 'Chicken Schnitzel'),
+        _dish('d2', 'Grilled Chicken'),
+        _dish('d3', 'Steak with Fries'),
+        _dish('d4', 'Chicken Salad'),
+        _dish('d5', 'Grilled Chicken Breast'),
+      ]);
+
+      MenuAnalysed parseElements(List<Map<String, Object?>> elements) =>
+          _parse(jsonEncode(<String, Object?>{'dishes': elements}), source)
+              as MenuAnalysed;
+
+      List<String> placedIds(MenuAnalysed result) => [
+        for (final dish in result.dishes) dish.dishId,
+      ];
+
+      test('an unknown id with a name another dish shares a word with '
+          'places the exact-name dish, not the first sharing one', () {
+        // Act
+        final result = parseElements([_element('2', 'Grilled Chicken')]);
+
+        // Assert
+        expect(placedIds(result), ['d2']);
+        expect(result.unclassified, isNot(contains('Grilled Chicken')));
+        expect(result.unclassified, contains('Chicken Schnitzel'));
+      });
+
+      test('every name stop-word is normalised and long enough to count, '
+          'or it could never be ignored', () {
+        for (final word in nameStopWords) {
+          expect(TextNormaliser.normalise(word), word);
+          expect(word.length, greaterThanOrEqualTo(minOverlapWordLength));
+        }
+      });
+
+      test('an invented dish sharing only a stop-word is never placed', () {
+        // Act
+        final result = parseElements([_element('', 'Chef special with fries')]);
+
+        // Assert
+        expect(result.dishes, isEmpty);
+        expect(result.unclassified.first, 'Chef special with fries');
+        expect(result.unclassified, contains('Steak with Fries'));
+      });
+
+      test('one shared content word out of three is not a match', () {
+        // Act
+        final result = parseElements([_element('x', 'Chicken Wings')]);
+
+        // Assert
+        expect(result.dishes, isEmpty);
+        expect(result.unclassified.first, 'Chicken Wings');
+      });
+
+      test('a reworded name holding the same content words matches', () {
+        // Act
+        final result = parseElements([_element(null, 'Chicken, grilled')]);
+
+        // Assert
+        expect(placedIds(result), ['d2']);
+        expect(result.dishes.single.name, 'Grilled Chicken');
+      });
+
+      test('two dishes tied for the best overlap match neither', () {
+        // Act — 2 of 3 words with "Grilled Chicken" and "Chicken Salad".
+        final result = parseElements([_element('x', 'Grilled Chicken Salad')]);
+
+        // Assert
+        expect(result.dishes, isEmpty);
+        expect(result.unclassified.first, 'Grilled Chicken Salad');
+      });
+
+      test('a matching id wins over a name naming another dish', () {
+        // Act
+        final result = parseElements([_element('d1', 'Grilled Chicken')]);
+
+        // Assert
+        expect(placedIds(result), ['d1']);
+        expect(result.dishes.single.name, 'Chicken Schnitzel');
+        expect(result.unclassified, contains('Grilled Chicken'));
+      });
+
+      test('a second element for a placed dish, by id or by name, is '
+          'dropped, not re-routed to a lookalike', () {
+        // Act
+        final result = parseElements([
+          _element('d2', 'Grilled Chicken'),
+          _element('', 'Grilled Chicken', verdict: 'nonKeto'),
+          _element('d2', 'Grilled Chicken', verdict: 'nonKeto'),
+        ]);
+
+        // Assert
+        expect(placedIds(result), ['d2']);
+        expect(result.dishes.single.verdict, DishVerdict.orderAsIs);
+        expect(result.unclassified, contains('Grilled Chicken Breast'));
+        expect(result.unclassified, isNot(contains('Grilled Chicken')));
+      });
+
+      test('a dish demoted by its first element is not placed by a later '
+          'one, so it is never in both lists', () {
+        // Act
+        final result = parseElements([
+          _element('d3', 'Steak with Fries', verdict: 'green'),
+          _element('d3', 'Steak with Fries'),
+        ]);
+
+        // Assert
+        expect(result.dishes, isEmpty);
+        expect(
+          result.unclassified.where((name) => name == 'Steak with Fries'),
+          hasLength(1),
+        );
+      });
     });
   });
 }
+
+/// One reply element for the provenance cases: [id], [name], a [verdict]
+/// and a plain `why`.
+Map<String, Object?> _element(
+  String? id,
+  String name, {
+  String verdict = 'orderAsIs',
+}) => <String, Object?>{
+  'id': id,
+  'name': name,
+  'verdict': verdict,
+  'why': 'Plain protein.',
+  'modification': null,
+  'net_carbs_estimate': null,
+  'hidden_carbs': <Object?>[],
+};
+
+/// One well-formed hidden-carb flag on [source] asking [question].
+Map<String, Object?> _flag(String source, String question) => <String, Object?>{
+  'source': source,
+  'certainty': 'suspected',
+  'waiter_question': question,
+};

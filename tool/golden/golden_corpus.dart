@@ -1271,6 +1271,7 @@ List<ReplyCase> handTextReplies() {
       ]),
     ),
     c('hand_id_beats_name', replyBody(<Object?>[replyDish(id: 'dish-salmon')])),
+    ...provenanceReplies(),
     c(
       'hand_fence_uppercase_json_tag',
       '```JSON\n${replyBody(<Object?>[replyDish()])}\n```',
@@ -1304,6 +1305,64 @@ List<ReplyCase> handTextReplies() {
     c('hand_empty_body', ''),
     c('hand_over_cap', replyBody(List<Object?>.filled(1001, null))),
     c('hand_at_cap', replyBody(List<Object?>.filled(1000, null))),
+  ];
+}
+
+/// A source menu for the provenance cases (issue #277): dishes that share
+/// words, so a loose name match would land on the wrong one.
+final Menu parserProvenanceMenu = parserMenu(<Dish>[
+  parserDish('d1', 'Chicken Schnitzel'),
+  parserDish('d2', 'Grilled Chicken'),
+  parserDish('d3', 'Steak with Fries'),
+  parserDish('d4', 'Chicken Salad'),
+  parserDish('d5', 'Grilled Chicken Breast'),
+]);
+
+/// Hand-written replies for §9.4 rule 3's name fallback, duplicates and
+/// rule 5 (issue #277), read against [parserProvenanceMenu].
+List<ReplyCase> provenanceReplies() {
+  ReplyCase c(String name, List<Object?> elements) => (
+    name: name,
+    body: replyBody(elements),
+    source: parserProvenanceMenu,
+    limit: 6,
+  );
+  return <ReplyCase>[
+    c('hand_provenance_unknown_id_exact_name', <Object?>[
+      replyDish(id: '2', name: 'Grilled Chicken'),
+    ]),
+    c('hand_provenance_stop_word_is_no_match', <Object?>[
+      replyDish(id: '', name: 'Chef special with fries'),
+    ]),
+    c('hand_provenance_reworded_name', <Object?>[
+      replyDish(id: null, name: 'Chicken, grilled'),
+    ]),
+    c('hand_provenance_one_shared_word_is_no_match', <Object?>[
+      replyDish(id: 'x', name: 'Chicken Wings'),
+    ]),
+    c('hand_provenance_tied_overlap_is_no_match', <Object?>[
+      replyDish(id: 'x', name: 'Grilled Chicken Salad'),
+    ]),
+    c('hand_provenance_id_wins_over_other_name', <Object?>[
+      replyDish(id: 'd1', name: 'Grilled Chicken'),
+    ]),
+    c('hand_duplicate_by_id_then_by_name', <Object?>[
+      replyDish(id: 'd2', name: 'Grilled Chicken'),
+      replyDish(id: '', name: 'Grilled Chicken', verdict: 'nonKeto'),
+      replyDish(id: 'd2', name: 'Grilled Chicken', verdict: 'nonKeto'),
+    ]),
+    c('hand_duplicate_demoted_then_valid', <Object?>[
+      replyDish(id: 'd3', name: 'Steak with Fries', verdict: 'green'),
+      replyDish(id: 'd3', name: 'Steak with Fries'),
+    ]),
+    c('hand_yellow_without_modification_despite_hidden_carbs', <Object?>[
+      replyDish(
+        id: 'd2',
+        name: 'Grilled Chicken',
+        verdict: 'modifiable',
+        hiddenCarbs: <Object?>[hiddenCarb('glaze')],
+      ),
+    ]),
   ];
 }
 

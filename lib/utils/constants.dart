@@ -100,10 +100,51 @@ const int maxWhyLength = 300;
 /// for length alone (architecture.md §9.4 rule 6, §9.1).
 const int maxModificationLength = 300;
 
-/// The minimum word length counted when the parser checks whether an
-/// LLM-returned dish name shares a word with a source dish name
+/// The minimum word length counted when the parser matches an
+/// LLM-returned dish name to a source dish name by word overlap
 /// (architecture.md §9.4 rule 3).
 const int minOverlapWordLength = 3;
+
+/// Words the parser ignores when it matches an LLM-returned dish name to a
+/// source dish name by word overlap (architecture.md §9.4 rule 3, issue
+/// #277): joining words and menu filler that say nothing about which dish
+/// is meant, so "Chef special with fries" never matches a dish because
+/// both say "with". Already normalised (`TextNormaliser.normalise`) and
+/// at least [minOverlapWordLength] letters long; shorter words never
+/// count anyway. Exported to the golden vocabulary, so the Python twin
+/// reads this very list.
+const Set<String> nameStopWords = <String>{
+  'and',
+  'the',
+  'with',
+  'without',
+  'for',
+  'from',
+  'our',
+  'your',
+  'served',
+  'plus',
+  'choice',
+  'ללא',
+  'בלי',
+  'בתוספת',
+  'מוגש',
+  'מוגשת',
+  'לבחירה',
+};
+
+/// The name-overlap match (architecture.md §9.4 rule 3, issue #277)
+/// needs the shared content words to be at least
+/// [nameOverlapNumerator]/[nameOverlapDenominator] of all the content
+/// words the two names hold between them (Jaccard). "Grilled Chicken"
+/// and "Chicken Schnitzel" share one word of three (1/3): different
+/// dishes. "Ribeye Steak, grilled" and "Grilled Ribeye Steak" share all
+/// three: the same dish, reworded.
+const int nameOverlapNumerator = 3;
+
+/// The denominator of the name-overlap threshold; see
+/// [nameOverlapNumerator].
+const int nameOverlapDenominator = 5;
 
 // ---------------------------------------------------------------------------
 // LLM prompt text (architecture.md §9.1)
