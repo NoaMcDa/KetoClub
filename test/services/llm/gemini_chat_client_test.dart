@@ -10,6 +10,7 @@ import 'package:ketoclub/services/llm/gemini_chat_client.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
 
 import '../../fakes/fake_api_key_store.dart';
+import '../../fakes/fake_transport_exceptions.dart';
 import 'llm_chat_client_contract.dart';
 
 /// The key every test saves unless it is exercising the key itself.
@@ -629,6 +630,7 @@ void main() {
         ChatFailureReason.apiKeyRejected,
       ),
       ('429', 429, '{}', ChatFailureReason.rateLimited),
+      ('504', 504, '{}', ChatFailureReason.timeout),
       ('500', 500, '{}', ChatFailureReason.badResponse),
       ('503', 503, 'not json', ChatFailureReason.badResponse),
       ('404', 404, '{}', ChatFailureReason.badResponse),
@@ -810,6 +812,81 @@ void main() {
       );
     });
 
+    test('the retry drops thinkingConfig as well as the schema, since a '
+        '400 can be about either (issue #278)', () async {
+      // Arrange
+      final sent = <http.Request>[];
+      final client = _build(
+        MockClient((request) async {
+          sent.add(request);
+          return sent.length == 1
+              ? http.Response(_badRequestBody, 400)
+              : http.Response(_successBody(), 200);
+        }),
+      );
+
+      // Act
+      await client.complete(
+        systemPrompt: 's',
+        userPrompt: 'u',
+        responseSchema: _schema,
+      );
+
+      // Assert
+      expect(_configOf(sent[0]).containsKey('thinkingConfig'), isTrue);
+      expect(
+        _configOf(sent[1]),
+        equals(<String, Object?>{
+          'responseMimeType': 'application/json',
+          'maxOutputTokens': 8192,
+          'temperature': 0,
+        }),
+      );
+    });
+
+    test('both attempts share one deadline: the retry gets only what the '
+        'first attempt left (issue #278)', () {
+      fakeAsync((async) {
+        // Arrange — the 400 takes 20 s, the retry never answers.
+        var requests = 0;
+        final client = _build(
+          MockClient((_) {
+            requests++;
+            if (requests == 1) {
+              return Future<http.Response>.delayed(
+                const Duration(seconds: 20),
+                () => http.Response(_badRequestBody, 400),
+              );
+            }
+            return Completer<http.Response>().future;
+          }),
+          timeout: const Duration(seconds: 30),
+        );
+        ChatResult? result;
+
+        // Act
+        unawaited(
+          client
+              .complete(
+                systemPrompt: 's',
+                userPrompt: 'u',
+                responseSchema: _schema,
+              )
+              .then((value) => result = value),
+        );
+        async.elapse(const Duration(seconds: 29));
+
+        // Assert
+        expect(requests, 2);
+        expect(result, isNull);
+        async.elapse(const Duration(seconds: 1));
+        expect(
+          result,
+          equals(const ChatFailed(reason: ChatFailureReason.timeout)),
+        );
+      });
+    });
+
     test('a timeout on the retry is timeout', () async {
       // Arrange
       var requests = 0;
@@ -888,6 +965,46 @@ void main() {
       // Arrange
       final client = _build(
         MockClient((_) async => throw http.ClientException('no route')),
+      );
+
+      // Act
+      final result = await client.complete(systemPrompt: 's', userPrompt: 'u');
+
+      // Assert
+      expect(
+        result,
+        equals(const ChatFailed(reason: ChatFailureReason.offline)),
+      );
+    });
+
+    test('a TLS handshake failure IOClient throws unwrapped is offline, '
+        'never a throw (issue #278)', () async {
+      // Arrange — services/ cannot name dart:io's HandshakeException, so
+      // a stand-in that is an Exception but not a ClientException.
+      final client = _build(
+        MockClient((_) async => throw const FakeHandshakeException()),
+      );
+
+      // Act
+      final result = await client.complete(systemPrompt: 's', userPrompt: 'u');
+
+      // Assert
+      expect(
+        result,
+        equals(const ChatFailed(reason: ChatFailureReason.offline)),
+      );
+    });
+
+    test('a socket error while the reply body is read is offline, never a '
+        'throw (issue #278)', () async {
+      // Arrange — the status arrives, then the body stream fails.
+      final client = _build(
+        MockClient.streaming(
+          (_, _) async => http.StreamedResponse(
+            Stream<List<int>>.error(const FakeSocketException()),
+            200,
+          ),
+        ),
       );
 
       // Act

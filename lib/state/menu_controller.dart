@@ -1550,6 +1550,11 @@ final class MenuController extends ChangeNotifier {
   /// unjudged under a progress row while the engine runs, rather than
   /// the previous analysis — which may describe other dish text — or
   /// nothing at all.
+  ///
+  /// The classifier never throws by contract, but should anything below
+  /// it break that, [phase] is put back to [LoadPhase.idle] on the way
+  /// out, so the screen is never left on the progress row forever (issue
+  /// #278). On a normal return the caller ends the phase, as before.
   Future<void> _classify(
     VenueRef ref,
     Menu menu,
@@ -1559,10 +1564,19 @@ final class MenuController extends ChangeNotifier {
     _phase = LoadPhase.classifying;
     notifyListeners();
 
-    final analysis = await _classifier.classify(menu, options: options);
-    _analysis = analysis;
-    if (analysis is MenuAnalysed) {
-      await _repository.saveAnalysis(ref, analysis);
+    var returned = false;
+    try {
+      final analysis = await _classifier.classify(menu, options: options);
+      _analysis = analysis;
+      if (analysis is MenuAnalysed) {
+        await _repository.saveAnalysis(ref, analysis);
+      }
+      returned = true;
+    } finally {
+      if (!returned) {
+        _phase = LoadPhase.idle;
+        notifyListeners();
+      }
     }
   }
 

@@ -39,6 +39,7 @@ import '../fakes/fake_menu_store_client.dart';
 import '../fakes/fake_notes_store.dart';
 import '../fakes/fake_platform_menu_adapter.dart';
 import '../fakes/fake_settings_store.dart';
+import '../fakes/fake_transport_exceptions.dart';
 import '../fakes/fake_visit_history_store.dart';
 
 /// The venue every test opens, unless a test builds its own.
@@ -1258,6 +1259,26 @@ void main() {
         expect(repository.loadCalls, isEmpty);
         expect(classifier.calls, isEmpty);
         expect(notifyCount, 0);
+      });
+
+      test('a classifier that throws still ends the classifying phase, so '
+          'the menu is never stuck on the progress row (issue #278)', () async {
+        // Arrange
+        repository.stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+        await controller.open(_ref);
+        final gate = Completer<void>();
+        classifier.gate = gate.future;
+        final pending = controller.reanalyse();
+        await pumpEventQueue();
+        expect(controller.phase.isClassifying, isTrue);
+
+        // Act
+        gate.completeError(const FakeHandshakeException());
+
+        // Assert
+        await expectLater(pending, throwsA(isA<FakeHandshakeException>()));
+        expect(controller.phase, LoadPhase.idle);
+        expect(controller.isLoading, isFalse);
       });
 
       test('reanalyse re-runs the classifier on the loaded menu without a '
