@@ -107,6 +107,17 @@ class ImagePart(BaseModel):
         return self._decoded_size
 
 
+USER_PROMPT_MAX_CHARS: Final = 400_000
+"""The longest ``ChatRequest.user_prompt``, in characters (#188).
+
+The one prompt budget both sides batch by: the Dart twin is
+``llmUserPromptMaxChars`` in ``lib/utils/constants.dart`` (change both
+together; the golden ``batches.json`` pins them equal), from which
+``LlmMenuClassifier`` sizes its ``/v1/chat`` batches, and
+``app.services.classify`` passes it to ``app.keto.batching.split_batches``
+for the server's own. A longer prompt is a 422 before Gemini is asked."""
+
+
 class ChatRequest(BaseModel):
     """Request body for ``POST /v1/chat``.
 
@@ -130,7 +141,7 @@ class ChatRequest(BaseModel):
     """
 
     system_prompt: str = Field(..., min_length=1, max_length=20000)
-    user_prompt: str = Field(..., min_length=1, max_length=400000)
+    user_prompt: str = Field(..., min_length=1, max_length=USER_PROMPT_MAX_CHARS)
     response_schema: dict[str, object] | None = None
     schema_name: str | None = Field(default=None, max_length=64)
     images: list[ImagePart] = Field(default_factory=list)

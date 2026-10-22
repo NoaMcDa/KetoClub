@@ -808,6 +808,58 @@ final Map<String, Menu> goldenHandBuiltMenus = <String, Menu>{
 };
 
 // ---------------------------------------------------------------------------
+// Batching (issue #188)
+// ---------------------------------------------------------------------------
+
+/// A 200-dish menu in six uneven categories, big enough that the real dish
+/// ceilings split it: English, Hebrew and an astral emoji (two UTF-16 code
+/// units, one Python code point) in its names, and every third dish with
+/// an option group, so line lengths vary.
+final Menu goldenLargeMenu = Menu(
+  venueRef: const VenueRef(source: MenuSource.wolt, platformId: 'large'),
+  currency: 'ILS',
+  fetchedAt: goldenNow,
+  venueName: 'Golden Market',
+  categories: <MenuCategory>[
+    for (final (index, size) in const <int>[50, 7, 61, 1, 45, 36].indexed)
+      MenuCategory(
+        id: 'large-c$index',
+        name: index.isEven ? 'Aisle $index' : 'מדף $index \u{1F96C}',
+        dishes: <Dish>[
+          for (var d = 0; d < size; d++)
+            menuDish(
+              'large-$index-$d',
+              d.isEven ? 'Grilled item $index-$d' : 'מנה $index-$d \u{1F356}',
+              description: 'x' * ((index * 7 + d * 13) % 40),
+              options: d % 3 == 0
+                  ? const <DishOption>[
+                      DishOption(
+                        name: 'Side',
+                        values: <String>['Salad', 'Fries', 'אורז'],
+                      ),
+                    ]
+                  : const <DishOption>[],
+            ),
+        ],
+      ),
+  ],
+);
+
+/// The `(maxDishes, maxChars)` limits the batching golden splits every
+/// menu under, by name, beside the real ones (`defaults` and `extract`,
+/// which the exporter reads from `constants.dart`, so a change to a
+/// constant changes the golden). Small enough that the hand-built menus
+/// split too, and that the character budget, not only the dish ceiling,
+/// closes batches; `chars1` puts every line, each longer than the budget,
+/// in a batch of its own.
+const Map<String, (int, int)> goldenBatchLimits = <String, (int, int)>{
+  'dishes4': (4, 400000),
+  'dishes7_chars600': (7, 600),
+  'chars300': (1000, 300),
+  'chars1': (1000, 1),
+};
+
+// ---------------------------------------------------------------------------
 // Dish kinds
 // ---------------------------------------------------------------------------
 

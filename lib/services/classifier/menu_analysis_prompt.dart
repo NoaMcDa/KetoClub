@@ -72,6 +72,11 @@ const String _visionDescriptionSection =
     "it, exactly as printed and in the menu's own language — never "
     'translate it — or null when none is printed.';
 
+/// One dish's [MenuAnalysisPrompt.userPrompt] line, as
+/// [MenuAnalysisPrompt.batches] measures it: the index of its category in
+/// the menu, the dish, and the line's length in UTF-16 code units.
+typedef _PromptLine = ({int category, Dish dish, int length});
+
 /// Builds the system prompt, user prompt, and strict JSON schema
 /// `LlmMenuClassifier` sends to the model through `LlmChatClient`
 /// (architecture.md §9.1, §9.2, §9.3).
@@ -202,6 +207,118 @@ abstract final class MenuAnalysisPrompt {
       }
     }
     return lines.join('\n');
+  }
+
+  /// The most dishes one request asks about (issue #188):
+  /// [llmBatchMaxDishesWithExtraction] when the request also extracts
+  /// ingredients ([extract], true exactly when
+  /// [ClassificationOptions.restrictionsRequested] is), whose reply is
+  /// larger per dish, and [llmBatchMaxDishes] otherwise.
+  static int batchMaxDishes({required bool extract}) =>
+      extract ? llmBatchMaxDishesWithExtraction : llmBatchMaxDishes;
+
+  /// [menu] split into the menus one request each analyses (issue #188,
+  /// architecture.md D6 as D25 amends it): as few as a [userPrompt] of at
+  /// most [maxChars] characters and at most [maxDishes] dishes allow.
+  ///
+  /// A menu that fits one request — every menu of at most [maxDishes]
+  /// dishes whose prompt is at most [maxChars], the empty menu included —
+  /// is returned as the one-element list holding [menu] itself, so its
+  /// request is byte for byte the one sent before batching existed, and
+  /// the chat cache keeps its key.
+  ///
+  /// Otherwise the dishes are dealt out in menu order, never reordered, so
+  /// the same menu always splits the same way and each batch's request is
+  /// the same bytes every time (the server's chat cache is keyed by them).
+  /// The dish ceiling is balanced first: a menu needing `k` batches by
+  /// count fills each with at most `ceil(n / k)` dishes, so 200 dishes
+  /// under a ceiling of 80 are 67, 67 and 66 rather than 80, 80 and 40.
+  /// A batch closes early when its next line would take the prompt past
+  /// [maxChars] (the lines are joined by one `\n`, counted); a single
+  /// line longer than [maxChars] is a batch of its own, which the backend
+  /// will refuse and the classifier reports as that batch's failure.
+  ///
+  /// Each batch is a [Menu] with [menu]'s reference, currency, fetch time
+  /// and venue name, holding the categories its dishes come from, each
+  /// under its own id and name with only those dishes, so a category the
+  /// split cuts appears in both batches it spans. The Python twin is
+  /// `split_batches` in `backend/app/keto/batching.py`; the golden
+  /// `batches.json` pins the two equal.
+  static List<Menu> batches(
+    Menu menu, {
+    required int maxDishes,
+    int maxChars = llmUserPromptMaxChars,
+  }) {
+    final lines = <_PromptLine>[];
+    for (var c = 0; c < menu.categories.length; c++) {
+      final category = menu.categories[c];
+      for (final dish in category.dishes) {
+        lines.add((
+          category: c,
+          dish: dish,
+          length: _dishLine(dish, category.name).length,
+        ));
+      }
+    }
+    final count = lines.length;
+    var promptLength = count == 0 ? 0 : count - 1;
+    for (final line in lines) {
+      promptLength += line.length;
+    }
+    if (count <= maxDishes && promptLength <= maxChars) return <Menu>[menu];
+
+    final batchCount = (count + maxDishes - 1) ~/ maxDishes;
+    final target = (count + batchCount - 1) ~/ batchCount;
+    final groups = <List<_PromptLine>>[];
+    var current = <_PromptLine>[];
+    var currentLength = 0;
+    for (final line in lines) {
+      var added = current.isEmpty
+          ? line.length
+          : currentLength + 1 + line.length;
+      if (current.isNotEmpty &&
+          (current.length >= target || added > maxChars)) {
+        groups.add(current);
+        current = <_PromptLine>[];
+        added = line.length;
+      }
+      current.add(line);
+      currentLength = added;
+    }
+    groups.add(current);
+    return <Menu>[for (final group in groups) _batchMenu(menu, group)];
+  }
+
+  /// The [Menu] holding [group]'s dishes, under [menu]'s categories.
+  static Menu _batchMenu(Menu menu, List<_PromptLine> group) {
+    final categories = <MenuCategory>[];
+    int? open;
+    var dishes = <Dish>[];
+    void close() {
+      final index = open;
+      if (index == null) return;
+      final source = menu.categories[index];
+      categories.add(
+        MenuCategory(id: source.id, name: source.name, dishes: dishes),
+      );
+    }
+
+    for (final line in group) {
+      if (line.category != open) {
+        close();
+        open = line.category;
+        dishes = <Dish>[];
+      }
+      dishes.add(line.dish);
+    }
+    close();
+    return Menu(
+      venueRef: menu.venueRef,
+      currency: menu.currency,
+      fetchedAt: menu.fetchedAt,
+      categories: categories,
+      venueName: menu.venueName,
+    );
   }
 
   /// One `userPrompt` line for [dish], under [categoryName].

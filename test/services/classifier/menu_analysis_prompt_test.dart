@@ -1,9 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/menu_analysis_prompt.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
+import 'package:ketoclub/services/menu/wolt/wolt_menu_mapper.dart';
 import 'package:ketoclub/utils/constants.dart';
 
 /// The venue every [Menu] built by this file is addressed to.
@@ -61,6 +66,42 @@ void _assertStrictSchema(Map<String, Object?> schema) {
     _assertStrictSchema(items as Map<String, Object?>);
   }
 }
+
+/// The real 56-dish Wolt fixture (issue #22), mapped as the app maps it.
+Menu _woltFixtureMenu() {
+  final raw = jsonDecode(
+    File('test/fixtures/wolt_hamosad_menu.json').readAsStringSync(),
+  ) as Map<String, Object?>;
+  final result = WoltMenuMapper.toMenu(
+    raw,
+    ref: _venueRef,
+    fetchedAt: DateTime.utc(2026),
+  );
+  return (result as MenuFetched).menu;
+}
+
+/// [count] dishes `d0..d{count-1}`, spread over categories of [perCategory].
+Menu _largeMenu(int count, {int perCategory = 30}) => _menuOf([
+  for (var start = 0; start < count; start += perCategory)
+    (
+      'Aisle ${start ~/ perCategory}',
+      [
+        for (var i = start; i < count && i < start + perCategory; i++)
+          Dish(
+            id: 'd$i',
+            name: 'Dish number $i',
+            description: '',
+            price: 10,
+            options: const [],
+          ),
+      ],
+    ),
+]);
+
+/// Every batch's dish ids, in order.
+List<List<String>> _ids(List<Menu> batches) => [
+  for (final batch in batches) [for (final dish in batch.allDishes) dish.id],
+];
 
 void main() {
   group('MenuAnalysisPrompt', () {
@@ -790,6 +831,180 @@ void main() {
       expect(
         itemOf(MenuAnalysisPrompt.visionResponseSchema())['properties'],
         isNot(contains('description')),
+      );
+    });
+  });
+
+  group('MenuAnalysisPrompt.batches (issue #188)', () {
+    test('the 56-dish Wolt fixture fits one keto request whole', () {
+      // Arrange
+      final menu = _woltFixtureMenu();
+
+      // Act
+      final batches = MenuAnalysisPrompt.batches(
+        menu,
+        maxDishes: MenuAnalysisPrompt.batchMaxDishes(extract: false),
+      );
+
+      // Assert: the prompt the issue measured, far under the budget, and
+      // the menu itself, so the request is the bytes it always was.
+      expect(menu.allDishes, hasLength(56));
+      expect(MenuAnalysisPrompt.userPrompt(menu).length, 24237);
+      expect(batches, hasLength(1));
+      expect(identical(batches.single, menu), isTrue);
+    });
+
+    test('the 56-dish Wolt fixture is two extraction requests of 28', () {
+      // Act
+      final batches = MenuAnalysisPrompt.batches(
+        _woltFixtureMenu(),
+        maxDishes: MenuAnalysisPrompt.batchMaxDishes(extract: true),
+      );
+
+      // Assert
+      expect([for (final b in batches) b.allDishes.length], [28, 28]);
+    });
+
+    test('batchMaxDishes is the keto ceiling, or the smaller extraction '
+        'one', () {
+      expect(
+        MenuAnalysisPrompt.batchMaxDishes(extract: false),
+        llmBatchMaxDishes,
+      );
+      expect(
+        MenuAnalysisPrompt.batchMaxDishes(extract: true),
+        llmBatchMaxDishesWithExtraction,
+      );
+      expect(llmBatchMaxDishesWithExtraction, lessThan(llmBatchMaxDishes));
+    });
+
+    test('200 dishes under a ceiling of 80 are balanced as 67, 67 and 66, '
+        'in menu order', () {
+      // Arrange
+      final menu = _largeMenu(200);
+
+      // Act
+      final batches = MenuAnalysisPrompt.batches(menu, maxDishes: 80);
+
+      // Assert
+      expect([for (final b in batches) b.allDishes.length], [67, 67, 66]);
+      expect(_ids(batches).expand((ids) => ids).toList(), [
+        for (final dish in menu.allDishes) dish.id,
+      ]);
+    });
+
+    test('a batch keeps the venue fields and cuts a category in two under '
+        'its own id and name', () {
+      // Arrange: 30 dishes a category, so batch one ends inside the third.
+      final menu = _largeMenu(200);
+
+      // Act
+      final first = MenuAnalysisPrompt.batches(menu, maxDishes: 80).first;
+
+      // Assert
+      expect(first.venueRef, menu.venueRef);
+      expect(first.currency, menu.currency);
+      expect(first.fetchedAt, menu.fetchedAt);
+      expect(first.venueName, menu.venueName);
+      expect(
+        [for (final c in first.categories) c.id],
+        ['cat-Aisle 0', 'cat-Aisle 1', 'cat-Aisle 2'],
+      );
+      expect(first.categories.last.dishes, hasLength(7));
+      expect(
+        MenuAnalysisPrompt.userPrompt(first).split('\n').first,
+        'd0 | Aisle 0 | Dish number 0 |  | ',
+      );
+    });
+
+    test("the batches' prompts are the whole prompt's lines, partitioned", () {
+      // Arrange
+      final menu = _largeMenu(200);
+
+      // Act
+      final batches = MenuAnalysisPrompt.batches(menu, maxDishes: 80);
+
+      // Assert
+      expect(
+        batches.map(MenuAnalysisPrompt.userPrompt).join('\n'),
+        MenuAnalysisPrompt.userPrompt(menu),
+      );
+    });
+
+    test('the character budget closes a batch before the dish ceiling', () {
+      // Arrange: each line is 34-36 characters.
+      final menu = _largeMenu(10);
+
+      // Act
+      final batches = MenuAnalysisPrompt.batches(
+        menu,
+        maxDishes: 100,
+        maxChars: 100,
+      );
+
+      // Assert: no batch's prompt is over the budget.
+      expect(batches.length, greaterThan(1));
+      for (final batch in batches) {
+        expect(
+          MenuAnalysisPrompt.userPrompt(batch).length,
+          lessThanOrEqualTo(100),
+        );
+      }
+      expect(_ids(batches).expand((ids) => ids), hasLength(10));
+    });
+
+    test('a line longer than the budget is a batch of its own', () {
+      // Act
+      final batches = MenuAnalysisPrompt.batches(
+        _largeMenu(3),
+        maxDishes: 100,
+        maxChars: 5,
+      );
+
+      // Assert
+      expect(_ids(batches), [
+        ['d0'],
+        ['d1'],
+        ['d2'],
+      ]);
+    });
+
+    test('the same menu always splits the same way', () {
+      // Arrange
+      final menu = _largeMenu(173);
+
+      // Act
+      final once = MenuAnalysisPrompt.batches(menu, maxDishes: 35);
+      final twice = MenuAnalysisPrompt.batches(menu, maxDishes: 35);
+
+      // Assert
+      expect(
+        once.map(MenuAnalysisPrompt.userPrompt).toList(),
+        twice.map(MenuAnalysisPrompt.userPrompt).toList(),
+      );
+    });
+
+    test('a menu at exactly the ceiling, and the empty menu, are returned '
+        'themselves', () {
+      // Arrange
+      final full = _largeMenu(80);
+      final empty = _menuOf(const []);
+
+      // Act + Assert
+      expect(
+        identical(MenuAnalysisPrompt.batches(full, maxDishes: 80).single, full),
+        isTrue,
+      );
+      expect(
+        identical(
+          MenuAnalysisPrompt.batches(empty, maxDishes: 80).single,
+          empty,
+        ),
+        isTrue,
+      );
+      expect(
+        MenuAnalysisPrompt.batches(_largeMenu(81), maxDishes: 80),
+        hasLength(2),
       );
     });
   });

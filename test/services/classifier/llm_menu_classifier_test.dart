@@ -10,8 +10,10 @@ import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/services/classifier/llm_menu_classifier.dart';
 import 'package:ketoclub/services/classifier/menu_analysis_prompt.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
+import 'package:ketoclub/services/classifier/menu_response_parser.dart';
 import 'package:ketoclub/services/llm/backend_chat_client.dart';
 import 'package:ketoclub/services/llm/llm_chat_client.dart';
+import 'package:ketoclub/utils/constants.dart';
 
 import '../../fakes/fake_clock.dart';
 import '../../fakes/fake_install_id_store.dart';
@@ -135,6 +137,91 @@ LlmMenuClassifier _buildContractClassifier() => LlmMenuClassifier(
     ),
   FakeClock(DateTime.utc(2026)),
 );
+
+/// [count] dishes `d0..d{count-1}` named `Dish number i`, 30 a category.
+Menu _largeMenu(int count) => Menu(
+  venueRef: _venueRef,
+  currency: 'ILS',
+  fetchedAt: DateTime.utc(2026),
+  categories: [
+    for (var start = 0; start < count; start += 30)
+      MenuCategory(
+        id: 'cat-$start',
+        name: 'Aisle $start',
+        dishes: [
+          for (var i = start; i < count && i < start + 30; i++)
+            _dishNamed('d$i', 'Dish number $i'),
+        ],
+      ),
+  ],
+);
+
+/// An [LlmChatClient] that places every dish its user prompt names as
+/// order-as-is, unless [failures] scripts the n-th call (from 1), and
+/// records every user prompt it was sent (issue #188). It answers after a
+/// turn of the event loop and counts how many calls were out at once.
+final class _PromptAnsweringChatClient implements LlmChatClient {
+  /// Creates a client answering the calls [failures] names with them.
+  new([this.failures = const <int, ChatResult>{}]);
+
+  /// The answer to the n-th call, by n, instead of the placed reply.
+  final Map<int, ChatResult> failures;
+
+  /// Every user prompt received, in call order.
+  final List<String> userPrompts = <String>[];
+
+  /// Every response schema received, in call order.
+  final List<Map<String, Object?>?> schemas = <Map<String, Object?>?>[];
+
+  /// The most calls awaiting an answer at one time.
+  int maxInFlight = 0;
+
+  int _inFlight = 0;
+
+  @override
+  Future<ChatResult> complete({
+    required String systemPrompt,
+    required String userPrompt,
+    Map<String, Object?>? responseSchema,
+    String? schemaName,
+    List<ChatImagePart> images = const <ChatImagePart>[],
+  }) async {
+    userPrompts.add(userPrompt);
+    schemas.add(responseSchema);
+    final call = userPrompts.length;
+    _inFlight++;
+    if (_inFlight > maxInFlight) maxInFlight = _inFlight;
+    await Future<void>.delayed(Duration.zero);
+    _inFlight--;
+    final scripted = failures[call];
+    if (scripted != null) return scripted;
+    final dishes = <Object?>[
+      for (final line in userPrompt.split('\n'))
+        <String, Object?>{
+          'id': line.split(' | ')[0],
+          'name': line.split(' | ')[2],
+          'verdict': 'orderAsIs',
+          'why': 'Plain protein.',
+          'modification': null,
+          'net_carbs_estimate': 1,
+          'hidden_carbs': <Object?>[],
+        },
+    ];
+    return ChatCompleted(
+      content: jsonEncode(<String, Object?>{'dishes': dishes}),
+      model: 'batch-model-$call',
+    );
+  }
+}
+
+/// The names of [menu]'s dishes, in order.
+List<String> _namesOf(Menu menu) => [
+  for (final dish in menu.allDishes) dish.name,
+];
+
+/// A classifier over [client] on a fixed clock.
+LlmMenuClassifier _over(LlmChatClient client) =>
+    LlmMenuClassifier(client, FakeClock(DateTime.utc(2026)));
 
 void main() {
   runMenuClassifierContract('LlmMenuClassifier', _buildContractClassifier);
@@ -283,7 +370,7 @@ void main() {
     });
 
     test(
-      'classify sends exactly one request whatever the dish count',
+      'classify sends exactly one request for a menu within one batch',
       () async {
         // Arrange
         final client = FakeLlmChatClient()
@@ -575,5 +662,182 @@ void main() {
         equals(_goldenSystemPromptAt6g + _goldenAllTogglesSection),
       );
     });
+  });
+
+  group('LlmMenuClassifier on a menu larger than one batch (issue #188)', () {
+    final menu = _largeMenu(200);
+    final batches = MenuAnalysisPrompt.batches(
+      menu,
+      maxDishes: llmBatchMaxDishes,
+    );
+
+    test('sends one request per batch, one at a time, in order, and merges '
+        'them', () async {
+      // Arrange
+      final client = _PromptAnsweringChatClient();
+      const options = ClassificationOptions(netCarbLimitGrams: 9);
+
+      // Act
+      final result = await _over(client).classify(menu, options: options);
+
+      // Assert: three requests, each its batch's prompt, never two at once.
+      expect(batches, hasLength(3));
+      expect(client.userPrompts, [
+        for (final batch in batches) MenuAnalysisPrompt.userPrompt(batch),
+      ]);
+      expect(client.maxInFlight, 1);
+      final analysed = result as MenuAnalysed;
+      expect(
+        [for (final dish in analysed.dishes) dish.dishId],
+        [for (final dish in menu.allDishes) dish.id],
+      );
+      expect(analysed.unclassified, isEmpty);
+      // The first answering batch names the model.
+      expect(analysed.engine, const LlmEngine(model: 'batch-model-1'));
+      expect(analysed.options, options.snapshot);
+      expect(analysed.schemaVersion, MenuResponseParser.schemaVersion);
+      expect(analysed.analysedAt, DateTime.utc(2026));
+    });
+
+    final ownFailures = <String, ChatResult>{
+      'a badResponse': const ChatFailed(reason: ChatFailureReason.badResponse),
+      'a timeout': const ChatFailed(reason: ChatFailureReason.timeout),
+      'a reply the parser rejects': const ChatCompleted(
+        content: 'not json',
+        model: 'm',
+      ),
+    };
+    for (final MapEntry(key: label, value: failure) in ownFailures.entries) {
+      test('one failed batch of three ($label) puts only its dishes under '
+          'unclassified, and the third is still sent', () async {
+        // Arrange
+        final client = _PromptAnsweringChatClient({2: failure});
+
+        // Act
+        final result = await _over(client).classify(menu);
+
+        // Assert
+        expect(client.userPrompts, hasLength(3));
+        final analysed = result as MenuAnalysed;
+        expect(
+          [for (final dish in analysed.dishes) dish.dishId],
+          [
+            for (final dish in batches[0].allDishes) dish.id,
+            for (final dish in batches[2].allDishes) dish.id,
+          ],
+        );
+        expect(analysed.unclassified, _namesOf(batches[1]));
+        expect(analysed.engine, const LlmEngine(model: 'batch-model-1'));
+      });
+    }
+
+    test(
+      'a first batch failing on its own lets the next name the model',
+      () async {
+        // Arrange
+        final client = _PromptAnsweringChatClient({
+          1: const ChatFailed(reason: ChatFailureReason.timeout),
+        });
+
+        // Act
+        final result = await _over(client).classify(menu);
+
+        // Assert
+        final analysed = result as MenuAnalysed;
+        expect(analysed.engine, const LlmEngine(model: 'batch-model-2'));
+        expect(analysed.unclassified, _namesOf(batches[0]));
+      },
+    );
+
+    test(
+      'every batch failing is the menu failing, with the first reason',
+      () async {
+        // Arrange
+        final client = _PromptAnsweringChatClient({
+          1: const ChatFailed(reason: ChatFailureReason.timeout),
+          2: const ChatFailed(reason: ChatFailureReason.badResponse),
+          3: const ChatCompleted(content: 'not json', model: 'm'),
+        });
+
+        // Act
+        final result = await _over(client).classify(menu);
+
+        // Assert
+        expect(
+          result,
+          const MenuAnalysisFailed(reason: MenuAnalysisFailureReason.timeout),
+        );
+      },
+    );
+
+    const menuWide = <ChatFailureReason>[
+      ChatFailureReason.rateLimited,
+      ChatFailureReason.offline,
+      ChatFailureReason.backendUnreachable,
+      ChatFailureReason.notConfigured,
+      ChatFailureReason.apiKeyMissing,
+      ChatFailureReason.apiKeyRejected,
+    ];
+    for (final reason in menuWide) {
+      test(
+        '${reason.name} mid-menu stops the menu and is its failure',
+        () async {
+          // Arrange
+          final client = _PromptAnsweringChatClient({
+            2: ChatFailed(reason: reason),
+          });
+
+          // Act
+          final result = await _over(client).classify(menu);
+
+          // Assert: the third batch is never sent, and the router will
+          // answer with the rules stamped with this reason.
+          expect(client.userPrompts, hasLength(2));
+          expect(
+            result,
+            MenuAnalysisFailed(reason: menuFailureReasonFor(reason)),
+          );
+        },
+      );
+    }
+
+    test('with restrictionsRequested, batches are the smaller extraction '
+        'size and ask for ingredients', () async {
+      // Arrange
+      final client = _PromptAnsweringChatClient();
+      const options = ClassificationOptions(restrictionsRequested: true);
+
+      // Act
+      final result = await _over(client).classify(menu, options: options);
+
+      // Assert: 200 dishes under a ceiling of 35 are 6 batches.
+      expect(client.userPrompts, hasLength(6));
+      for (final prompt in client.userPrompts) {
+        expect(
+          prompt.split('\n').length,
+          lessThanOrEqualTo(llmBatchMaxDishesWithExtraction),
+        );
+      }
+      expect(
+        client.schemas,
+        everyElement(MenuAnalysisPrompt.responseSchema(extract: true)),
+      );
+      expect((result as MenuAnalysed).dishes, hasLength(200));
+    });
+
+    test(
+      'a menu of exactly the ceiling is one request of the whole prompt',
+      () async {
+        // Arrange
+        final fits = _largeMenu(llmBatchMaxDishes);
+        final client = _PromptAnsweringChatClient();
+
+        // Act
+        await _over(client).classify(fits);
+
+        // Assert
+        expect(client.userPrompts, [MenuAnalysisPrompt.userPrompt(fits)]);
+      },
+    );
   });
 }

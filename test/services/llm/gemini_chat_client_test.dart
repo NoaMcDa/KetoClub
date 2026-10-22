@@ -345,7 +345,7 @@ void main() {
         _configOf(sent),
         equals(<String, Object?>{
           'responseMimeType': 'application/json',
-          'maxOutputTokens': 8192,
+          'maxOutputTokens': 65536,
           'temperature': 0,
           'thinkingConfig': <String, Object?>{'thinkingBudget': 0},
         }),
@@ -453,7 +453,7 @@ void main() {
         '{"system_instruction":{"parts":[{"text":"s"}]},',
         '"contents":[{"role":"user","parts":[{"text":"u"}]}],',
         '"generationConfig":{"responseMimeType":"application/json",',
-        '"maxOutputTokens":8192,"temperature":0,',
+        '"maxOutputTokens":65536,"temperature":0,',
         '"thinkingConfig":{"thinkingBudget":0}}}',
       ].join();
       expect(bodies, equals(<String>[expected, expected]));

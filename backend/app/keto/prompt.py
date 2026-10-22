@@ -18,7 +18,7 @@ Pure: no framework, no I/O beyond the cached vocabulary read.
 
 from typing import Any, Final
 
-from app.keto.models import AnalysisOptionsSnapshot, Menu
+from app.keto.models import AnalysisOptionsSnapshot, Dish, Menu
 from app.keto.vocabulary import vocabulary
 
 SCHEMA_NAME: Final[str] = vocabulary().prompt.schema_name
@@ -172,18 +172,20 @@ def user_prompt(menu: Menu) -> str:
     Prices are omitted. Each option group is ``label: value, value``; groups
     are joined by ``; ``.
     """
-    lines: list[str] = []
-    for category in menu.categories:
-        for dish in category.dishes:
-            options = "; ".join(
-                f"{option.name}: {', '.join(option.values)}" for option in dish.options
-            )
-            lines.append(
-                " | ".join(
-                    [dish.id, category.name, dish.name, dish.description, options]
-                )
-            )
-    return "\n".join(lines)
+    return "\n".join(
+        dish_line(dish, category.name)
+        for category in menu.categories
+        for dish in category.dishes
+    )
+
+
+def dish_line(dish: Dish, category_name: str) -> str:
+    """Dart ``_dishLine``: one :func:`user_prompt` line for ``dish`` under
+    ``category_name``. Public for ``app.keto.batching``, which measures it."""
+    options = "; ".join(
+        f"{option.name}: {', '.join(option.values)}" for option in dish.options
+    )
+    return " | ".join([dish.id, category_name, dish.name, dish.description, options])
 
 
 def _ingredients_schema() -> dict[str, Any]:
