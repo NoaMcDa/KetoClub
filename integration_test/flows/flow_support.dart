@@ -539,6 +539,11 @@ final class FlowFakeSettingsStore implements SettingsStore {
 
   @override
   Future<void> write(AppSettings settings) async => _settings = settings;
+
+  @override
+  Future<AppSettings> update(
+    AppSettings Function(AppSettings latest) change,
+  ) async => _settings = change(_settings);
 }
 
 /// A [Clock] fixed at a constant, so no flow test reads wall time.

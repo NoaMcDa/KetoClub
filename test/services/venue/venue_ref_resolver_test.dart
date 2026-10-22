@@ -394,6 +394,73 @@ void main() {
         ),
       );
     });
+
+    // Issue #280: a shared link's tracking parameters made the cache key
+    // long enough to corrupt the Hive box, and split one page into many
+    // entries. Each case is the same table the backend's twin replays
+    // (backend/tests/test_website_menu_route.py).
+    final trackingCases = <String, String>{
+      'https://cafe.co.il/menu?utm_source=ig&utm_medium=social'
+              '&fbclid=${'A' * 200}':
+          'https://cafe.co.il/menu',
+      'https://cafe.co.il/menu?lang=he&gclid=x&utm_campaign=z&page=2':
+          'https://cafe.co.il/menu?lang=he&page=2',
+      'https://cafe.co.il/menu?UTM_Source=ig&MSCLKID=1&id=7':
+          'https://cafe.co.il/menu?id=7',
+      'https://cafe.co.il/?igshid=abc': 'https://cafe.co.il',
+      'https://cafe.co.il/menu?utm=keep&utmost=keep':
+          'https://cafe.co.il/menu?utm=keep&utmost=keep',
+      'https://cafe.co.il/menu?': 'https://cafe.co.il/menu',
+      'https://cafe.co.il/menu?a=1': 'https://cafe.co.il/menu?a=1',
+    };
+    for (final MapEntry(key: raw, value: normalised) in trackingCases.entries) {
+      test('drops tracking parameters: $normalised', () {
+        expect(
+          VenueRefResolver.normaliseWebsiteUrl(Uri.parse(raw)),
+          normalised,
+        );
+      });
+    }
+
+    test('a link shared with tracking parameters is the same entry as the '
+        'bare link, under a short key', () {
+      final shared = VenueRefResolver.resolve(
+        'https://cafe.co.il/menu?utm_source=ig&utm_medium=social'
+        '&fbclid=${'A' * 200}',
+      );
+      final bare = VenueRefResolver.resolve('https://cafe.co.il/menu');
+
+      expect(shared, bare);
+      expect(shared!.cacheKey.length, lessThan(255));
+    });
+
+    test('isTrackingQueryParameter matches utm_* and click ids, ignoring '
+        'case, and nothing else', () {
+      for (final name in const [
+        'utm_source',
+        'UTM_MEDIUM',
+        'utm_',
+        'fbclid',
+        'gclid',
+        'GCLID',
+        'msclkid',
+        'igshid',
+        '_ga',
+      ]) {
+        expect(
+          VenueRefResolver.isTrackingQueryParameter(name),
+          isTrue,
+          reason: name,
+        );
+      }
+      for (final name in const ['utm', 'utmost', 'id', 'page', 'q', '']) {
+        expect(
+          VenueRefResolver.isTrackingQueryParameter(name),
+          isFalse,
+          reason: name,
+        );
+      }
+    });
   });
 
   group('VenueRefResolver.isExplicitLink', () {

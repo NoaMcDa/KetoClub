@@ -1289,7 +1289,9 @@ final class MenuController extends ChangeNotifier {
         _fetchStatusCode = null;
         // A successful open is remembered so the Explore screen can offer
         // to resume it (issue #55); a failed one is not.
-        await _settings.write(appSettings.copyWith(lastVenue: ref));
+        // Onto the latest stored settings, not the ones read before the
+        // fetch, so a change made during a slow load survives (#287).
+        await _settings.update((latest) => latest.copyWith(lastVenue: ref));
 
         final options = _optionsFrom(appSettings);
         final reusable = _reusableAnalysis(
@@ -1824,8 +1826,7 @@ final class MenuController extends ChangeNotifier {
   Future<void> setFilter(MenuFilter filter) async {
     _filter = filter;
     notifyListeners();
-    final appSettings = await _settings.read();
-    await _settings.write(appSettings.copyWith(lastFilter: filter));
+    await _settings.update((latest) => latest.copyWith(lastFilter: filter));
   }
 
   /// Changes [query] and notifies listeners (issue #51). Does not refetch

@@ -83,7 +83,8 @@ void main() {
   runSettingsStoreContract('PrefsSettingsStore', _buildStore);
 
   group('PrefsSettingsStore', () {
-    test('read returns defaults when the stored string is corrupt', () async {
+    test('read returns defaults with consent withheld when the stored '
+        'string is corrupt (issue #281: fail closed)', () async {
       // Arrange
       SharedPreferences.setMockInitialValues(<String, Object>{
         'flutter.ketoclub_settings': 'not valid json{',
@@ -93,26 +94,24 @@ void main() {
       // Act
       final result = await store.read();
 
-      // Assert
-      expect(result, equals(const AppSettings()));
+      // Assert: the stored consent may have been a refusal.
+      expect(result, equals(const AppSettings(estimationConsentGiven: false)));
     });
 
-    test(
-      'read returns defaults when the stored JSON is shaped wrong',
-      () async {
-        // Arrange
-        SharedPreferences.setMockInitialValues(<String, Object>{
-          'flutter.ketoclub_settings': '"just a string, not a map"',
-        });
-        final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
+    test('read returns defaults with consent withheld when the stored JSON '
+        'is shaped wrong (issue #281: fail closed)', () async {
+      // Arrange
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        'flutter.ketoclub_settings': '"just a string, not a map"',
+      });
+      final store = PrefsSettingsStore(load: SharedPreferences.getInstance);
 
-        // Act
-        final result = await store.read();
+      // Act
+      final result = await store.read();
 
-        // Assert
-        expect(result, equals(const AppSettings()));
-      },
-    );
+      // Assert
+      expect(result, equals(const AppSettings(estimationConsentGiven: false)));
+    });
 
     test('an install that persisted greenAndYellow before issue #35 changed '
         'the default and the Settings control still loads it without a '

@@ -8,6 +8,7 @@ import 'package:ketoclub/models/failures.dart';
 import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/shared_confirmation.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/services/storage/storage_key.dart';
 import 'package:ketoclub/utils/verdict_counts.dart';
 
 /// The reason whose `name` equals [wire], or null when none does.
@@ -388,6 +389,9 @@ abstract interface class MenuCache {
 /// Pins ([pin]) live in a second, tiny box ([openPinBox]) of cache keys
 /// rather than inside the entries, so the entry JSON, and with it every
 /// box already on a device, is unchanged: no schema migration.
+///
+/// Both boxes are keyed by [storageKeyFor], never by [VenueRef.cacheKey]
+/// directly, so no key passes Hive's 255-byte limit (issue #280).
 final class HiveMenuCache implements MenuCache {
   /// Creates a cache over the box [openBox] returns, keeping pins in the
   /// box [openPinBox] returns.
@@ -488,7 +492,7 @@ final class HiveMenuCache implements MenuCache {
     }
     String? raw;
     try {
-      raw = box.get(ref.cacheKey);
+      raw = box.get(storageKeyFor(ref));
       // A broken box is a miss, never a throw (architecture.md §6.4).
       // ignore: avoid_catching_errors
     } on HiveError {
@@ -515,7 +519,7 @@ final class HiveMenuCache implements MenuCache {
     } on HiveError {
       return;
     }
-    final key = entry.menu.venueRef.cacheKey;
+    final key = storageKeyFor(entry.menu.venueRef);
     final value = jsonEncode(entry.toJson());
     try {
       await box.put(key, value);
@@ -558,13 +562,13 @@ final class HiveMenuCache implements MenuCache {
       return;
     }
     try {
-      await box.delete(ref.cacheKey);
+      await box.delete(storageKeyFor(ref));
       // An entry that cannot be deleted just stays stale.
       // ignore: avoid_catching_errors
     } on HiveError {
       // Nothing to do: the delete above never landed.
     }
-    await _setPinKey(ref.cacheKey, pinned: false);
+    await _setPinKey(storageKeyFor(ref), pinned: false);
   }
 
   @override
@@ -573,19 +577,19 @@ final class HiveMenuCache implements MenuCache {
       final Box<String> box;
       try {
         box = await _openedBox();
-        if (!box.containsKey(ref.cacheKey)) return;
+        if (!box.containsKey(storageKeyFor(ref))) return;
         // A broken box cannot hold a pin for a menu it cannot read.
         // ignore: avoid_catching_errors
       } on HiveError {
         return;
       }
     }
-    await _setPinKey(ref.cacheKey, pinned: pinned);
+    await _setPinKey(storageKeyFor(ref), pinned: pinned);
   }
 
   @override
   Future<bool> isPinned(VenueRef ref) async =>
-      (await _pinnedKeys()).contains(ref.cacheKey);
+      (await _pinnedKeys()).contains(storageKeyFor(ref));
 
   @override
   Future<int> size() async {
@@ -642,7 +646,7 @@ final class HiveMenuCache implements MenuCache {
       result.add(
         CachedMenuEntry.summarise(
           cached,
-          pinned: pins.contains(cached.menu.venueRef.cacheKey),
+          pinned: pins.contains(storageKeyFor(cached.menu.venueRef)),
         ),
       );
     }

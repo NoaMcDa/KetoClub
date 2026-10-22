@@ -976,6 +976,28 @@ no physical device has exercised it (`HANDOFF.md`).
 | `SettingsStore` | `shared_preferences` | UI language, filter defaults, consent flag, last venue, appearance, net-carb limit (2–25 g, default 6), dietary toggles (seed-oil free, dairy-free, carnivore only; all off by default, a missing key reads as off), the Banto restriction profile (`dietaryProfile`, written only when non-empty; a missing or unreadable value reads as empty; D26) and the other people's profiles and which are combined (`profileName`, `groupProfiles`, `activeProfiles`, each written only when not its default; ALG-12) | until cleared |
 | `VisitHistoryStore` | `hive` (`menu_history` box) | one `VisitEntry` per `VenueRef` opened on this device (D23): the name and city it was shown under, first and last opened, open count, and the dish count, score and green/yellow counts it last had | until the row is removed or Settings clears saved menus |
 
+**Hive keys are bounded (issue #280).** Hive writes a string key's UTF-8
+length in one byte and checks it only in an `assert`, so a longer key corrupts
+the box in a release build (the next launch truncates it at that entry, losing
+everything cached after it). Every box keyed by a venue — `menu_cache`,
+`menu_cache_pins` and `menu_history` — is keyed by `storageKeyFor(ref)`
+(`services/storage/storage_key.dart`): `VenueRef.cacheKey` itself whenever it
+fits in 255 UTF-8 bytes, so every key already on a device is unchanged, and
+`source/#sha256:<hex of platformId>` otherwise. `cacheKey` stays the in-memory
+join key and the log form. `normaliseWebsiteUrl` also drops tracking
+parameters (`utm_*`, `fbclid`, `gclid`, …), on the backend's twin too, so a
+shared link is the same entry as the bare one.
+
+**Settings are read field by field and written read-modify-write (issues
+#281, #287).** `AppSettings.fromStored` reads each field on its own; one that
+is missing or unreadable falls back to its own default and leaves the rest as
+stored. Consent fails closed: a missing key is D16's default of given, a bool
+is itself, and anything else — or a stored record that is not a JSON object
+at all — reads as withheld. `SettingsStore.update(change)` applies a change to
+the latest stored value, one update at a time, so a screen holding an older
+snapshot (the disclosure banner, `MenuController.open` after a slow fetch,
+the Settings screen) changes only its own fields and never reverts consent.
+
 The install id is unlinkable to a person (D8 stays true in spirit) and is sent
 only as `X-KetoClub-Install-Id` to KetoClub's own backend, for its per-install
 rate limiter (§6.2 rule 2 note, `backend_plan.md` §3.4) — never to a restaurant
@@ -2464,7 +2486,8 @@ often appear on neither.
   keep priority (a Wolt URL that is not a venue page is still null), and the
   bare-word guard of #169 is unchanged. `platformId` is the URL normalised by
   `normaliseWebsiteUrl` (lower-case scheme and host, no fragment, no default
-  port, no trailing `/`), and `platformUrl` returns it. The route path
+  port, no trailing `/`, no tracking parameters since issue #280), and
+  `platformUrl` returns it. The route path
   percent-encodes it (`utils/venue_route.dart`) so a URL stays one segment.
 - **Finding the menu** (`services/menu/website/`, pure, every platform).
   `WebsiteMenuLocator.locate` tries, in order: (1) JSON-LD `Menu` /

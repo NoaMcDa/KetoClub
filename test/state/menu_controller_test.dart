@@ -670,6 +670,34 @@ void main() {
       expect((await settings.read()).lastVenue, equals(_ref));
     });
 
+    test('open writes lastVenue onto the latest settings, so consent turned '
+        'off during a slow load stays off (issue #287)', () async {
+      // Arrange: the fetch is held open while the user turns AI off.
+      final gate = Completer<void>();
+      repository
+        ..loadGate = gate.future
+        ..stub(_ref, MenuFetched(menu: _menuOf([_dish('Steak')])));
+      final opening = controller.open(_ref);
+      await pumpEventQueue();
+      expect(repository.loadCalls, hasLength(1));
+      await settings.write(
+        (await settings.read()).copyWith(
+          estimationConsentGiven: false,
+          themeMode: AppThemeMode.dark,
+        ),
+      );
+
+      // Act
+      gate.complete();
+      await opening;
+
+      // Assert
+      final stored = await settings.read();
+      expect(stored.lastVenue, equals(_ref));
+      expect(stored.estimationConsentGiven, isFalse);
+      expect(stored.themeMode, AppThemeMode.dark);
+    });
+
     test(
       'open does not write lastVenue when the fetch fails outright',
       () async {
