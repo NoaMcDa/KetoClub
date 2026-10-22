@@ -10,12 +10,21 @@ stays in ``app.services.website``.
 
 - **The install's budget** (``website_install_limiter``), once per call, so
   the route is no open proxy: a link hop is a second call and a second spend.
+- **One deadline** (``WEBSITE_FETCH_DEADLINE_SECONDS``) for the whole call:
+  every hop, its ``robots.txt`` and every body read (#269). The 15 s read
+  timeout bounds one read only, so a server dripping a byte at a time could
+  otherwise hold the request open for ever.
 - **Public hosts only.** ``http``/``https`` on the default port, no
   credentials; the host must resolve to globally routable addresses only,
-  checked again on every redirect hop (at most five).
+  checked before the request on every redirect hop (at most five), and
+  again by the connection itself, which dials only the addresses it checked
+  (``app.services.website_transport``, #267), so a DNS answer that changes
+  between the check and the connection cannot reach a private address.
 - **robots.txt** for ``ketoclubbot``, else ``*``, cached per host for
-  ``WEBSITE_ROBOTS_TTL_SECONDS``. A 4xx robots.txt means no rules; a 5xx or
-  an unreachable one means the site is not fetched (RFC 9309 §2.3.1.4).
+  ``WEBSITE_ROBOTS_TTL_SECONDS`` and read streamed, at most
+  ``WEBSITE_MAX_ROBOTS_BYTES`` of it (#269). A 4xx robots.txt means no rules;
+  a 5xx or an unreachable one means the site is not fetched (RFC 9309
+  §2.3.1.4).
 - **The site's budget** (``website_host_limiter``), per hop, across installs.
 - **Logged out, named.** Nothing of the inbound request is forwarded; every
   fetch sends ``WEBSITE_USER_AGENT``.
@@ -24,7 +33,11 @@ stays in ``app.services.website``.
   caller asks (``judge_page``): ``/v1/website-menu`` leaves those to the
   ported Dart reader (``app.website.adapter``), which takes JSON-LD before
   the JavaScript-only test exactly as the app does.
-- **A size cap per kind**, and only HTML or a PDF accepted.
+- **A size cap per kind**, applied to the bytes after decompression and
+  checked as they are inflated, never after (#269), and only HTML or a PDF
+  accepted.
+- **Parsing off the event loop** (#268): the page judge runs in a worker
+  thread under ``WEBSITE_PARSE_BUDGET_SECONDS``.
 
 Every failure is a ``BackendError`` with its own reason; nothing is cached
 and a log line carries the host and the outcome only, never the path, the
@@ -32,11 +45,13 @@ query or the body.
 """
 
 import logging
+import zlib
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import Final
 from urllib.parse import urljoin, urlsplit
 
+import anyio
 import httpx
 from fastapi import Request
 
@@ -54,12 +69,17 @@ from app.services.website import (
     parse_robots,
     path_of,
 )
+from app.services.website_transport import BlockedAddressError
 
 logger = logging.getLogger("ketoclub.website")
 
 WEBSITE_TIMEOUT: Final = httpx.Timeout(15.0, connect=5.0)
 MAX_REDIRECTS: Final = 5
 _ACCEPT: Final = "text/html,application/xhtml+xml,application/pdf;q=0.9,*/*;q=0.1"
+# Only what :class:`_BodyDecoder` can inflate under a cap. Without this
+# header httpx would advertise ``br``/``zstd`` whenever those packages are
+# installed, and they have no bounded decoder here.
+_ACCEPT_ENCODING: Final = "gzip, deflate"
 
 HostResolver = Callable[[str], Awaitable[list[str]]]
 
@@ -87,12 +107,27 @@ async def fetch_document(
     ``install_id`` keys the install budget and nothing else. With
     ``judge_page`` (``/v1/website/fetch``), an HTML page that opts out of AI
     use in its ``<meta>`` tags is 403 ``aiReserved`` and one that renders
-    only with JavaScript is 422 ``jsOnlyPage``.
+    only with JavaScript is 422 ``jsOnlyPage``. The whole call, every hop
+    included, ends within ``WEBSITE_FETCH_DEADLINE_SECONDS`` or is 504
+    ``timeout``.
     """
     install_limiter: RateLimiter = request.app.state.website_install_limiter
     if not install_limiter.allow(install_id):
         raise BackendError(429, "rateLimited")
 
+    deadline: float = request.app.state.settings.WEBSITE_FETCH_DEADLINE_SECONDS
+    host = checked_host(url)
+    try:
+        with anyio.fail_after(deadline):
+            return await _follow(request, url, judge_page=judge_page)
+    except TimeoutError:
+        # The host of the hop that ran out of time is not tracked; the
+        # pasted one names the fetch well enough for the log.
+        _log(host, "timeout")
+        raise BackendError(504, "timeout") from None
+
+
+async def _follow(request: Request, url: str, *, judge_page: bool) -> WebsiteDocument:
     for _ in range(MAX_REDIRECTS + 1):
         host = checked_host(url)
         try:
@@ -144,6 +179,8 @@ def checked_host(url: str) -> str:
 
 
 async def _require_public(request: Request, host: str) -> None:
+    """The early, friendly check: 400 ``invalidUrl`` before robots.txt is
+    asked for. The connection repeats it on the addresses it dials."""
     resolve: HostResolver = request.app.state.resolve_host
     try:
         addresses = await resolve(host)
@@ -163,7 +200,12 @@ async def _require_robots_allow(request: Request, url: str, host: str) -> None:
 
 
 async def _robots_for(request: Request, scheme: str, host: str) -> RobotsRules:
-    """The robots rules for ``host``, from the in-memory cache or fetched."""
+    """The robots rules for ``host``, from the in-memory cache or fetched.
+
+    The file is streamed and read only up to ``WEBSITE_MAX_ROBOTS_BYTES``
+    once inflated (RFC 9309 §2.5 lets a crawler stop there); the rest is
+    never downloaded.
+    """
     settings = request.app.state.settings
     cache: dict[str, tuple[float, RobotsRules]] = request.app.state.robots_cache
     clock: Callable[[], float] = request.app.state.website_clock
@@ -172,26 +214,24 @@ async def _robots_for(request: Request, scheme: str, host: str) -> RobotsRules:
     if cached is not None and clock() - cached[0] < settings.WEBSITE_ROBOTS_TTL_SECONDS:
         return cached[1]
 
-    http_client: httpx.AsyncClient = request.app.state.http_client
+    response = await _open(request, f"{key}/robots.txt", accept="text/plain")
+    if response is None:
+        raise BackendError(504, "timeout")
     try:
-        response = await http_client.get(
-            f"{key}/robots.txt",
-            headers=_headers(request, accept="text/plain"),
-            timeout=WEBSITE_TIMEOUT,
-            follow_redirects=False,
-        )
-    except httpx.TimeoutException:
-        raise BackendError(504, "timeout") from None
-    except httpx.HTTPError:
-        raise BackendError(502, "offline") from None
-    if response.status_code >= 500:
-        raise BackendError(502, "offline")
-    if 200 <= response.status_code < 300:
-        rules = parse_robots(response.text[: settings.WEBSITE_MAX_ROBOTS_BYTES])
-    else:
-        # 3xx is not followed here (a redirect could point anywhere), and a
-        # 4xx is "no robots.txt": both are read as no rules.
-        rules = RobotsRules()
+        if response.status_code >= 500:
+            raise BackendError(502, "offline")
+        if 200 <= response.status_code < 300:
+            content = await _read_body(
+                response, settings.WEBSITE_MAX_ROBOTS_BYTES, truncate=True
+            )
+            text = decode_page(content, response.headers.get("content-type", ""))
+            rules = await run_off_loop(request, lambda: parse_robots(text))
+        else:
+            # 3xx is not followed here (a redirect could point anywhere), and
+            # a 4xx is "no robots.txt": both are read as no rules.
+            rules = RobotsRules()
+    finally:
+        await response.aclose()
     cache[key] = (clock(), rules)
     return rules
 
@@ -204,12 +244,21 @@ def _require_host_budget(request: Request, host: str) -> None:
 
 async def _fetch(request: Request, url: str) -> httpx.Response | None:
     """Open a streamed GET of ``url``; None on a timeout."""
-    http_client: httpx.AsyncClient = request.app.state.http_client
+    return await _open(request, url, accept=_ACCEPT)
+
+
+async def _open(request: Request, url: str, *, accept: str) -> httpx.Response | None:
+    """A streamed GET through the public-only website client; None on a
+    timeout, 400 ``invalidUrl`` when the connection found a private address,
+    502 ``offline`` on any other transport failure."""
+    http_client: httpx.AsyncClient = request.app.state.website_http_client
     outgoing = http_client.build_request(
-        "GET", url, headers=_headers(request, accept=_ACCEPT), timeout=WEBSITE_TIMEOUT
+        "GET", url, headers=_headers(request, accept=accept), timeout=WEBSITE_TIMEOUT
     )
     try:
         return await http_client.send(outgoing, stream=True, follow_redirects=False)
+    except BlockedAddressError:
+        raise BackendError(400, "invalidUrl") from None
     except httpx.TimeoutException:
         return None
     except httpx.HTTPError:
@@ -235,12 +284,7 @@ async def _read_document(
     declared = headers.get("content-length", "")
     if declared.isdigit() and int(declared) > limit:
         raise BackendError(413, "tooLarge")
-    try:
-        content = await _read_capped(response, limit)
-    except httpx.TimeoutException:
-        raise BackendError(504, "timeout") from None
-    except httpx.HTTPError:
-        raise BackendError(502, "offline") from None
+    content = await _read_body(response, limit, truncate=False)
 
     kind = document_kind(content_type, content[:5])
     if kind is None:
@@ -261,12 +305,9 @@ async def _read_document(
             final_url=url,
         )
 
-    page = decode_page(content, content_type)
-    if judge_page:
-        if html_reserves_ai(page):
-            raise BackendError(403, "aiReserved")
-        if looks_javascript_only(page):
-            raise BackendError(422, "jsOnlyPage")
+    page = await run_off_loop(
+        request, lambda: _judged_page(content, content_type, judge_page=judge_page)
+    )
     return WebsiteDocument(
         kind="html",
         content_type=content_type,
@@ -276,15 +317,113 @@ async def _read_document(
     )
 
 
-async def _read_capped(response: httpx.Response, limit: int) -> bytes:
-    """The body, read until it ends or passes ``limit`` bytes (then 413)."""
+def _judged_page(content: bytes, content_type: str, *, judge_page: bool) -> str:
+    """The decoded page, after the ``<meta>`` opt-out and JavaScript-only
+    tests when ``judge_page``. Runs in a worker thread."""
+    page = decode_page(content, content_type)
+    if judge_page:
+        if html_reserves_ai(page):
+            raise BackendError(403, "aiReserved")
+        if looks_javascript_only(page):
+            raise BackendError(422, "jsOnlyPage")
+    return page
+
+
+async def run_off_loop[T](request: Request, work: Callable[[], T]) -> T:
+    """``work()`` in a worker thread, within ``WEBSITE_PARSE_BUDGET_SECONDS``
+    or 504 ``timeout`` (#268).
+
+    Parsing a hostile 2 MB page is linear now, but it is still CPU work that
+    would hold the event loop, and every other request with it. A thread
+    cannot be stopped, so on the budget's expiry the request answers at once
+    and the abandoned thread finishes on its own; the readers' linear-time
+    guarantee (``app.website.linear``) is what bounds that.
+    """
+    budget: float = request.app.state.settings.WEBSITE_PARSE_BUDGET_SECONDS
+    try:
+        with anyio.fail_after(budget):
+            return await anyio.to_thread.run_sync(work, abandon_on_cancel=True)
+    except TimeoutError:
+        raise BackendError(504, "timeout") from None
+
+
+class _BodyDecoder:
+    """Inflates a body's ``Content-Encoding`` a bounded amount at a time.
+
+    httpx's own decoders inflate a whole network chunk at once, so 64 KiB of
+    gzip could become 64 MiB before any cap was looked at (#269). Here
+    zlib is asked for at most ``room + 1`` bytes per call, so a body is never
+    inflated more than one byte past its cap. ``gzip`` and ``deflate`` (with
+    or without the zlib header, as httpx accepts) are inflated; any other
+    coding is 415 ``unsupportedContent``.
+    """
+
+    def __init__(self, content_encoding: str) -> None:
+        codings = [
+            coding.strip().lower()
+            for coding in content_encoding.split(",")
+            if coding.strip() and coding.strip().lower() != "identity"
+        ]
+        if len(codings) > 1 or (
+            codings and codings[0] not in ("gzip", "x-gzip", "deflate")
+        ):
+            raise BackendError(415, "unsupportedContent")
+        self._inflater: zlib._Decompress | None = None
+        self._raw_deflate_fallback = False
+        if codings:
+            gzip = codings[0] != "deflate"
+            self._inflater = zlib.decompressobj(
+                zlib.MAX_WBITS | 16 if gzip else zlib.MAX_WBITS
+            )
+            self._raw_deflate_fallback = not gzip
+        self._started = False
+
+    def decode(self, data: bytes, room: int) -> bytes:
+        """Up to ``room + 1`` bytes of what ``data`` inflates to; more than
+        ``room`` means the body is over its cap and the rest was not
+        inflated."""
+        if self._inflater is None:
+            return data
+        first, self._started = not self._started, True
+        try:
+            return self._inflater.decompress(data, room + 1)
+        except zlib.error:
+            if not (first and self._raw_deflate_fallback):
+                raise BackendError(502, "offline") from None
+        # A ``deflate`` body without the zlib header (raw deflate), which
+        # httpx also accepts.
+        self._inflater = zlib.decompressobj(-zlib.MAX_WBITS)
+        try:
+            return self._inflater.decompress(data, room + 1)
+        except zlib.error:
+            raise BackendError(502, "offline") from None
+
+
+async def _read_body(response: httpx.Response, limit: int, *, truncate: bool) -> bytes:
+    """The body inflated, read until it ends or passes ``limit`` bytes.
+
+    Past the limit: the first ``limit`` bytes when ``truncate`` (robots.txt),
+    else 413 ``tooLarge``. The raw stream is read, never httpx's decoded
+    one, so the cap applies as bytes are inflated. A read timeout is 504
+    ``timeout`` and any other transport failure 502 ``offline``.
+    """
+    decoder = _BodyDecoder(response.headers.get("content-encoding", ""))
     chunks: list[bytes] = []
     size = 0
-    async for chunk in response.aiter_bytes():
-        size += len(chunk)
-        if size > limit:
-            raise BackendError(413, "tooLarge")
-        chunks.append(chunk)
+    try:
+        async for raw in response.aiter_raw():
+            chunk = decoder.decode(raw, limit - size)
+            size += len(chunk)
+            if size > limit:
+                if not truncate:
+                    raise BackendError(413, "tooLarge")
+                chunks.append(chunk[: len(chunk) - (size - limit)])
+                break
+            chunks.append(chunk)
+    except httpx.TimeoutException:
+        raise BackendError(504, "timeout") from None
+    except httpx.HTTPError:
+        raise BackendError(502, "offline") from None
     return b"".join(chunks)
 
 
@@ -293,6 +432,7 @@ def _headers(request: Request, *, accept: str) -> dict[str, str]:
     return {
         "User-Agent": settings.WEBSITE_USER_AGENT,
         "Accept": accept,
+        "Accept-Encoding": _ACCEPT_ENCODING,
         "Accept-Language": "he,en;q=0.8",
     }
 

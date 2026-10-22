@@ -159,6 +159,34 @@ class ChatRequest(BaseModel):
                 return f"image {index} is over {max_bytes} bytes once decoded"
         return None
 
+    @staticmethod
+    def raw_image_bound_violation(
+        body: object, max_images: int, max_bytes: int
+    ) -> str | None:
+        """:meth:`image_bound_violation` on the body as parsed JSON, before
+        any part is validated (#269).
+
+        Validating a part base64-decodes it, so a body of many large parts
+        cost its full decoded size in memory before the bounds were looked
+        at. This counts the parts and measures each ``data`` string as
+        sent: strict, padded base64 longer than ``4 * ceil(max_bytes / 3)``
+        characters decodes to more than ``max_bytes``. Anything shaped
+        wrong is left to the model's own validation.
+        """
+        if not isinstance(body, dict):
+            return None
+        images = body.get("images")
+        if not isinstance(images, list):
+            return None
+        if len(images) > max_images:
+            return f"at most {max_images} images per request"
+        longest = 4 * -(-max_bytes // 3)
+        for index, image in enumerate(images):
+            data = image.get("data") if isinstance(image, dict) else None
+            if isinstance(data, str) and len(data) > longest:
+                return f"image {index} is over {max_bytes} bytes once decoded"
+        return None
+
 
 class WebsiteFetchRequest(BaseModel):
     """Request body for ``POST /v1/website/fetch`` (D19, #181).
