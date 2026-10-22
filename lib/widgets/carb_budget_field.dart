@@ -15,7 +15,9 @@ import 'package:provider/provider.dart';
 /// classifying.
 ///
 /// Reads and writes [CarbBudgetController] from the [MultiProvider] above
-/// [MaterialApp].
+/// [MaterialApp], and follows it (issue #286): a budget cleared or set
+/// elsewhere — the menu's "Clear filter" — shows here at once, rather than
+/// the number the field was built with.
 class CarbBudgetField extends StatefulWidget {
   /// Creates the field.
   ///
@@ -36,17 +38,31 @@ class CarbBudgetField extends StatefulWidget {
 class _CarbBudgetFieldState extends State<CarbBudgetField> {
   late final TextEditingController _text;
 
+  /// The budget this field shows and follows ([_follow]).
+  late final CarbBudgetController _budget;
+
   @override
   void initState() {
     super.initState();
-    final budget = context.read<CarbBudgetController>();
-    _text = TextEditingController(text: budget.budgetGrams?.toString() ?? '');
+    _budget = context.read<CarbBudgetController>()..addListener(_follow);
+    _text = TextEditingController(text: _shown(_budget.budgetGrams));
   }
 
   @override
   void dispose() {
+    _budget.removeListener(_follow);
     _text.dispose();
     super.dispose();
+  }
+
+  /// The field's text for [grams]: the number, or empty for no budget.
+  static String _shown(int? grams) => grams?.toString() ?? '';
+
+  /// Puts the controller's budget in the field whenever it changes, from
+  /// here (the clamped value) or from anywhere else (issue #286).
+  void _follow() {
+    final shown = _shown(_budget.budgetGrams);
+    if (_text.text != shown) _text.text = shown;
   }
 
   void _onSubmit(String value) {

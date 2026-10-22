@@ -554,8 +554,13 @@ class _PageRow extends StatelessWidget {
       child: Row(
         children: [
           Semantics(
+            // A node of its own, not folded into the reorderable row's.
+            container: true,
             button: true,
             label: l10n.scanScreenPreviewPage(number),
+            // The InkWell's tap is excluded with its children, so the node
+            // carries it (issue #285).
+            onTap: onPreview,
             excludeSemantics: true,
             child: InkWell(
               borderRadius: BorderRadius.circular(6),

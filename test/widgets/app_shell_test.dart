@@ -532,5 +532,41 @@ void main() {
       expect(find.text('screen:/saved'), findsOneWidget);
       expect(_navigator(tester).canPop(), isFalse);
     });
+
+    for (final (from, to) in <(double, double)>[(600, 1000), (1000, 600)]) {
+      testWidgets('crossing the breakpoint from ${from.toInt()}px to '
+          '${to.toInt()}px keeps the screen and its state (issue #287)', (
+        tester,
+      ) async {
+        // Arrange: a tab whose screen holds typed text in its own state.
+        _setWidth(tester, from);
+        await tester.pumpWidget(
+          const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: AppShell(
+              currentIndex: AppShell.scanIndex,
+              child: Material(child: TextField()),
+            ),
+          ),
+        );
+        await tester.enterText(find.byType(TextField), 'half a menu');
+        final before = tester.state(find.byType(EditableText));
+
+        // Act: the window crosses 840px (an iPad rotating, a browser
+        // resized).
+        _setWidth(tester, to);
+        await tester.pumpAndSettle();
+
+        // Assert: the other navigation surface, the same screen state.
+        expect(
+          find.byType(NavigationRail),
+          to >= 840 ? findsOne : findsNothing,
+        );
+        expect(find.byType(NavigationBar), to >= 840 ? findsNothing : findsOne);
+        expect(tester.state(find.byType(EditableText)), same(before));
+        expect(find.text('half a menu'), findsOneWidget);
+      });
+    }
   });
 }
