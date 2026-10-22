@@ -10,6 +10,11 @@
 // effect spans Settings, the briefing, the chef card, Explore and the menu,
 // which is why this is a flow and not a widget test.
 //
+// Issue #419: the briefing's chef card opens in the destination's language
+// — Japanese for Japan; and, in a second flow, French for a trip to
+// France, offline, with the "translated by the app" line, English a tap
+// away, and the card shared as an image (#420).
+//
 // The whole app is pumped with `bantoMode: true`, so it runs under
 // `flutter test` with no `--dart-define`.
 
@@ -26,12 +31,14 @@ import 'package:ketoclub/models/menu.dart';
 import 'package:ketoclub/models/restriction.dart';
 import 'package:ketoclub/models/trip_destination.dart';
 import 'package:ketoclub/models/venue.dart';
+import 'package:ketoclub/screens/chef_card_image_screen.dart';
 import 'package:ketoclub/screens/chef_card_screen.dart';
 import 'package:ketoclub/screens/settings_trip_section.dart';
 import 'package:ketoclub/screens/trip_briefing_screen.dart';
 import 'package:ketoclub/services/classifier/menu_classifier.dart';
 import 'package:ketoclub/services/menu/platform_menu_adapter.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
+import 'package:ketoclub/utils/allergens/chef_card_locales.dart';
 import 'package:ketoclub/utils/allergens/chef_card_templates.dart';
 import 'package:ketoclub/widgets/status_badge.dart';
 
@@ -160,11 +167,18 @@ void main() {
     await tester.pumpAndSettle();
     await tapAndSettle(tester, chefCard);
 
-    // Assert: the profile's card, every line on screen.
+    // Assert: the profile's card in Japanese (#419), every line on screen.
     expect(find.byType(ChefCardScreen), findsOneWidget);
-    final lines = ChefCardText.compose(_profile, hebrew: false);
+    final lines = ChefCardText.compose(
+      _profile,
+      hebrew: false,
+      language: ChefCardLanguage.ja,
+    );
     expect(lines, isNotEmpty);
-    expect(find.textContaining(lines.first), findsWidgets);
+    for (final line in lines) {
+      expect(find.text(line), findsOneWidget, reason: line);
+    }
+    expect(find.text(_en.chefCardTranslatedNote), findsOneWidget);
     expect(_safe.hasMatch(_allText(tester)), isFalse);
     expect(fakes.connectivity.online, isFalse);
 
@@ -220,5 +234,94 @@ void main() {
     expect((await fakes.settingsStore.read()).tripDestination, isNull);
     expect(find.byKey(settingsTripActiveKey), findsNothing);
     expect(find.byKey(settingsTripPickKey), findsOneWidget);
+  });
+
+  testWidgets('offline, a trip to France opens the chef card in French, '
+      'English a tap away, and shares it as an image', (tester) async {
+    // Setup: a trip to France, the phone offline.
+    final fakes = FakeAppDependencies();
+    await fakes.settingsStore.write(
+      AppSettings(
+        profile: _profile,
+        onboardingSeen: true,
+        disclosureSeen: true,
+        tripDestination: TripDestination.france,
+      ),
+    );
+    fakes.connectivity.online = false;
+    await tester.pumpWidget(
+      KetoClubApp(dependencies: fakes.dependencies, bantoMode: true),
+    );
+    await tester.pumpAndSettle();
+
+    // Act: Settings, the trip row, the briefing's chef card.
+    await tapAndSettle(tester, navDestination(_en.navSettings));
+    final row = find.byKey(settingsTripActiveKey);
+    await tester.scrollUntilVisible(
+      row,
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    await tapAndSettle(tester, row);
+    expect(find.text(_en.tripBriefingTitle('France')), findsOneWidget);
+    expect(
+      find.text(_en.tripBriefingChefCardLocalNote(_en.chefCardLanguageFrench)),
+      findsOneWidget,
+    );
+    final chefCard = find.byKey(tripBriefingChefCardKey);
+    await tester.ensureVisible(chefCard);
+    await tester.pumpAndSettle();
+    await tapAndSettle(tester, chefCard);
+
+    // Assert: French by default, with the Annex II names and the
+    // "translated by the app" line in the UI's English.
+    final french = ChefCardText.compose(
+      _profile,
+      hebrew: false,
+      language: ChefCardLanguage.fr,
+    );
+    for (final line in french) {
+      expect(find.text(line), findsOneWidget, reason: line);
+    }
+    expect(french.join('\n'), contains('blé'));
+    expect(french.join('\n'), contains('graines de sésame'));
+    expect(find.text(_en.chefCardTranslatedNote), findsOneWidget);
+    expect(_safe.hasMatch(_allText(tester)), isFalse);
+
+    // Act: English, then French again.
+    await tapAndSettle(tester, find.text(_en.settingsLanguageEnglish));
+    expect(
+      find.text(ChefCardText.compose(_profile, hebrew: false)[1]),
+      findsOneWidget,
+    );
+    expect(find.text(_en.chefCardTranslatedNote), findsNothing);
+    await tapAndSettle(tester, find.text(_en.chefCardLanguageFrench));
+    expect(find.text(french[1]), findsOneWidget);
+
+    // Act: share it as an image (#420).
+    final shareImage = find.byKey(chefCardShareImageKey);
+    await tester.ensureVisible(shareImage);
+    await tester.pumpAndSettle();
+    await tapAndSettle(tester, shareImage);
+    expect(find.byType(ChefCardImageScreen), findsOneWidget);
+    expect(find.text(ChefCardLanguage.fr.locale!.footer), findsOneWidget);
+    await tester.runAsync(() async {
+      await tester.tap(find.byKey(chefCardImageShareKey));
+      for (var i = 0; i < 300 && fakes.menuSharer.imageCalls.isEmpty; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+      }
+    });
+    await tester.pumpAndSettle();
+
+    // Assert: PNG bytes went to the sharer; nothing went online.
+    expect(fakes.menuSharer.imageCalls, hasLength(1));
+    expect(fakes.menuSharer.imageCalls.single.sublist(0, 4), <int>[
+      0x89,
+      0x50,
+      0x4E,
+      0x47,
+    ]);
+    expect(fakes.connectivity.online, isFalse);
   });
 }

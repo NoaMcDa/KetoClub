@@ -4281,6 +4281,153 @@ Settings no longer matches their old mark by name (the mark stays in the
 entry, unshown), and a dish id that a platform reassigns orphans a stored
 dish's answers as it does a cached one's (D27).
 
+**Re-running the setup, and the empty-profile notice (#421).** The first-run
+"What do you avoid?" screen is also reachable from Settings, "Run the setup
+again" in My restrictions (`RestrictionOnboardingScreen(prefill: true)`,
+pushed over the Settings route's own `SettingsController`): the chips start as
+the profile's, "Continue" replaces the profile through
+`SettingsController.replaceRestrictions` (a kept restriction keeps its place and
+its exceptions, a new one goes last, an unchosen one goes; keto and the user's
+own words are not on the screen and are left alone) and "Skip" writes nothing.
+The free plan's gate still applies, unchanged: the chips already chosen count,
+so choosing a second one opens the paywall, and a profile saved before is never
+re-gated. Under `bantoMode`, while the profiles a menu is read for hold nothing
+but keto, one dismissible `AppNotice.info` ("Tell Banto what you avoid to see
+which dishes fit you", with "Add what you avoid" and "Not now") sits above the
+dishes on the menu screen (`MenuController.showsProfileNudge`) and below the
+search on Discovery (`DiscoveryProfileNudge`, which reads the settings store
+itself like the disclosure banner, the Explore route having no settings
+controller). The action opens the restriction picker and adds the pick to the
+user's own profile, so no paywall step is needed (the first restriction is
+never gated, and `premium_gate_usage_test`'s allowlist is unchanged); the
+helper-tool sheet of ALG-11 follows the first one. "Not now" is remembered per
+surface by two settings keys, `profileNudgeMenuDismissed` and
+`profileNudgeDiscoveryDismissed`, each written only when true, so
+`const AppSettings().toJson()` and a keto install's stored record are
+byte-identical (`keto_unchanged_test`). **What it accepts.** A menu already
+open when sesame is added from its notice keeps its filter, so it lists every
+dish with the new pills until the user taps a tile, exactly as after editing
+the profile in Settings; and Discovery's notice sits below the fold on a very
+short screen.
+
+**Editing a restriction's exceptions (ALG-02a and ALG-12; #417).** The model,
+the evaluator, the group union and the chef card already carried
+`ProfileEntry.exceptions`; this adds the one screen that sets them. Under
+`bantoMode`, tapping a restriction's row in Settings' "My restrictions" or in
+the profile editor opens `ExceptionsSheet` (`widgets/exceptions_sheet.dart`):
+one sentence on what an exception does, the current ones as removable chips,
+suggestion chips, a free-text field (Hebrew or English) and Save, which calls
+`setExceptions` or the new `setExceptionsFor(profileId, id, …)`. The row's
+subtitle (`RestrictionRowSubtitle`) gains one muted "Except …" line.
+**The sentence is true because of how the evaluator matches**
+(`ProfileEvaluator._applies`): a concern is dropped when its matched text
+contains an exception as whole words, normalised and with no plural folding,
+so "almond" covers "almond" and "almond milk" but not "almonds", and a dish
+with another trigger beside the excepted one is still flagged for that
+other one. The sheet therefore says a word counts as written, and its
+suggestions (`exceptionSuggestions`) are the restriction's direct terms in
+the UI language, singular and plural both, minus the restriction's own name
+(excepting "tree nuts" would switch the restriction off), eight at most. A
+strict kind (`RestrictionKind.isStrict`: allergy, celiac, health condition)
+adds one line, "an exception means the app stops flagging that word; still
+ask the restaurant", and no copy says "safe". The cap is the model's
+(`maxExceptions`, five; `maxExceptionLength`, sixty): a word past it is refused
+with a message rather than dropped silently, blanks and repeats (ignoring
+case) are ignored, and Save takes a word still typed. C1 holds (the words stay
+in the profile on the device; nothing new is sent), C3 holds (no schema bump,
+no cache field), and with the flag off the rows are not built.
+
+**The order card: one card for the whole order (#418; restores the
+"Waiter card · N dishes" pill #169 deleted, on a new card).** With
+`bantoMode` and a wording that uses states, every evaluated dish card
+carries an "Add to my order" icon toggle beside the state pill (its label
+names what a tap does, for screen readers and as a tooltip; a keto card
+and a keto-only profile get none). The order is `OrderController`
+(`state/order_controller.dart`): dish ids per `VenueRef`, in the order
+added, **in memory only** (C1: no store, no cache, no history, no upload),
+and **app-scoped** — provided by `KetoClubApp` only under Banto and read
+by the menu screen as nullable — rather than a field of `MenuController`,
+which lives and dies with its route and would lose the order when the
+person goes back to Explore and returns; each menu keeps its own, so
+opening another neither shows nor clears it. It holds ids, never text or
+states: the card re-reads `MenuController.evaluationFor`, so it never
+shows a state the menu no longer gives, and a dish the menu no longer has
+drops out. While the order has a dish the menu evaluates, a "My order ·
+N" pill floats at the bottom centre of the dish list (over the list
+itself, so in two panes it is centred on the dishes, with the list's
+bottom padding grown to clear it; the menu route has no bottom bar or
+rail), and opens `OrderCardScreen` full screen with the Waiter Card's
+shell (brightness raised and restored, large type, `contentDirection`,
+a pinned Done): one section per dish — the name as printed, then the
+evaluator's change and `VerdictCopy.waiterQuestions`, both in the dish's
+language — followed once by `ChefCardText.allergyNote` for the profile
+the menu is read for (a group's union, exactly what the overflow's "Copy
+allergy note" copies), in the menu's language
+(`MenuShareText.menuIsHebrew`). The composer is pure,
+`utils/allergens/order_card_text.dart` (`OrderCardText`), taking the
+questions as plain strings because `VerdictCopy` sits in `widgets/`; its
+one new sentence, for a dish to avoid that the person adds anyway, is
+"The menu names '{the menu's words}' in this dish." / "התפריט מציין
+'{…}' במנה הזו." (the restriction as the thing avoided when the words are
+over 40 characters), in Dart per §6.3's exception, followed by the dish's
+question; never "safe" or "בטוח". In a group each dish reads the combined
+evaluation (every person's concern once), and per-person attribution on
+the order card is not built. The card's actions are Remove per dish (the
+last one closes the card), Copy, Share (`MenuSharer.shareText`, subject
+"My order") and Clear order; their labels are `order*` ARB keys. Nothing
+moves on the wire, in the goldens or in the Python twin.
+
+**The chef card in the destination's language, and as an image (ALG-13's
+local card, ALG-08; #419, #420; amends the trip-mode paragraph's "the card
+stays Hebrew or English").** `ChefCardLanguage`
+(`lib/utils/allergens/chef_card_locales.dart`) adds French, Italian,
+Spanish, German and Japanese to the card, one `ChefCardLocale` block each
+(the greeting, a sentence per restriction kind and for keto, vegan,
+vegetarian, kosher, halal and small portions, the certification questions,
+the user's own words and exceptions, the dish lines, both closings, the
+image footer, and a name per restriction). Like the Hebrew and English
+sentences they live in Dart, not ARB (§6.3's exception, §12): the card is
+read by the restaurant. **The names copied from the law are marked**
+(`officialNames`: Annex II of Regulation (EU) No 1169/2011 in each EU
+language for the 14 and wheat; the Consumer Affairs Agency's list for
+Japanese), and **every sentence and every other name is the app's
+translation, unreviewed by a native speaker** (`nativeSpeakerReviewed:
+false` in all five blocks; file 12 §15 has the sources, checked from
+search excerpts only, and the rules a reviewer keeps). A name sits after a
+colon so no sentence agrees with it; a restriction a block cannot name is
+named in English, never dropped; and `banned_words_test.dart` composes
+every line in all seven languages and bans *safe*, בטוח, *sûr*/*sans
+danger*, *sicuro*, *seguro*, *sicher* and 安全 with their stems. Every
+existing composer (`ChefCardText.compose`, `composeForDish`, `dishLine`,
+`closingLine`, `certificationQuestion`, `GroupChefCardText.compose`,
+`composeForDish`, `headingFor`) keeps its signature and gains an optional
+`language` that wins over `hebrew`, so a caller that passes none is byte
+for byte what it was; the allergy notes stay Hebrew or English.
+`ChefCardScreen` takes the trip from every caller (Settings, the profile
+editor, the group sheet, the briefing; the menu already passed it): while
+a trip to France, Italy, Spain, Germany or Japan is on, its toggle offers
+that language first and opens in it (`ChefCardLanguage.forTrip`; Israel,
+the US and the UK keep Hebrew and English), and under a translated card one
+muted line in the UI's language says it was translated by the app and not
+checked by a native speaker. A translated dish card's change and questions
+are the evaluator's English ones. The briefing's note no longer says the
+local card is missing; it names the language the card opens in. **As an
+image:** "Share as image" opens `ChefCardImageScreen`, which shows
+`ChefCardImage` (the card in the language shown, always in the light
+theme, with "Banto · a helper, not a guarantee — always ask the
+restaurant" in that language) inside a `RepaintBoundary`, renders it to a
+PNG in memory and hands it to `MenuSharer.shareImage` (new; `share_plus`
+with `XFile.fromData`, and its web download and mail fallbacks turned off),
+which on a platform that cannot share files shares the card's text instead
+and lets the screen say so in a snackbar; the text share stays. The image
+is never written by the app and nothing is uploaded (C1); everything is
+composed on the device, so the card and its image work offline, as trip
+mode does (a `flutter-tester` flow proves France → French → image).
+**What it accepts:** five unreviewed translations shown to restaurant staff,
+marked as such on screen; Japanese glyphs on the web build depend on a font
+the app does not bundle (phones have one; not checked in a browser); and
+no physical phone has shared the image yet.
+
 ### D27 — Post-meal confirmations, no ratings
 
 *(Banto, the Allergens epic's ALG-14, issue #356. Amends D23's visit

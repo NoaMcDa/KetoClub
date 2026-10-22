@@ -2082,7 +2082,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tripBriefingChefCardNote =>
-      'The card is made on this phone and opens without a connection. It is in Hebrew or English; cards in the local language are not available yet.';
+      'The card is made on this phone and opens without a connection.';
 
   @override
   String allergenMatrixNotice(String date) {
@@ -2462,4 +2462,160 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get savedRecheck =>
       'Your profile has changed since. Open this menu to check it again.';
+
+  @override
+  String get profileNudgeMessage =>
+      'Tell Banto what you avoid to see which dishes fit you';
+
+  @override
+  String get profileNudgeChoose => 'Add what you avoid';
+
+  @override
+  String get profileNudgeDismiss => 'Not now';
+
+  @override
+  String get settingsRestrictionsRerun => 'Run the setup again';
+
+  @override
+  String exceptionsSheetTitle(String name) {
+    return 'Exceptions: $name';
+  }
+
+  @override
+  String get exceptionsExplain =>
+      'Dishes whose only match is one of these words are not flagged for this restriction.';
+
+  @override
+  String get exceptionsWholeWord =>
+      'A word counts only as written, so add the plural too if you want it covered.';
+
+  @override
+  String get exceptionsCurrentHeading => 'Your exceptions';
+
+  @override
+  String get exceptionsNone => 'None yet';
+
+  @override
+  String get exceptionsSuggestionsHeading => 'Suggestions';
+
+  @override
+  String get exceptionsField => 'Another word';
+
+  @override
+  String get exceptionsAdd => 'Add';
+
+  @override
+  String get exceptionsSave => 'Save';
+
+  @override
+  String exceptionsRemove(String word) {
+    return 'Remove $word';
+  }
+
+  @override
+  String exceptionsFull(int max) {
+    return 'You can keep up to $max exceptions for one restriction. Remove one to add another.';
+  }
+
+  @override
+  String get exceptionsStrictNote =>
+      'An exception means the app stops flagging that word. Still ask the restaurant.';
+
+  @override
+  String exceptionsRowLine(String words) {
+    return 'Except $words';
+  }
+
+  @override
+  String get exceptionsEditHint => 'Edit exceptions';
+
+  @override
+  String get orderAdd => 'Add to my order';
+
+  @override
+  String get orderRemove => 'Remove from my order';
+
+  @override
+  String orderPill(int count) {
+    return 'My order · $count';
+  }
+
+  @override
+  String orderPillSemantic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'My order, $count dishes. Opens the order card.',
+      one: 'My order, 1 dish. Opens the order card.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get orderCardTitle => 'My order';
+
+  @override
+  String orderCardRemoveDish(String dish) {
+    return 'Remove $dish from my order';
+  }
+
+  @override
+  String get orderCardAllergyTitle => 'For the whole order';
+
+  @override
+  String get orderCardCopy => 'Copy';
+
+  @override
+  String get orderCardCopied => 'Order copied';
+
+  @override
+  String get orderCardShare => 'Share';
+
+  @override
+  String get orderCardClear => 'Clear order';
+
+  @override
+  String get chefCardLanguageFrench => 'French';
+
+  @override
+  String get chefCardLanguageItalian => 'Italian';
+
+  @override
+  String get chefCardLanguageSpanish => 'Spanish';
+
+  @override
+  String get chefCardLanguageGerman => 'German';
+
+  @override
+  String get chefCardLanguageJapanese => 'Japanese';
+
+  @override
+  String get chefCardTranslatedNote =>
+      'Translated by the app, not checked by a native speaker — show the card and ask.';
+
+  @override
+  String get chefCardShareImage => 'Share as image';
+
+  @override
+  String get chefCardImageTitle => 'The card as an image';
+
+  @override
+  String get chefCardImageExplain =>
+      'This is the image that will be shared. The app does not keep it.';
+
+  @override
+  String get chefCardImageShareButton => 'Share image';
+
+  @override
+  String get chefCardImageTextFallback =>
+      'This device can\'t share images, so the card was shared as text.';
+
+  @override
+  String get chefCardImageFailed =>
+      'The image could not be made. You can still share the card as text.';
+
+  @override
+  String tripBriefingChefCardLocalNote(String language) {
+    return 'The card opens in $language, translated by the app and not checked by a native speaker. Hebrew and English are a tap away.';
+  }
 }

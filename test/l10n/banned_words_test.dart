@@ -5,11 +5,23 @@
 //
 // The test reads both ARB files from disk as JSON, so a banned word cannot
 // hide in a string the widget tests never render.
+//
+// The chef card (issue #419) is read by restaurant staff in Hebrew,
+// English, French, Italian, Spanish, German or Japanese, so its sentences
+// live in Dart; the last group composes every line of it, in every
+// language, and bans a word meaning "safe" in each of them.
 
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ketoclub/models/dietary_profile.dart';
+import 'package:ketoclub/models/named_profile.dart';
+import 'package:ketoclub/models/restriction.dart';
+import 'package:ketoclub/utils/allergens/chef_card_locales.dart';
+import 'package:ketoclub/utils/allergens/chef_card_templates.dart';
+import 'package:ketoclub/utils/allergens/group_chef_card.dart';
+import 'package:ketoclub/utils/allergens/taxonomy.dart';
 
 /// English fragments that may not appear in any value.
 ///
@@ -38,6 +50,93 @@ const _bannedHebrew = <String>[
   'מכשיר רפואי',
   'מבטיח',
 ];
+
+/// Words meaning "safe", per language, banned from every chef card line.
+///
+/// A Latin-script word is matched case-insensitively at the start of a
+/// word (not preceded by a letter, Unicode-aware), so "sécurité",
+/// "Sicherheit", "sicherstellen" and "seguridad" are caught with their
+/// stems; Hebrew and Japanese are matched as substrings, since `\b` does
+/// not see their letters.
+const _safeWords = <String, List<String>>{
+  'en': <String>['safe'],
+  'he': <String>['בטוח'],
+  'fr': <String>['sans danger', 'sûr', 'sécuri'],
+  'it': <String>['sicur'],
+  'es': <String>['segur'],
+  'de': <String>['sicher'],
+  'ja': <String>['安全'],
+};
+
+/// Every line the chef card can show in [language]: one card per
+/// restriction (its line, its certification question, the closing), the
+/// user's own words, an entry's exceptions, a dish card with and without
+/// cross-contact, a group card for a dish, and the image footer.
+List<String> _chefCardLines(ChefCardLanguage language) {
+  final hebrew = language == ChefCardLanguage.he;
+  final lines = <String>[
+    for (final restriction in restrictionTaxonomy)
+      ...ChefCardText.compose(
+        DietaryProfile.empty.withEntry(
+          restriction.id,
+          exceptions: const <String>['x'],
+          terms: restriction.id == RestrictionId.custom
+              ? const <String>['kiwi']
+              : null,
+        ),
+        hebrew: hebrew,
+        language: language,
+      ),
+    for (final crossContact in <bool>[false, true])
+      ...ChefCardText.composeForDish(
+        DietaryProfile.empty.withEntry(RestrictionId.milk),
+        dishName: 'Dish',
+        modification: null,
+        questions: const <String>[],
+        crossContact: crossContact,
+        hebrew: hebrew,
+        language: language,
+      ),
+    ChefCardText.imageFooter(language),
+  ];
+  final group = GroupChefCardText.composeForDish(
+    <PersonDishPart>[
+      (
+        person: const NamedProfile(id: 'me', name: ''),
+        modification: null,
+        questions: const <String>[],
+      ),
+    ],
+    dishName: 'Dish',
+    crossContact: true,
+    hebrew: hebrew,
+    language: language,
+  );
+  return <String>[
+    ...lines,
+    GroupChefCardText.asText(group),
+    GroupChefCardText.asText(
+      GroupChefCardText.compose(
+        const <NamedProfile>[NamedProfile(id: 'me', name: '')],
+        hebrew: hebrew,
+        language: language,
+      ),
+    ),
+  ];
+}
+
+/// Whether [line] holds [word]: at a word start for Latin script, as a
+/// substring otherwise.
+bool _holds(String line, String word) {
+  if (RegExp('[A-Za-zÀ-ÿ]').hasMatch(word)) {
+    return RegExp(
+      '(?<!\\p{L})${RegExp.escape(word)}',
+      caseSensitive: false,
+      unicode: true,
+    ).hasMatch(line);
+  }
+  return line.contains(word);
+}
 
 /// Keys whose value may contain a banned word, with the reason.
 ///
@@ -136,6 +235,34 @@ void main() {
       });
     });
   }
+
+  group('the chef card, in every language (#419)', () {
+    test('the matcher catches each banned word and its stems', () {
+      expect(_holds('Ce plat est sûr.', 'sûr'), isTrue);
+      expect(_holds('Bitte sicherstellen', 'sicher'), isTrue);
+      expect(_holds('Es seguro', 'segur'), isTrue);
+      expect(_holds('è sicuro', 'sicur'), isTrue);
+      expect(_holds('安全です', '安全'), isTrue);
+      // Not at a word start: "assurer" holds no "sûr", "Unsafe" no "safe".
+      expect(_holds('assurer', 'sûr'), isFalse);
+      expect(_holds('asegurar', 'segur'), isFalse);
+      expect(_holds('Unsafe', 'safe'), isFalse);
+    });
+
+    for (final language in ChefCardLanguage.values) {
+      test('${language.name}: no line holds a word meaning "safe"', () {
+        final lines = _chefCardLines(language);
+        expect(lines, isNotEmpty);
+        final violations = <String>[
+          for (final line in lines)
+            for (final words in _safeWords.values)
+              for (final word in words)
+                if (_holds(line, word)) '"$word" in: $line',
+        ];
+        expect(violations, isEmpty, reason: violations.join('\n'));
+      });
+    }
+  });
 
   test('the exemptions are exactly the three reviewed ones', () {
     // Assert: the allowlist must not grow quietly.

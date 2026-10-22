@@ -15,6 +15,7 @@ import 'package:ketoclub/models/scanned_menu.dart';
 import 'package:ketoclub/models/venue.dart';
 import 'package:ketoclub/screens/chef_card_screen.dart';
 import 'package:ketoclub/screens/menu_group.dart';
+import 'package:ketoclub/screens/order_card_screen.dart';
 import 'package:ketoclub/screens/waiter_card_sheet.dart';
 import 'package:ketoclub/services/platform/connectivity.dart';
 import 'package:ketoclub/services/platform/external_link_opener.dart';
@@ -23,9 +24,11 @@ import 'package:ketoclub/services/platform/screen_brightness.dart';
 import 'package:ketoclub/services/venue/venue_ref_resolver.dart';
 import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/state/menu_controller.dart';
+import 'package:ketoclub/state/order_controller.dart';
 import 'package:ketoclub/state/scanned_pages_registry.dart';
 import 'package:ketoclub/theme/app_typography.dart';
 import 'package:ketoclub/utils/allergens/chef_card_templates.dart';
+import 'package:ketoclub/utils/allergens/order_card_text.dart';
 import 'package:ketoclub/utils/allergens/profile_evaluator.dart';
 import 'package:ketoclub/utils/banto_mode.dart';
 import 'package:ketoclub/utils/constants.dart';
@@ -50,6 +53,7 @@ import 'package:ketoclub/widgets/menu_question_sheet.dart';
 import 'package:ketoclub/widgets/menu_search_field.dart';
 import 'package:ketoclub/widgets/note_editor_sheet.dart';
 import 'package:ketoclub/widgets/offline_banner.dart';
+import 'package:ketoclub/widgets/profile_nudge.dart';
 import 'package:ketoclub/widgets/rename_menu_dialog.dart';
 import 'package:ketoclub/widgets/rules_reason_banner.dart';
 import 'package:ketoclub/widgets/scanned_page_chips.dart';
@@ -128,6 +132,9 @@ String _definitionTextFrom(String line) {
 /// The key of the header's state counts line (Banto, ALG-05), shown in
 /// place of the keto score for a profile without keto.
 const Key menuHeaderCountsKey = ValueKey<String>('menuHeaderCounts');
+
+/// The key of the floating "My order · N" pill (Banto, issue #418).
+const Key menuOrderPillKey = ValueKey<String>('menuOrderPill');
 
 /// The classified menu screen: a header naming the venue and its keto
 /// score, the persistent "{platform} · {age}" source line, the three
@@ -325,6 +332,9 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final controller = context.watch<MenuController>();
+    // Banto (issue #418): rebuild when "My order" changes; a keto build
+    // never looks it up.
+    if (widget.bantoMode) context.watch<OrderController?>();
     // The share action needs at least one green or yellow dish to build a
     // non-empty summary from (issue #54); a failed or not-yet-run analysis
     // — where every count below reads 0 — hides it rather than sharing an
@@ -778,6 +788,8 @@ class _MenuScreenState extends State<MenuScreen> {
     final notices = <Widget>[
       AnalysisProgressRow(phase: controller.phase),
       ...banners,
+      // Banto (issue #421): asks an empty profile what it avoids.
+      MenuProfileNudge(controller: controller, bantoMode: widget.bantoMode),
       // What the menu reveals about its kitchen, for a strict profile
       // (Banto, ALG-07); a keto build never reads the kitchen.
       if (widget.bantoMode)
@@ -846,19 +858,32 @@ class _MenuScreenState extends State<MenuScreen> {
       if (analysed && controller.unclassifiedRows.isNotEmpty)
         _unclassifiedSection(context, l10n, controller, localeTag),
     ];
+    // Banto (issue #418): the dishes added to "My order" that this menu
+    // still evaluates; empty without Banto, so a keto list is unchanged.
+    final ordered = _orderDishes(controller);
     // The dish list keeps [_scrollController] in either layout, so the
     // chip jump scrolls the dishes wherever the chips sit.
-    final dishList = _refreshable(
+    final dishList = _withOrderPill(
       controller,
-      ListView(
-        controller: _scrollController,
-        // Always scrollable, so a menu shorter than the screen can still
-        // be pulled down to refresh (RefreshIndicator's own requirement).
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(20, _listTopPadding, 20, 24),
-        children: twoPane
-            ? [...notices, ...dishes]
-            : [...top, ...notices, ...chips, ...dishes],
+      ordered,
+      _refreshable(
+        controller,
+        ListView(
+          controller: _scrollController,
+          // Always scrollable, so a menu shorter than the screen can still
+          // be pulled down to refresh (RefreshIndicator's own requirement).
+          physics: const AlwaysScrollableScrollPhysics(),
+          // Room under the last dish for the order pill, when it shows.
+          padding: EdgeInsets.fromLTRB(
+            20,
+            _listTopPadding,
+            20,
+            ordered.isEmpty ? 24 : 24 + _orderPillClearance,
+          ),
+          children: twoPane
+              ? [...notices, ...dishes]
+              : [...top, ...notices, ...chips, ...dishes],
+        ),
       ),
     );
     if (!twoPane) return dishList;
@@ -1582,11 +1607,125 @@ class _MenuScreenState extends State<MenuScreen> {
             showPrice:
                 widget.ref.source != MenuSource.scan &&
                 widget.ref.source != MenuSource.website,
+            // Banto (issue #418): "Add to my order", for a dish the
+            // profile evaluates; null, and so no toggle, otherwise.
+            inOrder: _order?.contains(widget.ref, row.dish.id) ?? false,
+            onToggleOrder:
+                _order == null || controller.evaluationFor(row.dish.id) == null
+                ? null
+                : (toggled) => _order?.toggle(widget.ref, toggled.dish.id),
           ),
         ),
       );
     }
     return widgets;
+  }
+
+  /// "My order" (Banto, issue #418), app-scoped so an order outlives this
+  /// route; null without Banto or where no [OrderController] is provided,
+  /// which leaves the toggle and the pill out. Watched by [build].
+  OrderController? get _order => widget.bantoMode
+      ? Provider.of<OrderController?>(context, listen: false)
+      : null;
+
+  /// How much taller the dish list's bottom padding grows while the order
+  /// pill shows, so the last dish can scroll clear of it.
+  static const double _orderPillClearance = 72;
+
+  /// The dishes of this menu's order that the menu still evaluates, in the
+  /// order they were added, with the questions the Waiter Card reads for
+  /// each ([VerdictCopy.waiterQuestions], in the dish's language). Empty
+  /// without an order.
+  List<OrderDish> _orderDishes(MenuController controller) {
+    final order = _order;
+    final menu = controller.menu;
+    if (order == null || menu == null) return const <OrderDish>[];
+    final ids = order.dishIdsFor(widget.ref);
+    if (ids.isEmpty) return const <OrderDish>[];
+    final byId = <String, Dish>{
+      for (final dish in menu.allDishes) dish.id: dish,
+    };
+    return <OrderDish>[
+      for (final id in ids)
+        if (byId[id] case final dish?)
+          if (controller.evaluationFor(id) case final evaluated?)
+            (
+              dish: dish,
+              evaluated: evaluated,
+              questions: VerdictCopy.waiterQuestions(
+                evaluated,
+                hebrew: VerdictCopy.dishIsHebrew(dish),
+              ),
+            ),
+    ];
+  }
+
+  /// [list] with the "My order · N" pill floating at its bottom centre
+  /// while [ordered] has dishes (Banto, issue #418). It sits over the dish
+  /// list alone, so in two panes it is centred on the dishes, not the
+  /// window, and it keeps clear of the system's bottom inset.
+  Widget _withOrderPill(
+    MenuController controller,
+    List<OrderDish> ordered,
+    Widget list,
+  ) {
+    if (ordered.isEmpty) return list;
+    final l10n = AppLocalizations.of(context)!;
+    final count = ordered.length;
+    return Stack(
+      children: [
+        Positioned.fill(child: list),
+        Positioned(
+          left: 16,
+          right: 16,
+          bottom: 16,
+          child: SafeArea(
+            top: false,
+            child: Center(
+              child: Semantics(
+                button: true,
+                excludeSemantics: true,
+                label: l10n.orderPillSemantic(count),
+                onTap: () => unawaited(_openOrderCard(controller)),
+                child: FloatingActionButton.extended(
+                  key: menuOrderPillKey,
+                  heroTag: null,
+                  shape: const StadiumBorder(),
+                  onPressed: () => unawaited(_openOrderCard(controller)),
+                  icon: const Icon(Icons.shopping_cart),
+                  label: Text(l10n.orderPill(count)),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Opens the full-screen [OrderCardScreen] for this menu's order (Banto,
+  /// issue #418), with the profile's allergy note in the menu's language.
+  /// Removing or clearing on the card updates the order here.
+  Future<void> _openOrderCard(MenuController controller) async {
+    final order = _order;
+    final menu = controller.menu;
+    final ordered = _orderDishes(controller);
+    if (order == null || menu == null || ordered.isEmpty) return;
+    final ref = widget.ref;
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        fullscreenDialog: true,
+        builder: (_) => OrderCardScreen(
+          dishes: ordered,
+          profile: controller.profile,
+          hebrew: MenuShareText.menuIsHebrew(menu),
+          onRemove: (dishId) => order.remove(ref, dishId),
+          onClear: () => order.clear(ref),
+          menuSharer: widget.menuSharer,
+          screenBrightness: widget.screenBrightness,
+        ),
+      ),
+    );
   }
 
   /// The [ScannedPageHeader] over [page]'s [dishCount] visible dishes

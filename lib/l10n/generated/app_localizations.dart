@@ -3378,10 +3378,10 @@ abstract class AppLocalizations {
   /// **'Open my chef card'**
   String get tripBriefingChefCard;
 
-  /// Banto (ALG-13): under the chef card button. Local-language cards are out of scope.
+  /// Banto (ALG-13): under the chef card button. A trip whose language has a card adds tripBriefingChefCardLocalNote (#419).
   ///
   /// In en, this message translates to:
-  /// **'The card is made on this phone and opens without a connection. It is in Hebrew or English; cards in the local language are not available yet.'**
+  /// **'The card is made on this phone and opens without a connection.'**
   String get tripBriefingChefCardNote;
 
   /// Banto (ALG-16): the menu screen's notice when the restaurant's own allergen matrix is on file; {date} is the day it holds from, formatted for the UI locale. A fact, never a badge or a rating, and never 'safe'.
@@ -3899,6 +3899,258 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your profile has changed since. Open this menu to check it again.'**
   String get savedRecheck;
+
+  /// Banto (#421): the notice above the dishes and above the Discovery list while the profile holds nothing but keto. Never says a dish is safe.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell Banto what you avoid to see which dishes fit you'**
+  String get profileNudgeMessage;
+
+  /// Banto (#421): the notice's action, which opens the restriction picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Add what you avoid'**
+  String get profileNudgeChoose;
+
+  /// Banto (#421): dismisses the notice for that screen; the choice is remembered on the device.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get profileNudgeDismiss;
+
+  /// Banto (#421): the My restrictions row that reopens the first-run 'What do you avoid?' screen, pre-filled with the current profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Run the setup again'**
+  String get settingsRestrictionsRerun;
+
+  /// Banto (#417): title of the exceptions sheet opened from a restriction's row; the name is the restriction's, in the UI language.
+  ///
+  /// In en, this message translates to:
+  /// **'Exceptions: {name}'**
+  String exceptionsSheetTitle(String name);
+
+  /// Banto (#417): the sheet's one-sentence explanation of what an exception does. Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'Dishes whose only match is one of these words are not flagged for this restriction.'**
+  String get exceptionsExplain;
+
+  /// Banto (#417): a hint under the explanation, true of the evaluator: an exception matches as whole words, with no plural folding.
+  ///
+  /// In en, this message translates to:
+  /// **'A word counts only as written, so add the plural too if you want it covered.'**
+  String get exceptionsWholeWord;
+
+  /// Banto (#417): heading above the removable chips of the current exceptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Your exceptions'**
+  String get exceptionsCurrentHeading;
+
+  /// Banto (#417): shown in place of the chips when there is no exception.
+  ///
+  /// In en, this message translates to:
+  /// **'None yet'**
+  String get exceptionsNone;
+
+  /// Banto (#417): heading above the suggestion chips drawn from the restriction's own words.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestions'**
+  String get exceptionsSuggestionsHeading;
+
+  /// Banto (#417): label of the exceptions sheet's free-text field.
+  ///
+  /// In en, this message translates to:
+  /// **'Another word'**
+  String get exceptionsField;
+
+  /// Banto (#417): adds the typed word to the exceptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get exceptionsAdd;
+
+  /// Banto (#417): saves the exceptions and closes the sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get exceptionsSave;
+
+  /// Banto (#417): tooltip of an exception chip's remove button.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {word}'**
+  String exceptionsRemove(String word);
+
+  /// Banto (#417): shown when a word is added past the cap.
+  ///
+  /// In en, this message translates to:
+  /// **'You can keep up to {max} exceptions for one restriction. Remove one to add another.'**
+  String exceptionsFull(int max);
+
+  /// Banto (#417): the extra line for a strict restriction (allergy, celiac, health condition). Never 'safe'.
+  ///
+  /// In en, this message translates to:
+  /// **'An exception means the app stops flagging that word. Still ask the restaurant.'**
+  String get exceptionsStrictNote;
+
+  /// Banto (#417): the muted line under a restriction's row listing its exceptions, joined by commas.
+  ///
+  /// In en, this message translates to:
+  /// **'Except {words}'**
+  String exceptionsRowLine(String words);
+
+  /// Banto (#417): the accessibility hint of a restriction row, which opens the exceptions sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit exceptions'**
+  String get exceptionsEditHint;
+
+  /// Banto (issue #418): the dish card's toggle, as a tooltip and screen-reader label, when the dish is not in the order yet. In memory only.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to my order'**
+  String get orderAdd;
+
+  /// Banto (issue #418): the dish card's toggle, as a tooltip and screen-reader label, when the dish is already in the order.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from my order'**
+  String get orderRemove;
+
+  /// Banto (issue #418): the floating pill over the menu once the order has dishes; opens the order card.
+  ///
+  /// In en, this message translates to:
+  /// **'My order · {count}'**
+  String orderPill(int count);
+
+  /// Banto (issue #418): what a screen reader announces for the order pill.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{My order, 1 dish. Opens the order card.} other{My order, {count} dishes. Opens the order card.}}'**
+  String orderPillSemantic(int count);
+
+  /// Banto (issue #418): the order card's small title; also the share subject.
+  ///
+  /// In en, this message translates to:
+  /// **'My order'**
+  String get orderCardTitle;
+
+  /// Banto (issue #418): the screen-reader label and tooltip of a section's remove button on the order card.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {dish} from my order'**
+  String orderCardRemoveDish(String dish);
+
+  /// Banto (issue #418): the label over the allergy note, shown once after the dishes on the order card.
+  ///
+  /// In en, this message translates to:
+  /// **'For the whole order'**
+  String get orderCardAllergyTitle;
+
+  /// Banto (issue #418): copies the whole order card as text.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get orderCardCopy;
+
+  /// Banto (issue #418): the snack bar after Copy on the order card.
+  ///
+  /// In en, this message translates to:
+  /// **'Order copied'**
+  String get orderCardCopied;
+
+  /// Banto (issue #418): shares the whole order card as text.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get orderCardShare;
+
+  /// Banto (issue #418): empties the order and closes the order card.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear order'**
+  String get orderCardClear;
+
+  /// Banto (#419): the chef card's language picker segment for French, shown during a trip to France.
+  ///
+  /// In en, this message translates to:
+  /// **'French'**
+  String get chefCardLanguageFrench;
+
+  /// Banto (#419): the chef card's language picker segment for Italian.
+  ///
+  /// In en, this message translates to:
+  /// **'Italian'**
+  String get chefCardLanguageItalian;
+
+  /// Banto (#419): the chef card's language picker segment for Spanish.
+  ///
+  /// In en, this message translates to:
+  /// **'Spanish'**
+  String get chefCardLanguageSpanish;
+
+  /// Banto (#419): the chef card's language picker segment for German.
+  ///
+  /// In en, this message translates to:
+  /// **'German'**
+  String get chefCardLanguageGerman;
+
+  /// Banto (#419): the chef card's language picker segment for Japanese.
+  ///
+  /// In en, this message translates to:
+  /// **'Japanese'**
+  String get chefCardLanguageJapanese;
+
+  /// Banto (#419): the muted line under a chef card shown in French, Italian, Spanish, German or Japanese. In the UI language.
+  ///
+  /// In en, this message translates to:
+  /// **'Translated by the app, not checked by a native speaker — show the card and ask.'**
+  String get chefCardTranslatedNote;
+
+  /// Banto (#420): opens the chef card as an image, ready to share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share as image'**
+  String get chefCardShareImage;
+
+  /// Banto (#420): title of the page that shows the chef card image before it is shared.
+  ///
+  /// In en, this message translates to:
+  /// **'The card as an image'**
+  String get chefCardImageTitle;
+
+  /// Banto (#420): under the image's title. Nothing is stored or uploaded.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the image that will be shared. The app does not keep it.'**
+  String get chefCardImageExplain;
+
+  /// Banto (#420): shares the chef card image through the platform's share sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Share image'**
+  String get chefCardImageShareButton;
+
+  /// Banto (#420): snackbar when the platform cannot share files and the card's text was shared instead.
+  ///
+  /// In en, this message translates to:
+  /// **'This device can\'t share images, so the card was shared as text.'**
+  String get chefCardImageTextFallback;
+
+  /// Banto (#420): snackbar when the card could not be rendered to an image.
+  ///
+  /// In en, this message translates to:
+  /// **'The image could not be made. You can still share the card as text.'**
+  String get chefCardImageFailed;
+
+  /// Banto (#419): under the chef card button on the briefing of a trip to France, Italy, Spain, Germany or Japan.
+  ///
+  /// In en, this message translates to:
+  /// **'The card opens in {language}, translated by the app and not checked by a native speaker. Hebrew and English are a tap away.'**
+  String tripBriefingChefCardLocalNote(String language);
 }
 
 class _AppLocalizationsDelegate

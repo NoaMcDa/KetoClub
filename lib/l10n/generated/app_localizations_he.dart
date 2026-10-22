@@ -2081,7 +2081,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get tripBriefingChefCardNote =>
-      'הכרטיס נוצר בטלפון הזה ונפתח גם בלי חיבור. הוא בעברית או באנגלית; כרטיסים בשפה המקומית עדיין לא זמינים.';
+      'הכרטיס נוצר בטלפון הזה ונפתח גם בלי חיבור.';
 
   @override
   String allergenMatrixNotice(String date) {
@@ -2452,4 +2452,160 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get savedRecheck =>
       'הפרופיל שלך השתנה מאז. אפשר לפתוח את התפריט כדי לבדוק שוב.';
+
+  @override
+  String get profileNudgeMessage =>
+      'ספרו ל־Banto ממה אתם נמנעים כדי לראות אילו מנות מתאימות לכם';
+
+  @override
+  String get profileNudgeChoose => 'הוספת מה שאתם נמנעים ממנו';
+
+  @override
+  String get profileNudgeDismiss => 'לא עכשיו';
+
+  @override
+  String get settingsRestrictionsRerun => 'להריץ שוב את ההגדרה';
+
+  @override
+  String exceptionsSheetTitle(String name) {
+    return 'חריגים: $name';
+  }
+
+  @override
+  String get exceptionsExplain =>
+      'מנות שההתאמה היחידה שלהן היא אחת המילים האלה לא יסומנו עבור ההגבלה הזו.';
+
+  @override
+  String get exceptionsWholeWord =>
+      'מילה נספרת רק כפי שהיא כתובה, ולכן כדאי להוסיף גם את הרבים אם רוצים שגם הוא יכוסה.';
+
+  @override
+  String get exceptionsCurrentHeading => 'החריגים שלך';
+
+  @override
+  String get exceptionsNone => 'אין עדיין';
+
+  @override
+  String get exceptionsSuggestionsHeading => 'הצעות';
+
+  @override
+  String get exceptionsField => 'מילה נוספת';
+
+  @override
+  String get exceptionsAdd => 'הוספה';
+
+  @override
+  String get exceptionsSave => 'שמירה';
+
+  @override
+  String exceptionsRemove(String word) {
+    return 'הסרת $word';
+  }
+
+  @override
+  String exceptionsFull(int max) {
+    return 'אפשר לשמור עד $max חריגים להגבלה אחת. כדאי להסיר אחד כדי להוסיף אחר.';
+  }
+
+  @override
+  String get exceptionsStrictNote =>
+      'חריג אומר שהאפליקציה מפסיקה לסמן את המילה הזו. עדיין כדאי לשאול במסעדה.';
+
+  @override
+  String exceptionsRowLine(String words) {
+    return 'למעט $words';
+  }
+
+  @override
+  String get exceptionsEditHint => 'עריכת חריגים';
+
+  @override
+  String get orderAdd => 'להוסיף להזמנה שלי';
+
+  @override
+  String get orderRemove => 'להסיר מההזמנה שלי';
+
+  @override
+  String orderPill(int count) {
+    return 'ההזמנה שלי · $count';
+  }
+
+  @override
+  String orderPillSemantic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ההזמנה שלי, $count מנות. פותח את כרטיס ההזמנה.',
+      one: 'ההזמנה שלי, מנה אחת. פותח את כרטיס ההזמנה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get orderCardTitle => 'ההזמנה שלי';
+
+  @override
+  String orderCardRemoveDish(String dish) {
+    return 'להסיר את $dish מההזמנה שלי';
+  }
+
+  @override
+  String get orderCardAllergyTitle => 'לכל ההזמנה';
+
+  @override
+  String get orderCardCopy => 'העתקה';
+
+  @override
+  String get orderCardCopied => 'ההזמנה הועתקה';
+
+  @override
+  String get orderCardShare => 'שיתוף';
+
+  @override
+  String get orderCardClear => 'ניקוי ההזמנה';
+
+  @override
+  String get chefCardLanguageFrench => 'צרפתית';
+
+  @override
+  String get chefCardLanguageItalian => 'איטלקית';
+
+  @override
+  String get chefCardLanguageSpanish => 'ספרדית';
+
+  @override
+  String get chefCardLanguageGerman => 'גרמנית';
+
+  @override
+  String get chefCardLanguageJapanese => 'יפנית';
+
+  @override
+  String get chefCardTranslatedNote =>
+      'תורגם על ידי האפליקציה ולא נבדק על ידי דובר/ת השפה — הציגו את הכרטיס ושאלו.';
+
+  @override
+  String get chefCardShareImage => 'שיתוף כתמונה';
+
+  @override
+  String get chefCardImageTitle => 'הכרטיס כתמונה';
+
+  @override
+  String get chefCardImageExplain =>
+      'זו התמונה שתשותף. האפליקציה לא שומרת אותה.';
+
+  @override
+  String get chefCardImageShareButton => 'שיתוף התמונה';
+
+  @override
+  String get chefCardImageTextFallback =>
+      'המכשיר הזה לא יכול לשתף תמונות, ולכן הכרטיס שותף כטקסט.';
+
+  @override
+  String get chefCardImageFailed =>
+      'לא ניתן היה ליצור את התמונה. אפשר עדיין לשתף את הכרטיס כטקסט.';
+
+  @override
+  String tripBriefingChefCardLocalNote(String language) {
+    return 'הכרטיס נפתח ב$language, בתרגום של האפליקציה שלא נבדק על ידי דובר/ת השפה. עברית ואנגלית זמינות בלחיצה.';
+  }
 }

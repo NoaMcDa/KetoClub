@@ -19,6 +19,7 @@ import 'package:ketoclub/state/carb_budget_controller.dart';
 import 'package:ketoclub/state/confirmation_controller.dart';
 import 'package:ketoclub/state/locale_controller.dart';
 import 'package:ketoclub/state/menu_controller.dart';
+import 'package:ketoclub/state/order_controller.dart';
 import 'package:ketoclub/state/premium_controller.dart';
 import 'package:ketoclub/state/saved_controller.dart';
 import 'package:ketoclub/state/scan_controller.dart';
@@ -75,6 +76,10 @@ class _KetoClubAppState extends State<KetoClubApp> {
   late final VenueSearchController _venueSearch;
   late final PremiumController _premium;
 
+  /// "My order" (Banto, issue #418), app-scoped so each menu's order
+  /// outlives its route for the session; provided only with Banto on.
+  final OrderController _order = OrderController();
+
   @override
   void initState() {
     super.initState();
@@ -115,6 +120,7 @@ class _KetoClubAppState extends State<KetoClubApp> {
     _carbBudget.dispose();
     _venueSearch.dispose();
     _premium.dispose();
+    _order.dispose();
     super.dispose();
   }
 
@@ -139,6 +145,8 @@ class _KetoClubAppState extends State<KetoClubApp> {
           value: _venueSearch,
         ),
         ChangeNotifierProvider<PremiumController>.value(value: _premium),
+        if (widget.bantoMode)
+          ChangeNotifierProvider<OrderController>.value(value: _order),
       ],
       child: AnimatedBuilder(
         animation: Listenable.merge([_localeController, _themeModeController]),
