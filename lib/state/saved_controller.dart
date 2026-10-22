@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:ketoclub/models/analysis.dart';
 import 'package:ketoclub/models/dietary_profile.dart';
@@ -132,6 +134,14 @@ final class RecentEntry {
 /// that actually deletes, from the history and the cache, made once a
 /// caller decides the undo window has passed.
 ///
+/// The undo window can outlive this controller (issue #287): the undo
+/// `SnackBar` belongs to the app's messenger, not to the Recent route. So a
+/// removal still pending when the controller is disposed is committed
+/// then, and [restore] and [commitRemoval] do nothing afterwards. And
+/// [commitRemoval] never deletes a menu that was opened again after it was
+/// hidden: the user went back to it, so its fresh visit and cached copy
+/// stay.
+///
 /// Never throws — [MenuRepository] and [VisitHistoryStore] already return
 /// values instead of throwing, or promise not to (architecture.md §18.1).
 final class SavedController extends ChangeNotifier {
@@ -160,6 +170,34 @@ final class SavedController extends ChangeNotifier {
 
   bool _isLoading = false;
   List<RecentEntry> _entries = const <RecentEntry>[];
+
+  /// The entries [hide] took out that neither [restore] nor
+  /// [commitRemoval] has settled yet, by cache key (issue #287).
+  final Map<String, RecentEntry> _pending = <String, RecentEntry>{};
+
+  /// Whether [dispose] has run (issue #287).
+  bool _disposed = false;
+
+  /// Commits every removal still pending — its undo can no longer reach
+  /// this controller — then stops notifying (issue #287).
+  @override
+  void dispose() {
+    _disposed = true;
+    final pending = List<RecentEntry>.of(_pending.values);
+    _pending.clear();
+    for (final entry in pending) {
+      unawaited(_remove(entry));
+    }
+    super.dispose();
+  }
+
+  /// Notifies listeners unless this controller is disposed: a load or a
+  /// write that resumes after the Recent route closed reaches no one.
+  @override
+  void notifyListeners() {
+    if (_disposed) return;
+    super.notifyListeners();
+  }
 
   /// The people the device reads menus for, and how the union of their
   /// profiles words a verdict; both are the keto defaults until [load] reads
@@ -296,14 +334,18 @@ final class SavedController extends ChangeNotifier {
     if (index == -1) return null;
     final removed = _entries[index];
     _entries = List<RecentEntry>.of(_entries)..removeAt(index);
+    _pending[ref.cacheKey] = removed;
     notifyListeners();
     return removed;
   }
 
   /// Puts [entry] — previously taken out by [hide] — back into [entries],
   /// keeping the most-recently-opened-first order. The undo path for
-  /// [hide].
+  /// [hide]. A no-op once this controller is disposed, when the removal
+  /// has already been committed (issue #287).
   void restore(RecentEntry entry) {
+    if (_disposed) return;
+    _pending.remove(entry.ref.cacheKey);
     _entries = _sorted([..._entries, entry]);
     notifyListeners();
   }
@@ -354,7 +396,28 @@ final class SavedController extends ChangeNotifier {
   /// Forgets [ref]'s menu: its entry in the visit history and its cached
   /// copy, each removed once. Called once an undo window has passed with
   /// no [restore] for it. Never throws.
+  ///
+  /// A no-op once this controller is disposed, which already committed
+  /// every pending removal, and for a [ref] no [hide] is pending for
+  /// (issue #287). And when the menu was opened again after [hide] took
+  /// it out, nothing is deleted: that visit and the menu it cached are
+  /// the user's again.
   Future<void> commitRemoval(VenueRef ref) async {
+    if (_disposed) return;
+    final entry = _pending.remove(ref.cacheKey);
+    if (entry == null) return;
+    await _remove(entry);
+  }
+
+  /// Deletes [entry]'s visit and cached copy, unless its menu has been
+  /// opened since [entry] was read (issue #287).
+  Future<void> _remove(RecentEntry entry) async {
+    final ref = entry.ref;
+    final current = await _history.read(ref);
+    if (current != null &&
+        current.lastOpenedAt.isAfter(entry.visit.lastOpenedAt)) {
+      return;
+    }
     await _history.remove(ref);
     await _repository.remove(ref);
   }
