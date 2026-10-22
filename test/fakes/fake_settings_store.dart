@@ -9,7 +9,7 @@ final class FakeSettingsStore implements SettingsStore {
 
   AppSettings _settings;
 
-  /// How many times [write] has been called.
+  /// How many times [write] or [update] has been called.
   int writeCallCount = 0;
 
   @override
@@ -19,5 +19,13 @@ final class FakeSettingsStore implements SettingsStore {
   Future<void> write(AppSettings settings) async {
     writeCallCount++;
     _settings = settings;
+  }
+
+  @override
+  Future<AppSettings> update(
+    AppSettings Function(AppSettings latest) change,
+  ) async {
+    writeCallCount++;
+    return _settings = change(_settings);
   }
 }

@@ -112,46 +112,33 @@ final class AppSettings {
     this.discoveryNudgeDismissed = false,
   });
 
-  /// The profiles a menu is read for until the user combines others: the
-  /// device owner's own.
-  static const List<String> defaultActiveProfileIds = <String>[
-    NamedProfile.primaryId,
-  ];
-
-  /// Reads settings written by [toJson].
+  /// Reads settings written by [toJson], field by field (issue #281).
   ///
-  /// Returns null for any shape mismatch, including a malformed
-  /// [lastVenue] or an unknown [filter] name, and never throws. [themeMode]
-  /// is the one exception (issue #58): it was added after installs already
-  /// existed without it, so a missing or unrecognised value decodes to
-  /// [AppThemeMode.system] rather than invalidating the whole record —
-  /// unlike [filter], whose own unknown value already fails this way for
-  /// data written before that field existed too.
+  /// Never throws and never gives up on the whole record: every field is
+  /// read on its own, and one that is missing or unreadable falls back to
+  /// its own default while every other field keeps its stored value. An
+  /// unknown [filter] name reads as [MenuFilter.all]; a [lastVenue] that
+  /// [VenueRef.tryFrom] cannot read (an unknown source, written by a newer
+  /// build before a downgrade) reads as null, and a non-string
+  /// [languageTag] as null — "follow the device".
   ///
-  /// [netCarbLimitGrams] (issue #57) follows [themeMode]'s rule for the
-  /// same reason: a missing or non-integer value decodes to
-  /// [defaultNetCarbLimitGrams]. An integer outside
-  /// [minNetCarbLimitGrams]..[maxNetCarbLimitGrams] is clamped into that
-  /// range rather than rejected, so a hand-edited or future value still
-  /// lands on the nearest limit the stepper can show.
+  /// **[estimationConsentGiven] fails closed.** A missing key reads as the
+  /// D16 default of true (issue #167: an install from before the field
+  /// existed), and a stored bool wins, so an install that refused keeps its
+  /// refusal. A value that is present but not a bool reads as **false**:
+  /// a parse failure may withdraw consent, but never grant it.
   ///
-  /// [seedOilFree], [dairyFree] and [carnivoreOnly] (issue #56) follow
-  /// the same rule: each was added after installs already existed, so a
-  /// missing or non-boolean value reads as false (the toggle off) rather
-  /// than invalidating the record.
+  /// [themeMode] (issue #58), [netCarbLimitGrams] (issue #57; an integer
+  /// outside [minNetCarbLimitGrams]..[maxNetCarbLimitGrams] is clamped into
+  /// it), the three dietary toggles (issue #56), [lastFilter] (issue #55)
+  /// and [disclosureSeen] (D16) read their defaults the same way.
   ///
-  /// [lastFilter] (issue #55) follows the same "added later" rule as
-  /// [themeMode] and [netCarbLimitGrams]: a missing key, or one whose
-  /// value [MenuFilter.tryParse] does not recognise, decodes to null —
-  /// "no last-used filter yet" — rather than invalidating the record.
+  /// [profile] (issue #344) reads as [DietaryProfile.empty] when missing,
+  /// and [DietaryProfile.tryFrom] drops what it cannot read.
   ///
-  /// [profile] (issue #344) follows the same rule: a missing key reads as
-  /// [DietaryProfile.empty], and [DietaryProfile.tryFrom] drops what it
-  /// cannot read rather than invalidating the record.
-  ///
-  /// The group profiles (ALG-12, issue #354) follow it too. An install
-  /// from before them has only [profile], which reads as the one primary
-  /// profile, named "Me" by the UI: that is the whole migration. A
+  /// The group profiles (ALG-12, issue #354) follow the same rule. An
+  /// install from before them has only [profile], which reads as the one
+  /// primary profile, named "Me" by the UI: that is the whole migration. A
   /// non-string [primaryProfileName] reads as empty; an [otherProfiles]
   /// item [NamedProfile.tryFrom] cannot read, that repeats an id or takes
   /// the primary one is dropped, and the list is cut to
@@ -159,68 +146,46 @@ final class AppSettings {
   /// names no profile, or repeats, is dropped, and an empty result reads as
   /// [defaultActiveProfileIds].
   ///
-  /// [tripDestination] (ALG-13, issue #355) follows the "added later" rule
-  /// too: a missing key, or a value [TripDestination.tryParse] does not
-  /// recognise, reads as null — no trip — rather than invalidating the
-  /// record.
-  ///
-  /// The monthly scan counter (ALG-18, issue #360) follows it too: a
-  /// missing key, a value that is not a `{month, count}` object, a month
-  /// that is not a string or a count that is not a positive integer reads
-  /// as no scans counted.
-  ///
-  /// [shareConfirmations] (ALG-14, issue #409) follows it too: anything
-  /// but a stored `true` reads as off.
-  static AppSettings? tryFrom(Map<String, Object?> json) {
-    final rawLanguageTag = json['languageTag'];
-    if (rawLanguageTag != null && rawLanguageTag is! String) return null;
+  /// [tripDestination] (ALG-13, issue #355) reads as null — no trip — when
+  /// missing or unrecognised. The monthly scan counter (ALG-18, issue
+  /// #360) reads as no scans counted for a value that is not a
+  /// `{month, count}` object, a month that is not a string or a count that
+  /// is not a positive integer. [disclosureCopyVersion] reads as 0 unless
+  /// it is a positive integer. [onboardingSeen], [helperToolSeen],
+  /// [shareConfirmations] (ALG-14, issue #409) and the two nudge dismissals
+  /// (issue #421) read as false for anything but a stored `true`.
+  factory fromStored(Map<String, Object?> json) {
     final rawFilter = json['filter'];
-    if (rawFilter is! String) return null;
-    final filter = MenuFilter.tryParse(rawFilter);
-    if (filter == null) return null;
-    // D16 (issue #167) flipped the default to true. A stored value —
-    // written by any install that reached [toJson] before or since —
-    // wins over the default, so an install that already refused keeps
-    // its refusal; a missing key on an install that predates
-    // estimationConsentGiven at all reads as the new default rather than
-    // invalidating the record.
-    final rawConsent = json['estimationConsentGiven'];
-    if (rawConsent != null && rawConsent is! bool) return null;
     final rawLastVenue = json['lastVenue'];
-    VenueRef? lastVenue;
-    if (rawLastVenue != null) {
-      if (rawLastVenue is! Map<String, Object?>) return null;
-      lastVenue = VenueRef.tryFrom(rawLastVenue);
-      if (lastVenue == null) return null;
-    }
     final rawThemeMode = json['themeMode'];
-    final themeMode = rawThemeMode is String
-        ? AppThemeMode.tryParse(rawThemeMode) ?? AppThemeMode.system
-        : AppThemeMode.system;
     final rawLimit = json['netCarbLimitGrams'];
-    final netCarbLimitGrams = rawLimit is int
-        ? clampNetCarbLimitGrams(rawLimit)
-        : defaultNetCarbLimitGrams;
     final rawLastFilter = json['lastFilter'];
-    final lastFilter = rawLastFilter is String
-        ? MenuFilter.tryParse(rawLastFilter)
-        : null;
     final others = _readOthers(json[_otherProfilesKey]);
     final scans = _readScans(json[_monthlyScansKey]);
     return AppSettings(
-      languageTag: rawLanguageTag is String ? rawLanguageTag : null,
-      filter: filter,
-      // Missing key → D16 default of true (issue #167); a stored bool
-      // wins. The earlier guard rejects any non-null non-bool, so by
-      // here rawConsent is null, true, or false.
-      estimationConsentGiven: rawConsent != false,
-      lastVenue: lastVenue,
-      themeMode: themeMode,
-      netCarbLimitGrams: netCarbLimitGrams,
+      languageTag: switch (json['languageTag']) {
+        final String tag => tag,
+        _ => null,
+      },
+      filter: rawFilter is String
+          ? MenuFilter.tryParse(rawFilter) ?? MenuFilter.all
+          : MenuFilter.all,
+      estimationConsentGiven: _readConsent(json['estimationConsentGiven']),
+      lastVenue: rawLastVenue is Map<String, Object?>
+          ? VenueRef.tryFrom(rawLastVenue)
+          : null,
+      themeMode: rawThemeMode is String
+          ? AppThemeMode.tryParse(rawThemeMode) ?? AppThemeMode.system
+          : AppThemeMode.system,
+      netCarbLimitGrams: rawLimit is int
+          ? clampNetCarbLimitGrams(rawLimit)
+          : defaultNetCarbLimitGrams,
       seedOilFree: json['seedOilFree'] == true,
       dairyFree: json['dairyFree'] == true,
       carnivoreOnly: json['carnivoreOnly'] == true,
-      lastFilter: lastFilter,
+      lastFilter: rawLastFilter is String
+          ? MenuFilter.tryParse(rawLastFilter)
+          : null,
       disclosureSeen: json['disclosureSeen'] == true,
       profile: DietaryProfile.tryFrom(json[_profileKey]),
       onboardingSeen: json[_onboardingSeenKey] == true,
@@ -240,6 +205,27 @@ final class AppSettings {
       discoveryNudgeDismissed: json[_discoveryNudgeDismissedKey] == true,
     );
   }
+
+  /// The profiles a menu is read for until the user combines others: the
+  /// device owner's own.
+  static const List<String> defaultActiveProfileIds = <String>[
+    NamedProfile.primaryId,
+  ];
+
+  /// Reads settings written by [toJson]: [AppSettings.fromStored] under
+  /// its older name. Never null since issue #281: an unreadable field falls
+  /// back to its own default and no longer invalidates the record.
+  static AppSettings? tryFrom(Map<String, Object?> json) =>
+      AppSettings.fromStored(json);
+
+  /// [raw] as the stored consent, failing closed (issue #281): a missing
+  /// key is the D16 default of true (issue #167), a bool is itself, and
+  /// anything else — a value that cannot be read — is false.
+  static bool _readConsent(Object? raw) => switch (raw) {
+    null => true,
+    final bool given => given,
+    _ => false,
+  };
 
   /// The month and count stored under [_monthlyScansKey]; see [tryFrom].
   static ({String month, int count}) _readScans(Object? raw) {
@@ -740,8 +726,21 @@ abstract interface class SettingsStore {
 
   /// Saves [settings], replacing any previously stored value.
   ///
+  /// Replaces every field, so a [settings] read before another write lands
+  /// undoes that write. A caller that changes some fields of what it read
+  /// earlier uses [update] instead (issue #287).
+  ///
   /// Never throws.
   Future<void> write(AppSettings settings);
+
+  /// Applies [change] to the latest stored settings and saves the result,
+  /// answering what was saved (issue #287): a read-modify-write, so a
+  /// change to one field never reverts a field someone else wrote after
+  /// the caller last read. An implementation runs one [update] at a time,
+  /// in call order, so two overlapping updates both land.
+  ///
+  /// Never throws, unless [change] itself does.
+  Future<AppSettings> update(AppSettings Function(AppSettings latest) change);
 }
 
 /// The shared_preferences key [AppSettings] is stored under, as one JSON
@@ -774,8 +773,42 @@ final class PrefsSettingsStore implements SettingsStore {
   /// and reusing that result on every later call.
   Future<SharedPreferences> _preferences() => _prefs ??= load();
 
+  /// The last queued operation; each [read], [write] and [update] runs
+  /// after it, so they settle one at a time and in call order.
+  Future<void> _tail = Future<void>.value();
+
+  /// Runs [task] after every operation queued before it.
+  Future<T> _serialised<T>(Future<T> Function() task) {
+    final result = _tail.then((_) => task());
+    // A failed task (only a throwing `update` change can fail) must not
+    // stall the queue behind it.
+    _tail = result.then<void>((_) {}, onError: (Object _) {});
+    return result;
+  }
+
   @override
-  Future<AppSettings> read() async {
+  Future<AppSettings> read() => _serialised(_read);
+
+  @override
+  Future<void> write(AppSettings settings) =>
+      _serialised(() => _write(settings));
+
+  @override
+  Future<AppSettings> update(AppSettings Function(AppSettings latest) change) =>
+      _serialised(() async {
+        final next = change(await _read());
+        await _write(next);
+        return next;
+      });
+
+  /// The stored settings; see [read].
+  ///
+  /// Nothing stored, or preferences that will not load, read as the
+  /// defaults. A stored value that cannot be decoded as a JSON object
+  /// reads as the defaults with consent **withheld** (issue #281): the
+  /// stored consent may have been a refusal, and a parse failure never
+  /// grants it.
+  Future<AppSettings> _read() async {
     final SharedPreferences prefs;
     try {
       prefs = await _preferences();
@@ -789,14 +822,20 @@ final class PrefsSettingsStore implements SettingsStore {
     try {
       decoded = jsonDecode(raw);
     } on FormatException {
-      return const AppSettings();
+      return _unreadable;
     }
-    if (decoded is! Map<String, Object?>) return const AppSettings();
-    return AppSettings.tryFrom(decoded) ?? const AppSettings();
+    if (decoded is! Map<String, Object?>) return _unreadable;
+    return AppSettings.fromStored(decoded);
   }
 
-  @override
-  Future<void> write(AppSettings settings) async {
+  /// What a stored record that cannot be decoded at all reads as: the
+  /// defaults, with consent failing closed (issue #281).
+  static const AppSettings _unreadable = AppSettings(
+    estimationConsentGiven: false,
+  );
+
+  /// Saves [settings]; see [write].
+  Future<void> _write(AppSettings settings) async {
     final SharedPreferences prefs;
     try {
       prefs = await _preferences();

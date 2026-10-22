@@ -195,8 +195,7 @@ final class SettingsController extends ChangeNotifier {
     _isBusy = true;
     notifyListeners();
 
-    _appSettings = _appSettings.copyWith(estimationConsentGiven: given);
-    await _settings.write(_appSettings);
+    await _change((latest) => latest.copyWith(estimationConsentGiven: given));
 
     _isBusy = false;
     notifyListeners();
@@ -213,8 +212,7 @@ final class SettingsController extends ChangeNotifier {
     _isBusy = true;
     notifyListeners();
 
-    _appSettings = _appSettings.copyWith(languageTag: tag);
-    await _settings.write(_appSettings);
+    await _change((latest) => latest.copyWith(languageTag: tag));
 
     _isBusy = false;
     notifyListeners();
@@ -225,8 +223,7 @@ final class SettingsController extends ChangeNotifier {
     _isBusy = true;
     notifyListeners();
 
-    _appSettings = _appSettings.copyWith(filter: filter);
-    await _settings.write(_appSettings);
+    await _change((latest) => latest.copyWith(filter: filter));
 
     _isBusy = false;
     notifyListeners();
@@ -237,8 +234,7 @@ final class SettingsController extends ChangeNotifier {
     _isBusy = true;
     notifyListeners();
 
-    _appSettings = _appSettings.copyWith(themeMode: mode);
-    await _settings.write(_appSettings);
+    await _change((latest) => latest.copyWith(themeMode: mode));
 
     _isBusy = false;
     notifyListeners();
@@ -255,10 +251,10 @@ final class SettingsController extends ChangeNotifier {
     _isBusy = true;
     notifyListeners();
 
-    _appSettings = _appSettings.copyWith(
-      netCarbLimitGrams: clampNetCarbLimitGrams(grams),
+    await _change(
+      (latest) =>
+          latest.copyWith(netCarbLimitGrams: clampNetCarbLimitGrams(grams)),
     );
-    await _settings.write(_appSettings);
 
     _isBusy = false;
     notifyListeners();
@@ -271,17 +267,17 @@ final class SettingsController extends ChangeNotifier {
   /// cached result; see `MenuController.open`. Named rather than
   /// positional for the reason [setConsent] gives.
   Future<void> setSeedOilFree({required bool enabled}) =>
-      _update(_appSettings.copyWith(seedOilFree: enabled));
+      _update((latest) => latest.copyWith(seedOilFree: enabled));
 
   /// Turns the "Dairy-free keto" rule on or off (issue #56). See
   /// [setSeedOilFree].
   Future<void> setDairyFree({required bool enabled}) =>
-      _update(_appSettings.copyWith(dairyFree: enabled));
+      _update((latest) => latest.copyWith(dairyFree: enabled));
 
   /// Turns the "Carnivore only" rule on or off (issue #56). See
   /// [setSeedOilFree].
   Future<void> setCarnivoreOnly({required bool enabled}) =>
-      _update(_appSettings.copyWith(carnivoreOnly: enabled));
+      _update((latest) => latest.copyWith(carnivoreOnly: enabled));
 
   /// Records that the first-launch AI-disclosure banner has been
   /// dismissed with "OK" (D16, issue #167). Leaves
@@ -289,7 +285,7 @@ final class SettingsController extends ChangeNotifier {
   /// but did not refuse — and persists [disclosureSeen] as true so the
   /// banner is never shown twice on the same install.
   Future<void> acknowledgeDisclosure() =>
-      _update(_appSettings.copyWith(disclosureSeen: true));
+      _update((latest) => latest.copyWith(disclosureSeen: true));
 
   /// Records that the first-launch AI-disclosure banner has been
   /// dismissed with "Turn off" (D16, issue #167): consent is set to
@@ -297,7 +293,8 @@ final class SettingsController extends ChangeNotifier {
   /// router stops sending dish text and the banner is never shown
   /// twice.
   Future<void> declineDisclosure() => _update(
-    _appSettings.copyWith(estimationConsentGiven: false, disclosureSeen: true),
+    (latest) =>
+        latest.copyWith(estimationConsentGiven: false, disclosureSeen: true),
   );
 
   /// Records that the first-run restriction onboarding has been completed
@@ -305,7 +302,7 @@ final class SettingsController extends ChangeNotifier {
   /// that flag; a no-op, with no write, when it is already set.
   Future<void> markOnboardingSeen() async {
     if (onboardingSeen) return;
-    await _update(_appSettings.copyWith(onboardingSeen: true));
+    await _update((latest) => latest.copyWith(onboardingSeen: true));
   }
 
   /// Turns sharing what the staff told the user on or off (ALG-14, issue
@@ -313,14 +310,14 @@ final class SettingsController extends ChangeNotifier {
   /// than positional for the reason [setConsent] gives.
   Future<void> setShareConfirmations({required bool enabled}) async {
     if (enabled == shareConfirmations) return;
-    await _update(_appSettings.copyWith(shareConfirmations: enabled));
+    await _update((latest) => latest.copyWith(shareConfirmations: enabled));
   }
 
   /// Records that the helper-tool sheet has been shown (ALG-11), so it is
   /// never shown twice. A no-op, with no write, when it is already set.
   Future<void> markHelperToolSeen() async {
     if (helperToolSeen) return;
-    await _update(_appSettings.copyWith(helperToolSeen: true));
+    await _update((latest) => latest.copyWith(helperToolSeen: true));
   }
 
   /// Adds [id] to the profile, last, with no exceptions (issue #344).
@@ -329,7 +326,9 @@ final class SettingsController extends ChangeNotifier {
   /// double tap cannot reset its exceptions.
   Future<void> addRestriction(RestrictionId id) async {
     if (profile.contains(id)) return;
-    await _update(_appSettings.copyWith(profile: profile.withEntry(id)));
+    await _update(
+      (latest) => latest.copyWith(profile: latest.profile.withEntry(id)),
+    );
   }
 
   /// Makes the profile hold exactly [ids] besides keto and the user's own
@@ -339,8 +338,20 @@ final class SettingsController extends ChangeNotifier {
   /// the user's own words are not on the setup screen and are left alone.
   /// A no-op, with no write, when nothing would change.
   Future<void> replaceRestrictions(List<RestrictionId> ids) async {
-    var next = profile;
-    for (final entry in profile.entries) {
+    if (_replaced(profile, ids) == profile) return;
+    await _update(
+      (latest) => latest.copyWith(profile: _replaced(latest.profile, ids)),
+    );
+  }
+
+  /// [current] holding exactly [ids] besides keto and the user's own
+  /// words; see [replaceRestrictions].
+  static DietaryProfile _replaced(
+    DietaryProfile current,
+    List<RestrictionId> ids,
+  ) {
+    var next = current;
+    for (final entry in current.entries) {
       final id = entry.restrictionId;
       if (id == RestrictionId.keto || id == RestrictionId.custom) continue;
       if (!ids.contains(id)) next = next.withoutEntry(id);
@@ -350,15 +361,16 @@ final class SettingsController extends ChangeNotifier {
         next = next.withEntry(id);
       }
     }
-    if (next == profile) return;
-    await _update(_appSettings.copyWith(profile: next));
+    return next;
   }
 
   /// Removes [id] and its exceptions from the profile (issue #344). A
   /// no-op, with no write, when the profile does not hold [id].
   Future<void> removeRestriction(RestrictionId id) async {
     if (!profile.contains(id)) return;
-    await _update(_appSettings.copyWith(profile: profile.withoutEntry(id)));
+    await _update(
+      (latest) => latest.copyWith(profile: latest.profile.withoutEntry(id)),
+    );
   }
 
   /// Adds [term], one of the user's own words, to their own restriction
@@ -366,17 +378,20 @@ final class SettingsController extends ChangeNotifier {
   /// write, when [term] is blank, already held (ignoring case) or the entry
   /// is full ([DietaryProfile.withCustomTerm]).
   Future<void> addCustomTerm(String term) async {
-    final next = profile.withCustomTerm(term);
-    if (identical(next, profile)) return;
-    await _update(_appSettings.copyWith(profile: next));
+    if (identical(profile.withCustomTerm(term), profile)) return;
+    await _update(
+      (latest) => latest.copyWith(profile: latest.profile.withCustomTerm(term)),
+    );
   }
 
   /// Removes [term] from the user's own restriction, and the entry with its
   /// last word (ALG-17). A no-op, with no write, when it is not held.
   Future<void> removeCustomTerm(String term) async {
-    final next = profile.withoutCustomTerm(term);
-    if (identical(next, profile)) return;
-    await _update(_appSettings.copyWith(profile: next));
+    if (identical(profile.withoutCustomTerm(term), profile)) return;
+    await _update(
+      (latest) =>
+          latest.copyWith(profile: latest.profile.withoutCustomTerm(term)),
+    );
   }
 
   /// Replaces the exceptions of [id] with [exceptions], trimmed,
@@ -386,8 +401,8 @@ final class SettingsController extends ChangeNotifier {
   Future<void> setExceptions(RestrictionId id, List<String> exceptions) async {
     if (!profile.contains(id)) return;
     await _update(
-      _appSettings.copyWith(
-        profile: profile.withEntry(id, exceptions: exceptions),
+      (latest) => latest.copyWith(
+        profile: latest.profile.withEntry(id, exceptions: exceptions),
       ),
     );
   }
@@ -432,9 +447,9 @@ final class SettingsController extends ChangeNotifier {
     }
     final id = 'p$n';
     await _update(
-      _appSettings.copyWith(
+      (latest) => latest.copyWith(
         otherProfiles: List<NamedProfile>.unmodifiable(<NamedProfile>[
-          ..._appSettings.otherProfiles,
+          ...latest.otherProfiles,
           NamedProfile(id: id, name: normalised, profile: profile),
         ]),
       ),
@@ -449,7 +464,9 @@ final class SettingsController extends ChangeNotifier {
     final normalised = NamedProfile.normaliseName(name);
     if (id == NamedProfile.primaryId) {
       if (normalised == _appSettings.primaryProfileName) return;
-      await _update(_appSettings.copyWith(primaryProfileName: normalised));
+      await _update(
+        (latest) => latest.copyWith(primaryProfileName: normalised),
+      );
       return;
     }
     if (normalised.isEmpty) return;
@@ -461,21 +478,21 @@ final class SettingsController extends ChangeNotifier {
   /// cannot be deleted; a no-op for it and for an unknown [id].
   Future<void> deleteProfile(String id) async {
     if (id == NamedProfile.primaryId || profileById(id) == null) return;
-    final active = <String>[
-      for (final activeId in _appSettings.activeProfileIds)
-        if (activeId != id) activeId,
-    ];
-    await _update(
-      _appSettings.copyWith(
+    await _update((latest) {
+      final active = <String>[
+        for (final activeId in latest.activeProfileIds)
+          if (activeId != id) activeId,
+      ];
+      return latest.copyWith(
         otherProfiles: List<NamedProfile>.unmodifiable(<NamedProfile>[
-          for (final named in _appSettings.otherProfiles)
+          for (final named in latest.otherProfiles)
             if (named.id != id) named,
         ]),
         activeProfileIds: active.isEmpty
             ? AppSettings.defaultActiveProfileIds
             : List<String>.unmodifiable(active),
-      ),
-    );
+      );
+    });
   }
 
   /// Adds [restriction] to the profile [id] (ALG-12); for the user's own,
@@ -575,7 +592,8 @@ final class SettingsController extends ChangeNotifier {
     ];
     if (next.isEmpty) return;
     await _update(
-      _appSettings.copyWith(activeProfileIds: List<String>.unmodifiable(next)),
+      (latest) =>
+          latest.copyWith(activeProfileIds: List<String>.unmodifiable(next)),
     );
   }
 
@@ -589,7 +607,7 @@ final class SettingsController extends ChangeNotifier {
   /// destination's lexicon is read on the device only.
   Future<void> setTripDestination(TripDestination? destination) async {
     if (destination == tripDestination) return;
-    await _update(_appSettings.copyWith(tripDestination: destination));
+    await _update((latest) => latest.copyWith(tripDestination: destination));
   }
 
   /// Replaces the other person [id] with what [change] makes of it.
@@ -597,25 +615,35 @@ final class SettingsController extends ChangeNotifier {
     String id,
     NamedProfile Function(NamedProfile named) change,
   ) => _update(
-    _appSettings.copyWith(
+    (latest) => latest.copyWith(
       otherProfiles: List<NamedProfile>.unmodifiable(<NamedProfile>[
-        for (final named in _appSettings.otherProfiles)
+        for (final named in latest.otherProfiles)
           if (named.id == id) change(named) else named,
       ]),
     ),
   );
 
-  /// Replaces the held settings with [next] and persists them, marking
-  /// [isBusy] around the write exactly as every other setter here does.
-  Future<void> _update(AppSettings next) async {
+  /// Applies [change] and persists it, marking [isBusy] around the write
+  /// exactly as every other setter here does.
+  Future<void> _update(AppSettings Function(AppSettings latest) change) async {
     _isBusy = true;
     notifyListeners();
 
-    _appSettings = next;
-    await _settings.write(_appSettings);
+    await _change(change);
 
     _isBusy = false;
     notifyListeners();
+  }
+
+  /// Applies [change] to the held settings at once, so the screen shows it
+  /// while the write is in flight, then to the **latest stored** settings
+  /// through [SettingsStore.update], and holds what was saved (issue #287).
+  /// So a setter here changes only its own fields: a venue opened, a filter
+  /// chosen or the disclosure banner answered since [load] is never
+  /// reverted by a write from this screen.
+  Future<void> _change(AppSettings Function(AppSettings latest) change) async {
+    _appSettings = change(_appSettings);
+    _appSettings = await _settings.update(change);
   }
 
   /// Forgets every cached menu and analysis, through the repository, and
@@ -632,8 +660,9 @@ final class SettingsController extends ChangeNotifier {
     await _repository.clearCache();
     await _history.clear();
     _cachedMenuCount = await _repository.cachedMenuCount();
-    _appSettings = _appSettings.copyWith(lastVenue: null, lastFilter: null);
-    await _settings.write(_appSettings);
+    await _change(
+      (latest) => latest.copyWith(lastVenue: null, lastFilter: null),
+    );
 
     _isBusy = false;
     notifyListeners();

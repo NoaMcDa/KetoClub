@@ -121,12 +121,14 @@ class _ConsentDisclosureBannerState extends State<ConsentDisclosureBanner> {
       (widget.bantoMode &&
           settings.disclosureCopyVersion < bantoDisclosureCopyVersion);
 
+  /// Applies [mutation] to the **latest stored** settings, never to the
+  /// snapshot this banner read on init (issue #287): consent turned off in
+  /// Settings, or a venue opened, while the banner sat on Explore must
+  /// survive a tap on "OK".
   Future<void> _persist(AppSettings Function(AppSettings) mutation) async {
-    final current = _settings;
-    if (current == null || _busy) return;
+    if (_settings == null || _busy) return;
     setState(() => _busy = true);
-    final next = mutation(current);
-    await widget.settingsStore.write(next);
+    final next = await widget.settingsStore.update(mutation);
     if (!mounted) return;
     setState(() {
       _settings = next;

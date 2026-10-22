@@ -6,8 +6,10 @@ url>``, so the menu ``POST /v1/website-menu`` returns and the row it writes
 to ``stored_menus`` are keyed exactly as the app keys the same paste.
 
 Normalising lower-cases the scheme and host (``DartUri.parse`` does), drops
-the fragment, a default port and one trailing ``/``, and keeps the path and
-query as given. A URL that is not ``http``/``https``, has user info, or whose
+the fragment, a default port, one trailing ``/`` and every tracking
+parameter (``utm_*``, ``fbclid``, ``gclid``, ...; #280), and keeps the path
+and the rest of the query as given; a query only tracking parameters held is
+dropped. A URL that is not ``http``/``https``, has user info, or whose
 host has no inner dot or is not public by name (``*.local``,
 ``*.localhost``, a private IPv4 literal) has no ref. The route still checks
 every address the host resolves to before it fetches anything.
@@ -22,6 +24,55 @@ from app.website.html import DartUri, UriFormatError
 
 _NUMERIC_LABEL: Final = re.compile(r"(?:[0-9]+|0x[0-9a-f]*)")
 _OCTET: Final = re.compile(r"0|[1-9][0-9]{0,2}")
+
+#: Dart ``VenueRefResolver._trackingParameters``: lower-cased query parameter
+#: names that only say where a link was shared from (#280). A name starting
+#: with ``utm_`` is one too.
+TRACKING_PARAMETERS: Final = frozenset(
+    {
+        "_ga",
+        "_gl",
+        "dclid",
+        "fbclid",
+        "gad_source",
+        "gbraid",
+        "gclid",
+        "gclsrc",
+        "igsh",
+        "igshid",
+        "li_fat_id",
+        "mc_cid",
+        "mc_eid",
+        "mkt_tok",
+        "msclkid",
+        "srsltid",
+        "ttclid",
+        "twclid",
+        "wbraid",
+        "yclid",
+    }
+)
+
+
+def is_tracking_query_parameter(name: str) -> bool:
+    """Dart ``VenueRefResolver.isTrackingQueryParameter``: ``utm_*`` or one of
+    :data:`TRACKING_PARAMETERS`, ignoring (ASCII) case."""
+    lower = name.lower()
+    return lower.startswith("utm_") or lower in TRACKING_PARAMETERS
+
+
+def _without_tracking(query: str | None) -> str | None:
+    """Dart ``VenueRefResolver._withoutTracking``: ``query`` without its
+    tracking parameters; ``None`` when they were all it held, or it was empty
+    or absent (Dart writes no bare ``?``)."""
+    if not query:
+        return None
+    kept = [
+        pair
+        for pair in query.split("&")
+        if not is_tracking_query_parameter(pair.split("=", 1)[0])
+    ]
+    return "&".join(kept) if kept else None
 
 
 def normalise_website_url(raw: str) -> str | None:
@@ -41,7 +92,11 @@ def normalise_website_url(raw: str) -> str | None:
         return None
     path = uri.path[:-1] if uri.path.endswith("/") else uri.path
     return DartUri(
-        scheme=scheme, host=host, port=uri.port, path=path, query=uri.query
+        scheme=scheme,
+        host=host,
+        port=uri.port,
+        path=path,
+        query=_without_tracking(uri.query),
     ).to_string()
 
 

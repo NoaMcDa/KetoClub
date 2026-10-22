@@ -167,9 +167,12 @@ abstract final class VenueRefResolver {
   /// [isPublicHost] refuses (a private or loopback IP address, `*.local`),
   /// or user info in the URL.
   ///
-  /// Lower-cases the scheme and host, drops the fragment, a default port
-  /// and one trailing `/`, and keeps the path and query as given, so the
-  /// same page pasted twice is the same cache entry.
+  /// Lower-cases the scheme and host, drops the fragment, a default port,
+  /// one trailing `/` and every tracking parameter
+  /// ([isTrackingQueryParameter]; issue #280), and keeps the path and the
+  /// rest of the query as given, so the same page pasted twice — or shared
+  /// once from Instagram and once from a newsletter — is the same cache
+  /// entry. A query left empty by the tracking parameters is dropped.
   static String? normaliseWebsiteUrl(Uri uri) {
     final scheme = uri.scheme.toLowerCase();
     if (scheme != 'http' && scheme != 'https') return null;
@@ -187,8 +190,63 @@ abstract final class VenueRefResolver {
       host: host,
       port: uri.hasPort ? uri.port : null,
       path: path,
-      query: uri.hasQuery ? uri.query : null,
+      query: uri.hasQuery ? _withoutTracking(uri.query) : null,
     ).toString();
+  }
+
+  /// The query parameter names, lower-cased, that only say where a link
+  /// was shared from (issue #280). A name starting with `utm_` is one too;
+  /// see [isTrackingQueryParameter].
+  static const Set<String> _trackingParameters = <String>{
+    '_ga',
+    '_gl',
+    'dclid',
+    'fbclid',
+    'gad_source',
+    'gbraid',
+    'gclid',
+    'gclsrc',
+    'igsh',
+    'igshid',
+    'li_fat_id',
+    'mc_cid',
+    'mc_eid',
+    'mkt_tok',
+    'msclkid',
+    'srsltid',
+    'ttclid',
+    'twclid',
+    'wbraid',
+    'yclid',
+  };
+
+  /// Whether the query parameter [name] is a tracking parameter, which
+  /// [normaliseWebsiteUrl] drops: `utm_*` or one of a fixed list of
+  /// click ids (`fbclid`, `gclid`, …), ignoring case. Public so the
+  /// backend's twin (`backend/app/website/ref.py`) can be pinned to the
+  /// same list.
+  static bool isTrackingQueryParameter(String name) {
+    final lower = name.toLowerCase();
+    return lower.startsWith('utm_') || _trackingParameters.contains(lower);
+  }
+
+  /// [query] without its tracking parameters, as given otherwise; null
+  /// when they were all it held, or it was empty (a bare `?`, which [Uri]
+  /// already dropped; said here so the backend's twin drops it too).
+  static String? _withoutTracking(String query) {
+    if (query.isEmpty) return null;
+    final kept = <String>[
+      for (final pair in query.split('&'))
+        if (!isTrackingQueryParameter(_parameterName(pair))) pair,
+    ];
+    return kept.isEmpty ? null : kept.join('&');
+  }
+
+  /// The name of the `name=value` [pair], as written (no decoding, so the
+  /// backend's twin reads it the same way).
+  static String _parameterName(String pair) {
+    final cut = pair.indexOf('=');
+    return cut == -1 ? pair : pair.substring(0, cut);
   }
 
   /// The host of a website [ref] (`cafe.co.il`), which the screens show in
