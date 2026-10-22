@@ -213,6 +213,17 @@ class Caps:
 
 
 @dataclass(frozen=True, slots=True)
+class Provenance:
+    """§9.4 rule 3's name fallback (``constants.dart``, issue #277): the
+    normalised stop-words a name match ignores, and the Jaccard threshold
+    ``name_overlap_numerator / name_overlap_denominator``."""
+
+    name_stop_words: tuple[str, ...]
+    name_overlap_numerator: int
+    name_overlap_denominator: int
+
+
+@dataclass(frozen=True, slots=True)
 class ScannedConstants:
     """The shape a scanned menu is built in (D15)."""
 
@@ -318,6 +329,7 @@ class Vocabulary:
     templates: Templates
     prompt: PromptText
     caps: Caps
+    provenance: Provenance
     scanned: ScannedConstants
     pasted: PastedConstants
     website: WebsiteConstants
@@ -336,6 +348,7 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
     templates = _obj(root["templates"], "templates")
     prompt = _obj(root["prompt"], "prompt")
     caps = _obj(root["caps"], "caps")
+    provenance = _obj(root["provenance"], "provenance")
     scanned = _obj(root["scanned"], "scanned")
     pasted = _obj(root["pasted"], "pasted")
     suffix = _obj(pasted["pastedPriceSuffix"], "pastedPriceSuffix")
@@ -470,6 +483,15 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
             parser_schema_version=cap("parserSchemaVersion"),
             max_scan_pages=cap("maxScanPages"),
             max_scan_page_bytes=cap("maxScanPageBytes"),
+        ),
+        provenance=Provenance(
+            name_stop_words=_strs(provenance["nameStopWords"], "nameStopWords"),
+            name_overlap_numerator=_int(
+                provenance["nameOverlapNumerator"], "nameOverlapNumerator"
+            ),
+            name_overlap_denominator=_int(
+                provenance["nameOverlapDenominator"], "nameOverlapDenominator"
+            ),
         ),
         scanned=ScannedConstants(
             scanned_category_id=_str(scanned["scannedCategoryId"], "id"),

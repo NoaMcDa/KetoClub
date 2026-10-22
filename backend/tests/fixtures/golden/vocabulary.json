@@ -2721,6 +2721,29 @@
     "schemaName": "menu_analysis",
     "seedOilFreePromptFragment": "Strict seed-oil free: the user avoids industrial seed oils (canola, rapeseed, soybean, sunflower, corn, cottonseed and generic vegetable oil). A dish that is fried, deep-fried or cooked in one of them is modifiable, with a modification asking for it to be cooked in olive oil, butter or tallow instead, unless it is already nonKeto."
   },
+  "provenance": {
+    "nameOverlapDenominator": 5,
+    "nameOverlapNumerator": 3,
+    "nameStopWords": [
+      "and",
+      "choice",
+      "for",
+      "from",
+      "our",
+      "plus",
+      "served",
+      "the",
+      "with",
+      "without",
+      "your",
+      "בלי",
+      "בתוספת",
+      "לבחירה",
+      "ללא",
+      "מוגש",
+      "מוגשת"
+    ]
+  },
   "scanned": {
     "scannedCategoryId": "scanned",
     "scannedCategoryNameEn": "Scanned menu",

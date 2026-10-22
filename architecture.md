@@ -1554,15 +1554,45 @@ tests free of a real clock.)* In order:
 1. Strip a markdown fence if present. `jsonDecode` inside `try`; any throw →
    `badResponse`.
 2. Root not a map, or `dishes` missing or not a list → `badResponse`.
-3. Per element: `id` must match a dish in `source` **or** `name` must share at least
-   one word of ≥ 3 letters with a source dish name after `text_normaliser` on both
-   sides. Otherwise the element is an invention and its name goes to `unclassified`
-   (constraint 6).
+3. Per element: an `id` that matches a dish in `source` **always wins**, whatever
+   `name` says. Only when `id` is missing or matches no source dish is `name` read,
+   and it must either normalise (`text_normaliser`) exactly to a source dish's name
+   (the first such in menu order), or overlap one source dish's name highly: the
+   *content words* of a name are its normalised words of ≥ 3 letters not in
+   `nameStopWords` ("with", "and", "ללא", …), and the shared content words must be
+   at least `nameOverlapNumerator`/`nameOverlapDenominator` (3/5) of all the
+   content words the two names hold (Jaccard), with one dish strictly best — a tie
+   is ambiguous and matches neither. Otherwise the element is an invention and its
+   name goes to `unclassified` (constraint 6). **Each source dish is judged at most
+   once:** the first element resolving to it (by id or name) is the one judged,
+   placed or demoted, and every later element resolving to the same dish is
+   dropped — never re-routed to a lookalike that is still free — so a dish is
+   never in `dishes` twice or in both `dishes` and `unclassified`. *(Issue #277:
+   the previous rule — any one shared word of ≥ 3 letters, first source dish wins —
+   gave "Grilled Chicken" with an unknown id to "Chicken Schnitzel", attached an
+   invented "Chef special with fries" to the first dish saying "with", and let two
+   elements give one dish two conflicting verdicts. A strict fallback costs only
+   a dish shown as unclassified; a loose one costs a wrong green. The model is
+   given every id, so the name path is a safety net, not the normal route. The
+   stop-words and the threshold are exported to the golden vocabulary, so the
+   Python twin reads the same values.)*
 4. `verdict` matched by string, never by ordinal; `why` non-empty. Either failing →
    `unclassified`.
 5. `verdict == modifiable` with a null, blank, or over-length `modification` →
-   `unclassified` (constraint 7). A green or red carrying a `modification` keeps the
-   verdict and drops the field.
+   `unclassified` (constraint 7), **even when it carries `hidden_carbs`** (issue
+   #277). A green or red carrying a `modification` keeps the verdict and drops the
+   field. The same holds for a green that issue #57's post-rule turns yellow (its
+   own `net_carbs_estimate` is over the limit): no usable `modification`, no yellow.
+
+   5a. *(Issue #213, written down by #277.)* A green carrying at least one
+   well-formed `hidden_carbs` flag is a wrong green (constraint 5) and becomes
+   `modifiable`. Its instruction is the model's usable `modification`, or else the
+   first flag's `waiter_question`. Only here may a waiter question stand in for an
+   instruction, because only here is the flag the dish's whole reason to be
+   yellow: the question asks the one thing that decides it. A yellow the model sent
+   is yellow for a reason the flag need not cover (a side of fries, a carb count),
+   so a question about a glaze would let the fries through as if handled — which is
+   why rule 5 holds for it as written. A red drops its flags.
 6. Caps: more than `maxAnalysedDishes` (1000; a sanity bound against a
    runaway reply, not a menu size — raised from 150, which real Israeli Wolt
    venues exceed, #188) dishes → `badResponse`; `why` truncated at 300
@@ -3828,8 +3858,8 @@ only when present, so other entries are byte-identical) and a fresh answer
 replaces it. **Matching is on the device only** (`utils/allergens/
 allergen_matrix.dart`, no Python twin, no golden): a row speaks for a dish
 when one of its names normalises exactly (`TextNormaliser.normalise`, the
-key §9.4 dedups names by) to the dish's name; §9.4 rule 3's shared-word test
-is how the parser rejects inventions and is far too loose to say whose
+key §9.4 dedups names by) to the dish's name; §9.4 rule 3's word-overlap fallback
+is how the parser rejects inventions and is too loose to say whose
 allergens a dish has. A row naming no dish, or only a dish another row also
 names, is listed in `AllergenMatrixMatch.unmatched` and applied to nothing:
 never guessed. A matched row's `contains` cell is a stated concern and its

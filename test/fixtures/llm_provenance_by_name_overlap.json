@@ -1,11 +1,11 @@
 {
-  "_fixture_note": "synthetic fixture: the model's id does not match the source dish, but its name shares a normalised word of 3+ letters with the source dish's name (architecture.md §9.4 rule 3, positive case for the name-overlap path).",
+  "_fixture_note": "synthetic fixture: the model's id does not match the source dish, but its name holds exactly the source dish's content words, reworded (architecture.md §9.4 rule 3, positive case for the name-overlap path; since issue #277 a single shared word, as in the 'Steak au poivre' this fixture used to carry, is no longer enough).",
   "dishes": [
     {
       "id": "llm-generated-id-42",
-      "name": "Steak au poivre",
+      "name": "Ribeye Steak, grilled",
       "verdict": "orderAsIs",
-      "why": "A peppercorn crust on a plain steak.",
+      "why": "A plain grilled ribeye.",
       "modification": null,
       "net_carbs_estimate": 2
     }

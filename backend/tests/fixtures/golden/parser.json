@@ -2203,7 +2203,7 @@
       "name": "llm_provenance_by_name_overlap.json@scanned",
       "netCarbLimitGrams": 6,
       "pageCount": null,
-      "reply": "{\n  \"_fixture_note\": \"synthetic fixture: the model's id does not match the source dish, but its name shares a normalised word of 3+ letters with the source dish's name (architecture.md §9.4 rule 3, positive case for the name-overlap path).\",\n  \"dishes\": [\n    {\n      \"id\": \"llm-generated-id-42\",\n      \"name\": \"Steak au poivre\",\n      \"verdict\": \"orderAsIs\",\n      \"why\": \"A peppercorn crust on a plain steak.\",\n      \"modification\": null,\n      \"net_carbs_estimate\": 2\n    }\n  ]\n}\n",
+      "reply": "{\n  \"_fixture_note\": \"synthetic fixture: the model's id does not match the source dish, but its name holds exactly the source dish's content words, reworded (architecture.md §9.4 rule 3, positive case for the name-overlap path; since issue #277 a single shared word, as in the 'Steak au poivre' this fixture used to carry, is no longer enough).\",\n  \"dishes\": [\n    {\n      \"id\": \"llm-generated-id-42\",\n      \"name\": \"Ribeye Steak, grilled\",\n      \"verdict\": \"orderAsIs\",\n      \"why\": \"A plain grilled ribeye.\",\n      \"modification\": null,\n      \"net_carbs_estimate\": 2\n    }\n  ]\n}\n",
       "result": {
         "analysis": {
           "analysedAt": "2026-01-01T00:00:00.000Z",
@@ -2212,10 +2212,10 @@
               "dishId": "v1",
               "hiddenCarbs": [],
               "modification": null,
-              "name": "Steak au poivre",
+              "name": "Ribeye Steak, grilled",
               "netCarbsEstimate": 2.0,
               "verdict": "orderAsIs",
-              "why": "A peppercorn crust on a plain steak."
+              "why": "A plain grilled ribeye."
             }
           ],
           "engine": {
@@ -2234,7 +2234,7 @@
                   "description": "",
                   "id": "v1",
                   "imageUrl": null,
-                  "name": "Steak au poivre",
+                  "name": "Ribeye Steak, grilled",
                   "options": [],
                   "page": null,
                   "price": 0.0
@@ -2248,7 +2248,7 @@
           "fetchedAt": "2026-01-01T00:00:00.000Z",
           "venueName": null,
           "venueRef": {
-            "platformId": "334b2e24",
+            "platformId": "01610720",
             "source": "scan"
           }
         }
@@ -3675,7 +3675,7 @@
     {
       "name": "llm_provenance_by_name_overlap.json",
       "netCarbLimitGrams": 6,
-      "reply": "{\n  \"_fixture_note\": \"synthetic fixture: the model's id does not match the source dish, but its name shares a normalised word of 3+ letters with the source dish's name (architecture.md §9.4 rule 3, positive case for the name-overlap path).\",\n  \"dishes\": [\n    {\n      \"id\": \"llm-generated-id-42\",\n      \"name\": \"Steak au poivre\",\n      \"verdict\": \"orderAsIs\",\n      \"why\": \"A peppercorn crust on a plain steak.\",\n      \"modification\": null,\n      \"net_carbs_estimate\": 2\n    }\n  ]\n}\n",
+      "reply": "{\n  \"_fixture_note\": \"synthetic fixture: the model's id does not match the source dish, but its name holds exactly the source dish's content words, reworded (architecture.md §9.4 rule 3, positive case for the name-overlap path; since issue #277 a single shared word, as in the 'Steak au poivre' this fixture used to carry, is no longer enough).\",\n  \"dishes\": [\n    {\n      \"id\": \"llm-generated-id-42\",\n      \"name\": \"Ribeye Steak, grilled\",\n      \"verdict\": \"orderAsIs\",\n      \"why\": \"A plain grilled ribeye.\",\n      \"modification\": null,\n      \"net_carbs_estimate\": 2\n    }\n  ]\n}\n",
       "result": {
         "analysed": {
           "analysedAt": "2026-01-01T00:00:00.000Z",
@@ -3687,7 +3687,7 @@
               "name": "Grilled Ribeye Steak",
               "netCarbsEstimate": 2.0,
               "verdict": "orderAsIs",
-              "why": "A peppercorn crust on a plain steak."
+              "why": "A plain grilled ribeye."
             }
           ],
           "engine": {
@@ -5084,23 +5084,7 @@
       "result": {
         "analysed": {
           "analysedAt": "2026-01-01T00:00:00.000Z",
-          "dishes": [
-            {
-              "dishId": "dish-steak",
-              "hiddenCarbs": [
-                {
-                  "certainty": "suspected",
-                  "source": "glaze",
-                  "waiterQuestion": "Is the glaze sugar-free?"
-                }
-              ],
-              "modification": "Is the glaze sugar-free?",
-              "name": "Grilled Steak",
-              "netCarbsEstimate": 9.0,
-              "verdict": "modifiable",
-              "why": "Plain grilled protein."
-            }
-          ],
+          "dishes": [],
           "engine": {
             "kind": "llm",
             "model": "golden-model"
@@ -5108,6 +5092,7 @@
           "options": null,
           "schemaVersion": 1,
           "unclassified": [
+            "Grilled Steak",
             "Grilled Salmon",
             "לחם הבית",
             "צ'יפס בטטה",
@@ -6668,15 +6653,6 @@
               "netCarbsEstimate": null,
               "verdict": "orderAsIs",
               "why": "Plain grilled protein."
-            },
-            {
-              "dishId": "dish-steak",
-              "hiddenCarbs": [],
-              "modification": null,
-              "name": "Grilled Steak",
-              "netCarbsEstimate": null,
-              "verdict": "nonKeto",
-              "why": "Second opinion."
             }
           ],
           "engine": {
@@ -6765,28 +6741,10 @@
           "analysedAt": "2026-01-01T00:00:00.000Z",
           "dishes": [
             {
-              "dishId": "dish-steak",
+              "dishId": "dish-salmon",
               "hiddenCarbs": [],
               "modification": null,
-              "name": "Grilled Steak",
-              "netCarbsEstimate": null,
-              "verdict": "orderAsIs",
-              "why": "Plain grilled protein."
-            },
-            {
-              "dishId": "dish-bread",
-              "hiddenCarbs": [],
-              "modification": null,
-              "name": "לחם הבית",
-              "netCarbsEstimate": null,
-              "verdict": "orderAsIs",
-              "why": "Plain grilled protein."
-            },
-            {
-              "dishId": "dish-chips",
-              "hiddenCarbs": [],
-              "modification": null,
-              "name": "צ'יפס בטטה",
+              "name": "Grilled Salmon",
               "netCarbsEstimate": null,
               "verdict": "orderAsIs",
               "why": "Plain grilled protein."
@@ -6800,10 +6758,14 @@
           "schemaVersion": 1,
           "unclassified": [
             "הלחם",
+            "לחמ",
+            "ציפס",
             "An Eg",
             "Ox",
             "Mystery dish",
-            "Grilled Salmon",
+            "Grilled Steak",
+            "לחם הבית",
+            "צ'יפס בטטה",
             "An Egg"
           ]
         }
@@ -6948,6 +6910,819 @@
                 "id": "dish-egg",
                 "imageUrl": null,
                 "name": "An Egg",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "name": "hand_provenance_unknown_id_exact_name",
+      "netCarbLimitGrams": 6,
+      "reply": "{\"dishes\":[{\"id\":\"2\",\"name\":\"Grilled Chicken\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [
+            {
+              "dishId": "d2",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Grilled Chicken",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Plain grilled protein."
+            }
+          ],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "Chicken Schnitzel",
+            "Steak with Fries",
+            "Chicken Salad",
+            "Grilled Chicken Breast"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d1",
+                "imageUrl": null,
+                "name": "Chicken Schnitzel",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d2",
+                "imageUrl": null,
+                "name": "Grilled Chicken",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d3",
+                "imageUrl": null,
+                "name": "Steak with Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d4",
+                "imageUrl": null,
+                "name": "Chicken Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d5",
+                "imageUrl": null,
+                "name": "Grilled Chicken Breast",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "name": "hand_provenance_stop_word_is_no_match",
+      "netCarbLimitGrams": 6,
+      "reply": "{\"dishes\":[{\"id\":\"\",\"name\":\"Chef special with fries\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "Chef special with fries",
+            "Chicken Schnitzel",
+            "Grilled Chicken",
+            "Steak with Fries",
+            "Chicken Salad",
+            "Grilled Chicken Breast"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d1",
+                "imageUrl": null,
+                "name": "Chicken Schnitzel",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d2",
+                "imageUrl": null,
+                "name": "Grilled Chicken",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d3",
+                "imageUrl": null,
+                "name": "Steak with Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d4",
+                "imageUrl": null,
+                "name": "Chicken Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d5",
+                "imageUrl": null,
+                "name": "Grilled Chicken Breast",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "name": "hand_provenance_reworded_name",
+      "netCarbLimitGrams": 6,
+      "reply": "{\"dishes\":[{\"id\":null,\"name\":\"Chicken, grilled\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [
+            {
+              "dishId": "d2",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Grilled Chicken",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Plain grilled protein."
+            }
+          ],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "Chicken Schnitzel",
+            "Steak with Fries",
+            "Chicken Salad",
+            "Grilled Chicken Breast"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d1",
+                "imageUrl": null,
+                "name": "Chicken Schnitzel",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d2",
+                "imageUrl": null,
+                "name": "Grilled Chicken",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d3",
+                "imageUrl": null,
+                "name": "Steak with Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d4",
+                "imageUrl": null,
+                "name": "Chicken Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d5",
+                "imageUrl": null,
+                "name": "Grilled Chicken Breast",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "name": "hand_provenance_one_shared_word_is_no_match",
+      "netCarbLimitGrams": 6,
+      "reply": "{\"dishes\":[{\"id\":\"x\",\"name\":\"Chicken Wings\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "Chicken Wings",
+            "Chicken Schnitzel",
+            "Grilled Chicken",
+            "Steak with Fries",
+            "Chicken Salad",
+            "Grilled Chicken Breast"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d1",
+                "imageUrl": null,
+                "name": "Chicken Schnitzel",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d2",
+                "imageUrl": null,
+                "name": "Grilled Chicken",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d3",
+                "imageUrl": null,
+                "name": "Steak with Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d4",
+                "imageUrl": null,
+                "name": "Chicken Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d5",
+                "imageUrl": null,
+                "name": "Grilled Chicken Breast",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "name": "hand_provenance_tied_overlap_is_no_match",
+      "netCarbLimitGrams": 6,
+      "reply": "{\"dishes\":[{\"id\":\"x\",\"name\":\"Grilled Chicken Salad\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "Grilled Chicken Salad",
+            "Chicken Schnitzel",
+            "Grilled Chicken",
+            "Steak with Fries",
+            "Chicken Salad",
+            "Grilled Chicken Breast"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d1",
+                "imageUrl": null,
+                "name": "Chicken Schnitzel",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d2",
+                "imageUrl": null,
+                "name": "Grilled Chicken",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d3",
+                "imageUrl": null,
+                "name": "Steak with Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d4",
+                "imageUrl": null,
+                "name": "Chicken Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d5",
+                "imageUrl": null,
+                "name": "Grilled Chicken Breast",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "name": "hand_provenance_id_wins_over_other_name",
+      "netCarbLimitGrams": 6,
+      "reply": "{\"dishes\":[{\"id\":\"d1\",\"name\":\"Grilled Chicken\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [
+            {
+              "dishId": "d1",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Chicken Schnitzel",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Plain grilled protein."
+            }
+          ],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "Grilled Chicken",
+            "Steak with Fries",
+            "Chicken Salad",
+            "Grilled Chicken Breast"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d1",
+                "imageUrl": null,
+                "name": "Chicken Schnitzel",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d2",
+                "imageUrl": null,
+                "name": "Grilled Chicken",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d3",
+                "imageUrl": null,
+                "name": "Steak with Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d4",
+                "imageUrl": null,
+                "name": "Chicken Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d5",
+                "imageUrl": null,
+                "name": "Grilled Chicken Breast",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "name": "hand_duplicate_by_id_then_by_name",
+      "netCarbLimitGrams": 6,
+      "reply": "{\"dishes\":[{\"id\":\"d2\",\"name\":\"Grilled Chicken\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]},{\"id\":\"\",\"name\":\"Grilled Chicken\",\"verdict\":\"nonKeto\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]},{\"id\":\"d2\",\"name\":\"Grilled Chicken\",\"verdict\":\"nonKeto\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [
+            {
+              "dishId": "d2",
+              "hiddenCarbs": [],
+              "modification": null,
+              "name": "Grilled Chicken",
+              "netCarbsEstimate": null,
+              "verdict": "orderAsIs",
+              "why": "Plain grilled protein."
+            }
+          ],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "Chicken Schnitzel",
+            "Steak with Fries",
+            "Chicken Salad",
+            "Grilled Chicken Breast"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d1",
+                "imageUrl": null,
+                "name": "Chicken Schnitzel",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d2",
+                "imageUrl": null,
+                "name": "Grilled Chicken",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d3",
+                "imageUrl": null,
+                "name": "Steak with Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d4",
+                "imageUrl": null,
+                "name": "Chicken Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d5",
+                "imageUrl": null,
+                "name": "Grilled Chicken Breast",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "name": "hand_duplicate_demoted_then_valid",
+      "netCarbLimitGrams": 6,
+      "reply": "{\"dishes\":[{\"id\":\"d3\",\"name\":\"Steak with Fries\",\"verdict\":\"green\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]},{\"id\":\"d3\",\"name\":\"Steak with Fries\",\"verdict\":\"orderAsIs\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "Steak with Fries",
+            "Chicken Schnitzel",
+            "Grilled Chicken",
+            "Chicken Salad",
+            "Grilled Chicken Breast"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d1",
+                "imageUrl": null,
+                "name": "Chicken Schnitzel",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d2",
+                "imageUrl": null,
+                "name": "Grilled Chicken",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d3",
+                "imageUrl": null,
+                "name": "Steak with Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d4",
+                "imageUrl": null,
+                "name": "Chicken Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d5",
+                "imageUrl": null,
+                "name": "Grilled Chicken Breast",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              }
+            ],
+            "id": "cat-1",
+            "name": "Mains"
+          }
+        ],
+        "currency": "ILS",
+        "fetchedAt": "2026-01-01T00:00:00.000Z",
+        "venueName": null,
+        "venueRef": {
+          "platformId": "response-parser-test-venue",
+          "source": "wolt"
+        }
+      }
+    },
+    {
+      "name": "hand_yellow_without_modification_despite_hidden_carbs",
+      "netCarbLimitGrams": 6,
+      "reply": "{\"dishes\":[{\"id\":\"d2\",\"name\":\"Grilled Chicken\",\"verdict\":\"modifiable\",\"why\":\"Plain grilled protein.\",\"modification\":null,\"net_carbs_estimate\":null,\"hidden_carbs\":[{\"source\":\"glaze\",\"certainty\":\"suspected\",\"waiter_question\":\"Is the glaze sugar-free?\"}]}]}",
+      "result": {
+        "analysed": {
+          "analysedAt": "2026-01-01T00:00:00.000Z",
+          "dishes": [],
+          "engine": {
+            "kind": "llm",
+            "model": "golden-model"
+          },
+          "options": null,
+          "schemaVersion": 1,
+          "unclassified": [
+            "Grilled Chicken",
+            "Chicken Schnitzel",
+            "Steak with Fries",
+            "Chicken Salad",
+            "Grilled Chicken Breast"
+          ]
+        }
+      },
+      "sourceMenu": {
+        "categories": [
+          {
+            "dishes": [
+              {
+                "description": "",
+                "id": "d1",
+                "imageUrl": null,
+                "name": "Chicken Schnitzel",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d2",
+                "imageUrl": null,
+                "name": "Grilled Chicken",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d3",
+                "imageUrl": null,
+                "name": "Steak with Fries",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d4",
+                "imageUrl": null,
+                "name": "Chicken Salad",
+                "options": [],
+                "page": null,
+                "price": 10.0
+              },
+              {
+                "description": "",
+                "id": "d5",
+                "imageUrl": null,
+                "name": "Grilled Chicken Breast",
                 "options": [],
                 "page": null,
                 "price": 10.0
