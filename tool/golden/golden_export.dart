@@ -80,6 +80,7 @@ const List<String> goldenFileNames = <String>[
   'kitchen_signals.json',
   'allergen_concerns.json',
   'declarations.json',
+  'batches.json',
 ];
 
 /// [document] in the corpus's canonical form: two-space indentation, every
@@ -122,6 +123,7 @@ Future<Map<String, Object?>> buildGoldens() async {
     'kitchen_signals.json': _kitchenSignals(inputs),
     'allergen_concerns.json': await _allergenConcerns(),
     'declarations.json': _declarations(inputs),
+    'batches.json': _batches(inputs),
   };
 }
 
@@ -838,6 +840,79 @@ Map<String, Object?> _prompt(_Inputs inputs) => <String, Object?>{
         },
   ],
 };
+
+// ---------------------------------------------------------------------------
+// batches.json
+// ---------------------------------------------------------------------------
+
+/// Every menu split by `MenuAnalysisPrompt.batches` under the real limits
+/// and [goldenBatchLimits] (issue #188), each batch recorded as its
+/// categories' ids with their dish ids and its user prompt's length, and
+/// the real limits themselves, which pin the Python constants equal. Each
+/// menu is written once, under `menus`, and named by its entries.
+Map<String, Object?> _batches(_Inputs inputs) {
+  final limits = <String, (int, int)>{
+    'defaults': (
+      MenuAnalysisPrompt.batchMaxDishes(extract: false),
+      llmUserPromptMaxChars,
+    ),
+    'extract': (
+      MenuAnalysisPrompt.batchMaxDishes(extract: true),
+      llmUserPromptMaxChars,
+    ),
+    ...goldenBatchLimits,
+  };
+  final menus = <String, Menu>{
+    ...inputs.menus,
+    'large': goldenLargeMenu,
+    'empty': Menu(
+      venueRef: goldenWoltRef,
+      currency: 'ILS',
+      fetchedAt: goldenNow,
+      categories: const <MenuCategory>[],
+    ),
+  };
+  return <String, Object?>{
+    'userPromptMaxChars': llmUserPromptMaxChars,
+    'maxDishes': llmBatchMaxDishes,
+    'maxDishesExtract': llmBatchMaxDishesWithExtraction,
+    'menus': <String, Object?>{
+      for (final MapEntry(key: name, value: menu) in menus.entries)
+        name: menu.toJson(),
+    },
+    'entries': <Object?>[
+      for (final MapEntry(key: menuName, value: menu) in menus.entries)
+        for (final MapEntry(key: limitName, value: (maxDishes, maxChars))
+            in limits.entries)
+          <String, Object?>{
+            'name': '$menuName/$limitName',
+            'menu': menuName,
+            'maxDishes': maxDishes,
+            'maxChars': maxChars,
+            'batches': <Object?>[
+              for (final batch in MenuAnalysisPrompt.batches(
+                menu,
+                maxDishes: maxDishes,
+                maxChars: maxChars,
+              ))
+                <String, Object?>{
+                  'categories': <Object?>[
+                    for (final category in batch.categories)
+                      <String, Object?>{
+                        'id': category.id,
+                        'dishIds': <String>[
+                          for (final dish in category.dishes) dish.id,
+                        ],
+                      },
+                  ],
+                  'userPromptLength': MenuAnalysisPrompt.userPrompt(batch)
+                      .length,
+                },
+            ],
+          },
+    ],
+  };
+}
 
 // ---------------------------------------------------------------------------
 // parser.json

@@ -150,8 +150,10 @@ final class GeminiChatClient implements LlmChatClient {
   /// The header Gemini reads the API key from.
   static const String apiKeyHeader = 'x-goog-api-key';
 
-  /// The reply budget, matching the backend's `GEMINI_MAX_OUTPUT_TOKENS`.
-  static const int maxOutputTokens = 8192;
+  /// The reply budget, matching the backend's `GEMINI_MAX_OUTPUT_TOKENS`
+  /// (raised there from 8192 for issue #188; this stayed behind until the
+  /// batch sizes in `constants.dart`, which assume it, were set).
+  static const int maxOutputTokens = 65536;
 
   /// The reasoning budget, matching the backend's
   /// `GEMINI_THINKING_BUDGET`: zero, so the whole output budget is spent

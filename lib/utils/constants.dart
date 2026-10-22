@@ -92,6 +92,40 @@ const Duration llmRequestTimeout = Duration(seconds: 120);
 /// `user_prompt` limit; this only has to sit above any menu that fits it.
 const int maxAnalysedDishes = 1000;
 
+/// The longest `user_prompt` KetoClub's backend accepts on its chat route,
+/// in characters (issue #188). The backend enforces it as
+/// `USER_PROMPT_MAX_CHARS` in `backend/app/schemas.py` (`ChatRequest`):
+/// change both together. A longer prompt is a 422 before Gemini is ever
+/// asked, so `LlmMenuClassifier` never sends one: it splits a menu whose
+/// prompt would exceed it into batches (`MenuAnalysisPrompt.batches`).
+///
+/// Dart counts UTF-16 code units and Python counts code points, so a Dart
+/// length is never shorter than the Python one: a prompt that fits here
+/// fits there.
+const int llmUserPromptMaxChars = 400000;
+
+/// The most dishes one menu-analysis request asks about (issue #188,
+/// architecture.md D6 as D25 amends it). The Python twin is
+/// `ANALYSIS_BATCH_MAX_DISHES` in `backend/app/keto/batching.py`; the
+/// golden `batches.json` pins the two equal.
+///
+/// Sized so the reply always fits the output budget
+/// (`GEMINI_MAX_OUTPUT_TOKENS`, 65,536 tokens): the worst keto dish is a
+/// 300-character `why` and a 300-character `modification` in Hebrew, at
+/// roughly a token a character, plus its keys, id, name and hidden-carb
+/// flags — about 750 tokens, and 80 of those is 60,000. It also keeps one
+/// request inside the 120 s client timeout: the smoke test measured about
+/// 0.9 s a dish (`architecture.md` §17.1).
+const int llmBatchMaxDishes = 80;
+
+/// [llmBatchMaxDishes] when the request also asks for each dish's
+/// ingredients (Banto; ALG-03, D26 C2), whose list makes every reply
+/// larger: up to 40 ingredients (`maxIngredientsPerDish`) at about 25
+/// tokens each on top of the 750 a keto dish takes, about 1,750 tokens a
+/// dish, and 35 of those is 61,250. The Python twin is
+/// `ANALYSIS_BATCH_MAX_DISHES_EXTRACT` in `backend/app/keto/batching.py`.
+const int llmBatchMaxDishesWithExtraction = 35;
+
 /// `why` is truncated at this many characters, never rejected for length
 /// alone (architecture.md §9.4 rule 6, §9.1).
 const int maxWhyLength = 300;

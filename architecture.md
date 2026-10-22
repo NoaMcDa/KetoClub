@@ -3112,6 +3112,39 @@ architecture-test host-string boundaries; one `AppDependencies` field for the
 estimate repository and one for `backendConfigured`; and `MenuFetched.analysis`
 now meaning "the backend answered with this" as well as "a website PDF was read".
 
+**Amendment: D6 becomes "as few requests as the prompt budget allows" (issue
+#188).** A menu is now classified in as few requests as fit, on the device
+(`LlmMenuClassifier`, over either chat client) and on the server
+(`app/services/classify.py`) alike, split by one deterministic rule with a
+twin on each side (`MenuAnalysisPrompt.batches`, `app/keto/batching.py`,
+pinned equal by the golden `batches.json`): at most `llmUserPromptMaxChars`
+characters of user prompt, the bound `/v1/chat` enforces
+(`USER_PROMPT_MAX_CHARS` in `backend/app/schemas.py`, 400,000), and at most 80
+dishes, or 35 when Banto asks for ingredients, so the worst reply (about 750
+tokens a keto dish in Hebrew, 1,750 with ingredients) fits the 65,536-token
+output budget the backend and now the phone client both set, and one request
+stays inside the 120 s timeout. The dishes are dealt out in menu order into
+balanced batches (200 dishes are 67, 67 and 66), so the same menu is always
+the same requests and the completion cache keeps working. A menu that fits
+one request (the 56-dish Wolt fixture is 24,237 characters) is that one
+request, byte for byte. The batches go one at a time and are merged in
+order. A batch whose own reply or wait fails (`badResponse`, `timeout`) puts
+its dishes under `unclassified` and the next is still sent; only when every
+batch failed is the menu a failure. Any other failure, `rateLimited` mid-menu
+included, stops the menu and is the whole menu's failure, so the router
+answers with the rules and names the reason: a `MenuAnalysed` has nowhere to
+carry one, so a partial result would show the rest as unexplained "not read"
+under an AI chip and keep that in the cache for a day. Through `/v1/chat` the
+batches already answered are completion-cache hits, which spend no quota, the
+next time. The server spends one analysis-bucket unit per batch, answers an
+empty bucket mid-menu as it would before the first (the 429, or the rules
+stamped `rateLimited`), and caches only a merge with no failed batch. What it
+costs: a large menu spends one request of the per-install limits per batch (a
+200-dish menu is three of the web build's 40 a day), and no real Gemini
+request over a large menu has been sent, so the per-dish token and latency
+figures the ceilings rest on are estimates from the 20-dish smoke test
+(§17.1).
+
 ### D26 — Banto: a profile for every restriction
 
 Banto extends the menu
