@@ -521,4 +521,85 @@ void main() {
       });
     });
   });
+
+  group('SavedController after the Recent route closes (issue #287)', () {
+    late FakeMenuRepository repository;
+    late FakeClock clock;
+    late FakeVisitHistoryStore history;
+    late SavedController controller;
+
+    setUp(() async {
+      repository = FakeMenuRepository();
+      clock = FakeClock(DateTime.utc(2026));
+      history = FakeVisitHistoryStore(clock);
+      repository.seedCache(
+        CachedMenu(menu: _menuWith(_woltRef, DateTime.utc(2026))),
+      );
+      history.seed(_visit(_woltRef, DateTime.utc(2026)));
+      controller = SavedController(repository, history);
+      await controller.load();
+    });
+
+    test('Undo after dispose does nothing and notifies no one', () async {
+      // Arrange: removed, then the route closes before Undo is tapped.
+      final removed = controller.hide(_woltRef)!;
+      controller.dispose();
+      await pumpEventQueue();
+
+      // Act
+      controller.restore(removed);
+
+      // Assert: no throw from a disposed notifier, and the removal the
+      // dispose committed stands.
+      expect(repository.removedRefs, [_woltRef]);
+      expect(history.removedRefs, [_woltRef]);
+    });
+
+    test('a removal pending at dispose is committed once, and a later '
+        'commitRemoval is a no-op', () async {
+      // Arrange
+      expect(controller.hide(_woltRef), isNotNull);
+
+      // Act: the route closes, then the SnackBar runs out.
+      controller.dispose();
+      await pumpEventQueue();
+      await controller.commitRemoval(_woltRef);
+
+      // Assert
+      expect(repository.removedRefs, [_woltRef]);
+      expect(history.removedRefs, [_woltRef]);
+    });
+
+    test(
+      'commitRemoval keeps a menu opened again after it was hidden',
+      () async {
+        // Arrange: removed, then the venue reopened before the SnackBar
+        // closed, which recorded a newer visit and cached the menu afresh.
+        controller.hide(_woltRef);
+        clock.advance(const Duration(minutes: 1));
+        await history.recordVisit(_woltRef, dishCount: 1);
+
+        // Act
+        await controller.commitRemoval(_woltRef);
+
+        // Assert
+        expect(repository.removedRefs, isEmpty);
+        expect(history.removedRefs, isEmpty);
+        expect(await repository.cached(_woltRef), isNotNull);
+      },
+    );
+
+    test('commitRemoval after an Undo deletes nothing', () async {
+      // Arrange
+      final removed = controller.hide(_woltRef)!;
+      controller.restore(removed);
+
+      // Act
+      await controller.commitRemoval(_woltRef);
+
+      // Assert
+      expect(repository.removedRefs, isEmpty);
+      expect(controller.entries.single.ref, _woltRef);
+    });
+  });
 }

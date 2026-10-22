@@ -640,6 +640,9 @@ class _SavedEntryTile extends StatelessWidget {
                         : l10n.savedKeepSemanticLabel(title),
                     button: true,
                     toggled: entry.isPinned,
+                    // The button's own tap is excluded with its children,
+                    // so the node carries it (issue #285).
+                    onTap: onTogglePin,
                     excludeSemantics: true,
                     child: IconButton(
                       icon: Icon(
@@ -673,6 +676,7 @@ class _SavedEntryTile extends StatelessWidget {
                 Semantics(
                   label: l10n.savedRemoveSemanticLabel(title),
                   button: true,
+                  onTap: onRemove,
                   excludeSemantics: true,
                   child: IconButton(
                     // The one destructive look, shared with Settings' "Clear"

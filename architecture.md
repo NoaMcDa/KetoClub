@@ -1148,6 +1148,12 @@ instead of leaving the app; Back from Explore leaves it (issue #262). `Scan`
 and `SavedScreen` are stateless placeholders with localized copy explaining what
 is missing, not stubs left silently blank; `MenuScreen` (reached from a search
 result, not a tab) and `WaiterCardSheet` (a modal) sit outside the shell.
+At 840px and wider the shell shows a `NavigationRail` instead of the bar
+(#223); both build the same tree around the tab's screen — a `Scaffold`
+whose body is a `Row` ending in the screen's keyed `Expanded` — so a window
+crossing 840px (an iPad rotating, a browser resized) keeps the route's
+controller and the screen's state: the Scan tab's pages and pasted text,
+Settings mid-edit (issue #287).
 
 **Content is capped at 680px on a wide window** *(issue #221, Phase 8)*. Every
 screen was drawn on a 390px artboard, and on a desktop browser a full-width
@@ -1191,6 +1197,22 @@ and the Waiter Card work as they do on a phone. The header never scrolls under
 the app bar there, so the bar shows no venue name (issue #237 applies below
 1080px only). Below 1080px, and for the loading, failed-fetch and empty-menu
 states at any width, the screen is the single capped column above, unchanged.
+The search text lives in `MenuController.query` rather than the field, so
+the field rebuilt in the other pane, or after a long scroll out of the lazy
+list, still shows the query that filters (issue #286).
+
+**What the list shows** *(issue #286)*. An unclassified dish is listed once,
+in the unclassified section, under every filter: `visibleRows` leaves out the
+dishes `unclassifiedRows` lists, where "All" once listed them twice. The
+"Showing N dishes" label counts the cards on screen (the visible rows and the
+unclassified section's), so a search, the carb budget or a page filter lowers
+it. The Filters row counts the carb budget as active only while its field is
+shown (an AI result). Each category header's `GlobalKey` is keyed by name and
+by which header of that name it is, since a pasted menu can repeat a heading;
+each dish card is keyed by its dish id, so an open waiter script stays with
+its dish when a filter moves it. A load superseded by a later one, or
+outlived by its screen, applies nothing (`MenuController`'s generation token,
+issue #287), and refresh is disabled while a load runs.
 
 Visual rules: a verdict is always icon **and** colour, never colour alone
 (accessibility). Unclassified dishes are listed under their own neutral heading.

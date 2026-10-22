@@ -248,8 +248,39 @@ final class MenuController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
+    // Retires whatever load is in flight: its results land on nothing.
+    _generation++;
     _carbBudget.removeListener(_onBudgetChange);
     super.dispose();
+  }
+
+  /// Whether [dispose] has run (issue #287). A load still in flight when
+  /// the screen goes away finishes into nothing: [notifyListeners] is
+  /// skipped, and [open], [refresh] and [reanalyse] stop at their next
+  /// step ([_isCurrent]).
+  bool _disposed = false;
+
+  /// Bumped by every [open], [refresh] and [reanalyse], and by [dispose]
+  /// (issue #287). Each load keeps the value it started with and applies
+  /// what it fetched or classified only while that is still the current
+  /// one ([_isCurrent]), so a load superseded by a later one, or outlived
+  /// by its screen, can neither overwrite the newer result, write the
+  /// last venue, record a visit, nor put [phase] back to idle while the
+  /// newer one is still running.
+  int _generation = 0;
+
+  /// Whether the load that started as [generation] is still the one this
+  /// controller shows: no later load has started and it is not disposed.
+  bool _isCurrent(int generation) => !_disposed && generation == _generation;
+
+  /// Notifies listeners unless this controller is disposed (issue #287):
+  /// an await that resumes after the screen went away, a load or a note
+  /// written as it closed, must not reach a dead listener list.
+  @override
+  void notifyListeners() {
+    if (_disposed) return;
+    super.notifyListeners();
   }
 
   /// Called when the budget changes; re-filters the visible rows by
@@ -678,7 +709,10 @@ final class MenuController extends ChangeNotifier {
   /// [MenuFilter.redOnly] keeps [DishVerdict.nonKeto] ones;
   /// [MenuFilter.greenAndYellow] keeps the first two together (see its own
   /// doc: no longer offered by a control, but still honoured); and
-  /// [MenuFilter.all] keeps every dish, judged or not. Independently,
+  /// [MenuFilter.all] keeps every dish, judged or not — except the dishes
+  /// [unclassifiedRows] already lists, which the menu screen shows once,
+  /// in the unclassified section, under every filter (issue #286; before
+  /// it, [MenuFilter.all] listed them a second time). Independently,
   /// [query] — normalised through [TextNormaliser.normalise], so it is
   /// case- and niqqud-insensitive — must appear in the dish's normalised
   /// name or description; a blank [query] applies no such test.
@@ -716,10 +750,16 @@ final class MenuController extends ChangeNotifier {
           .toList();
     } else {
       final analysedById = _analysedById();
+      // By identity: [unclassifiedRows] holds this menu's own instances,
+      // one per name it placed, so a twin of the same name stays listed.
+      final unclassified = Set<Dish>.identity()
+        ..addAll(unclassifiedRows.map((row) => row.dish));
       rows = <DishRow>[];
       for (final category in currentMenu.categories) {
         for (final dish in category.dishes) {
           final verdict = analysedById[dish.id];
+          // Listed once, in the unclassified section (issue #286).
+          if (verdict == null && unclassified.contains(dish)) continue;
           if (!_matchesFilter(dish.id, verdict)) continue;
           if (!_matchesQuery(dish, normalisedQuery)) continue;
           if (!_matchesBudget(verdict)) continue;
@@ -1199,10 +1239,15 @@ final class MenuController extends ChangeNotifier {
     VenueOpenHint? hint,
     bool bantoMode = BantoMode.enabled,
   }) async {
+    final generation = ++_generation;
     _ref = ref;
     _phase = LoadPhase.fetching;
     _pageFilter = null;
     _bantoMode = bantoMode;
+    // A retry starts from a clean slate (issue #287): the last failure's
+    // copy gives way to the loading state at once.
+    _fetchFailure = null;
+    _fetchStatusCode = null;
     notifyListeners();
 
     _openRef = ref;
@@ -1211,6 +1256,7 @@ final class MenuController extends ChangeNotifier {
     _filter = appSettings.lastFilter ?? _defaultFilter(appSettings.filter);
     _dishNotes = await _notes.readAll(ref);
     final previous = await _history.read(ref);
+    if (!_isCurrent(generation)) return;
     _workedFor = previous?.workedFor ?? const <String>[];
     _confirmations = previous?.confirmations ?? const <DishConfirmation>[];
     _changeConfirmations =
@@ -1222,6 +1268,9 @@ final class MenuController extends ChangeNotifier {
     }
 
     final fetchResult = await _repository.load(ref, forceRefresh: forceRefresh);
+    // Superseded or disposed while fetching (issue #287): nothing below
+    // runs, so neither the last venue nor a visit is written for it.
+    if (!_isCurrent(generation)) return;
     switch (fetchResult) {
       case MenuFetched(
         menu: final fetchedMenu,
@@ -1248,11 +1297,13 @@ final class MenuController extends ChangeNotifier {
           fetchedMenu,
           options,
         );
+        if (!_isCurrent(generation)) return;
         if (reusable != null) {
           _analysis = reusable;
         } else {
           await _classify(ref, fetchedMenu, options);
         }
+        if (!_isCurrent(generation)) return;
         await _recordVisit(
           ref,
           fetchedMenu,
@@ -1273,6 +1324,7 @@ final class MenuController extends ChangeNotifier {
         _fetchStatusCode = statusCode;
     }
 
+    if (!_isCurrent(generation)) return;
     _phase = LoadPhase.idle;
     notifyListeners();
   }
@@ -1482,9 +1534,15 @@ final class MenuController extends ChangeNotifier {
   /// failed fetch, returning [MenuFetched] with `fromCache: true` rather
   /// than [MenuFetchFailed] — that path is handled by the same branch
   /// [open] uses, below.
+  ///
+  /// Also a no-op while a load is running ([isLoading], issue #287): a
+  /// refresh pulled during a slow classification would start a second
+  /// model call, and whichever finished first would end the progress
+  /// state while the other still ran.
   Future<void> refresh() async {
     final currentRef = _ref;
-    if (currentRef == null) return;
+    if (currentRef == null || isLoading) return;
+    final generation = ++_generation;
     final previousMenu = _menu;
     final previousAnalysis = _analysis;
 
@@ -1492,6 +1550,7 @@ final class MenuController extends ChangeNotifier {
     notifyListeners();
 
     final fetchResult = await _repository.load(currentRef, forceRefresh: true);
+    if (!_isCurrent(generation)) return;
     switch (fetchResult) {
       case MenuFetched(
         menu: final fetchedMenu,
@@ -1513,6 +1572,7 @@ final class MenuController extends ChangeNotifier {
         _fetchFailure = null;
         _fetchStatusCode = null;
         final options = _optionsFrom(await _settings.read());
+        if (!_isCurrent(generation)) return;
         if (unchanged &&
             previousAnalysis is MenuAnalysed &&
             options.matches(previousAnalysis.options)) {
@@ -1538,6 +1598,7 @@ final class MenuController extends ChangeNotifier {
         _isFromCache = true;
     }
 
+    if (!_isCurrent(generation)) return;
     _phase = LoadPhase.idle;
     notifyListeners();
   }
@@ -1559,7 +1620,10 @@ final class MenuController extends ChangeNotifier {
     _phase = LoadPhase.classifying;
     notifyListeners();
 
+    final generation = _generation;
     final analysis = await _classifier.classify(menu, options: options);
+    // Superseded or disposed while the engine ran (issue #287).
+    if (!_isCurrent(generation)) return;
     _analysis = analysis;
     if (analysis is MenuAnalysed) {
       await _repository.saveAnalysis(ref, analysis);
@@ -1592,11 +1656,13 @@ final class MenuController extends ChangeNotifier {
   ///
   /// A no-op when [open] has not yet produced a [menu]. Persists a
   /// successful [MenuAnalysed] through the repository exactly as [open]
-  /// does, so the next [open] can reuse it.
+  /// does, so the next [open] can reuse it. A no-op while a load is
+  /// running ([isLoading], issue #287), as [refresh] is.
   Future<void> reanalyse() async {
     final currentMenu = _menu;
     final currentRef = _ref;
-    if (currentMenu == null || currentRef == null) return;
+    if (currentMenu == null || currentRef == null || isLoading) return;
+    final generation = ++_generation;
 
     // Loading from the first synchronous moment, like open(); the
     // listeners hear about it once _classify notifies. Classified through
@@ -1604,8 +1670,10 @@ final class MenuController extends ChangeNotifier {
     // while the retry runs (issue #65).
     _phase = LoadPhase.classifying;
     final options = _optionsFrom(await _settings.read());
+    if (!_isCurrent(generation)) return;
     await _classify(currentRef, currentMenu, options);
 
+    if (!_isCurrent(generation)) return;
     _phase = LoadPhase.idle;
     notifyListeners();
   }
@@ -1621,12 +1689,16 @@ final class MenuController extends ChangeNotifier {
   /// — every combined profile, for a group (ALG-12).
   ClassificationOptions _optionsFrom(AppSettings settings) {
     _applyPeople(settings);
+    final generation = _generation;
     return ClassificationOptions.fromSettings(
       settings,
       // The engine that picks up these options reports itself here, so
       // [phase] can name it (issue #65). An observer only: it takes no
-      // part in [ClassificationOptions.matches] or equality.
-      onEngineStarted: _onEngineStarted,
+      // part in [ClassificationOptions.matches] or equality. Heard only
+      // while the load these options were built for is current (#287).
+      onEngineStarted: (engine) {
+        if (_isCurrent(generation)) _onEngineStarted(engine);
+      },
       // The opening screen's flag, as [wording] reads it, so a screen in
       // Banto asks for ingredients whatever the compile-time define.
       bantoMode: _bantoMode,
