@@ -278,9 +278,40 @@ void main() {
       }
     });
 
-    test('does not guard corn (baby corn is a genuine trap)', () {
-      // Assert
-      expect(ketoQualifierGuardsEn, isNot(contains('corn')));
+    test('guards corn only after, by fed (baby corn is a genuine trap)', () {
+      // Act
+      final guard = ketoQualifierGuardsEn['corn'];
+      // Assert: "corn-fed chicken" (issue #273) names the feed; nothing
+      // before `corn` ever rescues it.
+      expect(guard, isNotNull);
+      expect(guard!.before, isEmpty);
+      expect(guard.after, equals(['fed']));
+    });
+
+    test('every name-wide substitute key is a guarded trigger', () {
+      // Arrange
+      final en = <String>{...carbModifiersEn.keys, ...nonKetoBasesEn};
+      final he = <String>{...carbModifiersHe.keys, ...nonKetoBasesHe};
+      // Assert (issue #273)
+      for (final key in ketoSubstituteNameWordsEn.keys) {
+        expect(en, contains(key), reason: key);
+      }
+      for (final key in ketoSubstituteNameWordsHe.keys) {
+        expect(he, contains(key), reason: key);
+      }
+    });
+
+    test('no regular English plural is an entry of its own', () {
+      // Assert (issue #274): every base already matches its s/es plural.
+      for (final base in nonKetoBasesEn) {
+        for (final suffix in ['s', 'es']) {
+          expect(
+            nonKetoBasesEn,
+            isNot(contains('$base$suffix')),
+            reason: '$base$suffix',
+          );
+        }
+      }
     });
 
     test('spaghetti is guarded only after, by squash', () {
@@ -307,15 +338,27 @@ void main() {
       }
     });
 
-    test('every guard is bidirectional (before equals after)', () {
+    test("every guard but צ'יפס is bidirectional (before equals after)", () {
       // Act, Assert
       for (final entry in ketoQualifierGuardsHe.entries) {
+        if (entry.key == "צ'יפס") continue;
         expect(
           entry.value.before,
           equals(entry.value.after),
           reason: 'ketoQualifierGuardsHe["${entry.key}"] must be symmetric',
         );
       }
+    });
+
+    test("צ'יפס is rescued by a cheese only before it (issue #273)", () {
+      // Act
+      final guard = ketoQualifierGuardsHe["צ'יפס"]!;
+      // Assert: "צ'יפס פרמזן כמהין" is truffle-parmesan fries; the
+      // vegetables and קטו still rescue from either side.
+      expect(guard.before, containsAll(<String>['פרמזן', 'גבינה']));
+      expect(guard.after, isNot(contains('פרמזן')));
+      expect(guard.after, isNot(contains('גבינה')));
+      expect(guard.after, containsAll(<String>['קישואים', 'קטו']));
     });
   });
 

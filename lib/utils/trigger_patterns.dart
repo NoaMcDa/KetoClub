@@ -59,5 +59,17 @@ RegExp hebrewTriggerPattern(
 /// substring match: `toasted almonds` and `Sacramento tomato salad` would
 /// turn red if it were. Public for the same reason as
 /// [hebrewTriggerPattern].
-RegExp latinTriggerPattern(String normalisedTrigger) =>
-    RegExp('\\b${RegExp.escape(normalisedTrigger)}\\b', caseSensitive: false);
+///
+/// [allowPlural] accepts a regular English plural, an `s` or `es` right
+/// after the trigger and before the boundary, so `dumpling` also finds
+/// "dumplings" and `blintz` "blintzes" (issue #274). Only the keto
+/// engine's non-keto bases turn it on; every other caller keeps the
+/// exact word.
+RegExp latinTriggerPattern(
+  String normalisedTrigger, {
+  bool allowPlural = false,
+}) => RegExp(
+  '\\b${RegExp.escape(normalisedTrigger)}${allowPlural ? '(?:e?s)?' : ''}'
+  r'\b',
+  caseSensitive: false,
+);
