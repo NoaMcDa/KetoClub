@@ -41,6 +41,8 @@ from app.routers import (
 )
 from app.services.rate_limit import RateLimiter
 from app.services.request_logging import RequestLoggingMiddleware
+from app.services.trusted_host import AllowedHostsMiddleware
+from app.services.website_transport import website_client
 
 # "No daily cap" (#123) expressed as a bound no real install could reach in
 # a day, so the discovery limiter's day window never binds.
@@ -72,9 +74,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         Base.metadata.create_all(engine)
         app.state.engine = engine
         app.state.http_client = httpx.AsyncClient()
+        # The website routes' own client (#267): it dials only the public
+        # addresses it resolved, ignores HTTP(S)_PROXY, and resolves through
+        # ``app.state.resolve_host`` so tests can stand in for DNS.
+        app.state.website_http_client = website_client(
+            lambda host: app.state.resolve_host(host),
+            app.state.website_network_backend,
+        )
         try:
             yield
         finally:
+            await app.state.website_http_client.aclose()
             await app.state.http_client.aclose()
             engine.dispose()
 
@@ -131,6 +141,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.robots_cache = {}
     app.state.website_clock = time.monotonic
     app.state.resolve_host = resolve_host_addresses
+    # The network under the website client; None is the real one. Tests set
+    # a fake (``httpcore.AsyncMockBackend``) before the lifespan runs.
+    app.state.website_network_backend = None
     app.add_exception_handler(BackendError, handle_backend_error)
     app.add_exception_handler(RequestValidationError, handle_validation_error)
 
@@ -145,6 +158,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         # here (issue #103): both /v1/chat and the Wolt proxy answer
         # X-KetoClub-Cache, and the client needs to read it.
         expose_headers=["X-KetoClub-Cache"],
+    )
+    # Added last, so it runs first (#271): a request naming a host this
+    # server is not never reaches CORS, the log or a route.
+    app.add_middleware(
+        AllowedHostsMiddleware, allowed_hosts=resolved_settings.allowed_hosts
     )
 
     app.include_router(health.router, prefix="/v1")
