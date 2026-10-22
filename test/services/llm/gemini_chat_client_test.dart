@@ -838,7 +838,7 @@ void main() {
         _configOf(sent[1]),
         equals(<String, Object?>{
           'responseMimeType': 'application/json',
-          'maxOutputTokens': 8192,
+          'maxOutputTokens': GeminiChatClient.maxOutputTokens,
           'temperature': 0,
         }),
       );
