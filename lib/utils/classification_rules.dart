@@ -175,11 +175,22 @@ final List<_CompiledBase> _fillingProteinHe = _compileDietaryHe(
 
 /// Every carb-only qualifier word, both languages, normalised once
 /// (issue #191) — the set [ClassificationRules.carbOnlyBase] tests a dish
-/// name's leftover words against.
+/// name's leftover words against. The toppings ([carbOnlyToppingsEn],
+/// [carbOnlyToppingsHe]) qualify too (issue #273).
 final Set<String> _carbOnlyQualifiers = <String>{
   for (final word in carbOnlyQualifiersEn) TextNormaliser.normalise(word),
   for (final word in carbOnlyQualifiersHe) TextNormaliser.normalise(word),
+  for (final word in carbOnlyToppingsEn) TextNormaliser.normalise(word),
+  for (final word in carbOnlyToppingsHe) TextNormaliser.normalise(word),
 };
+
+/// See [_baseEn]; the toppings [ClassificationRules.describesFilling]
+/// blanks out before it looks for a filling (issue #273), English then
+/// Hebrew, in list order.
+final List<_CompiledBase> _toppings = <_CompiledBase>[
+  ..._compileDietaryEn(carbOnlyToppingsEn),
+  ..._compileDietaryHe(carbOnlyToppingsHe),
+];
 
 /// No dietary rule but dairy has guards; the seed-oil and plant tables
 /// scan against this empty map.
@@ -703,8 +714,13 @@ abstract final class ClassificationRules {
         parts.add(TextNormaliser.normalise(value));
       }
     }
-    final text = parts.where((part) => part.isNotEmpty).join(' ');
+    var text = parts.where((part) => part.isNotEmpty).join(' ');
     if (text.isEmpty) return false;
+    // A topping named again ("tossed in truffle oil and parmesan") is not
+    // a filling (issue #273): each one is replaced with a space first.
+    for (final topping in _toppings) {
+      text = text.replaceAll(topping.pattern, ' ');
+    }
     return mentionsPlant(text) ||
         mentionsDairy(text) ||
         _anyUnguardedMatch(text, [

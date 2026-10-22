@@ -343,6 +343,8 @@ Map<String, Object?> _vocabulary() {
     'carbOnlyEligibleTriggers': carbOnlyEligibleTriggers.toList(),
     'carbOnlyQualifiersEn': carbOnlyQualifiersEn,
     'carbOnlyQualifiersHe': carbOnlyQualifiersHe,
+    'carbOnlyToppingsEn': carbOnlyToppingsEn,
+    'carbOnlyToppingsHe': carbOnlyToppingsHe,
     'fillingProteinTriggersEn': fillingProteinTriggersEn,
     'fillingProteinTriggersHe': fillingProteinTriggersHe,
     'seedOilTriggersEn': seedOilTriggersEn,

@@ -297,6 +297,8 @@ class Vocabulary:
     carb_only_eligible_triggers: tuple[str, ...]
     carb_only_qualifiers_en: tuple[str, ...]
     carb_only_qualifiers_he: tuple[str, ...]
+    carb_only_toppings_en: tuple[str, ...]
+    carb_only_toppings_he: tuple[str, ...]
     filling_protein_triggers_en: tuple[str, ...]
     filling_protein_triggers_he: tuple[str, ...]
     seed_oil_triggers_en: tuple[str, ...]
@@ -375,6 +377,8 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
         carb_only_eligible_triggers=strs("carbOnlyEligibleTriggers"),
         carb_only_qualifiers_en=strs("carbOnlyQualifiersEn"),
         carb_only_qualifiers_he=strs("carbOnlyQualifiersHe"),
+        carb_only_toppings_en=strs("carbOnlyToppingsEn"),
+        carb_only_toppings_he=strs("carbOnlyToppingsHe"),
         filling_protein_triggers_en=strs("fillingProteinTriggersEn"),
         filling_protein_triggers_he=strs("fillingProteinTriggersHe"),
         seed_oil_triggers_en=strs("seedOilTriggersEn"),

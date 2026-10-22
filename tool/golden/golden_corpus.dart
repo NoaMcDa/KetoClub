@@ -344,6 +344,9 @@ const List<String> ruleTexts = <String>[
   "קריספי צ'יקן בלחמנייה רכה",
   'Crispy chicken burger',
   'Crispy chicken skin',
+  "המבורגר עם צ'יפס פרמזן",
+  "סלט עם פרמזן צ'יפס",
+  "עוף עם צ'יפס קישואים",
   'Pizza with cauliflower crust',
   'פיצה על בסיס כרובית',
   'Keto margherita, thin pizza',
@@ -668,6 +671,18 @@ final List<Dish> ruleDishes = <Dish>[
       DishOption(name: 'Base', values: <String>['Rice', 'Greens']),
     ],
   ),
+  // Issue #273: toppings leave fries the whole dish; a real filling
+  // still makes a bread a carrier.
+  ruleDish(
+    "צ'יפס פרמז'ן כמהין",
+    description: "קריספי צ'יפס מוקפץ בשמן כמהין פלפל שחור ופרמז'ן",
+  ),
+  ruleDish(
+    'Truffle parmesan fries',
+    description: 'Crispy fries, truffle oil and parmesan',
+  ),
+  ruleDish('Pita', description: 'Grilled chicken, garlic, parmesan'),
+  ruleDish('פיתה', description: 'פלפל קלוי ושום'),
   // Issue #274: carb-only names of the new sides and breads.
   ruleDish('Hash browns'),
   ruleDish('Onion rings'),

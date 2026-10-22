@@ -931,6 +931,25 @@
     "דק",
     "עבה"
   ],
+  "carbOnlyToppingsEn": [
+    "truffle",
+    "parmesan",
+    "garlic",
+    "rosemary",
+    "herb",
+    "herbs",
+    "paprika",
+    "cajun",
+    "salt"
+  ],
+  "carbOnlyToppingsHe": [
+    "כמהין",
+    "פרמזן",
+    "שום",
+    "רוזמרין",
+    "פפריקה",
+    "מלח"
+  ],
   "dairyGuardsEn": {
     "butter": {
       "after": [],
@@ -2689,8 +2708,6 @@
       "after": [
         "קישואים",
         "כרוב",
-        "פרמזן",
-        "גבינה",
         "קייל",
         "קטו"
       ],

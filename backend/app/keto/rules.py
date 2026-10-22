@@ -213,7 +213,23 @@ def _carb_only_qualifiers() -> frozenset[str]:
     vocab = vocabulary()
     return frozenset(
         normalise(word)
-        for word in (*vocab.carb_only_qualifiers_en, *vocab.carb_only_qualifiers_he)
+        for word in (
+            *vocab.carb_only_qualifiers_en,
+            *vocab.carb_only_qualifiers_he,
+            *vocab.carb_only_toppings_en,
+            *vocab.carb_only_toppings_he,
+        )
+    )
+
+
+@cache
+def _toppings() -> tuple[_Compiled, ...]:
+    """The toppings :func:`describes_filling` blanks out (issue #273),
+    English then Hebrew, in vocabulary order; Hebrew with the prefix."""
+    vocab = vocabulary()
+    return (
+        *_latin(vocab.carb_only_toppings_en),
+        *_hebrew(vocab.carb_only_toppings_he, honour_no_prefix=False),
     )
 
 
@@ -430,6 +446,10 @@ def describes_filling(dish: Dish) -> bool:
     text = " ".join(part for part in parts if part)
     if not text:
         return False
+    # A topping named again is not a filling (issue #273): Dart's
+    # ``replaceAll`` with each topping pattern, in order.
+    for topping in _toppings():
+        text = topping.pattern.sub(" ", text)
     protein_en, protein_he = _filling_protein()
     return (
         mentions_plant(text)

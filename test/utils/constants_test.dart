@@ -338,15 +338,27 @@ void main() {
       }
     });
 
-    test('every guard is bidirectional (before equals after)', () {
+    test("every guard but צ'יפס is bidirectional (before equals after)", () {
       // Act, Assert
       for (final entry in ketoQualifierGuardsHe.entries) {
+        if (entry.key == "צ'יפס") continue;
         expect(
           entry.value.before,
           equals(entry.value.after),
           reason: 'ketoQualifierGuardsHe["${entry.key}"] must be symmetric',
         );
       }
+    });
+
+    test("צ'יפס is rescued by a cheese only before it (issue #273)", () {
+      // Act
+      final guard = ketoQualifierGuardsHe["צ'יפס"]!;
+      // Assert: "צ'יפס פרמזן כמהין" is truffle-parmesan fries; the
+      // vegetables and קטו still rescue from either side.
+      expect(guard.before, containsAll(<String>['פרמזן', 'גבינה']));
+      expect(guard.after, isNot(contains('פרמזן')));
+      expect(guard.after, isNot(contains('גבינה')));
+      expect(guard.after, containsAll(<String>['קישואים', 'קטו']));
     });
   });
 

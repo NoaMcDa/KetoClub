@@ -958,6 +958,62 @@ void main() {
       _expectGreen(ClassificationRules.match('Crispy chicken skin'));
     });
 
+    test('truffle-parmesan fries are the carb itself, so red', () {
+      // The real hamosad dish: once bare קריספי stopped making it red, a
+      // fries dish was told to swap its chips.
+      _expectRed(
+        ClassificationRules.matchDish(
+          _dishNamed(
+            "צ'יפס פרמז'ן כמהין",
+            description: "קריספי צ'יפס מוקפץ בשמן כמהין פלפל שחור ופרמז'ן",
+          ),
+        ),
+        label: "צ'יפס",
+      );
+      _expectRed(
+        ClassificationRules.matchDish(
+          _dishNamed(
+            'Truffle parmesan fries',
+            description: 'Crispy fries, truffle oil and parmesan',
+          ),
+        ),
+        label: 'fries',
+      );
+    });
+
+    test('a topping is not a filling, but a real filling still is', () {
+      _expectYellow(
+        ClassificationRules.matchDish(
+          _dishNamed('Pita', description: 'Grilled chicken, garlic, parmesan'),
+        ),
+        [carbModifiersEn['pita']],
+      );
+      _expectYellow(
+        ClassificationRules.matchDish(
+          _dishNamed('פיתה', description: 'פלפל קלוי ושום'),
+        ),
+        [carbModifiersHe['פיתה']],
+      );
+    });
+
+    test("a cheese after צ'יפס is a topping, before it a parmesan crisp", () {
+      _expectYellow(ClassificationRules.match("המבורגר עם צ'יפס פרמזן"), [
+        carbModifiersHe['המבורגר'],
+        carbModifiersHe["צ'יפס"],
+      ]);
+      expect(ClassificationRules.match("עוף עם צ'יפס גבינה").instructions, [
+        carbModifiersHe["צ'יפס"],
+      ]);
+      _expectGreen(ClassificationRules.match("סלט עם פרמזן צ'יפס"));
+      _expectGreen(ClassificationRules.match("סלט עם גבינה צ'יפס"));
+      _expectGreen(ClassificationRules.match('Salad with parmesan chips'));
+    });
+
+    test("a vegetable still rescues צ'יפס from either side", () {
+      _expectGreen(ClassificationRules.match("עוף עם צ'יפס קישואים"));
+      _expectGreen(ClassificationRules.match("עוף עם קייל צ'יפס"));
+    });
+
     test('a crispy coating is still red, in both languages', () {
       _expectRed(ClassificationRules.match('Chicken in a crispy coating'));
       _expectRed(ClassificationRules.match('עוף בציפוי קריספי'));

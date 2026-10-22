@@ -1458,6 +1458,39 @@ const List<String> carbOnlyQualifiersHe = <String>[
   'עבה',
 ];
 
+/// Seasonings and toppings, English, that leave a starch or a bread the
+/// whole dish (issue #273): "Truffle parmesan fries" is fries. Each one
+/// is a carb-only qualifier in the name ([carbOnlyQualifiersEn]), and is
+/// not a filling when the description or an option names it again
+/// ("fries tossed in truffle oil and parmesan"), so
+/// `ClassificationRules.describesFilling` reads the text without them.
+/// Single words, compared after normalisation. `pepper` is left out:
+/// blanking it would hide `bell pepper`, a real filling.
+const List<String> carbOnlyToppingsEn = <String>[
+  'truffle',
+  'parmesan',
+  'garlic',
+  'rosemary',
+  'herb',
+  'herbs',
+  'paprika',
+  'cajun',
+  'salt',
+];
+
+/// Hebrew mirror of [carbOnlyToppingsEn]: "צ'יפס פרמז'ן כמהין". Matched
+/// with the permissive prefix, so the description's `ופרמז'ן` is a
+/// topping too. `פלפל` is left out for the reason `pepper` is: it would
+/// hide `פלפל קלוי`.
+const List<String> carbOnlyToppingsHe = <String>[
+  'כמהין',
+  'פרמזן',
+  'שום',
+  'רוזמרין',
+  'פפריקה',
+  'מלח',
+];
+
 /// First words that mark an option value as a *removal* rather than an
 /// ingredient, English (issue #192): "No onions", "Without the bun". A
 /// value beginning with one names something the dish can be ordered
@@ -1688,8 +1721,9 @@ const List<String> _sugarFreeWords = <String>[
 ];
 
 /// Builds a Hebrew guard's [GuardWords] from one word list, applied on
-/// **both** sides. Unlike the English table, no Hebrew guard is
-/// `before`-only or `after`-only: Hebrew adjectives conventionally
+/// **both** sides. Unlike the English table, Hebrew guards are
+/// bidirectional (the cheeses of [_heChipsGuard] are the one exception):
+/// Hebrew adjectives conventionally
 /// follow the noun they qualify ("פיצה כרובית", pizza cauliflower-ish,
 /// not "כרובית פיצה"), the mirror image of the English word order these
 /// guards were modelled on, so checking one side only would leave that
@@ -1739,15 +1773,16 @@ final GuardWords _hePizzaGuard = _heGuard(const [
 /// See [ketoQualifierGuardsHe] — `ריזוטו`.
 final GuardWords _heRisottoGuard = _heGuard(const ['כרובית', 'קטו']);
 
-/// See [ketoQualifierGuardsHe] — `צ'יפס`.
-final GuardWords _heChipsGuard = _heGuard(const [
-  'קישואים',
-  'כרוב',
-  'פרמזן',
-  'גבינה',
-  'קייל',
-  'קטו',
-]);
+/// See [ketoQualifierGuardsHe] — `צ'יפס`. The one Hebrew guard that is
+/// not fully bidirectional (see [_heGuard]): a vegetable or `קטו` rescues
+/// from either side ("צ'יפס קישואים", zucchini chips), but the cheeses
+/// only *before* the chips. An Israeli menu prints "צ'יפס פרמזן כמהין"
+/// for truffle-parmesan fries, so a cheese after `צ'יפס` is a topping;
+/// "פרמזן צ'יפס" before it is the parmesan crisp.
+const GuardWords _heChipsGuard = (
+  before: <String>['קישואים', 'כרוב', 'פרמזן', 'גבינה', 'קייל', 'קטו'],
+  after: <String>['קישואים', 'כרוב', 'קייל', 'קטו'],
+);
 
 /// See [ketoQualifierGuardsHe] — shared by `לחמנייה` and `לחם`.
 final GuardWords _heBreadGuard = _heGuard(const [

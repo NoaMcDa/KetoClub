@@ -1636,7 +1636,7 @@
     {
       "carbOnlyBase": null,
       "coreText": "zucchini noodles pesto parmesan",
-      "describesFilling": true,
+      "describesFilling": false,
       "dish": {
         "description": "pesto, parmesan",
         "id": "d",
@@ -1775,9 +1775,11 @@
       },
       "match": {
         "baseLabel": null,
-        "instructions": [],
+        "instructions": [
+          "אפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?"
+        ],
         "isNonKeto": false,
-        "kind": "green"
+        "kind": "yellow"
       },
       "optionRulesText": "",
       "rulesText": "מגש ציפס עמ גבינה צהובה",
@@ -1884,7 +1886,7 @@
     {
       "carbOnlyBase": null,
       "coreText": "grilled sea bream lemon herbs",
-      "describesFilling": true,
+      "describesFilling": false,
       "dish": {
         "description": "Lemon, herbs",
         "id": "d",
@@ -2131,6 +2133,102 @@
       "optionRulesText": "base rice greens",
       "rulesText": "keto bowl base rice greens",
       "searchText": "keto bowl base rice greens"
+    },
+    {
+      "carbOnlyBase": "צ'יפס",
+      "coreText": "ציפס פרמזנ כמהינ קריספי ציפס מוקפצ בשמנ כמהינ פלפל שחור ופרמזנ",
+      "describesFilling": false,
+      "dish": {
+        "description": "קריספי צ'יפס מוקפץ בשמן כמהין פלפל שחור ופרמז'ן",
+        "id": "d",
+        "imageUrl": null,
+        "name": "צ'יפס פרמז'ן כמהין",
+        "options": [],
+        "page": null,
+        "price": 10.0
+      },
+      "match": {
+        "baseLabel": "צ'יפס",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "optionRulesText": "",
+      "rulesText": "ציפס פרמזנ כמהינ קריספי ציפס מוקפצ בשמנ כמהינ פלפל שחור ופרמזנ",
+      "searchText": "ציפס פרמזנ כמהינ קריספי ציפס מוקפצ בשמנ כמהינ פלפל שחור ופרמזנ"
+    },
+    {
+      "carbOnlyBase": "fries",
+      "coreText": "truffle parmesan fries crispy fries truffle oil and parmesan",
+      "describesFilling": false,
+      "dish": {
+        "description": "Crispy fries, truffle oil and parmesan",
+        "id": "d",
+        "imageUrl": null,
+        "name": "Truffle parmesan fries",
+        "options": [],
+        "page": null,
+        "price": 10.0
+      },
+      "match": {
+        "baseLabel": "fries",
+        "instructions": [],
+        "isNonKeto": true,
+        "kind": "red"
+      },
+      "optionRulesText": "",
+      "rulesText": "truffle parmesan fries crispy fries truffle oil and parmesan",
+      "searchText": "truffle parmesan fries crispy fries truffle oil and parmesan"
+    },
+    {
+      "carbOnlyBase": "pita",
+      "coreText": "pita grilled chicken garlic parmesan",
+      "describesFilling": true,
+      "dish": {
+        "description": "Grilled chicken, garlic, parmesan",
+        "id": "d",
+        "imageUrl": null,
+        "name": "Pita",
+        "options": [],
+        "page": null,
+        "price": 10.0
+      },
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "Please serve it on a plate, without the pita."
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "optionRulesText": "",
+      "rulesText": "pita grilled chicken garlic parmesan",
+      "searchText": "pita grilled chicken garlic parmesan"
+    },
+    {
+      "carbOnlyBase": "פיתה",
+      "coreText": "פיתה פלפל קלוי ושומ",
+      "describesFilling": true,
+      "dish": {
+        "description": "פלפל קלוי ושום",
+        "id": "d",
+        "imageUrl": null,
+        "name": "פיתה",
+        "options": [],
+        "page": null,
+        "price": 10.0
+      },
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "אפשר בבקשה לקבל את זה בצלחת, בלי הפיתה?"
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "optionRulesText": "",
+      "rulesText": "פיתה פלפל קלוי ושומ",
+      "searchText": "פיתה פלפל קלוי ושומ"
     },
     {
       "carbOnlyBase": "hash browns",
@@ -8484,6 +8582,36 @@
         "kind": "green"
       },
       "text": "Crispy chicken skin"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [
+          "אפשר בבקשה את ההמבורגר בלי לחמנייה, עטוף בחסה, ובמקום הצ'יפס סלט ירוק או ביצת עין?",
+          "אפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?"
+        ],
+        "isNonKeto": false,
+        "kind": "yellow"
+      },
+      "text": "המבורגר עם צ'יפס פרמזן"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "סלט עם פרמזן צ'יפס"
+    },
+    {
+      "match": {
+        "baseLabel": null,
+        "instructions": [],
+        "isNonKeto": false,
+        "kind": "green"
+      },
+      "text": "עוף עם צ'יפס קישואים"
     },
     {
       "match": {
@@ -41948,18 +42076,22 @@
     {
       "match": {
         "baseLabel": null,
-        "instructions": [],
+        "instructions": [
+          "אפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?"
+        ],
         "isNonKeto": false,
-        "kind": "green"
+        "kind": "yellow"
       },
       "text": "סלמון על הגריל עם צ'יפס פרמזן להיום"
     },
     {
       "match": {
         "baseLabel": null,
-        "instructions": [],
+        "instructions": [
+          "אפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?"
+        ],
         "isNonKeto": false,
-        "kind": "green"
+        "kind": "yellow"
       },
       "text": "סלמון על הגריל עם צ'יפס עם פרמזן להיום"
     },
@@ -41986,18 +42118,22 @@
     {
       "match": {
         "baseLabel": null,
-        "instructions": [],
+        "instructions": [
+          "אפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?"
+        ],
         "isNonKeto": false,
-        "kind": "green"
+        "kind": "yellow"
       },
       "text": "סלמון על הגריל עם צ'יפס גבינה להיום"
     },
     {
       "match": {
         "baseLabel": null,
-        "instructions": [],
+        "instructions": [
+          "אפשר בבקשה להחליף את הצ'יפס בסלט ירוק או בביצת עין?"
+        ],
         "isNonKeto": false,
-        "kind": "green"
+        "kind": "yellow"
       },
       "text": "סלמון על הגריל עם צ'יפס עם גבינה להיום"
     },
