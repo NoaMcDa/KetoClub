@@ -5,16 +5,23 @@ import 'package:ketoclub/l10n/generated/app_localizations.dart';
 /// `MenuController.visibleRows` by a dish's name and description as the
 /// user types, combined with whatever verdict filter is already active.
 ///
-/// Owns its own [TextEditingController] rather than taking the current
-/// text as a constructor parameter — nothing above this widget needs the
-/// raw text, only the normalised match `MenuController.setQuery` already
-/// does through [onChanged] — so a rebuild of the screen around it (a new
-/// filter, a pulled-to-refresh menu) never resets what the user is
-/// mid-typing or moves the cursor.
+/// The text lives in `MenuController.query`, passed in as [query] (issue
+/// #286): the field sits in a lazy list, so scrolling it far out of view,
+/// or the window crossing the menu's two-pane width, builds it afresh,
+/// and a field that kept the text only in its own state came back empty
+/// while the query still filtered the dishes. Its [TextEditingController]
+/// starts from [query] and follows it only when [query] changes to
+/// something other than what the field already reads — cleared from
+/// elsewhere, say — so a rebuild while the user types (every keystroke
+/// sets the query, which rebuilds the screen) never resets the text or
+/// moves the cursor.
 class MenuSearchField extends StatefulWidget {
-  /// Creates a search field that reports every change, including the
-  /// clear button's tap, through [onChanged].
-  const new({required this.onChanged, super.key});
+  /// Creates a search field showing [query] that reports every change,
+  /// including the clear button's tap, through [onChanged].
+  const new({required this.onChanged, this.query = '', super.key});
+
+  /// The search text the field shows: `MenuController.query`.
+  final String query;
 
   /// Called with the field's current text on every change. Called with
   /// `''` when the clear button is tapped, even if the field already read
@@ -26,7 +33,19 @@ class MenuSearchField extends StatefulWidget {
 }
 
 class _MenuSearchFieldState extends State<MenuSearchField> {
-  final TextEditingController _controller = TextEditingController();
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.query,
+  );
+
+  @override
+  void didUpdateWidget(MenuSearchField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.query == _controller.text) return;
+    _controller.value = TextEditingValue(
+      text: widget.query,
+      selection: TextSelection.collapsed(offset: widget.query.length),
+    );
+  }
 
   @override
   void dispose() {

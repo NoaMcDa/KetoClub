@@ -481,6 +481,47 @@ void main() {
       },
     );
 
+    testWidgets('a screen reader can press Keep and Remove: each node '
+        'carries the tap (issue #285)', (tester) async {
+      // Arrange
+      final semantics = tester.ensureSemantics();
+      final h = _Harness()
+        ..open(
+          CachedMenu(
+            menu: _menuWith(_woltRef, DateTime.now(), venueName: 'Vitrina'),
+          ),
+        );
+      await _pump(tester, h.controller);
+      await tester.pumpAndSettle();
+      final keep = find.semantics.byLabel(
+        _en.savedKeepSemanticLabel('Vitrina'),
+      );
+      final remove = find.semantics.byLabel(
+        _en.savedRemoveSemanticLabel('Vitrina'),
+      );
+      for (final node in [keep, remove]) {
+        expect(
+          node.evaluate().single.getSemanticsData().hasAction(
+            SemanticsAction.tap,
+          ),
+          isTrue,
+        );
+      }
+
+      // Act: a screen reader's double-tap on Keep, then on Remove.
+      tester.semantics.tap(keep);
+      await tester.pumpAndSettle();
+      tester.semantics.tap(
+        find.semantics.byLabel(_en.savedRemoveSemanticLabel('Vitrina')),
+      );
+      await tester.pump();
+
+      // Assert
+      expect(h.repository.pinCalls.single, (ref: _woltRef, pinned: true));
+      expect(h.controller.entries, isEmpty);
+      semantics.dispose();
+    });
+
     testWidgets('removing via the trailing action hides the row, shows an '
         'undo SnackBar, and undo restores it without touching the '
         'repository', (tester) async {

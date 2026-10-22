@@ -1230,6 +1230,9 @@ class _NoteRow extends StatelessWidget {
     return Semantics(
       button: true,
       label: l10n.dishCardEditNoteSemanticLabel(note),
+      // The InkWell's tap is excluded with its children, so the node
+      // carries it (issue #285).
+      onTap: onTap,
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,

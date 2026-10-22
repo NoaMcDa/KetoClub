@@ -17,6 +17,7 @@ import 'package:ketoclub/screens/venue_search_screen.dart';
 import 'package:ketoclub/services/storage/settings_store.dart';
 import 'package:ketoclub/state/app_dependencies.dart';
 import 'package:ketoclub/state/scan_controller.dart';
+import 'package:ketoclub/state/settings_controller.dart';
 import 'package:ketoclub/state/venue_search_controller.dart';
 import 'package:ketoclub/utils/constants.dart';
 import 'package:ketoclub/utils/venue_route.dart';
@@ -253,6 +254,80 @@ void main() {
       final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
       expect(bar.selectedIndex, equals(AppShell.settingsIndex));
     });
+  });
+
+  group('state across the 840px breakpoint (issue #287)', () {
+    /// Sizes the window to [width] logical pixels, restored at the end.
+    void setWidth(WidgetTester tester, double width) {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = Size(width, 900);
+      addTearDown(tester.view.reset);
+    }
+
+    for (final (from, to) in <(double, double)>[(600, 1000), (1000, 600)]) {
+      testWidgets('the Scan tab keeps its pages and pasted text from '
+          '${from.toInt()}px to ${to.toInt()}px', (tester) async {
+        // Arrange: a page photographed and text pasted on the Scan tab.
+        setWidth(tester, from);
+        final fakes = FakeAppDependencies();
+        await tester.pumpWidget(KetoClubApp(dependencies: fakes.dependencies));
+        await tester.pumpAndSettle();
+        tester
+            .state<NavigatorState>(find.byType(Navigator).first)
+            .pushNamed(scanRoutePath);
+        await tester.pumpAndSettle();
+        ScanController scan() => Provider.of<ScanController>(
+          tester.element(find.byType(ScanScreen)),
+          listen: false,
+        );
+        final before = scan();
+        final page = ScannedPage(
+          mimeType: ScannedPage.jpeg,
+          bytes: Uint8List.fromList(<int>[1, 2, 3]),
+        );
+        before
+          ..addPages(<ScannedPage>[page])
+          ..text = 'Grilled salmon';
+        await tester.pumpAndSettle();
+
+        // Act: an iPad rotates, or a browser window is resized.
+        setWidth(tester, to);
+        await tester.pumpAndSettle();
+
+        // Assert: the same controller, its page and its text.
+        expect(scan(), same(before));
+        expect(scan().pages, <ScannedPage>[page]);
+        expect(scan().text, 'Grilled salmon');
+      });
+
+      testWidgets('the Settings tab keeps its controller and screen state '
+          'from ${from.toInt()}px to ${to.toInt()}px', (tester) async {
+        // Arrange
+        setWidth(tester, from);
+        await tester.pumpWidget(
+          KetoClubApp(dependencies: FakeAppDependencies().dependencies),
+        );
+        await tester.pumpAndSettle();
+        tester
+            .state<NavigatorState>(find.byType(Navigator).first)
+            .pushReplacementNamed(settingsRoutePath);
+        await tester.pumpAndSettle();
+        SettingsController settings() => Provider.of<SettingsController>(
+          tester.element(find.byType(SettingsScreen)),
+          listen: false,
+        );
+        final controller = settings();
+        final state = tester.state(find.byType(SettingsScreen));
+
+        // Act
+        setWidth(tester, to);
+        await tester.pumpAndSettle();
+
+        // Assert
+        expect(settings(), same(controller));
+        expect(tester.state(find.byType(SettingsScreen)), same(state));
+      });
+    }
   });
 
   group('route stack (issue #262, audit G8)', () {

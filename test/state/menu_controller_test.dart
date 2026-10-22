@@ -465,48 +465,42 @@ void main() {
       });
     });
 
-    test(
-      'visibleRows under all adds unclassified and red dishes alike — '
-      'issue #29 draws no distinction between verdicts under "all"',
-      () async {
-        // Arrange
-        final green = _dish('Steak', id: 'green');
-        final red = _dish('Pasta', id: 'red');
-        final unclassified = _dish('Mystery', id: 'unclassified');
-        final menu = _menuOf([green, red, unclassified]);
-        repository.stub(_ref, MenuFetched(menu: menu));
-        classifier.respondWith(
-          MenuAnalysed(
-            dishes: [
-              _verdictFor(green, DishVerdict.orderAsIs),
-              _verdictFor(red, DishVerdict.nonKeto),
-            ],
-            unclassified: const <String>['Mystery'],
-            engine: const RulesEngine(
-              reason: MenuAnalysisFailureReason.notConfigured,
-            ),
-            analysedAt: clock.now(),
+    test('visibleRows under all adds red dishes like any other — issue #29 '
+        'draws no distinction between verdicts — and leaves an unclassified '
+        'one to unclassifiedRows, so it is listed once (issue #286)', () async {
+      // Arrange
+      final green = _dish('Steak', id: 'green');
+      final red = _dish('Pasta', id: 'red');
+      final unclassified = _dish('Mystery', id: 'unclassified');
+      final menu = _menuOf([green, red, unclassified]);
+      repository.stub(_ref, MenuFetched(menu: menu));
+      classifier.respondWith(
+        MenuAnalysed(
+          dishes: [
+            _verdictFor(green, DishVerdict.orderAsIs),
+            _verdictFor(red, DishVerdict.nonKeto),
+          ],
+          unclassified: const <String>['Mystery'],
+          engine: const RulesEngine(
+            reason: MenuAnalysisFailureReason.notConfigured,
           ),
-        );
-        await controller.open(_ref);
+          analysedAt: clock.now(),
+        ),
+      );
+      await controller.open(_ref);
 
-        // Act
-        await controller.setFilter(MenuFilter.all);
+      // Act
+      await controller.setFilter(MenuFilter.all);
 
-        // Assert
-        expect(controller.visibleRows.map((row) => row.dish.id).toSet(), {
-          'green',
-          'red',
-          'unclassified',
-        });
-        expect(
-          controller.visibleRows
-              .firstWhere((row) => row.dish.id == 'unclassified')
-              .analysis,
-          isNull,
-        );
-      },
-    );
+      // Assert
+      expect(controller.visibleRows.map((row) => row.dish.id).toList(), [
+        'green',
+        'red',
+      ]);
+      expect(controller.unclassifiedRows.map((row) => row.dish.id).toList(), [
+        'unclassified',
+      ]);
+    });
 
     test('unclassifiedNames lists a dish analysis skipped with a null '
         'DishRow analysis', () async {
@@ -528,11 +522,13 @@ void main() {
       await controller.setFilter(MenuFilter.all);
 
       // Act
-      final rows = controller.visibleRows;
+      final rows = controller.unclassifiedRows;
 
-      // Assert
+      // Assert: listed there, and only there (issue #286).
       expect(controller.unclassifiedNames, ['Mystery']);
+      expect(rows.single.dish, same(seen));
       expect(rows.single.analysis, isNull);
+      expect(controller.visibleRows, isEmpty);
     });
 
     test('unclassifiedRows resolves names to menu dishes, one each, and '
