@@ -276,6 +276,7 @@ class LatinPatternExample:
 
     trigger: str
     pattern: str
+    with_plural: str
     case_sensitive: bool
     unicode: bool
 
@@ -307,6 +308,8 @@ class Vocabulary:
     trigger_suppresses: Mapping[str, tuple[str, ...]]
     keto_qualifier_guards_en: Mapping[str, GuardWords]
     keto_qualifier_guards_he: Mapping[str, GuardWords]
+    keto_substitute_name_words_en: Mapping[str, tuple[str, ...]]
+    keto_substitute_name_words_he: Mapping[str, tuple[str, ...]]
     dairy_guards_en: Mapping[str, GuardWords]
     dairy_guards_he: Mapping[str, GuardWords]
     option_removal_words_en: tuple[str, ...]
@@ -383,6 +386,12 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
         trigger_suppresses=_strs_map(root["triggerSuppresses"], "triggerSuppresses"),
         keto_qualifier_guards_en=_guards(root["ketoQualifierGuardsEn"], "kqgEn"),
         keto_qualifier_guards_he=_guards(root["ketoQualifierGuardsHe"], "kqgHe"),
+        keto_substitute_name_words_en=_strs_map(
+            root["ketoSubstituteNameWordsEn"], "ketoSubstituteNameWordsEn"
+        ),
+        keto_substitute_name_words_he=_strs_map(
+            root["ketoSubstituteNameWordsHe"], "ketoSubstituteNameWordsHe"
+        ),
         dairy_guards_en=_guards(root["dairyGuardsEn"], "dairyGuardsEn"),
         dairy_guards_he=_guards(root["dairyGuardsHe"], "dairyGuardsHe"),
         option_removal_words_en=strs("optionRemovalWordsEn"),
@@ -397,6 +406,7 @@ def parse_vocabulary(raw: Any) -> Vocabulary:
         latin_trigger_pattern_example=LatinPatternExample(
             trigger=_str(latin_example["trigger"], "trigger"),
             pattern=_str(latin_example["pattern"], "pattern"),
+            with_plural=_str(latin_example["withPlural"], "withPlural"),
             case_sensitive=_bool(latin_example["caseSensitive"], "caseSensitive"),
             unicode=_bool(latin_example["unicode"], "unicode"),
         ),

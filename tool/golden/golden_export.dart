@@ -354,6 +354,8 @@ Map<String, Object?> _vocabulary() {
     'triggerSuppresses': triggerSuppresses,
     'ketoQualifierGuardsEn': _guards(ketoQualifierGuardsEn),
     'ketoQualifierGuardsHe': _guards(ketoQualifierGuardsHe),
+    'ketoSubstituteNameWordsEn': ketoSubstituteNameWordsEn,
+    'ketoSubstituteNameWordsHe': ketoSubstituteNameWordsHe,
     'dairyGuardsEn': _guards(dairyGuardsEn),
     'dairyGuardsHe': _guards(dairyGuardsHe),
     'optionRemovalWordsEn': optionRemovalWordsEn,
@@ -374,6 +376,10 @@ Map<String, Object?> _vocabulary() {
     'latinTriggerPatternExample': <String, Object?>{
       'trigger': 'sweet potato',
       'pattern': latinTriggerPattern('sweet potato').pattern,
+      'withPlural': latinTriggerPattern(
+        'sweet potato',
+        allowPlural: true,
+      ).pattern,
       'caseSensitive': latinTriggerPattern('x').isCaseSensitive,
       'unicode': latinTriggerPattern('x').isUnicode,
     },

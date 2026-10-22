@@ -21,7 +21,12 @@ Behaviour the port keeps from Dart:
 * **Guards** (D-V1) look at the up-to-two words before a match and the
   up-to-two words after it, and test each normalised guard phrase against
   that window with space padding on both sides, so a two-word phrase must be
-  literally adjacent.
+  literally adjacent. A match is also cancelled when the normalised dish
+  *name* (the whole text for :func:`match` and :func:`carb_only_base`)
+  holds one of its ``ketoSubstituteNameWords*`` phrases anywhere, tested
+  the same way (issue #273); the description is never read for those.
+* **English bases match their regular plural** (``s``/``es``, issue #274)
+  under their own key, so the singular's guard and label apply.
 * **Suppression** removes every occurrence whose key a fired, more specific
   trigger suppresses; the surviving sentences are deduplicated in first
   occurrence order, after a sort by match start.
@@ -115,8 +120,11 @@ class RuleMatch:
 # --- compiled tables ------------------------------------------------------------
 
 
-def _latin(keys: Sequence[str]) -> tuple[_Compiled, ...]:
-    return tuple(_Compiled(key, latin_trigger_pattern(normalise(key))) for key in keys)
+def _latin(keys: Sequence[str], *, allow_plural: bool = False) -> tuple[_Compiled, ...]:
+    return tuple(
+        _Compiled(key, latin_trigger_pattern(normalise(key), allow_plural=allow_plural))
+        for key in keys
+    )
 
 
 def _hebrew(keys: Sequence[str], *, honour_no_prefix: bool) -> tuple[_Compiled, ...]:
@@ -134,7 +142,8 @@ def _hebrew(keys: Sequence[str], *, honour_no_prefix: bool) -> tuple[_Compiled, 
 
 @cache
 def _bases_en() -> tuple[_Compiled, ...]:
-    return _latin(vocabulary().non_keto_bases_en)
+    # Every English base also matches its regular plural (issue #274).
+    return _latin(vocabulary().non_keto_bases_en, allow_plural=True)
 
 
 @cache
@@ -243,6 +252,34 @@ def _is_guarded(haystack: str, start: int, end: int, guard: GuardWords | None) -
     return False
 
 
+def _is_name_guarded(name: str, key: str) -> bool:
+    """Whether the normalised dish ``name`` holds, as whole words, a
+    keto-substitute phrase ``ketoSubstituteNameWords*`` lists for ``key``
+    (issue #273): the guard that reaches across the whole name."""
+    vocab = vocabulary()
+    phrases = vocab.keto_substitute_name_words_en.get(key)
+    if phrases is None:
+        phrases = vocab.keto_substitute_name_words_he.get(key)
+    if phrases is None or not name:
+        return False
+    return _window_contains_any_phrase([name], phrases)
+
+
+def _is_cancelled(
+    haystack: str,
+    name: str,
+    start: int,
+    end: int,
+    key: str,
+    guards: Mapping[str, GuardWords],
+) -> bool:
+    """The two-word-window guard (D-V1), or a keto substitute anywhere in
+    the dish name (issue #273)."""
+    return _is_guarded(haystack, start, end, guards.get(key)) or _is_name_guarded(
+        name, key
+    )
+
+
 def is_guarded(haystack: str, start: int, end: int, guard: GuardWords | None) -> bool:
     """``ClassificationRules.isGuarded``: whether ``guard`` cancels the match
     spanning ``start``-``end`` (code-point offsets, ``end`` exclusive) in the
@@ -254,9 +291,10 @@ def is_guarded(haystack: str, start: int, end: int, guard: GuardWords | None) ->
 # --- scans ----------------------------------------------------------------------
 
 
-def _first_unguarded_base_match(haystack: str) -> tuple[int, str] | None:
+def _first_unguarded_base_match(haystack: str, *, name: str) -> tuple[int, str] | None:
     """The earliest unguarded non-keto base in ``haystack`` as ``(start,
-    label)``; at one start, the first table entry found wins."""
+    label)``; at one start, the first table entry found wins. ``name`` is
+    the normalised dish name the name-wide substitute guard reads."""
     vocab = vocabulary()
     best: tuple[int, str] | None = None
     for table, guards, labels in (
@@ -265,8 +303,8 @@ def _first_unguarded_base_match(haystack: str) -> tuple[int, str] | None:
     ):
         for entry in table:
             for found in entry.pattern.finditer(haystack):
-                if _is_guarded(
-                    haystack, found.start(), found.end(), guards.get(entry.key)
+                if _is_cancelled(
+                    haystack, name, found.start(), found.end(), entry.key, guards
                 ):
                     continue
                 if best is None or found.start() < best[0]:
@@ -288,7 +326,7 @@ def _any_unguarded_match(
     return False
 
 
-def _unguarded_modifier_occurrences(haystack: str) -> list[_Occurrence]:
+def _unguarded_modifier_occurrences(haystack: str, *, name: str) -> list[_Occurrence]:
     vocab = vocabulary()
     occurrences: list[_Occurrence] = []
     for table, guards in (
@@ -297,8 +335,8 @@ def _unguarded_modifier_occurrences(haystack: str) -> list[_Occurrence]:
     ):
         for entry in table:
             for found in entry.pattern.finditer(haystack):
-                if _is_guarded(
-                    haystack, found.start(), found.end(), guards.get(entry.key)
+                if _is_cancelled(
+                    haystack, name, found.start(), found.end(), entry.key, guards
                 ):
                     continue
                 occurrences.append(
@@ -330,10 +368,10 @@ def match(raw_text: str) -> RuleMatch:
     the unguarded, unsuppressed carb modifiers' sentences, deduplicated.
     """
     haystack = normalise(raw_text)
-    base = _first_unguarded_base_match(haystack)
+    base = _first_unguarded_base_match(haystack, name=haystack)
     if base is not None:
         return RuleMatch(is_non_keto=True, base_label=base[1])
-    occurrences = _unguarded_modifier_occurrences(haystack)
+    occurrences = _unguarded_modifier_occurrences(haystack, name=haystack)
     return RuleMatch(
         is_non_keto=False,
         instructions=tuple(_sentences_after_suppression(occurrences)),
@@ -355,14 +393,15 @@ def match_dish(dish: Dish) -> RuleMatch:
     if carb_only is not None and not describes_filling(dish):
         return RuleMatch(is_non_keto=True, base_label=carb_only)
 
-    base = _first_unguarded_base_match(dish_core_text(dish))
+    name = normalise(dish.name)
+    base = _first_unguarded_base_match(dish_core_text(dish), name=name)
     if base is not None:
         return RuleMatch(is_non_keto=True, base_label=base[1])
 
     sentences = _sentences_after_suppression(
-        _unguarded_modifier_occurrences(dish_rules_text(dish))
+        _unguarded_modifier_occurrences(dish_rules_text(dish), name=name)
     )
-    option_base = _first_unguarded_base_match(dish_option_rules_text(dish))
+    option_base = _first_unguarded_base_match(dish_option_rules_text(dish), name=name)
     if option_base is not None:
         label = option_base[1]
         templates = vocabulary().templates
@@ -412,7 +451,7 @@ def carb_only_base(name: str) -> str | None:
     haystack = normalise(name)
     if not haystack:
         return None
-    occurrences = _unguarded_modifier_occurrences(haystack)
+    occurrences = _unguarded_modifier_occurrences(haystack, name=haystack)
     if not occurrences:
         return None
     eligible = vocabulary().carb_only_eligible_triggers

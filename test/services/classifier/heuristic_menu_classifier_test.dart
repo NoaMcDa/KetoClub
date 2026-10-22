@@ -282,11 +282,12 @@ void main() {
 
     test('classify given a mixed-script menu gives each dish its own '
         'language', () async {
-      // Arrange
+      // Arrange: the name alone, with no description to lean on — the
+      // construct form `עוגת` is what must make it red (issue #274).
       const hebrewDish = Dish(
         id: 'dish-cake-he',
         name: 'עוגת שוקולד',
-        description: 'עוגה עם שוקולד',
+        description: '',
         price: 32,
         options: [],
       );
@@ -607,11 +608,8 @@ void main() {
 
     test('a yellow dish keeps its carb sentence and the carb why, and gains '
         'the rule sentence after it', () async {
-      // Act
-      final analysed = await classifyOne(
-        'Fried chicken with rice',
-        seedOilOnly,
-      );
+      // Act: not "fried chicken", which is red since issue #274.
+      final analysed = await classifyOne('Fried fish with rice', seedOilOnly);
 
       // Assert
       expect(analysed.verdict, DishVerdict.modifiable);
@@ -890,6 +888,108 @@ void main() {
         expect(dish.modification, plain.dishes[index].modification);
       }
       expect(result.options?.restrictionsRequested, isTrue);
+    });
+  });
+
+  group('HeuristicMenuClassifier — rule engine verdicts (issues #273, '
+      '#274)', () {
+    /// One dish per name in [names], with no description, classified
+    /// together; returns the verdict of each.
+    Future<Map<String, DishVerdict>> verdicts(Iterable<String> names) async {
+      final dishes = [
+        for (final (index, name) in names.indexed)
+          Dish(
+            id: 'dish-$index',
+            name: name,
+            description: '',
+            price: 40,
+            options: const [],
+          ),
+      ];
+      final result = await _classify(_menuOf(dishes));
+      final byId = {for (final dish in result.dishes) dish.dishId: dish};
+      return {
+        for (final (index, name) in names.indexed)
+          name: byId['dish-$index']!.verdict,
+      };
+    }
+
+    test('the false reds of issue #273 are no longer red', () async {
+      // Arrange
+      const expected = <String, DishVerdict>{
+        'Grilled salmon, olive oil, lemon juice': DishVerdict.orderAsIs,
+        'דג עם מיץ לימון': DishVerdict.orderAsIs,
+        'סלמון עם עור קריספי': DishVerdict.orderAsIs,
+        'בייקון קריספי': DishVerdict.orderAsIs,
+        'Pizza with cauliflower crust': DishVerdict.orderAsIs,
+        'פיצה על בסיס כרובית': DishVerdict.orderAsIs,
+        'Zucchini pasta': DishVerdict.orderAsIs,
+        'Shirataki pasta': DishVerdict.orderAsIs,
+        'פסטת קישואים': DishVerdict.orderAsIs,
+        'גבינה מחלבה': DishVerdict.orderAsIs,
+        'מרק שמוגש בלילה': DishVerdict.orderAsIs,
+        'Beer-braised short rib': DishVerdict.orderAsIs,
+        'צלע בקר מבושלת בבירה': DishVerdict.orderAsIs,
+        'Port wine reduction': DishVerdict.modifiable,
+        'חזה ברווז ברוטב יין פורט': DishVerdict.modifiable,
+        'Corn-fed chicken': DishVerdict.orderAsIs,
+        'עוף מוזן תירס': DishVerdict.orderAsIs,
+        'Salad with rice vinegar dressing': DishVerdict.orderAsIs,
+        'סלט ברוטב חומץ אורז': DishVerdict.orderAsIs,
+      };
+
+      // Act
+      final actual = await verdicts(expected.keys);
+
+      // Assert
+      expect(actual, expected);
+    });
+
+    test('the false greens of issue #274 are no longer green', () async {
+      // Arrange
+      const expected = <String, DishVerdict>{
+        'Dumplings': DishVerdict.nonKeto,
+        'Cheesecake': DishVerdict.nonKeto,
+        'Cupcake': DishVerdict.nonKeto,
+        'Tacos': DishVerdict.nonKeto,
+        'Burritos': DishVerdict.nonKeto,
+        'Croissants': DishVerdict.nonKeto,
+        'Bagels': DishVerdict.nonKeto,
+        'Donuts': DishVerdict.nonKeto,
+        'Brownies': DishVerdict.nonKeto,
+        'Cookies': DishVerdict.nonKeto,
+        'Crepes': DishVerdict.nonKeto,
+        'Empanadas': DishVerdict.nonKeto,
+        'Croquettes': DishVerdict.nonKeto,
+        'עוגת שוקולד': DishVerdict.nonKeto,
+        'עוגת גבינה': DishVerdict.nonKeto,
+        "עוגיית שוקולד צ'יפס": DishVerdict.nonKeto,
+        'פיתות': DishVerdict.nonKeto,
+        'טורטיות': DishVerdict.nonKeto,
+        'Lentil soup': DishVerdict.nonKeto,
+        'Turkey with cranberry sauce': DishVerdict.modifiable,
+        'Hash browns': DishVerdict.nonKeto,
+        'Eggs with hash browns': DishVerdict.modifiable,
+        'Onion rings': DishVerdict.nonKeto,
+        'Nachos': DishVerdict.nonKeto,
+        'Lamb flatbread': DishVerdict.modifiable,
+        'Garlic naan': DishVerdict.modifiable,
+        'Salmon sushi': DishVerdict.nonKeto,
+        'Salmon nigiri': DishVerdict.nonKeto,
+        'סושי סלמון': DishVerdict.nonKeto,
+        'Tiramisu': DishVerdict.nonKeto,
+        'Crème brûlée': DishVerdict.nonKeto,
+        'Fried chicken': DishVerdict.nonKeto,
+        'Popcorn chicken': DishVerdict.nonKeto,
+        'French toast': DishVerdict.nonKeto,
+        "Fish 'n' Chips": DishVerdict.nonKeto,
+      };
+
+      // Act
+      final actual = await verdicts(expected.keys);
+
+      // Assert
+      expect(actual, expected);
     });
   });
 }

@@ -35,20 +35,35 @@ typedef _Occurrence = ({int start, int end, String key, String sentence});
 /// The entries where the permissive prefix lookbehind is unsafe: folded
 /// `חלה` also spells "began" (a common verb form), and `שמרים` with a מ
 /// prefix is `משמרים` ("preservatives", as in "ללא חומרים משמרים"), and
-/// `הפוך` collides with "to flip/reverse" (e.g. `להפוך`), so all three
-/// are compiled with no permissive prefix — see
-/// [hebrewTriggerPattern]'s `allowPrefix`. Applied to both
-/// [_compileBasesHe] and [_compileCarbHe].
-const Set<String> _noPrefixHebrewTriggers = <String>{'חלה', 'שמרים', 'הפוך'};
+/// `הפוך` collides with "to flip/reverse" (e.g. `להפוך`), and `חלבה`
+/// with a מ prefix is `מחלבה` ("dairy", issue #273), so all of them are
+/// compiled with no permissive prefix — see [hebrewTriggerPattern]'s
+/// `allowPrefix`. `חלבה`'s two commonest particles (`וחלבה`, `בחלבה`)
+/// are entries of their own, also prefix-free; `החלבה` deliberately is
+/// not, so the golden exporter's ה-prefix probe still finds `חלבה`
+/// prefix-free. Applied to both [_compileBasesHe] and [_compileCarbHe].
+const Set<String> _noPrefixHebrewTriggers = <String>{
+  'חלה',
+  'שמרים',
+  'הפוך',
+  'חלבה',
+  'וחלבה',
+  'בחלבה',
+};
 
 /// Compiles [nonKetoBasesEn], normalising each key at compile time so a
 /// human-readable, correctly-spelled `constants.dart` still matches
-/// normalised dish text.
+/// normalised dish text. Each base also matches its regular `s`/`es`
+/// plural (issue #274) under its own key, so the singular's guard and
+/// label apply to "dumplings" and "zucchini noodles" alike.
 List<_CompiledBase> _compileBasesEn() => nonKetoBasesEn
     .map(
       (key) => (
         key: key,
-        pattern: latinTriggerPattern(TextNormaliser.normalise(key)),
+        pattern: latinTriggerPattern(
+          TextNormaliser.normalise(key),
+          allowPlural: true,
+        ),
       ),
     )
     .toList(growable: false);
@@ -213,13 +228,40 @@ bool _isGuarded(String haystack, int start, int end, GuardWords? guard) {
   return false;
 }
 
+/// True when the normalised dish [name] contains, as whole words, one of
+/// the keto-substitute phrases [ketoSubstituteNameWordsEn] or
+/// [ketoSubstituteNameWordsHe] list for [key] (issue #273): the guard
+/// that reaches past the two-word window, across the whole name.
+bool _isNameGuarded(String name, String key) {
+  final phrases =
+      ketoSubstituteNameWordsEn[key] ?? ketoSubstituteNameWordsHe[key];
+  if (phrases == null || name.isEmpty) return false;
+  return _windowContainsAnyPhrase(<String>[name], phrases);
+}
+
+/// Whether the match of [key] spanning [start]-[end] in [haystack] is
+/// cancelled: by its two-word-window guard in [guards] (D-V1), or by a
+/// keto substitute named anywhere in the dish [name] (issue #273).
+bool _isCancelled(
+  String haystack,
+  String name,
+  int start,
+  int end,
+  String key,
+  Map<String, GuardWords> guards,
+) => _isGuarded(haystack, start, end, guards[key]) || _isNameGuarded(name, key);
+
 /// The earliest-occurring, unguarded non-keto-base match in [haystack]
-/// across both language tables, or null when none survives.
+/// across both language tables, or null when none survives. [name] is
+/// the normalised dish name the name-wide substitute guard reads.
 ///
 /// "Earliest-occurring" (smallest match-start offset) is this file's own
 /// tie-break for when more than one base matches one dish — the spec
 /// does not name one, since [RuleMatch.baseLabel] holds a single label.
-({int start, String label})? _firstUnguardedBaseMatch(String haystack) {
+({int start, String label})? _firstUnguardedBaseMatch(
+  String haystack, {
+  required String name,
+}) {
   ({int start, String label})? best;
   void scan(
     List<_CompiledBase> table,
@@ -228,7 +270,14 @@ bool _isGuarded(String haystack, int start, int end, GuardWords? guard) {
   ) {
     for (final entry in table) {
       for (final match in entry.pattern.allMatches(haystack)) {
-        if (_isGuarded(haystack, match.start, match.end, guards[entry.key])) {
+        if (_isCancelled(
+          haystack,
+          name,
+          match.start,
+          match.end,
+          entry.key,
+          guards,
+        )) {
           continue;
         }
         final current = best;
@@ -263,13 +312,24 @@ bool _anyUnguardedMatch(
 }
 
 /// Every unguarded carb-modifier occurrence in [haystack], across both
-/// language tables, in match-start order.
-List<_Occurrence> _unguardedModifierOccurrences(String haystack) {
+/// language tables, in match-start order. [name] is the normalised dish
+/// name, as for [_firstUnguardedBaseMatch].
+List<_Occurrence> _unguardedModifierOccurrences(
+  String haystack, {
+  required String name,
+}) {
   final occurrences = <_Occurrence>[];
   void scan(List<_CompiledModifier> table, Map<String, GuardWords> guards) {
     for (final entry in table) {
       for (final match in entry.pattern.allMatches(haystack)) {
-        if (_isGuarded(haystack, match.start, match.end, guards[entry.key])) {
+        if (_isCancelled(
+          haystack,
+          name,
+          match.start,
+          match.end,
+          entry.key,
+          guards,
+        )) {
           continue;
         }
         occurrences.add((
@@ -531,11 +591,13 @@ abstract final class ClassificationRules {
   /// Order: keto-substitute guards (D-V1) cancel matches first; then a
   /// surviving non-keto base makes the dish red with no instructions;
   /// then carb-modifier matches (after suppression, §"triggerSuppresses")
-  /// make it yellow with their deduplicated sentences.
+  /// make it yellow with their deduplicated sentences. The whole of
+  /// [rawText] is read as the dish name for the name-wide substitute
+  /// guard (issue #273).
   static RuleMatch match(String rawText) {
     final haystack = TextNormaliser.normalise(rawText);
 
-    final base = _firstUnguardedBaseMatch(haystack);
+    final base = _firstUnguardedBaseMatch(haystack, name: haystack);
     if (base != null) {
       return RuleMatch(
         isNonKeto: true,
@@ -544,7 +606,7 @@ abstract final class ClassificationRules {
       );
     }
 
-    final occurrences = _unguardedModifierOccurrences(haystack);
+    final occurrences = _unguardedModifierOccurrences(haystack, name: haystack);
     return RuleMatch(
       isNonKeto: false,
       instructions: _sentencesAfterSuppression(occurrences),
@@ -568,6 +630,11 @@ abstract final class ClassificationRules {
   ///    ("ללא אלף האיים"), so a burger is not told to swap a dressing it
   ///    only ever had the option to leave off.
   ///
+  /// Steps 2 and 3, and the option scan, also apply the name-wide
+  /// substitute guard (issue #273) with the dish's own name: "Pizza with
+  /// cauliflower crust" is not red, and a name with `keto` in it rescues
+  /// the description's `rice` too.
+  ///
   /// [match] stays for callers with only a string; the heuristic
   /// classifier uses this. Never throws.
   static RuleMatch matchDish(Dish dish) {
@@ -580,7 +647,11 @@ abstract final class ClassificationRules {
       );
     }
 
-    final base = _firstUnguardedBaseMatch(TextNormaliser.dishCoreText(dish));
+    final name = TextNormaliser.normalise(dish.name);
+    final base = _firstUnguardedBaseMatch(
+      TextNormaliser.dishCoreText(dish),
+      name: name,
+    );
     if (base != null) {
       return RuleMatch(
         isNonKeto: true,
@@ -591,6 +662,7 @@ abstract final class ClassificationRules {
 
     final occurrences = _unguardedModifierOccurrences(
       TextNormaliser.dishRulesText(dish),
+      name: name,
     );
     final sentences = _sentencesAfterSuppression(occurrences);
 
@@ -599,6 +671,7 @@ abstract final class ClassificationRules {
     // dish: yellow, with the ask to pick the other option, first.
     final optionBase = _firstUnguardedBaseMatch(
       TextNormaliser.dishOptionRulesText(dish),
+      name: name,
     );
     if (optionBase != null) {
       final template = TextNormaliser.containsHebrew(optionBase.label)
@@ -656,7 +729,7 @@ abstract final class ClassificationRules {
   static String? carbOnlyBase(String name) {
     final haystack = TextNormaliser.normalise(name);
     if (haystack.isEmpty) return null;
-    final occurrences = _unguardedModifierOccurrences(haystack);
+    final occurrences = _unguardedModifierOccurrences(haystack, name: haystack);
     if (occurrences.isEmpty) return null;
     // Only a starch or a bread can be the whole dish; a sauce, a dressing
     // or a root vegetable in the name means this rule does not apply, and
